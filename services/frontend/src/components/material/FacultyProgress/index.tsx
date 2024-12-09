@@ -1,11 +1,11 @@
 import { Stack } from '@mui/material'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { calculateStats, sortProgrammeKeys } from '@/components/FacultyStatistics/facultyHelpers'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
 import { Section } from '@/components/material/Section'
-import { GetAllProgressStatsResponse } from '@/shared/types/api/faculty'
+import { GetAllProgressStatsResponse } from '@/types/api/faculty'
+import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
 
 export const FacultyProgress = ({
   faculty,
@@ -33,7 +33,7 @@ export const FacultyProgress = ({
   }
 
   return (
-    <>
+    <Stack spacing={2}>
       <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
         {bachelorStats && (
           <Stack gap={2}>
@@ -131,6 +131,6 @@ export const FacultyProgress = ({
           </Stack>
         )}
       </Section>
-    </>
+    </Stack>
   )
 }

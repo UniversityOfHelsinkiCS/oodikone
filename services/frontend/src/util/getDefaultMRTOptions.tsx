@@ -79,6 +79,9 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
         disabled={table.getPrePaginationRowModel().rows.length === 0}
         onClick={() => handleExportRows(table.getPrePaginationRowModel().rows)}
         startIcon={<DownloadIcon />}
+        sx={{
+          backgroundColor: theme => theme.palette.export,
+        }}
         variant="contained"
       >
         Export to Excel

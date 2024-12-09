@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
@@ -13,7 +13,7 @@ export const FacultyGraduationsTab = () => {
   const [medianMode, setMedianMode] = useState(false)
 
   return (
-    <Box>
+    <Stack gap={2}>
       <Section
         cypress="AverageGraduationTimes"
         infoBoxContent={facultyToolTips.averageGraduationTimes}
@@ -37,6 +37,6 @@ export const FacultyGraduationsTab = () => {
         showMedian={medianMode}
         universityMode
       />
-    </Box>
+    </Stack>
   )
 }

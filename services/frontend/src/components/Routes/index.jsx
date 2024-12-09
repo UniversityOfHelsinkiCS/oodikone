@@ -7,7 +7,6 @@ import { CoursePopulation } from '@/components/CoursePopulation'
 import { CourseStatistics } from '@/components/CourseStatistics'
 import { CustomOpenUniPopulation } from '@/components/CustomOpenUniPopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
-import { FacultyStatistics } from '@/components/FacultyStatistics'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
@@ -20,6 +19,7 @@ import { Users } from '@/components/Users'
 import { languageCenterViewEnabled } from '@/conf'
 import { Changelog } from '@/pages/Changelog'
 import { CloseToGraduation } from '@/pages/CloseToGraduation'
+import { Faculties } from '@/pages/Faculties'
 import { Feedback } from '@/pages/Feedback'
 import { FrontPage } from '@/pages/FrontPage'
 import { University } from '@/pages/University'
@@ -60,7 +60,7 @@ export const Routes = () => (
         requiredRoles={['fullSisuAccess']}
       />
       <ProtectedRoute
-        component={FacultyStatistics}
+        component={Faculties}
         exact
         path={routes.faculties}
         requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']}

@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, NameWithCode } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -16,29 +16,29 @@ accessibility(ReactHighcharts.Highcharts)
 export const BreakdownBarChart = ({
   cypress,
   data,
-  handleClick,
   facultyGraph = true,
-  facultyNames,
-  year = null,
+  handleClick,
   mode,
+  names,
+  year = null,
   yearLabel,
 }: {
   cypress: string
   data: Array<GraduationStats & { code?: string }>
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   facultyGraph?: boolean
-  facultyNames?: Record<string, NameWithCode>
-  year?: number | null
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   mode: 'faculty' | 'programme'
+  names?: Record<string, Name | NameWithCode>
+  year?: number | null
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
   const theme = useTheme()
 
   const statData: HighCharts.SeriesBarOptions[] = [
-    { type: 'bar', name: 'On time', color: theme.graduationTimes.onTime, data: [] },
-    { type: 'bar', name: 'Max. year overtime', color: theme.graduationTimes.yearOver, data: [] },
-    { type: 'bar', name: 'Overtime', color: theme.graduationTimes.wayOver, data: [] },
+    { type: 'bar', name: 'On time', color: theme.palette.graduationTimes.onTime, data: [] },
+    { type: 'bar', name: 'Max. year overtime', color: theme.palette.graduationTimes.yearOver, data: [] },
+    { type: 'bar', name: 'Overtime', color: theme.palette.graduationTimes.wayOver, data: [] },
   ]
 
   let categories: number[] = []
@@ -62,17 +62,17 @@ export const BreakdownBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getFacultyName = (code: string) => {
-    if (!facultyNames) {
+  const getFacultyOrProgrammeName = (code: string) => {
+    if (!names) {
       return ''
     }
-    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+    return names[code]?.[language] ?? names[code]?.fi
   }
 
   const getTooltipText = (id: string, seriesName: string, amount: number) => {
     if (!facultyGraph) {
       const code = codeMap[id]
-      return `<b>${getFacultyName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
+      return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
     }
     return `<b>${seriesName}</b>: ${amount}`
   }
@@ -140,7 +140,6 @@ export const BreakdownBarChart = ({
         },
       },
       series: {
-        animation: false,
         point: {
           events: {
             click(event) {

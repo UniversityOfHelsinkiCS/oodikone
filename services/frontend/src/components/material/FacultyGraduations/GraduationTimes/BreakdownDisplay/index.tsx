@@ -1,25 +1,25 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { BreakdownBarChart } from './BreakdownBarChart'
 
 export const BreakdownDisplay = ({
   data,
-  facultyNames,
   handleClick,
   level,
   levelProgrammeData,
   mode,
+  names,
   programmeDataVisible,
   year,
   yearLabel,
 }: {
   data: GraduationStats[]
-  facultyNames: Record<string, NameWithCode>
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme'
+  names: Record<string, Name | NameWithCode>
   programmeDataVisible: boolean
   year: number | null
   yearLabel: 'Graduation year' | 'Start year'
@@ -34,9 +34,9 @@ export const BreakdownDisplay = ({
             cypress={`${level}BreakdownBarChartFaculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
-            facultyNames={facultyNames}
             handleClick={handleClick}
             mode={mode}
+            names={names}
             year={year}
             yearLabel={yearLabel}
           />

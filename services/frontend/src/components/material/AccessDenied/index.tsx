@@ -62,7 +62,7 @@ export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
           <ReactHighchart
             config={{
               credits: { enabled: false },
-              plotOptions: { series: { animation: false, label: { connectorAllowed: false }, pointStart: 2010 } },
+              plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
               series: dummyData,
               title: { text: 'Students of Computer Science 2018-2020' },
               yAxis: { title: { text: 'Cumulative credits' } },
@@ -72,7 +72,6 @@ export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
             config={{
               chart: { type: 'column' },
               credits: { enabled: false },
-              plotOptions: { series: { animation: false } },
               series: dummyData.map(element => ({
                 name: element.name,
                 data: [Math.max(...element.data)],

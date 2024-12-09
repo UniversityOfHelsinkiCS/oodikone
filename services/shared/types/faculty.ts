@@ -1,19 +1,19 @@
-import { NameWithCode } from './name'
+export type Graduated = 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
+export type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
+export type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
+export type StatsType = 'ALL' | 'CREDITS' | 'STUDENT' | 'THESIS'
+export type YearType = 'ACADEMIC_YEAR' | 'CALENDAR_YEAR'
 
-export interface GetAllProgressStatsRequest {
-  graduated: 'GRADUATED_EXCLUDED' | 'GRADUATED_INCLUDED'
-  includeSpecials: boolean
+export type GraduationStats = {
+  amount: number
+  median: number
+  name: number
+  statistics: {
+    onTime: number
+    yearOver: number
+    wayOver: number
+  }
+  times: number[]
 }
 
-export interface GetAllProgressStatsResponse {
-  bachelorsProgStats: Record<string, number[][]>
-  bcMsProgStats: Record<string, number[][]>
-  creditCounts: Record<string, Record<string, number[]>>
-  doctoralProgStats: Record<string, number[][]>
-  mastersProgStats: Record<string, number[][]>
-  programmeNames: Record<string, NameWithCode>
-  yearlyBachelorTitles: string[][]
-  yearlyBcMsTitles: string[][]
-  yearlyMasterTitles: string[][]
-  years: string[]
-}
+export type ProgrammeMedians = Record<number, { data: Array<GraduationStats & { code: string }>; programmes: string[] }>

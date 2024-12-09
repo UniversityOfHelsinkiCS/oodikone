@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash'
 import moment from 'moment'
 
 import { rootOrgId } from '../../config'
-import { Graduated, SpecialGroups } from '../../shared/types/api/faculty'
+import { Graduated, SpecialGroups } from '../../shared/types'
 import { Unarray } from '../../types'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'

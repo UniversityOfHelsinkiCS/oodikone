@@ -1,14 +1,13 @@
 import { useState } from 'react'
 
 import { Section } from '@/components/material/Section'
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { BreakdownDisplay } from './BreakdownDisplay'
 import { MedianDisplay } from './MedianDisplay'
 
 export const GraduationTimes = ({
   classSizes,
   data,
-  facultyNames,
   goal,
   goalExceptions,
   groupBy,
@@ -17,6 +16,7 @@ export const GraduationTimes = ({
   level,
   levelProgrammeData,
   mode,
+  names,
   showMedian,
   title,
   yearLabel,
@@ -38,7 +38,6 @@ export const GraduationTimes = ({
       }
     | undefined
   data: GraduationStats[] | undefined
-  facultyNames: Record<string, NameWithCode> | undefined
   goal: number | undefined
   goalExceptions: Record<string, number> | { needed: boolean }
   groupBy: 'byGradYear' | 'byStartYear'
@@ -47,6 +46,7 @@ export const GraduationTimes = ({
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians | undefined
   mode: 'faculty' | 'programme'
+  names: Record<string, Name | NameWithCode> | undefined
   showMedian: boolean
   title: string
   yearLabel: 'Graduation year' | 'Start year'
@@ -64,7 +64,7 @@ export const GraduationTimes = ({
     }
   }
 
-  const dataIsLoaded = classSizes && data && facultyNames && goal && levelProgrammeData
+  const dataIsLoaded = classSizes && data && names && goal && levelProgrammeData
 
   return (
     <Section cypress={`${level}GraduationTimes`} isError={isError} isLoading={isLoading && !dataIsLoaded} title={title}>
@@ -72,7 +72,6 @@ export const GraduationTimes = ({
         <MedianDisplay
           classSizes={classSizes}
           data={data}
-          facultyNames={facultyNames}
           goal={goal}
           goalExceptions={goalExceptions}
           groupBy={groupBy}
@@ -80,6 +79,7 @@ export const GraduationTimes = ({
           level={level}
           levelProgrammeData={levelProgrammeData}
           mode={mode}
+          names={names}
           programmeDataVisible={programmeDataVisible}
           title={title}
           year={year}
@@ -89,11 +89,11 @@ export const GraduationTimes = ({
       {!showMedian && dataIsLoaded && (
         <BreakdownDisplay
           data={data}
-          facultyNames={facultyNames}
           handleClick={handleClick}
           level={level}
           levelProgrammeData={levelProgrammeData}
           mode={mode}
+          names={names}
           programmeDataVisible={programmeDataVisible}
           year={year}
           yearLabel={yearLabel}

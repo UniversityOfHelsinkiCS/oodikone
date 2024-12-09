@@ -1,14 +1,17 @@
+import { deepPurple } from '@mui/material/colors'
 import { createTheme } from '@mui/material/styles'
 
 declare module '@mui/material/styles' {
-  interface Theme {
+  interface Palette {
+    export: string
     graduationTimes: {
       onTime: string
       yearOver: string
       wayOver: string
     }
   }
-  interface ThemeOptions {
+  interface PaletteOptions {
+    export: string
     graduationTimes?: {
       onTime: string
       yearOver: string
@@ -18,9 +21,12 @@ declare module '@mui/material/styles' {
 }
 
 export const theme = createTheme({
-  graduationTimes: {
-    onTime: '#90a959',
-    yearOver: '#fee191',
-    wayOver: '#fb6962',
+  palette: {
+    export: deepPurple[500],
+    graduationTimes: {
+      onTime: '#90a959',
+      yearOver: '#fee191',
+      wayOver: '#fb6962',
+    },
   },
 })
