@@ -270,6 +270,7 @@ export const BasicInformationTab = ({
       </Section>
       <Section
         cypress="graduatedOfTheFaculty"
+        infoBoxContent={facultyToolTips.graduatedOfTheFaculty}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
         title="Graduated of the faculty"
@@ -297,6 +298,7 @@ export const BasicInformationTab = ({
       </Section>
       <Section
         cypress="thesisWritersOfTheFaculty"
+        infoBoxContent={facultyToolTips.thesisWritersOfTheFaculty}
         isError={thesisWritersIsError}
         isLoading={thesisWritersIsLoading}
         title="Thesis writers of the faculty"
@@ -324,6 +326,7 @@ export const BasicInformationTab = ({
       </Section>
       <Section
         cypress="creditsProducedByTheFaculty"
+        infoBoxContent={facultyToolTips.creditsProducedByTheFaculty}
         isError={creditsIsError}
         isLoading={creditsIsLoading}
         title="Credits produced by the faculty"
