@@ -3,7 +3,7 @@ import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { getGraduationGraphTitle, getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { GraduationTimes } from '@/components/FacultyStatistics/TimesAndPaths/GraduationTimes'
+import { GraduationTimes } from '@/components/GraduationTimes'
 import { InfoBox } from '@/components/InfoBox'
 import { BreakdownBarChart } from '@/components/StudyProgramme/BreakdownBarChart'
 import { MedianTimeBarChart } from '@/components/StudyProgramme/MedianTimeBarChart'

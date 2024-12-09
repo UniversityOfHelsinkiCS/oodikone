@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 
-import '@/components/FacultyStatistics/faculty.css'
 import { BreakdownBarChart } from './BreakdownBarChart'
 import { MedianBarChart } from './MedianBarChart'
 
