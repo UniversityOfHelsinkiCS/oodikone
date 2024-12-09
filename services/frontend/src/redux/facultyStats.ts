@@ -9,6 +9,8 @@ import {
   GetFacultyThesisStatsRequest,
   GetFacultyGraduationTimesResponse,
   GetFacultyGraduationTimesRequest,
+  GetFacultyProgressStatsResponse,
+  GetFacultyProgressStatsRequest,
   GetAllProgressStatsResponse,
   GetAllProgressStatsRequest,
   GetFacultyStudentStatsResponse,
@@ -41,7 +43,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, studyProgrammeFilter }) =>
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),
-    getFacultyProgressStats: builder.query({
+    getFacultyProgressStats: builder.query<GetFacultyProgressStatsResponse, GetFacultyProgressStatsRequest>({
       query: ({ id, specialGroups, graduated }) =>
         `/faculties/${id}/progressstats?special_groups=${specialGroups}&graduated=${graduated}`,
     }),

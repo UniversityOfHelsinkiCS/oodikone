@@ -80,7 +80,6 @@ export const Faculties = () => {
         <ProgressTab
           faculty={faculty}
           graduatedGroup={graduatedGroup}
-          requiredRights={requiredRights}
           setGraduatedGroup={setGraduatedGroup}
           setSpecialGroups={setSpecialGroups}
           specialGroups={specialGroups}

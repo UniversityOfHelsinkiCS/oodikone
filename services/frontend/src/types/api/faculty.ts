@@ -1,3 +1,5 @@
+// TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
+
 import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
 
@@ -115,6 +117,28 @@ export type GetFacultiesResponse = {
   code: string
   id: string
   name: Name
+}
+
+export type GetFacultyProgressStatsResponse = {
+  bachelorsProgStats: Record<string, number[][]>
+  bcMsProgStats: Record<string, number[][]>
+  creditCounts: Record<string, Record<string, number[]>>
+  doctoralProgStats: Record<string, number[][]>
+  id: string
+  lastUpdated: string
+  mastersProgStats: Record<string, number[][]>
+  programmeNames: Record<string, NameWithCode>
+  status: string
+  yearlyBachelorTitles: string[][]
+  yearlyBcMsTitles: string[][]
+  yearlyMasterTitles: string[][]
+  years: string[]
+}
+
+export type GetFacultyProgressStatsRequest = {
+  id: string
+  specialGroups: SpecialGroups
+  graduated: Graduated
 }
 
 export type GetAllProgressStatsRequest = {
