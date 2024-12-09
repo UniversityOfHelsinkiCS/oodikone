@@ -1,53 +1,50 @@
+import {
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+} from '@mui/icons-material'
+import {
+  Box,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { Fragment, useState } from 'react'
-import { Button, Icon, Label, Popup, Table } from 'semantic-ui-react'
 
 import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PopulationLink } from '@/components/StudyProgramme/StudyTrackOverview/PopulationLink'
+import { InfoBox } from '@/components/material/InfoBox'
+import { PopulationLink } from '@/components/material/PopulationLink'
+import { Section } from '@/components/material/Section'
+import { DegreeProgramme } from '@/types/api/faculty'
 
-const getStyle = index => {
-  if ([4, 12].includes(index)) return { backgroundColor: '#f9f9f9', borderLeftWidth: 'thick' }
-  if ([1, 5, 8, 9, 13, 16, 17, 20, 21].includes(index)) return { backgroundColor: '#f9f9f9' }
-  if (index === 18) return { borderLeftWidth: 'thick' }
-  return {}
-}
-
-const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
-const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
-
-const getRowStyle = (index, tableLinePlaces, dark = false) => {
-  const backgroundColorsToUse = dark ? backgroundColorsDarks : backgroundColors
-
-  if (tableLinePlaces[2]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[2][1]] }
-
-  if (tableLinePlaces[1]?.[0] <= index) return { backgroundColor: backgroundColorsToUse[tableLinePlaces[1][1]] }
-
-  return { backgroundColor: backgroundColorsToUse[tableLinePlaces[0][1]] }
-}
-
-const getTableCell = ({ year, programme, valIndex, rowIndex, tableLinePlaces, value }) => {
+const getTableCell = (year: string, programme: string, value: number | string) => {
   return (
-    <Table.Cell
-      key={`${year}-${programme}-color-${Math.random()}`}
-      style={
-        getStyle(valIndex + 1)?.backgroundColor
-          ? {
-              borderLeftWidth: getStyle(valIndex + 1).borderLeftWidth,
-              ...getRowStyle(rowIndex, tableLinePlaces, true),
-            }
-          : { ...getStyle(valIndex + 1), ...getRowStyle(rowIndex, tableLinePlaces) }
-      }
-      textAlign="right"
-    >
+    <TableCell key={`${year}-${programme}-color-${Math.random()}`} sx={{ textAlign: 'right' }}>
       {value}
-    </Table.Cell>
+    </TableCell>
   )
 }
 
-const getOtherCountriesList = ({ year, code, extraTableStats }) => {
+const getOtherCountriesList = ({
+  year,
+  code,
+  extraTableStats,
+}: {
+  year: string
+  code: string
+  extraTableStats: Record<string, Record<string, Record<string, number>>>
+}) => {
   const countriesData = extraTableStats?.[year]?.[code]
-
-  if (!countriesData || Object.keys(countriesData).length === 0) return null
+  if (!countriesData || Object.keys(countriesData).length === 0) {
+    return null
+  }
 
   return Object.keys(countriesData)
     .sort()
@@ -58,173 +55,176 @@ const getOtherCountriesList = ({ year, code, extraTableStats }) => {
     ))
 }
 
-const getRows = ({
-  index,
-  programme,
-  year,
-  showPercentages,
-  programmeStats,
-  extraTableStats,
-  tableLinePlaces,
-  programmeNames,
-}) => {
+const getRows = (
+  extraTableStats: Record<string, Record<string, Record<string, number>>>,
+  programme: string,
+  programmeNames: Record<string, DegreeProgramme>,
+  programmeStats: Record<string, Record<string, (number | string)[]>>,
+  showPercentages: boolean,
+  year: string
+) => {
   return programmeStats[programme][year].map((value, valIndex) => {
     const key = `${programme}-${year}-${`${value}${valIndex}`}`
     if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
-    const tableCell = getTableCell({ year, programme, valIndex, rowIndex: index, tableLinePlaces, value })
+    const tableCell = getTableCell(year, programme, value)
     if (valIndex === 19) {
       const countriesPopupContent = getOtherCountriesList({
         year,
         code: programmeNames[programme].code,
         extraTableStats,
       })
-      if (!countriesPopupContent) return tableCell
-      return <Popup content={countriesPopupContent} key={key} trigger={tableCell} />
+      if (!countriesPopupContent) {
+        return tableCell
+      }
+      return (
+        <Tooltip key={key} title={countriesPopupContent}>
+          {tableCell}
+        </Tooltip>
+      )
     }
     return tableCell
   })
 }
 
 export const FacultyStudentDataTable = ({
-  cypress,
   extraTableStats,
   programmeNames,
   programmeStats,
   requiredRights,
   showPercentages,
   sortedKeys,
-  tableLinePlaces,
   tableStats,
   titles,
   years,
+}: {
+  extraTableStats: Record<string, Record<string, Record<string, number>>>
+  programmeNames: Record<string, DegreeProgramme>
+  programmeStats: Record<string, Record<string, (number | string)[]>>
+  requiredRights: {
+    fullAccessToStudentData: boolean
+    programmeRights: string[]
+  }
+  showPercentages: boolean
+  sortedKeys: string[]
+  tableLinePlaces: string[][]
+  tableStats: Record<string, (number | string)[]>
+  titles: string[]
+  years: string[]
 }) => {
-  const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
+  const cypress = 'FacultyStudentStatsTable'
+  const [yearsVisible, setVisible] = useState(new Array<boolean>(years.length).fill(false))
   const { getTextIn } = useLanguage()
-  const toggleVisibility = yearIndex => {
+  const toggleVisibility = (yearIndex: number) => {
     const arrayToModify = [...yearsVisible]
     arrayToModify[yearIndex] = !yearsVisible[yearIndex]
     setVisible(arrayToModify)
   }
-  return (
-    <div className="datatable">
-      <Table celled data-cy={cypress} structured>
-        <Table.Header>
-          <Table.Row key="FirstHeader">
-            <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
-            <Table.HeaderCell colSpan={!showPercentages ? 4 : 8} style={{ borderLeftWidth: 'thick' }}>
-              Current status
-            </Table.HeaderCell>
-            <Table.HeaderCell colSpan={!showPercentages ? 3 : 6} style={{ borderLeftWidth: 'thick' }}>
-              Gender
-            </Table.HeaderCell>
-            <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
-              <Popup
-                content="Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
-                trigger={
-                  <div>
-                    Countries <Icon name="question circle" />
-                  </div>
-                }
-              />
-            </Table.HeaderCell>
-          </Table.Row>
-          <Table.Row key="secondHeader">
-            {titles.map((title, index) => (
-              <Table.HeaderCell
-                colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
-                key={title}
-                style={[3, 7, 10].includes(index) ? { borderLeftWidth: 'thick' } : {}}
-                textAlign="center"
-              >
-                {title}
-              </Table.HeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
+  const infoText =
+    "Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
 
-        <Table.Body>
-          {years.map((year, yearIndex) => {
-            return (
-              <Fragment key={`${year}-fragment`}>
-                <Table.Row className={year === 'Total' ? 'total-row-cell' : ''} key={`${year}-faculty-row}`}>
-                  {tableStats[year]?.map((value, valueIndex) => {
-                    if (valueIndex === 0)
+  return (
+    <Section>
+      <TableContainer>
+        <Table data-cy={cypress}>
+          <TableHead>
+            <TableRow key="FirstHeader">
+              <TableCell colSpan={!showPercentages ? 3 : 4} />
+              <TableCell colSpan={!showPercentages ? 4 : 8}>Current status</TableCell>
+              <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
+              <TableCell colSpan={!showPercentages ? 2 : 4}>
+                <Stack direction="row" gap={1}>
+                  Countries
+                  <InfoBox content={infoText} mini />
+                </Stack>
+              </TableCell>
+            </TableRow>
+            <TableRow key="secondHeader">
+              {titles.map((title, index) => (
+                <TableCell
+                  colSpan={[0, 1].includes(index) || !showPercentages ? 1 : 2}
+                  key={title}
+                  sx={{ textAlign: 'right' }}
+                >
+                  {title}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {years.map((year, yearIndex) => {
+              return (
+                <Fragment key={`${year}-fragment`}>
+                  <TableRow key={`${year}-faculty-row}`}>
+                    {tableStats[year]?.map((value, valueIndex) => {
+                      if (valueIndex === 0)
+                        return (
+                          <TableCell key={`${year}-faculty-cell}`}>
+                            <Box
+                              alignItems="center"
+                              data-cy={`Button-${cypress}-${yearIndex}`}
+                              display="flex"
+                              justifyContent="center"
+                              key={`${year}-studentsTableButton}`}
+                            >
+                              <IconButton
+                                data-cy={`${cypress}${yearIndex}`}
+                                onClick={() => toggleVisibility(yearIndex)}
+                                size="small"
+                              >
+                                {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                              </IconButton>
+                              <Typography variant="body2">{value}</Typography>
+                            </Box>
+                          </TableCell>
+                        )
+                      if (
+                        !showPercentages &&
+                        typeof value === 'string' &&
+                        (value.includes('%') || value.includes('NA'))
+                      ) {
+                        return null
+                      }
                       return (
-                        <Table.Cell key={`${year}-faculty-cell}`}>
-                          <Button
-                            as="div"
-                            data-cy={`Button-${cypress}-${yearIndex}`}
-                            key={`${year}-studentsTableButton}`}
-                            labelPosition="right"
-                            onClick={() => toggleVisibility(yearIndex)}
-                            style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}
-                          >
-                            <Button icon style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}>
-                              <Icon name={yearsVisible[yearIndex] ? 'angle down' : 'angle right'} />
-                            </Button>
-                            <Label as="a" style={{ backgroundColor: 'white', borderRadius: 0, margin: 0, padding: 0 }}>
-                              <b>{value}</b>
-                            </Label>
-                          </Button>
-                        </Table.Cell>
-                      )
-                    if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA')))
-                      return null
-                    return (
-                      <Table.Cell
-                        key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
-                        style={getStyle(valueIndex)}
-                        textAlign="right"
-                      >
-                        {value}
-                      </Table.Cell>
-                    )
-                  })}
-                </Table.Row>
-                {yearsVisible[yearIndex] &&
-                  sortedKeys.map((programme, index) => {
-                    return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
-                      <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
-                        <Table.Cell
-                          key={`${year}-${programme}`}
-                          style={{ paddingLeft: '50px', ...getRowStyle(index, tableLinePlaces) }}
-                          textAlign="left"
+                        <TableCell
+                          key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
+                          sx={{ textAlign: 'right' }}
                         >
-                          <Popup
-                            content={
-                              <p>
-                                {programmeNames[programme].code} – {getTextIn(programmeNames[programme].name)}
-                              </p>
-                            }
-                            trigger={<b>{programmeNames[programme].progId}</b>}
-                          />
-                          {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                            (requiredRights.fullAccessToStudentData && (
-                              <PopulationLink
-                                studyProgramme={programmeNames[programme].code}
-                                year={year}
-                                years={getCalendarYears(years)}
-                              />
-                            ))}
-                        </Table.Cell>
-                        {getRows({
-                          index,
-                          programme,
-                          year,
-                          showPercentages,
-                          programmeStats,
-                          extraTableStats,
-                          tableLinePlaces,
-                          programmeNames,
-                        })}
-                      </Table.Row>
-                    )
-                  })}
-              </Fragment>
-            )
-          })}
-        </Table.Body>
-      </Table>
-    </div>
+                          {value}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                  {yearsVisible[yearIndex] &&
+                    sortedKeys.map(programme => {
+                      return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
+                        <TableRow key={`${year}-regular-row-${programme}`}>
+                          <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
+                            <Stack alignItems="center" direction="row" gap={0.5}>
+                              <Tooltip
+                                title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
+                              >
+                                <b>{programmeNames[programme].progId}</b>
+                              </Tooltip>
+                              {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
+                                (requiredRights.fullAccessToStudentData && (
+                                  <PopulationLink
+                                    studyProgramme={programmeNames[programme].code}
+                                    year={year}
+                                    years={getCalendarYears(years)}
+                                  />
+                                ))}
+                            </Stack>
+                          </TableCell>
+                          {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
+                        </TableRow>
+                      )
+                    })}
+                </Fragment>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Section>
   )
 }

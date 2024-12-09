@@ -135,7 +135,6 @@ export const StudentsByStartingYearTab = ({
       >
         {studentStats?.data && (
           <FacultyStudentDataTable
-            cypress="FacultyStudentStatsTable"
             extraTableStats={studentStats?.data.facultyTableStatsExtra}
             programmeNames={studentStats?.data.programmeNames}
             programmeStats={studentStats?.data.programmeStats}
