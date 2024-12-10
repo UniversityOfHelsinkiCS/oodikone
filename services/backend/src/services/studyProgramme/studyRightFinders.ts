@@ -35,7 +35,7 @@ export const getStudyRightsInProgramme = async (
   if (includeStudentsAndCredits) {
     include.push({
       model: Student,
-      attributes: ['gender_code', 'home_country_en'],
+      attributes: ['gender_code', 'citizenships'],
       include: [
         {
           model: Credit,

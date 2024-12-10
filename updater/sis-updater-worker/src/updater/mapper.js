@@ -89,7 +89,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
   const gender_code = parseGender(gender_urn)
 
   const citizenships = (student.citizenships ?? []).map(countryUrn => getCountry(countryUrn).name)
-  const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null
 
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
 
@@ -120,9 +119,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     creditcount: calculateTotalCreditsFromAttainments(attainmentsOfStudent),
     dateofuniversityenrollment,
     citizenships,
-    home_country_fi: home_country ? home_country.name.fi : null,
-    home_country_sv: home_country ? home_country.name.sv : null,
-    home_country_en: home_country ? home_country.name.en : null,
     sis_person_id: id,
     hasPersonalIdentityCode: has_personal_identity_code,
   }

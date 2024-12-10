@@ -1,6 +1,7 @@
 import { orderBy } from 'lodash'
 import { Form, Dropdown } from 'semantic-ui-react'
 
+import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
@@ -8,22 +9,26 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const { getTextIn } = useLanguage()
   const { selected } = options
 
-  const dropdownOptions = withoutSelf().reduce((citizenships, student) => {
-    const { home_country_en: homeCountryEn, home_country_fi: homeCountryFi, home_country_sv: homeCountrySv } = student
+  const dropdownOptions = withoutSelf().reduce((options, student) => {
+    for (const citizenship of student.citizenships) {
+      const countryName = citizenship.en
+      if (options.some(option => option.value === countryName)) {
+        continue
+      }
+      const count = withoutSelf().filter(student =>
+        student.citizenships.some(citizenship => citizenship.en === countryName)
+      ).length
+      const country = getTextIn(citizenship)
 
-    if (citizenships.every(option => option.value !== homeCountryEn)) {
-      const count = withoutSelf().filter(student => student.home_country_en === homeCountryEn).length
-      const homeCountry = getTextIn({ fi: homeCountryFi, en: homeCountryEn, sv: homeCountrySv })
-
-      citizenships.push({
-        key: homeCountryEn,
-        value: homeCountryEn,
-        text: `${homeCountry} (${count})`,
+      options.push({
+        key: countryName,
+        value: countryName,
+        text: `${country} (${count})`,
         count,
       })
     }
 
-    return citizenships
+    return options
   }, [])
 
   const sortedDropdownOptions = orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
@@ -56,10 +61,12 @@ export const citizenshipFilter = createFilter({
     selected: '',
   },
 
+  info: filterToolTips.citizenship,
+
   isActive: ({ selected }) => selected !== '',
 
   filter(student, { selected }) {
-    return selected === student.home_country_en
+    return student.citizenships.some(citizenship => citizenship.en === selected)
   },
 
   component: CitizenshipFilterCard,

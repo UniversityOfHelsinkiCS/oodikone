@@ -267,16 +267,20 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
-    const studentHomeCountry = studyRight.student.home_country_en
+    const studentCitizenships = studyRight.student.citizenships
 
-    if (studentHomeCountry === 'Finland') {
-      yearlyStats[year][programmeOrStudyTrack].finnish += 1
-    } else {
-      yearlyStats[year][programmeOrStudyTrack].otherCountries += 1
-      if (!yearlyStats[year][programmeOrStudyTrack].otherCountriesCounts[studentHomeCountry]) {
-        yearlyStats[year][programmeOrStudyTrack].otherCountriesCounts[studentHomeCountry] = 0
+    for (const citizenship of studentCitizenships) {
+      const country = citizenship.en
+      if (!country) {
+        continue
       }
-      yearlyStats[year][programmeOrStudyTrack].otherCountriesCounts[studentHomeCountry] += 1
+      if (country === 'Finland') {
+        yearlyStats[year][programmeOrStudyTrack].finnish += 1
+      } else {
+        yearlyStats[year][programmeOrStudyTrack].otherCountries += 1
+        yearlyStats[year][programmeOrStudyTrack].otherCountriesCounts[country] ??= 0
+        yearlyStats[year][programmeOrStudyTrack].otherCountriesCounts[country] += 1
+      }
     }
 
     if (!hasGraduated) return

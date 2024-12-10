@@ -159,9 +159,7 @@ const formatStudentForPopulationStatistics = (
     tags,
     birthdate,
     sis_person_id,
-    home_country_fi,
-    home_country_sv,
-    home_country_en,
+    citizenships,
   } = student
 
   const criteriaCoursesBySubstitutions = criteria?.allCourses
@@ -271,9 +269,7 @@ const formatStudentForPopulationStatistics = (
     birthdate,
     studyplans,
     sis_person_id,
-    home_country_en,
-    home_country_fi,
-    home_country_sv,
+    citizenships,
     criteriaProgress: toProgressCriteria(),
     curriculumVersion: getCurriculumVersion(correctStudyplan[0]?.curriculum_period_id),
     transferredStudyright,

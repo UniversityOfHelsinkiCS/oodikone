@@ -41,7 +41,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
     const columns = ['credits.since', 'programme', 'startYear']
     if (studyGuidanceGroup?.tags?.studyProgramme)
       columns.push(
-        'citizenship',
+        'citizenships',
         'credits.hops',
         'curriculumPeriod',
         'endDate',
@@ -81,7 +81,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
     coursePopulation: ['enrollmentDate', 'gradeForSingleCourse', 'language', 'passDate', 'programme', 'startYear'],
     population: [
       'admissionType',
-      'citizenship',
+      'citizenships',
       'credits.hops',
       'credits.studyright',
       'curriculumPeriod',

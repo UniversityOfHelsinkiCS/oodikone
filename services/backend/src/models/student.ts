@@ -61,15 +61,6 @@ export class Student extends Model<InferAttributes<Student>> {
   citizenships!: Name[]
 
   @Column(DataType.STRING)
-  home_country_fi!: string
-
-  @Column(DataType.STRING)
-  home_country_sv!: string
-
-  @Column(DataType.STRING)
-  home_country_en!: string
-
-  @Column(DataType.STRING)
   gender_code!: GenderCode
 
   @Column(DataType.STRING)

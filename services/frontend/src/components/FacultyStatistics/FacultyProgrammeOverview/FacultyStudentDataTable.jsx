@@ -127,10 +127,10 @@ export const FacultyStudentDataTable = ({
             </Table.HeaderCell>
             <Table.HeaderCell colSpan={!showPercentages ? 2 : 4} style={{ borderLeftWidth: 'thick' }}>
               <Popup
-                content="Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
+                content="Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for study programmes."
                 trigger={
                   <div>
-                    Countries <Icon name="question circle" />
+                    Citizenships <Icon name="question circle" />
                   </div>
                 }
               />
