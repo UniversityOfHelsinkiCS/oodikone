@@ -64,7 +64,7 @@ export const ProgressTab = ({
   return (
     <Stack gap={2}>
       <Section
-        cypress="InfoFacultyProgress"
+        cypress="FacultyProgress"
         exportOnClick={() =>
           exportProgressTable(
             {
@@ -80,8 +80,6 @@ export const ProgressTab = ({
           )
         }
         infoBoxContent={facultyToolTips.studentProgress}
-        isError={isError}
-        isLoading={isLoading}
         title="Progress of students of the faculty"
       >
         <Stack alignItems="center" direction={{ sm: 'column', md: 'row' }} justifyContent="space-around">
@@ -105,40 +103,43 @@ export const ProgressTab = ({
           />
         </Stack>
       </Section>
-      {progressStats.isSuccess && progressStats.data && (
-        <Stack gap={2}>
-          <Section isError={isError} isLoading={isLoading} title="Bachelor">
-            {bachelorStats && hasNonZeroStats(bachelorStats) && (
-              <Stack gap={2}>
-                <FacultyBarChart
-                  cypress="FacultyBachelorsProgress"
-                  data={{
-                    id: faculty.code,
-                    stats: bachelorStats.chartStats,
-                    years: progressStats.data.years,
-                  }}
-                />
-                <FacultyProgressTable
-                  cypress="FacultyBachelorsProgressTable"
-                  data={bachelorStats.tableStats}
-                  programmeNames={progressStats?.data.programmeNames}
-                  programmeStats={progressStats?.data.bachelorsProgStats}
-                  progressTitles={progressStats?.data.yearlyBachelorTitles}
-                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
-                    listObj => listObj[0]
-                  )}
-                  titles={bachelorStats.tableTitles}
-                />
-              </Stack>
-            )}
-          </Section>
-          <Section
-            infoBoxContent={facultyToolTips.bachelorMasterProgress}
-            isError={isError}
-            isLoading={isLoading}
-            title={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}
-          >
-            {bachelorMasterStats && hasNonZeroStats(bachelorMasterStats) && (
+      <Stack gap={2}>
+        <Section isError={isError} isLoading={isLoading} title="Bachelor">
+          {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
+            <Stack gap={2}>
+              <FacultyBarChart
+                cypress="FacultyBachelorsProgress"
+                data={{
+                  id: faculty.code,
+                  stats: bachelorStats.chartStats,
+                  years: progressStats.data.years,
+                }}
+              />
+              <FacultyProgressTable
+                cypress="FacultyBachelorsProgressTable"
+                data={bachelorStats.tableStats}
+                programmeNames={progressStats?.data.programmeNames}
+                programmeStats={progressStats?.data.bachelorsProgStats}
+                progressTitles={progressStats?.data.yearlyBachelorTitles}
+                sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
+                  listObj => listObj[0]
+                )}
+                titles={bachelorStats.tableTitles}
+              />
+            </Stack>
+          )}
+        </Section>
+        <Section
+          cypress="BachelorMastersProgress"
+          infoBoxContent={facultyToolTips.bachelorMasterProgress}
+          isError={isError}
+          isLoading={isLoading}
+          title={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}
+        >
+          {progressStats.isSuccess &&
+            progressStats.data &&
+            bachelorMasterStats &&
+            hasNonZeroStats(bachelorMasterStats) && (
               <Stack gap={2}>
                 <FacultyBarChart
                   cypress="FacultyBachelorMastersProgress"
@@ -161,9 +162,13 @@ export const ProgressTab = ({
                 />
               </Stack>
             )}
-          </Section>
-          <Section isError={isError} isLoading={isLoading} title="Master">
-            {masterStats && hasNonZeroStats(masterStats) && !(faculty.code === 'H90') && (
+        </Section>
+        <Section isError={isError} isLoading={isLoading} title="Master">
+          {progressStats.isSuccess &&
+            progressStats.data &&
+            masterStats &&
+            hasNonZeroStats(masterStats) &&
+            !(faculty.code === 'H90') && (
               <Stack gap={2}>
                 <FacultyBarChart
                   cypress="FacultyMastersProgress"
@@ -186,33 +191,32 @@ export const ProgressTab = ({
                 />
               </Stack>
             )}
-          </Section>
-          <Section isError={isError} isLoading={isLoading} title="Doctor">
-            {doctorStats && hasNonZeroStats(doctorStats) && (
-              <Stack gap={2}>
-                <FacultyBarChart
-                  cypress="FacultyDoctoralProgress"
-                  data={{
-                    id: faculty.code,
-                    stats: doctorStats.chartStats,
-                    years: progressStats?.data.years,
-                  }}
-                />
-                <FacultyProgressTable
-                  cypress="FacultyDoctoralProgressTable"
-                  data={doctorStats.tableStats}
-                  programmeNames={progressStats?.data.programmeNames}
-                  programmeStats={progressStats?.data.doctoralProgStats}
-                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
-                    listObj => listObj[0]
-                  )}
-                  titles={doctorStats.tableTitles}
-                />
-              </Stack>
-            )}
-          </Section>
-        </Stack>
-      )}
+        </Section>
+        <Section isError={isError} isLoading={isLoading} title="Doctor">
+          {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
+            <Stack gap={2}>
+              <FacultyBarChart
+                cypress="FacultyDoctoralProgress"
+                data={{
+                  id: faculty.code,
+                  stats: doctorStats.chartStats,
+                  years: progressStats?.data.years,
+                }}
+              />
+              <FacultyProgressTable
+                cypress="FacultyDoctoralProgressTable"
+                data={doctorStats.tableStats}
+                programmeNames={progressStats?.data.programmeNames}
+                programmeStats={progressStats?.data.doctoralProgStats}
+                sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
+                  listObj => listObj[0]
+                )}
+                titles={doctorStats.tableTitles}
+              />
+            </Stack>
+          )}
+        </Section>
+      </Stack>
     </Stack>
   )
 }

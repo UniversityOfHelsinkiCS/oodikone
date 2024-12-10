@@ -118,7 +118,7 @@ export const StudentsByStartingYearTab = ({
         </Stack>
       </Section>
       <Section
-        cypress="InfoFacultyStudentTable"
+        cypress="FacultyStudentTable"
         exportOnClick={() =>
           exportStudentTable(
             studentStats?.data,
@@ -129,8 +129,8 @@ export const StudentsByStartingYearTab = ({
           )
         }
         infoBoxContent={facultyToolTips.studentsStatsOfTheFaculty}
-        isError={studentStats.isError || (studentStats.isSuccess && !studentStats.data)}
-        isLoading={studentStats.isFetching || studentStats.isLoading}
+        isError={isError}
+        isLoading={isLoading}
         title="Students of the faculty by starting year"
       >
         {studentStats?.data && (

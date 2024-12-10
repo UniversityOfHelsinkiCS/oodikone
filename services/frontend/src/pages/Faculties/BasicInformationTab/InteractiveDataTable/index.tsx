@@ -111,7 +111,7 @@ export const InteractiveDataTable = ({
   return (
     <Section>
       <TableContainer>
-        <Table data-cy={`Table-${cypress}`} size="small">
+        <Table data-cy={`${cypress}InteractiveDataTable`} size="small">
           <TableHead>
             <TableRow>
               {titles.map((title, index) => (
@@ -138,7 +138,7 @@ export const InteractiveDataTable = ({
                   yearIndex={yearIndex}
                 />
                 <TableRow style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                  <TableCell colSpan={100} data-cy={`Cell-${cypress}-${yearIndex}`}>
+                  <TableCell colSpan={100}>
                     <CollapsedStackedBar
                       data={
                         columnIndex === 0

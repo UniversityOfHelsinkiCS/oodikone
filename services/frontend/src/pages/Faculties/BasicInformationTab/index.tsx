@@ -240,7 +240,7 @@ export const BasicInformationTab = ({
         </Stack>
       </Section>
       <Section
-        cypress="studentOfTheFaculty"
+        cypress="StudentsOfTheFaculty"
         infoBoxContent={facultyToolTips.studentsOfTheFaculty}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
@@ -269,7 +269,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="graduatedOfTheFaculty"
+        cypress="GraduatedOfTheFaculty"
         infoBoxContent={facultyToolTips.graduatedOfTheFaculty}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
@@ -297,7 +297,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="thesisWritersOfTheFaculty"
+        cypress="ThesisWritersOfTheFaculty"
         infoBoxContent={facultyToolTips.thesisWritersOfTheFaculty}
         isError={thesisWritersIsError}
         isLoading={thesisWritersIsLoading}
@@ -325,7 +325,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="creditsProducedByTheFaculty"
+        cypress="CreditsProducedByTheFaculty"
         infoBoxContent={facultyToolTips.creditsProducedByTheFaculty}
         isError={creditsIsError}
         isLoading={creditsIsLoading}

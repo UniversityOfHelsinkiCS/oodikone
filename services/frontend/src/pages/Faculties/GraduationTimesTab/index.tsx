@@ -102,7 +102,7 @@ export const GraduationTimesTab = ({
   return (
     <Stack gap={2}>
       <Section
-        cypress="Section-AverageGraduationTimes"
+        cypress="AverageGraduationTimes"
         exportOnClick={() => exportToExcel(graduationStats.data, programmeNames)}
         infoBoxContent={facultyToolTips.averageGraduationTimes}
         title="Average graduation times by education level"

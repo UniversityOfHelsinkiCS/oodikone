@@ -7,11 +7,11 @@ import { LoadingSkeleton } from './LoadingSkeleton'
 
 export const Section = ({
   children,
-  cypress,
+  cypress = '',
   exportOnClick,
   infoBoxContent,
-  isLoading,
-  isError,
+  isLoading = false,
+  isError = false,
   title,
 }: {
   children: React.ReactNode
@@ -23,14 +23,16 @@ export const Section = ({
   title?: string
 }) => {
   return (
-    <Paper sx={{ padding: 2 }} variant="outlined">
+    <Paper data-cy={cypress} sx={{ padding: 2 }} variant="outlined">
       {title && (
         <Stack alignItems="center" direction="row" justifyContent="space-between">
           <Typography component="h2" variant="h5">
             {title}
           </Typography>
           <Stack direction="row" gap={1}>
-            {exportOnClick && <ExportButton onClick={exportOnClick} />}
+            {exportOnClick && (
+              <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
+            )}
             {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
           </Stack>
         </Stack>

@@ -76,7 +76,7 @@ export const StackedBarChart = ({
   }
 
   return (
-    <Section data-cy={`Graph-${cypress}`}>
+    <Section cypress={`${cypress}Graph`}>
       <ReactHighcharts config={config} />
     </Section>
   )

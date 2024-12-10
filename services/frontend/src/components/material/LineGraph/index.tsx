@@ -62,7 +62,7 @@ export const LineGraph = ({
   }
 
   return (
-    <Section data-cy={`Graph-${cypress}`}>
+    <Section cypress={`${cypress}Graph`}>
       <ReactHighcharts config={config} />
     </Section>
   )

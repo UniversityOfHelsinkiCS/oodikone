@@ -45,6 +45,7 @@ export const Faculties = () => {
     <Container data-cy="FacultySegmentContainer" maxWidth="lg">
       <PageTitle subtitle={facultyCode} title={facultyName ?? 'Faculties'} />
       <Tabs
+        data-cy="FacultyTabs"
         onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })}
         sx={{ marginBottom: 2 }}
         value={tab}
@@ -53,7 +54,7 @@ export const Faculties = () => {
         <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
         <Tab data-cy="ProgressTab" label="Progress" />
         <Tab data-cy="GraduationTimesTab" label="Graduation times" />
-        <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />
+        {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
       </Tabs>
       {tab === 0 && (
         <BasicInformationTab

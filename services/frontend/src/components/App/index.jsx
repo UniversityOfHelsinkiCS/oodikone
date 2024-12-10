@@ -17,6 +17,7 @@ import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { theme } from '@/theme'
 
+// TODO: What other options should be set globally?
 HighCharts.setOptions({
   plotOptions: {
     series: {
