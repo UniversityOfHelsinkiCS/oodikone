@@ -88,9 +88,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
 
   const gender_code = parseGender(gender_urn)
 
-  // Country logic should be fixed, see issue:
-  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2958
-  const country = getCountry(student.country_urn)
+  const citizenships = (student.citizenships ?? []).map(countryUrn => getCountry(countryUrn).name)
   const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null
 
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
@@ -121,9 +119,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     birthdate: date_of_birth,
     creditcount: calculateTotalCreditsFromAttainments(attainmentsOfStudent),
     dateofuniversityenrollment,
-    country_fi: country ? country.name.fi : null,
-    country_sv: country ? country.name.sv : null,
-    country_en: country ? country.name.en : null,
+    citizenships,
     home_country_fi: home_country ? home_country.name.fi : null,
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,

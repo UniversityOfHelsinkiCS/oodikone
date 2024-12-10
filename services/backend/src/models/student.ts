@@ -1,6 +1,7 @@
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
+import { Name } from '../shared/types'
 import { GenderCode } from '../types'
 import { Credit, Enrollment, SISStudyRight, Studyplan } from '.'
 
@@ -56,14 +57,8 @@ export class Student extends Model<InferAttributes<Student>> {
   @Column(DataType.STRING)
   phone_number!: string
 
-  @Column(DataType.STRING)
-  country_fi!: string
-
-  @Column(DataType.STRING)
-  country_sv!: string
-
-  @Column(DataType.STRING)
-  country_en!: string
+  @Column(DataType.JSONB)
+  citizenships!: Name[]
 
   @Column(DataType.STRING)
   home_country_fi!: string

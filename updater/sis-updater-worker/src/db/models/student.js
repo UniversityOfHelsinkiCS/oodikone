@@ -1,4 +1,4 @@
-const { Model, DATE, INTEGER, STRING, BOOLEAN } = require('sequelize')
+const { Model, DATE, INTEGER, STRING, BOOLEAN, JSONB } = require('sequelize')
 
 const { dbConnections } = require('../connection')
 
@@ -20,9 +20,7 @@ Student.init(
     phone_number: { type: STRING },
     secondary_email: { type: STRING },
     national_student_number: { type: STRING },
-    country_fi: { type: STRING },
-    country_sv: { type: STRING },
-    country_en: { type: STRING },
+    citizenships: { type: JSONB },
     home_country_fi: { type: STRING },
     home_country_sv: { type: STRING },
     home_country_en: { type: STRING },
