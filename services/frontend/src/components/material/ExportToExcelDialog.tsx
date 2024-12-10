@@ -159,7 +159,12 @@ export const ExportToExcelDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button color="primary" disabled={selectedColumns.length === 0} onClick={handleExport} variant="contained">
+        <Button
+          disabled={selectedColumns.length === 0}
+          onClick={handleExport}
+          sx={{ backgroundColor: theme => theme.palette.export }}
+          variant="contained"
+        >
           Export
         </Button>
       </DialogActions>

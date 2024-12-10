@@ -1,6 +1,6 @@
-import { Box } from '@mui/material'
+import { Stack } from '@mui/material'
 
-import { GetAllGraduationStatsResponse } from '@/shared/types/api/university'
+import { GetAllGraduationStatsResponse } from '@/types/api/university'
 import { GraduationTimes } from './GraduationTimes'
 
 export const FacultyGraduations = ({
@@ -26,7 +26,7 @@ export const FacultyGraduations = ({
   const classSizes = data?.classSizes
   const commonProps = {
     classSizes,
-    facultyNames,
+    names: facultyNames,
     goalExceptions,
     groupBy: 'byGradYear' as const,
     isError,
@@ -37,7 +37,7 @@ export const FacultyGraduations = ({
   }
 
   return (
-    <Box>
+    <Stack gap={2}>
       <GraduationTimes
         data={medians?.bachelor}
         goal={goals?.bachelor}
@@ -70,6 +70,6 @@ export const FacultyGraduations = ({
         title="Doctor"
         {...commonProps}
       />
-    </Box>
+    </Stack>
   )
 }

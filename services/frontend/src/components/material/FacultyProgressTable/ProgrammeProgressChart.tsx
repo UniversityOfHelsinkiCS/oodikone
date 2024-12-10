@@ -83,7 +83,6 @@ export const ProgrammeProgressChart = ({
     },
     plotOptions: {
       series: {
-        animation: false,
         stacking: 'percent',
         dataLabels: {
           enabled: true,

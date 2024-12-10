@@ -238,7 +238,6 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
       },
       series: {
         cursor: 'pointer',
-        animation: false,
         point: {
           events: {
             click(event) {

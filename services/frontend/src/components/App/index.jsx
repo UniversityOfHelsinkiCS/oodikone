@@ -3,6 +3,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import * as Sentry from '@sentry/browser'
+import HighCharts from 'highcharts'
 import moment from 'moment'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
@@ -15,6 +16,15 @@ import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { isProduction } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { theme } from '@/theme'
+
+// TODO: What other options should be set globally?
+HighCharts.setOptions({
+  plotOptions: {
+    series: {
+      animation: false,
+    },
+  },
+})
 
 moment.updateLocale('en', {
   week: {

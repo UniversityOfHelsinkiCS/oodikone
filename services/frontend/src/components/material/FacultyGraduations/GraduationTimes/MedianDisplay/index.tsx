@@ -1,12 +1,11 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({
   classSizes,
   data,
-  facultyNames,
   goal,
   goalExceptions,
   groupBy,
@@ -14,6 +13,7 @@ export const MedianDisplay = ({
   level,
   levelProgrammeData,
   mode,
+  names,
   programmeDataVisible,
   title,
   year,
@@ -34,7 +34,6 @@ export const MedianDisplay = ({
     }
   }
   data: GraduationStats[]
-  facultyNames: Record<string, NameWithCode>
   goal: number
   goalExceptions: Record<string, number> | { needed: boolean }
   groupBy: 'byGradYear' | 'byStartYear'
@@ -42,6 +41,7 @@ export const MedianDisplay = ({
   level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme'
+  names: Record<string, Name | NameWithCode>
   programmeDataVisible: boolean
   title: string
   year: number | null
@@ -67,10 +67,10 @@ export const MedianDisplay = ({
           classSizes={classSizes?.[level]}
           cypress={`${level}MedianBarChart`}
           data={data}
-          facultyNames={facultyNames}
           goal={goal}
           handleClick={handleClick}
           mode={mode}
+          names={names}
           title={title}
           yearLabel={yearLabel}
         />
@@ -80,12 +80,12 @@ export const MedianDisplay = ({
             cypress={`${level}MedianBarChartFaculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
-            facultyNames={facultyNames}
             goal={goal}
             goalExceptions={goalExceptions}
             handleClick={handleClick}
             level={level}
             mode={mode}
+            names={names}
             title={title}
             year={year}
             yearLabel={yearLabel}

@@ -1,4 +1,3 @@
-import { Paper } from '@mui/material'
 import { OptionsStackingValue, SeriesColumnOptions } from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -6,6 +5,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { generateGradientColors } from '@/common'
+import { Section } from '@/components/material/Section'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -59,9 +59,6 @@ export const FacultyBarChart = ({
           format: '{point.percentage:.1f}%',
         },
       },
-      series: {
-        animation: false,
-      },
     },
     exporting: {
       filename: `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`,
@@ -77,8 +74,8 @@ export const FacultyBarChart = ({
   }
 
   return (
-    <Paper data-cy={`${cypress}BarChart`} sx={{ padding: 2 }} variant="outlined">
+    <Section cypress={`${cypress}BarChart`}>
       <ReactHighcharts config={config} />
-    </Paper>
+    </Section>
   )
 }

@@ -1,57 +1,45 @@
-import { Alert, Box, CircularProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import { Box, Paper, Stack, Typography } from '@mui/material'
 
 import { InfoBox } from '@/components/material/InfoBox'
-
-const ErrorMessage = () => {
-  return (
-    <Alert severity="error">
-      <Typography variant="body1">Something went wrong, please try refreshing the page.</Typography>
-    </Alert>
-  )
-}
-
-const LoadingSkeleton = () => {
-  return (
-    <Box sx={{ height: 400, position: 'relative' }}>
-      <Skeleton height={400} variant="rectangular" />
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    </Box>
-  )
-}
+import { ErrorMessage } from './ErrorMessage'
+import { ExportButton } from './ExportButton'
+import { LoadingSkeleton } from './LoadingSkeleton'
 
 export const Section = ({
   children,
-  cypress,
-  isLoading,
-  isError,
-  title,
+  cypress = '',
+  exportOnClick,
   infoBoxContent,
+  isLoading = false,
+  isError = false,
+  title,
 }: {
   children: React.ReactNode
   cypress?: string
+  exportOnClick?: () => void
+  infoBoxContent?: string
   isLoading?: boolean
   isError?: boolean
-  title: string
-  infoBoxContent?: string
+  title?: string
 }) => {
   return (
-    <Paper sx={{ marginBottom: 2, padding: 2 }} variant="outlined">
-      <Stack alignItems="center" direction="row" justifyContent="space-between">
-        <Typography component="h2" variant="h5">
-          {title}
-        </Typography>
-        {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
-      </Stack>
-      <Box sx={{ marginTop: 2 }}>{isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}</Box>
+    <Paper data-cy={cypress} sx={{ padding: 2 }} variant="outlined">
+      {title && (
+        <Stack alignItems="center" direction="row" justifyContent="space-between">
+          <Typography component="h2" variant="h5">
+            {title}
+          </Typography>
+          <Stack direction="row" gap={1}>
+            {exportOnClick && (
+              <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
+            )}
+            {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
+          </Stack>
+        </Stack>
+      )}
+      <Box sx={{ marginTop: title ? 2 : 0 }}>
+        {isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}
+      </Box>
     </Paper>
   )
 }

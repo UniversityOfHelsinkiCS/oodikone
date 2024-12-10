@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, NameWithCode } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -18,12 +18,12 @@ export const MedianBarChart = ({
   cypress,
   data,
   facultyGraph = true,
-  facultyNames,
   goal,
   goalExceptions,
   handleClick,
   level,
   mode,
+  names,
   title,
   year,
   yearLabel,
@@ -41,12 +41,12 @@ export const MedianBarChart = ({
   cypress: string
   data: GraduationStats[]
   facultyGraph?: boolean
-  facultyNames: Record<string, NameWithCode>
   goal: number
   goalExceptions?: Record<string, number> | { needed: boolean }
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
   level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
   mode: 'faculty' | 'programme'
+  names: Record<string, Name | NameWithCode>
   title: string
   year?: number | null
   yearLabel: 'Graduation year' | 'Start year'
@@ -62,11 +62,11 @@ export const MedianBarChart = ({
       if (Object.keys(goalExceptions).includes(data.code)) {
         const realGoal = goal + goalExceptions[data.code]
         if (data.median <= realGoal) {
-          data.color = theme.graduationTimes.onTime
+          data.color = theme.palette.graduationTimes.onTime
         } else if (data.median <= realGoal + 12) {
-          data.color = theme.graduationTimes.yearOver
+          data.color = theme.palette.graduationTimes.yearOver
         } else {
-          data.color = theme.graduationTimes.wayOver
+          data.color = theme.palette.graduationTimes.wayOver
         }
         data.realGoal = realGoal
       }
@@ -101,11 +101,11 @@ export const MedianBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getFacultyName = (code: string) => {
-    if (!facultyNames) {
+  const getFacultyOrProgrammeName = (code: string) => {
+    if (!names) {
       return ''
     }
-    return facultyNames[code]?.[language] ?? facultyNames[code]?.fi
+    return names[code]?.[language] ?? names[code]?.fi
   }
 
   const getTooltipText = (
@@ -125,7 +125,7 @@ export const MedianBarChart = ({
 
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
-      return `<b>${getFacultyName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
+      return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
   }
@@ -169,7 +169,6 @@ export const MedianBarChart = ({
     },
     plotOptions: {
       series: {
-        animation: false,
         dataLabels: {
           enabled: true,
           inside: true,
@@ -203,14 +202,14 @@ export const MedianBarChart = ({
         zones: [
           {
             value: goal + 0.1,
-            color: theme.graduationTimes.onTime,
+            color: theme.palette.graduationTimes.onTime,
           },
           {
             value: goal + 12.1,
-            color: theme.graduationTimes.yearOver,
+            color: theme.palette.graduationTimes.yearOver,
           },
           {
-            color: theme.graduationTimes.wayOver,
+            color: theme.palette.graduationTimes.wayOver,
           },
         ],
         point: {
@@ -243,13 +242,13 @@ export const MedianBarChart = ({
       showFirstLabel: false,
       plotLines: [
         {
-          color: theme.graduationTimes.onTime,
+          color: theme.palette.graduationTimes.onTime,
           width: 2,
           value: goal,
           dashStyle: 'ShortDash',
         },
         {
-          color: theme.graduationTimes.yearOver,
+          color: theme.palette.graduationTimes.yearOver,
           width: 2,
           value: goal + 12,
           dashStyle: 'ShortDash',
