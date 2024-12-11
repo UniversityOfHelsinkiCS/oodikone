@@ -73,6 +73,9 @@ export const facultyToolTips: Record<string, string> = {
     start date of the bachelor programme and at the moment, they do not include any transferred credits.
     Thus, in these statistics some students have fewer credits than in reality.
   `,
+  interactiveDataTable: `
+    Sort bars in the yearly charts by programme code or other column values. Sorting is done inside the degree group.
+  `,
 }
 
 facultyToolTips.studentsStatsOfTheFaculty = studyProgrammeToolTips.studyTrackOverview.replace(

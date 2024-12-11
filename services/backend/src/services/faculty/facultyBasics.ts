@@ -1,11 +1,10 @@
 import { cloneDeep } from 'lodash'
 
+import { NameWithCode } from '../../shared/types'
 import { DegreeProgrammeType } from '../../types'
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'
 import type { ProgrammesOfOrganization } from './faculty'
-
-type ProgrammeName = { code: string; en?: string; fi?: string; sv?: string }
 
 type StudyTrackBasicStats = Awaited<ReturnType<typeof getBasicStatsForStudytrack>>
 
@@ -19,12 +18,12 @@ const calculateCombinedStats = async (
     graphStats: [] as StudyTrackBasicStats['graphStats'],
     programmeTableStats: {} as Record<string, StudyTrackBasicStats['tableStats']>,
     tableStats: [] as StudyTrackBasicStats['tableStats'],
-    titles: ['', 'Started\nstudying', 'Accepted', 'Graduated'],
+    titles: ['Code', 'Started\nstudying', 'Accepted', 'Graduated'],
   }
   if (includeAllSpecials) {
     studentInfo.titles.push('Transferred out\nof programme', 'Transferred into\nprogramme')
   }
-  const programmeNames: Record<string, ProgrammeName> = {}
+  const programmeNames: Record<string, NameWithCode> = {}
   let years: Array<string | number> = []
 
   for (const programme of facultyProgrammes) {
@@ -143,7 +142,7 @@ const calculateCombinedStats = async (
       graphStats: combinedGraphStats,
       programmeTableStats: combinedProgrammeTableStats,
       tableStats: combinedTableStats,
-      titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+      titles: ['Code', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
     },
   }
 }

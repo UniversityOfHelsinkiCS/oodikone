@@ -1,7 +1,9 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
 import { Fragment, useState } from 'react'
 
+import { facultyToolTips } from '@/common/InfoToolTips'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
+import { InfoBox } from '@/components/material/InfoBox'
 import { Section } from '@/components/material/Section'
 import { NameWithCode } from '@shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
@@ -115,14 +117,21 @@ export const InteractiveDataTable = ({
           <TableHead>
             <TableRow>
               {titles.map((title, index) => (
-                <TableCell align="right" key={title}>
-                  <TableSortLabel
-                    active={sorter === sorterNames[index]}
-                    direction={sortDirection}
-                    onClick={() => handleSortClick(sorterNames[index], index)}
-                  >
-                    {title}
-                  </TableSortLabel>
+                <TableCell key={title}>
+                  <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
+                    {index === 0 && (
+                      <Box sx={{ marginRight: 1 }}>
+                        <InfoBox content={facultyToolTips.interactiveDataTable} mini />
+                      </Box>
+                    )}
+                    <TableSortLabel
+                      active={sorter === sorterNames[index]}
+                      direction={sortDirection}
+                      onClick={() => handleSortClick(sorterNames[index], index)}
+                    >
+                      {title}
+                    </TableSortLabel>
+                  </Box>
                 </TableCell>
               ))}
             </TableRow>

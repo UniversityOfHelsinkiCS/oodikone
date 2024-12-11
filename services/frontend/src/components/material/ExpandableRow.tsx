@@ -26,9 +26,9 @@ export const ExpandableRow = ({
   return (
     <TableRow>
       {yearArray?.map((value, index) => (
-        <TableCell align={index === 0 ? 'center' : 'right'} key={getKey(value, index)}>
+        <TableCell align="right" key={getKey(value, index)}>
           {index === 0 ? (
-            <Box alignItems="center" display="flex" justifyContent="center">
+            <Box alignItems="center" display="flex" justifyContent="left">
               <IconButton data-cy={`${cypress}${yearIndex}`} onClick={toggleVisibility} size="small">
                 {visible ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
