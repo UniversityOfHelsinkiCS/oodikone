@@ -90,14 +90,29 @@ export const NavigationBar = () => {
           >
             <OodikoneLogo />
             {!isLoading && location && (
-              <Tabs textColor="inherit" value={activeTab} variant="scrollable">
+              <Tabs
+                sx={{
+                  '& .MuiTabs-indicator': {
+                    backgroundColor: theme => theme.palette.activeNavigationTab,
+                  },
+                }}
+                textColor="inherit"
+                value={activeTab}
+                variant="scrollable"
+              >
                 {Object.entries(visibleNavigationItems).map(([key, item]) => (
                   <Tab
                     component={item.path ? Link : 'div'}
                     data-cy={`nav-bar-button-${key}`}
                     key={key}
                     label={<NavigationButton item={item} />}
-                    sx={{ '&:hover': { color: 'inherit' } }}
+                    sx={{
+                      opacity: 1,
+                      '&:hover': {
+                        color: 'inherit',
+                        opacity: 0.7,
+                      },
+                    }}
                     to={item.path ?? ''}
                   />
                 ))}

@@ -3,6 +3,7 @@ import { createTheme } from '@mui/material/styles'
 
 declare module '@mui/material/styles' {
   interface Palette {
+    activeNavigationTab: string
     export: string
     graduationTimes: {
       onTime: string
@@ -11,6 +12,7 @@ declare module '@mui/material/styles' {
     }
   }
   interface PaletteOptions {
+    activeNavigationTab: string
     export: string
     graduationTimes?: {
       onTime: string
@@ -22,6 +24,7 @@ declare module '@mui/material/styles' {
 
 export const theme = createTheme({
   palette: {
+    activeNavigationTab: '#fff',
     export: deepPurple[500],
     graduationTimes: {
       onTime: '#90a959',
