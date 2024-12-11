@@ -1,8 +1,8 @@
 import moment from 'moment'
 import { Op } from 'sequelize'
 
+import { Name } from '@shared/types'
 import { Semester } from '../models'
-import { Name } from '../shared/types'
 
 type SemestersAndYears = {
   years: {

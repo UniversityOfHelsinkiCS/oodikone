@@ -133,12 +133,6 @@ export default [
     },
   },
   {
-    files: ['services/**/shared/**/*'],
-    rules: {
-      'import/no-unused-modules': 'off',
-    },
-  },
-  {
     files: ['cypress/**/*.js', 'services/backend/**/*.js', 'updater/**/*.js'],
     languageOptions: {
       sourceType: 'commonjs',
@@ -164,7 +158,7 @@ export default [
   },
   {
     settings: {
-      'import/internal-regex': '^@/shared/',
+      'import/internal-regex': '^@shared/',
       'import/resolver': {
         typescript: {
           project: [

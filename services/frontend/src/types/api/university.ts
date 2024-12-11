@@ -1,4 +1,4 @@
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, NameWithCode, ProgrammeMedians } from '@shared/types'
 
 // ? Almost identical to GetFacultyGraduationTimesResponse, could be combined?
 export interface GetAllGraduationStatsResponse {

@@ -5,7 +5,7 @@ import { filterInternalReleases } from '@/common'
 import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useGetChangelogQuery } from '@/redux/changelog'
-import { Release } from '@/shared/types'
+import { Release } from '@shared/types'
 import { ReleaseCard } from './ReleaseCard'
 
 export const Changelog = () => {

@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { Section } from '@/components/material/Section'
-import { NameWithCode } from '@/shared/types'
+import { NameWithCode } from '@shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
 
 export const InteractiveDataTable = ({

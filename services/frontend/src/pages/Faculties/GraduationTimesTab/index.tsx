@@ -8,9 +8,9 @@ import { GraduationTimes } from '@/components/material/FacultyGraduations/Gradua
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
-import { Name } from '@/shared/types'
 import { GetFacultiesResponse, GetFacultyGraduationTimesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { Name } from '@shared/types'
 
 export const GraduationTimesTab = ({
   faculty,

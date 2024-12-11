@@ -1,5 +1,6 @@
 import { col, InferAttributes, Op, where } from 'sequelize'
 
+import { Name } from '@shared/types'
 import {
   Course,
   Credit,
@@ -10,7 +11,6 @@ import {
   SISStudyRight,
   SISStudyRightElement,
 } from '../../models'
-import { Name } from '../../shared/types'
 import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurriculumVersion } from './shared'

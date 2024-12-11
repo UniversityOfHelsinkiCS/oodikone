@@ -13,7 +13,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../shared/types'
+import { Name } from '@shared/types'
 import { CourseProvider } from './courseProvider'
 import { CourseType } from './courseType'
 import { Credit } from './credit'

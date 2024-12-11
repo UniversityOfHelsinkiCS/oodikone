@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@shared/types'
 import { BreakdownBarChart } from './BreakdownBarChart'
 
 export const BreakdownDisplay = ({

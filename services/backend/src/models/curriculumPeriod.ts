@@ -1,7 +1,7 @@
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '../shared/types'
+import { Name } from '@shared/types'
 
 @Table({
   underscored: true,

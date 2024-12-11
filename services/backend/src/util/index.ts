@@ -1,5 +1,5 @@
+import { Role } from '@shared/types'
 import { ProgrammeModule } from '../models'
-import { Role } from '../shared/types'
 import { DetailedProgrammeRights } from '../types'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {

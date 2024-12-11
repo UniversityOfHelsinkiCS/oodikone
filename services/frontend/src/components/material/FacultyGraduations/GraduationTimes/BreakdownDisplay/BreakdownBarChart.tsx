@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, Name, NameWithCode } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode } from '@shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

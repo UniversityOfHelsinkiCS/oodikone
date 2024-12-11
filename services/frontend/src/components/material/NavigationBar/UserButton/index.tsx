@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { LANGUAGE_CODES, LANGUAGE_TEXTS } from '@/shared/language'
+import { LANGUAGE_CODES, LANGUAGE_TEXTS } from '@shared/language'
 import { LogOutButton } from './LogOutButton'
 import { StopMockingButton } from './StopMockingButton'
 

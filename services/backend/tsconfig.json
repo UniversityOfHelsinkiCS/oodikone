@@ -7,8 +7,8 @@
     "module": "nodenext",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "dist",
-    "rootDir": ".",
+    "outDir": "../dist",
+    "rootDir": "..",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,7 +17,11 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
   },
-  "include": ["src/**/*", "index.js"]
+  "include": ["src/**/*", "index.js", "../shared/**/*"]
 }

@@ -1,8 +1,8 @@
 import { utils, writeFile } from 'xlsx'
 
-import { Name } from '@/shared/types'
 import { DegreeProgramme, GetFacultyStudentStatsResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { Name } from '@shared/types'
 
 export const exportStudentTable = (
   data: GetFacultyStudentStatsResponse | undefined,

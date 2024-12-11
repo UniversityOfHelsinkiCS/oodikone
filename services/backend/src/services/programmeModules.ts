@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize'
 
+import { Name } from '@shared/types'
 import { dbConnections } from '../database/connection'
 import { CurriculumPeriod, ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
-import { Name } from '../shared/types'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 

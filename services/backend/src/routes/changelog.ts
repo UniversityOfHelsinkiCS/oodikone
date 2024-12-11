@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { Request, Response, Router } from 'express'
 
+import { Release } from '@shared/types'
 import { isDev } from '../config'
-import { Release } from '../shared/types'
 
 const router = Router()
 

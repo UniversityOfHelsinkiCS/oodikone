@@ -1,4 +1,4 @@
-import { Name } from '../../shared/types'
+import { Name } from '@shared/types'
 import { EnrollmentState } from '../../types'
 import { lengthOf, percentageOf } from '../../util'
 
