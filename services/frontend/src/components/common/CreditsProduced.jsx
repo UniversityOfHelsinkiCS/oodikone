@@ -67,7 +67,7 @@ export const makeTableStats = (data, showAll, isAcademicYear) => {
     if (showAll) yearStats.splice(5, 0, Math.round(agreement), Math.round(separate))
     tableStats.push(yearStats)
   }
-  const titles = ['', 'Total', 'Degree students', 'Exchange students', 'Open university', 'Transferred']
+  const titles = ['Code', 'Total', 'Degree students', 'Exchange students', 'Open university', 'Transferred']
   if (showAll) titles.splice(5, 0, 'Other university', 'Separate')
   return { data: tableStats, titles }
 }
