@@ -3,7 +3,7 @@ import { Box, CircularProgress, Skeleton, Stack, Typography } from '@mui/materia
 export const LoadingSkeleton = () => {
   return (
     <Box sx={{ height: 400, position: 'relative' }}>
-      <Skeleton height={400} variant="rectangular" />
+      <Skeleton height={400} sx={{ borderRadius: 1 }} variant="rectangular" />
       <Box
         sx={{
           position: 'absolute',
