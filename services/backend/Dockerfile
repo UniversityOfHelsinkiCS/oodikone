@@ -26,6 +26,8 @@ COPY ./backend .
 
 RUN npm run build
 
+RUN ls -la /opt/app-root/src
+RUN ls -la /opt/app-root/src/dist
 
 
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal

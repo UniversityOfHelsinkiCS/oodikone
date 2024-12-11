@@ -32,6 +32,8 @@ services:
     build:
       context: services
       dockerfile: frontend/Dockerfile
+      args:
+        - --progress=plain
 
   kone-db:
     <<: *defaults
