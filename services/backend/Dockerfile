@@ -60,4 +60,4 @@ COPY --from=build /opt/app-root/src/dist ./dist
 
 RUN npm ci
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/backend/index.js"]
