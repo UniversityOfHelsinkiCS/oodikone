@@ -26,6 +26,8 @@ COPY ./backend .
 
 RUN npm run build
 
+RUN ls -la /opt/app-root/
+RUN ls -la /opt/app-root/src/src/
 RUN ls -la /opt/app-root/src
 RUN ls -la /opt/app-root/src/dist
 
