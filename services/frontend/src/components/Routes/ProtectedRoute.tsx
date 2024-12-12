@@ -1,4 +1,4 @@
-import { Route } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import { checkUserAccess } from '@/common'
 import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
@@ -6,20 +6,14 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Role } from '@/shared/types'
 import { AccessDeniedMessage } from './AccessDeniedMessage'
 
-export const ProtectedRoute = ({
-  component,
-  location,
-  path,
-  requiredRoles = [],
-  requireUserHasRights = false,
-  ...rest
-}: {
-  component: JSX.Element
-  location: { hash: string; pathname: string; search: string; state: any }
-  path: string
-  requiredRoles: Role[]
-  requireUserHasRights: boolean
-}) => {
+interface ProtectedRouteProps {
+  element: JSX.Element
+  requiredRoles?: Role[]
+  requireUserHasRights?: boolean
+}
+
+export const ProtectedRoute = ({ element, requiredRoles = [], requireUserHasRights = false }: ProtectedRouteProps) => {
+  const location = useLocation()
   const { iamGroups, isAdmin, programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullSisuAccessRoutes = ['populations', 'students', 'custompopulation', 'study-programme', 'coursepopulation']
 
@@ -30,22 +24,18 @@ export const ProtectedRoute = ({
     if (requiredRoles.includes('courseStatistics')) {
       return hasRequiredRoles || hasRequiredRights
     }
-    if (fullSisuAccessRoutes.some(route => path.includes(route))) {
+    if (fullSisuAccessRoutes.some(route => location.pathname.includes(route))) {
       return hasRequiredRoles || hasRequiredRights
     }
-    if (path.includes('languagecenterview')) {
+    if (location.pathname.includes('languagecenterview')) {
       return iamGroups.includes('grp-kielikeskus-esihenkilot')
     }
-    if (path.includes('teachers')) {
+    if (location.pathname.includes('teachers')) {
       return hasRequiredRoles || hasFullAccessToTeacherData(roles, iamGroups)
     }
 
     return hasRequiredRoles && hasRequiredRights
   }
 
-  if (hasAccessToRoute()) {
-    return <Route component={component} location={location} path={path} {...rest} />
-  }
-
-  return <AccessDeniedMessage />
+  return hasAccessToRoute() ? element : <AccessDeniedMessage />
 }
