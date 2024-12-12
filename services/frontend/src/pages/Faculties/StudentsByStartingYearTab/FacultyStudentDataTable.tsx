@@ -125,7 +125,7 @@ export const FacultyStudentDataTable = ({
   return (
     <Section>
       <TableContainer>
-        <Table data-cy={cypress}>
+        <Table data-cy={cypress} sx={{ '& td': { whiteSpace: 'nowrap' } }}>
           <TableHead>
             <TableRow key="FirstHeader">
               <TableCell colSpan={!showPercentages ? 3 : 4} />
