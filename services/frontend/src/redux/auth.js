@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { RTKApi } from '@/apiConnection'
 import { showAsUserKey } from '@/common'
@@ -48,7 +48,7 @@ export const useGetAuthorizedUserQuery = () => {
 }
 
 export const useShowAsUser = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const showAsUser = (username, reload = true) => {
     if (username) {
@@ -58,7 +58,7 @@ export const useShowAsUser = () => {
     }
 
     if (reload) {
-      history.push('/')
+      void navigate('/')
       window.location.reload()
     }
   }
