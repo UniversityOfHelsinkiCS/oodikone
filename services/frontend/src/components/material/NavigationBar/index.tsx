@@ -18,7 +18,7 @@ export const NavigationBar = () => {
   const [activeTab, setActiveTab] = useState<number | false>(false)
 
   const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
-    const allPaths = [mainPath, ...subPaths].filter(Boolean)
+    const allPaths = [mainPath, ...subPaths].filter((path): path is string => Boolean(path))
     return allPaths.some(currentPath => location.pathname.includes(currentPath))
   }
 

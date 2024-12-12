@@ -76,10 +76,10 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
               showItem(subItem.key) && (
                 <MenuItem
                   component={Link}
-                  key={subItem.path}
+                  key={subItem.path ?? ''}
                   onClick={() => setAnchorEl(null)}
-                  selected={location.pathname?.includes(subItem.path)}
-                  to={subItem.path}
+                  selected={location.pathname?.includes(subItem.path ?? '') ?? false}
+                  to={subItem.path ?? '/'}
                 >
                   {subItem.label}
                 </MenuItem>
