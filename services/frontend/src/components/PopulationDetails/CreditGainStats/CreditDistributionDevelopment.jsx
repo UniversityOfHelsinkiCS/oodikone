@@ -145,7 +145,7 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
 export const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
-  const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
+  const [stackOrdering, setStackOrdering] = useState(StackOrdering.DESCENDING)
   const location = useLocation()
   const { months } = qs.parse(location.search)
   const { data: semestersAndYears = {} } = useGetSemestersQuery()
