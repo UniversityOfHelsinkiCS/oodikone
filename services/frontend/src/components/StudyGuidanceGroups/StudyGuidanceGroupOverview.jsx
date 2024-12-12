@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
 
 import { textAndDescriptionSearch } from '@/common'
@@ -15,12 +15,12 @@ import './StudyGuidanceGroupOverview.css'
 
 const LinkToGroup = ({ group }) => {
   const { getTextIn } = useLanguage()
-  const history = useHistory()
+  const navigate = useNavigate()
   const destination = `/studyguidancegroups/${group.id}`
   return (
     <Link data-cy={`study-guidance-group-link-${group.id}`} style={{ color: 'black' }} to={destination}>
       {getTextIn(group.name)}
-      <Icon color="blue" name="level up alternate" onClick={() => history.push(destination)} />
+      <Icon color="blue" name="level up alternate" onClick={() => void navigate(destination)} />
     </Link>
   )
 }

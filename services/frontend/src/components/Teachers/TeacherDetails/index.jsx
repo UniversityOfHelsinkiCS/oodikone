@@ -1,5 +1,5 @@
 import { isString } from 'lodash'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { Card, Segment, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -24,7 +24,7 @@ export const TeacherDetails = ({ teacherId }) => {
 
   if (isLoading) return <Segment basic loading />
 
-  if (isError) return <Redirect to="/teachers" />
+  if (isError) return <Navigate replace to="/teachers" />
 
   const { courses, years, semesters } = teacher.statistics
 
