@@ -2,6 +2,14 @@ import { Stack, Switch, Typography } from '@mui/material'
 
 import { InfoBox } from '@/components/material/InfoBox'
 
+const ToggleLabel = ({ active, disabled, label }: { active: boolean; disabled: boolean; label: string }) => {
+  return (
+    <Typography color={disabled ? 'text.secondary' : 'text.primary'} fontWeight={active ? 'bold' : ''}>
+      {label}
+    </Typography>
+  )
+}
+
 export const Toggle = ({
   cypress,
   disabled = false,
@@ -22,9 +30,9 @@ export const Toggle = ({
   return (
     <Stack alignItems="center" direction="row" gap={1}>
       <Stack alignItems="center" direction="row">
-        <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{firstLabel}</Typography>
+        <ToggleLabel active={!value} disabled={disabled} label={firstLabel} />
         <Switch checked={value} data-cy={cypress} disabled={disabled} onChange={() => setValue(!value)} />
-        <Typography color={disabled ? 'text.secondary' : 'text.primary'}>{secondLabel}</Typography>
+        <ToggleLabel active={value} disabled={disabled} label={secondLabel} />
       </Stack>
       {infoBoxContent && <InfoBox content={infoBoxContent} mini />}
     </Stack>
