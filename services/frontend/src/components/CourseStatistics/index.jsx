@@ -1,7 +1,7 @@
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Header, Message, Segment, Tab } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
@@ -24,7 +24,8 @@ const MENU = {
 }
 
 export const CourseStatistics = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const { pending: loading, data: courseStatsData } = useSelector(({ courseStats }) => courseStats)
@@ -43,14 +44,14 @@ export const CourseStatistics = () => {
   }, [initCourseCode])
 
   useEffect(() => {
-    const { courseCodes, ...params } = qs.parse(history.location.search)
+    const { courseCodes, ...params } = qs.parse(location.search)
     if (!courseCodes) return
     const query = {
       ...params,
       courseCodes: JSON.parse(courseCodes),
     }
-    dispatch(getCourseStats(query, onProgress))
-  }, [history.location.search])
+    void dispatch(getCourseStats(query, onProgress))
+  }, [location.search])
 
   useEffect(() => {
     if (statsIsEmpty) {
@@ -104,7 +105,7 @@ export const CourseStatistics = () => {
           content: MENU.QUERY,
           icon: 'search',
           position: 'right',
-          onClick: () => history.push('/coursestatistics'),
+          onClick: () => navigate('/coursestatistics'),
         },
         render: () => null,
       },
@@ -133,7 +134,7 @@ export const CourseStatistics = () => {
   const panes = getPanes()
 
   const getContent = () => {
-    if (statsIsEmpty || history.location.search === '') {
+    if (statsIsEmpty || location.search === '') {
       return <SearchForm onProgress={onProgress} />
     }
 
