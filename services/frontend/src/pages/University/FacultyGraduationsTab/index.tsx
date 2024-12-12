@@ -1,10 +1,11 @@
-import { Box, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { FacultyGraduations } from '@/components/material/FacultyGraduations'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyGraduationsTab = () => {
@@ -19,7 +20,7 @@ export const FacultyGraduationsTab = () => {
         infoBoxContent={facultyToolTips.averageGraduationTimes}
         title="Average graduation times"
       >
-        <Box display="flex" justifyContent="center">
+        <ToggleContainer>
           <Toggle
             cypress="GraduationTimeToggle"
             disabled={isFetching || isLoading || isError}
@@ -28,7 +29,7 @@ export const FacultyGraduationsTab = () => {
             setValue={() => setMedianMode(!medianMode)}
             value={medianMode}
           />
-        </Box>
+        </ToggleContainer>
       </Section>
       <FacultyGraduations
         data={data}

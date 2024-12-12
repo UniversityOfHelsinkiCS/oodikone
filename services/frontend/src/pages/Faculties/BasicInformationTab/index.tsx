@@ -7,6 +7,7 @@ import { LineGraph } from '@/components/material/LineGraph'
 import { Section } from '@/components/material/Section'
 import { StackedBarChart } from '@/components/material/StackedBarChart'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import {
   useGetFacultyBasicStatsQuery,
   useGetFacultyCreditStatsQuery,
@@ -197,7 +198,7 @@ export const BasicInformationTab = ({
   return (
     <Stack gap={2}>
       <Section>
-        <Stack alignItems="center" direction="column" gap={1}>
+        <ToggleContainer>
           <Toggle
             cypress="YearToggle"
             disabled={isFetchingOrLoading || hasErrors}
@@ -237,7 +238,7 @@ export const BasicInformationTab = ({
               view.
             </Alert>
           )}
-        </Stack>
+        </ToggleContainer>
       </Section>
       <Section
         cypress="StudentsOfTheFaculty"

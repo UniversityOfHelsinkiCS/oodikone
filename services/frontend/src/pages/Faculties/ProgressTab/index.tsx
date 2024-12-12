@@ -6,6 +6,7 @@ import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
@@ -82,7 +83,7 @@ export const ProgressTab = ({
         infoBoxContent={facultyToolTips.studentProgress}
         title="Progress of students of the faculty"
       >
-        <Stack alignItems="center" direction={{ sm: 'column', md: 'row' }} justifyContent="space-around">
+        <ToggleContainer>
           <Toggle
             cypress="GraduatedToggle"
             disabled={isError || isLoading}
@@ -101,7 +102,7 @@ export const ProgressTab = ({
             setValue={setSpecialGroups}
             value={specialGroups}
           />
-        </Stack>
+        </ToggleContainer>
       </Section>
       <Stack gap={2}>
         <Section isError={isError} isLoading={isLoading} title="Bachelor">

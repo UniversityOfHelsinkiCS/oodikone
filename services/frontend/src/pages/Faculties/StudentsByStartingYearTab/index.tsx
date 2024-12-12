@@ -5,6 +5,7 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { exportStudentTable } from './export'
@@ -88,7 +89,7 @@ export const StudentsByStartingYearTab = ({
   return (
     <Stack gap={2}>
       <Section>
-        <Stack alignItems="center" direction="column" gap={2} justifyContent="space-around">
+        <ToggleContainer>
           <Toggle
             cypress="StudentToggle"
             disabled={isError || isLoading}
@@ -115,7 +116,7 @@ export const StudentsByStartingYearTab = ({
             setValue={setShowPercentages}
             value={showPercentages}
           />
-        </Stack>
+        </ToggleContainer>
       </Section>
       <Section
         cypress="FacultyStudentTable"

@@ -7,6 +7,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { GraduationTimes } from '@/components/material/FacultyGraduations/GraduationTimes'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
 import { Name } from '@/shared/types'
 import { GetFacultiesResponse, GetFacultyGraduationTimesResponse } from '@/types/api/faculty'
@@ -107,7 +108,7 @@ export const GraduationTimesTab = ({
         infoBoxContent={facultyToolTips.averageGraduationTimes}
         title="Average graduation times by education level"
       >
-        <Stack alignItems="center" direction="column" gap={2} justifyContent="space-around">
+        <ToggleContainer>
           <Toggle
             cypress="GraduationTimeToggle"
             disabled={isError || isLoading}
@@ -133,7 +134,7 @@ export const GraduationTimesTab = ({
             setValue={setStudyProgrammes}
             value={studyProgrammes}
           />
-        </Stack>
+        </ToggleContainer>
       </Section>
       <Stack gap={2}>
         <GraduationTimes

@@ -5,6 +5,7 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { FacultyProgress } from '@/components/material/FacultyProgress'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyProgressTab = () => {
@@ -23,7 +24,7 @@ export const FacultyProgressTab = () => {
         infoBoxContent={facultyToolTips.studentProgress}
         title="Progress of students of the university"
       >
-        <Stack alignItems="center" direction={{ sm: 'column', md: 'row' }} justifyContent="space-around">
+        <ToggleContainer>
           <Toggle
             cypress="GraduatedToggle"
             disabled={progressStats.isLoading || progressStats.isError}
@@ -42,7 +43,7 @@ export const FacultyProgressTab = () => {
             setValue={() => setIncludeSpecials(!excludeSpecials)}
             value={excludeSpecials}
           />
-        </Stack>
+        </ToggleContainer>
       </Section>
       <FacultyProgress
         faculty="ALL"
