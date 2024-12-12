@@ -30,7 +30,6 @@ export const Faculties = () => {
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const [tab, handleTabChange] = useTabs(isAdmin ? 5 : 4)
-  const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
@@ -58,9 +57,7 @@ export const Faculties = () => {
       </Tabs>
       {tab === 0 && (
         <BasicInformationTab
-          academicYear={academicYear}
           faculty={faculty}
-          setAcademicYear={setAcademicYear}
           setSpecialGroups={setSpecialGroups}
           setStudyProgrammes={setStudyProgrammes}
           specialGroups={specialGroups}

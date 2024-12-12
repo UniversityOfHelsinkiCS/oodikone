@@ -114,23 +114,20 @@ const getSortedProgrammeIdsAndPlotLinePlaces = (
 }
 
 export const BasicInformationTab = ({
-  academicYear,
   faculty,
-  setAcademicYear,
   setSpecialGroups,
   setStudyProgrammes,
   specialGroups,
   studyProgrammes,
 }: {
-  academicYear: boolean
   faculty: GetFacultiesResponse
-  setAcademicYear: (value: boolean) => void
   setSpecialGroups: (value: boolean) => void
   setStudyProgrammes: (value: boolean) => void
   specialGroups: boolean
   studyProgrammes: boolean
 }) => {
   const [showAll, setShowAll] = useState(false)
+  const [academicYear, setAcademicYear] = useState(false)
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
