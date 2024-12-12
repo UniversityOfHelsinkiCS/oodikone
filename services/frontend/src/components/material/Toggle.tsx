@@ -31,7 +31,27 @@ export const Toggle = ({
     <Stack alignItems="center" direction="row" gap={1}>
       <Stack alignItems="center" direction="row">
         <ToggleLabel active={!value} disabled={disabled} label={firstLabel} />
-        <Switch checked={value} data-cy={cypress} disabled={disabled} onChange={() => setValue(!value)} />
+        <Switch
+          checked={value}
+          data-cy={cypress}
+          disabled={disabled}
+          onChange={() => setValue(!value)}
+          sx={{
+            '& .MuiSwitch-switchBase': {
+              color: 'white',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked': {
+              color: 'white',
+            },
+            '& .MuiSwitch-track': {
+              backgroundColor: 'gray',
+              opacity: 0.5,
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: 'gray',
+            },
+          }}
+        />
         <ToggleLabel active={value} disabled={disabled} label={secondLabel} />
       </Stack>
       {infoBoxContent && <InfoBox content={infoBoxContent} mini />}
