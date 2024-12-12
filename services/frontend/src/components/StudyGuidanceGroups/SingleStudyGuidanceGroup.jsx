@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button, Divider, Header, Label } from 'semantic-ui-react'
 
 import { isMastersProgramme } from '@/common'
@@ -257,11 +257,11 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
 }
 
 const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { getTextIn } = useLanguage()
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const handleBack = () => {
-    history.push('/studyguidancegroups')
+    void navigate('/studyguidancegroups')
   }
 
   return (

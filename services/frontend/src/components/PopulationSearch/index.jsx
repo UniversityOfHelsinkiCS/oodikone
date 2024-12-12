@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
 import { useProgress } from '@/common/hooks'
@@ -12,7 +12,6 @@ import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 export const PopulationSearch = ({ combinedProgrammeCode }) => {
-  const history = useHistory()
   const location = useLocation()
   const populations = useSelector(state => state.populations)
   const populationFound = populations.data.students !== undefined
@@ -22,12 +21,12 @@ export const PopulationSearch = ({ combinedProgrammeCode }) => {
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
   const bothHopsSelected = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
-  const title = populationFound && history.location.search ? null : 'Search for class'
+  const title = populationFound && location.search ? null : 'Search for class'
 
   return (
     <Segment>
       {title && <Header size="medium">{title}</Header>}
-      {(!populationFound || !history.location.search) && (
+      {(!populationFound || !location.search) && (
         <>
           <InfoBox content={populationStatisticsToolTips.search} cypress="PopulationSearch" />
           <Divider />

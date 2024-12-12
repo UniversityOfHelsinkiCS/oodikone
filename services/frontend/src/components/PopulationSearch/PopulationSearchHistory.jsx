@@ -1,7 +1,7 @@
 import qs from 'query-string'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -12,7 +12,7 @@ import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
 export const PopulationSearchHistory = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const populations = useSelector(state => state.populations)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(populations.query?.semesters || ['FALL', 'SPRING'])
@@ -47,7 +47,7 @@ export const PopulationSearchHistory = () => {
       studyRights: JSON.stringify(studyRights),
     }
     const searchString = qs.stringify(queryObject)
-    history.push({ search: searchString })
+    void navigate({ search: searchString })
   }
 
   const renderAdvancedSettingsSelector = () => {
