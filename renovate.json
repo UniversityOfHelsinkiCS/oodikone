@@ -28,7 +28,5 @@
     "labels": ["security"]
   },
   "addLabels": ["dependencies"],
-  "rangeStrategy": "bump",
-  "schedule": ["before 5:00am"],
-  "timezone": "Europe/Helsinki"
+  "rangeStrategy": "bump"
 }
