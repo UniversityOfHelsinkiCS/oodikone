@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import { Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 
 import { isDefaultServiceProvider } from '@/common'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
@@ -48,95 +48,97 @@ const routes = {
 
 export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
-    <Switch>
-      <Route component={FrontPage} exact path="/" />
-      <Route component={Changelog} exact path={routes.changelog} />
-      {isDefaultServiceProvider() && <Route component={Feedback} exact path={routes.feedback} />}
-      <ProtectedRoute
-        component={PopulationStatistics}
-        exact
+    <RouterRoutes>
+      <Route element={<FrontPage />} path="/" />
+      <Route element={<Changelog />} path={routes.changelog} />
+      {isDefaultServiceProvider() && <Route element={<Feedback />} path={routes.feedback} />}
+      <Route
+        element={
+          <ProtectedRoute element={<PopulationStatistics />} requireUserHasRights requiredRoles={['fullSisuAccess']} />
+        }
         path={routes.populations}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess']}
       />
-      <ProtectedRoute
-        component={Faculties}
-        exact
+      <Route
+        element={
+          <ProtectedRoute element={<Faculties />} requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']} />
+        }
         path={routes.faculties}
-        requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']}
       />
-      <ProtectedRoute
-        component={StudyProgramme}
-        exact
+      <Route
+        element={
+          <ProtectedRoute element={<StudyProgramme />} requireUserHasRights requiredRoles={['fullSisuAccess']} />
+        }
         path={routes.studyProgramme}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess']}
       />
-      <ProtectedRoute
-        component={StudentStatistics}
-        exact
+      <Route
+        element={
+          <ProtectedRoute
+            element={<StudentStatistics />}
+            requireUserHasRights
+            requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
+          />
+        }
         path={routes.students}
-        requireUserHasRights
-        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
-      <ProtectedRoute
-        component={CourseStatistics}
-        exact
+      <Route
+        element={
+          <ProtectedRoute
+            element={<CourseStatistics />}
+            requireUserHasRights
+            requiredRoles={['fullSisuAccess', 'courseStatistics']}
+          />
+        }
         path={routes.courseStatistics}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess', 'courseStatistics']}
       />
-      <ProtectedRoute component={Users} exact path={routes.users} requiredRoles={['admin']} />
-      <ProtectedRoute component={Teachers} exact path={routes.teachers} requiredRoles={['teachers']} />
+      <Route element={<ProtectedRoute element={<Users />} requiredRoles={['admin']} />} path={routes.users} />
+      <Route element={<ProtectedRoute element={<Teachers />} requiredRoles={['teachers']} />} path={routes.teachers} />
       {isDefaultServiceProvider() && (
-        <ProtectedRoute
-          component={CoursePopulation}
-          exact
+        <Route
+          element={
+            <ProtectedRoute element={<CoursePopulation />} requireUserHasRights requiredRoles={['fullSisuAccess']} />
+          }
           path={routes.coursepopulation}
-          requireUserHasRights
-          requiredRoles={['fullSisuAccess']}
         />
       )}
-      <ProtectedRoute
-        component={CustomPopulation}
-        exact
+      <Route
+        element={
+          <ProtectedRoute
+            element={<CustomPopulation />}
+            requireUserHasRights
+            requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
+          />
+        }
         path={routes.custompopulation}
-        requireUserHasRights
-        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
       />
       {isDefaultServiceProvider() && (
-        <ProtectedRoute
-          component={CustomOpenUniPopulation}
-          exact
+        <Route
+          element={<ProtectedRoute element={<CustomOpenUniPopulation />} requiredRoles={['admin', 'openUniSearch']} />}
           path={routes.customOpenUniPopulation}
-          requiredRoles={['admin', 'openUniSearch']}
         />
       )}
-      <ProtectedRoute component={CompletedCourses} exact path={routes.completedCoursesSearch} />
-      <ProtectedRoute component={Updater} exact path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
-      <ProtectedRoute
-        component={StudyGuidanceGroups}
-        exact
+      <Route element={<ProtectedRoute element={<CompletedCourses />} />} path={routes.completedCoursesSearch} />
+      <Route
+        element={<ProtectedRoute element={<Updater />} requireUserHasRights requiredRoles={['admin']} />}
+        path={routes.updater}
+      />
+      <Route
+        element={<ProtectedRoute element={<StudyGuidanceGroups />} requiredRoles={['studyGuidanceGroups']} />}
         path={routes.studyGuidanceGroups}
-        requiredRoles={['studyGuidanceGroups']}
       />
       {languageCenterViewEnabled && (
-        <ProtectedRoute
-          component={LanguageCenterView}
-          exact
+        <Route
+          element={<ProtectedRoute element={<LanguageCenterView />} requireUserHasRights requiredRoles={['admin']} />}
           path={routes.languageCenterView}
-          requireUserHasRights
-          requiredRoles={['admin']}
         />
       )}
-      <ProtectedRoute component={University} exact path={routes.university} />
-      <ProtectedRoute
-        component={CloseToGraduation}
-        exact
+      <Route element={<ProtectedRoute element={<University />} />} path={routes.university} />
+      <Route
+        element={
+          <ProtectedRoute element={<CloseToGraduation />} requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']} />
+        }
         path={routes.closeToGraduation}
-        requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']}
       />
-      <Redirect to="/" />
-    </Switch>
+      <Route element={<Navigate replace to="/" />} path="*" />
+    </RouterRoutes>
   </Suspense>
 )
