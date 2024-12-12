@@ -1,6 +1,6 @@
 import qs from 'query-string'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Segment, Tab } from 'semantic-ui-react'
 
 import { useProgress, useTabs } from '@/common/hooks'
@@ -10,9 +10,9 @@ import { StudentsPane } from './panes/StudentsPane'
 import './resultTabs.css'
 
 export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
-  const [tab, setTab] = useTabs('cs_tab', 0, history)
+  const [tab, setTab] = useTabs('cs_tab', 0, navigate)
   const { userHasAccessToAllStats } = primary
   const courseStats = useSelector(({ courseStats }) => courseStats)
   const { pending: loading } = courseStats
@@ -32,7 +32,7 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
     }
     dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    history.replace({ search: qs.stringify(queryToString) })
+    void navigate({ search: qs.stringify(queryToString) }, { replace: true })
   }
 
   const paneTypes = [
