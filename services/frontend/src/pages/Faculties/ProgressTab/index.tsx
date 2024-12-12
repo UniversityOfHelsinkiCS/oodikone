@@ -10,6 +10,7 @@ import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
+import { AccordionWrapper } from './AccordionWrapper'
 import { exportProgressTable } from './export'
 
 export const ProgressTab = ({
@@ -105,118 +106,125 @@ export const ProgressTab = ({
         </ToggleContainer>
       </Section>
       <Stack gap={2}>
-        <Section isError={isError} isLoading={isLoading} title="Bachelor">
-          {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
-            <Stack gap={2}>
-              <FacultyBarChart
-                cypress="FacultyBachelorsProgress"
-                data={{
-                  id: faculty.code,
-                  stats: bachelorStats.chartStats,
-                  years: progressStats.data.years,
-                }}
-              />
-              <FacultyProgressTable
-                cypress="FacultyBachelorsProgressTable"
-                data={bachelorStats.tableStats}
-                programmeNames={progressStats?.data.programmeNames}
-                programmeStats={progressStats?.data.bachelorsProgStats}
-                progressTitles={progressStats?.data.yearlyBachelorTitles}
-                sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
-                  listObj => listObj[0]
-                )}
-                titles={bachelorStats.tableTitles}
-              />
-            </Stack>
-          )}
-        </Section>
-        <Section
-          cypress="BachelorMastersProgress"
-          infoBoxContent={facultyToolTips.bachelorMasterProgress}
-          isError={isError}
-          isLoading={isLoading}
-          title={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}
-        >
-          {progressStats.isSuccess &&
-            progressStats.data &&
-            bachelorMasterStats &&
-            hasNonZeroStats(bachelorMasterStats) && (
+        <AccordionWrapper level="Bachelor">
+          <Section isError={isError} isLoading={isLoading}>
+            {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
               <Stack gap={2}>
                 <FacultyBarChart
-                  cypress="FacultyBachelorMastersProgress"
+                  cypress="FacultyBachelorsProgress"
                   data={{
                     id: faculty.code,
-                    stats: bachelorMasterStats.chartStats,
-                    years: progressStats?.data.years,
+                    stats: bachelorStats.chartStats,
+                    years: progressStats.data.years,
                   }}
                 />
                 <FacultyProgressTable
-                  cypress="FacultyBachelorMasterProgressTable"
-                  data={bachelorMasterStats.tableStats}
-                  programmeNames={progressStats.data.programmeNames}
-                  programmeStats={progressStats.data.bcMsProgStats}
-                  progressTitles={progressStats.data.yearlyBcMsTitles}
-                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
-                    listObj => listObj[0]
-                  )}
-                  titles={bachelorMasterStats.tableTitles}
-                />
-              </Stack>
-            )}
-        </Section>
-        <Section isError={isError} isLoading={isLoading} title="Master">
-          {progressStats.isSuccess &&
-            progressStats.data &&
-            masterStats &&
-            hasNonZeroStats(masterStats) &&
-            !(faculty.code === 'H90') && (
-              <Stack gap={2}>
-                <FacultyBarChart
-                  cypress="FacultyMastersProgress"
-                  data={{
-                    id: faculty.code,
-                    stats: masterStats.chartStats,
-                    years: progressStats?.data.years,
-                  }}
-                />
-                <FacultyProgressTable
-                  cypress="FacultyMastersProgressTable"
-                  data={masterStats.tableStats}
+                  cypress="FacultyBachelorsProgressTable"
+                  data={bachelorStats.tableStats}
                   programmeNames={progressStats?.data.programmeNames}
-                  programmeStats={progressStats?.data.mastersProgStats}
-                  progressTitles={progressStats?.data.yearlyMasterTitles}
-                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
+                  programmeStats={progressStats?.data.bachelorsProgStats}
+                  progressTitles={progressStats?.data.yearlyBachelorTitles}
+                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bachelorsProgStats).map(
                     listObj => listObj[0]
                   )}
-                  titles={masterStats.tableTitles}
+                  titles={bachelorStats.tableTitles}
                 />
               </Stack>
             )}
-        </Section>
-        <Section isError={isError} isLoading={isLoading} title="Doctor">
-          {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
-            <Stack gap={2}>
-              <FacultyBarChart
-                cypress="FacultyDoctoralProgress"
-                data={{
-                  id: faculty.code,
-                  stats: doctorStats.chartStats,
-                  years: progressStats?.data.years,
-                }}
-              />
-              <FacultyProgressTable
-                cypress="FacultyDoctoralProgressTable"
-                data={doctorStats.tableStats}
-                programmeNames={progressStats?.data.programmeNames}
-                programmeStats={progressStats?.data.doctoralProgStats}
-                sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
-                  listObj => listObj[0]
-                )}
-                titles={doctorStats.tableTitles}
-              />
-            </Stack>
-          )}
-        </Section>
+          </Section>
+        </AccordionWrapper>
+        <AccordionWrapper level={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}>
+          <Section
+            cypress="BachelorMastersProgress"
+            infoBoxContent={facultyToolTips.bachelorMasterProgress}
+            isError={isError}
+            isLoading={isLoading}
+          >
+            {progressStats.isSuccess &&
+              progressStats.data &&
+              bachelorMasterStats &&
+              hasNonZeroStats(bachelorMasterStats) && (
+                <Stack gap={2}>
+                  <FacultyBarChart
+                    cypress="FacultyBachelorMastersProgress"
+                    data={{
+                      id: faculty.code,
+                      stats: bachelorMasterStats.chartStats,
+                      years: progressStats?.data.years,
+                    }}
+                  />
+                  <FacultyProgressTable
+                    cypress="FacultyBachelorMasterProgressTable"
+                    data={bachelorMasterStats.tableStats}
+                    programmeNames={progressStats.data.programmeNames}
+                    programmeStats={progressStats.data.bcMsProgStats}
+                    progressTitles={progressStats.data.yearlyBcMsTitles}
+                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
+                      listObj => listObj[0]
+                    )}
+                    titles={bachelorMasterStats.tableTitles}
+                  />
+                </Stack>
+              )}
+          </Section>
+        </AccordionWrapper>
+        <AccordionWrapper level="Master">
+          <Section isError={isError} isLoading={isLoading}>
+            {progressStats.isSuccess &&
+              progressStats.data &&
+              masterStats &&
+              hasNonZeroStats(masterStats) &&
+              !(faculty.code === 'H90') && (
+                <Stack gap={2}>
+                  <FacultyBarChart
+                    cypress="FacultyMastersProgress"
+                    data={{
+                      id: faculty.code,
+                      stats: masterStats.chartStats,
+                      years: progressStats?.data.years,
+                    }}
+                  />
+                  <FacultyProgressTable
+                    cypress="FacultyMastersProgressTable"
+                    data={masterStats.tableStats}
+                    programmeNames={progressStats?.data.programmeNames}
+                    programmeStats={progressStats?.data.mastersProgStats}
+                    progressTitles={progressStats?.data.yearlyMasterTitles}
+                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
+                      listObj => listObj[0]
+                    )}
+                    titles={masterStats.tableTitles}
+                  />
+                </Stack>
+              )}
+          </Section>
+        </AccordionWrapper>
+        <AccordionWrapper level="Doctor">
+          <Section isError={isError} isLoading={isLoading}>
+            {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
+              <Stack gap={2}>
+                <FacultyBarChart
+                  cypress="FacultyDoctoralProgress"
+                  data={{
+                    id: faculty.code,
+                    stats: doctorStats.chartStats,
+                    years: progressStats?.data.years,
+                  }}
+                />
+                <FacultyProgressTable
+                  cypress="FacultyDoctoralProgressTable"
+                  data={doctorStats.tableStats}
+                  programmeNames={progressStats?.data.programmeNames}
+                  programmeStats={progressStats?.data.doctoralProgStats}
+                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.doctoralProgStats).map(
+                    listObj => listObj[0]
+                  )}
+                  titles={doctorStats.tableTitles}
+                />
+              </Stack>
+            )}
+          </Section>
+        </AccordionWrapper>
       </Stack>
     </Stack>
   )
