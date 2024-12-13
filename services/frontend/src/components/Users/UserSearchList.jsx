@@ -81,7 +81,7 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
       key: 'USERNAME',
       title: 'Username',
       getRowContent: user => (
-        <Link data-cy={`user-edit-button-${user.username}`} to={`users/${user.id}`}>
+        <Link data-cy={`user-edit-button-${user.username}`} to={`/users/${user.id}`}>
           {user.username}
         </Link>
       ),
