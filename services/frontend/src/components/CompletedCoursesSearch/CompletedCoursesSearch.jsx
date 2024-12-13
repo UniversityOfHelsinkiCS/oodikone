@@ -76,7 +76,7 @@ export const CompletedCoursesSearch = ({ setValues }) => {
 
   const pushQueryToUrl = query => {
     const searchString = qs.stringify(query)
-    void navigate({ search: searchString })
+    navigate({ search: searchString })
   }
 
   const handleClose = () => {

@@ -47,7 +47,7 @@ export const PopulationSearchHistory = () => {
       studyRights: JSON.stringify(studyRights),
     }
     const searchString = qs.stringify(queryObject)
-    void navigate({ search: searchString })
+    navigate({ search: searchString })
   }
 
   const renderAdvancedSettingsSelector = () => {

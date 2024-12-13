@@ -1,4 +1,5 @@
 import qs from 'query-string'
+import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Segment, Tab } from 'semantic-ui-react'
@@ -12,7 +13,8 @@ import './resultTabs.css'
 export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const [tab, setTab] = useTabs('cs_tab', 0, navigate)
+  const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
+  const [tab, setTab] = useTabs('cs_tab', 0, { location, replace })
   const { userHasAccessToAllStats } = primary
   const courseStats = useSelector(({ courseStats }) => courseStats)
   const { pending: loading } = courseStats
@@ -32,7 +34,7 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
     }
     dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    void navigate({ search: qs.stringify(queryToString) }, { replace: true })
+    navigate({ search: qs.stringify(queryToString) }, { replace: true })
   }
 
   const paneTypes = [

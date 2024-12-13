@@ -380,7 +380,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       unifyCourses,
     }
     const searchString = qs.stringify(queryObject)
-    void navigate(`/coursepopulation?${searchString}`)
+    navigate(`/coursepopulation?${searchString}`)
   }
 
   const renderShowPopulation = (disabled = false) => {

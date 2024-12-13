@@ -29,30 +29,37 @@ export const useTabs = (id, initialTab, { location, replace }) => {
   const [tab, setTab] = useState(-1)
   const [didMount, setDidMount] = useState(false)
 
-  const pushToUrl = newTab => {
-    replace({
-      pathname: location.pathname,
-      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab }),
-    })
-  }
+  const pushToUrl = useCallback(
+    newTab => {
+      const currentParams = qs.parse(location.search)
+      const newSearch = qs.stringify({ ...currentParams, [id]: newTab })
+      replace({ pathname: location.pathname, search: newSearch })
+    },
+    [id, location.pathname, location.search, replace]
+  )
 
   useEffect(() => {
     const params = qs.parse(location.search)
     const queryTab = params[id]
-    setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab))
+    try {
+      setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab))
+    } catch (error) {
+      setTab(initialTab)
+    }
     setDidMount(true)
-  }, [])
+  }, [id, initialTab, location.search])
 
   useEffect(() => {
-    if (tab !== undefined && didMount) pushToUrl(tab)
-  }, [tab])
+    if (tab !== undefined && didMount) {
+      pushToUrl(tab)
+    }
+  }, [tab, didMount, pushToUrl])
 
-  return [
-    tab,
-    (_, { activeIndex }) => {
-      setTab(activeIndex)
-    },
-  ]
+  const handleTabChange = useCallback((_, { activeIndex }) => {
+    setTab(activeIndex)
+  }, [])
+
+  return [tab, handleTabChange]
 }
 
 export const useSearchHistory = (id, capacity = 5) => {

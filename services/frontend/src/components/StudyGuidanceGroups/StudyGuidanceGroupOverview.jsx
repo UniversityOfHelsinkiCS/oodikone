@@ -20,7 +20,7 @@ const LinkToGroup = ({ group }) => {
   return (
     <Link data-cy={`study-guidance-group-link-${group.id}`} style={{ color: 'black' }} to={destination}>
       {getTextIn(group.name)}
-      <Icon color="blue" name="level up alternate" onClick={() => void navigate(destination)} />
+      <Icon color="blue" name="level up alternate" onClick={() => navigate(destination)} />
     </Link>
   )
 }

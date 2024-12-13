@@ -53,7 +53,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const pushQueryToUrl = query => {
     setTimeout(() => {
       const searchString = qs.stringify(query)
-      void navigate({ search: searchString }, { replace: true })
+      navigate({ search: searchString }, { replace: true })
     }, 0)
   }
 

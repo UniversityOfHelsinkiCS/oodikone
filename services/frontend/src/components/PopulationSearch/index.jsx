@@ -26,7 +26,7 @@ export const PopulationSearch = ({ combinedProgrammeCode }) => {
   return (
     <Segment>
       {title && <Header size="medium">{title}</Header>}
-      {(!populationFound || !location.search) && (
+      {!populationFound && (
         <>
           <InfoBox content={populationStatisticsToolTips.search} cypress="PopulationSearch" />
           <Divider />

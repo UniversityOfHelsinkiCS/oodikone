@@ -1,5 +1,4 @@
-import { useLocation } from 'react-router-dom'
-
+import { Outlet, useLocation } from 'react-router-dom'
 import { checkUserAccess } from '@/common'
 import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -7,14 +6,13 @@ import { Role } from '@/shared/types'
 import { AccessDeniedMessage } from './AccessDeniedMessage'
 
 interface ProtectedRouteProps {
-  element: JSX.Element
   requiredRoles?: Role[]
   requireUserHasRights?: boolean
 }
 
-export const ProtectedRoute = ({ element, requiredRoles = [], requireUserHasRights = false }: ProtectedRouteProps) => {
-  const location = useLocation()
+export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false }: ProtectedRouteProps) => {
   const { iamGroups, isAdmin, programmeRights, roles } = useGetAuthorizedUserQuery()
+  const location = useLocation()
   const fullSisuAccessRoutes = ['populations', 'students', 'custompopulation', 'study-programme', 'coursepopulation']
 
   const hasAccessToRoute = () => {
@@ -37,5 +35,9 @@ export const ProtectedRoute = ({ element, requiredRoles = [], requireUserHasRigh
     return hasRequiredRoles && hasRequiredRights
   }
 
-  return hasAccessToRoute() ? element : <AccessDeniedMessage />
+  if (!hasAccessToRoute()) {
+    return <AccessDeniedMessage />
+  }
+
+  return <Outlet />
 }

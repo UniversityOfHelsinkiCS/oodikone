@@ -105,7 +105,7 @@ export const CourseStatistics = () => {
           content: MENU.QUERY,
           icon: 'search',
           position: 'right',
-          onClick: () => navigate('/coursestatistics'),
+          onClick: () => void navigate('/coursestatistics'),
         },
         render: () => null,
       },

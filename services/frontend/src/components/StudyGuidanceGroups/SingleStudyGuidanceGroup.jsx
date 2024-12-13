@@ -261,7 +261,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
   const { getTextIn } = useLanguage()
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const handleBack = () => {
-    void navigate('/studyguidancegroups')
+    navigate('/studyguidancegroups')
   }
 
   return (
