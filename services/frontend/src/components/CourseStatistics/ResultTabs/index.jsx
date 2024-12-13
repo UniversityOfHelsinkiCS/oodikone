@@ -1,5 +1,4 @@
 import qs from 'query-string'
-import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Segment, Tab } from 'semantic-ui-react'
@@ -13,8 +12,7 @@ import './resultTabs.css'
 export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('cs_tab', 0, { location, replace })
+  const [tab, setTab] = useTabs('cs_tab', 0, { location, replace: () => {} })
   const { userHasAccessToAllStats } = primary
   const courseStats = useSelector(({ courseStats }) => courseStats)
   const { pending: loading } = courseStats
@@ -26,15 +24,21 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
   }
 
   const updateSeparate = separate => {
-    const { courseCodes, ...params } = qs.parse(location.search)
+    // Only proceed if we're still on the coursestatistics page
+    if (!location.pathname.includes('coursestatistics')) {
+      return
+    }
+
+    const { courseCodes, cs_tab, ...params } = qs.parse(location.search)
     const query = {
       ...params,
       courseCodes: JSON.parse(courseCodes),
       separate,
+      cs_tab: tab,
     }
     dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    navigate({ search: qs.stringify(queryToString) }, { replace: true })
+    void navigate({ search: qs.stringify(queryToString) }, { replace: true })
   }
 
   const paneTypes = [

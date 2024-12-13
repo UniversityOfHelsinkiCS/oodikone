@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 
 import { useTabs, useTitle } from '@/common/hooks'
@@ -20,11 +19,9 @@ const pane = (title, Content, icon) => ({
 })
 
 const TeachersTabs = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const { roles, iamGroups } = useGetAuthorizedUserQuery()
-  const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('t_tab', 0, { location, replace })
+  const [tab, setTab] = useTabs('t_tab', 0, { location, replace: () => {} })
   const panes = [pane('Statistics', TeacherStatistics, 'table')]
   if (hasFullAccessToTeacherData(roles, iamGroups)) {
     panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))

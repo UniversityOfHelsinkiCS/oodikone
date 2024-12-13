@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useParams, useLocation } from 'react-router-dom'
 import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName, isDefaultServiceProvider } from '@/common'
@@ -26,15 +26,13 @@ const createName = (studyProgrammeId, combibedProgrammeId, programmes, language,
 }
 
 export const StudyProgramme = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const { studyProgrammeId } = useParams()
   const { data: programmes } = useGetProgrammesQuery()
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('p_tab', 0, { location, replace })
+  const [tab, setTab] = useTabs('p_tab', 0, { location, replace: () => {} })
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
