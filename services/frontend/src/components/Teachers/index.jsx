@@ -24,7 +24,7 @@ const TeachersTabs = () => {
   const location = useLocation()
   const { roles, iamGroups } = useGetAuthorizedUserQuery()
   const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('p_tab', 0, { location, replace })
+  const [tab, setTab] = useTabs('t_tab', 0, { location, replace })
   const panes = [pane('Statistics', TeacherStatistics, 'table')]
   if (hasFullAccessToTeacherData(roles, iamGroups)) {
     panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))
