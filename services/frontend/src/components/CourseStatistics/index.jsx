@@ -50,7 +50,7 @@ export const CourseStatistics = () => {
       ...params,
       courseCodes: JSON.parse(courseCodes),
     }
-    void dispatch(getCourseStats(query, onProgress))
+    dispatch(getCourseStats(query, onProgress))
   }, [location.search])
 
   useEffect(() => {
