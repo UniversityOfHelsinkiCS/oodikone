@@ -1,7 +1,7 @@
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { Header, Message, Segment, Tab } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
@@ -105,7 +105,7 @@ export const CourseStatistics = () => {
           content: MENU.QUERY,
           icon: 'search',
           position: 'right',
-          onClick: () => void navigate('/coursestatistics'),
+          onClick: () => navigate('/coursestatistics'),
         },
         render: () => null,
       },

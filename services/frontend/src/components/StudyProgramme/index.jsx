@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router'
 import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName, isDefaultServiceProvider } from '@/common'

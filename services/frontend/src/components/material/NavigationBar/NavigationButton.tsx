@@ -1,7 +1,7 @@
 import { ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material'
 import { Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { languageCenterViewEnabled } from '@/conf'

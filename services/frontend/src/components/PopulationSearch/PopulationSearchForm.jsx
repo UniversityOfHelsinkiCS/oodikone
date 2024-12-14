@@ -4,7 +4,7 @@ import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { Button, Form, Message, Radio } from 'semantic-ui-react'
 
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'

@@ -2,7 +2,7 @@ import { sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'
 
 import { validateInputLength } from '@/common'

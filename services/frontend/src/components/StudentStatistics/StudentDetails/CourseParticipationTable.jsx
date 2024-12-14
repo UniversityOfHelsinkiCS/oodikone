@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Divider, Header, Icon, Item, Label } from 'semantic-ui-react'
 
 import { getTextInWithOpen } from '@/common'

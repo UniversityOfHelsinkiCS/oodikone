@@ -1,7 +1,7 @@
 import { mapValues, uniq } from 'lodash'
 import qs from 'query-string'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
 import {

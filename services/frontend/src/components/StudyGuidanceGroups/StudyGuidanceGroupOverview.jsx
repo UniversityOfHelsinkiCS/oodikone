@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router'
 import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
 
 import { textAndDescriptionSearch } from '@/common'

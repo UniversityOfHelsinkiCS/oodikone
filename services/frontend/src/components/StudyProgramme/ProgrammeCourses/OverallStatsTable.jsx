@@ -1,6 +1,6 @@
 import { max, min, range } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Header, Item, Icon, Loader, Segment } from 'semantic-ui-react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'

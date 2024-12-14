@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { Button, Card, Divider, Loader, Message, Popup, Segment } from 'semantic-ui-react'
 import { isDefaultServiceProvider } from '@/common'
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'

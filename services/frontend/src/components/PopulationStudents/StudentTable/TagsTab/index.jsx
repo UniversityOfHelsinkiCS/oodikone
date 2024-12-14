@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Tab } from 'semantic-ui-react'
 
 import { TagList } from '@/components/TagList'

@@ -1,7 +1,7 @@
 import qs from 'query-string'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Button, Form } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'

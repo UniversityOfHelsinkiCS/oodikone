@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'

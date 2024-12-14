@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { RTKApi } from '@/apiConnection'
 import { showAsUserKey } from '@/common'
@@ -58,7 +58,7 @@ export const useShowAsUser = () => {
     }
 
     if (reload) {
-      void navigate('/')
+      navigate('/')
       window.location.reload()
     }
   }

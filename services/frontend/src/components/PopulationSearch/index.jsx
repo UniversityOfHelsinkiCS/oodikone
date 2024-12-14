@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
 import { useProgress } from '@/common/hooks'

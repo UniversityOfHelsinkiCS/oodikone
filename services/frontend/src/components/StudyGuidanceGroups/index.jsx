@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { Header } from 'semantic-ui-react'
 
 import { useTitle } from '@/common/hooks'

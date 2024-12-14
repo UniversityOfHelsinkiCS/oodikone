@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Segment, Icon, Item } from 'semantic-ui-react'
 
 import { calculatePercentage, isDefaultServiceProvider } from '@/common'

@@ -1,6 +1,6 @@
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-react'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'

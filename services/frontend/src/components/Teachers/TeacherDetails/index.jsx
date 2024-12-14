@@ -1,5 +1,5 @@
 import { isString } from 'lodash'
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router'
 import { Card, Segment, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

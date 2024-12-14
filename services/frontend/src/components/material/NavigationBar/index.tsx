@@ -1,6 +1,6 @@
 import { AppBar, Box, Container, Tab, Tabs, Toolbar } from '@mui/material'
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { hasFullAccessToTeacherData } from '@/components/Teachers/util'

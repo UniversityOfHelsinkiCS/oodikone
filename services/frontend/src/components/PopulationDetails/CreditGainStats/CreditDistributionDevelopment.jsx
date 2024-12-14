@@ -6,7 +6,7 @@ import moment from 'moment'
 import qs from 'query-string'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
 import { generateGradientColors, getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'

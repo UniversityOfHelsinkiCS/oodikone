@@ -1,6 +1,6 @@
 import { Container, Tab, Tabs } from '@mui/material'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 
 import { useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

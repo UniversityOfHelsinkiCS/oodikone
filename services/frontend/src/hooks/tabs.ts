@@ -1,6 +1,6 @@
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 
 export const useTabs = (totalTabs: number) => {
   const navigate = useNavigate()
