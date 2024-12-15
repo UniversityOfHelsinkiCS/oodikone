@@ -1,6 +1,6 @@
 import { NorthEast as NorthEastIcon } from '@mui/icons-material'
 import moment from 'moment'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 const getMonths = (year: number) => {
   const end = moment()

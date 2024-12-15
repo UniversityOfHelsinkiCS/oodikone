@@ -1,6 +1,6 @@
 import { Person as PersonIcon } from '@mui/icons-material'
 import { IconButton, Stack } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import { ExternalLink } from './Footer/ExternalLink'
 

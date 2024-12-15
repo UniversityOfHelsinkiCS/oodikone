@@ -1,4 +1,4 @@
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { Button, Card, Divider, Loader, Message, Popup, Segment } from 'semantic-ui-react'
 import { isDefaultServiceProvider } from '@/common'
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
@@ -8,7 +8,7 @@ import { AccessRights } from './AccessRights'
 import { EmailNotification } from './EmailNotification'
 
 export const UserPage = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { userid } = useParams()
   const { username: currentUserName, isAdmin } = useGetAuthorizedUserQuery()
@@ -49,7 +49,7 @@ export const UserPage = () => {
 
   return (
     <Segment className="contentSegment" loading={isLoading}>
-      <Button content="Back" icon="arrow circle left" onClick={() => history.push('/users')} />
+      <Button content="Back" icon="arrow circle left" onClick={() => navigate('/users')} />
       <Divider />
       <Card.Group>
         {!user.sisPersonId && (

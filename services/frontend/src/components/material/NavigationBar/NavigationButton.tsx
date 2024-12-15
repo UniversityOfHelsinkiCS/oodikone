@@ -1,7 +1,7 @@
 import { ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material'
 import { Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router'
 
 import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
 import { languageCenterViewEnabled } from '@/conf'
@@ -76,10 +76,10 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
               showItem(subItem.key) && (
                 <MenuItem
                   component={Link}
-                  key={subItem.path}
+                  key={subItem.path ?? ''}
                   onClick={() => setAnchorEl(null)}
-                  selected={location.pathname?.includes(subItem.path)}
-                  to={subItem.path}
+                  selected={location.pathname?.includes(subItem.path ?? '') ?? false}
+                  to={subItem.path ?? '/'}
                 >
                   {subItem.label}
                 </MenuItem>

@@ -1,6 +1,6 @@
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Message, Icon, Item, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'

@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
@@ -81,7 +81,7 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
       key: 'USERNAME',
       title: 'Username',
       getRowContent: user => (
-        <Link data-cy={`user-edit-button-${user.username}`} to={`users/${user.id}`}>
+        <Link data-cy={`user-edit-button-${user.username}`} to={`/users/${user.id}`}>
           {user.username}
         </Link>
       ),

@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import { Navigate, Route, Routes as RouterRoutes } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
 import { CompletedCourses } from '@/components/CompletedCoursesSearch'
@@ -48,95 +48,80 @@ const routes = {
 
 export const Routes = () => (
   <Suspense fallback={<SegmentDimmer isLoading />}>
-    <Switch>
-      <Route component={FrontPage} exact path="/" />
-      <Route component={Changelog} exact path={routes.changelog} />
-      {isDefaultServiceProvider() && <Route component={Feedback} exact path={routes.feedback} />}
-      <ProtectedRoute
-        component={PopulationStatistics}
-        exact
-        path={routes.populations}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess']}
-      />
-      <ProtectedRoute
-        component={Faculties}
-        exact
-        path={routes.faculties}
-        requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']}
-      />
-      <ProtectedRoute
-        component={StudyProgramme}
-        exact
-        path={routes.studyProgramme}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess']}
-      />
-      <ProtectedRoute
-        component={StudentStatistics}
-        exact
-        path={routes.students}
-        requireUserHasRights
-        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
-      />
-      <ProtectedRoute
-        component={CourseStatistics}
-        exact
-        path={routes.courseStatistics}
-        requireUserHasRights
-        requiredRoles={['fullSisuAccess', 'courseStatistics']}
-      />
-      <ProtectedRoute component={Users} exact path={routes.users} requiredRoles={['admin']} />
-      <ProtectedRoute component={Teachers} exact path={routes.teachers} requiredRoles={['teachers']} />
+    <RouterRoutes>
+      {/* Public routes */}
+      <Route element={<FrontPage />} path="/" />
+      <Route element={<Changelog />} path={routes.changelog} />
+      {isDefaultServiceProvider() && <Route element={<Feedback />} path={routes.feedback} />}
+
+      {/* Full Sisu Access Routes */}
+      <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['fullSisuAccess']} />}>
+        <Route element={<PopulationStatistics />} path={routes.populations} />
+        <Route element={<StudyProgramme />} path={routes.studyProgramme} />
+        {isDefaultServiceProvider() && <Route element={<CoursePopulation />} path={routes.coursepopulation} />}
+      </Route>
+
+      {/* Admin Routes */}
+      <Route element={<ProtectedRoute requiredRoles={['admin']} />}>
+        <Route element={<Users />} path={routes.users} />
+      </Route>
+
+      {/* Admin with Rights Routes */}
+      <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['admin']} />}>
+        <Route element={<Updater />} path={routes.updater} />
+        {languageCenterViewEnabled && <Route element={<LanguageCenterView />} path={routes.languageCenterView} />}
+      </Route>
+
+      {/* Course Statistics Routes */}
+      <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['fullSisuAccess', 'courseStatistics']} />}>
+        <Route element={<CourseStatistics />} path={routes.courseStatistics} />
+      </Route>
+
+      {/* Faculty Statistics Routes */}
+      <Route element={<ProtectedRoute requiredRoles={['admin', 'fullSisuAccess', 'facultyStatistics']} />}>
+        <Route element={<Faculties />} path={routes.faculties} />
+      </Route>
+
+      {/* Student Access Routes */}
+      <Route
+        element={
+          <ProtectedRoute requireUserHasRights requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']} />
+        }
+      >
+        <Route element={<StudentStatistics />} path={routes.students} />
+        <Route element={<CustomPopulation />} path={routes.custompopulation} />
+      </Route>
+
+      {/* Teacher Routes */}
+      <Route element={<ProtectedRoute requiredRoles={['teachers']} />}>
+        <Route element={<Teachers />} path={routes.teachers} />
+      </Route>
+
+      {/* Study Guidance Routes */}
+      <Route element={<ProtectedRoute requiredRoles={['studyGuidanceGroups']} />}>
+        <Route element={<StudyGuidanceGroups />} path={routes.studyGuidanceGroups} />
+      </Route>
+
+      {/* Close to Graduation Routes */}
+      <Route element={<ProtectedRoute requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']} />}>
+        <Route element={<CloseToGraduation />} path={routes.closeToGraduation} />
+      </Route>
+
+      {/* OpenUni Routes */}
       {isDefaultServiceProvider() && (
-        <ProtectedRoute
-          component={CoursePopulation}
-          exact
-          path={routes.coursepopulation}
-          requireUserHasRights
-          requiredRoles={['fullSisuAccess']}
-        />
+        <Route element={<ProtectedRoute requiredRoles={['admin', 'openUniSearch']} />}>
+          <Route element={<CustomOpenUniPopulation />} path={routes.customOpenUniPopulation} />
+        </Route>
       )}
-      <ProtectedRoute
-        component={CustomPopulation}
-        exact
-        path={routes.custompopulation}
-        requireUserHasRights
-        requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']}
-      />
-      {isDefaultServiceProvider() && (
-        <ProtectedRoute
-          component={CustomOpenUniPopulation}
-          exact
-          path={routes.customOpenUniPopulation}
-          requiredRoles={['admin', 'openUniSearch']}
-        />
-      )}
-      <ProtectedRoute component={CompletedCourses} exact path={routes.completedCoursesSearch} />
-      <ProtectedRoute component={Updater} exact path={routes.updater} requireUserHasRights requiredRoles={['admin']} />
-      <ProtectedRoute
-        component={StudyGuidanceGroups}
-        exact
-        path={routes.studyGuidanceGroups}
-        requiredRoles={['studyGuidanceGroups']}
-      />
-      {languageCenterViewEnabled && (
-        <ProtectedRoute
-          component={LanguageCenterView}
-          exact
-          path={routes.languageCenterView}
-          requireUserHasRights
-          requiredRoles={['admin']}
-        />
-      )}
-      <ProtectedRoute component={University} exact path={routes.university} />
-      <ProtectedRoute
-        component={CloseToGraduation}
-        exact
-        path={routes.closeToGraduation}
-        requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']}
-      />
-      <Redirect to="/" />
-    </Switch>
+
+      {/* Basic Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<CompletedCourses />} path={routes.completedCoursesSearch} />
+        <Route element={<University />} path={routes.university} />
+      </Route>
+
+      {/* Catch all route */}
+      <Route element={<Navigate replace to="/" />} path="*" />
+    </RouterRoutes>
   </Suspense>
 )

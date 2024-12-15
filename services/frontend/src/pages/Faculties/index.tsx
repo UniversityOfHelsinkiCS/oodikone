@@ -1,6 +1,6 @@
 import { Container, Tab, Tabs } from '@mui/material'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 
 import { useTitle } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -8,7 +8,6 @@ import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { GetFacultiesResponse } from '@/types/api/faculty'
 import { BasicInformationTab } from './BasicInformationTab'
 import { FacultyList } from './FacultyList'
 import { GraduationTimesTab } from './GraduationTimesTab'
@@ -21,8 +20,7 @@ export const Faculties = () => {
   const { facultyId } = useParams()
 
   const { data: faculties = [] } = useGetFacultiesQuery()
-  const faculty: GetFacultiesResponse | undefined =
-    faculties.length > 0 && facultyId && faculties.find(faculty => faculty.id === facultyId)
+  const faculty = facultyId && faculties.length > 0 ? faculties.find(faculty => faculty.id === facultyId) : undefined
   const facultyCode = faculty?.code
   const facultyName = faculty && getTextIn(faculty.name)
 

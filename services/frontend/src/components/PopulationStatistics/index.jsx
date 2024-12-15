@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'

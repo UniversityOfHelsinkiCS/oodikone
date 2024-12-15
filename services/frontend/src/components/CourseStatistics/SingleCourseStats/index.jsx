@@ -2,7 +2,7 @@ import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { Button, Form, Grid, Header, Popup, Segment } from 'semantic-ui-react'
 
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
@@ -29,7 +29,7 @@ const countFilteredStudents = (stat, filter) => {
 }
 
 export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllStats }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { getTextIn } = useLanguage()
@@ -380,7 +380,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       unifyCourses,
     }
     const searchString = qs.stringify(queryObject)
-    history.push(`/coursepopulation?${searchString}`)
+    navigate(`/coursepopulation?${searchString}`)
   }
 
   const renderShowPopulation = (disabled = false) => {

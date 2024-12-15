@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unused-modules
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'

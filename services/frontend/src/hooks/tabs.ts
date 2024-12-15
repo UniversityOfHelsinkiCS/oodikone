@@ -1,9 +1,9 @@
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 
 export const useTabs = (totalTabs: number) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
 
   const id = 'tab'
@@ -20,10 +20,11 @@ export const useTabs = (totalTabs: number) => {
   })
 
   const pushToUrl = (newTab: number) => {
-    history.replace({
-      pathname: location.pathname,
-      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab }),
+    const search = qs.stringify({
+      ...qs.parse(location.search),
+      [id]: newTab,
     })
+    void navigate({ pathname: location.pathname, search }, { replace: true })
   }
 
   useEffect(() => {

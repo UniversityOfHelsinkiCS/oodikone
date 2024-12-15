@@ -4,7 +4,7 @@ import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { Button, Form, Message, Radio } from 'semantic-ui-react'
 
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
@@ -33,7 +33,7 @@ const initialQuery = () => ({
 })
 
 export const PopulationSearchForm = ({ onProgress }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const populations = useSelector(state => state.populations)
@@ -161,7 +161,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
           : studyRights.programme
       const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
       const searchString = qs.stringify(queryObject)
-      history.push({ search: searchString })
+      navigate({ search: searchString })
     }, 0)
   }
 

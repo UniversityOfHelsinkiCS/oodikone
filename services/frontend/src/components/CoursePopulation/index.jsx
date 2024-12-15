@@ -1,6 +1,6 @@
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { Form, Header, Input, Segment } from 'semantic-ui-react'
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { useCurrentSemester, useProgress, useTitle } from '@/common/hooks'

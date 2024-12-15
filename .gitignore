@@ -70,3 +70,4 @@ environments/
 
 # Target of shared symlink
 services/**/src/shared
+

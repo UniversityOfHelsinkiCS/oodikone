@@ -1,7 +1,7 @@
 import { keyBy } from 'lodash'
 import moment from 'moment'
 import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Icon, Message, Tab } from 'semantic-ui-react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'

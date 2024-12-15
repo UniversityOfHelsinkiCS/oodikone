@@ -2,7 +2,7 @@ import { sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router'
 import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'
 
 import { validateInputLength } from '@/common'
@@ -37,7 +37,7 @@ export const SearchForm = ({ onProgress }) => {
   const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const isLoading = useSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCoursesEnabled, toggleSelectMultipleCoursesEnabled] = useToggle(false)
@@ -112,7 +112,7 @@ export const SearchForm = ({ onProgress }) => {
       combineSubstitutions: JSON.stringify(combineSubstitutions),
     }
     const searchString = qs.stringify(queryObject)
-    history.push({ search: searchString })
+    navigate({ search: searchString })
   }
 
   const onSearchHistorySelected = historyItem => {
