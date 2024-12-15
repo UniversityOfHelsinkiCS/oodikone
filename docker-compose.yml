@@ -189,7 +189,7 @@ services:
 
   jami-db:
     <<: *defaults
-    image: postgres:15.8
+    image: postgres:15.10
     environment:
       - PGDATA=/data
       - POSTGRES_PASSWORD=postgres
