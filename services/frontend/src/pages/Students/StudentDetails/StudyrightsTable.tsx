@@ -1,13 +1,16 @@
+import { FilterAlt as FilterAltIcon, NorthEast as NorthEastIcon } from '@mui/icons-material'
+import { TableBody, TableCell, TableHead, TableRow, Tooltip, IconButton, Stack } from '@mui/material'
 import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Link } from 'react-router'
-import { Button, Divider, Header, Icon, Item, Popup, Table } from 'semantic-ui-react'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
 import { useCurrentSemester } from '@/common/hooks'
 import { studentToolTips } from '@/common/InfoToolTips'
-import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Section } from '@/components/material/Section'
+import { StyledTable } from '@/components/material/StyledTable'
+import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { reformatDate } from '@/util/timeAndDate'
@@ -18,10 +21,9 @@ const studyRightIsActive = (studyRight, currentSemester) =>
 
 export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
-  const { data: studyProgrammes } = useGetProgrammesQuery()
-  const { semestercode: currentSemesterCode } = useCurrentSemester()
-
-  const studyRightHeaders = ['Programme', 'Study track', 'Status', 'Completed']
+  const { data: studyProgrammes } = useGetProgrammesQuery({})
+  const currentSemester = useCurrentSemester()
+  const currentSemesterCode = currentSemester?.semestercode
 
   if (!student) return null
 
@@ -84,7 +86,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
       studyPlan =>
         newestProgrammeCode === studyPlan.programme_code && studyPlan.sis_study_right_id === studyright.studyRightId
     )
-    if (!studyPlan) return <>-</>
+    if (!studyPlan) return null
 
     const { completed_credits: credits = 0 } = studyPlan
     if (studyright.graduated) return `${credits} cr`
@@ -93,95 +95,109 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
     return `${completedPercentage} (${credits} cr)`
   }
 
-  const showPopulationStatistics = (studyprogramme, date) => {
-    const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
-    const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
+  const showPopulationStatistics = (studyprogramme: string, date: string) => {
+    const yearFromDate = parseInt(date.slice(0, 4), 10)
+    const year = moment(date).isBefore(`${yearFromDate}-08-01`, 'day') ? yearFromDate - 1 : yearFromDate
+    const months = Math.ceil(moment().diff(`${year}-08-01`, 'months', true))
     return `/populations?months=${months}&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
   }
 
   return (
-    <>
-      <Divider horizontal style={{ margin: '2em 0' }}>
-        <Header as="h4">Filter credits by study right</Header>
-      </Divider>
-      <Table>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell />
-            {studyRightHeaders.map(header => (
-              <Table.HeaderCell key={header}>
-                {header}
-                {header === 'Status' && (
-                  <HoverableHelpPopup
-                    content={studentToolTips.studyRightStatus}
-                    size="mini"
-                    style={{ marginLeft: '0.25rem' }}
-                  />
-                )}
-              </Table.HeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
+    <Section
+      cypress="study-rights-section"
+      infoBoxContent="To filter the credits shown in the **Credit graph** by study right, click the filter icon next to the corresponding row in the table below. When a study right is selected, courses included in that study right's study plan are also highlighted with a light blue background in the **Courses** table."
+      title="Study rights"
+    >
+      <StyledTable>
+        <TableHead>
+          <TableRow>
+            <TableCell width="50px" />
+            <TableCell>Programme</TableCell>
+            <TableCell>Study track</TableCell>
+            <TableCell>
+              <TableHeaderWithTooltip header="Status" tooltipText={studentToolTips.studyRightStatus} />
+            </TableCell>
+            <TableCell>Completed</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {studyRightRows.map(studyRight => {
             const numberOfProgrammes = studyRight.programmes.length
             const rowIsFilterable = studyRight.studyPlanId != null
 
             return studyRight.programmes.map(({ name, startDate, endDate, code, studyTrack }, index) => {
               const isFirstRow = index === 0
+              const isLastRow = index === numberOfProgrammes - 1
+
+              let borderWidth = '1px'
+              if (isFirstRow && numberOfProgrammes > 1) {
+                borderWidth = '1px 1px 0 1px'
+              } else if (isLastRow && numberOfProgrammes > 1) {
+                borderWidth = '0 1px 1px 1px'
+              }
+
               return (
-                <Table.Row
+                <TableRow
                   key={`${studyRight.key}-${code}`}
                   onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId) : null)}
-                  style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
+                  style={{
+                    cursor: rowIsFilterable ? 'pointer' : 'not-allowed',
+                    borderWidth,
+                  }}
                 >
                   {isFirstRow && (
-                    <Table.Cell rowSpan={numberOfProgrammes}>
-                      <Popup
-                        content={
+                    <TableCell rowSpan={numberOfProgrammes}>
+                      <Tooltip
+                        arrow
+                        title={
                           rowIsFilterable
                             ? 'Display credits included in the study plan of this study right'
                             : 'This study right does not have a study plan'
                         }
-                        size="mini"
-                        trigger={
-                          <div>
-                            <Button
-                              basic={studyRight.studyPlanId !== selectedStudyPlanId}
-                              disabled={!rowIsFilterable}
-                              icon
-                              onClick={() => handleStudyPlanChange(studyRight.studyPlanId)}
-                              primary={studyRight.studyPlanId === selectedStudyPlanId}
-                              size="mini"
-                            >
-                              <Icon name="filter" />
-                            </Button>
-                          </div>
-                        }
-                      />
-                    </Table.Cell>
+                      >
+                        <div>
+                          <IconButton
+                            color={studyRight.studyPlanId === selectedStudyPlanId ? 'primary' : 'default'}
+                            disabled={!rowIsFilterable}
+                            onClick={() => handleStudyPlanChange(studyRight.studyPlanId)}
+                            size="small"
+                            sx={{
+                              borderRadius: 2,
+                              border: rowIsFilterable ? '1px solid rgba(0, 0, 0, 0.23)' : 'none',
+                            }}
+                          >
+                            <FilterAltIcon fontSize="small" />
+                          </IconButton>
+                        </div>
+                      </Tooltip>
+                    </TableCell>
                   )}
-                  <Table.Cell style={{ border: !isFirstRow && 'none' }}>
-                    {`${getTextIn(name)} (${reformatDate(startDate, DISPLAY_DATE_FORMAT)}–${reformatDate(endDate, DISPLAY_DATE_FORMAT)})`}
-                    {studyProgrammes != null && code in studyProgrammes && (
-                      <Item as={Link} to={showPopulationStatistics(code, startDate)}>
-                        <Icon name="level up alternate" />
-                      </Item>
-                    )}
-                  </Table.Cell>
-                  <Table.Cell style={{ border: !isFirstRow && 'none' }}>
-                    {studyTrack && <div>{`${getTextIn(studyTrack.name)}`}</div>}
-                  </Table.Cell>
-                  {isFirstRow && <Table.Cell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</Table.Cell>}
+                  <TableCell>
+                    <Stack alignItems="center" direction="row">
+                      {`${getTextIn(name)} (${reformatDate(startDate, DISPLAY_DATE_FORMAT)}–${reformatDate(endDate, DISPLAY_DATE_FORMAT)})`}
+                      {studyProgrammes != null && code in studyProgrammes && (
+                        <IconButton
+                          color="primary"
+                          component={Link}
+                          size="small"
+                          to={showPopulationStatistics(code, startDate)}
+                        >
+                          <NorthEastIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{getTextIn(studyTrack?.name)}</TableCell>
+                  {isFirstRow && <TableCell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</TableCell>}
                   {isFirstRow && (
-                    <Table.Cell rowSpan={numberOfProgrammes}>{renderCompletionPercent(studyRight, student)}</Table.Cell>
+                    <TableCell rowSpan={numberOfProgrammes}>{renderCompletionPercent(studyRight, student)}</TableCell>
                   )}
-                </Table.Row>
+                </TableRow>
               )
             })
           })}
-        </Table.Body>
-      </Table>
-    </>
+        </TableBody>
+      </StyledTable>
+    </Section>
   )
 }

@@ -1,7 +1,11 @@
+import { ArrowDropDown as ArrowForwardIosSharpIcon } from '@mui/icons-material'
+import { AccordionDetails, AccordionSummary, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { useState } from 'react'
-import { Icon, Accordion, Table, Popup } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { StyledAccordion } from '@/components/material/StyledAccordion'
+import { StyledTable } from '@/components/material/StyledTable'
+import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
@@ -53,6 +57,7 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
       year: firstDisplayedYear,
       filteredStudents: [student],
       getTextIn,
+      programmeCode: null,
     }
 
     const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
@@ -73,6 +78,7 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
       ...baseArguments,
       studentToStudyrightEndMap,
       studentToSecondStudyrightEndMap,
+      semestersToAddToStart: null,
     })
 
     acc[studyright.id] = getSemesterEnrollmentsContent(student, studyright)
@@ -98,42 +104,37 @@ export const EnrollmentAccordion = ({ student }) => {
   const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semestersAndYears)
 
   return (
-    <Accordion style={{ marginBottom: active ? '0.5em' : 0 }}>
-      <Accordion.Title active={active} onClick={() => setActive(!active)}>
-        <Icon name="dropdown" />
-        Enrollments
-      </Accordion.Title>
-      <Accordion.Content active={active}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Programme(s)</Table.HeaderCell>
-              <Table.HeaderCell>
-                Semesters (starting from autumn {firstDisplayedYear})
-                <Popup
-                  content="Displays enrollment data for the current and up to nine previous academic years."
-                  position="top center"
-                  trigger={<Icon name="question circle outline" style={{ opacity: 0.5, marginLeft: '0.25em' }} />}
+    <StyledAccordion expanded={active} onChange={() => setActive(!active)}>
+      <AccordionSummary expandIcon={<ArrowForwardIosSharpIcon />}>Enrollments</AccordionSummary>
+      <AccordionDetails>
+        <StyledTable showCellBorders sx={{ marginBottom: 1 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Programme(s)</TableCell>
+              <TableCell>
+                <TableHeaderWithTooltip
+                  header={`Semesters (starting from autumn ${firstDisplayedYear})`}
+                  tooltipText="Displays enrollment data for the current and up to nine previous academic years."
                 />
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {studyRightsWithSemesterEnrollments.map(studyRightId => (
-              <Table.Row key={studyRightId}>
-                <Table.Cell>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
+              <TableRow key={studyRightId}>
+                <TableCell>
+                  <Stack spacing={1}>
                     {programmeNames[studyRightId].map(getTextIn).map(element => (
                       <div key={element}>{element}</div>
                     ))}
-                  </div>
-                </Table.Cell>
-                <Table.Cell>{semesterEnrollments[studyRightId]}</Table.Cell>
-              </Table.Row>
+                  </Stack>
+                </TableCell>
+                <TableCell>{semesterEnrollments[studyRightId]}</TableCell>
+              </TableRow>
             ))}
-          </Table.Body>
-        </Table>
-      </Accordion.Content>
-    </Accordion>
+          </TableBody>
+        </StyledTable>
+      </AccordionDetails>
+    </StyledAccordion>
   )
 }

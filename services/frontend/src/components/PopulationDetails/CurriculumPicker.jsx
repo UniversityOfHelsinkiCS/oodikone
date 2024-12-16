@@ -1,5 +1,6 @@
+import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Dropdown, Form, Input, Radio } from 'semantic-ui-react'
+import { Form, Input, Radio } from 'semantic-ui-react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'
 
@@ -45,23 +46,22 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
   if (curriculums.length === 0) return null
 
   return (
-    <Dropdown
-      className="link item"
-      data-cy="curriculum-picker"
-      disabled={disabled}
-      onChange={(_, { value }) => setSelectedCurriculum(curriculums.find(curriculum => curriculum.id === value))}
-      options={curriculums.map(curriculum => ({
-        key: curriculum.curriculum_period_ids.toSorted().join(', '),
-        value: curriculum.id,
-        text: curriculum.curriculumName,
-      }))}
-      style={{
-        background: '#e3e3e3',
-        marginLeft: '10px',
-        padding: '4px 4px 4px 8px',
-      }}
-      value={chosenCurriculum.id}
-    />
+    <FormControl disabled={disabled} variant="standard">
+      <Select
+        MenuProps={{
+          disablePortal: true,
+        }}
+        data-cy="curriculum-picker"
+        onChange={event => setSelectedCurriculum(curriculums.find(({ id }) => id === event.target.value))}
+        value={chosenCurriculum.id}
+      >
+        {curriculums.map(curriculum => (
+          <MenuItem key={curriculum.id} value={curriculum.id}>
+            {curriculum.curriculumName}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   )
 }
 

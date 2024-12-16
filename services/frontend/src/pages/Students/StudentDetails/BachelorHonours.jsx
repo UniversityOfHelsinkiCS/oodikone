@@ -1,6 +1,17 @@
+import { ArrowDropDown as ArrowDropDownIcon, Close as CloseIcon, Done as DoneIcon } from '@mui/icons-material'
+import {
+  AccordionDetails,
+  AccordionSummary,
+  Chip,
+  Stack,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import moment from 'moment'
 import { useState } from 'react'
-import { Accordion, Divider, Header, Icon, Label, Table } from 'semantic-ui-react'
 
 import {
   bachelorHonoursProgrammes as bachelorCodes,
@@ -8,9 +19,35 @@ import {
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
 } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Section } from '@/components/material/Section'
+import { StyledAccordion } from '@/components/material/StyledAccordion'
+import { StyledTable } from '@/components/material/StyledTable'
 import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
+
+const ModuleTable = ({ data, cypress, getTextIn }) => (
+  <StyledTable data-cy={cypress}>
+    <TableHead>
+      <TableRow>
+        <TableCell>Date</TableCell>
+        <TableCell>Module</TableCell>
+        <TableCell>Grade</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {data.map(module => (
+        <TableRow key={module.course.code}>
+          <TableCell>{reformatDate(module.date, DISPLAY_DATE_FORMAT)}</TableCell>
+          <TableCell>
+            {getTextIn(module.course.name)} ({module.course.code})
+          </TableCell>
+          <TableCell>{module.grade}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </StyledTable>
+)
 
 export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   const [curriculum, setCurriculum] = useState(null)
@@ -86,72 +123,57 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
     reason = 'Module grades too low'
   }
 
-  const dataRows = modules =>
-    modules.map(mod => (
-      <Table.Row key={mod.course.code}>
-        <Table.Cell>{reformatDate(mod.date, DISPLAY_DATE_FORMAT)}</Table.Cell>
-        <Table.Cell>
-          {getTextIn(mod.course.name)} ({mod.course.code})
-        </Table.Cell>
-        <Table.Cell>{mod.grade}</Table.Cell>
-      </Table.Row>
-    ))
-
-  const dataTable = (data, cypress) => (
-    <Table data-cy={cypress}>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Date</Table.HeaderCell>
-          <Table.HeaderCell>Module</Table.HeaderCell>
-          <Table.HeaderCell>Grade</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>{dataRows(data)}</Table.Body>
-    </Table>
-  )
-
   return (
-    <>
-      <Divider horizontal>
-        <Header as="h4">Bachelor Honours</Header>
-      </Divider>
-      <Header as="h5">Qualified</Header>
-      <Label
-        color={honours ? 'green' : 'red'}
-        content={honours ? 'Qualified for Honours' : 'Not qualified for Honours'}
-        tag
-      />
-      {!honours && reason && <Label color="red" content={reason} tag />}
-      {inspection && <Label color="blue" content="Might need further inspection" tag />}
-      <div style={{ marginTop: '15px', marginBottom: '15px' }}>
-        Select curriculum version used for checking Bachelor Honours eligibility
+    <Section title="Bachelor Honours">
+      <Typography component="h3" gutterBottom variant="h6">
+        Qualified
+      </Typography>
+      <Stack direction="row" spacing={1}>
+        <Chip
+          color={honours ? 'success' : 'error'}
+          data-cy={`honours-chip-${honours ? 'qualified' : 'not-qualified'}`}
+          icon={honours ? <DoneIcon /> : <CloseIcon />}
+          label={honours ? 'Qualified for Honours' : 'Not qualified for Honours'}
+        />
+        {!honours && reason && <Chip color="error" data-cy="honours-chip-error" label={reason} />}
+        {inspection && <Chip color="info" data-cy="honours-chip-inspection" label="Might need further inspection" />}
+      </Stack>
+      <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
+        <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
         <CurriculumPicker
           curriculum={curriculum}
           programmeCodes={[programmeCode]}
           setCurriculum={setCurriculum}
           year={new Date().getFullYear()}
         />
-      </div>
-      {honours ? (
-        <Accordion>
-          <Accordion.Title
-            active={showHonoursModules}
-            index={0}
-            onClick={() => setShowHonoursModules(!showHonoursModules)}
-          >
-            <Header as="h4">
-              <Icon name="dropdown" />
-              Main courses and other modules
-            </Header>
-          </Accordion.Title>
-          <Accordion.Content active={showHonoursModules}>
-            <h4>Main Modules</h4>
-            {mainModules.length > 0 && dataTable(mainModules, 'main-modules')}
-            <h4>Other Modules</h4>
-            {otherModules.length > 0 && dataTable(otherModules, 'other-modules')}
-          </Accordion.Content>
-        </Accordion>
-      ) : null}
-    </>
+      </Stack>
+      {honours && (
+        <StyledAccordion expanded={showHonoursModules} onChange={() => setShowHonoursModules(!showHonoursModules)}>
+          <AccordionSummary expandIcon={<ArrowDropDownIcon />} sx={{ fontWeight: 'bold' }}>
+            Study modules
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={2}>
+              <div>
+                <Typography fontWeight="bold" gutterBottom>
+                  Main modules
+                </Typography>
+                {mainModules.length > 0 && (
+                  <ModuleTable cypress="main-modules" data={mainModules} getTextIn={getTextIn} />
+                )}
+              </div>
+              <div>
+                <Typography fontWeight="bold" gutterBottom>
+                  Other modules
+                </Typography>
+                {otherModules.length > 0 && (
+                  <ModuleTable cypress="other-modules" data={otherModules} getTextIn={getTextIn} />
+                )}
+              </div>
+            </Stack>
+          </AccordionDetails>
+        </StyledAccordion>
+      )}
+    </Section>
   )
 }

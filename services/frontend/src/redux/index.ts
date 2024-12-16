@@ -27,10 +27,11 @@ export const store = configureStore({
   },
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
-  middleware: getDefaultMiddleware => [
-    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
-    RTKApi.middleware,
-    handleRequest,
-  ],
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(RTKApi.middleware, handleRequest),
 })
 setupListeners(store.dispatch)
+
+export type RootState = ReturnType<typeof store.getState>
+// eslint-disable-next-line import/no-unused-modules
+export type AppDispatch = typeof store.dispatch

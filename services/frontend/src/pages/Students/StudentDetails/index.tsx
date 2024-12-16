@@ -1,19 +1,22 @@
+import { Alert, CircularProgress, Stack } from '@mui/material'
 import { isEmpty, orderBy } from 'lodash'
 import { useState } from 'react'
-import { Loader, Message } from 'semantic-ui-react'
+import { useParams } from 'react-router'
 
 import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
-import { StudentInfoCard } from '@/components/StudentStatistics/StudentInfoCard'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
 import { BachelorHonours } from './BachelorHonours'
-import { CourseParticipationTable } from './CourseParticipationTable'
+import { CourseTables } from './CourseTables'
 import { StudentGraphs } from './StudentGraphs'
+import { StudentInfoCard } from './StudentInfoCard'
 import { StudyrightsTable } from './StudyrightsTable'
 import { TagsTable } from './TagsTable'
 
-const getAbsentYears = (studyRights, semesters) => {
-  const semesterEnrollments = studyRights.reduce((acc, { semesterEnrollments }) => {
+const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters']) => {
+  const semesterEnrollments = studyRights.reduce<
+    Record<string, { semestercode: number; enrollmenttype: number; statutoryAbsence: boolean }>
+  >((acc, { semesterEnrollments }) => {
     if (semesterEnrollments == null) return acc
     for (const enrollment of semesterEnrollments) {
       const currentEnrollment = acc[enrollment.semester]
@@ -33,8 +36,8 @@ const getAbsentYears = (studyRights, semesters) => {
     return acc
   }, {})
 
-  const minimumSemesterCode = Math.min(...Object.keys(semesterEnrollments))
-  const maximumSemesterCode = Math.max(...Object.keys(semesterEnrollments))
+  const minimumSemesterCode = Math.min(...Object.keys(semesterEnrollments).map(Number))
+  const maximumSemesterCode = Math.max(...Object.keys(semesterEnrollments).map(Number))
 
   for (let i = minimumSemesterCode + 1; i < maximumSemesterCode; i++) {
     if (!semesterEnrollments[i]) {
@@ -53,19 +56,22 @@ const getAbsentYears = (studyRights, semesters) => {
   return mergedEnrollments
 }
 
-export const StudentDetails = ({ studentNumber }) => {
+export type Absence = ReturnType<typeof getAbsentYears>[number]
+
+export const StudentDetails = () => {
+  const { studentNumber } = useParams()
   const [graphYearStart, setGraphYear] = useState(null)
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
   const { data: semestersAndYears } = useGetSemestersQuery()
-  const { data: student, isLoading, isError } = useGetStudentQuery(studentNumber)
+  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery(studentNumber)
   let honoursCode
 
   if (isLoading) {
-    return <Loader active />
+    return <CircularProgress />
   }
 
   if (isError || student.error) {
-    return <Message header="Student not found or no sufficient permissions" icon="warning sign" negative size="big" />
+    return <Alert severity="error">Student not found or no sufficient permissions</Alert>
   }
 
   if (!student || !studentNumber || isEmpty(student) || !semestersAndYears) {
@@ -105,23 +111,22 @@ export const StudentDetails = ({ studentNumber }) => {
   const absences = getAbsentYears(student.studyRights, semestersAndYears.semesters)
 
   return (
-    <>
+    <Stack spacing={2} width="100%">
       <StudentInfoCard student={student} />
       <StudentGraphs
         absences={absences}
         graphYearStart={graphYearStart}
         selectedStudyPlanId={selectedStudyPlanId}
-        semesters={semestersAndYears}
         student={student}
       />
-      <TagsTable student={student} />
       <StudyrightsTable
         handleStudyPlanChange={handleStudyPlanChange}
         selectedStudyPlanId={selectedStudyPlanId}
         student={student}
       />
+      <TagsTable student={student} />
       {honoursCode && <BachelorHonours absentYears={absences} programmeCode={honoursCode} student={student} />}
-      <CourseParticipationTable selectedStudyPlanId={selectedStudyPlanId} student={student} />
-    </>
+      <CourseTables selectedStudyPlanId={selectedStudyPlanId} student={student} />
+    </Stack>
   )
 }

@@ -8,13 +8,21 @@ const student = {
   email: 'sisutestidata134902@testisisudata.fi',
 }
 
+const typeToSearch = text => {
+  cy.get("input[placeholder='Search with a student number or name (surname firstname)']").type(text)
+}
+
 const typeStudentNumberAndClick = studentNumber => {
-  cy.get('.prompt').type(studentNumber)
-  cy.contains('td a', studentNumber).click()
+  typeToSearch(studentNumber)
+  cy.contains('td', studentNumber).click()
+}
+
+const clearSearch = () => {
+  cy.get("input[placeholder='Search with a student number or name (surname firstname)']").clear()
 }
 
 describe('Students tests', () => {
-  describe('when using basic user', () => {
+  describe('When using basic user', () => {
     beforeEach(() => {
       cy.init()
       cy.contains('Students').click()
@@ -23,7 +31,7 @@ describe('Students tests', () => {
     })
 
     it('Students search form is usable', () => {
-      cy.get('.prompt').type(student.lastname)
+      typeToSearch(student.lastname)
       cy.contains('Student number')
       cy.contains('Started')
       cy.contains('Credits')
@@ -37,20 +45,19 @@ describe('Students tests', () => {
     })
 
     it('Search term must be at least 4 characters long', () => {
-      cy.get('.prompt').type(student.lastname.slice(0, 3))
-      cy.contains('No search results or search term is not accurate enough')
-      cy.get('.prompt').type(student.lastname.slice(3))
+      typeToSearch(student.lastname.slice(0, 3))
+      cy.contains('Search term is not accurate enough')
+      typeToSearch(student.lastname.slice(3))
       cy.get('table tbody tr').should('have.length', 1)
     })
 
-    it('can search with studentnumber too', () => {
-      cy.get('.prompt').type(student.studentnumber)
+    it('Can search with studentnumber too', () => {
+      typeToSearch(student.studentnumber)
       cy.contains(student.studentnumber)
     })
 
     it('Can get student specific page by clicking student', () => {
-      cy.get('.prompt').type(student.studentnumber)
-      cy.contains('td a', student.studentnumber).click()
+      typeStudentNumberAndClick(student.studentnumber)
       cy.contains('Matemaattisten tieteiden kandiohjelma (01.08.2020–31.07.2027)')
       cy.contains(student.lastname).should('not.exist')
       cy.contains(student.firstnames).should('not.exist')
@@ -69,7 +76,7 @@ describe('Students tests', () => {
 
     it("'Update student' button is not shown", () => {
       typeStudentNumberAndClick(student.studentnumber)
-      cy.get('div.ui.fluid.card').within(() => {
+      cy.get('[data-cy=student-info-card]').within(() => {
         cy.contains('button', 'Update student').should('not.exist')
       })
     })
@@ -88,7 +95,7 @@ describe('Students tests', () => {
         .siblings()
         .last()
         .within(() => {
-          cy.get('.level').click()
+          cy.get('a').click()
         })
       cy.url().should('include', '/coursestatistics')
       cy.contains('MAT12004 Tilastollinen päättely I')
@@ -98,7 +105,7 @@ describe('Students tests', () => {
 
     it('Has correct Sisu link', () => {
       typeStudentNumberAndClick(student.studentnumber)
-      cy.get('[data-cy=sisulink] > a')
+      cy.get('[data-cy=sisu-link]')
         .should('have.attr', 'href')
         .and('include', `https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`)
     })
@@ -110,7 +117,7 @@ describe('Students tests', () => {
         'Matemaattisten tieteiden kandiohjelma',
         'Oikeustieteen maisterin koulutusohjelmaOikeusnotaarin koulutusohjelma',
       ]
-      cy.get('div.ui.fluid.card').within(() => {
+      cy.get('[data-cy=student-info-card]').within(() => {
         cy.contains('Enrollments').click()
         cy.get('table tbody tr')
           .should('have.length', 3)
@@ -122,18 +129,22 @@ describe('Students tests', () => {
       })
     })
 
-    it('Searching with bad inputs doesnt yield results', () => {
-      cy.get('.prompt').type('SWAG LITTINEN')
+    it("Searching with bad inputs doesn't yield results", () => {
+      typeToSearch('SWAG LITTINEN')
       cy.contains('Student number').should('not.exist')
-
-      cy.get('.prompt').clear().type('01114')
+      clearSearch()
+      typeToSearch('01114')
       cy.contains('Student number').should('not.exist')
     })
 
     it('Can jump to population page', () => {
       typeStudentNumberAndClick(student.studentnumber)
-      cy.contains('.ui.table', 'Completed').within(() => {
-        cy.get('i.level.up.alternate.icon').click()
+      cy.get('[data-cy=study-rights-section]').within(() => {
+        cy.contains('Matemaattisten tieteiden kandiohjelma')
+          .parent()
+          .within(() => {
+            cy.get('a').click()
+          })
       })
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
       cy.contains('class size 30 students')
@@ -141,33 +152,32 @@ describe('Students tests', () => {
 
     it('Grade graph works in all three different modes', () => {
       typeStudentNumberAndClick(student.studentnumber)
-      cy.contains('a.item', 'Grade graph').click()
-      cy.contains('text.highcharts-title', 'Grade plot')
-      cy.contains('a.item', 'Show group mean').click()
-      cy.get('.labeled.input').within(() => {
-        cy.contains('.label', 'Group size')
+      cy.contains('button', 'Grade graph').click()
+      cy.contains('button', 'Show group mean').click()
+      cy.get('[data-cy=group-size-input]').within(() => {
+        cy.contains('label', 'Group size')
         cy.get('input').should('have.value', '5')
       })
       cy.contains('.highcharts-container text', "Nov '22")
       cy.contains('.highcharts-container text', "Jul '22").should('not.exist')
-      cy.contains('text.highcharts-title', 'Grade plot')
-      cy.get('.labeled.input').within(() => {
-        cy.contains('.label', 'Group size')
-        cy.get('input').clear().type('10')
+      cy.get('[data-cy=group-size-input]').within(() => {
+        cy.contains('label', 'Group size')
+        cy.get('input').clear()
+        cy.get('input').type('10')
         cy.get('input').should('have.value', '10')
       })
       cy.contains('.highcharts-container text', "Jul '22")
       cy.contains('.highcharts-container text', "Nov '22").should('not.exist')
-      cy.contains('a.item', 'Show semester mean').click()
+      cy.contains('button', 'Show semester mean').click()
       cy.contains('.highcharts-container text', "Jan '22")
     })
 
     describe('Bachelor Honours section', () => {
       it("Shows 'Qualified for Honours' tag and main modules info when the student is qualified", () => {
         cy.visit('/students/495976')
-        cy.contains('.divider h4', 'Bachelor Honours')
-        cy.contains('.green.tag.label', 'Qualified for Honours')
-        cy.contains('Main courses and other modules').click()
+        cy.contains('h2', 'Bachelor Honours')
+        cy.contains('[data-cy=honours-chip-qualified]', 'Qualified for Honours')
+        cy.contains('Study modules').click()
         cy.get('[data-cy=main-modules] tbody tr')
           .should('have.length', 3)
           .each(($tr, index) => {
@@ -186,35 +196,35 @@ describe('Students tests', () => {
 
       it("Shows 'Did not graduate in time' when the student has graduated but not in time", () => {
         cy.visit('/students/540355')
-        cy.contains('.divider h4', 'Bachelor Honours')
-        cy.contains('.red.tag.label', 'Not qualified for Honours')
-        cy.contains('.red.tag.label', 'Did not graduate in time')
+        cy.contains('h2', 'Bachelor Honours')
+        cy.contains('[data-cy=honours-chip-not-qualified]', 'Not qualified for Honours')
+        cy.contains('[data-cy=honours-chip-error]', 'Did not graduate in time')
       })
 
       it("Shows 'Module grades too low' when the student has graduated in time but has too low grades", () => {
         cy.visit('/students/547934')
-        cy.contains('.divider h4', 'Bachelor Honours')
-        cy.contains('.red.tag.label', 'Not qualified for Honours')
-        cy.contains('.red.tag.label', 'Module grades too low')
+        cy.contains('h2', 'Bachelor Honours')
+        cy.contains('[data-cy=honours-chip-not-qualified]', 'Not qualified for Honours')
+        cy.contains('[data-cy=honours-chip-error]', 'Module grades too low')
       })
 
       it("Shows 'Might need further inspection' when the student has graduated in time but has more than four main modules", () => {
         cy.visit('/students/478837')
-        cy.contains('.divider h4', 'Bachelor Honours')
-        cy.contains('.blue.tag.label', 'Might need further inspection')
+        cy.contains('h2', 'Bachelor Honours')
+        cy.contains('[data-cy=honours-chip-inspection]', 'Might need further inspection')
       })
 
       it("Shows 'Has not graduated' when the student has not graduated", () => {
         cy.visit(`students/${student.studentnumber}`)
-        cy.contains('.divider h4', 'Bachelor Honours')
-        cy.contains('.red.tag.label', 'Not qualified for Honours')
-        cy.contains('.red.tag.label', 'Has not graduated')
+        cy.contains('h2', 'Bachelor Honours')
+        cy.contains('[data-cy=honours-chip-not-qualified]', 'Not qualified for Honours')
+        cy.contains('[data-cy=honours-chip-error]', 'Has not graduated')
       })
     })
   })
 
   // Use admin to see all students
-  describe('when using admin user', () => {
+  describe('When using admin user', () => {
     beforeEach(() => {
       cy.init('/students', 'admin')
     })
@@ -226,14 +236,14 @@ describe('Students tests', () => {
 
     it("'Update student' button is shown", () => {
       typeStudentNumberAndClick(student.studentnumber)
-      cy.get('div.ui.fluid.card').within(() => {
+      cy.get('[data-cy=student-info-card]').within(() => {
         cy.contains('button', 'Update student')
       })
     })
 
     it('Bachelor Honours section is not shown for students outside of Faculty of Science', () => {
       cy.visit('/students/453146')
-      cy.contains('.divider h4', 'Bachelor Honours').should('not.exist')
+      cy.contains('h2', 'Bachelor Honours').should('not.exist')
     })
 
     it('When a study plan is selected, courses included in the study plan are highlighted with a blue background', () => {
@@ -241,9 +251,11 @@ describe('Students tests', () => {
       cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
         cy.get('td').eq(0).click()
       })
-      cy.contains('table tbody tr', 'Kandidaatintutkielma (KUKA-LIS222)')
-        .should('have.attr', 'style')
-        .and('equal', 'background-color: rgb(232, 244, 255);')
+      cy.contains('table tbody tr', 'Kandidaatintutkielma (KUKA-LIS222)').should(
+        'have.css',
+        'background-color',
+        'rgb(232, 244, 255)'
+      )
     })
 
     it('When a study plan is selected, the time frame of the credit graph is updated', () => {

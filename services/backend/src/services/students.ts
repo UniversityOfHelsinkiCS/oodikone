@@ -344,6 +344,7 @@ export const bySearchTermAndStudentNumbers = async (searchterm: string, studentN
             },
           }
         : { [Op.or]: [nameLike(terms), studentnumberLike(terms)] },
+      order: [['dateofuniversityenrollment', 'DESC NULLS LAST']],
     })
   ).map(formatSharedStudentData)
 }

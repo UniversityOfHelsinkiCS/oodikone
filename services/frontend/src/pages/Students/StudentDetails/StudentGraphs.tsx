@@ -1,3 +1,15 @@
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Paper,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@mui/material'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -5,20 +17,21 @@ import { chunk, flattenDeep, groupBy } from 'lodash'
 import moment from 'moment'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
-import { Input, Menu, Message, Tab } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
+import { Absence } from '.'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
 const getEarliestAttainmentDate = ({ courses }) => {
-  if (!courses || !courses.length) return null
+  if (!courses?.length) return null
   // Courses are already sorted by date in the backend
   return courses[0].date
 }
@@ -33,18 +46,24 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyPlan, study
   const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
   return Math.min(
-    ...flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
+    ...flattenDeep<number>(filteredCourses.map(({ date }) => new Date(date).getTime())),
     new Date(studyRightTargetStart).getTime()
   )
 }
 
-const resolveGraphEndDate = (dates, selectedStudyPlan, student, studyRightTargetEnd, selectedStudyRightElement) => {
-  if (!selectedStudyPlan) return Math.max(...(dates || []), new Date().getTime())
-  const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
+const resolveGraphEndDate = (
+  dates: number[],
+  coursesIncludedInStudyPlan: string[],
+  student: any,
+  studyRightTargetEnd: Date,
+  selectedStudyRightElement: any
+) => {
+  if (!coursesIncludedInStudyPlan.length) return Math.max(...(dates || []), new Date().getTime())
+  const filteredCourses = student.courses.filter(({ course }) => coursesIncludedInStudyPlan.includes(course.code))
 
   const comparedValues = [
     new Date(studyRightTargetEnd).getTime(),
-    ...flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime())),
+    ...flattenDeep<number>(filteredCourses.map(({ date }) => new Date(date).getTime())),
   ]
   if (selectedStudyRightElement?.graduated) {
     const graduationDate = new Date(selectedStudyRightElement.endDate)
@@ -63,7 +82,7 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
   const selectedStudyRightElement = selectedStudyRight?.studyRightElements.find(
     ({ code }) => code === selectedStudyPlan.programme_code
   )
-  const creditDates = student.courses.map(({ date }) => new Date(date))
+  const creditDates = student.courses.map(({ date }) => new Date(date).getTime())
   const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(
     selectedStudyRightElement,
     absences
@@ -73,7 +92,7 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
   )
   const endDate = resolveGraphEndDate(
     creditDates,
-    selectedStudyPlan,
+    selectedStudyPlan?.included_courses ?? [],
     student,
     studyRightTargetEnd,
     selectedStudyRightElement
@@ -82,16 +101,19 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
     <CreditAccumulationGraphHighCharts
       absences={absences}
       endDate={endDate}
+      programmeCodes={null}
       selectedStudyPlan={selectedStudyPlan}
+      showFullStudyPath={null}
       singleStudent
       startDate={selectedStart}
       students={[student]}
+      studyPlanFilterIsActive={null}
       studyRightId={studyRightId}
     />
   )
 }
 
-const semesterChunkify = (courses, semesters, getTextIn) => {
+const semesterChunkify = (courses, semesters, getTextIn: ReturnType<typeof useLanguage>['getTextIn']) => {
   const semesterChunks = courses.reduce((acc, curr) => {
     const semester = semesters.find(
       semester => moment(curr.date).isSameOrAfter(semester.startdate) && moment(curr.date).isBefore(semester.enddate)
@@ -120,7 +142,12 @@ const semesterChunkify = (courses, semesters, getTextIn) => {
   return semesterMeans
 }
 
-const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
+const gradeMeanSeries = (
+  student: any,
+  chunksize: number,
+  semesters: SemestersData | undefined,
+  getTextIn: ReturnType<typeof useLanguage>['getTextIn']
+) => {
   const filteredCourses = student.courses.filter(
     course => !Number.isNaN(Number(course.grade)) && !course.isStudyModuleCredit && course.passed
   )
@@ -133,7 +160,6 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
         acc.grades.push({
           grade: Number(course.grade),
           date: course.date,
-          code: course.course_code,
           credits: course.credits,
         })
         // Weighted average: each grade is multiplied by the amount of credits the course is worth
@@ -143,13 +169,18 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
       acc.mean.push({ y: acc.totalGradeSum / acc.totalCredits, x: new Date(courses[0].date).getTime() })
       return acc
     },
-    { grades: [], mean: [], totalGradeSum: 0, totalCredits: 0 }
+    {
+      grades: [] as Array<{ grade: number; date: string; credits: number }>,
+      mean: [] as Array<{ y: number; x: number }>,
+      totalGradeSum: 0,
+      totalCredits: 0,
+    }
   )
 
   const size = Number(chunksize) ? chunksize : 3
   const chunks = chunk(gradesAndMeans.grades, size)
 
-  const groupMeans = chunks.reduce((acc, curr) => {
+  const groupMeans = chunks.reduce<Array<{ name: string; y: number; x: number }>>((acc, curr) => {
     const gradeSum = curr.reduce((a, b) => a + b.grade * b.credits, 0)
     const creditSum = curr.reduce((a, b) => a + b.credits, 0)
     if (curr.length > 0)
@@ -170,13 +201,14 @@ const gradeMeanSeries = (student, chunksize, semesters, getTextIn) => {
   }
 }
 
-const GradeGraph = ({ semesters, student }) => {
+const GradeGraph = ({ student }: { student: any }) => {
   const { getTextIn } = useLanguage()
   const [groupSize, setGroupSize] = useState(5)
   const [graphMode, setGraphMode] = useState('total')
+  const { data: semesters } = useGetSemestersQuery()
   const series = useMemo(
     () => gradeMeanSeries(student, groupSize, semesters, getTextIn),
-    [student, groupSize, semesters]
+    [student, groupSize, semesters, getTextIn]
   )
   const { totalMeans, groupMeans, semesterMeans } = series
 
@@ -188,7 +220,7 @@ const GradeGraph = ({ semesters, student }) => {
       enabled: false,
     },
     title: {
-      text: 'Grade plot',
+      text: '',
     },
     tooltip: {
       pointFormat: '{point.y:.2f}',
@@ -208,66 +240,75 @@ const GradeGraph = ({ semesters, student }) => {
   const semesterMeanOptions = { ...defaultOptions, series: semesterMeans }
 
   return (
-    <>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Message style={{ maxWidth: '600px' }}>
-          <Message.Header>Grade graph</Message.Header>
-          Painotettu keskiarvo lasketaan kaikista niistä opintojaksoista, joiden arviointiasteikko on 0–5.{' '}
-          <b>Total mean</b> näyttää, kuinka keskiarvo on kehittynyt opintojen aikana. <b>Group mean</b> jakaa kurssit
-          valitun kokoisiin ryhmiin ja laskee niiden keskiarvot. <b>Semester mean</b> laskee jokaisen lukukauden
-          keskiarvon.
-        </Message>
-        <Menu compact style={{ marginBottom: '15px' }}>
-          <Menu.Item active={graphMode === 'total'} onClick={() => setGraphMode('total')}>
-            Show total mean
-          </Menu.Item>
-          <Menu.Item active={graphMode === 'group'} onClick={() => setGraphMode('group')}>
-            Show group mean
-          </Menu.Item>
-          <Menu.Item active={graphMode === 'semester'} onClick={() => setGraphMode('semester')}>
-            Show semester mean
-          </Menu.Item>
-        </Menu>
-        {graphMode === 'group' && (
-          <Input
-            label="Group size"
-            onChange={(_event, { value }) => {
-              if (!Number.isNaN(Number(value))) setGroupSize(Number(value))
-            }}
-            value={groupSize}
-          />
-        )}
-      </div>
-      {graphMode === 'total' && <ReactHighcharts config={totalMeanOptions} />}
-      {graphMode === 'group' && <ReactHighcharts config={groupMeanOptions} />}
-      {graphMode === 'semester' && <ReactHighcharts config={semesterMeanOptions} />}
-    </>
+    <Stack alignItems="center" spacing={2}>
+      <Alert severity="info" sx={{ maxWidth: '75%' }}>
+        <AlertTitle>Grade graph</AlertTitle>
+        Painotettu keskiarvo lasketaan kaikista niistä opintojaksoista, joiden arviointiasteikko on 0–5.{' '}
+        <b>Total mean</b> näyttää, kuinka keskiarvo on kehittynyt opintojen aikana. <b>Group mean</b> jakaa kurssit
+        valitun kokoisiin ryhmiin ja laskee niiden keskiarvot. <b>Semester mean</b> laskee jokaisen lukukauden
+        keskiarvon.
+      </Alert>
+      <ToggleButtonGroup
+        color="primary"
+        exclusive
+        onChange={(_event, newMode) => setGraphMode(newMode)}
+        value={graphMode}
+      >
+        <ToggleButton value="total">Show total mean</ToggleButton>
+        <ToggleButton value="group">Show group mean</ToggleButton>
+        <ToggleButton value="semester">Show semester mean</ToggleButton>
+      </ToggleButtonGroup>
+      {graphMode === 'group' && (
+        <TextField
+          data-cy="group-size-input"
+          label="Group size"
+          onChange={event => {
+            if (!Number.isNaN(Number(event.target.value))) {
+              setGroupSize(Number(event.target.value))
+            }
+          }}
+          value={groupSize}
+        />
+      )}
+      <Box width="100%">
+        {graphMode === 'total' && <ReactHighcharts config={totalMeanOptions} />}
+        {graphMode === 'group' && <ReactHighcharts config={groupMeanOptions} />}
+        {graphMode === 'semester' && <ReactHighcharts config={semesterMeanOptions} />}
+      </Box>
+    </Stack>
   )
 }
 
-export const StudentGraphs = ({ absences, graphYearStart, semesters, student, selectedStudyPlanId }) => {
-  const panes = [
-    {
-      menuItem: 'Credit graph',
-      render: () => (
-        <Tab.Pane>
+export const StudentGraphs = ({
+  absences,
+  graphYearStart,
+  student,
+  selectedStudyPlanId,
+}: {
+  absences: Absence[]
+  graphYearStart: string | null
+  student: any
+  selectedStudyPlanId: string | null
+}) => {
+  const [activeTab, setActiveTab] = useState(0)
+
+  return (
+    <Paper variant="outlined">
+      <Tabs onChange={(_event, newValue: number) => setActiveTab(newValue)} value={activeTab}>
+        <Tab label="Credit graph" />
+        <Tab label="Grade graph" />
+      </Tabs>
+      <Box sx={{ padding: 2 }}>
+        {activeTab === 0 && (
           <CreditsGraph
             absences={absences}
             graphYearStart={graphYearStart}
             selectedStudyPlanId={selectedStudyPlanId}
             student={student}
           />
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: 'Grade graph',
-      render: () => (
-        <Tab.Pane>
-          <GradeGraph semesters={semesters} student={student} />
-        </Tab.Pane>
-      ),
-    },
-  ]
-  return <Tab panes={panes} />
+        )}
+        {activeTab === 1 && <GradeGraph student={student} />}
+      </Box>
+    </Paper>
+  )
 }

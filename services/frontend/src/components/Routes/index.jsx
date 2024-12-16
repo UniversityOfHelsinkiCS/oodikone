@@ -10,7 +10,6 @@ import { CustomPopulation } from '@/components/CustomPopulation'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
-import { StudentStatistics } from '@/components/StudentStatistics'
 import { StudyGuidanceGroups } from '@/components/StudyGuidanceGroups'
 import { StudyProgramme } from '@/components/StudyProgramme'
 import { Teachers } from '@/components/Teachers'
@@ -22,11 +21,14 @@ import { CloseToGraduation } from '@/pages/CloseToGraduation'
 import { Faculties } from '@/pages/Faculties'
 import { Feedback } from '@/pages/Feedback'
 import { FrontPage } from '@/pages/FrontPage'
+import { Students } from '@/pages/Students'
+import { StudentDetails } from '@/pages/Students/StudentDetails'
+import { StudentSearch } from '@/pages/Students/StudentSearch'
 import { University } from '@/pages/University'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const routes = {
-  students: '/students/:studentNumber?',
+  students: '/students',
   courseStatistics: '/coursestatistics',
   teachers: '/teachers/:teacherid?',
   users: '/users/:userid?',
@@ -88,7 +90,10 @@ export const Routes = () => (
           <ProtectedRoute requireUserHasRights requiredRoles={['admin', 'fullSisuAccess', 'studyGuidanceGroups']} />
         }
       >
-        <Route element={<StudentStatistics />} path={routes.students} />
+        <Route element={<Students />} path={routes.students}>
+          <Route element={<StudentSearch />} index />
+          <Route element={<StudentDetails />} path=":studentNumber" />
+        </Route>
         <Route element={<CustomPopulation />} path={routes.custompopulation} />
       </Route>
 
