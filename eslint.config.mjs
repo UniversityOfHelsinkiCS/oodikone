@@ -90,6 +90,7 @@ export default [
         'error',
         { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
       ],
+      'react/jsx-boolean-value': ['error', 'never'],
       'react/jsx-filename-extension': ['error', { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }],
       'react/jsx-sort-props': ['error', { reservedFirst: false }],
       'react/no-array-index-key': 'error',
@@ -99,7 +100,7 @@ export default [
       'react/prefer-stateless-function': 'error',
       'react/prop-types': 'off',
       ...pluginReactHooks.configs.recommended.rules,
-      'react-hooks/exhaustive-deps': 'off', // TODO: Delete this override
+      'react-hooks/exhaustive-deps': 'warn', // TODO: Delete this override
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',
       '@typescript-eslint/consistent-type-definitions': 'off',
