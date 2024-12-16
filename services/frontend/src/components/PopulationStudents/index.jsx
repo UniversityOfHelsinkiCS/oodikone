@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
@@ -131,7 +131,6 @@ const PopulationStudents = ({
   variant,
   year,
 }) => {
-  const [state, setState] = useState({})
   const studentRef = useRef()
   const { query } = useSelector(({ populations }) => populations)
   let mainProgramme = query?.studyRights?.programme || ''
@@ -151,10 +150,6 @@ const PopulationStudents = ({
   }
 
   const { isAdmin } = useGetAuthorizedUserQuery()
-
-  useEffect(() => {
-    setState({ ...state, admin: isAdmin })
-  }, [])
 
   if (filteredStudents.length === 0) {
     return null
