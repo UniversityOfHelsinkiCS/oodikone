@@ -742,16 +742,23 @@ describe('Study programme overview', () => {
           cy.contains(studentNumber)
         }
 
-        cy.go('back')
+        for (const studentNumber of studentNumbers) {
+          cy.visit(`/students/${studentNumber}`)
+          cy.contains('Tags')
+          cy.contains(name)
+        }
+
+        cy.get('a').contains('Matemaattisten tieteiden kandiohjelma').invoke('removeAttr', 'target').click()
+        cy.url().should('include', '/study-programme/KH50_001?p_tab=4')
+
         deleteTag(name)
       })
 
       it('deleting a tag from tag view also removes it from students', () => {
         cy.contains(name).should('not.exist')
         for (const studentNumber of studentNumbers) {
-          cy.contains('Students').click()
-          cy.get('.prompt').type(studentNumber)
-          cy.contains('a', studentNumber).click()
+          cy.visit(`/students/${studentNumber}`)
+          cy.contains('Tags').should('not.exist')
           cy.contains(name).should('not.exist')
         }
       })

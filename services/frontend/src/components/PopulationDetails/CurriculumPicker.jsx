@@ -48,6 +48,9 @@ export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year
   return (
     <FormControl disabled={disabled} variant="standard">
       <Select
+        MenuProps={{
+          disablePortal: true,
+        }}
         data-cy="curriculum-picker"
         onChange={event => setSelectedCurriculum(curriculums.find(({ id }) => id === event.target.value))}
         value={chosenCurriculum.id}
