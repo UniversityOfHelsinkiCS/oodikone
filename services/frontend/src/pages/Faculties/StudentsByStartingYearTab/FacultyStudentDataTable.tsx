@@ -120,7 +120,7 @@ export const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
   const infoText =
-    "Hover over 'Other' cell to see from which countries students are coming. Shown only for study programmes."
+    "Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for study programmes."
 
   return (
     <Section>
@@ -133,7 +133,7 @@ export const FacultyStudentDataTable = ({
               <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
               <TableCell colSpan={!showPercentages ? 2 : 4}>
                 <Stack direction="row" gap={1}>
-                  Countries
+                  Citizenships
                   <InfoBox content={infoText} mini />
                 </Stack>
               </TableCell>

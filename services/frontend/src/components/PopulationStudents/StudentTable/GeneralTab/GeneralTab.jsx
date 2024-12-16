@@ -534,11 +534,12 @@ export const GeneralTab = ({
       title: 'Gender',
       getRowVal: student => getGender(student.gender_code),
     },
-    citizenship: {
-      key: 'citizenship',
-      title: 'Citizenship',
-      getRowVal: student =>
-        getTextIn({ fi: student.home_country_fi, en: student.home_country_en, sv: student.home_country_sv }),
+    citizenships: {
+      key: 'citizenships',
+      title: 'Citizenships',
+      getRowVal: student => student.citizenships.map(getTextIn).sort(),
+      formatValue: value => value.join(', '),
+      filterType: 'multi',
     },
     option: (isBachelorsProgramme || isMastersProgramme) && {
       key: 'option',

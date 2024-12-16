@@ -37,4 +37,9 @@ export const filterToolTips = {
       Valitse opiskelijoita sen mukaan, minä vuonna heidän ensimmäinen opinto-oikeutensa yliopistolla alkoi (ei siis ainoastaan tarkasteltavan tutkinnon oikeus). Avoimia opinto-oikeuksia ei oteta huomioon.
     `,
   },
+  citizenship: {
+    label: null,
+    short:
+      'Rajaa opiskelijoita kansalaisuuden perusteella. Tulokseen sisältyvät opiskelijat, joilla on valitun valtion kansalaisuus, riippumatta siitä, onko heillä myös muita kansalaisuuksia.',
+  },
 }

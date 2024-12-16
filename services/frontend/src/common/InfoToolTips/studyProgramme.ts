@@ -117,7 +117,7 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
     Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Inactive”.
 
-    Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**, **Countries**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon.
+    Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon. **Citizenships**-kategoriat (**Finland** ja **Other**) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
 
     Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 
