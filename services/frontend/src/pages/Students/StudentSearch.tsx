@@ -40,7 +40,11 @@ export const StudentSearch = () => {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { visible: showNames } = useStudentNameVisibility()
-  const { data: students, isFetching } = useSearchStudentsQuery(query, {
+  const {
+    data: students,
+    isUninitialized,
+    isFetching,
+  } = useSearchStudentsQuery(query, {
     skip: query.trim().length < (Number.isNaN(Number(query)) ? 4 : 6),
   })
   const debouncedSetQuery = useMemo(() => debounce(setQuery, 1000), [setQuery])
@@ -128,6 +132,11 @@ export const StudentSearch = () => {
       {!isLoading && students?.length === 0 && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="error">No students found</Alert>
+        </Box>
+      )}
+      {isUninitialized && query === searchString && (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Alert severity="info">Search term is not accurate enough</Alert>
         </Box>
       )}
     </Stack>
