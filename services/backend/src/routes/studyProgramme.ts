@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express'
 
+import { Graduated, SpecialGroups, YearType } from '@shared/types'
 import {
   getBasicStats,
   setBasicStats,
@@ -18,7 +19,6 @@ import { getGraduationStatsForStudyTrack } from '../services/studyProgramme/stud
 import { updateBasicView, updateStudyTrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme, getStudyTracksForProgramme } from '../services/studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
-import { Graduated, SpecialGroups, YearType } from '../shared/types'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { Section } from '@/components/material/Section'
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@shared/types'
 import { BreakdownDisplay } from './BreakdownDisplay'
 import { MedianDisplay } from './MedianDisplay'
 

@@ -35,7 +35,7 @@ ENV REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED=$LANGUAGE_CENTER_VIEW_ENABLED
 COPY ./frontend/package* ./
 RUN npm ci --include=dev
 COPY ./frontend .
-COPY ./shared/ ./src/shared
+COPY ./shared/ ../shared
 
 RUN npm run build && npm install -g serve@12.0.0
 

@@ -1,9 +1,9 @@
 import { orderBy, range } from 'lodash'
 import { Op } from 'sequelize'
 
+import { Name } from '@shared/types'
+import { mapToProviders } from '@shared/util'
 import { Credit, Enrollment } from '../../models'
-import { Name } from '../../shared/types'
-import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, EnrollmentState } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { createArrayOfCourses } from '../languageCenterData'

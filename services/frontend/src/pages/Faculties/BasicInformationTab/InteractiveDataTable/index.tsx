@@ -5,7 +5,7 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { InfoBox } from '@/components/material/InfoBox'
 import { Section } from '@/components/material/Section'
-import { NameWithCode } from '@/shared/types'
+import { NameWithCode } from '@shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
 
 export const InteractiveDataTable = ({

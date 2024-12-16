@@ -12,7 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../shared/types'
+import { Name } from '@shared/types'
 import { DegreeProgrammeType } from '../types'
 import { Organization } from './organization'
 import { ProgrammeModuleChild } from './programmeModuleChild'

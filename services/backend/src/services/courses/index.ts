@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
+import { Name } from '@shared/types'
 import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
-import { Name } from '../../shared/types'
 import { EnrollmentState, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import logger from '../../util/logger'

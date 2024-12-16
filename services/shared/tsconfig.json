@@ -7,7 +7,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "rootDir": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,

@@ -14,9 +14,9 @@ import {
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { NameWithCode } from '@/shared/types'
 import { DegreeProgramme, GetFacultiesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { NameWithCode } from '@shared/types'
 import { InteractiveDataTable } from './InteractiveDataTable'
 
 const calculateTotals = stats => {

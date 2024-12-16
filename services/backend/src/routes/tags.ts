@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { difference } from 'lodash'
 
+import { Role } from '@shared/types'
 import { Tag, TagStudent } from '../models/kone'
 import { filterStudentnumbersByAccessrights } from '../services/students'
 import {
@@ -14,7 +15,6 @@ import {
   TagFromFrontend,
   StudentTagFromFrontend,
 } from '../services/tags'
-import { Role } from '../shared/types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()

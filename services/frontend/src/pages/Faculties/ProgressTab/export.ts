@@ -1,8 +1,8 @@
 import { utils, writeFile } from 'xlsx'
 
-import { Name, NameWithCode } from '@/shared/types'
 import { sortProgrammeKeys } from '@/util/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { Name, NameWithCode } from '@shared/types'
 
 export const exportProgressTable = (
   progressStats,

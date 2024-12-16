@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { cloneDeep } from 'lodash'
 
+import { Graduated, NameWithCode } from '@shared/types'
 import { serviceProvider } from '../config'
 import { magicFacultyCode } from '../config/organizationConstants'
 import { Organization } from '../models'
@@ -15,7 +16,6 @@ import {
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress, FacultyProgressData } from '../services/faculty/facultyStudentProgress'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
-import { Graduated, NameWithCode } from '../shared/types'
 import logger from '../util/logger'
 
 const router = Router()

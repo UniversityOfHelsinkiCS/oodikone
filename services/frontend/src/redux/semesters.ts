@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { Name } from '@/shared/types'
+import { Name } from '@shared/types'
 
 type SemestersData = {
   semesters: Record<

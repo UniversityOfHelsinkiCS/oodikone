@@ -4,7 +4,7 @@ import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
 import { isCourseSelected, toggleCourseSelection } from '@/components/FilterView/filters/courses'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name } from '@/shared/types'
+import { Name } from '@shared/types'
 
 interface CourseFilterToggleProps {
   courseCode: string

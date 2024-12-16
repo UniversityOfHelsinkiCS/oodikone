@@ -3,8 +3,8 @@ import ReactMarkdown from 'react-markdown'
 
 import { getDescription } from '@/common'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
-import { Release } from '@/shared/types'
 import { reformatDate } from '@/util/timeAndDate'
+import { Release } from '@shared/types'
 
 export const ReleaseCard = ({ isLoading, release }: { isLoading: boolean; release: Release }) => {
   return (

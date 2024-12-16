@@ -1,4 +1,4 @@
-import { Name } from '../shared/types'
+import { Name } from '@shared/types'
 
 export interface StudyTrack {
   code: string

@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize'
 
+import { Name } from '@shared/types'
 import { dbConnections } from '../../database/connection'
-import { Name } from '../../shared/types'
 import { ExtentCode } from '../../types'
 import logger from '../../util/logger'
 

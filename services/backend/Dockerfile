@@ -21,11 +21,15 @@ ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./backend/package*.json ./
 RUN npm ci --include=dev
-COPY ./shared ./src/shared
+COPY ./shared ../shared
 COPY ./backend .
 
 RUN npm run build
 
+RUN ls -la /opt/app-root/
+RUN ls -la /opt/app-root/src/src/
+RUN ls -la /opt/app-root/src
+RUN ls -la /opt/app-root/src/dist
 
 
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal
@@ -56,4 +60,4 @@ COPY --from=build /opt/app-root/src/dist ./dist
 
 RUN npm ci
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/backend/index.js"]

@@ -2,11 +2,11 @@ import { isEqual, keyBy, omit, uniq } from 'lodash'
 import { LRUCache } from 'lru-cache'
 import { InferAttributes } from 'sequelize'
 
+import { Role } from '@shared/types'
 import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { Role } from '../shared/types'
 import { DetailedProgrammeRights, ExpandedUser, FormattedUser, IamAccess } from '../types'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'

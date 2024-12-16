@@ -1,7 +1,7 @@
 // TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
 
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
-import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
+import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@shared/types'
+import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@shared/types/faculty'
 
 export type GraphStat = {
   data: number[]

@@ -2,7 +2,7 @@ import { Dropdown, DropdownProps } from 'semantic-ui-react'
 
 import '../studyprogramme.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name } from '@/shared/types'
+import { Name } from '@shared/types'
 
 interface StudyTrackSelectorProps {
   track: string
