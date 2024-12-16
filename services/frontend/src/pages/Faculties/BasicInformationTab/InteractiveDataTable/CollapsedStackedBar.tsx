@@ -150,7 +150,7 @@ export const CollapsedStackedBar = ({
         }</p><br />`
         const diffArray = differenceArray[this.x!]
         this.points?.forEach(point => {
-          tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>
+          tooltipString += `<span style="color:${point.color as string}">●</span> <b>${point.series.name}: ${point.y}</b>
           (<span style="color:${getColor(diffArray[point.series.name])};font-weight:bold">${getCorrectSign(
             diffArray[point.series.name]
           )}</span>)<br />`
