@@ -1,12 +1,3 @@
-.cardHeader {
-  display: flex !important;
-  justify-content: space-between !important;
-}
-
-.controlIcon {
-  cursor: pointer;
-}
-
 .enrollment-label-no-margin {
   border-radius: 0.28rem;
   box-shadow:

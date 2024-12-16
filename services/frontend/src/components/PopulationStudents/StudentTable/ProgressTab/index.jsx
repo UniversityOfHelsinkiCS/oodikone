@@ -6,7 +6,7 @@ import { Icon, Message, Tab } from 'semantic-ui-react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import '@/components/StudentStatistics/StudentInfoCard/studentInfoCard.css'
+import './index.css'
 import { SortableTable } from '@/components/SortableTable'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { ISO_DATE_FORMAT } from '@/constants/date'
