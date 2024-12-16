@@ -22,7 +22,7 @@ export const StudentInfoCard = ({ student }) => {
   }
 
   return (
-    <Card variant="outlined">
+    <Card data-cy="student-info-card" variant="outlined">
       <CardContent>
         <Stack spacing={1}>
           <Stack alignItems="flex-start">
@@ -30,6 +30,7 @@ export const StudentInfoCard = ({ student }) => {
               {name} {student.studentNumber}
             </Typography>
             <ExternalLink
+              cypress="sisu-link"
               href={`https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
               text="Sisu"
               variant="h6"

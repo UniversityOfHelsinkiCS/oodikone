@@ -260,6 +260,7 @@ const GradeGraph = ({ student }: { student: any }) => {
       </ToggleButtonGroup>
       {graphMode === 'group' && (
         <TextField
+          data-cy="group-size-input"
           label="Group size"
           onChange={event => {
             if (!Number.isNaN(Number(event.target.value))) {

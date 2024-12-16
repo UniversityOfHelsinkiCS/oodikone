@@ -131,11 +131,12 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       <Stack direction="row" spacing={1}>
         <Chip
           color={honours ? 'success' : 'error'}
+          data-cy={`honours-chip-${honours ? 'qualified' : 'not-qualified'}`}
           icon={honours ? <DoneIcon /> : <CloseIcon />}
           label={honours ? 'Qualified for Honours' : 'Not qualified for Honours'}
         />
-        {!honours && reason && <Chip color="error" label={reason} />}
-        {inspection && <Chip color="info" label="Might need further inspection" />}
+        {!honours && reason && <Chip color="error" data-cy="honours-chip-error" label={reason} />}
+        {inspection && <Chip color="info" data-cy="honours-chip-inspection" label="Might need further inspection" />}
       </Stack>
       <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
         <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
