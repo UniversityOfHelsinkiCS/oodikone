@@ -158,7 +158,9 @@ const ColumnContent = ({ column, data, isGroup, parents }) => {
 }
 
 const RowComponent = ({ data, isGroup, parents }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const columns = useContextSelector(SortableTableContext, ({ columns }) => columns)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const columnSpans = useContextSelector(SortableTableContext, ({ columnSpans }) => columnSpans)
 
   const resolveProp = value => {
