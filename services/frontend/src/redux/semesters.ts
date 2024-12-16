@@ -1,7 +1,7 @@
 import { RTKApi } from '@/apiConnection'
 import { Name } from '@/shared/types'
 
-type SemestersData = {
+export type SemestersData = {
   semesters: Record<
     string,
     {
