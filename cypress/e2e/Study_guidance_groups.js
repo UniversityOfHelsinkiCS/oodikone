@@ -141,7 +141,7 @@ describe('Study guidance group tests', () => {
           'Transferred from',
           'Admission type',
           'Gender',
-          'Citizenship',
+          'Citizenships',
           'Curriculum period',
           'Latest attainment date',
           'Tags',
