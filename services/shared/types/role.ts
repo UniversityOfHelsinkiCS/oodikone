@@ -3,7 +3,6 @@ export type Role =
   | 'courseStatistics'
   | 'facultyStatistics'
   | 'fullSisuAccess'
-  | 'katselmusViewer'
   | 'openUniSearch'
   | 'studyGuidanceGroups'
   | 'teachers'
