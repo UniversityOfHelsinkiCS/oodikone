@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && NODE_OPTIONS=\"--max-old-space-size=4096\" vite build",
     "preview": "vite preview",
     "tsc": "tsc"
   },
