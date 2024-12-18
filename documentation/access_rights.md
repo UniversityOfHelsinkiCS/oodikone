@@ -12,15 +12,12 @@ Roles are defined [here](../services/backend/src/config/roles.ts). Criteria for 
 - studyGuidanceGroups
 - teachers
 
-The roles `openUniSearch` and `studyGuidanceGroups` simply enable certain views (_Open uni student population_ and _Guidance groups_ respectively).
+The roles `facultyStatistics`, `openUniSearch`, and `studyGuidanceGroups` simply enable certain views (_Faculties_, _Open uni student population_, and _Guidance groups_ respectively).
 
 ### courseStatistics
 
 - Can see statistics of every course but year statistics of ≤ 5 students are hidden
-
-### facultyStatistics
-
-- Can see statistics of every course and year
+  - If the user has [full rights](#programmes) to **any** programme, they can also see exact statistics even if there are ≤ 5 students (the same behavior as with `admin` or `fullSisuAccess` roles)
 
 ### teachers
 
