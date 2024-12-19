@@ -13,15 +13,19 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false }: ProtectedRouteProps) => {
   const { iamGroups, isAdmin, programmeRights, roles } = useGetAuthorizedUserQuery()
   const location = useLocation()
-  const fullSisuAccessRoutes = ['populations', 'students', 'custompopulation', 'study-programme', 'coursepopulation']
+  const fullSisuAccessRoutes = [
+    'populations',
+    'students',
+    'custompopulation',
+    'study-programme',
+    'coursepopulation',
+    'coursestatistics',
+  ]
 
   const hasAccessToRoute = () => {
     if (isAdmin) return true
     const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, roles) : true
     const hasRequiredRights = requireUserHasRights ? programmeRights.length > 0 : true
-    if (requiredRoles.includes('courseStatistics')) {
-      return hasRequiredRoles || hasRequiredRights
-    }
     if (fullSisuAccessRoutes.some(route => location.pathname.includes(route))) {
       return hasRequiredRoles || hasRequiredRights
     }
