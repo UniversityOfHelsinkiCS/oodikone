@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 const openCompletedCoursesModal = () => {
-  cy.get('button').contains('Search completed courses of students').click()
+  cy.contains('button', 'Search completed courses of students').click()
 }
 
 const hasLanded = () => {
@@ -15,22 +15,40 @@ const openSearch = () => {
   cy.init('/completedcoursessearch')
   hasLanded()
 }
+
 const selectSavedCourselist = name => {
-  cy.get('[data-cy="history-search"]').children().eq(0).type(name).type('{enter}')
+  cy.get('[data-cy=history-search]').click()
+  cy.get('[data-cy=history-search]').type(name)
+  cy.get('[data-cy=history-search]').type('{downarrow}')
+  cy.get('[data-cy=history-search]').type('{enter}')
 }
 
-const deleteAllSearches = () => {
-  cy.contains('Saved courselists')
-    .get('.dropdown')
-    .then(dropdown => {
-      const searchItems = dropdown.find('div[role=option] > span[class=text]')
-      for (let i = 0; i < searchItems.length; i++) {
-        if (searchItems[i].textContent.includes('TEST-')) {
-          cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type('{enter}')
-          cy.get('button').contains('Delete').click()
+const createCourseList = (courseCodes, courseListName) => {
+  openSearch()
+  openCompletedCoursesModal()
+  cy.get('[data-cy=course-list-input]').type(courseCodes.join('\n'))
+  cy.get('[data-cy=search-name]').type(courseListName)
+  cy.get('[data-cy=save-courselist]').click()
+}
+
+const generateCourseListName = () => `TEST-course-list-${new Date().getTime()}`
+
+const deleteAllPreviousSearches = () => {
+  cy.get('[data-cy=history-search]').click()
+
+  cy.get('.MuiAutocomplete-popper li').then($options => {
+    if ($options.length > 0) {
+      cy.wrap($options).each(($option, index, $list) => {
+        cy.wrap($option).click()
+        cy.get('[data-cy=delete-courselist]').click()
+        if (index < $list.length - 1) {
+          cy.get('[data-cy=history-search]').click()
         }
-      }
-    })
+      })
+    } else {
+      cy.contains('You have no previous searches.')
+    }
+  })
 }
 
 describe('When search modal is opened', () => {
@@ -39,8 +57,7 @@ describe('When search modal is opened', () => {
     hasLanded()
     cy.url().should('include', '/completedcoursessearch')
     cy.contains('Search completed courses of students')
-    cy.get('[data-cy="open-completed-courses-modal-button"]').click()
-    deleteAllSearches()
+    cy.get('[data-cy=open-completed-courses-modal-button]').click()
   })
 
   it('Modal opens correctly', () => {
@@ -49,8 +66,16 @@ describe('When search modal is opened', () => {
     openCompletedCoursesModal()
     cy.contains('Search completed courses of students')
     cy.contains('Insert one or more student numbers, separated by a space, a newline, a comma, or a semicolon.')
-    cy.contains('Insert one or more courses, separated by a space, a newline, or a comma.')
+    cy.contains('Insert one or more courses, separated by a space, a newline, a comma, or a semicolon.')
     cy.contains('Insert name for this course list if you wish to save it')
+  })
+
+  it('Modal gets the correct course codes and student numbers from the URL', () => {
+    cy.init('/completedcoursessearch?courseList=TKT10001&courseList=TKT10002&studentList=433237&studentList=457144')
+    hasLanded()
+    openCompletedCoursesModal()
+    cy.contains('[data-cy=student-no-input]', '433237, 457144')
+    cy.contains('[data-cy=course-list-input]', 'TKT10001, TKT10002')
   })
 
   describe('When a search is executed with invalid input', () => {
@@ -58,17 +83,16 @@ describe('When search modal is opened', () => {
       cy.init('/completedcoursessearch')
       hasLanded()
       openCompletedCoursesModal()
-      cy.get('[data-cy="student-no-input"]').type('1')
-      cy.get('[data-cy="course-list-input"]').type('1')
-      cy.get('[data-cy="completed-courses-search-button"]').click()
-      cy.get('[data-cy="rights-notification"]').should(
+      cy.get('[data-cy=student-no-input]').type('1')
+      cy.get('[data-cy=course-list-input]').type('1')
+      cy.get('[data-cy=completed-courses-search-button]').click()
+      cy.get('[data-cy=rights-notification]').should(
         'contain.text',
-        'The following students information could not be displayed'
+        'The information for the following students could not be displayed'
       )
-      cy.get('[data-cy="rights-notification"]').should('contain.text', '1')
-      cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', 'Completed courses search')
-      cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', 'Student number')
-      cy.get('[data-cy="completed-courses-table-div"]').should('not.contain', '1')
+      cy.contains('[data-cy=rights-notification]', '1')
+      cy.contains('[data-cy=completed-courses-table-div]', 'Student number')
+      cy.contains('[data-cy=completed-courses-table-div]', '1').should('not.exist')
     })
   })
 
@@ -78,9 +102,9 @@ describe('When search modal is opened', () => {
       hasLanded()
       openCompletedCoursesModal()
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
-        cy.get('[data-cy="student-no-input"]').type(studentSet1.join('\n'))
-        cy.get('[data-cy="course-list-input"]').type(coursesSet1.join('\n'))
-        cy.get('[data-cy="completed-courses-search-button"]').click()
+        cy.get('[data-cy=student-no-input]').type(studentSet1.join('\n'))
+        cy.get('[data-cy=course-list-input]').type(coursesSet1.join('\n'))
+        cy.get('[data-cy=completed-courses-search-button]').click()
       })
     })
 
@@ -95,63 +119,61 @@ describe('When search modal is opened', () => {
 
     it('Finds correct students and courses', () => {
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[0])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[1])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[2])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[3])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', studentSet1[4])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[0])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[1])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[2])
-        cy.get('[data-cy="completed-courses-table-div"]').should('contain.text', coursesSet1[3])
+        for (const studentNumber of studentSet1) {
+          cy.contains('[data-cy=completed-courses-table-div]', studentNumber)
+        }
+        for (const courseCode of coursesSet1) {
+          cy.contains('[data-cy=completed-courses-table-div]', courseCode)
+        }
       })
     })
   })
 })
 
-const courseListNames = ['TEST-courselist1', 'TEST-courselist2']
-
 describe('Courselist saving-related functions work', () => {
   beforeEach(() => {
     openSearch()
     openCompletedCoursesModal()
-    cy.get('[data-cy="course-list-input"]').type('CSM14204\nTKT10004')
-    cy.get('[data-cy="search-name"]').type(courseListNames[0])
-    cy.get('button').contains('Save').click()
+    cy.get('body').then($body => {
+      if ($body.find('[data-cy=history-search]').length > 0) {
+        deleteAllPreviousSearches()
+      } else {
+        cy.contains('You have no previous searches.')
+      }
+    })
   })
 
   it('Course list can be saved', () => {
-    selectSavedCourselist(courseListNames[0])
+    const courseList = generateCourseListName()
+    const courses = ['CSM14204', 'TKT10004']
+    createCourseList(courses, courseList)
     openSearch()
     openCompletedCoursesModal()
-    selectSavedCourselist(courseListNames[0])
-    cy.get('[data-cy="course-list-input"]').contains('TKT10004').contains('CSM14204')
+    selectSavedCourselist(courseList)
+    cy.contains('[data-cy=course-list-input]', courses.join(', '))
   })
 
   it('Course list can be deleted', () => {
+    const courseList = generateCourseListName()
+    createCourseList(['CSM14204', 'TKT10004'], courseList)
     openSearch()
     openCompletedCoursesModal()
-    cy.get('[data-cy="search-name"]').type(courseListNames[1])
-    cy.get('button').contains('Save').click()
-    openSearch()
-    openCompletedCoursesModal()
-    selectSavedCourselist(courseListNames[1])
-    cy.get('button').contains('Delete').click()
-    cy.get('[data-cy="history-search"]')
-      .type(courseListNames[1])
-      .type('{enter}')
-      .should('not.contain', courseListNames[1])
+    selectSavedCourselist(courseList)
+    cy.get('[data-cy=delete-courselist]').click()
+    cy.contains('You have no previous searches.')
   })
 
   it('Course list can be updated', () => {
+    const courseList = generateCourseListName()
+    createCourseList(['CSM14204', 'TKT10004'], courseList)
     openSearch()
     openCompletedCoursesModal()
-    selectSavedCourselist(courseListNames[0])
-    cy.get('[data-cy="course-list-input"]').type(',TKT10001')
-    cy.get('button').contains('Save').click()
+    selectSavedCourselist(courseList)
+    cy.get('[data-cy=course-list-input]').type(',TKT10001')
+    cy.get('[data-cy=save-courselist]').click()
     openSearch()
     openCompletedCoursesModal()
-    selectSavedCourselist(courseListNames[0])
-    cy.get('[data-cy="course-list-input"]').contains('TKT10001')
+    selectSavedCourselist(courseList)
+    cy.contains('[data-cy=course-list-input]', 'CSM14204, TKT10004, TKT10001')
   })
 })
