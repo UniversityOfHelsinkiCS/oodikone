@@ -2,12 +2,13 @@ import { RTKApi } from '@/apiConnection'
 
 const completedCoursesSearchApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getCompletedCourses: builder.query({
+    getCompletedCourses: builder.query<any, { courseList: string[]; studentList: string[] }>({
       query: ({ courseList, studentList }) =>
         `completedcoursessearch?courselist=${JSON.stringify(courseList)}&studentlist=${JSON.stringify(studentList)}`,
     }),
-    getSavedCourseLists: builder.query({
+    getSavedCourseLists: builder.query<any, void>({
       query: () => '/completedcoursessearch/searches',
+      providesTags: ['CompletedCoursesSearchList'],
     }),
     createCourseList: builder.mutation({
       query: ({ courseList, name }) => ({
@@ -18,6 +19,7 @@ const completedCoursesSearchApi = RTKApi.injectEndpoints({
           name,
         },
       }),
+      invalidatesTags: ['CompletedCoursesSearchList'],
     }),
     updateCourseList: builder.mutation({
       query: ({ id, courseList }) => ({
@@ -27,14 +29,15 @@ const completedCoursesSearchApi = RTKApi.injectEndpoints({
           courselist: courseList,
         },
       }),
+      invalidatesTags: ['CompletedCoursesSearchList'],
     }),
     deleteCourseList: builder.mutation({
       query: ({ id }) => ({
         url: `/completedcoursessearch/searches/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['CompletedCoursesSearchList'],
     }),
-    overrideExisting: false,
   }),
 })
 

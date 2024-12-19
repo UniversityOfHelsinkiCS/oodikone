@@ -110,6 +110,7 @@ export const handleRequest = store => next => async action => {
 export const RTKApi = createApi({
   reducerPath: 'api',
   tagTypes: [
+    'CompletedCoursesSearchList',
     'CustomPopulationSearches',
     'ProgressCriteria',
     'Semester',
