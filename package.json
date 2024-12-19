@@ -56,9 +56,9 @@
     "node-actionlint": "^1.2.2",
     "nyc": "^17.1.0",
     "prettier": "3.4.2",
-    "stylelint": "^16.11.0",
+    "stylelint": "^16.12.0",
     "stylelint-config-standard": "^36.0.1",
-    "typescript-eslint": "^8.18.0"
+    "typescript-eslint": "^8.18.1"
   },
   "dependencies": {
     "lodash": "^4.17.21",
