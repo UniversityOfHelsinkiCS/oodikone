@@ -1,5 +1,6 @@
 import { FilterAlt as FilterAltIcon, NorthEast as NorthEastIcon } from '@mui/icons-material'
 import { TableBody, TableCell, TableHead, TableRow, Tooltip, IconButton, Stack } from '@mui/material'
+import { blue } from '@mui/material/colors'
 import { orderBy } from 'lodash'
 import moment from 'moment'
 import { Link } from 'react-router'
@@ -120,7 +121,13 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
             <TableCell>Completed</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody
+          sx={{
+            '& .MuiTableRow-root:hover': {
+              backgroundColor: 'inherit',
+            },
+          }}
+        >
           {studyRightRows.map(studyRight => {
             const numberOfProgrammes = studyRight.programmes.length
             const rowIsFilterable = studyRight.studyPlanId != null
@@ -129,20 +136,14 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
               const isFirstRow = index === 0
               const isLastRow = index === numberOfProgrammes - 1
 
-              let borderWidth = '1px'
-              if (isFirstRow && numberOfProgrammes > 1) {
-                borderWidth = '1px 1px 0 1px'
-              } else if (isLastRow && numberOfProgrammes > 1) {
-                borderWidth = '0 1px 1px 1px'
-              }
-
               return (
                 <TableRow
                   key={`${studyRight.key}-${code}`}
                   onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId) : null)}
                   style={{
                     cursor: rowIsFilterable ? 'pointer' : 'not-allowed',
-                    borderWidth,
+                    borderWidth: `0 1px ${isLastRow ? '1px' : '0'} 1px`, // Bottom border only for the last programme in the study right
+                    backgroundColor: studyRight.studyPlanId === selectedStudyPlanId ? blue[50] : 'inherit',
                   }}
                 >
                   {isFirstRow && (
