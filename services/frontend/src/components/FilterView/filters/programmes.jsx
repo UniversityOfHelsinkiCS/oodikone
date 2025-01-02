@@ -133,7 +133,6 @@ const getStudentProgrammes = student =>
 
 const createStudentToProgrammeMap = (students, studyRightPredicate) => {
   const studentToProgrammeMap = {}
-  const programmes = []
 
   for (const student of students) {
     const studentProgrammes = getStudentProgrammes(student)
@@ -146,19 +145,15 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
     }
 
     studentToProgrammeMap[student.studentNumber] = filteredProgrammes.reduce((acc, { code, name }) => {
+      if (acc.some(programme => programme.code === code)) {
+        return acc
+      }
       acc.push({ code, name })
       return acc
     }, [])
-
-    for (const { code, name } of filteredProgrammes) {
-      if (programmes.some(prog => prog.code === code)) {
-        continue
-      }
-      programmes.push({ code, name })
-    }
   }
 
-  return { programmes, studentToProgrammeMap }
+  return studentToProgrammeMap
 }
 
 const MODE_PREDICATES = {
@@ -204,7 +199,7 @@ export const programmeFilter = createFilter({
 
   isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
 
-  filter({ studentNumber }, { selectedProgrammes }, { precomputed: { studentToProgrammeMap } }) {
+  filter({ studentNumber }, { selectedProgrammes }, { precomputed: studentToProgrammeMap }) {
     return selectedProgrammes.every(pcode => studentToProgrammeMap[studentNumber].some(({ code }) => code === pcode))
   },
 
@@ -224,11 +219,11 @@ export const programmeFilter = createFilter({
     },
   },
 
-  render: (props, { precomputed, args }) => (
+  render: (props, { precomputed: studentToProgrammeMap, args }) => (
     <ProgrammeFilterCard
       {...props}
       additionalModes={args?.additionalModes ?? []}
-      studentToProgrammeMap={precomputed.studentToProgrammeMap}
+      studentToProgrammeMap={studentToProgrammeMap}
     />
   ),
 })
