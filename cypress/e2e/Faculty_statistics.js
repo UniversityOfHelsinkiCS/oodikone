@@ -58,7 +58,6 @@ describe('Faculty statistics', () => {
       it('Correct tabs are shown', () => {
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Basic information')
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Students by starting year')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Progress')
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Graduation times')
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Update statistics')
       })
@@ -106,7 +105,6 @@ describe('Faculty statistics', () => {
       it('Correct tabs are shown', () => {
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Basic information')
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Students by starting year')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Progress')
         cy.get('[data-cy="FacultyTabs"]').should('contain', 'Graduation times')
         cy.get('[data-cy="FacultyTabs"]').should('not.contain', 'Update statistics')
       })
