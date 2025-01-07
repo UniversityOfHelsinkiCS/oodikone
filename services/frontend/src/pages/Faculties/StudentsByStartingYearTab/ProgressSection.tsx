@@ -5,25 +5,19 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
 import { Section } from '@/components/material/Section'
-import { Toggle } from '@/components/material/Toggle'
-import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
 import { AccordionWrapper } from './AccordionWrapper'
-import { exportProgressTable } from './export'
+import { exportProgressTable } from './exportProgressTable'
 
-export const ProgressTab = ({
+export const ProgressSection = ({
   faculty,
   graduatedGroup,
-  setGraduatedGroup,
-  setSpecialGroups,
   specialGroups,
 }: {
   faculty: GetFacultiesResponse
   graduatedGroup: boolean
-  setGraduatedGroup: (value: boolean) => void
-  setSpecialGroups: (value: boolean) => void
   specialGroups: boolean
 }) => {
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -34,9 +28,6 @@ export const ProgressTab = ({
     specialGroups: specials,
     graduated,
   })
-
-  const isLoading = progressStats.isLoading || progressStats.isFetching
-  const isError = progressStats.isError || (progressStats.isSuccess && !progressStats.data)
 
   const getSortedProgrammeKeysProgress = (studyLevelStats: Record<string, number[][]>) => {
     return sortProgrammeKeys(
@@ -82,32 +73,10 @@ export const ProgressTab = ({
           )
         }
         infoBoxContent={facultyToolTips.studentProgress}
-        title="Progress of students of the faculty"
+        title="Progress of students of the faculty by starting year"
       >
-        <ToggleContainer>
-          <Toggle
-            cypress="GraduatedToggle"
-            disabled={isError || isLoading}
-            firstLabel="Graduated included"
-            infoBoxContent={facultyToolTips.graduatedToggle}
-            secondLabel="Graduated excluded"
-            setValue={setGraduatedGroup}
-            value={graduatedGroup}
-          />
-          <Toggle
-            cypress="StudentToggle"
-            disabled={isError || isLoading}
-            firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.studentToggle}
-            secondLabel="Special study rights excluded"
-            setValue={setSpecialGroups}
-            value={specialGroups}
-          />
-        </ToggleContainer>
-      </Section>
-      <Stack gap={2}>
-        <AccordionWrapper level="Bachelor">
-          <Section isError={isError} isLoading={isLoading}>
+        <Stack gap={2}>
+          <AccordionWrapper level="Bachelor">
             {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
               <Stack gap={2}>
                 <FacultyBarChart
@@ -131,15 +100,8 @@ export const ProgressTab = ({
                 />
               </Stack>
             )}
-          </Section>
-        </AccordionWrapper>
-        <AccordionWrapper level={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}>
-          <Section
-            cypress="BachelorMastersProgress"
-            infoBoxContent={facultyToolTips.bachelorMasterProgress}
-            isError={isError}
-            isLoading={isLoading}
-          >
+          </AccordionWrapper>
+          <AccordionWrapper level={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}>
             {progressStats.isSuccess &&
               progressStats.data &&
               bachelorMasterStats &&
@@ -166,10 +128,8 @@ export const ProgressTab = ({
                   />
                 </Stack>
               )}
-          </Section>
-        </AccordionWrapper>
-        <AccordionWrapper level="Master">
-          <Section isError={isError} isLoading={isLoading}>
+          </AccordionWrapper>
+          <AccordionWrapper level="Master">
             {progressStats.isSuccess &&
               progressStats.data &&
               masterStats &&
@@ -197,10 +157,8 @@ export const ProgressTab = ({
                   />
                 </Stack>
               )}
-          </Section>
-        </AccordionWrapper>
-        <AccordionWrapper level="Doctor">
-          <Section isError={isError} isLoading={isLoading}>
+          </AccordionWrapper>
+          <AccordionWrapper level="Doctor">
             {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
               <Stack gap={2}>
                 <FacultyBarChart
@@ -223,9 +181,9 @@ export const ProgressTab = ({
                 />
               </Stack>
             )}
-          </Section>
-        </AccordionWrapper>
-      </Stack>
+          </AccordionWrapper>
+        </Stack>
+      </Section>
     </Stack>
   )
 }

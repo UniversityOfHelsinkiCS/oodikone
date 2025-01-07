@@ -11,7 +11,6 @@ import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { BasicInformationTab } from './BasicInformationTab'
 import { FacultyList } from './FacultyList'
 import { GraduationTimesTab } from './GraduationTimesTab'
-import { ProgressTab } from './ProgressTab'
 import { StudentsByStartingYearTab } from './StudentsByStartingYearTab'
 import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 
@@ -27,7 +26,7 @@ export const Faculties = () => {
   useTitle(facultyName ? `${facultyName} - Faculties` : 'Faculties')
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
-  const [tab, handleTabChange] = useTabs(isAdmin ? 5 : 4)
+  const [tab, handleTabChange] = useTabs(isAdmin ? 4 : 3)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
@@ -49,7 +48,6 @@ export const Faculties = () => {
       >
         <Tab data-cy="BasicInformationTab" label="Basic information" />
         <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
-        <Tab data-cy="ProgressTab" label="Progress" />
         <Tab data-cy="GraduationTimesTab" label="Graduation times" />
         {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
       </Tabs>
@@ -73,22 +71,13 @@ export const Faculties = () => {
         />
       )}
       {tab === 2 && (
-        <ProgressTab
-          faculty={faculty}
-          graduatedGroup={graduatedGroup}
-          setGraduatedGroup={setGraduatedGroup}
-          setSpecialGroups={setSpecialGroups}
-          specialGroups={specialGroups}
-        />
-      )}
-      {tab === 3 && (
         <GraduationTimesTab
           faculty={faculty}
           setStudyProgrammes={setStudyProgrammes}
           studyProgrammes={studyProgrammes}
         />
       )}
-      {tab === 4 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
+      {tab === 3 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
     </Container>
   )
 }

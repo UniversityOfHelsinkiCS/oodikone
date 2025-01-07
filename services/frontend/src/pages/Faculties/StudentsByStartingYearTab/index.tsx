@@ -8,8 +8,9 @@ import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
-import { exportStudentTable } from './export'
+import { exportStudentTable } from './exportStudentTable'
 import { FacultyStudentDataTable } from './FacultyStudentDataTable'
+import { ProgressSection } from './ProgressSection'
 
 const getKey = (programmeKeys: string[][], index: number) => {
   if (programmeKeys[index][1].startsWith('T') || programmeKeys[index][1].startsWith('LIS')) {
@@ -108,14 +109,6 @@ export const StudentsByStartingYearTab = ({
             setValue={setGraduatedGroup}
             value={graduatedGroup}
           />
-          <Toggle
-            cypress="HidePercentagesToggle"
-            disabled={isError || isLoading}
-            firstLabel="Hide percentages"
-            secondLabel="Show percentages"
-            setValue={setShowPercentages}
-            value={showPercentages}
-          />
         </ToggleContainer>
       </Section>
       <Section
@@ -134,21 +127,34 @@ export const StudentsByStartingYearTab = ({
         isLoading={isLoading}
         title="Students of the faculty by starting year"
       >
-        {studentStats?.data && (
-          <FacultyStudentDataTable
-            extraTableStats={studentStats?.data.facultyTableStatsExtra}
-            programmeNames={studentStats?.data.programmeNames}
-            programmeStats={studentStats?.data.programmeStats}
-            requiredRights={requiredRights}
-            showPercentages={showPercentages}
-            sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[1])}
-            tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
-            tableStats={studentStats?.data.facultyTableStats}
-            titles={studentStats?.data.titles}
-            years={studentStats?.data.years}
-          />
-        )}
+        <Stack gap={2}>
+          <ToggleContainer>
+            <Toggle
+              cypress="HidePercentagesToggle"
+              disabled={isError || isLoading}
+              firstLabel="Hide percentages"
+              secondLabel="Show percentages"
+              setValue={setShowPercentages}
+              value={showPercentages}
+            />
+          </ToggleContainer>
+          {studentStats?.data && (
+            <FacultyStudentDataTable
+              extraTableStats={studentStats?.data.facultyTableStatsExtra}
+              programmeNames={studentStats?.data.programmeNames}
+              programmeStats={studentStats?.data.programmeStats}
+              requiredRights={requiredRights}
+              showPercentages={showPercentages}
+              sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[1])}
+              tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
+              tableStats={studentStats?.data.facultyTableStats}
+              titles={studentStats?.data.titles}
+              years={studentStats?.data.years}
+            />
+          )}
+        </Stack>
       </Section>
+      <ProgressSection faculty={faculty} graduatedGroup={graduatedGroup} specialGroups={specialGroups} />
     </Stack>
   )
 }
