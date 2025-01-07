@@ -51,20 +51,24 @@ export const RangeSelector = ({ min, max, value, onChange, disabled = false }) =
         max={isDisabled ? 1 : max}
         min={isDisabled ? 0 : min}
         onChange={isDisabled ? noop : onChange}
-        renderThumb={({ props }) => (
-          <div
-            {...props}
-            style={{
-              ...props.style,
-              height: '13px',
-              width: '13px',
-              backgroundColor: '#f2f2f2',
-              border: isDisabled ? '#f2f2f2' : '3px solid rgb(33, 133, 208)',
-              borderRadius: '10px',
-            }}
-            tabIndex=""
-          />
-        )}
+        renderThumb={({ props }) => {
+          const { key, ...rest } = props
+          return (
+            <div
+              key={key}
+              {...rest}
+              style={{
+                ...props.style,
+                height: '13px',
+                width: '13px',
+                backgroundColor: '#f2f2f2',
+                border: isDisabled ? '#f2f2f2' : '3px solid rgb(33, 133, 208)',
+                borderRadius: '10px',
+              }}
+              tabIndex=""
+            />
+          )
+        }}
         renderTrack={({ props, children }) => (
           <div
             {...props}
