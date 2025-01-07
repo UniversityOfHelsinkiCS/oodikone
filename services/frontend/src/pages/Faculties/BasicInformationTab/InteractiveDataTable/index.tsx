@@ -1,10 +1,11 @@
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
+import { Box, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
 import { Fragment, useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { InfoBox } from '@/components/material/InfoBox'
 import { Section } from '@/components/material/Section'
+import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@/shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
 
@@ -113,7 +114,7 @@ export const InteractiveDataTable = ({
   return (
     <Section>
       <TableContainer>
-        <Table data-cy={`${cypress}InteractiveDataTable`} size="small">
+        <StyledTable data-cy={`${cypress}InteractiveDataTable`} showCellBorders size="small">
           <TableHead>
             <TableRow>
               {titles.map((title, index) => (
@@ -183,7 +184,7 @@ export const InteractiveDataTable = ({
               </Fragment>
             ))}
           </TableBody>
-        </Table>
+        </StyledTable>
       </TableContainer>
     </Section>
   )

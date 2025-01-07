@@ -1,8 +1,9 @@
-import { Box, Collapse, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Collapse, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { Section } from '@/components/material/Section'
+import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@/shared/types'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
@@ -39,7 +40,7 @@ export const FacultyProgressTable = ({
   return (
     <Section>
       <TableContainer>
-        <Table data-cy={cypress} size="small">
+        <StyledTable data-cy={cypress} showCellBorders size="small">
           <TableHead>
             <TableRow>
               {titles.map(title => (
@@ -61,26 +62,20 @@ export const FacultyProgressTable = ({
                       yearArray={yearArray}
                       yearIndex={yearIndex}
                     />
-                    <TableRow>
-                      <TableCell
-                        colSpan={100}
-                        style={{
-                          padding: 0,
-                          borderBottom: visibleYears[yearIndex] ? '' : 'none',
-                        }}
-                      >
-                        <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
-                          <Box padding={1}>
+                    {visibleYears[yearIndex] && (
+                      <TableRow>
+                        <TableCell colSpan={100}>
+                          <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
                             <ProgrammeProgressChart
                               data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
                               labels={sortedKeys}
                               longLabels={programmeNames}
                               names={progressTitles ? progressTitles[yearIndex] : titles.slice(2)}
                             />
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </>
                 ) : (
                   <TableRow>
@@ -94,7 +89,7 @@ export const FacultyProgressTable = ({
               </Fragment>
             ))}
           </TableBody>
-        </Table>
+        </StyledTable>
       </TableContainer>
     </Section>
   )

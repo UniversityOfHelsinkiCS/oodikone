@@ -6,7 +6,6 @@ import {
   Box,
   IconButton,
   Stack,
-  Table,
   TableBody,
   TableCell,
   TableContainer,
@@ -22,6 +21,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { InfoBox } from '@/components/material/InfoBox'
 import { PopulationLink } from '@/components/material/PopulationLink'
 import { Section } from '@/components/material/Section'
+import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
 
 const getTableCell = (year: string, programme: string, value: number | string) => {
@@ -125,7 +125,7 @@ export const FacultyStudentDataTable = ({
   return (
     <Section>
       <TableContainer>
-        <Table data-cy={cypress} sx={{ '& td': { whiteSpace: 'nowrap' } }}>
+        <StyledTable data-cy={cypress} showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
           <TableHead>
             <TableRow key="FirstHeader">
               <TableCell colSpan={!showPercentages ? 3 : 4} />
@@ -223,7 +223,7 @@ export const FacultyStudentDataTable = ({
               )
             })}
           </TableBody>
-        </Table>
+        </StyledTable>
       </TableContainer>
     </Section>
   )
