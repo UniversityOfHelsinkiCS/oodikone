@@ -28,3 +28,6 @@ export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER
 export const languageCenterViewEnabled = !process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED
   ? true
   : process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED === 'true'
+
+// SISU url
+export const sisUrl = process.env.REACT_APP_SIS_URL ? process.env.REACT_APP_SIS_URL : 'https://sisu.helsinki.fi'

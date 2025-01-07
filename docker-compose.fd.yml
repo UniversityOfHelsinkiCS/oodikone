@@ -64,6 +64,7 @@ services:
     environment:
       REACT_APP_SERVICE_PROVIDER: fd
       REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED: 'false'
+      REACT_APP_SIS_URL: 'https://sis-qa.funidata.fi'
     volumes:
       - ./services/frontend/src/:/opt/app-root/src/src
       - ./services/shared/:/opt/app-root/src/src/shared

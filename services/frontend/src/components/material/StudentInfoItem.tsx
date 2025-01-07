@@ -1,7 +1,7 @@
 import { Person as PersonIcon } from '@mui/icons-material'
 import { IconButton, Stack } from '@mui/material'
 import { Link } from 'react-router'
-
+import { sisUrl } from '@/conf'
 import { ExternalLink } from './Footer/ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => (
@@ -11,10 +11,7 @@ export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: s
       <IconButton component={Link} sx={{ padding: 0 }} target="_blank" to={`/students/${studentNumber}`}>
         <PersonIcon color="primary" fontSize="small" />
       </IconButton>
-      <ExternalLink
-        href={`https://sisu.helsinki.fi/tutor/role/staff/student/${sisPersonId}/basic/basic-info`}
-        text="Sisu"
-      />
+      <ExternalLink href={`${sisUrl}/tutor/role/staff/student/${sisPersonId}/basic/basic-info`} text="Sisu" />
     </Stack>
   </Stack>
 )
