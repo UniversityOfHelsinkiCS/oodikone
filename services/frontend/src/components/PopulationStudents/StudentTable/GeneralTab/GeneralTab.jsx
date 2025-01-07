@@ -402,6 +402,19 @@ export const GeneralTab = ({
       filterType: 'date',
       getRowVal: student => reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT),
     },
+    option: (isBachelorsProgramme || isMastersProgramme) && {
+      key: 'option',
+      title: isMastersProgramme ? 'Bachelor' : 'Master',
+      getRowVal: student => (student.option ? getTextIn(student.option.name) : ''),
+      formatValue: value => (
+        <div style={{ maxWidth: '290px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+      ),
+      cellProps: student => {
+        return {
+          title: student.option ? getTextIn(student.option.name) : '',
+        }
+      },
+    },
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'Semesters\npresent',
@@ -540,19 +553,6 @@ export const GeneralTab = ({
       getRowVal: student => student.citizenships.map(getTextIn).sort(),
       formatValue: value => value.join(', '),
       filterType: 'multi',
-    },
-    option: (isBachelorsProgramme || isMastersProgramme) && {
-      key: 'option',
-      title: isMastersProgramme ? 'Bachelor' : 'Master',
-      getRowVal: student => (student.option ? getTextIn(student.option.name) : ''),
-      formatValue: value => (
-        <div style={{ maxWidth: '290px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
-      ),
-      cellProps: student => {
-        return {
-          title: student.option ? getTextIn(student.option.name) : '',
-        }
-      },
     },
     curriculumPeriod: {
       key: 'curriculumPeriod',
