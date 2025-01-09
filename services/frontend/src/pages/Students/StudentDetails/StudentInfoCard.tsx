@@ -4,6 +4,7 @@ import { Card, CardContent, Typography, Button, Stack } from '@mui/material'
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/Footer/ExternalLink'
 import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { sisUrl } from '@/conf'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { reformatDate } from '@/util/timeAndDate'
@@ -31,7 +32,7 @@ export const StudentInfoCard = ({ student }) => {
             </Typography>
             <ExternalLink
               cypress="sisu-link"
-              href={`https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
+              href={`${sisUrl}/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
               text="Sisu"
               variant="h6"
             />

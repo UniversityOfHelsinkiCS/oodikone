@@ -21,6 +21,7 @@ services:
         SENTRY_DSN: ''
         SERVICE_PROVIDER: fd
         LANGUAGE_CENTER_VIEW_ENABLED: 'false' # currently no intention to be enabled
+        SIS_URL: 'https://sis-qa.funidata.fi'
         NODE_ENV: production
     image: ${DOCKER_OODIKONE_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/oodikone}/oodikone-frontend:${DOCKER_IMAGE_TAG:-dev}
 
