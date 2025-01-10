@@ -208,7 +208,7 @@ export const populationStatisticsToolTips = {
     3. Jos suoritukseen tai ilmoittautumiseen ei liity opiskeluoikeutta eikä kurssia ole sijoitettu opintosuunnitelmaan, käytetään viimeisintä koulutusohjelmaa suorituksen tai ilmoittautumisen hetkellä
   `,
   programmeDistributionCustomPopulation: `
-    'Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.
+    Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.
   `,
   gradeDistributionCoursePopulation: 'Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.',
   creditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
