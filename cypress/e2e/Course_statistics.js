@@ -238,7 +238,7 @@ describe('Course Statistics tests', () => {
       cy.contains('581328 Tietokantojen perusteet')
       cy.contains('A581328 Avoin yo: Tietokantojen perusteet')
       cy.get('.right').click()
-      cy.contains('No results')
+      cy.contains('Please enter at least 5 characters for course name or 2 characters for course code.')
     })
 
     it('"Select all search results" button is not showing unless "Select multiple courses" toggle is on', () => {
@@ -283,7 +283,7 @@ describe('Course Statistics tests', () => {
       cy.contains('BSCS1003 Data Structures and Algorithms')
       cy.contains('58131 Tietorakenteet')
       cy.get('.right').click()
-      cy.contains('No results')
+      cy.contains('Please enter at least 5 characters for course name or 2 characters for course code.')
       searchByCourseName('tietorakenteet ja algoritmit')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
 
