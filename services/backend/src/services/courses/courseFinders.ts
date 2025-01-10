@@ -1,3 +1,4 @@
+import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
 import { Course } from '../../models'
@@ -52,7 +53,17 @@ const getRawCourses = async (name: string, code: string) => {
 const getCourses = async (name: string, code: string) => {
   const rawCourses = await getRawCourses(name, code)
   const courses: CourseWithSubsId[] = rawCourses
-    .map(course => ({ ...course.dataValues }))
+    .map(course => ({
+      ...course.toJSON(),
+      substitutions: orderBy(course.substitutions, [
+        substitution => {
+          if (/^A/.exec(substitution)) return 4 // open university codes come last
+          if (/^\d/.exec(substitution)) return 2 // old numeric codes come second
+          if (/^[A-Za-z]/.exec(substitution)) return 1 // new letter based codes come first
+          return 3 // unknown, comes before open uni?
+        },
+      ]),
+    }))
     .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
   return courses
 }
@@ -87,7 +98,7 @@ export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
     }
   })
 
-  return { courses }
+  return courses
 }
 
 export const getCoursesByCodes = (codes: string[]) => {

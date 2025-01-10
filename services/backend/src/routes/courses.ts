@@ -1,10 +1,10 @@
 import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
+import moment from 'moment'
 
 import { serviceProvider } from '../config'
 import { getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode, getCoursesByCodes } from '../services/courses/courseFinders'
-import { CourseWithSubsId } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } from '../util'
 import logger from '../util/logger'
 
@@ -24,24 +24,45 @@ router.get('/v2/coursesmulti', async (req: GetCoursesRequest, res: Response) => 
     return res.status(400).json({ error: 'Query parameter name or code is invalid' })
   }
 
-  let results: { courses: CourseWithSubsId[] } = { courses: [] }
-  results = await getCoursesByNameAndOrCode(name, code)
+  const courses = await getCoursesByNameAndOrCode(name, code)
 
   if (combineSubstitutions === 'false') {
-    const courseCodes = results.courses.map(course => course.code)
+    const courseCodes = courses.map(course => course.code)
     const substitutions = [
       ...new Set(
-        results.courses
-          .flatMap(course => course.substitutions)
-          .filter(code => code !== null && !courseCodes.includes(code))
+        courses.flatMap(course => course.substitutions).filter(code => code !== null && !courseCodes.includes(code))
       ),
     ]
     const substitutionDetails = await getCoursesByCodes(substitutions)
     for (const substitution of substitutionDetails) {
-      results.courses.push(substitution.dataValues)
+      courses.push(substitution.toJSON())
     }
   }
-  res.json(results)
+
+  const mergedCourses = {}
+
+  for (const course of courses) {
+    const groupId = combineSubstitutions === 'true' ? course.subsId! : course.code
+    if (!(course.max_attainment_date && course.min_attainment_date)) {
+      continue
+    }
+    if (!mergedCourses[groupId]) {
+      mergedCourses[groupId] = {
+        ...course,
+        substitutions: combineSubstitutions === 'true' ? course.substitutions : [],
+      }
+    } else {
+      const mergedCourse = mergedCourses[groupId]
+      if (moment(mergedCourse.max_attainment_date).isBefore(course.max_attainment_date)) {
+        mergedCourse.max_attainment_date = course.max_attainment_date
+      }
+      if (moment(mergedCourse.min_attainment_date).isAfter(course.min_attainment_date)) {
+        mergedCourse.min_attainment_date = course.min_attainment_date
+      }
+    }
+  }
+
+  res.json({ courses: Object.values(mergedCourses) })
 })
 
 interface GetCourseYearlyStatsRequest extends Request {
