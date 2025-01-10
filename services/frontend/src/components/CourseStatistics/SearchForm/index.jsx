@@ -1,26 +1,18 @@
-import { sortBy } from 'lodash'
+import { omit, sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router'
-import { Form, Header, Message, Popup, Radio, Segment } from 'semantic-ui-react'
+import { Form, Header, Input, Message, Popup, Radio, Segment } from 'semantic-ui-react'
 
 import { validateInputLength } from '@/common'
 import { useSearchHistory, useToggle } from '@/common/hooks'
 import { MemoizedCourseTable as CourseTable } from '@/components/CourseStatistics/CourseTable'
-import { TimeoutAutoSubmitSearchInput as AutoSubmitSearchInput } from '@/components/CourseStatistics/SearchForm/AutoSubmitSearchInput'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
-import { clearCourses, findCoursesV2 } from '@/redux/coursesearch'
+import { useDebouncedState } from '@/hooks/useDebouncedState'
+import { useGetCourseSearchResultQuery } from '@/redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '@/redux/coursestats'
-import { getCourseSearchResults } from '@/selectors/courses'
-
-const INITIAL = {
-  courseName: '',
-  courseCode: '',
-  selectedCourses: {},
-  separate: false,
-}
 
 // For now, let's allow more courses because it's necessary and doesn't necessarily fail if the courses
 // have small populations (this used to be limited to 40)
@@ -38,41 +30,54 @@ export const SearchForm = ({ onProgress }) => {
   const dispatch = useDispatch()
   const location = useLocation()
   const navigate = useNavigate()
-  const isLoading = useSelector(state => state.courseStats.pending)
+  const isLoadingCourseStats = useSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCoursesEnabled, toggleSelectMultipleCoursesEnabled] = useToggle(false)
-  const matchingCourses = useSelector(state => getCourseSearchResults(state, combineSubstitutions))
-  const [state, setState] = useState({ ...INITIAL })
-  const { courseName, courseCode, selectedCourses, separate } = state
+  const [courseName, setCourseName] = useState('')
+  const [courseCode, setCourseCode] = useState('')
+  const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState(courseName)
+  const [debouncedCourseCode, setDebouncedCourseCode] = useDebouncedState(courseCode)
+  const [selectedCourses, setSelectedCourses] = useState({})
+
+  const isInputValid = validateInputLength(courseName, 5) || validateInputLength(courseCode, 2)
+  const isDebouncedInputValid =
+    validateInputLength(debouncedCourseName, 5) || validateInputLength(debouncedCourseCode, 2)
+  const debouncedChanged = debouncedCourseName !== courseName || debouncedCourseCode !== courseCode
+
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
+  const { data, isFetching } = useGetCourseSearchResultQuery(
+    { name: debouncedCourseName, code: debouncedCourseCode, combineSubstitutions },
+    { skip: !isDebouncedInputValid }
+  )
+  const matchingCourses = data?.courses ?? []
+
+  const handleCourseNameChange = event => {
+    setCourseName(event.target.value)
+    setDebouncedCourseName(event.target.value)
+  }
+
+  const handleCourseCodeChange = event => {
+    setCourseCode(event.target.value)
+    setDebouncedCourseCode(event.target.value)
+  }
 
   const parseQueryFromUrl = () => {
-    const {
-      courseCodes,
-      separate,
-      unifyOpenUniCourses,
-      combineSubstitutions: combineSubstitutionsFromUrl,
-      ...rest
-    } = qs.parse(location.search)
+    const search = qs.parse(location.search)
     const query = {
-      ...INITIAL,
-      ...rest,
-      courseCodes: JSON.parse(courseCodes),
-      separate: JSON.parse(separate),
-      combineSubstitutions: combineSubstitutionsFromUrl ?? JSON.parse(combineSubstitutions),
+      courseCodes: JSON.parse(search.courseCodes),
+      separate: JSON.parse(search.separate),
+      combineSubstitutions: search.combineSubstitutionsFrom ?? JSON.parse(combineSubstitutions),
     }
     return query
   }
 
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
-    setState({ ...state, ...query })
     dispatch(getCourseStats(query, onProgress))
   }
 
   useEffect(() => {
     if (!location.search) {
-      dispatch(clearCourses())
       dispatch(clearCourseStats())
     }
   }, [])
@@ -84,23 +89,15 @@ export const SearchForm = ({ onProgress }) => {
   }, [location.search])
 
   const onSelectCourse = course => {
-    course.selected = !course.selected
     const isSelected = !!selectedCourses[course.code]
 
     if (isSelected) {
-      const { [course.code]: omit, ...rest } = selectedCourses
-      setState({
-        ...state,
-        selectedCourses: rest,
-      })
+      setSelectedCourses(previousSelectedCourses => omit(previousSelectedCourses, course.code))
     } else {
-      setState({
-        ...state,
-        selectedCourses: {
-          ...selectedCourses,
-          [course.code]: { ...course, selected: true },
-        },
-      })
+      setSelectedCourses(previousSelectedCourses => ({
+        ...previousSelectedCourses,
+        [course.code]: { ...course, selected: true },
+      }))
     }
   }
 
@@ -123,7 +120,7 @@ export const SearchForm = ({ onProgress }) => {
     const codes = sortBy(Object.keys(selectedCourses))
     const params = {
       courseCodes: codes,
-      separate,
+      separate: false,
       combineSubstitutions,
     }
     const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name)} ${code}`)
@@ -134,21 +131,8 @@ export const SearchForm = ({ onProgress }) => {
     pushQueryToUrl(params)
   }
 
-  const fetchCourses = () => {
-    const isValidName = validateInputLength(courseName, 5)
-    const isValidCode = validateInputLength(courseCode, 2)
-
-    if (isValidName || isValidCode) {
-      return dispatch(findCoursesV2({ name: courseName, code: courseCode, combineSubstitutions }))
-    }
-    if (courseName.length < 5 && courseCode.length < 2) {
-      dispatch(clearCourses())
-    }
-    return Promise.resolve()
-  }
-
   const clearSelectedCourses = () => {
-    setState({ ...state, selectedCourses: {} })
+    setSelectedCourses({})
   }
 
   useEffect(() => {
@@ -157,10 +141,6 @@ export const SearchForm = ({ onProgress }) => {
   }, [selectedCourses])
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchCourses()
-    }
-    fetchData()
     clearSelectedCourses()
   }, [combineSubstitutions])
 
@@ -171,9 +151,9 @@ export const SearchForm = ({ onProgress }) => {
 
   const courses = matchingCourses.filter(course => !selectedCourses[course.code])
 
-  const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
+  const selected = Object.values(selectedCourses)
   const noSelectedCourses = selected.length === 0
-  const disabled = isLoading || noSelectedCourses || selected.length > MAX_SELECTED_COURSES
+  const disabled = isLoadingCourseStats || noSelectedCourses || selected.length > MAX_SELECTED_COURSES
 
   const renderFetchStatisticsButton = () => {
     const FetchStatisticsButton = (
@@ -213,51 +193,44 @@ export const SearchForm = ({ onProgress }) => {
   }
 
   const addAllCourses = () => {
-    courses.forEach(course => {
-      course.selected = true
-    })
-
     const newSelectedCourses = courses.reduce((newSelected, course) => {
       newSelected[course.code] = { ...course }
       return newSelected
     }, {})
 
-    setState({
-      ...state,
-      selectedCourses: {
-        ...selectedCourses,
-        ...newSelectedCourses,
-      },
-    })
+    setSelectedCourses(previousSelectedCourses => ({
+      ...previousSelectedCourses,
+      ...newSelectedCourses,
+    }))
   }
 
   return (
     <>
-      <Segment loading={isLoading}>
+      <Segment loading={isLoadingCourseStats}>
         <Form>
           <Header>Search for courses</Header>
           <div style={{ marginBottom: '15px' }}>
             <Form.Group>
               <Form.Field width={7}>
                 <label>Name</label>
-                <AutoSubmitSearchInput
-                  cypress="course-name-input"
-                  doSearch={fetchCourses}
-                  inputValue={courseName}
-                  loading={isLoading}
-                  onChange={courseName => setState({ ...state, courseName })}
+                <Input
+                  data-cy="course-name-input"
+                  fluid
+                  icon="search"
+                  onChange={handleCourseNameChange}
                   placeholder="Search by course name"
+                  value={courseName}
                 />
               </Form.Field>
               <Form.Field width={4}>
                 <label>Code</label>
-                <AutoSubmitSearchInput
-                  cypress="course-code-input"
-                  doSearch={fetchCourses}
-                  inputValue={courseCode}
-                  loading={isLoading}
-                  onChange={courseCode => setState({ ...state, courseCode })}
+                <Input
+                  data-cy="course-code-input"
+                  fluid
+                  icon="search"
+                  onChange={handleCourseCodeChange}
                   placeholder="Search by course code"
+                  value={courseCode}
                 />
               </Form.Field>
               <Form.Field>
@@ -314,43 +287,57 @@ export const SearchForm = ({ onProgress }) => {
               <Message>
                 <b style={{ color: 'red', fontSize: '14pt' }}>Notice:</b> Selecting many courses may fail if there are
                 too many students in total. If the feature does not work, try again with fewer courses. <br /> <br />
-                <b>Currently selected: {Object.keys(state.selectedCourses).length || 0}</b>
+                <b>Currently selected: {Object.keys(selectedCourses).length || 0}</b>
               </Message>
             )}
-            <div style={!noSelectedCourses ? searchBoxStyle : null}>
-              <CourseTable
-                controlIcon="trash alternate outline"
-                courses={selected}
-                hidden={noSelectedCourses}
-                onSelectCourse={onSelectCourse}
-                selectedTable
-                title="Selected courses"
-              />
-              {renderFetchStatisticsButton()}
-            </div>
-            <CourseTable
-              courses={courses}
-              hidden={isLoading || (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)}
-              onSelectCourse={onSelectCourse}
-              title="Searched courses"
-            />
-            {courses.length && selectMultipleCoursesEnabled ? (
-              <div className="select-all-container">
-                <Form.Button
-                  basic
-                  color="green"
-                  content="Select all search results"
-                  onClick={addAllCourses}
-                  size="large"
-                  type="button"
+            <Segment basic loading={(isFetching || debouncedChanged) && isInputValid} style={{ padding: 0 }}>
+              {!isInputValid ? (
+                <Message
+                  content="Please enter at least 5 characters for course name or 2 characters for course code."
+                  negative
                 />
-              </div>
-            ) : null}
+              ) : (
+                <>
+                  <div style={!noSelectedCourses ? searchBoxStyle : null}>
+                    <CourseTable
+                      controlIcon="trash alternate outline"
+                      courses={selected}
+                      hidden={noSelectedCourses}
+                      onSelectCourse={onSelectCourse}
+                      selectedTable
+                      title="Selected courses"
+                    />
+                    {renderFetchStatisticsButton()}
+                  </div>
+                  <CourseTable
+                    courses={courses}
+                    hidden={
+                      isLoadingCourseStats ||
+                      (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)
+                    }
+                    onSelectCourse={onSelectCourse}
+                    title="Searched courses"
+                  />
+                  {courses.length > 0 && selectMultipleCoursesEnabled && (
+                    <div className="select-all-container">
+                      <Form.Button
+                        basic
+                        color="green"
+                        content="Select all search results"
+                        onClick={addAllCourses}
+                        size="large"
+                        type="button"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </Segment>
           </div>
         </Form>
       </Segment>
       <SearchHistory
-        disabled={isLoading}
+        disabled={isLoadingCourseStats}
         handleSearch={onSearchHistorySelected}
         items={searchHistory.map(item => {
           item.timestamp = new Date(item.timestamp)
