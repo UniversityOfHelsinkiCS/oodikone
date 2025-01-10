@@ -288,7 +288,7 @@ export const getCreditCategories = (
   return range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 }
 
-export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
+export const validateInputLength = (input, minLength) => input?.trim().length >= minLength
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
