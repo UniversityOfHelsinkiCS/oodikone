@@ -81,11 +81,11 @@ describe('Study programme overview', () => {
       const tableContents = [
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
-        [2023, 26, 0],
-        [2022, 48, 0],
-        [2021, 47, 66],
-        [2020, 12, 18],
-        [2019, 1, 15],
+        [2023, 26, 5],
+        [2022, 48, 13],
+        [2021, 47, 76],
+        [2020, 12, 23],
+        [2019, 1, 19],
         [2018, 0, 0],
         [2017, 0, 1],
       ]
@@ -113,11 +113,11 @@ describe('Study programme overview', () => {
       const graduatedTableContents = [
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
-        [2023, 24, 0],
-        [2022, 44, 0],
-        [2021, 46, 60],
-        [2020, 11, 17],
-        [2019, 1, 15],
+        [2023, 24, 5],
+        [2022, 44, 12],
+        [2021, 46, 69],
+        [2020, 11, 22],
+        [2019, 1, 18],
         [2018, 0, 0],
         [2017, 0, 1],
       ]
@@ -175,7 +175,7 @@ describe('Study programme overview', () => {
         .should('contain', 'Graduated students')
         .should('contain', 'Wrote thesis')
         .should('contain', 47)
-        .should('contain', 66)
+        .should('contain', 76)
 
       cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
       cy.get('[data-cy=GraduationTimeToggle]').click()
