@@ -114,7 +114,30 @@ export const getTransferredCredits = async (provider: string, since: Date) =>
     },
   })
 
-export const getThesisCredits = async (provider: string, thesisType: string[], studentnumbers: string[]) =>
+export const getStudyRightThesisCredits = async (thesisType: string[], studyRightIds: string[]) =>
+  await Credit.findAll({
+    attributes: ['attainment_date', 'student_studentnumber'],
+    include: {
+      model: Course,
+      attributes: [],
+      where: {
+        course_unit_type: {
+          [Op.in]: thesisType,
+        },
+      },
+    },
+    where: {
+      credittypecode: CreditTypeCode.PASSED,
+      isStudyModule: {
+        [Op.not]: true,
+      },
+      studyright_id: {
+        [Op.in]: studyRightIds,
+      },
+    },
+  })
+
+export const getOrganizationThesisCredits = async (provider: string, thesisType: string[], studentnumbers: string[]) =>
   await Credit.findAll({
     attributes: ['attainment_date', 'student_studentnumber'],
     include: {

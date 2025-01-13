@@ -7,7 +7,7 @@ import { DegreeProgrammeType, ExtentCode, Phase, SemesterEnrollment, StudyTrack 
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
-import { getThesisCredits } from './creditGetters'
+import { getStudyRightThesisCredits, getOrganizationThesisCredits } from './creditGetters'
 import { getGraduatedStats } from './studyProgrammeBasics'
 import {
   defineYear,
@@ -101,19 +101,35 @@ const getGraduationTimeAndThesisWriterStats = async ({
       thesisTableStats: tableStats,
     }
   }
+
   const doCombo = await shouldIncludeComboStats(studyProgramme)
   const graduationTimes: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const graduationTimesCombo: Record<string, number[]> = getYearsObject({ years, emptyArrays: true })
   const { semesters } = await getSemestersAndYears()
 
-  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
-  const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
   const thesisType = await getThesisType(studyProgramme)
-  const thesisCredits = await getThesisCredits(mapToProviders([studyProgramme])[0], thesisType, studentNumbers)
-  const thesisWriterMap = thesisCredits.reduce<Record<string, Date>>((acc, credit) => {
-    acc[credit.student_studentnumber] = credit.attainment_date
-    return acc
-  }, {})
+  const studyRights = await getStudyRightsInProgramme(studyProgramme, false)
+  const studyRightIds = studyRights.map(studyRight => studyRight.id)
+  const studentNumbers = studyRights.map(studyRight => studyRight.studentNumber)
+
+  const studyRightThesisCredits = await getStudyRightThesisCredits(thesisType, studyRightIds)
+
+  const studyRightThesisStudentNumbers = studyRightThesisCredits.map(item => item.student_studentnumber)
+  const organizationStudentNumbers = studentNumbers.filter(student => !studyRightThesisStudentNumbers.includes(student))
+
+  const organizationThesisCredits = await getOrganizationThesisCredits(
+    mapToProviders([studyProgramme])[0],
+    thesisType,
+    organizationStudentNumbers
+  )
+
+  const thesisWriterMap = [...studyRightThesisCredits, ...organizationThesisCredits].reduce<Record<string, Date>>(
+    (acc, credit) => {
+      acc[credit.student_studentnumber] = credit.attainment_date
+      return acc
+    },
+    {}
+  )
 
   for (const studyRight of studyRights) {
     const correctStudyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
