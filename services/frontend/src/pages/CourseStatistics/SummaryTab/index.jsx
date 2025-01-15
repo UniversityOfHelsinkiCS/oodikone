@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Form, Header, Label, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
-import { AttemptsTable } from '@/components/CourseStatistics/AttemptsTable'
-import { userHasAccessToAllCourseStats } from '@/components/CourseStatistics/courseStatisticsUtils'
-import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
+import { AttemptsTable } from '../AttemptsTable'
+import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
+import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { DataExport } from './DataExport'
 
 // Certified JavaScript moment but basically this was crashing

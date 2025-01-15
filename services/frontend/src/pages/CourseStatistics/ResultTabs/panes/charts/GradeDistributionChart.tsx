@@ -10,7 +10,7 @@ import {
   getMaxValueOfSeries,
   getSeriesType,
   getThesisGradeSpread,
-} from '@/components/CourseStatistics/ResultTabs/panes/util'
+} from '@/pages/CourseStatistics/ResultTabs/panes/util'
 import { chartColor, color } from '@/styles/colors'
 
 exporting(ReactHighcharts.Highcharts)

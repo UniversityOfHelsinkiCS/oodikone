@@ -7,12 +7,12 @@ import { Form, Header, Input, Message, Popup, Radio, Segment } from 'semantic-ui
 
 import { validateInputLength } from '@/common'
 import { useSearchHistory, useToggle } from '@/common/hooks'
-import { MemoizedCourseTable as CourseTable } from '@/components/CourseStatistics/CourseTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/SearchHistory'
 import { useDebouncedState } from '@/hooks/useDebouncedState'
 import { useGetCourseSearchResultQuery } from '@/redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '@/redux/coursestats'
+import { MemoizedCourseTable as CourseTable } from '../CourseTable'
 
 // For now, let's allow more courses because it's necessary and doesn't necessarily fail if the courses
 // have small populations (this used to be limited to 40)

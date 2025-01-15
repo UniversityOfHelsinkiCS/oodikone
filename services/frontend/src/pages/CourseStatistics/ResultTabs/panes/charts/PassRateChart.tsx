@@ -3,11 +3,7 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
-import {
-  absoluteToRelative,
-  getDataObject,
-  getMaxValueOfSeries,
-} from '@/components/CourseStatistics/ResultTabs/panes/util'
+import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '@/pages/CourseStatistics/ResultTabs/panes/util'
 import { chartColor, color } from '@/styles/colors'
 
 exporting(ReactHighcharts.Highcharts)

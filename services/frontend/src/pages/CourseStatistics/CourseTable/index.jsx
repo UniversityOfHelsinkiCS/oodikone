@@ -3,8 +3,8 @@ import { arrayOf, bool, func, shape, string } from 'prop-types'
 import { memo } from 'react'
 import { Table } from 'semantic-ui-react'
 
-import { getActiveYears } from '@/components/CourseStatistics/courseStatisticsUtils'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { getActiveYears } from '../courseStatisticsUtils'
 import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, controlIcon }) => {
