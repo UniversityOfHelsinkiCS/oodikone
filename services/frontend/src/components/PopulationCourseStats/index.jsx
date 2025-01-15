@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
 import { useTabChangeAnalytics } from '@/common/hooks'
-import { clearCourseStats } from '@/redux/coursestats'
+import { clearCourseStats } from '@/redux/courseStats'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'

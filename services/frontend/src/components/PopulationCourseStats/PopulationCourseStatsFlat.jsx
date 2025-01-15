@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
-import { clearCourseStats } from '@/redux/coursestats'
+import { clearCourseStats } from '@/redux/courseStats'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PopulationCourseContext } from './PopulationCourseContext'
