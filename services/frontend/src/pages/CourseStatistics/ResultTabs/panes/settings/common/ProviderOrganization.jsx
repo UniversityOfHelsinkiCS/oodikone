@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { Checkbox, Segment, SegmentGroup } from 'semantic-ui-react'
 
-import { toggleOpenAndRegularCourses } from '@/redux/coursesearch'
+import { toggleOpenAndRegularCourses } from '@/redux/courseSearch'
 
 export const ProviderOrganization = ({ availableStats }) => {
   const dispatch = useDispatch()

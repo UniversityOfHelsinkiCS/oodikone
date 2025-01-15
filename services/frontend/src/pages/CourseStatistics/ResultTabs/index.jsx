@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router'
 import { Segment, Tab } from 'semantic-ui-react'
 
 import { useProgress, useTabs } from '@/common/hooks'
-import { getCourseStats } from '@/redux/coursestats'
+import { getCourseStats } from '@/redux/courseStats'
 import { AttemptsPane } from './panes/AttemptsPane'
 import { StudentsPane } from './panes/StudentsPane'
 import './resultTabs.css'

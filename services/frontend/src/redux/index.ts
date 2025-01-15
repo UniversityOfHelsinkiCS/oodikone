@@ -3,7 +3,7 @@ import { setupListeners } from '@reduxjs/toolkit/query/react'
 
 import { handleRequest, RTKApi } from '@/apiConnection'
 import { reducer as actionHistory } from './actionHistory'
-import { reducer as courseSearch } from './coursesearch'
+import { reducer as courseSearch } from './courseSearch'
 import { coursesSummaryFormReducer as courseSummaryForm } from './coursesSummaryForm'
 import { reducer as courseStats } from './courseStats'
 import { reducer as filters } from './filters'
