@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { SEARCH_HISTORY_VERSION } from '@/constants'
-
-type SearchHistoryItem = Record<string, any>
+import { SearchHistoryItem } from '@/types/searchHistory'
 
 export const useSearchHistory = (id: string, capacity = 5) => {
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([])

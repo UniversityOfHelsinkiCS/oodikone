@@ -5,13 +5,7 @@ import moment from 'moment'
 import { useEffect, useState } from 'react'
 
 import { DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
-
-type ListItem = {
-  id: string
-  text: string
-  timestamp: string
-  params: any
-}
+import { SearchHistoryItem } from '@/types/searchHistory'
 
 export const SearchHistory = ({
   handleSearch,
@@ -20,13 +14,13 @@ export const SearchHistory = ({
 }: {
   handleSearch: (params: any) => void
   header?: string
-  items: ListItem[]
+  items: SearchHistoryItem[]
 }) => {
-  const [selected, setSelected] = useState<ListItem | null>(null)
+  const [selected, setSelected] = useState<SearchHistoryItem | null>(null)
 
-  const sortedItems = sortBy(items, item => -new Date(item.timestamp).getTime())
+  const sortedItems = sortBy(items, item => -new Date(item.timestamp!).getTime())
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: ListItem | null) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: SearchHistoryItem | null) => {
     if (newValue === null) {
       handleSearch(newValue)
     } else {
