@@ -1,9 +1,0 @@
-.controlIcon,
-.controlIcon:active {
-  box-shadow: none !important;
-  background: none !important;
-}
-
-#selected-table {
-  padding: 0 !important;
-}
