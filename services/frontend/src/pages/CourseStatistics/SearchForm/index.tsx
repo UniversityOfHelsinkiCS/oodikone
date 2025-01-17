@@ -1,5 +1,15 @@
 import { LibraryAddCheck as LibraryAddIcon, Search as SearchIcon } from '@mui/icons-material'
-import { Alert, Box, Button, Grid2 as Grid, InputAdornment, Stack, TextField } from '@mui/material'
+import {
+  Alert,
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Grid2 as Grid,
+  InputAdornment,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { omit, sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
@@ -26,7 +36,7 @@ import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 // fail if the courses have small populations (this used to be limited to 40)
 const MAX_SELECTED_COURSES = 99999
 
-export const SearchForm = ({ onProgress }) => {
+export const SearchForm = ({ onProgress, progress }) => {
   const { getTextIn } = useLanguage()
   const dispatch = useDispatch()
   const location = useLocation()
@@ -174,6 +184,9 @@ export const SearchForm = ({ onProgress }) => {
 
   return (
     <Stack gap={2}>
+      <Backdrop open={isLoadingCourseStats} sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" value={progress} variant="determinate" />
+      </Backdrop>
       <Section title="Search for courses">
         <Box autoComplete="off" component="form" noValidate>
           <Stack gap={2}>
