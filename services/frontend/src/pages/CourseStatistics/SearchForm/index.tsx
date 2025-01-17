@@ -1,5 +1,5 @@
 import { LibraryAddCheck as LibraryAddIcon, Search as SearchIcon } from '@mui/icons-material'
-import { Alert, Box, Button, Grid2 as Grid, InputAdornment, Paper, Stack, TextField } from '@mui/material'
+import { Alert, Box, Button, Grid2 as Grid, InputAdornment, Stack, TextField } from '@mui/material'
 import { omit, sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
@@ -177,8 +177,8 @@ export const SearchForm = ({ onProgress }) => {
       <Section title="Search for courses">
         <Box autoComplete="off" component="form" noValidate>
           <Stack gap={2}>
-            <Grid container spacing={2}>
-              <Grid size={8}>
+            <Grid alignItems="center" container spacing={2}>
+              <Grid size={5}>
                 <TextField
                   data-cy="course-name-input"
                   fullWidth
@@ -197,7 +197,7 @@ export const SearchForm = ({ onProgress }) => {
                   value={courseName}
                 />
               </Grid>
-              <Grid size={4}>
+              <Grid size={3}>
                 <TextField
                   data-cy="course-code-input"
                   fullWidth
@@ -216,29 +216,29 @@ export const SearchForm = ({ onProgress }) => {
                   value={courseCode}
                 />
               </Grid>
+              <Grid size={4}>
+                <ToggleWithTooltip
+                  checked={combineSubstitutions}
+                  cypress="combine-substitutions-toggle"
+                  label="Combine substitutions"
+                  onChange={toggleCombineSubstitutions}
+                  tooltipText={getTextIn({
+                    fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
+                    en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
+                  })}
+                />
+                <ToggleWithTooltip
+                  checked={selectMultipleCourses}
+                  cypress="select-multiple-courses-toggle"
+                  label="Select multiple courses"
+                  onChange={toggleSelectMultipleCourses}
+                  tooltipText={getTextIn({
+                    fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
+                    en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
+                  })}
+                />
+              </Grid>
             </Grid>
-            <Paper sx={{ display: 'flex', justifyContent: 'center', padding: 1 }} variant="outlined">
-              <ToggleWithTooltip
-                checked={combineSubstitutions}
-                cypress="combine-substitutions-toggle"
-                label="Combine substitutions"
-                onChange={toggleCombineSubstitutions}
-                tooltipText={getTextIn({
-                  fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
-                  en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
-                })}
-              />
-              <ToggleWithTooltip
-                checked={selectMultipleCourses}
-                cypress="select-multiple-courses-toggle"
-                label="Select multiple courses"
-                onChange={toggleSelectMultipleCourses}
-                tooltipText={getTextIn({
-                  fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
-                  en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
-                })}
-              />
-            </Paper>
             {selectMultipleCourses && (
               <MultipleCoursesAlert selectedCourses={Object.keys(selectedCourses).length || 0} />
             )}
