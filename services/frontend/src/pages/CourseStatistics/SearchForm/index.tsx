@@ -1,5 +1,5 @@
-import { LibraryAddCheck as LibraryAddIcon } from '@mui/icons-material'
-import { Alert, Box, Button, Grid2 as Grid, Paper, Stack, TextField } from '@mui/material'
+import { LibraryAddCheck as LibraryAddIcon, Search as SearchIcon } from '@mui/icons-material'
+import { Alert, Box, Button, Grid2 as Grid, InputAdornment, Paper, Stack, TextField } from '@mui/material'
 import { omit, sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
@@ -186,6 +186,15 @@ export const SearchForm = ({ onProgress }) => {
                   label="Name"
                   onChange={handleCourseNameChange}
                   placeholder="Search by course name"
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                   value={courseName}
                 />
               </Grid>
@@ -196,6 +205,15 @@ export const SearchForm = ({ onProgress }) => {
                   label="Code"
                   onChange={handleCourseCodeChange}
                   placeholder="Search by course code"
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                   value={courseCode}
                 />
               </Grid>
