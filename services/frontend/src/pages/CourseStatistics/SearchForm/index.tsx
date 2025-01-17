@@ -10,6 +10,7 @@ import { validateInputLength } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/material/SearchHistory'
 import { Section } from '@/components/material/Section'
+import { ToggleWithTooltip } from '@/components/material/ToggleWithTooltip'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
 import { useDebouncedState } from '@/hooks/useDebouncedState'
@@ -17,11 +18,9 @@ import { RootState } from '@/redux'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { getCourseStats, clearCourseStats } from '@/redux/courseStats'
 import { SearchHistoryItem } from '@/types/searchHistory'
-import { CombineSubstitutionsToggle } from './CombineSubstitutionsToggle'
 import { MemoizedCourseTable as CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
-import { SelectMultipleCoursesToggle } from './SelectMultipleCoursesToggle'
 
 // For now, let's allow more courses because it's necessary and doesn't necessarily
 // fail if the courses have small populations (this used to be limited to 40)
@@ -219,8 +218,26 @@ export const SearchForm = ({ onProgress }) => {
               </Grid>
             </Grid>
             <Paper sx={{ display: 'flex', justifyContent: 'center', padding: 1 }} variant="outlined">
-              <CombineSubstitutionsToggle checked={combineSubstitutions} onChange={toggleCombineSubstitutions} />
-              <SelectMultipleCoursesToggle checked={selectMultipleCourses} onChange={toggleSelectMultipleCourses} />
+              <ToggleWithTooltip
+                checked={combineSubstitutions}
+                cypress="combine-substitutions-toggle"
+                label="Combine substitutions"
+                onChange={toggleCombineSubstitutions}
+                tooltipText={getTextIn({
+                  fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
+                  en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
+                })}
+              />
+              <ToggleWithTooltip
+                checked={selectMultipleCourses}
+                cypress="select-multiple-courses-toggle"
+                label="Select multiple courses"
+                onChange={toggleSelectMultipleCourses}
+                tooltipText={getTextIn({
+                  fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
+                  en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
+                })}
+              />
             </Paper>
             {selectMultipleCourses && (
               <MultipleCoursesAlert selectedCourses={Object.keys(selectedCourses).length || 0} />
