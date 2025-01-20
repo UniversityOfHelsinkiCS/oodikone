@@ -4,7 +4,6 @@ import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
-import { useCurrentSemester, useDegreeProgrammeTypes } from '@/common/hooks'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -29,6 +28,8 @@ import {
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
+import { useCurrentSemester } from '@/hooks/currentSemester'
+import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'

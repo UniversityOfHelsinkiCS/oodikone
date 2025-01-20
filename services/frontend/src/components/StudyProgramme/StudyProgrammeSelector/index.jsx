@@ -8,9 +8,9 @@ import {
   getUnifiedProgrammeName,
   isDefaultServiceProvider,
 } from '@/common'
-import { useCurrentCurriculumPeriod } from '@/common/hooks'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useCurrentCurriculumPeriod } from '@/hooks/currentCurriculumPeriod'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import {
   useAddStudyProgrammePinMutation,

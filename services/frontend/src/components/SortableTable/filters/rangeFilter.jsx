@@ -3,9 +3,9 @@ import { useMemo } from 'react'
 import { Icon } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
-import { useDebounce } from '@/common/hooks'
 import { RangeSelector } from '@/components/common/RangeSelector'
 import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
+import { useDebounce } from '@/hooks/debounce'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []

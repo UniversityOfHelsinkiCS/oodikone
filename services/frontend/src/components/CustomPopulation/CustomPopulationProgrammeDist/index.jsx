@@ -1,12 +1,12 @@
 import moment from 'moment'
 
 import { getNewestProgrammeOfStudentAt } from '@/common'
-import { useCurrentSemester } from '@/common/hooks'
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
 import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 

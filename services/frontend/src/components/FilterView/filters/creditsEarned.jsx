@@ -2,8 +2,8 @@ import { max, min } from 'lodash'
 import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
-import { useDebounce } from '@/common/hooks'
 import { RangeSelector } from '@/components/common/RangeSelector'
+import { useDebounce } from '@/hooks/debounce'
 import { createFilter } from './createFilter'
 
 const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {

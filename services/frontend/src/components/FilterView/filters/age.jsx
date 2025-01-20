@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
-import { useDebounce } from '@/common/hooks'
 import { RangeSelector } from '@/components/common/RangeSelector'
+import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
 import { createFilter } from './createFilter'
 
