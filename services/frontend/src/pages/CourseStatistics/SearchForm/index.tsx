@@ -261,20 +261,23 @@ export const SearchForm = ({ onProgress, progress }) => {
               </Alert>
             ) : (
               <Section isLoading={(isFetching || debouncedChanged) && isInputValid}>
-                <Stack gap={2}>
-                  <CourseTable
-                    courses={selected}
-                    hidden={noSelectedCourses}
-                    onSelectCourse={onSelectCourse}
-                    title="Selected courses"
-                  />
-                  <FetchStatisticsButton
-                    disabled={disabled}
-                    maxSelectedCourses={MAX_SELECTED_COURSES}
-                    onClick={onSubmitFormClick}
-                    selectedCourses={selected.length}
-                  />
-                </Stack>
+                {selected.length > 0 && selectMultipleCourses && (
+                  <Stack gap={2}>
+                    <CourseTable
+                      courses={selected}
+                      hidden={noSelectedCourses}
+                      onSelectCourse={onSelectCourse}
+                      title="Selected courses"
+                    />
+
+                    <FetchStatisticsButton
+                      disabled={disabled}
+                      maxSelectedCourses={MAX_SELECTED_COURSES}
+                      onClick={onSubmitFormClick}
+                      selectedCourses={selected.length}
+                    />
+                  </Stack>
+                )}
                 <CourseTable
                   courses={courses}
                   hidden={
