@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Form, Header, Input, Label, Message, Segment } from 'semantic-ui-react'
 
-import { useProgress } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
@@ -24,6 +23,7 @@ import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/Po
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
+import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
 import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
