@@ -3,7 +3,7 @@ import { useParams } from 'react-router'
 import { Header } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
-import { useTitle } from '@/common/hooks'
+import { useTitle } from '@/hooks/title'
 import { useLazyGetAllUsersQuery } from '@/redux/users'
 import { NewUserSection } from './NewUserSection'
 import { UserPage } from './UserPage'

@@ -16,11 +16,11 @@ import { useEffect, useState } from 'react'
 
 import { callApi } from '@/apiConnection'
 import { isDefaultServiceProvider } from '@/common'
-import { useTitle } from '@/common/hooks'
 import { updaterToolTips } from '@/common/InfoToolTips/updater'
 import { PageTitle } from '@/components/material/PageTitle'
 import { Section } from '@/components/material/Section'
 import { languageCenterViewEnabled } from '@/conf'
+import { useTitle } from '@/hooks/title'
 
 export const Updater = () => {
   const [messages, setMessages] = useState([])

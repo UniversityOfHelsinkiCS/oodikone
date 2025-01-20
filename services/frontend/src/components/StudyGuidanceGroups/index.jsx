@@ -1,7 +1,7 @@
 import { useParams } from 'react-router'
 import { Header } from 'semantic-ui-react'
 
-import { useTitle } from '@/common/hooks'
+import { useTitle } from '@/hooks/title'
 import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
 import { Wrapper } from './common'
 import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'

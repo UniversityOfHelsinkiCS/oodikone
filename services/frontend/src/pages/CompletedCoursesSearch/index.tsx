@@ -3,8 +3,8 @@ import { Alert, Box, Container, Stack } from '@mui/material'
 import { green, yellow, grey } from '@mui/material/colors'
 import { useState } from 'react'
 
-import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
+import { useTitle } from '@/hooks/title'
 import { SearchModal } from './SearchModal'
 import { SearchResults } from './SearchResults'
 

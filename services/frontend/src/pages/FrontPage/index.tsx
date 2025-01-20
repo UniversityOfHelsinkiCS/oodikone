@@ -8,8 +8,8 @@ import {
   getFullStudyProgrammeRights,
   isDefaultServiceProvider,
 } from '@/common'
-import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
+import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { Release } from '@/shared/types'

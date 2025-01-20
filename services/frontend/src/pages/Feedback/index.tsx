@@ -3,9 +3,9 @@ import { Send } from '@mui/icons-material'
 import { Box, Button, Container, Link, Modal, TextField, Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useSendFeedbackMutation } from '@/redux/feedback'
 

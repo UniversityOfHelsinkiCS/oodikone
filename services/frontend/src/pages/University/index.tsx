@@ -1,8 +1,8 @@
 import { Container, Tab, Tabs } from '@mui/material'
 
-import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'
+import { useTitle } from '@/hooks/title'
 import { FacultyGraduationsTab } from './FacultyGraduationsTab'
 import { FacultyProgressTab } from './FacultyProgressTab'
 

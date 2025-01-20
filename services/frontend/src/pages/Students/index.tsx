@@ -1,9 +1,9 @@
 import { Container, Stack } from '@mui/material'
 import { Outlet } from 'react-router'
 
-import { useTitle } from '@/common/hooks'
 import { PageTitle } from '@/components/material/PageTitle'
 import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
+import { useTitle } from '@/hooks/title'
 
 export const Students = () => {
   useTitle('Student statistics')

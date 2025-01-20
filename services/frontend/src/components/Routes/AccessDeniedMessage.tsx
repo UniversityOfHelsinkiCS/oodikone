@@ -1,8 +1,8 @@
 import { DoNotDisturb } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Container, Link } from '@mui/material'
 
-import { useTitle } from '@/common/hooks'
-import { PageTitle } from '../material/PageTitle'
+import { PageTitle } from '@/components/material/PageTitle'
+import { useTitle } from '@/hooks/title'
 
 export const AccessDeniedMessage = () => {
   useTitle('Access denied')

@@ -129,15 +129,6 @@ export const useProgress = loading => {
   }
 }
 
-export const useTitle = title => {
-  useEffect(() => {
-    document.title = title ? `${title} - Oodikone` : 'Oodikone'
-    return () => {
-      document.title = 'Oodikone'
-    }
-  }, [title])
-}
-
 export const useLocalStorage = (key, initialValue) => {
   const [storedValue, setStoredValue] = useState(() => {
     try {

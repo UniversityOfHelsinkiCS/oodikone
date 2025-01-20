@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import ReactHighchart from 'react-highcharts'
 
 import { images } from '@/common'
-import { useTitle } from '@/common/hooks'
+import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
 import { EasterEgg } from './EasterEgg'
 

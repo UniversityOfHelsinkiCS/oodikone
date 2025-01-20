@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
 import { extractItems, textAndDescriptionSearch } from '@/common'
-import { useTitle } from '@/common/hooks'
 import { SearchHistory } from '@/components/SearchHistory'
+import { useTitle } from '@/hooks/title'
 import {
   useCreateCustomPopulationSearchMutation,
   useDeleteCustomPopulationSearchMutation,
