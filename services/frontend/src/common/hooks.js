@@ -204,14 +204,6 @@ export const useDebounce = (value, timeout, onChange) => {
   return [innerValue, setValue, flush, dirty]
 }
 
-export const useToggle = (initialValue = false) => {
-  const [value, setValue] = useState(initialValue)
-  const toggle = useCallback(() => {
-    setValue(value => !value)
-  }, [])
-  return [value, toggle]
-}
-
 /**
  * This hook is similar to useMemo, but it does a deep comparison of the dependencies (using `isEqual` from Lodash).
  */
