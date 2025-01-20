@@ -163,8 +163,8 @@ describe('Course Statistics tests', () => {
 
     it('Searching multiple courses having substitution mappings shows course statistics', () => {
       cy.contains('Search for courses')
-      cy.cs('select-multiple-courses-toggle').should('not.have.class', 'checked').click()
-      cy.cs('select-multiple-courses-toggle').should('have.class', 'checked')
+      cy.cs('select-multiple-courses-toggle').should('not.have.class', 'Mui-checked').click()
+      cy.cs('select-multiple-courses-toggle').should('have.class', 'Mui-checked')
       searchByCourseCode('TKT')
       cy.contains('td', /^TKT20001/).click()
       cy.contains('td', /^TKT10002/).click()
@@ -195,13 +195,13 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.get('.ui.contentSegment .ui.menu').contains('Course').click()
+      cy.get('.ui.menu').contains('Course').click()
       cy.cs('course-selector').get('.active.selected.item').contains('TKT10002')
       cy.get('#CourseStatPanes table a.item:first').click()
       cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
 
       cy.go('back')
-      cy.get('.ui.contentSegment .ui.menu').contains('Course').click()
+      cy.get('.ui.menu').contains('Course').click()
       cy.cs('course-selector').click()
       cy.cs('course-selector').contains('TKT20001').click()
       cy.get('#CourseStatPanes table a.item:first').click()
@@ -244,11 +244,11 @@ describe('Course Statistics tests', () => {
     it('"Select all search results" button is not showing unless "Select multiple courses" toggle is on', () => {
       cy.contains('Search for courses')
       searchByCourseCode('TKT')
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'checked')
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'Mui-checked')
       cy.contains('TKT10004, BSCS2001, 581328, A581328, AYTKT10004')
       cy.contains('Select all search results').should('not.exist')
       cy.get('[data-cy="select-multiple-courses-toggle"]').click()
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'checked')
+      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'Mui-checked')
       cy.contains('Select all search results')
     })
 
@@ -354,8 +354,8 @@ describe('Course Statistics tests', () => {
         beforeEach(() => {
           cy.url().should('include', '/coursestatistics')
           cy.contains('Search for courses')
-          cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'checked').click()
-          cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'checked')
+          cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'Mui-checked').click()
+          cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'Mui-checked')
           searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')

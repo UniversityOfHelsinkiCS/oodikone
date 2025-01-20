@@ -1,79 +1,83 @@
+import { Container } from '@mui/material'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router'
-import { Header, Message, Segment, Tab } from 'semantic-ui-react'
+import { Tab } from 'semantic-ui-react'
 
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
 import { useProgress, useTitle } from '@/common/hooks'
-import { ProgressBar } from '@/components/ProgressBar'
+import { PageTitle } from '@/components/material/PageTitle'
+import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
+import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getCourseStats } from '@/redux/coursestats'
+import { getCourseStats } from '@/redux/courseStats'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import { FacultyLevelStatistics } from './FacultyLevelStatistics'
 import { SearchForm } from './SearchForm'
 import { SingleCourseTab } from './SingleCourseTab'
 import { SummaryTab } from './SummaryTab'
-import './courseStatistics.css'
 
 const MENU = {
   SUM: 'Summary',
   COURSE: 'Course',
   QUERY: 'New query',
   FACULTY: 'Faculty statistics',
-}
+} as const
 
 export const CourseStatistics = () => {
+  useTitle('Course statistics')
+
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
-  const { pending: loading, data: courseStatsData } = useSelector(({ courseStats }) => courseStats)
+  const { pending: loading, data: courseStatsData } = useSelector((state: RootState) => state.courseStats)
   const courses = Object.keys(courseStatsData)
   const statsIsEmpty = courses.length === 0
   const singleCourseStats = courses.length === 1
-  const initCourseCode = courses[0] || ''
+  const initialCourseCode = courses[0] || ''
 
   const [activeIndex, setActiveIndex] = useState(0)
-  const [selected, setSelected] = useState(initCourseCode)
+  const [selected, setSelected] = useState(initialCourseCode)
   const { onProgress, progress } = useProgress(loading)
-  useTitle('Course statistics')
 
   useEffect(() => {
-    setSelected(initCourseCode)
-  }, [initCourseCode])
+    setSelected(initialCourseCode)
+  }, [initialCourseCode])
 
   useEffect(() => {
     const { courseCodes, ...params } = qs.parse(location.search)
-    if (!courseCodes) return
+    if (!courseCodes) {
+      return
+    }
     const query = {
       ...params,
-      courseCodes: JSON.parse(courseCodes),
+      courseCodes: JSON.parse(courseCodes as string),
     }
     dispatch(getCourseStats(query, onProgress))
   }, [location.search])
 
   useEffect(() => {
     if (statsIsEmpty) {
-      setSelected(initCourseCode)
+      setSelected(initialCourseCode)
       setActiveIndex(0)
     }
-  }, [statsIsEmpty])
+  }, [initialCourseCode, statsIsEmpty])
 
-  const switchToCourse = coursecode => {
+  const switchToCourse = (courseCode: string) => {
     setActiveIndex(1)
-    setSelected(coursecode)
+    setSelected(courseCode)
   }
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
   const getPanes = () => {
-    let panes = [
+    let panes: any[] = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={switchToCourse} userHasAccessToAllStats={userHasAccessToAllStats} />,
+        render: () => <SummaryTab onClickCourse={switchToCourse} />,
       },
       {
         menuItem: MENU.COURSE,
@@ -114,48 +118,32 @@ export const CourseStatistics = () => {
     return !singleCourseStats ? panes : panes.filter(pane => pane.menuItem !== MENU.SUM)
   }
 
-  const handleTabChange = (_, { activeIndex, panes }) => {
+  const handleTabChange = (_: any, data: any) => {
+    const { activeIndex, panes } = data
     if (panes[activeIndex].menuItem.key !== 'query') {
       setActiveIndex(activeIndex)
     }
   }
 
-  if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && fullStudyProgrammeRights.length < 1)
-    return (
-      <div className="segmentContainer">
-        <Message
-          color="red"
-          error
-          header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
-        />
-      </div>
-    )
+  if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && fullStudyProgrammeRights.length < 1) {
+    return <AccessDeniedMessage />
+  }
 
   const panes = getPanes()
 
-  const getContent = () => {
-    if (statsIsEmpty || location.search === '') {
-      return <SearchForm onProgress={onProgress} />
-    }
-
-    return (
-      <Tab
-        activeIndex={activeIndex}
-        menu={{ attached: false, borderless: false }}
-        onTabChange={handleTabChange}
-        panes={panes}
-      />
-    )
-  }
   return (
-    <div className="segmentContainer">
-      <Header className="segmentTitle" size="large">
-        Course statistics
-      </Header>
-      <Segment className="contentSegment">
-        {getContent()}
-        <ProgressBar fixed progress={progress} />
-      </Segment>
-    </div>
+    <Container maxWidth="lg">
+      <PageTitle title="Course statistics" />
+      {statsIsEmpty || location.search === '' ? (
+        <SearchForm onProgress={onProgress} progress={progress} />
+      ) : (
+        <Tab
+          activeIndex={activeIndex}
+          menu={{ attached: false, borderless: false }}
+          onTabChange={handleTabChange}
+          panes={panes}
+        />
+      )}
+    </Container>
   )
 }

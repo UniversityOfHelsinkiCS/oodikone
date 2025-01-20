@@ -1,5 +1,7 @@
 import moment from 'moment'
 
+import { Role } from '@/shared/types'
+
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
 
@@ -14,7 +16,9 @@ const getCourseYears = course => ({
 
 export const getActiveYears = course => {
   const { startYear, endYear } = getCourseYears(course)
-  if (!startYear && !endYear) return 'No attainments yet'
+  if (!startYear && !endYear) {
+    return 'No attainments yet'
+  }
   const startYearText = getYearText(startYear, isSpring(course.min_attainment_date))
   const endYearText = getYearText(endYear, isSpring(course.max_attainment_date))
   if (endYear === MAX_YEAR && isPre2016Course(course)) {
@@ -28,9 +32,14 @@ export const getActiveYears = course => {
   if (endYear === MAX_YEAR) {
     return `${startYearText} — `
   }
-  if (startYearText === endYearText) return startYearText
+
+  if (startYearText === endYearText) {
+    return startYearText
+  }
+
   return `${startYearText} — ${endYearText}`
 }
 
-export const userHasAccessToAllCourseStats = (roles, rights) =>
-  roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || rights.length > 0
+export const userHasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
+  return roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || studyProgrammeRights.length > 0
+}

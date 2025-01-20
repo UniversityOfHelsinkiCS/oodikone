@@ -1,5 +1,5 @@
 import { callController } from '@/apiConnection/index'
-import { listreducer, actions } from './common/listreducer'
+import { actions, listreducer } from './common/listreducer'
 
 const prefix = 'COURSESTATS_'
 
@@ -7,7 +7,14 @@ const { reset } = actions(prefix)
 
 export const clearCourseStats = reset
 
-export const getCourseStats = ({ courseCodes, separate, combineSubstitutions = true }, onProgress) => {
+export const getCourseStats = (
+  {
+    courseCodes,
+    separate = false,
+    combineSubstitutions = true,
+  }: { courseCodes: string[]; separate?: boolean; combineSubstitutions?: boolean },
+  onProgress: any
+) => {
   const route = '/v3/courseyearlystats'
   const params = {
     codes: courseCodes,
@@ -17,9 +24,9 @@ export const getCourseStats = ({ courseCodes, separate, combineSubstitutions = t
   return callController(route, prefix, [], 'get', params, params, onProgress)
 }
 
-const responseToObj = coursestats => {
+const responseToObj = courseStats => {
   const data = {}
-  coursestats.forEach(stat => {
+  courseStats.forEach(stat => {
     data[stat.unifyStats.coursecode] = stat
   })
   return data

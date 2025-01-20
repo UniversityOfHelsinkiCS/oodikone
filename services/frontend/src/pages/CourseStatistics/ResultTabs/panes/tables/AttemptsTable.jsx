@@ -4,14 +4,14 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { SortableTable, row } from '@/components/SortableTable'
 import {
   getGradeSpread,
   getSortableColumn,
   getThesisGradeSpread,
   isThesisGrades,
   resolveGrades,
-} from '@/components/CourseStatistics/ResultTabs/panes/util'
-import { SortableTable, row } from '@/components/SortableTable'
+} from '@/pages/CourseStatistics/ResultTabs/panes/util'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
