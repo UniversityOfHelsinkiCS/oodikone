@@ -1,41 +1,9 @@
 import { isEqual } from 'lodash'
-import qs from 'query-string'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useGetCurriculumPeriodsQuery } from '@/redux/curriculumPeriods'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-
-// Use @/hooks/tabs for MUI components instead
-export const useTabs = (id, initialTab, { location, replace }) => {
-  const [tab, setTab] = useState(-1)
-  const [didMount, setDidMount] = useState(false)
-
-  const pushToUrl = newTab => {
-    replace({
-      pathname: location.pathname,
-      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab }),
-    })
-  }
-
-  useEffect(() => {
-    const params = qs.parse(location.search)
-    const queryTab = params[id]
-    setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab))
-    setDidMount(true)
-  }, [])
-
-  useEffect(() => {
-    if (tab !== undefined && didMount) pushToUrl(tab)
-  }, [tab])
-
-  return [
-    tab,
-    (_, { activeIndex }) => {
-      setTab(activeIndex)
-    },
-  ]
-}
 
 export const useDebounce = (value, timeout, onChange) => {
   const [innerValue, setInnerValue] = useState(value)

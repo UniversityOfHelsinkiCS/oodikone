@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router'
 import { Header, Segment, Tab } from 'semantic-ui-react'
 
-import { useTabs } from '@/common/hooks'
+import { useSemanticTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { TeacherDetails } from './TeacherDetails'
@@ -25,7 +25,7 @@ const TeachersTabs = () => {
   const location = useLocation()
   const { roles, iamGroups } = useGetAuthorizedUserQuery()
   const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('t_tab', 0, { location, replace })
+  const [tab, setTab] = useSemanticTabs('t_tab', 0, { location, replace })
   const panes = [pane('Statistics', TeacherStatistics, 'table')]
   if (hasFullAccessToTeacherData(roles, iamGroups)) {
     panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))

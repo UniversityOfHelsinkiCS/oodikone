@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 import { Segment, Tab } from 'semantic-ui-react'
 
-import { useTabs } from '@/common/hooks'
 import { useProgress } from '@/hooks/progress'
+import { useSemanticTabs } from '@/hooks/tabs'
 import { getCourseStats } from '@/redux/courseStats'
 import { AttemptsPane } from './panes/AttemptsPane'
 import { StudentsPane } from './panes/StudentsPane'
@@ -15,7 +15,7 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
   const navigate = useNavigate()
   const location = useLocation()
   const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('cs_tab', 0, { location, replace })
+  const [tab, setTab] = useSemanticTabs('cs_tab', 0, { location, replace })
   const { userHasAccessToAllStats } = primary
   const courseStats = useSelector(({ courseStats }) => courseStats)
   const { pending: loading } = courseStats

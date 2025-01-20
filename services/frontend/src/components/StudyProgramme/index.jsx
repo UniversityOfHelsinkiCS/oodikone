@@ -3,8 +3,8 @@ import { useParams, useLocation, useNavigate } from 'react-router'
 import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights, getUnifiedProgrammeName, isDefaultServiceProvider } from '@/common'
-import { useTabs } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useSemanticTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
@@ -35,7 +35,7 @@ export const StudyProgramme = () => {
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useTabs('p_tab', 0, { location, replace })
+  const [tab, setTab] = useSemanticTabs('p_tab', 0, { location, replace })
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
