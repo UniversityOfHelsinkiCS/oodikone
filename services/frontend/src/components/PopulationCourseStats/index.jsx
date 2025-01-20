@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
-import { useTabChangeAnalytics } from '@/common/hooks'
+import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { clearCourseStats } from '@/redux/courseStats'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'

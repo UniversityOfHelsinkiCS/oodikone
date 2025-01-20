@@ -6,23 +6,6 @@ import { useGetCurriculumPeriodsQuery } from '@/redux/curriculumPeriods'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
-export const useTabChangeAnalytics = () => {
-  const previousTabIndex = useRef(0)
-
-  const handleTabChange = useCallback(
-    (_, data) => {
-      const { activeIndex } = data
-
-      if (previousTabIndex.current !== activeIndex) {
-        previousTabIndex.current = activeIndex
-      }
-    },
-    [previousTabIndex]
-  )
-
-  return { handleTabChange }
-}
-
 // Use @/hooks/tabs for MUI components instead
 export const useTabs = (id, initialTab, { location, replace }) => {
   const [tab, setTab] = useState(-1)
