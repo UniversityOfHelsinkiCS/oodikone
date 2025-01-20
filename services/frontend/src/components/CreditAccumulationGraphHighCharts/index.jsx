@@ -8,9 +8,9 @@ import ReactHighstock from 'react-highcharts/ReactHighstock'
 import { Button, Radio } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
-import { useDeepMemo } from '@/common/hooks'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { useDeepMemo } from '@/hooks/deepMemo'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
 

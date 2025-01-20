@@ -3,12 +3,12 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 
-import { useDeepMemo } from '@/common/hooks'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { useDeepMemo } from '@/hooks/deepMemo'
 import { getPopulationSelectedStudentCourses } from '@/redux/populationSelectedStudentCourses'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 

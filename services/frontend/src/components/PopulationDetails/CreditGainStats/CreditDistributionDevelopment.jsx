@@ -10,10 +10,10 @@ import { useLocation } from 'react-router'
 import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
 import { generateGradientColors, getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
-import { useDeepMemo } from '@/common/hooks'
 import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useDeepMemo } from '@/hooks/deepMemo'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
 exporting(ReactHighcharts.Highcharts)

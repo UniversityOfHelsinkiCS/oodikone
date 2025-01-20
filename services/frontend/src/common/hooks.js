@@ -86,19 +86,6 @@ export const useDebounce = (value, timeout, onChange) => {
   return [innerValue, setValue, flush, dirty]
 }
 
-/**
- * This hook is similar to useMemo, but it does a deep comparison of the dependencies (using `isEqual` from Lodash).
- */
-export const useDeepMemo = (factory, dependencies) => {
-  const ref = useRef()
-
-  if (!ref.current || !isEqual(dependencies, ref.current.deps)) {
-    ref.current = { deps: dependencies, result: factory() }
-  }
-
-  return ref.current.result
-}
-
 export const useCurrentSemester = () => {
   const { data: semesterData } = useGetSemestersQuery()
   if (!semesterData) return null
