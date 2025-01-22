@@ -1,14 +1,14 @@
-import { Container } from '@mui/material'
+import { Container, Tab, Tabs } from '@mui/material'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useLocation } from 'react-router'
-import { Tab } from 'semantic-ui-react'
+import { useLocation } from 'react-router'
 
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/common'
 import { PageTitle } from '@/components/material/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useProgress } from '@/hooks/progress'
+import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -19,17 +19,9 @@ import { SearchForm } from './SearchForm'
 import { SingleCourseTab } from './SingleCourseTab'
 import { SummaryTab } from './SummaryTab'
 
-const MENU = {
-  SUM: 'Summary',
-  COURSE: 'Course',
-  QUERY: 'New query',
-  FACULTY: 'Faculty statistics',
-} as const
-
 export const CourseStatistics = () => {
   useTitle('Course statistics')
 
-  const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
@@ -39,9 +31,9 @@ export const CourseStatistics = () => {
   const singleCourseStats = courses.length === 1
   const initialCourseCode = courses[0] || ''
 
-  const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initialCourseCode)
   const { onProgress, progress } = useProgress(loading)
+  const [tab, handleTabChange, switchToTab] = useTabs(3)
 
   useEffect(() => {
     setSelected(initialCourseCode)
@@ -62,75 +54,21 @@ export const CourseStatistics = () => {
   useEffect(() => {
     if (statsIsEmpty) {
       setSelected(initialCourseCode)
-      setActiveIndex(0)
+      switchToTab(0)
     }
   }, [initialCourseCode, statsIsEmpty])
 
   const switchToCourse = (courseCode: string) => {
-    setActiveIndex(1)
+    switchToTab(0)
     setSelected(courseCode)
   }
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
-  const getPanes = () => {
-    let panes: any[] = [
-      {
-        menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={switchToCourse} />,
-      },
-      {
-        menuItem: MENU.COURSE,
-        render: () => (
-          <SingleCourseTab
-            selected={selected}
-            setSelected={setSelected}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ),
-      },
-    ]
-
-    if (userHasAccessToAllStats) {
-      panes = [
-        ...panes,
-        {
-          menuItem: MENU.FACULTY,
-          render: () => <FacultyLevelStatistics />,
-        },
-      ]
-    }
-
-    panes = [
-      ...panes,
-      {
-        menuItem: {
-          key: 'query',
-          content: MENU.QUERY,
-          icon: 'search',
-          position: 'right',
-          onClick: () => navigate('/coursestatistics'),
-        },
-        render: () => null,
-      },
-    ]
-
-    return !singleCourseStats ? panes : panes.filter(pane => pane.menuItem !== MENU.SUM)
-  }
-
-  const handleTabChange = (_: any, data: any) => {
-    const { activeIndex, panes } = data
-    if (panes[activeIndex].menuItem.key !== 'query') {
-      setActiveIndex(activeIndex)
-    }
-  }
-
   if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && fullStudyProgrammeRights.length < 1) {
     return <AccessDeniedMessage />
   }
-
-  const panes = getPanes()
 
   return (
     <Container maxWidth="lg">
@@ -138,12 +76,22 @@ export const CourseStatistics = () => {
       {statsIsEmpty || location.search === '' ? (
         <SearchForm onProgress={onProgress} progress={progress} />
       ) : (
-        <Tab
-          activeIndex={activeIndex}
-          menu={{ attached: false, borderless: false }}
-          onTabChange={handleTabChange}
-          panes={panes}
-        />
+        <>
+          <Tabs onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })} value={tab}>
+            <Tab data-cy="CourseTab" label="Course" />
+            <Tab data-cy="SummaryTab" disabled={singleCourseStats} label="Summary" />
+            <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />
+          </Tabs>
+          {tab === 0 && (
+            <SingleCourseTab
+              selected={selected}
+              setSelected={setSelected}
+              userHasAccessToAllStats={userHasAccessToAllStats}
+            />
+          )}
+          {tab === 1 && !singleCourseStats && <SummaryTab onClickCourse={switchToCourse} />}
+          {tab === 2 && userHasAccessToAllStats && <FacultyLevelStatistics />}
+        </>
       )}
     </Container>
   )
