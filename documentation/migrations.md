@@ -25,6 +25,9 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
 - Use **snake_case** in the actual database columns.
 - If a model has `underscored: true`, Sequelize automatically converts camelCase to snake_case in all queries. Otherwise, specify the column name explicitly.
 
+> [!IMPORTANT]  
+> The column name **in the database** (snake_case) must be used in the migration file, not the camelCase name from your model.
+
 ### Verifying the migration locally
 
 - Migrations are run automatically whenever the server restarts.
@@ -78,8 +81,7 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
 
    - Go to `updater/sis-updater-worker/src/db/migrations/`.
    - Name your file using the format described above (e.g. `20250122_00_add_column_to_table.js`).
-     > [!IMPORTANT]  
-     > The column name **in the database** (snake_case) must be used in the migration, not the camelCase name from your model.
+   - **Remember**: The column name **in the database** (snake_case) must be used in the migration file, not the camelCase name from your model.
 
 1. **Run and verify the migration:**
 
@@ -102,8 +104,7 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
    - Go to `services/backend/src/database/`.
    - Use `migrations_kone` (for `kone-db`) or `migrations_user` (for `user-db`).
    - Name the file using the same `YYYYMMDD_XX_description.js` format.
-     > [!IMPORTANT]  
-     > The column name **in the database** (snake_case) must be used in the migration, not the camelCase name from your model.
+   - **Remember**: The column name **in the database** (snake_case) must be used in the migration file, not the camelCase name from your model.
 
 1. **Run and verify the migration:**
 
