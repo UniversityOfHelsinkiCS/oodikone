@@ -7,8 +7,8 @@ import { Header, Icon, Item } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { SortableTable, row } from '@/components/SortableTable'
-import { defineCellColor, getSortableColumn, resolveGrades } from '@/pages/CourseStatistics/ResultTabs/panes/util'
 import { getCourseAlternatives } from '@/selectors/courseStats'
+import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 

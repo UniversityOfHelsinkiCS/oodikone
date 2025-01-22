@@ -7,9 +7,9 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
-import { AttemptsTable } from '../AttemptsTable'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 import { ProgrammeDropdown } from '../ProgrammeDropdown'
+import { AttemptsTable } from './AttemptsTable'
 import { DataExport } from './DataExport'
 
 // Certified JavaScript moment but basically this was crashing

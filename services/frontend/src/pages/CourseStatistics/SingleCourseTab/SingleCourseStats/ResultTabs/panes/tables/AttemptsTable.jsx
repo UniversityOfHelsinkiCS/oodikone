@@ -5,14 +5,8 @@ import { Link } from 'react-router'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
 import { SortableTable, row } from '@/components/SortableTable'
-import {
-  getGradeSpread,
-  getSortableColumn,
-  getThesisGradeSpread,
-  isThesisGrades,
-  resolveGrades,
-} from '@/pages/CourseStatistics/ResultTabs/panes/util'
 import { getCourseAlternatives } from '@/selectors/courseStats'
+import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
   stats.map(stat => {

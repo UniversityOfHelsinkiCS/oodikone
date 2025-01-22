@@ -10,9 +10,9 @@ import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/singleCourseStats'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
-import { ProgrammeDropdown } from '../ProgrammeDropdown'
-import { ResultTabs } from '../ResultTabs'
+import { ProgrammeDropdown } from '../../ProgrammeDropdown'
 import { countTotalStats } from './countTotalStats'
+import { ResultTabs } from './ResultTabs'
 import { YearFilter } from './YearFilter'
 
 const countFilteredStudents = (stat, filter) => {

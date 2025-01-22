@@ -4,7 +4,7 @@ import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { setSelectedCourse } from '@/redux/singleCourseStats'
 import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
-import { SingleCourseStats } from '../SingleCourseStats'
+import { SingleCourseStats } from './SingleCourseStats'
 
 const CourseSelector = ({ courses, selected, setSelected }) => {
   const dispatch = useDispatch()
