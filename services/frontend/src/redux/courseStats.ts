@@ -1,4 +1,5 @@
 import { callController } from '@/apiConnection/index'
+import { CourseStat } from '@/types/courseStat'
 import { actions, listreducer } from './common/listreducer'
 
 const prefix = 'COURSESTATS_'
@@ -24,8 +25,8 @@ export const getCourseStats = (
   return callController(route, prefix, [], 'get', params, params, onProgress)
 }
 
-const responseToObj = courseStats => {
-  const data = {}
+const responseToObj = (courseStats: Record<string, CourseStat>[]) => {
+  const data: Record<string, Record<string, CourseStat>> = {}
   courseStats.forEach(stat => {
     data[stat.unifyStats.coursecode] = stat
   })

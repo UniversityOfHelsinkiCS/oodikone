@@ -14,7 +14,7 @@ import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getCourseStats } from '@/redux/courseStats'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
-import { FacultyLevelStatistics } from './FacultyLevelStatistics'
+import { FacultyStatisticsTab } from './FacultyStatisticsTab'
 import { SearchForm } from './SearchForm'
 import { SingleCourseTab } from './SingleCourseTab'
 import { SummaryTab } from './SummaryTab'
@@ -90,7 +90,7 @@ export const CourseStatistics = () => {
             />
           )}
           {tab === 1 && !singleCourseStats && <SummaryTab onClickCourse={switchToCourse} />}
-          {tab === 2 && userHasAccessToAllStats && <FacultyLevelStatistics />}
+          {tab === 2 && userHasAccessToAllStats && <FacultyStatisticsTab />}
         </>
       )}
     </Container>
