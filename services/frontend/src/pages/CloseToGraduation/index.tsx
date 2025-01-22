@@ -17,10 +17,24 @@ import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { Language } from '@/shared/language'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
+
+const getFullLanguage = (languageCode: Language) => {
+  switch (languageCode) {
+    case 'fi':
+      return 'Finnish'
+    case 'sv':
+      return 'Swedish'
+    case 'en':
+      return 'English'
+    default:
+      return null
+  }
+}
 
 export const CloseToGraduation = () => {
   const { data: students } = useGetStudentsCloseToGraduationQuery()
@@ -88,6 +102,12 @@ export const CloseToGraduation = () => {
       {
         accessorKey: 'student.secondaryEmail',
         header: 'Secondary email',
+      },
+      {
+        accessorFn: row => getFullLanguage(row.student.preferredLanguage),
+        id: 'preferredLanguage',
+        header: 'Preferred language',
+        filterVariant: 'multi-select',
       },
       {
         accessorFn: row => getTextIn(row.faculty),
@@ -263,6 +283,7 @@ export const CloseToGraduation = () => {
     'student.phoneNumber': false,
     'student.email': false,
     'student.secondaryEmail': false,
+    preferredLanguage: false,
     semesterEnrollments: false,
   })
 

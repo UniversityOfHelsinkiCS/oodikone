@@ -31,6 +31,7 @@ type AccumulatorType = {
     email: string
     phoneNumber: string
     secondaryEmail: string
+    preferredLanguage: string
   }
   studyright: {
     startDate: Date
@@ -105,6 +106,7 @@ const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<str
     sis_person_id,
     email,
     phone_number: phoneNumber,
+    preferredLanguage,
     secondary_email: secondaryEmail,
   } = student
   return student.studyplans.reduce<AccumulatorType[]>((acc, studyPlan) => {
@@ -137,7 +139,7 @@ const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<str
     )
 
     acc.push({
-      student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail },
+      student: { studentNumber, name, sis_person_id, email, phoneNumber, secondaryEmail, preferredLanguage },
       studyright: {
         startDate: startOfStudyright,
         semesterEnrollments,
@@ -178,6 +180,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         'creditcount',
         'email',
         'phone_number',
+        'preferredLanguage',
         'secondary_email',
         'sis_person_id',
         'studentnumber',
