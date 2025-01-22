@@ -43,7 +43,11 @@ export const useTabs = (totalTabs: number) => {
     setTab(activeIndex)
   }
 
-  return [tab, handleChange] as const
+  const switchToTab = (newTab: number) => {
+    setTab(newTab)
+  }
+
+  return [tab, handleChange, switchToTab] as const
 }
 
 // ! To be deprecated, use useTabs for MUI components
