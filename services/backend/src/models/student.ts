@@ -69,6 +69,9 @@ export class Student extends Model<InferAttributes<Student>> {
   @Column(DataType.BOOLEAN)
   hasPersonalIdentityCode!: boolean
 
+  @Column(DataType.STRING)
+  preferredLanguage!: string
+
   @CreatedAt
   @Column(DataType.DATE)
   createdAt!: Date

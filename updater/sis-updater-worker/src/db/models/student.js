@@ -24,6 +24,7 @@ Student.init(
     gender_code: { type: STRING },
     sis_person_id: { type: STRING },
     hasPersonalIdentityCode: { type: BOOLEAN },
+    preferredLanguage: { type: STRING },
     createdAt: {
       type: DATE,
     },

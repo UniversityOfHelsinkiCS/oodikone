@@ -81,12 +81,15 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     date_of_birth,
     id,
     has_personal_identity_code,
+    preferred_language_urn,
   } = student
 
   // Filter out test student from oodi data
   if (student_number === '012023965') return null
 
   const gender_code = parseGender(gender_urn)
+
+  const preferredLanguage = preferred_language_urn?.slice(-2) ?? 'en'
 
   const citizenships = (student.citizenships ?? []).map(countryUrn => getCountry(countryUrn).name)
 
@@ -121,6 +124,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     citizenships,
     sis_person_id: id,
     hasPersonalIdentityCode: has_personal_identity_code,
+    preferredLanguage,
   }
 }
 
