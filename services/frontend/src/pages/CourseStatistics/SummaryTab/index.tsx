@@ -1,16 +1,20 @@
+import { Stack, Typography } from '@mui/material'
 import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
-import { Form, Header, Label, Segment } from 'semantic-ui-react'
+import { Form, Label } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Section } from '@/components/material/Section'
+import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
+import { AttemptData } from '@/types/attemptData'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { AttemptsTable } from './AttemptsTable'
-import { DataExport } from './DataExport'
+import { exportToExcel } from './export'
 
 // Certified JavaScript moment but basically this was crashing
 // since sometimes object like {en: ..., fi: ...., sv: ....}
@@ -28,17 +32,17 @@ const unObjectifyProperty = ({ obj, property }) => {
   return { ...obj, [property]: suspectField }
 }
 
-export const SummaryTab = ({ onClickCourse }) => {
+export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: string) => void }) => {
   const { roles, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
   const dispatch = useDispatch()
   const programmes = useSelector(state => getAllStudyProgrammes(state))
-  const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)
-  const statistics = useSelector(state => summaryStatistics(state, userHasAccessToAllStats))
-  const queryInfo = useSelector(state => getQueryInfo(state))
-
+  const form = useSelector((state: RootState) => state.courseSummaryForm)
+  const statistics = useSelector((state: RootState) => summaryStatistics(state))
+  const queryInfo = useSelector((state: RootState) => getQueryInfo(state))
   const { getTextIn } = useLanguage()
+
   const handleChange = (_, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
     if ((!form.programmes.includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
@@ -47,7 +51,7 @@ export const SummaryTab = ({ onClickCourse }) => {
     dispatch(setValue(name, selected))
   }
 
-  const data = statistics.map(stat => {
+  const data: AttemptData[] = statistics.map(stat => {
     const { coursecode, name, realisations, summary } = stat
     const { passed, failed, passrate } = summary
     return {
@@ -69,45 +73,43 @@ export const SummaryTab = ({ onClickCourse }) => {
     .map(programme => ({ ...programme, name: programme.text }))
 
   return (
-    <div>
-      <Segment>
-        <Form>
-          {userHasAccessToAllStats && (
-            <>
-              <Header as="h4">Filter statistics by study programmes</Header>
-              <ProgrammeDropdown
-                label="Study programmes"
-                name="programmes"
-                onChange={handleChange}
-                options={options}
-                value={form.programmes}
-              />
-            </>
+    <Section>
+      <Stack gap={2}>
+        <Section>
+          <Form>
+            {userHasAccessToAllStats && (
+              <>
+                <Typography component="h3" variant="h6">
+                  Filter statistics by study programmes
+                </Typography>
+                <ProgrammeDropdown
+                  label="Study programmes"
+                  name="programmes"
+                  onChange={handleChange}
+                  options={options}
+                  value={form.programmes}
+                />
+              </>
+            )}
+            <Form.Field>
+              <label>Timeframe</label>
+              <Label.Group>
+                {queryInfo.timeframe.map(objBeforeUbObjectifying => {
+                  const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
+                  const { code, name } = obj
+                  return <Label content={name} key={code} />
+                })}
+              </Label.Group>
+            </Form.Field>
+          </Form>
+        </Section>
+        <Section exportOnClick={() => exportToExcel(data)}>
+          <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
+          {!userHasAccessToAllStats && (
+            <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
           )}
-          <Form.Field>
-            <label>Timeframe</label>
-            <Label.Group>
-              {queryInfo.timeframe.map(objBeforeUbObjectifying => {
-                const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
-                const { code, name } = obj
-                return <Label content={name} key={code} />
-              })}
-            </Label.Group>
-          </Form.Field>
-        </Form>
-      </Segment>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <DataExport data={data} />
-      </div>
-      <AttemptsTable
-        categoryName="Course"
-        data={data}
-        onClickCourse={onClickCourse}
-        userHasAccessToAllStats={userHasAccessToAllStats}
-      />
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
-      )}
-    </div>
+        </Section>
+      </Stack>
+    </Section>
   )
 }
