@@ -1,7 +1,6 @@
-import { Stack, Typography } from '@mui/material'
+import { Chip, Grid2 as Grid, Stack, Typography } from '@mui/material'
 import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
-import { Form, Label } from 'semantic-ui-react'
 
 import { getFullStudyProgrammeRights } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -11,6 +10,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
+import { DropdownOption } from '@/types/dropdownOption'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { AttemptsTable } from './AttemptsTable'
@@ -43,12 +43,12 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const queryInfo = useSelector((state: RootState) => getQueryInfo(state))
   const { getTextIn } = useLanguage()
 
-  const handleChange = (_, { name, value }) => {
-    let selected = [...value].filter(v => v !== ALL.value)
-    if ((!form.programmes.includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
+  const handleChange = (newProgrammes: string[]) => {
+    let selected = [...newProgrammes].filter(programme => programme !== ALL.value)
+    if ((!form.programmes.includes(ALL.value) && newProgrammes.includes(ALL.value)) || newProgrammes.length === 0) {
       selected = [ALL.value]
     }
-    dispatch(setValue(name, selected))
+    dispatch(setValue('programmes', selected))
   }
 
   const data: AttemptData[] = statistics.map(stat => {
@@ -66,7 +66,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
     }
   })
 
-  const options = programmes
+  const options: DropdownOption[] = programmes
     .map(programme => ({ ...programme, size: new Set(flatten(Object.values(programme.students))).size }))
     .filter(programme => programme.size > 0)
     .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
@@ -76,37 +76,40 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
     <Section>
       <Stack gap={2}>
         <Section>
-          <Form>
+          <Stack gap={1}>
             {userHasAccessToAllStats && (
-              <>
+              <Stack gap={1}>
                 <Typography component="h3" variant="h6">
                   Filter statistics by study programmes
                 </Typography>
                 <ProgrammeDropdown
                   label="Study programmes"
-                  name="programmes"
                   onChange={handleChange}
                   options={options}
                   value={form.programmes}
                 />
-              </>
+              </Stack>
             )}
-            <Form.Field>
-              <label>Timeframe</label>
-              <Label.Group>
-                {queryInfo.timeframe.map(objBeforeUbObjectifying => {
-                  const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
+            <Stack gap={1}>
+              <Typography component="h3" variant="h6">
+                Timeframe
+              </Typography>
+              <Grid container spacing={1}>
+                {queryInfo.timeframe.map(objBeforeUnObjectifying => {
+                  const obj = unObjectifyProperty({ obj: objBeforeUnObjectifying, property: 'name' })
                   const { code, name } = obj
-                  return <Label content={name} key={code} />
+                  return <Chip key={code} label={name} size="small" />
                 })}
-              </Label.Group>
-            </Form.Field>
-          </Form>
+              </Grid>
+            </Stack>
+          </Stack>
         </Section>
         <Section exportOnClick={() => exportToExcel(data)}>
           <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
           {!userHasAccessToAllStats && (
-            <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
+            <Typography color="text.secondary" component="span" variant="body2">
+              * Years with 5 students or fewer are NOT included in the total
+            </Typography>
           )}
         </Section>
       </Stack>

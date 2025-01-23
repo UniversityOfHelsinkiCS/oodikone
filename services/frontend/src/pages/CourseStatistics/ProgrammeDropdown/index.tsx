@@ -1,49 +1,42 @@
+import { Autocomplete, Chip, TextField } from '@mui/material'
 import { orderBy } from 'lodash'
-import { Form } from 'semantic-ui-react'
 
+import { DropdownOption } from '@/types/dropdownOption'
 import { DropdownItem } from './DropdownItem'
 
-type Option = {
-  description: string
-  key: string
-  name: string
-  size: number
-  students: string[]
-  text: string
-  value: string
-}
-
-interface ProgrammeDropdownProps {
+export const ProgrammeDropdown = ({
+  label,
+  onChange,
+  options,
+  placeholder,
+  value,
+}: {
   label: string
-  name: string
-  onChange: () => void
-  options: Option[]
+  onChange: (newProgrammes: string[]) => void
+  options: DropdownOption[]
   placeholder?: string
   value: string[]
-}
-
-export const ProgrammeDropdown = ({ label, name, onChange, options, placeholder, value }: ProgrammeDropdownProps) => {
+}) => {
   return (
-    <Form.Dropdown
-      fluid
-      label={label}
+    <Autocomplete
+      getOptionLabel={option => option.text}
+      isOptionEqualToValue={(option, value) => option.value === value.value}
       multiple
-      name={name}
-      onChange={onChange}
-      options={orderBy(options, ['size'], ['desc']).map(option => ({
-        key: option.key,
-        content: (
-          <DropdownItem code={option.key} description={option.description} name={option.text} size={option.size} />
-        ),
-        text: option.text,
-        value: option.value,
-      }))}
-      placeholder={placeholder}
-      search
-      selectOnBlur={false}
-      selectOnNavigation={false}
-      selection
-      value={value}
+      onChange={(_event, newProgrammes) => onChange(newProgrammes.map(value => value.value))}
+      options={orderBy(options, ['size'], ['desc'])}
+      renderInput={params => <TextField {...params} label={label} placeholder={placeholder} variant="outlined" />}
+      renderOption={(props, opt) => {
+        const option = opt as DropdownOption
+        return (
+          <li {...props} key={option.value + option.key}>
+            <DropdownItem code={option.key} description={option.description} name={option.text} size={option.size} />
+          </li>
+        )
+      }}
+      renderTags={(tagValue, getTagProps) =>
+        tagValue.map((option, index) => <Chip {...getTagProps({ index })} key={option.value} label={option.text} />)
+      }
+      value={value.map(val => options.find(option => option.value === val) ?? { text: '', value: '' })}
     />
   )
 }
