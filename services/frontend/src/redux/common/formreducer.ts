@@ -1,5 +1,5 @@
-export const formreducer = (prefix, initvals = {}) => {
-  const initial = { ...initvals }
+export const formreducer = (prefix: string, initialValue: Record<string, any> = {}) => {
+  const initial = { ...initialValue }
 
   const actions = {
     CLEAR: `${prefix}_CLEAR`,
@@ -22,6 +22,7 @@ export const formreducer = (prefix, initvals = {}) => {
 
   const setValue = (name, value) => ({ type: actions.SET, name, value })
   const clear = () => ({ type: actions.CLEAR })
+
   return {
     reducer,
     setValue,
