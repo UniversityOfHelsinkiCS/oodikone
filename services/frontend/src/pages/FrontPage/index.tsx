@@ -2,17 +2,13 @@ import { Box, Button, Container, Divider, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
-import {
-  checkUserAccess,
-  filterInternalReleases,
-  getFullStudyProgrammeRights,
-  isDefaultServiceProvider,
-} from '@/common'
+import { filterInternalReleases, isDefaultServiceProvider } from '@/common'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { Release } from '@/shared/types'
+import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
 import { FeatureItem } from './FeatureItem'
 import { MaterialInfoCard } from './MaterialInfoCard'
 import { ReleaseItem } from './ReleaseItem'

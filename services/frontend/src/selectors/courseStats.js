@@ -134,8 +134,6 @@ export const getAllStudyProgrammes = createSelector(
   }
 )
 
-const getUserHasAccessToAllStatsFromProps = (_, userHasAccessToAllStats) => userHasAccessToAllStats
-
 const calculatePassRate = (passed, failed) => {
   const passRate = (100 * passed) / (passed + failed)
   return passRate ? passRate.toFixed(2) : null
@@ -175,10 +173,12 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
 }
 
 const summaryStatistics = createSelector(
-  getCourseStats,
-  getAllStudyProgrammes,
-  courseSummaryFormProgrammesSelector,
-  getUserHasAccessToAllStatsFromProps,
+  [
+    getCourseStats,
+    getAllStudyProgrammes,
+    courseSummaryFormProgrammesSelector,
+    (_, userHasAccessToAllStats) => userHasAccessToAllStats,
+  ],
   (courseStats, programmes, programmeCodes, userHasAccessToAllStats) => {
     const filteredProgrammes = programmes.filter(programme => programmeCodes.includes(programme.key))
     const students = new Set(
@@ -207,7 +207,7 @@ const summaryStatistics = createSelector(
   }
 )
 
-export const selectSummaryStatistics = (state, userHasAccessToAllStats) => {
+export const getSummaryStatistics = (state, userHasAccessToAllStats) => {
   // * Awful hack for satisfying TypeScript
   // ? Can userHasAccessToAllStats be passed directly to summaryStatistics?
   return summaryStatistics.resultFunc(

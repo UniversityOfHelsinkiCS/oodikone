@@ -1,4 +1,4 @@
-import { filter, intersection, maxBy, orderBy, range } from 'lodash'
+import { filter, maxBy, orderBy, range } from 'lodash'
 import moment from 'moment'
 
 import irtomikko from '@/assets/irtomikko.png'
@@ -15,10 +15,6 @@ export const textAndDescriptionSearch = (dropDownOptions, param) =>
 export const images = {
   toskaLogo,
   irtomikko,
-}
-
-export const checkUserAccess = (requiredRoles, roles) => {
-  return intersection(requiredRoles, roles).length > 0
 }
 
 export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
@@ -351,9 +347,6 @@ export const generateGradientColors = steps => {
   }
   return gradientColors
 }
-
-export const getFullStudyProgrammeRights = programmeRights =>
-  programmeRights ? programmeRights.filter(({ limited }) => !limited).map(({ code }) => code) : []
 
 export const isNewStudyProgramme = programmeCode => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
 

@@ -2,16 +2,15 @@ import { Chip, Grid2 as Grid, Stack, Typography } from '@mui/material'
 import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { getFullStudyProgrammeRights } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
-import { ALL, getAllStudyProgrammes, getQueryInfo, selectSummaryStatistics } from '@/selectors/courseStats'
+import { ALL, getAllStudyProgrammes, getQueryInfo, getSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
-import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
+import { getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
 import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { AttemptsTable } from './AttemptsTable'
 import { exportToExcel } from './export'
@@ -39,7 +38,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const dispatch = useDispatch()
   const programmes = useSelector(state => getAllStudyProgrammes(state))
   const form = useSelector((state: RootState) => state.courseSummaryForm)
-  const statistics = useSelector((state: RootState) => selectSummaryStatistics(state, userHasAccessToAllStats))
+  const statistics = useSelector((state: RootState) => getSummaryStatistics(state, userHasAccessToAllStats))
   const queryInfo = useSelector((state: RootState) => getQueryInfo(state))
   const { getTextIn } = useLanguage()
 

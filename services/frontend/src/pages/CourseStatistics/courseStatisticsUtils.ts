@@ -1,7 +1,5 @@
 import moment from 'moment'
 
-import { Role } from '@/shared/types'
-
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
 
@@ -38,8 +36,4 @@ export const getActiveYears = course => {
   }
 
   return `${startYearText} — ${endYearText}`
-}
-
-export const userHasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
-  return roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || studyProgrammeRights.length > 0
 }

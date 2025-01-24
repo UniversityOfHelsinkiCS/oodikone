@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
-import { getFullStudyProgrammeRights, getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
+import { getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -35,6 +35,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { makePopulationsToData } from '@/selectors/populationDetails'
+import { getFullStudyProgrammeRights } from '@/util/access'
 
 const getYearText = year => {
   if (year === 'All') return ''
