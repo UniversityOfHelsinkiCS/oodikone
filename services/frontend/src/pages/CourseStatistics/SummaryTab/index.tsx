@@ -8,7 +8,7 @@ import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
-import { ALL, getAllStudyProgrammes, getQueryInfo, summaryStatistics } from '@/selectors/courseStats'
+import { ALL, getAllStudyProgrammes, getQueryInfo, selectSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
 import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
@@ -39,7 +39,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const dispatch = useDispatch()
   const programmes = useSelector(state => getAllStudyProgrammes(state))
   const form = useSelector((state: RootState) => state.courseSummaryForm)
-  const statistics = useSelector((state: RootState) => summaryStatistics(state))
+  const statistics = useSelector((state: RootState) => selectSummaryStatistics(state, userHasAccessToAllStats))
   const queryInfo = useSelector((state: RootState) => getQueryInfo(state))
   const { getTextIn } = useLanguage()
 

@@ -5,6 +5,7 @@ const courseStatsSelector = state => state.courseStats.data
 const openOrRegularSelector = state => state.courseSearch.openOrRegular
 const singleCourseStatsSelector = state => state.singleCourseStats
 const courseSummaryFormProgrammesSelector = state => state.courseSummaryForm.programmes
+const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
 export const getCourseStats = createSelector(
   [courseStatsSelector, openOrRegularSelector],
@@ -30,6 +31,7 @@ export const getCourseAlternatives = createSelector(
     return courseStats[singleCourseStats.selectedCourse][openOrRegular].alternatives
   }
 )
+
 export const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
   const availableStats = {}
 
@@ -44,8 +46,6 @@ export const getAvailableStats = createSelector([courseStatsSelector], courseSta
   })
   return availableStats
 })
-
-const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
 export const getQueryInfo = createSelector([getCourseStats], stats => {
   const courseStats = Object.values(stats)
@@ -174,7 +174,7 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
   return summary
 }
 
-export const summaryStatistics = createSelector(
+const summaryStatistics = createSelector(
   getCourseStats,
   getAllStudyProgrammes,
   courseSummaryFormProgrammesSelector,
@@ -206,6 +206,17 @@ export const summaryStatistics = createSelector(
     })
   }
 )
+
+export const selectSummaryStatistics = (state, userHasAccessToAllStats) => {
+  // * Awful hack for satisfying TypeScript
+  // ? Can userHasAccessToAllStats be passed directly to summaryStatistics?
+  return summaryStatistics.resultFunc(
+    getCourseStats(state),
+    getAllStudyProgrammes(state),
+    courseSummaryFormProgrammesSelector(state),
+    userHasAccessToAllStats
+  )
+}
 
 export const getCourses = createSelector(getCourseStats, stats =>
   Object.values(stats).map(({ name, coursecode: code }) => ({
