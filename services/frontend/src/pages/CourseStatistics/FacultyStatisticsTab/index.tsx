@@ -3,7 +3,6 @@ import { flatten, uniq } from 'lodash'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { CourseStat } from '@/types/courseStat'
 import { CourseTable } from './CourseTable'
@@ -40,32 +39,30 @@ export const FacultyStatisticsTab = () => {
   ))
 
   return (
-    <Section>
-      <Stack gap={2}>
-        <FormControl fullWidth>
-          <InputLabel id="academic-year-select-label">Select academic year</InputLabel>
-          <Select
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 200,
-                },
+    <Stack gap={2}>
+      <FormControl fullWidth>
+        <InputLabel id="academic-year-select-label">Select academic year</InputLabel>
+        <Select
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 200,
               },
-            }}
-            label="Select academic year"
-            labelId="academic-year-select-label"
-            onChange={event => setSelectedYear(event.target.value)}
-            value={selectedYear}
-          >
-            {dropdownOptions.map(({ key, text, value }) => (
-              <MenuItem key={key} value={value}>
-                {text}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        {courseTables}
-      </Stack>
-    </Section>
+            },
+          }}
+          label="Select academic year"
+          labelId="academic-year-select-label"
+          onChange={event => setSelectedYear(event.target.value)}
+          value={selectedYear}
+        >
+          {dropdownOptions.map(({ key, text, value }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {courseTables}
+    </Stack>
   )
 }

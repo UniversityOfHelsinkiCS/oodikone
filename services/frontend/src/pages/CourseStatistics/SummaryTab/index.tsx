@@ -72,46 +72,44 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
     .map(programme => ({ ...programme, name: programme.text }))
 
   return (
-    <Section>
-      <Stack gap={2}>
-        <Section>
-          <Stack gap={1}>
-            {userHasAccessToAllStats && (
-              <Stack gap={1}>
-                <Typography component="h3" variant="h6">
-                  Filter statistics by study programmes
-                </Typography>
-                <ProgrammeDropdown
-                  label="Study programmes"
-                  onChange={handleChange}
-                  options={options}
-                  value={form.programmes}
-                />
-              </Stack>
-            )}
+    <Stack gap={2}>
+      <Section>
+        <Stack gap={1}>
+          {userHasAccessToAllStats && (
             <Stack gap={1}>
               <Typography component="h3" variant="h6">
-                Timeframe
+                Filter statistics by study programmes
               </Typography>
-              <Grid container spacing={1}>
-                {queryInfo.timeframe.map(objBeforeUnObjectifying => {
-                  const obj = unObjectifyProperty({ obj: objBeforeUnObjectifying, property: 'name' })
-                  const { code, name } = obj
-                  return <Chip key={code} label={name} size="small" />
-                })}
-              </Grid>
+              <ProgrammeDropdown
+                label="Study programmes"
+                onChange={handleChange}
+                options={options}
+                value={form.programmes}
+              />
             </Stack>
-          </Stack>
-        </Section>
-        <Section exportOnClick={() => exportToExcel(data)}>
-          <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
-          {!userHasAccessToAllStats && (
-            <Typography color="text.secondary" component="span" variant="body2">
-              * Years with 5 students or fewer are NOT included in the total
-            </Typography>
           )}
-        </Section>
-      </Stack>
-    </Section>
+          <Stack gap={1}>
+            <Typography component="h3" variant="h6">
+              Timeframe
+            </Typography>
+            <Grid container spacing={1}>
+              {queryInfo.timeframe.map(objBeforeUnObjectifying => {
+                const obj = unObjectifyProperty({ obj: objBeforeUnObjectifying, property: 'name' })
+                const { code, name } = obj
+                return <Chip key={code} label={name} size="small" />
+              })}
+            </Grid>
+          </Stack>
+        </Stack>
+      </Section>
+      <Section exportOnClick={() => exportToExcel(data)}>
+        <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
+        {!userHasAccessToAllStats && (
+          <Typography color="text.secondary" component="span" variant="body2">
+            * Years with 5 students or fewer are NOT included in the total
+          </Typography>
+        )}
+      </Section>
+    </Stack>
   )
 }
