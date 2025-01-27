@@ -36,7 +36,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
   const dispatch = useDispatch()
-  const programmes = useSelector(state => getAllStudyProgrammes(state))
+  const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
   const form = useSelector((state: RootState) => state.courseSummaryForm)
   const statistics = useSelector((state: RootState) => getSummaryStatistics(state, userHasAccessToAllStats))
   const { getTextIn } = useLanguage()

@@ -3,6 +3,6 @@ import { formreducer } from './common/formreducer'
 
 const prefix = 'COURSE_SUMMARY_FORM'
 
-const reducer = formreducer(prefix, { programmes: [ALL.value] })
+const courseSummaryreducer = formreducer(prefix, { programmes: [ALL.value] })
 
-export const { reducer: coursesSummaryFormReducer, setValue } = reducer
+export const { reducer, setValue } = courseSummaryreducer

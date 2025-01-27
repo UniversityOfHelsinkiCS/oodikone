@@ -1,7 +1,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
 import { useDispatch } from 'react-redux'
 
-import { setSelectedCourse } from '@/redux/singleCourseStats'
+import { setSelectedCourse } from '@/redux/selectedCourse'
 
 export const CourseSelector = ({
   courses,

@@ -1,11 +1,12 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { flatten } from 'lodash'
 
-const courseStatsSelector = state => state.courseStats.data
-const openOrRegularSelector = state => state.courseSearch.openOrRegular
-const singleCourseStatsSelector = state => state.singleCourseStats
-const courseSummaryFormProgrammesSelector = state => state.courseSummaryForm.programmes
-const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
+import { RootState } from '@/redux'
+
+const courseStatsSelector = (state: RootState) => state.courseStats.data
+const openOrRegularSelector = (state: RootState) => state.courseSearch.openOrRegular
+const courseSummaryFormProgrammesSelector = (state: RootState) => state.courseSummaryForm.programmes
+const selectedCourseSelector = (state: RootState) => state.selectedCourse.selectedCourse
 
 export const getCourseStats = createSelector(
   [courseStatsSelector, openOrRegularSelector],
@@ -26,9 +27,12 @@ export const getCourseStats = createSelector(
 )
 
 export const getCourseAlternatives = createSelector(
-  [courseStatsSelector, openOrRegularSelector, singleCourseStatsSelector],
-  (courseStats, openOrRegular, singleCourseStats) => {
-    return courseStats[singleCourseStats.selectedCourse][openOrRegular].alternatives
+  [courseStatsSelector, openOrRegularSelector, selectedCourseSelector],
+  (courseStats, openOrRegular, selectedCourse) => {
+    if (!selectedCourse) {
+      return []
+    }
+    return courseStats[selectedCourse][openOrRegular].alternatives
   }
 )
 
@@ -52,7 +56,7 @@ export const ALL = {
   value: 'ALL',
   text: 'All',
   description: 'All students combined',
-}
+} as const
 
 const mergeStudents = (students1, students2) => {
   Object.keys(students2).forEach(k => {
@@ -192,7 +196,7 @@ const summaryStatistics = createSelector(
   }
 )
 
-export const getSummaryStatistics = (state, userHasAccessToAllStats) => {
+export const getSummaryStatistics = (state: RootState, userHasAccessToAllStats: boolean) => {
   // * Awful hack for satisfying TypeScript
   // ? Can userHasAccessToAllStats be passed directly to summaryStatistics?
   return summaryStatistics.resultFunc(

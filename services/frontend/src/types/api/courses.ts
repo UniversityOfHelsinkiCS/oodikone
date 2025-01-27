@@ -1,4 +1,5 @@
 import { Name } from '@/shared/types'
+import { CourseStat } from '@/types/courseStat'
 
 export type GetCourseSearchResultResponse = {
   courses: Array<{
@@ -22,4 +23,16 @@ export type GetCourseSearchResultRequest = {
   name?: string
   code?: string
   combineSubstitutions?: boolean
+}
+
+export type GetSingleCourseStatsResponse = {
+  openStats: CourseStat
+  regularStats: CourseStat
+  unifyStats: CourseStat
+}
+
+export type GetSingleCourseStatsRequest = {
+  courseCodes: string[]
+  separate: boolean
+  combineSubstitutions: boolean
 }
