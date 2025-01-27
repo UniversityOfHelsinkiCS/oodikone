@@ -30,7 +30,7 @@ const CourseLabel = ({ code, name, primary }) => (
   </Label>
 )
 
-export const SingleCourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
+export const CourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
   const { getTextIn } = useLanguage()
   const stats = useSelector(getCourseStats)
   const availableStats = useSelector(getAvailableStats)

@@ -13,9 +13,9 @@ import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getCourseStats } from '@/redux/courseStats'
 import { checkUserAccess, getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
+import { CourseTab } from './CourseTab'
 import { FacultyStatisticsTab } from './FacultyStatisticsTab'
 import { SearchForm } from './SearchForm'
-import { SingleCourseTab } from './SingleCourseTab'
 import { SummaryTab } from './SummaryTab'
 
 export const CourseStatistics = () => {
@@ -82,7 +82,7 @@ export const CourseStatistics = () => {
             <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />
           </Tabs>
           {tab === 0 && (
-            <SingleCourseTab
+            <CourseTab
               selected={selected}
               setSelected={setSelected}
               userHasAccessToAllStats={userHasAccessToAllStats}

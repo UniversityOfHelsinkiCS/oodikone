@@ -9,7 +9,6 @@ import { useSemanticTabs } from '@/hooks/tabs'
 import { getCourseStats } from '@/redux/courseStats'
 import { AttemptsPane } from './panes/AttemptsPane'
 import { StudentsPane } from './panes/StudentsPane'
-import './resultTabs.css'
 
 export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
   const navigate = useNavigate()
