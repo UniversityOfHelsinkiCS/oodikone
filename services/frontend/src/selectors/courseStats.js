@@ -117,6 +117,9 @@ export const getAllStudyProgrammes = createSelector(
 )
 
 const calculatePassRate = (passed, failed) => {
+  if (passed === 0 && failed > 0) {
+    return '0.00'
+  }
   const passRate = (100 * passed) / (passed + failed)
   return passRate ? passRate.toFixed(2) : null
 }
