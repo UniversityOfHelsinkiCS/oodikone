@@ -6,7 +6,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { setValue } from '@/redux/coursesSummaryForm'
+import { setProgrammes } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
@@ -46,7 +46,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
     if ((!form.programmes.includes(ALL.value) && newProgrammes.includes(ALL.value)) || newProgrammes.length === 0) {
       selected = [ALL.value]
     }
-    dispatch(setValue('programmes', selected))
+    dispatch(setProgrammes(selected))
   }
 
   const data: AttemptData[] = statistics.map(stat => {

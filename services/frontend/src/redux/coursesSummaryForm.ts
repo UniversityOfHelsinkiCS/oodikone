@@ -1,8 +1,19 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
 import { ALL } from '@/selectors/courseStats'
-import { formreducer } from './common/formreducer'
 
-const prefix = 'COURSE_SUMMARY_FORM'
+const initialState: { programmes: string[] } = { programmes: [ALL.value] }
 
-const courseSummaryreducer = formreducer(prefix, { programmes: [ALL.value] })
+const coursesSummaryFormSlice = createSlice({
+  name: 'coursesSummaryForm',
+  initialState,
+  reducers: {
+    setProgrammes(state, action: PayloadAction<string[]>) {
+      state.programmes = action.payload
+    },
+  },
+})
 
-export const { reducer, setValue } = courseSummaryreducer
+export const { setProgrammes } = coursesSummaryFormSlice.actions
+
+export const { reducer } = coursesSummaryFormSlice
