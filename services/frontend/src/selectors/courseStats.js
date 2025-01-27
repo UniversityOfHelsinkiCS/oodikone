@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { flatten, sortBy } from 'lodash'
+import { flatten } from 'lodash'
 
 const courseStatsSelector = state => state.courseStats.data
 const openOrRegularSelector = state => state.courseSearch.openOrRegular
@@ -45,24 +45,6 @@ export const getAvailableStats = createSelector([courseStatsSelector], courseSta
     }
   })
   return availableStats
-})
-
-export const getQueryInfo = createSelector([getCourseStats], stats => {
-  const courseStats = Object.values(stats)
-  const semesters = {}
-  const courses = []
-  courseStats.forEach(course => {
-    courses.push({
-      code: course.coursecode,
-      name: course.name,
-      alternatives: course.alternatives,
-    })
-    course.statistics.forEach(({ name, code }) => {
-      semesters[code] = { name, code }
-    })
-  })
-  const timeframe = sortBy(Object.values(semesters), 'code')
-  return { courses, timeframe }
 })
 
 export const ALL = {

@@ -76,7 +76,11 @@ export const CourseStatistics = () => {
         <SearchForm onProgress={onProgress} progress={progress} />
       ) : (
         <>
-          <Tabs onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })} value={tab}>
+          <Tabs
+            onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })}
+            sx={{ marginBottom: 2 }}
+            value={tab}
+          >
             <Tab data-cy="CourseTab" label="Course" />
             <Tab data-cy="SummaryTab" disabled={singleCourseStats} label="Summary" />
             <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />

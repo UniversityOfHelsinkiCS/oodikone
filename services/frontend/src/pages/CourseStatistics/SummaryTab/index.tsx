@@ -1,4 +1,4 @@
-import { Chip, Grid2 as Grid, Stack, Typography } from '@mui/material'
+import { Stack, Typography } from '@mui/material'
 import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -7,7 +7,7 @@ import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setValue } from '@/redux/coursesSummaryForm'
-import { ALL, getAllStudyProgrammes, getQueryInfo, getSummaryStatistics } from '@/selectors/courseStats'
+import { ALL, getAllStudyProgrammes, getSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
 import { getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
@@ -20,7 +20,7 @@ import { exportToExcel } from './export'
 // was being passed to React which is not legal but then again
 // it works sometimes? so doing this to make sure while fixing
 // the crash the realisations that worked will keep working
-const unObjectifyProperty = ({ obj, property }) => {
+const unObjectifyProperty = ({ obj, property }: { obj: object; property: string }) => {
   const suspectField = obj[property]
   if (typeof suspectField === 'object' && suspectField !== null) {
     if (suspectField.en) {
@@ -39,7 +39,6 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const programmes = useSelector(state => getAllStudyProgrammes(state))
   const form = useSelector((state: RootState) => state.courseSummaryForm)
   const statistics = useSelector((state: RootState) => getSummaryStatistics(state, userHasAccessToAllStats))
-  const queryInfo = useSelector((state: RootState) => getQueryInfo(state))
   const { getTextIn } = useLanguage()
 
   const handleChange = (newProgrammes: string[]) => {
@@ -73,35 +72,16 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
 
   return (
     <Stack gap={2}>
-      <Section>
-        <Stack gap={1}>
-          {userHasAccessToAllStats && (
-            <Stack gap={1}>
-              <Typography component="h3" variant="h6">
-                Filter statistics by study programmes
-              </Typography>
-              <ProgrammeDropdown
-                label="Study programmes"
-                onChange={handleChange}
-                options={options}
-                value={form.programmes}
-              />
-            </Stack>
-          )}
-          <Stack gap={1}>
-            <Typography component="h3" variant="h6">
-              Timeframe
-            </Typography>
-            <Grid container spacing={1}>
-              {queryInfo.timeframe.map(objBeforeUnObjectifying => {
-                const obj = unObjectifyProperty({ obj: objBeforeUnObjectifying, property: 'name' })
-                const { code, name } = obj
-                return <Chip key={code} label={name} size="small" />
-              })}
-            </Grid>
-          </Stack>
-        </Stack>
-      </Section>
+      <Stack gap={1}>
+        {userHasAccessToAllStats && (
+          <ProgrammeDropdown
+            label="Select study programmes"
+            onChange={handleChange}
+            options={options}
+            value={form.programmes}
+          />
+        )}
+      </Stack>
       <Section exportOnClick={() => exportToExcel(data)}>
         <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
         {!userHasAccessToAllStats && (
