@@ -1,43 +1,29 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { Divider, Form, Header, Label, Segment } from 'semantic-ui-react'
+import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material'
+import { useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { setSelectedCourse } from '@/redux/singleCourseStats'
+import { Section } from '@/components/material/Section'
 import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
+import { CourseLabel } from './CourseLabel'
+import { CourseSelector } from './CourseSelector'
 import { SingleCourseStats } from './SingleCourseStats'
 
-const CourseSelector = ({ courses, selected, setSelected }) => {
-  const dispatch = useDispatch()
-  const onCourseChange = (_, { value }) => {
-    setSelected(value)
-    dispatch(setSelectedCourse(value))
-  }
-
-  return (
-    <>
-      <Header as="h4">Select course</Header>
-      <Form>
-        <Form.Select data-cy="course-selector" fluid onChange={onCourseChange} options={courses} value={selected} />
-      </Form>
-      <Divider />
-    </>
-  )
-}
-
-const CourseLabel = ({ code, name, primary }) => (
-  <Label color={primary ? 'blue' : undefined} size="large" style={{ marginBottom: 5, marginRight: 5 }}>
-    {code} {name}
-  </Label>
-)
-
-export const CourseTab = ({ selected, setSelected, userHasAccessToAllStats }) => {
+export const CourseTab = ({
+  selected,
+  setSelected,
+  userHasAccessToAllStats,
+}: {
+  selected: string
+  setSelected: (courseCode: string) => void
+  userHasAccessToAllStats: boolean
+}) => {
   const { getTextIn } = useLanguage()
   const stats = useSelector(getCourseStats)
   const availableStats = useSelector(getAvailableStats)
   const courses = useSelector(getCourses).map(({ code, name }) => ({
-    key: code,
-    value: code,
-    text: `${getTextIn(name)} (${code})`,
+    key: code as string,
+    code: code as string,
+    name: getTextIn(name)!,
   }))
 
   if (!stats[selected]) {
@@ -47,24 +33,41 @@ export const CourseTab = ({ selected, setSelected, userHasAccessToAllStats }) =>
   const hasSubstitutions = stats[selected].alternatives.length > 1
 
   return (
-    <div>
-      <Segment>
-        <Header as="h4">{hasSubstitutions ? 'Selected courses' : 'Selected course'}</Header>
-        {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-        {hasSubstitutions && <Header as="h5">Course</Header>}
-        <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)} primary />
-        {hasSubstitutions && <Header as="h5">Substitutions</Header>}
-        {stats[selected].alternatives
-          .filter(course => course.code !== selected)
-          .map(course => (
-            <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)} />
-          ))}
-      </Segment>
+    <Stack gap={2}>
+      <Section title={hasSubstitutions ? 'Selected courses' : 'Selected course'}>
+        <Stack gap={1}>
+          {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
+          {hasSubstitutions && (
+            <Typography component="h3" variant="h6">
+              Course
+            </Typography>
+          )}
+          <Box>
+            <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} primary />
+          </Box>
+          {hasSubstitutions && (
+            <Stack gap={1}>
+              <Typography component="h3" variant="h6">
+                Substitutions
+              </Typography>
+              <Grid container spacing={1}>
+                {stats[selected].alternatives
+                  .filter(course => course.code !== selected)
+                  .map(course => (
+                    <Grid key={course.code}>
+                      <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)!} />
+                    </Grid>
+                  ))}
+              </Grid>
+            </Stack>
+          )}
+        </Stack>
+      </Section>
       <SingleCourseStats
         availableStats={availableStats[selected]}
         stats={stats[selected]}
         userHasAccessToAllStats={userHasAccessToAllStats}
       />
-    </div>
+    </Stack>
   )
 }
