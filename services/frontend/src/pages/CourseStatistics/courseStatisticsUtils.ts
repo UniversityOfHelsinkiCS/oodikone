@@ -7,6 +7,13 @@ const isSpring = date => moment(date).month() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year, spring) => (spring ? `Spring ${year}` : `Fall ${year}`)
 
+export const formatPassRate = (passRate: string) => {
+  if (!passRate) {
+    return '-'
+  }
+  return `${passRate} %`
+}
+
 const getCourseYears = course => ({
   startYear: moment(course.min_attainment_date).year(),
   endYear: moment(course.max_attainment_date).year(),

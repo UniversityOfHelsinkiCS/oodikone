@@ -1,30 +1,45 @@
 import { utils, writeFile } from 'xlsx'
 
+import { formatPassRate } from '@/pages/CourseStatistics/courseStatisticsUtils'
+import { AttemptData } from '@/types/attemptData'
 import { getTimestamp } from '@/util/timeAndDate'
 
-export const exportToExcel = data => {
-  const jsonItems = data.reduce((arr, cur) => {
-    const { passed: Passed, failed: Failed, passrate: Passrate, category: Title } = cur
-    const years = cur.realisations.map(r => ({
-      Passed: r.passed,
-      Failed: r.failed,
-      Passrate: r.passrate,
-      Title: r.realisation,
-      obfuscated: r.obfuscated,
+type Row = {
+  Title: string
+  Passed: string
+  Failed: string
+  'Pass rate': string
+  obfuscated?: boolean
+}
+
+export const exportToExcel = (data: AttemptData[]) => {
+  const sheetRows = data.reduce((rows, course) => {
+    const courseRow: Row = {
+      Title: course.category ?? '',
+      Passed: course.passed.toString(),
+      Failed: course.failed.toString(),
+      'Pass rate': formatPassRate(course.passrate),
+    }
+    const years: Row[] = course.realisations.map(realisation => ({
+      Title: realisation.realisation,
+      Passed: realisation.passed.toString(),
+      Failed: realisation.failed.toString(),
+      'Pass rate': formatPassRate(realisation.passrate),
+      obfuscated: realisation.obfuscated,
     }))
-    const rows = [{ Title, Passed, Failed, Passrate }, ...years]
-    const obfuscatedRows = rows.map(row => {
+    const obfuscatedRows: Row[] = [courseRow, ...years].map(row => {
       if (row.obfuscated) {
-        const obf = '5 or fewer students'
-        return { Title: row.Title, Passed: obf, Failed: obf, Passrate: obf }
+        const obfuscatedText = '5 or fewer students'
+        return { Title: row.Title, Passed: obfuscatedText, Failed: obfuscatedText, 'Pass rate': obfuscatedText }
       }
       const { obfuscated, ...rest } = row
       return rest
     })
-    arr.push(...obfuscatedRows)
-    return arr
-  }, [])
-  const worksheet = utils.json_to_sheet(jsonItems)
+    rows.push(...obfuscatedRows)
+    return rows
+  }, [] as Row[])
+
+  const worksheet = utils.json_to_sheet(sheetRows)
   const workbook = utils.book_new()
   utils.book_append_sheet(workbook, worksheet)
   writeFile(workbook, `oodikone_course_statistics_${getTimestamp()}.xlsx`)

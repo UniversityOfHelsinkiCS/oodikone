@@ -5,6 +5,7 @@ import {
 import { IconButton, TableCell, TableRow, Typography } from '@mui/material'
 import { useState } from 'react'
 
+import { formatPassRate } from '@/pages/CourseStatistics/courseStatisticsUtils'
 import { AttemptData } from '@/types/attemptData'
 
 const ContentCell = ({ content, obfuscated }: { content: string; obfuscated: boolean }) => {
@@ -71,7 +72,7 @@ export const FoldableRow = ({
         </TableCell>
         <ContentCell content={passed} obfuscated={obfuscated} />
         <ContentCell content={failed} obfuscated={obfuscated} />
-        <ContentCell content={`${passrate || '0.00'} %`} obfuscated={obfuscated} />
+        <ContentCell content={formatPassRate(passrate)} obfuscated={obfuscated} />
       </TableRow>
     )
   }
