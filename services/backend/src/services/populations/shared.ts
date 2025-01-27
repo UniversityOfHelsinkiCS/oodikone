@@ -448,24 +448,6 @@ export const formatStudentsForApi = (
   }
 }
 
-const getSubstitutions = async (codes: string[]) => {
-  const courses = await Course.findAll({
-    attributes: ['code', 'substitutions'],
-    where: {
-      code: {
-        [Op.iLike]: { [Op.any]: codes },
-      },
-    },
-    raw: true,
-  })
-
-  const substitutions = [
-    ...new Set(courses.flatMap(({ code, substitutions }) => [code, ...Object.values(substitutions).flat()])),
-  ]
-
-  return substitutions
-}
-
 export type EnrollmentsQueryResult = Array<{
   code: string
   name: Name
@@ -482,12 +464,10 @@ export type CoursesQueryResult = Array<
   }
 >
 
-// This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students
 export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
   const result: EnrollmentsQueryResult = await sequelize.query(
     `
-      SELECT DISTINCT ON (course.id)
+      SELECT DISTINCT
         course.code,
         course.name,
         course.substitutions,
@@ -496,24 +476,32 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
       FROM course
       INNER JOIN (
         SELECT
-          course_id,
-          ARRAY_AGG(JSON_BUILD_OBJECT(
+          course_code,
+          ARRAY_AGG(JSONB_BUILD_OBJECT(
             'studentnumber', studentnumber,
             'state', state,
             'enrollment_date_time', enrollment_date_time
           )) AS data
         FROM enrollment
-        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate AND enrollment.state = :enrollmentState
-        GROUP BY enrollment.course_id
-      ) enrollment ON enrollment.course_id = course.id 
-      WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
+        WHERE studentnumber IN (:studentnumbers)
+          AND enrollment_date_time < :beforeDate
+          AND state = :enrollmentState
+        GROUP BY course_code
+      ) AS enrollment
+        ON enrollment.course_code = course.code
+      WHERE course.code IN (:courseCodes)
+         OR (
+          SELECT
+            JSONB_AGG(DISTINCT alt_code)
+          FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
+          WHERE code IN (:courseCodes)
+        ) ? course.code
     `,
     {
       replacements: {
         studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
-        courseCodes,
-        skipCourseCodeFilter: courses.length === 0,
+        courseCodes: courses.length ? courses : ['DUMMY'],
         enrollmentState: EnrollmentState.ENROLLED,
       },
       type: QueryTypes.SELECT,
@@ -523,21 +511,35 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
 }
 
 export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const courseCodes = courses.length === 0 ? ['DUMMY'] : await getSubstitutions(courses)
-  const result: CoursesQueryResult = await sequelize.query(
+  return sequelize.query(
     `
-      SELECT DISTINCT ON (course.id)
+      SELECT
         course.code,
         course.name,
         course.substitutions,
         course.main_course_code,
-        credit.data AS credits,
-        enrollment.data AS enrollments
+        enrollment.data AS enrollments,
+        credit.data AS credits
       FROM course
-      INNER JOIN (
+      LEFT JOIN (
         SELECT
           course_code,
-          ARRAY_AGG(JSON_BUILD_OBJECT(
+          ARRAY_AGG(JSONB_BUILD_OBJECT(
+            'studentnumber', studentnumber,
+            'state', state,
+            'enrollment_date_time', enrollment_date_time
+          )) AS data
+        FROM enrollment
+        WHERE studentnumber IN (:studentnumbers)
+          AND enrollment_date_time < :beforeDate
+          AND state = :enrollmentState
+        GROUP BY course_code
+      ) AS enrollment
+        ON enrollment.course_code = course.code
+      LEFT JOIN (
+        SELECT
+          course_code,
+          ARRAY_AGG(JSONB_BUILD_OBJECT(
             'grade', grade,
             'student_studentnumber', student_studentnumber,
             'attainment_date', attainment_date,
@@ -545,35 +547,31 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
             'course_code', course_code
           )) AS data
         FROM credit
-        WHERE student_studentnumber IN (:studentnumbers) AND attainment_date < :beforeDate
-        GROUP BY credit.course_code
-      ) credit ON credit.course_code = course.code
-      LEFT JOIN (
-        SELECT
-          course_id,
-          ARRAY_AGG(JSON_BUILD_OBJECT(
-            'studentnumber', studentnumber,
-            'state', state,
-            'enrollment_date_time', enrollment_date_time
-          )) AS data
-        FROM enrollment
-        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate AND enrollment.state = :enrollmentState
-        GROUP BY enrollment.course_id
-      ) enrollment ON enrollment.course_id = course.id 
-      WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
+        WHERE student_studentnumber IN (:studentnumbers)
+          AND attainment_date < :beforeDate
+        GROUP BY course_code
+      ) AS credit
+        ON credit.course_code = course.code
+      WHERE :skipCourseCodeFilter
+        OR  course.code IN (:courseCodes)
+        OR  (
+          SELECT
+            JSONB_AGG(DISTINCT alt_code)
+          FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
+          WHERE code IN (:courseCodes)
+        ) ? course.code
     `,
     {
       replacements: {
         studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
-        courseCodes,
+        courseCodes: courses.length ? courses : ['DUMMY'],
         skipCourseCodeFilter: courses.length === 0,
         enrollmentState: EnrollmentState.ENROLLED,
       },
       type: QueryTypes.SELECT,
     }
-  )
-  return result
+  ) as Promise<CoursesQueryResult>
 }
 
 export const parseCreditInfo = (credit: CreditPick) => {

@@ -22,39 +22,34 @@ const getStudentsAndCourses = async (
   studentNumbers: string[] | null,
   courseCodes: string[] | undefined
 ): Promise<[number, CoursesQueryResult, EnrollmentsQueryResult]> => {
-  if (!studentNumbers) {
-    const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
-    const studentnumbers =
-      selectedStudents ??
-      (await getStudentNumbersWithAllStudyRightElements({
-        studyRights,
-        startDate,
-        endDate,
-        exchangeStudents,
-        nondegreeStudents,
-        transferredOutStudents: transferredStudents,
-      }))
+  const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
 
-    const allStudents = studentnumbers.length
-    const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
-    const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
-    const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
-    const courseEnrollments = await findCourseEnrollments(
-      studentnumbers,
-      dateMonthsFromNow(startDate, months),
-      filteredCourseCodes
-    )
+  const studentnumbers =
+    studentNumbers ??
+    selectedStudents ??
+    (await getStudentNumbersWithAllStudyRightElements({
+      studyRights,
+      startDate,
+      endDate,
+      exchangeStudents,
+      nondegreeStudents,
+      transferredOutStudents: transferredStudents,
+    }))
 
-    return [allStudents, courses, courseEnrollments]
-  }
+  const allStudents = studentnumbers.length
 
-  const { months, startDate } = params
   const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
-  const allStudents = studentNumbers.length
-  const courses = await findCourses(studentNumbers, beforeDate, courseCodes)
-  const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
+  const courses = !studentNumbers
+    ? await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
+    : await findCourses(studentnumbers, beforeDate, courseCodes)
+
+  const foundCourseCodes = [...new Set(courses.map(({ code }) => code))].toSorted()
   const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
-  const courseEnrollments = await findCourseEnrollments(studentNumbers, beforeDate, filteredCourseCodes)
+  const courseEnrollments = filteredCourseCodes?.length
+    ? !studentNumbers
+      ? await findCourseEnrollments(studentnumbers, dateMonthsFromNow(startDate, months), filteredCourseCodes)
+      : await findCourseEnrollments(studentnumbers, beforeDate, filteredCourseCodes)
+    : []
 
   return [allStudents, courses, courseEnrollments]
 }
@@ -149,7 +144,7 @@ export const bottlenecksOf = async (query: Query, studentNumbers: string[] | nul
       })
     }
     if ('credits' in course) {
-      course.credits.forEach(credit => {
+      course.credits?.forEach(credit => {
         const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
         if (query?.selectedStudents?.includes(studentnumber) || !query?.selectedStudents) {
           const semester = getPassingSemester(startYear, date)
