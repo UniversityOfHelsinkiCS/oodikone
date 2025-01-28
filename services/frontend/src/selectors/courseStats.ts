@@ -2,22 +2,25 @@ import { createSelector } from '@reduxjs/toolkit'
 import { flatten } from 'lodash'
 
 import { RootState } from '@/redux'
+import { Name } from '@/shared/types'
+import { CourseStat, Realisation } from '@/types/courseStat'
 
-const courseStatsSelector = (state: RootState) => state.courseStats.data
+const courseStatsSelector = (state: RootState) => state.courseStats.data // TODO: Type at source
 const openOrRegularSelector = (state: RootState) => state.courseSearch.openOrRegular
 const courseSummaryFormProgrammesSelector = (state: RootState) => state.courseSummaryForm.programmes
 const selectedCourseSelector = (state: RootState) => state.selectedCourse.selectedCourse
 
+type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
+
 export const getCourseStats = createSelector(
   [courseStatsSelector, openOrRegularSelector],
-  (courseStats, openOrRegular) => {
-    const stats = {}
-
+  (courseStats: CourseStats, openOrRegular) => {
+    const stats: Record<string, CourseStat> = {}
     Object.entries(courseStats).forEach(entry => {
-      const [coursecode] = entry
+      const [courseCode] = entry
       const data = entry[1][openOrRegular]
       const { statistics } = data
-      stats[coursecode] = {
+      stats[courseCode] = {
         ...data,
         statistics,
       }
@@ -28,7 +31,7 @@ export const getCourseStats = createSelector(
 
 export const getCourseAlternatives = createSelector(
   [courseStatsSelector, openOrRegularSelector, selectedCourseSelector],
-  (courseStats, openOrRegular, selectedCourse) => {
+  (courseStats: CourseStats, openOrRegular, selectedCourse) => {
     if (!selectedCourse) {
       return []
     }
@@ -36,13 +39,11 @@ export const getCourseAlternatives = createSelector(
   }
 )
 
-export const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
-  const availableStats = {}
-
+export const getAvailableStats = createSelector([courseStatsSelector], (courseStats: CourseStats) => {
+  const availableStats = { unify: false, open: false, university: false }
   Object.entries(courseStats).forEach(entry => {
-    const [coursecode] = entry
-
-    availableStats[coursecode] = {
+    const [courseCode] = entry
+    availableStats[courseCode] = {
       unify: entry[1].unifyStats.statistics.length > 0,
       open: entry[1].openStats.statistics.length > 0,
       university: entry[1].regularStats.statistics.length > 0,
@@ -58,12 +59,12 @@ export const ALL = {
   description: 'All students combined',
 } as const
 
-const mergeStudents = (students1, students2) => {
-  Object.keys(students2).forEach(k => {
-    if (students1[k]) {
-      students1[k] = [...students1[k], ...students2[k]]
+const mergeStudents = (students1: Record<string, string[]>, students2: Record<string, string[]>) => {
+  Object.keys(students2).forEach(yearCode => {
+    if (students1[yearCode]) {
+      students1[yearCode] = [...students1[yearCode], ...students2[yearCode]]
     } else {
-      students1[k] = students2[k]
+      students1[yearCode] = students2[yearCode]
     }
   })
   return students1
@@ -71,23 +72,24 @@ const mergeStudents = (students1, students2) => {
 
 export const getAllStudyProgrammes = createSelector(
   [getCourseStats, selectedCourseSelector],
-  (courseStats, selectedCourseCode) => {
-    const studentsIncluded = new Set(
-      selectedCourseCode
-        ? courseStats[selectedCourseCode]?.statistics?.reduce(
-            (res, curr) => [...res, ...curr.students.studentNumbers],
-            []
-          )
-        : Object.values(courseStats).reduce((totalStudents, programme) => {
-            const programmeStudents = programme?.statistics?.reduce(
-              (res, curr) => [...res, ...curr.students.studentNumbers],
-              []
-            )
-            return [...totalStudents, ...programmeStudents]
-          }, [])
+  (courseStats: Record<string, CourseStat>, selectedCourseCode) => {
+    const selectedStudentNumbers = courseStats[selectedCourseCode!]?.statistics?.reduce(
+      (res, curr) => [...res, ...curr.students.studentNumbers],
+      [] as string[]
     )
+    const allStudentNumbers = Object.values(courseStats).reduce((totalStudents, programme) => {
+      const programmeStudents = programme?.statistics?.reduce(
+        (res, curr) => [...res, ...curr.students.studentNumbers],
+        [] as string[]
+      )
+      return [...totalStudents, ...programmeStudents]
+    }, [] as string[])
+    const studentsIncluded = new Set<string>(selectedCourseCode ? selectedStudentNumbers : allStudentNumbers)
 
-    const all = {}
+    const all: Record<
+      string,
+      { key: string; value: string; description: string; text: Name; students: Record<string, string[]> }
+    > = {}
     Object.values(courseStats).forEach(stat => {
       const { programmes } = stat
       Object.entries(programmes).forEach(entry => {
@@ -95,7 +97,7 @@ export const getAllStudyProgrammes = createSelector(
         const { name, students } = info
         const filteredStudents = Object.keys(students).reduce(
           (acc, k) => ({ ...acc, [k]: students[k].filter(student => studentsIncluded.has(student)) }),
-          {}
+          {} as Record<string, string[]>
         )
         if (!all[code]) {
           all[code] = {
@@ -111,7 +113,7 @@ export const getAllStudyProgrammes = createSelector(
       })
     })
 
-    let allStudents = {}
+    let allStudents: Record<string, string[]> = {}
     Object.values(all).forEach(curr => {
       allStudents = mergeStudents(allStudents, curr.students)
     })
@@ -120,7 +122,7 @@ export const getAllStudyProgrammes = createSelector(
   }
 )
 
-const calculatePassRate = (passed, failed) => {
+const calculatePassRate = (passed: number, failed: number) => {
   if (passed === 0 && failed > 0) {
     return '0.00'
   }
@@ -128,35 +130,43 @@ const calculatePassRate = (passed, failed) => {
   return passRate ? passRate.toFixed(2) : null
 }
 
-const getRealisationStats = (realisation, filterStudentFn, userHasAccessToAllStats) => {
+const getRealisationStats = (
+  realisation: Realisation,
+  filterStudentFn: (studentNumber: string) => boolean,
+  userHasAccessToAllStats: boolean
+) => {
   const { name, attempts, obfuscated } = realisation
   const { passed, failed } = attempts.categories
   const passedAmount = userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
   const failedAmount = userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
-
   return {
     passed: passedAmount,
     failed: failedAmount,
     realisation: name,
-    passrate: calculatePassRate(passedAmount, failedAmount),
+    passRate: calculatePassRate(passedAmount, failedAmount),
     obfuscated,
   }
 }
 
-const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) => {
-  const summaryAcc = {
-    passed: 0,
-    failed: 0,
-  }
+const getSummaryStats = (
+  statistics: Realisation[],
+  filterStudentFn: (studentNumber: string) => boolean,
+  userHasAccessToAllStats: boolean
+) => {
+  const summary = statistics.reduce(
+    (acc, cur) => {
+      const { passed, failed } = cur.attempts.categories
+      acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
+      acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
+      return acc
+    },
+    {
+      passed: 0,
+      failed: 0,
+    } as { passed: number; failed: number; passRate: string | null }
+  )
 
-  const summary = statistics.reduce((acc, cur) => {
-    const { passed, failed } = cur.attempts.categories
-    acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
-    acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
-    return acc
-  }, summaryAcc)
-
-  summary.passrate = calculatePassRate(summary.passed, summary.failed)
+  summary.passRate = calculatePassRate(summary.passed, summary.failed)
 
   return summary
 }
@@ -168,19 +178,23 @@ const summaryStatistics = createSelector(
     courseSummaryFormProgrammesSelector,
     (_, userHasAccessToAllStats) => userHasAccessToAllStats,
   ],
-  (courseStats, programmes, programmeCodes, userHasAccessToAllStats) => {
+  (courseStats, programmes, programmeCodes, userHasAccessToAllStats: boolean) => {
     const filteredProgrammes = programmes.filter(programme => programmeCodes.includes(programme.key))
     const students = new Set(
-      filteredProgrammes.reduce((acc, programme) => [...acc, ...flatten(Object.values(programme.students))], [])
+      filteredProgrammes.reduce(
+        (acc, programme) => [...acc, ...flatten(Object.values(programme.students))],
+        [] as string[]
+      )
     )
 
-    const filterStudentFn = studentNumber => students.has(studentNumber)
+    const filterStudentFn = (studentNumber: string) => students.has(studentNumber)
+
     return Object.entries(courseStats).map(entry => {
       const [coursecode, data] = entry
       const { statistics, name } = data
 
-      // No filters based on programmes can be applied, if the programme and student number-data
-      // has been obfuscated
+      // No filters based on programmes can be applied, if the
+      // programme and student number data has been obfuscated
       const realisations = statistics.map(realisation =>
         getRealisationStats(realisation, filterStudentFn, userHasAccessToAllStats)
       )
@@ -207,9 +221,9 @@ export const getSummaryStatistics = (state: RootState, userHasAccessToAllStats: 
   )
 }
 
-export const getCourses = createSelector(getCourseStats, stats =>
-  Object.values(stats).map(({ name, coursecode: code }) => ({
+export const getCourses = createSelector(getCourseStats, courseStats => {
+  return Object.values(courseStats).map(({ name, coursecode: code }) => ({
     code,
     name,
   }))
-)
+})
