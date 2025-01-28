@@ -3,12 +3,12 @@ export type AttemptData = {
   failed: number
   id: string
   passed: number
-  passrate: string
+  passRate: string
   realisations: {
     failed: number
     obfuscated: boolean | undefined
     passed: number
-    passrate: string
+    passRate: string
     realisation: string
   }[]
 }
