@@ -1,6 +1,6 @@
 import { col, fn, Op, where } from 'sequelize'
 
-import { Course, Credit, Enrollment, Student } from '../models/index'
+import { Course, Credit, Enrollment, Student, Studyplan } from '../models/index'
 import { CreditTypeCode, EnrollmentState } from '../types'
 
 type Courses = Array<Pick<Course, 'code' | 'name' | 'substitutions'>>
@@ -23,9 +23,10 @@ interface StudentInfo {
   lastname: string
   email: string
   sis_person_id: string
-  secondary_email: string | null
+  coursesInStudyPlan: string[]
+  secondaryEmail: string | null
   credits: StudentCredit[]
-  enrollments: StudentEnrollment[]
+  enrollments: Record<string, StudentEnrollment>
 }
 
 type StudentCredits = Record<
@@ -36,16 +37,18 @@ type StudentCredits = Record<
   }
 >
 
-interface FormattedStudent {
+interface FormattedStudent extends StudentInfo {
   studentNumber: string
-  sis_person_id: string
-  credits: StudentCredit[]
-  enrollments: Record<string, any>
   allEnrollments: StudentEnrollment[]
-  firstnames: string
-  lastname: string
-  email: string
-  secondaryEmail: string | null
+}
+
+interface StudentWithStudyplanNested
+  extends Pick<Student, 'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'> {
+  studyplans: { included_courses: string[] }[]
+}
+
+interface StudentWithCourses extends Omit<StudentWithStudyplanNested, 'studyplans'> {
+  coursesInStudyPlan: string[]
 }
 
 const getCourses = async (courseCodes: string[]) => {
@@ -122,19 +125,27 @@ const getEnrollments = async (courses: Courses, fullCourseCodes: string[], stude
 }
 
 const getStudents = async (studentNumbers: string[]) => {
-  const students: Array<
-    Pick<Student, 'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'>
-  > = (
-    await Student.findAll({
-      attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id', 'secondary_email'],
-      where: {
-        studentnumber: {
-          [Op.in]: studentNumbers,
-        },
+  const students = await Student.findAll({
+    attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id', 'secondary_email'],
+    where: {
+      studentnumber: {
+        [Op.in]: studentNumbers,
       },
-    })
-  ).map(student => student.toJSON())
-  return students
+    },
+    include: [
+      {
+        model: Studyplan,
+        as: 'studyplans',
+        attributes: ['included_courses'],
+      },
+    ],
+  })
+
+  return students.map(student => {
+    const { studyplans, ...rest } = student.toJSON() as StudentWithStudyplanNested
+    const coursesInStudyPlan = studyplans.flatMap(studyplan => studyplan.included_courses)
+    return { ...rest, coursesInStudyPlan } as StudentWithCourses
+  })
 }
 
 export const getCompletedCourses = async (studentNumbers: string[], courseCodes: string[]) => {
@@ -159,7 +170,8 @@ export const getCompletedCourses = async (studentNumbers: string[], courseCodes:
       lastname: student.lastname,
       email: student.email,
       sis_person_id: student.sis_person_id,
-      secondary_email: student.secondary_email,
+      secondaryEmail: student.secondary_email,
+      coursesInStudyPlan: student.coursesInStudyPlan,
       credits: [],
       enrollments: [],
     }
@@ -214,7 +226,8 @@ export const getCompletedCourses = async (studentNumbers: string[], courseCodes:
       firstnames: student.firstnames,
       lastname: student.lastname,
       email: student.email,
-      secondaryEmail: student.secondary_email,
+      secondaryEmail: student.secondaryEmail,
+      coursesInStudyPlan: student.coursesInStudyPlan,
     })
     return acc
   }, [] as FormattedStudent[])
