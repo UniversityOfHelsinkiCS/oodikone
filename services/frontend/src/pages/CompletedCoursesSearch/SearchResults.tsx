@@ -1,10 +1,9 @@
-import { Done as DoneIcon, Remove as RemoveIcon } from '@mui/icons-material'
+import { Done as DoneIcon, Remove as RemoveIcon, CropSquare as SquareIcon } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
 import { green, yellow, grey } from '@mui/material/colors'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { RightsNotification } from '@/components/material/RightsNotification'
@@ -24,8 +23,13 @@ const getTotalUnfinished = student => Object.values(student.enrollments).length
 const getCompletion = (student, courseCode, { icon }) => {
   const completion = student.credits.find(credit => credit.courseCode === courseCode && isPassed(credit.creditType))
   const enrollment = student.enrollments[courseCode]
+  const isInStudyPlan = student.coursesInStudyPlan.includes(courseCode)
+
   if (completion === undefined) {
     if (!enrollment) {
+      if (isInStudyPlan) {
+        return <SquareIcon fontSize="small" style={{ color: grey[500] }} />
+      }
       return null
     }
     if (icon) {
@@ -47,7 +51,7 @@ const getCellTitle = (student, courseCode) => {
   const credit = student.credits.find(credit => credit.courseCode === courseCode)
   const enrollment = student.enrollments[courseCode]
   if (!credit && !enrollment) {
-    return ''
+    return 'Student has the course in their primary study plan'
   }
   const title = credit
     ? `Passed on ${moment(credit.date).format(ISO_DATE_FORMAT)}\nCourse code: ${
