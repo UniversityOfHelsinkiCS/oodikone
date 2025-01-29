@@ -34,7 +34,7 @@ export const FoldableRow = ({
   const showCourseRealisations = hasRealisations && isUnfolded
 
   const getRow = (rowId: string, rowData: any, isMainRow = true) => {
-    const { passed, failed, passrate, realisation, obfuscated } = rowData
+    const { passed, failed, passRate, realisation, obfuscated } = rowData
     const showFoldIcon = isMainRow && hasRealisations
     return (
       <TableRow
@@ -72,7 +72,7 @@ export const FoldableRow = ({
         </TableCell>
         <ContentCell content={passed} obfuscated={obfuscated} />
         <ContentCell content={failed} obfuscated={obfuscated} />
-        <ContentCell content={formatPassRate(passrate)} obfuscated={obfuscated} />
+        <ContentCell content={formatPassRate(passRate)} obfuscated={obfuscated} />
       </TableRow>
     )
   }

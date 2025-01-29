@@ -21,8 +21,8 @@ export const CourseTab = ({
   const stats = useSelector(getCourseStats)
   const availableStats = useSelector(getAvailableStats)
   const courses = useSelector(getCourses).map(({ code, name }) => ({
-    key: code as string,
-    code: code as string,
+    key: code,
+    code,
     name: getTextIn(name)!,
   }))
 

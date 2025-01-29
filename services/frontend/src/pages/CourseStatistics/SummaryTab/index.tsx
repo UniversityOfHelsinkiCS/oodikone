@@ -51,15 +51,21 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
 
   const data: AttemptData[] = statistics.map(stat => {
     const { coursecode, name, realisations, summary } = stat
-    const { passed, failed, passrate } = summary
+    const { passed, failed, passRate } = summary
     return {
       id: coursecode,
-      category: getTextIn(name),
+      category: getTextIn(name)!,
       passed,
       failed,
-      passrate,
+      passRate,
       realisations: realisations.map(obj => {
-        return unObjectifyProperty({ obj, property: 'realisation' })
+        return unObjectifyProperty({ obj, property: 'realisation' }) as {
+          failed: number
+          obfuscated?: boolean
+          passed: number
+          passRate: string | null
+          realisation: string
+        }
       }),
     }
   })
@@ -67,7 +73,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const options: DropdownOption[] = programmes
     .map(programme => ({ ...programme, size: new Set(flatten(Object.values(programme.students))).size }))
     .filter(programme => programme.size > 0)
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text)!, ...rest }))
     .map(programme => ({ ...programme, name: programme.text }))
 
   return (

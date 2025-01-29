@@ -3,7 +3,7 @@ export type DropdownOption = {
   key: string
   name: string
   size: number
-  students: string[]
+  students: Record<string, string[]>
   text: string
   value: string
 }

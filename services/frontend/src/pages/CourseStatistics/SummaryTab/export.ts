@@ -18,13 +18,13 @@ export const exportToExcel = (data: AttemptData[]) => {
       Title: course.category ?? '',
       Passed: course.passed.toString(),
       Failed: course.failed.toString(),
-      'Pass rate': formatPassRate(course.passrate),
+      'Pass rate': formatPassRate(course.passRate),
     }
     const years: Row[] = course.realisations.map(realisation => ({
       Title: realisation.realisation,
       Passed: realisation.passed.toString(),
       Failed: realisation.failed.toString(),
-      'Pass rate': formatPassRate(realisation.passrate),
+      'Pass rate': formatPassRate(realisation.passRate),
       obfuscated: realisation.obfuscated,
     }))
     const obfuscatedRows: Row[] = [courseRow, ...years].map(row => {
