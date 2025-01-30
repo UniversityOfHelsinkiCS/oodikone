@@ -3,6 +3,7 @@ import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -11,7 +12,6 @@ import { ALL, getAllStudyProgrammes, getSummaryStatistics } from '@/selectors/co
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
 import { getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
-import { ProgrammeDropdown } from '../ProgrammeDropdown'
 import { AttemptsTable } from './AttemptsTable'
 import { exportToExcel } from './export'
 
