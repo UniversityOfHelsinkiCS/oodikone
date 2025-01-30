@@ -16,29 +16,33 @@ export type FacultyStat = {
   year: string
 }
 
-type Enrollment = {
-  studentNumber: string
+export type Enrollment = {
   enrollmentDateTime: string
+  studentNumber: string
+}
+
+export type Attempts = {
+  categories: {
+    failed: string[]
+    passed: string[]
+  }
+  grades: Record<string, string[]>
+}
+
+export type Students = {
+  grades: Record<string, string[]>
+  studentNumbers: string[]
 }
 
 export type Realisation = {
   allEnrollments: Enrollment[]
-  attempts: {
-    categories: {
-      failed: string[]
-      passed: string[]
-    }
-    grades: Record<string, string[]>
-  }
+  attempts: Attempts
   code: number
   coursecode: string
   enrollments: Enrollment[]
   name: string
   obfuscated?: boolean
-  students: {
-    grades: Record<string, string[]>
-    studentNumbers: string[]
-  }
+  students: Students
   yearCode: number
 }
 
