@@ -1,45 +1,62 @@
+import { DoNotDisturb as DoNotDisturbIcon } from '@mui/icons-material'
+import { Box, Button, Stack, Tooltip } from '@mui/material'
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
-import { Button, Form, Grid, Header, Popup, Segment } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
+import { Section } from '@/components/material/Section'
+import { RootState } from '@/redux'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
-import { ProgrammeDropdown } from '../../ProgrammeDropdown'
+import { Name } from '@/shared/types'
+import { Attempts, CourseStat, Enrollment, Students } from '@/types/courseStat'
+import { DropdownOption } from '@/types/dropdownOption'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
 import { YearFilter } from './YearFilter'
 
-const countFilteredStudents = (stat, filter) => {
+const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
   if (!stat) {
     return {}
   }
-  return Object.entries(stat).reduce((acc, entry) => {
-    const [category, students] = entry
-    return {
-      ...acc,
-      [category]: students.filter(filter).length,
-    }
-  }, {})
+  return Object.entries(stat).reduce(
+    (acc, entry) => {
+      const [category, students] = entry
+      return {
+        ...acc,
+        [category]: students.filter(filter).length,
+      }
+    },
+    {} as Record<string, number>
+  )
 }
 
-export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllStats }) => {
+export const SingleCourseStats = ({
+  availableStats,
+  stats,
+  userHasAccessToAllStats,
+}: {
+  availableStats: { unify: boolean; open: boolean; university: boolean }
+  stats: CourseStat
+  userHasAccessToAllStats: boolean
+}) => {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const { getTextIn } = useLanguage()
-  const [primary, setPrimary] = useState([ALL.value])
-  const [comparison, setComparison] = useState([])
+  const [primary, setPrimary] = useState<string[]>([ALL.value])
+  const [comparison, setComparison] = useState<string[]>([])
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
-  const [separate, setSeparate] = useState(null)
-  const programmes = useSelector(state => getAllStudyProgrammes(state))
-  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
+  const [separate, setSeparate] = useState<boolean | null>(null)
+  const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
+  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
   const { coursecode } = stats
 
   const { data: semesterData } = useGetSemestersQuery()
@@ -47,7 +64,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     const semesters = Object.values(semesterData?.semesters ?? [])
       .map(({ semestercode, name, yearcode }) => ({
         key: semestercode,
-        texts: Object.values(name),
+        texts: Object.values(name) as string[],
         value: yearcode,
       }))
       .reverse()
@@ -66,7 +83,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
   const parseQueryFromUrl = () => {
     const { separate } = qs.parse(location.search)
     return {
-      separate: JSON.parse(separate),
+      separate: JSON.parse(separate as string),
     }
   }
 
@@ -95,13 +112,15 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
     dispatch(setSelectedCourse(coursecode))
 
-    const yearCodes = stats.statistics.map(s => s.yearCode)
-    const initFromYear = min(yearCodes)
-    const initToYear = max(yearCodes)
+    const yearCodes = stats.statistics.map(stat => stat.yearCode)
+    const initFromYear = min(yearCodes) ?? 0
+    const initToYear = max(yearCodes) ?? 0
     setFromYear(initFromYear)
     setToYear(initToYear)
 
-    return () => dispatch(clearSelectedCourse())
+    return () => {
+      dispatch(clearSelectedCourse())
+    }
   }, [])
 
   useEffect(() => {
@@ -117,7 +136,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }, [programmes])
 
-  const getProgrammeName = programmeCode => {
+  const getProgrammeName = (programmeCode: string) => {
     if (programmeCode === ALL.value) {
       return 'All'
     }
@@ -125,7 +144,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       return 'Excluded'
     }
     const { name } = stats.programmes[programmeCode]
-    return getTextIn(name)
+    return getTextIn(name)!
   }
 
   const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
@@ -140,7 +159,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     )
   }
 
-  const belongsToAtLeastOneProgramme = codes => {
+  const belongsToAtLeastOneProgramme = (codes: string[]) => {
     if (codes.includes(ALL.value)) {
       return () => true
     }
@@ -154,16 +173,16 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       }
     })
 
-    return studentNumber => studentNumbers.has(studentNumber)
+    return (studentNumber: string) => studentNumbers.has(studentNumber)
   }
 
-  const validProgrammeCode = code => {
+  const isValidProgrammeCode = (code: string) => {
     const { programmes } = stats
     return programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
 
   const filteredYearsAndSemesters = () => {
-    const yearCodes = stats.statistics.map(s => s.yearCode)
+    const yearCodes = stats.statistics.map(stat => stat.yearCode)
     const from = min(yearCodes)
     const to = max(yearCodes)
     if (from == null || to == null) {
@@ -179,21 +198,25 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const isStatInYearRange = ({ name }) => {
-    const timeFilter = ({ value }) => value >= fromYear && value <= toYear
+  const isStatInYearRange = ({ name }: { name: Name | string }) => {
+    const timeFilter = ({ value }: { value: number }) => value >= fromYear && value <= toYear
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
     if (separate) {
-      return filteredSemesters.find(year => year.texts.includes(getTextIn(name)))
+      return filteredSemesters.find(year => year.texts.includes(getTextIn(name as Name)!))
     }
     return filteredYears.find(year => year.text === name)
   }
 
-  const countAttemptStats = (attempts, totalEnrollments, filter) => {
+  const countAttemptStats = (
+    attempts: Attempts,
+    totalEnrollments: number | undefined,
+    filter: (studentNumber: string) => boolean
+  ) => {
     const grades = countFilteredStudents(attempts.grades, filter)
     const categories = countFilteredStudents(attempts.categories, filter)
     const { failed, passed } = categories
-    const total = totalEnrollments || passed + failed
+    const total = totalEnrollments ?? passed + failed
     const passRate = Math.min(100 * (passed / total), 100)
 
     return {
@@ -203,12 +226,14 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const countStudentStats = (allStudents, enrolledNoGrade = 0, filter) => {
+  const countStudentStats = (
+    allStudents: Students,
+    enrolledNoGrade = 0,
+    filter: (studentNumber: string) => boolean
+  ) => {
     const grades = countFilteredStudents(allStudents.grades, filter)
     const totalGrades = Object.values(grades).reduce((total, studentsWithGrade) => total + studentsWithGrade, 0)
-    const totalPassed = Object.keys(grades).reduce((total, grade) => {
-      return grade !== '0' ? total + grades[grade] : total
-    }, 0)
+    const totalPassed = Object.keys(grades).reduce((total, grade) => (grade !== '0' ? total + grades[grade] : total), 0)
     const totalFailed = grades['0'] + enrolledNoGrade
     const total = totalGrades + enrolledNoGrade
     const passRate = totalPassed / total
@@ -224,7 +249,11 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const countStudentEnrollmentStats = (allAttempts, filteredEnrollments, displayEnrollments) => {
+  const countStudentEnrollmentStats = (
+    allAttempts: Attempts,
+    filteredEnrollments: Enrollment[],
+    displayEnrollments: boolean
+  ) => {
     const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber }) => {
       const hasFailed = allAttempts.categories.failed ? allAttempts.categories.failed.includes(studentNumber) : false
       const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentNumber) : false
@@ -239,7 +268,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const statsForProgrammes = (programmeCodes, name) => {
+  const statsForProgrammes = (programmeCodes: string[], name: string) => {
     if (programmeCodes.length === 0) {
       return undefined
     }
@@ -267,7 +296,7 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
           const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
-          const parsedName = separate ? getTextIn(name) : name
+          const parsedName = separate ? getTextIn(name as Name) : name
 
           return {
             name: parsedName,
@@ -293,12 +322,15 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const handleSelect = (_event, { name, value }) => {
-    let selected = [...value].filter(value => value !== ALL.value)
+  const handleSelect = (newProgrammes: string[], name?: string) => {
+    let selected = [...newProgrammes].filter(value => value !== ALL.value)
     if (name === 'primary') {
       setComparison(comparison.filter(programmeCode => programmeCode !== 'EXCLUDED'))
     }
-    if ((!primary.includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
+    if (
+      (!primary.includes(ALL.value) && newProgrammes.includes(ALL.value)) ||
+      (name === 'primary' && newProgrammes.length === 0)
+    ) {
       selected = [ALL.value]
     }
     if (name === 'primary') {
@@ -309,18 +341,24 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const handleYearChange = (_event, { name, value }) => {
-    if (name === 'fromYear' && value <= toYear) {
-      setFromYear(value)
-    } else if (name === 'toYear' && value >= fromYear) {
-      setToYear(value)
+  const handleToYearChange = event => {
+    const newYear = event.target.value as number
+    if (newYear >= fromYear) {
+      setToYear(newYear)
+    }
+  }
+
+  const handleFromYearChange = event => {
+    const newYear = event.target.value as number
+    if (newYear <= toYear) {
+      setFromYear(newYear)
     }
   }
 
   const filteredProgrammeStatistics = () => {
     const excludedProgrammes = getExcluded()
     const primaryProgrammes = primary
-    const comparisonProgrammes = comparison.filter(code => validProgrammeCode(code))
+    const comparisonProgrammes = comparison.filter(code => isValidProgrammeCode(code))
     if (comparison.includes('EXCLUDED')) {
       comparisonProgrammes.push(...excludedProgrammes)
     }
@@ -340,16 +378,14 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     }
   }
 
-  const clearComparison = () => setComparison([])
-
-  const comparisonProgrammes = programmes => {
+  const comparisonProgrammes = (programmes: DropdownOption[]) => {
     const result = programmes.filter(({ key }) => key !== 'EXCLUDED')
     const excludedProgrammes = getExcluded()
 
     if (!primary.includes(ALL.value)) {
       const excludedStudents = result
         .filter(({ key }) => excludedProgrammes.includes(key) && key !== 'ALL')
-        .reduce((res, { students }) => [...res, ...flatten(Object.values(students))], [])
+        .reduce((res, { students }) => [...res, ...flatten(Object.values(students))], [] as string[])
       const uniqueExcludedStudents = uniq(excludedStudents)
       result.push({
         key: 'EXCLUDED',
@@ -368,8 +404,8 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
   const showPopulation = () => {
     const from = fromYear
     const to = toYear
-    const years2 = `${years.find(s => s.value === from).text.split('-')[0]}-${
-      years.find(s => s.value === to).text.split('-')[1]
+    const years2 = `${years.find(year => year.value === from)?.text.split('-')[0]}-${
+      years.find(year => year.value === to)?.text.split('-')[1]
     }`
     const queryObject = {
       from,
@@ -380,20 +416,24 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
       unifyCourses,
     }
     const searchString = qs.stringify(queryObject)
-    navigate(`/coursepopulation?${searchString}`)
+    void navigate(`/coursepopulation?${searchString}`)
   }
 
   const renderShowPopulation = (disabled = false) => {
-    if (userHasAccessToAllStats) {
-      return <Button content="Show population" disabled={disabled} onClick={showPopulation} />
+    if (!userHasAccessToAllStats) {
+      return null
     }
-    return null
+    return (
+      <Button disabled={disabled} onClick={showPopulation} variant="contained">
+        Show population
+      </Button>
+    )
   }
 
   const statistics = filteredProgrammeStatistics()
   const { filteredYears } = filteredYearsAndSemesters()
 
-  const timeFilter = (_, value) => value >= fromYear && value <= toYear
+  const timeFilter = (_, value: string) => Number(value) >= fromYear && Number(value) <= toYear
   const filteredProgrammes = programmes
     .map(programme => {
       const students = new Set(flatten(Object.values(pickBy(programme.students, timeFilter))))
@@ -402,48 +442,58 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
     .filter(programme => programme.size > 0)
 
   if (stats.statistics.length < 1) {
-    return <Segment>No data for selected course</Segment>
+    return <Section>No data for selected course</Section>
   }
 
-  const options = filteredProgrammes
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text), ...rest }))
-    .map(programme => ({ ...programme, name: programme.text }))
+  const options: DropdownOption[] = filteredProgrammes.map(programme => ({
+    description: programme.description,
+    key: programme.key,
+    size: programme.size,
+    students: programme.students,
+    text: getTextIn(programme.text)!,
+    value: programme.value,
+  }))
+
+  const maxYearText = `The maximum time range to generate a population for this course is ${Math.max(
+    0,
+    maxYearsToCreatePopulationFrom
+  )} ${maxYearsToCreatePopulationFrom === 1 ? 'year' : 'years'}`
 
   return (
-    <div>
-      <Segment>
-        <Header as="h4">Statistics by time range</Header>
-        <YearFilter fromYear={fromYear} handleChange={handleYearChange} toYear={toYear} years={filteredYears} />
-        <Form>
+    <Stack gap={2}>
+      <Section title="Statistics by time range">
+        <Stack direction="row" gap={2}>
+          <YearFilter
+            fromYear={fromYear}
+            handleFromYearChange={handleFromYearChange}
+            handleToYearChange={handleToYearChange}
+            toYear={toYear}
+            years={filteredYears}
+          />
           {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
-            <Popup
-              content={`The maximum time range to generate a population for this course is ${Math.max(
-                0,
-                maxYearsToCreatePopulationFrom
-              )} years`}
-              trigger={<span>{renderShowPopulation(true)}</span>}
-            />
+            <Tooltip arrow placement="right" title={maxYearText}>
+              <span>{renderShowPopulation(true)}</span>
+            </Tooltip>
           ) : (
             renderShowPopulation()
           )}
-        </Form>
-      </Segment>
+        </Stack>
+      </Section>
       {userHasAccessToAllStats && (
-        <Segment>
-          <Form>
-            <Header as="h4">Filter statistics by study programmes</Header>
-            <Grid>
-              <Grid.Column width={8}>
-                <ProgrammeDropdown
-                  label="Primary group"
-                  name="primary"
-                  onChange={handleSelect}
-                  options={options}
-                  placeholder="Select study programmes"
-                  value={primary}
-                />
-              </Grid.Column>
-              <Grid.Column width={8}>
+        <Section title="Filter statistics by study programme">
+          <Stack direction="row" gap={2}>
+            <Box width="50%">
+              <ProgrammeDropdown
+                label="Primary group"
+                name="primary"
+                onChange={handleSelect}
+                options={options}
+                placeholder="Select study programmes"
+                value={primary}
+              />
+            </Box>
+            <Box width="50%">
+              <Stack gap={1}>
                 <ProgrammeDropdown
                   label="Comparison group"
                   name="comparison"
@@ -452,21 +502,18 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
                   placeholder="Optional"
                   value={comparison}
                 />
-              </Grid.Column>
-              <Grid.Column width={8} />
-              <Grid.Column width={8}>
-                <Form.Group>
-                  <Form.Button
-                    content="Select excluded study programmes"
-                    disabled={primary.length === 1 && primary[0] === ALL.value}
-                    onClick={setExcludedToComparison}
-                  />
-                  <Form.Button content="Clear" onClick={clearComparison} />
-                </Form.Group>
-              </Grid.Column>
-            </Grid>
-          </Form>
-        </Segment>
+                <Button
+                  disabled={primary.length === 1 && primary[0] === ALL.value}
+                  onClick={setExcludedToComparison}
+                  startIcon={<DoNotDisturbIcon />}
+                  variant="outlined"
+                >
+                  Select excluded study programmes
+                </Button>
+              </Stack>
+            </Box>
+          </Stack>
+        </Section>
       )}
       <ResultTabs
         availableStats={availableStats}
@@ -474,6 +521,6 @@ export const SingleCourseStats = ({ stats, availableStats, userHasAccessToAllSta
         primary={statistics.primary}
         separate={separate}
       />
-    </div>
+    </Stack>
   )
 }

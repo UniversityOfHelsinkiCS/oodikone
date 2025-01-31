@@ -1,39 +1,67 @@
-import { DropdownProps, Form } from 'semantic-ui-react'
+import { FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material'
 
-interface YearFilterProps {
-  years: Array<{ key: number; text: string; value: number }>
+export const YearFilter = ({
+  fromYear,
+  handleFromYearChange,
+  handleToYearChange,
+  toYear,
+  years,
+}: {
   fromYear: number
+  handleFromYearChange: (event) => void
+  handleToYearChange: (event) => void
   toYear: number
-  handleChange: (event: React.SyntheticEvent, data: DropdownProps) => void
-}
+  years: Array<{ key: number; text: string; value: number }>
+}) => {
+  const style = { width: 150 }
+  const menuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 200,
+      },
+    },
+  }
 
-export const YearFilter = ({ years, fromYear, toYear, handleChange }: YearFilterProps) => (
-  <Form>
-    <Form.Group inline>
-      <Form.Dropdown
-        inline
-        label="From:"
-        name="fromYear"
-        onChange={handleChange}
-        options={toYear ? years.filter(({ value }) => value <= toYear) : years}
-        placeholder="Select academic year"
-        selectOnBlur={false}
-        selectOnNavigation={false}
-        selection
-        value={fromYear}
-      />
-      <Form.Dropdown
-        inline
-        label="To:"
-        name="toYear"
-        onChange={handleChange}
-        options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
-        placeholder="Select academic year"
-        selectOnBlur={false}
-        selectOnNavigation={false}
-        selection
-        value={toYear}
-      />
-    </Form.Group>
-  </Form>
-)
+  return (
+    <Stack direction="row" gap={2}>
+      <FormControl size="small" variant="outlined">
+        <InputLabel>From</InputLabel>
+        <Select
+          MenuProps={menuProps}
+          label="From"
+          name="fromYear"
+          onChange={handleFromYearChange}
+          sx={style}
+          value={fromYear || ''}
+        >
+          {years
+            .filter(({ value }) => !toYear || value <= toYear)
+            .map(({ key, text, value }) => (
+              <MenuItem key={key} value={value}>
+                {text}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
+      <FormControl size="small" variant="outlined">
+        <InputLabel>To</InputLabel>
+        <Select
+          MenuProps={menuProps}
+          label="To"
+          name="toYear"
+          onChange={handleToYearChange}
+          sx={style}
+          value={toYear || ''}
+        >
+          {years
+            .filter(({ value }) => !fromYear || value >= fromYear)
+            .map(({ key, text, value }) => (
+              <MenuItem key={key} value={value}>
+                {text}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
+    </Stack>
+  )
+}

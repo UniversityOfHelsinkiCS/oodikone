@@ -21,6 +21,7 @@ export const ProgrammeDropdown = ({
 }) => {
   return (
     <Autocomplete
+      fullWidth
       getOptionLabel={option => option.text}
       isOptionEqualToValue={(option, value) => option.value === value.value}
       multiple
