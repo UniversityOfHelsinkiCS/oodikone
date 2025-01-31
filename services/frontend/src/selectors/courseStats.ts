@@ -55,7 +55,11 @@ export const getAvailableStats = createSelector([courseStatsSelector], (courseSt
 export const ALL = {
   key: 'ALL',
   value: 'ALL',
-  text: 'All',
+  text: {
+    fi: 'All',
+    en: 'All',
+    sv: 'All',
+  } as Name,
   description: 'All students combined',
 } as const
 

@@ -73,8 +73,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const options: DropdownOption[] = programmes
     .map(programme => ({ ...programme, size: new Set(flatten(Object.values(programme.students))).size }))
     .filter(programme => programme.size > 0)
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text)!, ...rest }))
-    .map(programme => ({ ...programme, name: programme.text }))
+    .map(({ text, ...rest }) => ({ text: getTextIn(text)!, ...rest }))
 
   return (
     <Stack gap={2}>
