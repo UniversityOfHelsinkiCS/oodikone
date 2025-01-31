@@ -1,3 +1,4 @@
+import { Stack } from '@mui/material'
 import { isEqual, sortBy } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
@@ -10,6 +11,7 @@ import { Button, Form, Message, Radio } from 'semantic-ui-react'
 import { createPinnedFirstComparator, isNewStudyProgramme, textAndDescriptionSearch } from '@/common'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { InfoBox } from '@/components/material/InfoBox'
 import { SearchHistory } from '@/components/SearchHistory'
 import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useSearchHistory } from '@/hooks/searchHistory'
@@ -39,7 +41,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const populations = useSelector(state => state.populations)
   const previousQuery = populations.query || {}
   const { getTextIn } = useLanguage()
-  const { fullAccessToStudentData, isAdmin } = useGetAuthorizedUserQuery()
+  const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const [query, setQuery] = useState(initialQuery())
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
@@ -178,6 +180,11 @@ export const PopulationSearchForm = ({ onProgress }) => {
 
     return [studyRightsText, timeText, studentStatusesText].filter(text => text).join(' - ')
   }
+
+  const bachelorAndMasterInfoTooltip = `If you choose a Bachelor's programme, toggling 'Show
+    Bachelor + Master' on will also show information about the students' master's studies. If you
+    choose a Master's programme, you can see information about the students' bachelor's studies.
+    #### This feature is experimental and might still change`
 
   const handleSubmit = () => {
     addItemToSearchHistory({
@@ -327,17 +334,18 @@ export const PopulationSearchForm = ({ onProgress }) => {
               value={query.studyRights.programme}
             />
           </div>
-          {isAdmin && (
+          <Stack direction="row" spacing={1}>
             <Radio
               checked={showBachelorAndMaster}
               label="Show Bachelor + Master"
               onChange={() => {
-                setQuery({ ...query, showFullStudyPath: !showBachelorAndMaster })
+                setQuery({ ...query, showBachelorAndMaster: !showBachelorAndMaster })
                 setShowBachelorAndMaster(!showBachelorAndMaster)
               }}
               toggle
             />
-          )}
+            <InfoBox content={bachelorAndMasterInfoTooltip} mini />
+          </Stack>
         </div>
       </Form.Field>
     )
