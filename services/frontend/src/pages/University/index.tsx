@@ -9,16 +9,12 @@ import { FacultyProgressTab } from './FacultyProgressTab'
 export const University = () => {
   useTitle('University')
 
-  const [tab, handleTabChange] = useTabs(2)
+  const [tab, setTab] = useTabs(2)
 
   return (
     <Container maxWidth="lg">
       <PageTitle title="University" />
-      <Tabs
-        onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })}
-        sx={{ marginBottom: 2 }}
-        value={tab}
-      >
+      <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
         <Tab data-cy="FacultyProgressTab" label="Faculty progress" />
         <Tab data-cy="FacultyGraduationsTab" label="Faculty graduations" />
       </Tabs>

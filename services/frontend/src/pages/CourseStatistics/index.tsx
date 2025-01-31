@@ -32,7 +32,7 @@ export const CourseStatistics = () => {
 
   const [selected, setSelected] = useState(initialCourseCode)
   const { onProgress, progress } = useProgress(loading)
-  const [tab, handleTabChange, switchToTab] = useTabs(3)
+  const [tab, setTab] = useTabs(3)
 
   useEffect(() => {
     setSelected(initialCourseCode)
@@ -53,12 +53,12 @@ export const CourseStatistics = () => {
   useEffect(() => {
     if (statsIsEmpty) {
       setSelected(initialCourseCode)
-      switchToTab(0)
+      setTab(0)
     }
   }, [initialCourseCode, statsIsEmpty])
 
   const switchToCourse = (courseCode: string) => {
-    switchToTab(0)
+    setTab(0)
     setSelected(courseCode)
   }
 
@@ -76,11 +76,7 @@ export const CourseStatistics = () => {
         <SearchForm onProgress={onProgress} progress={progress} />
       ) : (
         <>
-          <Tabs
-            onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })}
-            sx={{ marginBottom: 2 }}
-            value={tab}
-          >
+          <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
             <Tab data-cy="CourseTab" label="Course" />
             <Tab data-cy="SummaryTab" disabled={singleCourseStats} label="Summary" />
             <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />

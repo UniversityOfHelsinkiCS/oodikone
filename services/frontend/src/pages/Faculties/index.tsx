@@ -26,7 +26,7 @@ export const Faculties = () => {
   useTitle(facultyName ? `${facultyName} - Faculties` : 'Faculties')
 
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
-  const [tab, handleTabChange] = useTabs(isAdmin ? 4 : 3)
+  const [tab, setTab] = useTabs(isAdmin ? 4 : 3)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
@@ -40,12 +40,7 @@ export const Faculties = () => {
   return (
     <Container data-cy="FacultySegmentContainer" maxWidth="lg">
       <PageTitle subtitle={facultyCode} title={facultyName ?? 'Faculties'} />
-      <Tabs
-        data-cy="FacultyTabs"
-        onChange={(event, newValue) => handleTabChange(event, { activeIndex: newValue })}
-        sx={{ marginBottom: 2 }}
-        value={tab}
-      >
+      <Tabs data-cy="FacultyTabs" onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
         <Tab data-cy="BasicInformationTab" label="Basic information" />
         <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
         <Tab data-cy="GraduationTimesTab" label="Graduation times" />
