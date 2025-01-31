@@ -159,7 +159,7 @@ export const MedianBarChart = ({
         }
         return getTooltipText(
           point.name,
-          point.code ? point.code : point.name,
+          point.code ?? point.name,
           point.amount!,
           this.y!,
           point.statistics!,
@@ -195,7 +195,7 @@ export const MedianBarChart = ({
               code?: string
               amount?: number
             }
-            return getDataLabel(point.amount!, point.code ? point.code : point.name)
+            return getDataLabel(point.amount!, point.code ?? point.name)
           },
         },
         showInLegend: false,
