@@ -15,7 +15,7 @@ import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { Name } from '@/shared/types'
-import { Attempts, CourseStat, Enrollment, Students } from '@/types/courseStat'
+import { Attempts, CourseStat, Enrollment, FormattedStats, ProgrammeStats, Students } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
@@ -23,7 +23,7 @@ import { YearFilter } from './YearFilter'
 
 const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
   if (!stat) {
-    return {}
+    return {} as { passed: number; failed: number }
   }
   return Object.entries(stat).reduce(
     (acc, entry) => {
@@ -33,7 +33,7 @@ const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentN
         [category]: students.filter(filter).length,
       }
     },
-    {} as Record<string, number>
+    {} as { passed: number; failed: number }
   )
 }
 
@@ -274,7 +274,7 @@ export const SingleCourseStats = ({
     }
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(programmeCodes)
-    const formattedStats = statistics
+    const formattedStats: FormattedStats[] = statistics
       .filter(isStatInYearRange)
       .map(
         ({
@@ -296,7 +296,7 @@ export const SingleCourseStats = ({
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
           const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
-          const parsedName = separate ? getTextIn(name as Name) : name
+          const parsedName = separate ? getTextIn(name as Name)! : name
 
           return {
             name: parsedName,
@@ -306,20 +306,19 @@ export const SingleCourseStats = ({
             code,
             coursecode,
             rowObfuscated: obfuscated,
-            userHasAccessToAllStats,
           }
         }
       )
 
-    const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
-
-    return {
+    const totals = countTotalStats(formattedStats)
+    const programmeStats: ProgrammeStats = {
       codes: programmeCodes,
       name,
       stats: formattedStats.concat(totals),
-      userHasAccessToAllStats,
       totals,
+      userHasAccessToAllStats,
     }
+    return programmeStats
   }
 
   const handleSelect = (newProgrammes: string[], name?: string) => {

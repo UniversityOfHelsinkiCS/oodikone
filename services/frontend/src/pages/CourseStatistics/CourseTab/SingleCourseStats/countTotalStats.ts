@@ -1,3 +1,5 @@
+import { FormattedStats } from '@/types/courseStat'
+
 const parseGrade = (grade: string) => {
   const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
   if (parsedGrade === 'LA') {
@@ -6,12 +8,11 @@ const parseGrade = (grade: string) => {
   return parsedGrade
 }
 
-export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean) => {
-  const initialStats = {
+export const countTotalStats = (formattedStats: FormattedStats[]) => {
+  const initialStats: FormattedStats = {
     code: 9999,
     name: 'Total',
     coursecode: '000',
-    userHasAccessToAllStats,
     attempts: {
       categories: {
         passed: 0,
@@ -72,17 +73,20 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats: boolean
       attempts: {
         categories: { passed, failed },
         grades: cgrades,
-        totalAttempts: acc.attempts.totalAttempts + curr.attempts.totalEnrollments || passed + failed,
-        totalEnrollments: acc.attempts.totalEnrollments + (curr.attempts.totalEnrollments || 0),
+        passRate: acc.attempts.passRate,
+        totalAttempts: acc.attempts.totalAttempts! + curr.attempts.totalEnrollments! || passed + failed,
+        totalEnrollments: (acc.attempts.totalEnrollments ?? 0) + (curr.attempts.totalEnrollments ?? 0),
       },
       students: {
         total: acc.students.total + curr.students.total,
-        totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
+        totalEnrollments: (acc.students.totalEnrollments ?? 0) + (curr.students.totalEnrollments ?? 0),
         totalPassed: acc.students.totalPassed + curr.students.totalPassed,
         totalFailed: acc.students.totalFailed + (curr.students.totalFailed || 0),
         enrolledStudentsWithNoGrade:
-          acc.students.enrolledStudentsWithNoGrade + (curr.students.enrolledStudentsWithNoGrade || 0),
+          (acc.students.enrolledStudentsWithNoGrade ?? 0) + (curr.students.enrolledStudentsWithNoGrade ?? 0),
         grades: bestEffortGrades,
+        passRate: acc.students.passRate,
+        failRate: acc.students.failRate,
       },
     }
   }, initialStats)

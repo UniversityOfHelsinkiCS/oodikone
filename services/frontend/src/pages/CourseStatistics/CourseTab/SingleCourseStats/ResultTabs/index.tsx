@@ -2,31 +2,46 @@ import qs from 'query-string'
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
-import { Segment, Tab } from 'semantic-ui-react'
+import { Tab } from 'semantic-ui-react'
 
+import { Section } from '@/components/material/Section'
 import { useProgress } from '@/hooks/progress'
 import { useSemanticTabs } from '@/hooks/tabs'
+import { RootState } from '@/redux'
 import { getCourseStats } from '@/redux/courseStats'
+import { ProgrammeStats } from '@/types/courseStat'
 import { AttemptsPane } from './panes/AttemptsPane'
 import { StudentsPane } from './panes/StudentsPane'
 
-export const ResultTabs = ({ primary, comparison, separate, availableStats }) => {
+export const ResultTabs = ({
+  availableStats,
+  comparison,
+  primary,
+  separate,
+}: {
+  availableStats: { unify: boolean; open: boolean; university: boolean }
+  comparison: ProgrammeStats | undefined
+  primary: ProgrammeStats | undefined
+  separate: boolean | null
+}) => {
   const navigate = useNavigate()
   const location = useLocation()
   const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
   const [tab, setTab] = useSemanticTabs('cs_tab', 0, { location, replace })
-  const { userHasAccessToAllStats } = primary
-  const courseStats = useSelector(({ courseStats }) => courseStats)
+  const courseStats = useSelector((state: RootState) => state.courseStats)
   const { pending: loading } = courseStats
   const { onProgress } = useProgress(loading)
   const dispatch = useDispatch()
+
+  if (!primary) {
+    return null
+  }
 
   const handleTabChange = (...params) => {
     setTab(...params)
   }
 
-  const updateSeparate = separate => {
-    // Only proceed if we're still on the coursestatistics page
+  const updateSeparate = (separate: boolean) => {
     if (!location.pathname.includes('coursestatistics')) {
       return
     }
@@ -34,12 +49,12 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
     const { courseCodes, ...params } = qs.parse(location.search)
     const query = {
       ...params,
-      courseCodes: JSON.parse(courseCodes),
+      courseCodes: JSON.parse(courseCodes as string),
       separate,
     }
     dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    navigate({ search: qs.stringify(queryToString) }, { replace: true })
+    void navigate({ search: qs.stringify(queryToString) }, { replace: true })
   }
 
   const paneTypes = [
@@ -63,14 +78,14 @@ export const ResultTabs = ({ primary, comparison, separate, availableStats }) =>
         datasets={[primary, comparison]}
         separate={separate}
         updateQuery={updateSeparate}
-        userHasAccessToAllStats={userHasAccessToAllStats}
+        userHasAccessToAllStats={primary.userHasAccessToAllStats}
       />
     ),
   }))
 
   return (
-    <Segment loading={loading}>
+    <Section isLoading={loading}>
       <Tab activeIndex={tab} id="CourseStatPanes" onTabChange={handleTabChange} panes={panes} />
-    </Segment>
+    </Section>
   )
 }
