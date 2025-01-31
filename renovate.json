@@ -11,14 +11,6 @@
     },
     {
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["node"],
-      "versionCompatibility": "^(?<version>[^-]+)(?<compatibility>-.*)?$",
-      "versioning": "node"
-    },
-    {
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["node"],
-      "matchUpdateTypes": ["minor", "patch"],
       "enabled": false
     }
   ],
