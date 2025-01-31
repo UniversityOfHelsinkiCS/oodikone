@@ -106,7 +106,7 @@ export const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) =
     studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.studyProgramme.includes('+')
 
   if (
-    ((populations?.query?.studyRights?.combinedProgramme || populations?.query?.showFullStudyPath === 'true') &&
+    ((populations?.query?.studyRights?.combinedProgramme || populations?.query?.showBachelorAndMaster === 'true') &&
       variant === 'population') ||
     (studyGuidanceGroupCombinedProgramme && variant === 'studyGuidanceGroupPopulation')
   ) {

@@ -56,7 +56,7 @@ export const GeneralTab = ({
 
   const { data: populationStatistics, query } = populations
 
-  const showFullStudyPath = query?.showFullStudyPath === 'true'
+  const showBachelorAndMaster = query?.showBachelorAndMaster === 'true'
 
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(studyright => !!studyright)
@@ -123,7 +123,7 @@ export const GeneralTab = ({
     year,
     getTextIn,
     currentSemester: currentSemester?.semestercode,
-    showFullStudyPath,
+    showBachelorAndMaster,
   })
 
   const transferFrom = student => getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
@@ -285,7 +285,7 @@ export const GeneralTab = ({
       studentToSecondStudyrightEndMap,
       studentToStudyrightEndMap,
       year,
-      semestersToAddToStart: showFullStudyPath && isMastersProgramme ? 6 : 0,
+      semestersToAddToStart: showBachelorAndMaster && isMastersProgramme ? 6 : 0,
     })
 
   const availableCreditsColumns = {

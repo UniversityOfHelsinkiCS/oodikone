@@ -103,7 +103,7 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
       endDate={endDate}
       programmeCodes={null}
       selectedStudyPlan={selectedStudyPlan}
-      showFullStudyPath={null}
+      showBachelorAndMaster={null}
       singleStudent
       startDate={selectedStart}
       students={[student]}

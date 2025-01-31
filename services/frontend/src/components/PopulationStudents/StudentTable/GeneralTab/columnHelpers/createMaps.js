@@ -10,7 +10,7 @@ export const createMaps = ({
   year,
   currentSemester,
   getTextIn,
-  showFullStudyPath,
+  showBachelorAndMaster,
 }) => {
   const studentToStudyrightStartMap = {}
   const studentToStudyrightEndMap = {}
@@ -27,7 +27,7 @@ export const createMaps = ({
         if (combinedProgrammeCode) {
           return element.code === combinedProgrammeCode
         }
-        if (showFullStudyPath && studyRightElement) {
+        if (showBachelorAndMaster && studyRightElement) {
           const degreeProgrammeTypeToCheck =
             studyRightElement.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
               ? 'urn:code:degree-program-type:masters-degree'

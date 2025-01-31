@@ -313,8 +313,8 @@ const addGraduation = (points, graduationDate, notFirst) => {
   points.sort((a, b) => a.x - b.x)
 }
 
-const findGraduationsByCodes = (student, programmeCodes, showFullStudyPath) => {
-  if (showFullStudyPath) {
+const findGraduationsByCodes = (student, programmeCodes, showBachelorAndMaster) => {
+  if (showBachelorAndMaster) {
     return (
       student.studyRights
         .find(studyRight => studyRight.studyRightElements.some(element => programmeCodes.includes(element.code)))
@@ -340,12 +340,12 @@ const createStudentCreditLines = (
   cutStudyPlanCredits,
   programmeCodes,
   selectedStudyPlan,
-  showFullStudyPath
+  showBachelorAndMaster
 ) =>
   students.map(student => {
     const { studyrightStart } = student
     let startDate = singleStudent ? selectedStartDate : studyrightStart
-    if (showFullStudyPath) {
+    if (showBachelorAndMaster) {
       startDate =
         student.studyRights.find(studyRight =>
           studyRight.studyRightElements.some(element => element.code === programmeCodes[0])
@@ -363,7 +363,7 @@ const createStudentCreditLines = (
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
-    const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes, showFullStudyPath) : []
+    const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes, showBachelorAndMaster) : []
 
     if (points?.length > 0) {
       if (!singleStudent && points[0].y !== 0 && students.length < 100) {
@@ -414,7 +414,7 @@ export const CreditAccumulationGraphHighCharts = ({
   customPopulation = false,
   studyPlanFilterIsActive,
   selectedStudyPlan,
-  showFullStudyPath,
+  showBachelorAndMaster,
 }) => {
   const chartRef = useRef()
   const { getTextIn } = useLanguage()
@@ -434,7 +434,7 @@ export const CreditAccumulationGraphHighCharts = ({
         cutStudyPlanCredits,
         programmeCodes,
         selectedStudyPlan,
-        showFullStudyPath
+        showBachelorAndMaster
       ),
     [
       students,
@@ -445,7 +445,7 @@ export const CreditAccumulationGraphHighCharts = ({
       cutStudyPlanCredits,
       programmeCodes,
       selectedStudyPlan,
-      showFullStudyPath,
+      showBachelorAndMaster,
     ]
   )
 

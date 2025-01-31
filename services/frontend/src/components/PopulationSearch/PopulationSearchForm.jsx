@@ -29,7 +29,7 @@ const initialQuery = () => ({
   studentStatuses: [],
   studyRights: {},
   months: getMonths('2017', 'FALL'),
-  showFullStudyPath: false,
+  showBachelorAndMaster: false,
 })
 
 export const PopulationSearchForm = ({ onProgress }) => {
@@ -41,7 +41,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
   const { getTextIn } = useLanguage()
   const { fullAccessToStudentData, isAdmin } = useGetAuthorizedUserQuery()
   const [query, setQuery] = useState(initialQuery())
-  const [showFullStudyPath, setShowFullStudyPath] = useState(false)
+  const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
   const { data: programmes = {}, isLoading: programmesAreLoading } = useGetProgrammesQuery()
@@ -329,11 +329,11 @@ export const PopulationSearchForm = ({ onProgress }) => {
           </div>
           {isAdmin && (
             <Radio
-              checked={showFullStudyPath}
-              label="Show full study path"
+              checked={showBachelorAndMaster}
+              label="Show Bachelor + Master"
               onChange={() => {
-                setQuery({ ...query, showFullStudyPath: !showFullStudyPath })
-                setShowFullStudyPath(!showFullStudyPath)
+                setQuery({ ...query, showFullStudyPath: !showBachelorAndMaster })
+                setShowBachelorAndMaster(!showBachelorAndMaster)
               }}
               toggle
             />

@@ -63,7 +63,7 @@ export const PopulationDetails = ({
           {filteredStudents.length > 0 && (
             <CreditAccumulationGraphHighCharts
               programmeCodes={programmeCodes}
-              showFullStudyPath={query?.showFullStudyPath === 'true'}
+              showBachelorAndMaster={query?.showBachelorAndMaster === 'true'}
               students={filteredStudents}
               studyPlanFilterIsActive={studyPlanFilterIsActive}
             />

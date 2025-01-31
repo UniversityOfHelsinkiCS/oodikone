@@ -19,7 +19,7 @@ export const getPopulationStatistics = ({
   years,
   onProgress,
   tag,
-  showFullStudyPath,
+  showBachelorAndMaster,
 }) => {
   const route = '/v3/populationstatistics/'
   const prefix = 'GET_POPULATION_STATISTICS_'
@@ -32,7 +32,7 @@ export const getPopulationStatistics = ({
     year,
     years,
     tag,
-    showFullStudyPath,
+    showBachelorAndMaster,
   }
   const params = {
     semesters,
