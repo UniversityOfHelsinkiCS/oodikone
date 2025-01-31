@@ -46,7 +46,7 @@ services:
     <<: *defaults
     command: >
       sh -c 'redis-server --appendonly yes && redis-cli flushall'
-    image: redis:6.2.16
+    image: redis:7.2.6
     ports:
       - 6379:6379
 
