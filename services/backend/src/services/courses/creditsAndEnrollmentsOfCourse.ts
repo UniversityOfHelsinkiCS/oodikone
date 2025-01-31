@@ -53,7 +53,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
   const studyRightIds = Object.keys(studyRightMap)
 
   const studyRightElements = await SISStudyRightElement.findAll({
-    attributes: ['code', 'name', 'startDate', 'studyRightId'],
+    attributes: ['code', 'name', 'startDate', 'endDate', 'studyRightId'],
     where: {
       studyRightId: {
         [Op.in]: studyRightIds,

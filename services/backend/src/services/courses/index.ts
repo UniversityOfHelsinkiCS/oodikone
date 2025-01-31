@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import moment from 'moment'
 import { Op } from 'sequelize'
 
 import { serviceProvider } from '../../config'
@@ -67,11 +68,22 @@ const parseCredit = (
     credits,
     attainment_date: attainmentDate,
     student_studentnumber: studentNumber,
+    studyright_id: studyRightId,
   } = credit
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
   const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
-  const programmes = studyRightElements.map(formatStudyRightElement)
+  let programmeOfCredit: SISStudyRightElement | undefined
+  programmeOfCredit = studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId)
+  if (!programmeOfCredit) {
+    programmeOfCredit = studyRightElements
+      .filter(studyRightElement =>
+        moment(attainmentDate).isBetween(moment(studyRightElement.startDate), moment(studyRightElement.endDate))
+      )
+      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())[0] // The newest studyRightElement
+  }
+
+  const programmes = programmeOfCredit ? [programmeOfCredit].map(formatStudyRightElement) : []
 
   const formattedCredit: FormattedCredit = {
     yearCode,
