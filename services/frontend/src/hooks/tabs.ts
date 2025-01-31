@@ -33,7 +33,7 @@ export const useTabs = (totalTabs: number) => {
     if (queryTab !== tab) {
       setTab(queryTab)
     }
-  }, [id, location.search])
+  }, [location.search])
 
   useEffect(() => {
     pushToUrl(tab)

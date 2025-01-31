@@ -1,12 +1,13 @@
-import { Pane } from './Pane'
+import { Tab } from './Tab'
 import { AttemptsTable } from './tables/AttemptsTable'
 
-export const AttemptsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
+export const AttemptsTab = ({ availableStats, datasets, loading, separate, userHasAccessToAllStats, updateQuery }) => {
   return (
-    <Pane
+    <Tab
       availableStats={availableStats}
       datasets={datasets}
       initialSettings={{ viewMode: 'ATTEMPTS', separate, splitDirection: 'row' }}
+      loading={loading}
       tableComponent={AttemptsTable}
       updateQuery={updateQuery}
       userHasAccessToAllStats={userHasAccessToAllStats}

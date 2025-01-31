@@ -1,12 +1,13 @@
-import { Pane } from './Pane'
+import { Tab } from './Tab'
 import { StudentsTable } from './tables/StudentsTable'
 
-export const StudentsPane = ({ availableStats, datasets, separate, userHasAccessToAllStats, updateQuery }) => {
+export const StudentsTab = ({ availableStats, datasets, loading, separate, userHasAccessToAllStats, updateQuery }) => {
   return (
-    <Pane
+    <Tab
       availableStats={availableStats}
       datasets={datasets}
       initialSettings={{ viewMode: 'STUDENTS', separate, splitDirection: 'row' }}
+      loading={loading}
       tableComponent={StudentsTable}
       updateQuery={updateQuery}
       userHasAccessToAllStats={userHasAccessToAllStats}

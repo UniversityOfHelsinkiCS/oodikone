@@ -1,17 +1,16 @@
+import { Person as PersonIcon, Replay as ReplayIcon } from '@mui/icons-material'
+import { Tab, Tabs } from '@mui/material'
 import qs from 'query-string'
-import { useCallback } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
-import { Tab } from 'semantic-ui-react'
 
-import { Section } from '@/components/material/Section'
 import { useProgress } from '@/hooks/progress'
-import { useSemanticTabs } from '@/hooks/tabs'
 import { RootState } from '@/redux'
 import { getCourseStats } from '@/redux/courseStats'
 import { ProgrammeStats } from '@/types/courseStat'
-import { AttemptsPane } from './panes/AttemptsPane'
-import { StudentsPane } from './panes/StudentsPane'
+import { AttemptsTab } from './tabs/AttemptsTab'
+import { StudentsTab } from './tabs/StudentsTab'
 
 export const ResultTabs = ({
   availableStats,
@@ -26,8 +25,7 @@ export const ResultTabs = ({
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const replace = useCallback(options => navigate(options, { replace: true }), [navigate])
-  const [tab, setTab] = useSemanticTabs('cs_tab', 0, { location, replace })
+  const [tab, setTab] = useState(0)
   const courseStats = useSelector((state: RootState) => state.courseStats)
   const { pending: loading } = courseStats
   const { onProgress } = useProgress(loading)
@@ -35,10 +33,6 @@ export const ResultTabs = ({
 
   if (!primary) {
     return null
-  }
-
-  const handleTabChange = (...params) => {
-    setTab(...params)
   }
 
   const updateSeparate = (separate: boolean) => {
@@ -57,35 +51,32 @@ export const ResultTabs = ({
     void navigate({ search: qs.stringify(queryToString) }, { replace: true })
   }
 
-  const paneTypes = [
-    {
-      label: 'Students',
-      icon: 'user',
-      component: StudentsPane,
-    },
-    {
-      label: 'Attempts',
-      icon: 'redo',
-      component: AttemptsPane,
-    },
-  ]
-
-  const panes = paneTypes.map(({ icon, label, component: Component }) => ({
-    menuItem: { icon, content: label, key: label },
-    render: () => (
-      <Component
-        availableStats={availableStats}
-        datasets={[primary, comparison]}
-        separate={separate}
-        updateQuery={updateSeparate}
-        userHasAccessToAllStats={primary.userHasAccessToAllStats}
-      />
-    ),
-  }))
-
   return (
-    <Section isLoading={loading}>
-      <Tab activeIndex={tab} id="CourseStatPanes" onTabChange={handleTabChange} panes={panes} />
-    </Section>
+    <>
+      <Tabs onChange={() => setTab(tab ^ 1)} value={tab}>
+        <Tab icon={<PersonIcon />} iconPosition="start" label="Students" />
+        <Tab icon={<ReplayIcon />} iconPosition="start" label="Attempts" />
+      </Tabs>
+      {tab === 0 && (
+        <StudentsTab
+          availableStats={availableStats}
+          datasets={[primary, comparison]}
+          loading={loading}
+          separate={separate}
+          updateQuery={updateSeparate}
+          userHasAccessToAllStats={primary.userHasAccessToAllStats}
+        />
+      )}
+      {tab === 1 && (
+        <AttemptsTab
+          availableStats={availableStats}
+          datasets={[primary, comparison]}
+          loading={loading}
+          separate={separate}
+          updateQuery={updateSeparate}
+          userHasAccessToAllStats={primary.userHasAccessToAllStats}
+        />
+      )}
+    </>
   )
 }

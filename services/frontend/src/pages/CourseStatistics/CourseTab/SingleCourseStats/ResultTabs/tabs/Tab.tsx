@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Segment, Tab } from 'semantic-ui-react'
+
+import { Section } from '@/components/material/Section'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
 import { ChartSettings } from './settings/ChartSettings'
@@ -106,10 +107,11 @@ const GradeDistributionChartSection = ({
  *
  * @param tableComponent - Should be either StudentsTable or AttemptsTable
  */
-export const Pane = ({
+export const Tab = ({
   availableStats,
   datasets,
   initialSettings,
+  loading,
   tableComponent,
   updateQuery,
   userHasAccessToAllStats,
@@ -139,41 +141,39 @@ export const Pane = ({
   }
 
   return (
-    <Tab.Pane>
-      <Segment basic>
-        <TableSection
-          availableStats={availableStats}
+    <Section isLoading={loading}>
+      <TableSection
+        availableStats={availableStats}
+        datasets={datasets}
+        setSettings={setSettings}
+        setSplitDirection={setSplitDirection}
+        settings={settings}
+        styleContainer={styleContainer}
+        styleData={styleData}
+        tableComponent={tableComponent}
+        toggleSeparate={toggleSeparate}
+        userHasAccessToAllStats={userHasAccessToAllStats}
+      />
+      {settings.showGrades ? (
+        <GradeDistributionChartSection
           datasets={datasets}
-          setSettings={setSettings}
-          setSplitDirection={setSplitDirection}
-          settings={settings}
+          isRelative={settings.isRelative}
+          setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
           styleContainer={styleContainer}
           styleData={styleData}
-          tableComponent={tableComponent}
-          toggleSeparate={toggleSeparate}
           userHasAccessToAllStats={userHasAccessToAllStats}
         />
-        {settings.showGrades ? (
-          <GradeDistributionChartSection
-            datasets={datasets}
-            isRelative={settings.isRelative}
-            setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-            styleContainer={styleContainer}
-            styleData={styleData}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ) : (
-          <PassRateChartSection
-            datasets={datasets}
-            isRelative={settings.isRelative}
-            setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-            styleContainer={styleContainer}
-            styleData={styleData}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-            viewMode={settings.viewMode}
-          />
-        )}
-      </Segment>
-    </Tab.Pane>
+      ) : (
+        <PassRateChartSection
+          datasets={datasets}
+          isRelative={settings.isRelative}
+          setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
+          styleContainer={styleContainer}
+          styleData={styleData}
+          userHasAccessToAllStats={userHasAccessToAllStats}
+          viewMode={settings.viewMode}
+        />
+      )}
+    </Section>
   )
 }
