@@ -172,6 +172,7 @@ export const populationStatisticsToolTips = {
     - ✓ Harmaa tarkastusmerkki = Opiskelija on suorittanut kurssin vastaavalla kurssikoodilla
     - — Keltainen viiva = Opiskelijalla on alle 6kk vanha ilmoittautuminen kurssille
     - — Harmaa viiva = Opiskelijalla on yli 6kk vanha ilmoittautuminen kurssille
+    - □ Harmaa laatikko = Opiskelija on lisännyt kurssin opintosuunitelmaansa, mutta ei ole ilmoittautunut kurssille tai suorittanut sitä
 
     **Tags**
 
