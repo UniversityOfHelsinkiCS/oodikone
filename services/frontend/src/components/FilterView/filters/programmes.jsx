@@ -160,7 +160,8 @@ const MODE_PREDICATES = {
   any: () => true,
   active: (_, studyRightElement) =>
     !studyRightElement.cancelled &&
-    moment().isBetween(studyRightElement.startDate, studyRightElement.endDate, 'day', '[]'),
+    moment().isSameOrAfter(studyRightElement.startDate, 'day') &&
+    (moment().isSameOrBefore(studyRightElement.endDate, 'day') || studyRightElement.endDate == null),
 }
 
 export const programmeFilter = createFilter({
