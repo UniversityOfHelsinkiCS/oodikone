@@ -9,8 +9,9 @@ import { useProgress } from '@/hooks/progress'
 import { RootState } from '@/redux'
 import { getCourseStats } from '@/redux/courseStats'
 import { ProgrammeStats } from '@/types/courseStat'
-import { AttemptsTab } from './tabs/AttemptsTab'
-import { StudentsTab } from './tabs/StudentsTab'
+import { ResultTab } from './tabs/ResultTab'
+import { AttemptsTable } from './tabs/tables/AttemptsTable'
+import { StudentsTable } from './tabs/tables/StudentsTable'
 
 export const ResultTabs = ({
   availableStats,
@@ -21,7 +22,7 @@ export const ResultTabs = ({
   availableStats: { unify: boolean; open: boolean; university: boolean }
   comparison: ProgrammeStats | undefined
   primary: ProgrammeStats | undefined
-  separate: boolean | null
+  separate: boolean
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -58,21 +59,23 @@ export const ResultTabs = ({
         <Tab icon={<ReplayIcon />} iconPosition="start" label="Attempts" />
       </Tabs>
       {tab === 0 && (
-        <StudentsTab
+        <ResultTab
           availableStats={availableStats}
           datasets={[primary, comparison]}
+          initialSettings={{ viewMode: 'STUDENTS', separate, splitDirection: 'row' }}
           loading={loading}
-          separate={separate}
+          tableComponent={StudentsTable}
           updateQuery={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />
       )}
       {tab === 1 && (
-        <AttemptsTab
+        <ResultTab
           availableStats={availableStats}
           datasets={[primary, comparison]}
+          initialSettings={{ viewMode: 'ATTEMPTS', separate, splitDirection: 'row' }}
           loading={loading}
-          separate={separate}
+          tableComponent={AttemptsTable}
           updateQuery={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />

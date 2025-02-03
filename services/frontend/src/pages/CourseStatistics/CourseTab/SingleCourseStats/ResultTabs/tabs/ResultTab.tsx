@@ -107,7 +107,7 @@ const GradeDistributionChartSection = ({
  *
  * @param tableComponent - Should be either StudentsTable or AttemptsTable
  */
-export const Tab = ({
+export const ResultTab = ({
   availableStats,
   datasets,
   initialSettings,

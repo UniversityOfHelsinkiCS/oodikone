@@ -54,7 +54,7 @@ export const SingleCourseStats = ({
   const [comparison, setComparison] = useState<string[]>([])
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
-  const [separate, setSeparate] = useState<boolean | null>(null)
+  const [separate, setSeparate] = useState<boolean>(false)
   const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
   const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
   const { coursecode } = stats
@@ -108,7 +108,7 @@ export const SingleCourseStats = ({
   useEffect(() => {
     if (location.search) {
       const { separate } = parseQueryFromUrl()
-      setSeparate(separate)
+      setSeparate([true, false].includes(separate) ? separate : false)
     }
     dispatch(setSelectedCourse(coursecode))
 
@@ -126,7 +126,7 @@ export const SingleCourseStats = ({
   useEffect(() => {
     if (location.search) {
       const { separate } = parseQueryFromUrl()
-      setSeparate(separate)
+      setSeparate([true, false].includes(separate) ? separate : false)
     }
   }, [location.search])
 
