@@ -15,7 +15,15 @@ import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import { Name } from '@/shared/types'
-import { Attempts, CourseStat, Enrollment, FormattedStats, ProgrammeStats, Students } from '@/types/courseStat'
+import {
+  Attempts,
+  AvailableStats,
+  CourseStat,
+  Enrollment,
+  FormattedStats,
+  ProgrammeStats,
+  Students,
+} from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
@@ -42,7 +50,7 @@ export const SingleCourseStats = ({
   stats,
   userHasAccessToAllStats,
 }: {
-  availableStats: { unify: boolean; open: boolean; university: boolean }
+  availableStats: AvailableStats
   stats: CourseStat
   userHasAccessToAllStats: boolean
 }) => {

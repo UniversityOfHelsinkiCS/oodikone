@@ -1,49 +1,40 @@
-import { Radio, Segment, SegmentGroup } from 'semantic-ui-react'
+import { Box, Stack, Switch } from '@mui/material'
 
-import { courseStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox'
-import { DirectionToggle } from './common/DirectionToggle'
-import { ProviderOrganization } from './common/ProviderOrganization'
-import { Setting } from './common/Setting'
+import { AvailableStats } from '@/types/courseStat'
+import { ProviderOrganization } from './ProviderOrganization'
+import { Setting } from './Setting'
 
-export const TableSettings = ({ availableStats, datasets, onChange, onSeparateChange, setSplitDirection, value }) => {
-  const { showGrades, separate, splitDirection, viewMode } = value
-
-  const settings = [
-    <Setting key="gradeToggle" labelText="Show grades">
-      <Radio
-        checked={showGrades}
-        data-cy="gradeToggle"
-        onChange={() => onChange({ ...value, showGrades: !showGrades })}
-        toggle
-      />
-    </Setting>,
-    <Setting key="separateToggle" labelText="Separate by semesters">
-      <Radio checked={separate} data-cy="separateToggle" onChange={() => onSeparateChange(!separate)} toggle />
-    </Setting>,
-    <Setting key="providerOrganization" labelText="Provider organization(s)">
-      <ProviderOrganization availableStats={availableStats} />
-    </Setting>,
-  ]
-
-  if (datasets.filter(dataset => dataset).length > 1) {
-    settings.push(
-      <Setting key="splitDirection" labelText="Split direction">
-        <DirectionToggle setSplitDirection={setSplitDirection} splitDirection={splitDirection} />
-      </Setting>
-    )
-  }
-
+export const TableSettings = ({
+  availableStats,
+  onShowGradesChange,
+  onSeparateChange,
+  separate,
+  showGrades,
+}: {
+  availableStats: AvailableStats
+  onShowGradesChange: (value) => void
+  onSeparateChange: (separate: boolean) => void
+  separate: boolean
+  showGrades: boolean
+}) => {
   return (
-    <div style={{ alignItems: 'center', display: 'flex' }}>
-      <SegmentGroup horizontal>
-        {settings.map(setting => (
-          <Segment key={setting.key}>{setting}</Segment>
-        ))}
-      </SegmentGroup>
-      <div style={{ marginLeft: '20px' }}>
-        <InfoBox content={courseStatisticsToolTips.tables[viewMode]} popup />
-      </div>
-    </div>
+    <Box sx={{ alignItems: 'center', display: 'flex' }}>
+      <Stack direction="row" gap={1}>
+        <Setting
+          control={
+            <Switch checked={showGrades} data-cy="gradeToggle" onChange={() => onShowGradesChange(!showGrades)} />
+          }
+          labelText="Show grades"
+        />
+        <Setting
+          control={<Switch checked={separate} data-cy="separateToggle" onChange={() => onSeparateChange(!separate)} />}
+          labelText="Separate by semesters"
+        />
+        <Setting
+          control={<ProviderOrganization availableStats={availableStats} />}
+          labelText="Provider organization(s)"
+        />
+      </Stack>
+    </Box>
   )
 }

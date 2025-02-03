@@ -1,179 +1,120 @@
+import { Stack } from '@mui/material'
 import { useState } from 'react'
 
+import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
+import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
 import { ChartSettings } from './settings/ChartSettings'
 import { TableSettings } from './settings/TableSettings'
+import { AttemptsTable } from './tables/AttemptsTable'
+import { StudentsTable } from './tables/StudentsTable'
 
-const TableSection = ({
-  availableStats,
-  datasets,
-  settings,
-  setSettings,
-  setSplitDirection,
-  tableComponent: Table,
-  toggleSeparate,
-  styleContainer,
-  styleData,
-  userHasAccessToAllStats,
-}) => {
-  return (
-    <>
-      <div style={{ marginBottom: '1em' }}>
-        <TableSettings
-          availableStats={availableStats}
-          datasets={datasets}
-          onChange={setSettings}
-          onSeparateChange={toggleSeparate}
-          setSplitDirection={setSplitDirection}
-          value={settings}
-        />
-      </div>
-      <div style={styleContainer}>
-        {datasets
-          .filter(data => data)
-          .map(data => (
-            <div key={data.name} style={styleData}>
-              <Table data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
-            </div>
-          ))}
-      </div>
-    </>
-  )
+type ResultTabSettings = {
+  isRelative: boolean
+  separate: boolean
+  showGrades: boolean
+  viewMode: 'STUDENTS' | 'ATTEMPTS'
 }
 
-const PassRateChartSection = ({
-  datasets,
-  isRelative,
-  setIsRelative,
-  styleContainer,
-  styleData,
-  userHasAccessToAllStats,
-  viewMode,
-}) => {
-  return (
-    <>
-      <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="PassRate" viewMode={viewMode} />
-      <div style={styleContainer}>
-        {datasets
-          .filter(data => data)
-          .map(data => (
-            <div key={data.name} style={styleData}>
-              <PassRateChart
-                data={data}
-                isRelative={isRelative}
-                userHasAccessToAllStats={userHasAccessToAllStats}
-                viewMode={viewMode}
-              />
-            </div>
-          ))}
-      </div>
-    </>
-  )
-}
-
-const GradeDistributionChartSection = ({
-  datasets,
-  isRelative,
-  setIsRelative,
-  styleContainer,
-  styleData,
-  userHasAccessToAllStats,
-}) => {
-  return (
-    <>
-      <ChartSettings isRelative={isRelative} setIsRelative={setIsRelative} tab="GradeDistribution" />
-      <div style={styleContainer}>
-        {datasets
-          .filter(data => data)
-          .map(data => (
-            <div key={data.name} style={styleData}>
-              <GradeDistributionChart
-                data={data}
-                isRelative={isRelative}
-                userHasAccessToAllStats={userHasAccessToAllStats}
-              />
-            </div>
-          ))}
-      </div>
-    </>
-  )
-}
-
-/**
- * A generalized pane component that is used on the Students and the Attempts tabs.
- * Contains settings and table for the corresponding tab and the pass rate chart.
- *
- * @param tableComponent - Should be either StudentsTable or AttemptsTable
- */
 export const ResultTab = ({
   availableStats,
   datasets,
   initialSettings,
   loading,
-  tableComponent,
-  updateQuery,
+  updateSeparate,
   userHasAccessToAllStats,
+}: {
+  availableStats: AvailableStats
+  datasets: (ProgrammeStats | undefined)[]
+  initialSettings: { viewMode: 'STUDENTS' | 'ATTEMPTS'; separate: boolean }
+  loading: boolean
+  updateSeparate: (separate: boolean) => void
+  userHasAccessToAllStats: boolean
 }) => {
-  const [settings, setSettings] = useState(initialSettings)
+  const [settings, setSettings] = useState<ResultTabSettings>({
+    isRelative: false,
+    separate: initialSettings.separate,
+    showGrades: false,
+    viewMode: initialSettings.viewMode,
+  })
 
-  const setSplitDirection = splitDirection => {
-    setSettings({ ...settings, splitDirection })
+  const toggleShowGrades = (showGrades: boolean) => {
+    setSettings({ ...settings, showGrades })
   }
 
-  const toggleSeparate = separate => {
+  const toggleSeparate = (separate: boolean) => {
     setSettings({ ...settings, separate })
-    updateQuery(separate)
-  }
-
-  const halfWidth = datasets.filter(dataset => dataset).length > 1 && settings.splitDirection === 'row'
-  const styleContainer = {
-    display: 'flex',
-    flexDirection: settings.splitDirection,
-    justifyContent: 'space-between',
-  }
-  const styleData = {
-    flexGrow: 1,
-    flexBasis: 1,
-    marginBottom: halfWidth ? '0px' : '20px',
-    maxWidth: halfWidth ? '49%' : '100%',
+    updateSeparate(separate)
   }
 
   return (
-    <Section isLoading={loading}>
-      <TableSection
-        availableStats={availableStats}
-        datasets={datasets}
-        setSettings={setSettings}
-        setSplitDirection={setSplitDirection}
-        settings={settings}
-        styleContainer={styleContainer}
-        styleData={styleData}
-        tableComponent={tableComponent}
-        toggleSeparate={toggleSeparate}
-        userHasAccessToAllStats={userHasAccessToAllStats}
-      />
-      {settings.showGrades ? (
-        <GradeDistributionChartSection
-          datasets={datasets}
-          isRelative={settings.isRelative}
-          setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-          styleContainer={styleContainer}
-          styleData={styleData}
-          userHasAccessToAllStats={userHasAccessToAllStats}
-        />
-      ) : (
-        <PassRateChartSection
-          datasets={datasets}
-          isRelative={settings.isRelative}
-          setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-          styleContainer={styleContainer}
-          styleData={styleData}
-          userHasAccessToAllStats={userHasAccessToAllStats}
-          viewMode={settings.viewMode}
-        />
-      )}
-    </Section>
+    <>
+      <Section
+        infoBoxContent={courseStatisticsToolTips.tables[settings.viewMode]}
+        isLoading={loading}
+        title={settings.viewMode === 'STUDENTS' ? 'Student statistics' : 'Attempt statistics'}
+      >
+        <Stack gap={2}>
+          <TableSettings
+            availableStats={availableStats}
+            onSeparateChange={toggleSeparate}
+            onShowGradesChange={toggleShowGrades}
+            separate={settings.separate}
+            showGrades={settings.showGrades}
+          />
+          {datasets
+            .filter(data => data !== undefined)
+            .map(data => (
+              <div key={data.name}>
+                {settings.viewMode === 'STUDENTS' ? (
+                  <StudentsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
+                ) : (
+                  <AttemptsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
+                )}
+              </div>
+            ))}
+        </Stack>
+      </Section>
+      <Section isLoading={loading} title={settings.showGrades ? 'Grade distribution' : 'Pass rate'}>
+        {settings.showGrades ? (
+          <>
+            <ChartSettings
+              isRelative={settings.isRelative}
+              setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
+            />
+            {datasets
+              .filter(data => data !== undefined)
+              .map(data => (
+                <GradeDistributionChart
+                  data={data}
+                  isRelative={settings.isRelative}
+                  key={data.name}
+                  userHasAccessToAllStats={userHasAccessToAllStats}
+                />
+              ))}
+          </>
+        ) : (
+          <>
+            <ChartSettings
+              isRelative={settings.isRelative}
+              setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
+            />
+            {datasets
+              .filter(data => data !== undefined)
+              .map(data => (
+                <PassRateChart
+                  data={data}
+                  isRelative={settings.isRelative}
+                  key={data.name}
+                  userHasAccessToAllStats={userHasAccessToAllStats}
+                  viewMode={settings.viewMode}
+                />
+              ))}
+          </>
+        )}
+      </Section>
+    </>
   )
 }

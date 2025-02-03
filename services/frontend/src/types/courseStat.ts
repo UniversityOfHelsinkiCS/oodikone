@@ -99,3 +99,5 @@ export type ProgrammeStats = {
   totals: FormattedStats
   userHasAccessToAllStats: boolean
 }
+
+export type AvailableStats = { unify: boolean; open: boolean; university: boolean }
