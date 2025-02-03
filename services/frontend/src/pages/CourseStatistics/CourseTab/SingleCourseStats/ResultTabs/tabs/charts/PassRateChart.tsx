@@ -4,6 +4,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { chartColor, color } from '@/styles/colors'
+import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
 exporting(ReactHighcharts.Highcharts)
@@ -114,7 +115,7 @@ const getPassRateAttemptSeriesFromStats = stats => {
   }
 }
 
-const getPassRateStudentSeriesFromStats = stats => {
+const getPassRateStudentSeriesFromStats = (stats: FormattedStats[]) => {
   const all: number[] = []
   const passed: number[] = []
   const failed: number[] = []
@@ -124,7 +125,7 @@ const getPassRateStudentSeriesFromStats = stats => {
     all.push(year.students.total || 0)
     passed.push(year.students.totalPassed || 0)
     failed.push(year.students.totalFailed || 0)
-    enrolledNoGrade.push(year.students.enrolledStudentsWithNoGrade || 0)
+    enrolledNoGrade.push(year.students.enrolledStudentsWithNoGrade ?? 0)
   })
 
   return {
@@ -142,14 +143,17 @@ const getPassRateStudentSeriesFromStats = stats => {
   }
 }
 
-interface PassRateChartProps {
-  data: any
+export const PassRateChart = ({
+  data,
+  isRelative,
+  userHasAccessToAllStats,
+  viewMode,
+}: {
+  data: ProgrammeStats
   isRelative: boolean
   userHasAccessToAllStats: boolean
   viewMode: 'ATTEMPTS' | 'STUDENTS'
-}
-
-export const PassRateChart = ({ data, isRelative, userHasAccessToAllStats, viewMode }: PassRateChartProps) => {
+}) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
 
