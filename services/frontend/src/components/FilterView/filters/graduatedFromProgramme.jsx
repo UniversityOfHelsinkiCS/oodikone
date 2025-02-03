@@ -56,14 +56,27 @@ export const graduatedFromProgrammeFilter = createFilter({
   isActive: ({ mode }) => mode !== null,
 
   filter(student, { mode }, { args }) {
-    const chosenProgrammeCode =
-      (mode === 2 || mode === -1) && args.combinedProgrammeCode ? args.combinedProgrammeCode : args.code
-    const correctStudyRight = student.studyRights.find(studyRight =>
-      studyRight.studyRightElements.some(el => el.code === chosenProgrammeCode)
-    )
-    const hasGraduated =
-      correctStudyRight != null &&
-      correctStudyRight.studyRightElements.find(el => el.code === chosenProgrammeCode).graduated
+    const { code, showBachelorAndMaster } = args
+    const BACHELORS = 'urn:code:degree-program-type:bachelors-degree'
+    const MASTERS = 'urn:code:degree-program-type:masters-degree'
+
+    const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === code))
+    if (!studyRight) return false
+
+    const element = studyRight.studyRightElements.find(el => el.code === code)
+
+    const isBachelorOrMaster = [BACHELORS, MASTERS].includes(element?.degreeProgrammeType)
+
+    let hasGraduated = false
+
+    if (!isBachelorOrMaster || !showBachelorAndMaster) {
+      hasGraduated = !!element?.graduated
+    } else if ([0, 1].includes(mode)) {
+      hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === BACHELORS && el.graduated)
+    } else if ([2, -1].includes(mode)) {
+      hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === MASTERS && el.graduated)
+    }
+
     const keepGraduated = mode > 0
 
     return keepGraduated === hasGraduated
@@ -72,7 +85,7 @@ export const graduatedFromProgrammeFilter = createFilter({
   render: (props, { args }) => (
     <GraduatedFromProgrammeFilterCard
       {...props}
-      isCombinedExtent={args.code && args.combinedProgrammeCode}
+      isCombinedExtent={args.code && (args.combinedProgrammeCode || args.showBachelorAndMaster)}
       isLicentiate={args.combinedProgrammeCode === 'MH90_001'}
     />
   ),

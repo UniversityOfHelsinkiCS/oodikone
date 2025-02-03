@@ -70,6 +70,7 @@ export const PopulationStatistics = () => {
   }
   const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
   const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
+  const showBachelorAndMaster = query?.showBachelorAndMaster === 'true' || combinedProgrammeCode !== ''
 
   const filters = [
     !onlyIamRights ? ageFilter : null,
@@ -83,7 +84,11 @@ export const PopulationStatistics = () => {
       programme: programmeCode,
     }),
     genderFilter,
-    graduatedFromProgrammeFilter({ code: programmeCode, combinedProgrammeCode }),
+    graduatedFromProgrammeFilter({
+      code: programmeCode,
+      combinedProgrammeCode,
+      showBachelorAndMaster,
+    }),
     hopsFilter({ programmeCode, combinedProgrammeCode }),
     studentNumberFilter,
     startYearAtUniFilter,
