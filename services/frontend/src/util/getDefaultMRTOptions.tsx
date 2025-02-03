@@ -46,6 +46,15 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
       showColumnFilters: true,
     },
     localization: language === 'fi' ? MRT_Localization_FI : MRT_Localization_EN,
+    muiFilterTextFieldProps: ({ column }) => {
+      if (
+        column.columnDef.filterVariant &&
+        ['multi-select', 'select', 'text'].includes(column.columnDef.filterVariant)
+      ) {
+        return { placeholder: '' }
+      }
+      return {}
+    },
     muiPaginationProps: {
       rowsPerPageOptions: [50, 100, 200, 300, 400, 500],
     },
