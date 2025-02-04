@@ -98,9 +98,9 @@ describe('Students tests', () => {
           cy.get('a').click()
         })
       cy.url().should('include', '/coursestatistics')
-      cy.contains('MAT12004 Tilastollinen päättely I')
-      cy.contains('AYMAT12004 Avoin yo: Tilastollinen päättely I')
-      cy.contains('57046 Johdatus tilastolliseen päättelyyn')
+      cy.contains('MAT12004 • Tilastollinen päättely I')
+      cy.contains('AYMAT12004 • Avoin yo: Tilastollinen päättely I')
+      cy.contains('57046 • Johdatus tilastolliseen päättelyyn')
     })
 
     it('Has correct Sisu link', () => {

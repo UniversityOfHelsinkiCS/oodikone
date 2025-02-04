@@ -98,10 +98,10 @@ describe('Population statistics tests', () => {
       cy.contains('td', 'MAT11001').siblings().find('i.level.up').click()
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
-      cy.contains('MAT11001 Johdatus yliopistomatematiikkaan')
-      cy.contains('AYMAT11001 Avoin yo: Johdatus yliopistomatematiikkaan')
-      cy.contains('57033 Johdatus yliopistomatematiikkaan')
-      cy.contains('A57033 Avoin yo: Johdatus yliopistomatematiikkaan')
+      cy.contains('MAT11001 • Johdatus yliopistomatematiikkaan')
+      cy.contains('AYMAT11001 • Avoin yo: Johdatus yliopistomatematiikkaan')
+      cy.contains('57033 • Johdatus yliopistomatematiikkaan')
+      cy.contains('A57033 • Avoin yo: Johdatus yliopistomatematiikkaan')
     })
 
     it('Courses of class curriculum selection works', () => {
