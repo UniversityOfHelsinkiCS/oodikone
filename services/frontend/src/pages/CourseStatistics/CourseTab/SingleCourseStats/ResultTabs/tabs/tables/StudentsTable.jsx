@@ -7,15 +7,12 @@ import { Icon, Item } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { SortableTable, row } from '@/components/SortableTable'
-import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
-import { Name } from '@/shared/types'
-import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
-const getGradeColumns = (grades: { key: string; title: string }[]) => {
+const getGradeColumns = grades => {
   return grades.map(({ key, title }) =>
     getSortableColumn({
       key,
@@ -26,15 +23,8 @@ const getGradeColumns = (grades: { key: string; title: string }[]) => {
   )
 }
 
-const getColumns = (
-  stats: FormattedStats[],
-  showGrades: boolean,
-  userHasAccessToAllStats: boolean,
-  alternatives: { code: string; name: Name }[],
-  separate: boolean,
-  unifyCourses: 'openStats' | 'regularStats' | 'unifyStats'
-) => {
-  const showPopulation = (yearCode: number, years: string) => {
+const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
+  const showPopulation = (yearCode, years) => {
     const queryObject = {
       from: yearCode,
       to: yearCode,
@@ -180,19 +170,9 @@ const getColumns = (
   })
 }
 
-export const StudentsTable = ({
-  data: { name, stats },
-  separate,
-  showGrades,
-  userHasAccessToAllStats,
-}: {
-  data: ProgrammeStats
-  separate: boolean
-  showGrades: boolean
-  userHasAccessToAllStats: boolean
-}) => {
+export const StudentsTable = ({ data: { name, stats }, separate, showGrades, userHasAccessToAllStats }) => {
   const alternatives = useSelector(getCourseAlternatives)
-  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
+  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
 
   const columns = useMemo(
     () => getColumns(stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
