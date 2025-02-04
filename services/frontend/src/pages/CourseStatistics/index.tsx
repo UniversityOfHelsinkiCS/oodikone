@@ -1,4 +1,4 @@
-import { Container, Tab, Tabs } from '@mui/material'
+import { Box, Container, Tab, Tabs } from '@mui/material'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,6 +15,7 @@ import { getCourseStats } from '@/redux/courseStats'
 import { checkUserAccess, getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
 import { CourseTab } from './CourseTab'
 import { FacultyStatisticsTab } from './FacultyStatisticsTab'
+import { NewQueryButton } from './NewQueryButton'
 import { SearchForm } from './SearchForm'
 import { SummaryTab } from './SummaryTab'
 
@@ -76,11 +77,14 @@ export const CourseStatistics = () => {
         <SearchForm onProgress={onProgress} progress={progress} />
       ) : (
         <>
-          <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
-            <Tab data-cy="CourseTab" label="Course" />
-            <Tab data-cy="SummaryTab" disabled={singleCourseStats} label="Summary" />
-            <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />
-          </Tabs>
+          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+            <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ flexGrow: 1 }} value={tab}>
+              <Tab data-cy="CourseTab" label="Course" />
+              <Tab data-cy="SummaryTab" disabled={singleCourseStats} label="Summary" />
+              <Tab data-cy="FacultyStatisticsTab" disabled={!userHasAccessToAllStats} label="Faculty statistics" />
+            </Tabs>
+            <NewQueryButton />
+          </Box>
           {tab === 0 && (
             <CourseTab
               selected={selected}
