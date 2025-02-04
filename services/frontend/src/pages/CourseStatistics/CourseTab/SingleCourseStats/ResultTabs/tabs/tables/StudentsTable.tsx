@@ -3,16 +3,19 @@ import qs from 'query-string'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router'
-import { Header, Icon, Item } from 'semantic-ui-react'
+import { Icon, Item } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { SortableTable, row } from '@/components/SortableTable'
+import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
+import { Name } from '@/shared/types'
+import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
 
 const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
 
-const getGradeColumns = grades => {
+const getGradeColumns = (grades: { key: string; title: string }[]) => {
   return grades.map(({ key, title }) =>
     getSortableColumn({
       key,
@@ -23,11 +26,18 @@ const getGradeColumns = grades => {
   )
 }
 
-const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
-  const showPopulation = (yearcode, years) => {
+const getColumns = (
+  stats: FormattedStats[],
+  showGrades: boolean,
+  userHasAccessToAllStats: boolean,
+  alternatives: { code: string; name: Name }[],
+  separate: boolean,
+  unifyCourses: 'openStats' | 'regularStats' | 'unifyStats'
+) => {
+  const showPopulation = (yearCode: number, years: string) => {
     const queryObject = {
-      from: yearcode,
-      to: yearcode,
+      from: yearCode,
+      to: yearCode,
       coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
       years,
       separate,
@@ -36,6 +46,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
   }
+
   const toskaColumns = [
     {
       key: 'TIME_PARENT',
@@ -171,12 +182,17 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
 
 export const StudentsTable = ({
   data: { name, stats },
-  settings: { separate, showGrades },
+  separate,
+  showGrades,
   userHasAccessToAllStats,
-  headerVisible = false,
+}: {
+  data: ProgrammeStats
+  separate: boolean
+  showGrades: boolean
+  userHasAccessToAllStats: boolean
 }) => {
   const alternatives = useSelector(getCourseAlternatives)
-  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
+  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
 
   const columns = useMemo(
     () => getColumns(stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
@@ -192,11 +208,6 @@ export const StudentsTable = ({
 
   return (
     <div>
-      {headerVisible && (
-        <Header as="h3" textAlign="center">
-          {name}
-        </Header>
-      )}
       <SortableTable
         columns={columns}
         data={data}

@@ -69,7 +69,12 @@ export const ResultTab = ({
             .map(data => (
               <div key={data.name}>
                 {settings.viewMode === 'STUDENTS' ? (
-                  <StudentsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
+                  <StudentsTable
+                    data={data}
+                    separate={settings.separate}
+                    showGrades={settings.showGrades}
+                    userHasAccessToAllStats={userHasAccessToAllStats}
+                  />
                 ) : (
                   <AttemptsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
                 )}

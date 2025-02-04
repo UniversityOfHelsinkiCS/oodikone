@@ -1,6 +1,7 @@
 import { flatten } from 'lodash'
 
 import { calculatePercentage } from '@/common'
+import { FormattedStats } from '@/types/courseStat'
 
 type Series = {
   name: string
@@ -110,7 +111,7 @@ const getSortedGrades = (grades: string[]) => {
   })
 }
 
-export const resolveGrades = stats => {
+export const resolveGrades = (stats: FormattedStats[]) => {
   const allGrades = [
     '0',
     ...flatten(
