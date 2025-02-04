@@ -22,7 +22,7 @@ const checkGradeTable = gradesTableContents => {
 }
 
 const checkTableContents = contents => {
-  cy.get('#CourseStatPanes table>tbody').within(() => {
+  cy.get('table>tbody').within(() => {
     contents.forEach((values, trIndex) => {
       cy.get('tr')
         .eq(trIndex)
@@ -46,7 +46,7 @@ const toggleSeparateBySemesters = () => {
 }
 
 const openAttemptsTab = () => {
-  cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+  cy.get('[data-cy="AttemptsTab"]').click()
 }
 
 const searchByCourseName = courseName => {
@@ -55,6 +55,19 @@ const searchByCourseName = courseName => {
 
 const searchByCourseCode = courseCode => {
   cy.get("input[placeholder='Search by course code']").type(courseCode)
+}
+
+const clickNewQueryButton = () => {
+  cy.get('[data-cy="NewQueryButton"]').click()
+}
+
+const selectFromYear = year => {
+  cy.get('[data-cy="FromYearSelector"]').click()
+  cy.get(`[data-cy="FromYearSelectorOption${year}"]`).click()
+}
+
+const openSummaryTab = () => {
+  cy.get('[data-cy="SummaryTab"]').click()
 }
 
 describe('Course Statistics tests', () => {
@@ -76,21 +89,20 @@ describe('Course Statistics tests', () => {
         searchByCourseCode('KK-RUKIRJ')
         cy.contains('td', /^KK-RUKIRJ,/).click()
         cy.contains('Search for courses').should('not.exist')
-        cy.contains('KK-RUKIRJ Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
-        cy.contains('AYKK-RUKIRJ Avoin yo: Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
-        cy.contains('KK-RULAAK2 Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
+        cy.contains('KK-RUKIRJ • Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
+        cy.contains('AYKK-RUKIRJ • Avoin yo: Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
+        cy.contains('KK-RULAAK2 • Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1)')
         cy.contains(
-          'KK-RUHYK Helsingin yliopistossa toiseen tutkintoon suoritettu toisen kotimaisen kielen kirjallinen taito, ruotsi'
+          'KK-RUHYK • Helsingin yliopistossa toiseen tutkintoon suoritettu toisen kotimaisen kielen kirjallinen taito, ruotsi'
         )
-        cy.contains('992912 Toisen kotimaisen kielen kirjallinen taito, ruotsi')
-        cy.contains('A992912 Avoin yo: Toisen kotimaisen kielen kirjallinen taito, ruotsi')
+        cy.contains('992912 • Toisen kotimaisen kielen kirjallinen taito, ruotsi')
+        cy.contains('A992912 • Avoin yo: Toisen kotimaisen kielen kirjallinen taito, ruotsi')
         cy.contains('2004-2005')
         cy.contains('Show population').should('be.disabled')
         cy.contains('Show population').trigger('mouseover', { force: true })
         cy.contains('The maximum time range to generate a population for this course is 17 years')
         cy.contains('Show population').trigger('mouseleave', { force: true })
-        cy.contains('div', '2004-2005').click()
-        cy.contains('2019-2020').click()
+        selectFromYear('2019-2020')
         cy.contains('Show population').click()
         cy.contains(
           'Population of course Toisen kotimaisen kielen kirjallinen taito, ruotsi (CEFR B1) 2019-2024 (open and normal)'
@@ -110,7 +122,7 @@ describe('Course Statistics tests', () => {
         searchByCourseCode('50131')
         cy.contains('td', '50131').click()
         cy.contains('Search for courses').should('not.exist')
-        cy.contains('50131 Pro gradu -tutkielma tietojenkäsittelytieteessä')
+        cy.contains('50131 • Pro gradu -tutkielma tietojenkäsittelytieteessä')
         cy.contains('Show population').should('be.enabled').click()
         cy.contains('Population of course Pro gradu -tutkielma tietojenkäsittelytieteessä 2007-2020 (open and normal)')
         cy.contains('10 students out of 10 shown')
@@ -127,9 +139,9 @@ describe('Course Statistics tests', () => {
         cy.contains('td', '200012').click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains(
-          'ON-310 Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot'
+          'ON-310 • Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot'
         )
-        cy.contains('200012 Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
+        cy.contains('200012 • Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
         cy.contains('Show population').should('be.enabled').click()
         cy.contains(
           'Population of course Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
@@ -149,15 +161,15 @@ describe('Course Statistics tests', () => {
       cy.contains('TKT20001')
       cy.contains('58131')
 
-      cy.contains('.tabular.menu a', 'Students').click()
+      cy.contains('Students').click()
       cy.contains('All')
       cy.contains('svg', 'Pass rate')
 
-      cy.contains('.tabular.menu a', 'Attempts').click()
+      cy.contains('Attempts').click()
       cy.contains('All')
       cy.contains('svg', 'Pass rate')
 
-      cy.contains('a', 'New query').click()
+      clickNewQueryButton()
       cy.contains('Search for courses')
     })
 
@@ -171,19 +183,20 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.contains('.courseNameCell', 'Tietorakenteet ja algoritmit').contains('TKT20001').click()
-      cy.contains('.courseNameCell', 'Ohjelmoinnin perusteet').should('not.exist')
+      openSummaryTab()
+      cy.contains('Tietorakenteet ja algoritmit').click()
+      cy.contains('Ohjelmoinnin perusteet').should('not.exist')
       cy.contains('TKT20001')
       cy.contains('58131')
-      cy.contains('Summary').click()
 
-      cy.contains('.courseNameCell', 'Ohjelmoinnin perusteet').contains('TKT10002').click()
-      cy.contains('.courseNameCell', 'Käyttöjärjestelmät').should('not.exist')
+      openSummaryTab()
+      cy.contains('Ohjelmoinnin perusteet').click()
+      cy.contains('Käyttöjärjestelmät').should('not.exist')
       cy.contains('TKT10002')
       cy.contains('581325')
-      cy.contains('Summary').click()
+      openSummaryTab()
 
-      cy.contains('a', 'New query').click()
+      clickNewQueryButton()
       cy.contains('Search for courses')
     })
 
@@ -195,15 +208,16 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.get('.ui.menu').contains('Course').click()
-      cy.cs('course-selector').get('.active.selected.item').contains('TKT10002')
+      cy.get('[data-cy="CourseSelector"]')
+      cy.get('[data-cy="CourseSelectorOptionTKT10002"]')
+      cy.cs('CourseSelector').get('.active.selected.item').contains('TKT10002')
       cy.get('#CourseStatPanes table a.item:first').click()
       cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
 
       cy.go('back')
       cy.get('.ui.menu').contains('Course').click()
-      cy.cs('course-selector').click()
-      cy.cs('course-selector').contains('TKT20001').click()
+      cy.cs('CourseSelector').click()
+      cy.cs('CourseSelector').contains('TKT20001').click()
       cy.get('#CourseStatPanes table a.item:first').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit')
     })
@@ -232,12 +246,12 @@ describe('Course Statistics tests', () => {
 
       cy.contains('Search for courses').should('not.exist')
 
-      cy.contains('TKT10004 Tietokantojen perusteet')
-      cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
-      cy.contains('BSCS2001 Introduction to Databases')
-      cy.contains('581328 Tietokantojen perusteet')
-      cy.contains('A581328 Avoin yo: Tietokantojen perusteet')
-      cy.get('.right').click()
+      cy.contains('TKT10004 • Tietokantojen perusteet')
+      cy.contains('AYTKT10004 • Avoin yo: Tietokantojen perusteet')
+      cy.contains('BSCS2001 • Introduction to Databases')
+      cy.contains('581328 • Tietokantojen perusteet')
+      cy.contains('A581328 • Avoin yo: Tietokantojen perusteet')
+      clickNewQueryButton()
       cy.contains('Please enter at least 5 characters for course name or 2 characters for course code.')
     })
 
@@ -259,16 +273,16 @@ describe('Course Statistics tests', () => {
       cy.contains('td', /^TKT10004/).click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
-      cy.contains('A581328 Avoin yo: Tietokantojen perusteet')
-      cy.contains('TKT10004 Tietokantojen perusteet')
-      cy.contains('BSCS2001 Introduction to Databases')
-      cy.contains('581328 Tietokantojen perusteet')
-      cy.cs('providerCheckboxUniversity').should('have.class', 'checked').click()
-      cy.cs('providerCheckboxOpenUni').should('have.class', 'checked').click()
-      cy.contains('TKT10004 Tietokantojen perusteet')
-      cy.contains('BSCS2001 Introduction to Databases')
-      cy.contains('581328 Tietokantojen perusteet')
+      cy.contains('AYTKT10004 • Avoin yo: Tietokantojen perusteet')
+      cy.contains('A581328 • Avoin yo: Tietokantojen perusteet')
+      cy.contains('TKT10004 • Tietokantojen perusteet')
+      cy.contains('BSCS2001 • Introduction to Databases')
+      cy.contains('581328 • Tietokantojen perusteet')
+      cy.cs('ProviderCheckboxUniversity').should('have.class', 'Mui-checked').click()
+      cy.cs('ProviderCheckboxOpenUni').should('have.class', 'Mui-checked').click()
+      cy.contains('TKT10004 • Tietokantojen perusteet')
+      cy.contains('BSCS2001 • Introduction to Databases')
+      cy.contains('581328 • Tietokantojen perusteet')
     })
 
     it('Searching course by name displays right courses, 10 credit courses', { retries: 2 }, () => {
@@ -278,28 +292,28 @@ describe('Course Statistics tests', () => {
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.contains('TKT20001 Tietorakenteet ja algoritmit')
-      cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
-      cy.contains('BSCS1003 Data Structures and Algorithms')
-      cy.contains('58131 Tietorakenteet')
-      cy.get('.right').click()
+      cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
+      cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
+      cy.contains('BSCS1003 • Data Structures and Algorithms')
+      cy.contains('58131 • Tietorakenteet')
+      clickNewQueryButton()
       cy.contains('Please enter at least 5 characters for course name or 2 characters for course code.')
       searchByCourseName('tietorakenteet ja algoritmit')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
 
       cy.contains('Search for courses').should('not.exist')
-      cy.contains('TKT20001 Tietorakenteet ja algoritmit')
-      cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
-      cy.contains('BSCS1003 Data Structures and Algorithms')
-      cy.contains('58131 Tietorakenteet')
+      cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
+      cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
+      cy.contains('BSCS1003 • Data Structures and Algorithms')
+      cy.contains('58131 • Tietorakenteet')
     })
 
     it('Can find course population', () => {
       cy.contains('Search for courses')
       searchByCourseCode('TKT20003')
       cy.contains('tr', 'TKT20003').click()
-      cy.contains('TKT20003 Käyttöjärjestelmät')
-      cy.contains('582219 Käyttöjärjestelmät')
+      cy.contains('TKT20003 • Käyttöjärjestelmät')
+      cy.contains('582219 • Käyttöjärjestelmät')
       cy.get('tbody > :nth-child(4) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2020-2021 (open and normal')
       cy.contains('TKT20003')
@@ -312,10 +326,10 @@ describe('Course Statistics tests', () => {
     it('Population of course shows grades for each student', () => {
       searchByCourseCode('TKT20001')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
-      cy.contains('TKT20001 Tietorakenteet ja algoritmit')
-      cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
-      cy.contains('BSCS1003 Data Structures and Algorithms')
-      cy.contains('58131 Tietorakenteet')
+      cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
+      cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
+      cy.contains('BSCS1003 • Data Structures and Algorithms')
+      cy.contains('58131 • Tietorakenteet')
       cy.get('tbody >:nth-child(5) > :nth-child(2) .level').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
       cy.contains('Students (33)').click()
@@ -326,10 +340,10 @@ describe('Course Statistics tests', () => {
     it("In 'Course population' view, student numbers of students that the user isn't allowed to see are hidden", () => {
       searchByCourseCode('TKT20001')
       cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
-      cy.contains('TKT20001 Tietorakenteet ja algoritmit')
-      cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
-      cy.contains('BSCS1003 Data Structures and Algorithms')
-      cy.contains('58131 Tietorakenteet')
+      cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
+      cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
+      cy.contains('BSCS1003 • Data Structures and Algorithms')
+      cy.contains('58131 • Tietorakenteet')
       cy.get('tbody >:nth-child(5) > :nth-child(2) .level').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
       cy.contains('Students (33)').click()
@@ -339,9 +353,8 @@ describe('Course Statistics tests', () => {
     it('Language distribution is correct', () => {
       searchByCourseCode('TKT20003')
       cy.contains('td', 'TKT20003, 582219').click()
-      cy.contains('TKT20003 Käyttöjärjestelmät')
-      cy.contains('582219 Käyttöjärjestelmät')
-      cy.cs('providerCheckboxOpenUni').click()
+      cy.contains('TKT20003 • Käyttöjärjestelmät')
+      cy.contains('582219 • Käyttöjärjestelmät')
       cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2021-2022 (open and normal)')
       cy.contains('Language distribution').click()
@@ -359,7 +372,7 @@ describe('Course Statistics tests', () => {
           searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')
-          cy.contains('TKT10002 Ohjelmoinnin perusteet')
+          cy.contains('TKT10002 • Ohjelmoinnin perusteet')
         })
 
         it('Time range', () => {
@@ -555,11 +568,11 @@ describe('Course Statistics tests', () => {
           searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002, BSCS1001, 581325, A581325, AYTKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')
-          cy.contains('TKT10002 Ohjelmoinnin perusteet')
-          cy.contains('AYTKT10002 Avoin yo: Ohjelmoinnin perusteet')
-          cy.contains('BSCS1001 Introduction to Programming')
-          cy.contains('581325 Ohjelmoinnin perusteet')
-          cy.contains('A581325 Avoin yo: Ohjelmoinnin perusteet')
+          cy.contains('TKT10002 • Ohjelmoinnin perusteet')
+          cy.contains('AYTKT10002 • Avoin yo: Ohjelmoinnin perusteet')
+          cy.contains('BSCS1001 • Introduction to Programming')
+          cy.contains('581325 • Ohjelmoinnin perusteet')
+          cy.contains('A581325 • Avoin yo: Ohjelmoinnin perusteet')
         })
 
         it('Time range', () => {
@@ -862,16 +875,14 @@ describe('Course Statistics tests', () => {
 
         it('After changing time range shows same stats', () => {
           const newYearRange = { from: '2016-2017', to: '2019-2020' }
-          cy.get("div[name='fromYear']")
-            .click()
-            .within(() => {
-              cy.contains(newYearRange.from).click()
-            })
+          cy.get("div[name='fromYear']").click()
+          cy.get("div[name='fromYear']").within(() => {
+            cy.contains(newYearRange.from).click()
+          })
           cy.get("div[name='toYear']")
-            .click()
-            .within(() => {
-              cy.contains(newYearRange.to).click()
-            })
+          cy.get("div[name='toYear']").within(() => {
+            cy.contains(newYearRange.to).click()
+          })
 
           // Time range
           cy.get("div[name='fromYear']").within(() => {
@@ -893,11 +904,11 @@ describe('Course Statistics tests', () => {
       it('If no data available, provider organization(s) toggle is disabled', () => {
         searchByCourseCode('TKT20014')
         cy.contains('TKT20014').click()
-        cy.contains('TKT20014 Kypsyysnäyte LuK')
-        cy.contains('50036 Suomenkielinen kypsyysnäyte LuK')
-        cy.contains('50037 Ruotsinkielinen kypsyysnäyte LuK')
-        cy.cs('providerCheckboxUniversity').find('input').should('not.be.disabled')
-        cy.cs('providerCheckboxOpenUni').find('input').should('be.disabled')
+        cy.contains('TKT20014 • Kypsyysnäyte LuK')
+        cy.contains('50036 • Suomenkielinen kypsyysnäyte LuK')
+        cy.contains('50037 • Ruotsinkielinen kypsyysnäyte LuK')
+        cy.cs('ProviderCheckboxUniversity').find('input').should('not.be.disabled')
+        cy.cs('ProviderCheckboxOpenUni').find('input').should('be.disabled')
       })
 
       it('Has right to see all the students, because course provider is TKT', () => {
@@ -918,7 +929,7 @@ describe('Course Statistics tests', () => {
     cy.contains('Filter statistics by study programmes').should('not.exist')
     cy.contains('Faculty statistics').should('not.exist')
     cy.contains('Show population').should('not.exist')
-    cy.contains('.tabular.menu a', 'Attempts').click()
+    openAttemptsTab()
 
     const emptyYear = year => [year, null, '5 or fewer students', 'NA', 'NA', 'NA', 'NA']
 

@@ -33,7 +33,7 @@ export const ProviderOrganization = ({ availableStats }: { availableStats: Avail
           control={
             <Checkbox
               checked={openOrRegular === 'regularStats' || openOrRegular === 'unifyStats'}
-              data-cy="providerCheckboxUniversity"
+              data-cy="ProviderCheckboxUniversity"
               disabled={!availableStats.university}
               onChange={toggleValue}
               value="regularStats"
@@ -45,7 +45,7 @@ export const ProviderOrganization = ({ availableStats }: { availableStats: Avail
           control={
             <Checkbox
               checked={openOrRegular === 'openStats' || openOrRegular === 'unifyStats'}
-              data-cy="providerCheckboxOpenUni"
+              data-cy="ProviderCheckboxOpenUni"
               disabled={!availableStats.open}
               onChange={toggleValue}
               value="openStats"

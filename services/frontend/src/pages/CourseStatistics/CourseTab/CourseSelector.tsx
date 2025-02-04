@@ -23,9 +23,9 @@ export const CourseSelector = ({
   return (
     <FormControl fullWidth>
       <InputLabel>Select course</InputLabel>
-      <Select data-cy="course-selector" label="Select course" onChange={onCourseChange} value={selected}>
+      <Select data-cy="CourseSelector" label="Select course" onChange={onCourseChange} value={selected}>
         {courses.map(({ key, code, name }) => (
-          <MenuItem key={key} value={code}>
+          <MenuItem data-cy={`CourseSelectorOption${code}`} key={key} value={code}>
             <Box display="flex" justifyContent="space-between" width="100%">
               <Typography color="text.primary" component="span" variant="body1">
                 {name}

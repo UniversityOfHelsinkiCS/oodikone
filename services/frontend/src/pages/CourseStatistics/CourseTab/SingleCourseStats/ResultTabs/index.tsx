@@ -53,8 +53,8 @@ export const ResultTabs = ({
   return (
     <>
       <Tabs onChange={() => setTab(tab ^ 1)} value={tab}>
-        <Tab icon={<PersonIcon />} iconPosition="start" label="Students" />
-        <Tab icon={<ReplayIcon />} iconPosition="start" label="Attempts" />
+        <Tab data-cy="StudentsTab" icon={<PersonIcon />} iconPosition="start" label="Students" />
+        <Tab data-cy="AttemptsTab" icon={<ReplayIcon />} iconPosition="start" label="Attempts" />
       </Tabs>
       {tab === 0 && (
         <ResultTab

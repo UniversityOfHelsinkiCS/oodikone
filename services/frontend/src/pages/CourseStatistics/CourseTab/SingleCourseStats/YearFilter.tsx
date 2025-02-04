@@ -28,6 +28,7 @@ export const YearFilter = ({
         <InputLabel>From</InputLabel>
         <Select
           MenuProps={menuProps}
+          data-cy="FromYearSelector"
           label="From"
           name="fromYear"
           onChange={handleFromYearChange}
@@ -37,7 +38,7 @@ export const YearFilter = ({
           {years
             .filter(({ value }) => !toYear || value <= toYear)
             .map(({ key, text, value }) => (
-              <MenuItem key={key} value={value}>
+              <MenuItem data-cy={`FromYearSelectorOption${text}`} key={key} value={value}>
                 {text}
               </MenuItem>
             ))}
@@ -47,6 +48,7 @@ export const YearFilter = ({
         <InputLabel>To</InputLabel>
         <Select
           MenuProps={menuProps}
+          data-cy="ToYearSelector"
           label="To"
           name="toYear"
           onChange={handleToYearChange}
@@ -56,7 +58,7 @@ export const YearFilter = ({
           {years
             .filter(({ value }) => !fromYear || value >= fromYear)
             .map(({ key, text, value }) => (
-              <MenuItem key={key} value={value}>
+              <MenuItem data-cy={`ToYearSelectorOption${text}`} key={key} value={value}>
                 {text}
               </MenuItem>
             ))}
