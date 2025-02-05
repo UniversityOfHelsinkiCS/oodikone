@@ -156,8 +156,9 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
   }
 }
 
-const getGrades = (grades: Record<string, number>, enrolledStudentsWithNoGrade: number | undefined) => {
-  const enrolledWithNoGrade = enrolledStudentsWithNoGrade ?? 0
+const getGrades = students => {
+  const grades = { ...students.grades }
+  const enrolledWithNoGrade = students.enrolledStudentsWithNoGrade || 0
   grades[0] = (grades[0] || 0) + enrolledWithNoGrade
   return grades
 }
@@ -174,7 +175,7 @@ export const GradeDistributionChart = ({
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
   const statYears = stats.map(year => year.name)
-  const grades = stats.map(year => getGrades(year.students.grades, year.students.enrolledStudentsWithNoGrade))
+  const grades = stats.map(year => getGrades(year.students))
 
   const gradeGraphSeries = getGradeSeries(grades)
   const seriesType = getSeriesType(grades)
