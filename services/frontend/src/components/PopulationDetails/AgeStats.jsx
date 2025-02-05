@@ -4,9 +4,9 @@ import { arrayOf, object, shape } from 'prop-types'
 import { Fragment, useState } from 'react'
 import { Icon, Radio, Table } from 'semantic-ui-react'
 
-import { getFullStudyProgrammeRights } from '@/common'
 import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { getFullStudyProgrammeRights } from '@/util/access'
 import { getAge } from '@/util/timeAndDate'
 
 export const AgeStats = ({ filteredStudents, query }) => {

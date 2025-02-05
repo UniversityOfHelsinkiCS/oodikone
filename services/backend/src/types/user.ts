@@ -2,8 +2,7 @@ import { InferAttributes } from 'sequelize'
 
 import { User } from '../models/user'
 import { Language } from '../shared/language'
-import { Role } from '../shared/types'
-import { DetailedProgrammeRights } from './detailedProgrammeRights'
+import { DetailedProgrammeRights, Role } from '../shared/types'
 
 export type ExpandedUser = InferAttributes<User> & {
   iamGroups: string[]

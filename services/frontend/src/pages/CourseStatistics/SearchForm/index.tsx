@@ -94,7 +94,7 @@ export const SearchForm = ({ onProgress, progress }) => {
   }, [])
 
   useEffect(() => {
-    if (location.search) {
+    if (location.search && location.search !== '?tab=0') {
       fetchStatisticsFromUrlParams()
     }
   }, [location.search])

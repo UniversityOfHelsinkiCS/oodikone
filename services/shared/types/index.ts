@@ -1,3 +1,4 @@
+export type { DetailedProgrammeRights } from './detailedProgrammeRights'
 export type {
   Graduated,
   GraduationStats,

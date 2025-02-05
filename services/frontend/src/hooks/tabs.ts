@@ -33,17 +33,17 @@ export const useTabs = (totalTabs: number) => {
     if (queryTab !== tab) {
       setTab(queryTab)
     }
-  }, [id, location.search])
+  }, [location.search])
 
   useEffect(() => {
     pushToUrl(tab)
   }, [tab])
 
-  const handleChange = (_event: React.SyntheticEvent, { activeIndex }: { activeIndex: number }) => {
-    setTab(activeIndex)
+  const switchToTab = (newTab: number) => {
+    setTab(newTab)
   }
 
-  return [tab, handleChange] as const
+  return [tab, switchToTab] as const
 }
 
 // ! To be deprecated, use useTabs for MUI components

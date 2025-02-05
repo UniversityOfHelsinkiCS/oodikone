@@ -3,9 +3,10 @@ import { Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
 
-import { checkUserAccess, getFullStudyProgrammeRights, isDefaultServiceProvider } from '@/common'
+import { isDefaultServiceProvider } from '@/common'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
 import { NavigationItem } from './navigationItems'
 
 export const NavigationButton = ({ item }: { item: NavigationItem }) => {

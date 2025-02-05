@@ -1,13 +1,18 @@
 import moment from 'moment'
 
-import { Role } from '@/shared/types'
-
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
 
 const isSpring = date => moment(date).month() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year, spring) => (spring ? `Spring ${year}` : `Fall ${year}`)
+
+export const formatPassRate = (passRate: string | null) => {
+  if (!passRate) {
+    return '-'
+  }
+  return `${passRate} %`
+}
 
 const getCourseYears = course => ({
   startYear: moment(course.min_attainment_date).year(),
@@ -38,8 +43,4 @@ export const getActiveYears = course => {
   }
 
   return `${startYearText} — ${endYearText}`
-}
-
-export const userHasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
-  return roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || studyProgrammeRights.length > 0
 }
