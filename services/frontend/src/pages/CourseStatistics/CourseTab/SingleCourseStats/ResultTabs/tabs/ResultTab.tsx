@@ -82,44 +82,50 @@ export const ResultTab = ({
             ))}
         </Stack>
       </Section>
-      <Section isLoading={loading} title={settings.showGrades ? 'Grade distribution' : 'Pass rate'}>
-        {settings.showGrades ? (
-          <>
-            <ChartSettings
-              isRelative={settings.isRelative}
-              setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-            />
-            {datasets
-              .filter(data => data !== undefined)
-              .map(data => (
-                <GradeDistributionChart
-                  data={data}
-                  isRelative={settings.isRelative}
-                  key={data.name}
-                  userHasAccessToAllStats={userHasAccessToAllStats}
-                />
-              ))}
-          </>
-        ) : (
-          <>
-            <ChartSettings
-              isRelative={settings.isRelative}
-              setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
-            />
-            {datasets
-              .filter(data => data !== undefined)
-              .map(data => (
-                <PassRateChart
-                  data={data}
-                  isRelative={settings.isRelative}
-                  key={data.name}
-                  userHasAccessToAllStats={userHasAccessToAllStats}
-                  viewMode={settings.viewMode}
-                />
-              ))}
-          </>
-        )}
-      </Section>
+      {settings.showGrades ? (
+        <Section
+          infoBoxContent={courseStatisticsToolTips.gradeDistribution}
+          isLoading={loading}
+          title="Grade distribution"
+        >
+          <ChartSettings
+            isRelative={settings.isRelative}
+            setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
+          />
+          {datasets
+            .filter(data => data !== undefined)
+            .map(data => (
+              <GradeDistributionChart
+                data={data}
+                isRelative={settings.isRelative}
+                key={data.name}
+                userHasAccessToAllStats={userHasAccessToAllStats}
+              />
+            ))}
+        </Section>
+      ) : (
+        <Section
+          infoBoxContent={courseStatisticsToolTips.passRate[settings.viewMode]}
+          isLoading={loading}
+          title="Pass rate"
+        >
+          <ChartSettings
+            isRelative={settings.isRelative}
+            setIsRelative={isRelative => setSettings({ ...settings, isRelative })}
+          />
+          {datasets
+            .filter(data => data !== undefined)
+            .map(data => (
+              <PassRateChart
+                data={data}
+                isRelative={settings.isRelative}
+                key={data.name}
+                userHasAccessToAllStats={userHasAccessToAllStats}
+                viewMode={settings.viewMode}
+              />
+            ))}
+        </Section>
+      )}
     </>
   )
 }

@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+// TODO: Test info boxes
+
 const checkGradeTable = gradesTableContents => {
   cy.cs('Grade distribution')
     .parent()
