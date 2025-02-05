@@ -45,6 +45,10 @@ const toggleSeparateBySemesters = () => {
   cy.cs('separateToggle', { force: true }).click({ force: true })
 }
 
+const openStudentsTab = () => {
+  cy.cs('StudentsTab').click()
+}
+
 const openAttemptsTab = () => {
   cy.cs('AttemptsTab').click()
 }
@@ -165,12 +169,10 @@ describe('Course Statistics tests', () => {
       cy.contains('TKT20001')
       cy.contains('58131')
 
-      cy.contains('Students').click()
-      cy.contains('All')
+      openStudentsTab()
       cy.contains('svg', 'Pass rate')
 
-      cy.contains('Attempts').click()
-      cy.contains('All')
+      openAttemptsTab()
       cy.contains('svg', 'Pass rate')
 
       clickNewQueryButton()
