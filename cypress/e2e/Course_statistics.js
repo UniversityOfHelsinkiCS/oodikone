@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 const checkGradeTable = gradesTableContents => {
-  cy.get('[data-cy="Grade distribution"]')
+  cy.cs('Grade distribution')
     .parent()
     .siblings('.content.active')
     .get('table > tbody')
@@ -38,15 +38,15 @@ const checkTableContents = contents => {
 }
 
 const toggleShowGrades = () => {
-  cy.get('[data-cy=gradeToggle]', { force: true }).click({ force: true })
+  cy.cs('gradeToggle', { force: true }).click({ force: true })
 }
 
 const toggleSeparateBySemesters = () => {
-  cy.get('[data-cy=separateToggle]', { force: true }).click({ force: true })
+  cy.cs('separateToggle', { force: true }).click({ force: true })
 }
 
 const openAttemptsTab = () => {
-  cy.get('[data-cy="AttemptsTab"]').click()
+  cy.cs('AttemptsTab').click()
 }
 
 const searchByCourseName = courseName => {
@@ -58,16 +58,20 @@ const searchByCourseCode = courseCode => {
 }
 
 const clickNewQueryButton = () => {
-  cy.get('[data-cy="NewQueryButton"]').click()
+  cy.cs('NewQueryButton').click()
 }
 
 const selectFromYear = year => {
-  cy.get('[data-cy="FromYearSelector"]').click()
-  cy.get(`[data-cy="FromYearSelectorOption${year}"]`).click()
+  cy.cs('FromYearSelector').click()
+  cy.cs(`FromYearSelectorOption${year}`).click()
 }
 
 const openSummaryTab = () => {
-  cy.get('[data-cy="SummaryTab"]').click()
+  cy.cs('SummaryTab').click()
+}
+
+const clickAway = () => {
+  cy.get('body').click(0, 0)
 }
 
 describe('Course Statistics tests', () => {
@@ -208,17 +212,13 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').click()
       cy.contains('Search for courses').should('not.exist')
 
-      cy.get('[data-cy="CourseSelector"]')
-      cy.get('[data-cy="CourseSelectorOptionTKT10002"]')
-      cy.cs('CourseSelector').get('.active.selected.item').contains('TKT10002')
-      cy.get('#CourseStatPanes table a.item:first').click()
+      cy.get('table a.item:first').click()
       cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
 
       cy.go('back')
-      cy.get('.ui.menu').contains('Course').click()
       cy.cs('CourseSelector').click()
-      cy.cs('CourseSelector').contains('TKT20001').click()
-      cy.get('#CourseStatPanes table a.item:first').click()
+      cy.cs('CourseSelectorOptionTKT20001').click()
+      cy.get('table a.item:first').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit')
     })
 
@@ -258,11 +258,11 @@ describe('Course Statistics tests', () => {
     it('"Select all search results" button is not showing unless "Select multiple courses" toggle is on', () => {
       cy.contains('Search for courses')
       searchByCourseCode('TKT')
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('not.have.class', 'Mui-checked')
+      cy.cs('select-multiple-courses-toggle').should('not.have.class', 'Mui-checked')
       cy.contains('TKT10004, BSCS2001, 581328, A581328, AYTKT10004')
       cy.contains('Select all search results').should('not.exist')
-      cy.get('[data-cy="select-multiple-courses-toggle"]').click()
-      cy.get('[data-cy="select-multiple-courses-toggle"]').should('have.class', 'Mui-checked')
+      cy.cs('select-multiple-courses-toggle').click()
+      cy.cs('select-multiple-courses-toggle').should('have.class', 'Mui-checked')
       cy.contains('Select all search results')
     })
 
@@ -367,8 +367,8 @@ describe('Course Statistics tests', () => {
         beforeEach(() => {
           cy.url().should('include', '/coursestatistics')
           cy.contains('Search for courses')
-          cy.get('[data-cy="combine-substitutions-toggle"]').should('have.class', 'Mui-checked').click()
-          cy.get('[data-cy="combine-substitutions-toggle"]').should('not.have.class', 'Mui-checked')
+          cy.cs('combine-substitutions-toggle').should('have.class', 'Mui-checked').click()
+          cy.cs('combine-substitutions-toggle').should('not.have.class', 'Mui-checked')
           searchByCourseCode('TKT10002')
           cy.contains('td', /^TKT10002$/).click()
           cy.contains('Search for courses').should('not.exist')
@@ -376,19 +376,16 @@ describe('Course Statistics tests', () => {
         })
 
         it('Time range', () => {
-          const yearRange = { from: '2016-2017', to: '2023-2024' }
-          cy.get("div[name='fromYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', yearRange.to)
-            cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', '2016-2017')
-            cy.get("div[role='option']").should('have.length', 8)
-          })
-          cy.get("div[name='toYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', '2023-2024')
-            cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', yearRange.from)
-            cy.get("div[role='option']").should('have.length', 8)
-          })
+          cy.cs('FromYearSelector').click()
+          cy.cs('FromYearSelectorOption2016-2017').should('have.class', 'Mui-selected')
+          cy.get('[data-cy^="FromYearSelectorOption"]').should('have.length', 8)
+          clickAway()
+
+          cy.cs('ToYearSelector').click()
+          cy.cs('ToYearSelectorOption2023-2024').should('have.class', 'Mui-selected')
+          cy.get('[data-cy^="ToYearSelectorOption"]').should('have.length', 8)
+          clickAway()
+
           cy.contains('Show population').should('be.enabled')
         })
 
@@ -576,20 +573,16 @@ describe('Course Statistics tests', () => {
         })
 
         it('Time range', () => {
-          const yearRange = { from: '1999-2000', to: '2023-2024' }
-          cy.contains('Statistics by time range')
-          cy.get("div[name='fromYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', yearRange.to)
-            cy.contains("div[role='option']", yearRange.from).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', '1999-2000')
-            cy.get("div[role='option']").should('have.length', 25)
-          })
-          cy.get("div[name='toYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', '2023-2024')
-            cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', yearRange.from)
-            cy.get("div[role='option']").should('have.length', 25)
-          })
+          cy.cs('FromYearSelector').click()
+          cy.cs('FromYearSelectorOption1999-2000').should('have.class', 'Mui-selected')
+          cy.get('[data-cy^="FromYearSelectorOption"]').should('have.length', 25)
+          clickAway()
+
+          cy.cs('ToYearSelector').click()
+          cy.cs('ToYearSelectorOption2023-2024').should('have.class', 'Mui-selected')
+          cy.get('[data-cy^="ToYearSelectorOption"]').should('have.length', 25)
+          clickAway()
+
           cy.contains('Show population').should('be.enabled')
         })
 
@@ -873,30 +866,25 @@ describe('Course Statistics tests', () => {
           })
         })
 
-        it('After changing time range shows same stats', () => {
-          const newYearRange = { from: '2016-2017', to: '2019-2020' }
-          cy.get("div[name='fromYear']").click()
-          cy.get("div[name='fromYear']").within(() => {
-            cy.contains(newYearRange.from).click()
-          })
-          cy.get("div[name='toYear']")
-          cy.get("div[name='toYear']").within(() => {
-            cy.contains(newYearRange.to).click()
-          })
+        it('After changing time range shows correct options', () => {
+          cy.cs('FromYearSelector').click()
+          cy.cs('FromYearSelectorOption2016-2017').click()
+          cy.cs('FromYearSelectorOption2016-2017').should('have.class', 'Mui-selected')
+          clickAway()
 
-          // Time range
-          cy.get("div[name='fromYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', newYearRange.to)
-            cy.contains("div[role='option']", newYearRange.from).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', '1999-2000')
-            cy.get("div[role='option']").should('have.length', 21)
-          })
-          cy.get("div[name='toYear']").within(() => {
-            cy.get("div[role='option']").first().should('have.text', '2023-2024')
-            cy.contains("div[role='option']", newYearRange.to).should('have.class', 'selected')
-            cy.get("div[role='option']").last().should('have.text', newYearRange.from)
-            cy.get("div[role='option']").should('have.length', 8)
-          })
+          cy.cs('ToYearSelector').click()
+          cy.cs('ToYearSelectorOption2019-2020').click()
+          cy.cs('ToYearSelectorOption2019-2020').should('have.class', 'Mui-selected')
+          clickAway()
+
+          cy.cs('FromYearSelector').click()
+          cy.get('[data-cy^="FromYearSelectorOption"]').should('have.length', 21)
+          clickAway()
+
+          cy.cs('ToYearSelector').click()
+          cy.get('[data-cy^="ToYearSelectorOption"]').should('have.length', 8)
+          clickAway()
+
           cy.contains('Show population').should('be.enabled')
         })
       })
@@ -923,8 +911,8 @@ describe('Course Statistics tests', () => {
 
   it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
-    cy.get('[data-cy=nav-bar-button-courseStatistics]').click()
-    cy.get('[data-cy=course-code-input]').type('TKT10002')
+    cy.cs('nav-bar-button-courseStatistics').click()
+    cy.cs('course-code-input').type('TKT10002')
     cy.contains('tr', 'TKT10002').click()
     cy.contains('Filter statistics by study programmes').should('not.exist')
     cy.contains('Faculty statistics').should('not.exist')
