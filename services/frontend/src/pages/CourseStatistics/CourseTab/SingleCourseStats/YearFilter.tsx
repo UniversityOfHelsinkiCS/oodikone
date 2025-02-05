@@ -22,6 +22,9 @@ export const YearFilter = ({
     },
   }
 
+  const validFromYear = years.some(year => year.value === fromYear) ? fromYear : ''
+  const validToYear = years.some(year => year.value === toYear) ? toYear : ''
+
   return (
     <Stack direction="row" gap={2}>
       <FormControl size="small" variant="outlined">
@@ -33,7 +36,7 @@ export const YearFilter = ({
           name="fromYear"
           onChange={handleFromYearChange}
           sx={style}
-          value={fromYear || ''}
+          value={validFromYear}
         >
           {years
             .filter(({ value }) => !toYear || value <= toYear)
@@ -53,7 +56,7 @@ export const YearFilter = ({
           name="toYear"
           onChange={handleToYearChange}
           sx={style}
-          value={toYear || ''}
+          value={validToYear}
         >
           {years
             .filter(({ value }) => !fromYear || value >= fromYear)

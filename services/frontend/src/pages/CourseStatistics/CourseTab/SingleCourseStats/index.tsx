@@ -31,7 +31,7 @@ import { YearFilter } from './YearFilter'
 
 const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
   if (!stat) {
-    return {} as { passed: number; failed: number }
+    return {} as Record<string, number>
   }
   return Object.entries(stat).reduce(
     (acc, entry) => {
@@ -41,7 +41,7 @@ const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentN
         [category]: students.filter(filter).length,
       }
     },
-    {} as { passed: number; failed: number }
+    {} as Record<string, number>
   )
 }
 
@@ -222,7 +222,7 @@ export const SingleCourseStats = ({
     filter: (studentNumber: string) => boolean
   ) => {
     const grades = countFilteredStudents(attempts.grades, filter)
-    const categories = countFilteredStudents(attempts.categories, filter)
+    const categories = countFilteredStudents(attempts.categories, filter) as { failed: number; passed: number }
     const { failed, passed } = categories
     const total = totalEnrollments ?? passed + failed
     const passRate = Math.min(100 * (passed / total), 100)
