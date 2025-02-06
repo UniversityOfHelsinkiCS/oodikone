@@ -1,4 +1,4 @@
-import { Logout } from '@mui/icons-material'
+import { Logout as LogoutIcon } from '@mui/icons-material'
 import { ListItemIcon, MenuItem, Typography } from '@mui/material'
 
 import { isDev } from '@/conf'
@@ -10,7 +10,7 @@ export const LogOutButton = () => {
   return (
     <MenuItem disabled={isDev} onClick={() => logout()}>
       <ListItemIcon>
-        <Logout color="error" />
+        <LogoutIcon color="error" />
       </ListItemIcon>
       <Typography color="error">Log out</Typography>
     </MenuItem>

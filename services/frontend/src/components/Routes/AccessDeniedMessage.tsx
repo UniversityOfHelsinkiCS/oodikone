@@ -1,4 +1,4 @@
-import { DoNotDisturb } from '@mui/icons-material'
+import { DoNotDisturb as DoNotDisturbIcon } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Container, Link } from '@mui/material'
 
 import { PageTitle } from '@/components/material/PageTitle'
@@ -18,7 +18,7 @@ export const AccessDeniedMessage = () => {
               alignItems: 'center',
             }}
           >
-            <DoNotDisturb />
+            <DoNotDisturbIcon />
           </Box>
         }
         severity="error"

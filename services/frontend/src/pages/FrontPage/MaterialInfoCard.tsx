@@ -1,4 +1,4 @@
-import { InfoOutlined } from '@mui/icons-material'
+import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Link } from '@mui/material'
 import { NavLink } from 'react-router'
 
@@ -18,7 +18,7 @@ export const MaterialInfoCard = () => {
             alignItems: 'center',
           }}
         >
-          <InfoOutlined />
+          <InfoOutlinedIcon />
         </Box>
       }
       severity="info"

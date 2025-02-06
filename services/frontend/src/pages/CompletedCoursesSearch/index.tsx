@@ -1,4 +1,4 @@
-import { Done as DoneIcon, Remove as RemoveIcon, CropSquare as SquareIcon } from '@mui/icons-material'
+import { CropSquare as CropSquareIcon, Done as DoneIcon, Remove as RemoveIcon } from '@mui/icons-material'
 import { Alert, Box, Container, Stack } from '@mui/material'
 import { green, yellow, grey } from '@mui/material/colors'
 import { useState } from 'react'
@@ -24,19 +24,19 @@ export const CompletedCourses = () => {
             account.
           </Box>
           <Stack direction="row">
-            <DoneIcon fontSize="small" style={{ color: green[700] }} />: Student has completed the course with a passing
+            <DoneIcon fontSize="small" sx={{ color: green[700] }} />: Student has completed the course with a passing
             grade.
           </Stack>
           <Stack direction="row">
-            <RemoveIcon fontSize="small" style={{ color: yellow[800] }} />: Student has not completed the course, but
-            has an active enrollment from less than 6 months ago.
+            <RemoveIcon fontSize="small" sx={{ color: yellow[800] }} />: Student has not completed the course, but has
+            an active enrollment from less than 6 months ago.
           </Stack>
           <Stack direction="row">
-            <RemoveIcon fontSize="small" style={{ color: grey[700] }} />: Student has not completed the course, but has
-            an enrollment from more than 6 months ago.
+            <RemoveIcon fontSize="small" sx={{ color: grey[700] }} />: Student has not completed the course, but has an
+            enrollment from more than 6 months ago.
           </Stack>
           <Stack direction="row">
-            <SquareIcon fontSize="small" style={{ color: grey[500] }} />: Student has the course in their primary study
+            <CropSquareIcon fontSize="small" sx={{ color: grey[500] }} />: Student has the course in their primary study
             plan, but has not enrolled to, or completed it.
           </Stack>
           <b>Empty cell</b>: Student has no completion or enrollment for the course.

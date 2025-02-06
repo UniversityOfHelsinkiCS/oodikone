@@ -1,4 +1,4 @@
-import { AccountCircle, Check, Language } from '@mui/icons-material'
+import { AccountCircle as AccountCircleIcon, Check as CheckIcon, Language as LanguageIcon } from '@mui/icons-material'
 import { Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 
@@ -29,7 +29,7 @@ export const UserButton = () => {
           padding: 0,
         }}
       >
-        <AccountCircle />
+        <AccountCircleIcon />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -57,13 +57,13 @@ export const UserButton = () => {
         <Divider />
         <MenuItem sx={{ pointerEvents: 'none' }}>
           <ListItemIcon>
-            <Language />
+            <LanguageIcon />
           </ListItemIcon>
           <Typography>Language</Typography>
         </MenuItem>
         {languageOptions.map(({ key, text, value }) => (
           <MenuItem key={key} onClick={() => setLanguage(value)} selected={language === value}>
-            <ListItemIcon>{language === value ? <Check fontSize="small" /> : null}</ListItemIcon>
+            <ListItemIcon>{language === value ? <CheckIcon fontSize="small" /> : null}</ListItemIcon>
             <Typography fontWeight={language === value ? 'bold' : 'normal'}>{text}</Typography>
           </MenuItem>
         ))}

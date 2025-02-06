@@ -1,4 +1,4 @@
-import { OpenInNew } from '@mui/icons-material'
+import { OpenInNew as OpenInNewIcon } from '@mui/icons-material'
 import { Link, LinkOwnProps } from '@mui/material'
 
 /**
@@ -30,7 +30,7 @@ export const ExternalLink = ({
       variant={variant}
     >
       {text}
-      <OpenInNew fontSize="inherit" />
+      <OpenInNewIcon fontSize="inherit" />
     </Link>
   )
 }

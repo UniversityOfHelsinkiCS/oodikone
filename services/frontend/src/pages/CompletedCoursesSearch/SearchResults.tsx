@@ -1,4 +1,4 @@
-import { Done as DoneIcon, Remove as RemoveIcon, CropSquare as SquareIcon } from '@mui/icons-material'
+import { CropSquare as CropSquareIcon, Done as DoneIcon, Remove as RemoveIcon } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
 import { green, yellow, grey } from '@mui/material/colors'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
@@ -28,7 +28,7 @@ const getCompletion = (student, courseCode, { icon }) => {
   if (completion === undefined) {
     if (!enrollment) {
       if (isInStudyPlan) {
-        return <SquareIcon fontSize="small" style={{ color: grey[500] }} />
+        return <CropSquareIcon fontSize="small" style={{ color: grey[500] }} />
       }
       return null
     }

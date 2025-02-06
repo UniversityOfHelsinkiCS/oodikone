@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-import { Send } from '@mui/icons-material'
+import { Send as SendIcon } from '@mui/icons-material'
 import { Box, Button, Container, Link, Modal, TextField, Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
@@ -130,7 +130,7 @@ export const Feedback = () => {
             <Button
               color="primary"
               disabled={!feedback.trim().length || isLoading}
-              endIcon={<Send />}
+              endIcon={<SendIcon />}
               onClick={handleSubmit}
               variant="contained"
             >

@@ -1,4 +1,4 @@
-import { HelpOutline } from '@mui/icons-material'
+import { HelpOutline as HelpOutlineIcon } from '@mui/icons-material'
 import { Button, IconButton, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import ReactMarkdown from 'react-markdown'
@@ -33,10 +33,10 @@ export const InfoBox = ({
     >
       {mini ? (
         <IconButton data-cy={`${cypress}InfoBoxButton`} sx={{ padding: 0 }}>
-          <HelpOutline fontSize="small" />
+          <HelpOutlineIcon fontSize="small" />
         </IconButton>
       ) : (
-        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutline />} variant="contained">
+        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutlineIcon />} variant="contained">
           Info
         </Button>
       )}
