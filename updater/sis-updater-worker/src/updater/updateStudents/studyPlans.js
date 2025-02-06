@@ -22,6 +22,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
       'group_id'
     )
   )
+
   const educationHasStudyRight = Object.keys(groupedStudyRightSnapshots).reduce((acc, k) => {
     const sorted = groupedStudyRightSnapshots[k]
       .filter(s => new Date(s.snapshot_date_time) <= new Date())
@@ -99,6 +100,13 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
   const programmeModuleIdToCode = programmeModules.reduce((res, cur) => {
     res[cur.id] = cur.code
+    return res
+  }, {})
+
+  const programmeModuleIdToStudyModuleCode = programmeModules.reduce((res, mod) => {
+    if (mod.type === 'StudyModule') {
+      res[mod.id] = mod.code
+    }
     return res
   }, {})
 
@@ -202,6 +210,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   const mapStudyplan = studyplanMapper(
     personIdToStudentNumber,
     programmeModuleIdToCode,
+    programmeModuleIdToStudyModuleCode,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,
