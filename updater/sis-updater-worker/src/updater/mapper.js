@@ -342,6 +342,7 @@ const studyplanMapper =
   (
     personIdToStudentNumber,
     programmeModuleIdToCode,
+    programmeModuleIdToStudyModuleCode,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,
@@ -359,8 +360,10 @@ const studyplanMapper =
     return studyPlanIdToDegrees[studyplan.id].map(programmeId => {
       const code = programmeModuleIdToCode[programmeId]
       if (!code) return null
+
       const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
       const id = `${studentnumber}-${code}-${studyrightId}`
+
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId]?.has(code))
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
@@ -368,9 +371,10 @@ const studyplanMapper =
           if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
           return courseUnitIdToCode[courseUnitId]
         })
+
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
         .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
-        .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
+        .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId]?.code)
         .map(sanitizeCourseCode)
         .filter(course => !!course)
 
@@ -446,12 +450,24 @@ const studyplanMapper =
               .filter(a => !!a),
         'id'
       )
+
       const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
 
       const includedCourses = graduated
         ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
         : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules)
       if (includedCourses.length === 0) return null
+
+      const includedModules = Array.from(
+        studyplan.module_selections.reduce((modules, { moduleId }) => {
+          const studyModuleCode = programmeModuleIdToStudyModuleCode[moduleId]
+          if (studyModuleCode) {
+            modules.add(studyModuleCode)
+          }
+          return modules
+        }, new Set())
+      )
+
       return {
         id,
         studentnumber,
@@ -461,6 +477,7 @@ const studyplanMapper =
         sisu_id: studyplan.id,
         curriculum_period_id: studyplan.curriculum_period_id,
         sis_study_right_id: studyrightId,
+        includedModules,
       }
     })
   }

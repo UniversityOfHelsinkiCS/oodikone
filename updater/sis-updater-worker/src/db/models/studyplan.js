@@ -28,6 +28,10 @@ Studyplan.init(
     included_courses: {
       type: ARRAY(STRING),
     },
+    includedModules: {
+      type: ARRAY(STRING),
+      field: 'included_modules',
+    },
     sisu_id: {
       type: STRING,
     },
