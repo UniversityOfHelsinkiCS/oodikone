@@ -23,13 +23,17 @@ export const ProviderOrganizationSelect = ({ availableStats }: { availableStats:
         sx={{ height: 60, width: 250 }}
         value={openOrRegular}
       >
-        <MenuItem disabled={!availableStats.unify} value="unifyStats">
+        <MenuItem data-cy="ProviderOrganizationSelectOptionBoth" disabled={!availableStats.unify} value="unifyStats">
           Both
         </MenuItem>
-        <MenuItem disabled={!availableStats.university} value="regularStats">
+        <MenuItem
+          data-cy="ProviderOrganizationSelectOptionRegular"
+          disabled={!availableStats.university}
+          value="regularStats"
+        >
           {availableStats.university ? 'University' : 'University (not available)'}
         </MenuItem>
-        <MenuItem disabled={!availableStats.open} value="openStats">
+        <MenuItem data-cy="ProviderOrganizationSelectOptionOpen" disabled={!availableStats.open} value="openStats">
           {availableStats.open ? 'Open university' : 'Open university (not available)'}
         </MenuItem>
       </Select>

@@ -270,23 +270,34 @@ describe('Course Statistics tests', () => {
       cy.contains('Select all search results')
     })
 
-    it('Provider organization toggle works', () => {
+    it('Provider organization select works', () => {
       cy.contains('Search for courses')
       searchByCourseName('tietokantojen perusteet')
 
       cy.contains('td', /^TKT10004/).click()
       cy.contains('Search for courses').should('not.exist')
 
+      cy.contains('TKT10004 • Tietokantojen perusteet')
       cy.contains('AYTKT10004 • Avoin yo: Tietokantojen perusteet')
+      cy.contains('BSCS2001 • Introduction to Databases')
+      cy.contains('581328 • Tietokantojen perusteet')
       cy.contains('A581328 • Avoin yo: Tietokantojen perusteet')
-      cy.contains('TKT10004 • Tietokantojen perusteet')
-      cy.contains('BSCS2001 • Introduction to Databases')
-      cy.contains('581328 • Tietokantojen perusteet')
-      cy.cs('ProviderCheckboxUniversity').should('have.class', 'Mui-checked').click()
-      cy.cs('ProviderCheckboxOpenUni').should('have.class', 'Mui-checked').click()
-      cy.contains('TKT10004 • Tietokantojen perusteet')
-      cy.contains('BSCS2001 • Introduction to Databases')
-      cy.contains('581328 • Tietokantojen perusteet')
+
+      cy.cs('ProviderOrganizationSelect').click()
+      cy.cs('ProviderOrganizationSelectOptionBoth').should('have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionOpen').should('not.have.class', 'Mui-selected')
+
+      cy.cs('ProviderOrganizationSelectOptionRegular').click()
+      cy.cs('ProviderOrganizationSelectOptionBoth').should('not.have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionRegular').should('have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionOpen').should('not.have.class', 'Mui-selected')
+
+      cy.cs('ProviderOrganizationSelect').click()
+      cy.cs('ProviderOrganizationSelectOptionOpen').click()
+      cy.cs('ProviderOrganizationSelectOptionBoth').should('not.have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-selected')
+      cy.cs('ProviderOrganizationSelectOptionOpen').should('have.class', 'Mui-selected')
     })
 
     it('Searching course by name displays right courses, 10 credit courses', { retries: 2 }, () => {
@@ -893,14 +904,29 @@ describe('Course Statistics tests', () => {
         })
       })
 
-      it('If no data available, provider organization(s) toggle is disabled', () => {
+      it('If no data available, provider organization(s) select is disabled', () => {
         searchByCourseCode('TKT20014')
         cy.contains('TKT20014').click()
+
         cy.contains('TKT20014 • Kypsyysnäyte LuK')
-        cy.contains('50036 • Suomenkielinen kypsyysnäyte LuK')
         cy.contains('50037 • Ruotsinkielinen kypsyysnäyte LuK')
-        cy.cs('ProviderCheckboxUniversity').find('input').should('not.be.disabled')
-        cy.cs('ProviderCheckboxOpenUni').find('input').should('be.disabled')
+        cy.contains('50036 • Suomenkielinen kypsyysnäyte LuK')
+
+        cy.cs('ProviderOrganizationSelect').click()
+
+        cy.cs('ProviderOrganizationSelectOptionBoth').should('have.class', 'Mui-selected')
+        cy.cs('ProviderOrganizationSelectOptionBoth').should('not.have.class', 'Mui-disabled')
+        cy.cs('ProviderOrganizationSelectOptionBoth').should('have.text', 'Both')
+
+        cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-selected')
+        cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-disabled')
+        cy.cs('ProviderOrganizationSelectOptionRegular').should('have.text', 'University')
+        cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.text', 'University (not available)')
+
+        cy.cs('ProviderOrganizationSelectOptionOpen').should('not.have.class', 'Mui-selected')
+        cy.cs('ProviderOrganizationSelectOptionOpen').should('have.class', 'Mui-disabled')
+        cy.cs('ProviderOrganizationSelectOptionOpen').should('have.text', 'Open university (not available)')
+        cy.cs('ProviderOrganizationSelectOptionOpen').should('not.have.text', 'University')
       })
 
       it('Has right to see all the students, because course provider is TKT', () => {
