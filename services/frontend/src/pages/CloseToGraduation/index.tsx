@@ -151,11 +151,17 @@ export const CloseToGraduation = () => {
         header: 'Completed credits – HOPS',
         accessorKey: 'credits.hops',
         filterVariant: 'range',
+        muiTableBodyCellProps: {
+          align: 'right',
+        },
       },
       {
         header: 'Completed credits – Total',
         accessorKey: 'credits.all',
         filterVariant: 'range',
+        muiTableBodyCellProps: {
+          align: 'right',
+        },
       },
       {
         header: 'BSc & MSc study right',
@@ -196,6 +202,9 @@ export const CloseToGraduation = () => {
             tooltipText="The number of semesters the student has been absent (both statutory and non-statutory absences) during their study right"
           />
         ),
+        muiTableBodyCellProps: {
+          align: 'right',
+        },
       },
       {
         header: 'Thesis completed',
