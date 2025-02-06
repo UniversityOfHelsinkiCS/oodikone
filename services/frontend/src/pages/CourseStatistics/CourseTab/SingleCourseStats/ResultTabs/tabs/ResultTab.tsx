@@ -52,6 +52,7 @@ export const ResultTab = ({
   return (
     <>
       <Section
+        cypress={settings.viewMode === 'STUDENTS' ? 'StudentStatistics' : 'AttemptStatistics'}
         infoBoxContent={courseStatisticsToolTips.tables[settings.viewMode]}
         isLoading={loading}
         title={settings.viewMode === 'STUDENTS' ? 'Student statistics' : 'Attempt statistics'}
@@ -84,6 +85,7 @@ export const ResultTab = ({
       </Section>
       {settings.showGrades ? (
         <Section
+          cypress="GradeDistribution"
           infoBoxContent={courseStatisticsToolTips.gradeDistribution}
           isLoading={loading}
           title="Grade distribution"
@@ -105,6 +107,7 @@ export const ResultTab = ({
         </Section>
       ) : (
         <Section
+          cypress={settings.viewMode === 'STUDENTS' ? 'PassRateStudents' : 'PassRateAttempts'}
           infoBoxContent={courseStatisticsToolTips.passRate[settings.viewMode]}
           isLoading={loading}
           title="Pass rate"

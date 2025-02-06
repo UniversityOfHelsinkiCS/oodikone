@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-// TODO: Test info boxes
-
 const checkGradeTable = gradesTableContents => {
   cy.cs('Grade distribution')
     .parent()
@@ -405,6 +403,24 @@ describe('Course Statistics tests', () => {
         })
 
         describe('Students tab', () => {
+          describe('Info boxes', () => {
+            it('Student statistics table', () => {
+              cy.cs('StudentStatisticsInfoBoxButton').click()
+              cy.cs('StudentStatisticsInfoBoxContent').contains('Table - Students')
+            })
+
+            it('Pass rate', () => {
+              cy.cs('PassRateStudentsInfoBoxButton').click()
+              cy.cs('PassRateStudentsInfoBoxContent').contains('Pass rate - Students')
+            })
+
+            it('Grade distribution', () => {
+              toggleShowGrades()
+              cy.cs('GradeDistributionInfoBoxButton').click()
+              cy.cs('GradeDistributionInfoBoxContent').contains('Grade distribution')
+            })
+          })
+
           it('Show grades off, Separate by semesters off', () => {
             const tableContents = [
               // [Time, --, Total students, Passed, Failed, Enrolled no grade, Pass rate, Fail rate]
@@ -489,6 +505,24 @@ describe('Course Statistics tests', () => {
         describe('Attempts tab', () => {
           beforeEach(() => {
             openAttemptsTab()
+          })
+
+          describe('Info boxes', () => {
+            it('Attempt statistics table', () => {
+              cy.cs('AttemptStatisticsInfoBoxButton').click()
+              cy.cs('AttemptStatisticsInfoBoxContent').contains('Table - Attempts')
+            })
+
+            it('Pass rate', () => {
+              cy.cs('PassRateAttemptsInfoBoxButton').click()
+              cy.cs('PassRateAttemptsInfoBoxContent').contains('Pass rate - Attempts')
+            })
+
+            it('Grade distribution', () => {
+              toggleShowGrades()
+              cy.cs('GradeDistributionInfoBoxButton').click()
+              cy.cs('GradeDistributionInfoBoxContent').contains('Grade distribution')
+            })
           })
 
           it('Show grades off, Separate by semesters off', () => {
