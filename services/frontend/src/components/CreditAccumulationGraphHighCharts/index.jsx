@@ -50,9 +50,6 @@ const createGraphOptions = ({
   }
 
   return {
-    credits: {
-      enabled: false,
-    },
     plotOptions: {
       series: {
         findNearestPointBy: 'xy',

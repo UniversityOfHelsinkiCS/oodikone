@@ -18,9 +18,6 @@ export const StackedBarChart = ({ cypress, data, labels, wideTable, exportFileNa
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     xAxis: {
       categories: labels,
       allowDecimals: false,

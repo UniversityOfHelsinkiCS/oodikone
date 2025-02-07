@@ -23,9 +23,6 @@ const passRateAttemptGraphOptions = (
     type: 'column',
   },
   colors: isRelative ? colorsRelative : colors,
-  credits: {
-    enabled: false,
-  },
   title: {
     text: title,
   },
@@ -65,9 +62,6 @@ const passRateStudentGraphOptions = (
     type: 'column',
   },
   colors: isRelative ? colorsRelative : colors,
-  credits: {
-    enabled: false,
-  },
   title: {
     text: title,
   },

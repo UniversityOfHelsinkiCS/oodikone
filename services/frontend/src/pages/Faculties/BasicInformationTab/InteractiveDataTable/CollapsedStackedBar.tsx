@@ -103,9 +103,6 @@ export const CollapsedStackedBar = ({
       marginTop: 60,
       height: getFlexHeight(labels.length),
     },
-    credits: {
-      enabled: false,
-    },
     title: {
       text: '',
       style: {

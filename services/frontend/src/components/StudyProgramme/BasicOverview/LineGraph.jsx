@@ -22,9 +22,6 @@ export const LineGraph = ({ cypress, data, wideTable, exportFileName }) => {
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     exporting: {
       filename: exportFileName,
     },

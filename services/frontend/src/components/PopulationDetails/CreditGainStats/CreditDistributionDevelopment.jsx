@@ -205,9 +205,6 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   const config = {
     series: stackOrdering === StackOrdering.ASCENDING ? series.toReversed() : series,
     title: { text: title },
-    credits: {
-      enabled: false,
-    },
     tooltip: {
       formatter() {
         // eslint-disable-next-line react/no-this-in-sfc

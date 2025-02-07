@@ -36,9 +36,6 @@ export const StackedBarChart = ({
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     xAxis: {
       categories: labels,
       allowDecimals: false,

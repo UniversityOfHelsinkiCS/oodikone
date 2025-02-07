@@ -29,9 +29,6 @@ const getGradeGraphOptions = (
     type: 'column',
   },
   colors,
-  credits: {
-    enabled: false,
-  },
   title: {
     text: title,
   },

@@ -19,6 +19,9 @@ import { theme } from '@/theme'
 
 // TODO: What other options should be set globally?
 HighCharts.setOptions({
+  credits: {
+    enabled: false,
+  },
   plotOptions: {
     series: {
       animation: false,

@@ -41,9 +41,6 @@ export const FacultyBarChart = ({
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     xAxis: {
       categories: data?.years,
     },

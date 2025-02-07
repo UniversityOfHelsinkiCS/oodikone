@@ -48,9 +48,6 @@ export const ProgrammeProgressChart = ({
       marginTop: 60,
       height: 80 + 45 * labels.length,
     },
-    credits: {
-      enabled: false,
-    },
     title: {
       text: '',
     },
