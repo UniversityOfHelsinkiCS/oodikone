@@ -48,9 +48,6 @@ export const ProgrammeProgressChart = ({
       marginTop: 60,
       height: 80 + 45 * labels.length,
     },
-    title: {
-      text: '',
-    },
     series: dataTranspose,
     xAxis: {
       categories: labels,

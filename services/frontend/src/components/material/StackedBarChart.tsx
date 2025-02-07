@@ -32,9 +32,6 @@ export const StackedBarChart = ({
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index], type: 'column' as const }))
 
   const config: HighCharts.Options = {
-    title: {
-      text: '',
-    },
     series: dataWithColors,
     xAxis: {
       categories: labels,

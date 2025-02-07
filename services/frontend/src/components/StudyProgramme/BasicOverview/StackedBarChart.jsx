@@ -14,9 +14,6 @@ export const StackedBarChart = ({ cypress, data, labels, wideTable, exportFileNa
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const config = {
-    title: {
-      text: '',
-    },
     series: dataWithColors,
     xAxis: {
       categories: labels,
