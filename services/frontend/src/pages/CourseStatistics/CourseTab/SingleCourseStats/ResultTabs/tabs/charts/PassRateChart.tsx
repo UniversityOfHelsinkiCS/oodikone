@@ -12,12 +12,13 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const passRateAttemptGraphOptions = (
+const graphOptions = (
   categories: string[],
   colors: string[],
   colorsRelative: string[],
   isRelative: boolean,
   max: number,
+  mode: 'attempts' | 'students',
   title: string
 ) => ({
   chart: {
@@ -33,7 +34,7 @@ const passRateAttemptGraphOptions = (
   yAxis: {
     allowDecimals: false,
     title: {
-      text: isRelative ? 'Share of students' : 'Number of students',
+      text: isRelative ? `Share of ${mode}` : `Number of ${mode}`,
     },
     max,
     floor: -max,
@@ -42,45 +43,6 @@ const passRateAttemptGraphOptions = (
     column: {
       stacking: 'normal' as const,
       borderRadius: 3,
-    },
-    series: {
-      tooltip: {
-        valueSuffix: isRelative ? '%' : '',
-      },
-    },
-  },
-})
-
-const passRateStudentGraphOptions = (
-  categories: string[],
-  colors: string[],
-  colorsRelative: string[],
-  isRelative: boolean,
-  max: number,
-  title: string
-) => ({
-  chart: {
-    type: 'column',
-  },
-  colors: isRelative ? colorsRelative : colors,
-  title: {
-    text: title,
-  },
-  xAxis: {
-    categories,
-  },
-  yAxis: {
-    allowDecimals: false,
-    title: {
-      text: isRelative ? 'Share of students' : 'Number of students',
-    },
-    max,
-    floor: -max,
-  },
-  plotOptions: {
-    column: {
-      stacking: 'normal' as const,
-      borderRadius: 1,
     },
     series: {
       tooltip: {
@@ -168,19 +130,17 @@ export const PassRateChart = ({
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
 
-  const isAttemptsMode = viewMode === 'ATTEMPTS'
-  const passRateGraphSeries = isAttemptsMode
-    ? getPassRateAttemptSeriesFromStats(stats)
-    : getPassRateStudentSeriesFromStats(stats)
+  const passRateGraphSeries =
+    viewMode === 'ATTEMPTS' ? getPassRateAttemptSeriesFromStats(stats) : getPassRateStudentSeriesFromStats(stats)
 
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passRateGraphSeries.absolute)
-  const graphOptions = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
   const primaryGraphOptions = graphOptions(
     statYears,
     colors,
     colorsRelative,
     isRelative,
     maxPassRateVal,
+    viewMode.toLowerCase() as 'attempts' | 'students',
     `Pass rate for group ${data.name}`
   )
 
