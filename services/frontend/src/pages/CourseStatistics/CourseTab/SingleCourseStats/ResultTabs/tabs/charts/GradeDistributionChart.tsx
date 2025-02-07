@@ -4,6 +4,7 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
+import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { ProgrammeStats } from '@/types/courseStat'
 import {
   absoluteToRelative,
@@ -215,9 +216,7 @@ export const GradeDistributionChart = ({
           series: isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute,
         }}
       />
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
-      )}
+      <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )
 }

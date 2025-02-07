@@ -1,10 +1,11 @@
-import { Stack, Typography } from '@mui/material'
+import { Stack } from '@mui/material'
 import { flatten } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
+import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setProgrammes } from '@/redux/coursesSummaryForm'
@@ -89,11 +90,7 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
       </Stack>
       <Section exportOnClick={() => exportToExcel(data)}>
         <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
-        {!userHasAccessToAllStats && (
-          <Typography color="text.secondary" component="span" variant="body2">
-            * Years with 5 students or fewer are NOT included in the total
-          </Typography>
-        )}
+        <TotalsDisclaimer userHasAccessToAllStats={userHasAccessToAllStats} />
       </Section>
     </Stack>
   )
