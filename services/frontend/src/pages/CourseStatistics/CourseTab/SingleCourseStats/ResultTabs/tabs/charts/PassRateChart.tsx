@@ -1,9 +1,9 @@
+import { useTheme } from '@mui/material'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
-import { chartColor, color } from '@/styles/colors'
 import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
@@ -11,10 +11,14 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const colorsRelative = [color.green, color.red, chartColor.redLight]
-const colors = [chartColor.blue, ...colorsRelative]
-
-const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
+const passRateAttemptGraphOptions = (
+  categories: string[],
+  colors: string[],
+  colorsRelative: string[],
+  isRelative: boolean,
+  max: number,
+  title: string
+) => ({
   chart: {
     type: 'column',
   },
@@ -49,7 +53,14 @@ const passRateAttemptGraphOptions = (isRelative: boolean, categories: string[], 
   },
 })
 
-const passRateStudentGraphOptions = (isRelative: boolean, categories: string[], max: number, title: string) => ({
+const passRateStudentGraphOptions = (
+  categories: string[],
+  colors: string[],
+  colorsRelative: string[],
+  isRelative: boolean,
+  max: number,
+  title: string
+) => ({
   chart: {
     type: 'column',
   },
@@ -154,6 +165,11 @@ export const PassRateChart = ({
   userHasAccessToAllStats: boolean
   viewMode: 'ATTEMPTS' | 'STUDENTS'
 }) => {
+  const theme = useTheme()
+  const gradeColors = theme.palette.grades
+  const colorsRelative = [gradeColors.pass, gradeColors.fail, gradeColors.enrolledNoGrade]
+  const colors = [gradeColors.generic, ...colorsRelative]
+
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
 
@@ -164,7 +180,14 @@ export const PassRateChart = ({
 
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passRateGraphSeries.absolute)
   const graphOptions = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudentGraphOptions
-  const primaryGraphOptions = graphOptions(isRelative, statYears, maxPassRateVal, `Pass rate for group ${data.name}`)
+  const primaryGraphOptions = graphOptions(
+    statYears,
+    colors,
+    colorsRelative,
+    isRelative,
+    maxPassRateVal,
+    `Pass rate for group ${data.name}`
+  )
 
   return (
     <div>
