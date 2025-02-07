@@ -6,51 +6,11 @@ import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
-import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
+import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from '../util'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
-
-const graphOptions = (
-  categories: string[],
-  colors: string[],
-  colorsRelative: string[],
-  isRelative: boolean,
-  max: number,
-  mode: 'attempts' | 'students',
-  title: string
-) => ({
-  chart: {
-    type: 'column',
-  },
-  colors: isRelative ? colorsRelative : colors,
-  title: {
-    text: title,
-  },
-  xAxis: {
-    categories,
-  },
-  yAxis: {
-    allowDecimals: false,
-    title: {
-      text: isRelative ? `Share of ${mode}` : `Number of ${mode}`,
-    },
-    max,
-    floor: -max,
-  },
-  plotOptions: {
-    column: {
-      stacking: 'normal' as const,
-      borderRadius: 3,
-    },
-    series: {
-      tooltip: {
-        valueSuffix: isRelative ? '%' : '',
-      },
-    },
-  },
-})
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all: number[] = []
@@ -134,13 +94,13 @@ export const PassRateChart = ({
     viewMode === 'ATTEMPTS' ? getPassRateAttemptSeriesFromStats(stats) : getPassRateStudentSeriesFromStats(stats)
 
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passRateGraphSeries.absolute)
-  const primaryGraphOptions = graphOptions(
-    statYears,
+  const primaryGraphOptions = getGraphOptions(
     colors,
     colorsRelative,
     isRelative,
     maxPassRateVal,
     viewMode.toLowerCase() as 'attempts' | 'students',
+    statYears,
     `Pass rate for group ${data.name}`
   )
 
