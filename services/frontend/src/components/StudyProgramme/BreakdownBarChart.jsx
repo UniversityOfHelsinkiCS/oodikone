@@ -69,9 +69,6 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
       allowDecimals: false,
       showFirstLabel: false,
     },
-    credits: {
-      enabled: false,
-    },
     plotOptions: {
       bar: {
         dataLabels: {

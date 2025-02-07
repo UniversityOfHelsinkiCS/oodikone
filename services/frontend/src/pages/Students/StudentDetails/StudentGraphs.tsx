@@ -216,9 +216,6 @@ const GradeGraph = ({ student }: { student: any }) => {
     chart: {
       type: 'spline',
     },
-    credits: {
-      enabled: false,
-    },
     title: {
       text: '',
     },

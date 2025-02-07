@@ -39,9 +39,6 @@ export const LineGraph = ({
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     exporting: {
       filename: exportFileName,
     },

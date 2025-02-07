@@ -61,7 +61,6 @@ export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
         <Stack sx={{ alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
           <ReactHighchart
             config={{
-              credits: { enabled: false },
               plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
               series: dummyData,
               title: { text: 'Students of Computer Science 2018-2020' },
@@ -71,7 +70,6 @@ export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
           <ReactHighchart
             config={{
               chart: { type: 'column' },
-              credits: { enabled: false },
               series: dummyData.map(element => ({
                 name: element.name,
                 data: [Math.max(...element.data)],

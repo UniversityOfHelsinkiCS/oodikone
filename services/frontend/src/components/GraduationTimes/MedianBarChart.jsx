@@ -199,9 +199,6 @@ export const MedianBarChart = ({
         },
       ],
     },
-    credits: {
-      enabled: false,
-    },
   }
 
   if (!facultyGraph) {

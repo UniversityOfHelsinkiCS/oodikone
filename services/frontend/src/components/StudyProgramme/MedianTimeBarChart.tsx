@@ -158,9 +158,6 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
         },
       ],
     },
-    credits: {
-      enabled: false,
-    },
   }
 
   return (

@@ -255,9 +255,6 @@ export const MedianBarChart = ({
         },
       ],
     },
-    credits: {
-      enabled: false,
-    },
   }
 
   return (

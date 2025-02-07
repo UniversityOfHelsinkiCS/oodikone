@@ -17,9 +17,6 @@ export const BarChart = ({ cypress, data }) => {
       text: '',
     },
     series: dataWithColors,
-    credits: {
-      enabled: false,
-    },
     xAxis: {
       categories: data?.years,
     },
