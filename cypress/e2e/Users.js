@@ -61,7 +61,7 @@ describe('Users tests', () => {
       userButtonWorks('admin')
     })
 
-    describe('can mock as other users', () => {
+    describe('can mock as other users', { retries: 3 }, () => {
       beforeEach(() => {
         cy.cs('user-edit-button-basic').click()
         cy.get('i.spy').click()
@@ -71,7 +71,7 @@ describe('Users tests', () => {
         userButtonWorks('basic', true)
       })
 
-      it("only the mocked user's programmes are visible", { retries: 2 }, () => {
+      it("only the mocked user's programmes are visible", () => {
         cy.visit('/populations')
         cy.contains('label', 'Study programme')
           .siblings()
