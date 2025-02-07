@@ -5,7 +5,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { ProgrammeStats } from '@/types/courseStat'
+import { ProgrammeStats, ViewMode } from '@/types/courseStat'
 import {
   absoluteToRelative,
   getDataObject,
@@ -130,18 +130,8 @@ export const GradeDistributionChart = ({
   data: ProgrammeStats
   isRelative: boolean
   userHasAccessToAllStats: boolean
-  viewMode: 'ATTEMPTS' | 'STUDENTS'
+  viewMode: ViewMode
 }) => {
-  const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
-
-  const statYears = stats.map(year => year.name)
-  const grades = stats.map(year => getGrades(year.students))
-
-  const gradeGraphSeries = getGradeSeries(grades)
-  const seriesType = getSeriesType(grades)
-
-  const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
-
   const theme = useTheme()
   const gradeColors = theme.palette.grades
   const colors = {
@@ -161,24 +151,28 @@ export const GradeDistributionChart = ({
     thesis: [gradeColors.generic],
   }
 
-  const primaryGraphOptions = getGraphOptions(
+  const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
+  const statYears = stats.map(year => year.name)
+
+  const grades = stats.map(year => getGrades(year.students))
+
+  const series = getGradeSeries(grades)
+  const seriesType = getSeriesType(grades)
+  const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(series.absolute)
+
+  const graphOptions = getGraphOptions(
     colors[seriesType],
     colors[seriesType],
     isRelative,
     maxGradeValue,
-    viewMode.toLowerCase() as 'attempts' | 'students',
     statYears,
-    `Grades for group ${data.name}`
+    `Grades for group ${data.name}`,
+    viewMode
   )
 
   return (
     <div>
-      <ReactHighcharts
-        config={{
-          ...primaryGraphOptions,
-          series: isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute,
-        }}
-      />
+      <ReactHighcharts config={{ ...graphOptions, series: isRelative ? series.relative : series.absolute }} />
       <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )

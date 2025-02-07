@@ -5,7 +5,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
+import { FormattedStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from '../util'
 
 exporting(ReactHighcharts.Highcharts)
@@ -80,7 +80,7 @@ export const PassRateChart = ({
   data: ProgrammeStats
   isRelative: boolean
   userHasAccessToAllStats: boolean
-  viewMode: 'ATTEMPTS' | 'STUDENTS'
+  viewMode: ViewMode
 }) => {
   const theme = useTheme()
   const gradeColors = theme.palette.grades
@@ -90,28 +90,23 @@ export const PassRateChart = ({
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
 
-  const passRateGraphSeries =
+  const series =
     viewMode === 'ATTEMPTS' ? getPassRateAttemptSeriesFromStats(stats) : getPassRateStudentSeriesFromStats(stats)
+  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(series.absolute)
 
-  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(passRateGraphSeries.absolute)
-  const primaryGraphOptions = getGraphOptions(
+  const graphOptions = getGraphOptions(
     colors,
     colorsRelative,
     isRelative,
     maxPassRateVal,
-    viewMode.toLowerCase() as 'attempts' | 'students',
     statYears,
-    `Pass rate for group ${data.name}`
+    `Pass rate for group ${data.name}`,
+    viewMode
   )
 
   return (
     <div>
-      <ReactHighcharts
-        config={{
-          ...primaryGraphOptions,
-          series: isRelative ? passRateGraphSeries.relative : passRateGraphSeries.absolute,
-        }}
-      />
+      <ReactHighcharts config={{ ...graphOptions, series: isRelative ? series.relative : series.absolute }} />
       <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )

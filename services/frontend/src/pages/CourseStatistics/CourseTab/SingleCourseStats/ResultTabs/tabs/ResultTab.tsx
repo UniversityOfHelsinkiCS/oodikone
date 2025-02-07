@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
-import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
+import { AvailableStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
 import { ChartSettings } from './settings/ChartSettings'
@@ -15,7 +15,7 @@ type ResultTabSettings = {
   isRelative: boolean
   separate: boolean
   showGrades: boolean
-  viewMode: 'STUDENTS' | 'ATTEMPTS'
+  viewMode: ViewMode
 }
 
 export const ResultTab = ({
@@ -28,7 +28,7 @@ export const ResultTab = ({
 }: {
   availableStats: AvailableStats
   datasets: (ProgrammeStats | undefined)[]
-  initialSettings: { viewMode: 'STUDENTS' | 'ATTEMPTS'; separate: boolean }
+  initialSettings: { viewMode: ViewMode; separate: boolean }
   loading: boolean
   updateSeparate: (separate: boolean) => void
   userHasAccessToAllStats: boolean
