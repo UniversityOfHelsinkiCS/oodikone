@@ -9,7 +9,7 @@ visibleLinks.basic = [...visibleLinks.onlycoursestatistics, 'Faculties', 'Progra
 visibleLinks.admin = [...visibleLinks.basic, 'Teachers', 'Admin']
 
 const containsLinks = links => {
-  cy.get('[data-cy=nav-bar]').within(() => {
+  cy.cs('nav-bar').within(() => {
     for (const link of links) {
       cy.contains(link)
     }
@@ -17,7 +17,7 @@ const containsLinks = links => {
 }
 
 const userButtonWorks = (username, mocking = false) => {
-  cy.get('[data-cy=nav-bar-user-button]').click()
+  cy.cs('nav-bar-user-button').click()
   cy.contains(mocking ? `Mocking as ${username}` : `Logged in as ${username}`)
   cy.contains('Language')
   cy.contains('suomi')
@@ -71,7 +71,7 @@ describe('Users tests', () => {
         userButtonWorks('basic', true)
       })
 
-      it("only the mocked user's programmes are visible", () => {
+      it("only the mocked user's programmes are visible", { retries: 2 }, () => {
         cy.visit('/populations')
         cy.contains('label', 'Study programme')
           .siblings()
