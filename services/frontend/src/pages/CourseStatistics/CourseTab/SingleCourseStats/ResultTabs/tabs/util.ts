@@ -1,7 +1,7 @@
 import { flatten } from 'lodash'
 
 import { calculatePercentage } from '@/common'
-import { FormattedStats } from '@/types/courseStat'
+import { FormattedStats, ViewMode } from '@/types/courseStat'
 
 type Series = {
   name: string
@@ -259,9 +259,9 @@ export const getGraphOptions = (
   colorsRelative: string[],
   isRelative: boolean,
   max: number,
-  mode: 'attempts' | 'students',
   statYears: string[],
-  title: string
+  title: string,
+  viewMode: ViewMode
 ) => ({
   chart: {
     type: 'column',
@@ -276,7 +276,7 @@ export const getGraphOptions = (
   yAxis: {
     allowDecimals: false,
     title: {
-      text: isRelative ? `Share of ${mode}` : `Number of ${mode}`,
+      text: isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`,
     },
     max,
     floor: -max,

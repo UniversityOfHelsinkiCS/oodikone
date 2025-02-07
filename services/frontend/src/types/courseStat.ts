@@ -101,3 +101,5 @@ export type ProgrammeStats = {
 }
 
 export type AvailableStats = { unify: boolean; open: boolean; university: boolean }
+
+export type ViewMode = 'ATTEMPTS' | 'STUDENTS'
