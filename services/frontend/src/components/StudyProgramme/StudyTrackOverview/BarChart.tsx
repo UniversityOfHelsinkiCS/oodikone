@@ -31,9 +31,6 @@ export const BarChart = ({ data, track }: BarChartProps) => {
   }))
 
   const config = {
-    title: {
-      text: '',
-    },
     series: dataWithColors,
     xAxis: {
       categories: data?.years,

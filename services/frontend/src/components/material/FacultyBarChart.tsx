@@ -37,9 +37,6 @@ export const FacultyBarChart = ({
   }))
 
   const config = {
-    title: {
-      text: '',
-    },
     series: dataWithColors,
     xAxis: {
       categories: data?.years,

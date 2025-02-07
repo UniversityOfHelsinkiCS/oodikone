@@ -216,9 +216,6 @@ const GradeGraph = ({ student }: { student: any }) => {
     chart: {
       type: 'spline',
     },
-    title: {
-      text: '',
-    },
     tooltip: {
       pointFormat: '{point.y:.2f}',
     },

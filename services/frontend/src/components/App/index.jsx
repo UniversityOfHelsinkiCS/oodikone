@@ -27,6 +27,9 @@ HighCharts.setOptions({
       animation: false,
     },
   },
+  title: {
+    text: '',
+  },
 })
 
 moment.updateLocale('en', {

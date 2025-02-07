@@ -13,9 +13,6 @@ export const BarChart = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const config = {
-    title: {
-      text: '',
-    },
     series: dataWithColors,
     xAxis: {
       categories: data?.years,
