@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
@@ -173,9 +174,7 @@ export const AttemptsTable = ({
         maxHeight="40vh"
         title={`Yearly attempt statistics for group ${name}`}
       />
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
-      )}
+      <TotalsDisclaimer userHasAccessToAllStats={userHasAccessToAllStats} />
     </>
   )
 }

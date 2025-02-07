@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 import { Icon, Item } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
+import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
@@ -196,9 +197,7 @@ export const StudentsTable = ({ data: { name, stats }, separate, showGrades, use
         maxHeight="40vh"
         title={`Student statistics for group ${name}`}
       />
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or fewer are NOT included in the total</span>
-      )}
+      <TotalsDisclaimer userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
+import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from '../util'
 
@@ -191,9 +192,7 @@ export const PassRateChart = ({
           series: isRelative ? passRateGraphSeries.relative : passRateGraphSeries.absolute,
         }}
       />
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or fewer are shown as 0 in the chart</span>
-      )}
+      <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )
 }
