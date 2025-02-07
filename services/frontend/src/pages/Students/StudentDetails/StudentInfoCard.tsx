@@ -1,5 +1,5 @@
 import { Refresh as RefreshIcon } from '@mui/icons-material'
-import { Card, CardContent, Typography, Button, Stack } from '@mui/material'
+import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material'
 
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/Footer/ExternalLink'
@@ -26,7 +26,7 @@ export const StudentInfoCard = ({ student }) => {
     <Card data-cy="student-info-card" variant="outlined">
       <CardContent>
         <Stack spacing={1}>
-          <Stack alignItems="flex-start">
+          <Stack direction="column">
             <Typography variant="h6">
               {name} {student.studentNumber}
             </Typography>
@@ -38,8 +38,8 @@ export const StudentInfoCard = ({ student }) => {
             />
             <Typography color="textSecondary">{email}</Typography>
           </Stack>
-          <Stack alignItems="flex-start" spacing={1}>
-            Credits: {student.credits ?? 0}
+          <Stack alignItems="flex-start" direction="column" spacing={1}>
+            <Box component="span">Credits: {student.credits ?? 0}</Box>
             <EnrollmentAccordion student={student} />
             Updated at {formattedTimestamp}
             {isAdmin && (
