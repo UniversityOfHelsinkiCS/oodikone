@@ -10,6 +10,7 @@ import {
   absoluteToRelative,
   getDataObject,
   getGradeSpread,
+  getGraphOptions,
   getMaxValueOfSeries,
   getSeriesType,
   getThesisGradeSpread,
@@ -18,47 +19,6 @@ import {
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
-
-const getGradeGraphOptions = (
-  colors: string[],
-  maxGradeValue: number,
-  isRelative: boolean,
-  statYears: string[],
-  title: string
-) => ({
-  chart: {
-    type: 'column',
-  },
-  colors,
-  title: {
-    text: title,
-  },
-  legend: {
-    enabled: false,
-  },
-  xAxis: {
-    categories: statYears,
-  },
-  yAxis: {
-    allowDecimals: false,
-    title: {
-      text: isRelative ? 'Share of students' : 'Number of students',
-    },
-    max: maxGradeValue,
-    floor: -maxGradeValue,
-  },
-  plotOptions: {
-    column: {
-      stacking: 'normal' as const,
-      borderRadius: 2,
-    },
-    series: {
-      tooltip: {
-        valueSuffix: isRelative ? '%' : '',
-      },
-    },
-  },
-})
 
 const calculateSumAll = (newSeries: Record<string, number[]>) => {
   return Object.values(newSeries)[0].map((_, index) =>
@@ -165,10 +125,12 @@ export const GradeDistributionChart = ({
   data,
   isRelative,
   userHasAccessToAllStats,
+  viewMode,
 }: {
   data: ProgrammeStats
   isRelative: boolean
   userHasAccessToAllStats: boolean
+  viewMode: 'ATTEMPTS' | 'STUDENTS'
 }) => {
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
@@ -179,7 +141,6 @@ export const GradeDistributionChart = ({
   const seriesType = getSeriesType(grades)
 
   const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
-  const title = `Grades for group ${data.name}`
 
   const theme = useTheme()
   const gradeColors = theme.palette.grades
@@ -200,19 +161,21 @@ export const GradeDistributionChart = ({
     thesis: [gradeColors.generic],
   }
 
-  const primaryDistributionOptions = getGradeGraphOptions(
+  const primaryGraphOptions = getGraphOptions(
     colors[seriesType],
-    maxGradeValue,
+    colors[seriesType],
     isRelative,
+    maxGradeValue,
+    viewMode.toLowerCase() as 'attempts' | 'students',
     statYears,
-    title
+    `Grades for group ${data.name}`
   )
 
   return (
     <div>
       <ReactHighcharts
         config={{
-          ...primaryDistributionOptions,
+          ...primaryGraphOptions,
           series: isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute,
         }}
       />

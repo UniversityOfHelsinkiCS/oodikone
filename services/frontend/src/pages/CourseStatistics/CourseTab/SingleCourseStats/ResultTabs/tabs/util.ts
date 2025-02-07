@@ -253,3 +253,43 @@ export const getGradeSpread = (series: Array<Record<string, number>>, isRelative
 export const defineCellColor = (rowObfuscated: boolean) => {
   return rowObfuscated && { style: { color: 'gray' } }
 }
+
+export const getGraphOptions = (
+  colors: string[],
+  colorsRelative: string[],
+  isRelative: boolean,
+  max: number,
+  mode: 'attempts' | 'students',
+  statYears: string[],
+  title: string
+) => ({
+  chart: {
+    type: 'column',
+  },
+  colors: isRelative ? colorsRelative : colors,
+  title: {
+    text: title,
+  },
+  xAxis: {
+    categories: statYears,
+  },
+  yAxis: {
+    allowDecimals: false,
+    title: {
+      text: isRelative ? `Share of ${mode}` : `Number of ${mode}`,
+    },
+    max,
+    floor: -max,
+  },
+  plotOptions: {
+    column: {
+      stacking: 'normal' as const,
+      borderRadius: 3,
+    },
+    series: {
+      tooltip: {
+        valueSuffix: isRelative ? '%' : '',
+      },
+    },
+  },
+})

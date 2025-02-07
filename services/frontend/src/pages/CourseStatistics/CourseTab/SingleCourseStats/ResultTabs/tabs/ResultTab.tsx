@@ -102,6 +102,7 @@ export const ResultTab = ({
                 isRelative={settings.isRelative}
                 key={data.name}
                 userHasAccessToAllStats={userHasAccessToAllStats}
+                viewMode={settings.viewMode}
               />
             ))}
         </Section>
