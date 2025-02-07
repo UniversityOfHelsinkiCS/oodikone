@@ -1,9 +1,9 @@
+import { useTheme } from '@mui/material'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
-import { chartColor, color } from '@/styles/colors'
 import { ProgrammeStats } from '@/types/courseStat'
 import {
   absoluteToRelative,
@@ -183,21 +183,23 @@ export const GradeDistributionChart = ({
   const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(gradeGraphSeries.absolute)
   const title = `Grades for group ${data.name}`
 
+  const theme = useTheme()
+  const gradeColors = theme.palette.grades
   const colors = {
     other: [
-      color.red,
-      chartColor.blue,
-      chartColor.blue,
-      chartColor.blue,
-      chartColor.blue,
-      chartColor.blue,
-      color.green,
-      color.green,
-      color.green,
+      gradeColors.fail,
+      gradeColors.generic,
+      gradeColors.generic,
+      gradeColors.generic,
+      gradeColors.generic,
+      gradeColors.generic,
+      gradeColors.pass,
+      gradeColors.pass,
+      gradeColors.pass,
     ],
-    'pass-fail': [color.red, color.green],
-    'second-national-language': [color.red, color.green, color.green, color.green],
-    thesis: [chartColor.blue],
+    'pass-fail': [gradeColors.fail, gradeColors.pass],
+    'second-national-language': [gradeColors.fail, gradeColors.pass, gradeColors.pass, gradeColors.pass],
+    thesis: [gradeColors.generic],
   }
 
   const primaryDistributionOptions = getGradeGraphOptions(

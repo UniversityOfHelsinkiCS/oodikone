@@ -1,28 +1,7 @@
 import { deepPurple } from '@mui/material/colors'
-import { createTheme } from '@mui/material/styles'
+import { createTheme, ThemeOptions } from '@mui/material/styles'
 
-declare module '@mui/material/styles' {
-  interface Palette {
-    activeNavigationTab: string
-    export: string
-    graduationTimes: {
-      onTime: string
-      yearOver: string
-      wayOver: string
-    }
-  }
-  interface PaletteOptions {
-    activeNavigationTab: string
-    export: string
-    graduationTimes?: {
-      onTime: string
-      yearOver: string
-      wayOver: string
-    }
-  }
-}
-
-export const theme = createTheme({
+const baseTheme = {
   palette: {
     activeNavigationTab: '#fff',
     export: deepPurple[500],
@@ -31,5 +10,20 @@ export const theme = createTheme({
       yearOver: '#fee191',
       wayOver: '#fb6962',
     },
+    grades: {
+      pass: '#008000',
+      fail: '#e5053a',
+      generic: '#178aa5',
+      enrolledNoGrade: '#e2726d',
+    },
   },
-})
+} as const
+
+type CustomPalette = typeof baseTheme.palette
+
+declare module '@mui/material/styles' {
+  interface Palette extends CustomPalette {}
+  interface PaletteOptions extends CustomPalette {}
+}
+
+export const theme = createTheme(baseTheme as ThemeOptions)
