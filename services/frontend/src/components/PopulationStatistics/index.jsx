@@ -191,7 +191,7 @@ export const PopulationStatistics = () => {
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
-            {title}
+            {title} {query?.showBachelorAndMaster === 'true' && ' (Bachelor + Master view)'}
             {location.search !== '' && query?.studyRights?.studyTrack && (
               <Header.Subheader>studytrack {query.studyRights.studyTrack}</Header.Subheader>
             )}
