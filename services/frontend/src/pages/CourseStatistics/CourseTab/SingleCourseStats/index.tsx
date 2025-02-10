@@ -185,8 +185,7 @@ export const SingleCourseStats = ({
   }
 
   const isValidProgrammeCode = (code: string) => {
-    const { programmes } = stats
-    return programmes[code] || code === ALL.value || code === 'EXCLUDED'
+    return stats.programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
 
   const filteredYearsAndSemesters = () => {
@@ -199,7 +198,7 @@ export const SingleCourseStats = ({
         filteredSemesters: semesters,
       }
     }
-    const timeFilter = ({ value }) => value >= from && value <= to
+    const timeFilter = ({ value }: { value: number }) => value >= from && value <= to
     return {
       filteredYears: years.filter(timeFilter),
       filteredSemesters: semesters.filter(timeFilter),
