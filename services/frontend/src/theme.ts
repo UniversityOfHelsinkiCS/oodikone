@@ -1,4 +1,4 @@
-import { deepPurple } from '@mui/material/colors'
+import { blue, deepPurple, green, indigo, orange, purple, red } from '@mui/material/colors'
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
 const baseTheme = {
@@ -11,10 +11,25 @@ const baseTheme = {
       wayOver: '#fb6962',
     },
     grades: {
-      pass: '#008000',
-      fail: '#e5053a',
-      generic: '#178aa5',
-      enrolledNoGrade: '#e2726d',
+      all: indigo[300],
+      enrolledNoGrade: orange[300],
+      fail: red[300],
+      tt: green[100],
+      ht: green[200],
+      pass: green[300],
+      grade1: blue[100],
+      grade2: blue[200],
+      grade3: blue[300],
+      grade4: blue[400],
+      grade5: blue[500],
+      i: purple[100],
+      a: purple[200],
+      nsla: purple[300],
+      lub: purple[400],
+      cl: purple[500],
+      mcla: purple[600],
+      ecla: purple[700],
+      l: purple[800],
     },
   },
 } as const
