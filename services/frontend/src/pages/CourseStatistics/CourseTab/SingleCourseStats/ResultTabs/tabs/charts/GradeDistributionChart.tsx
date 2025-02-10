@@ -50,13 +50,13 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
       ],
       relative: [
         getDataObject('I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
-        getDataObject('A', newSeries.A.map(absoluteToRelative(sumAll)), 'b'),
-        getDataObject('NSLA', newSeries.NSLA.map(absoluteToRelative(sumAll)), 'c'),
-        getDataObject('LUB', newSeries.LUB.map(absoluteToRelative(sumAll)), 'd'),
-        getDataObject('CL', newSeries.CL.map(absoluteToRelative(sumAll)), 'e'),
-        getDataObject('MCLA', newSeries.MCLA.map(absoluteToRelative(sumAll)), 'f'),
-        getDataObject('ECLA', newSeries.ECLA.map(absoluteToRelative(sumAll)), 'g'),
-        getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'h'),
+        getDataObject('A', newSeries.A.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('NSLA', newSeries.NSLA.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('LUB', newSeries.LUB.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('CL', newSeries.CL.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('MCLA', newSeries.MCLA.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('ECLA', newSeries.ECLA.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'a'),
       ],
     }
   }
@@ -71,9 +71,9 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
       ],
       relative: [
         getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-        getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'b'),
-        getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'c'),
-        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'd'),
+        getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'a'),
+        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'a'),
       ],
     }
   }
@@ -83,7 +83,7 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
       absolute: [getDataObject('0', newSeries[0], 'a'), getDataObject('Hyv.', newSeries['Hyv.'], 'b')],
       relative: [
         getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'b'),
+        getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'a'),
       ],
     }
   }
@@ -91,25 +91,25 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
   return {
     absolute: [
       getDataObject('0', newSeries[0], 'a'),
-      getDataObject('1', newSeries[1], 'b'),
-      getDataObject('2', newSeries[2], 'c'),
-      getDataObject('3', newSeries[3], 'd'),
-      getDataObject('4', newSeries[4], 'e'),
-      getDataObject('5', newSeries[5], 'f'),
-      getDataObject('HT', newSeries.HT, 'g'),
-      getDataObject('TT', newSeries.TT, 'h'),
-      getDataObject('Hyv.', newSeries['Hyv.'], 'i'),
+      getDataObject('TT', newSeries.TT, 'b'),
+      getDataObject('HT', newSeries.HT, 'b'),
+      getDataObject('Hyv.', newSeries['Hyv.'], 'b'),
+      getDataObject('1', newSeries[1], 'c'),
+      getDataObject('2', newSeries[2], 'd'),
+      getDataObject('3', newSeries[3], 'e'),
+      getDataObject('4', newSeries[4], 'f'),
+      getDataObject('5', newSeries[5], 'g'),
     ],
     relative: [
       getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
-      getDataObject('1', newSeries[1].map(absoluteToRelative(sumAll)), 'b'),
-      getDataObject('2', newSeries[2].map(absoluteToRelative(sumAll)), 'c'),
-      getDataObject('3', newSeries[3].map(absoluteToRelative(sumAll)), 'd'),
-      getDataObject('4', newSeries[4].map(absoluteToRelative(sumAll)), 'e'),
-      getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'f'),
-      getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'g'),
-      getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'h'),
-      getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
+      getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('1', newSeries[1].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('2', newSeries[2].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('3', newSeries[3].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('4', newSeries[4].map(absoluteToRelative(sumAll)), 'a'),
+      getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'a'),
     ],
   }
 }
@@ -137,18 +137,27 @@ export const GradeDistributionChart = ({
   const colors = {
     other: [
       gradeColors.fail,
-      gradeColors.generic,
-      gradeColors.generic,
-      gradeColors.generic,
-      gradeColors.generic,
-      gradeColors.generic,
+      gradeColors.tt,
+      gradeColors.ht,
       gradeColors.pass,
-      gradeColors.pass,
-      gradeColors.pass,
+      gradeColors.grade1,
+      gradeColors.grade2,
+      gradeColors.grade3,
+      gradeColors.grade4,
+      gradeColors.grade5,
     ],
     'pass-fail': [gradeColors.fail, gradeColors.pass],
-    'second-national-language': [gradeColors.fail, gradeColors.pass, gradeColors.pass, gradeColors.pass],
-    thesis: [gradeColors.generic],
+    'second-national-language': [gradeColors.fail, gradeColors.tt, gradeColors.ht, gradeColors.pass],
+    thesis: [
+      gradeColors.i,
+      gradeColors.a,
+      gradeColors.nsla,
+      gradeColors.lub,
+      gradeColors.cl,
+      gradeColors.mcla,
+      gradeColors.ecla,
+      gradeColors.l,
+    ],
   }
 
   const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
