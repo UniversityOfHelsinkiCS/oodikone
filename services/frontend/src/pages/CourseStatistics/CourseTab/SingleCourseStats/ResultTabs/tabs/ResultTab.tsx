@@ -1,5 +1,5 @@
 import { Stack } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
@@ -39,6 +39,10 @@ export const ResultTab = ({
     showGrades: false,
     viewMode: initialSettings.viewMode,
   })
+
+  useEffect(() => {
+    setSettings({ ...settings, separate: initialSettings.separate, viewMode: initialSettings.viewMode })
+  }, [initialSettings])
 
   const toggleShowGrades = (showGrades: boolean) => {
     setSettings({ ...settings, showGrades })
