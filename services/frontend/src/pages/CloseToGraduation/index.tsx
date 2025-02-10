@@ -199,7 +199,21 @@ export const CloseToGraduation = () => {
         Header: (
           <TableHeaderWithTooltip
             header="Semesters absent"
-            tooltipText="The number of semesters the student has been absent (both statutory and non-statutory absences) during their study right"
+            tooltipText="The number of semesters the student has been absent (both statutory (*lakiperusteinen*) and non-statutory absences) during their study right. The current semester is included."
+          />
+        ),
+        muiTableBodyCellProps: {
+          align: 'right',
+        },
+      },
+      {
+        header: 'Semesters used',
+        accessorKey: 'numberOfUsedSemesters',
+        filterVariant: 'range',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Semesters used"
+            tooltipText="The number of semesters the student has either been enrolled as present (*läsnäoleva*) or the enrollment was neglected (*laiminlyöty*) during their study right. The current semester is included."
           />
         ),
         muiTableBodyCellProps: {

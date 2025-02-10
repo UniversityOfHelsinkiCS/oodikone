@@ -13,6 +13,7 @@ import {
 import { Name } from '../../shared/types'
 import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
+import { getCurrentSemester } from '../semesters'
 import { getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
@@ -53,6 +54,7 @@ type AccumulatorType = {
   faculty: Name
   attainmentDates: AttainmentDates
   numberOfAbsentSemesters: number
+  numberOfUsedSemesters: number
   curriculumPeriod: string | null
   credits: {
     hops: number
@@ -99,7 +101,11 @@ const findThesisAndLatestAndEarliestAttainments = (
   return { attainmentDates, thesisData }
 }
 
-const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<string, Name>) => {
+const formatStudent = (
+  student: InferAttributes<Student>,
+  facultyMap: Record<string, Name>,
+  currentSemesterCode: number
+) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
@@ -119,10 +125,20 @@ const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<str
       semesterEnrollments,
     } = studyRight
 
-    const numberOfAbsentSemesters = (semesterEnrollments ?? []).reduce(
-      (acc, enrollment) => (enrollment.type === EnrollmentType.ABSENT ? acc + 1 : acc),
-      0
-    )
+    let numberOfAbsentSemesters = 0
+    let numberOfUsedSemesters = 0
+
+    if (semesterEnrollments != null) {
+      for (const enrollment of semesterEnrollments) {
+        if (enrollment.semester > currentSemesterCode) continue
+
+        if (enrollment.type === EnrollmentType.ABSENT) {
+          numberOfAbsentSemesters += 1
+        } else {
+          numberOfUsedSemesters += 1
+        }
+      }
+    }
 
     const {
       code: programmeCode,
@@ -162,6 +178,7 @@ const formatStudent = (student: InferAttributes<Student>, facultyMap: Record<str
       faculty: facultyMap[programmeCode],
       attainmentDates,
       numberOfAbsentSemesters,
+      numberOfUsedSemesters,
       curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
       credits: {
         hops: studyPlan.completed_credits,
@@ -297,8 +314,10 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
     facultyMap[programme.code] = programme['organization.name']
   }
 
+  const { semestercode: currentSemesterCode } = await getCurrentSemester()
+
   return students
-    .flatMap(student => formatStudent(student, facultyMap))
+    .flatMap(student => formatStudent(student, facultyMap, currentSemesterCode))
     .reduce(
       (acc, student) => {
         if (student.programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
