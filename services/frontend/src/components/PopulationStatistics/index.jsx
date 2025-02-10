@@ -94,7 +94,7 @@ export const PopulationStatistics = () => {
     studentNumberFilter,
     startYearAtUniFilter,
     studyTrackFilter({ code: programmeCode }),
-    studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester }),
+    studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
     tagsFilter,
     transferredToProgrammeFilter,
   ].filter(Boolean)
