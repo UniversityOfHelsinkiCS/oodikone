@@ -85,7 +85,7 @@ export const PassRateChart = ({
   const theme = useTheme()
   const gradeColors = theme.palette.grades
   const colorsRelative = [gradeColors.pass, gradeColors.fail, gradeColors.enrolledNoGrade]
-  const colors = [gradeColors.generic, ...colorsRelative]
+  const colors = [gradeColors.all, ...colorsRelative]
 
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
