@@ -3,7 +3,7 @@ import { Form, Radio } from 'semantic-ui-react'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
-const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode }) => {
+const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode, showBachelorAndMaster }) => {
   const { activeProgramme, activeCombinedProgramme } = options
 
   const toggle = (buttonValue, type) => () =>
@@ -18,7 +18,7 @@ const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
             activeCombinedProgramme: null,
           }
     )
-  const restOfTitle = combinedProgrammeCode ? 'Bachelor study right' : 'study right'
+  const restOfTitle = showBachelorAndMaster ? 'Bachelor study right' : 'study right'
   const typeOfCombined = combinedProgrammeCode === 'MH90_001' ? 'Licentiate' : 'Master'
   return (
     <Form>
@@ -37,7 +37,7 @@ const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
           name="radioGroup"
           onChange={toggle(true, 'default')}
         />
-        {combinedProgrammeCode && (
+        {showBachelorAndMaster && (
           <Radio
             checked={activeCombinedProgramme === true}
             data-cy="option-active-combined"
@@ -53,7 +53,7 @@ const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
           name="radioGroup"
           onChange={toggle(false, 'default')}
         />
-        {combinedProgrammeCode && (
+        {showBachelorAndMaster && (
           <Radio
             checked={activeCombinedProgramme === false}
             data-cy="option-inactive-combined"
@@ -66,6 +66,8 @@ const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgramm
     </Form>
   )
 }
+
+const isStudyRightActive = enrollment => enrollment != null && [1, 2].includes(enrollment.type)
 
 export const studyRightStatusFilter = createFilter({
   key: 'studyRightStatusFilter',
@@ -83,37 +85,55 @@ export const studyRightStatusFilter = createFilter({
     activeProgramme !== null || activeCombinedProgramme !== null,
 
   filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
-    const { code, combinedProgrammeCode, currentSemester } = args
+    const { code, currentSemester, showBachelorAndMaster } = args
     if (!currentSemester) {
       return true
     }
-
-    const chosenCode = activeCombinedProgramme !== null && combinedProgrammeCode ? combinedProgrammeCode : code
     const studyRight = student.studyRights.find(studyRight =>
-      studyRight.studyRightElements.some(element => element.code === chosenCode)
+      studyRight.studyRightElements.some(element => element.code === code)
     )
-
-    if (!studyRight || studyRight.studyRightElements.find(element => element.code === chosenCode).graduated) {
+    const currentSemesterCode = currentSemester.semestercode
+    if (!studyRight) {
       return false
     }
-
-    const currentSemesterCode = currentSemester.semestercode
     const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === currentSemesterCode)
 
-    // Study right is active if the student has enrolled (absent or present) for the current semester
-    if (activeProgramme === true || activeCombinedProgramme === true) {
-      return enrollment != null && [1, 2].includes(enrollment.type)
-    }
+    if (!showBachelorAndMaster) {
+      if (studyRight.studyRightElements.find(element => element.code === code).graduated) {
+        return false
+      }
 
-    // Study right is inactive if the student has not enrolled for the current semester
-    if (activeProgramme === false || activeCombinedProgramme === false) {
-      return enrollment == null || (enrollment && enrollment.type === 3)
-    }
+      return activeProgramme === isStudyRightActive(enrollment)
+    } else {
+      const BACHELOR = 'urn:code:degree-program-type:bachelors-degree'
+      const MASTER = 'urn:code:degree-program-type:masters-degree'
+      const hasBachelorsProgramme =
+        studyRight.studyRightElements.find(element => element.degreeProgrammeType === BACHELOR) != null
+      const graduatedBachelor = studyRight.studyRightElements.some(
+        element => element.degreeProgrammeType === BACHELOR && element.graduated
+      )
+      const graduatedMaster = studyRight.studyRightElements.some(
+        element => element.degreeProgrammeType === MASTER && element.graduated
+      )
 
+      if (activeProgramme !== null) {
+        if (!hasBachelorsProgramme || graduatedBachelor) return false
+        return activeProgramme === isStudyRightActive(enrollment)
+      }
+
+      if (activeCombinedProgramme !== null) {
+        if ((hasBachelorsProgramme && !graduatedBachelor) || graduatedMaster) return false
+        return activeCombinedProgramme === isStudyRightActive(enrollment)
+      }
+    }
     return false
   },
 
   render: (props, { args }) => (
-    <StudyRightStatusFilterCard {...props} combinedProgrammeCode={args.combinedProgrammeCode} />
+    <StudyRightStatusFilterCard
+      {...props}
+      combinedProgrammeCode={args.combinedProgrammeCode}
+      showBachelorAndMaster={args.showBachelorAndMaster}
+    />
   ),
 })
