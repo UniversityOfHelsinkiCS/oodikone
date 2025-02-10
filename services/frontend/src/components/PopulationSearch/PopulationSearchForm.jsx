@@ -14,6 +14,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { InfoBox } from '@/components/material/InfoBox'
 import { SearchHistory } from '@/components/SearchHistory'
 import { YEAR_DATE_FORMAT } from '@/constants/date'
+import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
@@ -68,6 +69,11 @@ export const PopulationSearchForm = ({ onProgress }) => {
   )
   const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes || []
+  const degreeProgrammeType = useDegreeProgrammeTypes([query.studyRights.programme])
+  const bachelorOrMasterProgrammeIsSelected = [
+    'urn:code:degree-program-type:bachelors-degree',
+    'urn:code:degree-program-type:masters-degree',
+  ].includes(degreeProgrammeType[query.studyRights.programme])
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -337,6 +343,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
           <Stack direction="row" spacing={1}>
             <Radio
               checked={showBachelorAndMaster}
+              disabled={!bachelorOrMasterProgrammeIsSelected}
               label="Show Bachelor + Master"
               onChange={() => {
                 setQuery({ ...query, showBachelorAndMaster: !showBachelorAndMaster })
