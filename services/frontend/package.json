@@ -15,7 +15,7 @@
     "@mui/material": "^6.4.2",
     "@mui/x-date-pickers": "^7.24.1",
     "@reduxjs/toolkit": "^2.5.1",
-    "@sentry/browser": "^8.53.0",
+    "@sentry/browser": "^9.0.0",
     "axios": "^1.7.9",
     "highcharts": "^11.4.8",
     "immer": "^10.1.1",
