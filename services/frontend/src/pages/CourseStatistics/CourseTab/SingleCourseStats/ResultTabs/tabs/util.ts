@@ -73,7 +73,7 @@ export const getSeriesType = (series: Array<Record<string, number>>) => {
 }
 
 export const absoluteToRelative = (all: number[]) => (p: number, i: number) => {
-  return parseFloat(calculatePercentage(p, all[i]).slice(0, -1))
+  return Math.min(100, parseFloat(calculatePercentage(p, all[i]).slice(0, -1)))
 }
 
 const gradesOrder = {
@@ -271,3 +271,7 @@ export const getGraphOptions = (
     },
   },
 })
+
+export const formatPercentage = (rate: number) => {
+  return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`
+}

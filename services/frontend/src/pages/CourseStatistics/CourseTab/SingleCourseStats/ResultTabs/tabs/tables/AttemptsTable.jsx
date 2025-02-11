@@ -7,7 +7,14 @@ import { Header, Icon, Item } from 'semantic-ui-react'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
-import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
+import {
+  formatPercentage,
+  getGradeSpread,
+  getSortableColumn,
+  getThesisGradeSpread,
+  isThesisGrades,
+  resolveGrades,
+} from '../util'
 
 const getTableData = (stats, useThesisGrades) =>
   stats.map(stat => {
@@ -133,7 +140,7 @@ export const AttemptsTable = ({
       key: 'PASSRATE',
       title: 'Pass rate',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.passRate),
-      getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`),
+      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.passRate)),
     }),
     getSortableColumn({
       key: 'ENROLLMENTS',

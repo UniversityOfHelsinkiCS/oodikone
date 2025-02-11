@@ -33,7 +33,7 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
   const newSeries = seriesType === 'thesis' ? getThesisGradeSpread(series) : getGradeSpread(series)
   const sumAll = calculateSumAll(newSeries)
 
-  const gradeCategories: Record<string, string[]> = {
+  const gradeCategories = {
     thesis: ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L'],
     'second-national-language': ['0', 'TT', 'HT', 'Hyv.'],
     'pass-fail': ['0', 'Hyv.'],
