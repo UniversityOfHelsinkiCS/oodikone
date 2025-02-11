@@ -288,8 +288,8 @@ export class CourseYearlyStatsCounter {
   }
 
   private insertEmptyRows = async () => {
-    const first = min(Object.keys(this.groups))
-    const last = max(Object.keys(this.groups))
+    const first = min(Object.keys(this.groups).map(Number))
+    const last = max(Object.keys(this.groups).map(Number))
     if (!(first && last)) {
       return
     }
@@ -301,7 +301,7 @@ export class CourseYearlyStatsCounter {
       return `${startYear}-${endYear}`
     }
 
-    for (let i = Number(first) + 1; i <= Number(last); i++) {
+    for (let i = first + 1; i <= last; i++) {
       if (this.groups[i]) {
         continue
       }
