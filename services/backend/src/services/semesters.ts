@@ -13,6 +13,16 @@ type SemestersAndYears = {
   }
 }
 
+export const getSemesterNameByCode = async (semesterCode: number) => {
+  const semester = await Semester.findOne({
+    attributes: ['name'],
+    where: {
+      semestercode: semesterCode,
+    },
+  })
+  return semester!
+}
+
 export const getCurrentSemester = async () => {
   const today = new Date()
   const currentSemester = await Semester.findOne({

@@ -240,7 +240,7 @@ const getYearlyStatsOfNew = async (
     counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
   })
 
-  const statistics = counter.getFinalStatistics(anonymizationSalt)
+  const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
   let substitutionCourses: Course[] | undefined
   if (combineSubstitutions && courseForSubs?.substitutions && courseForSubs.substitutions.length > 0) {
