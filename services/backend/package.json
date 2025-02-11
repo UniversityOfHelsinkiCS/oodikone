@@ -5,8 +5,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@sentry/node": "^8.53.0",
-    "@sentry/profiling-node": "^8.53.0",
+    "@sentry/node": "^9.0.0",
+    "@sentry/profiling-node": "^9.0.0",
     "axios": "^1.7.9",
     "bullmq": "^5.39.1",
     "compression": "^1.7.5",
