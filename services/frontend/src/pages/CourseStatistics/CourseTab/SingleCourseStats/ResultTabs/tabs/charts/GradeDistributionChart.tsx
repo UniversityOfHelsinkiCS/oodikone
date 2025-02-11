@@ -30,10 +30,7 @@ const calculateSumAll = (newSeries: Record<string, number[]>) => {
 
 const getGradeSeries = (series: Array<Record<string, number>>) => {
   const seriesType = getSeriesType(series)
-  const newSeries =
-    seriesType === 'thesis'
-      ? (getThesisGradeSpread(series) as Record<string, number[]>)
-      : (getGradeSpread(series) as Record<string, number[]>)
+  const newSeries = seriesType === 'thesis' ? getThesisGradeSpread(series) : getGradeSpread(series)
   const sumAll = calculateSumAll(newSeries)
 
   const gradeCategories: Record<string, string[]> = {

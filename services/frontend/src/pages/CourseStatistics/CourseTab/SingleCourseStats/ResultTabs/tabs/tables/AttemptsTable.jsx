@@ -1,4 +1,4 @@
-import { mapValues, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import qs from 'query-string'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router'
@@ -9,7 +9,7 @@ import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { getGradeSpread, getSortableColumn, getThesisGradeSpread, isThesisGrades, resolveGrades } from '../util'
 
-const getTableData = (stats, useThesisGrades, isRelative) =>
+const getTableData = (stats, useThesisGrades) =>
   stats.map(stat => {
     const {
       name,
@@ -21,9 +21,7 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
 
     const attemptsWithGrades = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
     const attempts = totalEnrollments || attemptsWithGrades
-    const gradeSpread = useThesisGrades
-      ? getThesisGradeSpread([grades], isRelative)
-      : getGradeSpread([grades], isRelative)
+    const gradeSpread = useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades])
 
     const mapped = {
       name,
@@ -35,7 +33,7 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
       passRate: stat.attempts.passRate,
       attempts: stat.attempts.totalAttempts || attempts,
       rowObfuscated,
-      ...mapValues(gradeSpread, x => x[0]),
+      ...gradeSpread,
     }
 
     if (mapped.name === 'Total') {
@@ -57,7 +55,7 @@ const getGradeColumns = grades => {
 
 export const AttemptsTable = ({
   data: { stats, name },
-  settings: { showGrades, separate, isRelative },
+  settings: { showGrades, separate },
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
@@ -157,7 +155,7 @@ export const AttemptsTable = ({
     ]
   }
 
-  const data = getTableData(stats, useThesisGrades, isRelative)
+  const data = getTableData(stats, useThesisGrades)
 
   return (
     <>

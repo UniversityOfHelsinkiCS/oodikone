@@ -1,4 +1,7 @@
+import { max, min } from 'lodash'
+
 import { Name } from '../../shared/types'
+import { getSemesterNameByCode } from '../semesters'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
@@ -284,14 +287,42 @@ export class CourseYearlyStatsCounter {
     return this.programmes
   }
 
-  private parseGroupStatistics(anonymizationSalt: string | null) {
+  private insertEmptyRows = async () => {
+    const first = min(Object.keys(this.groups).map(Number))
+    const last = max(Object.keys(this.groups).map(Number))
+    if (!(first && last)) {
+      return
+    }
+
+    const getNextYear = (name: string) => {
+      const years = name.split('-')
+      const startYear = parseInt(years[0], 10) + 1
+      const endYear = parseInt(years[1], 10) + 1
+      return `${startYear}-${endYear}`
+    }
+
+    for (let i = first + 1; i <= last; i++) {
+      if (this.groups[i]) {
+        continue
+      }
+
+      const previous = this.groups[i - 1]
+      const semester = await getSemesterNameByCode(i)
+      const name = typeof previous.name === 'string' ? getNextYear(previous.name) : semester.name
+      this.initGroup(i, name, this.groups[i - 1].coursecode, i)
+    }
+  }
+
+  private async parseGroupStatistics(anonymizationSalt: string | null) {
     for (const [studentNumber, data] of this.students) {
       this.groups[data.code].students.studentNumbers.push(studentNumber)
     }
 
+    await this.insertEmptyRows()
+
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
       const { students } = rest
-      const grades = {}
+      const grades = {} as Grades
       Object.keys(students.grades).forEach(student => {
         const { grade, passed } = students.grades[student]
         const parsedGrade = passed ? grade : '0'
@@ -350,10 +381,10 @@ export class CourseYearlyStatsCounter {
     return this.facultyStats
   }
 
-  public getFinalStatistics(anonymizationSalt: string | null) {
+  public async getFinalStatistics(anonymizationSalt: string | null) {
     return {
       programmes: this.parseProgrammeStatistics(anonymizationSalt),
-      statistics: this.parseGroupStatistics(anonymizationSalt),
+      statistics: await this.parseGroupStatistics(anonymizationSalt),
       facultyStats: this.parseFacultyStatistics(anonymizationSalt),
       obfuscated: this.obfuscated,
     }

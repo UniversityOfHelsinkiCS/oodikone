@@ -183,24 +183,7 @@ const accumulateGrades = (
   )
 }
 
-const calculateTotal = (series: Record<string, number[]>) => {
-  return Object.keys(series).reduce((acc, curr) => {
-    const numOfGrades = series[curr][0]
-    return acc + numOfGrades
-  }, 0)
-}
-
-const calculateRelative = (series: Record<string, number[]>, total: number) => {
-  return Object.keys(series).reduce(
-    (acc, curr) => {
-      acc[curr] = `${Math.round((series[curr][0] / total) * 10000) / 100}%`
-      return acc
-    },
-    {} as Record<string, string>
-  )
-}
-
-export const getThesisGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
+export const getThesisGradeSpread = (series: Array<Record<string, number>>) => {
   const thesisGradeAccumulator = {
     L: [],
     ECLA: [],
@@ -222,12 +205,10 @@ export const getThesisGradeSpread = (series: Array<Record<string, number>>, isRe
   const getMergedKey = (key: string) => (key === 'LA' ? 'LUB' : key)
 
   const newSeries = accumulateGrades(series, thesisGradeAccumulator, getMergedKey)
-  const total = calculateTotal(newSeries)
-
-  return isRelative ? calculateRelative(newSeries, total) : newSeries
+  return newSeries
 }
 
-export const getGradeSpread = (series: Array<Record<string, number>>, isRelative?: boolean) => {
+export const getGradeSpread = (series: Array<Record<string, number>>) => {
   const gradeAccumulator = {
     0: [],
     1: [],
@@ -241,13 +222,10 @@ export const getGradeSpread = (series: Array<Record<string, number>>, isRelative
   } as Record<string, number[]>
 
   const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
-
   const getMergedKey = (key: string) => (Number(key) ? Math.round(Number(key)).toString() : key)
 
   const newSeries = accumulateGrades(series, gradeAccumulator, getMergedKey, failedKeys)
-  const total = calculateTotal(newSeries)
-
-  return isRelative ? calculateRelative(newSeries, total) : newSeries
+  return newSeries
 }
 
 export const defineCellColor = (rowObfuscated: boolean) => {
