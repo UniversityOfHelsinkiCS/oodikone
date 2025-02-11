@@ -20,8 +20,6 @@ import { SearchForm } from './SearchForm'
 import { SummaryTab } from './SummaryTab'
 
 export const CourseStatistics = () => {
-  useTitle('Course statistics')
-
   const location = useLocation()
   const dispatch = useDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
@@ -34,6 +32,7 @@ export const CourseStatistics = () => {
   const [selected, setSelected] = useState(initialCourseCode)
   const { onProgress, progress } = useProgress(loading)
   const [tab, setTab] = useTabs(3)
+  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
 
   useEffect(() => {
     setSelected(initialCourseCode)
