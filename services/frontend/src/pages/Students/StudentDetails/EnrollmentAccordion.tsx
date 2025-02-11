@@ -90,7 +90,13 @@ export const EnrollmentAccordion = ({ student }) => {
   const [active, setActive] = useState(false)
   const { getTextIn } = useLanguage()
 
-  if (!semestersAndYears || !student || student.studyRights.length === 0) return null
+  if (
+    !semestersAndYears ||
+    !student?.studyRights?.length ||
+    !student.studyRights.some(studyRight => studyRight.semesterEnrollments)
+  ) {
+    return null
+  }
 
   const { studyRights } = student
 
