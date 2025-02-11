@@ -7,3 +7,16 @@ export type Language = (typeof LANGUAGE_CODES)[number]
 export const isLanguage = (lang: unknown): lang is Language => {
   return typeof lang === 'string' && LANGUAGE_CODES.includes(lang as Language)
 }
+
+export const getFullLanguage = (languageCode: Language) => {
+  switch (languageCode) {
+    case 'fi':
+      return 'Finnish'
+    case 'sv':
+      return 'Swedish'
+    case 'en':
+      return 'English'
+    default:
+      return null
+  }
+}

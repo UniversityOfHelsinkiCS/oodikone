@@ -17,24 +17,11 @@ import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { Language } from '@/shared/language'
+import { getFullLanguage } from '@/shared/language'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
-
-const getFullLanguage = (languageCode: Language) => {
-  switch (languageCode) {
-    case 'fi':
-      return 'Finnish'
-    case 'sv':
-      return 'Swedish'
-    case 'en':
-      return 'English'
-    default:
-      return null
-  }
-}
 
 export const CloseToGraduation = () => {
   const { data: students } = useGetStudentsCloseToGraduationQuery()
