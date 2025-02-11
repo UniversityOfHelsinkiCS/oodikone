@@ -1,4 +1,4 @@
-const { Model, ARRAY, DATE, DOUBLE, STRING } = require('sequelize')
+const { Model, ARRAY, DATE, DOUBLE, STRING, TEXT } = require('sequelize')
 
 const { dbConnections } = require('../connection')
 
@@ -29,7 +29,7 @@ Studyplan.init(
       type: ARRAY(STRING),
     },
     includedModules: {
-      type: ARRAY(STRING),
+      type: ARRAY(TEXT),
       field: 'included_modules',
     },
     sisu_id: {

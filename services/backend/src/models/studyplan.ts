@@ -43,6 +43,9 @@ export class Studyplan extends Model<InferAttributes<Studyplan>> {
   @Column(DataType.ARRAY(DataType.STRING))
   included_courses!: string[]
 
+  @Column({ type: DataType.ARRAY(DataType.TEXT), field: 'included_modules' })
+  includedModules!: string[]
+
   @Column(DataType.STRING)
   sisu_id!: string
 
