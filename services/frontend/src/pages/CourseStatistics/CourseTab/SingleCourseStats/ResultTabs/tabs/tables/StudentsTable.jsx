@@ -9,9 +9,7 @@ import { isDefaultServiceProvider } from '@/common'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
-import { defineCellColor, getSortableColumn, resolveGrades } from '../util'
-
-const formatPercentage = passRate => (Number.isNaN(passRate) ? '–' : `${(passRate * 100).toFixed(2)} %`)
+import { defineCellColor, formatPercentage, getSortableColumn, resolveGrades } from '../util'
 
 const getGradeColumns = grades => {
   return grades.map(({ key, title }) =>
@@ -133,7 +131,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       key: 'PASS_RATE',
       title: 'Pass rate',
       getRowVal: s => (s.rowObfuscated ? 0 : s.students.passRate * 100),
-      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.passRate)),
+      getRowContent: s => (s.rowObfuscated ? '5 or fewer students' : formatPercentage(s.students.passRate * 100)),
       filterType: 'range',
       cellProps: s => ({
         style: {
@@ -147,7 +145,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
       title: 'Fail rate',
       filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.failRate || 0) * 100),
-      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
+      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate * 100)),
       cellProps: s => ({
         style: {
           textAlign: 'right',

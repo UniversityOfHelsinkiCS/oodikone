@@ -12,7 +12,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const getPassRateAttemptSeriesFromStats = stats => {
+const getPassRateAttemptSeriesFromStats = (stats: FormattedStats[]) => {
   const all: number[] = []
   const passed: number[] = []
   const failed: number[] = []
@@ -21,8 +21,8 @@ const getPassRateAttemptSeriesFromStats = stats => {
   stats.forEach(year => {
     const { passed: p, failed: f } = year.attempts.categories
     const { totalEnrollments } = year.attempts
-    const enrolledWithNoGrade = totalEnrollments > 0 ? totalEnrollments - p - f : 0
-    all.push(totalEnrollments || p + f)
+    const enrolledWithNoGrade = totalEnrollments && totalEnrollments > 0 ? Math.max(0, totalEnrollments - p - f) : 0
+    all.push(totalEnrollments ?? p + f)
     passed.push(p)
     failed.push(f)
     enrolledNoGrade.push(enrolledWithNoGrade)
