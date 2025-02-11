@@ -15,6 +15,7 @@ import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithToo
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
+import { useTitle } from '@/hooks/title'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { getFullLanguage } from '@/shared/language'
@@ -24,6 +25,7 @@ import { reformatDate } from '@/util/timeAndDate'
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
 
 export const CloseToGraduation = () => {
+  useTitle('Students close to graduation')
   const { data: students } = useGetStudentsCloseToGraduationQuery()
   const { data: semesterData } = useGetSemestersQuery()
   const [selectedTab, setSelectedTab] = useState(0)
