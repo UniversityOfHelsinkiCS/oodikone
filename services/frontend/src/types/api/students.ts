@@ -4,20 +4,20 @@ export type SearchStudentsRequest = {
   searchTerm: string
 }
 
-export type SearchStudentsResponse = {
-  courses: any[]
-  credits: number
-  firstnames: string
-  lastname: string
-  started: string
-  studentNumber: string
-  studyRights: {
-    id: string
-    studyRightElements: {
-      name: Name
-    }[]
+export type ActiveStudyRight = {
+  id: string
+  studyRightElements: {
+    name: Name
   }[]
-  studyplans: any[]
+}
+
+export type SearchStudentsResponse = {
+  activeStudyRights: ActiveStudyRight[]
+  credits: number
+  firstNames: string
+  lastName: string
+  started: string | null
+  studentNumber: string
 }
 
 export type GetStudentRequest = {

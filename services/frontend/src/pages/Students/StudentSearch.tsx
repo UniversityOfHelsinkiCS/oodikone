@@ -20,15 +20,16 @@ import { useStudentNameVisibility } from '@/components/material/StudentNameVisib
 import { StyledTable } from '@/components/material/StyledTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
+import { ActiveStudyRight } from '@/types/api/students'
 import { reformatDate } from '@/util/timeAndDate'
 
-const getProgrammes = (studyRights, getTextIn) =>
+const getProgrammes = (studyRights: ActiveStudyRight[], getTextIn) =>
   [
     ...new Set(
       studyRights
         .reduce(
           (res, studyRight) => [...res, ...studyRight.studyRightElements.map(element => getTextIn(element.name))],
-          []
+          [] as string[]
         )
         .sort()
     ),
@@ -104,8 +105,8 @@ export const StudentSearch = () => {
               >
                 {showNames && (
                   <>
-                    <TableCell>{student.lastname}</TableCell>
-                    <TableCell>{student.firstnames}</TableCell>
+                    <TableCell>{student.lastName}</TableCell>
+                    <TableCell>{student.firstNames}</TableCell>
                   </>
                 )}
                 <TableCell>{student.studentNumber}</TableCell>
@@ -114,7 +115,7 @@ export const StudentSearch = () => {
                 </TableCell>
                 <TableCell align="right">{student.credits}</TableCell>
                 <TableCell>
-                  {getProgrammes(student.studyRights, getTextIn).map(programme => (
+                  {getProgrammes(student.activeStudyRights, getTextIn).map(programme => (
                     <div key={`${programme}`}>{programme}</div>
                   ))}
                 </TableCell>
