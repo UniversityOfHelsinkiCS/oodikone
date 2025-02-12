@@ -303,7 +303,7 @@ const nameLike = (terms: string[]) => {
   }
 }
 
-const studentnumberLike = (terms: string[]) => {
+const studentNumberLike = (terms: string[]) => {
   return {
     studentnumber: {
       [Op.iLike]: likefy(terms[0]),
@@ -311,8 +311,26 @@ const studentnumberLike = (terms: string[]) => {
   }
 }
 
-export const bySearchTermAndStudentNumbers = async (searchterm: string, studentNumbers?: string[]) => {
-  const terms = splitByEmptySpace(searchterm)
+const formatStudentForSearch = ({
+  creditcount,
+  dateofuniversityenrollment,
+  firstnames,
+  lastname,
+  studentnumber,
+  studyRights,
+}: InferAttributes<Student>) => {
+  return {
+    activeStudyRights: studyRights || [],
+    credits: creditcount || 0,
+    firstNames: firstnames,
+    lastName: lastname,
+    studentNumber: studentnumber,
+    started: dateofuniversityenrollment,
+  }
+}
+
+export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentNumbers?: string[]) => {
+  const terms = splitByEmptySpace(searchTerm)
   return (
     await Student.findAll({
       attributes: ['studentnumber', 'firstnames', 'lastname', 'creditcount', 'dateofuniversityenrollment'],
@@ -337,16 +355,16 @@ export const bySearchTermAndStudentNumbers = async (searchterm: string, studentN
       where: studentNumbers
         ? {
             [Op.and]: {
-              [Op.or]: [nameLike(terms), studentnumberLike(terms)],
+              [Op.or]: [nameLike(terms), studentNumberLike(terms)],
               studentnumber: {
                 [Op.in]: studentNumbers,
               },
             },
           }
-        : { [Op.or]: [nameLike(terms), studentnumberLike(terms)] },
+        : { [Op.or]: [nameLike(terms), studentNumberLike(terms)] },
       order: [['dateofuniversityenrollment', 'DESC NULLS LAST']],
     })
-  ).map(formatSharedStudentData)
+  ).map(formatStudentForSearch)
 }
 
 export const filterStudentnumbersByAccessrights = async (studentnumbers: string[], codes: string[]) =>
