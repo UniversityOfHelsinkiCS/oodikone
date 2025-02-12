@@ -40,13 +40,12 @@ export const StudentSearch = () => {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { visible: showNames } = useStudentNameVisibility()
-  const {
-    data: students,
-    isUninitialized,
-    isFetching,
-  } = useSearchStudentsQuery(query, {
-    skip: query.trim().length < (Number.isNaN(Number(query)) ? 4 : 6),
-  })
+  const { data: students, isFetching } = useSearchStudentsQuery(
+    { searchTerm: query },
+    {
+      skip: query.trim().length < (Number.isNaN(Number(query)) ? 4 : 6),
+    }
+  )
   const debouncedSetQuery = useMemo(() => debounce(setQuery, 1000), [setQuery])
   const isLoading = isFetching || query !== searchString
 
@@ -67,7 +66,7 @@ export const StudentSearch = () => {
         autoFocus
         fullWidth
         onChange={handleSearchChange}
-        placeholder="Search with a student number or name (surname firstname)"
+        placeholder="Search by student number or student name"
         slotProps={{
           input: {
             endAdornment: (
@@ -80,7 +79,7 @@ export const StudentSearch = () => {
         }}
         value={searchString}
       />
-      {!isLoading && students?.length > 0 && (
+      {!isLoading && students && students.length > 0 && searchString && (
         <StyledTable>
           <TableHead>
             <TableRow>
@@ -92,7 +91,7 @@ export const StudentSearch = () => {
               )}
               <TableCell>Student number</TableCell>
               <TableCell>Started</TableCell>
-              <TableCell>Credits</TableCell>
+              <TableCell align="right">Credits</TableCell>
               <TableCell>Active study rights</TableCell>
             </TableRow>
           </TableHead>
@@ -113,7 +112,7 @@ export const StudentSearch = () => {
                 <TableCell>
                   {student.started ? reformatDate(student.started, DISPLAY_DATE_FORMAT) : 'Unavailable'}
                 </TableCell>
-                <TableCell>{student.credits}</TableCell>
+                <TableCell align="right">{student.credits}</TableCell>
                 <TableCell>
                   {getProgrammes(student.studyRights, getTextIn).map(programme => (
                     <div key={`${programme}`}>{programme}</div>
@@ -132,11 +131,6 @@ export const StudentSearch = () => {
       {!isLoading && students?.length === 0 && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="error">No students found</Alert>
-        </Box>
-      )}
-      {isUninitialized && query === searchString && (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Alert severity="info">Search term is not accurate enough</Alert>
         </Box>
       )}
     </Stack>
