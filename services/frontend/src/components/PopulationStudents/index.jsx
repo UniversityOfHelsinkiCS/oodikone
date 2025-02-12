@@ -5,7 +5,7 @@ import { Tab } from 'semantic-ui-react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
-import { StudentNameVisibilityToggle } from '@/components/StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVisibilityToggle'
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

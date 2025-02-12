@@ -1,9 +1,9 @@
 import { memo } from 'react'
 import { Table } from 'semantic-ui-react'
 
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { TagStudent } from '@/components/TagStudent'
 import { useGetStudentTagsByStudyTrackQuery, useGetTagsByStudyTrackQuery } from '@/redux/tags'
-import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
 const Row = memo(
   ({ studentsTags, studentNumber, studytrack, tagOptions, name, combinedProgramme }) => (

@@ -2,8 +2,8 @@ import { arrayOf, string, shape } from 'prop-types'
 import { useState } from 'react'
 import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
-import { useStudentNameVisibility } from '../StudentNameVisibilityToggle'
 
 export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions, studentname, combinedProgramme }) => {
   const [deleteStudentTags] = useDeleteStudentTagsMutation()
