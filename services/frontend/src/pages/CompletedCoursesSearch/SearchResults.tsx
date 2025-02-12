@@ -8,7 +8,10 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { RightsNotification } from '@/components/material/RightsNotification'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
-import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import {
+  StudentNameVisibilityToggle,
+  useStudentNameVisibility,
+} from '@/components/material/StudentNameVisibilityToggle'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'

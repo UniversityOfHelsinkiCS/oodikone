@@ -6,8 +6,8 @@ import { hiddenNameAndEmailForExcel } from '@/common/columns'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { SortableTable, row } from '@/components/SortableTable'
-import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { isWithinSixMonths, reformatDate } from '@/util/timeAndDate'
