@@ -12,49 +12,30 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const getPassRateAttemptSeriesFromStats = (stats: FormattedStats[]) => {
+const getPassRateSeries = (stats: FormattedStats[], viewMode: ViewMode) => {
   const all: number[] = []
   const passed: number[] = []
   const failed: number[] = []
   const enrolledNoGrade: number[] = []
 
-  stats.forEach(year => {
-    const { passed: p, failed: f } = year.attempts.categories
-    const { totalEnrollments } = year.attempts
-    const enrolledWithNoGrade = totalEnrollments && totalEnrollments > 0 ? Math.max(0, totalEnrollments - p - f) : 0
-    all.push(totalEnrollments ?? p + f)
-    passed.push(p)
-    failed.push(f)
-    enrolledNoGrade.push(enrolledWithNoGrade)
-  })
-
-  return {
-    absolute: [
-      getDataObject('all', all, 'a'),
-      getDataObject('passed', passed, 'b'),
-      getDataObject('failed', failed, 'c'),
-      getDataObject('enrolled, no grade', enrolledNoGrade, 'c'),
-    ],
-    relative: [
-      getDataObject('passed', passed.map(absoluteToRelative(all)), 'a'),
-      getDataObject('failed', failed.map(absoluteToRelative(all)), 'a'),
-      getDataObject('enrolled, no grade', enrolledNoGrade.map(absoluteToRelative(all)), 'a'),
-    ],
+  if (viewMode === 'ATTEMPTS') {
+    stats.forEach(year => {
+      const { passed: p, failed: f } = year.attempts.categories
+      const { totalEnrollments } = year.attempts
+      const enrolledWithNoGrade = totalEnrollments && totalEnrollments > 0 ? Math.max(0, totalEnrollments - p - f) : 0
+      all.push(totalEnrollments ?? p + f)
+      passed.push(p)
+      failed.push(f)
+      enrolledNoGrade.push(enrolledWithNoGrade)
+    })
+  } else {
+    stats.forEach(year => {
+      all.push(year.students.total || 0)
+      passed.push(year.students.totalPassed || 0)
+      failed.push(year.students.totalFailed || 0)
+      enrolledNoGrade.push(year.students.enrolledStudentsWithNoGrade ?? 0)
+    })
   }
-}
-
-const getPassRateStudentSeriesFromStats = (stats: FormattedStats[]) => {
-  const all: number[] = []
-  const passed: number[] = []
-  const failed: number[] = []
-  const enrolledNoGrade: number[] = []
-
-  stats.forEach(year => {
-    all.push(year.students.total || 0)
-    passed.push(year.students.totalPassed || 0)
-    failed.push(year.students.totalFailed || 0)
-    enrolledNoGrade.push(year.students.enrolledStudentsWithNoGrade ?? 0)
-  })
 
   return {
     absolute: [
@@ -90,8 +71,7 @@ export const PassRateChart = ({
   const stats = data.stats.filter(stat => stat.name !== 'Total')
   const statYears = stats.map(year => year.name)
 
-  const series =
-    viewMode === 'ATTEMPTS' ? getPassRateAttemptSeriesFromStats(stats) : getPassRateStudentSeriesFromStats(stats)
+  const series = getPassRateSeries(stats, viewMode)
   const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(series.absolute)
 
   const graphOptions = getGraphOptions(
