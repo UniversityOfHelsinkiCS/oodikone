@@ -63,7 +63,7 @@ export const StudentDetails = () => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
   const { data: semestersAndYears } = useGetSemestersQuery()
-  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery(studentNumber)
+  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery({ studentNumber })
   let honoursCode
 
   if (isLoading) {
