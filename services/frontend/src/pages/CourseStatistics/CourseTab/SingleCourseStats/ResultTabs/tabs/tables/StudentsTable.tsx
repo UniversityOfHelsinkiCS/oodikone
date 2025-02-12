@@ -10,6 +10,7 @@ import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { defineCellColor, formatPercentage, getSortableColumn, resolveGrades } from '../util'
+import { RootState } from '@/redux'
 
 const getGradeColumns = grades => {
   return grades.map(({ key, title }) =>
@@ -171,7 +172,7 @@ const getColumns = (stats, showGrades, userHasAccessToAllStats, alternatives, se
 
 export const StudentsTable = ({ data: { name, stats }, separate, showGrades, userHasAccessToAllStats }) => {
   const alternatives = useSelector(getCourseAlternatives)
-  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
+  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
 
   const columns = useMemo(
     () => getColumns(stats, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses),
