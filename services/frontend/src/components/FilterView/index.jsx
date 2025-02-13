@@ -51,7 +51,7 @@ export const FilterView = ({
     )
   )
 
-  const precomputed = useMemo(() => precompute(orderedFilters), [students, orderedFilters, filterOptions])
+  const precomputed = useMemo(() => precompute(orderedFilters), [precompute, orderedFilters])
 
   const getFilterContext = key => {
     const filter = filtersByKey[key]
@@ -86,10 +86,7 @@ export const FilterView = ({
     }, students)
   )
 
-  const filteredStudents = useMemo(
-    () => applyFilters(orderedFilters),
-    [students, orderedFilters, filterOptions, precomputed]
-  )
+  const filteredStudents = useMemo(() => applyFilters(orderedFilters), [applyFilters, orderedFilters])
 
   const areOptionsDirty = key => !!storeFilterOptions[key]
 
