@@ -105,7 +105,7 @@ const getSortedGrades = (grades: string[]) => {
       return { key: grade, title: 'Failed' }
     }
     if (OTHER_PASSED_GRADES.includes(grade.toLowerCase())) {
-      return { key: grade, title: 'Other\npassed' }
+      return { key: grade, title: 'Other passed' }
     }
     return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
   })
