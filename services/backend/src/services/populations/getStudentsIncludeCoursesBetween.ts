@@ -143,7 +143,7 @@ const getStudents = async (studentNumbers: string[]) => {
         model: Studyplan,
         attributes: [
           'included_courses',
-          'programme_code',
+          'includedModules',
           'completed_credits',
           'curriculum_period_id',
           'sis_study_right_id',
