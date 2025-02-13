@@ -50,6 +50,17 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
 
   Also confirm that the new (or updated) column exists in the appropriate table and has the correct type.
 
+### Reverting a migration locally
+
+If you need to **revert a migration locally**, follow these steps:
+
+1. Locate the `migrator.up()` function in the code:
+   - For `user-db` and `kone-db`: [`services/backend/src/database/connection.ts`](../services/backend/src/database/connection.ts)
+   - For `sis-db`: [`updater/sis-updater-worker/src/db/connection.js`](../updater/sis-updater-worker/src/db/connection.js)
+1. Change `migrator.up()` to `migrator.down()` and save the file. The latest migration will be reverted automatically when the server reloads.
+1. **Important:** After the migration is reverted, change `migrator.down()` back to `migrator.up()` to ensure future migrations run correctly.
+1. For more instructions, see the [umzug documentation](https://github.com/sequelize/umzug?tab=readme-ov-file#usage).
+
 ### Deploying changes to production
 
 - **Push changes** to the `master` branch and wait for the workflow to finish.
@@ -113,5 +124,4 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
 
 1. **Push to master and release:**
    - Wait for the CI workflow to pass.
-   - **Create a new release**; then check the production logs (in OpenShift) to confirm the migration.
-   - Optionally, use `db-cli` to check the production database state (see `how_to_db_cli.md` in GitLab).
+   - **Create a new release**; then check the production logs (in OpenShift) to confirm the migrationor use `db-cli`.
