@@ -1,8 +1,9 @@
 import { Person as PersonIcon } from '@mui/icons-material'
 import { IconButton, Stack } from '@mui/material'
 import { Link } from 'react-router'
+
 import { sisUrl } from '@/conf'
-import { ExternalLink } from './Footer/ExternalLink'
+import { ExternalLink } from './ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => (
   <Stack direction="row" justifyContent="space-between">

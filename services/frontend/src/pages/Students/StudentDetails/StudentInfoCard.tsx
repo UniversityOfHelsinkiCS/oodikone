@@ -2,7 +2,7 @@ import { Refresh as RefreshIcon } from '@mui/icons-material'
 import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material'
 
 import { callApi } from '@/apiConnection'
-import { ExternalLink } from '@/components/material/Footer/ExternalLink'
+import { ExternalLink } from '@/components/material/ExternalLink'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { sisUrl } from '@/conf'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
