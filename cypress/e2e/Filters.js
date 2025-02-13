@@ -259,6 +259,50 @@ describe('Population Statistics', () => {
   })
 })
 
+describe('Population Statistics with Bachelor + Master', () => {
+  const pathToMathBSc2017 =
+    '/populations?months=91&semesters=FALL&semesters=SPRING&showBachelorAndMaster=true&studyRights=%7B%22programme%22%3A%22KH50_001%22%2C%22combinedProgramme%22%3A%22%22%7D&year=2017'
+  const defaultAmountOfStudents = 47
+  const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
+
+  beforeEach(() => {
+    cy.init(pathToMathBSc2017)
+  })
+
+  it('Graduation filter works', () => {
+    runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
+      const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
+
+      getCard().cs('option-graduated-bachelor').click()
+      checkFilteringResult(42)
+      getCard().cs('option-graduated-master').click()
+      checkFilteringResult(18)
+      getCard().cs('option-not-graduated-bachelor').click()
+      checkFilteringResult(5)
+      getCard().cs('option-not-graduated-master').click()
+      checkFilteringResult(29)
+      getCard().cs('option-all').click()
+    })
+  })
+
+  it('Study right status filter works', () => {
+    runTestStepWithPreAndPostParts('studyRightStatusFilter', () => {
+      const getCard = () => cy.cs('studyRightStatusFilter-filter-card')
+
+      // First two are 0 because there are no semester enrollments for the current semester
+      getCard().cs('option-active').click()
+      checkFilteringResult(0)
+      getCard().cs('option-active-combined').click()
+      checkFilteringResult(0)
+      getCard().cs('option-inactive').click()
+      checkFilteringResult(5)
+      getCard().cs('option-inactive-combined').click()
+      checkFilteringResult(24)
+      getCard().cs('option-activity-status-all').click()
+    })
+  })
+})
+
 describe('Course Statistics', () => {
   const pathToLimits2021 =
     '/coursepopulation?coursecodes=%5B"MAT11003"%2C"57116"%2C"57016"%2C"AYMAT11003"%5D&from=72&separate=false&to=72&unifyCourses=unifyStats&years=2021-2022'
