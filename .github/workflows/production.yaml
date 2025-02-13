@@ -98,7 +98,7 @@ jobs:
         run: docker cp frontend:/opt/app-root/src/build ./build
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v1
+        uses: getsentry/action-release@v2
         env:
           SENTRY_URL: https://toska.cs.helsinki.fi/
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_TOKEN }}
@@ -132,7 +132,7 @@ jobs:
         run: docker cp backend:/opt/app-root/src/dist ./dist
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v1
+        uses: getsentry/action-release@v2
         env:
           SENTRY_URL: https://toska.cs.helsinki.fi/
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_TOKEN }}
