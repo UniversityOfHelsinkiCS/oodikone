@@ -48,23 +48,23 @@ const testRangeFilter = (parentEl, min, max, expected) => {
 // functions don't take any parameters and using global object for matching test step name seemed overcomplicated.
 const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   return (filterName, testStepFunctionToRun) => {
-    const card = cy.cs(`${filterName}-filter-card`)
+    cy.cs(`${filterName}-filter-card`)
+      .invoke('attr', 'data-open')
+      .then(open => {
+        const getHeader = () => cy.cs(`${filterName}-header`)
 
-    card.invoke('attr', 'data-open').then(open => {
-      const getHeader = () => cy.cs(`${filterName}-header`)
+        if (open === 'false') {
+          getHeader().click({ force: true })
+        }
 
-      if (open === 'false') {
-        getHeader().click({ force: true })
-      }
+        checkFilteringResult(amountWithoutFiltering)
+        testStepFunctionToRun()
+        checkFilteringResult(amountWithoutFiltering)
 
-      checkFilteringResult(amountWithoutFiltering)
-      testStepFunctionToRun()
-      checkFilteringResult(amountWithoutFiltering)
-
-      if (open === 'false') {
-        getHeader().click({ force: true })
-      }
-    })
+        if (open === 'false') {
+          getHeader().click({ force: true })
+        }
+      })
   }
 }
 
@@ -79,10 +79,9 @@ describe("Population statistics with a master's programme", () => {
 
   it('Study track filter works', () => {
     runTestStepWithPreAndPostParts('StudyTrack', () => {
-      const card = cy.cs('StudyTrack-filter-card')
-      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
+      cy.cs('StudyTrack-filter-card').cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
       checkFilteringResult(15)
-      programmeDropdown.get('i.delete').click()
+      cy.cs('StudyTrack-filter-card').cs('StudyTrack-filter-dropdown').get('i.delete').click()
     })
   })
 
@@ -93,8 +92,7 @@ describe("Population statistics with a master's programme", () => {
 
     it('is set to all by default', () => {
       runTestStepWithPreAndPostParts('studyRightTypeFilter', () => {
-        const card = cy.cs('studyRightTypeFilter-filter-card')
-        card.get('[data-cy="all"] input').should('be.checked')
+        cy.cs('studyRightTypeFilter-filter-card').get('[data-cy="all"] input').should('be.checked')
       })
     })
 
@@ -127,8 +125,7 @@ describe('Population Statistics', () => {
     cy.contains('By default only students who have not transferred to this study programme are shown.')
 
     runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
-      const card = cy.cs('TransferredToProgramme-filter-card')
-      card.get('[data-cy="option-havenot"] input').should('be.checked')
+      cy.cs('TransferredToProgramme-filter-card').get('[data-cy="option-havenot"] input').should('be.checked')
     })
   })
 
@@ -219,15 +216,19 @@ describe('Population Statistics', () => {
         { code: 'MAT21012', name: 'Differentiaaliyhtälöt I' },
         { code: 'MFK-M204', name: 'Matematiikkaa kaikkialla' },
       ]
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0].code} - ${courses[0].name}`).click()
+      cy.cs('courseFilter-course-dropdown').click()
+      cy.contains(`${courses[0].code} - ${courses[0].name}`).click()
       checkFilteringResult(10)
       cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1) // Passed students
       checkFilteringResult(8)
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1].code} - ${courses[1].name}`).click()
+      cy.cs('courseFilter-course-dropdown').click()
+      cy.contains(`${courses[1].code} - ${courses[1].name}`).click()
       checkFilteringResult(6)
       cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
       checkFilteringResult(5)
-      courses.forEach(({ code }) => cy.cs(`courseFilter-${code}-clear`).click())
+      courses.forEach(({ code }) => {
+        cy.cs(`courseFilter-${code}-clear`).click()
+      })
     })
   })
 
@@ -332,10 +333,9 @@ describe('Course Statistics', () => {
 
   it('Programme filter works', () => {
     runTestStepWithPreAndPostParts('Programme', () => {
-      const card = cy.cs('Programme-filter-card')
-      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(1)
+      cy.cs('Programme-filter-card').cs('Programme-filter-dropdown').selectFromDropdown(1)
       checkFilteringResult(33)
-      programmeDropdown.get('i.delete').click()
+      cy.cs('Programme-filter-card').cs('Programme-filter-dropdown').get('i.delete').click()
     })
   })
 
@@ -393,9 +393,10 @@ describe('Custom Population Statistics', () => {
     cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
       const students = [...studentNumbersForCSStudentsSet1, ...studentNumbersForCSStudentsSet2]
       runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(students.length)
-      cy.cs('student-number-input').click().type(students.join('\n'))
+      cy.cs('student-number-input').click()
+      cy.cs('student-number-input').type(students.join('{enter}'))
+      cy.cs('search-button').click()
     })
-    cy.cs('search-button').click()
   })
 
   it('Age filter works', () => {
@@ -413,10 +414,9 @@ describe('Custom Population Statistics', () => {
 
   it('Programme filter works', () => {
     runTestStepWithPreAndPostParts('Programme', () => {
-      const card = cy.cs('Programme-filter-card')
-      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(1)
+      cy.cs('Programme-filter-card').cs('Programme-filter-dropdown').selectFromDropdown(1)
       checkFilteringResult(3)
-      programmeDropdown.get('i.delete').click()
+      cy.cs('Programme-filter-card').cs('Programme-filter-dropdown').get('i.delete').click()
     })
   })
 
@@ -446,15 +446,19 @@ describe('Custom Population Statistics', () => {
         { code: 'MAT11005', name: 'Integraalilaskenta' },
         { code: 'MAT21007', name: 'Mitta ja integraali' },
       ]
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[0].code} - ${courses[0].name}`).click()
+      cy.cs('courseFilter-course-dropdown').click()
+      cy.contains(`${courses[0].code} - ${courses[0].name}`).click()
       checkFilteringResult(7)
       cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1)
       checkFilteringResult(6)
-      cy.cs('courseFilter-course-dropdown').click().contains(`${courses[1].code} - ${courses[1].name}`).click()
+      cy.cs('courseFilter-course-dropdown').click()
+      cy.contains(`${courses[1].code} - ${courses[1].name}`).click()
       checkFilteringResult(5)
       cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(3)
       checkFilteringResult(2)
-      courses.forEach(({ code }) => cy.cs(`courseFilter-${code}-clear`).click())
+      courses.forEach(({ code }) => {
+        cy.cs(`courseFilter-${code}-clear`).click()
+      })
     })
   })
 })
