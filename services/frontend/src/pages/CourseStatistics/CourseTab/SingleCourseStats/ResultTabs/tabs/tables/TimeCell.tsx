@@ -25,6 +25,7 @@ export const TimeCell = ({
         <IconButton
           color="primary"
           component={Link}
+          data-cy={`course-population-for-${name}`}
           disabled={isEmptyRow}
           size="small"
           sx={{ padding: 0 }}
