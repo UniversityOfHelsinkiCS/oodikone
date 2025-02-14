@@ -21,7 +21,7 @@ const getGradeColumns = (grades: { key: string; title: string }[]) => {
     id: `students.grades.${key}`,
     accessorFn: row => row.students.grades[key],
     header: title,
-    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell na /> : cell.getValue() || 0),
+    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue() || 0),
   }))
 }
 
@@ -88,12 +88,12 @@ export const StudentsTable = ({
       {
         accessorKey: 'students.totalPassed',
         header: 'Passed',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell na /> : cell.getValue<number>() || 0),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
       },
       {
         accessorKey: 'students.totalFailed',
         header: 'Failed',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell na /> : cell.getValue<number>() || 0),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
       },
       ...getGradeColumns(resolveGrades(stats)),
       {
@@ -111,13 +111,13 @@ export const StudentsTable = ({
         accessorKey: 'students.passRate',
         header: 'Pass rate',
         Cell: ({ cell, row }) =>
-          row.original.rowObfuscated ? <ObfuscatedCell na /> : formatPercentage(cell.getValue<number>() * 100),
+          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>() * 100),
       },
       {
         accessorKey: 'students.failRate',
         header: 'Fail rate',
         Cell: ({ cell, row }) =>
-          row.original.rowObfuscated ? <ObfuscatedCell na /> : formatPercentage(cell.getValue<number>() * 100),
+          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>() * 100),
       },
     ],
     [showPopulation, stats, userHasAccessToAllStats]
