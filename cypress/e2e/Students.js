@@ -1,24 +1,20 @@
 /// <reference types="cypress" />
 
 const student = {
-  firstnames: 'Varpu Roope',
-  lastname: 'Mårtensson',
-  studentnumber: '550003',
-  sis_person_id: 'hy-hlo-115926826',
+  firstNames: 'Varpu Roope',
+  lastName: 'Mårtensson',
+  studentNumber: '550003',
+  sisPersonId: 'hy-hlo-115926826',
   email: 'sisutestidata134902@testisisudata.fi',
 }
 
 const typeToSearch = text => {
-  cy.get("input[placeholder='Search with a student number or name (surname firstname)']").type(text)
+  cy.cs('student-search').type(text)
 }
 
 const typeStudentNumberAndClick = studentNumber => {
   typeToSearch(studentNumber)
   cy.contains('td', studentNumber).click()
-}
-
-const clearSearch = () => {
-  cy.get("input[placeholder='Search with a student number or name (surname firstname)']").clear()
 }
 
 describe('Students tests', () => {
@@ -31,65 +27,84 @@ describe('Students tests', () => {
     })
 
     it('Students search form is usable', () => {
-      typeToSearch(student.lastname)
+      typeToSearch(student.lastName)
       cy.contains('Student number')
+      cy.contains('Last name').should('not.exist')
+      cy.contains('First names').should('not.exist')
       cy.contains('Started')
       cy.contains('Credits')
-      cy.contains(student.firstnames).should('not.exist')
+      cy.contains('Active study rights')
+      cy.contains(student.firstNames).should('not.exist')
+      cy.contains(student.lastName).should('not.exist')
 
       cy.cs('toggleStudentNames').click()
-      cy.contains(student.firstnames)
+      cy.contains(student.firstNames)
+      cy.contains('Student number')
+      cy.contains('Last name')
+      cy.contains('First names')
+      cy.contains('Started')
+      cy.contains('Credits')
+      cy.contains('Active study rights')
+      cy.contains(student.firstNames)
+      cy.contains(student.lastName)
 
       cy.cs('toggleStudentNames').click()
-      cy.contains(student.firstnames).should('not.exist')
+      cy.contains('Student number')
+      cy.contains('Last name').should('not.exist')
+      cy.contains('First names').should('not.exist')
+      cy.contains('Started')
+      cy.contains('Credits')
+      cy.contains('Active study rights')
+      cy.contains(student.firstNames).should('not.exist')
+      cy.contains(student.lastName).should('not.exist')
     })
 
     it('Search term must be at least 4 characters long', () => {
-      typeToSearch(student.lastname.slice(0, 3))
+      typeToSearch(student.lastName.slice(0, 3))
       cy.contains('Search term is not accurate enough')
-      typeToSearch(student.lastname.slice(3))
+      typeToSearch(student.lastName.slice(3))
       cy.get('table tbody tr').should('have.length', 1)
     })
 
-    it('Can search with studentnumber too', () => {
-      typeToSearch(student.studentnumber)
-      cy.contains(student.studentnumber)
+    it('Can search with student number too', () => {
+      typeToSearch(student.studentNumber)
+      cy.contains(student.studentNumber)
     })
 
     it('Can get student specific page by clicking student', () => {
-      typeStudentNumberAndClick(student.studentnumber)
+      typeStudentNumberAndClick(student.studentNumber)
       cy.contains('Matemaattisten tieteiden kandiohjelma (01.08.2020–31.07.2027)')
-      cy.contains(student.lastname).should('not.exist')
-      cy.contains(student.firstnames).should('not.exist')
+      cy.contains(student.lastName).should('not.exist')
+      cy.contains(student.firstNames).should('not.exist')
       cy.contains(student.email).should('not.exist')
 
       cy.cs('toggleStudentNames').click()
-      cy.contains(student.lastname)
-      cy.contains(student.firstnames)
+      cy.contains(student.lastName)
+      cy.contains(student.firstNames)
       cy.contains(student.email)
 
       cy.cs('toggleStudentNames').click()
-      cy.contains(student.lastname).should('not.exist')
-      cy.contains(student.firstnames).should('not.exist')
+      cy.contains(student.lastName).should('not.exist')
+      cy.contains(student.firstNames).should('not.exist')
       cy.contains(student.email).should('not.exist')
     })
 
     it("'Update student' button is not shown", () => {
-      typeStudentNumberAndClick(student.studentnumber)
-      cy.get('[data-cy=student-info-card]').within(() => {
+      typeStudentNumberAndClick(student.studentNumber)
+      cy.cs('student-info-card').within(() => {
         cy.contains('button', 'Update student').should('not.exist')
       })
     })
 
     it('Can get back to search menu', () => {
-      typeStudentNumberAndClick(student.studentnumber)
+      typeStudentNumberAndClick(student.studentNumber)
       cy.go('back')
       cy.contains('Student number').should('not.exist')
       cy.contains('Credits').should('not.exist')
     })
 
     it('Can jump to course', () => {
-      typeStudentNumberAndClick(student.studentnumber)
+      typeStudentNumberAndClick(student.studentNumber)
       cy.contains('Tilastollinen päättely I (MAT12004)')
         .parent()
         .siblings()
@@ -104,20 +119,20 @@ describe('Students tests', () => {
     })
 
     it('Has correct Sisu link', () => {
-      typeStudentNumberAndClick(student.studentnumber)
-      cy.get('[data-cy=sisu-link]')
+      typeStudentNumberAndClick(student.studentNumber)
+      cy.cs('sisu-link')
         .should('have.attr', 'href')
-        .and('include', `https://sisu.helsinki.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`)
+        .and('include', `https://sisu.helsinki.fi/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`)
     })
 
     it('Semester enrollments can be toggled', () => {
-      typeStudentNumberAndClick(student.studentnumber)
+      typeStudentNumberAndClick(student.studentNumber)
       const programmes = [
         'Oikeustieteen tohtoriohjelma',
         'Matemaattisten tieteiden kandiohjelma',
         'Oikeustieteen maisterin koulutusohjelmaOikeusnotaarin koulutusohjelma',
       ]
-      cy.get('[data-cy=student-info-card]').within(() => {
+      cy.cs('student-info-card').within(() => {
         cy.contains('Enrollments').click()
         cy.get('table tbody tr')
           .should('have.length', 3)
@@ -129,17 +144,19 @@ describe('Students tests', () => {
       })
     })
 
-    it("Searching with bad inputs doesn't yield results", () => {
+    it("Searching with bad name doesn't yield results", () => {
       typeToSearch('SWAG LITTINEN')
       cy.contains('Student number').should('not.exist')
-      clearSearch()
+    })
+
+    it("Searching with bad student number doesn't yield results", () => {
       typeToSearch('01114')
       cy.contains('Student number').should('not.exist')
     })
 
     it('Can jump to population page', () => {
-      typeStudentNumberAndClick(student.studentnumber)
-      cy.get('[data-cy=study-rights-section]').within(() => {
+      typeStudentNumberAndClick(student.studentNumber)
+      cy.cs('study-rights-section').within(() => {
         cy.contains('Matemaattisten tieteiden kandiohjelma')
           .parent()
           .within(() => {
@@ -151,16 +168,16 @@ describe('Students tests', () => {
     })
 
     it('Grade graph works in all three different modes', () => {
-      typeStudentNumberAndClick(student.studentnumber)
+      typeStudentNumberAndClick(student.studentNumber)
       cy.contains('button', 'Grade graph').click()
       cy.contains('button', 'Show group mean').click()
-      cy.get('[data-cy=group-size-input]').within(() => {
+      cy.cs('group-size-input').within(() => {
         cy.contains('label', 'Group size')
         cy.get('input').should('have.value', '5')
       })
       cy.contains('.highcharts-container text', "Nov '22")
       cy.contains('.highcharts-container text', "Jul '22").should('not.exist')
-      cy.get('[data-cy=group-size-input]').within(() => {
+      cy.cs('group-size-input').within(() => {
         cy.contains('label', 'Group size')
         cy.get('input').clear()
         cy.get('input').type('10')
@@ -215,7 +232,7 @@ describe('Students tests', () => {
       })
 
       it("Shows 'Has not graduated' when the student has not graduated", () => {
-        cy.visit(`students/${student.studentnumber}`)
+        cy.visit(`students/${student.studentNumber}`)
         cy.contains('h2', 'Bachelor Honours')
         cy.contains('[data-cy=honours-chip-not-qualified]', 'Not qualified for Honours')
         cy.contains('[data-cy=honours-chip-error]', 'Has not graduated')
@@ -229,14 +246,14 @@ describe('Students tests', () => {
       cy.init('/students', 'admin')
     })
 
-    it('Does not crash if student has no studyright or courses', () => {
+    it('Does not crash if student has no study rights or courses', () => {
       typeStudentNumberAndClick('450730')
       cy.contains('Credits: 0')
     })
 
     it("'Update student' button is shown", () => {
-      typeStudentNumberAndClick(student.studentnumber)
-      cy.get('[data-cy=student-info-card]').within(() => {
+      typeStudentNumberAndClick(student.studentNumber)
+      cy.cs('student-info-card').within(() => {
         cy.contains('button', 'Update student')
       })
     })

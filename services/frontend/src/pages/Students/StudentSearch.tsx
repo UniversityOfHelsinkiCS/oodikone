@@ -65,6 +65,7 @@ export const StudentSearch = () => {
     <Stack spacing={2} sx={{ width: '100%' }}>
       <TextField
         autoFocus
+        data-cy="student-search"
         fullWidth
         onChange={handleSearchChange}
         placeholder="Search by student number or student name"
@@ -124,12 +125,17 @@ export const StudentSearch = () => {
           </TableBody>
         </StyledTable>
       )}
+      {[1, 2, 3].includes(searchString.length) && (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Alert severity="info">Search term is not accurate enough</Alert>
+        </Box>
+      )}
       {isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', padding: 5 }}>
           <CircularProgress />
         </Box>
       )}
-      {!isLoading && students?.length === 0 && (
+      {!isLoading && students?.length === 0 && searchString.length > 3 && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="error">No students found</Alert>
         </Box>
