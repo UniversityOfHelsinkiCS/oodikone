@@ -16,19 +16,20 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { StyledTable } from '@/components/material/StyledTable'
-import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
+import { ActiveStudyRight } from '@/types/api/students'
 import { reformatDate } from '@/util/timeAndDate'
 
-const getProgrammes = (studyRights, getTextIn) =>
+const getProgrammes = (studyRights: ActiveStudyRight[], getTextIn) =>
   [
     ...new Set(
       studyRights
         .reduce(
           (res, studyRight) => [...res, ...studyRight.studyRightElements.map(element => getTextIn(element.name))],
-          []
+          [] as string[]
         )
         .sort()
     ),
@@ -40,13 +41,12 @@ export const StudentSearch = () => {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { visible: showNames } = useStudentNameVisibility()
-  const {
-    data: students,
-    isUninitialized,
-    isFetching,
-  } = useSearchStudentsQuery(query, {
-    skip: query.trim().length < (Number.isNaN(Number(query)) ? 4 : 6),
-  })
+  const { data: students, isFetching } = useSearchStudentsQuery(
+    { searchTerm: query },
+    {
+      skip: query.trim().length < (Number.isNaN(Number(query)) ? 4 : 6),
+    }
+  )
   const debouncedSetQuery = useMemo(() => debounce(setQuery, 1000), [setQuery])
   const isLoading = isFetching || query !== searchString
 
@@ -65,9 +65,10 @@ export const StudentSearch = () => {
     <Stack spacing={2} sx={{ width: '100%' }}>
       <TextField
         autoFocus
+        data-cy="student-search"
         fullWidth
         onChange={handleSearchChange}
-        placeholder="Search with a student number or name (surname firstname)"
+        placeholder="Search by student number or student name"
         slotProps={{
           input: {
             endAdornment: (
@@ -80,7 +81,7 @@ export const StudentSearch = () => {
         }}
         value={searchString}
       />
-      {!isLoading && students?.length > 0 && (
+      {!isLoading && students && students.length > 0 && searchString && (
         <StyledTable>
           <TableHead>
             <TableRow>
@@ -92,7 +93,7 @@ export const StudentSearch = () => {
               )}
               <TableCell>Student number</TableCell>
               <TableCell>Started</TableCell>
-              <TableCell>Credits</TableCell>
+              <TableCell align="right">Credits</TableCell>
               <TableCell>Active study rights</TableCell>
             </TableRow>
           </TableHead>
@@ -105,17 +106,17 @@ export const StudentSearch = () => {
               >
                 {showNames && (
                   <>
-                    <TableCell>{student.lastname}</TableCell>
-                    <TableCell>{student.firstnames}</TableCell>
+                    <TableCell>{student.lastName}</TableCell>
+                    <TableCell>{student.firstNames}</TableCell>
                   </>
                 )}
                 <TableCell>{student.studentNumber}</TableCell>
                 <TableCell>
                   {student.started ? reformatDate(student.started, DISPLAY_DATE_FORMAT) : 'Unavailable'}
                 </TableCell>
-                <TableCell>{student.credits}</TableCell>
+                <TableCell align="right">{student.credits}</TableCell>
                 <TableCell>
-                  {getProgrammes(student.studyRights, getTextIn).map(programme => (
+                  {getProgrammes(student.activeStudyRights, getTextIn).map(programme => (
                     <div key={`${programme}`}>{programme}</div>
                   ))}
                 </TableCell>
@@ -124,19 +125,19 @@ export const StudentSearch = () => {
           </TableBody>
         </StyledTable>
       )}
+      {[1, 2, 3].includes(searchString.length) && (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Alert severity="info">Search term is not accurate enough</Alert>
+        </Box>
+      )}
       {isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', padding: 5 }}>
           <CircularProgress />
         </Box>
       )}
-      {!isLoading && students?.length === 0 && (
+      {!isLoading && students?.length === 0 && searchString.length > 3 && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="error">No students found</Alert>
-        </Box>
-      )}
-      {isUninitialized && query === searchString && (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Alert severity="info">Search term is not accurate enough</Alert>
         </Box>
       )}
     </Stack>

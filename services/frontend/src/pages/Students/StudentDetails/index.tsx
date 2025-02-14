@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router'
 
 import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
+import { useTitle } from '@/hooks/title'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
 import { BachelorHonours } from './BachelorHonours'
@@ -60,10 +61,11 @@ export type Absence = ReturnType<typeof getAbsentYears>[number]
 
 export const StudentDetails = () => {
   const { studentNumber } = useParams()
+  useTitle(studentNumber ? `${studentNumber} - Student statistics` : 'Student statistics')
   const [graphYearStart, setGraphYear] = useState(null)
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
   const { data: semestersAndYears } = useGetSemestersQuery()
-  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery(studentNumber)
+  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery({ studentNumber })
   let honoursCode
 
   if (isLoading) {

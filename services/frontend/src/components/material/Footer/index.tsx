@@ -1,10 +1,10 @@
 import { Box, Container, Divider, Stack, Typography } from '@mui/material'
 
 import { isDefaultServiceProvider } from '@/common'
+import { ExternalLink } from '@/components/material/ExternalLink'
 import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
 import { DISPLAY_DATETIME_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
-import { ExternalLink } from './ExternalLink'
 import { InternalLink } from './InternalLink'
 import { ToskaLogo } from './ToskaLogo'
 
