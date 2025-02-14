@@ -129,14 +129,16 @@ export const StudentsTable = ({
     setColumnVisibility(prev => {
       const updatedVisibility: Record<string, boolean> = { ...prev }
 
-      resolveGrades(stats).forEach(({ key }) => {
-        updatedVisibility[`students.grades.${key}`] = showGrades
+      const gradeColumns = resolveGrades(stats).map(({ key }) => `students.grades.${key}`)
+
+      gradeColumns.forEach(key => {
+        updatedVisibility[key] = showGrades
       })
 
       updatedVisibility['students.totalPassed'] = !showGrades
       updatedVisibility['students.totalFailed'] = !showGrades
 
-      return updatedVisibility
+      return { ...updatedVisibility }
     })
   }, [showGrades, stats])
 
