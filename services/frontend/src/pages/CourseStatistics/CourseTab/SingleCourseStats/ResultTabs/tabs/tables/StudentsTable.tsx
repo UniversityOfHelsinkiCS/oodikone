@@ -157,7 +157,19 @@ export const StudentsTable = ({
       sorting: [{ id: 'name', desc: false }],
       showColumnFilters: false,
     },
-    state: { columnVisibility },
+    state: {
+      columnVisibility,
+      columnOrder: [
+        'name',
+        'students.total',
+        'students.totalPassed',
+        'students.totalFailed',
+        ...resolveGrades(stats).map(({ key }) => `students.grades.${key}`),
+        'students.enrolledStudentsWithNoGrade',
+        'students.passRate',
+        'students.failRate',
+      ],
+    },
     onColumnVisibilityChange: setColumnVisibility,
     muiTableBodyCellProps: {
       ...defaultOptions?.muiTableHeadCellProps,
