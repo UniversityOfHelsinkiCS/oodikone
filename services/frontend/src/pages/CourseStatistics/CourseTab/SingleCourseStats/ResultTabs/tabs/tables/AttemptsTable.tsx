@@ -6,15 +6,21 @@ import { Header, Icon, Item } from 'semantic-ui-react'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { SortableTable, row } from '@/components/SortableTable'
+import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
-import {
-  formatPercentage,
-  getGradeSpread,
-  getSortableColumn,
-  getThesisGradeSpread,
-  isThesisGrades,
-  resolveGrades,
-} from '../util'
+import { getGradeSpread, getThesisGradeSpread, isThesisGrades } from '../util'
+import { formatPercentage, resolveGrades } from './util'
+
+const getSortableColumn = opts => ({
+  filterType: 'range',
+  cellProps: s => ({
+    style: {
+      textAlign: 'right',
+      color: s.rowObfuscated ? 'gray' : 'inherit',
+    },
+  }),
+  ...opts,
+})
 
 const getTableData = (stats, useThesisGrades) =>
   stats.map(stat => {
@@ -71,7 +77,7 @@ export const AttemptsTable = ({
   } = stats[0]
   const useThesisGrades = isThesisGrades(grades)
   const alternatives = useSelector(getCourseAlternatives)
-  const unifyCourses = useSelector(state => state.courseSearch.openOrRegular)
+  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
 
   const showPopulation = (yearCode, years, unifyCourses) => {
     const queryObject = {
