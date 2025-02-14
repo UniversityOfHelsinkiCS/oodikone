@@ -6,7 +6,7 @@ import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { FormattedStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
-import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from '../util'
+import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from './util'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

@@ -12,18 +12,9 @@ import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
-import { formatPercentage, resolveGrades } from '../util'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
-
-const getGradeColumns = (grades: { key: string; title: string }[]) => {
-  return grades.map(({ key, title }) => ({
-    id: `students.grades.${key}`,
-    accessorFn: row => row.students.grades[key],
-    header: title,
-    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue() || 0),
-  }))
-}
+import { formatPercentage, getGradeColumns, resolveGrades } from './util'
 
 export const StudentsTable = ({
   data: { name, stats },
