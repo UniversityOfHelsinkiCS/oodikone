@@ -228,10 +228,6 @@ export const getGradeSpread = (series: Array<Record<string, number>>) => {
   return newSeries
 }
 
-export const defineCellColor = (rowObfuscated: boolean) => {
-  return rowObfuscated && { style: { color: 'gray' } }
-}
-
 export const getGraphOptions = (
   colors: string[],
   colorsRelative: string[],

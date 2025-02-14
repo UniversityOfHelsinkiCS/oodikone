@@ -68,6 +68,7 @@ export const StudentsTable = ({
         Cell: ({ cell, row }) => (
           <TimeCell
             href={showPopulation(row.original.code, row.original.name)}
+            isEmptyRow={row.original.students.total === 0}
             name={cell.getValue<string>()}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
