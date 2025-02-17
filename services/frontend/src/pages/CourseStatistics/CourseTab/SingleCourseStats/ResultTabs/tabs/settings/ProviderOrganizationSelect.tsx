@@ -24,7 +24,7 @@ export const ProviderOrganizationSelect = ({ availableStats }: { availableStats:
         value={openOrRegular}
       >
         <MenuItem data-cy="ProviderOrganizationSelectOptionBoth" disabled={!availableStats.unify} value="unifyStats">
-          Both
+          University + Open university
         </MenuItem>
         <MenuItem
           data-cy="ProviderOrganizationSelectOptionRegular"
