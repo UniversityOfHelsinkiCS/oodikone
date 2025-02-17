@@ -1055,7 +1055,7 @@ describe('Course Statistics tests', () => {
 
         cy.cs('ProviderOrganizationSelectOptionBoth').should('have.class', 'Mui-selected')
         cy.cs('ProviderOrganizationSelectOptionBoth').should('not.have.class', 'Mui-disabled')
-        cy.cs('ProviderOrganizationSelectOptionBoth').should('have.text', 'Both')
+        cy.cs('ProviderOrganizationSelectOptionBoth').should('have.text', 'University + Open university')
 
         cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-selected')
         cy.cs('ProviderOrganizationSelectOptionRegular').should('not.have.class', 'Mui-disabled')
