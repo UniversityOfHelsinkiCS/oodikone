@@ -10,8 +10,8 @@ export const formatPercentage = (rate: number) => {
 
 export const getGradeColumns = (grades: { key: string; title: string }[]) => {
   return grades.map(({ key, title }) => ({
-    id: `students.grades.${key}`,
-    accessorFn: row => row.students.grades[key],
+    id: `grades.${key}`,
+    accessorFn: row => row.grades[key],
     header: title,
     Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue() || 0),
   }))

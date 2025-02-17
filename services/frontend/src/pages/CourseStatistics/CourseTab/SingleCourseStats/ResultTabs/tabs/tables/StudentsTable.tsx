@@ -16,6 +16,20 @@ import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
 import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
 
+const getTableData = (stats: FormattedStats[]) => {
+  return stats.map(stat => ({
+    name: stat.name,
+    code: stat.code,
+    totalStudents: stat.students.total,
+    passed: stat.students.totalPassed,
+    failed: stat.students.totalFailed,
+    enrolledNoGrade: stat.students.enrolledStudentsWithNoGrade,
+    passRate: formatPercentage(stat.students.passRate * 100),
+    failRate: formatPercentage(stat.students.failRate * 100),
+    grades: stat.students.grades,
+  }))
+}
+
 export const StudentsTable = ({
   data: { name, stats },
   separate,
@@ -52,6 +66,8 @@ export const StudentsTable = ({
     [alternatives, separate, unifyCourses]
   )
 
+  const data = useMemo(() => getTableData(stats), [stats])
+
   const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
       {
@@ -60,7 +76,7 @@ export const StudentsTable = ({
         Cell: ({ cell, row }) => (
           <TimeCell
             href={showPopulation(row.original.code, row.original.name)}
-            isEmptyRow={row.original.students.total === 0}
+            isEmptyRow={row.original.totalStudents === 0}
             name={cell.getValue<string>()}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
@@ -68,7 +84,7 @@ export const StudentsTable = ({
         sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
       },
       {
-        accessorKey: 'students.total',
+        accessorKey: 'totalStudents',
         header: 'Total students',
         Header: (
           <TableHeaderWithTooltip
@@ -79,18 +95,18 @@ export const StudentsTable = ({
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
       {
-        accessorKey: 'students.totalPassed',
+        accessorKey: 'passed',
         header: 'Passed',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
       },
       {
-        accessorKey: 'students.totalFailed',
+        accessorKey: 'failed',
         header: 'Failed',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
       },
       ...getGradeColumns(resolveGrades(stats)),
       {
-        accessorKey: 'students.enrolledStudentsWithNoGrade',
+        accessorKey: 'enrolledNoGrade',
         header: 'Enrolled, no grade',
         Header: (
           <TableHeaderWithTooltip
@@ -101,16 +117,14 @@ export const StudentsTable = ({
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
       {
-        accessorKey: 'students.passRate',
+        accessorKey: 'passRate',
         header: 'Pass rate',
-        Cell: ({ cell, row }) =>
-          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>() * 100),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
       {
-        accessorKey: 'students.failRate',
+        accessorKey: 'failRate',
         header: 'Fail rate',
-        Cell: ({ cell, row }) =>
-          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>() * 100),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
     ],
     [showPopulation, stats, userHasAccessToAllStats]
@@ -120,14 +134,14 @@ export const StudentsTable = ({
     setColumnVisibility(prev => {
       const updatedVisibility: Record<string, boolean> = { ...prev }
 
-      const gradeColumns = resolveGrades(stats).map(({ key }) => `students.grades.${key}`)
+      const gradeColumns = resolveGrades(stats).map(({ key }) => `grades.${key}`)
 
       gradeColumns.forEach(key => {
         updatedVisibility[key] = showGrades
       })
 
-      updatedVisibility['students.totalPassed'] = !showGrades
-      updatedVisibility['students.totalFailed'] = !showGrades
+      updatedVisibility.passed = !showGrades
+      updatedVisibility.failed = !showGrades
 
       return { ...updatedVisibility }
     })
@@ -139,7 +153,7 @@ export const StudentsTable = ({
     ...defaultOptions,
     ...commonOptions,
     columns,
-    data: stats,
+    data,
     initialState: {
       ...defaultOptions.initialState,
       ...commonOptions.initialState,
@@ -148,13 +162,13 @@ export const StudentsTable = ({
       columnVisibility,
       columnOrder: [
         'name',
-        'students.total',
-        'students.totalPassed',
-        'students.totalFailed',
-        ...resolveGrades(stats).map(({ key }) => `students.grades.${key}`),
-        'students.enrolledStudentsWithNoGrade',
-        'students.passRate',
-        'students.failRate',
+        'totalStudents',
+        'passed',
+        'failed',
+        ...resolveGrades(stats).map(({ key }) => `grades.${key}`),
+        'enrolledNoGrade',
+        'passRate',
+        'failRate',
       ],
     },
     onColumnVisibilityChange: setColumnVisibility,
