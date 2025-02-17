@@ -1,28 +1,22 @@
 import { uniq } from 'lodash'
+import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import qs from 'query-string'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router'
-import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { SortableTable, row } from '@/components/SortableTable'
 import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
+import { FormattedStats } from '@/types/courseStat'
+import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades } from '../util'
-import { formatPercentage, resolveGrades } from './util'
+import { ObfuscatedCell } from './ObfuscatedCell'
+import { TimeCell } from './TimeCell'
+import { formatPercentage, getGradeColumns, resolveGrades } from './util'
 
-const getSortableColumn = opts => ({
-  filterType: 'range',
-  cellProps: s => ({
-    style: {
-      textAlign: 'right',
-      color: s.rowObfuscated ? 'gray' : 'inherit',
-    },
-  }),
-  ...opts,
-})
-
-const getTableData = (stats, useThesisGrades) =>
+const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) =>
   stats.map(stat => {
     const {
       name,
@@ -33,8 +27,7 @@ const getTableData = (stats, useThesisGrades) =>
     } = stat
 
     const attemptsWithGrades = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
-    const attempts = totalEnrollments || attemptsWithGrades
-    const gradeSpread = useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades])
+    const attempts = totalEnrollments ?? attemptsWithGrades
 
     const mapped = {
       name,
@@ -42,150 +35,166 @@ const getTableData = (stats, useThesisGrades) =>
       coursecode,
       passed: stat.attempts.categories.passed,
       failed: stat.attempts.categories.failed,
-      totalEnrollments: stat.attempts.totalEnrollments,
+      enrollments: stat.attempts.totalEnrollments,
       passRate: stat.attempts.passRate,
-      attempts: stat.attempts.totalAttempts || attempts,
+      attempts: stat.attempts.totalAttempts ?? attempts,
       rowObfuscated,
-      ...gradeSpread,
-    }
-
-    if (mapped.name === 'Total') {
-      return row(mapped, { ignoreFilters: true })
+      students: {
+        grades: useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades]),
+      },
     }
 
     return mapped
   })
 
-const getGradeColumns = grades => {
-  return grades.map(({ key, title }) =>
-    getSortableColumn({
-      key,
-      title,
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s[key] || 0),
-    })
-  )
-}
-
 export const AttemptsTable = ({
-  data: { stats, name },
-  settings: { showGrades, separate },
+  data: { name, stats },
+  separate,
+  showGrades,
   userHasAccessToAllStats,
-  headerVisible = false,
+}: {
+  data: { name: string; stats: FormattedStats[] }
+  separate: boolean
+  showGrades: boolean
+  userHasAccessToAllStats: boolean
 }) => {
-  const {
-    attempts: { grades },
-  } = stats[0]
-  const useThesisGrades = isThesisGrades(grades)
+  const { language } = useLanguage()
+
   const alternatives = useSelector(getCourseAlternatives)
   const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
 
-  const showPopulation = (yearCode, years, unifyCourses) => {
-    const queryObject = {
-      from: yearCode,
-      to: yearCode,
-      coursecodes: JSON.stringify(uniq(alternatives)),
-      years,
-      separate,
-      unifyCourses,
-    }
-    const searchString = qs.stringify(queryObject)
-    return `/coursepopulation?${searchString}`
-  }
+  const [exportModalOpen, setExportModalOpen] = useState(false)
+  const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
-  const timeColumn = {
-    key: 'TIME-PARENT',
-    merge: true,
-    mergeHeader: true,
-    children: [
-      getSortableColumn({
-        key: 'TIME',
-        title: 'Time',
-        filterType: 'range',
-        cellProps: {},
-        getRowVal: s => s.code + 1949,
-        getRowExportVal: s => s.name,
-        getRowContent: s => (
-          <div>
-            {s.name}
-            {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
-          </div>
-        ),
-      }),
+  const showPopulation = useCallback(
+    (yearCode: string, years: string) => {
+      const queryObject = {
+        from: yearCode,
+        to: yearCode,
+        coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
+        years,
+        separate,
+        unifyCourses,
+      }
+      const searchString = qs.stringify(queryObject)
+      return `/coursepopulation?${searchString}`
+    },
+    [alternatives, separate, unifyCourses]
+  )
+
+  const useThesisGrades = isThesisGrades(stats[0].attempts.grades)
+  const data = useMemo(() => getTableData(stats, useThesisGrades), [stats, useThesisGrades])
+
+  const columns = useMemo<MRT_ColumnDef<any>[]>(
+    () => [
       {
-        key: 'TIME-ICON',
-        export: false,
-        getRowContent: s =>
-          s.name !== 'Total' &&
-          userHasAccessToAllStats && (
-            <Item as={Link} to={showPopulation(s.code, s.name, unifyCourses)}>
-              <Icon name="level up alternate" />
-            </Item>
-          ),
+        accessorKey: 'name',
+        header: 'Time',
+        Cell: ({ cell, row }) => (
+          <TimeCell
+            href={showPopulation(row.original.code, row.original.name)}
+            isEmptyRow={row.original.attempts.total === 0}
+            name={cell.getValue<string>()}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+          />
+        ),
+        sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
       },
-    ],
-  }
-
-  let columns = [
-    timeColumn,
-    getSortableColumn({
-      key: 'ATTEMPTS',
-      title: 'Total\nattempts',
-      getRowVal: s => (s.rowObfuscated ? '5 or fewer students' : s.attempts),
-    }),
-    getSortableColumn({
-      key: 'PASSED',
-      title: 'Passed',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.passed),
-    }),
-    getSortableColumn({
-      key: 'FAILED',
-      title: 'Failed',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.failed),
-    }),
-    getSortableColumn({
-      key: 'PASSRATE',
-      title: 'Pass rate',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.passRate),
-      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.passRate)),
-    }),
-    getSortableColumn({
-      key: 'ENROLLMENTS',
-      title: 'Enrollments',
-      helpText: 'All enrollments with enrolled state',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
-    }),
-  ]
-
-  if (showGrades) {
-    columns = [
-      timeColumn,
-      getSortableColumn({
-        key: 'ATTEMPTS',
-        title: 'Total\nattempts',
-        getRowVal: s => (s.rowObfuscated ? '5 or fewer students' : s.attempts),
-      }),
+      {
+        accessorKey: 'attempts',
+        header: 'Total attempts',
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
+      },
+      {
+        accessorKey: 'passed',
+        header: 'Passed',
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
+      },
+      {
+        accessorKey: 'failed',
+        header: 'Failed',
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
+      },
+      {
+        accessorKey: 'passRate',
+        header: 'Pass rate',
+        Cell: ({ cell, row }) =>
+          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>()),
+      },
+      {
+        accessorKey: 'enrollments',
+        header: 'Enrollments',
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
+      },
       ...getGradeColumns(resolveGrades(stats)),
-    ]
-  }
+    ],
+    [showPopulation, stats, userHasAccessToAllStats]
+  )
 
-  const data = getTableData(stats, useThesisGrades)
+  useEffect(() => {
+    setColumnVisibility(prev => {
+      const updatedVisibility: Record<string, boolean> = { ...prev }
+
+      const gradeColumns = resolveGrades(stats).map(({ key }) => `students.grades.${key}`)
+
+      gradeColumns.forEach(key => {
+        updatedVisibility[key] = showGrades
+      })
+
+      updatedVisibility.passed = !showGrades
+      updatedVisibility.failed = !showGrades
+      updatedVisibility.passRate = !showGrades
+      updatedVisibility.enrollments = !showGrades
+
+      return { ...updatedVisibility }
+    })
+  }, [showGrades, stats])
+
+  const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
+
+  const table = useMaterialReactTable({
+    ...defaultOptions,
+    columns,
+    data,
+    defaultColumn: { size: 0 },
+    enableHiding: false,
+    enableDensityToggle: false,
+    initialState: {
+      ...defaultOptions.initialState,
+      sorting: [{ id: 'name', desc: false }],
+      showColumnFilters: false,
+    },
+    state: {
+      columnVisibility,
+      columnOrder: [
+        'name',
+        'attempts',
+        'passed',
+        'failed',
+        ...resolveGrades(stats).map(({ key }) => `students.grades.${key}`),
+        'passRate',
+        'enrollments',
+      ],
+    },
+    onColumnVisibilityChange: setColumnVisibility,
+    muiTableBodyCellProps: {
+      ...defaultOptions?.muiTableHeadCellProps,
+      align: 'right',
+    },
+  })
 
   return (
-    <>
-      {headerVisible && (
-        <Header as="h3" textAlign="center">
-          {name}
-        </Header>
-      )}
-      <SortableTable
-        columns={columns}
-        data={data}
-        defaultSort={['TIME', 'desc']}
-        featureName="yearly_attempts"
-        maxHeight="40vh"
-        title={`Yearly attempt statistics for group ${name}`}
+    <div>
+      <ExportToExcelDialog
+        exportColumns={columns}
+        exportData={exportData}
+        featureName={`attempt_statistics_${name}`}
+        onClose={() => setExportModalOpen(false)}
+        open={exportModalOpen}
       />
+      <MaterialReactTable table={table} />
       <TotalsDisclaimer userHasAccessToAllStats={userHasAccessToAllStats} />
-    </>
+    </div>
   )
 }
