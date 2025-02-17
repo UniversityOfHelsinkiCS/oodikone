@@ -16,36 +16,34 @@ import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
 import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
 
-const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) =>
-  stats.map(stat => {
+const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) => {
+  return stats.map(stat => {
     const {
       name,
       code,
       attempts: { grades, totalEnrollments },
-      coursecode,
       rowObfuscated,
     } = stat
 
     const attemptsWithGrades = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
     const attempts = totalEnrollments ?? attemptsWithGrades
+    const gradeSpread = useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades])
 
     const mapped = {
       name,
       code,
-      coursecode,
+      totalAttempts: stat.attempts.totalAttempts ?? attempts,
       passed: stat.attempts.categories.passed,
       failed: stat.attempts.categories.failed,
+      passRate: formatPercentage(stat.attempts.passRate),
       enrollments: stat.attempts.totalEnrollments,
-      passRate: stat.attempts.passRate,
-      attempts: stat.attempts.totalAttempts ?? attempts,
-      rowObfuscated,
-      students: {
-        grades: useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades]),
-      },
+      rowObfuscated: rowObfuscated ?? false,
+      grades: Object.fromEntries(Object.entries(gradeSpread).map(([key, value]) => [key, value[0]])),
     }
 
     return mapped
   })
+}
 
 export const AttemptsTable = ({
   data: { name, stats },
@@ -94,7 +92,7 @@ export const AttemptsTable = ({
         Cell: ({ cell, row }) => (
           <TimeCell
             href={showPopulation(row.original.code, row.original.name)}
-            isEmptyRow={row.original.attempts.total === 0}
+            isEmptyRow={row.original.totalAttempts === 0}
             name={cell.getValue<string>()}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
@@ -102,7 +100,7 @@ export const AttemptsTable = ({
         sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
       },
       {
-        accessorKey: 'attempts',
+        accessorKey: 'totalAttempts',
         header: 'Total attempts',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
@@ -119,8 +117,7 @@ export const AttemptsTable = ({
       {
         accessorKey: 'passRate',
         header: 'Pass rate',
-        Cell: ({ cell, row }) =>
-          row.original.rowObfuscated ? <ObfuscatedCell /> : formatPercentage(cell.getValue<number>()),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<string>()),
       },
       {
         accessorKey: 'enrollments',
@@ -136,7 +133,7 @@ export const AttemptsTable = ({
     setColumnVisibility(prev => {
       const updatedVisibility: Record<string, boolean> = { ...prev }
 
-      const gradeColumns = resolveGrades(stats).map(({ key }) => `students.grades.${key}`)
+      const gradeColumns = resolveGrades(stats).map(({ key }) => `grades.${key}`)
 
       gradeColumns.forEach(key => {
         updatedVisibility[key] = showGrades
@@ -166,10 +163,10 @@ export const AttemptsTable = ({
       columnVisibility,
       columnOrder: [
         'name',
-        'attempts',
+        'totalAttempts',
         'passed',
         'failed',
-        ...resolveGrades(stats).map(({ key }) => `students.grades.${key}`),
+        ...resolveGrades(stats).map(({ key }) => `grades.${key}`),
         'passRate',
         'enrollments',
       ],
