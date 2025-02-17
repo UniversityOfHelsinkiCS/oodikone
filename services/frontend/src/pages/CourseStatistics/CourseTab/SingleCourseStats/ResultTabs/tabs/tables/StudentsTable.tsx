@@ -34,6 +34,7 @@ export const StudentsTable = ({
 
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
   const showPopulation = useCallback(
     (yearCode: string, years: string) => {
@@ -115,8 +116,6 @@ export const StudentsTable = ({
     [showPopulation, stats, userHasAccessToAllStats]
   )
 
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
-
   useEffect(() => {
     setColumnVisibility(prev => {
       const updatedVisibility: Record<string, boolean> = { ...prev }
@@ -173,7 +172,7 @@ export const StudentsTable = ({
       <ExportToExcelDialog
         exportColumns={columns}
         exportData={exportData}
-        featureName={`group_statistics_${name}`}
+        featureName={`student_statistics_${name}`}
         onClose={() => setExportModalOpen(false)}
         open={exportModalOpen}
       />
