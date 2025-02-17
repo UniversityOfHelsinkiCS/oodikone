@@ -1,151 +1,10 @@
-import { flatten } from 'lodash'
-
-import { calculatePercentage } from '@/common'
-import { FormattedStats, ViewMode } from '@/types/courseStat'
-
-type Series = {
-  name: string
-  data: number[]
-  stack: string
-  type: 'column'
-}
-
-export const getDataObject = (name: string, data: number[], stack: string): Series => {
-  return {
-    name,
-    data,
-    stack,
-    type: 'column' as const,
-  }
-}
-
-export const getMaxValueOfSeries = (series: Series[]) => {
-  return Object.values(series).reduce((acc, cur) => {
-    const curMax = Math.max(...cur.data.filter(n => !Number.isNaN(n)).map(Math.abs))
-    return curMax >= acc ? curMax : acc
-  }, 0)
-}
-
-const THESIS_GRADES = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
-const SECOND_NATIONAL_LANGUAGE_GRADES = ['TT', 'HT']
-const PASS_FAIL_GRADES = ['0', 'Hyv.']
-const NUMERIC_GRADES = ['1', '2', '3', '4', '5']
-
-export const isThesisGrades = (grades: Record<string, number>) => {
-  return Object.keys(grades).some(grade => THESIS_GRADES.includes(grade))
-}
-
-const isThesisSeries = (series: Array<Record<string, number>>) => {
-  return series?.some(record => isThesisGrades(record))
-}
-
-const isSecondNationalLanguageSeries = (series: Array<Record<string, number>>) => {
-  return series?.every(record => {
-    const grades = Object.keys(record)
-    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
-    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
-    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
-    return !hasNumericGrades && hasPassFailGrades && hasSecondNationalLanguageGrades
-  })
-}
-
-const isPassFailSeries = (series: Array<Record<string, number>>) => {
-  return series?.every(record => {
-    const grades = Object.keys(record)
-    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
-    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
-    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
-    return !hasNumericGrades && hasPassFailGrades && !hasSecondNationalLanguageGrades
-  })
-}
-
-export const getSeriesType = (series: Array<Record<string, number>>) => {
-  if (isThesisSeries(series)) {
-    return 'thesis'
-  }
-  if (isSecondNationalLanguageSeries(series)) {
-    return 'second-national-language'
-  }
-  if (isPassFailSeries(series)) {
-    return 'pass-fail'
-  }
-  return 'other'
-}
-
-export const absoluteToRelative = (all: number[]) => (p: number, i: number) => {
-  return Math.min(100, parseFloat(calculatePercentage(p, all[i]).slice(0, -1)))
-}
-
-const gradesOrder = {
-  0: 0,
-  1: 10,
-  2: 20,
-  3: 30,
-  4: 40,
-  5: 50,
-  'Hyv.': 60,
-  I: 0,
-  A: 1,
-  LUB: 2,
-  NSLA: 3,
-  CL: 4,
-  MCLA: 5,
-  ECLA: 6,
-  L: 7,
-} as const
-
-const sortGrades = (a: string, b: string) => gradesOrder[a] - gradesOrder[b]
-
-const FAILED_GRADES = ['eisa', 'hyl.', 'hyl', '0', 'luop']
-const OTHER_PASSED_GRADES = ['hyv.', 'hyv']
-
-const getSortedGrades = (grades: string[]) => {
-  return grades.sort(sortGrades).map(grade => {
-    if (grade === '0') {
-      return { key: grade, title: 'Failed' }
-    }
-    if (OTHER_PASSED_GRADES.includes(grade.toLowerCase())) {
-      return { key: grade, title: 'Other passed' }
-    }
-    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
-  })
-}
-
-export const resolveGrades = (stats: FormattedStats[]) => {
-  const allGrades = [
-    '0',
-    ...flatten(
-      stats.map(({ students }) =>
-        [...Object.keys(students.grades)].map(grade => {
-          const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-          if (FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
-            return '0'
-          }
-          if (parsedGrade === 'LA') {
-            return 'LUB'
-          }
-          return parsedGrade
-        })
-      )
-    ),
-  ] as string[]
-  if (allGrades.filter(grade => NUMERIC_GRADES.includes(grade)).length) {
-    allGrades.push(...['1', '2', '3', '4', '5'])
-  }
-  const grades = [...new Set(allGrades)]
-  return getSortedGrades(grades)
-}
-
-export const getSortableColumn = opts => ({
-  filterType: 'range',
-  cellProps: s => ({
-    style: {
-      textAlign: 'right',
-      color: s.rowObfuscated ? 'gray' : 'inherit',
-    },
-  }),
-  ...opts,
-})
+import {
+  FAILED_GRADES,
+  NUMERIC_GRADES,
+  PASS_FAIL_GRADES,
+  SECOND_NATIONAL_LANGUAGE_GRADES,
+  THESIS_GRADES,
+} from '@/constants/grades'
 
 const accumulateGrades = (
   series: Array<Record<string, number>>,
@@ -221,53 +80,51 @@ export const getGradeSpread = (series: Array<Record<string, number>>) => {
     'Hyv.': [],
   } as Record<string, number[]>
 
-  const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
   const getMergedKey = (key: string) => (Number(key) ? Math.round(Number(key)).toString() : key)
 
-  const newSeries = accumulateGrades(series, gradeAccumulator, getMergedKey, failedKeys)
+  const newSeries = accumulateGrades(series, gradeAccumulator, getMergedKey, FAILED_GRADES)
   return newSeries
 }
 
-export const getGraphOptions = (
-  colors: string[],
-  colorsRelative: string[],
-  isRelative: boolean,
-  max: number,
-  statYears: string[],
-  title: string,
-  viewMode: ViewMode
-) => ({
-  chart: {
-    type: 'column',
-  },
-  colors: isRelative ? colorsRelative : colors,
-  title: {
-    text: title,
-  },
-  xAxis: {
-    categories: statYears,
-  },
-  yAxis: {
-    allowDecimals: false,
-    title: {
-      text: isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`,
-    },
-    max,
-    floor: -max,
-  },
-  plotOptions: {
-    column: {
-      stacking: 'normal' as const,
-      borderRadius: 3,
-    },
-    series: {
-      tooltip: {
-        valueSuffix: isRelative ? '%' : '',
-      },
-    },
-  },
-})
+export const isThesisGrades = (grades: Record<string, number>) => {
+  return Object.keys(grades).some(grade => THESIS_GRADES.includes(grade))
+}
 
-export const formatPercentage = (rate: number) => {
-  return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`
+const isThesisSeries = (series: Array<Record<string, number>>) => {
+  return series?.some(record => isThesisGrades(record))
+}
+
+const isSecondNationalLanguageSeries = (series: Array<Record<string, number>>) => {
+  return series?.every(record => {
+    const grades = Object.keys(record)
+    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+    return !hasNumericGrades && hasPassFailGrades && hasSecondNationalLanguageGrades
+  })
+}
+
+const isPassFailSeries = (series: Array<Record<string, number>>) => {
+  return series?.every(record => {
+    const grades = Object.keys(record)
+    const hasPassFailGrades = grades.some(grade => PASS_FAIL_GRADES.includes(grade))
+    const hasNumericGrades = grades.some(grade => NUMERIC_GRADES.includes(grade))
+    const hasSecondNationalLanguageGrades = grades.some(grade => SECOND_NATIONAL_LANGUAGE_GRADES.includes(grade))
+    return !hasNumericGrades && hasPassFailGrades && !hasSecondNationalLanguageGrades
+  })
+}
+
+export const getSeriesType = (series: Array<Record<string, number>>) => {
+  // TODO: Add a new category with only numeric grades ('other' minus TT, HT)
+
+  if (isThesisSeries(series)) {
+    return 'thesis'
+  }
+  if (isSecondNationalLanguageSeries(series)) {
+    return 'second-national-language'
+  }
+  if (isPassFailSeries(series)) {
+    return 'pass-fail'
+  }
+  return 'other'
 }

@@ -1,3 +1,4 @@
+import { FAILED_GRADES } from '@/constants/grades'
 import { FormattedStats } from '@/types/courseStat'
 
 const parseGrade = (grade: string) => {
@@ -52,7 +53,7 @@ export const countTotalStats = (formattedStats: FormattedStats[]) => {
       }
       cgrades[parsedGrade] += curr.attempts.grades[grade]
 
-      if (['eisa', 'hyl.', 'hyl', '0', 'luop'].includes(parsedGrade.toLowerCase())) {
+      if (FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
         failed += curr.attempts.grades[grade]
       } else {
         passed += curr.attempts.grades[grade]

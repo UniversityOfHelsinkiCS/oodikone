@@ -6,31 +6,46 @@ import { useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
-import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { RootState } from '@/redux'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
+import { getGradeSpread, getThesisGradeSpread, isThesisGrades } from '../util'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
 import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
 
-const getTableData = (stats: FormattedStats[]) => {
-  return stats.map(stat => ({
-    name: stat.name,
-    code: stat.code,
-    totalStudents: stat.students.total,
-    passed: stat.students.totalPassed,
-    failed: stat.students.totalFailed,
-    enrolledNoGrade: stat.students.enrolledStudentsWithNoGrade,
-    passRate: formatPercentage(stat.students.passRate * 100),
-    failRate: formatPercentage(stat.students.failRate * 100),
-    grades: stat.students.grades,
-  }))
+const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) => {
+  return stats.map(stat => {
+    const {
+      name,
+      code,
+      attempts: { grades, totalEnrollments },
+      rowObfuscated,
+    } = stat
+
+    const attemptsWithGrades = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
+    const attempts = totalEnrollments ?? attemptsWithGrades
+    const gradeSpread = useThesisGrades ? getThesisGradeSpread([grades]) : getGradeSpread([grades])
+
+    const mapped = {
+      name,
+      code,
+      totalAttempts: stat.attempts.totalAttempts ?? attempts,
+      passed: stat.attempts.categories.passed,
+      failed: stat.attempts.categories.failed,
+      passRate: formatPercentage(stat.attempts.passRate),
+      enrollments: stat.attempts.totalEnrollments,
+      rowObfuscated: rowObfuscated ?? false,
+      grades: Object.fromEntries(Object.entries(gradeSpread).map(([key, value]) => [key, value[0]])),
+    }
+
+    return mapped
+  })
 }
 
-export const StudentsTable = ({
+export const AttemptsTable = ({
   data: { name, stats },
   separate,
   showGrades,
@@ -66,7 +81,8 @@ export const StudentsTable = ({
     [alternatives, separate, unifyCourses]
   )
 
-  const data = useMemo(() => getTableData(stats), [stats])
+  const useThesisGrades = isThesisGrades(stats[0].attempts.grades)
+  const data = useMemo(() => getTableData(stats, useThesisGrades), [stats, useThesisGrades])
 
   const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
@@ -76,7 +92,7 @@ export const StudentsTable = ({
         Cell: ({ cell, row }) => (
           <TimeCell
             href={showPopulation(row.original.code, row.original.name)}
-            isEmptyRow={row.original.totalStudents === 0}
+            isEmptyRow={row.original.totalAttempts === 0}
             name={cell.getValue<string>()}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
@@ -84,14 +100,8 @@ export const StudentsTable = ({
         sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
       },
       {
-        accessorKey: 'totalStudents',
-        header: 'Total students',
-        Header: (
-          <TableHeaderWithTooltip
-            header="Total students"
-            tooltipText="Total count of students, including enrolled students with no grade"
-          />
-        ),
+        accessorKey: 'totalAttempts',
+        header: 'Total attempts',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
       {
@@ -104,28 +114,17 @@ export const StudentsTable = ({
         header: 'Failed',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
       },
-      ...getGradeColumns(resolveGrades(stats)),
-      {
-        accessorKey: 'enrolledNoGrade',
-        header: 'Enrolled, no grade',
-        Header: (
-          <TableHeaderWithTooltip
-            header="Enrolled, no grade"
-            tooltipText="Total count of students with a valid enrollment and no passing or failing grade"
-          />
-        ),
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
-      },
       {
         accessorKey: 'passRate',
         header: 'Pass rate',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
+        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<string>()),
       },
       {
-        accessorKey: 'failRate',
-        header: 'Fail rate',
+        accessorKey: 'enrollments',
+        header: 'Enrollments',
         Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
       },
+      ...getGradeColumns(resolveGrades(stats)),
     ],
     [showPopulation, stats, userHasAccessToAllStats]
   )
@@ -142,6 +141,8 @@ export const StudentsTable = ({
 
       updatedVisibility.passed = !showGrades
       updatedVisibility.failed = !showGrades
+      updatedVisibility.passRate = !showGrades
+      updatedVisibility.enrollments = !showGrades
 
       return { ...updatedVisibility }
     })
@@ -162,13 +163,12 @@ export const StudentsTable = ({
       columnVisibility,
       columnOrder: [
         'name',
-        'totalStudents',
+        'totalAttempts',
         'passed',
         'failed',
         ...resolveGrades(stats).map(({ key }) => `grades.${key}`),
-        'enrolledNoGrade',
         'passRate',
-        'failRate',
+        'enrollments',
       ],
     },
     onColumnVisibilityChange: setColumnVisibility,
@@ -183,7 +183,7 @@ export const StudentsTable = ({
       <ExportToExcelDialog
         exportColumns={columns}
         exportData={exportData}
-        featureName={`student_statistics_${name}`}
+        featureName={`attempt_statistics_${name}`}
         onClose={() => setExportModalOpen(false)}
         open={exportModalOpen}
       />

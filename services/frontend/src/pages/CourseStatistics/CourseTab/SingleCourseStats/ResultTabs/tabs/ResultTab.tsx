@@ -81,7 +81,12 @@ export const ResultTab = ({
                     userHasAccessToAllStats={userHasAccessToAllStats}
                   />
                 ) : (
-                  <AttemptsTable data={data} settings={settings} userHasAccessToAllStats={userHasAccessToAllStats} />
+                  <AttemptsTable
+                    data={data}
+                    separate={settings.separate}
+                    showGrades={settings.showGrades}
+                    userHasAccessToAllStats={userHasAccessToAllStats}
+                  />
                 )}
               </div>
             ))}

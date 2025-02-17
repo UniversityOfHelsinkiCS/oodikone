@@ -6,15 +6,8 @@ import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { ProgrammeStats, ViewMode } from '@/types/courseStat'
-import {
-  absoluteToRelative,
-  getDataObject,
-  getGradeSpread,
-  getGraphOptions,
-  getMaxValueOfSeries,
-  getSeriesType,
-  getThesisGradeSpread,
-} from '../util'
+import { getGradeSpread, getSeriesType, getThesisGradeSpread } from '../util'
+import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from './util'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
