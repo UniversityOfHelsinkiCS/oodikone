@@ -5,7 +5,6 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { NUMERIC_GRADES, PASS_FAIL_GRADES, SECOND_NATIONAL_LANGUAGE_GRADES, THESIS_GRADES } from '@/constants/grades'
 import { ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { getGradeSpread, getSeriesType, getThesisGradeSpread } from '../util'
 import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from './util'
@@ -28,10 +27,10 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
   const sumAll = calculateSumAll(newSeries)
 
   const gradeCategories = {
-    thesis: THESIS_GRADES,
-    'second-national-language': [...PASS_FAIL_GRADES, ...SECOND_NATIONAL_LANGUAGE_GRADES],
-    'pass-fail': PASS_FAIL_GRADES,
-    other: [...NUMERIC_GRADES, ...PASS_FAIL_GRADES, ...SECOND_NATIONAL_LANGUAGE_GRADES],
+    thesis: ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L'],
+    'second-national-language': ['0', 'TT', 'HT', 'Hyv.'],
+    'pass-fail': ['0', 'Hyv.'],
+    other: ['0', 'TT', 'HT', 'Hyv.', '1', '2', '3', '4', '5'],
   }
 
   const categories = gradeCategories[seriesType] || gradeCategories.other
