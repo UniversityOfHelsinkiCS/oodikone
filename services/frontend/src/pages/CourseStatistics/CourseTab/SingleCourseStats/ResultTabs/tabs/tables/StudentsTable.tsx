@@ -14,7 +14,7 @@ import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
-import { formatPercentage, getGradeColumns, resolveGrades } from './util'
+import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
 
 export const StudentsTable = ({
   data: { name, stats },
@@ -137,15 +137,12 @@ export const StudentsTable = ({
 
   const table = useMaterialReactTable({
     ...defaultOptions,
+    ...commonOptions,
     columns,
     data: stats,
-    defaultColumn: { size: 0 },
-    enableHiding: false,
-    enableDensityToggle: false,
     initialState: {
       ...defaultOptions.initialState,
-      sorting: [{ id: 'name', desc: false }],
-      showColumnFilters: false,
+      ...commonOptions.initialState,
     },
     state: {
       columnVisibility,
@@ -163,7 +160,7 @@ export const StudentsTable = ({
     onColumnVisibilityChange: setColumnVisibility,
     muiTableBodyCellProps: {
       ...defaultOptions?.muiTableHeadCellProps,
-      align: 'right',
+      ...commonOptions?.muiTableBodyCellProps,
     },
   })
 

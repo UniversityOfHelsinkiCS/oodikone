@@ -14,7 +14,7 @@ import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades } from '../util'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
-import { formatPercentage, getGradeColumns, resolveGrades } from './util'
+import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
 
 const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) =>
   stats.map(stat => {
@@ -155,15 +155,12 @@ export const AttemptsTable = ({
 
   const table = useMaterialReactTable({
     ...defaultOptions,
+    ...commonOptions,
     columns,
     data,
-    defaultColumn: { size: 0 },
-    enableHiding: false,
-    enableDensityToggle: false,
     initialState: {
       ...defaultOptions.initialState,
-      sorting: [{ id: 'name', desc: false }],
-      showColumnFilters: false,
+      ...commonOptions.initialState,
     },
     state: {
       columnVisibility,
@@ -180,7 +177,7 @@ export const AttemptsTable = ({
     onColumnVisibilityChange: setColumnVisibility,
     muiTableBodyCellProps: {
       ...defaultOptions?.muiTableHeadCellProps,
-      align: 'right',
+      ...commonOptions?.muiTableBodyCellProps,
     },
   })
 

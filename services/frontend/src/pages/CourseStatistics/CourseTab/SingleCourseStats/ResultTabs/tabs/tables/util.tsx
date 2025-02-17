@@ -73,3 +73,19 @@ export const resolveGrades = (stats: FormattedStats[]) => {
   const grades = [...new Set(allGrades)]
   return getSortedGrades(grades)
 }
+
+export const commonOptions = {
+  defaultColumn: { size: 0 },
+  enableColumnFilters: false,
+  enableColumnOrdering: false,
+  enableDensityToggle: false,
+  enableGlobalFilter: false,
+  enableHiding: false,
+  initialState: {
+    sorting: [{ id: 'name', desc: false }],
+    showColumnFilters: false,
+  },
+  muiTableBodyCellProps: {
+    align: 'right' as const,
+  },
+}
