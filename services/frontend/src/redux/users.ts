@@ -1,8 +1,10 @@
 import { RTKApi } from '@/apiConnection'
 
+import { User } from '@/types/api/users'
+
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getAllUsers: builder.query({
+    getAllUsers: builder.query<User[], void>({
       query: () => '/users',
     }),
     getAccessGroups: builder.query({
@@ -63,7 +65,7 @@ const usersApi = RTKApi.injectEndpoints({
         body: { user },
       }),
     }),
-    deleteUser: builder.mutation({
+    deleteUser: builder.mutation<void, string>({
       query: userId => ({
         url: '/users/delete',
         method: 'DELETE',
