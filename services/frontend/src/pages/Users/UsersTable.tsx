@@ -1,34 +1,47 @@
 import { isEqual } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { Button, Label, Loader, Popup, Segment } from 'semantic-ui-react'
+import { Button, Label, Popup } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Section } from '@/components/material/Section'
 import { SortableTable } from '@/components/SortableTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useShowAsUser } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useDeleteUserMutation } from '@/redux/users'
+import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) => {
+export const UsersTable = ({
+  getAllUsersQuery,
+  isError,
+  isLoading,
+  users,
+}: {
+  getAllUsersQuery
+  isError: boolean
+  isLoading: boolean
+  users: User[]
+}) => {
   const { getTextIn } = useLanguage()
-  const [popupTimeout, setPopupTimeout] = useState(null)
-  const [popupOpen, setPopupOpen] = useState(false)
-  const [userEmails, setUserEmails] = useState([])
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
-  const { data: studyProgrammes = {} } = useGetProgrammesQuery()
+  const [popupTimeout, setPopupTimeout] = useState<number | undefined>(undefined)
+  const [popupOpen, setPopupOpen] = useState<boolean>(false)
+  const [userEmails, setUserEmails] = useState<string[]>([])
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const { data: studyProgrammes = {} } = useGetProgrammesQuery({})
+  console.log(studyProgrammes)
   const showAsUser = useShowAsUser()
 
   const [deleteUserMutation, { data: deletedUser }] = useDeleteUserMutation()
 
   const copyEmailsToClipboard = () => {
-    navigator.clipboard.writeText(userEmails.join('; '))
+    void navigator.clipboard.writeText(userEmails.join('; '))
   }
 
   const handleDisplayedDataChange = useCallback(
-    users => {
+    (users: User[]) => {
       const newEmails = users.filter(user => user.email).map(user => user.email)
       if (!isEqual(newEmails, userEmails)) {
         setUserEmails(newEmails)
@@ -46,7 +59,7 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
 
   useEffect(() => {
     return () => clearTimeout(popupTimeout)
-  }, [])
+  }, [popupTimeout])
 
   const handlePopupOpen = () => {
     setPopupOpen(true)
@@ -55,16 +68,19 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
 
   const handlePopupClose = () => {
     setPopupOpen(false)
-    setPopupTimeout(null)
+    setPopupTimeout(undefined)
   }
 
-  const deleteUser = userId => {
-    deleteUserMutation(userId)
+  const deleteUser = (userId: string) => {
+    void deleteUserMutation(userId)
   }
 
-  const changeButton = userId => {
-    if (confirmDeleteId !== userId) setConfirmDeleteId(userId)
-    else deleteUser(userId)
+  const changeButton = (userId: string) => {
+    if (confirmDeleteId !== userId) {
+      setConfirmDeleteId(userId)
+    } else {
+      deleteUser(userId)
+    }
   }
 
   const columnsWithoutIamGroups = [
@@ -182,12 +198,8 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
     ...columnsWithoutIamGroups.slice(4),
   ]
 
-  if (isLoading) return <Loader active inline="centered" />
-
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-
   return (
-    <Segment className="contentSegment">
+    <Section isError={isError} isLoading={isLoading}>
       <SortableTable
         columns={isDefaultServiceProvider() ? columnsWithIamGroups : columnsWithoutIamGroupsWithDelete}
         data={users}
@@ -210,6 +222,6 @@ export const UserSearchList = ({ getAllUsersQuery, users, isLoading, isError }) 
           }
         />
       </div>
-    </Segment>
+    </Section>
   )
 }
