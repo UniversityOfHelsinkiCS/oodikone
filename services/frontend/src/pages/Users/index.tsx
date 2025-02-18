@@ -23,10 +23,10 @@ export const Users = () => {
     if (!userid) {
       void getAllUsersQuery()
     }
-  }, [userid])
+  }, [userid, getAllUsersQuery])
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <PageTitle title="Users" />
       {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
       {userid ? (
