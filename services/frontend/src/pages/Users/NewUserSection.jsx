@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Button, Form, FormGroup, Input, Loader, Segment } from 'semantic-ui-react'
+
+import { SortableTable } from '@/components/SortableTable'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
-import { SortableTable } from '../SortableTable'
 
 export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
