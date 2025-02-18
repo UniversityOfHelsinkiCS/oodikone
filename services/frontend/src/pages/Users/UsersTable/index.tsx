@@ -5,7 +5,6 @@ import { Link } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Section } from '@/components/material/Section'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { DetailedProgrammeRights, Role } from '@/shared/types'
@@ -15,6 +14,7 @@ import { CopyEmailAddressesButton } from './CopyEmailAddressesButton'
 import { DeleteButton } from './DeleteButton'
 import { MockButton } from './MockButton'
 import { RoleChip } from './RoleChip'
+import { StatusMessage } from './StatusMessage'
 
 export const UsersTable = ({
   getAllUsersQuery,
@@ -144,6 +144,7 @@ export const UsersTable = ({
         pageSize: 10,
         pageIndex: 0,
       },
+      showGlobalFilter: true,
     },
     state: {
       columnOrder: ['name', 'username', 'roles', 'programmeRights', 'iamGroups', 'lastLogin', 'actions'],
@@ -156,12 +157,13 @@ export const UsersTable = ({
         lastLogin: true,
       },
     },
-    renderTopToolbarCustomActions: () => <CopyEmailAddressesButton userEmails={userEmails} />,
+    renderTopToolbarCustomActions: () => (
+      <Stack alignItems="center" direction="row" gap={1}>
+        <CopyEmailAddressesButton userEmails={userEmails} />
+        <StatusMessage isError={isError} isLoading={isLoading} />
+      </Stack>
+    ),
   })
 
-  return (
-    <Section isError={isError} isLoading={isLoading}>
-      <MaterialReactTable table={table} />
-    </Section>
-  )
+  return <MaterialReactTable table={table} />
 }
