@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import { Container, Stack } from '@mui/material'
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
@@ -28,12 +28,14 @@ export const Users = () => {
   return (
     <Container maxWidth="xl">
       <PageTitle title="Users" />
-      {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
-      {userid ? (
-        <UserPage />
-      ) : (
-        <UsersTable getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
-      )}
+      <Stack gap={2}>
+        {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
+        {userid ? (
+          <UserPage />
+        ) : (
+          <UsersTable getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
+        )}
+      </Stack>
     </Container>
   )
 }

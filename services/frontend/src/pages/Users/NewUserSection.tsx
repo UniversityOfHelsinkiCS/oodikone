@@ -1,12 +1,27 @@
+import { Add as AddIcon, Send as SendIcon } from '@mui/icons-material'
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Button, Form, FormGroup, Input, Loader, Segment } from 'semantic-ui-react'
-
-import { SortableTable } from '@/components/SortableTable'
+import { Section } from '@/components/material/Section'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 
 export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')
-  const [user, setUser] = useState('')
+  const [user, setUser] = useState<any>()
   const [showAdded, setShowAdded] = useState(false)
   const [showAddError, setShowAddError] = useState(false)
 
@@ -23,7 +38,7 @@ export const NewUserSection = ({ onAddUser }) => {
     if (!isLoadingGetUser && !isErrorAddUser && !isFetching) {
       setUser(userFromApi)
     }
-  }, [userFromApi, isLoadingGetUser, isErrorGetUser, isFetching])
+  }, [userFromApi, isLoadingGetUser, isErrorGetUser, isFetching, isErrorAddUser])
 
   useEffect(() => {
     if (!isLoadingAddUser && !isErrorAddUser && addedUser) {
@@ -34,101 +49,104 @@ export const NewUserSection = ({ onAddUser }) => {
       setTimeout(() => setShowAdded(false), 2000)
     }
     if (isErrorAddUser) {
-      if (addUserError.status === 400) {
+      if ('status' in addUserError && addUserError.status === 400) {
         setShowAddError(true)
         setTimeout(() => setShowAddError(false), 2000)
       }
     }
-  }, [addedUser, isLoadingAddUser, isErrorAddUser])
+  }, [addedUser, isLoadingAddUser, isErrorAddUser, onAddUser, addUserError])
 
   const getUser = event => {
-    if (!eppn) return
+    if (!eppn) {
+      return
+    }
     setUser('')
     event.preventDefault()
-    getUserFromSisuByEppnQuery(eppn)
+    void getUserFromSisuByEppnQuery(eppn)
   }
 
   const addUser = () => {
-    if (!user) return
-    addUserMutation(user)
+    if (!user) {
+      return
+    }
+    void addUserMutation(user)
   }
 
   const cancelUser = () => {
     setUser('')
   }
 
-  if (isLoadingGetUser) return <Loader active inline="centered" />
+  if (isLoadingGetUser) {
+    return (
+      <Box display="flex" justifyContent="center" width="100%">
+        <CircularProgress />
+      </Box>
+    )
+  }
 
   return (
-    <Segment className="contentSegment">
-      <Form>
-        <FormGroup>
-          <Input onChange={event => setEppn(event.target.value)} placeholder="Enter user eppn" value={eppn} />
-          <Button color="blue" onClick={getUser}>
+    <>
+      <Section title="Add new user">
+        <Stack direction="row" gap={1} sx={{ width: '100%' }}>
+          <TextField
+            fullWidth
+            onChange={event => setEppn(event.target.value)}
+            placeholder="Enter user eppn"
+            size="small"
+            sx={{ flex: 1 }}
+            value={eppn}
+          />
+          <Button color="primary" endIcon={<SendIcon />} onClick={getUser} variant="contained">
             Fetch user from Sisu
           </Button>
-        </FormGroup>
-      </Form>
-
-      {isErrorGetUser && <h4>Something went wrong, please try a different eppn.</h4>}
-
-      {showAdded && <h4> Added user to the Oodikone user-database.</h4>}
-
-      {showAddError && <h4 style={{ color: 'red' }}>The user already exists in Oodikone.</h4>}
-
-      {!isErrorGetUser && user && (
-        <SortableTable
-          columns={[
-            {
-              key: 'NAME',
-              title: 'Name',
-              sortable: false,
-              filterable: false,
-              getRowVal: user => {
-                const name = user.first_name.concat(' ', user.last_name)
-                return name
-              },
-              getRowContent: user => {
-                const name = user.first_name.concat(' ', user.last_name)
-                return name
-              },
-            },
-            {
-              key: 'USERNAME',
-              title: 'Username',
-              sortable: false,
-              filterable: false,
-              getRowVal: user => user.eppn,
-              getRowContent: user => user.eppn,
-            },
-            {
-              key: 'ADDUSER',
-              title: 'Add user',
-              sortable: false,
-              filterable: false,
-              getRowVal: () => (
-                <Button color="green" onClick={addUser}>
-                  Add
-                </Button>
-              ),
-            },
-            {
-              key: 'CANCELUSER',
-              title: 'Cancel',
-              sortable: false,
-              filterable: false,
-              getRowVal: () => (
-                <Button color="red" onClick={cancelUser}>
-                  Cancel
-                </Button>
-              ),
-            },
-          ]}
-          data={[user]}
-          hideHeaderBar
-          singleLine={false}
-        />
+        </Stack>
+      </Section>
+      {isErrorGetUser && (
+        <Alert severity="warning" variant="outlined">
+          <Typography>Something went wrong, please try a different eppn</Typography>
+        </Alert>
       )}
-    </Segment>
+      {showAdded && (
+        <Alert severity="success" variant="outlined">
+          <Typography>Added user to the Oodikone user database</Typography>
+        </Alert>
+      )}
+      {showAddError && (
+        <Alert severity="error" variant="outlined">
+          <Typography>The user already exists in Oodikone</Typography>
+        </Alert>
+      )}
+      {!isErrorGetUser && user && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  {user.first_name} {user.last_name}
+                </TableCell>
+                <TableCell>{user.eppn}</TableCell>
+                <TableCell>
+                  <Stack direction="row" gap={1}>
+                    <Button color="inherit" onClick={cancelUser} variant="text">
+                      Cancel
+                    </Button>
+                    <Button color="success" endIcon={<AddIcon />} onClick={addUser} variant="contained">
+                      Add
+                    </Button>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </>
   )
 }
