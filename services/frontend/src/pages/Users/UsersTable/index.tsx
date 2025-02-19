@@ -51,7 +51,7 @@ export const UsersTable = ({
       if (programmeNames.length === 1) {
         return programmeNames[0]
       }
-      return `${programmeNames[0]} + ${programmeNames.length - 1} others`
+      return `${programmeNames[0]} + ${programmeNames.length - 1} ${programmeNames.length === 2 ? 'other' : 'others'}`
     },
     [getTextIn, studyProgrammes]
   )

@@ -1,11 +1,11 @@
-import { Check as CheckIcon, Edit as EditIcon } from '@mui/icons-material'
-import { AlertProps, Box, Button, Card, CardContent, Checkbox, Divider, Stack, Typography } from '@mui/material'
+import { AlertProps, Box, Card, CardContent, Checkbox, Divider, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
 import { StatusNotification } from '@/components/material/StatusNotification'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
+import { EditButton } from './EditButton'
 
 export const RolesCard = ({ user }) => {
   const [selected, setSelected] = useState<string[]>(user.roles || [])
@@ -59,14 +59,7 @@ export const RolesCard = ({ user }) => {
             <Typography component="h2" variant="h5">
               Roles
             </Typography>
-            <Button
-              color={editing ? 'success' : 'primary'}
-              disabled={result.isLoading}
-              endIcon={editing ? <CheckIcon /> : <EditIcon />}
-              onClick={handleEditClick}
-            >
-              {editing ? 'Save' : 'Edit'}
-            </Button>
+            <EditButton disabled={result.isLoading} editing={editing} onClick={handleEditClick} />
           </Stack>
         </CardContent>
         <Divider />
