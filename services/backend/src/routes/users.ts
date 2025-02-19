@@ -5,6 +5,7 @@ import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
 import { LANGUAGE_CODES, Language } from '../shared/language'
+import { Role } from '../shared/types'
 import logger from '../util/logger'
 
 const router = Router()
@@ -14,7 +15,7 @@ router.get('/', auth.roles(['admin']), async (_req: Request, res: Response) => {
   res.json(results)
 })
 
-router.get('/access_groups', auth.roles(['admin']), (_req: Request, res: Response) => {
+router.get('/roles', auth.roles(['admin']), (_req: Request, res: Response) => {
   res.json(roles)
 })
 
@@ -34,17 +35,17 @@ router.get('/:uid', auth.roles(['admin']), async (req: UidRequest, res: Response
   }
 })
 
-interface ModifyAccessRequest extends Request {
+interface ModifyRolesRequest extends Request {
   body: {
     username: string
-    accessgroups: Record<string, boolean>
+    roles: Record<Role, boolean>
   }
 }
 
-router.post('/modifyaccess', auth.roles(['admin']), async (req: ModifyAccessRequest, res: Response) => {
-  const { username, accessgroups } = req.body
+router.post('/modify-roles', auth.roles(['admin']), async (req: ModifyRolesRequest, res: Response) => {
+  const { username, roles } = req.body
   try {
-    await userService.modifyAccess(username, accessgroups)
+    await userService.modifyAccess(username, roles)
     res.status(204).end()
   } catch (error) {
     res.status(400).json(error)

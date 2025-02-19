@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
 import { StatusNotification } from '@/components/material/StatusNotification'
-import { roles } from '@/constants/roles'
-import { useModifyAccessGroupsMutation } from '@/redux/users'
+import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
 
 export const RolesCard = ({ user }) => {
   const [selected, setSelected] = useState<string[]>(user.roles || [])
   const [editing, setEditing] = useState(false)
-  const [mutateAccessGroups, result] = useModifyAccessGroupsMutation()
+  const { data: roles = [] } = useGetRolesQuery()
+  const [mutateRoles, result] = useModifyRolesMutation()
   const [notification, setNotification] = useState({
     open: false,
     message: '',
@@ -23,11 +23,11 @@ export const RolesCard = ({ user }) => {
   }
 
   const submit = async () => {
-    const accessgroups = roles.reduce(
+    const newRoles = roles.reduce(
       (acc, role) => ({ ...acc, [role]: selected.includes(role) }),
       {} as Record<Role, boolean>
     )
-    await mutateAccessGroups({ username: user.username, accessgroups })
+    await mutateRoles({ username: user.username, roles: newRoles })
   }
 
   const handleEditClick = async () => {
@@ -42,8 +42,9 @@ export const RolesCard = ({ user }) => {
       setNotification({ open: true, message: 'Roles updated successfully!', severity: 'success' })
     } else if (result.isError) {
       setNotification({ open: true, message: 'Failed to update roles.', severity: 'error' })
+      setSelected(user.roles)
     }
-  }, [result.isSuccess, result.isError])
+  }, [result.isSuccess, result.isError, user.roles])
 
   return (
     <>

@@ -1,4 +1,5 @@
 import { RTKApi } from '@/apiConnection'
+import { Role } from '@/shared/types'
 
 import { User } from '@/types/api/users'
 
@@ -7,8 +8,8 @@ const usersApi = RTKApi.injectEndpoints({
     getAllUsers: builder.query<User[], void>({
       query: () => '/users',
     }),
-    getAccessGroups: builder.query({
-      query: () => '/users/access_groups',
+    getRoles: builder.query<Role[], void>({
+      query: () => '/users/roles',
     }),
     getUser: builder.query({
       query: uid => `/users/${uid}`,
@@ -17,11 +18,11 @@ const usersApi = RTKApi.injectEndpoints({
     getUserFromSisuByEppn: builder.query({
       query: eppn => `/users/from-sisu-by-eppn/${eppn}`,
     }),
-    modifyAccessGroups: builder.mutation({
-      query: ({ username, accessgroups }) => ({
-        url: '/users/modifyaccess',
+    modifyRoles: builder.mutation<void, { username: string; roles: Record<Role, boolean> }>({
+      query: ({ username, roles }) => ({
+        url: '/users/modify-roles',
         method: 'POST',
-        body: { username, accessgroups },
+        body: { username, roles },
       }),
       invalidatesTags: ['Users'],
     }),
@@ -78,10 +79,10 @@ const usersApi = RTKApi.injectEndpoints({
 
 export const {
   useGetUserQuery,
-  useGetAccessGroupsQuery,
+  useGetRolesQuery,
   useLazyGetAllUsersQuery,
   useLazyGetUserFromSisuByEppnQuery,
-  useModifyAccessGroupsMutation,
+  useModifyRolesMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
   useGetUserAccessEmailPreviewQuery,
