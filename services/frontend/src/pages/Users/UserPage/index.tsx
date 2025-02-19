@@ -1,68 +1,35 @@
-import { useNavigate, useParams } from 'react-router'
-import { Button, Card, Divider, Loader, Message, Popup, Segment } from 'semantic-ui-react'
+import { Container, Stack } from '@mui/material'
+import { useParams } from 'react-router'
+import { Card, Divider, Loader, Message } from 'semantic-ui-react'
+
 import { isDefaultServiceProvider } from '@/common'
-import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
+import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
 import { AccessGroups } from './AccessGroups'
 import { AccessRights } from './AccessRights'
 import { EmailNotification } from './EmailNotification'
+import { InfoCard } from './InfoCard'
+import { MissingIdAlert } from './MissingIdAlert'
 
 export const UserPage = () => {
-  const navigate = useNavigate()
-
   const { userid } = useParams()
-  const { username: currentUserName, isAdmin } = useGetAuthorizedUserQuery()
-  const showAsUser = useShowAsUser()
   const { data: user, isLoading, isError, error } = useGetUserQuery(userid)
 
-  if (isLoading) return <Loader active inline="centered" />
+  useTitle(user?.name ? `${user.name} - Users` : 'Users')
 
-  if (isError) return <Message header={error.data.error} icon="ban" negative size="big" />
+  if (isLoading) {
+    return <Loader active inline="centered" />
+  }
 
-  const renderUserInfoCard = () => (
-    <Card fluid>
-      <Card.Content>
-        <Card.Header>
-          {isAdmin && user.username !== currentUserName && (
-            <Popup
-              content="Show Oodikone as this user"
-              trigger={
-                <Button
-                  basic
-                  circular
-                  floated="right"
-                  icon="spy"
-                  onClick={() => showAsUser(user.username)}
-                  size="tiny"
-                />
-              }
-            />
-          )}
-          {user.name}
-        </Card.Header>
-        <Divider />
-        <Card.Meta content={user.username} />
-        <Card.Meta content={user.email} />
-      </Card.Content>
-    </Card>
-  )
+  if (isError) {
+    return <Message header={error.data.error} icon="ban" negative size="big" />
+  }
 
   return (
-    <Segment className="contentSegment" loading={isLoading}>
-      <Button content="Back" icon="arrow circle left" onClick={() => navigate('/users')} />
-      <Divider />
-      <Card.Group>
-        {!user.sisPersonId && (
-          <Message
-            content="All their roles and access rights might not be displayed."
-            header="This user does not have a person id"
-            icon="exclamation circle"
-            info
-            negative
-            style={{ margin: '1rem 0' }}
-          />
-        )}
-        {renderUserInfoCard()}
+    <Container maxWidth="md">
+      <Stack direction="column" gap={2}>
+        <MissingIdAlert visible={!user.sisPersonId} />
+        <InfoCard user={user} />
         <Card fluid>
           <Card.Content>
             <Card.Header content="Roles" />
@@ -87,7 +54,7 @@ export const UserPage = () => {
             </Card.Content>
           </Card>
         )}
-      </Card.Group>
-    </Segment>
+      </Stack>
+    </Container>
   )
 }
