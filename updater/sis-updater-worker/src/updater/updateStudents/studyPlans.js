@@ -103,12 +103,12 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const studyModuleIds = programmeModules.reduce((modules, cur) => {
-    if (cur.type === 'StudyModule') {
-      modules.push(cur.id)
+  const programmeModuleIdToStudyModuleCode = programmeModules.reduce((res, mod) => {
+    if (mod.type === 'StudyModule') {
+      res[mod.id] = mod.code
     }
-    return modules
-  }, [])
+    return res
+  }, {})
 
   const courseUnitIdToCode = courseUnits.reduce((res, cur) => {
     res[cur.id] = cur.code
@@ -210,7 +210,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   const mapStudyplan = studyplanMapper(
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    studyModuleIds,
+    programmeModuleIdToStudyModuleCode,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,

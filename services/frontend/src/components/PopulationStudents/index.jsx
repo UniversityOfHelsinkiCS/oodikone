@@ -14,6 +14,7 @@ import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
+import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
 
@@ -70,6 +71,10 @@ const Panes = ({
           variant={variant}
         />
       ),
+    },
+    {
+      menuItem: 'Modules',
+      render: () => <ModulesTab curriculum={curriculum} students={filteredStudents} />,
     },
     {
       menuItem: 'Tags',
@@ -206,8 +211,8 @@ export const PopulationStudentsContainer = ({ ...props }) => {
         (props.programmeCode &&
           !props.programmeCode.includes('KH') &&
           !['MH30_001', 'MH30_003'].includes(props.programmeCode))
-          ? ['General', 'Courses', 'Tags']
-          : ['General', 'Courses', 'Tags', 'Progress'],
+          ? ['General', 'Courses', 'Modules', 'Tags']
+          : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
       infotoolTipContent: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
