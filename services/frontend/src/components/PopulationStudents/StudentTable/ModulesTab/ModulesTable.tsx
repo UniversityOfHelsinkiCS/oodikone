@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
-import { useStudentNameVisibility } from '@/components/StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 
