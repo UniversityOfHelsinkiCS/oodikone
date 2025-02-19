@@ -23,10 +23,15 @@ export const RolesCard = ({ user }) => {
   }
 
   const submit = async () => {
+    if (selected === user.roles) {
+      return
+    }
+
     const newRoles = roles.reduce(
       (acc, role) => ({ ...acc, [role]: selected.includes(role) }),
       {} as Record<Role, boolean>
     )
+
     await mutateRoles({ username: user.username, roles: newRoles })
   }
 
@@ -55,11 +60,10 @@ export const RolesCard = ({ user }) => {
               Roles
             </Typography>
             <Button
-              color={editing ? 'success' : 'warning'}
+              color={editing ? 'success' : 'primary'}
               disabled={result.isLoading}
               endIcon={editing ? <CheckIcon /> : <EditIcon />}
               onClick={handleEditClick}
-              variant="outlined"
             >
               {editing ? 'Save' : 'Edit'}
             </Button>
@@ -68,9 +72,12 @@ export const RolesCard = ({ user }) => {
         <Divider />
         <CardContent>
           {roles.map(role => (
-            <Box key={role} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box key={role} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>
               <RoleChip role={role} />
-              <Checkbox checked={selected.includes(role)} disabled={!editing} onChange={() => toggleRole(role)} />
+              <Stack direction="row" gap={1} sx={{ alignItems: 'center' }}>
+                {selected.includes(role) && <Typography>Selected</Typography>}
+                <Checkbox checked={selected.includes(role)} disabled={!editing} onChange={() => toggleRole(role)} />
+              </Stack>
             </Box>
           ))}
         </CardContent>

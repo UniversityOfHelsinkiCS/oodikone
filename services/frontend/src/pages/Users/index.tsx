@@ -31,7 +31,7 @@ export const Users = () => {
       <Stack gap={2}>
         {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
         {userid ? (
-          <UserPage />
+          <UserPage userId={userid} />
         ) : (
           <UsersTable getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
         )}
