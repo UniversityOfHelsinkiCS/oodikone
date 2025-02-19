@@ -11,7 +11,7 @@ const usersApi = RTKApi.injectEndpoints({
     getRoles: builder.query<Role[], void>({
       query: () => '/users/roles',
     }),
-    getUser: builder.query({
+    getUser: builder.query<User, string>({
       query: uid => `/users/${uid}`,
       providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),

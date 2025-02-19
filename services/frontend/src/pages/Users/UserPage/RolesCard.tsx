@@ -5,9 +5,10 @@ import { RoleChip } from '@/components/material/RoleChip'
 import { StatusNotification } from '@/components/material/StatusNotification'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
+import { User } from '@/types/api/users'
 import { EditButton } from './EditButton'
 
-export const RolesCard = ({ user }) => {
+export const RolesCard = ({ user }: { user: User }) => {
   const [selected, setSelected] = useState<string[]>(user.roles || [])
   const [editing, setEditing] = useState(false)
   const { data: roles = [] } = useGetRolesQuery()

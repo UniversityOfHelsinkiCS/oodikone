@@ -18,10 +18,11 @@ import { MockButton } from '@/components/material/MockButton'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getFullLanguage } from '@/shared/language'
+import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { NotifyButton } from './NotifyButton'
 
-export const InfoCard = ({ user }) => {
+export const InfoCard = ({ user }: { user: User }) => {
   const { username: currentUserName } = useGetAuthorizedUserQuery()
 
   return (

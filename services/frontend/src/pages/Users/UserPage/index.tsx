@@ -1,6 +1,5 @@
-import { Box, CircularProgress, Container, Stack } from '@mui/material'
+import { Alert, Box, CircularProgress, Container, Stack } from '@mui/material'
 
-import { AccessDenied } from '@/components/material/AccessDenied'
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
 import { InfoCard } from './InfoCard'
@@ -21,8 +20,14 @@ export const UserPage = ({ userId }: { userId: string }) => {
     )
   }
 
-  if (isError) {
-    return <AccessDenied />
+  if (!user || isError) {
+    return (
+      <Container maxWidth="sm">
+        <Alert severity="error" variant="outlined">
+          User not found
+        </Alert>
+      </Container>
+    )
   }
 
   return (
