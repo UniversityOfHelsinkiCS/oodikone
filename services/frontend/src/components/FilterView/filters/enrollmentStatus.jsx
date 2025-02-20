@@ -10,7 +10,7 @@ const STATUS_OPTIONS = [
   { key: 'enrl-status-inactive', text: 'Passive', value: 3 },
 ]
 
-const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, semesterCodes }) => {
+const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters }) => {
   const name = 'enrollmentStatusFilter'
   const { getTextIn } = useLanguage()
 
@@ -20,12 +20,13 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, se
     return null
   }
 
-  const semesterOptions = semesterCodes
-    .sort((prev, cur) => cur - prev)
-    .map(code => ({
-      key: `semester-option-${code}`,
-      text: getTextIn(allSemesters[code].name),
-      value: code,
+  const semesterOptions = Object.values(allSemesters)
+    .filter(semester => new Date(semester.startdate) <= new Date())
+    .sort((a, b) => b.semestercode - a.semestercode)
+    .map(({ semestercode, name }) => ({
+      key: `semester-option-${semestercode}`,
+      text: getTextIn(name),
+      value: semestercode,
     }))
 
   return (
@@ -87,19 +88,6 @@ export const enrollmentStatusFilter = createFilter({
 
   isActive: ({ status }) => status !== null,
 
-  precompute: ({ students }) => {
-    const semesterCodes = new Set()
-    for (const student of students) {
-      for (const studyRight of student.studyRights) {
-        if (!studyRight.semesterEnrollments) continue
-        for (const enrollment of studyRight.semesterEnrollments) {
-          semesterCodes.add(enrollment.semester)
-        }
-      }
-    }
-    return { semesterCodes: [...semesterCodes] }
-  },
-
   filter(student, { status, semesters }, { args }) {
     if (args.programme) {
       const correctStudyRight = student.studyRights.find(studyRight =>
@@ -126,7 +114,5 @@ export const enrollmentStatusFilter = createFilter({
     })
   },
 
-  render: (props, { precomputed, args }) => (
-    <EnrollmentStatusFilterCard {...props} allSemesters={args.allSemesters} semesterCodes={precomputed.semesterCodes} />
-  ),
+  render: (props, { args }) => <EnrollmentStatusFilterCard {...props} allSemesters={args.allSemesters} />,
 })
