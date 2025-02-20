@@ -10,7 +10,6 @@ export const FilterTray = () => {
     allStudents,
     filters,
     withoutFilter,
-    filterOptions,
     setFilterOptions,
     resetFilter,
     resetFilters,
@@ -23,7 +22,7 @@ export const FilterTray = () => {
   const filterSet = filters
     .sort((a, b) => (a.title ?? a.key).localeCompare(b.title ?? b.key))
     .map(filter => {
-      const { key, title, isActive, render, info } = filter
+      const { key, render } = filter
       const ctx = getContextByKey(key)
 
       const props = {
@@ -36,14 +35,7 @@ export const FilterTray = () => {
 
       return (
         <div key={key}>
-          <FilterCard
-            active={isActive(filterOptions[key])}
-            filter={filter}
-            info={info}
-            onClear={() => resetFilter(key)}
-            options={ctx.options}
-            title={title ?? key}
-          >
+          <FilterCard filter={filter} onClear={() => resetFilter(key)} options={ctx.options}>
             {render(props, ctx)}
           </FilterCard>
         </div>

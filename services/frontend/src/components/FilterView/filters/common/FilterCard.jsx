@@ -74,7 +74,7 @@ export const FilterCard = ({ filter, options, children, onClear }) => {
                 style={{ margin: 0 }}
               />
             )}
-            {info && <HoverableHelpPopup content={info.short} style={{ cursor: 'auto', margin: 0, color: '#888' }} />}
+            {info && <HoverableHelpPopup content={info} style={{ cursor: 'auto', margin: 0, color: '#888' }} />}
           </div>
         </div>
       </div>
