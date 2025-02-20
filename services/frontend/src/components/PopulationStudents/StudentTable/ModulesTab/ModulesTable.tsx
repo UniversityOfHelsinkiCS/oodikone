@@ -1,10 +1,11 @@
-import { Done as DoneIcon } from '@mui/icons-material'
+import { CropSquare as CropSquareIcon } from '@mui/icons-material'
 import Box from '@mui/material/Box'
+import { grey } from '@mui/material/colors'
 import {
+  type MRT_ColumnDef,
+  type MRT_VisibilityState,
   MaterialReactTable,
   useMaterialReactTable,
-  type MRT_VisibilityState,
-  type MRT_ColumnDef,
 } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -79,7 +80,7 @@ export const ModulesTab: React.FC<ModuleProps> = ({ formattedModules, formattedS
       Cell: ({ cell }) => (
         <>
           <Box sx={{ display: 'flex', justifyContent: 'center' }} title="Has the module in their primary study plan">
-            {hasModuleInHOPS(cell.row.original, code) && <DoneIcon />}
+            {hasModuleInHOPS(cell.row.original, code) && <CropSquareIcon sx={{ color: grey[500] }} />}
           </Box>
         </>
       ),
