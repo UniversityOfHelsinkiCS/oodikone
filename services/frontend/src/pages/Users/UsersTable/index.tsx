@@ -1,6 +1,6 @@
 import { Box, Chip, Stack } from '@mui/material'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
@@ -9,6 +9,7 @@ import { MockButton } from '@/components/material/MockButton'
 import { RoleChip } from '@/components/material/RoleChip'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { useGetRolesQuery } from '@/redux/users'
 import { DetailedProgrammeRights, Role } from '@/shared/types'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
@@ -28,12 +29,8 @@ export const UsersTable = ({
   users: User[]
 }) => {
   const { getTextIn } = useLanguage()
-  const [userEmails, setUserEmails] = useState<string[]>([])
-  const { data: studyProgrammes = {} } = useGetProgrammesQuery({})
-
-  useEffect(() => {
-    setUserEmails(users.map(user => user.email))
-  }, [users])
+  const { data: roles = [] } = useGetRolesQuery()
+  const { data: studyProgrammes = {} } = useGetProgrammesQuery()
 
   const formatProgrammeRights = useCallback(
     (programmeRights: DetailedProgrammeRights[]) => {
@@ -87,6 +84,8 @@ export const UsersTable = ({
         ),
         enableSorting: false,
         size: 350,
+        filterVariant: 'multi-select',
+        filterSelectOptions: roles,
       },
       {
         accessorKey: 'programmeRights',
@@ -129,21 +128,19 @@ export const UsersTable = ({
         enableSorting: false,
       },
     ],
-    [formatProgrammeRights, getAllUsersQuery]
+    [formatProgrammeRights, getAllUsersQuery, roles]
   )
 
   const table = useMaterialReactTable({
     columns,
     data: users,
     defaultColumn: { size: 0 },
+    enableBottomToolbar: false,
     enableColumnOrdering: false,
     enableDensityToggle: false,
     enableHiding: false,
+    enablePagination: false,
     initialState: {
-      pagination: {
-        pageSize: 10,
-        pageIndex: 0,
-      },
       showGlobalFilter: true,
     },
     state: {
@@ -157,12 +154,16 @@ export const UsersTable = ({
         lastLogin: true,
       },
     },
-    renderTopToolbarCustomActions: () => (
-      <Stack alignItems="center" direction="row" gap={1}>
-        <CopyEmailAddressesButton userEmails={userEmails} />
-        <StatusMessage isError={isError} isLoading={isLoading} />
-      </Stack>
-    ),
+    renderTopToolbarCustomActions: ({ table }) => {
+      const visibleEmails = table.getPrePaginationRowModel().rows.map(row => row.original.email)
+
+      return (
+        <Stack alignItems="center" direction="row" gap={1}>
+          <CopyEmailAddressesButton userEmails={visibleEmails} />
+          <StatusMessage isError={isError} isLoading={isLoading} />
+        </Stack>
+      )
+    },
   })
 
   return <MaterialReactTable table={table} />
