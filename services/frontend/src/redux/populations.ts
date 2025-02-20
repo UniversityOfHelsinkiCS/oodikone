@@ -1,5 +1,5 @@
 import { RTKApi, callController } from '@/apiConnection'
-import { Programme } from '@/types/programme'
+import { DegreeProgramme } from '@/types/api/faculty'
 
 const initialState = {
   pending: false,
@@ -70,7 +70,7 @@ const populationApi = RTKApi.injectEndpoints({
         params: { courseCodes },
       }),
     }),
-    getProgrammes: builder.query<Record<string, Programme>, void>({
+    getProgrammes: builder.query<Record<string, DegreeProgramme>, void>({
       query: () => '/v3/populationstatistics/studyprogrammes',
       keepUnusedDataFor: 60 * 60,
     }),
