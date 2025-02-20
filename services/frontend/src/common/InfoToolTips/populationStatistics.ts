@@ -174,6 +174,10 @@ export const populationStatisticsToolTips = {
     - — Harmaa viiva = Opiskelijalla on yli 6kk vanha ilmoittautuminen kurssille
     - □ Harmaa laatikko = Opiskelija on lisännyt kurssin opintosuunitelmaansa, mutta ei ole ilmoittautunut kurssille tai suorittanut sitä
 
+    **Modules**
+
+    Tällä välilehdellä näkyy, mitä opintokokonaisuuksia opiskelija on valinnut opintosuunnitelmaansa. Näkymä ei huomioi valinnaisia opintokokonaisuuksia.
+
     **Tags**
 
     Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
