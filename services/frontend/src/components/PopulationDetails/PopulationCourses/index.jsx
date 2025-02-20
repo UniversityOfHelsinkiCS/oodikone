@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 
@@ -26,24 +26,24 @@ export const PopulationCourses = ({
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 
-  const getSelectedStudents = students =>
-    onlyIamRights
-      ? students.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
-      : students.map(student => student.studentNumber)
+  const fetch = useCallback(
+    courses => {
+      dispatch(
+        getPopulationSelectedStudentCourses({
+          ...query,
+          studyRights: [query.studyRights.programme],
+          selectedStudents: onlyIamRights
+            ? filteredStudents.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
+            : filteredStudents.map(student => student.studentNumber),
+          selectedStudentsByYear,
+          courses,
+        })
+      )
+    },
+    [dispatch, filteredStudents, onlyIamRights, query, selectedStudentsByYear]
+  )
 
-  const fetch = courses => {
-    dispatch(
-      getPopulationSelectedStudentCourses({
-        ...query,
-        studyRights: [query.studyRights.programme],
-        selectedStudents: getSelectedStudents(filteredStudents),
-        selectedStudentsByYear,
-        courses,
-      })
-    )
-  }
-
-  const programmeCodesToFetch = useDeepMemo(() => {
+  const programmeCourses = useDeepMemo(() => {
     if (!mandatoryCourses) {
       return null
     }
@@ -53,21 +53,21 @@ export const PopulationCourses = ({
   }, [mandatoryCourses])
 
   useEffect(() => {
-    if (programmeCodesToFetch == null || populationSelectedStudentCourses?.query == null) {
+    if (programmeCourses == null || populationSelectedStudentCourses?.query == null) {
       return
     }
     const { courses, selectedStudents } = populationSelectedStudentCourses.query
     if (
-      !isEqual(programmeCodesToFetch, courses) ||
+      !isEqual(programmeCourses, courses) ||
       selectedStudents.length !== filteredStudents.length ||
       !isEqual(
-        selectedStudents,
+        onlyIamRights ? selectedStudents.map(student => student.encryptedData) : selectedStudents,
         filteredStudents.map(({ studentNumber }) => studentNumber)
       )
     ) {
-      fetch(programmeCodesToFetch)
+      fetch(programmeCourses)
     }
-  }, [programmeCodesToFetch, filteredStudents])
+  }, [programmeCourses, filteredStudents, populationSelectedStudentCourses.query, onlyIamRights, fetch])
 
   const pending = populationSelectedStudentCourses.pending || !mandatoryCourses
 
