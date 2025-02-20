@@ -40,34 +40,31 @@ const formatStudent = (student: any, degreeProgrammeCodes: string[]): FormattedS
   }
 }
 
-const getAllModules = (modules: any[], degreeProgrammeCodes: string[]): FormattedModules => {
-  return modules.reduce((acc: FormattedModules, cur: any) => {
-    if (
-      !!cur.code &&
-      (degreeProgrammeCodes.includes(cur.parent_code) || (!cur.parent_code && !degreeProgrammeCodes.includes(cur.code)))
-    ) {
-      acc[cur.code] = cur.name
+const getAllModules = (curriculumCourses: any[]) =>
+  curriculumCourses?.reduce<FormattedModules>((modules, course) => {
+    if (!modules[course.parent_code] && course.visible?.visibility) {
+      modules[course.parent_code] = course.parent_name
     }
-    return acc
+    return modules
   }, {})
-}
 
 const getDegreeProgrammeCodes = (curriculumModules): string[] => {
   return curriculumModules.filter(mod => !!mod.degree_programme_type).map(mod => mod.code)
 }
 
 export const ModulesTabContainer = ({ curriculum, students }) => {
-  const curriculumCombined = useMemo(
+  const curriculumModules = useMemo(
     () => [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules],
     [curriculum]
   )
-
-  const degreeProgrammeCodes = useMemo(() => getDegreeProgrammeCodes(curriculumCombined), [curriculumCombined])
-
-  const formattedModules = useMemo(
-    () => getAllModules(curriculumCombined, degreeProgrammeCodes),
-    [curriculumCombined, degreeProgrammeCodes]
+  const curriculumCourses = useMemo(
+    () => [...curriculum.defaultProgrammeCourses, ...curriculum.secondProgrammeCourses],
+    [curriculum]
   )
+
+  const degreeProgrammeCodes = useMemo(() => getDegreeProgrammeCodes(curriculumModules), [curriculumModules])
+
+  const formattedModules = useMemo(() => getAllModules(curriculumCourses), [curriculum, degreeProgrammeCodes])
 
   const formattedStudents = useMemo(
     () => students.map(student => formatStudent(student, degreeProgrammeCodes)),
