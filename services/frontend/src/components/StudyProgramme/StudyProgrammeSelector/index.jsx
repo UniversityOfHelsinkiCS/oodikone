@@ -124,7 +124,7 @@ export const StudyProgrammeSelector = () => {
     if (isDefaultServiceProvider() && programme.code.startsWith('2_')) {
       continue
     }
-    if (!programme.curriculum_period_ids.includes(currentCurriculumPeriod.id)) {
+    if (!programme.curriculumPeriodIds.includes(currentCurriculumPeriod.id)) {
       otherProgrammes.push(programme)
     } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree') {
       bachelorProgrammes.push(programme)
