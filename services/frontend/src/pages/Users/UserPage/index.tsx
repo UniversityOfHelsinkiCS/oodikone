@@ -2,6 +2,7 @@ import { Alert, Box, CircularProgress, Container, Stack } from '@mui/material'
 
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
+import { IamGroupsCard } from './IamGroupsCard'
 import { InfoCard } from './InfoCard'
 import { MissingIdAlert } from './MissingIdAlert'
 import { RolesCard } from './RolesCard'
@@ -35,7 +36,14 @@ export const UserPage = ({ userId }: { userId: string }) => {
       <Stack direction="column" gap={2}>
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
-        <RolesCard user={user} />
+        <Box display="flex" gap={2}>
+          <Box flex={1}>
+            <IamGroupsCard user={user} />
+          </Box>
+          <Box flex={2}>
+            <RolesCard user={user} />
+          </Box>
+        </Box>
         <StudyProgrammeRightsCard user={user} />
       </Stack>
     </Container>

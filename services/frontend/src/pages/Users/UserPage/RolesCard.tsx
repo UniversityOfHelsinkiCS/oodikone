@@ -54,7 +54,7 @@ export const RolesCard = ({ user }: { user: User }) => {
 
   return (
     <>
-      <Card sx={{ width: '100%' }} variant="outlined">
+      <Card sx={{ height: '100%', width: '100%' }} variant="outlined">
         <CardContent>
           <Stack direction="row" justifyContent="space-between">
             <Typography component="h2" variant="h5">
