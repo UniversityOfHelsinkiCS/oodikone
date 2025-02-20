@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -29,6 +28,7 @@ import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/use
 import { DetailedProgrammeRights } from '@/shared/types'
 import { User } from '@/types/api/users'
 import { checkUserAccess } from '@/util/access'
+import { CardHeader } from './CardHeader'
 import { EditButton } from './EditButton'
 
 const mapAndSortProgrammes = (programmeRights: DetailedProgrammeRights[], studyProgrammes, getTextIn) => {
@@ -122,16 +122,11 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
   return (
     <>
       <Card sx={{ width: '100%' }} variant="outlined">
-        <CardContent>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography component="h2" variant="h5">
-              Study programme rights
-            </Typography>
-            <EditButton disabled={hasFullAccess} editing={editing} onClick={handleEditClick} />
-          </Stack>
-        </CardContent>
+        <CardHeader
+          buttons={<EditButton disabled={hasFullAccess} editing={editing} onClick={handleEditClick} />}
+          title="Study programme rights"
+        />
 
-        <Divider />
         {hasFullAccess ? (
           <Alert severity="info">This user has full access to all study programmes.</Alert>
         ) : (

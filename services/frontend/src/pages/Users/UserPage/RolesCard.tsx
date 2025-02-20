@@ -1,4 +1,4 @@
-import { AlertProps, Box, Card, CardContent, Checkbox, Chip, Divider, Stack, Typography } from '@mui/material'
+import { AlertProps, Box, Card, CardContent, Checkbox, Chip, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
@@ -6,6 +6,7 @@ import { StatusNotification } from '@/components/material/StatusNotification'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
 import { User } from '@/types/api/users'
+import { CardHeader } from './CardHeader'
 import { EditButton } from './EditButton'
 
 export const RolesCard = ({ user }: { user: User }) => {
@@ -55,15 +56,10 @@ export const RolesCard = ({ user }: { user: User }) => {
   return (
     <>
       <Card sx={{ height: '100%', width: '100%' }} variant="outlined">
-        <CardContent>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography component="h2" variant="h5">
-              Roles
-            </Typography>
-            <EditButton disabled={result.isLoading} editing={editing} onClick={handleEditClick} />
-          </Stack>
-        </CardContent>
-        <Divider />
+        <CardHeader
+          buttons={<EditButton disabled={result.isLoading} editing={editing} onClick={handleEditClick} />}
+          title="Roles"
+        />
         <CardContent>
           {roles.map(role => (
             <Box key={role} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>

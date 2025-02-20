@@ -1,16 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Divider,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material'
+import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { Link } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
@@ -20,6 +8,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getFullLanguage } from '@/shared/language'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
+import { CardHeader } from './CardHeader'
 import { NotifyButton } from './NotifyButton'
 
 export const InfoCard = ({ user }: { user: User }) => {
@@ -27,18 +16,15 @@ export const InfoCard = ({ user }: { user: User }) => {
 
   return (
     <Card sx={{ width: '100%' }} variant="outlined">
-      <CardContent>
-        <Stack direction="row" justifyContent="space-between">
-          <Typography component="h2" variant="h5">
-            {user.name}
-          </Typography>
-          <Stack direction="row" gap={1}>
+      <CardHeader
+        buttons={
+          <>
             {user.username !== currentUserName && <MockButton username={user.username} />}
             {isDefaultServiceProvider() && <NotifyButton />}
-          </Stack>
-        </Stack>
-      </CardContent>
-      <Divider />
+          </>
+        }
+        title={user.name}
+      />
       <CardContent>
         <TableContainer>
           <Table>
