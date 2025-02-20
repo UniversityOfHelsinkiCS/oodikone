@@ -191,10 +191,10 @@ const PopulationStudents = ({
 
 const getTabs = programmeCode => {
   if (programmeCode && (programmeCode.includes('KH') || ['MH30_001', 'MH30_003'].includes(programmeCode))) {
-    return ['General', 'Courses', 'Progress']
+    return ['General', 'Courses', 'Modules', 'Progress']
   }
   if (programmeCode) {
-    return ['General', 'Courses']
+    return ['General', 'Courses', 'Modules']
   }
   return ['General']
 }
