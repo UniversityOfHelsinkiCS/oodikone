@@ -124,7 +124,7 @@ describe('Study guidance group tests', () => {
         cy.cs('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] .ui.attached.tabular.menu').then($menu => {
           const tabNames = Array.from($menu[0].children).map(elem => elem.innerText)
-          expect(tabNames).to.deep.equal(['General', 'Courses', 'Progress'])
+          expect(tabNames).to.deep.equal(['General', 'Courses', 'Modules', 'Progress'])
         })
       })
 
