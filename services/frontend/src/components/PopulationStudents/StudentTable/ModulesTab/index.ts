@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { createLocaleComparator } from '@/common'
 import { ModulesTab } from './ModulesTable'
 
 export type FormattedStudent = {
@@ -40,13 +41,17 @@ const formatStudent = (student: any, degreeProgrammeCodes: string[]): FormattedS
   }
 }
 
-const getAllModules = (curriculumCourses: any[]) =>
-  curriculumCourses?.reduce<FormattedModules>((modules, course) => {
+const getAllModules = (curriculumCourses: any[]) => {
+  const localeComparator = createLocaleComparator()
+  const modulesUnordered = curriculumCourses?.reduce<FormattedModules>((modules, course) => {
     if (!modules[course.parent_code] && course.visible?.visibility) {
       modules[course.parent_code] = course.parent_name
     }
     return modules
   }, {})
+
+  return Object.fromEntries(Object.entries(modulesUnordered).sort(([keyA], [keyB]) => localeComparator(keyA, keyB)))
+}
 
 const getDegreeProgrammeCodes = (curriculumModules): string[] => {
   return curriculumModules.filter(mod => !!mod.degree_programme_type).map(mod => mod.code)
