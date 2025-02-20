@@ -1,4 +1,4 @@
-import { AlertProps, Box, Card, CardContent, Checkbox, Divider, Stack, Typography } from '@mui/material'
+import { AlertProps, Box, Card, CardContent, Checkbox, Chip, Divider, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
@@ -68,9 +68,14 @@ export const RolesCard = ({ user }: { user: User }) => {
           {roles.map(role => (
             <Box key={role} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>
               <RoleChip role={role} />
-              <Stack direction="row" gap={1} sx={{ alignItems: 'center' }}>
-                {selected.includes(role) && <Typography>Selected</Typography>}
-                <Checkbox checked={selected.includes(role)} disabled={!editing} onChange={() => toggleRole(role)} />
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
+                {selected.includes(role) && <Chip color="success" label="Active" size="small" variant="outlined" />}
+                <Checkbox
+                  checked={selected.includes(role)}
+                  color="success"
+                  disabled={!editing || !['admin', 'teachers'].includes(role)}
+                  onChange={() => toggleRole(role)}
+                />
               </Stack>
             </Box>
           ))}

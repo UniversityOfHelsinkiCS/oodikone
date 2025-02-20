@@ -5,7 +5,7 @@ import { useGetUserQuery } from '@/redux/users'
 import { InfoCard } from './InfoCard'
 import { MissingIdAlert } from './MissingIdAlert'
 import { RolesCard } from './RolesCard'
-import { StudyProgrammesCard } from './StudyProgrammesCard'
+import { StudyProgrammeRightsCard } from './StudyProgrammeRightsCard'
 
 export const UserPage = ({ userId }: { userId: string }) => {
   const { data: user, isLoading, isError } = useGetUserQuery(userId)
@@ -36,7 +36,7 @@ export const UserPage = ({ userId }: { userId: string }) => {
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
         <RolesCard user={user} />
-        <StudyProgrammesCard user={user} />
+        <StudyProgrammeRightsCard user={user} />
       </Stack>
     </Container>
   )
