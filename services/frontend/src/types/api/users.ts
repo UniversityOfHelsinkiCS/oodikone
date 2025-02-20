@@ -13,3 +13,8 @@ export type User = {
   sisPersonId: string
   username: string
 }
+
+export type Email = {
+  html: string
+  subject: string
+}

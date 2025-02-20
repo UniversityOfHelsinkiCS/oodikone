@@ -1,7 +1,7 @@
 import { RTKApi } from '@/apiConnection'
 import { Role } from '@/shared/types'
 
-import { User } from '@/types/api/users'
+import { Email, User } from '@/types/api/users'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -42,10 +42,10 @@ const usersApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
-    getUserAccessEmailPreview: builder.query({
+    getUserAccessEmailPreview: builder.query<Email, void>({
       query: () => '/users/email/preview',
     }),
-    sendUserAccessEmail: builder.mutation({
+    sendUserAccessEmail: builder.mutation<void, string>({
       query: recipientAddress => ({
         url: '/users/email',
         method: 'POST',

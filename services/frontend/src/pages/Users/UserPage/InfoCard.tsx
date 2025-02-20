@@ -20,7 +20,7 @@ export const InfoCard = ({ user }: { user: User }) => {
         buttons={
           <>
             {user.username !== currentUserName && <MockButton username={user.username} />}
-            {isDefaultServiceProvider() && <NotifyButton />}
+            {isDefaultServiceProvider() && <NotifyButton userEmail={user.email} />}
           </>
         }
         title={user.name}
