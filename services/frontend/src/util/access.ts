@@ -10,10 +10,16 @@ export const getFullStudyProgrammeRights = (programmeRights: DetailedProgrammeRi
   if (programmeRights) {
     return programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
   }
-
   return []
 }
 
-export const userHasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
+export const hasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
   return roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || studyProgrammeRights.length > 0
+}
+
+export const hasFullAccessToTeacherData = (roles: Role[], iamGroups: string[]) => {
+  return (
+    roles.some(role => role === 'admin') ||
+    iamGroups.some(iamGroup => ['hy-dekaanit', 'hy-varadekaanit-opetus'].includes(iamGroup))
+  )
 }

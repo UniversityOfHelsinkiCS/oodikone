@@ -12,7 +12,7 @@ import { useTitle } from '@/hooks/title'
 import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getCourseStats } from '@/redux/courseStats'
-import { checkUserAccess, getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
+import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { CourseTab } from './CourseTab'
 import { FacultyStatisticsTab } from './FacultyStatisticsTab'
 import { NewQueryButton } from './NewQueryButton'
@@ -63,7 +63,7 @@ export const CourseStatistics = () => {
   }
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
+  const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
   if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && fullStudyProgrammeRights.length < 1) {
     return <AccessDeniedMessage />

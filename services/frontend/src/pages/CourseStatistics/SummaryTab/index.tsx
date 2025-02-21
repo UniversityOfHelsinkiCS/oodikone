@@ -12,7 +12,7 @@ import { setProgrammes } from '@/redux/coursesSummaryForm'
 import { ALL, getAllStudyProgrammes, getSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
-import { getFullStudyProgrammeRights, userHasAccessToAllCourseStats } from '@/util/access'
+import { getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { AttemptsTable } from './AttemptsTable'
 import { exportToExcel } from './export'
 
@@ -35,7 +35,7 @@ const unObjectifyProperty = ({ obj, property }: { obj: object; property: string 
 export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: string) => void }) => {
   const { roles, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
+  const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
   const dispatch = useDispatch()
   const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
   const form = useSelector((state: RootState) => state.courseSummaryForm)

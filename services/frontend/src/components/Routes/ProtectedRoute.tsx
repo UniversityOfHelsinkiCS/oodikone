@@ -1,9 +1,8 @@
 import { Outlet, useLocation } from 'react-router'
 
-import { hasFullAccessToTeacherData } from '@/components/Teachers/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Role } from '@/shared/types'
-import { checkUserAccess } from '@/util/access'
+import { checkUserAccess, hasFullAccessToTeacherData } from '@/util/access'
 import { AccessDeniedMessage } from './AccessDeniedMessage'
 
 interface ProtectedRouteProps {

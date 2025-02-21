@@ -10,8 +10,7 @@ import { useGetProvidersQuery } from '@/redux/providers'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { mapToProviders } from '@/shared/util'
-import { getFullStudyProgrammeRights } from '@/util/access'
-import { hasFullAccessToTeacherData } from '../util'
+import { getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()

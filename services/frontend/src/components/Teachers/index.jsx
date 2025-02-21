@@ -5,11 +5,11 @@ import { Header, Segment, Tab } from 'semantic-ui-react'
 import { useSemanticTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { hasFullAccessToTeacherData } from '@/util/access'
 import { TeacherDetails } from './TeacherDetails'
 import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherSearchTab } from './TeacherSearchTab'
 import { TeacherStatistics } from './TeacherStatistics'
-import { hasFullAccessToTeacherData } from './util'
 
 const pane = (title, Content, icon) => ({
   menuItem: { key: title, content: title, icon },
