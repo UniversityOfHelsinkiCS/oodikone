@@ -125,6 +125,7 @@ services:
       - sis-updater-nats
     environment:
       REDIS_URI: //redis:6379
+      REDIS_HOST: redis
       SECRET_TOKEN: dev
       SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
       SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
@@ -156,6 +157,7 @@ services:
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db
       REDIS_URI: //redis:6379
+      REDIS_HOST: redis
       SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
       SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
       SIS_IMPORTER_DATABASE: importer-db
