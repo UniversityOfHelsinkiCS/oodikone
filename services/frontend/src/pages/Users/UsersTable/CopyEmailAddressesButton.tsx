@@ -8,7 +8,12 @@ export const CopyEmailAddressesButton = ({ userEmails }: { userEmails: string[] 
 
   return (
     <Tooltip arrow placement="right" title="Copy the email addresses of all users to clipboard">
-      <Button onClick={copyEmailsToClipboard} startIcon={<CopyAllIcon />} variant="contained">
+      <Button
+        data-cy="copy-email-addresses-button"
+        onClick={copyEmailsToClipboard}
+        startIcon={<CopyAllIcon />}
+        variant="contained"
+      >
         Copy email addresses
       </Button>
     </Tooltip>

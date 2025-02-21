@@ -64,7 +64,7 @@ export const UsersTable = ({
         accessorKey: 'username',
         header: 'Username',
         Cell: ({ cell, row }) => (
-          <Link data-cy={`user-edit-button-${row.original.username}`} to={`/users/${row.original.id}`}>
+          <Link data-cy={`user-page-button-${row.original.username}`} to={`/users/${row.original.id}`}>
             {cell.getValue<string>()}
           </Link>
         ),

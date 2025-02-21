@@ -1,20 +1,24 @@
-import { PersonSearch as PersonSearchIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon, PersonSearch as PersonSearchIcon } from '@mui/icons-material'
 import { Button } from '@mui/material'
 
-import { useShowAsUser } from '@/redux/auth'
+import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
 
 export const MockButton = ({ username }: { username: string }) => {
   const showAsUser = useShowAsUser()
+  const { mockedBy, username: loggedInAs } = useGetAuthorizedUserQuery()
+
+  const isBeingMocked = mockedBy && username === loggedInAs
 
   return (
     <Button
-      color="warning"
-      onClick={() => showAsUser(username)}
+      color={isBeingMocked ? 'error' : 'warning'}
+      data-cy="mock-button"
+      onClick={() => showAsUser(isBeingMocked ? null : username)}
       size="small"
-      startIcon={<PersonSearchIcon />}
+      startIcon={isBeingMocked ? <LogoutIcon /> : <PersonSearchIcon />}
       variant="outlined"
     >
-      Mock
+      {isBeingMocked ? 'Stop' : 'Mock'}
     </Button>
   )
 }

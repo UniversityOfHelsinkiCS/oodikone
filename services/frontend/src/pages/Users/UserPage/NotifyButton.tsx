@@ -34,6 +34,7 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
     <>
       <Button
         color="primary"
+        data-cy="notify-button"
         disabled={!userEmail || previewIsLoading || previewIsError}
         onClick={() => setConfirmOpen(true)}
         size="small"
