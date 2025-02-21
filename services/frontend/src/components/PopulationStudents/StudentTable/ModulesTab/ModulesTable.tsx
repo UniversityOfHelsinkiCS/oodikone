@@ -1,5 +1,5 @@
 import { CropSquare as CropSquareIcon } from '@mui/icons-material'
-import Box from '@mui/material/Box'
+import { Box } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import {
   type MRT_ColumnDef,
@@ -18,15 +18,16 @@ import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 
 import type { FormattedModules, FormattedStudent } from '.'
 
-interface ModuleProps {
-  formattedModules: FormattedModules
-  formattedStudents: FormattedStudent[]
-}
-
 const hasModuleInHOPS = (student: FormattedStudent, moduleCode: string) =>
   student.modulesInHOPS?.includes(moduleCode) ?? false
 
-export const ModulesTab: React.FC<ModuleProps> = ({ formattedModules, formattedStudents }) => {
+export const ModulesTab = ({
+  formattedModules,
+  formattedStudents,
+}: {
+  formattedModules: FormattedModules
+  formattedStudents: FormattedStudent[]
+}) => {
   const { getTextIn, language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -43,6 +44,8 @@ export const ModulesTab: React.FC<ModuleProps> = ({ formattedModules, formattedS
       firstNames: namesVisible,
     })
   }, [namesVisible])
+
+  const isLoading = Object.keys(formattedModules).length === 0
 
   const staticColumns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
@@ -98,6 +101,7 @@ export const ModulesTab: React.FC<ModuleProps> = ({ formattedModules, formattedS
     data: formattedStudents ?? [],
     state: {
       columnVisibility,
+      isLoading,
     },
     onColumnVisibilityChange: setColumnVisibility,
   })

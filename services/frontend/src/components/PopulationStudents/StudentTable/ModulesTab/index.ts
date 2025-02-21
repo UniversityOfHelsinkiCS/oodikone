@@ -59,11 +59,11 @@ const getDegreeProgrammeCodes = (curriculumModules): string[] => {
 
 export const ModulesTabContainer = ({ curriculum, students }) => {
   const curriculumModules = useMemo(
-    () => [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules],
+    () => (curriculum ? [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules] : []),
     [curriculum]
   )
   const curriculumCourses = useMemo(
-    () => [...curriculum.defaultProgrammeCourses, ...curriculum.secondProgrammeCourses],
+    () => (curriculum ? [...curriculum.defaultProgrammeCourses, ...curriculum.secondProgrammeCourses] : []),
     [curriculum]
   )
 
