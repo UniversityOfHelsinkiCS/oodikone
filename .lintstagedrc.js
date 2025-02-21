@@ -6,6 +6,8 @@ const relativeFilePaths = files => [...files.map(file => path.relative(cwd, file
 module.exports = {
   '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
     `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
+  'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
+  'services/frontend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
   '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files => `prettier --write ${files.join(' ')}`,
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
   Dockerfile: files =>
