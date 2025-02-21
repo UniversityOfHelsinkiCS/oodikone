@@ -32,6 +32,8 @@ export const UsersTable = ({
   const { data: roles = [] } = useGetRolesQuery()
   const { data: studyProgrammes = {} } = useGetProgrammesQuery()
 
+  const iamGroups = [...new Set(users.map(user => user.iamGroups).flat())]
+
   const formatProgrammeRights = useCallback(
     (programmeRights: DetailedProgrammeRights[]) => {
       const uniqueRights = new Set(programmeRights.map(programmeRight => programmeRight.code))
@@ -108,11 +110,14 @@ export const UsersTable = ({
         ),
         enableSorting: false,
         size: 350,
+        filterVariant: 'multi-select',
+        filterSelectOptions: iamGroups,
       },
       {
         accessorKey: 'lastLogin',
         header: 'Last login',
         Cell: ({ cell }) => reformatDate(cell.getValue<string>(), DISPLAY_DATE_FORMAT),
+        enableColumnFilter: false,
       },
       {
         id: 'actions',
@@ -128,7 +133,7 @@ export const UsersTable = ({
         enableSorting: false,
       },
     ],
-    [formatProgrammeRights, getAllUsersQuery, roles]
+    [formatProgrammeRights, getAllUsersQuery, iamGroups, roles]
   )
 
   const table = useMaterialReactTable({
