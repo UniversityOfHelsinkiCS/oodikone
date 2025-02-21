@@ -1,4 +1,4 @@
-import { Delete as DeleteIcon, Save as SaveIcon } from '@mui/icons-material'
+import { Delete as DeleteIcon, Save as SaveIcon, Send as SendIcon } from '@mui/icons-material'
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from 'react-router'
 
 import { SearchHistory } from '@/components/material/SearchHistory'
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useStatusNotification } from '@/hooks/statusNotification'
 import {
   useCreateCourseListMutation,
   useDeleteCourseListMutation,
@@ -27,8 +28,7 @@ export const SearchModal = ({ setValues }) => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
-  const [displaySuccessNotification, setDisplaySuccessNotification] = useState(false)
-  const [displayErrorNotification, setDisplayErrorNotification] = useState(false)
+  const [message, open, severity, setStatusNotification] = useStatusNotification()
   const [courseInput, setCourseInput] = useState('')
   const [studentInput, setStudentInput] = useState('')
   const [name, setName] = useState('')
@@ -91,9 +91,9 @@ export const SearchModal = ({ setValues }) => {
         : await createCourseList({ courseList, name })
 
     if (result.data) {
-      setDisplaySuccessNotification(true)
+      setStatusNotification('The course list was saved successfully.', 'success')
     } else {
-      setDisplayErrorNotification(true)
+      setStatusNotification('An error occurred while saving the course list. Please try again.', 'error')
     }
   }
 
@@ -136,18 +136,6 @@ export const SearchModal = ({ setValues }) => {
       </Button>
       <Dialog maxWidth="md" onClose={handleClose} open={modalOpen}>
         <DialogTitle>Search completed courses of students</DialogTitle>
-        <StatusNotification
-          message="The course list was saved successfully."
-          onClose={() => setDisplaySuccessNotification(false)}
-          open={displaySuccessNotification}
-          severity="success"
-        />
-        <StatusNotification
-          message="An error occurred while saving the course list. Please try again."
-          onClose={() => setDisplayErrorNotification(false)}
-          open={displayErrorNotification}
-          severity="error"
-        />
         <DialogContent>
           <Stack spacing={2}>
             <Box>
@@ -202,39 +190,45 @@ export const SearchModal = ({ setValues }) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            color="primary"
-            data-cy="save-courselist"
-            disabled={!name || isFetching}
-            onClick={onSave}
-            startIcon={<SaveIcon />}
-            variant="contained"
-          >
-            Save
-          </Button>
-          <Button
-            color="error"
-            data-cy="delete-courselist"
-            disabled={!selectedSearchId || isFetching}
-            onClick={onDelete}
-            startIcon={<DeleteIcon />}
-            variant="contained"
-          >
-            Delete
-          </Button>
-          <Button
-            data-cy="completed-courses-search-button"
-            disabled={courseInput.trim() === '' || studentInput.trim() === ''}
-            onClick={event => onClicker(event)}
-            variant="contained"
-          >
-            Search
-          </Button>
+          <Stack direction="row" justifyContent="space-between" px={2} width="100%">
+            <Button onClick={handleClose} variant="text">
+              Cancel
+            </Button>
+            <Stack direction="row" gap={1}>
+              <Button
+                color="error"
+                data-cy="delete-courselist"
+                disabled={!selectedSearchId || isFetching}
+                endIcon={<DeleteIcon />}
+                onClick={onDelete}
+                variant="contained"
+              >
+                Delete
+              </Button>
+              <Button
+                color="success"
+                data-cy="save-courselist"
+                disabled={!name || isFetching}
+                endIcon={<SaveIcon />}
+                onClick={onSave}
+                variant="contained"
+              >
+                Save
+              </Button>
+              <Button
+                data-cy="completed-courses-search-button"
+                disabled={courseInput.trim() === '' || studentInput.trim() === ''}
+                endIcon={<SendIcon />}
+                onClick={event => onClicker(event)}
+                variant="contained"
+              >
+                Search
+              </Button>
+            </Stack>
+          </Stack>
         </DialogActions>
       </Dialog>
+      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

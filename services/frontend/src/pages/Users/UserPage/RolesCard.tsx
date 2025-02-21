@@ -1,8 +1,9 @@
-import { AlertProps, Box, Card, CardContent, Checkbox, Chip, Stack } from '@mui/material'
+import { Box, Card, CardContent, Checkbox, Chip, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useStatusNotification } from '@/hooks/statusNotification'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
 import { User } from '@/types/api/users'
@@ -14,11 +15,7 @@ export const RolesCard = ({ user }: { user: User }) => {
   const [editing, setEditing] = useState(false)
   const { data: roles = [] } = useGetRolesQuery()
   const [mutateRoles, result] = useModifyRolesMutation()
-  const [notification, setNotification] = useState({
-    open: false,
-    message: '',
-    severity: undefined as AlertProps['severity'],
-  })
+  const [message, open, severity, setStatusNotification] = useStatusNotification()
 
   const toggleRole = (role: string) => {
     setSelected(prev => (prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]))
@@ -46,9 +43,9 @@ export const RolesCard = ({ user }: { user: User }) => {
 
   useEffect(() => {
     if (result.isSuccess) {
-      setNotification({ open: true, message: 'Roles updated successfully!', severity: 'success' })
+      setStatusNotification('Roles updated successfully!', 'success')
     } else if (result.isError) {
-      setNotification({ open: true, message: 'Failed to update roles.', severity: 'error' })
+      setStatusNotification('Failed to update roles.', 'error')
       setSelected(user.roles)
     }
   }, [result.isSuccess, result.isError, user.roles])
@@ -77,12 +74,7 @@ export const RolesCard = ({ user }: { user: User }) => {
           ))}
         </CardContent>
       </Card>
-      <StatusNotification
-        message={notification.message}
-        onClose={() => setNotification(prev => ({ ...prev, open: false }))}
-        open={notification.open}
-        severity={notification.severity}
-      />
+      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

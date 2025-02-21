@@ -1,27 +1,25 @@
 import { Email as EmailIcon, Send as SendIcon } from '@mui/icons-material'
-import { AlertProps, Button, Card, CardContent, CardHeader, Modal, Stack } from '@mui/material'
+import { Button, Card, CardContent, CardHeader, Modal, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useStatusNotification } from '@/hooks/statusNotification'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailPreview } from './EmailPreview'
 
 export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [notification, setNotification] = useState({
-    open: false,
-    message: '',
-    severity: undefined as AlertProps['severity'],
-  })
+  const [message, open, severity, setStatusNotification] = useStatusNotification()
+
   const [sendEmail, { isLoading: sendIsLoading, isError: sendIsError, isSuccess: sendIsSuccess }] =
     useSendUserAccessEmailMutation()
   const { data: email, isLoading: previewIsLoading, isError: previewIsError } = useGetUserAccessEmailPreviewQuery()
 
   useEffect(() => {
     if (sendIsSuccess) {
-      setNotification({ open: true, message: `Email sent to ${userEmail}`, severity: 'success' })
+      setStatusNotification(`Email sent to ${userEmail}`, 'success')
     } else if (sendIsError) {
-      setNotification({ open: true, message: `Email could not be sent to ${userEmail}`, severity: 'error' })
+      setStatusNotification(`Email could not be sent to ${userEmail}`, 'error')
     }
   }, [sendIsError, sendIsSuccess, userEmail])
 
@@ -83,12 +81,7 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
           </Card>
         </Modal>
       )}
-      <StatusNotification
-        message={notification.message}
-        onClose={() => setNotification(prev => ({ ...prev, open: false }))}
-        open={notification.open}
-        severity={notification.severity}
-      />
+      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

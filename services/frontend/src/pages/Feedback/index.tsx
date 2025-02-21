@@ -1,10 +1,10 @@
-/* eslint-disable consistent-return */
 import { Send as SendIcon } from '@mui/icons-material'
 import { Box, Button, Container, Link, Modal, TextField, Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { PageTitle } from '@/components/material/PageTitle'
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useStatusNotification } from '@/hooks/statusNotification'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useSendFeedbackMutation } from '@/redux/feedback'
@@ -13,9 +13,8 @@ export const Feedback = () => {
   useTitle('Feedback')
 
   const [feedback, setFeedback] = useState('')
-  const [showError, setShowError] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [message, open, severity, setStatusNotification] = useStatusNotification()
 
   const { email } = useGetAuthorizedUserQuery()
   const [sendFeedback, { isError, isLoading, isSuccess }] = useSendFeedbackMutation()
@@ -23,17 +22,19 @@ export const Feedback = () => {
   useEffect(() => {
     if (isSuccess) {
       setFeedback('')
-      setShowSuccess(true)
-      const timer = setTimeout(() => setShowSuccess(false), 10000)
-      return () => clearTimeout(timer)
+      setStatusNotification(
+        'Your message was sent. Thank you for contacting us. We will get back to you soon.',
+        'success'
+      )
     }
   }, [isSuccess])
 
   useEffect(() => {
     if (isError) {
-      setShowError(true)
-      const timer = setTimeout(() => setShowError(false), 10000)
-      return () => clearTimeout(timer)
+      setStatusNotification(
+        'Your message was not sent. An error occurred while trying to send your message. Please try again.',
+        'error'
+      )
     }
   }, [isError])
 
@@ -48,18 +49,6 @@ export const Feedback = () => {
 
   return (
     <Container maxWidth="md">
-      <StatusNotification
-        message="Your message was sent. Thank you for contacting us. We will get back to you soon."
-        onClose={() => setShowSuccess(false)}
-        open={showSuccess}
-        severity="success"
-      />
-      <StatusNotification
-        message="Your message was not sent. An error occurred while trying to send your message. Please try again."
-        onClose={() => setShowError(false)}
-        open={showError}
-        severity="error"
-      />
       <PageTitle title="Feedback" />
       <Box textAlign="center">
         <Typography>
@@ -139,6 +128,7 @@ export const Feedback = () => {
           </Box>
         </Box>
       </Modal>
+      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </Container>
   )
 }

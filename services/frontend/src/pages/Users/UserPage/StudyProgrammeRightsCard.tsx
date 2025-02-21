@@ -1,7 +1,6 @@
 import { CheckCircle as CheckCircleIcon, Warning as WarningIcon } from '@mui/icons-material'
 import {
   Alert,
-  AlertProps,
   Box,
   Button,
   Card,
@@ -23,6 +22,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterOldProgrammesToggle } from '@/components/material/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/material/InfoBox'
 import { StatusNotification } from '@/components/material/StatusNotification'
+import { useStatusNotification } from '@/hooks/statusNotification'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 import { DetailedProgrammeRights } from '@/shared/types'
@@ -49,11 +49,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
   const { getTextIn } = useLanguage()
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState<string[]>([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState<string[]>([])
-  const [notification, setNotification] = useState({
-    open: false,
-    message: '',
-    severity: undefined as AlertProps['severity'],
-  })
+  const [message, open, severity, setStatusNotification] = useStatusNotification()
   const [editing, setEditing] = useState(false)
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
   const { data: programmes = {} } = useGetProgrammesQuery()
@@ -63,9 +59,9 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
 
   useEffect(() => {
     if (addResult.isSuccess || removeResult.isSuccess) {
-      setNotification({ open: true, message: 'Access rights updated successfully!', severity: 'success' })
+      setStatusNotification('Access rights updated successfully!', 'success')
     } else if (addResult.isError || removeResult.isError) {
-      setNotification({ open: true, message: 'Failed to update access rights.', severity: 'error' })
+      setStatusNotification('Failed to update access rights.', 'error')
     }
   }, [addResult.isSuccess, addResult.isError, removeResult.isSuccess, removeResult.isError])
 
@@ -241,12 +237,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
         )}
       </Card>
 
-      <StatusNotification
-        message={notification.message}
-        onClose={() => setNotification(prev => ({ ...prev, open: false }))}
-        open={notification.open}
-        severity={notification.severity}
-      />
+      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }
