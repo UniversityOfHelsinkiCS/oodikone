@@ -31,6 +31,10 @@ const baseTheme = {
       ecla: purple[700],
       l: purple[800],
     },
+    roles: {
+      admin: red[300],
+      fullSisuAccess: orange[300],
+    },
   },
 } as const
 

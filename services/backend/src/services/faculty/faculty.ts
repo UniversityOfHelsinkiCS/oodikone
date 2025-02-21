@@ -22,16 +22,21 @@ const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPerio
 
 type ProgrammeModuleWithRelevantAttributes = Pick<
   InferAttributes<ProgrammeModule>,
-  'code' | 'name' | 'degreeProgrammeType' | 'curriculum_period_ids'
-> & { progId: string }
+  'code' | 'name' | 'degreeProgrammeType'
+> & { curriculumPeriodIds: string[]; progId: string }
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
 export const getDegreeProgrammesOfOrganization = async (organizationId: string, onlyCurrentProgrammes: boolean) => {
-  const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { valid_from: Date }> =
+  const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { validFrom: Date }> =
     await sequelize.query(
       `
-      SELECT code, name, degree_programme_type as "degreeProgrammeType", curriculum_period_ids, valid_from
+      SELECT 
+        code,
+        curriculum_period_ids as "curriculumPeriodIds",
+        degree_programme_type as "degreeProgrammeType",
+        name,
+        valid_from as "validFrom"
       FROM programme_modules
       WHERE organization_id IN (
         WITH RECURSIVE cte AS (
@@ -65,7 +70,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
     // Programmes are ordered by valid_from in descending order, so the first one whose valid_from date isn't in the future, is the newest version
-    const newestProgrammeVersion = programmeVersions.find(prog => new Date() >= prog.valid_from)
+    const newestProgrammeVersion = programmeVersions.find(prog => new Date() >= prog.validFrom)
     if (!newestProgrammeVersion) {
       continue
     }
@@ -73,7 +78,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 
     const yearsOfProgramme = programmeVersions
       .map(prog =>
-        prog.curriculum_period_ids.map(curriculumPeriodId => {
+        prog.curriculumPeriodIds.map(curriculumPeriodId => {
           return mapCurriculumPeriodIdToYear(curriculumPeriodId, curriculumPeriods)
         })
       )
@@ -85,10 +90,10 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
     if (isRelevantProgramme) {
       relevantProgrammes.push({
         code,
-        name,
+        curriculumPeriodIds: programmeVersions.map(prog => prog.curriculumPeriodIds).flat(),
         degreeProgrammeType,
+        name,
         progId,
-        curriculum_period_ids: programmeVersions.map(prog => prog.curriculum_period_ids).flat(),
       })
     }
   }

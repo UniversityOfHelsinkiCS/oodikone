@@ -63,8 +63,8 @@ describe('Users tests', () => {
 
     describe('can mock as other users', { retries: 3 }, () => {
       beforeEach(() => {
-        cy.cs('user-edit-button-basic').click()
-        cy.get('i.spy').click()
+        cy.cs('user-page-button-basic').click()
+        cy.cs('mock-button').click()
       })
 
       it('user button shows mocked user', () => {

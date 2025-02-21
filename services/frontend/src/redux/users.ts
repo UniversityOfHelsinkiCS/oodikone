@@ -1,25 +1,28 @@
 import { RTKApi } from '@/apiConnection'
+import { Role } from '@/shared/types'
+
+import { Email, User } from '@/types/api/users'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getAllUsers: builder.query({
+    getAllUsers: builder.query<User[], void>({
       query: () => '/users',
     }),
-    getAccessGroups: builder.query({
-      query: () => '/users/access_groups',
+    getRoles: builder.query<Role[], void>({
+      query: () => '/users/roles',
     }),
-    getUser: builder.query({
+    getUser: builder.query<User, string>({
       query: uid => `/users/${uid}`,
       providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),
     getUserFromSisuByEppn: builder.query({
       query: eppn => `/users/from-sisu-by-eppn/${eppn}`,
     }),
-    modifyAccessGroups: builder.mutation({
-      query: ({ username, accessgroups }) => ({
-        url: '/users/modifyaccess',
+    modifyRoles: builder.mutation<void, { username: string; roles: Record<Role, boolean> }>({
+      query: ({ username, roles }) => ({
+        url: '/users/modify-roles',
         method: 'POST',
-        body: { username, accessgroups },
+        body: { username, roles },
       }),
       invalidatesTags: ['Users'],
     }),
@@ -39,10 +42,10 @@ const usersApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
-    getUserAccessEmailPreview: builder.query({
+    getUserAccessEmailPreview: builder.query<Email, void>({
       query: () => '/users/email/preview',
     }),
-    sendUserAccessEmail: builder.mutation({
+    sendUserAccessEmail: builder.mutation<void, string>({
       query: recipientAddress => ({
         url: '/users/email',
         method: 'POST',
@@ -63,7 +66,7 @@ const usersApi = RTKApi.injectEndpoints({
         body: { user },
       }),
     }),
-    deleteUser: builder.mutation({
+    deleteUser: builder.mutation<void, string>({
       query: userId => ({
         url: '/users/delete',
         method: 'DELETE',
@@ -76,10 +79,10 @@ const usersApi = RTKApi.injectEndpoints({
 
 export const {
   useGetUserQuery,
-  useGetAccessGroupsQuery,
+  useGetRolesQuery,
   useLazyGetAllUsersQuery,
   useLazyGetUserFromSisuByEppnQuery,
-  useModifyAccessGroupsMutation,
+  useModifyRolesMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
   useGetUserAccessEmailPreviewQuery,

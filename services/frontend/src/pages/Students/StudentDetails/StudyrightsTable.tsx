@@ -22,7 +22,7 @@ const studyRightIsActive = (studyRight, currentSemester) =>
 
 export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
-  const { data: studyProgrammes } = useGetProgrammesQuery({})
+  const { data: studyProgrammes } = useGetProgrammesQuery()
   const currentSemester = useCurrentSemester()
   const currentSemesterCode = currentSemester?.semestercode
 

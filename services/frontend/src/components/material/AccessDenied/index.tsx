@@ -39,7 +39,7 @@ const dummyData = names.map(name => ({
   type: 'line' as const,
 }))
 
-export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
+export const AccessDenied = ({ notEnabled = false }: { notEnabled?: boolean }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
   useTitle(header)
   const subheader = notEnabled
@@ -53,7 +53,7 @@ export const AccessDenied = ({ notEnabled }: { notEnabled: boolean }) => {
     if (notEnabled) {
       setTimeout(() => setEasterEggVisible(true), Math.floor(Math.random() * 1800000) + 600000)
     }
-  }, [])
+  }, [notEnabled])
 
   return (
     <Box>

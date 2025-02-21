@@ -34,7 +34,7 @@ const isRole = (role: string) => {
   return (roles as readonly string[]).includes(role)
 }
 
-export const modifyAccess = async (username: string, rolesOfUser: Record<string, boolean>) => {
+export const modifyAccess = async (username: string, rolesOfUser: Record<Role, boolean>) => {
   const user = await User.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)

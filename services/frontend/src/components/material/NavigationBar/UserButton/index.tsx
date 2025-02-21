@@ -1,5 +1,5 @@
 import { AccountCircle as AccountCircleIcon, Check as CheckIcon, Language as LanguageIcon } from '@mui/icons-material'
-import { Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
+import { Badge, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -24,12 +24,11 @@ export const UserButton = () => {
       <IconButton
         data-cy="nav-bar-user-button"
         onClick={event => setAnchorEl(event.currentTarget)}
-        sx={{
-          color: mockedBy ? theme => theme.palette.warning.light : 'inherit',
-          padding: 0,
-        }}
+        sx={{ color: 'inherit', padding: 0 }}
       >
-        <AccountCircleIcon />
+        <Badge color="warning" invisible={!mockedBy} variant="dot">
+          <AccountCircleIcon />
+        </Badge>
       </IconButton>
       <Menu
         anchorEl={anchorEl}
