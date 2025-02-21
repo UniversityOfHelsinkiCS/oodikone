@@ -8,6 +8,7 @@ import moment from 'moment'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
+import { LanguageProvider } from '@/components/LanguagePicker/useLanguage'
 import { AccessDenied } from '@/components/material/AccessDenied'
 import { Footer } from '@/components/material/Footer'
 import { NavigationBar } from '@/components/material/NavigationBar'
@@ -55,17 +56,19 @@ const Layout = ({ children }) => (
       minHeight: '100vh',
     }}
   >
-    <LocalizationProvider dateAdapter={AdapterMoment}>
-      <ThemeProvider theme={theme}>
-        <StatusNotificationProvider>
-          <CssBaseline />
-          <NavigationBar />
-          <main style={{ flex: 1 }}>{children}</main>
-          <StatusNotification />
-          <Footer />
-        </StatusNotificationProvider>
-      </ThemeProvider>
-    </LocalizationProvider>
+    <LanguageProvider>
+      <LocalizationProvider dateAdapter={AdapterMoment}>
+        <ThemeProvider theme={theme}>
+          <StatusNotificationProvider>
+            <CssBaseline />
+            <NavigationBar />
+            <main style={{ flex: 1 }}>{children}</main>
+            <StatusNotification />
+            <Footer />
+          </StatusNotificationProvider>
+        </ThemeProvider>
+      </LocalizationProvider>
+    </LanguageProvider>
   </div>
 )
 
