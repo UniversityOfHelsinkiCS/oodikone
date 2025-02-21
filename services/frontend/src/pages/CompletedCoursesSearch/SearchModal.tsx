@@ -15,8 +15,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
 import { SearchHistory } from '@/components/material/SearchHistory'
-import { StatusNotification } from '@/components/material/StatusNotification'
-import { useStatusNotification } from '@/hooks/statusNotification'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import {
   useCreateCourseListMutation,
   useDeleteCourseListMutation,
@@ -28,7 +27,7 @@ export const SearchModal = ({ setValues }) => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
-  const [message, open, severity, setStatusNotification] = useStatusNotification()
+  const { setStatusNotification } = useStatusNotification()
   const [courseInput, setCourseInput] = useState('')
   const [studentInput, setStudentInput] = useState('')
   const [name, setName] = useState('')
@@ -228,7 +227,6 @@ export const SearchModal = ({ setValues }) => {
           </Stack>
         </DialogActions>
       </Dialog>
-      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

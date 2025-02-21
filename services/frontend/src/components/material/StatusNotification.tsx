@@ -1,32 +1,17 @@
-import { Alert, AlertProps, Snackbar } from '@mui/material'
+import { Alert, Snackbar } from '@mui/material'
+import { useStatusNotification } from './StatusNotificationContext'
 
-/**
- * A temporary notification message to give feedback on the status of an action.
- *
- * @param message - The message to display to the user.
- * @param onClose - The function to call when the notification is closed.
- * @param open - Whether the notification is open or not.
- * @param severity - The severity of the notification. Changes the color and icon of the notification.
- */
-export const StatusNotification = ({
-  message,
-  onClose,
-  open,
-  severity,
-}: {
-  message: string
-  onClose: () => void
-  open: boolean
-  severity: AlertProps['severity']
-}) => {
+export const StatusNotification = () => {
+  const { message, severity, open, closeNotification } = useStatusNotification()
+
   return (
     <Snackbar
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      autoHideDuration={30000}
-      onClose={onClose}
+      autoHideDuration={5000}
+      onClose={closeNotification}
       open={open}
     >
-      <Alert onClose={onClose} severity={severity}>
+      <Alert onClose={closeNotification} severity={severity}>
         {message}
       </Alert>
     </Snackbar>

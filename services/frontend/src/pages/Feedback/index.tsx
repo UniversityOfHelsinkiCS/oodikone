@@ -3,8 +3,7 @@ import { Box, Button, Container, Link, Modal, TextField, Tooltip, Typography } f
 import { useEffect, useState } from 'react'
 
 import { PageTitle } from '@/components/material/PageTitle'
-import { StatusNotification } from '@/components/material/StatusNotification'
-import { useStatusNotification } from '@/hooks/statusNotification'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useSendFeedbackMutation } from '@/redux/feedback'
@@ -14,7 +13,7 @@ export const Feedback = () => {
 
   const [feedback, setFeedback] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
-  const [message, open, severity, setStatusNotification] = useStatusNotification()
+  const { setStatusNotification } = useStatusNotification()
 
   const { email } = useGetAuthorizedUserQuery()
   const [sendFeedback, { isError, isLoading, isSuccess }] = useSendFeedbackMutation()
@@ -128,7 +127,6 @@ export const Feedback = () => {
           </Box>
         </Box>
       </Modal>
-      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </Container>
   )
 }

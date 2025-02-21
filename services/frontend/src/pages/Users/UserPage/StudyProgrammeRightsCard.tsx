@@ -21,8 +21,7 @@ import { userToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterOldProgrammesToggle } from '@/components/material/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/material/InfoBox'
-import { StatusNotification } from '@/components/material/StatusNotification'
-import { useStatusNotification } from '@/hooks/statusNotification'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 import { DetailedProgrammeRights } from '@/shared/types'
@@ -49,7 +48,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
   const { getTextIn } = useLanguage()
   const [accessRightsToBeAdded, setAccessRightsToBeAdded] = useState<string[]>([])
   const [accessRightsToBeRemoved, setAccessRightsToBeRemoved] = useState<string[]>([])
-  const [message, open, severity, setStatusNotification] = useStatusNotification()
+  const { setStatusNotification } = useStatusNotification()
   const [editing, setEditing] = useState(false)
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
   const { data: programmes = {} } = useGetProgrammesQuery()
@@ -236,8 +235,6 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
           </>
         )}
       </Card>
-
-      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

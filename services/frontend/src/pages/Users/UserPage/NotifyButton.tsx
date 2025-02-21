@@ -2,14 +2,13 @@ import { Email as EmailIcon, Send as SendIcon } from '@mui/icons-material'
 import { Button, Card, CardContent, CardHeader, Modal, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { StatusNotification } from '@/components/material/StatusNotification'
-import { useStatusNotification } from '@/hooks/statusNotification'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailPreview } from './EmailPreview'
 
 export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [message, open, severity, setStatusNotification] = useStatusNotification()
+  const { setStatusNotification } = useStatusNotification()
 
   const [sendEmail, { isLoading: sendIsLoading, isError: sendIsError, isSuccess: sendIsSuccess }] =
     useSendUserAccessEmailMutation()
@@ -81,7 +80,6 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
           </Card>
         </Modal>
       )}
-      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }

@@ -11,6 +11,8 @@ import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 import { AccessDenied } from '@/components/material/AccessDenied'
 import { Footer } from '@/components/material/Footer'
 import { NavigationBar } from '@/components/material/NavigationBar'
+import { StatusNotification } from '@/components/material/StatusNotification'
+import { StatusNotificationProvider } from '@/components/material/StatusNotificationContext'
 import { Routes } from '@/components/Routes'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { isProduction } from '@/conf'
@@ -55,10 +57,13 @@ const Layout = ({ children }) => (
   >
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <NavigationBar />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <StatusNotificationProvider>
+          <CssBaseline />
+          <NavigationBar />
+          <main style={{ flex: 1 }}>{children}</main>
+          <StatusNotification />
+          <Footer />
+        </StatusNotificationProvider>
       </ThemeProvider>
     </LocalizationProvider>
   </div>

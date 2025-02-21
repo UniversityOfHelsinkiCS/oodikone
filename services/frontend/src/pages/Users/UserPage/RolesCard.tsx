@@ -2,8 +2,7 @@ import { Box, Card, CardContent, Checkbox, Chip, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { RoleChip } from '@/components/material/RoleChip'
-import { StatusNotification } from '@/components/material/StatusNotification'
-import { useStatusNotification } from '@/hooks/statusNotification'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { Role } from '@/shared/types'
 import { User } from '@/types/api/users'
@@ -15,7 +14,7 @@ export const RolesCard = ({ user }: { user: User }) => {
   const [editing, setEditing] = useState(false)
   const { data: roles = [] } = useGetRolesQuery()
   const [mutateRoles, result] = useModifyRolesMutation()
-  const [message, open, severity, setStatusNotification] = useStatusNotification()
+  const { setStatusNotification } = useStatusNotification()
 
   const toggleRole = (role: string) => {
     setSelected(prev => (prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]))
@@ -74,7 +73,6 @@ export const RolesCard = ({ user }: { user: User }) => {
           ))}
         </CardContent>
       </Card>
-      <StatusNotification message={message} onClose={() => setStatusNotification('')} open={open} severity={severity} />
     </>
   )
 }
