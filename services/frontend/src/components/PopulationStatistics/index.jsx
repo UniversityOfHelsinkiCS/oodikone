@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
-import { getStudentTotalCredits, getUnifiedProgrammeName } from '@/common'
+import { getStudentTotalCredits } from '@/common'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -36,6 +36,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { makePopulationsToData } from '@/selectors/populationDetails'
 import { getFullStudyProgrammeRights } from '@/util/access'
+import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 
 const getYearText = year => {
   if (year === 'All') return ''
@@ -147,7 +148,7 @@ export const PopulationStatistics = () => {
 
   const programmeText =
     query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
-      ? getUnifiedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
+      ? getCombinedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
       : getTextIn(programmeName)
   const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 

@@ -1,6 +1,6 @@
 import { RTKApi } from '@/apiConnection'
-import { getUnifiedProgrammeName } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
@@ -81,7 +81,7 @@ const getCombinedOptions = (dataForCombined, getTextIn, language) => {
       key: 'KH90_001+MH90_001',
       value: 'KH90_001+MH90_001',
       description: 'KH90_001+MH90_001',
-      text: getUnifiedProgrammeName(
+      text: getCombinedProgrammeName(
         getTextIn(dataForCombined?.KH90_001),
         getTextIn(dataForCombined?.MH90_001),
         language

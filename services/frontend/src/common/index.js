@@ -27,16 +27,6 @@ export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
   return 'Doctoral study right'
 }
 
-export const getUnifiedProgrammeName = (bachelor, masterLicentiate, language) => {
-  if (language === 'fi')
-    return `${bachelor} ja ${
-      masterLicentiate?.includes('lisensiaatin') ? 'lisensiaatin koulutusohjelma' : 'maisterin koulutusohjelma'
-    }`
-  if (language === 'en') return `${bachelor?.split(' ')[0]} and ${masterLicentiate}`
-  if (language === 'sv') return `${bachelor?.split('programmet')[0]}- och ${masterLicentiate}`
-  return bachelor
-}
-
 export const isFall = semester => semester % 2 === 1
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
