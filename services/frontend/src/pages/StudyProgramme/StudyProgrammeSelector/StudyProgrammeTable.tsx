@@ -59,6 +59,7 @@ export const StudyProgrammeTable = ({
           const isPinned = pinnedProgrammes.includes(row.original.code)
           return (
             <IconButton
+              data-cy={`pin-programme-${row.original.code}-button`}
               onClick={
                 isPinned
                   ? () => removeStudyProgrammePins({ programmeCode: row.original.code })

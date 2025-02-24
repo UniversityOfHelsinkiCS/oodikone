@@ -4,6 +4,7 @@ export const FilterOldProgrammesToggle = ({ checked, onChange }: { checked: bool
   return (
     <FormControlLabel
       control={<Switch checked={checked} onChange={onChange} />}
+      data-cy="filter-old-programmes-toggle"
       label="Filter out old and specialized programmes"
     />
   )
