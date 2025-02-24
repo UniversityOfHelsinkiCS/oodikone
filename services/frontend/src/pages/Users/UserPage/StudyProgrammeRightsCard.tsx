@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { createLocaleComparator, isDefaultServiceProvider, isNewStudyProgramme } from '@/common'
+import { isDefaultServiceProvider, isNewStudyProgramme } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterOldProgrammesToggle } from '@/components/material/FilterOldProgrammesToggle'
@@ -27,6 +27,7 @@ import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/use
 import { DetailedProgrammeRights } from '@/shared/types'
 import { User } from '@/types/api/users'
 import { checkUserAccess } from '@/util/access'
+import { createLocaleComparator } from '@/util/comparator'
 import { CardHeader } from './CardHeader'
 import { EditButton } from './EditButton'
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
-import { createLocaleComparator, getCurrentSemester } from '@/common'
+import { getCurrentSemester } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -11,6 +11,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { mapToProviders } from '@/shared/util'
 import { getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
+import { createLocaleComparator } from '@/util/comparator'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()
