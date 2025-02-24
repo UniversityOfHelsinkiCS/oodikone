@@ -1,17 +1,35 @@
-import { Form, FormField, FormInput } from 'semantic-ui-react'
+import { Search as SearchIcon } from '@mui/icons-material'
+import { InputAdornment, TextField } from '@mui/material'
 
-export const StudyProgrammeFilter = ({ handleFilterChange, studyProgrammes }) => {
-  if (studyProgrammes.length <= 10) return null
+import { DegreeProgramme } from '@/types/api/faculty'
+
+export const StudyProgrammeFilter = ({
+  handleFilterChange,
+  studyProgrammes,
+}: {
+  handleFilterChange: (value: string) => void
+  studyProgrammes: DegreeProgramme[]
+}) => {
+  if (studyProgrammes.length <= 10) {
+    return null
+  }
 
   return (
-    <Form>
-      <FormField>
-        <label style={{ marginBottom: '10px' }}>Filter programmes</label>
-        <FormInput
-          onChange={event => handleFilterChange(event.target.value)}
-          placeholder="Type here to filter study programmes"
-        />
-      </FormField>
-    </Form>
+    <TextField
+      data-cy="study-programme-filter"
+      fullWidth
+      label="Filter study programmes"
+      onChange={event => handleFilterChange(event.target.value)}
+      placeholder="Type here to filter study programmes"
+      slotProps={{
+        input: {
+          endAdornment: (
+            <InputAdornment position="end">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        },
+      }}
+    />
   )
 }

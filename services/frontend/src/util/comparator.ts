@@ -1,3 +1,5 @@
+import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
+
 /**
  * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
  *
@@ -12,7 +14,10 @@ export const createLocaleComparator = (field: string | null = null) => {
 
 export const createPinnedFirstComparator = (pinnedProgrammes: string[]) => {
   const localeComparator = createLocaleComparator('code')
-  return (programmeA, programmeB) => {
+  return (
+    programmeA: DegreeProgramme | CombinedDegreeProgramme,
+    programmeB: DegreeProgramme | CombinedDegreeProgramme
+  ) => {
     const pinnedA = pinnedProgrammes.includes(programmeA.code)
     const pinnedB = pinnedProgrammes.includes(programmeB.code)
     if (pinnedA && !pinnedB) {
