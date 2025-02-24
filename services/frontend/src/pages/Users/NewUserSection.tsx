@@ -1,9 +1,7 @@
 import { Add as AddIcon, Send as SendIcon } from '@mui/icons-material'
 import {
   Alert,
-  Box,
   Button,
-  CircularProgress,
   Paper,
   Stack,
   Table,
@@ -16,6 +14,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { Loading } from '@/components/material/Loading'
 import { Section } from '@/components/material/Section'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 
@@ -77,11 +76,7 @@ export const NewUserSection = ({ onAddUser }) => {
   }
 
   if (isLoadingGetUser) {
-    return (
-      <Box display="flex" justifyContent="center" width="100%">
-        <CircularProgress />
-      </Box>
-    )
+    return <Loading />
   }
 
   return (

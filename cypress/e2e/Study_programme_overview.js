@@ -10,7 +10,33 @@ const deleteTag = name => {
 }
 
 describe('Study programme overview', () => {
-  /* Basic information overview -tests */
+  describe('Study programme selector', () => {
+    beforeEach(() => {
+      cy.init('/study-programme', 'admin')
+    })
+
+    it('Correct categories', () => {
+      cy.contains('Bachelor programmes')
+      cy.contains('Master programmes')
+      cy.contains('Combined programmes')
+      cy.contains('Doctoral programmes')
+    })
+
+    it('Study programme search filter', () => {
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
+      cy.contains('Matemaattisten tieteiden kandiohjelma').should('exist')
+      cy.cs('study-programme-filter').type('Tietojenkäsittelytieteen')
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
+      cy.contains('Matemaattisten tieteiden kandiohjelma').should('not.exist')
+    })
+
+    it('Old and specialized programmes filter', () => {
+      cy.contains('Biotekniikka (ylempi)').should('not.exist')
+      cy.cs('filter-old-programmes-toggle').click()
+      cy.contains('Biotekniikka (ylempi)').should('exist')
+    })
+  })
+
   describe('Basic information view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -235,7 +261,6 @@ describe('Study programme overview', () => {
     })
   })
 
-  /* Study track overview tests */
   describe('Study track overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -469,7 +494,6 @@ describe('Study programme overview', () => {
     })
   })
 
-  /* Programme courses -tests */
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
@@ -678,7 +702,6 @@ describe('Study programme overview', () => {
     })
   })
 
-  /* Tag-tests */
   describe('Tags view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')

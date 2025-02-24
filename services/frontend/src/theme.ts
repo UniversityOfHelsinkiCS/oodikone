@@ -1,4 +1,4 @@
-import { blue, deepPurple, green, indigo, orange, purple, red } from '@mui/material/colors'
+import { blue, blueGrey, deepPurple, green, indigo, orange, purple, red } from '@mui/material/colors'
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
 const baseTheme = {
@@ -30,6 +30,10 @@ const baseTheme = {
       mcla: purple[600],
       ecla: purple[700],
       l: purple[800],
+    },
+    studyProgrammePin: {
+      pinned: blueGrey[900],
+      unpinned: blueGrey[100],
     },
     roles: {
       admin: red[300],

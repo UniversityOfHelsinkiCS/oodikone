@@ -161,9 +161,14 @@ export type GetAllProgressStatsResponse = {
 
 export type DegreeProgramme = {
   code: string
+  curriculumPeriodIds: string[]
   degreeProgrammeType: string
   name: Name
   progId: string
+}
+
+export type CombinedDegreeProgramme = Omit<DegreeProgramme, 'curriculumPeriodIds' | 'degreeProgrammeType'> & {
+  combinedCode: string
 }
 
 export type GetFacultyStudentStatsResponse = {

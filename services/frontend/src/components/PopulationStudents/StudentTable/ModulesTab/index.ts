@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { createLocaleComparator } from '@/common'
+
+import { createLocaleComparator } from '@/util/comparator'
 import { ModulesTab } from './ModulesTable'
 
 export type FormattedStudent = {

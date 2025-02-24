@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router'
-import { Container, Header, Menu, Segment, Tab } from 'semantic-ui-react'
+import { Header, Menu, Segment, Tab } from 'semantic-ui-react'
 
-import { getUnifiedProgrammeName, isDefaultServiceProvider } from '@/common'
+import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useSemanticTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { getFullStudyProgrammeRights } from '@/util/access'
+import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { BasicOverview } from './BasicOverview'
 import { DegreeCoursesTable } from './DegreeCourses'
 import { ProgrammeCourses } from './ProgrammeCourses'
@@ -19,7 +20,7 @@ import { UpdateView } from './UpdateView'
 
 const createName = (studyProgrammeId, combibedProgrammeId, programmes, language, getTextIn) => {
   if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId])
-    return getUnifiedProgrammeName(
+    return getCombinedProgrammeName(
       getTextIn(programmes?.[studyProgrammeId].name),
       getTextIn(programmes?.[combibedProgrammeId].name),
       language
@@ -43,14 +44,7 @@ export const StudyProgramme = () => {
   useTitle('Study programmes')
 
   if (!studyProgrammeId) {
-    return (
-      <Container>
-        <Header className="segmentTitle" size="large">
-          Study programmes
-        </Header>
-        <StudyProgrammeSelector />
-      </Container>
-    )
+    return <StudyProgrammeSelector />
   }
 
   const programmeId =

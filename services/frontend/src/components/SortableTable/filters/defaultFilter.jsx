@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react'
 import { Dropdown, Icon, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
-import { createLocaleComparator } from '@/common'
 import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
+import { createLocaleComparator } from '@/util/comparator'
 
 const ValueFilterType = {
   Include: 'include',

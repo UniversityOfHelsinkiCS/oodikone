@@ -2,11 +2,11 @@ import { RTKApi } from '@/apiConnection'
 
 const studyProgrammePinsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getStudyProgrammePins: builder.query({
+    getStudyProgrammePins: builder.query<{ studyProgrammes: string[]; userId: string }, void>({
       query: () => 'study-programme-pins',
       providesTags: ['StudyProgrammePins'],
     }),
-    addStudyProgrammePin: builder.mutation({
+    addStudyProgrammePin: builder.mutation<void, { programmeCode: string }>({
       query: ({ programmeCode }) => ({
         url: 'study-programme-pins',
         method: 'POST',
@@ -16,7 +16,7 @@ const studyProgrammePinsApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['StudyProgrammePins'],
     }),
-    removeStudyProgrammePin: builder.mutation({
+    removeStudyProgrammePin: builder.mutation<void, { programmeCode: string }>({
       query: ({ programmeCode }) => ({
         url: 'study-programme-pins',
         method: 'DELETE',
