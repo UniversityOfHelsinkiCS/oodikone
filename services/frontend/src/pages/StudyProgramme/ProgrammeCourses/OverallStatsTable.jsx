@@ -7,7 +7,7 @@ import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
-import { Toggle } from '@/components/StudyProgramme/Toggle'
+import { Toggle } from '@/pages/StudyProgramme/Toggle'
 import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
 import { CourseYearFilter } from './CourseYearFilter'
 

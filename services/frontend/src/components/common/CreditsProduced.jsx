@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Radio } from 'semantic-ui-react'
 
-import { DataTable } from '@/components/StudyProgramme/BasicOverview/DataTable'
-import { StackedBarChart } from '@/components/StudyProgramme/BasicOverview/StackedBarChart'
+import { DataTable } from '@/pages/StudyProgramme/BasicOverview/DataTable'
+import { StackedBarChart } from '@/pages/StudyProgramme/BasicOverview/StackedBarChart'
 
 const getFormattedYear = (year, academicYear) => (academicYear ? `${year} - ${year + 1}` : `${year}`)
 

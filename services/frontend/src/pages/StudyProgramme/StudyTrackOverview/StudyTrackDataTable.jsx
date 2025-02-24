@@ -3,7 +3,7 @@ import { Icon, Popup, Table } from 'semantic-ui-react'
 
 import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Toggle } from '@/components/StudyProgramme/Toggle'
+import { Toggle } from '@/pages/StudyProgramme/Toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationLink } from './PopulationLink'
 
