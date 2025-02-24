@@ -1,11 +1,11 @@
 import { Alert, Box, Container, Stack } from '@mui/material'
 import { debounce } from 'lodash'
 import { useState } from 'react'
-import { Loader } from 'semantic-ui-react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterOldProgrammesToggle } from '@/components/material/FilterOldProgrammesToggle'
+import { Loading } from '@/components/material/Loading'
 import { PageTitle } from '@/components/material/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useCurrentCurriculumPeriod } from '@/hooks/currentCurriculumPeriod'
@@ -40,7 +40,7 @@ export const StudyProgrammeSelector = () => {
   const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
 
   if (isLoading || !currentCurriculumPeriod) {
-    return <Loader active>Loading</Loader>
+    return <Loading />
   }
 
   const combinations = { KH90_001: 'MH90_001' }

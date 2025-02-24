@@ -1,5 +1,6 @@
-import { Alert, Box, CircularProgress, Container, Stack } from '@mui/material'
+import { Alert, Box, Container, Stack } from '@mui/material'
 
+import { Loading } from '@/components/material/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
 import { IamGroupsCard } from './IamGroupsCard'
@@ -14,11 +15,7 @@ export const UserPage = ({ userId }: { userId: string }) => {
   useTitle(user?.name ? `${user.name} - Users` : 'Users')
 
   if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-        <CircularProgress />
-      </Box>
-    )
+    return <Loading />
   }
 
   if (!user || isError) {
