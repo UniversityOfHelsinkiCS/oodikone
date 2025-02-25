@@ -54,3 +54,5 @@ export const useLanguage = () => {
     getTextIn,
   }
 }
+
+export type GetTextIn = ReturnType<typeof useLanguage>['getTextIn']

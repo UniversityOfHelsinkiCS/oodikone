@@ -1,6 +1,6 @@
 import { utils, writeFile } from 'xlsx'
 
-import { Name } from '@/shared/types'
+import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import { DegreeProgramme, GetFacultyStudentStatsResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
 
@@ -9,7 +9,7 @@ export const exportStudentTable = (
   programmeNames: Record<string, DegreeProgramme> | undefined,
   faculty: string,
   sortedkeys: string[],
-  getTextIn: (text: Name | null | undefined, lang?: string) => string | null | undefined
+  getTextIn: GetTextIn
 ) => {
   if (!data || !programmeNames) {
     return
