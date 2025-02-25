@@ -91,6 +91,32 @@ describe('Population statistics tests', () => {
       cy.cs('filtered-students')
     })
 
+    // This test sometimes fails on headless mode. It seems that the click on the
+    // 'Fetch class with new settings' button doesn't always trigger history.push()
+    // so the page doesn't reload. This is why waiting also doesn't help.
+    it('Advanced settings work', { retries: 2 }, () => {
+      cy.visit(pathToMathMSc2020)
+      cy.get('[data-cy=advanced-toggle]').click()
+      // only spring
+      cy.cs('toggle-fall').click()
+      cy.contains('Fetch class').click()
+      cy.contains('Credit accumulation (for 17 students)')
+      cy.url().should('not.include', 'semesters=FALL')
+      // only fall
+      cy.get('[data-cy=advanced-toggle]').click()
+      cy.cs('toggle-fall').click()
+      cy.cs('toggle-spring').click()
+      cy.contains('Fetch class').click()
+      cy.contains('Credit accumulation (for 9 students)')
+      cy.url().should('not.include', 'semesters=SPRING')
+      // spring + fall
+      cy.get('[data-cy=advanced-toggle]').click()
+      cy.cs('toggle-spring').click()
+      cy.contains('Fetch class').click()
+      cy.contains('Credit accumulation (for 26 students)')
+      cy.url().should('include', 'semesters=FALL&semesters=SPRING')
+    })
+
     describe('Credit statistics', () => {
       it("'Credits gained' tab shows correct statistics for all students of the class and also students grouped by admission type", () => {
         cy.clock(new Date('2024-08-30').getTime(), ['Date'])
@@ -280,47 +306,58 @@ describe('Population statistics tests', () => {
     })
 
     describe('Students', () => {
-      it("Empty 'tags' tab has a link to the page where tags can be created", { retries: 2 }, () => {
+      beforeEach(() => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Students (27)')
           .parent()
           .then($parentDiv => {
             if (!$parentDiv.hasClass('active')) cy.contains('Students (27)').click()
           })
-        cy.get('[data-cy=student-table-tabs]').within(() => {
-          cy.contains('Tags').click()
+      })
+
+      it("'General tab' is usable", () => {
+        cy.cs('student-table-tabs').within(() => {
+          cy.contains('522142')
+          cy.contains('Tilastotiede')
+          cy.contains('Matematiikka')
+          cy.contains('Teoreettisten ja laskennallisten menetelmien maisteriohjelma')
+          cy.contains('Todistusvalinta')
         })
-        cy.contains('No tags defined. You can define them here.').find('a').click()
+      })
+
+      it("'Courses tab' is usable", () => {
+        cy.cs('student-table-tabs').within(() => {
+          cy.contains('Courses').click()
+          cy.contains('MAT12001')
+          cy.contains('MAT21001')
+        })
+      })
+
+      it("'Modules tab' Displays correct modules based on the selected programme", () => {
+        cy.cs('student-table-tabs').within(() => {
+          cy.contains('Modules').click()
+          cy.contains('MAT011')
+          cy.contains('MAT110')
+        })
+        cy.contains('Courses of class').click()
+        cy.cs('curriculum-picker').click()
+        cy.contains('2023–2026').click()
+        cy.contains('Courses of class').click()
+        cy.cs('student-table-tabs').within(() => {
+          cy.contains('MAT011').should('not.exist')
+          cy.contains('MAT110')
+        })
+      })
+
+      it("Empty 'tags' tab has a link to the page where tags can be created", () => {
+        cy.cs('student-table-tabs').within(() => {
+          cy.contains('Tags').click()
+          cy.contains('No tags defined. You can define them here.').find('a').click()
+        })
         cy.url().should('include', '/study-programme/KH50_001?p_m_tab=0&p_tab=4')
         cy.contains('Matemaattisten tieteiden kandiohjelma')
         cy.contains('Create tags for study programme')
         cy.contains('button', 'Create a new tag').should('be.disabled')
-      })
-
-      // This test sometimes fails on headless mode. It seems that the click on the
-      // 'Fetch class with new settings' button doesn't always trigger history.push()
-      // so the page doesn't reload. This is why waiting also doesn't help.
-      it('Advanced settings work', { retries: 2 }, () => {
-        cy.visit(pathToMathMSc2020)
-        cy.get('[data-cy=advanced-toggle]').click()
-        // only spring
-        cy.cs('toggle-fall').click()
-        cy.contains('Fetch class').click()
-        cy.contains('Credit accumulation (for 17 students)')
-        cy.url().should('not.include', 'semesters=FALL')
-        // only fall
-        cy.get('[data-cy=advanced-toggle]').click()
-        cy.cs('toggle-fall').click()
-        cy.cs('toggle-spring').click()
-        cy.contains('Fetch class').click()
-        cy.contains('Credit accumulation (for 9 students)')
-        cy.url().should('not.include', 'semesters=SPRING')
-        // spring + fall
-        cy.get('[data-cy=advanced-toggle]').click()
-        cy.cs('toggle-spring').click()
-        cy.contains('Fetch class').click()
-        cy.contains('Credit accumulation (for 26 students)')
-        cy.url().should('include', 'semesters=FALL&semesters=SPRING')
       })
     })
   })
