@@ -4,7 +4,7 @@ import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
 import { useGetColorizedTableCourseStatsQuery } from '@/redux/studyProgramme'
 import { OverallStatsTable } from './OverallStatsTable'
 
-export const ProgrammeCourses = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
+export const ProgrammeCoursesTab = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
   const paneTypes = [
     {
       label: 'By credit type',

@@ -1,5 +1,4 @@
 import moment from 'moment'
-import { string } from 'prop-types'
 import { useState } from 'react'
 import Datetime from 'react-datetime'
 import { Link } from 'react-router'
@@ -7,12 +6,12 @@ import { Button, Confirm, Form, Header, Icon, Item, List, Message, Popup, Segmen
 
 import { SortableTable } from '@/components/SortableTable'
 import { YEAR_DATE_FORMAT } from '@/constants/date'
-import { TagModal } from '@/pages/StudyProgramme/TagModal'
+import { TagModal } from '@/pages/StudyProgramme/TagsTab/TagModal'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation, useGetTagsByStudyTrackQuery, useDeleteTagMutation } from '@/redux/tags'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const Tags = ({ studyprogramme, combinedProgramme }) => {
+export const TagsTab = ({ studyprogramme, combinedProgramme }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [year, setYear] = useState(null)
@@ -178,9 +177,4 @@ export const Tags = ({ studyprogramme, combinedProgramme }) => {
       <SortableTable columns={columns} data={tags} />
     </List>
   )
-}
-
-Tags.propTypes = {
-  studyprogramme: string.isRequired,
-  combinedProgramme: string.isRequired,
 }

@@ -39,7 +39,7 @@ const getGraduatedText = code => {
   return 'Graduated and thesis writers of the programme'
 }
 
-export const BasicOverview = ({
+export const BasicInformationTab = ({
   academicYear,
   combinedProgramme,
   setAcademicYear,

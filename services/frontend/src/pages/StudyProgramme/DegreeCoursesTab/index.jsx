@@ -7,7 +7,7 @@ import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
 import { CreditCriteriaForm } from './CreditCriteriaForm'
 import { DegreeCourseTableView } from './DegreeCourseTableView'
 
-export const DegreeCoursesTable = ({ studyProgramme, combinedProgramme, year }) => {
+export const DegreeCoursesTab = ({ studyProgramme, combinedProgramme, year }) => {
   const [defaultModules, setDefaultModules] = useState([])
   const [curriculum, setCurriculum] = useState(null)
   const [secondProgrammeModules, setSecondProgrammeModules] = useState([])

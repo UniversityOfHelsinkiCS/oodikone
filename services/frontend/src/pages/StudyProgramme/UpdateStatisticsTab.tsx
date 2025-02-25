@@ -4,7 +4,7 @@ import { Button } from 'semantic-ui-react'
 import { UpdateStatusIcon } from '@/components/common/UpdateStatusIcon'
 import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/studyProgramme'
 
-export const UpdateView = ({ combinedProgramme, studyProgramme }) => {
+export const UpdateStatisticsTab = ({ combinedProgramme, studyProgramme }) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipStudyTrack, setSkipStudyTrack] = useState(true)
 
