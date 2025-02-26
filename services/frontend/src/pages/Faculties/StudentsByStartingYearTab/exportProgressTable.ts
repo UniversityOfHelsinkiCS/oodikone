@@ -1,6 +1,7 @@
 import { utils, writeFile } from 'xlsx'
 
-import { Name, NameWithCode } from '@/shared/types'
+import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
+import { NameWithCode } from '@/shared/types'
 import { sortProgrammeKeys } from '@/util/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
 
@@ -8,7 +9,7 @@ export const exportProgressTable = (
   progressStats,
   programmeNames: Record<string, NameWithCode> | undefined,
   faculty: string,
-  getTextIn: (text: Name | null | undefined, lang?: string) => string | null | undefined
+  getTextIn: GetTextIn
 ) => {
   if (!progressStats || !programmeNames) {
     return

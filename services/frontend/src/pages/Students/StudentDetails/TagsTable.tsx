@@ -36,7 +36,10 @@ export const TagsTable = ({ student }: { student: any }) => {
     }
   }
 
-  if (tagData.length === 0) return null
+  if (tagData.length === 0) {
+    return null
+  }
+
   return (
     <Section
       infoBoxContent="Personal tags have a purple background, while shared tags have a gray background. You can view or create tags by clicking the programme name."
@@ -54,7 +57,7 @@ export const TagsTable = ({ student }: { student: any }) => {
           {tagData.map(({ programme, tags }) => (
             <TableRow key={programme.code}>
               <TableCell>
-                <Link target="_blank" to={`/study-programme/${programme.code}?p_tab=4`}>
+                <Link target="_blank" to={`/study-programme/${programme.code}?tab=4`}>
                   {getTextIn(programme.name)}
                 </Link>
               </TableCell>

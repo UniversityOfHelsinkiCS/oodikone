@@ -15,7 +15,7 @@ import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
 
-export const StudyTrackOverview = ({
+export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
   graduated,
   setGraduated,

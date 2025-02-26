@@ -1,4 +1,4 @@
-import { Container, Tab, Tabs } from '@mui/material'
+import { Container, Stack, Tab, Tabs } from '@mui/material'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 
@@ -39,40 +39,42 @@ export const Faculties = () => {
 
   return (
     <Container data-cy="FacultySegmentContainer" maxWidth="lg">
-      <PageTitle subtitle={facultyCode} title={facultyName ?? 'Faculties'} />
-      <Tabs data-cy="FacultyTabs" onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
-        <Tab data-cy="BasicInformationTab" label="Basic information" />
-        <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
-        <Tab data-cy="GraduationTimesTab" label="Graduation times" />
-        {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
-      </Tabs>
-      {tab === 0 && (
-        <BasicInformationTab
-          faculty={faculty}
-          setSpecialGroups={setSpecialGroups}
-          setStudyProgrammes={setStudyProgrammes}
-          specialGroups={specialGroups}
-          studyProgrammes={studyProgrammes}
-        />
-      )}
-      {tab === 1 && (
-        <StudentsByStartingYearTab
-          faculty={faculty}
-          graduatedGroup={graduatedGroup}
-          requiredRights={requiredRights}
-          setGraduatedGroup={setGraduatedGroup}
-          setSpecialGroups={setSpecialGroups}
-          specialGroups={specialGroups}
-        />
-      )}
-      {tab === 2 && (
-        <GraduationTimesTab
-          faculty={faculty}
-          setStudyProgrammes={setStudyProgrammes}
-          studyProgrammes={studyProgrammes}
-        />
-      )}
-      {tab === 3 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
+      <PageTitle subtitle={facultyCode} title={facultyName} />
+      <Stack gap={2}>
+        <Tabs data-cy="FacultyTabs" onChange={(_event, newTab) => setTab(newTab)} value={tab}>
+          <Tab data-cy="BasicInformationTab" label="Basic information" />
+          <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
+          <Tab data-cy="GraduationTimesTab" label="Graduation times" />
+          {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
+        </Tabs>
+        {tab === 0 && (
+          <BasicInformationTab
+            faculty={faculty}
+            setSpecialGroups={setSpecialGroups}
+            setStudyProgrammes={setStudyProgrammes}
+            specialGroups={specialGroups}
+            studyProgrammes={studyProgrammes}
+          />
+        )}
+        {tab === 1 && (
+          <StudentsByStartingYearTab
+            faculty={faculty}
+            graduatedGroup={graduatedGroup}
+            requiredRights={requiredRights}
+            setGraduatedGroup={setGraduatedGroup}
+            setSpecialGroups={setSpecialGroups}
+            specialGroups={specialGroups}
+          />
+        )}
+        {tab === 2 && (
+          <GraduationTimesTab
+            faculty={faculty}
+            setStudyProgrammes={setStudyProgrammes}
+            studyProgrammes={studyProgrammes}
+          />
+        )}
+        {tab === 3 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
+      </Stack>
     </Container>
   )
 }

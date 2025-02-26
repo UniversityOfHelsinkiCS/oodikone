@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 
-import { DegreeCoursesTable } from '@/pages/StudyProgramme/DegreeCourses'
+import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 
 export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
   const [open, setOpen] = useState(false)
@@ -25,7 +25,7 @@ export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
       <Modal.Header>Hide degree courses</Modal.Header>
       <Modal.Content image>
         <Container>
-          <DegreeCoursesTable studyProgramme={studyProgramme} year={year} />
+          <DegreeCoursesTab studyProgramme={studyProgramme} year={year} />
           <Button icon labelPosition="left" onClick={() => setModalOpenState(false)} style={{ marginTop: '10px' }}>
             <Icon name="save" />
             Save & Close

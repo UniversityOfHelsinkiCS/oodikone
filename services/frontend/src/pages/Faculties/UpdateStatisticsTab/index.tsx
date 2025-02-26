@@ -2,8 +2,8 @@ import { Stack, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { Section } from '@/components/material/Section'
+import { UpdateButton } from '@/components/material/UpdateButton'
 import { useUpdateFacultyBasicTabQuery, useUpdateFacultyProgressTabQuery } from '@/redux/facultyStats'
-import { UpdateButton } from './UpdateButton'
 
 export const UpdateStatisticsTab = ({ id }: { id: string }) => {
   const [skipBasic, setSkipBasic] = useState(true)

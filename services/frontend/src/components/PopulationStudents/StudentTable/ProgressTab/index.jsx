@@ -479,8 +479,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     <>
       {!isStudyGuidanceGroupProgramme && (
         <h5>
-          Criteria can be changed <Link to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}>here.</Link> Please
-          refresh page after changes.
+          Criteria can be changed <Link to={`/study-programme/${programme}?tab=4`}>here.</Link> Please refresh page
+          after changes.
         </h5>
       )}
       <Message style={{ fontSize: '16px', maxWidth: '700px' }}>

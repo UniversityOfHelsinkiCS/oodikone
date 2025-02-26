@@ -354,7 +354,7 @@ describe('Population statistics tests', () => {
           cy.contains('Tags').click()
           cy.contains('No tags defined. You can define them here.').find('a').click()
         })
-        cy.url().should('include', '/study-programme/KH50_001?p_m_tab=0&p_tab=4')
+        cy.url().should('include', '/study-programme/KH50_001?tab=4')
         cy.contains('Matemaattisten tieteiden kandiohjelma')
         cy.contains('Create tags for study programme')
         cy.contains('button', 'Create a new tag').should('be.disabled')

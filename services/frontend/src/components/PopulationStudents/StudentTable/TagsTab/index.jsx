@@ -21,7 +21,7 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink
           >
             <h3>
               No tags defined. You can define them{' '}
-              <Link onClick={() => {}} to={`/study-programme/${programmeForTagsLink}?p_m_tab=0&p_tab=4`}>
+              <Link onClick={() => {}} to={`/study-programme/${programmeForTagsLink}?tab=4`}>
                 here
               </Link>
               .

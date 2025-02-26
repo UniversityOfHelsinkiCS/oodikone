@@ -37,7 +37,7 @@ describe('Study programme overview', () => {
     })
   })
 
-  describe('Basic information view works for basic user', () => {
+  describe('Basic information tab works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
@@ -261,15 +261,15 @@ describe('Study programme overview', () => {
     })
   })
 
-  describe('Study track overview works for basic user', () => {
+  describe('Study tracks and class statistics tab works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.get('.attached').contains('Study tracks and class statistics').click()
+      cy.cs('study-tracks-and-class-statistics-tab').click()
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Study tracks and class statistics -tab loads', () => {
+    it('Study tracks and class statistics', () => {
       cy.get('[data-cy=Section-studyTrackOverview]')
       cy.get('[data-cy=Section-studyTrackProgress]')
       cy.get('[data-cy=Section-averageGraduationTimesStudyTracks]')
@@ -494,11 +494,11 @@ describe('Study programme overview', () => {
     })
   })
 
-  describe('Programme courses works for basic user', () => {
+  describe('Programme courses tab works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.get('.attached').contains('Programme courses').click()
+      cy.cs('programme-courses-tab').click()
     })
 
     it('content loads', () => {
@@ -681,11 +681,11 @@ describe('Study programme overview', () => {
     })
   })
 
-  describe('Degree courses works for basic user', () => {
+  describe('Degree courses tab works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.get('.attached').contains('Degree courses').click()
+      cy.cs('degree-courses-tab').click()
     })
 
     it('content loads', () => {
@@ -702,11 +702,11 @@ describe('Study programme overview', () => {
     })
   })
 
-  describe('Tags view works for basic user', () => {
+  describe('Tags tab works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
-      cy.get('.attached').contains('Tags').click()
+      cy.cs('tags-tab').click()
     })
 
     it('can create and delete tags for population', () => {
@@ -751,7 +751,9 @@ describe('Study programme overview', () => {
 
         cy.contains('Successfully added tags to students.')
 
-        cy.contains('td', name).get('i.level.up.alternate.icon').click()
+        cy.contains('td', name).within(() => {
+          cy.get('i.level.up.alternate.icon').click()
+        })
 
         cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
         cy.contains(`Tagged with: ${name}`)
@@ -772,7 +774,7 @@ describe('Study programme overview', () => {
         }
 
         cy.get('a').contains('Matemaattisten tieteiden kandiohjelma').invoke('removeAttr', 'target').click()
-        cy.url().should('include', '/study-programme/KH50_001?p_tab=4')
+        cy.url().should('include', '/study-programme/KH50_001?tab=4')
 
         deleteTag(name)
       })
@@ -813,7 +815,7 @@ describe('Study programme overview', () => {
     })
 
     it('can access study tracks', () => {
-      cy.get('.attached').contains('Study tracks and class statistics').click()
+      cy.cs('study-tracks-and-class-statistics-tab').click()
 
       cy.get('[data-cy=Section-studyTrackOverview]')
       cy.get('[data-cy=Section-studyTrackProgress]')
@@ -821,7 +823,9 @@ describe('Study programme overview', () => {
     })
 
     it("doesn't see other tabs", () => {
-      cy.get('div.ui.tabular.menu a').should('have.length', 2)
+      cy.cs('degree-courses-tab').should('not.exist')
+      cy.cs('tags-tab').should('not.exist')
+      cy.cs('update-statistics-tab').should('not.exist')
     })
   })
 })
