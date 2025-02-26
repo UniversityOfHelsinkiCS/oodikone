@@ -11,7 +11,12 @@ accessibility(ReactHighcharts.Highcharts)
 
 type Statistics = { onTime: number; yearOver: number; wayOver: number }
 
-interface MedianTimeBarChartProps {
+export const MedianTimeBarChart = ({
+  byStartYear,
+  data,
+  goal,
+  title,
+}: {
   byStartYear: boolean
   data: Array<{
     amount: number
@@ -23,9 +28,7 @@ interface MedianTimeBarChartProps {
   }>
   goal: number
   title: string
-}
-
-export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTimeBarChartProps) => {
+}) => {
   if (!data) {
     return null
   }
@@ -161,7 +164,7 @@ export const MedianTimeBarChart = ({ byStartYear, data, goal, title }: MedianTim
   }
 
   return (
-    <div data-cy={`graduation-times-graph${title.split(' ')[0]}`}>
+    <div data-cy={`${title.split(' ')[0]}-median-time-bar-chart`}>
       <ReactHighcharts config={config} />
     </div>
   )

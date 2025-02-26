@@ -17,16 +17,6 @@ export const images = {
   irtomikko,
 }
 
-export const getGraduationGraphTitle = (studyProgramme, doCombo = false) => {
-  if (!studyProgramme) return ''
-  if (['MH30_001', 'MH30_003'].includes(studyProgramme)) return 'Licenciate study right'
-  if (doCombo && studyProgramme === 'MH90_001') return 'Bachelor + licentiate study right'
-  if (doCombo && studyProgramme.includes('MH')) return 'Bachelor + master study right'
-  if (studyProgramme.includes('KH')) return 'Bachelor study right'
-  if (studyProgramme.includes('MH')) return 'Master study right'
-  return 'Doctoral study right'
-}
-
 export const isFall = semester => semester % 2 === 1
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {

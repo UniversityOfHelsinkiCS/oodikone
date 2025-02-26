@@ -2,11 +2,7 @@
 
 import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
-
-export type GraphStat = {
-  data: number[]
-  name: string
-}
+import { GraphStat } from '@/types/graphStat'
 
 type Info = {
   graphStats: GraphStat[]

@@ -1,39 +1,25 @@
+import { Alert, Stack, Switch, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Divider, Loader, Message } from 'semantic-ui-react'
 
-import { getGraduationGraphTitle, isDefaultServiceProvider } from '@/common'
+import { isDefaultServiceProvider } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { CreditsProduced } from '@/components/common/CreditsProduced'
-import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { DataTable } from '@/components/material/DataTable'
+import { LineGraph } from '@/components/material/LineGraph'
+import { Section } from '@/components/material/Section'
+import { StackedBarChart } from '@/components/material/StackedBarChart'
+import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { BreakdownBarChart } from '@/pages/StudyProgramme/BreakdownBarChart'
 import { MedianTimeBarChart } from '@/pages/StudyProgramme/MedianTimeBarChart'
-import { Toggle } from '@/pages/StudyProgramme/Toggle'
-import '@/pages/StudyProgramme/studyprogramme.css'
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from '@/redux/studyProgramme'
+import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
+import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
 import { BarChart } from './BarChart'
-import { DataTable } from './DataTable'
-import { LineGraph } from './LineGraph'
-import { StackedBarChart } from './StackedBarChart'
 
-const getDivider = (title, toolTipText) => (
-  <>
-    <div className="divider">
-      <Divider data-cy={`Section-${toolTipText}`} horizontal>
-        {title}
-      </Divider>
-    </div>
-    <div style={{ marginBottom: '1em' }}>
-      <InfoBox content={studyProgrammeToolTips[toolTipText]} />
-    </div>
-  </>
-)
-
-const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
-
-const getGraduatedText = code => {
-  if (code.slice(0, 1) === 'T' || code.slice(0, 3) === 'LIS') {
+const getGraduatedText = (code: string) => {
+  if (code.startsWith('T') || code.startsWith('LIS')) {
     return 'Graduated of the programme'
   }
   return 'Graduated and thesis writers of the programme'
@@ -45,214 +31,279 @@ export const BasicInformationTab = ({
   setAcademicYear,
   setSpecialGroupsExcluded,
   specialGroupsExcluded,
-  studyprogramme,
+  studyProgramme,
+}: {
+  academicYear: boolean
+  combinedProgramme: string
+  setAcademicYear: (value: boolean) => void
+  setSpecialGroupsExcluded: (value: boolean) => void
+  specialGroupsExcluded: boolean
+  studyProgramme: string
 }) => {
+  const [showAll, setShowAll] = useState(false)
   const [showMedian, setShowMedian] = useState(false)
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({
-    id: studyprogramme,
+    id: studyProgramme,
     combinedProgramme,
     yearType,
     specialGroups: special,
   })
   const credits = useGetCreditStatsQuery({
-    codes: [studyprogramme, combinedProgramme].filter(Boolean),
+    codes: [studyProgramme, combinedProgramme].filter(Boolean),
     isAcademicYear: academicYear,
     specialGroups: !specialGroupsExcluded,
   })
   const graduations = useGetGraduationStatsQuery({
-    id: studyprogramme,
+    id: studyProgramme,
     combinedProgramme,
     yearType,
     specialGroups: special,
   })
 
+  const creditStats = credits?.data?.stats?.[studyProgramme]?.stats
+  const tableStats = makeTableStats(creditStats, showAll, academicYear)
+  const creditGraphStats = makeGraphData(creditStats, showAll, academicYear)
+
+  const secondStats = credits?.data?.stats?.[combinedProgramme]?.stats
+  const secondTableStats = secondStats ? makeTableStats(secondStats, showAll, academicYear) : null
+  const secondCreditGraphStats = secondStats ? makeGraphData(secondStats, showAll, academicYear) : null
+
   const doCombo = graduations?.data?.doCombo
   const timesData = graduations?.data?.graduationTimes
   const timesDataSecondProgramme = graduations?.data?.graduationTimesSecondProgramme
 
-  const displayMedian = () => (
-    <>
-      {doCombo && (
-        <MedianTimeBarChart
-          byStartYear={false}
-          data={graduations?.data?.comboTimes?.medians}
-          goal={graduations?.data?.comboTimes?.goal}
-          title={getGraduationGraphTitle(studyprogramme, doCombo)}
-        />
-      )}
-      {studyprogramme !== 'MH90_001' && (
-        <MedianTimeBarChart
-          byStartYear={false}
-          data={timesData?.medians}
-          goal={graduations?.data.graduationTimes?.goal}
-          title={getGraduationGraphTitle(studyprogramme)}
-        />
-      )}
-      {combinedProgramme && (
-        <MedianTimeBarChart
-          byStartYear={false}
-          data={timesDataSecondProgramme?.medians}
-          goal={graduations?.data.graduationTimesSecondProgramme?.goal}
-          title={getGraduationGraphTitle(combinedProgramme, true)}
-        />
-      )}
-    </>
-  )
+  const basicsIsLoading = basics.isLoading || basics.isFetching
+  const creditsIsLoading = credits.isLoading || credits.isFetching
+  const graduationsIsLoading = graduations.isLoading || graduations.isFetching
+  const isFetchingOrLoading = basicsIsLoading || creditsIsLoading || graduationsIsLoading
 
-  const displayBreakdown = () => (
-    <>
-      {doCombo && (
-        <BreakdownBarChart
-          data={graduations?.data?.comboTimes?.medians}
-          title={getGraduationGraphTitle(studyprogramme, doCombo)}
-        />
-      )}
-      {studyprogramme !== 'MH90_001' && (
-        <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyprogramme)} />
-      )}
-      {combinedProgramme && (
-        <BreakdownBarChart
-          data={timesDataSecondProgramme?.medians}
-          title={getGraduationGraphTitle(combinedProgramme, true)}
-        />
-      )}
-    </>
-  )
-
-  const isFetchingOrLoading =
-    basics.isLoading ||
-    credits.isLoading ||
-    graduations.isLoading ||
-    basics.isFetching ||
-    credits.isFetching ||
-    graduations.isFetching
-
-  const isError =
-    (basics.isError && credits.isError && graduations.isError) ||
-    (basics.isSuccess &&
-      !basics.data &&
-      credits.isSuccess &&
-      !credits.data &&
-      graduations.isSuccess &&
-      !graduations.data)
-
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  const basicsIsError = basics.isError || (basics.isSuccess && !basics.data)
+  const creditsIsError = credits.isError || (credits.isSuccess && !credits.data)
+  const graduationsIsError = graduations.isError || (graduations.isSuccess && !graduations.data)
+  const hasErrors = basicsIsError || creditsIsError || graduationsIsError
 
   return (
-    <div className="studyprogramme-overview">
-      <div className="toggle-container">
-        <Toggle
-          cypress="YearToggle"
-          firstLabel="Calendar year"
-          secondLabel="Academic year"
-          setValue={setAcademicYear}
-          toolTips={studyProgrammeToolTips.yearToggle}
-          value={academicYear}
-        />
-        <Toggle
-          cypress="StudentToggle"
-          firstLabel="All study rights"
-          secondLabel="Special study rights excluded"
-          setValue={setSpecialGroupsExcluded}
-          toolTips={studyProgrammeToolTips.studentToggle}
-          value={specialGroupsExcluded}
-        />
-      </div>
-      {isFetchingOrLoading ? (
-        <Loader active style={{ marginTop: '10em' }} />
-      ) : (
-        <>
-          {!isNewProgramme(studyprogramme) && (
-            <Message>
-              Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes
-            </Message>
-          )}
-          {basics.isSuccess && basics.data && (
-            <>
-              {getDivider('Students of the study programme', 'studentsOfTheStudyProgramme')}
-              <div className="section-container">
-                <LineGraph
-                  cypress="StudentsOfTheStudyProgramme"
-                  data={basics?.data}
-                  exportFileName={`oodikone_StudentsOfTheStudyProgramme_${studyprogramme}_${getTimestamp()}`}
+    <Stack gap={2}>
+      <Section>
+        <ToggleContainer>
+          <Toggle
+            cypress="year-toggle"
+            disabled={isFetchingOrLoading || hasErrors}
+            firstLabel="Calendar year"
+            infoBoxContent={studyProgrammeToolTips.yearToggle}
+            secondLabel="Academic year"
+            setValue={setAcademicYear}
+            value={academicYear}
+          />
+          <Toggle
+            cypress="study-rights-toggle"
+            disabled={isFetchingOrLoading || hasErrors}
+            firstLabel="All study rights"
+            infoBoxContent={studyProgrammeToolTips.studentToggle}
+            secondLabel="Special study rights excluded"
+            setValue={setSpecialGroupsExcluded}
+            value={specialGroupsExcluded}
+          />
+        </ToggleContainer>
+      </Section>
+
+      <Section
+        cypress="students-of-the-study-programme-section"
+        infoBoxContent={studyProgrammeToolTips.studentsOfTheStudyProgramme}
+        isError={basicsIsError}
+        isLoading={basicsIsLoading}
+        title="Students of the study programme"
+      >
+        {basics.isSuccess && basics.data && (
+          <Stack gap={2}>
+            {!isNewProgramme(studyProgramme) && (
+              <Alert severity="info" variant="outlined">
+                Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes
+              </Alert>
+            )}
+            <LineGraph
+              cypress="students-of-the-study-programme"
+              exportFileName={`oodikone_StudentsOfTheStudyProgramme_${studyProgramme}_${getTimestamp()}`}
+              graphStats={basics.data.graphStats}
+              years={basics.data.years}
+            />
+            <DataTable
+              cypress="students-of-the-study-programme"
+              data={basics.data.tableStats}
+              titles={basics.data.titles}
+            />
+          </Stack>
+        )}
+      </Section>
+
+      <Section
+        cypress="credits-produced-by-the-study-programme-section"
+        infoBoxContent={studyProgrammeToolTips.creditsProducedByTheStudyProgramme}
+        isError={creditsIsError}
+        isLoading={creditsIsLoading}
+        title="Credits produced by the study programme"
+      >
+        {creditGraphStats && tableStats && isDefaultServiceProvider() && (
+          <Stack gap={2}>
+            <Stack alignItems="center">
+              <Stack alignItems="center" direction="row">
+                <Switch checked={showAll} onChange={() => setShowAll(!showAll)} />
+                <Typography>Show special categories</Typography>
+              </Stack>
+            </Stack>
+            <StackedBarChart
+              cypress="credits-produced-by-the-study-programme"
+              data={creditGraphStats.data}
+              exportFileName={`oodikone_CreditsProducedByTheStudyProgramme_${studyProgramme}_${getTimestamp()}`}
+              labels={creditGraphStats.years}
+            />
+            <DataTable
+              cypress="credits-produced-by-the-study-programme"
+              data={tableStats.data}
+              titles={tableStats.titles}
+            />
+            {secondCreditGraphStats && secondTableStats && (
+              <Stack gap={2}>
+                <Typography variant="h6">Credits produced by the licentiate programme</Typography>
+                <StackedBarChart
+                  cypress="credits-produced-by-the-study-programme"
+                  data={secondCreditGraphStats.data}
+                  exportFileName={`oodikone_CreditsProducedByTheStudyProgramme_${studyProgramme}_${getTimestamp()}`}
+                  labels={secondCreditGraphStats.years}
                 />
                 <DataTable
-                  cypress="StudentsOfTheStudyProgramme"
-                  data={basics?.data?.tableStats}
-                  titles={basics?.data?.titles}
+                  cypress="credits-produced-by-the-study-programme-second"
+                  data={secondTableStats.data}
+                  titles={secondTableStats.titles}
                 />
-              </div>
-            </>
-          )}
-          {credits?.data?.stats?.[studyprogramme]?.stats && isDefaultServiceProvider() && (
-            <>
-              {getDivider('Credits produced by the study programme', 'creditsProducedByTheStudyProgramme')}
-              <CreditsProduced
-                academicYear={academicYear}
-                data={credits?.data?.stats?.[studyprogramme]?.stats}
-                secondData={credits?.data?.stats?.[combinedProgramme]?.stats}
+              </Stack>
+            )}
+          </Stack>
+        )}
+      </Section>
+
+      <Section
+        cypress="graduated-of-the-programme-section"
+        infoBoxContent={studyProgrammeToolTips.graduatedAndThesisWritersOfTheProgramme}
+        isError={graduationsIsError}
+        isLoading={graduationsIsLoading}
+        title={getGraduatedText(studyProgramme)}
+      >
+        {graduations.isSuccess && graduations.data && (
+          <Stack gap={2}>
+            <BarChart cypress="GraduatedAndgraduationsOfTheProgramme" data={graduations?.data} />
+            <DataTable
+              cypress="GraduatedAndgraduationsOfTheProgramme"
+              data={graduations?.data?.tableStats}
+              titles={graduations?.data?.titles}
+            />
+          </Stack>
+        )}
+      </Section>
+
+      <Section
+        cypress="average-graduation-times-section"
+        infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
+        isError={graduationsIsError}
+        isLoading={graduationsIsLoading}
+        title="Average graduation times"
+      >
+        {graduations.isSuccess && graduations.data && (
+          <Stack gap={2}>
+            <ToggleContainer>
+              <Toggle
+                cypress="GraduationTimeToggle"
+                firstLabel="Breakdown"
+                secondLabel="Median time"
+                setValue={setShowMedian}
+                value={showMedian}
               />
-            </>
-          )}
-          {graduations.isSuccess && graduations.data && (
-            <>
-              {getDivider(getGraduatedText(studyprogramme), 'graduatedAndThesisWritersOfTheProgramme')}
-              <div className="section-container">
-                <BarChart cypress="GraduatedAndThesisWritersOfTheProgramme" data={graduations?.data} />
-                <DataTable
-                  cypress="GraduatedAndThesisWritersOfTheProgramme"
-                  data={graduations?.data?.tableStats}
-                  titles={graduations?.data?.titles}
-                />
-              </div>
-              {getDivider('Average graduation times by year of graduation', 'averageGraduationTimes')}
-              <div className="toggle-container">
-                <Toggle
-                  cypress="GraduationTimeToggle"
-                  firstLabel="Breakdown"
-                  secondLabel="Median time"
-                  setValue={setShowMedian}
-                  value={showMedian}
-                />
-              </div>
-              <div className={`section-container${doCombo ? '' : '-centered'}`}>
-                {showMedian ? displayMedian() : displayBreakdown()}
-              </div>
-              {graduations?.data?.programmesBeforeOrAfterGraphStats?.length && (
-                <>
-                  {getDivider(
-                    studyprogramme.includes('KH')
-                      ? 'Primary master programme studies after this programme'
-                      : 'Primary bachelor programme studies before this programme',
-                    'programmesBeforeOrAfter'
-                  )}
-                  <div className="section-container">
-                    <StackedBarChart
-                      cypress="ProgrammesBeforeOrAfter"
-                      data={graduations?.data?.programmesBeforeOrAfterGraphStats.map(programme => ({
-                        ...programme,
-                        name: getTextIn(programme.name),
-                      }))}
-                      labels={graduations?.data?.years}
-                      wideTable
-                    />
-                    <DataTable
-                      data={graduations?.data?.programmesBeforeOrAfterTableStats.map(programme =>
-                        programme.with(2, getTextIn(programme[2]))
-                      )}
-                      titles={graduations?.data?.programmesBeforeOrAfterTitles}
-                      wideTable
-                    />
-                  </div>
-                </>
+            </ToggleContainer>
+            {showMedian ? (
+              <>
+                {doCombo && (
+                  <MedianTimeBarChart
+                    byStartYear={false}
+                    data={graduations?.data?.comboTimes?.medians}
+                    goal={graduations?.data?.comboTimes?.goal}
+                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  />
+                )}
+                {studyProgramme !== 'MH90_001' && (
+                  <MedianTimeBarChart
+                    byStartYear={false}
+                    data={timesData?.medians}
+                    goal={graduations?.data.graduationTimes?.goal}
+                    title={getGraduationGraphTitle(studyProgramme)}
+                  />
+                )}
+                {combinedProgramme && (
+                  <MedianTimeBarChart
+                    byStartYear={false}
+                    data={timesDataSecondProgramme?.medians}
+                    goal={graduations?.data.graduationTimesSecondProgramme?.goal}
+                    title={getGraduationGraphTitle(combinedProgramme, true)}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {doCombo && (
+                  <BreakdownBarChart
+                    data={graduations?.data?.comboTimes?.medians}
+                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  />
+                )}
+                {studyProgramme !== 'MH90_001' && (
+                  <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyProgramme)} />
+                )}
+                {combinedProgramme && (
+                  <BreakdownBarChart
+                    data={timesDataSecondProgramme?.medians}
+                    title={getGraduationGraphTitle(combinedProgramme, true)}
+                  />
+                )}
+              </>
+            )}
+          </Stack>
+        )}
+      </Section>
+
+      <Section
+        cypress="programmes-before-or-after-section"
+        infoBoxContent={studyProgrammeToolTips.programmesBeforeOrAfter}
+        isError={graduationsIsError}
+        isLoading={graduationsIsLoading}
+        title={
+          studyProgramme.includes('KH')
+            ? 'Primary master programme studies after this programme'
+            : 'Primary bachelor programme studies before this programme'
+        }
+      >
+        {graduations.isSuccess && graduations?.data?.programmesBeforeOrAfterGraphStats?.length && (
+          <Stack gap={2}>
+            <StackedBarChart
+              cypress="programmes-before-or-after"
+              data={graduations?.data?.programmesBeforeOrAfterGraphStats.map(programme => ({
+                ...programme,
+                name: getTextIn(programme.name),
+              }))}
+              exportFileName={`oodikone_graduations_${studyProgramme}_${getTimestamp()}`}
+              labels={graduations?.data?.years}
+            />
+            <DataTable
+              cypress="programmes-before-or-after"
+              data={graduations?.data?.programmesBeforeOrAfterTableStats.map(programme =>
+                programme.with(2, getTextIn(programme[2]))
               )}
-            </>
-          )}
-        </>
-      )}
-    </div>
+              titles={graduations?.data?.programmesBeforeOrAfterTitles}
+            />
+          </Stack>
+        )}
+      </Section>
+    </Stack>
   )
 }

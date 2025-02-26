@@ -2,7 +2,6 @@ import { Alert, Stack, Switch, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { makeGraphData, makeTableStats } from '@/components/common/CreditsProduced'
 import { LineGraph } from '@/components/material/LineGraph'
 import { Section } from '@/components/material/Section'
 import { StackedBarChart } from '@/components/material/StackedBarChart'
@@ -16,6 +15,7 @@ import {
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { NameWithCode } from '@/shared/types'
 import { DegreeProgramme, GetFacultiesResponse } from '@/types/api/faculty'
+import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getTimestamp } from '@/util/timeAndDate'
 import { InteractiveDataTable } from './InteractiveDataTable'
 

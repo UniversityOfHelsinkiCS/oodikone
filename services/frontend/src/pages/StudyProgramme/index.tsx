@@ -88,7 +88,7 @@ export const StudyProgramme = () => {
           setAcademicYear={setAcademicYear}
           setSpecialGroupsExcluded={setSpecialGroupsExcluded}
           specialGroupsExcluded={specialGroupsExcluded}
-          studyprogramme={programmeId}
+          studyProgramme={programmeId}
         />
       ),
     },

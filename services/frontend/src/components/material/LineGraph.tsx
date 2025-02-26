@@ -4,7 +4,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { Section } from '@/components/material/Section'
-import { GraphStat } from '@/types/api/faculty'
+import { GraphStat } from '@/types/graphStat'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
