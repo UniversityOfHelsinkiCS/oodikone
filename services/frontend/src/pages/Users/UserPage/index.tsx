@@ -1,5 +1,6 @@
 import { Alert, Box, Container, Stack } from '@mui/material'
 
+import { isDefaultServiceProvider } from '@/common'
 import { Loading } from '@/components/material/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
@@ -34,9 +35,11 @@ export const UserPage = ({ userId }: { userId: string }) => {
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
         <Box gap={2} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
-          <Box flex={1}>
-            <IamGroupsCard user={user} />
-          </Box>
+          {isDefaultServiceProvider() && (
+            <Box flex={1}>
+              <IamGroupsCard user={user} />
+            </Box>
+          )}
           <Box flex={2}>
             <RolesCard user={user} />
           </Box>
