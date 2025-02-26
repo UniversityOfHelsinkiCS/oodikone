@@ -171,7 +171,7 @@ export const StudyProgramme = () => {
           variant="scrollable"
         >
           {tabs.map(tab => (
-            <Tab key={tab.key} label={tab.label} />
+            <Tab data-cy={tab.cypress} key={tab.key} label={tab.label} />
           ))}
         </Tabs>
         {tabs.map(tab => currentTab === tabs.indexOf(tab) && tab.component)}
