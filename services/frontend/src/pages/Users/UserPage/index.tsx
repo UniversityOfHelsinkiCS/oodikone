@@ -33,7 +33,7 @@ export const UserPage = ({ userId }: { userId: string }) => {
       <Stack direction="column" gap={2}>
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
-        <Box display="flex" gap={2}>
+        <Box gap={2} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
           <Box flex={1}>
             <IamGroupsCard user={user} />
           </Box>
