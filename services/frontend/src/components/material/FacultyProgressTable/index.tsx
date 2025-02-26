@@ -2,7 +2,6 @@ import { Collapse, TableBody, TableCell, TableContainer, TableHead, TableRow } f
 import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'
-import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@/shared/types'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
@@ -38,59 +37,57 @@ export const FacultyProgressTable = ({
   const getKey = (value: number | string, index: number) => `${value}-${index}`
 
   return (
-    <Section>
-      <TableContainer>
-        <StyledTable data-cy={cypress} showCellBorders size="small">
-          <TableHead>
-            <TableRow>
-              {titles.map(title => (
-                <TableCell align="right" key={title}>
-                  {title}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((yearArray, yearIndex) => (
-              <Fragment key={yearArray[0]}>
-                {!isTotalRow(yearArray) ? (
-                  <>
-                    <ExpandableRow
-                      cypress={visibleYears[yearIndex] ? `${cypress}HideButton` : `${cypress}ShowButton`}
-                      toggleVisibility={() => toggleVisibility(yearIndex)}
-                      visible={visibleYears[yearIndex]}
-                      yearArray={yearArray}
-                      yearIndex={yearIndex}
-                    />
-                    {visibleYears[yearIndex] && (
-                      <TableRow>
-                        <TableCell colSpan={100}>
-                          <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
-                            <ProgrammeProgressChart
-                              data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
-                              labels={sortedKeys}
-                              longLabels={programmeNames}
-                              names={progressTitles ? progressTitles[yearIndex] : titles.slice(2)}
-                            />
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
-                ) : (
-                  <TableRow>
-                    {yearArray.map((value, index) => (
-                      <TableCell align="right" key={getKey(value, index)}>
-                        <b>{value}</b>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                )}
-              </Fragment>
+    <TableContainer>
+      <StyledTable data-cy={cypress} showCellBorders size="small">
+        <TableHead>
+          <TableRow>
+            {titles.map(title => (
+              <TableCell align="right" key={title}>
+                {title}
+              </TableCell>
             ))}
-          </TableBody>
-        </StyledTable>
-      </TableContainer>
-    </Section>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((yearArray, yearIndex) => (
+            <Fragment key={yearArray[0]}>
+              {!isTotalRow(yearArray) ? (
+                <>
+                  <ExpandableRow
+                    cypress={visibleYears[yearIndex] ? `${cypress}HideButton` : `${cypress}ShowButton`}
+                    toggleVisibility={() => toggleVisibility(yearIndex)}
+                    visible={visibleYears[yearIndex]}
+                    yearArray={yearArray}
+                    yearIndex={yearIndex}
+                  />
+                  {visibleYears[yearIndex] && (
+                    <TableRow>
+                      <TableCell colSpan={100}>
+                        <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
+                          <ProgrammeProgressChart
+                            data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
+                            labels={sortedKeys}
+                            longLabels={programmeNames}
+                            names={progressTitles ? progressTitles[yearIndex] : titles.slice(2)}
+                          />
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </>
+              ) : (
+                <TableRow>
+                  {yearArray.map((value, index) => (
+                    <TableCell align="right" key={getKey(value, index)}>
+                      <b>{value}</b>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )}
+            </Fragment>
+          ))}
+        </TableBody>
+      </StyledTable>
+    </TableContainer>
   )
 }

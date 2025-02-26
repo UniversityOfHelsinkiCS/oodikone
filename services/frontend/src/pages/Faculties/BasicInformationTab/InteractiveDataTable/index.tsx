@@ -4,7 +4,6 @@ import { Fragment, useState } from 'react'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { InfoBox } from '@/components/material/InfoBox'
-import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@/shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
@@ -112,80 +111,78 @@ export const InteractiveDataTable = ({
   const differenceToPrevYears = calculateDiffToPrevYear(dataProgrammeStats)
 
   return (
-    <Section>
-      <TableContainer>
-        <StyledTable data-cy={`${cypress}InteractiveDataTable`} showCellBorders size="small">
-          <TableHead>
-            <TableRow>
-              {titles.map((title, index) => (
-                <TableCell key={title}>
-                  <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
-                    {index === 0 && (
-                      <Box sx={{ marginRight: 1 }}>
-                        <InfoBox content={facultyToolTips.interactiveDataTable} mini />
-                      </Box>
-                    )}
-                    <TableSortLabel
-                      active={sorter === sorterNames[index]}
-                      direction={sortDirection}
-                      onClick={() => handleSortClick(sorterNames[index], index)}
-                    >
-                      {title}
-                    </TableSortLabel>
-                  </Box>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataStats?.map((yearArray, yearIndex) => (
-              <Fragment key={yearArray[0]}>
-                <ExpandableRow
-                  cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
-                  toggleVisibility={() => toggleVisibility(yearIndex)}
-                  visible={visible[yearIndex]}
-                  yearArray={yearArray}
-                  yearIndex={yearIndex}
-                />
-                <TableRow style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                  <TableCell colSpan={100}>
-                    <CollapsedStackedBar
-                      data={
-                        columnIndex === 0
-                          ? sortedKeys
-                              ?.map(programme =>
-                                dataProgrammeStats[programme]
-                                  ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                                  : null
-                              )
-                              .filter(programme => !!programme)
-                          : keyOrder[yearIndex]
-                              ?.map(programme =>
-                                dataProgrammeStats[programme]
-                                  ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                                  : null
-                              )
-                              .filter(programme => !!programme)
-                      }
-                      differenceData={Object.keys(differenceToPrevYears)?.reduce(
-                        (yearlyObject, programme) => ({
-                          ...yearlyObject,
-                          [programme]: differenceToPrevYears[programme][yearIndex],
-                        }),
-                        {}
-                      )}
-                      labels={columnIndex === 0 ? sortedKeys : keyOrder[yearIndex]}
-                      longLabels={programmeNames}
-                      names={titles?.slice(sliceStart)}
-                      plotLinePlaces={plotLinePlaces}
-                    />
-                  </TableCell>
-                </TableRow>
-              </Fragment>
+    <TableContainer>
+      <StyledTable data-cy={`${cypress}InteractiveDataTable`} showCellBorders size="small">
+        <TableHead>
+          <TableRow>
+            {titles.map((title, index) => (
+              <TableCell key={title}>
+                <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
+                  {index === 0 && (
+                    <Box sx={{ marginRight: 1 }}>
+                      <InfoBox content={facultyToolTips.interactiveDataTable} mini />
+                    </Box>
+                  )}
+                  <TableSortLabel
+                    active={sorter === sorterNames[index]}
+                    direction={sortDirection}
+                    onClick={() => handleSortClick(sorterNames[index], index)}
+                  >
+                    {title}
+                  </TableSortLabel>
+                </Box>
+              </TableCell>
             ))}
-          </TableBody>
-        </StyledTable>
-      </TableContainer>
-    </Section>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {dataStats?.map((yearArray, yearIndex) => (
+            <Fragment key={yearArray[0]}>
+              <ExpandableRow
+                cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
+                toggleVisibility={() => toggleVisibility(yearIndex)}
+                visible={visible[yearIndex]}
+                yearArray={yearArray}
+                yearIndex={yearIndex}
+              />
+              <TableRow style={{ display: visible[yearIndex] ? '' : 'none' }}>
+                <TableCell colSpan={100}>
+                  <CollapsedStackedBar
+                    data={
+                      columnIndex === 0
+                        ? sortedKeys
+                            ?.map(programme =>
+                              dataProgrammeStats[programme]
+                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
+                                : null
+                            )
+                            .filter(programme => !!programme)
+                        : keyOrder[yearIndex]
+                            ?.map(programme =>
+                              dataProgrammeStats[programme]
+                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
+                                : null
+                            )
+                            .filter(programme => !!programme)
+                    }
+                    differenceData={Object.keys(differenceToPrevYears)?.reduce(
+                      (yearlyObject, programme) => ({
+                        ...yearlyObject,
+                        [programme]: differenceToPrevYears[programme][yearIndex],
+                      }),
+                      {}
+                    )}
+                    labels={columnIndex === 0 ? sortedKeys : keyOrder[yearIndex]}
+                    longLabels={programmeNames}
+                    names={titles?.slice(sliceStart)}
+                    plotLinePlaces={plotLinePlaces}
+                  />
+                </TableCell>
+              </TableRow>
+            </Fragment>
+          ))}
+        </TableBody>
+      </StyledTable>
+    </TableContainer>
   )
 }

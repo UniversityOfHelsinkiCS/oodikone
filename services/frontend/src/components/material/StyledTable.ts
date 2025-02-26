@@ -5,6 +5,9 @@ export const StyledTable = styled(Table, {
   shouldForwardProp: prop => prop !== 'showCellBorders',
 })<{ showCellBorders?: boolean }>(({ theme, showCellBorders }) => {
   return {
+    border: `1px solid ${theme.palette.grey[300]}`,
+    borderRadius: theme.shape.borderRadius,
+    borderCollapse: 'separate',
     '& tr': {
       border: `1px solid ${theme.palette.grey[300]}`,
       '&:hover': {

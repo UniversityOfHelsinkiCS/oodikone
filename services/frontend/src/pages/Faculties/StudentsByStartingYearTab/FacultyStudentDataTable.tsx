@@ -20,7 +20,6 @@ import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { InfoBox } from '@/components/material/InfoBox'
 import { PopulationLink } from '@/components/material/PopulationLink'
-import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
 
@@ -123,108 +122,106 @@ export const FacultyStudentDataTable = ({
     "Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for study programmes."
 
   return (
-    <Section>
-      <TableContainer>
-        <StyledTable data-cy={cypress} showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
-          <TableHead>
-            <TableRow key="FirstHeader">
-              <TableCell colSpan={!showPercentages ? 3 : 4} />
-              <TableCell colSpan={!showPercentages ? 4 : 8}>Current status</TableCell>
-              <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
-              <TableCell colSpan={!showPercentages ? 2 : 4}>
-                <Stack direction="row" gap={1}>
-                  Citizenships
-                  <InfoBox content={infoText} mini />
-                </Stack>
+    <TableContainer>
+      <StyledTable data-cy={cypress} showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
+        <TableHead>
+          <TableRow key="FirstHeader">
+            <TableCell colSpan={!showPercentages ? 3 : 4} />
+            <TableCell colSpan={!showPercentages ? 4 : 8}>Current status</TableCell>
+            <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
+            <TableCell colSpan={!showPercentages ? 2 : 4}>
+              <Stack direction="row" gap={1}>
+                Citizenships
+                <InfoBox content={infoText} mini />
+              </Stack>
+            </TableCell>
+          </TableRow>
+          <TableRow key="secondHeader">
+            {titles.map((title, index) => (
+              <TableCell
+                colSpan={[0, 1].includes(index) || !showPercentages ? 1 : 2}
+                key={title}
+                sx={{ textAlign: 'right' }}
+              >
+                {title}
               </TableCell>
-            </TableRow>
-            <TableRow key="secondHeader">
-              {titles.map((title, index) => (
-                <TableCell
-                  colSpan={[0, 1].includes(index) || !showPercentages ? 1 : 2}
-                  key={title}
-                  sx={{ textAlign: 'right' }}
-                >
-                  {title}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {years.map((year, yearIndex) => {
-              return (
-                <Fragment key={`${year}-fragment`}>
-                  <TableRow key={`${year}-faculty-row}`}>
-                    {tableStats[year]?.map((value, valueIndex) => {
-                      if (valueIndex === 0)
-                        return (
-                          <TableCell key={`${year}-faculty-cell}`}>
-                            <Box
-                              alignItems="center"
-                              data-cy={`Button-${cypress}-${yearIndex}`}
-                              display="flex"
-                              justifyContent="center"
-                              key={`${year}-studentsTableButton}`}
-                            >
-                              <IconButton
-                                data-cy={`${cypress}${yearIndex}`}
-                                onClick={() => toggleVisibility(yearIndex)}
-                                size="small"
-                              >
-                                {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                              </IconButton>
-                              <Typography variant="body2">{value}</Typography>
-                            </Box>
-                          </TableCell>
-                        )
-                      if (
-                        !showPercentages &&
-                        typeof value === 'string' &&
-                        (value.includes('%') || value.includes('NA'))
-                      ) {
-                        return null
-                      }
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {years.map((year, yearIndex) => {
+            return (
+              <Fragment key={`${year}-fragment`}>
+                <TableRow key={`${year}-faculty-row}`}>
+                  {tableStats[year]?.map((value, valueIndex) => {
+                    if (valueIndex === 0)
                       return (
-                        <TableCell
-                          key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
-                          sx={{ textAlign: 'right' }}
-                        >
-                          {value}
+                        <TableCell key={`${year}-faculty-cell}`}>
+                          <Box
+                            alignItems="center"
+                            data-cy={`Button-${cypress}-${yearIndex}`}
+                            display="flex"
+                            justifyContent="center"
+                            key={`${year}-studentsTableButton}`}
+                          >
+                            <IconButton
+                              data-cy={`${cypress}${yearIndex}`}
+                              onClick={() => toggleVisibility(yearIndex)}
+                              size="small"
+                            >
+                              {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                            </IconButton>
+                            <Typography variant="body2">{value}</Typography>
+                          </Box>
                         </TableCell>
                       )
-                    })}
-                  </TableRow>
-                  {yearsVisible[yearIndex] &&
-                    sortedKeys.map(programme => {
-                      return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
-                        <TableRow key={`${year}-regular-row-${programme}`}>
-                          <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
-                            <Stack alignItems="center" direction="row" gap={0.5}>
-                              <Tooltip
-                                title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
-                              >
-                                <b>{programmeNames[programme].progId}</b>
-                              </Tooltip>
-                              {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                                (requiredRights.fullAccessToStudentData && (
-                                  <PopulationLink
-                                    studyProgramme={programmeNames[programme].code}
-                                    year={year}
-                                    years={getCalendarYears(years)}
-                                  />
-                                ))}
-                            </Stack>
-                          </TableCell>
-                          {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
-                        </TableRow>
-                      )
-                    })}
-                </Fragment>
-              )
-            })}
-          </TableBody>
-        </StyledTable>
-      </TableContainer>
-    </Section>
+                    if (
+                      !showPercentages &&
+                      typeof value === 'string' &&
+                      (value.includes('%') || value.includes('NA'))
+                    ) {
+                      return null
+                    }
+                    return (
+                      <TableCell
+                        key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
+                        sx={{ textAlign: 'right' }}
+                      >
+                        {value}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+                {yearsVisible[yearIndex] &&
+                  sortedKeys.map(programme => {
+                    return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
+                      <TableRow key={`${year}-regular-row-${programme}`}>
+                        <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
+                          <Stack alignItems="center" direction="row" gap={0.5}>
+                            <Tooltip
+                              title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
+                            >
+                              <b>{programmeNames[programme].progId}</b>
+                            </Tooltip>
+                            {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
+                              (requiredRights.fullAccessToStudentData && (
+                                <PopulationLink
+                                  studyProgramme={programmeNames[programme].code}
+                                  year={year}
+                                  years={getCalendarYears(years)}
+                                />
+                              ))}
+                          </Stack>
+                        </TableCell>
+                        {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
+                      </TableRow>
+                    )
+                  })}
+              </Fragment>
+            )
+          })}
+        </TableBody>
+      </StyledTable>
+    </TableContainer>
   )
 }
