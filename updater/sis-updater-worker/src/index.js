@@ -17,6 +17,7 @@ const { loadMapsOnDemand } = require('./updater/shared')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
+require('./worker')
 
 const handleMessage = messageHandler => async msg => {
   let data = null
