@@ -6,7 +6,6 @@ const { chunk } = require('lodash')
 const {
   NATS_GROUP,
   SIS_UPDATER_SCHEDULE_CHANNEL,
-  SIS_MISC_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
   isDev,
   DEV_SCHEDULE_COUNT,
@@ -19,6 +18,7 @@ const {
 } = require('./config')
 const { knexConnection } = require('./db/connection')
 const { startPrePurge, startPurge } = require('./purge')
+const { queue } = require('./queue')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
@@ -213,12 +213,8 @@ const scheduleByStudentNumbers = async studentNumbers => {
   logger.info('Scheduling by student numbers')
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
-
-  await eachLimit(
-    chunk(personsToUpdate, CHUNK_SIZE),
-    10,
-    async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL)
-  )
+  const personChunks = chunk(personsToUpdate, CHUNK_SIZE)
+  await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students', data: personsToUpdate })))
 }
 
 const scheduleByCourseCodes = async courseCodes => {

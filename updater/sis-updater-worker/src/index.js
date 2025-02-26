@@ -1,7 +1,6 @@
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_CHANNEL,
-  SIS_MISC_SCHEDULE_CHANNEL,
   NATS_GROUP,
   REDIS_TOTAL_META_KEY,
   REDIS_TOTAL_STUDENTS_KEY,
@@ -12,7 +11,7 @@ const {
 const { dbConnections } = require('./db/connection')
 const { postUpdate } = require('./postUpdate')
 const { update } = require('./updater')
-const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
+const { purge, prePurge } = require('./updater/purge')
 const { loadMapsOnDemand } = require('./updater/shared')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
@@ -111,13 +110,6 @@ const purgeMsgHandler = async purgeMsg => {
   if (purgeMsg.action === 'PREPURGE_START') await prePurge(purgeMsg)
 }
 
-const miscMsgHandler = async miscMessage => {
-  const studentNumbers = miscMessage.entityIds.map(s => s.student_number)
-  const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id) }
-  await purgeByStudentNumber(studentNumbers)
-  await updateMsgHandler(msgInUpdateFormat)
-}
-
 stan.on('error', error => {
   logger.error({ message: 'NATS connection failed', meta: error })
   if (!process.env.CI) process.exit(1)
@@ -150,10 +142,4 @@ dbConnections.on('connect', async () => {
 
   const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
   infoChannel.on('message', handleMessage(handleInfoMessage))
-
-  const miscChannel = stan.subscribe(SIS_MISC_SCHEDULE_CHANNEL, NATS_GROUP, opts)
-  miscChannel.on('message', handleMessage(miscMsgHandler))
-  miscChannel.on('error', error => {
-    logger.error({ message: 'Misc channel error', meta: error.stack })
-  })
 })
