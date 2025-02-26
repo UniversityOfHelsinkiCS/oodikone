@@ -1,10 +1,17 @@
+import { Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Button } from 'semantic-ui-react'
 
-import { UpdateStatusIcon } from '@/components/common/UpdateStatusIcon'
+import { Section } from '@/components/material/Section'
+import { UpdateButton } from '@/components/material/UpdateButton'
 import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/studyProgramme'
 
-export const UpdateStatisticsTab = ({ combinedProgramme, studyProgramme }) => {
+export const UpdateStatisticsTab = ({
+  combinedProgramme,
+  studyProgramme,
+}: {
+  combinedProgramme: string
+  studyProgramme: string
+}) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipStudyTrack, setSkipStudyTrack] = useState(true)
 
@@ -15,31 +22,18 @@ export const UpdateStatisticsTab = ({ combinedProgramme, studyProgramme }) => {
   )
 
   return (
-    <div className="update-view">
-      <div className="button-container">
-        <h4>Update data on Basic information view</h4>
-        <Button
-          color="blue"
-          data-cy="updatebasicinfo"
-          disabled={basicStats.isLoading}
-          onClick={() => setSkipBasic(false)}
-        >
-          Update
-        </Button>
-        <UpdateStatusIcon stats={basicStats} />
-      </div>
-      <div className="button-container">
-        <h4>Update data on Study tracks and class statistics view</h4>
-        <Button
-          color="blue"
-          data-cy="updatepopulations"
-          disabled={studyTrackStats.isLoading}
-          onClick={() => setSkipStudyTrack()}
-        >
-          Update
-        </Button>
-        <UpdateStatusIcon stats={studyTrackStats} />
-      </div>
-    </div>
+    <Section title="Update data">
+      <Stack gap={2}>
+        <Typography>Click an Update button to update the data on the corresponding tab</Typography>
+        <Typography component="h3" variant="h6">
+          Update Basic information
+        </Typography>
+        <UpdateButton onClick={() => setSkipBasic(false)} stats={basicStats} />
+        <Typography component="h3" variant="h6">
+          Update Study tracks and class statistics
+        </Typography>
+        <UpdateButton onClick={() => setSkipStudyTrack(false)} stats={studyTrackStats} />
+      </Stack>
+    </Section>
   )
 }
