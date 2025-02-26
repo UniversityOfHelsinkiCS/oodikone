@@ -8,6 +8,7 @@ module.exports.SIS_PURGE_CHANNEL = 'SIS_PURGE_CHANNEL'
 module.exports.MIGRATIONS_LOCK = 'MIGRATIONS_LOCK'
 module.exports.PURGE_LOCK = 'PURGE_LOCK'
 module.exports.REDIS_HOST = process.env.REDIS_HOST
+module.exports.REDIS_PORT = process.env.REDIS_PORT || 6379
 module.exports.REDIS_TOTAL_META_KEY = 'TOTAL_META'
 module.exports.REDIS_TOTAL_STUDENTS_KEY = 'TOTAL_STUDENTS'
 module.exports.REDIS_TOTAL_META_DONE_KEY = 'TOTAL_META_DONE'

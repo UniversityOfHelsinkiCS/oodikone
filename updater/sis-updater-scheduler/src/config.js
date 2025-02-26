@@ -16,6 +16,7 @@ module.exports.LATEST_MESSAGE_RECEIVED_THRESHOLD = 1000 * 60 * 5
 module.exports.REDIS_LAST_WEEKLY_SCHEDULE = 'LAST_WEEKLY_SCHEDULE'
 module.exports.REDIS_LAST_PREPURGE_INFO = 'LAST_PREPURGE_INFO'
 module.exports.REDIS_HOST = process.env.REDIS_HOST
+module.exports.REDIS_PORT = process.env.REDIS_PORT || 6379
 
 module.exports.EXIT_AFTER_IMMEDIATES = process.env.EXIT_AFTER_IMMEDIATES === 'yes'
 module.exports.SCHEDULE_IMMEDIATE = process.env.SCHEDULE_IMMEDIATE?.split(',') || []
