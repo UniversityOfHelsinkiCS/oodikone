@@ -3,13 +3,14 @@ import { useState } from 'react'
 import { useParams } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { Language } from '@/shared/language'
+import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { BasicInformationTab } from './BasicInformationTab'
@@ -23,14 +24,14 @@ import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 const getProgrammeName = (
   studyProgrammeId: string,
   combibedProgrammeId: string,
-  programmes,
+  programmes: Record<string, DegreeProgramme> | undefined,
   language: Language,
-  getTextIn
+  getTextIn: GetTextIn
 ) => {
   if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId]) {
     return getCombinedProgrammeName(
-      getTextIn(programmes?.[studyProgrammeId].name),
-      getTextIn(programmes?.[combibedProgrammeId].name),
+      getTextIn(programmes?.[studyProgrammeId].name)!,
+      getTextIn(programmes?.[combibedProgrammeId].name)!,
       language
     )
   }
@@ -53,7 +54,7 @@ export const StudyProgramme = () => {
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const [tab, setTab] = useTabs(isAdmin ? 6 : 5)
+  const [currentTab, setCurrentTab] = useTabs(isAdmin ? 6 : 5)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -70,10 +71,91 @@ export const StudyProgramme = () => {
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
 
-  const otherTabsVisible =
+  const otherTabsVisible: boolean =
     fullAccessToStudentData ||
     fullStudyProgrammeRights.includes(programmeId) ||
     fullStudyProgrammeRights.includes(secondProgrammeId)
+
+  const tabs = [
+    {
+      key: 'BasicInformationTab',
+      cypress: 'basic-information-tab',
+      label: 'Basic information',
+      component: (
+        <BasicInformationTab
+          academicYear={academicYear}
+          combinedProgramme={secondProgrammeId}
+          setAcademicYear={setAcademicYear}
+          setSpecialGroupsExcluded={setSpecialGroupsExcluded}
+          specialGroupsExcluded={specialGroupsExcluded}
+          studyprogramme={programmeId}
+        />
+      ),
+    },
+    {
+      key: 'StudyTracksAndClassStatisticsTab',
+      cypress: 'study-tracks-and-class-statistics-tab',
+      label: 'Study tracks and class statistics',
+      component: (
+        <StudyTracksAndClassStatisticsTab
+          combinedProgramme={secondProgrammeId}
+          graduated={graduated}
+          setGraduated={setGraduated}
+          setSpecialGroupsExcluded={setSpecialGroupsExcluded}
+          specialGroupsExcluded={specialGroupsExcluded}
+          studyProgramme={programmeId}
+        />
+      ),
+    },
+  ]
+
+  if (otherTabsVisible && isDefaultServiceProvider()) {
+    tabs.push({
+      key: 'ProgrammeCoursesTab',
+      cypress: 'programme-courses-tab',
+      label: 'Programme courses',
+      component: (
+        <ProgrammeCoursesTab
+          academicYear={academicYear}
+          combinedProgramme={secondProgrammeId}
+          setAcademicYear={setAcademicYear}
+          studyProgramme={programmeId}
+        />
+      ),
+    })
+  }
+
+  if (otherTabsVisible) {
+    tabs.push(
+      {
+        key: 'DegreeCoursesTab',
+        cypress: 'degree-courses-tab',
+        label: 'Degree courses',
+        component: (
+          <DegreeCoursesTab
+            combinedProgramme={secondProgrammeId}
+            studyProgramme={programmeId}
+            year={`${new Date().getFullYear()}`}
+          />
+        ),
+      },
+      {
+        key: 'TagsTab',
+        cypress: 'tags-tab',
+        label: 'Tags',
+        component: <TagsTab combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />,
+      }
+    )
+  }
+
+  if (isAdmin) {
+    tabs.push({
+      key: 'UpdateStatisticsTab',
+      cypress: 'update-statistics-tab',
+      label: 'Update statistics',
+      component: <UpdateStatisticsTab combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />,
+    })
+  }
 
   return (
     <Container maxWidth="lg">
@@ -82,57 +164,17 @@ export const StudyProgramme = () => {
         title={programmeName}
       />
       <Stack gap={2}>
-        <Tabs data-cy="StudyProgrammeTabs" onChange={(_event, newTab) => setTab(newTab)} value={tab}>
-          <Tab data-cy="BasicInformationTab" label="Basic information" />
-          <Tab data-cy="StudyTracksAndClassStatisticsTab" label="Study tracks and class statistics" />
-          {otherTabsVisible && isDefaultServiceProvider() && (
-            <Tab data-cy="ProgrammeCoursesTab" label="Programme courses" />
-          )}
-          {otherTabsVisible && <Tab data-cy="DegreeCoursesTab" label="Degree courses" />}
-          {otherTabsVisible && <Tab data-cy="TagsTab" label="Tags" />}
-          {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
+        <Tabs
+          data-cy="study-programme-tabs"
+          onChange={(_event, newTab) => setCurrentTab(newTab)}
+          value={currentTab}
+          variant="scrollable"
+        >
+          {tabs.map(tab => (
+            <Tab key={tab.key} label={tab.label} />
+          ))}
         </Tabs>
-        {tab === 0 && (
-          <BasicInformationTab
-            academicYear={academicYear}
-            combinedProgramme={secondProgrammeId}
-            setAcademicYear={setAcademicYear}
-            setSpecialGroupsExcluded={setSpecialGroupsExcluded}
-            specialGroupsExcluded={specialGroupsExcluded}
-            studyprogramme={programmeId}
-          />
-        )}
-        {tab === 1 && (
-          <StudyTracksAndClassStatisticsTab
-            combinedProgramme={secondProgrammeId}
-            graduated={graduated}
-            setGraduated={setGraduated}
-            setSpecialGroupsExcluded={setSpecialGroupsExcluded}
-            specialGroupsExcluded={specialGroupsExcluded}
-            studyProgramme={programmeId}
-          />
-        )}
-        {tab === 2 && otherTabsVisible && isDefaultServiceProvider() && (
-          <ProgrammeCoursesTab
-            academicYear={academicYear}
-            combinedProgramme={secondProgrammeId}
-            setAcademicYear={setAcademicYear}
-            studyProgramme={programmeId}
-          />
-        )}
-        {tab === 3 && otherTabsVisible && (
-          <DegreeCoursesTab
-            combinedProgramme={secondProgrammeId}
-            studyProgramme={programmeId}
-            year={`${new Date().getFullYear()}`}
-          />
-        )}
-        {tab === 4 && otherTabsVisible && (
-          <TagsTab combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />
-        )}
-        {tab === 5 && isAdmin && (
-          <UpdateStatisticsTab combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />
-        )}
+        {tabs.map(tab => currentTab === tabs.indexOf(tab) && tab.component)}
       </Stack>
     </Container>
   )
