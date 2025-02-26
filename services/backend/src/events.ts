@@ -1,6 +1,6 @@
 import { CronJob } from 'cron'
 
-import { isProduction, runningInCI, languageCenterViewEnabled } from './config'
+import { isProduction, runningInCI, languageCenterViewEnabled, CRON_SCHEDULE } from './config'
 import { getDegreeProgrammesOfFaculty } from './services/faculty/faculty'
 import { getFaculties } from './services/faculty/facultyHelpers'
 import { updateFacultyOverview, updateFacultyProgressOverview } from './services/faculty/facultyUpdates'
@@ -105,8 +105,8 @@ const dailyJobs = async () => {
 
 export const startCron = () => {
   if (isProduction && !runningInCI) {
-    logger.info('Cronjob for refreshing stats started: runs daily at 23:00')
-    schedule('0 23 * * *', async () => {
+    logger.info(`Cronjob for refreshing stats started: runs at "${CRON_SCHEDULE}"`)
+    schedule(CRON_SCHEDULE, async () => {
       logger.info('Running daily jobs from cron')
       await dailyJobs()
     })

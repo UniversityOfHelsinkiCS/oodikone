@@ -56,6 +56,7 @@ let DB_MAX_CRON_CONNECTIONS = DB_MAX_CONNECTIONS - 5
 if (DB_MAX_CRON_CONNECTIONS < 1) {
   DB_MAX_CRON_CONNECTIONS = 1
 }
+const CRON_SCHEDULE = process.env.CRON_SCHEDULE || '0 23 * * *' // Default to 23:00 daily
 
 const redis = process.env.REDIS
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
@@ -70,6 +71,7 @@ module.exports = {
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
   DB_MAX_CRON_CONNECTIONS,
+  CRON_SCHEDULE,
   redis,
   SECRET_TOKEN,
   DB_SCHEMA_KONE,
