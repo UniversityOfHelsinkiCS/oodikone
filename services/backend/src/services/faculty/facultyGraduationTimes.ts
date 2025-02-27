@@ -171,54 +171,44 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     classSizes.programmes[code] = classSizesByYear
 
     if (!medians[level]) {
-      medians[level] = cloneDeep(basicStats).map(year => {
-        if (!classSizes[level]) {
-          classSizes[level] = {}
-        }
-        classSizes[level][year.name] = year.classSize
-        return { ...omit(year, ['y', 'classSize']), median: year.y }
-      })
-    } else {
-      for (const statsForYear of basicStats) {
-        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+      medians[level] = cloneDeep(basicStats).map(year => ({ ...omit(year, ['y', 'classSize']), median: year.y }))
+    }
+    classSizes[level] ??= {}
+    for (const statsForYear of basicStats) {
+      classSizes[level][statsForYear.name] ??= 0
+      ;(classSizes[level][statsForYear.name] as number) += statsForYear.classSize
+      const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
+      if (!correctYear) {
+        medians[level].push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+        continue
+      }
+      correctYear.times.push(...statsForYear.times)
+      correctYear.median = getMedian(correctYear.times)
+      correctYear.amount += statsForYear.amount
+      correctYear.statistics.onTime += statsForYear.statistics.onTime
+      correctYear.statistics.yearOver += statsForYear.statistics.yearOver
+      correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+    }
+
+    if (level === 'master' && comboStats.length) {
+      if (!medians.bcMsCombo) {
+        medians.bcMsCombo = cloneDeep(comboStats).map(year => ({ ...omit(year, ['y', 'classSize']), median: year.y }))
+      }
+      classSizes.bcMsCombo ??= {}
+      for (const statsForYear of comboStats) {
+        classSizes.bcMsCombo[statsForYear.name] ??= 0
+        ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize
+        const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
         if (!correctYear) {
-          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+          medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
           continue
         }
-        ;(classSizes[level][statsForYear.name] as number) += statsForYear.classSize
         correctYear.times.push(...statsForYear.times)
         correctYear.median = getMedian(correctYear.times)
         correctYear.amount += statsForYear.amount
         correctYear.statistics.onTime += statsForYear.statistics.onTime
         correctYear.statistics.yearOver += statsForYear.statistics.yearOver
         correctYear.statistics.wayOver += statsForYear.statistics.wayOver
-      }
-    }
-
-    if (level === 'master' && comboStats.length) {
-      if (!medians.bcMsCombo) {
-        medians.bcMsCombo = cloneDeep(comboStats).map(year => {
-          if (!classSizes.bcMsCombo) {
-            classSizes.bcMsCombo = {}
-          }
-          classSizes.bcMsCombo[year.name] = year.classSize
-          return { ...omit(year, ['y', 'classSize']), median: year.y }
-        })
-      } else {
-        for (const statsForYear of comboStats) {
-          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
-          if (!correctYear) {
-            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
-            continue
-          }
-          ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize
-          correctYear.times.push(...statsForYear.times)
-          correctYear.median = getMedian(correctYear.times)
-          correctYear.amount += statsForYear.amount
-          correctYear.statistics.onTime += statsForYear.statistics.onTime
-          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
-          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
-        }
       }
     }
 
