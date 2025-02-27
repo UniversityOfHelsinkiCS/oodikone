@@ -5,8 +5,8 @@ import { getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { GraduationTimes } from '@/components/GraduationTimes'
 import { InfoBox } from '@/components/InfoBox'
-import { BreakdownBarChart } from '@/pages/StudyProgramme/BreakdownBarChart'
-import { MedianTimeBarChart } from '@/pages/StudyProgramme/MedianTimeBarChart'
+import { BreakdownBarChart } from '@/components/material/BreakdownBarChart'
+import { MedianTimeBarChart } from '@/components/material/MedianTimeBarChart'
 import { Toggle } from '@/pages/StudyProgramme/Toggle'
 import '@/pages/StudyProgramme/studyprogramme.css'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
@@ -147,15 +147,15 @@ export const StudyTracksAndClassStatisticsTab = ({
           <StudyTrackSelector setTrack={setTrack} studyTracks={stats?.data?.studyTracks} track={track} />
           <div className="toggle-container">
             <Toggle
-              cypress="StudentToggle"
+              cypress="study-right-toggle"
               firstLabel="All study rights"
               secondLabel="Special study rights excluded"
               setValue={setSpecialGroupsExcluded}
-              toolTips={studyProgrammeToolTips.studentToggle}
+              toolTips={studyProgrammeToolTips.studyRightToggle}
               value={specialGroupsExcluded}
             />
             <Toggle
-              cypress="GraduatedToggle"
+              cypress="graduated-toggle"
               firstLabel="Graduated included"
               secondLabel="Graduated excluded"
               setValue={setGraduated}
@@ -209,7 +209,7 @@ export const StudyTracksAndClassStatisticsTab = ({
             <>
               {getDivider('Average graduation times by starting year', infoTextGraduationTimes)}
               <Toggle
-                cypress="GraduationTimeToggle"
+                cypress="graduation-time-toggle"
                 firstLabel="Breakdown"
                 secondLabel="Median times"
                 setValue={setShowMedian}

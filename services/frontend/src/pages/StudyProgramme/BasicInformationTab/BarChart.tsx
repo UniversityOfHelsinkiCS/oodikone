@@ -11,39 +11,37 @@ exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
 // TODO: Move to theme
-const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
+const colors = ['#003E65', '#1392c2', '#036415']
 
-export const LineGraph = ({
-  cypress,
-  exportFileName,
-  graphStats,
-  years,
-}: {
-  cypress: string
-  exportFileName: string
-  graphStats: GraphStat[]
-  years: number[]
-}) => {
-  if (!graphStats) {
+export const BarChart = ({ id, graphStats, years }: { id: string; graphStats: GraphStat[]; years: number[] }) => {
+  if (!graphStats || !id || !years) {
     return null
   }
 
   const dataWithColors = graphStats.map((series, index) => ({
     ...series,
     color: colors[index],
-    type: 'line' as const,
+    type: 'column' as const,
   }))
 
-  const config = {
+  const config: Highcharts.Options = {
     series: dataWithColors,
-    exporting: {
-      filename: exportFileName,
+    xAxis: {
+      categories: years.map(year => year.toString()),
     },
     chart: {
+      type: 'column' as const,
       height: '450px',
     },
-    xAxis: {
-      categories: years.map(String),
+    exporting: {
+      filename: `oodikone_graduations_and_thesis_of_study_programme_${id}`,
+    },
+    plotOptions: {
+      column: {
+        dataLabels: {
+          enabled: true,
+        },
+      },
     },
     yAxis: {
       allowDecimals: false,
@@ -56,7 +54,7 @@ export const LineGraph = ({
   }
 
   return (
-    <Section cypress={`${cypress}-line-graph`}>
+    <Section cypress="graduated-and-thesis-writers-of-the-programme-bar-chart">
       <ReactHighcharts config={config} />
     </Section>
   )

@@ -5,6 +5,8 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
+import { Section } from '@/components/material/Section'
+
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
@@ -164,8 +166,8 @@ export const MedianTimeBarChart = ({
   }
 
   return (
-    <div data-cy={`${title.split(' ')[0]}-median-time-bar-chart`}>
+    <Section cypress={`${title.split(' ')[0].toLowerCase()}-median-time-bar-chart`}>
       <ReactHighcharts config={config} />
-    </div>
+    </Section>
   )
 }

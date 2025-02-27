@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { isDefaultServiceProvider } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { BreakdownBarChart } from '@/components/material/BreakdownBarChart'
 import { DataTable } from '@/components/material/DataTable'
 import { LineGraph } from '@/components/material/LineGraph'
+import { MedianTimeBarChart } from '@/components/material/MedianTimeBarChart'
 import { Section } from '@/components/material/Section'
 import { StackedBarChart } from '@/components/material/StackedBarChart'
 import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'
-import { BreakdownBarChart } from '@/pages/StudyProgramme/BreakdownBarChart'
-import { MedianTimeBarChart } from '@/pages/StudyProgramme/MedianTimeBarChart'
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from '@/redux/studyProgramme'
 import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
@@ -99,10 +99,10 @@ export const BasicInformationTab = ({
             value={academicYear}
           />
           <Toggle
-            cypress="study-rights-toggle"
+            cypress="study-right-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="All study rights"
-            infoBoxContent={studyProgrammeToolTips.studentToggle}
+            infoBoxContent={studyProgrammeToolTips.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroupsExcluded}
             value={specialGroupsExcluded}
@@ -111,7 +111,7 @@ export const BasicInformationTab = ({
       </Section>
 
       <Section
-        cypress="students-of-the-study-programme-section"
+        cypress="students-of-the-study-programme"
         infoBoxContent={studyProgrammeToolTips.studentsOfTheStudyProgramme}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
@@ -140,7 +140,7 @@ export const BasicInformationTab = ({
       </Section>
 
       <Section
-        cypress="credits-produced-by-the-study-programme-section"
+        cypress="credits-produced-by-the-study-programme"
         infoBoxContent={studyProgrammeToolTips.creditsProducedByTheStudyProgramme}
         isError={creditsIsError}
         isLoading={creditsIsLoading}
@@ -150,7 +150,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <Stack alignItems="center">
               <Stack alignItems="center" direction="row">
-                <Switch checked={showAll} onChange={() => setShowAll(!showAll)} />
+                <Switch checked={showAll} data-cy="special-categories-toggle" onChange={() => setShowAll(!showAll)} />
                 <Typography>Show special categories</Typography>
               </Stack>
             </Stack>
@@ -186,7 +186,7 @@ export const BasicInformationTab = ({
       </Section>
 
       <Section
-        cypress="graduated-of-the-programme-section"
+        cypress="graduated-and-thesis-writers-of-the-programme"
         infoBoxContent={studyProgrammeToolTips.graduatedAndThesisWritersOfTheProgramme}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
@@ -194,9 +194,13 @@ export const BasicInformationTab = ({
       >
         {graduations.isSuccess && graduations.data && (
           <Stack gap={2}>
-            <BarChart cypress="GraduatedAndgraduationsOfTheProgramme" data={graduations?.data} />
+            <BarChart
+              graphStats={graduations.data.graphStats}
+              id={graduations.data.id}
+              years={graduations.data.years}
+            />
             <DataTable
-              cypress="GraduatedAndgraduationsOfTheProgramme"
+              cypress="graduated-and-graduations-of-the-programme"
               data={graduations?.data?.tableStats}
               titles={graduations?.data?.titles}
             />
@@ -205,7 +209,7 @@ export const BasicInformationTab = ({
       </Section>
 
       <Section
-        cypress="average-graduation-times-section"
+        cypress="average-graduation-times"
         infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
@@ -215,7 +219,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <ToggleContainer>
               <Toggle
-                cypress="GraduationTimeToggle"
+                cypress="graduation-time-toggle"
                 firstLabel="Breakdown"
                 secondLabel="Median time"
                 setValue={setShowMedian}
@@ -273,7 +277,7 @@ export const BasicInformationTab = ({
       </Section>
 
       <Section
-        cypress="programmes-before-or-after-section"
+        cypress="programmes-before-or-after"
         infoBoxContent={studyProgrammeToolTips.programmesBeforeOrAfter}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}

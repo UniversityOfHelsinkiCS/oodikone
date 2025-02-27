@@ -68,7 +68,7 @@ export const FacultyBarChart = ({
   }
 
   return (
-    <Section cypress={`${cypress}BarChart`}>
+    <Section cypress={`${cypress}-bar-chart`}>
       <ReactHighcharts config={config} />
     </Section>
   )

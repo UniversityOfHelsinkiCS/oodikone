@@ -197,7 +197,7 @@ export const BasicInformationTab = ({
       <Section>
         <ToggleContainer>
           <Toggle
-            cypress="YearToggle"
+            cypress="year-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="Calendar year"
             infoBoxContent={facultyToolTips.yearToggle}
@@ -206,7 +206,7 @@ export const BasicInformationTab = ({
             value={academicYear}
           />
           <Toggle
-            cypress="ProgrammeToggle"
+            cypress="programme-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="New study programmes"
             infoBoxContent={facultyToolTips.programmeToggle}
@@ -215,22 +215,22 @@ export const BasicInformationTab = ({
             value={studyProgrammes}
           />
           <Toggle
-            cypress="StudentToggle"
+            cypress="study-right-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.studentToggle}
+            infoBoxContent={facultyToolTips.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroups}
             value={specialGroups}
           />
           {studyProgrammeFilter === 'ALL_PROGRAMMES' && (
-            <Alert data-cy="FacultyProgrammesShownInfo" severity="info" sx={{ width: '100%' }}>
+            <Alert data-cy="faculty-programmes-shown-info" severity="info" sx={{ width: '100%' }}>
               Please note that the data is complete only for current Bachelor's, Master's and Doctoral programmes.
               Especially, credits and thesis writers contain only data for current programmes.
             </Alert>
           )}
           {special === 'SPECIAL_EXCLUDED' && (
-            <Alert data-cy="FacultyExcludeSpecialsInfo" severity="info" sx={{ width: '100%' }}>
+            <Alert data-cy="faculty-exclude-specials-info" severity="info" sx={{ width: '100%' }}>
               Please note that excluding the special study rights does not affect the "Credits produced by the faculty"
               view.
             </Alert>
@@ -238,7 +238,7 @@ export const BasicInformationTab = ({
         </ToggleContainer>
       </Section>
       <Section
-        cypress="StudentsOfTheFaculty"
+        cypress="students-of-the-faculty"
         infoBoxContent={facultyToolTips.studentsOfTheFaculty}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
@@ -247,13 +247,13 @@ export const BasicInformationTab = ({
         {basics.isSuccess && basics.data && (
           <Stack gap={2}>
             <LineGraph
-              cypress="StudentsOfTheFaculty"
-              exportFileName={`oodikone_StudentsOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+              cypress="students-of-the-faculty"
+              exportFileName={`oodikone_students-of-the-faculty_${faculty?.code}_${getTimestamp()}`}
               graphStats={basics.data.studentInfo.graphStats}
               years={basics.data.years}
             />
             <InteractiveDataTable
-              cypress="StudentsOfTheFaculty"
+              cypress="students-of-the-faculty"
               dataProgrammeStats={basics.data.studentInfo.programmeTableStats}
               dataStats={basics.data.studentInfo.tableStats}
               plotLinePlaces={basicStatsPlotLinePlaces}
@@ -267,7 +267,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="GraduatedOfTheFaculty"
+        cypress="graduated-of-the-faculty"
         infoBoxContent={facultyToolTips.graduatedOfTheFaculty}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
@@ -276,13 +276,13 @@ export const BasicInformationTab = ({
         {basics.isSuccess && basics.data && (
           <Stack gap={2}>
             <LineGraph
-              cypress="GraduatedOfTheFaculty"
-              exportFileName={`oodikone_GraduatedOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+              cypress="graduated-of-the-faculty"
+              exportFileName={`oodikon"graduated-of-the-faculty"_${faculty?.code}_${getTimestamp()}`}
               graphStats={basics.data.graduationInfo.graphStats}
               years={basics.data.years}
             />
             <InteractiveDataTable
-              cypress="GraduatedOfTheFaculty"
+              cypress="graduated-of-the-faculty"
               dataProgrammeStats={basics.data.graduationInfo.programmeTableStats}
               dataStats={basics.data.graduationInfo.tableStats}
               plotLinePlaces={basicStatsPlotLinePlaces}
@@ -295,7 +295,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="ThesisWritersOfTheFaculty"
+        cypress="thesis-writers-of-the-faculty"
         infoBoxContent={facultyToolTips.thesisWritersOfTheFaculty}
         isError={thesisWritersIsError}
         isLoading={thesisWritersIsLoading}
@@ -304,13 +304,13 @@ export const BasicInformationTab = ({
         {thesisWriters.isSuccess && thesisWriters.data && (
           <Stack gap={2}>
             <LineGraph
-              cypress="ThesisWritersOfTheFaculty"
+              cypress="thesis-writers-of-the-faculty"
               exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
               graphStats={thesisWriters.data.graphStats}
               years={thesisWriters.data.years}
             />
             <InteractiveDataTable
-              cypress="ThesisWritersOfTheFaculty"
+              cypress="thesis-writers-of-the-faculty"
               dataProgrammeStats={thesisWriters.data.programmeTableStats}
               dataStats={thesisWriters.data.tableStats}
               plotLinePlaces={thesisWriterStatsPlotLinePlaces}
@@ -323,7 +323,7 @@ export const BasicInformationTab = ({
         )}
       </Section>
       <Section
-        cypress="CreditsProducedByTheFaculty"
+        cypress="credits-produced-by-the-faculty"
         infoBoxContent={facultyToolTips.creditsProducedByTheFaculty}
         isError={creditsIsError}
         isLoading={creditsIsLoading}
@@ -339,13 +339,13 @@ export const BasicInformationTab = ({
           {credits.isSuccess && credits.data && (
             <Stack gap={2}>
               <StackedBarChart
-                cypress="CreditsProducedByTheFaculty"
+                cypress="credits-produced-by-the-faculty"
                 data={graphStats?.data}
-                exportFileName={`oodikone_CreditsProducedByTheFaculty_${faculty?.code}_${getTimestamp()}`}
+                exportFileName={`oodikone_credits-produced-by-the-faculty_${faculty?.code}_${getTimestamp()}`}
                 labels={graphStats?.years}
               />
               <InteractiveDataTable
-                cypress="CreditsProducedByTheFaculty"
+                cypress="credits-produced-by-the-faculty"
                 dataProgrammeStats={programmeStats}
                 dataStats={tableStats?.data}
                 plotLinePlaces={creditStatsPlotLinePlaces}

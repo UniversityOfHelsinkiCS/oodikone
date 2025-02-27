@@ -66,10 +66,10 @@ describe('University view', () => {
     })
 
     it('info boxes contain correct information', () => {
-      cy.get('[data-cy=FacultyProgressInfoBoxButton]').click()
-      cy.get('[data-cy=FacultyProgressInfoBoxContent]').contains('Kuvaa tiedekuntaan kuuluvien')
-      cy.get('[data-cy=FacultyBachelorMastersProgressInfoBoxButton]').click()
-      cy.get('[data-cy=FacultyBachelorMastersProgressInfoBoxContent]').contains('The starting year is the')
+      cy.get('[data-cy=FacultyProgress-info-box-button]').click()
+      cy.get('[data-cy=FacultyProgress-info-box-content]').contains('Kuvaa tiedekuntaan kuuluvien')
+      cy.get('[data-cy=FacultyBachelorMastersProgress-info-box-button]').click()
+      cy.get('[data-cy=FacultyBachelorMastersProgress-info-box-content]').contains('The starting year is the')
     })
   })
 
@@ -88,8 +88,10 @@ describe('University view', () => {
     })
 
     it('info boxes contain correct information', () => {
-      cy.get('[data-cy=AverageGraduationTimesInfoBoxButton]').click()
-      cy.get('[data-cy=AverageGraduationTimesInfoBoxContent]').contains('Opiskelijoiden keskimääräiset valmistumisajat')
+      cy.get('[data-cy=AverageGraduationTimes-info-box-button]').click()
+      cy.get('[data-cy=AverageGraduationTimes-info-box-content]').contains(
+        'Opiskelijoiden keskimääräiset valmistumisajat'
+      )
     })
   })
 })

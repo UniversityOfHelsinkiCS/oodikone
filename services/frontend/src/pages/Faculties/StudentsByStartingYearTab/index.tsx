@@ -92,16 +92,16 @@ export const StudentsByStartingYearTab = ({
       <Section>
         <ToggleContainer>
           <Toggle
-            cypress="StudentToggle"
+            cypress="study-right-toggle"
             disabled={isError || isLoading}
             firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.studentToggle}
+            infoBoxContent={facultyToolTips.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroups}
             value={specialGroups}
           />
           <Toggle
-            cypress="GraduatedToggle"
+            cypress="graduated-toggle"
             disabled={isError || isLoading}
             firstLabel="Graduated included"
             infoBoxContent={facultyToolTips.graduatedToggle}
@@ -112,7 +112,7 @@ export const StudentsByStartingYearTab = ({
         </ToggleContainer>
       </Section>
       <Section
-        cypress="FacultyStudentTable"
+        cypress="faculty-student-table"
         exportOnClick={() =>
           exportStudentTable(
             studentStats?.data,
@@ -130,7 +130,7 @@ export const StudentsByStartingYearTab = ({
         <Stack gap={2}>
           <ToggleContainer>
             <Toggle
-              cypress="HidePercentagesToggle"
+              cypress="percentage-toggle"
               disabled={isError || isLoading}
               firstLabel="Hide percentages"
               secondLabel="Show percentages"

@@ -110,7 +110,6 @@ export const FacultyStudentDataTable = ({
   titles: string[]
   years: string[]
 }) => {
-  const cypress = 'FacultyStudentStatsTable'
   const [yearsVisible, setVisible] = useState(new Array<boolean>(years.length).fill(false))
   const { getTextIn } = useLanguage()
   const toggleVisibility = (yearIndex: number) => {
@@ -123,7 +122,7 @@ export const FacultyStudentDataTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={cypress} showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
+      <StyledTable data-cy="faculty-student-stats-table" showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
         <TableHead>
           <TableRow key="FirstHeader">
             <TableCell colSpan={!showPercentages ? 3 : 4} />
@@ -159,16 +158,11 @@ export const FacultyStudentDataTable = ({
                         <TableCell key={`${year}-faculty-cell}`}>
                           <Box
                             alignItems="center"
-                            data-cy={`Button-${cypress}-${yearIndex}`}
                             display="flex"
                             justifyContent="center"
                             key={`${year}-studentsTableButton}`}
                           >
-                            <IconButton
-                              data-cy={`${cypress}${yearIndex}`}
-                              onClick={() => toggleVisibility(yearIndex)}
-                              size="small"
-                            >
+                            <IconButton onClick={() => toggleVisibility(yearIndex)} size="small">
                               {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
                             </IconButton>
                             <Typography variant="body2">{value}</Typography>

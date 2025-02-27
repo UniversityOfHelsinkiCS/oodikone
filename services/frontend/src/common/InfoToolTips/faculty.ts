@@ -88,5 +88,5 @@ facultyToolTips.studentsOfTheFaculty =
     .replace('Transferred away', 'Transferred out of programme')
     .replace('Transferred to', 'Transferred into programme')
 facultyToolTips.graduatedToggle = studyProgrammeToolTips.graduatedToggle
-facultyToolTips.studentToggle = studyProgrammeToolTips.studentToggle
+facultyToolTips.studyRightToggle = studyProgrammeToolTips.studyRightToggle
 facultyToolTips.yearToggle = studyProgrammeToolTips.yearToggle

@@ -112,7 +112,7 @@ export const InteractiveDataTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={`${cypress}InteractiveDataTable`} showCellBorders size="small">
+      <StyledTable data-cy={`${cypress}-interactive-data-table`} showCellBorders size="small">
         <TableHead>
           <TableRow>
             {titles.map((title, index) => (

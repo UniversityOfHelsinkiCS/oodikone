@@ -56,10 +56,10 @@ describe('Faculty statistics', () => {
       })
 
       it('Correct tabs are shown', () => {
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Basic information')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Students by starting year')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Graduation times')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Update statistics')
+        cy.cs('faculty-tabs').should('contain', 'Basic information')
+        cy.cs('faculty-tabs').should('contain', 'Students by starting year')
+        cy.cs('faculty-tabs').should('contain', 'Graduation times')
+        cy.cs('faculty-tabs').should('contain', 'Update statistics')
       })
     })
 
@@ -71,66 +71,66 @@ describe('Faculty statistics', () => {
 
       describe('Info boxes', () => {
         it('Students of the faculty', () => {
-          cy.get('[data-cy=StudentsOfTheFacultyInfoBoxButton]').click()
-          cy.get('[data-cy=StudentsOfTheFacultyInfoBoxContent]').contains('Taulukon luvut on')
+          cy.cs('students-of-the-faculty-info-box-button').click()
+          cy.cs('students-of-the-faculty-info-box-content').contains('Taulukon luvut on')
         })
 
         it('Graduated of the faculty', () => {
-          cy.get('[data-cy=GraduatedOfTheFacultyInfoBoxButton]').click()
-          cy.get('[data-cy=GraduatedOfTheFacultyInfoBoxContent]').contains('Sisältää kyseisenä')
+          cy.cs('graduated-of-the-faculty-info-box-button').click()
+          cy.cs('graduated-of-the-faculty-info-box-content').contains('Sisältää kyseisenä')
         })
 
         it('Thesis writers of the faculty', () => {
-          cy.get('[data-cy=ThesisWritersOfTheFacultyInfoBoxButton]').click()
-          cy.get('[data-cy=ThesisWritersOfTheFacultyInfoBoxContent]').contains('Sisältää kyseisenä')
+          cy.cs('thesis-writers-of-the-faculty-info-box-button').click()
+          cy.cs('thesis-writers-of-the-faculty-info-box-content').contains('Sisältää kyseisenä')
         })
 
         it('Credits produced by the faculty', () => {
-          cy.get('[data-cy=CreditsProducedByTheFacultyInfoBoxButton]').click()
-          cy.get('[data-cy=CreditsProducedByTheFacultyInfoBoxContent]').contains('Sisältää opintopisteet')
+          cy.cs('credits-produced-by-the-faculty-info-box-button').click()
+          cy.cs('credits-produced-by-the-faculty-info-box-content').contains('Sisältää opintopisteet')
         })
       })
 
       it('All graphs and tables are shown', () => {
-        cy.get('[data-cy="StudentsOfTheFacultyGraph"]').should('be.visible')
-        cy.get('[data-cy="StudentsOfTheFacultyInteractiveDataTable"]').should('be.visible')
-        cy.get('[data-cy="GraduatedOfTheFacultyGraph"]').should('be.visible')
-        cy.get('[data-cy="GraduatedOfTheFacultyInteractiveDataTable"]').should('be.visible')
-        cy.get('[data-cy="ThesisWritersOfTheFacultyGraph"]').should('be.visible')
-        cy.get('[data-cy="ThesisWritersOfTheFacultyInteractiveDataTable"]').should('be.visible')
-        cy.get('[data-cy="CreditsProducedByTheFacultyGraph"]').should('be.visible')
-        cy.get('[data-cy="CreditsProducedByTheFacultyInteractiveDataTable"]').should('be.visible')
+        cy.cs('students-of-the-faculty-line-graph-section').should('be.visible')
+        cy.cs('students-of-the-faculty-interactive-data-table').should('be.visible')
+        cy.cs('graduated-of-the-faculty-line-graph-section').should('be.visible')
+        cy.cs('graduated-of-the-faculty-interactive-data-table').should('be.visible')
+        cy.cs('thesis-writers-of-the-faculty-line-graph-section').should('be.visible')
+        cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('be.visible')
+        cy.cs('credits-produced-by-the-faculty-stacked-bar-chart-section').should('be.visible')
+        cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('be.visible')
       })
 
       it('Correct tabs are shown', () => {
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Basic information')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Students by starting year')
-        cy.get('[data-cy="FacultyTabs"]').should('contain', 'Graduation times')
-        cy.get('[data-cy="FacultyTabs"]').should('not.contain', 'Update statistics')
+        cy.cs('faculty-tabs').should('contain', 'Basic information')
+        cy.cs('faculty-tabs').should('contain', 'Students by starting year')
+        cy.cs('faculty-tabs').should('contain', 'Graduation times')
+        cy.cs('faculty-tabs').should('not.contain', 'Update statistics')
       })
 
       it('Toggle years works', () => {
-        cy.get('[data-cy="CreditsProducedByTheFacultyInteractiveDataTable"]').should('contain', '2022')
-        cy.get('[data-cy="ThesisWritersOfTheFacultyInteractiveDataTable"]').should('contain', '2022')
-        cy.get('[data-cy="StudentsOfTheFacultyInteractiveDataTable"]').should('contain', '2022')
-        cy.get('[data-cy="GraduatedOfTheFacultyInteractiveDataTable"]').should('contain', '2022')
-        cy.get('[data-cy="YearToggle"]').click()
-        cy.get('[data-cy="CreditsProducedByTheFacultyInteractiveDataTable"]').should('contain', '2022 - 2023')
-        cy.get('[data-cy="ThesisWritersOfTheFacultyInteractiveDataTable"]').should('contain', '2022 - 2023')
-        cy.get('[data-cy="StudentsOfTheFacultyInteractiveDataTable"]').should('contain', '2022 - 2023')
-        cy.get('[data-cy="GraduatedOfTheFacultyInteractiveDataTable"]').should('contain', '2022 - 2023')
+        cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('students-of-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('graduated-of-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('year-toggle').click()
+        cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
+        cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
+        cy.cs('students-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
+        cy.cs('graduated-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
       })
 
       it('Toggle programmes works', () => {
-        cy.get('[data-cy="FacultyProgrammesShownInfo"]').should('not.exist')
-        cy.get('[data-cy="ProgrammeToggle"]').click()
-        cy.get('[data-cy="FacultyProgrammesShownInfo"]').should('be.visible')
+        cy.cs('faculty-programmes-shown-info').should('not.exist')
+        cy.cs('programme-toggle').click()
+        cy.cs('faculty-programmes-shown-info').should('be.visible')
       })
 
       it('Toggle study rights works', () => {
-        cy.get('[data-cy="FacultyExcludeSpecialsInfo"]').should('not.exist')
-        cy.get('[data-cy="StudentToggle"]').click()
-        cy.get('[data-cy="FacultyExcludeSpecialsInfo"]').should('be.visible')
+        cy.cs('faculty-exclude-specials-info').should('not.exist')
+        cy.cs('study-right-toggle').click()
+        cy.cs('faculty-exclude-specials-info').should('be.visible')
       })
 
       it.skip('Data can be exported to Excel files', { retries: 2 }, () => {
@@ -142,7 +142,7 @@ describe('Faculty statistics', () => {
           'CreditsProducedByTheFaculty',
         ]
         sections.forEach(section => {
-          cy.get(`[data-cy="${section}Graph"]`).within(() => {
+          cy.cs(`${section}Graph`).within(() => {
             cy.get('[aria-label="View chart menu, Chart"]').click({ force: true })
             cy.contains('li.highcharts-menu-item', 'Download XLS').click()
             const downloadedFile = `oodikone_${section}_H50_${timestamp}.xls`
@@ -161,14 +161,14 @@ describe('Faculty statistics', () => {
     })
 
     it('Export button', { retries: 2 }, () => {
-      cy.get('[data-cy=FacultyStudentTableExportButton]').should('be.visible').and('not.be.disabled').click()
+      cy.cs('faculty-student-table-export-button').should('be.visible').and('not.be.disabled').click()
       const downloadedFile = `oodikone_H50_programme_stats_${timestamp}.xlsx`
       cy.readFile(path.join(downloadsFolder, downloadedFile))
     })
 
     it('Info box', () => {
-      cy.get('[data-cy=FacultyStudentTableInfoBoxButton]').click()
-      cy.get('[data-cy=FacultyStudentTableInfoBoxContent]').contains('Opiskelijat, joiden')
+      cy.cs('faculty-student-table-info-box-button').click()
+      cy.cs('faculty-student-table-info-box-content').contains('Opiskelijat, joiden')
     })
 
     it.skip('Study right toggle', () => {
@@ -192,10 +192,10 @@ describe('Faculty statistics', () => {
     })
 
     it('Percentage toggle works', () => {
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', '92.3 %')
-      cy.get('[data-cy="HidePercentagesToggle"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', '92.3 %')
+      cy.cs('faculty-student-stats-table').should('be.visible')
+      cy.cs('faculty-student-stats-table').should('not.contain', '92.3 %')
+      cy.cs('percentage-toggle').click()
+      cy.cs('faculty-student-stats-table').should('contain', '92.3 %')
     })
   })
 
@@ -208,33 +208,33 @@ describe('Faculty statistics', () => {
 
     it.skip('Export button', { retries: 2 }, () => {
       // TODO: Fix this test
-      cy.get('[data-cy=FacultyProgressExportButton]').should('be.visible').and('not.be.disabled').click()
+      cy.cs('FacultyProgress-export-button').should('be.visible').and('not.be.disabled').click()
       const downloadedFile = `oodikone_H50_progress_tab_${timestamp}.xlsx`
       cy.readFile(path.join(downloadsFolder, downloadedFile))
     })
 
     it.skip('Info boxes', () => {
-      cy.get('[data-cy=FacultyProgressInfoBoxButton]').click()
-      cy.get('[data-cy=FacultyProgressInfoBoxContent]').contains('Kuvaa tiedekuntaan')
+      cy.cs('FacultyProgress-info-box-button').click()
+      cy.cs('FacultyProgress-info-box-content').contains('Kuvaa tiedekuntaan')
       // TODO: Click open the accordion first
-      cy.get('[data-cy=BachelorMastersProgressInfoBoxButton]').click()
-      cy.get('[data-cy=BachelorMastersProgressInfoBoxContent]').contains('The starting year is the')
+      cy.cs('BachelorMastersProgress-info-box-button').click()
+      cy.cs('BachelorMastersProgress-info-box-content').contains('The starting year is the')
     })
 
     it.skip('Progress bar charts exist', () => {
       // TODO: Click open the accordion first
-      cy.get('[data-cy="FacultyBachelorsProgressBarChart"]').should('be.visible')
-      cy.get('[data-cy="FacultyBachelorMastersProgressBarChart"]').should('be.visible')
-      cy.get('[data-cy="FacultyMastersProgressBarChart"]').should('be.visible')
-      cy.get('[data-cy="FacultyBachelorsProgressBarChart"]').should('be.visible')
+      cy.cs('FacultyBachelorsProgressBarChart').should('be.visible')
+      cy.cs('FacultyBachelorMastersProgressBarChart').should('be.visible')
+      cy.cs('FacultyMastersProgressBarChart').should('be.visible')
+      cy.cs('FacultyBachelorsProgressBarChart').should('be.visible')
     })
 
     it.skip('Progress tables exist', () => {
       // TODO: Click open the accordion first
-      cy.get('[data-cy="FacultyBachelorsProgressTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyBachelorMasterProgressTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyMastersProgressTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyBachelorsProgressTable"]').should('be.visible')
+      cy.cs('FacultyBachelorsProgressTable').should('be.visible')
+      cy.cs('FacultyBachelorMasterProgressTable').should('be.visible')
+      cy.cs('FacultyMastersProgressTable').should('be.visible')
+      cy.cs('FacultyBachelorsProgressTable').should('be.visible')
     })
 
     it.skip('Graduated toggle', () => {
@@ -255,14 +255,14 @@ describe('Faculty statistics', () => {
 
     it.skip('Export button', { retries: 2 }, () => {
       // TODO: Fix this test
-      cy.get('[data-cy=AverageGraduationTimesExportButton]').should('be.visible').and('not.be.disabled').click()
+      cy.cs('average-graduation-times-export-button').should('be.visible').and('not.be.disabled').click()
       const downloadedFile = `oodikone_H50_graduation_times_${timestamp}.xlsx`
       cy.readFile(path.join(downloadsFolder, downloadedFile))
     })
 
     it('Info boxes', () => {
-      cy.get('[data-cy=AverageGraduationTimesInfoBoxButton]').click()
-      cy.get('[data-cy=AverageGraduationTimesInfoBoxContent]').contains('Opiskelijoiden keskimääräiset')
+      cy.cs('average-graduation-times-info-box-button').click()
+      cy.cs('average-graduation-times-info-box-content').contains('Opiskelijoiden keskimääräiset')
     })
 
     it.skip('Study times toggle', () => {
@@ -278,10 +278,10 @@ describe('Faculty statistics', () => {
     })
 
     it('Graphs are visible', () => {
-      cy.get('[data-cy="bachelorGraduationTimes"]').should('be.visible')
+      cy.cs('bachelor-graduation-times-section').should('be.visible')
       // ! No test data for bachelor + master
-      cy.get('[data-cy="masterGraduationTimes"]').should('be.visible')
-      cy.get('[data-cy="doctorGraduationTimes"]').should('be.visible')
+      cy.cs('master-graduation-times-section').should('be.visible')
+      cy.cs('doctor-graduation-times-section').should('be.visible')
     })
   })
 })

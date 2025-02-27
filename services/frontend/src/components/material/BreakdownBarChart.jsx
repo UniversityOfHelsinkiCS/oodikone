@@ -4,6 +4,8 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
+import { Section } from '@/components/material/Section'
+
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
@@ -91,8 +93,8 @@ export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   }
 
   return (
-    <div data-cy={`graduation-times-graph-breakdown${title.split(' ')[0]}`}>
+    <Section cypress={`${title.split(' ')[0].toLowerCase()}-breakdown-bar-chart`}>
       <ReactHighcharts config={config} />
-    </div>
+    </Section>
   )
 }

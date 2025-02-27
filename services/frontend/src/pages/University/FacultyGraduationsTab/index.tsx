@@ -16,13 +16,13 @@ export const FacultyGraduationsTab = () => {
   return (
     <Stack gap={2}>
       <Section
-        cypress="AverageGraduationTimes"
+        cypress="average-graduation-times"
         infoBoxContent={facultyToolTips.averageGraduationTimes}
         title="Average graduation times"
       >
         <ToggleContainer>
           <Toggle
-            cypress="GraduationTimeToggle"
+            cypress="graduation-time-toggle"
             disabled={isFetching || isLoading || isError}
             firstLabel="Breakdown"
             secondLabel="Median times"
