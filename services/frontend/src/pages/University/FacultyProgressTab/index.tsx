@@ -20,7 +20,7 @@ export const FacultyProgressTab = () => {
   return (
     <Stack gap={2}>
       <Section
-        cypress="FacultyProgress"
+        cypress="faculty-progress"
         infoBoxContent={facultyToolTips.studentProgress}
         title="Progress of students of the university"
       >

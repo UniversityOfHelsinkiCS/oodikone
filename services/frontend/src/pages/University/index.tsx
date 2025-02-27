@@ -15,8 +15,8 @@ export const University = () => {
     <Container maxWidth="lg">
       <PageTitle title="University" />
       <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
-        <Tab data-cy="FacultyProgressTab" label="Faculty progress" />
-        <Tab data-cy="FacultyGraduationsTab" label="Faculty graduations" />
+        <Tab data-cy="faculty-progress-tab" label="Faculty progress" />
+        <Tab data-cy="faculty-graduations-tab" label="Faculty graduations" />
       </Tabs>
       {tab === 0 && <FacultyProgressTab />}
       {tab === 1 && <FacultyGraduationsTab />}

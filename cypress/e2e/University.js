@@ -1,26 +1,26 @@
 /// <reference types="cypress" />
 
-const progressLevels = ['Bachelors', 'BachelorMasters', 'Masters', 'Doctoral']
+const progressLevels = ['bachelors', 'bachelor-masters', 'masters', 'doctoral']
 
 const checkProgressBarCharts = () => {
-  progressLevels.forEach(level => cy.get(`[data-cy=Faculty${level}ProgressBarChart]`))
+  progressLevels.forEach(level => cy.cs(`faculty-${level}-progress-bar-chart-section`))
 }
 
 const checkProgressTables = () => {
-  progressLevels.forEach(level => cy.get(`[data-cy=Faculty${level}ProgressTable]`))
+  progressLevels.forEach(level => cy.cs(`faculty-${level}-progress-table`))
 }
 
 const graduationTimesLevels = ['bachelor', 'master', 'doctor'] // ? Bachelor + master seems to be missing in test data
 
 const checkAverageGraduationTimesBreakdownBarCharts = () => {
   graduationTimesLevels.forEach(level => {
-    cy.get(`[data-cy=${level}BreakdownBarChart]`)
+    cy.cs(`${level}-breakdown-bar-chart`)
   })
 }
 
 const checkAverageGraduationTimesMedianBarCharts = () => {
   graduationTimesLevels.forEach(level => {
-    cy.get(`[data-cy=${level}MedianBarChart]`)
+    cy.cs(`${level}-median-bar-chart`)
   })
 }
 
@@ -40,20 +40,20 @@ describe('University view', () => {
     })
 
     it("'Graduated included / Graduated excluded' toggle works", () => {
-      cy.get('[data-cy=GraduatedToggle]').click()
+      cy.cs('graduated-toggle').click()
       checkProgressBarCharts()
       checkProgressTables()
     })
 
     it("'All study rights / Special study rights excluded' toggle works", () => {
-      cy.get('[data-cy=StudyRightToggle]').click()
+      cy.cs('study-right-toggle').click()
       checkProgressBarCharts()
       checkProgressTables()
     })
 
     it('years in the tables can be clicked to show faculty level breakdown', () => {
-      cy.get('[data-cy=StudyRightToggle]').click()
-      cy.get('[data-cy=FacultyBachelorsProgressTableShowButton3]').click()
+      cy.cs('study-right-toggle').click()
+      cy.cs('faculty-bachelors-progress-table-show-button3').click()
       cy.contains('29.5%').trigger('mouseover', { force: true })
       cy.contains('Matemaattis-luonnontieteellinen tiedekunta')
       cy.contains('H50')
@@ -66,16 +66,16 @@ describe('University view', () => {
     })
 
     it('info boxes contain correct information', () => {
-      cy.get('[data-cy=FacultyProgress-info-box-button]').click()
-      cy.get('[data-cy=FacultyProgress-info-box-content]').contains('Kuvaa tiedekuntaan kuuluvien')
-      cy.get('[data-cy=FacultyBachelorMastersProgress-info-box-button]').click()
-      cy.get('[data-cy=FacultyBachelorMastersProgress-info-box-content]').contains('The starting year is the')
+      cy.cs('faculty-progress-info-box-button').click()
+      cy.cs('faculty-progress-info-box-content').contains('Kuvaa tiedekuntaan kuuluvien')
+      cy.cs('faculty-bachelor-masters-progress-info-box-button').click()
+      cy.cs('faculty-bachelor-masters-progress-info-box-content').contains('The starting year is the')
     })
   })
 
   describe('Faculty graduations tab', () => {
     beforeEach(() => {
-      cy.get('[data-cy=FacultyGraduationsTab]').click()
+      cy.cs('faculty-graduations-tab').click()
     })
 
     it('has all the correct median time bar charts', () => {
@@ -83,15 +83,13 @@ describe('University view', () => {
     })
 
     it("'Breakdown/Median times' toggle works", () => {
-      cy.get('[data-cy=GraduationTimeToggle]').click()
+      cy.cs('graduation-time-toggle').click()
       checkAverageGraduationTimesMedianBarCharts()
     })
 
     it('info boxes contain correct information', () => {
-      cy.get('[data-cy=AverageGraduationTimes-info-box-button]').click()
-      cy.get('[data-cy=AverageGraduationTimes-info-box-content]').contains(
-        'Opiskelijoiden keskimääräiset valmistumisajat'
-      )
+      cy.cs('average-graduation-times-info-box-button').click()
+      cy.cs('average-graduation-times-info-box-content').contains('Opiskelijoiden keskimääräiset valmistumisajat')
     })
   })
 })

@@ -264,7 +264,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
           olevia opiskelijoita.
         </p>
       </StyledMessage>
-      <div data-cy="Table-study-guidance-group-overview" style={{ margin: 'auto' }}>
+      <div data-cy="study-guidance-group-overview-data-table" style={{ margin: 'auto' }}>
         <SortableTable columns={headers} data={groups} hideHeaderBar singleLine={false} />
       </div>
     </div>
