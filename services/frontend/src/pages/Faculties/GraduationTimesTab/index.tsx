@@ -103,14 +103,14 @@ export const GraduationTimesTab = ({
   return (
     <Stack gap={2}>
       <Section
-        cypress="AverageGraduationTimes"
+        cypress="average-graduation-times"
         exportOnClick={() => exportToExcel(graduationStats.data, programmeNames)}
         infoBoxContent={facultyToolTips.averageGraduationTimes}
         title="Average graduation times by education level"
       >
         <ToggleContainer>
           <Toggle
-            cypress="GraduationTimeToggle"
+            cypress="graduation-time-toggle"
             disabled={isError || isLoading}
             firstLabel="Breakdown"
             secondLabel="Median study times"
@@ -118,7 +118,7 @@ export const GraduationTimesTab = ({
             value={showMedian}
           />
           <Toggle
-            cypress="GroupByToggle"
+            cypress="group-by-toggle"
             disabled={isError || isLoading}
             firstLabel="Group by: Graduation year"
             secondLabel="Starting year"
@@ -126,7 +126,7 @@ export const GraduationTimesTab = ({
             value={groupByStartYear}
           />
           <Toggle
-            cypress="ProgrammeToggle"
+            cypress="programme-toggle"
             disabled={isError || isLoading}
             firstLabel="New study programmes"
             infoBoxContent={facultyToolTips.programmeToggle}

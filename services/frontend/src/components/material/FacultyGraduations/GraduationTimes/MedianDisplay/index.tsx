@@ -65,7 +65,7 @@ export const MedianDisplay = ({
       <Stack direction={{ sm: 'column', md: 'row' }}>
         <MedianBarChart
           classSizes={classSizes?.[level]}
-          cypress={`${level}MedianBarChart`}
+          cypress={`${level}-median-bar-chart`}
           data={data}
           goal={goal}
           handleClick={handleClick}
@@ -77,7 +77,7 @@ export const MedianDisplay = ({
         {programmeDataVisible && year && year in levelProgrammeData && (
           <MedianBarChart
             classSizes={classSizes?.programmes}
-            cypress={`${level}MedianBarChartFaculty`}
+            cypress={`${level}-median-bar-chart-faculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
             goal={goal}

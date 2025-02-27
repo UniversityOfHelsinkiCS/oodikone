@@ -41,11 +41,11 @@ export const Faculties = () => {
     <Container data-cy="FacultySegmentContainer" maxWidth="lg">
       <PageTitle subtitle={facultyCode} title={facultyName} />
       <Stack gap={2}>
-        <Tabs data-cy="FacultyTabs" onChange={(_event, newTab) => setTab(newTab)} value={tab}>
-          <Tab data-cy="BasicInformationTab" label="Basic information" />
-          <Tab data-cy="StudentsByStartingYearTab" label="Students by starting year" />
-          <Tab data-cy="GraduationTimesTab" label="Graduation times" />
-          {isAdmin && <Tab data-cy="UpdateStatisticsTab" label="Update statistics" />}
+        <Tabs data-cy="faculty-tabs" onChange={(_event, newTab) => setTab(newTab)} value={tab}>
+          <Tab label="Basic information" />
+          <Tab label="Students by starting year" />
+          <Tab label="Graduation times" />
+          {isAdmin && <Tab label="Update statistics" />}
         </Tabs>
         {tab === 0 && (
           <BasicInformationTab

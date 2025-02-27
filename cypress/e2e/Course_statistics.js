@@ -410,19 +410,19 @@ describe('Course Statistics tests', () => {
         describe('Students tab', () => {
           describe('Info boxes', () => {
             it('Student statistics table', () => {
-              cy.cs('StudentStatisticsInfoBoxButton').click()
-              cy.cs('StudentStatisticsInfoBoxContent').contains('Table - Students')
+              cy.cs('StudentStatistics-info-box-button').click()
+              cy.cs('StudentStatistics-info-box-content').contains('Table - Students')
             })
 
             it('Pass rate', () => {
-              cy.cs('PassRateStudentsInfoBoxButton').click()
-              cy.cs('PassRateStudentsInfoBoxContent').contains('Pass rate - Students')
+              cy.cs('PassRateStudents-info-box-button').click()
+              cy.cs('PassRateStudents-info-box-content').contains('Pass rate - Students')
             })
 
             it('Grade distribution', () => {
               toggleShowGrades()
-              cy.cs('GradeDistributionInfoBoxButton').click()
-              cy.cs('GradeDistributionInfoBoxContent').contains('Grade distribution')
+              cy.cs('GradeDistribution-info-box-button').click()
+              cy.cs('GradeDistribution-info-box-content').contains('Grade distribution')
             })
           })
 
@@ -516,19 +516,19 @@ describe('Course Statistics tests', () => {
 
           describe('Info boxes', () => {
             it('Attempt statistics table', () => {
-              cy.cs('AttemptStatisticsInfoBoxButton').click()
-              cy.cs('AttemptStatisticsInfoBoxContent').contains('Table - Attempts')
+              cy.cs('AttemptStatistics-info-box-button').click()
+              cy.cs('AttemptStatistics-info-box-content').contains('Table - Attempts')
             })
 
             it('Pass rate', () => {
-              cy.cs('PassRateAttemptsInfoBoxButton').click()
-              cy.cs('PassRateAttemptsInfoBoxContent').contains('Pass rate - Attempts')
+              cy.cs('PassRateAttempts-info-box-button').click()
+              cy.cs('PassRateAttempts-info-box-content').contains('Pass rate - Attempts')
             })
 
             it('Grade distribution', () => {
               toggleShowGrades()
-              cy.cs('GradeDistributionInfoBoxButton').click()
-              cy.cs('GradeDistributionInfoBoxContent').contains('Grade distribution')
+              cy.cs('GradeDistribution-info-box-button').click()
+              cy.cs('GradeDistribution-info-box-content').contains('Grade distribution')
             })
           })
 

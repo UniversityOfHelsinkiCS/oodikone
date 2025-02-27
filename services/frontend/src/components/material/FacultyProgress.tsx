@@ -38,7 +38,7 @@ export const FacultyProgress = ({
         {bachelorStats && (
           <Stack gap={2}>
             <FacultyBarChart
-              cypress="FacultyBachelorsProgress"
+              cypress="faculty-bachelors-progress"
               data={{
                 id: faculty,
                 stats: bachelorStats?.chartStats,
@@ -46,7 +46,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="FacultyBachelorsProgressTable"
+              cypress="faculty-bachelors-progress-table"
               data={bachelorStats?.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bachelorsProgStats}
@@ -58,7 +58,7 @@ export const FacultyProgress = ({
         )}
       </Section>
       <Section
-        cypress="FacultyBachelorMastersProgress"
+        cypress="faculty-bachelor-masters-progress"
         infoBoxContent={facultyToolTips.bachelorMasterProgress}
         isError={isError}
         isLoading={isLoading && !bachelorMasterStats}
@@ -67,7 +67,7 @@ export const FacultyProgress = ({
         {bachelorMasterStats && (
           <Stack gap={2}>
             <FacultyBarChart
-              cypress="FacultyBachelorMastersProgress"
+              cypress="faculty-bachelor-masters-progress"
               data={{
                 id: faculty,
                 stats: bachelorMasterStats.chartStats,
@@ -75,7 +75,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="FacultyBachelorMastersProgressTable"
+              cypress="faculty-bachelor-masters-progress-table"
               data={bachelorMasterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bcMsProgStats}
@@ -90,7 +90,7 @@ export const FacultyProgress = ({
         {masterStats && faculty !== 'H90' && (
           <Stack gap={2}>
             <FacultyBarChart
-              cypress="FacultyMastersProgress"
+              cypress="faculty-masters-progress"
               data={{
                 id: faculty,
                 stats: masterStats.chartStats,
@@ -98,7 +98,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="FacultyMastersProgressTable"
+              cypress="faculty-masters-progress-table"
               data={masterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.mastersProgStats}
@@ -113,7 +113,7 @@ export const FacultyProgress = ({
         {doctorStats && (
           <Stack gap={2}>
             <FacultyBarChart
-              cypress="FacultyDoctoralProgress"
+              cypress="faculty-doctoral-progress"
               data={{
                 id: faculty,
                 stats: doctorStats.chartStats,
@@ -121,7 +121,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="FacultyDoctoralProgressTable"
+              cypress="faculty-doctoral-progress-table"
               data={doctorStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.doctoralProgStats}

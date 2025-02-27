@@ -18,7 +18,7 @@ export const BasicDataTable = ({ data, titles, track }: BasicDataTableProps) => 
   })
 
   return (
-    <Table celled compact data-cy="Table-StudyTrackProgress">
+    <Table celled compact data-cy="study-track-progress-basic-data-table">
       <Table.Header>
         <Table.Row>
           {titles?.map(title => (

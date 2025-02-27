@@ -138,7 +138,7 @@ export const GraduationTimes = ({
   }
 
   return (
-    <div className={`graduation-times-${level}`} data-cy={`Section-${level}`}>
+    <div className={`graduation-times-${level}`} data-cy={`${level}-section`}>
       <Divider horizontal>{title}</Divider>
       {!showMedian ? (
         <BreakdownDisplay

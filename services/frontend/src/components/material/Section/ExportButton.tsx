@@ -12,7 +12,7 @@ export const ExportButton = ({
 }) => {
   return (
     <Button
-      data-cy={`${cypress}ExportButton`}
+      data-cy={`${cypress}-export-button`}
       disabled={disabled}
       onClick={onClick}
       startIcon={<DownloadIcon />}

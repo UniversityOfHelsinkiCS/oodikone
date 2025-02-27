@@ -317,7 +317,7 @@ export const StudyTrackDataTable = ({
         setValue={setShowPercentages}
         value={showPercentages}
       />
-      <Table celled data-cy="Table-StudyTrackOverview">
+      <Table celled data-cy="study-tracks-and-class-statistics-data-table">
         <Table.Header>
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />

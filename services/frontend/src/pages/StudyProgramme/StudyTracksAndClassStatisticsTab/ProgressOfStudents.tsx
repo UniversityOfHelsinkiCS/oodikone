@@ -21,7 +21,7 @@ export const ProgressOfStudents = ({ progressStats, progressComboStats, track, y
         <>
           <h2 style={{ margin: '0 0 1rem 0' }}>Bachelor + master study right</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-            <div data-cy="Graph-StudyTrackProgressCombo" style={{ flex: '2 1 600px', minWidth: '600px' }}>
+            <div data-cy="study-track-progress-combo-bar-chart" style={{ flex: '2 1 600px', minWidth: '600px' }}>
               <BarChart
                 data={{
                   creditGraphStats: { [track]: progressComboStats.chartStats },
@@ -42,7 +42,7 @@ export const ProgressOfStudents = ({ progressStats, progressComboStats, track, y
       )}
       {progressComboStats != null && <h2 style={{ margin: '2rem 0 1rem 0' }}>Master study right</h2>}
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-        <div data-cy="Graph-StudyTrackProgress" style={{ flex: '2 1 600px', minWidth: '600px' }}>
+        <div data-cy="study-track-progress-bar-chart" style={{ flex: '2 1 600px', minWidth: '600px' }}>
           <BarChart
             data={{
               creditGraphStats: { [track]: progressStats.chartStats },

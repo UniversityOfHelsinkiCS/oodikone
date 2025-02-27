@@ -23,7 +23,7 @@ export const Section = ({
   title?: string
 }) => {
   return (
-    <Paper data-cy={cypress} sx={{ padding: 2 }} variant="outlined">
+    <Paper data-cy={`${cypress}-section`} sx={{ padding: 2 }} variant="outlined">
       <Stack alignItems="center" direction="row" justifyContent="space-between" sx={{ paddingBottom: 1 }}>
         <Typography component="h2" variant="h5">
           {title}

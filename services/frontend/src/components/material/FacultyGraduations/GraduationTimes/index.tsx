@@ -67,7 +67,12 @@ export const GraduationTimes = ({
   const dataIsLoaded = classSizes && data && names && goal && levelProgrammeData
 
   return (
-    <Section cypress={`${level}GraduationTimes`} isError={isError} isLoading={isLoading && !dataIsLoaded} title={title}>
+    <Section
+      cypress={`${level}-graduation-times`}
+      isError={isError}
+      isLoading={isLoading && !dataIsLoaded}
+      title={title}
+    >
       {showMedian && dataIsLoaded && (
         <MedianDisplay
           classSizes={classSizes}

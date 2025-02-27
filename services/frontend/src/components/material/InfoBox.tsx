@@ -26,17 +26,17 @@ export const InfoBox = ({
     <CustomWidthTooltip
       arrow
       title={
-        <Typography component="div" data-cy={`${cypress}InfoBoxContent`} sx={{ padding: 1 }} variant="body2">
+        <Typography component="div" data-cy={`${cypress}-info-box-content`} sx={{ padding: 1 }} variant="body2">
           <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
         </Typography>
       }
     >
       {mini ? (
-        <IconButton data-cy={`${cypress}InfoBoxButton`} sx={{ padding: 0 }}>
+        <IconButton data-cy={`${cypress}-info-box-button`} sx={{ padding: 0 }}>
           <HelpOutlineIcon fontSize="small" />
         </IconButton>
       ) : (
-        <Button color="info" data-cy={`${cypress}InfoBoxButton`} startIcon={<HelpOutlineIcon />} variant="contained">
+        <Button color="info" data-cy={`${cypress}-info-box-button`} startIcon={<HelpOutlineIcon />} variant="contained">
           Info
         </Button>
       )}

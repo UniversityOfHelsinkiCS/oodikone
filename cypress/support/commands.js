@@ -128,7 +128,7 @@ Cypress.Commands.add('selectFromDropdown', { prevSubject: true }, (s, index) => 
 })
 
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
-  cy.get(`[data-cy=Table-${tableName}] tbody`).within(() => {
+  cy.get(`[data-cy=${tableName}-data-table] tbody`).within(() => {
     correctStats.forEach((values, trIndex) => {
       cy.get('tr')
         .filter(':visible')
