@@ -105,7 +105,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
 
   return (
     <Section
-      cypress="study-rights-section"
+      cypress="study-rights"
       infoBoxContent="To filter the credits shown in the **Credit graph** by study right, click the filter icon next to the corresponding row in the table below. When a study right is selected, courses included in that study right's study plan are also highlighted with a light blue background in the **Courses** table."
       title="Study rights"
     >
