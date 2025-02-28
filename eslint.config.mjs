@@ -80,7 +80,6 @@ export default [
       'no-param-reassign': ['error', { props: false }],
       'no-promise-executor-return': 'error',
       'no-return-assign': 'error',
-      'no-return-await': 'error',
       'object-shorthand': ['error', 'always'],
       'prefer-const': 'error',
       'prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
@@ -160,7 +159,6 @@ export default [
       'no-await-in-loop': 'off',
       'no-param-reassign': 'off',
       'no-promise-executor-return': 'off',
-      'no-return-await': 'off',
     },
   },
   {
