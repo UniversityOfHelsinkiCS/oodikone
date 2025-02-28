@@ -25,7 +25,7 @@ export const ExternalLink = ({
       data-cy={cypress}
       href={href}
       rel="noopener noreferrer"
-      sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}
+      sx={{ alignItems: 'center', display: 'inline-flex', gap: 0.5 }}
       target="_blank"
       variant={variant}
     >
