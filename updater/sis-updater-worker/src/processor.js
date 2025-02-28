@@ -1,6 +1,6 @@
 const { postUpdate } = require('./postUpdate')
 const { update } = require('./updater')
-const { purgeByStudentNumber } = require('./updater/purge')
+const { purgeByStudentNumber, prePurge, purge } = require('./updater/purge')
 
 const updateMsgHandler = async updateMsg => {
   // TODO: Remove the following line after postUpdate is implemented correctly (worker.js calculates the processing time more accurately)
@@ -18,6 +18,13 @@ module.exports = async job => {
       await updateMsgHandler(msgInUpdateFormat)
       break
     }
+    case 'prepurge_start': {
+      const count = await prePurge(job.data)
+      return { counts: count, before: job.data.before }
+    }
+    case 'purge_start':
+      await purge(job.data)
+      break
     default:
       throw new Error(`Unknown job type: ${job.name}`)
   }

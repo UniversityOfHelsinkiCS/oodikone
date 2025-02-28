@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 
-const { PURGE_LOCK, SIS_PURGE_CHANNEL } = require('../config')
+const { PURGE_LOCK } = require('../config')
 const {
   Organization,
   Course,
@@ -17,7 +17,6 @@ const {
 } = require('../db/models')
 const { logger } = require('../utils/logger')
 const { lock } = require('../utils/redis')
-const { stan } = require('../utils/stan')
 
 const tableToModel = {
   course: Course,
@@ -34,45 +33,62 @@ const tableToModel = {
   programme_modules: ProgrammeModule,
 }
 
-const sendToNats = (channel, data) =>
-  new Promise((res, rej) => {
-    stan.publish(channel, JSON.stringify(data), error => {
-      if (error) {
-        logger.error({ message: 'Failed publishing to nats', meta: error.stack })
-        rej(error)
+const prePurge = async ({ tables, before }) => {
+  const beforeDate = new Date(before)
+
+  const counts = await Promise.all(
+    tables.map(async table => {
+      if (!tableToModel[table]) {
+        logger.error(`Prepurge failed: Table "${table}" not found in tableToModel`)
+        return null
       }
-      res()
+
+      const count = await tableToModel[table].count({
+        where: {
+          updatedAt: {
+            [Op.lt]: beforeDate,
+          },
+        },
+      })
+
+      return { [table]: count }
     })
-  })
+  )
 
-const prePurge = async ({ table, before }) => {
-  const count = await tableToModel[table].count({
-    where: {
-      updatedAt: {
-        [Op.lt]: new Date(before),
-      },
-    },
-  })
-
-  sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE_STATUS', table, count, before })
+  return counts.filter(Boolean).reduce((acc, curr) => ({ ...acc, ...curr }), {})
 }
 
-const purge = async ({ table, before }) => {
+const purge = async ({ tables, before }) => {
   const unlock = await lock(PURGE_LOCK, 1000 * 60 * 60)
-  const deletedCount = await tableToModel[table].destroy({
-    where: {
-      updatedAt: {
-        [Op.lt]: new Date(before),
-      },
-    },
-  })
+  const beforeDate = new Date(before)
 
-  logger.info({
-    message: 'Purge',
-    table,
-    count: deletedCount,
-  })
-  await unlock()
+  try {
+    await Promise.all(
+      tables.map(async table => {
+        if (!tableToModel[table]) {
+          logger.error(`Purge failed: Table "${table}" not found in tableToModel`)
+          return
+        }
+
+        const deletedCount = await tableToModel[table].destroy({
+          where: {
+            updatedAt: {
+              [Op.lt]: beforeDate,
+            },
+          },
+        })
+
+        if (deletedCount > 0) {
+          logger.info(`Purged ${deletedCount} row(s) from "${table}" (older than ${before}).`)
+        }
+      })
+    )
+  } catch (error) {
+    logger.error('Purge failed', { error })
+    throw error // Rethrow to make the BullMQ job fail
+  } finally {
+    await unlock()
+  }
 }
 
 const purgeByStudentNumber = async studentNumbers => {

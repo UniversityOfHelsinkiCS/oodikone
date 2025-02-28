@@ -19,6 +19,7 @@ const {
 const { knexConnection } = require('./db/connection')
 const { startPrePurge, startPurge } = require('./purge')
 const { queue } = require('./queue')
+require('./jobEvents')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
 const { stan, opts } = require('./utils/stan')
