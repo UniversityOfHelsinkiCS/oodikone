@@ -224,7 +224,7 @@ const schedulePrePurge = async () => {
   try {
     await startPrePurge()
   } catch (error) {
-    logger.error({ message: 'Purge failed', meta: error.stack })
+    logger.error({ message: 'Scheduling prepurge failed', meta: error.stack })
     throw error
   }
 }
@@ -233,7 +233,7 @@ const schedulePurge = async () => {
   try {
     await startPurge()
   } catch (error) {
-    logger.error({ message: 'Purge failed', meta: error.stack })
+    logger.error({ message: 'Scheduling purge failed', meta: error.stack })
     throw error
   }
 }
