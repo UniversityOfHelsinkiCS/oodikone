@@ -6,7 +6,6 @@
     "dev": "nodemon ./src/index.js"
   },
   "dependencies": {
-    "async": "^3.2.6",
     "bullmq": "^5.41.6",
     "cron": "^3.5.0",
     "express": "^4.21.2",
