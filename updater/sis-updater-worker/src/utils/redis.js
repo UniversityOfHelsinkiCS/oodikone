@@ -1,10 +1,11 @@
 const { createClient } = require('redis')
 const redisLock = require('redis-lock')
 
+const { REDIS_HOST, REDIS_PORT } = require('../config')
 const { logger } = require('./logger')
 
 const redisClient = createClient({
-  url: `redis:${process.env.REDIS_URI}`,
+  url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
 })
 
 const lock = redisLock(redisClient)

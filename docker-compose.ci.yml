@@ -122,7 +122,6 @@ services:
     environment:
       CI: 'true'
       DB_URL: postgres://postgres@sis-db:5432/sis-db
-      REDIS_URI: //redis:6379
       REDIS_HOST: redis
       SIS_IMPORTER_DATABASE: sis-importer-db
       SIS_IMPORTER_HOST: sis-importer-db
@@ -145,7 +144,6 @@ services:
       - sis-updater-nats
     environment:
       CI: 'true'
-      REDIS_URI: //redis:6379
       REDIS_HOST: redis
       SECRET_TOKEN: dev
       SIS_IMPORTER_DATABASE: sis-importer-db
