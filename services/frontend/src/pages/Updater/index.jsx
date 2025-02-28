@@ -5,7 +5,6 @@ import {
   Container,
   FormControl,
   FormControlLabel,
-  Grid2 as Grid,
   Radio,
   RadioGroup,
   Stack,
@@ -17,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { callApi } from '@/apiConnection'
 import { isDefaultServiceProvider } from '@/common'
 import { updaterToolTips } from '@/common/InfoToolTips/updater'
+import { ExternalLink } from '@/components/material/ExternalLink'
 import { PageTitle } from '@/components/material/PageTitle'
 import { Section } from '@/components/material/Section'
 import { languageCenterViewEnabled } from '@/conf'
@@ -181,22 +181,22 @@ export const Updater = () => {
           </Stack>
         </Section>
         <Section title="Stop updating">
-          <Grid container spacing={1}>
-            <Grid size={6}>Aborts all updating processes in the worker, also those started by a cron-job</Grid>
-            <Grid size={3}>
-              <Button color="error" onClick={abortSisUpdater} variant="contained">
-                Stop updater-worker
-              </Button>
-            </Grid>
-            <Grid size={6}>
-              Removes all jobs <b>waiting</b> in the queue (listed above under <em>Jobs waiting</em>)
-            </Grid>
-            <Grid size={3}>
-              <Button color="error" onClick={removeWaitingJobs} variant="contained">
-                Remove waiting jobs
-              </Button>
-            </Grid>
-          </Grid>
+          <Typography my={1}>
+            <ExternalLink href="https://api.docs.bullmq.io/classes/v5.Queue.html#drain" text="Drain" variant="body1" />{' '}
+            the backend or updater queue, including jobs started by a cron job.
+          </Typography>
+          <Typography my={1}>
+            Jobs waiting in the backend queue are listed above under <em>Jobs waiting</em>, but jobs in the updater
+            queue are not visible on this page.
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button color="error" onClick={abortSisUpdater} variant="contained">
+              Clear updater queue
+            </Button>
+            <Button color="error" onClick={removeWaitingJobs} variant="contained">
+              Clear backend queue
+            </Button>
+          </Stack>
         </Section>
         <Section title="Status messages">
           {messages.length > 0 && (
