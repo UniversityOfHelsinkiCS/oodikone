@@ -5,7 +5,7 @@ const moment = require('moment')
 
 const { redis, concurrentWorkers } = require('../config')
 const logger = require('../util/logger')
-const { defaultJobOptions, queueName } = require('./queue')
+const { queueName } = require('./queue')
 
 const connection = {
   host: redis,
@@ -43,6 +43,6 @@ worker.on('failed', (job, error) => {
 })
 
 worker.on('active', job => {
-  const attemptInfo = job.attemptsMade > 1 ? `(attempt ${job.attemptsMade}/${defaultJobOptions.attempts})` : ''
+  const attemptInfo = job.attemptsStarted > 1 ? `(attempt ${job.attemptsStarted}/${job.opts.attempts})` : ''
   logger.info(`Started job: ${job.id} ${attemptInfo}`)
 })
