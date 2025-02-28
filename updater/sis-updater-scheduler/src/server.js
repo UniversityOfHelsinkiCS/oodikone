@@ -3,6 +3,7 @@ const express = require('express')
 require('express-async-errors')
 const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
 const { sendToSlack } = require('./purge')
+const { queue } = require('./queue')
 const {
   scheduleMeta,
   scheduleStudents,
@@ -12,7 +13,6 @@ const {
 } = require('./scheduler')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
-const { stan } = require('./utils/stan')
 
 const bakeMessage =
   res =>
@@ -92,25 +92,27 @@ app.post('/v1/students', async (req, res) => {
 })
 
 app.get('/v1/rediscache', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'RELOAD_REDIS' }), error => {
-    if (error) {
-      return res.locals.msg('Error sending reloading msg?')
-    }
-
-    logger.info('Scheduled redis cache reloading')
-    res.locals.msg('Scheduled redis cache reloading')
-  })
+  await queue.add('reload_redis')
+  logger.info('Scheduled redis cache reloading')
+  res.locals.msg('Scheduled redis cache reloading')
 })
 
 app.get('/v1/abort', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'ABORT' }), error => {
-    if (error) {
-      return res.locals.msg('Error sending abort msg?')
+  const jobCountsBeforeDrain = await queue.getJobCounts()
+  await queue.drain()
+  const jobCountsAfterDrain = await queue.getJobCounts()
+  const differences = {}
+  for (const key in jobCountsBeforeDrain) {
+    const difference = jobCountsBeforeDrain[key] - jobCountsAfterDrain[key]
+    if (difference) {
+      differences[key] = difference
     }
-
-    logger.info('Abort message sent')
-    res.locals.msg('Abort message sent')
-  })
+  }
+  const differenceString = Object.entries(differences)
+    .map(([jobType, deletedJobs]) => `${deletedJobs} ${jobType} job(s)`)
+    .join(', ')
+  logger.info(`Removed approximately ${differenceString} from queue`)
+  res.locals.msg(`Removed approximately ${differenceString} from queue`)
 })
 
 app.post('/v1/courses', async (req, res) => {

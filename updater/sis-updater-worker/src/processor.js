@@ -1,6 +1,7 @@
 const { postUpdate } = require('./postUpdate')
 const { update } = require('./updater')
 const { purgeByStudentNumber, prePurge, purge } = require('./updater/purge')
+const { loadMapsOnDemand } = require('./updater/shared')
 
 const updateMsgHandler = async updateMsg => {
   // TODO: Remove the following line after postUpdate is implemented correctly (worker.js calculates the processing time more accurately)
@@ -35,6 +36,9 @@ module.exports = async job => {
     case 'study_levels':
     case 'study_modules':
       await updateMsgHandler({ entityIds: job.data, type: job.name })
+      break
+    case 'reload_redis':
+      await loadMapsOnDemand()
       break
     default:
       throw new Error(`Unknown job type: ${job.name}`)
