@@ -56,7 +56,6 @@ app.use(auth)
 app.get('/v1/meta', async (_, res) => {
   await scheduleMeta()
 
-  logger.info('Scheduled meta')
   res.locals.msg('Scheduled meta')
 })
 

@@ -1,20 +1,12 @@
-const { eachLimit } = require('async')
-// eslint-disable-next-line no-redeclare
-const crypto = require('crypto')
 const { chunk } = require('lodash')
 
 const {
-  NATS_GROUP,
-  SIS_UPDATER_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
   isDev,
   DEV_SCHEDULE_COUNT,
-  REDIS_TOTAL_META_KEY,
-  REDIS_TOTAL_STUDENTS_KEY,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
   LATEST_MESSAGE_RECEIVED_THRESHOLD,
-  ENABLE_WORKER_REPORTING,
 } = require('./config')
 const { knexConnection } = require('./db/connection')
 const { startPrePurge, startPurge } = require('./purge')
@@ -22,7 +14,6 @@ const { queue } = require('./queue')
 require('./jobEvents')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
-const { stan, opts } = require('./utils/stan')
 
 const IMPORTER_TABLES = {
   attainments: 'attainments',
@@ -37,58 +28,6 @@ const IMPORTER_TABLES = {
   termRegistrations: 'term_registrations',
   studyRightPrimalities: 'study_right_primalities',
   curriculumPeriods: 'curriculum_periods',
-}
-
-const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
-  if (!ENABLE_WORKER_REPORTING) {
-    stan.publish(channel, JSON.stringify(args))
-    return
-  }
-
-  const id = crypto.randomUUID()
-
-  const completionChannel = stan.subscribe(`SIS_COMPLETED_CHANNEL-${id}`, NATS_GROUP, opts)
-
-  return new Promise((resolve, reject) => {
-    const messageHandler = msg => {
-      let data = null
-
-      try {
-        data = JSON.parse(msg.getData())
-      } catch (error) {
-        logger.error({
-          message: 'Unable to parse completion message.',
-          meta: error.stack,
-        })
-
-        return
-      }
-
-      if (data.id === id) {
-        if (data.success) {
-          resolve()
-        } else {
-          logger.error(`Job failed: ${data.message}`)
-          reject(data.message)
-        }
-
-        completionChannel.off('message', messageHandler)
-        completionChannel.unsubscribe()
-      }
-
-      msg.ack()
-    }
-
-    completionChannel.on('message', messageHandler)
-
-    stan.publish(channel, JSON.stringify({ ...args, id }))
-  })
-}
-
-const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
-  const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
-  await redisClient.incrBy(redisKey, entityIds.length)
-  await schedule({ entityIds, type }, channel)
 }
 
 const scheduleFromDb = async ({
@@ -114,12 +53,12 @@ const scheduleFromDb = async ({
     knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
   }
   const entities = await knexBuilder
-  await eachLimit(chunk(entities, CHUNK_SIZE), 10, async entity => await createJobs(entity, scheduleId || table))
+  const chunks = chunk(entities, CHUNK_SIZE)
+  await queue.addBulk(chunks.map(entities => ({ name: scheduleId ?? table, data: entities })))
   return entities.length
 }
 
 const scheduleMeta = async (clean = true) => {
-  logger.info('Scheduled meta')
   await scheduleFromDb({
     table: IMPORTER_TABLES.organisations,
     clean,
@@ -136,7 +75,7 @@ const scheduleMeta = async (clean = true) => {
   })
 
   const creditTypes = [4, 7, 9, 10]
-  await createJobs(creditTypes, 'credit_types')
+  await queue.add('credit_types', creditTypes)
 
   await scheduleFromDb({
     table: IMPORTER_TABLES.courseUnits,
@@ -160,6 +99,7 @@ const scheduleMeta = async (clean = true) => {
     table: IMPORTER_TABLES.curriculumPeriods,
     clean,
   })
+  logger.info('Scheduled meta')
 }
 
 const scheduleStudents = async () => {
@@ -215,7 +155,7 @@ const scheduleByStudentNumbers = async studentNumbers => {
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
   const personChunks = chunk(personsToUpdate, CHUNK_SIZE)
-  await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students', data: personsToUpdate })))
+  await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students_with_purge', data: personsToUpdate })))
 }
 
 const scheduleByCourseCodes = async courseCodes => {
@@ -226,11 +166,8 @@ const scheduleByCourseCodes = async courseCodes => {
     .distinct('group_id')
     .pluck('group_id')
 
-  await eachLimit(
-    chunk(coursesToUpdate, CHUNK_SIZE),
-    10,
-    async course => await createJobs(course, IMPORTER_TABLES.courseUnits)
-  )
+  const courseChunks = chunk(coursesToUpdate, CHUNK_SIZE)
+  await queue.addBulk(courseChunks.map(courses => ({ name: 'course_units', data: courses })))
 }
 
 const isUpdaterActive = async () => {
@@ -250,7 +187,8 @@ const scheduleHourly = async () => {
     // between now and the last update
     const personsToUpdate = await getHourlyPersonsToUpdate()
 
-    await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async students => await createJobs(students, 'students'))
+    const personChunks = chunk(personsToUpdate, CHUNK_SIZE)
+    await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students', data: personsToUpdate })))
   } catch (error) {
     logger.error({ message: 'Hourly scheduling failed', meta: error.stack })
     throw error
@@ -261,12 +199,10 @@ const scheduleProgrammes = async () => {
   logger.info('Scheduling programmes')
   const { knex } = knexConnection
 
-  const modules = await knex('modules').where({ type: 'DegreeProgramme' })
-
-  const entityIds = modules.map(module => module.id)
+  const entityIds = await knex('modules').where({ type: 'DegreeProgramme' }).pluck('id')
 
   try {
-    await createJobs(entityIds, 'programme_modules')
+    await queue.add('programme_modules', entityIds)
   } catch (error) {
     logger.error({ message: 'Programme module scheduling failed', meta: error.stack })
     throw error

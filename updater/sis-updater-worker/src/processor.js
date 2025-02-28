@@ -11,9 +11,9 @@ const updateMsgHandler = async updateMsg => {
 
 module.exports = async job => {
   switch (job.name) {
-    case 'students': {
+    case 'students_with_purge': {
       const studentNumbers = job.data.map(student => student.student_number)
-      const msgInUpdateFormat = { type: job.name, entityIds: job.data.map(student => student.id) }
+      const msgInUpdateFormat = { type: 'students', entityIds: job.data.map(student => student.id) }
       await purgeByStudentNumber(studentNumbers)
       await updateMsgHandler(msgInUpdateFormat)
       break
@@ -24,6 +24,17 @@ module.exports = async job => {
     }
     case 'purge_start':
       await purge(job.data)
+      break
+    case 'course_units':
+    case 'credit_types':
+    case 'curriculum_periods':
+    case 'education_types':
+    case 'organisations':
+    case 'programme_modules':
+    case 'students':
+    case 'study_levels':
+    case 'study_modules':
+      await updateMsgHandler({ entityIds: job.data, type: job.name })
       break
     default:
       throw new Error(`Unknown job type: ${job.name}`)

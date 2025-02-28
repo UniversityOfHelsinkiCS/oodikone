@@ -1,5 +1,4 @@
 const {
-  SIS_UPDATER_SCHEDULE_CHANNEL,
   NATS_GROUP,
   REDIS_TOTAL_META_KEY,
   REDIS_TOTAL_STUDENTS_KEY,
@@ -8,8 +7,6 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED,
 } = require('./config')
 const { dbConnections } = require('./db/connection')
-const { postUpdate } = require('./postUpdate')
-const { update } = require('./updater')
 const { loadMapsOnDemand } = require('./updater/shared')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
@@ -79,30 +76,6 @@ const handleInfoMessage = async infoMsg => {
   }
 }
 
-const isAllowedToUpdateMsg = async updateMsg => {
-  if (!updateMsg.entityIds) return true
-
-  const doneKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
-  const totalKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
-
-  const done = Number(await redisClient.get(doneKey))
-  const totalScheduled = Number(await redisClient.get(totalKey))
-
-  if (totalScheduled > done) return true
-  await resetStatusToZero(doneKey, totalKey)
-
-  return false
-}
-
-const updateMsgHandler = async updateMsg => {
-  const allowedToUpdate = await isAllowedToUpdateMsg(updateMsg)
-  if (!allowedToUpdate) return
-
-  const startTime = new Date()
-  await update(updateMsg)
-  await postUpdate(updateMsg, startTime)
-}
-
 stan.on('error', error => {
   logger.error({ message: 'NATS connection failed', meta: error })
   if (!process.env.CI) process.exit(1)
@@ -120,12 +93,6 @@ dbConnections.on('error', () => {
 
 dbConnections.on('connect', async () => {
   logger.info('DB connections established')
-
-  const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
-  updaterChannel.on('message', handleMessage(updateMsgHandler))
-  updaterChannel.on('error', error => {
-    logger.error({ message: 'Updater channel error', meta: error.stack })
-  })
 
   const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
   infoChannel.on('message', handleMessage(handleInfoMessage))
