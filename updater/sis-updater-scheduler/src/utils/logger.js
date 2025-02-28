@@ -5,9 +5,7 @@ const Sentry = require('winston-transport-sentry-node').default
 
 const { isDev, isStaging, isProduction, runningInCI, serviceProvider } = require('../config')
 
-const { combine, timestamp, printf, splat } = winston.format
-
-const formatDate = timestamp => new Date(timestamp).toLocaleString('fi-FI')
+const { combine, timestamp, printf, colorize, uncolorize } = winston.format
 
 const transports = []
 
@@ -15,53 +13,44 @@ if (isProduction && !isStaging && !runningInCI && process.env.SENTRY_DSN) {
   transports.push(new Sentry({ level: 'error' }))
 }
 
-if (isDev) {
-  const devFormat = printf(
-    ({ level, message, timestamp, ...rest }) => `${formatDate(timestamp)} ${level}: ${message} ${JSON.stringify(rest)}`
-  )
+const devFormat = printf(
+  ({ timestamp, level, message, error, ...rest }) =>
+    `${timestamp} ${level}: ${message}${error ? ` ${error?.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
+)
 
+const prodFormat = printf(({ timestamp, level, message, error, ...rest }) => {
+  const log = { timestamp, level, message, ...rest }
+  if (error) {
+    log.error = error?.stack
+  }
+  return JSON.stringify(log)
+})
+
+transports.push(
+  new winston.transports.Console({
+    level: isDev ? 'debug' : 'info',
+    format: combine(
+      isDev ? colorize() : uncolorize(),
+      timestamp({ format: isDev ? 'HH.mm.ss' : 'D.M.YYYY klo HH.mm.ss' }),
+      isDev ? devFormat : prodFormat
+    ),
+  })
+)
+
+if (isProduction && !isStaging && serviceProvider !== 'fd') {
   transports.push(
-    new winston.transports.Console({
-      level: 'debug',
-      format: combine(splat(), timestamp(), devFormat),
+    new WinstonGelfTransporter({
+      handleExceptions: true,
+      host: 'svm-116.cs.helsinki.fi',
+      port: 9503,
+      protocol: 'udp',
+      hostName: os.hostname(),
+      additional: {
+        app: 'updater-scheduler',
+        environment: 'production',
+      },
     })
   )
-} else {
-  const levels = {
-    error: 0,
-    warn: 1,
-    info: 2,
-    http: 3,
-    verbose: 4,
-    debug: 5,
-    silly: 6,
-  }
-
-  const prodFormat = printf(({ level, timestamp, ...rest }) =>
-    JSON.stringify({
-      level: levels[level],
-      timestamp: formatDate(timestamp),
-      ...rest,
-    })
-  )
-
-  transports.push(new winston.transports.Console({ format: combine(splat(), timestamp(), prodFormat) }))
-
-  if (isProduction && !isStaging && serviceProvider !== 'fd') {
-    transports.push(
-      new WinstonGelfTransporter({
-        handleExceptions: true,
-        host: 'svm-116.cs.helsinki.fi',
-        port: 9503,
-        protocol: 'udp',
-        hostName: os.hostname(),
-        additional: {
-          app: 'updater-scheduler',
-          environment: 'production',
-        },
-      })
-    )
-  }
 }
 
 const logger = winston.createLogger({ transports })
