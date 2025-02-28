@@ -9,7 +9,7 @@ const params = { params: { token: SECRET_TOKEN } }
 
 export const abortUpdate = async () => {
   const response = await client.get('/v1/abort', params)
-  return response.data
+  return response.data?.message
 }
 
 export const updateSISCoursesByCourseCode = async (coursecodes: string[]) => {

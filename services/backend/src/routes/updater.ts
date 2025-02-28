@@ -115,8 +115,8 @@ router.post('/refresh-close-to-graduation', (req: Request, res: Response) => {
 })
 
 router.get('/abort', async (_req: Request, res: Response) => {
-  await abortUpdate()
-  res.status(200).json()
+  const response = await abortUpdate()
+  res.status(200).json(response)
 })
 
 router.get('/jobs', async (_req: Request, res: Response) => {
