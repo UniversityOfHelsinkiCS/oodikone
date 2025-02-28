@@ -70,7 +70,7 @@ app.post('/v1/studyplans', async (req, res) => {
   const { studentnumbers } = req.body
   const msg = `Scheduling update of ${studentnumbers.length} students whose studyplan has not been updated recently`
   logger.info(msg)
-  sendToSlack(msg)
+  await sendToSlack(msg)
   await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Shceduled studyplans update')
 })
