@@ -1,14 +1,9 @@
-import { Radio } from 'semantic-ui-react'
+import { FormControlLabel, Switch } from '@mui/material'
 
-export const IncludeSubstitutionsToggle = ({ includeSubstitutions, toggleIncludeSubstitutions }) => {
-  return (
-    <div style={{ marginTop: 15, marginBottom: 10 }}>
-      <Radio
-        checked={includeSubstitutions}
-        label="Include substitutions"
-        onChange={toggleIncludeSubstitutions}
-        toggle
-      />
-    </div>
-  )
-}
+export const IncludeSubstitutionsToggle = ({ includeSubstitutions, toggleIncludeSubstitutions }) => (
+  <FormControlLabel
+    control={<Switch checked={includeSubstitutions} onChange={toggleIncludeSubstitutions} />}
+    label="Include substitutions"
+    sx={{ margin: 0 }}
+  />
+)
