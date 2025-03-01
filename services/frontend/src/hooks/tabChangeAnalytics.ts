@@ -1,11 +1,15 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 export const useTabChangeAnalytics = () => {
   const previousTabIndex = useRef<number>(0)
+  const [showSubstitutionToggle, setShowSubstitutionToggle] = useState(false)
 
   const handleTabChange = useCallback(
     (_, data) => {
-      const { activeIndex } = data
+      const { activeIndex, panes } = data
+
+      const isCoursesTab = activeIndex === panes.findIndex(pane => pane.menuItem == 'Courses')
+      setShowSubstitutionToggle(isCoursesTab)
 
       if (previousTabIndex.current !== activeIndex) {
         previousTabIndex.current = activeIndex
@@ -14,5 +18,5 @@ export const useTabChangeAnalytics = () => {
     [previousTabIndex]
   )
 
-  return { handleTabChange } as const
+  return { handleTabChange, showSubstitutionToggle } as const
 }

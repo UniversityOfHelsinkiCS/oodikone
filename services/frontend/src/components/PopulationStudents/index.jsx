@@ -36,7 +36,7 @@ const Panes = ({
   visiblePanes,
   year,
 }) => {
-  const { handleTabChange } = useTabChangeAnalytics()
+  const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
@@ -108,12 +108,14 @@ const Panes = ({
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginTop: '5px', marginBottom: '5px' }}>
           <StudentNameVisibilityToggle />
-          <IncludeSubstitutionsToggle
-            includeSubstitutions={includeSubstitutions}
-            toggleIncludeSubstitutions={toggleIncludeSubstitutions}
-          />
+          {showSubstitutionToggle && (
+            <IncludeSubstitutionsToggle
+              includeSubstitutions={includeSubstitutions}
+              toggleIncludeSubstitutions={toggleIncludeSubstitutions}
+            />
+          )}
         </div>
         {dataExport}
       </div>
