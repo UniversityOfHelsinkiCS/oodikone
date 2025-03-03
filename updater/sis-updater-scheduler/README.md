@@ -1,34 +1,56 @@
 # sis-updater-scheduler
 
-The scheduler is mainly responsible for publishing NATS messages with entity ids that should be updated. The messages will then be picked up by sis-updater-worker, and the entities with the specified ids will be updated. The way the worker will do it is by fetching the needed entities from the importer DB and upserting them to Oodikone's own DB.
+## Overview
 
-The scheduler publishes NATS messages with entity ids to be updated mainly based on 2 triggers:
-**cronjobs** and **HTTP requests**. The HTTP requests are used if one of the Oodikone users (admins only) wants to proactively trigger an update to certain entities or entity types.
+The **sis-updater-scheduler** is responsible for scheduling entity updates by publishing BullMQ jobs. These jobs contain entity IDs that need updating and are processed by **sis-updater-worker**. The worker retrieves the required entities from the importer database and upserts them into Oodikone's database.
 
-The cronjobs are part of the same Node.js process. There are two cronjobs that trigger entity updates: one running weekly and one running hourly. Depending on the type of entity, they are therefore updated on a weekly or hourly basis.
+## Job triggers
 
-There are also cronjobs to run `prepurge` and `purge` jobs on the weekly basis. See below for more info about `purge` and `prepurge`.
+The scheduler creates BullMQ jobs based on two triggers:
 
-## Step by step overview of what Scheduler does:
+1. **Cron jobs**:
+   - There are two scheduled cron jobs:
+     - A **weekly job** that updates all relevant entities.
+     - An **hourly job** that updates only entities modified since the last hourly update.
+   - Additionally, there are cron jobs for **prepurge** and **purge** processes, which help remove outdated data. See the [Prepurge and purge workflows](#prepurge-and-purge-workflows) section for more details.
+1. **HTTP requests**:
+   - Oodikone admins can manually trigger updates for specific entities or entity types via HTTP requests.
 
-1. The cronjob runs one of the two functions: `scheduleHourly` or `scheduleWeekly`. The first one only schedules the data that was modified since the last hourly update. `scheduleWeekly` on the other hand schedules "everything" for update.
-2. To figure out what entities should be scheduled, the scheduler fetches ids of entities from the **importer's** postgres instance. Depending on whether the cronjob run is hourly or weekly, the scheduler fetches either all ids of the ones belonging to entities updated in the last hour only.
-3. For each entity separately, the ids are then split into smaller chunks (based on `CHUNK_SIZE` env variable) and are sent to `sis-updater-worker` via NATS. Before sending the NATS message, the scheduler increments a redis key (one of the two, either `TOTAL_STUDENTS` if the entity type is `student` or `TOTAL_META` if the entity type is anothing else) by the number of entities being sent to NATS. The redis entry is updated so that `sis-updater-worker` can use it (see worker's README for more details).
-4. Depending on the value of `ENABLE_WORKER_REPORTING` constant, scheduler will either just publish the message to NATS and forget about it moving on to the next things **OR** it will wait for the `-worker` to successfully acknowledge the processing of the message before moving one to the next one. Note however, that entities of the same type e.g. `student` entities are scheduled in parallel even if `ENABLE_WORKER_REPORTING` is set to true. It's just that in that case, the scheduler will first wait for all successful acks for one entity type before moving on to the next one.  
+## How the scheduler works
+
+1. A cron job runs either `scheduleHourly` or `scheduleWeekly`:
+   - `scheduleHourly`: Updates only entities modified since the last hourly update.
+   - `scheduleWeekly`: Updates all relevant entities.
+1. The scheduler fetches the entity IDs from the **importer database**.
+1. The fetched IDs are split into smaller chunks (based on the `CHUNK_SIZE` environment variable).
+1. BullMQ jobs are created with these chunks and added to the queue, where they will be processed by sis-updater-worker.
 
 ## Prepurge and purge workflows
 
-Rows are sometimes deleted from Sisu, which means they should also be deleted from Oodikone's database. This is done by deleting all rows which have not been updated in a while.
+Entities deleted from Sisu must also be removed from Oodikone’s database. This is done by deleting rows that haven’t been updated in a while.
 
-Every Monday a prepurge flow is scheduled and every Sunday a purge flow.
+- **Prepurge**: Runs every **Monday**.
+- **Purge**: Runs every **Sunday**.
 
-Each of the flows go through all of the `TABLES_TO_PURGE` one at a time and does the following:
+### Prepurge process
 
-**The prepurge flow** sends a message to NATS of the following shape `{ action: 'PREPURGE_START', table, before }` where table is the name of the purged table and `before` is the date before which all the old data will be purged.
-It also creates a feedback channel, which listens to responses from `sis-updater-worker` and each time a response to prepurge message is received, the schedule does the following:
-- Calculate how many rows of data will be deleted as a result of the **upcoming** purge and from which tables
-- Send a Slack message informing how many rows and from which tables will be deleted
-- Sets metadata to Redis indicating after what date the corresponding purge can actually be run. This is later used during purge flow to determine if the purge is actually allowed to be run at that point in time. There is a minimum number of days that should pass between prepurge and purge before the purge is allowed to run.
+Prepurge identifies outdated rows before they are permanently deleted:
 
-**The purge flow** gets the metadata from the Redis mentioned above to determine if the purge can be run at this point in time or not yet. If it is allowed to run, then for each of the purged tables, the scheduler sends the following message to NATS `{ action: 'PURGE_START', table, before: purgeTargetDate }`.
+1. The scheduler creates a BullMQ job with:
+   - `tables`: List of tables to check (`TABLES_TO_PURGE`).
+   - `before`: A date threshold; rows older than this will be deleted (based on the `updatedAt` column).
+1. The scheduler listens for a response from **sis-updater-worker** ([`src/jobEvents.js`](./src/jobEvents.js)).
+1. The worker returns a count of outdated rows per table.
+1. Based on this data, the scheduler:
+   - Sends a **Slack notification** about the upcoming purge.
+   - Updates the **Redis key `LAST_PREPURGE_INFO`**, which determines when the acual purge can occur.
 
+### Purge process
+
+The purge permanently removes outdated rows if the required waiting period has passed:
+
+1. The scheduler checks Redis to determine if purging is allowed.
+1. If permitted, a BullMQ job is created with the same `tables` and `before` parameters as the prepurge job.
+1. The **sis-updater-worker** processes the job and deletes outdated rows.
+
+For more details, see the purge implementation in [`src/purge.js`](./src/purge.js).
