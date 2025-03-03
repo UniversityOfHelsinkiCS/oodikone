@@ -3,13 +3,13 @@ const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 const Sentry = require('winston-transport-sentry-node').default
 
-const { isDev, isStaging, isProduction, runningInCI, serviceProvider } = require('../config')
+const { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DSN } = require('../config')
 
 const { colorize, combine, timestamp, printf, uncolorize } = winston.format
 
 const transports = []
 
-if (isProduction && !isStaging && !runningInCI && process.env.SENTRY_DSN) {
+if (isProduction && !isStaging && !runningInCI && SENTRY_DSN) {
   transports.push(new Sentry({ level: 'error' }))
 }
 

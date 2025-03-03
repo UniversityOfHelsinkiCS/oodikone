@@ -124,8 +124,6 @@ services:
       SIS_IMPORTER_DATABASE: importer-db
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_USER: dev
-      SIS_NATS_TOKEN: dev
-      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SERVICE_PROVIDER: fd
     ports:
       - 8082:8082
@@ -154,8 +152,6 @@ services:
       SIS_IMPORTER_PASSWORD: dev
       SIS_IMPORTER_USER: dev
       SIS_PASSWORD: postgres
-      SIS_NATS_TOKEN: dev
-      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       ROOT_ORG_ID: ${ROOT_ORG_ID}
       SERVICE_PROVIDER: fd
     volumes:

@@ -1,11 +1,16 @@
 const EventEmitter = require('events')
 const knex = require('knex')
 
-const { isDev, runningInCI } = require('../config')
+const {
+  isDev,
+  runningInCI,
+  SIS_IMPORTER_HOST,
+  SIS_IMPORTER_PORT,
+  SIS_IMPORTER_USER,
+  SIS_IMPORTER_PASSWORD,
+  SIS_IMPORTER_DATABASE,
+} = require('../config')
 const { logger } = require('../utils/logger')
-
-const { SIS_IMPORTER_HOST, SIS_IMPORTER_PORT, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } =
-  process.env
 
 class KnexConnection extends EventEmitter {
   constructor() {

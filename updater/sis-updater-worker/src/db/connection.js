@@ -3,11 +3,10 @@ const knex = require('knex')
 const Sequelize = require('sequelize')
 const Umzug = require('umzug')
 
-const { MIGRATIONS_LOCK, isDev, runningInCI } = require('../config')
-const { logger } = require('../utils/logger')
-const { lock } = require('../utils/redis')
-
 const {
+  MIGRATIONS_LOCK,
+  isDev,
+  runningInCI,
   DB_URL,
   SIS_IMPORTER_HOST,
   SIS_IMPORTER_PORT,
@@ -15,7 +14,9 @@ const {
   SIS_IMPORTER_PASSWORD,
   SIS_IMPORTER_DATABASE,
   SIS_PASSWORD,
-} = process.env
+} = require('../config')
+const { logger } = require('../utils/logger')
+const { lock } = require('../utils/redis')
 
 class DbConnections extends EventEmitter {
   constructor() {

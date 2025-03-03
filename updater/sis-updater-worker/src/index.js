@@ -13,5 +13,5 @@ dbConnections
 
 dbConnections.on('error', () => {
   logger.error('DB connections failed')
-  if (!process.env.CI) process.exit(1)
+  process.exit(1)
 })

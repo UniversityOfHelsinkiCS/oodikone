@@ -18,7 +18,7 @@ knexConnection.connect().catch(error => {
 
 knexConnection.on('error', error => {
   logger.error({ message: 'Knex database connection failed', meta: error.stack })
-  if (!process.env.CI) process.exit(1)
+  process.exit(1)
 })
 
 const JOB_TYPES = {
