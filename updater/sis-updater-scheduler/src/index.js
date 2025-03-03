@@ -11,16 +11,9 @@ const { startServer } = require('./server')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { logger } = require('./utils/logger')
 const { redisClient } = require('./utils/redis')
-const { stan } = require('./utils/stan')
 
-stan.on('error', error => {
-  logger.error({ message: `NATS connection failed: ${error}`, meta: error.stack })
-  if (!process.env.CI) process.exit(1)
-})
-
-stan.on('connect', ({ clientID }) => {
-  logger.info(`Connected to NATS as ${clientID}`)
-  knexConnection.connect()
+knexConnection.connect().catch(error => {
+  logger.error('Knex database connection failed', { error })
 })
 
 knexConnection.on('error', error => {
