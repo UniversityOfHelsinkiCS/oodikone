@@ -28,6 +28,7 @@ const IMPORTER_TABLES = {
   termRegistrations: 'term_registrations',
   studyRightPrimalities: 'study_right_primalities',
   curriculumPeriods: 'curriculum_periods',
+  enrolments: 'enrolments',
 }
 
 const scheduleFromDb = async ({
@@ -130,13 +131,13 @@ const getHourlyPersonsToUpdate = async () => {
     updatedAttainmentStudents,
     updatedStudyrightStudents,
     updatedTermRegistrationStudents,
-    updatedStudyRightPrimalitiesStudents,
+    updatedEnrollmentStudents,
   ] = await Promise.all([
     getUpdatedFrom(IMPORTER_TABLES.persons, 'id').whereNotNull('student_number'),
     getUpdatedFrom(IMPORTER_TABLES.attainments, 'person_id'),
     getUpdatedFrom(IMPORTER_TABLES.studyrights, 'person_id'),
     getUpdatedFrom(IMPORTER_TABLES.termRegistrations, 'student_id'),
-    getUpdatedFrom(IMPORTER_TABLES.studyRightPrimalities, 'student_id'),
+    getUpdatedFrom(IMPORTER_TABLES.enrolments, 'person_id'),
   ])
 
   return Array.from(
@@ -145,7 +146,7 @@ const getHourlyPersonsToUpdate = async () => {
       ...updatedAttainmentStudents,
       ...updatedStudyrightStudents,
       ...updatedTermRegistrationStudents,
-      ...updatedStudyRightPrimalitiesStudents,
+      ...updatedEnrollmentStudents,
     ])
   )
 }
