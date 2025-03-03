@@ -1,11 +1,10 @@
-import { arrayOf, string, shape } from 'prop-types'
 import { useState } from 'react'
 import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
 
-export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions, studentname, combinedProgramme }) => {
+export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions, studentName, combinedProgramme }) => {
   const [deleteStudentTags] = useDeleteStudentTagsMutation()
   const [createStudentTags, { isLoading }] = useCreateStudentTagsMutation()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -13,28 +12,33 @@ export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions
 
   const handleSave = async () => {
     await createStudentTags({
-      tags: selectedTags.map(tag => ({ tag_id: tag, studentnumber })),
-      studytrack,
       combinedProgramme,
+      studentTags: selectedTags.map(tag => ({ studentNumber, tagId: tag })),
+      studyTrack,
     })
     setSelectedTags([])
   }
 
   const deleteTag = tag => {
-    deleteStudentTags({ tagId: tag.tag_id, studentnumbers: [studentnumber], studytrack, combinedProgramme })
+    deleteStudentTags({
+      combinedProgramme,
+      tagId: tag.id,
+      studentNumbers: [studentNumber],
+      studyTrack,
+    })
   }
 
-  const studentsTags = studentstags.map(studentTag => (
-    <Label color={studentTag.tag.personal_user_id ? 'purple' : null} key={`${studentnumber}-${studentTag.tag.tag_id}`}>
-      {studentTag.tag.tagname} <Icon link name="delete" onClick={() => deleteTag(studentTag.tag)} />
+  const studentTagLabels = studentTags.map(studentTag => (
+    <Label color={studentTag.tag.personalUserId ? 'purple' : null} key={`${studentNumber}-${studentTag.tag.id}`}>
+      {studentTag.tag.name} <Icon link name="delete" onClick={() => deleteTag(studentTag.tag)} />
     </Label>
   ))
 
   return (
     <Table.Row>
-      {namesVisible && <Table.Cell>{studentname}</Table.Cell>}
-      <Table.Cell>{studentnumber}</Table.Cell>
-      <Table.Cell>{studentsTags}</Table.Cell>
+      {namesVisible && <Table.Cell>{studentName}</Table.Cell>}
+      <Table.Cell>{studentNumber}</Table.Cell>
+      <Table.Cell>{studentTagLabels}</Table.Cell>
       <Table.Cell>
         <div style={{ display: 'flex', gap: '0.5em' }}>
           <Dropdown
@@ -55,13 +59,4 @@ export const TagStudent = ({ studentnumber, studentstags, studytrack, tagOptions
       </Table.Cell>
     </Table.Row>
   )
-}
-
-TagStudent.propTypes = {
-  studentnumber: string.isRequired,
-  studentname: string.isRequired,
-  studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
-  studytrack: string.isRequired,
-  tagOptions: arrayOf(shape({})).isRequired,
-  combinedProgramme: string.isRequired,
 }

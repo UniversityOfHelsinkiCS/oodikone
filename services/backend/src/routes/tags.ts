@@ -42,7 +42,7 @@ interface GetTagsByStudyTrackRequest extends Request {
   }
 }
 
-router.get('/tags/:studytrack', async (req: GetTagsByStudyTrackRequest, res: Response) => {
+router.get('/tags/:studyTrack', async (req: GetTagsByStudyTrackRequest, res: Response) => {
   const { studyTrack } = req.params
   const { roles, id, programmeRights } = req.user
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -111,7 +111,7 @@ interface GetStudentTagsByStudyTrackRequest extends Request {
   }
 }
 
-router.get('/studenttags/:studytrack', async (req: GetStudentTagsByStudyTrackRequest, res: Response) => {
+router.get('/studenttags/:studyTrack', async (req: GetStudentTagsByStudyTrackRequest, res: Response) => {
   const { studyTrack } = req.params
   const { roles, id, programmeRights } = req.user
 
@@ -123,8 +123,8 @@ router.get('/studenttags/:studytrack', async (req: GetStudentTagsByStudyTrackReq
   }
 
   const tags = await getStudentTagsByStudyTrack(studyTrack)
-  console.log(tags)
-  res.status(200).json(filterRelevantStudentTags(tags, id))
+  const relevantTags = filterRelevantStudentTags(tags, id)
+  res.status(200).json(relevantTags)
 })
 
 interface PostStudentTagsRequest extends Request {
@@ -138,6 +138,10 @@ interface PostStudentTagsRequest extends Request {
 router.post('/studenttags', async (req: PostStudentTagsRequest, res: Response) => {
   const { combinedProgramme, studentTags, studyTrack } = req.body
   const { roles, programmeRights } = req.user
+
+  if (!studentTags || !studyTrack) {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 

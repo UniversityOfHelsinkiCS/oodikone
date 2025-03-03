@@ -13,23 +13,23 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
   const [deleteStudentTags] = useDeleteStudentTagsMutation()
 
   useEffect(() => {
-    const createdOptions = tags.map(tag => ({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
+    const createdOptions = tags.map(tag => ({ key: tag.id, text: tag.name, value: tag.id }))
     setOptions(createdOptions)
   }, [])
 
   const handleChange = (event, { value }) => {
     event.preventDefault()
     setSelected(value)
-    const foundTag = tags.find(tag => tag.tag_id === value)
+    const foundTag = tags.find(tag => tag.id === value)
     setSelectedTag(foundTag)
   }
 
   const handleDelete = () => {
     deleteStudentTags({
-      tagId: selectedValue,
-      studentnumbers: selectedStudents,
-      studytrack: mainProgramme,
       combinedProgramme,
+      tagId: selectedValue,
+      studentNumbers: selectedStudents,
+      studyTrack: mainProgramme,
     })
     setSelected('')
     setConfirmDelete(false)
@@ -39,12 +39,12 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
     const tagList = []
     selectedStudents.forEach(studentNumber => {
       tagList.push({
-        tag_id: selectedValue,
-        studentnumber: studentNumber,
+        studentNumber,
+        tagId: selectedValue,
       })
     })
     setSelected('')
-    createStudentTags({ tags: tagList, studytrack: mainProgramme, combinedProgramme })
+    createStudentTags({ combinedProgramme, studyTrack: mainProgramme, studentTags: tagList })
     setConfirmAdd(false)
   }
 
