@@ -479,7 +479,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     <>
       {!isStudyGuidanceGroupProgramme && (
         <h5>
-          Criteria can be changed <Link to={`/study-programme/${programme}?tab=4`}>here.</Link> Please refresh page
+          Criteria can be changed <Link to={`/study-programme/${programme}?tab=3`}>here.</Link> Please refresh page
           after changes.
         </h5>
       )}
