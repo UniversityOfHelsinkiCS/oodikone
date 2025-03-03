@@ -512,7 +512,8 @@ export const findCourseEnrollments = async (studentNumbers: string[], beforeDate
 
 export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
   return sequelize.query(
-    `
+    courses.length
+      ? `
       SELECT
         course.code,
         course.name,
@@ -552,21 +553,65 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
         GROUP BY course_code
       ) AS credit
         ON credit.course_code = course.code
-      WHERE :skipCourseCodeFilter
-        OR  course.code IN (:courseCodes)
-        OR  (
-          SELECT
-            JSONB_AGG(DISTINCT alt_code)
-          FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
-          WHERE code IN (:courseCodes)
-        ) ? course.code
+      WHERE
+        (
+          course.code IN (:courseCodes)
+          OR (
+            SELECT
+              JSONB_AGG(DISTINCT alt_code)
+            FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
+            WHERE code IN (:courseCodes)
+          ) ? course.code
+        ) AND (enrollment.data IS NOT NULL OR credit.data IS NOT NULL)
+    `
+      : `
+      SELECT
+        course.code,
+        course.name,
+        course.substitutions,
+        course.main_course_code,
+        enrollment.data AS enrollments,
+        credit.data AS credits
+      FROM course
+      LEFT JOIN (
+        SELECT
+          course_code,
+          ARRAY_AGG(JSONB_BUILD_OBJECT(
+            'studentnumber', studentnumber,
+            'state', state,
+            'enrollment_date_time', enrollment_date_time
+          )) AS data
+        FROM enrollment
+        WHERE studentnumber IN (:studentnumbers)
+          AND enrollment_date_time < :beforeDate
+          AND state = :enrollmentState
+        GROUP BY course_code
+      ) AS enrollment
+        ON enrollment.course_code = course.code
+      LEFT JOIN (
+        SELECT
+          course_code,
+          ARRAY_AGG(JSONB_BUILD_OBJECT(
+            'grade', grade,
+            'student_studentnumber', student_studentnumber,
+            'attainment_date', attainment_date,
+            'credittypecode', credittypecode,
+            'course_code', course_code
+          )) AS data
+        FROM credit
+        WHERE student_studentnumber IN (:studentnumbers)
+          AND attainment_date < :beforeDate
+        GROUP BY course_code
+      ) AS credit
+        ON credit.course_code = course.code
+      WHERE
+        enrollment.data IS NOT NULL OR credit.data IS NOT NULL
     `,
     {
       replacements: {
         studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
         beforeDate,
         courseCodes: courses.length ? courses : ['DUMMY'],
-        skipCourseCodeFilter: courses.length === 0,
         enrollmentState: EnrollmentState.ENROLLED,
       },
       type: QueryTypes.SELECT,
