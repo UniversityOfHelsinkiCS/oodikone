@@ -1,19 +1,30 @@
 import { Op } from 'sequelize'
 
-import { Tag, TagStudent } from '../models/kone'
+import { Tag as TagModel, TagStudent as TagStudentModel } from '../models/kone'
+import { NewTag, StudentTag, Tag } from '../shared/types'
 
 export const findTagsByStudyTrack = async (studyTrack: string) => {
-  return Tag.findAll({
+  const tags = await TagModel.findAll({
     where: {
       studytrack: {
         [Op.eq]: studyTrack,
       },
     },
   })
+  return tags.map(
+    tag =>
+      ({
+        id: tag.tag_id,
+        name: tag.tagname,
+        studyTrack: tag.studytrack,
+        personalUserId: tag.personal_user_id,
+        year: tag.year,
+      }) as Tag
+  )
 }
 
 export const findTagsFromStudyTrackById = async (studyTrack: string, tagIds: string[]) => {
-  return Tag.findAll({
+  return TagModel.findAll({
     where: {
       studytrack: {
         [Op.eq]: studyTrack,
@@ -25,26 +36,17 @@ export const findTagsFromStudyTrackById = async (studyTrack: string, tagIds: str
   })
 }
 
-export type TagFromFrontend = {
-  studytrack: string
-  tagname: string
-  year: string
-  personal_user_id: string | null
-}
-
-export const createNewTag = async (tag: TagFromFrontend) => {
-  if (Number.isNaN(tag.year)) {
-    const newTag = {
-      ...tag,
-      year: null,
-    }
-    return Tag.create(newTag)
-  }
-  return Tag.create(tag)
+export const createNewTag = async (tag: NewTag) => {
+  return TagModel.create({
+    studytrack: tag.studyTrack,
+    tagname: tag.name,
+    personal_user_id: tag.personalUserId,
+    year: Number.isNaN(tag.year) ? null : tag.year,
+  })
 }
 
 export const deleteTag = async (tagId: string) => {
-  return Tag.destroy({
+  return TagModel.destroy({
     where: {
       tag_id: {
         [Op.eq]: tagId,
@@ -53,11 +55,11 @@ export const deleteTag = async (tagId: string) => {
   })
 }
 
-export const getStudentTagsByStudyTrack = (studyTrack: string) => {
-  return TagStudent.findAll({
+export const getStudentTagsByStudyTrack = async (studyTrack: string) => {
+  const studentTags = await TagStudentModel.findAll({
     include: {
-      model: Tag,
-      attributes: ['tag_id', 'tagname', 'personal_user_id'],
+      model: TagModel,
+      attributes: ['personal_user_id'],
       where: {
         studytrack: {
           [Op.eq]: studyTrack,
@@ -65,19 +67,21 @@ export const getStudentTagsByStudyTrack = (studyTrack: string) => {
       },
     },
   })
+  return studentTags.map(studentTag => studentTag.toJSON())
 }
 
-export type StudentTagFromFrontend = {
-  tag_id: string
-  studentnumber: string
-}
-
-export const createMultipleStudentTags = async (tags: StudentTagFromFrontend[]) => {
-  return TagStudent.bulkCreate(tags, { ignoreDuplicates: true })
+export const createMultipleStudentTags = async (studentTags: StudentTag[]) => {
+  return TagStudentModel.bulkCreate(
+    studentTags.map(studentTag => ({
+      tag_id: studentTag.tagId,
+      studentnumber: studentTag.studentNumber,
+    })),
+    { ignoreDuplicates: true }
+  )
 }
 
 export const deleteMultipleStudentTags = async (tagId: string, studentNumbers: string[]) => {
-  return TagStudent.destroy({
+  return TagStudentModel.destroy({
     where: {
       tag_id: {
         [Op.eq]: tagId,
