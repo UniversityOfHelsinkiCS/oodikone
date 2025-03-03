@@ -11,3 +11,4 @@ export type {
 export type { Name, NameWithCode } from './name'
 export type { Release } from './release'
 export type { Role } from './role'
+export type { NewTag, Tag } from './tag'
