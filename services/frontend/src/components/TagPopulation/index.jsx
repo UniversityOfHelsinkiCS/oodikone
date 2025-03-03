@@ -52,7 +52,7 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
     <Confirm
       cancelButton="Cancel"
       confirmButton="Confirm"
-      content={`Are you sure you want to add tag "${selectedTag ? selectedTag.tagname : null}" to ${selectedStudents.length} students?`}
+      content={`Are you sure you want to add tag "${selectedTag ? selectedTag.name : null}" to ${selectedStudents.length} students?`}
       onCancel={() => setConfirmAdd(false)}
       onConfirm={() => handleAdd()}
       open={confirmAdd && !!selectedTag}
@@ -63,7 +63,7 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
     <Confirm
       cancelButton="Cancel"
       confirmButton="Confirm"
-      content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.tagname : null}" from ${selectedStudents.length} students?`}
+      content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.name : null}" from ${selectedStudents.length} students?`}
       onCancel={() => setConfirmDelete(false)}
       onConfirm={() => handleDelete()}
       open={confirmDelete && !!selectedTag}
