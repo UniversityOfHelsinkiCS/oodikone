@@ -7,3 +7,9 @@ export type Tag = {
 }
 
 export type NewTag = Omit<Tag, 'id'>
+
+export type StudentTag = {
+  studentNumber: string
+  tagId: string
+  tag?: Tag
+}
