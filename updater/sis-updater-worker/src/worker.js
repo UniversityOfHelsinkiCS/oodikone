@@ -31,5 +31,9 @@ worker.on('failed', (job, error) => {
 })
 
 worker.on('active', job => {
-  logger.info(`Started job ${job.id}`)
+  logger.info({
+    message: `Started job ${job.id}`,
+    type: job.name,
+    count: job.data?.length,
+  })
 })
