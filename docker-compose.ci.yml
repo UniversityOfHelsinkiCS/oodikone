@@ -118,7 +118,6 @@ services:
       - redis
       - sis-db
       - sis-importer-db
-      - sis-updater-nats
     environment:
       CI: 'true'
       DB_URL: postgres://postgres@sis-db:5432/sis-db
@@ -141,7 +140,6 @@ services:
     depends_on:
       - redis
       - sis-importer-db
-      - sis-updater-nats
     environment:
       CI: 'true'
       REDIS_HOST: redis
@@ -156,13 +154,5 @@ services:
       EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
     ports:
       - 8082:8082
-    profiles:
-      - updater
-
-  sis-updater-nats:
-    <<: *defaults
-    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
-    container_name: sis-updater-nats
-    image: nats-streaming:0.25.6
     profiles:
       - updater
