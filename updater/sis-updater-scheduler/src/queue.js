@@ -11,10 +11,10 @@ const queue = new Queue('updater-queue', {
   connection,
   defaultJobOptions: {
     removeOnComplete: {
-      count: 1000,
+      age: 60 * 60,
     },
     removeOnFail: {
-      count: 5000,
+      age: 24 * 60 * 60,
     },
   },
 })
