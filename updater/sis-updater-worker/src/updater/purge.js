@@ -7,13 +7,13 @@ const {
   CourseType,
   Student,
   CourseProvider,
-  Semester,
   Teacher,
   CreditType,
   Credit,
   CreditTeacher,
   StudyrightExtent,
-  ProgrammeModule,
+  SISStudyRightElement,
+  SISStudyRight,
 } = require('../db/models')
 const { logger } = require('../utils/logger')
 const { lock } = require('../utils/redis')
@@ -26,11 +26,10 @@ const tableToModel = {
   credit_teachers: CreditTeacher,
   credit_types: CreditType,
   organization: Organization,
-  semesters: Semester,
-  student: Student,
+  sis_study_right_elements: SISStudyRightElement,
+  sis_study_rights: SISStudyRight,
   studyright_extents: StudyrightExtent,
   teacher: Teacher,
-  programme_modules: ProgrammeModule,
 }
 
 const prePurge = async ({ tables, before }) => {
