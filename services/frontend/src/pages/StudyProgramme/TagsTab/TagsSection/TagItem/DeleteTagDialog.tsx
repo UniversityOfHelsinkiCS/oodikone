@@ -1,5 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
+import { useEffect } from 'react'
 
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useDeleteTagMutation } from '@/redux/tags'
 import { Tag } from '@/shared/types'
 
@@ -12,13 +14,26 @@ export const DeleteTagDialog = ({
   tag: Tag
   tagToDelete: Tag | null
 }) => {
-  const [deleteTag] = useDeleteTagMutation()
+  const { setStatusNotification } = useStatusNotification()
+  const [deleteTag, { isError, isSuccess }] = useDeleteTagMutation()
 
   const handleDeleteTag = (event, tag: Tag) => {
     event.preventDefault()
     void deleteTag(tag)
     setTagToDelete(null)
   }
+
+  useEffect(() => {
+    if (isError) {
+      setStatusNotification(`Failed to delete tag ${tag.name}`, 'error')
+    }
+  }, [isError, tag])
+
+  useEffect(() => {
+    if (isSuccess) {
+      setStatusNotification(`Tag ${tag.name} deleted successfully`, 'success')
+    }
+  }, [isSuccess, tag])
 
   return (
     <Dialog open={tagToDelete?.id === tag.id}>

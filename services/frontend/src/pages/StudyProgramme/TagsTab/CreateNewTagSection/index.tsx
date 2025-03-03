@@ -2,10 +2,11 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { Button, FormControlLabel, Stack, Switch, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import { Moment } from 'moment'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation } from '@/redux/tags'
@@ -16,8 +17,9 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
   const [tagName, setTagName] = useState<string>('')
   const [year, setYear] = useState<Moment | null>(null)
   const [personal, setPersonal] = useState(false)
+  const { setStatusNotification } = useStatusNotification()
   const { id: userId } = useGetAuthorizedUserQuery()
-  const [createTag] = useCreateTagMutation()
+  const [createTag, { isError, isSuccess }] = useCreateTagMutation()
 
   const handleSubmit = event => {
     event.preventDefault()
@@ -36,6 +38,18 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
   const handleChange = ({ target }) => {
     setTagName(target.value)
   }
+
+  useEffect(() => {
+    if (isError) {
+      setStatusNotification('Failed to create new tag', 'error')
+    }
+  }, [isError])
+
+  useEffect(() => {
+    if (isSuccess) {
+      setStatusNotification('New tag created', 'success')
+    }
+  }, [isSuccess])
 
   return (
     <Section cypress="create-new-tag" infoBoxContent={studyProgrammeToolTips.tags} title="Create new tag">

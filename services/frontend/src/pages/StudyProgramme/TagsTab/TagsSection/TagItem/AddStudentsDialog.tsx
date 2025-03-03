@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import { extractItems } from '@/common'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useCreateStudentTagsMutation } from '@/redux/tags'
 import { Tag } from '@/shared/types'
 
@@ -27,18 +28,25 @@ export const AddStudentsDialog = ({
   studyTrack: string
   tag: Tag
 }) => {
+  const { setStatusNotification } = useStatusNotification()
   const [input, setInput] = useState('')
   const parsedStudentNumbers = extractItems(input)
   const [createStudentTags, { isError, isLoading, isSuccess }] = useCreateStudentTagsMutation()
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isSuccess) {
-        setInput('')
-        setTimeout(() => setOpen(false), 2000)
-      }
+    if (isError) {
+      setStatusNotification(
+        `Failed to add students to tag ${tag.name}. Did you enter correct student numbers?`,
+        'error'
+      )
     }
-  }, [isLoading, isSuccess, setOpen])
+  }, [isError, tag])
+
+  useEffect(() => {
+    if (isSuccess) {
+      setStatusNotification(`Students added to tag ${tag.name}`, 'success')
+    }
+  }, [isSuccess, tag])
 
   const handleClick = async event => {
     event.preventDefault()
@@ -76,7 +84,7 @@ export const AddStudentsDialog = ({
         </Button>
         <Button
           color="success"
-          disabled={isError || isLoading || !parsedStudentNumbers.length}
+          disabled={isLoading || !parsedStudentNumbers.length}
           onClick={handleClick}
           variant="contained"
         >
