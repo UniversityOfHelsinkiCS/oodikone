@@ -1,22 +1,32 @@
-const { postUpdate } = require('./postUpdate')
+const { intersection } = require('lodash')
+
 const { update } = require('./updater')
 const { purgeByStudentNumber, prePurge, purge } = require('./updater/purge')
 const { loadMapsOnDemand } = require('./updater/shared')
+const {
+  fixVarhaiskasvatusStudyRights,
+  studentsThatNeedToBeFixed,
+} = require('./updater/updateStudents/varhaiskasvatusFixer')
 
 const updateMsgHandler = async updateMsg => {
-  // TODO: Remove the following line after postUpdate is implemented correctly (worker.js calculates the processing time more accurately)
-  const startTime = new Date()
   await update(updateMsg)
-  await postUpdate(updateMsg, startTime)
+  if (updateMsg.type === 'students') {
+    const studentsToBeFixed = intersection(
+      updateMsg.entityIds || [],
+      studentsThatNeedToBeFixed.map(s => s.id)
+    )
+    if (studentsToBeFixed.length > 0) {
+      await fixVarhaiskasvatusStudyRights(studentsToBeFixed)
+    }
+  }
 }
 
 module.exports = async job => {
   switch (job.name) {
     case 'students_with_purge': {
       const studentNumbers = job.data.map(student => student.student_number)
-      const msgInUpdateFormat = { type: 'students', entityIds: job.data.map(student => student.id) }
       await purgeByStudentNumber(studentNumbers)
-      await updateMsgHandler(msgInUpdateFormat)
+      await updateMsgHandler({ type: 'students', entityIds: job.data.map(student => student.id) })
       break
     }
     case 'prepurge_start': {
