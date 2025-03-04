@@ -5,11 +5,11 @@ import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
 import {
+  Query as FormattedQueryParams,
   dateMonthsFromNow,
   formatStudentsForApi,
   getOptionsForStudents,
   parseQueryParams,
-  Query as FormattedQueryParams,
 } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
@@ -54,6 +54,7 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
   let criteria = {} as Criteria
 
   const degreeProgrammeType = await getDegreeProgrammeType(code)
+
   if (degreeProgrammeType === DegreeProgrammeType.MASTER || degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
     optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   }

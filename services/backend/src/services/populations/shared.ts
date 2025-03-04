@@ -1,5 +1,4 @@
 import { orderBy } from 'lodash'
-import moment from 'moment'
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
@@ -34,43 +33,93 @@ const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear
   }
 }
 
-const getCreditAmount = (
-  course: ParsedCourse,
-  hops: Studyplan[],
-  courseCode: string,
-  startDate: string,
-  addition: number
-) => {
-  return moment(course.date).isBetween(moment(startDate), moment(startDate).add(addition, 'year')) &&
-    hops.length > 0 &&
-    (hops[0].included_courses.includes(courseCode) || hops[0].included_courses.includes(course.course_code))
-    ? course.credits
-    : 0
+/**
+ * @returns A new date with year incremented by the given amount
+ */
+const dateYearsFromNow = (date: Date, years: number) => {
+  const newDate = new Date(date)
+  newDate.setFullYear(newDate.getFullYear() + years)
+  return newDate
+}
+
+/**
+ * @param date The initial Date as ISOString
+ * @param months Number of months to add to the start date
+ * @returns A new date with months incremented by the given amount
+ */
+export const dateMonthsFromNow = (date: string, months: number) => {
+  const initialDate = new Date(date)
+  return new Date(initialDate.setMonth(initialDate.getMonth() + months))
+}
+
+/**
+ * @returns A new Date with amount of days added to the start date
+ */
+const dateDaysFromNow = (date: Date, days: number) => new Date(date.getTime() + 24 * 60 * 60 * 1000 * days)
+
+const getCreditAmount = (course: ParsedCourse, hops: Studyplan[], courseCode: string, startDate: string) => {
+  const courseDate = new Date(course.date)
+  const startDateFromString = new Date(startDate)
+
+  const creditAmounts = [0, 0, 0, 0, 0, 0]
+
+  for (let i = 1; i <= 6; i++) {
+    if (
+      courseDate > startDateFromString &&
+      courseDate < dateYearsFromNow(startDateFromString, i) &&
+      hops.length > 0 &&
+      (hops[0].included_courses.includes(courseCode) || hops[0].included_courses.includes(course.course_code))
+    ) {
+      creditAmounts[i - 1] = course.credits
+    }
+  }
+  return creditAmounts
 }
 
 const updateCourseByYear = (
   criteria: Criteria,
-  criteriaYear: string,
   course: ParsedCourse,
   criteriaChecked: Record<string, CriteriaYear>,
-  yearToAdd: string,
   correctCode: string
 ) => {
-  // TODO: Clean up this mess
-  if (
-    criteria?.courses?.[criteriaYear] &&
-    (criteria.courses[criteriaYear].includes(course.course_code) ||
-      criteria.courses[criteriaYear].some((criteriaCourse: string) =>
-        criteria.allCourses[criteriaCourse]?.includes(course.course_code)
-      ))
-  ) {
-    if (
-      !criteriaChecked[yearToAdd].coursesSatisfied[correctCode] ||
-      new Date(criteriaChecked[yearToAdd].coursesSatisfied[correctCode]) > new Date(course.date)
-    ) {
-      criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+  const yearMap = [
+    { criteriaYear: 'yearOne', yearToAdd: 'year1' },
+    { criteriaYear: 'yearTwo', yearToAdd: 'year2' },
+    { criteriaYear: 'yearThree', yearToAdd: 'year3' },
+    { criteriaYear: 'yearFour', yearToAdd: 'year4' },
+    { criteriaYear: 'yearFive', yearToAdd: 'year5' },
+    { criteriaYear: 'yearSix', yearToAdd: 'year6' },
+  ]
+
+  const courseSets = yearMap.reduce(
+    (acc, { criteriaYear }) => {
+      const yearCourses = criteria?.courses?.[criteriaYear] || []
+      const expandedCodes = new Set<string>()
+
+      yearCourses.forEach((mainCode: string) => {
+        expandedCodes.add(mainCode)
+
+        criteria.allCourses[mainCode]?.forEach((subCode: string) => {
+          expandedCodes.add(subCode)
+        })
+      })
+
+      acc[criteriaYear] = expandedCodes
+      return acc
+    },
+    {} as Record<string, Set<string>>
+  )
+
+  yearMap.forEach(({ criteriaYear, yearToAdd }) => {
+    const yearSet = courseSets[criteriaYear]
+
+    if (yearSet?.has(course.course_code)) {
+      const currentDate = criteriaChecked[yearToAdd].coursesSatisfied[correctCode]
+      if (!currentDate || new Date(currentDate) > new Date(course.date)) {
+        criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+      }
     }
-  }
+  })
 }
 
 const updateCreditCriteriaInfo = (
@@ -113,16 +162,18 @@ const formatStudentForPopulationStatistics = (
   enrollments: Record<string, Enrollment[]>,
   credits: Record<string, Credit[]>,
   startDate: string,
-  startDateMoment: moment.Moment,
-  endDateMoment: moment.Moment,
+  endDate: string,
   criteria: Criteria,
   code: string,
   optionData: Record<string, { name: Name }>
 ) => {
+  const startDateFromISO = new Date(startDate)
+  const endDateFromISO = new Date(endDate)
+
   const toCourse = (credit: Credit, normalizeDate: boolean): ParsedCourse => {
     const attainmentDateNormalized =
-      normalizeDate && credit.attainment_date < new Date(startDate)
-        ? startDateMoment.clone().add(1, 'day').toISOString()
+      normalizeDate && credit.attainment_date < startDateFromISO
+        ? dateDaysFromNow(startDateFromISO, 1).toISOString()
         : credit.attainment_date.toISOString()
     const passed =
       Credit.passed({ credittypecode: credit.credittypecode }) ||
@@ -193,9 +244,16 @@ const formatStudentForPopulationStatistics = (
         correctStudyRightElement!
       )
       if (hasTransferredToProgramme) {
-        const transferredFromProgramme = correctStudyRight.studyRightElements.find(element =>
-          moment(element.endDate).isSame(moment(correctStudyRightElement?.startDate).subtract(1, 'd'), 'day')
-        )?.code
+        const transferredFromProgramme = correctStudyRight.studyRightElements.find(element => {
+          const studyRightStart = new Date(correctStudyRightElement?.startDate ?? 0)
+          const studyRightEndDate = new Date(element.endDate)
+          const studyRightStartDate = dateDaysFromNow(studyRightStart, -1)
+          return (
+            studyRightStartDate.getFullYear() === studyRightEndDate.getFullYear() &&
+            studyRightStartDate.getMonth() === studyRightEndDate.getMonth() &&
+            studyRightStartDate.getDate() === studyRightEndDate.getDate()
+          )
+        })?.code
         if (transferredFromProgramme) {
           transferredStudyright = true
           transferSource = transferredFromProgramme
@@ -215,23 +273,21 @@ const formatStudentForPopulationStatistics = (
     }
 
     const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
+
     if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, true)) : []
+
       courses.forEach(course => {
         if (course.passed) {
           const correctCode = criteriaCoursesBySubstitutions[course.course_code]
-          updateCourseByYear(criteria, 'yearOne', course, criteriaChecked, 'year1', correctCode)
-          updateCourseByYear(criteria, 'yearTwo', course, criteriaChecked, 'year2', correctCode)
-          updateCourseByYear(criteria, 'yearThree', course, criteriaChecked, 'year3', correctCode)
-          updateCourseByYear(criteria, 'yearFour', course, criteriaChecked, 'year4', correctCode)
-          updateCourseByYear(criteria, 'yearFive', course, criteriaChecked, 'year5', correctCode)
-          updateCourseByYear(criteria, 'yearSix', course, criteriaChecked, 'year6', correctCode)
-          academicYears.first += getCreditAmount(course, correctStudyplan, correctCode, startDate, 1)
-          academicYears.second += getCreditAmount(course, correctStudyplan, correctCode, startDate, 2)
-          academicYears.third += getCreditAmount(course, correctStudyplan, correctCode, startDate, 3)
-          academicYears.fourth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 4)
-          academicYears.fifth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 5)
-          academicYears.sixth += getCreditAmount(course, correctStudyplan, correctCode, startDate, 6)
+
+          updateCourseByYear(criteria, course, criteriaChecked, correctCode)
+
+          const creditAmounts = getCreditAmount(course, correctStudyplan, correctCode, startDate)
+
+          Object.keys(academicYears).forEach((year, index) => {
+            academicYears[year] += creditAmounts[index]
+          })
         }
       })
     }
@@ -246,6 +302,7 @@ const formatStudentForPopulationStatistics = (
   }
 
   const started = dateofuniversityenrollment
+  const starting = +startDateFromISO <= +started && +started <= +endDateFromISO
 
   return {
     firstnames,
@@ -264,7 +321,7 @@ const formatStudentForPopulationStatistics = (
     updatedAt: updatedAt || createdAt,
     tags: tags ?? [],
     studyrightStart: startDate,
-    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
+    starting,
     option,
     birthdate,
     studyplans,
@@ -275,10 +332,6 @@ const formatStudentForPopulationStatistics = (
     transferredStudyright,
     transferSource,
   }
-}
-
-export const dateMonthsFromNow = (date: string, months: number) => {
-  return new Date(moment(date).add(months, 'months').format('YYYY-MM-DD'))
 }
 
 export type Query = {
@@ -410,9 +463,6 @@ export const formatStudentsForApi = (
   criteria: Criteria,
   code: string
 ) => {
-  const startDateMoment = moment(startDate)
-  const endDateMoment = moment(endDate)
-
   const creditsByStudent = credits.reduce(
     (acc, credit) => {
       acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
@@ -437,8 +487,7 @@ export const formatStudentsForApi = (
         enrollmentsByStudent,
         creditsByStudent,
         startDate,
-        startDateMoment,
-        endDateMoment,
+        endDate,
         criteria,
         code,
         optionData
