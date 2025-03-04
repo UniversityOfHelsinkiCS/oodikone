@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react'
 
 import { callApi } from '@/apiConnection'
 import { isDefaultServiceProvider } from '@/common'
-import { updaterToolTips } from '@/common/InfoToolTips/updater'
+import { updaterToolTips } from '@/common/InfoToolTips'
 import { ExternalLink } from '@/components/material/ExternalLink'
 import { PageTitle } from '@/components/material/PageTitle'
 import { Section } from '@/components/material/Section'

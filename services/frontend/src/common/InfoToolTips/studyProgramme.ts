@@ -138,6 +138,11 @@ export const studyProgrammeToolTips: Record<string, string> = {
   notCompleted: `
     Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
   `,
+  tags: `
+    Here you can create tags for study programme. You can either create public tags or *personal* tags. Tags can be used to combine students from other starting years.
+    'Associated start year' means what year you want to use as a start year for the students in that tag. For example with this you can move student from earlier starting year to next year if the student was absent during first year.
+    However this is optional and you can create a new tag without selecting year.
+  `,
 }
 
 studyProgrammeToolTips.studyTrackOverviewCombinedProgramme = studyProgrammeToolTips.studyTrackOverview

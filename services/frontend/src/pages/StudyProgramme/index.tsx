@@ -143,7 +143,7 @@ export const StudyProgramme = () => {
         key: 'TagsTab',
         cypress: 'tags-tab',
         label: 'Tags',
-        component: <TagsTab combinedProgramme={secondProgrammeId} studyprogramme={programmeId} />,
+        component: <TagsTab combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />,
       }
     )
   }

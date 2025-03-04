@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
-    "@mui/x-date-pickers": "^7.27.0",
+    "@mui/x-date-pickers": "^7.27.1",
     "@reduxjs/toolkit": "^2.5.1",
     "@sentry/browser": "^8.55.0",
     "axios": "^1.7.9",

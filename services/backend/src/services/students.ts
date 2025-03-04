@@ -367,7 +367,7 @@ export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentN
   ).map(formatStudentForSearch)
 }
 
-export const filterStudentnumbersByAccessrights = async (studentnumbers: string[], codes: string[]) =>
+export const filterStudentNumbersByAccessRights = async (studentnumbers: string[], codes: string[]) =>
   (
     await Student.findAll({
       attributes: ['studentnumber'],

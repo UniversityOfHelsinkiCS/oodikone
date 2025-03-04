@@ -6,36 +6,36 @@ import { TagStudent } from '@/components/TagStudent'
 import { useGetStudentTagsByStudyTrackQuery, useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
 const Row = memo(
-  ({ studentsTags, studentNumber, studytrack, tagOptions, name, combinedProgramme }) => (
+  ({ studentTags, studentNumber, studyTrack, tagOptions, name, combinedProgramme }) => (
     <TagStudent
       combinedProgramme={combinedProgramme}
-      studentname={name}
-      studentnumber={studentNumber}
-      studentstags={studentsTags}
-      studytrack={studytrack}
+      studentName={name}
+      studentNumber={studentNumber}
+      studentTags={studentTags}
+      studyTrack={studyTrack}
       tagOptions={tagOptions}
     />
   ),
-  (prevProps, newProps) => prevProps.studentsTags.length === newProps.studentsTags.length
+  (prevProps, newProps) => prevProps.studentTags.length === newProps.studentTags.length
 )
 
 export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents }) => {
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
-  const { data: tagstudent } = useGetStudentTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+  const { data: tagStudents } = useGetStudentTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
   const { visible: namesVisible } = useStudentNameVisibility()
 
   const tagRows =
-    tagstudent && tags
+    tagStudents && tags
       ? selectedStudents.map(({ studentNumber, name }) => {
-          const studentsTags = tagstudent.filter(tag => tag.studentnumber === studentNumber)
-          const tagIds = studentsTags.map(tag => tag.tag.tag_id)
+          const studentTags = tagStudents.filter(tag => tag.studentNumber === studentNumber)
+          const tagIds = studentTags.map(tag => tag.tag.id)
           const studentTagOptions = tags
-            .filter(tag => !tagIds?.includes(tag.tag_id))
+            .filter(tag => !tagIds?.includes(tag.id))
             .map(tag => ({
-              key: tag.tag_id,
-              text: tag.tagname,
-              value: tag.tag_id,
+              key: tag.id,
+              text: tag.name,
+              value: tag.id,
             }))
           return (
             <Row
@@ -43,8 +43,8 @@ export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents }) 
               key={studentNumber}
               name={name}
               studentNumber={studentNumber}
-              studentsTags={studentsTags}
-              studytrack={mainProgramme}
+              studentTags={studentTags}
+              studyTrack={mainProgramme}
               tagOptions={studentTagOptions}
             />
           )
