@@ -85,6 +85,7 @@ export const StudyProgramme = () => {
         <BasicInformationTab
           academicYear={academicYear}
           combinedProgramme={secondProgrammeId}
+          key="BasicInformationTabContent"
           setAcademicYear={setAcademicYear}
           setSpecialGroupsExcluded={setSpecialGroupsExcluded}
           specialGroupsExcluded={specialGroupsExcluded}
@@ -100,6 +101,7 @@ export const StudyProgramme = () => {
         <StudyTracksAndClassStatisticsTab
           combinedProgramme={secondProgrammeId}
           graduated={graduated}
+          key="StudyTracksAndClassStatisticsTabContent"
           setGraduated={setGraduated}
           setSpecialGroupsExcluded={setSpecialGroupsExcluded}
           specialGroupsExcluded={specialGroupsExcluded}
@@ -118,6 +120,7 @@ export const StudyProgramme = () => {
         <ProgrammeCoursesTab
           academicYear={academicYear}
           combinedProgramme={secondProgrammeId}
+          key="ProgrammeCoursesTabContent"
           setAcademicYear={setAcademicYear}
           studyProgramme={programmeId}
         />
@@ -134,6 +137,7 @@ export const StudyProgramme = () => {
         component: (
           <DegreeCoursesTab
             combinedProgramme={secondProgrammeId}
+            key="DegreeCoursesTabContent"
             studyProgramme={programmeId}
             year={`${new Date().getFullYear()}`}
           />
@@ -143,7 +147,7 @@ export const StudyProgramme = () => {
         key: 'TagsTab',
         cypress: 'tags-tab',
         label: 'Tags',
-        component: <TagsTab combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />,
+        component: <TagsTab combinedProgramme={secondProgrammeId} key="TagsTabContent" studyProgramme={programmeId} />,
       }
     )
   }
@@ -153,7 +157,13 @@ export const StudyProgramme = () => {
       key: 'UpdateStatisticsTab',
       cypress: 'update-statistics-tab',
       label: 'Update statistics',
-      component: <UpdateStatisticsTab combinedProgramme={secondProgrammeId} studyProgramme={programmeId} />,
+      component: (
+        <UpdateStatisticsTab
+          combinedProgramme={secondProgrammeId}
+          key="UpdateStatisticsTabContent"
+          studyProgramme={programmeId}
+        />
+      ),
     })
   }
 
