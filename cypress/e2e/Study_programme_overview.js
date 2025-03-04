@@ -2,11 +2,18 @@
 
 const { getEmptyYears } = require('../support/commands')
 
-const deleteTag = name => {
-  cy.contains('td', name).siblings().contains('Delete').click()
+const tagName = `tag-${new Date().getTime()}`
+
+const selectYear = year => {
+  // eslint-disable-next-line cypress/unsafe-to-chain-command
+  cy.contains('Associated start year (optional)').click({ force: true }).type(year)
+}
+
+const deleteTag = tagName => {
+  cy.cs(`delete-tag-${tagName}-button`).click()
+  cy.contains('Delete tag')
   cy.contains('Are you sure you want to delete tag')
-  cy.contains('Confirm').click()
-  cy.contains('td', name).should('not.exist')
+  cy.cs('confirm-delete-tag-button').click()
 }
 
 describe('Study programme overview', () => {
@@ -707,54 +714,70 @@ describe('Study programme overview', () => {
       cy.cs('tags-tab').click()
     })
 
-    it('can create and delete tags for population', () => {
-      const name = `tag-${new Date().getTime()}`
-      cy.get('.tagNameSelectInput > .ui > input').type(name)
-      cy.get('.yearSelectInput').type('2022')
-      cy.contains('Create a new tag').click()
-      cy.contains(name)
-      cy.contains('2022')
-      deleteTag(name)
+    it('info box', () => {
+      cy.cs('create-new-tag-info-box-button').click()
+      cy.cs('create-new-tag-info-box-content').contains('Here you can create')
     })
 
-    it('can create personal tags', () => {
-      const name = `tag-${new Date().getTime()}`
-      cy.get('.tagNameSelectInput > .ui > input').type(name)
-      cy.get('.yearSelectInput').type('2022')
+    describe('Adding tags to populations and removing them works', () => {
+      beforeEach(() => {
+        cy.contains('This study programme does not have any tags yet')
+        cy.cs('tag-name-text-field').type(tagName)
+      })
 
-      cy.get('.ui > label').click()
-      cy.contains('Create a new tag').click()
-      cy.contains(name)
-      deleteTag(name)
+      afterEach(() => {
+        deleteTag(tagName)
+        cy.contains('This study programme does not have any tags yet')
+      })
+
+      it('can create and delete tags without start year', () => {
+        cy.cs('create-button').click()
+        cy.contains(tagName)
+        cy.contains('No associated start year')
+      })
+
+      it('can create and delete tags with start year', () => {
+        selectYear('2022')
+        cy.cs('create-button').click()
+        cy.contains(tagName)
+        cy.contains('Associated start year 2022')
+      })
+
+      it('population link works', () => {
+        selectYear('2022')
+        cy.cs('create-button').click()
+        cy.contains(tagName)
+        cy.cs('population-link-button').click()
+        cy.contains(`Tagged with: ${tagName}`)
+        cy.go('back')
+      })
+
+      it('can create personal tags', () => {
+        cy.cs('personal-tag-toggle').click()
+        cy.cs('create-button').click()
+        cy.contains(tagName)
+        cy.cs(`${tagName}-visibility-icon`)
+      })
     })
 
     describe('Adding tags to students and removing them works', () => {
-      const name = `tag-${new Date().getTime()}`
       const studentInput = '477806,478275;   478953  479239\n   480080'
       const studentNumbers = studentInput.match(/[^\s,;]+/g)
 
       it('can add tags to students', () => {
-        cy.get('.tagNameSelectInput > .ui > input').type(name)
-        cy.get('.yearSelectInput').type('2022')
-        cy.contains('Create a new tag').click()
-        cy.contains(name)
+        cy.cs('tag-name-text-field').type(tagName)
+        selectYear('2022')
+        cy.cs('create-button').click()
+        cy.contains(tagName)
 
-        cy.contains('Add a tag to students').click()
-        cy.get('.form > .field > .dropdown').click().get('.ui > input.search').type(name).click()
+        cy.cs('add-students-button').click()
+        cy.cs('add-students-text-field').type(studentInput)
+        cy.cs('add-students-confirm-button').click()
+        cy.contains('Students added to tag')
 
-        cy.get('.form > .field > .dropdown > .visible').contains(name).click()
-
-        cy.get('textarea').type(studentInput)
-        cy.contains('Add tags').click()
-
-        cy.contains('Successfully added tags to students.')
-
-        cy.contains('td', name).within(() => {
-          cy.get('i.level.up.alternate.icon').click()
-        })
-
+        cy.cs('population-link-button').click()
         cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
-        cy.contains(`Tagged with: ${name}`)
+        cy.contains(`Tagged with: ${tagName}`)
         cy.contains('Students (5)')
           .parent()
           .then($parentDiv => {
@@ -768,21 +791,21 @@ describe('Study programme overview', () => {
         for (const studentNumber of studentNumbers) {
           cy.visit(`/students/${studentNumber}`)
           cy.contains('Tags')
-          cy.contains(name)
+          cy.contains(tagName)
         }
 
         cy.get('a').contains('Matemaattisten tieteiden kandiohjelma').invoke('removeAttr', 'target').click()
         cy.url().should('include', '/study-programme/KH50_001?tab=4')
 
-        deleteTag(name)
+        deleteTag(tagName)
       })
 
       it('deleting a tag from tag view also removes it from students', () => {
-        cy.contains(name).should('not.exist')
+        cy.contains(tagName).should('not.exist')
         for (const studentNumber of studentNumbers) {
           cy.visit(`/students/${studentNumber}`)
           cy.contains('Tags').should('not.exist')
-          cy.contains(name).should('not.exist')
+          cy.contains(tagName).should('not.exist')
         }
       })
     })

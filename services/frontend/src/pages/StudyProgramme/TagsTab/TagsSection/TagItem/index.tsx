@@ -32,12 +32,12 @@ export const TagItem = ({
         secondaryAction={
           <Stack direction="row">
             <Tooltip arrow placement="top" title="Add students to tag">
-              <IconButton onClick={() => setStudentsToAddDialogOpen(true)}>
+              <IconButton data-cy="add-students-button" onClick={() => setStudentsToAddDialogOpen(true)}>
                 <PersonAddAlt1Icon />
               </IconButton>
             </Tooltip>
             <Tooltip arrow placement="top" title="Delete tag">
-              <IconButton onClick={() => setTagToDelete(tag)}>
+              <IconButton data-cy={`delete-tag-${tag.name}-button`} onClick={() => setTagToDelete(tag)}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -60,7 +60,7 @@ export const TagItem = ({
               )}
               {tag.personalUserId && (
                 <Tooltip arrow placement="right" title="Only you can see this tag">
-                  <VisibilityIcon fontSize="small" />
+                  <VisibilityIcon data-cy={`${tag.name}-visibility-icon`} fontSize="small" />
                 </Tooltip>
               )}
             </Stack>

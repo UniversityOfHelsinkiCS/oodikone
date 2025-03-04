@@ -17,7 +17,7 @@ const getMonths = (year: number) => {
 const PopulationLinkButton = ({ title, to }: { title: string; to: string }) => {
   return (
     <Link title={title} to={to}>
-      <IconButton color="primary">
+      <IconButton color="primary" data-cy="population-link-button">
         <NorthEastIcon fontSize="small" />
       </IconButton>
     </Link>

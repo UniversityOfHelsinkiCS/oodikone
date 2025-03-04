@@ -69,6 +69,7 @@ export const AddStudentsDialog = ({
         <Stack gap={1}>
           <DialogContentText>Insert student numbers you wish to tag</DialogContentText>
           <TextField
+            data-cy="add-students-text-field"
             minRows={3}
             multiline
             onChange={event => setInput(event.target.value)}
@@ -84,6 +85,7 @@ export const AddStudentsDialog = ({
         </Button>
         <Button
           color="success"
+          data-cy="add-students-confirm-button"
           disabled={isLoading || !parsedStudentNumbers.length}
           onClick={handleClick}
           variant="contained"

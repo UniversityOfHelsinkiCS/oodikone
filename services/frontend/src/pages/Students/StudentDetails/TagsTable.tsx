@@ -27,7 +27,7 @@ export const TagsTable = ({ student }: { student: any }) => {
 
   for (const tag of student.tags) {
     const tagsForProgramme = tagData.find(({ programme }) => programme.code === tag.programme.code)
-    const parsedTag = { userId: tag.tag.personalUserId, tagName: tag.tag.name, id: tag.id }
+    const parsedTag = { userId: tag.tag.personal_user_id, tagName: tag.tag.tagname, id: tag.tag_id }
 
     if (tagsForProgramme) {
       tagsForProgramme.tags.push(parsedTag)

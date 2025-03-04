@@ -48,7 +48,12 @@ export const DeleteTagDialog = ({
         <Button onClick={() => setTagToDelete(null)} variant="outlined">
           Cancel
         </Button>
-        <Button color="error" onClick={event => handleDeleteTag(event, tag)} variant="contained">
+        <Button
+          color="error"
+          data-cy="confirm-delete-tag-button"
+          onClick={event => handleDeleteTag(event, tag)}
+          variant="contained"
+        >
           Confirm
         </Button>
       </DialogActions>

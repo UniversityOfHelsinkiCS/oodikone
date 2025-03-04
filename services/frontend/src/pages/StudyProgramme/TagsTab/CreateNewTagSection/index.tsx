@@ -56,6 +56,7 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
       <Stack direction="column">
         <Stack alignItems="center" direction="row" gap={1}>
           <TextField
+            data-cy="tag-name-text-field"
             label="Tag name"
             onChange={handleChange}
             placeholder="Enter a name for the new tag"
@@ -63,6 +64,7 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
             value={tagName}
           />
           <DatePicker
+            data-cy="associated-start-year-date-picker"
             label="Associated start year (optional)"
             onChange={newYear => setYear(newYear)}
             sx={{
@@ -72,6 +74,7 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
             views={['year']}
           />
           <Button
+            data-cy="create-button"
             disabled={!tagName.trim() || tags.some(tag => tag.name === tagName.trim())}
             endIcon={<AddIcon />}
             onClick={handleSubmit}
@@ -82,6 +85,7 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
         </Stack>
         <FormControlLabel
           control={<Switch checked={personal} onChange={() => setPersonal(!personal)} />}
+          data-cy="personal-tag-toggle"
           label="Personal tag"
         />
       </Stack>
