@@ -2,6 +2,7 @@ import moment from 'moment'
 import { InferAttributes } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
+import { GraduationTimes, MedianEntry, ProgrammeOrStudyTrackGraduationStats, StudyTrackStats } from '../../shared/types'
 import { GenderCode, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
@@ -22,19 +23,6 @@ import {
 } from './studyProgrammeHelpers'
 import { getStudyTracksForProgramme } from './studyRightFinders'
 
-type MedianEntry = {
-  amount: number
-  classSize: number
-  name: string
-  statistics: ReturnType<typeof countTimeCategories>
-  y: number
-  times: number[]
-}
-
-export type ProgrammeOrStudyTrackGraduationStats = {
-  medians: { basic: MedianEntry[]; combo: MedianEntry[] }
-}
-
 const getCreditCount = (credits: Credit[], startDate: Date) =>
   credits
     .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
@@ -47,15 +35,8 @@ const getGraduationTimeStats = async (
   mainStatsByTrack: ReturnType<typeof combineStats>['mainStatsByTrack'],
   combinedProgramme?: string
 ) => {
-  type Goals = { basic: number; combo: number }
-
-  type GraduationTimes = {
-    goals: Goals
-    [programmeOrStudyTrack: string]: ProgrammeOrStudyTrackGraduationStats | Goals
-  }
-
   const goal = await getGoal(combinedProgramme ?? studyProgramme)
-  const finalGraduationTimes: GraduationTimes = { goals: { basic: goal, combo: goal + 36 } }
+  const finalGraduationTimes = { goals: { basic: goal, combo: goal + 36 } }
 
   const calculateGraduationTimes = (
     graduationTimes: Record<string, Record<string, number[]>>,
@@ -92,7 +73,7 @@ const getGraduationTimeStats = async (
   calculateGraduationTimes(graduationTimes, 'basic')
   calculateGraduationTimes(graduationTimesCombo, 'combo')
 
-  return finalGraduationTimes
+  return finalGraduationTimes as GraduationTimes
 }
 
 const getEmptyYear = () => ({
@@ -501,13 +482,21 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     return tableTitles.studytracksCombined.master
   }
   const graduatedTitles = combinedProgramme ? getCorrectCombinedTitles() : tableTitles.studytracksBasic
-  return {
-    id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
-    years,
-    ...stats,
+
+  const studyTrackStats: StudyTrackStats = {
+    creditCounts: stats.creditCounts,
+    creditCountsCombo: stats.creditCountsCombo,
     doCombo,
-    studyTracks,
+    graduationTimes: stats.graduationTimes,
+    graduationTimesSecondProg: stats.graduationTimesSecondProg,
+    id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
     includeGraduated: settings.graduated,
+    mainStatsByTrack: stats.mainStatsByTrack,
+    mainStatsByYear: stats.mainStatsByYear,
+    otherCountriesCount: stats.otherCountriesCount,
     populationTitles: [...tableTitles.studytracksStart, ...graduatedTitles, ...tableTitles.studytracksEnd],
+    studyTracks,
+    years,
   }
+  return studyTrackStats
 }

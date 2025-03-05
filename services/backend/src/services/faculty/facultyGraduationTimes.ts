@@ -6,10 +6,7 @@ import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTra
 import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
-import {
-  getStudyTrackStatsForStudyProgramme,
-  ProgrammeOrStudyTrackGraduationStats,
-} from '../studyProgramme/studyTrackStats'
+import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
 
 export type LevelGraduationStats = Omit<GraduationTimes['medians'][number], 'y'> & { median: number }
@@ -161,7 +158,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
     const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
     if (!(programmeCode in graduationTimes)) continue
-    const statsForProgramme = graduationTimes[programmeCode] as ProgrammeOrStudyTrackGraduationStats
+    const statsForProgramme = graduationTimes[programmeCode]
     const basicStats = statsForProgramme.medians.basic
     const comboStats = statsForProgramme.medians.combo
     const classSizesByYear = basicStats.reduce<Record<string, number>>(
