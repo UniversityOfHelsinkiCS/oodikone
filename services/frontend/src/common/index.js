@@ -388,15 +388,6 @@ export const isDefaultServiceProvider = () => {
 
 export const formatContent = content => content.replace(/\n +/g, '\n')
 
-export const getCalendarYears = years => {
-  return years.reduce((all, year) => {
-    if (year === 'Total') {
-      return all
-    }
-    return all.concat(Number(year.slice(0, 4)))
-  }, [])
-}
-
 export const filterInternalReleases = release => !release.title.startsWith('Internal:')
 
 export const getDescription = description => {
