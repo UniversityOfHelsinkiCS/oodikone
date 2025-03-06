@@ -311,6 +311,9 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
                 if (hasActiveEnrollments(student, course.code)) {
                   return 0
                 }
+                if (hasCourseInStudyplan(student, course.code)) {
+                  return 'HOPS'
+                }
                 return null
               },
               getRowContent: student => {
