@@ -33,7 +33,8 @@ export const bottlenecksOf = async (
 
   const courses = await findCourses(selectedStudents, selectedCourses)
 
-  // HACK:
+  // HACK: If year isn't present or is invalid, return MAGIC_NUMBER.
+  //       The new degree programs start on 2017.
   const getYear = (studentnumber: string): number => {
     const MAGIC_NUMBER = 2017
     for (const year in selectedStudentsByYear) {

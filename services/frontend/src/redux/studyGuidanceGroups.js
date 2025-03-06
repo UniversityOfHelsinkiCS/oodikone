@@ -26,10 +26,10 @@ const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
       }),
     }),
     getStudyGuidanceGroupPopulationCourses: builder.query({
-      query: ({ studentnumberlist, year }) => ({
-        url: '/v2/populationstatistics/coursesbystudentnumberlist',
+      query: ({ studentnumberlist }) => ({
+        url: '/v4/populationstatistics/courses',
         method: 'POST',
-        body: { studentnumberlist, usingStudyGuidanceGroups: true, year },
+        body: { selectedStudents: studentnumberlist },
       }),
     }),
   }),

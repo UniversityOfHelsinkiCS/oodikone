@@ -14,7 +14,6 @@ import { findByCourseAndSemesters } from '../services/students'
 import { mapToProviders } from '../shared/util'
 import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
-import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
@@ -37,8 +36,8 @@ export type PopulationstatisticsCoursesResBody = Bottlenecks | { error: string }
 export type PopulationstatisticsCoursesReqBody = {
   // NOTE: Encrypted students have their iv in selectedStudents
   selectedStudents: string[] | EncryptedStudent[]
-  selectedStudentsByYear: { [year: string]: string[] }
-  courses: string[]
+  selectedStudentsByYear?: { [year: string]: string[] }
+  courses?: string[]
 }
 
 // NOTE: POST instead of GET because of too long params and "sensitive" data
@@ -46,7 +45,7 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
   '/v4/populationstatistics/courses',
   async (req, res) => {
     const { roles, studentsUserCanAccess } = req.user
-    const { selectedStudents, selectedStudentsByYear, courses: selectedCourses } = req.body
+    const { selectedStudents, courses: selectedCourses = [], selectedStudentsByYear = {} } = req.body
 
     const hasFullAccess = hasFullAccessToStudentData(roles)
 
@@ -75,38 +74,6 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
       selectedCourses,
       isEncrypted
     )
-
-    return res.json(result)
-  }
-)
-
-type PopulationstatisticsByStudentNumberListResBody = PopulationstatisticsCoursesResBody
-type PopulationstatisticsByStudentNumberListReqBody = {
-  studentnumberlist: string[]
-  year: string
-  studyRights: string[]
-  semesters: string[]
-  months: number
-}
-
-router.post<never, PopulationstatisticsByStudentNumberListResBody, PopulationstatisticsByStudentNumberListReqBody>(
-  '/v2/populationstatistics/coursesbystudentnumberlist',
-  async (req, res) => {
-    const { roles, studentsUserCanAccess } = req.user
-    const { studentnumberlist: selectedStudents } = req.body
-
-    const selectedStudentsByYear = [] as any
-    const courses = [] as any
-
-    if (!selectedStudents) {
-      throw new ApplicationError('The body should have a studentnumberlist defined', 400)
-    }
-
-    const studentNumbers = hasFullAccessToStudentData(roles)
-      ? selectedStudents
-      : intersection(selectedStudents, studentsUserCanAccess)
-
-    const result = await bottlenecksOf(studentNumbers, selectedStudentsByYear, courses)
 
     return res.json(result)
   }
