@@ -19,11 +19,13 @@ The scheduler creates BullMQ jobs based on two triggers:
 ## How the scheduler works
 
 1. A cron job runs either `scheduleHourly` or `scheduleWeekly`:
-   - `scheduleHourly`: Updates only entities modified since the last hourly update.
-   - `scheduleWeekly`: Updates all relevant entities.
+   - `scheduleHourly`: Updates only entities that have been modified since the last hourly update. This ensures that changes such as new attainments or recently updated student data are quickly reflected in Oodikone.
+   - `scheduleWeekly`: Updates all relevant entities, including those that may not have been considered in hourly updates. Some changes, such as modifications to study plans, are only processed in the weekly update.
 1. The scheduler fetches the entity IDs from the **importer database**.
 1. The fetched IDs are split into smaller chunks (based on the `CHUNK_SIZE` environment variable).
-1. BullMQ jobs are created with these chunks and added to the queue, where they will be processed by sis-updater-worker.
+1. BullMQ jobs are created with these chunks and added to the queue, where they will be processed by **sis-updater-worker**.
+
+By combining hourly and weekly updates, we ensure that Oodikone reflects the latest available data as quickly as possible while also periodically performing a full refresh to capture any changes that might otherwise be missed.
 
 ## Prepurge and purge workflows
 
