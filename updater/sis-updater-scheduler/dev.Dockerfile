@@ -2,6 +2,8 @@ FROM node:22-alpine
 
 WORKDIR /opt/app-root/src
 
+ENV TZ="Europe/Helsinki"
+
 ENV NODE_ENV=development
 
 COPY ./package* ./
