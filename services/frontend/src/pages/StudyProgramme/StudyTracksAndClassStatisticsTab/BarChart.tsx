@@ -3,7 +3,7 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
-import { generateGradientColors } from '@/common'
+import { generateGradientColors } from '@/util/color'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
