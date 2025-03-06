@@ -201,19 +201,6 @@ export const findByCourseAndSemesters = async (
   return studentNumbers
 }
 
-export const findByTag = async (tag: string) => {
-  return (
-    await TagStudent.findAll({
-      attributes: ['studentnumber'],
-      where: {
-        tag_id: {
-          [Op.eq]: tag,
-        },
-      },
-    })
-  ).map(st => st.studentnumber)
-}
-
 const formatSharedStudentData = ({
   firstnames,
   lastname,

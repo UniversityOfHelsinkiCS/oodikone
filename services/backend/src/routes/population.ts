@@ -6,12 +6,11 @@ import { difference, intersection, uniq } from 'lodash'
 import { rootOrgId } from '../config'
 import { SISStudyRight } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
-import { encrypt, decrypt, type EncrypterData } from '../services/encrypt'
+import { encrypt, type EncrypterData } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
-import { bottlenecksOf } from '../services/populations/bottlenecksOf'
+import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
-import { populationStudentsMerger, populationCourseStatsMerger } from '../services/statMerger'
-import { findByTag, findByCourseAndSemesters } from '../services/students'
+import { findByCourseAndSemesters } from '../services/students'
 import { mapToProviders } from '../shared/util'
 import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
@@ -34,288 +33,206 @@ const isEncryptedStudent = (student?: string | EncryptedStudent) => {
   return (student as EncryptedStudent)?.encryptedData !== undefined
 }
 
-interface PostPopulationStatisticsRequest extends Request {
-  body: {
-    year: string
-    semesters: string[]
-    studyRights: string | string[]
-    months: number
-    selectedStudents: string[] | EncryptedStudent[]
-    selectedStudentsByYear?: { [year: string]: string[] }
-    studentStatuses?: string[]
-    years?: string[]
-  }
+export type PopulationstatisticsCoursesResBody = Bottlenecks | { error: string }
+export type PopulationstatisticsCoursesReqBody = {
+  // NOTE: Encrypted students have their iv in selectedStudents
+  selectedStudents: string[] | EncryptedStudent[]
+  selectedStudentsByYear: { [year: string]: string[] }
+  courses: string[]
 }
 
-// POST instead of GET because of too long params and "sensitive" data
-router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatisticsRequest, res: Response) => {
-  if (!req.body.year || !req.body.semesters || !req.body.studyRights) {
-    Sentry.captureException(new Error('The body should have a year, semester and study rights defined'))
-    return res.status(400).json({ error: 'The body should have a year, semester and study rights defined' })
-  }
-
-  if (!Array.isArray(req.body.studyRights)) {
-    req.body.studyRights = [req.body.studyRights]
-  }
-
-  if (req.body.months == null) {
-    req.body.months = 12
-  }
-
-  const encrypted = isEncryptedStudent(req.body.selectedStudents[0])
-
-  if (
-    !encrypted &&
-    !hasFullAccessToStudentData(req.user.roles) &&
-    req.body.selectedStudents.some(student => !req.user.studentsUserCanAccess.includes(student))
-  ) {
-    return res.status(403).json({ error: 'Trying to request unauthorized students data' })
-  }
-
-  if (!req.body.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
-    return res.status(400).json({ error: 'Semester should be either SPRING OR FALL' })
-  }
-
-  if (
-    req.body.studentStatuses &&
-    !req.body.studentStatuses.every(
-      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
-    )
-  ) {
-    return res.status(400).json({ error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' })
-  }
-
-  if (req.body.years) {
-    const upperYearBound = new Date().getFullYear() + 1
-    const multiCourseStatPromises = Promise.all(
-      req.body.years.map(year => {
-        if (req.body.selectedStudentsByYear) {
-          req.body.selectedStudents = encrypted
-            ? (req.body.selectedStudents as EncryptedStudent[]).filter(isEncryptedStudent).map(decrypt)
-            : req.body.selectedStudentsByYear[year]
-        }
-        const newMonths = (upperYearBound - Number(year)) * 12
-        const query = { ...req.body, year, months: newMonths, selectedStudents: req.body.selectedStudents as string[] }
-        const coursestatistics = bottlenecksOf(query, null, encrypted)
-        return coursestatistics
-      })
-    )
-    const multiCourseStats = await multiCourseStatPromises
-    const result = populationCourseStatsMerger(multiCourseStats)
-    if (result.error) {
-      return res.status(400).json(result)
-    }
-
-    return res.json(result)
-  }
-
-  if (encrypted) {
-    req.body.selectedStudents = (req.body.selectedStudents as EncryptedStudent[]).map(decrypt)
-  }
-
-  const query = { ...req.body, selectedStudents: req.body.selectedStudents as string[] }
-  try {
-    const result = await bottlenecksOf(query, null, encrypted)
-    return res.json(result)
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      Sentry.captureException(error)
-    }
-    return res.status(400).end()
-  }
-})
-
-interface PostPopulationStatisticsByTagRequest extends Request {
-  body: {
-    tag: string
-  }
-}
-
-router.post(
-  '/v2/populationstatistics/coursesbytag',
-  async (req: PostPopulationStatisticsByTagRequest, res: Response) => {
+// NOTE: POST instead of GET because of too long params and "sensitive" data
+router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCoursesReqBody>(
+  '/v4/populationstatistics/courses',
+  async (req, res) => {
     const { roles, studentsUserCanAccess } = req.user
-    const { tag } = req.body
-    if (!tag) {
-      return res.status(400).json({ error: 'The body should have a tag defined' })
+    const { selectedStudents, selectedStudentsByYear, courses: selectedCourses } = req.body
+
+    const hasFullAccess = hasFullAccessToStudentData(roles)
+
+    const isEncrypted = selectedStudents.some(isEncryptedStudent)
+    const hasAccessToStudents =
+      isEncrypted || (selectedStudents as string[]).every(student => studentsUserCanAccess.includes(student))
+
+    if (!hasAccessToStudents && !hasFullAccess) {
+      return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    const studentNumbers = await findByTag(tag)
-    const studentNumberList = hasFullAccessToStudentData(roles)
-      ? studentNumbers
-      : intersection(studentNumbers, studentsUserCanAccess)
-
-    try {
-      const result = await bottlenecksOf(
-        {
-          year: '1900',
-          studyRights: [],
-          semesters: ['FALL', 'SPRING'],
-          months: 10000,
-          tag,
-        },
-        studentNumberList
-      )
-      return res.json(result)
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        Sentry.captureException(error)
-      }
-      return res.status(400).end()
+    if (isEncrypted && !selectedStudents.every(isEncryptedStudent)) {
+      Sentry.captureException(new Error('Trying to request unencrypted student data as encrypted'))
+      return res.status(403).json({ error: 'Trying to request unauthorized student data' })
     }
+
+    const requiredFields = [selectedStudents, selectedCourses]
+    if (requiredFields.some(field => !field)) {
+      Sentry.captureException(new Error('The request body should countain: selected students and courses'))
+      return res.status(400).json({ error: 'The request body should countain: selected students and courses' })
+    }
+
+    const result = await bottlenecksOf(
+      selectedStudents as string[],
+      selectedStudentsByYear,
+      selectedCourses,
+      isEncrypted
+    )
+
+    return res.json(result)
   }
 )
 
-interface PostPopulationStatisticsByStudentNumberListRequest extends Request {
-  body: {
-    studentnumberlist: string[]
-    year: string
-    studyRights: string[]
-    semesters: string[]
-    months: number
-  }
+type PopulationstatisticsByStudentNumberListResBody = PopulationstatisticsCoursesResBody
+type PopulationstatisticsByStudentNumberListReqBody = {
+  studentnumberlist: string[]
+  year: string
+  studyRights: string[]
+  semesters: string[]
+  months: number
 }
 
-router.post(
+router.post<never, PopulationstatisticsByStudentNumberListResBody, PopulationstatisticsByStudentNumberListReqBody>(
   '/v2/populationstatistics/coursesbystudentnumberlist',
-  async (req: PostPopulationStatisticsByStudentNumberListRequest, res: Response) => {
+  async (req, res) => {
     const { roles, studentsUserCanAccess } = req.user
-    const {
-      body: { studentnumberlist, ...query },
-    } = req
+    const { studentnumberlist: selectedStudents } = req.body
 
-    if (!studentnumberlist) {
+    const selectedStudentsByYear = [] as any
+    const courses = [] as any
+
+    if (!selectedStudents) {
       throw new ApplicationError('The body should have a studentnumberlist defined', 400)
     }
 
     const studentNumbers = hasFullAccessToStudentData(roles)
-      ? studentnumberlist
-      : intersection(studentnumberlist, studentsUserCanAccess)
+      ? selectedStudents
+      : intersection(selectedStudents, studentsUserCanAccess)
 
-    try {
-      const result = await bottlenecksOf(
-        {
-          year: query?.year ?? 1900,
-          studyRights: query?.studyRights ?? [],
-          semesters: query?.semesters ?? ['FALL', 'SPRING'],
-          months: query?.months ?? 10000,
-        },
-        studentNumbers
-      )
-      return res.json(result)
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        Sentry.captureException(error)
-      }
-      return res.status(400).end()
-    }
+    const result = await bottlenecksOf(studentNumbers, selectedStudentsByYear, courses)
+
+    return res.json(result)
   }
 )
 
-interface GetPopulationStatisticsRequest extends Request {
-  query: {
-    year: string
-    semesters: string[]
-    studyRights: string
-    months: string
-    years?: string[]
-  }
+export type PopulationstatisticsResBody = { students: any } | { error: string }
+export type PopulationstatisticsReqBody = never
+export type PopulationstatisticsQuery = {
+  semesters: string[]
+  months: string
+  studyRights: string
+  year: string
+  years?: string[]
 }
 
-router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsRequest, res: Response) => {
-  const { year, semesters, studyRights: studyRightsJSON } = req.query
-  const { roles, programmeRights, id: userId } = req.user
-  if (!year || !semesters || !studyRightsJSON) {
-    res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
-    return
-  }
+router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
+  '/v3/populationstatistics',
+  async (req, res) => {
+    const { roles, programmeRights: userProgrammeRights, id: userId } = req.user
+    const { year, semesters, studyRights: studyRightsJSON } = req.query
 
-  const studyRights: { programme: string; combinedProgramme: string } = JSON.parse(studyRightsJSON)
-
-  const fullProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const programmeRightsCodes = programmeRights.map(({ code }) => code)
-
-  try {
-    if (
-      !hasFullAccessToStudentData(roles) &&
-      !programmeRightsCodes.includes(studyRights.programme) &&
-      !programmeRightsCodes.includes(studyRights.combinedProgramme)
-    ) {
-      return res.status(403).json([])
+    const requiredFields = [year, semesters, studyRightsJSON]
+    if (requiredFields.some(field => !field)) {
+      return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
     }
-  } catch (error) {
-    return res.status(400).json({ error: 'The query had invalid studyRights' })
-  }
 
-  if (req.query.months === null) {
-    req.query.months = '12'
-  }
+    const studyRights: { programme: string; combinedProgramme: string } = JSON.parse(studyRightsJSON)
+    const programmeRightsCodes = userProgrammeRights.map(({ code }) => code)
 
-  if (req.query.years) {
-    const upperYearBound = new Date().getFullYear() + 1
-    const multiPopulationStudentPromises = Promise.all(
-      req.query.years.map(year => {
-        const newMonths = (upperYearBound - Number(year)) * 12
-        const populationStudents = optimizedStatisticsOf({
-          ...req.query,
-          year: Number(year),
-          studyRights: { programme: studyRights.programme },
-          months: newMonths,
+    const hasFullAccess = hasFullAccessToStudentData(roles)
+    const hasAccessToProgramme = programmeRightsCodes.includes(studyRights.programme)
+    const hasAccessToCombinedProgramme = programmeRightsCodes.includes(studyRights.combinedProgramme)
+
+    if (!hasAccessToProgramme && !hasAccessToCombinedProgramme && !hasFullAccess) {
+      return res.status(403).json({ error: 'Trying to request unauthorized students data' })
+    }
+
+    // DONE:
+
+    if (req.query.months === null) {
+      req.query.months = '12'
+    }
+
+    if (req.query.years) {
+      const upperYearBound = new Date().getFullYear() + 1
+      const multiPopulationStudentPromises = Promise.all(
+        req.query.years.map(year => {
+          const newMonths = (upperYearBound - Number(year)) * 12
+          const populationStudents = optimizedStatisticsOf({
+            ...req.query,
+            year: Number(year),
+            studyRights: { programme: studyRights.programme },
+            months: newMonths,
+          })
+          return populationStudents
         })
-        return populationStudents
-      })
-    )
-    const multiPopulationStudents = await multiPopulationStudentPromises
+      )
+      const multiPopulationStudents = await multiPopulationStudentPromises
 
-    const result = populationStudentsMerger(multiPopulationStudents)
-    res.json(filterPersonalTags(result, userId))
-  } else {
-    const result: any = await optimizedStatisticsOf({
-      ...req.query,
-      year: Number(req.query.year),
-      studyRights: { programme: studyRights.programme },
-      months: Number(req.query.months),
-    })
+      const populationStudentsMerger = (multiYearStudents: any) => {
+        const samples = { students: [], courses: [] as any[] }
+        const uniqueCourseCodes = new Set<string>()
 
-    if ('error' in result && result.error) {
-      Sentry.captureException(new Error(result.error))
-      return res.status(400).end()
-    }
-
-    // Obfuscate if user has only limited study programme rights
-    if (
-      !hasFullAccessToStudentData(roles) &&
-      !fullProgrammeRights.includes(studyRights.programme) &&
-      !fullProgrammeRights.includes(studyRights.combinedProgramme)
-    ) {
-      if (!('students' in result)) {
-        return
-      }
-      result.students = result.students.map(student => {
-        const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
-        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
-        return {
-          ...student,
-          firstnames: '',
-          lastname: '',
-          phoneNumber: '',
-          iv,
-          studentNumber,
-          name: '',
-          email: '',
-          secondaryEmail: '',
-          sis_person_id: '',
-          enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
-          tags: [],
-          birthdate: obfuscatedBirthDate,
-          obfuscated: true,
+        for (const year of multiYearStudents) {
+          samples.students = samples.students.concat(year.students)
+          for (const course of year.courses) {
+            if (!uniqueCourseCodes.has(course.code)) {
+              uniqueCourseCodes.add(course.code)
+              samples.courses.push(course)
+            }
+          }
         }
-      })
-    }
 
-    res.json(filterPersonalTags(result, userId))
+        return samples
+      }
+      const result = populationStudentsMerger(multiPopulationStudents)
+      res.json(filterPersonalTags(result, userId))
+    } else {
+      const result: any = await optimizedStatisticsOf({
+        ...req.query,
+        year: Number(req.query.year),
+        studyRights: { programme: studyRights.programme },
+        months: Number(req.query.months),
+      })
+
+      if ('error' in result && result.error) {
+        Sentry.captureException(new Error(result.error))
+        return res.status(400).end()
+      }
+
+      const fullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
+      // Obfuscate if user has only limited study programme rights
+      if (
+        !hasFullAccessToStudentData(roles) &&
+        !fullProgrammeRights.includes(studyRights.programme) &&
+        !fullProgrammeRights.includes(studyRights.combinedProgramme)
+      ) {
+        if (!('students' in result)) {
+          return
+        }
+        result.students = result.students.map(student => {
+          const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
+          const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
+          return {
+            ...student,
+            firstnames: '',
+            lastname: '',
+            phoneNumber: '',
+            iv,
+            studentNumber,
+            name: '',
+            email: '',
+            secondaryEmail: '',
+            sis_person_id: '',
+            enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
+            tags: [],
+            birthdate: obfuscatedBirthDate,
+            obfuscated: true,
+          }
+        })
+      }
+
+      res.json(filterPersonalTags(result, userId))
+    }
   }
-})
+)
 
 interface GetPopulationStatisticsByCourseRequest extends Request {
   query: {
