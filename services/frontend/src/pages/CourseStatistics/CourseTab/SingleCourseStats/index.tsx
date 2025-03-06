@@ -91,7 +91,7 @@ export const SingleCourseStats = ({
   const parseQueryFromUrl = () => {
     const { separate } = qs.parse(location.search)
     return {
-      separate: JSON.parse(separate as string),
+      separate: JSON.parse((separate ?? 'false') as string),
     }
   }
 
