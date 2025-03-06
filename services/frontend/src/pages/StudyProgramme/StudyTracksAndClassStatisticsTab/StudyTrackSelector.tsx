@@ -10,31 +10,33 @@ export const StudyTrackSelector = ({
 }: {
   setStudyTrack: (studyTrack: string) => void
   studyTrack: string
-  studyTracks: Record<string, string | Name>
+  studyTracks: Record<string, string | Name> | undefined
 }) => {
   const { getTextIn } = useLanguage()
 
-  if (!studyTracks) {
-    return null
+  const options: { code: string; name: string; value: string }[] = []
+  if (studyTracks) {
+    options.push(
+      ...Object.entries(studyTracks)
+        .map(([code, studyTrack]) => ({
+          code,
+          name: typeof studyTrack === 'string' ? studyTrack : getTextIn(studyTrack)!,
+          value: code,
+        }))
+        .sort((a, b) => {
+          if (a.name.startsWith('All students of the programme')) return -1
+          if (b.name.startsWith('All students of the programme')) return 1
+          return a.name.localeCompare(b.name, 'fi', { sensitivity: 'accent' })
+        })
+    )
   }
-
-  const options = Object.entries(studyTracks)
-    .map(([code, studyTrack]) => ({
-      code,
-      name: typeof studyTrack === 'string' ? studyTrack : getTextIn(studyTrack)!,
-      value: code,
-    }))
-    .sort((a, b) => {
-      if (a.name.startsWith('All students of the programme')) return -1
-      if (b.name.startsWith('All students of the programme')) return 1
-      return a.name.localeCompare(b.name, 'fi', { sensitivity: 'accent' })
-    })
 
   return (
     <FormControl fullWidth>
       <InputLabel id="demo-simple-select-label">Select study track</InputLabel>
       <Select
         data-cy="study-track-select"
+        disabled={options.length === 0}
         label="Select study track"
         onChange={event => setStudyTrack(event.target.value)}
         value={studyTrack}
