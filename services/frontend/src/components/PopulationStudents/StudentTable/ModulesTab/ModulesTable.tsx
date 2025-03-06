@@ -102,6 +102,7 @@ export const ModulesTab = ({
     state: {
       columnVisibility,
       isLoading,
+      columnPinning: { left: ['studentNumber'] },
     },
     onColumnVisibilityChange: setColumnVisibility,
   })
