@@ -1,64 +1,58 @@
-import { BarChart } from './BarChart'
-import { BasicDataTable } from './BasicDataTable'
+import { Stack, Typography } from '@mui/material'
 
-interface ProgressStats {
-  chartStats: Array<{ data: number[]; name: string }>
-  tableStats: Array<Array<string | number>>
+import { ProgressBarChart } from '@/components/material/ProgressBarChart'
+import { ProgressTable } from './ProgressTable'
+
+type ProgressStats = {
+  chartStats: {
+    data: number[]
+    name: string
+  }[]
+  tableStats: (string | number)[][]
   tableTitles: string[]
 }
 
-interface ProgressOfStudentsProps {
-  progressStats: ProgressStats
-  progressComboStats: ProgressStats
-  track: string
+export const ProgressOfStudents = ({
+  progressComboStats,
+  progressStats,
+  studyProgramme,
+  years,
+}: {
+  progressComboStats: ProgressStats | null
+  progressStats: ProgressStats | null
+  studyProgramme: string
   years: string[]
-}
-
-export const ProgressOfStudents = ({ progressStats, progressComboStats, track, years }: ProgressOfStudentsProps) => {
+}) => {
   return (
-    <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
-      {progressComboStats != null && (
-        <>
-          <h2 style={{ margin: '0 0 1rem 0' }}>Bachelor + master study right</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-            <div data-cy="study-track-progress-combo-bar-chart" style={{ flex: '2 1 600px', minWidth: '600px' }}>
-              <BarChart
-                data={{
-                  creditGraphStats: { [track]: progressComboStats.chartStats },
-                  years,
-                }}
-                track={track}
-              />
-            </div>
-            <div style={{ flex: '1 2 1000px', minWidth: '1000px' }}>
-              <BasicDataTable
-                data={{ [track]: progressComboStats.tableStats }}
-                titles={progressComboStats.tableTitles}
-                track={track}
-              />
-            </div>
-          </div>
-        </>
-      )}
-      {progressComboStats != null && <h2 style={{ margin: '2rem 0 1rem 0' }}>Master study right</h2>}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-        <div data-cy="study-track-progress-bar-chart" style={{ flex: '2 1 600px', minWidth: '600px' }}>
-          <BarChart
+    <Stack gap={2}>
+      {progressComboStats !== null && (
+        <Stack gap={2}>
+          <Typography variant="h6">Bachelor + master study right</Typography>
+          <ProgressBarChart
+            cypress="programme-bachelor-masters"
             data={{
-              creditGraphStats: { [track]: progressStats.chartStats },
+              id: studyProgramme,
+              stats: progressComboStats.chartStats,
               years,
             }}
-            track={track}
           />
-        </div>
-        <div style={{ flex: '1 2 1000px', minWidth: '1000px' }}>
-          <BasicDataTable
-            data={{ [track]: progressStats.tableStats }}
-            titles={progressStats.tableTitles}
-            track={track}
+          <ProgressTable data={progressComboStats.tableStats} titles={progressComboStats.tableTitles} />
+        </Stack>
+      )}
+      {progressStats !== null && (
+        <Stack gap={2}>
+          {progressComboStats != null && <Typography variant="h6">Master study right</Typography>}
+          <ProgressBarChart
+            cypress="programme"
+            data={{
+              id: studyProgramme,
+              stats: progressStats.chartStats,
+              years,
+            }}
           />
-        </div>
-      </div>
-    </div>
+          <ProgressTable data={progressStats.tableStats} titles={progressStats.tableTitles} />
+        </Stack>
+      )}
+    </Stack>
   )
 }

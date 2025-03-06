@@ -45,7 +45,7 @@ export const SingleStudyTrackRow = ({
           )
         }
         return (
-          <TableCell align="left" key={getCellKey(code, index)}>
+          <TableCell align="right" key={getCellKey(code, index)}>
             {value}
             {index === 0 &&
               (fullAccessToStudentData ||
