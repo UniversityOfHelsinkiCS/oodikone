@@ -56,15 +56,6 @@ export const keysOf = <T extends object>(obj: T) => {
   return Object.keys(obj) as Array<keyof T>
 }
 
-export const lengthOf = (obj: object) => Object.keys(obj).length
-
-export const percentageOf = (num: number, denom: number) => {
-  if (denom === 0) {
-    return 0
-  }
-  return Math.round(((100 * num) / denom) * 100) / 100
-}
-
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
 
 export const validateParamLength = (param: any, minLength: number) => {

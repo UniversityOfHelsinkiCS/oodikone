@@ -46,12 +46,12 @@ export const bottlenecksOf = async (
     return MAGIC_NUMBER
   }
 
-  const allStudents = selectedStudents.length
+  const selectedStudentCount = selectedStudents.length
   const stats = {} as Record<string, CourseStatsCounter>
 
   for (const course of courses) {
     const { code: mainCode, name: mainName } = courses.find(({ code }) => code == course?.main_course_code) ?? course
-    const coursestats = stats[mainCode] ?? new CourseStatsCounter(mainCode, mainName, allStudents)
+    const coursestats = stats[mainCode] ?? new CourseStatsCounter(mainCode, mainName)
 
     coursestats.addCourseSubstitutions(course.substitutions)
     course.enrollments?.forEach(({ studentnumber, state, enrollment_date_time }) => {
@@ -69,8 +69,10 @@ export const bottlenecksOf = async (
   }
 
   const bottlenecks: Bottlenecks = {
-    allStudents,
-    coursestatistics: Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats()),
+    allStudents: selectedStudentCount,
+    coursestatistics: Object.values(stats).map(coursestatistics =>
+      coursestatistics.getFinalStats(selectedStudentCount)
+    ),
   }
 
   if (isEncrypted) {
