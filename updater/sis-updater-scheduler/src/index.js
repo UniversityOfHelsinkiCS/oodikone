@@ -66,10 +66,19 @@ knexConnection.on('connect', async () => {
   startServer()
   await handleImmediates()
 
-  // Monday-Friday at every minute 30
-  scheduleCron('30 * * * 1-5', async () => {
+  // Every hour at the 30th minute
+  scheduleCron('30 * * * *', async () => {
     // If updater is currently running, then return
     if ((await isUpdaterActive()) || isDev) return
+
+    const now = new Date()
+    const dayOfWeek = now.getDay()
+    const hour = now.getHours()
+
+    // Skip hourly updates on Saturday between 4:30 AM and 11:30 AM because of weekly updates
+    if (dayOfWeek === 6 && hour >= 4 && hour <= 11) {
+      return
+    }
 
     try {
       logger.info('Starting hourly')
