@@ -38,7 +38,7 @@ export const FacultyProgressTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={cypress} showCellBorders size="small">
+      <StyledTable data-cy={`${cypress}-faculty-progress-table`} showCellBorders size="small">
         <TableHead>
           <TableRow>
             {titles.map(title => (

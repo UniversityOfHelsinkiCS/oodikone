@@ -11,7 +11,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-export const FacultyBarChart = ({
+export const ProgressBarChart = ({
   cypress,
   data,
 }: {
@@ -55,7 +55,7 @@ export const FacultyBarChart = ({
       },
     },
     exporting: {
-      filename: `oodikone_progress_of_students_in_${data?.id}_by_study_start_year`,
+      filename: `oodikone_progress_of_students_in_${data?.id}_by_starting_year`,
     },
     yAxis: {
       allowDecimals: false,
@@ -68,7 +68,7 @@ export const FacultyBarChart = ({
   }
 
   return (
-    <Section cypress={`${cypress}-bar-chart`}>
+    <Section cypress={`${cypress}-progress-bar-chart`}>
       <ReactHighcharts config={config} />
     </Section>
   )
