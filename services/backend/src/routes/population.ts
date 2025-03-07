@@ -6,7 +6,7 @@ import { difference, intersection, uniq } from 'lodash'
 import { rootOrgId } from '../config'
 import { SISStudyRight } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
-import { encrypt, decrypt } from '../services/encrypt'
+import { encrypt, decrypt, type EncrypterData } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
@@ -29,11 +29,10 @@ const filterPersonalTags = (population: Record<string, any>, userId: string) => 
   }
 }
 
+type EncryptedStudent = EncrypterData
 const isEncryptedStudent = (student?: string | EncryptedStudent) => {
   return (student as EncryptedStudent)?.encryptedData !== undefined
 }
-
-type EncryptedStudent = { iv: string; encryptedData: string }
 
 interface PostPopulationStatisticsRequest extends Request {
   body: {
@@ -92,7 +91,7 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
       req.body.years.map(year => {
         if (req.body.selectedStudentsByYear) {
           req.body.selectedStudents = encrypted
-            ? req.body.selectedStudents.filter(isEncryptedStudent).map(decrypt)
+            ? (req.body.selectedStudents as EncryptedStudent[]).filter(isEncryptedStudent).map(decrypt)
             : req.body.selectedStudentsByYear[year]
         }
         const newMonths = (upperYearBound - Number(year)) * 12
@@ -111,7 +110,7 @@ router.post('/v2/populationstatistics/courses', async (req: PostPopulationStatis
   }
 
   if (encrypted) {
-    req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
+    req.body.selectedStudents = (req.body.selectedStudents as EncryptedStudent[]).map(decrypt)
   }
 
   const query = { ...req.body, selectedStudents: req.body.selectedStudents as string[] }

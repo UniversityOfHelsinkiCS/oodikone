@@ -1,10 +1,10 @@
-const { createCipheriv, createDecipheriv, randomBytes } = require('crypto')
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
 
-const { CRYPT_KEY } = require('../config')
+import { CRYPT_KEY } from '../config'
 
 const algorithm = 'aes-256-cbc'
 
-const encrypt = text => {
+export const encrypt = (text: string) => {
   if (!CRYPT_KEY) throw Error('Define crypt key in environment variables')
   const iv = randomBytes(16)
   const cipher = createCipheriv(algorithm, Buffer.from(CRYPT_KEY, 'hex'), iv)
@@ -17,15 +17,14 @@ const encrypt = text => {
   }
 }
 
-const decrypt = text => {
+export type EncrypterData = { iv: string; encryptedData: string }
+export const decrypt = (data: EncrypterData) => {
   if (!CRYPT_KEY) throw Error('Define crypt key in environment variables')
-  const iv = Buffer.from(text.iv, 'hex')
-  const encryptedText = Buffer.from(text.encryptedData, 'hex')
+  const iv = Buffer.from(data.iv, 'hex')
+  const encryptedText = Buffer.from(data.encryptedData, 'hex')
   const decipher = createDecipheriv(algorithm, Buffer.from(CRYPT_KEY, 'hex'), iv)
   let decrypted = decipher.update(encryptedText)
   decrypted = Buffer.concat([decrypted, decipher.final()])
 
   return decrypted.toString()
 }
-
-module.exports = { encrypt, decrypt }
