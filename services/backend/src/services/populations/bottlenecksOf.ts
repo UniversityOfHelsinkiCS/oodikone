@@ -1,6 +1,6 @@
 import { getPassingSemester } from '../../util/semester'
 import { type CourseStatistics, CourseStatsCounter } from '../courses/courseStatsCounter'
-import { encrypt, decrypt } from '../encrypt'
+import { encrypt, decrypt, EncrypterData } from '../encrypt'
 import { findCourses, parseCreditInfo } from './shared'
 
 export type Bottlenecks = {
@@ -29,7 +29,8 @@ export const bottlenecksOf = async (
     }
   }
 
-  if (isEncrypted) selectedStudents = selectedStudents.map(decrypt)
+  // HACK: Encrypted students can't be decrypted if passed as strings
+  if (isEncrypted) selectedStudents = (selectedStudents as unknown as EncrypterData[]).map(decrypt)
 
   const courses = await findCourses(selectedStudents, selectedCourses)
 
