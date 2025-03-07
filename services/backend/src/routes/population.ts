@@ -13,7 +13,7 @@ import { optimizedStatisticsOf } from '../services/populations/optimizedStatisti
 import { findByCourseAndSemesters } from '../services/students'
 import { mapToProviders } from '../shared/util'
 import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
-import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
+import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
 const router = Router()
 
@@ -84,6 +84,7 @@ export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
   semesters: string[]
   months: string
+  // NOTE: This param is a JSON -object
   studyRights: string
   year: string
   years?: string[]
@@ -100,7 +101,11 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
     }
 
-    const studyRights: { programme: string; combinedProgramme: string } = JSON.parse(studyRightsJSON)
+    const studyRights: { programme: string; combinedProgramme: string } | null = safeJSONParse(studyRightsJSON)
+    if (studyRights === null) {
+      return res.status(400).json({ error: 'Invalid studyrights value!' })
+    }
+
     const programmeRightsCodes = userProgrammeRights.map(({ code }) => code)
 
     const hasFullAccess = hasFullAccessToStudentData(roles)

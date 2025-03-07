@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'
+
 import { ProgrammeModule } from '../models'
 import { DetailedProgrammeRights, Role } from '../shared/types'
 
@@ -91,4 +93,13 @@ export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
     where: { code: programmeCode },
   })
   return programmeModule ? programmeModule.minimumCredits : null
+}
+
+export const safeJSONParse = <T>(json: string): T | null => {
+  try {
+    return JSON.parse(json)
+  } catch (error) {
+    Sentry.captureException(error)
+    return null
+  }
 }
