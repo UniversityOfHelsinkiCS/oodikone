@@ -277,8 +277,9 @@ const formatStudentForPopulationStatistics = (
     if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, true)) : []
 
-      courses.forEach(course => {
-        if (course.passed) {
+      courses
+        .filter(course => course.passed)
+        .forEach(course => {
           const correctCode = criteriaCoursesBySubstitutions[course.course_code]
 
           updateCourseByYear(criteria, course, criteriaChecked, correctCode)
@@ -288,8 +289,7 @@ const formatStudentForPopulationStatistics = (
           Object.keys(academicYears).forEach((year, index) => {
             academicYears[year] += creditAmounts[index]
           })
-        }
-      })
+        })
     }
 
     updateCreditCriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
