@@ -36,7 +36,6 @@ export type PopulationstatisticsCoursesResBody = Bottlenecks | { error: string }
 export type PopulationstatisticsCoursesReqBody = {
   // NOTE: Encrypted students have their iv in selectedStudents
   selectedStudents: string[] | EncryptedStudent[]
-  // NOTE: When students are encrypted the encryptedData is used (as string)
   selectedStudentsByYear?: { [year: string]: string[] }
   courses?: string[]
 }
