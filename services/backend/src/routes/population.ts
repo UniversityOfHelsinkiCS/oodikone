@@ -36,6 +36,7 @@ export type PopulationstatisticsCoursesResBody = Bottlenecks | { error: string }
 export type PopulationstatisticsCoursesReqBody = {
   // NOTE: Encrypted students have their iv in selectedStudents
   selectedStudents: string[] | EncryptedStudent[]
+  // NOTE: When students are encrypted the encryptedData is used (as string)
   selectedStudentsByYear?: { [year: string]: string[] }
   courses?: string[]
 }
@@ -83,7 +84,7 @@ export type PopulationstatisticsResBody = { students: any } | { error: string }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
   semesters: string[]
-  months: string
+  months?: string
   // NOTE: This param is a JSON -object
   studyRights: string
   year: string
@@ -94,49 +95,45 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
   '/v3/populationstatistics',
   async (req, res) => {
     const { roles, programmeRights: userProgrammeRights, id: userId } = req.user
-    const { year, semesters, studyRights: studyRightsJSON } = req.query
+    const { year, semesters, studyRights: requestedStudyRightsJSON } = req.query
 
-    const requiredFields = [year, semesters, studyRightsJSON]
+    const months = req.query.months ?? '12'
+
+    const requiredFields = [year, semesters, requestedStudyRightsJSON]
     if (requiredFields.some(field => !field)) {
       return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
     }
 
-    const studyRights: { programme: string; combinedProgramme: string } | null = safeJSONParse(studyRightsJSON)
-    if (studyRights === null) {
+    const requestedStudyRights: { programme: string; combinedProgramme: string } | null =
+      safeJSONParse(requestedStudyRightsJSON)
+    if (requestedStudyRights === null) {
       return res.status(400).json({ error: 'Invalid studyrights value!' })
     }
 
-    const programmeRightsCodes = userProgrammeRights.map(({ code }) => code)
+    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
 
     const hasFullAccess = hasFullAccessToStudentData(roles)
-    const hasAccessToProgramme = programmeRightsCodes.includes(studyRights.programme)
-    const hasAccessToCombinedProgramme = programmeRightsCodes.includes(studyRights.combinedProgramme)
+    const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
+    const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
 
     if (!hasAccessToProgramme && !hasAccessToCombinedProgramme && !hasFullAccess) {
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
     // DONE:
-
-    if (req.query.months === null) {
-      req.query.months = '12'
-    }
-
     if (req.query.years) {
       const upperYearBound = new Date().getFullYear() + 1
-      const multiPopulationStudentPromises = Promise.all(
+      const multiYearStudents = Promise.all(
         req.query.years.map(year => {
           const newMonths = (upperYearBound - Number(year)) * 12
-          const populationStudents = optimizedStatisticsOf({
+          return optimizedStatisticsOf({
             ...req.query,
             year: Number(year),
-            studyRights: { programme: studyRights.programme },
+            studyRights: { programme: requestedStudyRights.programme },
             months: newMonths,
           })
-          return populationStudents
         })
       )
-      const multiPopulationStudents = await multiPopulationStudentPromises
 
       const populationStudentsMerger = (multiYearStudents: any) => {
         const samples = { students: [], courses: [] as any[] }
@@ -154,14 +151,14 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
 
         return samples
       }
-      const result = populationStudentsMerger(multiPopulationStudents)
+      const result = populationStudentsMerger(await multiYearStudents)
       res.json(filterPersonalTags(result, userId))
     } else {
       const result: any = await optimizedStatisticsOf({
         ...req.query,
-        year: Number(req.query.year),
-        studyRights: { programme: studyRights.programme },
-        months: Number(req.query.months),
+        year: Number(year),
+        studyRights: { programme: requestedStudyRights.programme },
+        months: Number(months),
       })
 
       if ('error' in result && result.error) {
@@ -173,8 +170,8 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       // Obfuscate if user has only limited study programme rights
       if (
         !hasFullAccessToStudentData(roles) &&
-        !fullProgrammeRights.includes(studyRights.programme) &&
-        !fullProgrammeRights.includes(studyRights.combinedProgramme)
+        !fullProgrammeRights.includes(requestedStudyRights.programme) &&
+        !fullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
       ) {
         if (!('students' in result)) {
           return
