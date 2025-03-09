@@ -45,7 +45,7 @@ export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedPro
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {
   const rolesWithFullAccess: Role[] = ['admin', 'fullSisuAccess']
-  return roles?.some(role => rolesWithFullAccess.includes(role))
+  return !!roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
 export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
@@ -84,7 +84,7 @@ export const getDegreeProgrammeType = async (programmeCode: string) => {
     attributes: ['degreeProgrammeType'],
     where: { code: programmeCode },
   })
-  return programmeModule ? programmeModule.degreeProgrammeType : null
+  return programmeModule?.degreeProgrammeType ?? null
 }
 
 export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
@@ -92,7 +92,7 @@ export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
     attributes: ['minimumCredits'],
     where: { code: programmeCode },
   })
-  return programmeModule ? programmeModule.minimumCredits : null
+  return programmeModule?.minimumCredits ?? null
 }
 
 export const safeJSONParse = <T>(json: string): T | null => {
