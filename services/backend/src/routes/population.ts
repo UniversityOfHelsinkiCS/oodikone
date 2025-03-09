@@ -17,7 +17,12 @@ import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse 
 
 const router = Router()
 
-const filterPersonalTags = (population: Record<string, any>, userId: string) => {
+type populationPersonalTagFilter = {
+  [key: string]: any
+  students: any[]
+}
+
+const filterPersonalTags = (population: populationPersonalTagFilter, userId: string) => {
   return {
     ...population,
     students: population.students.map(student => {
@@ -109,13 +114,14 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(400).json({ error: 'Invalid studyrights value!' })
     }
 
+    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
     const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
 
-    const hasFullAccess = hasFullAccessToStudentData(roles)
+    const hasFullAccessToStudents = hasFullAccessToStudentData(roles)
     const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
     const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
 
-    if (!hasAccessToProgramme && !hasAccessToCombinedProgramme && !hasFullAccess) {
+    if (!hasFullAccessToStudents && !hasAccessToProgramme && !hasAccessToCombinedProgramme) {
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
@@ -162,24 +168,22 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       })
     }
 
-    if ('error' in result && result.error) {
+    if ('error' in result) {
       Sentry.captureException(new Error(result.error))
       return res.status(400).end()
     }
 
-    const fullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
-    // Obfuscate if user has only limited study programme rights
+    // Obfuscate if user has only limited study programme rights and there are any students
     if (
+      'students' in result &&
       !hasFullAccessToStudentData(roles) &&
-      !fullProgrammeRights.includes(requestedStudyRights.programme) &&
-      !fullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
+      !userFullProgrammeRights.includes(requestedStudyRights.programme) &&
+      !userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
     ) {
-      if (!('students' in result)) {
-        return
-      }
       result.students = result.students.map(student => {
         const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
-        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
+        // correct year for age distribution calculation but the date is always January 1st
+        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0))
         return {
           ...student,
           firstnames: '',
@@ -330,7 +334,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
     },
     filteredStudentNumbers
   )
-  if ('error' in result && result.error) {
+  if ('error' in result) {
     Sentry.captureException(new Error(result.error))
     return res.status(500).json({ error: result.error })
   }
