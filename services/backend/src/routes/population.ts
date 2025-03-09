@@ -251,6 +251,7 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
     req.query.months = '12'
   }
 
+  let result: { students: any[]; courses: any[] } | { error: string }
   if (req.query.years) {
     const upperYearBound = new Date().getFullYear() + 1
     const multiPopulationStudentPromises = Promise.all(
@@ -267,54 +268,53 @@ router.get('/v3/populationstatistics', async (req: GetPopulationStatisticsReques
     )
     const multiPopulationStudents = await multiPopulationStudentPromises
 
-    const result = populationStudentsMerger(multiPopulationStudents)
-    res.json(filterPersonalTags(result, userId))
+    result = populationStudentsMerger(multiPopulationStudents)
   } else {
-    const result: any = await optimizedStatisticsOf({
+    result = await optimizedStatisticsOf({
       ...req.query,
       year: Number(req.query.year),
       studyRights: { programme: studyRights.programme },
       months: Number(req.query.months),
     })
-
-    if ('error' in result && result.error) {
-      Sentry.captureException(new Error(result.error))
-      return res.status(400).end()
-    }
-
-    // Obfuscate if user has only limited study programme rights
-    if (
-      !hasFullAccessToStudentData(roles) &&
-      !fullProgrammeRights.includes(studyRights.programme) &&
-      !fullProgrammeRights.includes(studyRights.combinedProgramme)
-    ) {
-      if (!('students' in result)) {
-        return
-      }
-      result.students = result.students.map(student => {
-        const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
-        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
-        return {
-          ...student,
-          firstnames: '',
-          lastname: '',
-          phoneNumber: '',
-          iv,
-          studentNumber,
-          name: '',
-          email: '',
-          secondaryEmail: '',
-          sis_person_id: '',
-          enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
-          tags: [],
-          birthdate: obfuscatedBirthDate,
-          obfuscated: true,
-        }
-      })
-    }
-
-    res.json(filterPersonalTags(result, userId))
   }
+
+  if ('error' in result && result.error) {
+    Sentry.captureException(new Error(result.error))
+    return res.status(400).end()
+  }
+
+  // Obfuscate if user has only limited study programme rights
+  if (
+    !hasFullAccessToStudentData(roles) &&
+    !fullProgrammeRights.includes(studyRights.programme) &&
+    !fullProgrammeRights.includes(studyRights.combinedProgramme)
+  ) {
+    if (!('students' in result)) {
+      return
+    }
+    result.students = result.students.map(student => {
+      const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
+      const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0, 1)) // correct year for age distribution calculation but the date is always January 1st
+      return {
+        ...student,
+        firstnames: '',
+        lastname: '',
+        phoneNumber: '',
+        iv,
+        studentNumber,
+        name: '',
+        email: '',
+        secondaryEmail: '',
+        sis_person_id: '',
+        enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
+        tags: [],
+        birthdate: obfuscatedBirthDate,
+        obfuscated: true,
+      }
+    })
+  }
+
+  return res.json(filterPersonalTags(result, userId))
 })
 
 interface GetPopulationStatisticsByCourseRequest extends Request {
