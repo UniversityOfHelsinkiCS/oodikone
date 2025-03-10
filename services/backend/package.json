@@ -8,7 +8,7 @@
     "@sentry/node": "^8.55.0",
     "@sentry/profiling-node": "^8.55.0",
     "axios": "^1.8.1",
-    "bullmq": "^5.41.7",
+    "bullmq": "^5.41.8",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
     "cron": "^4.1.0",
@@ -35,7 +35,7 @@
     "@types/express": "^4.17.21",
     "@types/lodash": "^4.17.16",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.13.9",
+    "@types/node": "^22.13.10",
     "@types/validator": "^13.12.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
