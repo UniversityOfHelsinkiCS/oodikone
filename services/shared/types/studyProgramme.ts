@@ -1,14 +1,11 @@
+import { GraduationStatistics } from './graduations'
 import { Name } from './name'
 
 export type MedianEntry = {
   amount: number
   classSize: number
   name: string
-  statistics: {
-    onTime: number
-    yearOver: number
-    wayOver: number
-  }
+  statistics: GraduationStatistics
   times: number[]
   y: number
 }
@@ -26,9 +23,9 @@ export type Goals = {
 }
 
 export type GraduationTimes = {
-  goals: Goals
-} & {
   [programmeOrStudyTrack: string]: ProgrammeOrStudyTrackGraduationStats
+} & {
+  goals: Goals
 }
 
 export type StudyTrackStats = {

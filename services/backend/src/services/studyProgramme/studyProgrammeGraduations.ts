@@ -1,7 +1,7 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
-import { Name } from '../../shared/types'
+import { GraduationStatistics, Name } from '../../shared/types'
 import { mapToProviders } from '../../shared/util'
 import { DegreeProgrammeType, ExtentCode, Phase, SemesterEnrollment, StudyTrack } from '../../types'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
@@ -74,7 +74,7 @@ export type GraduationTimes = {
     y: number
     amount: number
     name: string | number
-    statistics: { onTime: number; yearOver: number; wayOver: number }
+    statistics: GraduationStatistics
     times: number[]
   }>
   goal: number

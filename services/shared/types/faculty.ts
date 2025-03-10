@@ -1,3 +1,5 @@
+import { GraduationStatistics } from './graduations'
+
 export type Graduated = 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
 export type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
 export type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
@@ -8,11 +10,7 @@ export type GraduationStats = {
   amount: number
   median: number
   name: number
-  statistics: {
-    onTime: number
-    yearOver: number
-    wayOver: number
-  }
+  statistics: GraduationStatistics
   times: number[]
 }
 

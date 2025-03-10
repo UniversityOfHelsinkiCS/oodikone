@@ -6,12 +6,11 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { Section } from '@/components/material/Section'
+import { GraduationStatistics } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
-
-type Statistics = { onTime: number; yearOver: number; wayOver: number }
 
 export const MedianTimeBarChart = ({
   byStartYear,
@@ -24,7 +23,7 @@ export const MedianTimeBarChart = ({
     amount: number
     classSize: number
     name: string
-    statistics: Statistics
+    statistics: GraduationStatistics
     times: number[]
     y: number
   }>
@@ -56,7 +55,13 @@ export const MedianTimeBarChart = ({
     return data.length * multiplier + 100
   }
 
-  const getTooltipText = (amount: number, y: number, year: string, statistics: Statistics, classSize: number) => {
+  const getTooltipText = (
+    amount: number,
+    y: number,
+    year: string,
+    statistics: GraduationStatistics,
+    classSize: number
+  ) => {
     const sortingText =
       byStartYear && title !== 'Bachelor + master study right'
         ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
@@ -83,7 +88,7 @@ export const MedianTimeBarChart = ({
         const point = this.point as Highcharts.Point & {
           amount: number
           name: string
-          statistics: Statistics
+          statistics: GraduationStatistics
           classSize: number
         }
         return getTooltipText(point.amount, this.y!, point.name, point.statistics, point.classSize)

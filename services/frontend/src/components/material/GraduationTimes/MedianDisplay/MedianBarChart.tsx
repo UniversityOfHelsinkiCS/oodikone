@@ -7,7 +7,7 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStats, Name, NameWithCode } from '@/shared/types'
+import { GraduationStatistics, GraduationStats, Name, NameWithCode } from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -113,7 +113,7 @@ export const MedianBarChart = ({
     code: string,
     amount: number,
     median: number,
-    statistics: { onTime: number; yearOver: number; wayOver: number },
+    statistics: GraduationStatistics,
     realGoal: number | undefined
   ) => {
     const sortingText =
@@ -150,11 +150,7 @@ export const MedianBarChart = ({
         const point = this.point as Highcharts.Point & {
           code?: string
           amount?: number
-          statistics?: {
-            onTime: number
-            yearOver: number
-            wayOver: number
-          }
+          statistics?: GraduationStatistics
           realGoal?: number
         }
         return getTooltipText(

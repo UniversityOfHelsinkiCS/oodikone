@@ -8,6 +8,7 @@ export type {
   StatsType,
   YearType,
 } from './faculty'
+export type { GraduationStatistics } from './graduations'
 export type { Name, NameWithCode } from './name'
 export type { Release } from './release'
 export type { Role } from './role'
