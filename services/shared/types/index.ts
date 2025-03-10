@@ -1,14 +1,12 @@
 export type { DetailedProgrammeRights } from './detailedProgrammeRights'
+export type { Graduated, SpecialGroups, ProgrammeFilter, StatsType, YearType } from './faculty'
 export type {
-  Graduated,
+  FacultyClassSizes,
   GraduationStats,
-  SpecialGroups,
-  ProgrammeFilter,
+  GraduationStatistics,
+  ProgrammeClassSizes,
   ProgrammeMedians,
-  StatsType,
-  YearType,
-} from './faculty'
-export type { GraduationStatistics } from './graduations'
+} from './graduations'
 export type { Name, NameWithCode } from './name'
 export type { Release } from './release'
 export type { Role } from './role'

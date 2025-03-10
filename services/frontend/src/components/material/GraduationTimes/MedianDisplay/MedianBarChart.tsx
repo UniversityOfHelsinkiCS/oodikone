@@ -7,7 +7,14 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationStatistics, GraduationStats, Name, NameWithCode } from '@/shared/types'
+import {
+  FacultyClassSizes,
+  GraduationStatistics,
+  GraduationStats,
+  Name,
+  NameWithCode,
+  ProgrammeClassSizes,
+} from '@/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -28,25 +35,16 @@ export const MedianBarChart = ({
   year,
   yearLabel,
 }: {
-  classSizes:
-    | Record<string, number>
-    | {
-        [code: string]: {
-          bachelor: Record<string, number>
-          bcMsCombo: Record<string, number>
-          master: Record<string, number>
-          doctor: Record<string, number>
-        }
-      }
+  classSizes: FacultyClassSizes['programmes'] | ProgrammeClassSizes['studyTracks']
   cypress: string
   data: GraduationStats[]
   facultyGraph?: boolean
   goal: number
   goalExceptions?: Record<string, number> | { needed: boolean }
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
-  level?: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
-  mode: 'faculty' | 'programme'
-  names: Record<string, Name | NameWithCode>
+  level?: string
+  mode: 'faculty' | 'programme' | 'study track'
+  names?: Record<string, Name | NameWithCode>
   title: string
   year?: number | null
   yearLabel: 'Graduation year' | 'Start year'

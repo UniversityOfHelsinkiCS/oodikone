@@ -15,7 +15,7 @@ export const BreakdownDisplay = ({
   yearLabel,
 }: {
   data: GraduationStats[]
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
   level: string
   levelProgrammeData: ProgrammeMedians
   mode: 'faculty' | 'programme' | 'study track'
@@ -36,7 +36,7 @@ export const BreakdownDisplay = ({
             facultyGraph={false}
             handleClick={handleClick}
             mode={mode}
-            names={names}
+            names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
             year={year}
             yearLabel={yearLabel}
           />

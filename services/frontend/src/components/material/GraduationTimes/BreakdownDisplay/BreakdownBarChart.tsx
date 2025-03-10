@@ -24,9 +24,9 @@ export const BreakdownBarChart = ({
   yearLabel,
 }: {
   cypress: string
-  data: Array<GraduationStats & { code?: string }>
+  data: GraduationStats[]
   facultyGraph?: boolean
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
   mode: 'faculty' | 'programme' | 'study track'
   names?: Record<string, Name | NameWithCode>
   year?: number | null
@@ -41,7 +41,7 @@ export const BreakdownBarChart = ({
     { type: 'bar', name: 'Overtime', color: theme.palette.graduationTimes.wayOver, data: [] },
   ]
 
-  let categories: number[] = []
+  let categories: string[] = []
   const codeMap = {}
 
   for (const item of data) {

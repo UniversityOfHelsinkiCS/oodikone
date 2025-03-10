@@ -1,6 +1,13 @@
 import { Box, Stack, Typography } from '@mui/material'
 
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import {
+  FacultyClassSizes,
+  GraduationStats,
+  Name,
+  NameWithCode,
+  ProgrammeClassSizes,
+  ProgrammeMedians,
+} from '@/shared/types'
 import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({
@@ -19,29 +26,16 @@ export const MedianDisplay = ({
   year,
   yearLabel,
 }: {
-  classSizes: {
-    bachelor: Record<string, number>
-    bcMsCombo: Record<string, number>
-    master: Record<string, number>
-    doctor: Record<string, number>
-    programmes: {
-      [code: string]: {
-        bachelor: Record<string, number>
-        bcMsCombo: Record<string, number>
-        master: Record<string, number>
-        doctor: Record<string, number>
-      }
-    }
-  }
+  classSizes: FacultyClassSizes | ProgrammeClassSizes
   data: GraduationStats[]
   goal: number
   goalExceptions: Record<string, number> | { needed: boolean }
   groupBy: 'byGradYear' | 'byStartYear'
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
-  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
+  level: string
   levelProgrammeData: ProgrammeMedians
-  mode: 'faculty' | 'programme'
-  names: Record<string, Name | NameWithCode>
+  mode: 'faculty' | 'programme' | 'study track'
+  names: Record<string, Name | NameWithCode> | Record<string, string | Name>
   programmeDataVisible: boolean
   title: string
   year: number | null
@@ -70,13 +64,13 @@ export const MedianDisplay = ({
           goal={goal}
           handleClick={handleClick}
           mode={mode}
-          names={names}
+          names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
           title={title}
           yearLabel={yearLabel}
         />
         {programmeDataVisible && year && year in levelProgrammeData && (
           <MedianBarChart
-            classSizes={classSizes?.programmes}
+            classSizes={'programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks}
             cypress={`${level}-median-bar-chart-faculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
@@ -85,7 +79,7 @@ export const MedianDisplay = ({
             handleClick={handleClick}
             level={level}
             mode={mode}
-            names={names}
+            names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
             title={title}
             year={year}
             yearLabel={yearLabel}

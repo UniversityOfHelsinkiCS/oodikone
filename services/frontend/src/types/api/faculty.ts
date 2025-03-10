@@ -1,6 +1,6 @@
 // TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
 
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { FacultyClassSizes, GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
 import { GraphStat } from '@/types/graphStat'
 
@@ -77,20 +77,7 @@ export type GetFacultyGraduationTimesResponse = {
       }
     }
   }
-  classSizes: {
-    bachelor: Record<string, number>
-    bcMsCombo: Record<string, number>
-    doctor: Record<string, number>
-    master: Record<string, number>
-    programmes: {
-      [code: string]: {
-        bachelor: Record<string, number>
-        bcMsCombo: Record<string, number>
-        master: Record<string, number>
-        doctor: Record<string, number>
-      }
-    }
-  }
+  classSizes: FacultyClassSizes
   goals: {
     bachelor: number
     bcMsCombo: number
