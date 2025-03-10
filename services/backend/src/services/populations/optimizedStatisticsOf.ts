@@ -44,9 +44,9 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
       studyRights,
       startDate,
       endDate,
-      exchangeStudents,
-      nondegreeStudents,
-      transferredOutStudents: transferredStudents,
+      includeExchangeStudents: exchangeStudents,
+      includeNondegreeStudents: nondegreeStudents,
+      includeTransferredOutStudents: transferredStudents,
     }))
 
   const code = studyRights[0] || ''
