@@ -21,32 +21,30 @@ export const GraduationTimes = ({
   title,
   yearLabel,
 }: {
-  classSizes:
-    | {
+  classSizes?: {
+    bachelor: Record<string, number>
+    bcMsCombo: Record<string, number>
+    master: Record<string, number>
+    doctor: Record<string, number>
+    programmes: {
+      [code: string]: {
         bachelor: Record<string, number>
         bcMsCombo: Record<string, number>
         master: Record<string, number>
         doctor: Record<string, number>
-        programmes: {
-          [code: string]: {
-            bachelor: Record<string, number>
-            bcMsCombo: Record<string, number>
-            master: Record<string, number>
-            doctor: Record<string, number>
-          }
-        }
       }
-    | undefined
+    }
+  }
   data: GraduationStats[] | undefined
   goal: number | undefined
   goalExceptions: Record<string, number> | { needed: boolean }
   groupBy: 'byGradYear' | 'byStartYear'
   isError: boolean
   isLoading: boolean
-  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
+  level: string
   levelProgrammeData: ProgrammeMedians | undefined
-  mode: 'faculty' | 'programme'
-  names: Record<string, Name | NameWithCode> | undefined
+  mode: 'faculty' | 'programme' | 'study track'
+  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
   showMedian: boolean
   title: string
   yearLabel: 'Graduation year' | 'Start year'

@@ -27,7 +27,7 @@ export const BreakdownBarChart = ({
   data: Array<GraduationStats & { code?: string }>
   facultyGraph?: boolean
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
-  mode: 'faculty' | 'programme'
+  mode: 'faculty' | 'programme' | 'study track'
   names?: Record<string, Name | NameWithCode>
   year?: number | null
   yearLabel?: 'Graduation year' | 'Start year'
