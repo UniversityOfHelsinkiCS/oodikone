@@ -4,6 +4,7 @@ import { Dropdown, Icon, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
 import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
+import { formatToArray } from '@/shared/util'
 import { createLocaleComparator } from '@/util/comparator'
 
 const ValueFilterType = {
@@ -174,13 +175,9 @@ export const defaultColumnFilter = {
   },
 
   filter: (ctx, column, options) => {
-    let values = getColumnValue(ctx, column)
+    const values = formatToArray(getColumnValue(ctx, column))
 
     const defaultResult = !options.valueFilters.some(({ type }) => type === ValueFilterType.Include)
-
-    if (!Array.isArray(values)) {
-      values = [values]
-    }
 
     return chain(options.valueFilters)
       .reduce((acc, { type, value }) => {

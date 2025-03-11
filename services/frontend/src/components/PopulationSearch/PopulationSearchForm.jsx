@@ -100,10 +100,9 @@ export const PopulationSearchForm = ({ onProgress }) => {
   }
 
   const fetchPopulation = async query => {
-    const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const uuid = crypto.randomUUID()
     dispatch(clearSelected())
-    dispatch(getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }))
+    dispatch(getPopulationStatistics({ ...query, uuid, onProgress }))
   }
 
   const fetchPopulationFromUrlParams = () => {

@@ -31,11 +31,13 @@ export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(programmeCodeToProviderCode)
 }
 
+export const formatToArray = <T>(param: T | T[]): T[] => {
+  return Array.isArray(param) ? param : [param]
+}
+
 export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
   const result = { ...query }
-  params
-    .filter(param => !!result[param])
-    .forEach(param => (result[param] = Array.isArray(result[param]) ? result[param] : [result[param]]))
+  params.filter(param => !!result[param]).forEach(param => (result[param] = formatToArray(result[param])))
 
   return result
 }
