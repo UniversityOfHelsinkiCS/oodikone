@@ -1,6 +1,5 @@
 import { Alert, AlertTitle, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Loader } from 'semantic-ui-react'
 
 import { getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
@@ -57,13 +56,15 @@ export const StudyTracksAndClassStatisticsTab = ({
   }, [studyProgramme, studyTrack, studyTrackStats, specialGroupsExcluded])
 
   const hasErrors = (isSuccess && !studyTrackStats) || isError
-  if (hasErrors) {
-    return <h3>Something went wrong, please try refreshing the page.</h3>
-  }
+  const isFetchingOrLoading = isFetching || isLoading
 
   const noData = isSuccess && studyTrackStats.mainStatsByYear && !studyTrackStats.mainStatsByYear.Total.length
   if (noData) {
-    return <h3>There is no data available for the selected programme between 2017-2022</h3>
+    return (
+      <Alert severity="warning" variant="outlined">
+        There is no data available for the selected programme between 2017-{new Date().getFullYear()}
+      </Alert>
+    )
   }
 
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
@@ -100,7 +101,7 @@ export const StudyTracksAndClassStatisticsTab = ({
   }
 
   const hasStudyTracks = Object.keys(studyTrackStats?.studyTracks ?? {}).length > 1 && studyTrack === studyProgramme
-  const studyProgrammeMode = studyTrack === '' || studyTrack === studyProgramme
+  const isStudyProgrammeMode = studyTrack === '' || studyTrack === studyProgramme
 
   const calculateStudyTrackStats = (combo = false) => {
     if (!studyTrackStats?.graduationTimes) {
@@ -155,11 +156,6 @@ export const StudyTracksAndClassStatisticsTab = ({
     }
   }
 
-  // TODO: Replace with section status
-  if (isLoading || isFetching) {
-    return <Loader active style={{ marginTop: '10em' }} />
-  }
-
   return (
     <Stack gap={2}>
       <Section>
@@ -172,7 +168,7 @@ export const StudyTracksAndClassStatisticsTab = ({
           <ToggleContainer>
             <Toggle
               cypress="study-right-toggle"
-              disabled={isError || isFetching || isLoading}
+              disabled={hasErrors || isFetchingOrLoading}
               firstLabel="All study rights"
               infoBoxContent={studyProgrammeToolTips.studyRightToggle}
               secondLabel="Special study rights excluded"
@@ -181,7 +177,7 @@ export const StudyTracksAndClassStatisticsTab = ({
             />
             <Toggle
               cypress="graduated-toggle"
-              disabled={isError || isFetching || isLoading}
+              disabled={hasErrors || isFetchingOrLoading}
               firstLabel="Graduated included"
               infoBoxContent={studyProgrammeToolTips.graduatedToggle}
               secondLabel="Graduated excluded"
@@ -198,9 +194,9 @@ export const StudyTracksAndClassStatisticsTab = ({
             ? studyProgrammeToolTips.studyTrackOverviewCombinedProgramme
             : studyProgrammeToolTips.studyTrackOverview
         }
-        // TODO: isError={}
-        // TODO: isLoading={}
-        title={`Students of the study ${studyProgrammeMode ? 'programme' : `track ${studyTrack}`} by starting year`}
+        isError={hasErrors}
+        isLoading={isFetchingOrLoading}
+        title={`Students of the study ${isStudyProgrammeMode ? 'programme' : `track ${studyTrack}`} by starting year`}
       >
         <Stack gap={2}>
           <ToggleContainer>
@@ -231,11 +227,11 @@ export const StudyTracksAndClassStatisticsTab = ({
         </Stack>
       </Section>
 
-      {studyProgrammeMode ? (
+      {isStudyProgrammeMode ? (
         <Section
           infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
-          // TODO: isError={}
-          // TODO: isLoading={}
+          isError={hasErrors}
+          isLoading={isFetchingOrLoading}
           title="Progress of students of the study programme by starting year"
         >
           {studyTrackStats && (
@@ -264,15 +260,14 @@ export const StudyTracksAndClassStatisticsTab = ({
               ? studyProgrammeToolTips.averageGraduationTimesStudyTracksMaster
               : studyProgrammeToolTips.averageGraduationTimesStudyTracks
           }
-          // TODO: isError={}
-          // TODO: isLoading={}
+          isError={hasErrors}
+          isLoading={isFetchingOrLoading}
           title="Average graduation times by starting year"
         >
           <Stack gap={2}>
             <ToggleContainer>
               <Toggle
                 cypress="graduation-time-toggle"
-                // TODO: disabled={}
                 firstLabel="Breakdown"
                 secondLabel="Median times"
                 setValue={setShowMedian}
