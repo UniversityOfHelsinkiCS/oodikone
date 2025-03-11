@@ -264,7 +264,7 @@ describe('Population statistics tests', () => {
       it('New fetch of courses data is done when curriculum is changed', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
-        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
+        cy.intercept('/api/v2/populationstatistics/courses').as('courseData')
         cy.get('[data-cy=curriculum-picker]').click()
         cy.contains('2020–2023').click({ force: true })
 
@@ -287,7 +287,7 @@ describe('Population statistics tests', () => {
       it('New fetch of courses data is done when filtered students change', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
-        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
+        cy.intercept('/api/v2/populationstatistics/courses').as('courseData')
         cy.wait('@courseData').then(({ response }) => {
           expect(response.body).to.have.property('allStudents')
           expect(response.body).to.have.property('coursestatistics')

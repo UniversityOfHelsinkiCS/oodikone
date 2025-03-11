@@ -4,34 +4,30 @@ import { SISStudyRight, SISStudyRightElement } from '../../models'
 import { ExtentCode } from '../../types'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
-const exchangeStudents = [ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE]
-
-const nondegreeStudents = [
-  ExtentCode.CONTINUING_EDUCATION,
-  ExtentCode.OPEN_UNIVERSITY_STUDIES,
-  ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
-  ExtentCode.CONTRACT_TRAINING,
-  ExtentCode.SPECIALIZATION_STUDIES,
-  ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
-  ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
-  ExtentCode.NON_DEGREE_STUDIES,
-  ExtentCode.SUMMER_AND_WINTER_SCHOOL,
-]
-
 export const getStudentNumbersWithAllStudyRightElements = async ({
   studyRights,
   startDate,
   endDate,
-  includeExchangeStudents,
-  includeNondegreeStudents,
-  includeTransferredOutStudents,
+  exchangeStudents,
+  nondegreeStudents,
+  transferredOutStudents,
 }) => {
   const filteredExtents = [ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS]
-  if (!includeExchangeStudents) {
-    filteredExtents.push(...exchangeStudents)
+  if (!exchangeStudents) {
+    filteredExtents.push(ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE)
   }
-  if (!includeNondegreeStudents) {
-    filteredExtents.push(...nondegreeStudents)
+  if (!nondegreeStudents) {
+    filteredExtents.push(
+      ExtentCode.CONTINUING_EDUCATION,
+      ExtentCode.OPEN_UNIVERSITY_STUDIES,
+      ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+      ExtentCode.CONTRACT_TRAINING,
+      ExtentCode.SPECIALIZATION_STUDIES,
+      ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+      ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+      ExtentCode.NON_DEGREE_STUDIES,
+      ExtentCode.SUMMER_AND_WINTER_SCHOOL
+    )
   }
 
   const studyRightIds = (
@@ -77,7 +73,7 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
 
   const studentNumbers = studentsStudyRights.map(student => student.studentNumber)
 
-  if (includeTransferredOutStudents) {
+  if (transferredOutStudents) {
     return studentNumbers
   }
 

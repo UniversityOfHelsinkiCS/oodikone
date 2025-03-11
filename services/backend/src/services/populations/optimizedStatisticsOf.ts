@@ -1,42 +1,42 @@
 import { Name } from '../../shared/types'
+import { formatQueryParamsToArrays } from '../../shared/util'
 import { Criteria, DegreeProgrammeType } from '../../types'
 import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
-import { QueryParams, dateMonthsFromNow, formatStudentsForApi, getOptionsForStudents, parseQueryParams } from './shared'
+import {
+  Query as FormattedQueryParams,
+  dateMonthsFromNow,
+  formatStudentsForApi,
+  getOptionsForStudents,
+  parseQueryParams,
+} from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
-export type OptimizedStatisticsQuery = {
-  semesters: string[]
-  studentStatuses?: string[]
-  studyRights?: string | string[]
-  year: string
-  months?: string
+type Query = {
+  year?: number
+  studyRights?: string[] | { programme: string }
+  semesters?: string[]
+  months?: number
 }
 
 const hasCorrectStatus = (studentStatuses: string[]) => {
   return studentStatuses.every(status => ['EXCHANGE', 'NONDEGREE', 'TRANSFERRED'].includes(status))
 }
 
-export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, studentNumberList?: string[]) => {
-  if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
+export const optimizedStatisticsOf = async (query: Query, studentNumberList?: string[]) => {
+  const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses'])
+
+  if (!formattedQueryParams.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
-  if (query.studentStatuses && !hasCorrectStatus(query.studentStatuses)) {
+  if (formattedQueryParams.studentStatuses && !hasCorrectStatus(formattedQueryParams.studentStatuses)) {
     return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
 
-  const {
-    studyRights,
-    startDate,
-    months,
-    endDate,
-    includeExchangeStudents,
-    includeNondegreeStudents,
-    includeTransferredStudents: includeTransferredOutStudents,
-    tag,
-  } = parseQueryParams(query as QueryParams)
+  const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+    parseQueryParams(formattedQueryParams as FormattedQueryParams)
 
   const studentNumbers =
     studentNumberList ??
@@ -44,9 +44,9 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
       studyRights,
       startDate,
       endDate,
-      includeExchangeStudents,
-      includeNondegreeStudents,
-      includeTransferredOutStudents,
+      exchangeStudents,
+      nondegreeStudents,
+      transferredOutStudents: transferredStudents,
     }))
 
   const code = studyRights[0] || ''

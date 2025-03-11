@@ -1,13 +1,6 @@
 import { Name } from '../../shared/types'
 import { EnrollmentState } from '../../types'
-
-const lengthOf = (obj: object) => Object.keys(obj).length
-const percentageOf = (num: number, denom: number) => {
-  if (denom === 0) {
-    return 0
-  }
-  return Math.round(((100 * num) / denom) * 100) / 100
-}
+import { lengthOf, percentageOf } from '../../util'
 
 const fall: string[] = []
 const spring: string[] = []
@@ -102,13 +95,15 @@ export type CourseStatistics = {
 }
 
 export class CourseStatsCounter {
+  private studentsInTotal: number
   private course: Course
   private students: Students
   private stats: Stats
   private enrollments: DynamicEnrollments
   private grades: Grades
 
-  constructor(code: string, name: Name) {
+  constructor(code: string, name: Name, studentsInTotal: number) {
+    this.studentsInTotal = studentsInTotal
     this.course = {
       code,
       name,
@@ -238,9 +233,10 @@ export class CourseStatsCounter {
 
   private getPassingSemestersCumulative() {
     const { passingSemesters } = this.stats
-    const attemptStats: Record<string, number> = {}
+    const attemptStats: Record<string, number> = {
+      BEFORE: passingSemesters.BEFORE,
+    }
 
-    attemptStats.BEFORE = passingSemesters.BEFORE
     attemptStats['0-FALL'] = passingSemesters.BEFORE + passingSemesters['0-FALL']
     attemptStats['0-SPRING'] = attemptStats['0-FALL'] + passingSemesters['0-SPRING']
 
@@ -254,8 +250,8 @@ export class CourseStatsCounter {
     return attemptStats
   }
 
-  public getFinalStats(populationCount: number): CourseStatistics {
-    const { stats, students, course, grades } = this
+  public getFinalStats() {
+    const { stats, students } = this
     const allStudents = Object.keys(students.all)
     const filteredEnrolledNoGrade = getFilteredEnrolledNoGrade(this.enrollments, allStudents)
 
@@ -266,14 +262,14 @@ export class CourseStatsCounter {
     stats.failed = lengthOf(students.failed)
     stats.improvedPassedGrade = lengthOf(students.improvedPassedGrade)
     stats.percentage = percentageOf(stats.passed, stats.students)
-    stats.passedOfPopulation = percentageOf(stats.passed, populationCount)
-    stats.triedOfPopulation = percentageOf(stats.students, populationCount)
+    stats.passedOfPopulation = percentageOf(stats.passed, this.studentsInTotal)
+    stats.triedOfPopulation = percentageOf(stats.students, this.studentsInTotal)
     stats.perStudent = percentageOf(stats.attempts, stats.passed + stats.failed) / 100
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
     stats.totalStudents = stats.students
     stats.totalEnrolledNoGrade = lengthOf(filteredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
-    return { stats, students, course, grades }
+    return { stats, students, course: this.course, grades: this.grades } as CourseStatistics
   }
 }
