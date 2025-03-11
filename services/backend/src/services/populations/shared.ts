@@ -5,6 +5,7 @@ import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { Name } from '../../shared/types'
+import { formatToArray } from '../../shared/util'
 import { Criteria, DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -47,9 +48,11 @@ const dateYearsFromNow = (date: Date, years: number) => {
  * @param months Number of months to add to the start date
  * @returns A new date with months incremented by the given amount
  */
-export const dateMonthsFromNow = (date: string, months: number) => {
+export const dateMonthsFromNow = (date: string, months?: string) => {
   const initialDate = new Date(date)
-  return new Date(initialDate.setMonth(initialDate.getMonth() + months))
+  // NOTE: Cast to number, uses "MAGIC_NUMBER" if undefined or NaN
+  const acualMonths = +(months ?? NaN) || 10000
+  return new Date(initialDate.setMonth(initialDate.getMonth() + acualMonths))
 }
 
 /**
@@ -334,9 +337,9 @@ const formatStudentForPopulationStatistics = (
   }
 }
 
-export type Query = {
+export type QueryParams = {
   year: string
-  months: number
+  months?: string
   semesters: string[]
   studyRights: string | string[]
   selectedStudents?: string[]
@@ -347,29 +350,31 @@ export type Query = {
   courses?: string[]
 }
 
-export type Params = {
+export type ParsedQueryParams = {
   startDate: string
   endDate: string
   includeExchangeStudents: boolean
   includeNondegreeStudents: boolean
   includeTransferredStudents: boolean
   studyRights: string[]
-  months: number
+  months?: string
   tag?: Tag
 }
 
-export const parseQueryParams = (query: Query) => {
+export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
+  const yearAsNumber = +year
+
   const hasFall = semesters.includes('FALL')
   const hasSpring = semesters.includes('SPRING')
 
   const startDate = hasFall
-    ? new Date(`${year}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
+    ? new Date(`${yearAsNumber}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const endDate = hasSpring
-    ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
+    ? new Date(`${yearAsNumber + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
   const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
@@ -380,12 +385,12 @@ export const parseQueryParams = (query: Query) => {
     includeNondegreeStudents,
     includeTransferredStudents,
     // Remove falsy values so the query doesn't break
-    studyRights: (Array.isArray(studyRights) ? studyRights : Object.values(studyRights)).filter(Boolean),
+    studyRights: formatToArray(studyRights).filter(Boolean),
     months,
     startDate,
     endDate,
-    tag,
-  } as Params
+    tag: tag as unknown as Tag | undefined,
+  }
 }
 
 export const getOptionsForStudents = async (

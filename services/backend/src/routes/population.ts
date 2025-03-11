@@ -11,7 +11,7 @@ import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../
 import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
-import { mapToProviders } from '../shared/util'
+import { formatToArray, mapToProviders } from '../shared/util'
 import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
@@ -87,22 +87,24 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
 export type PopulationstatisticsResBody = { students: any } | { error: string }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
-  semesters: string[]
-  months?: string
+  semesters: string | string[]
+  studentStatuses?: string[]
   // NOTE: This param is a JSON -object
   studyRights: string
   year: string
+  months?: string
   years?: string[]
 }
 
 router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
   '/v3/populationstatistics',
   async (req, res) => {
-    const { roles, programmeRights: userProgrammeRights, id: userId } = req.user
+    const { roles: userRoles, programmeRights: userProgrammeRights } = req.user
     const { year, semesters, studyRights: requestedStudyRightsJSON } = req.query
 
     const months = req.query.months ?? '12'
 
+    // NOTE: `year` isn't needed anymore if `years` is defined
     const requiredFields = [year, semesters, requestedStudyRightsJSON]
     if (requiredFields.some(field => !field)) {
       return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
@@ -117,7 +119,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
     const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
 
-    const hasFullAccessToStudents = hasFullAccessToStudentData(roles)
+    const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
     const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
     const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
 
@@ -131,12 +133,13 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       const upperYearBound = new Date().getFullYear() + 1
       const multiYearStudents = Promise.all(
         req.query.years.map(year => {
-          const newMonths = (upperYearBound - Number(year)) * 12
+          const yearAsNumber = +year
+          const monthsForCurrentYear = String((upperYearBound - yearAsNumber) * 12)
           return optimizedStatisticsOf({
             ...req.query,
-            year: Number(year),
-            studyRights: { programme: requestedStudyRights.programme },
-            months: newMonths,
+            studyRights: requestedStudyRights.programme,
+            months: monthsForCurrentYear,
+            semesters: formatToArray(semesters),
           })
         })
       )
@@ -162,9 +165,9 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     } else {
       result = await optimizedStatisticsOf({
         ...req.query,
-        year: Number(year),
-        studyRights: { programme: requestedStudyRights.programme },
-        months: Number(months),
+        studyRights: requestedStudyRights.programme,
+        months,
+        semesters: formatToArray(semesters),
       })
     }
 
@@ -176,7 +179,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     // Obfuscate if user has only limited study programme rights and there are any students
     if (
       'students' in result &&
-      !hasFullAccessToStudentData(roles) &&
+      !hasFullAccessToStudentData(userRoles) &&
       !userFullProgrammeRights.includes(requestedStudyRights.programme) &&
       !userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
     ) {
@@ -203,6 +206,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       })
     }
 
+    const { id: userId } = req.user
     return res.json(filterPersonalTags(result, userId))
   }
 )
@@ -244,10 +248,9 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     {
       // Useless, because studentnumbers are already filtered above by from & to.
       // We should probably refactor this to avoid more confusement.
-      year: 1900,
-      studyRights: [],
+      year: '1900',
+      studyRights: undefined,
       semesters: ['FALL', 'SPRING'],
-      months: 10000,
     },
     studentNumbers
   )
@@ -321,16 +324,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentnumberlist
     : intersection(studentnumberlist, studentsUserCanAccess)
-  const studyProgrammeCode = tags?.studyProgramme?.includes('+')
-    ? tags?.studyProgramme.split('+')[0]
-    : tags?.studyProgramme
+
+  const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
   const result = await optimizedStatisticsOf(
     {
-      year: tags?.year ? Number(tags.year) : 1900,
-      studyRights: studyProgrammeCode ? [studyProgrammeCode] : [],
+      year: tags?.year ?? '1900',
+      studyRights: studyProgrammeCode,
       semesters: ['FALL', 'SPRING'],
-      months: 10000,
     },
     filteredStudentNumbers
   )
