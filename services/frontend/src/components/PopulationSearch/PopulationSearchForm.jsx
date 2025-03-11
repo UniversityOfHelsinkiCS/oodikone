@@ -105,12 +105,13 @@ export const PopulationSearchForm = ({ onProgress }) => {
     dispatch(getPopulationStatistics({ ...query, uuid, onProgress }))
   }
 
+  // HACK: This function doesn't work as intended
   const fetchPopulationFromUrlParams = () => {
     const query = parseQueryFromUrl()
     const formattedQuery = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     if (!checkPreviousQuery(formattedQuery, previousQuery)) {
       setQuery(query)
-      fetchPopulation(query)
+      fetchPopulation(formattedQuery)
     }
   }
 
