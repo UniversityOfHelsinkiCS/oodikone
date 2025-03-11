@@ -36,7 +36,7 @@ export const StudyTrackSelector = ({
       <InputLabel id="demo-simple-select-label">Select study track</InputLabel>
       <Select
         data-cy="study-track-select"
-        disabled={options.length === 0}
+        disabled={options.length < 2}
         label="Select study track"
         onChange={event => setStudyTrack(event.target.value)}
         value={studyTrack}
