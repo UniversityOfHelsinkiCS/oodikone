@@ -22,12 +22,16 @@ import { TagsTab } from './TagsTab'
 import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 
 const getProgrammeName = (
-  studyProgrammeId: string,
+  studyProgrammeId: string | undefined,
   combibedProgrammeId: string,
   programmes: Record<string, DegreeProgramme> | undefined,
   language: Language,
   getTextIn: GetTextIn
 ) => {
+  if (!studyProgrammeId) {
+    return null
+  }
+
   if (combibedProgrammeId && programmes?.[studyProgrammeId] && programmes?.[combibedProgrammeId]) {
     return getCombinedProgrammeName(
       getTextIn(programmes?.[studyProgrammeId].name)!,
@@ -59,15 +63,16 @@ export const StudyProgramme = () => {
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
 
-  useTitle('Study programmes') // TODO: Include programme name if a programme is selected
-
-  if (!studyProgrammeId) {
-    return <StudyProgrammeSelector />
-  }
-
   const programmeId = studyProgrammeId?.includes('+') ? studyProgrammeId.split('+')[0] : studyProgrammeId
   const secondProgrammeId = studyProgrammeId?.includes('+') ? studyProgrammeId.split('+')[1] : ''
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
+
+  useTitle(programmeName ? `${programmeName} - Study programmes` : 'Study programmes')
+
+  if (!studyProgrammeId || !programmeId) {
+    return <StudyProgrammeSelector />
+  }
+
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
 
