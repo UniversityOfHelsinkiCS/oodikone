@@ -11,6 +11,7 @@ import {
   useDeleteOpenUniCourseSearchMutation,
   useUpdateOpenUniCourseSearchMutation,
 } from '@/redux/openUniPopulations'
+import { formatToArray } from '@/shared/util'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const location = useLocation()
@@ -59,8 +60,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
 
   const parseQueryFromUrl = () => {
     const { courseCode, startdate, enddate } = qs.parse(location.search)
-    let courseCodes = courseCode
-    if (!Array.isArray(courseCode)) courseCodes = [courseCode]
+    const courseCodes = formatToArray(courseCode)
     const query = {
       courseList: courseCodes,
       startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),

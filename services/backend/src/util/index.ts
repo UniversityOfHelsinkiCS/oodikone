@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'
+
 import { ProgrammeModule } from '../models'
 import { DetailedProgrammeRights, Role } from '../shared/types'
 
@@ -43,7 +45,7 @@ export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedPro
 
 export const hasFullAccessToStudentData = (roles?: Role[]) => {
   const rolesWithFullAccess: Role[] = ['admin', 'fullSisuAccess']
-  return roles?.some(role => rolesWithFullAccess.includes(role))
+  return !!roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
 export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
@@ -54,15 +56,6 @@ export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.e
  */
 export const keysOf = <T extends object>(obj: T) => {
   return Object.keys(obj) as Array<keyof T>
-}
-
-export const lengthOf = (obj: object) => Object.keys(obj).length
-
-export const percentageOf = (num: number, denom: number) => {
-  if (denom === 0) {
-    return 0
-  }
-  return Math.round(((100 * num) / denom) * 100) / 100
 }
 
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
@@ -91,7 +84,7 @@ export const getDegreeProgrammeType = async (programmeCode: string) => {
     attributes: ['degreeProgrammeType'],
     where: { code: programmeCode },
   })
-  return programmeModule ? programmeModule.degreeProgrammeType : null
+  return programmeModule?.degreeProgrammeType ?? null
 }
 
 export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
@@ -99,5 +92,14 @@ export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
     attributes: ['minimumCredits'],
     where: { code: programmeCode },
   })
-  return programmeModule ? programmeModule.minimumCredits : null
+  return programmeModule?.minimumCredits ?? null
+}
+
+export const safeJSONParse = <T>(json: string): T | null => {
+  try {
+    return JSON.parse(json)
+  } catch (error) {
+    Sentry.captureException(error)
+    return null
+  }
 }

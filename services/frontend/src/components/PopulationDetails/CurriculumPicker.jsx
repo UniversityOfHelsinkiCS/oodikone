@@ -8,16 +8,12 @@ const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => 
   if (selectedCurriculum?.curriculum_period_ids) {
     return selectedCurriculum
   }
-  if (curriculums.length > 0) {
-    if (!startYear) {
-      return curriculums[0]
-    }
-    const defaultCurriculum = curriculums.find(
-      curriculum => new Date(curriculum.valid_from) <= new Date(`${startYear}-08-01`)
-    )
-    return defaultCurriculum ?? curriculums[0]
-  }
-  return null
+
+  return (
+    curriculums?.find(curriculum => new Date(curriculum.valid_from) <= new Date(`${startYear}-08-01`)) ??
+    curriculums[0] ??
+    null
+  )
 }
 
 export const CurriculumPicker = ({ setCurriculum, programmeCodes, disabled, year }) => {

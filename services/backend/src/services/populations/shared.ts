@@ -5,6 +5,7 @@ import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { Name } from '../../shared/types'
+import { formatToArray } from '../../shared/util'
 import { Criteria, DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -47,9 +48,11 @@ const dateYearsFromNow = (date: Date, years: number) => {
  * @param months Number of months to add to the start date
  * @returns A new date with months incremented by the given amount
  */
-export const dateMonthsFromNow = (date: string, months: number) => {
+export const dateMonthsFromNow = (date: string, months?: string) => {
   const initialDate = new Date(date)
-  return new Date(initialDate.setMonth(initialDate.getMonth() + months))
+  // NOTE: Cast to number, uses "MAGIC_NUMBER" if undefined or NaN
+  const acualMonths = +(months ?? NaN) || 10000
+  return new Date(initialDate.setMonth(initialDate.getMonth() + acualMonths))
 }
 
 /**
@@ -277,8 +280,9 @@ const formatStudentForPopulationStatistics = (
     if (criteria.courses || criteria.credits) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, true)) : []
 
-      courses.forEach(course => {
-        if (course.passed) {
+      courses
+        .filter(course => course.passed)
+        .forEach(course => {
           const correctCode = criteriaCoursesBySubstitutions[course.course_code]
 
           updateCourseByYear(criteria, course, criteriaChecked, correctCode)
@@ -288,8 +292,7 @@ const formatStudentForPopulationStatistics = (
           Object.keys(academicYears).forEach((year, index) => {
             academicYears[year] += creditAmounts[index]
           })
-        }
-      })
+        })
     }
 
     updateCreditCriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
@@ -334,9 +337,9 @@ const formatStudentForPopulationStatistics = (
   }
 }
 
-export type Query = {
+export type QueryParams = {
   year: string
-  months: number
+  months?: string
   semesters: string[]
   studyRights: string | string[]
   selectedStudents?: string[]
@@ -347,45 +350,47 @@ export type Query = {
   courses?: string[]
 }
 
-export type Params = {
+export type ParsedQueryParams = {
   startDate: string
   endDate: string
-  exchangeStudents: boolean
-  nondegreeStudents: boolean
-  transferredStudents: boolean
+  includeExchangeStudents: boolean
+  includeNondegreeStudents: boolean
+  includeTransferredStudents: boolean
   studyRights: string[]
-  months: number
+  months?: string
   tag?: Tag
 }
 
-export const parseQueryParams = (query: Query) => {
+export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
+  const yearAsNumber = +year
+
   const hasFall = semesters.includes('FALL')
   const hasSpring = semesters.includes('SPRING')
 
   const startDate = hasFall
-    ? new Date(`${year}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
+    ? new Date(`${yearAsNumber}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
 
   const endDate = hasSpring
-    ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
+    ? new Date(`${yearAsNumber + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
 
-  const exchangeStudents = studentStatuses?.includes('EXCHANGE')
-  const nondegreeStudents = studentStatuses?.includes('NONDEGREE')
-  const transferredStudents = studentStatuses?.includes('TRANSFERRED')
+  const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
+  const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
+  const includeTransferredStudents = !!studentStatuses?.includes('TRANSFERRED')
 
   return {
-    exchangeStudents,
-    nondegreeStudents,
-    transferredStudents,
+    includeExchangeStudents,
+    includeNondegreeStudents,
+    includeTransferredStudents,
     // Remove falsy values so the query doesn't break
-    studyRights: (Array.isArray(studyRights) ? studyRights : Object.values(studyRights)).filter(Boolean),
+    studyRights: formatToArray(studyRights).filter(Boolean),
     months,
     startDate,
     endDate,
-    tag,
-  } as Params
+    tag: tag as unknown as Tag | undefined,
+  }
 }
 
 export const getOptionsForStudents = async (
@@ -513,53 +518,7 @@ export type CoursesQueryResult = Array<
   }
 >
 
-export const findCourseEnrollments = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
-  const result: EnrollmentsQueryResult = await sequelize.query(
-    `
-      SELECT DISTINCT
-        course.code,
-        course.name,
-        course.substitutions,
-        course.main_course_code,
-        enrollment.data AS enrollments
-      FROM course
-      INNER JOIN (
-        SELECT
-          course_code,
-          ARRAY_AGG(JSONB_BUILD_OBJECT(
-            'studentnumber', studentnumber,
-            'state', state,
-            'enrollment_date_time', enrollment_date_time
-          )) AS data
-        FROM enrollment
-        WHERE studentnumber IN (:studentnumbers)
-          AND enrollment_date_time < :beforeDate
-          AND state = :enrollmentState
-        GROUP BY course_code
-      ) AS enrollment
-        ON enrollment.course_code = course.code
-      WHERE course.code IN (:courseCodes)
-         OR (
-          SELECT
-            JSONB_AGG(DISTINCT alt_code)
-          FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
-          WHERE code IN (:courseCodes)
-        ) ? course.code
-    `,
-    {
-      replacements: {
-        studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
-        beforeDate,
-        courseCodes: courses.length ? courses : ['DUMMY'],
-        enrollmentState: EnrollmentState.ENROLLED,
-      },
-      type: QueryTypes.SELECT,
-    }
-  )
-  return result
-}
-
-export const findCourses = async (studentNumbers: string[], beforeDate: Date, courses: string[] = []) => {
+export const findCourses = async (studentNumbers: string[], courses: string[] = []) => {
   return sequelize.query(
     courses.length
       ? `
@@ -581,7 +540,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
           )) AS data
         FROM enrollment
         WHERE studentnumber IN (:studentnumbers)
-          AND enrollment_date_time < :beforeDate
           AND state = :enrollmentState
         GROUP BY course_code
       ) AS enrollment
@@ -598,7 +556,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
           )) AS data
         FROM credit
         WHERE student_studentnumber IN (:studentnumbers)
-          AND attainment_date < :beforeDate
         GROUP BY course_code
       ) AS credit
         ON credit.course_code = course.code
@@ -632,7 +589,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
           )) AS data
         FROM enrollment
         WHERE studentnumber IN (:studentnumbers)
-          AND enrollment_date_time < :beforeDate
           AND state = :enrollmentState
         GROUP BY course_code
       ) AS enrollment
@@ -649,7 +605,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
           )) AS data
         FROM credit
         WHERE student_studentnumber IN (:studentnumbers)
-          AND attainment_date < :beforeDate
         GROUP BY course_code
       ) AS credit
         ON credit.course_code = course.code
@@ -659,7 +614,6 @@ export const findCourses = async (studentNumbers: string[], beforeDate: Date, co
     {
       replacements: {
         studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
-        beforeDate,
         courseCodes: courses.length ? courses : ['DUMMY'],
         enrollmentState: EnrollmentState.ENROLLED,
       },

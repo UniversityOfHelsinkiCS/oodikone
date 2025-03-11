@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { formatToArray } from '@/shared/util'
 import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (
@@ -179,22 +180,22 @@ export const studentNumberFilter = createFilter({
 
   actions: {
     addToAllowlist: (options, students) => {
-      const sns = Array.isArray(students) ? students : [students]
+      const sns = formatToArray(students)
       options.allowlist = union(options.allowlist, sns)
     },
 
     setAllowlist: (options, students) => {
-      const sns = Array.isArray(students) ? students : [students]
+      const sns = formatToArray(students)
       options.allowlist = sns
     },
 
     addToBlocklist: (options, students) => {
-      const sns = Array.isArray(students) ? students : [students]
+      const sns = formatToArray(students)
       options.blocklist = union(options.blocklist, sns)
     },
 
     setBlocklist: (options, students) => {
-      const sns = Array.isArray(students) ? students : [students]
+      const sns = formatToArray(students)
       options.blocklist = sns
     },
   },
