@@ -350,9 +350,9 @@ export type Query = {
 export type Params = {
   startDate: string
   endDate: string
-  exchangeStudents: boolean
-  nondegreeStudents: boolean
-  transferredStudents: boolean
+  includeExchangeStudents: boolean
+  includeNondegreeStudents: boolean
+  includeTransferredStudents: boolean
   studyRights: string[]
   months: number
   tag?: Tag
@@ -371,14 +371,14 @@ export const parseQueryParams = (query: Query) => {
     ? new Date(`${year + 1}-${SemesterStart.FALL}`).toISOString()
     : new Date(`${year + 1}-${SemesterStart.SPRING}`).toISOString()
 
-  const exchangeStudents = studentStatuses?.includes('EXCHANGE')
-  const nondegreeStudents = studentStatuses?.includes('NONDEGREE')
-  const transferredStudents = studentStatuses?.includes('TRANSFERRED')
+  const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
+  const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
+  const includeTransferredStudents = !!studentStatuses?.includes('TRANSFERRED')
 
   return {
-    exchangeStudents,
-    nondegreeStudents,
-    transferredStudents,
+    includeExchangeStudents,
+    includeNondegreeStudents,
+    includeTransferredStudents,
     // Remove falsy values so the query doesn't break
     studyRights: (Array.isArray(studyRights) ? studyRights : Object.values(studyRights)).filter(Boolean),
     months,

@@ -35,8 +35,16 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
     return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
 
-  const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-    parseQueryParams(formattedQueryParams as FormattedQueryParams)
+  const {
+    studyRights,
+    startDate,
+    months,
+    endDate,
+    includeExchangeStudents,
+    includeNondegreeStudents,
+    includeTransferredStudents: includeTransferredOutStudents,
+    tag,
+  } = parseQueryParams(formattedQueryParams as FormattedQueryParams)
 
   const studentNumbers =
     studentNumberList ??
@@ -44,9 +52,9 @@ export const optimizedStatisticsOf = async (query: Query, studentNumberList?: st
       studyRights,
       startDate,
       endDate,
-      includeExchangeStudents: exchangeStudents,
-      includeNondegreeStudents: nondegreeStudents,
-      includeTransferredOutStudents: transferredStudents,
+      includeExchangeStudents,
+      includeNondegreeStudents,
+      includeTransferredOutStudents,
     }))
 
   const code = studyRights[0] || ''
