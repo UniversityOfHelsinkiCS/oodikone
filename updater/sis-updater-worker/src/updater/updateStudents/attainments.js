@@ -83,56 +83,49 @@ const updateAttainments = async (
   const coursesToBeCreated = new Map()
   const courseProvidersToBeCreated = []
 
-  // These modules cause problems, if credits are updated
-  const modulesNotAvailable = [
-    'hy-DP-65295180-ma',
-    'hy-DP-141512970',
-    'hy-DP-141513052',
-    'hy-SM-89304486',
-    'hy-SM-96923271',
-    'hy-SM-100017957',
-    'hy-SM-93788863',
-  ]
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
-      // Fix attainments with missing modules
-      if (modulesNotAvailable.includes(att.module_group_id)) {
-        if (att.module_group_id === 'hy-SM-89304486') {
-          const course = await Course.findOne({ where: { code: '71066' } })
-          return { ...att, module_group_id: course.id }
-        }
-        if (att.module_group_id === 'hy-SM-100017957') {
-          const course = await Course.findOne({ where: { code: '523102' } })
-          return { ...att, module_group_id: course.id }
-        }
-        if (['hy-DP-65295180-ma', 'hy-DP-141512970', 'hy-DP-141513052'].includes(att.module_group_id)) {
-          const { code, name } = await selectOneById('educations', att.module_group_id.replace('DP', 'EDU'))
-          coursesToBeCreated.set(code, {
+      if (att.module_group_id) {
+        const module = await selectOneById('modules', att.module_group_id)
+        // Fix attainments with missing modules (see for example issue #4761)
+        if (!module) {
+          if (att.module_group_id === 'hy-SM-89304486') {
+            const course = await Course.findOne({ where: { code: '71066' } })
+            return { ...att, module_group_id: course.id }
+          }
+          if (att.module_group_id === 'hy-SM-100017957') {
+            const course = await Course.findOne({ where: { code: '523102' } })
+            return { ...att, module_group_id: course.id }
+          }
+          const education = await selectOneById('educations', att.module_group_id.replace('DP', 'EDU'))
+          if (education) {
+            coursesToBeCreated.set(education.code, {
+              id: att.module_group_id,
+              name: education.name,
+              code: education.code,
+              main_course_code: education.code,
+              coursetypecode: att.study_level_urn,
+              course_unit_type: att.course_unit_type_urn,
+              substitutions: [],
+            })
+            return att
+          }
+          coursesToBeCreated.set(att.module_group_id, {
             id: att.module_group_id,
-            name,
-            code,
-            main_course_code: code,
+            name: {
+              fi: 'Tuntematon opintokokonaisuus',
+              en: 'Unknown study module',
+              sv: 'Okänd studiehelhet',
+            },
+            code: att.module_group_id,
+            main_course_code: att.module_group_id,
             coursetypecode: att.study_level_urn,
             course_unit_type: att.course_unit_type_urn,
             substitutions: [],
           })
           return att
         }
-        coursesToBeCreated.set(att.module_group_id, {
-          id: att.module_group_id,
-          name: {
-            fi: 'Tuntematon opintokokonaisuus',
-            en: 'Unknown study module',
-            sv: 'Okänd studiehelhet',
-          },
-          code: att.module_group_id,
-          main_course_code: att.module_group_id,
-          coursetypecode: att.study_level_urn,
-          course_unit_type: att.course_unit_type_urn,
-          substitutions: [],
-        })
-        return att
       }
 
       if (!customAttainmentTypes.includes(att.type)) return att

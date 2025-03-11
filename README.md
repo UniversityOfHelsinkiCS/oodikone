@@ -70,12 +70,9 @@ graph TB
         end
         server -->|Read| sisdb[(sis-db)]
         subgraph Updater
-            updaterscheduler[Scheduler] --> |Push jobs| nats
-            nats(NATS server)
-            updaterworker --> |Fetch jobs| nats
+            updaterscheduler[Scheduler] --> |Push BullMQ jobs| redis(Redis)
             updaterworker[Worker] -->|Write| sisdb
-            updaterscheduler --> redis(Redis)
-            updaterworker --> redis
+            updaterworker --> |Fetch BullMQ jobs| redis
         end
     end
 
