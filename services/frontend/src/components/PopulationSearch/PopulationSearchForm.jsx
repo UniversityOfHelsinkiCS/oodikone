@@ -100,18 +100,18 @@ export const PopulationSearchForm = ({ onProgress }) => {
   }
 
   const fetchPopulation = async query => {
-    const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     const uuid = crypto.randomUUID()
     dispatch(clearSelected())
-    dispatch(getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }))
+    dispatch(getPopulationStatistics({ ...query, uuid, onProgress }))
   }
 
+  // HACK: This function doesn't work as intended
   const fetchPopulationFromUrlParams = () => {
     const query = parseQueryFromUrl()
     const formattedQuery = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
     if (!checkPreviousQuery(formattedQuery, previousQuery)) {
       setQuery(query)
-      fetchPopulation(query)
+      fetchPopulation(formattedQuery)
     }
   }
 

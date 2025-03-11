@@ -4,11 +4,9 @@ const courseStatisticsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getStudentListCourseStatistics: builder.query({
       query: ({ studentNumbers }) => ({
-        url: '/v2/populationstatistics/coursesbystudentnumberlist',
+        url: '/v4/populationstatistics/courses',
         method: 'POST',
-        body: {
-          studentnumberlist: studentNumbers,
-        },
+        body: { selectedStudents: studentNumbers },
       }),
     }),
   }),

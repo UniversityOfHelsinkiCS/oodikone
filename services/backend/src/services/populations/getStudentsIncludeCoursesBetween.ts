@@ -79,13 +79,13 @@ const getEnrollments = async (studentNumbers: string[], attainmentDateFrom: mome
   return await Enrollment.findAll({
     attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
     where: {
-      enrollment_date_time: {
-        [Op.between]: [attainmentDateFrom, endDate],
-      },
       studentnumber: {
         [Op.in]: studentNumbers,
       },
       state: EnrollmentState.ENROLLED,
+      enrollment_date_time: {
+        [Op.between]: [attainmentDateFrom, endDate],
+      },
     },
     raw: true,
   })
