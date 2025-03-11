@@ -138,6 +138,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
           return optimizedStatisticsOf({
             ...req.query,
             studyRights: requestedStudyRights.programme,
+            year,
             months: monthsForCurrentYear,
             semesters: formatToArray(semesters),
           })
@@ -166,6 +167,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       result = await optimizedStatisticsOf({
         ...req.query,
         studyRights: requestedStudyRights.programme,
+        year,
         months,
         semesters: formatToArray(semesters),
       })
