@@ -1,5 +1,3 @@
-// TODO: This file contains copy-paste, consider refactoring
-
 import { NorthEast as NorthEastIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
 import moment from 'moment'
@@ -14,9 +12,92 @@ const getMonths = (year: number) => {
   return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
 }
 
-const PopulationLinkButton = ({ cypress, title, to }: { cypress?: string; title: string; to: string }) => {
+const getUrl = (params: {
+  months: number
+  studyRights: string
+  tag?: string
+  year: string | number
+  years?: string
+}) => {
+  const baseUrl = '/populations'
+  const urlParts = [
+    `months=${params.months}`,
+    'semesters=FALL',
+    'semesters=SPRING',
+    `studyRights=${params.studyRights}`,
+  ]
+
+  if (params.years) {
+    urlParts.push('year=All', `years=${params.years}`)
+  } else {
+    urlParts.push(`year=${params.year}`)
+  }
+
+  if (params.tag) {
+    urlParts.push(`tag=${params.tag}`)
+  }
+
+  const url = `${baseUrl}?${urlParts.join('&')}`
+  return url
+}
+
+const getStudyRights = (studyProgramme: string, combinedProgramme?: string, studyTrack?: string) => {
+  const studyRights: Record<string, string> = { programme: studyProgramme }
+  if (studyTrack) {
+    studyRights.studyTrack = studyTrack
+  }
+  if (combinedProgramme) {
+    studyRights.combinedProgramme = combinedProgramme
+  }
+  return encodeURIComponent(JSON.stringify(studyRights))
+}
+
+const getTitle = (selectedYear: string | number, year: string, tag?: Tag) => {
+  if (tag) {
+    return `Population statistics of class ${selectedYear} with tag ${tag.name}`
+  }
+  if (year === 'Total') {
+    return 'Population statistics of all years'
+  }
+  return `Population statistics of class ${selectedYear}`
+}
+
+export const PopulationLink = ({
+  combinedProgramme,
+  cypress,
+  studyProgramme,
+  studyTrack,
+  tag,
+  year,
+  years,
+}: {
+  combinedProgramme?: string
+  cypress?: string
+  studyProgramme: string
+  studyTrack?: string
+  tag?: Tag
+  year: string
+  years?: number[]
+}) => {
+  const selectedYear = tag?.year ?? (year === 'Total' ? Math.min(...(years ?? [])) : Number(year.slice(0, 4)))
+  const months =
+    year === 'Total'
+      ? getMonths(Math.min(...(years ?? [])))
+      : Math.ceil(moment.duration(moment().diff(`${selectedYear}-08-01`)).asMonths())
+
+  const title = getTitle(selectedYear, year, tag)
+
+  const studyRights = getStudyRights(studyProgramme, combinedProgramme, studyTrack)
+  const url = getUrl({
+    months,
+    studyRights,
+    year: year === 'Total' ? Math.min(...(years ?? [])) : selectedYear,
+    years: year === 'Total' ? (years ?? []).join('&years=') : undefined,
+    tag: tag?.id,
+  })
+
   return (
-    <Link title={title} to={to}>
+    <Link title={title} to={url}>
       <IconButton
         color="primary"
         data-cy={cypress ? `${cypress.toLowerCase()}-population-link-button` : 'population-link-button'}
@@ -25,102 +106,4 @@ const PopulationLinkButton = ({ cypress, title, to }: { cypress?: string; title:
       </IconButton>
     </Link>
   )
-}
-
-const getTotalPopulationLink = (
-  combinedProgramme: string | undefined,
-  months: number,
-  studyProgramme: string,
-  studyTrack: string | undefined,
-  years: string
-) => {
-  if (studyTrack) {
-    return (
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%2C"studyTrack"%3A"${studyTrack}"%7D&year=All&years=${years}`
-    )
-  }
-  if (combinedProgramme) {
-    return (
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%2C"combinedProgramme"%3A"${combinedProgramme}"%7D&year=All&years=${years}`
-    )
-  }
-  return (
-    `/populations?months=${months}&semesters=FALL&semesters=` +
-    `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%7D&year=All&years=${years}`
-  )
-}
-
-const getPopulationLink = (
-  combinedProgramme: string | undefined,
-  months: number,
-  startYear: number,
-  studyProgramme: string,
-  studyTrack: string | undefined
-) => {
-  if (studyTrack) {
-    return (
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%2C"studyTrack"%3A"${studyTrack}"%7D&year=${startYear}`
-    )
-  }
-  if (combinedProgramme) {
-    return (
-      `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%2C"combinedProgramme"%3A"${combinedProgramme}"%7D&year=${startYear}`
-    )
-  }
-  return (
-    `/populations?months=${months}&semesters=FALL&semesters=` +
-    `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%7D&year=${startYear}`
-  )
-}
-
-export const PopulationLink = ({
-  combinedProgramme,
-  cypress,
-  studyProgramme,
-  studyTrack,
-  year,
-  years,
-}: {
-  combinedProgramme?: string
-  cypress?: string
-  studyProgramme: string
-  studyTrack?: string
-  year: string
-  years: number[]
-}) => {
-  if (year === 'Total') {
-    const yearsString = years.join('&years=')
-    const months = getMonths(Math.min(...years.map(year => Number(year))))
-    const href = getTotalPopulationLink(combinedProgramme, months, studyProgramme, studyTrack, yearsString)
-    return <PopulationLinkButton cypress={cypress} title="Population statistics of all years" to={href} />
-  }
-
-  const startYear = Number(year.slice(0, 4))
-  const months = Math.ceil(moment.duration(moment().diff(`${startYear}-08-01`)).asMonths())
-  const href = getPopulationLink(combinedProgramme, months, startYear, studyProgramme, studyTrack)
-  return <PopulationLinkButton cypress={cypress} title={`Population statistics of class ${year}`} to={href} />
-}
-
-export const PopulationLinkWithTag = ({
-  combinedProgramme,
-  studyProgramme,
-  tag,
-}: {
-  combinedProgramme: string
-  studyProgramme: string
-  tag: Tag
-}) => {
-  const year = tag.year ?? new Date().getFullYear()
-  const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-  const href = combinedProgramme
-    ? `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%2C"combinedProgramme"%3A"${combinedProgramme}"%7D&year=${year}&tag=${tag.id}`
-    : `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyProgramme}"%7D&year=${year}&tag=${tag.id}`
-
-  return <PopulationLinkButton title={`Population statistics of class ${year} with tag ${tag.name}`} to={href} />
 }
