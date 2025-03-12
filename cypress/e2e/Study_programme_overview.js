@@ -368,7 +368,7 @@ describe('Study programme overview', () => {
 
       it('Links to class statistics page with study track info included work', () => {
         cy.cs('show-study-tracks-button').first().click()
-        cy.contains('td', 'Matematiikka, MAT-MAT').within(() => {
+        cy.contains('td', 'Matematiikka (MAT-MAT)').within(() => {
           cy.get('a').click()
         })
 
