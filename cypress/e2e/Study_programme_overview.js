@@ -819,6 +819,15 @@ describe('Study programme overview', () => {
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
     })
 
+    it.skip('year selector', () => {
+      // TODO: Implement this test
+      // Things to test:
+      // - Clicking the button works
+      // - Selecting a study track works
+      // - The button is disabled if only one year is selected
+      // - The slider is not visible if the user does not have correct programme rights
+    })
+
     it('can access programme and correct tabs are visible', () => {
       cy.contains('Basic information')
       cy.contains('Study tracks and class statistics')

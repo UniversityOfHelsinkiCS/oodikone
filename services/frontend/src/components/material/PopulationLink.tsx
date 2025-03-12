@@ -47,6 +47,7 @@ export const PopulationLink = ({
       <Link title={title} to={url}>
         <Button
           color="primary"
+          data-cy="population-link-show-button"
           disabled={years?.length === 1}
           endIcon={<NorthEastIcon fontSize="small" />}
           size="small"
