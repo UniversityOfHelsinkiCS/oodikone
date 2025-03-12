@@ -277,7 +277,24 @@ describe('Study programme overview', () => {
       cy.cs('study-tracks-and-class-statistics-tab').click()
     })
 
-    it('all sections are visible', () => {
+    describe('Info boxes', () => {
+      it('Study track overview section', () => {
+        cy.cs('study-track-overview-info-box-button').click()
+        cy.cs('study-track-overview-info-box-content').contains('Opiskelijat, joiden')
+      })
+
+      it('Progress of students section', () => {
+        cy.cs('progress-of-students-info-box-button').click()
+        cy.cs('progress-of-students-info-box-content').contains('Kuvaa koulutusohjelmassa')
+      })
+
+      it('Average graduation times section', () => {
+        cy.cs('average-graduation-times-info-box-button').click()
+        cy.cs('average-graduation-times-info-box-content').contains('Yksittäinen palkki')
+      })
+    })
+
+    it('All sections are visible', () => {
       cy.cs('study-track-selector-section')
       cy.cs('study-track-overview-section')
       cy.cs('progress-of-students-section')
