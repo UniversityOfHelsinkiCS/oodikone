@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Stack } from '@mui/material'
+import { Alert, AlertTitle, Divider, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { getTargetCreditsForProgramme } from '@/common'
@@ -16,6 +16,7 @@ import { getGraduationGraphTitle } from '@/util/studyProgramme'
 import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
+import { YearSelector } from './YearSelector'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
@@ -199,33 +200,36 @@ export const StudyTracksAndClassStatisticsTab = ({
         isLoading={isFetchingOrLoading}
         title={`Students of the study ${isStudyProgrammeMode ? 'programme' : `track ${studyTrack}`} by starting year`}
       >
-        <Stack gap={2}>
-          <ToggleContainer>
-            <Toggle
-              firstLabel="Hide percentages"
-              secondLabel="Show percentages"
-              setValue={setShowPercentages}
-              value={showPercentages}
-            />
-          </ToggleContainer>
-          {/* Implement a way to select a subset of years */}
-          {studyTrackStats && (
-            <StudyTrackDataTable
-              combinedProgramme={combinedProgramme}
-              dataOfAllTracks={studyTrackStats?.mainStatsByYear}
-              dataOfSingleTrack={
-                studyTrack && studyTrack !== studyProgramme ? studyTrackStats?.mainStatsByTrack[studyTrack] : null
-              }
-              otherCountriesStats={studyTrackStats?.otherCountriesCount}
-              showPercentages={showPercentages}
-              singleTrack={studyTrack !== studyProgramme ? studyTrack : null}
-              studyProgramme={studyProgramme}
-              studyTracks={studyTrackStats?.studyTracks}
-              titles={studyTrackStats?.populationTitles}
-              years={studyTrackStats?.years}
-            />
-          )}
-        </Stack>
+        {studyTrackStats && (
+          <Stack gap={2}>
+            <YearSelector studyProgramme={studyProgramme} years={studyTrackStats.years} />
+            <Divider />
+            <ToggleContainer>
+              <Toggle
+                firstLabel="Hide percentages"
+                secondLabel="Show percentages"
+                setValue={setShowPercentages}
+                value={showPercentages}
+              />
+            </ToggleContainer>
+            {studyTrackStats && (
+              <StudyTrackDataTable
+                combinedProgramme={combinedProgramme}
+                dataOfAllTracks={studyTrackStats.mainStatsByYear}
+                dataOfSingleTrack={
+                  studyTrack && studyTrack !== studyProgramme ? studyTrackStats.mainStatsByTrack[studyTrack] : null
+                }
+                otherCountriesStats={studyTrackStats.otherCountriesCount}
+                showPercentages={showPercentages}
+                singleTrack={studyTrack !== studyProgramme ? studyTrack : null}
+                studyProgramme={studyProgramme}
+                studyTracks={studyTrackStats.studyTracks}
+                titles={studyTrackStats.populationTitles}
+                years={studyTrackStats.years}
+              />
+            )}
+          </Stack>
+        )}
       </Section>
 
       {isStudyProgrammeMode ? (
