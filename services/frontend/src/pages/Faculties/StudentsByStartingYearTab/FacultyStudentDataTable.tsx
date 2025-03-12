@@ -16,12 +16,12 @@ import {
 } from '@mui/material'
 import { Fragment, useState } from 'react'
 
-import { getCalendarYears } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { InfoBox } from '@/components/material/InfoBox'
 import { PopulationLink } from '@/components/material/PopulationLink'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
+import { getCalendarYears } from '@/util/timeAndDate'
 
 const getTableCell = (year: string, programme: string, value: number | string) => {
   return (

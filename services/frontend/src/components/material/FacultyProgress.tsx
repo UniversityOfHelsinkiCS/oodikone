@@ -1,8 +1,8 @@
 import { Stack } from '@mui/material'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
+import { ProgressBarChart } from '@/components/material/ProgressBarChart'
 import { Section } from '@/components/material/Section'
 import { GetAllProgressStatsResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
@@ -37,8 +37,8 @@ export const FacultyProgress = ({
       <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
         {bachelorStats && (
           <Stack gap={2}>
-            <FacultyBarChart
-              cypress="faculty-bachelors-progress"
+            <ProgressBarChart
+              cypress="faculty-bachelors"
               data={{
                 id: faculty,
                 stats: bachelorStats?.chartStats,
@@ -46,7 +46,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-bachelors-progress-table"
+              cypress="bachelors"
               data={bachelorStats?.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bachelorsProgStats}
@@ -66,8 +66,8 @@ export const FacultyProgress = ({
       >
         {bachelorMasterStats && (
           <Stack gap={2}>
-            <FacultyBarChart
-              cypress="faculty-bachelor-masters-progress"
+            <ProgressBarChart
+              cypress="faculty-bachelor-masters"
               data={{
                 id: faculty,
                 stats: bachelorMasterStats.chartStats,
@@ -75,7 +75,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-bachelor-masters-progress-table"
+              cypress="bachelor-masters"
               data={bachelorMasterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bcMsProgStats}
@@ -89,8 +89,8 @@ export const FacultyProgress = ({
       <Section isError={isError} isLoading={isLoading && !masterStats} title="Master">
         {masterStats && faculty !== 'H90' && (
           <Stack gap={2}>
-            <FacultyBarChart
-              cypress="faculty-masters-progress"
+            <ProgressBarChart
+              cypress="faculty-masters"
               data={{
                 id: faculty,
                 stats: masterStats.chartStats,
@@ -98,7 +98,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-masters-progress-table"
+              cypress="masters"
               data={masterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.mastersProgStats}
@@ -112,8 +112,8 @@ export const FacultyProgress = ({
       <Section isError={isError} isLoading={isLoading && !doctorStats} title="Doctor">
         {doctorStats && (
           <Stack gap={2}>
-            <FacultyBarChart
-              cypress="faculty-doctoral-progress"
+            <ProgressBarChart
+              cypress="faculty-doctoral"
               data={{
                 id: faculty,
                 stats: doctorStats.chartStats,
@@ -121,7 +121,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-doctoral-progress-table"
+              cypress="doctoral"
               data={doctorStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.doctoralProgStats}

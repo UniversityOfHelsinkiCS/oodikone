@@ -15,11 +15,11 @@ export const BreakdownDisplay = ({
   yearLabel,
 }: {
   data: GraduationStats[]
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
-  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
+  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
+  level: string
   levelProgrammeData: ProgrammeMedians
-  mode: 'faculty' | 'programme'
-  names: Record<string, Name | NameWithCode>
+  mode: 'faculty' | 'programme' | 'study track'
+  names: Record<string, Name | NameWithCode> | Record<string, string | Name> | undefined
   programmeDataVisible: boolean
   year: number | null
   yearLabel: 'Graduation year' | 'Start year'

@@ -1,7 +1,14 @@
 import { useState } from 'react'
 
 import { Section } from '@/components/material/Section'
-import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import {
+  FacultyClassSizes,
+  GraduationStats,
+  Name,
+  NameWithCode,
+  ProgrammeClassSizes,
+  ProgrammeMedians,
+} from '@/shared/types'
 import { BreakdownDisplay } from './BreakdownDisplay'
 import { MedianDisplay } from './MedianDisplay'
 
@@ -10,7 +17,7 @@ export const GraduationTimes = ({
   data,
   goal,
   goalExceptions,
-  groupBy,
+  groupBy = 'byStartYear',
   isError,
   isLoading,
   level,
@@ -21,32 +28,17 @@ export const GraduationTimes = ({
   title,
   yearLabel,
 }: {
-  classSizes:
-    | {
-        bachelor: Record<string, number>
-        bcMsCombo: Record<string, number>
-        master: Record<string, number>
-        doctor: Record<string, number>
-        programmes: {
-          [code: string]: {
-            bachelor: Record<string, number>
-            bcMsCombo: Record<string, number>
-            master: Record<string, number>
-            doctor: Record<string, number>
-          }
-        }
-      }
-    | undefined
+  classSizes?: FacultyClassSizes | ProgrammeClassSizes
   data: GraduationStats[] | undefined
   goal: number | undefined
   goalExceptions: Record<string, number> | { needed: boolean }
-  groupBy: 'byGradYear' | 'byStartYear'
+  groupBy?: 'byGradYear' | 'byStartYear'
   isError: boolean
   isLoading: boolean
-  level: 'bachelor' | 'bcMsCombo' | 'master' | 'doctor'
-  levelProgrammeData: ProgrammeMedians | undefined
-  mode: 'faculty' | 'programme'
-  names: Record<string, Name | NameWithCode> | undefined
+  level: string
+  levelProgrammeData?: ProgrammeMedians
+  mode: 'faculty' | 'programme' | 'study track'
+  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
   showMedian: boolean
   title: string
   yearLabel: 'Graduation year' | 'Start year'
@@ -54,7 +46,7 @@ export const GraduationTimes = ({
   const [programmeDataVisible, setProgrammeDataVisible] = useState(false)
   const [year, setYear] = useState<number | null>(null)
 
-  const handleClick = (event, isFacultyGraph: boolean, seriesCategory: number | null = null) => {
+  const handleClick = (event, isFacultyGraph: boolean, seriesCategory: number | string | null = null) => {
     if (isFacultyGraph) {
       setYear(seriesCategory ?? event.point.name)
       setProgrammeDataVisible(true)

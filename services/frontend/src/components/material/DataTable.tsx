@@ -30,7 +30,7 @@ export const DataTable = ({
   }
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} variant="outlined">
       <StyledTable data-cy={`${cypress}-data-table`} showCellBorders>
         <TableHead>
           <TableRow>

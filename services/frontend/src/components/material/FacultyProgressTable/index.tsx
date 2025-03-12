@@ -38,7 +38,7 @@ export const FacultyProgressTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={cypress} showCellBorders size="small">
+      <StyledTable data-cy={`${cypress}-faculty-progress-table`} showCellBorders size="small">
         <TableHead>
           <TableRow>
             {titles.map(title => (
@@ -54,7 +54,11 @@ export const FacultyProgressTable = ({
               {!isTotalRow(yearArray) ? (
                 <>
                   <ExpandableRow
-                    cypress={visibleYears[yearIndex] ? `${cypress}-hide-button` : `${cypress}-show-button`}
+                    cypress={
+                      visibleYears[yearIndex]
+                        ? `${cypress}-faculty-progress-table-hide-button`
+                        : `${cypress}-faculty-progress-table-show-button`
+                    }
                     toggleVisibility={() => toggleVisibility(yearIndex)}
                     visible={visibleYears[yearIndex]}
                     yearArray={yearArray}

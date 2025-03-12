@@ -20,3 +20,12 @@ export const reformatDate = (date: string | Date | null | undefined, outputForma
   const parsedDate = moment(date).local().format(outputFormat)
   return parsedDate
 }
+
+export const getCalendarYears = (years: string[]) => {
+  return years.reduce((all, year) => {
+    if (year === 'Total') {
+      return all
+    }
+    return all.concat(Number(year.slice(0, 4)))
+  }, [] as number[])
+}

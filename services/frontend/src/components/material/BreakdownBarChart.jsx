@@ -10,6 +10,7 @@ exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
+// TODO: Combine with @/components/material/GraduationTimes/BreakdownDisplay/BreakdownBarChart
 export const BreakdownBarChart = ({ data, title, byStartYear = false }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },

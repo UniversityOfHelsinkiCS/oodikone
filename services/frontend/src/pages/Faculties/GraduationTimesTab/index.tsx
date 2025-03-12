@@ -4,7 +4,7 @@ import { utils, writeFile } from 'xlsx'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { GraduationTimes } from '@/components/material/FacultyGraduations/GraduationTimes'
+import { GraduationTimes } from '@/components/material/GraduationTimes'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'

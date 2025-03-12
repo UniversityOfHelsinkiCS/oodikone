@@ -1,54 +1,55 @@
-import { Dropdown, DropdownProps } from 'semantic-ui-react'
+import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 
-import '../studyprogramme.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Name } from '@/shared/types'
 
-interface StudyTrackSelectorProps {
-  track: string
-  setTrack: (track: string) => void
-  studyTracks: Record<string, string | Name>
-}
-
-export const StudyTrackSelector = ({ track, setTrack, studyTracks }: StudyTrackSelectorProps) => {
+export const StudyTrackSelector = ({
+  setStudyTrack,
+  studyTrack,
+  studyTracks,
+}: {
+  setStudyTrack: (studyTrack: string) => void
+  studyTrack: string
+  studyTracks: Record<string, string | Name> | undefined
+}) => {
   const { getTextIn } = useLanguage()
-  if (!studyTracks) {
-    return null
-  }
 
-  const handleStudyTrackChange = (event: React.SyntheticEvent, data: DropdownProps) => {
-    const { value } = data
-    event.preventDefault()
-    setTrack(value as string)
+  const options: { code: string; name: string; value: string }[] = []
+  if (studyTracks) {
+    options.push(
+      ...Object.entries(studyTracks)
+        .map(([code, studyTrack]) => ({
+          code,
+          name: typeof studyTrack === 'string' ? studyTrack : getTextIn(studyTrack)!,
+          value: code,
+        }))
+        .sort((a, b) => {
+          if (a.name.startsWith('All students of the programme')) return -1
+          if (b.name.startsWith('All students of the programme')) return 1
+          return a.name.localeCompare(b.name, 'fi', { sensitivity: 'accent' })
+        })
+    )
   }
-
-  const getOptionName = (studyTrack: string | Name) => {
-    return typeof studyTrack === 'string' ? studyTrack : getTextIn(studyTrack)
-  }
-
-  const studyTrackOptions = Object.entries(studyTracks)
-    .map(([code, studyTrack]) => ({
-      key: code,
-      value: code,
-      text: `${getOptionName(studyTrack)}, ${code}`,
-    }))
-    .sort((a, b) => {
-      if (a.text.startsWith('All students of the programme')) return -1
-      if (b.text.startsWith('All students of the programme')) return 1
-      return a.text.localeCompare(b.text, 'fi', { sensitivity: 'accent' })
-    })
 
   return (
-    <div className="studytrack-selector">
-      <h4>Choose study track</h4>
-      <Dropdown
-        fluid
-        name="studyTrack"
-        onChange={handleStudyTrackChange}
-        options={studyTrackOptions}
-        selection
-        value={track}
-      />
-    </div>
+    <FormControl fullWidth>
+      <InputLabel>Select study track</InputLabel>
+      <Select
+        data-cy="study-track-select"
+        disabled={options.length < 2}
+        label="Select study track"
+        onChange={event => setStudyTrack(event.target.value)}
+        value={studyTrack}
+      >
+        {options.map(option => (
+          <MenuItem key={option.code} value={option.value}>
+            <Box display="flex" justifyContent="space-between" width="100%">
+              <Typography color="text.primary">{option.name}</Typography>
+              <Typography color="text.secondary">{option.code}</Typography>
+            </Box>
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   )
 }

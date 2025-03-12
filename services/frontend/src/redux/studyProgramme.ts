@@ -1,5 +1,6 @@
 import { RTKApi } from '@/apiConnection'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Graduated, SpecialGroups, StudyTrackStats } from '@/shared/types'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { useGetProgrammesQuery } from './populations'
 
@@ -22,7 +23,10 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
-    getStudyTrackStats: builder.query({
+    getStudyTrackStats: builder.query<
+      StudyTrackStats,
+      { id: string; graduated: Graduated; specialGroups: SpecialGroups; combinedProgramme: string }
+    >({
       query: ({ id, graduated, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/studytrackstats?graduated=${graduated}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),

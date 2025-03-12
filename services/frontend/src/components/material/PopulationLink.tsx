@@ -14,10 +14,13 @@ const getMonths = (year: number) => {
   return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
 }
 
-const PopulationLinkButton = ({ title, to }: { title: string; to: string }) => {
+const PopulationLinkButton = ({ cypress, title, to }: { cypress?: string; title: string; to: string }) => {
   return (
     <Link title={title} to={to}>
-      <IconButton color="primary" data-cy="population-link-button">
+      <IconButton
+        color="primary"
+        data-cy={cypress ? `${cypress.toLowerCase()}-population-link-button` : 'population-link-button'}
+      >
         <NorthEastIcon fontSize="small" />
       </IconButton>
     </Link>
@@ -76,12 +79,14 @@ const getPopulationLink = (
 
 export const PopulationLink = ({
   combinedProgramme,
+  cypress,
   studyProgramme,
   studyTrack,
   year,
   years,
 }: {
   combinedProgramme?: string
+  cypress?: string
   studyProgramme: string
   studyTrack?: string
   year: string
@@ -91,13 +96,13 @@ export const PopulationLink = ({
     const yearsString = years.join('&years=')
     const months = getMonths(Math.min(...years.map(year => Number(year))))
     const href = getTotalPopulationLink(combinedProgramme, months, studyProgramme, studyTrack, yearsString)
-    return <PopulationLinkButton title="Population statistics of all years" to={href} />
+    return <PopulationLinkButton cypress={cypress} title="Population statistics of all years" to={href} />
   }
 
   const startYear = Number(year.slice(0, 4))
   const months = Math.ceil(moment.duration(moment().diff(`${startYear}-08-01`)).asMonths())
   const href = getPopulationLink(combinedProgramme, months, startYear, studyProgramme, studyTrack)
-  return <PopulationLinkButton title={`Population statistics of class ${year}`} to={href} />
+  return <PopulationLinkButton cypress={cypress} title={`Population statistics of class ${year}`} to={href} />
 }
 
 export const PopulationLinkWithTag = ({

@@ -7,7 +7,7 @@ const checkProgressBarCharts = () => {
 }
 
 const checkProgressTables = () => {
-  progressLevels.forEach(level => cy.cs(`faculty-${level}-progress-table`))
+  progressLevels.forEach(level => cy.cs(`${level}-faculty-progress-table`))
 }
 
 const graduationTimesLevels = ['bachelor', 'master', 'doctor'] // ? Bachelor + master seems to be missing in test data
@@ -53,7 +53,7 @@ describe('University view', () => {
 
     it('years in the tables can be clicked to show faculty level breakdown', () => {
       cy.cs('study-right-toggle').click()
-      cy.cs('faculty-bachelors-progress-table-show-button3').click()
+      cy.cs('bachelors-faculty-progress-table-show-button3').click()
       cy.contains('29.5%').trigger('mouseover', { force: true })
       cy.contains('Matemaattis-luonnontieteellinen tiedekunta')
       cy.contains('H50')

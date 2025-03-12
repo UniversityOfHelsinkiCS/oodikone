@@ -2,8 +2,8 @@ import { Stack } from '@mui/material'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { FacultyBarChart } from '@/components/material/FacultyBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
+import { ProgressBarChart } from '@/components/material/ProgressBarChart'
 import { Section } from '@/components/material/Section'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
@@ -79,7 +79,7 @@ export const ProgressSection = ({
           <AccordionWrapper level="Bachelor">
             {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
               <Stack gap={2}>
-                <FacultyBarChart
+                <ProgressBarChart
                   cypress="FacultyBachelorsProgress"
                   data={{
                     id: faculty.code,
@@ -88,7 +88,7 @@ export const ProgressSection = ({
                   }}
                 />
                 <FacultyProgressTable
-                  cypress="FacultyBachelorsProgressTable"
+                  cypress="bachelors"
                   data={bachelorStats.tableStats}
                   programmeNames={progressStats?.data.programmeNames}
                   programmeStats={progressStats?.data.bachelorsProgStats}
@@ -107,8 +107,8 @@ export const ProgressSection = ({
               bachelorMasterStats &&
               hasNonZeroStats(bachelorMasterStats) && (
                 <Stack gap={2}>
-                  <FacultyBarChart
-                    cypress="FacultyBachelorMastersProgress"
+                  <ProgressBarChart
+                    cypress="faculty-bachelor-masters"
                     data={{
                       id: faculty.code,
                       stats: bachelorMasterStats.chartStats,
@@ -116,7 +116,7 @@ export const ProgressSection = ({
                     }}
                   />
                   <FacultyProgressTable
-                    cypress="FacultyBachelorMasterProgressTable"
+                    cypress="bachelor-masters"
                     data={bachelorMasterStats.tableStats}
                     programmeNames={progressStats.data.programmeNames}
                     programmeStats={progressStats.data.bcMsProgStats}
@@ -136,8 +136,8 @@ export const ProgressSection = ({
               hasNonZeroStats(masterStats) &&
               !(faculty.code === 'H90') && (
                 <Stack gap={2}>
-                  <FacultyBarChart
-                    cypress="FacultyMastersProgress"
+                  <ProgressBarChart
+                    cypress="faculty-masters"
                     data={{
                       id: faculty.code,
                       stats: masterStats.chartStats,
@@ -145,7 +145,7 @@ export const ProgressSection = ({
                     }}
                   />
                   <FacultyProgressTable
-                    cypress="FacultyMastersProgressTable"
+                    cypress="masters"
                     data={masterStats.tableStats}
                     programmeNames={progressStats?.data.programmeNames}
                     programmeStats={progressStats?.data.mastersProgStats}
@@ -161,8 +161,8 @@ export const ProgressSection = ({
           <AccordionWrapper level="Doctor">
             {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
               <Stack gap={2}>
-                <FacultyBarChart
-                  cypress="FacultyDoctoralProgress"
+                <ProgressBarChart
+                  cypress="faculty-doctoral"
                   data={{
                     id: faculty.code,
                     stats: doctorStats.chartStats,
@@ -170,7 +170,7 @@ export const ProgressSection = ({
                   }}
                 />
                 <FacultyProgressTable
-                  cypress="FacultyDoctoralProgressTable"
+                  cypress="doctoral"
                   data={doctorStats.tableStats}
                   programmeNames={progressStats?.data.programmeNames}
                   programmeStats={progressStats?.data.doctoralProgStats}
