@@ -58,7 +58,7 @@ export const MedianDisplay = ({
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
         <MedianBarChart
-          classSizes={classSizes?.[level]}
+          classSizes={classSizes?.[level] ?? {}}
           cypress={`${level}-median-bar-chart`}
           data={data}
           goal={goal}

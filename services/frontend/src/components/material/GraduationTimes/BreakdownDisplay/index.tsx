@@ -36,7 +36,7 @@ export const BreakdownDisplay = ({
             facultyGraph={false}
             handleClick={handleClick}
             mode={mode}
-            names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
+            names={names}
             year={year}
             yearLabel={yearLabel}
           />

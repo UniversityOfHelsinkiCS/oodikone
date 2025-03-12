@@ -28,7 +28,7 @@ export const BreakdownBarChart = ({
   facultyGraph?: boolean
   handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
   mode: 'faculty' | 'programme' | 'study track'
-  names?: Record<string, Name | NameWithCode>
+  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
   year?: number | null
   yearLabel?: 'Graduation year' | 'Start year'
 }) => {
@@ -66,7 +66,11 @@ export const BreakdownBarChart = ({
     if (!names) {
       return ''
     }
-    return names[code]?.[language] ?? names[code]?.fi
+    const name = names[code]
+    if (typeof name === 'string') {
+      return name
+    }
+    return name[language] ?? name.fi
   }
 
   const getTooltipText = (id: string, seriesName: string, amount: number) => {

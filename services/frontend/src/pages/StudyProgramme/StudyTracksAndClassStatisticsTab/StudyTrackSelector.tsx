@@ -33,7 +33,7 @@ export const StudyTrackSelector = ({
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="demo-simple-select-label">Select study track</InputLabel>
+      <InputLabel>Select study track</InputLabel>
       <Select
         data-cy="study-track-select"
         disabled={options.length < 2}

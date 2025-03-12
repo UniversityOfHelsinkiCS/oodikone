@@ -46,7 +46,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-bachelors-progress-table"
+              cypress="bachelors"
               data={bachelorStats?.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bachelorsProgStats}
@@ -75,7 +75,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-bachelor-masters-progress-table"
+              cypress="bachelor-masters"
               data={bachelorMasterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.bcMsProgStats}
@@ -98,7 +98,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-masters-progress-table"
+              cypress="masters"
               data={masterStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.mastersProgStats}
@@ -121,7 +121,7 @@ export const FacultyProgress = ({
               }}
             />
             <FacultyProgressTable
-              cypress="faculty-doctoral-progress-table"
+              cypress="doctoral"
               data={doctorStats.tableStats}
               programmeNames={progressStats!.programmeNames}
               programmeStats={progressStats!.doctoralProgStats}

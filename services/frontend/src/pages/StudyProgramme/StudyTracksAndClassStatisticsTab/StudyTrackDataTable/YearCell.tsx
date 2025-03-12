@@ -31,7 +31,7 @@ export const YearCell = ({
     <TableCell>
       <Stack alignItems="center" direction="row">
         {yearlyData.length > 1 && (
-          <IconButton onClick={setShow} size="small">
+          <IconButton data-cy="show-study-tracks-button" onClick={setShow} size="small">
             {show ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
           </IconButton>
         )}
@@ -39,6 +39,7 @@ export const YearCell = ({
         {(fullAccessToStudentData || allRights.includes(studyProgramme) || allRights.includes(combinedProgramme)) && (
           <PopulationLink
             combinedProgramme={combinedProgramme}
+            cypress={year.split(' - ')[0]}
             studyProgramme={studyProgramme}
             year={year}
             years={calendarYears}

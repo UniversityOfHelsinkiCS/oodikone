@@ -16,7 +16,7 @@ export const ProgressTable = ({ data, titles }: { data: (string | number)[][]; t
 
   return (
     <TableContainer component={Paper} variant="outlined">
-      <StyledTable data-cy="study-programme-progress-table" showCellBorders size="small">
+      <StyledTable data-cy="study-programme-progress-data-table" showCellBorders size="small">
         <TableHead>
           <TableRow>
             {titles?.map((title, index) => (

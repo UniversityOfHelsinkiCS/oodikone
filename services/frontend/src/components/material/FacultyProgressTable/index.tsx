@@ -54,7 +54,11 @@ export const FacultyProgressTable = ({
               {!isTotalRow(yearArray) ? (
                 <>
                   <ExpandableRow
-                    cypress={visibleYears[yearIndex] ? `${cypress}-hide-button` : `${cypress}-show-button`}
+                    cypress={
+                      visibleYears[yearIndex]
+                        ? `${cypress}-faculty-progress-table-hide-button`
+                        : `${cypress}-faculty-progress-table-show-button`
+                    }
                     toggleVisibility={() => toggleVisibility(yearIndex)}
                     visible={visibleYears[yearIndex]}
                     yearArray={yearArray}

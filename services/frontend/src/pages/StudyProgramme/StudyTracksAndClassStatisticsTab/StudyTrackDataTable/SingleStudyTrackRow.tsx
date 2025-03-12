@@ -53,6 +53,7 @@ export const SingleStudyTrackRow = ({
                 allRights.includes(combinedProgramme)) && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
+                  cypress={year.split(' - ')[0]}
                   studyProgramme={studyProgramme}
                   studyTrack={code}
                   year={year}

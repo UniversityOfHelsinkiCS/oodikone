@@ -158,7 +158,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
   return (
     <Stack gap={2}>
-      <Section>
+      <Section cypress="study-track-selector">
         <Stack gap={2}>
           <StudyTrackSelector
             setStudyTrack={setStudyTrack}
@@ -189,6 +189,7 @@ export const StudyTracksAndClassStatisticsTab = ({
       </Section>
 
       <Section
+        cypress="study-track-overview"
         infoBoxContent={
           combinedProgramme
             ? studyProgrammeToolTips.studyTrackOverviewCombinedProgramme
@@ -229,6 +230,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
       {isStudyProgrammeMode ? (
         <Section
+          cypress="progress-of-students"
           infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
           isError={hasErrors}
           isLoading={isFetchingOrLoading}
@@ -255,6 +257,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
       {isSuccess && studyTrackStats?.includeGraduated && studyTrackStats?.graduationTimes[studyTrack] && (
         <Section
+          cypress="average-graduation-times"
           infoBoxContent={
             studyProgramme.includes('MH')
               ? studyProgrammeToolTips.averageGraduationTimesStudyTracksMaster
@@ -290,7 +293,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                     goalExceptions={{ needed: false }}
                     isError={false}
                     isLoading={false}
-                    level={studyProgramme}
+                    level="programme"
                     levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
                     mode="study track"
                     names={studyTrackStats.studyTracks}
@@ -313,7 +316,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                     goalExceptions={{ needed: false }}
                     isError={false}
                     isLoading={false}
-                    level={studyProgramme}
+                    level="programme"
                     levelProgrammeData={studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats}
                     mode="study track"
                     names={studyTrackStats.studyTracks}
