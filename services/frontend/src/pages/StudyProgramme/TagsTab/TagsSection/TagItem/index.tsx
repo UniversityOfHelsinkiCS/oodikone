@@ -7,7 +7,7 @@ import {
 import { IconButton, ListItem, ListItemIcon, ListItemText, Stack, Tooltip } from '@mui/material'
 import { useState } from 'react'
 
-import { PopulationLinkWithTag } from '@/components/material/PopulationLink'
+import { PopulationLink } from '@/components/material/PopulationLink'
 import { Tag } from '@/shared/types'
 import { AddStudentsDialog } from './AddStudentsDialog'
 import { DeleteTagDialog } from './DeleteTagDialog'
@@ -52,10 +52,11 @@ export const TagItem = ({
             <Stack direction="row" sx={{ alignItems: 'center' }}>
               {tag.name}
               {tag.year && (
-                <PopulationLinkWithTag
+                <PopulationLink
                   combinedProgramme={combinedProgramme}
                   studyProgramme={studyProgramme}
                   tag={tag}
+                  year={tag.year}
                 />
               )}
               {tag.personalUserId && (
