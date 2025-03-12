@@ -9,8 +9,10 @@ import { MedianTimeBarChart } from '@/components/material/MedianTimeBarChart'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@/shared/types'
+import { hasAccessToProgrammePopulation } from '@/util/access'
 import { calculateStats } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
 import { ProgressOfStudents } from './ProgressOfStudents'
@@ -36,6 +38,15 @@ export const StudyTracksAndClassStatisticsTab = ({
   const [studyTrack, setStudyTrack] = useState(studyProgramme)
   const [showMedian, setShowMedian] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
+
+  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
+  const studyProgrammeRights = programmeRights.map(({ code }) => code)
+  const hasAccessToPopulation = hasAccessToProgrammePopulation(
+    combinedProgramme,
+    fullAccessToStudentData,
+    studyProgramme,
+    studyProgrammeRights
+  )
 
   const {
     data: studyTrackStats,
@@ -202,8 +213,12 @@ export const StudyTracksAndClassStatisticsTab = ({
       >
         {studyTrackStats && (
           <Stack gap={2}>
-            <YearSelector studyProgramme={studyProgramme} years={studyTrackStats.years} />
-            <Divider />
+            {hasAccessToPopulation && (
+              <>
+                <YearSelector studyProgramme={studyProgramme} years={studyTrackStats.years} />
+                <Divider />
+              </>
+            )}
             <ToggleContainer>
               <Toggle
                 firstLabel="Hide percentages"
@@ -220,6 +235,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                   studyTrack && studyTrack !== studyProgramme ? studyTrackStats.mainStatsByTrack[studyTrack] : null
                 }
                 otherCountriesStats={studyTrackStats.otherCountriesCount}
+                populationLinkVisible={hasAccessToPopulation}
                 showPercentages={showPercentages}
                 singleTrack={studyTrack !== studyProgramme ? studyTrack : null}
                 studyProgramme={studyProgramme}
