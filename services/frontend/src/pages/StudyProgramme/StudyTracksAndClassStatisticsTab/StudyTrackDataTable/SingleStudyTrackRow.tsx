@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from '@mui/material'
 
 import { PopulationLink } from '@/components/material/PopulationLink'
+import { BasicCell } from './BasicCell'
 import { OtherCountriesCell } from './OtherCountriesCell'
 import { getCellKey, shouldBeHidden } from './util'
 
@@ -31,6 +32,23 @@ export const SingleStudyTrackRow = ({
         if (shouldBeHidden(showPercentages, value)) {
           return null
         }
+        if (index === 0) {
+          return (
+            <TableCell align="right" key={getCellKey(code, index)} sx={{ whiteSpace: 'nowrap' }}>
+              {value}
+              {populationLinkVisible && (
+                <PopulationLink
+                  combinedProgramme={combinedProgramme}
+                  cypress={year.split(' - ')[0]}
+                  studyProgramme={studyProgramme}
+                  studyTrack={code}
+                  year={year}
+                  years={calendarYears}
+                />
+              )}
+            </TableCell>
+          )
+        }
         if (index === row.length - 2 && otherCountriesStats) {
           return (
             <OtherCountriesCell
@@ -42,21 +60,7 @@ export const SingleStudyTrackRow = ({
             />
           )
         }
-        return (
-          <TableCell align="right" key={getCellKey(code, index)} sx={{ whiteSpace: 'nowrap' }}>
-            {value}
-            {index === 0 && populationLinkVisible && (
-              <PopulationLink
-                combinedProgramme={combinedProgramme}
-                cypress={year.split(' - ')[0]}
-                studyProgramme={studyProgramme}
-                studyTrack={code}
-                year={year}
-                years={calendarYears}
-              />
-            )}
-          </TableCell>
-        )
+        return <BasicCell key={getCellKey('basic-cell', index)} value={value} />
       })}
     </TableRow>
   )

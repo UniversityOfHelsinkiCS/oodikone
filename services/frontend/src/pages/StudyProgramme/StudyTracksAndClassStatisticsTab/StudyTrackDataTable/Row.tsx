@@ -86,7 +86,7 @@ export const Row = ({
   const title =
     studyTracks[correctStudyTrack] === undefined
       ? correctStudyTrack
-      : `${getTextIn(studyTracks[correctStudyTrack] as Name)}, ${correctStudyTrack}`
+      : `${getTextIn(studyTracks[correctStudyTrack] as Name)} (${correctStudyTrack})`
 
   return (
     <TableRow>
@@ -96,7 +96,7 @@ export const Row = ({
         }
         if (index === 0) {
           return (
-            <TableCell align="left" key={getCellKey(year, index)} sx={{ whiteSpace: 'nowrap' }}>
+            <TableCell align="right" key={getCellKey(year, index)} sx={{ whiteSpace: 'nowrap' }}>
               {title}
               {populationLinkVisible && (
                 <PopulationLink
@@ -122,7 +122,7 @@ export const Row = ({
             />
           )
         }
-        return <BasicCell key={getCellKey('other-country', index)} value={value} />
+        return <BasicCell key={getCellKey('basic-cell', index)} value={value} />
       })}
     </TableRow>
   )
