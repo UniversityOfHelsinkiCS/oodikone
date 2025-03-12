@@ -1,66 +1,10 @@
 import { NorthEast as NorthEastIcon } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
 import moment from 'moment'
 import { Link } from 'react-router'
 
 import { Tag } from '@/shared/types'
-
-const getMonths = (year: number) => {
-  const end = moment()
-  const lastDayOfMonth = moment(end).endOf('month')
-  const start = `${year}-08-01`
-  return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
-}
-
-const getUrl = (params: {
-  months: number
-  studyRights: string
-  tag?: string
-  year: string | number
-  years?: string
-}) => {
-  const baseUrl = '/populations'
-  const urlParts = [
-    `months=${params.months}`,
-    'semesters=FALL',
-    'semesters=SPRING',
-    `studyRights=${params.studyRights}`,
-  ]
-
-  if (params.years) {
-    urlParts.push('year=All', `years=${params.years}`)
-  } else {
-    urlParts.push(`year=${params.year}`)
-  }
-
-  if (params.tag) {
-    urlParts.push(`tag=${params.tag}`)
-  }
-
-  const url = `${baseUrl}?${urlParts.join('&')}`
-  return url
-}
-
-const getStudyRights = (studyProgramme: string, combinedProgramme?: string, studyTrack?: string) => {
-  const studyRights: Record<string, string> = { programme: studyProgramme }
-  if (studyTrack) {
-    studyRights.studyTrack = studyTrack
-  }
-  if (combinedProgramme) {
-    studyRights.combinedProgramme = combinedProgramme
-  }
-  return encodeURIComponent(JSON.stringify(studyRights))
-}
-
-const getTitle = (selectedYear: string | number, year: string, tag?: Tag) => {
-  if (tag) {
-    return `Population statistics of class ${selectedYear} with tag ${tag.name}`
-  }
-  if (year === 'Total') {
-    return 'Population statistics of all years'
-  }
-  return `Population statistics of class ${selectedYear}`
-}
+import { getMonths, getStudyRights, getTitle, getUrl } from '@/util/populationLink'
 
 export const PopulationLink = ({
   combinedProgramme,
@@ -68,6 +12,7 @@ export const PopulationLink = ({
   studyProgramme,
   studyTrack,
   tag,
+  variant,
   year,
   years,
 }: {
@@ -76,6 +21,7 @@ export const PopulationLink = ({
   studyProgramme: string
   studyTrack?: string
   tag?: Tag
+  variant?: 'button'
   year: string
   years?: number[]
 }) => {
@@ -95,6 +41,23 @@ export const PopulationLink = ({
     years: year === 'Total' ? (years ?? []).join('&years=') : undefined,
     tag: tag?.id,
   })
+
+  if (variant === 'button') {
+    return (
+      <Link title={title} to={url}>
+        <Button
+          color="primary"
+          data-cy="population-link-show-button"
+          disabled={years?.length === 1}
+          endIcon={<NorthEastIcon fontSize="small" />}
+          size="small"
+          variant="contained"
+        >
+          Show
+        </Button>
+      </Link>
+    )
+  }
 
   return (
     <Link title={title} to={url}>

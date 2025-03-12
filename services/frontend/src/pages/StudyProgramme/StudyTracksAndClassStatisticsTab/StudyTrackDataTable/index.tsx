@@ -2,9 +2,7 @@ import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 import { useState } from 'react'
 
 import { InfoBox } from '@/components/material/InfoBox'
-import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Name } from '@/shared/types'
-import { hasAccessToProgrammePopulation } from '@/util/access'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Row } from './Row'
 import { SingleStudyTrackRow } from './SingleStudyTrackRow'
@@ -63,6 +61,7 @@ export const StudyTrackDataTable = ({
   dataOfAllTracks,
   dataOfSingleTrack,
   otherCountriesStats,
+  populationLinkVisible,
   showPercentages,
   singleTrack,
   studyProgramme,
@@ -74,6 +73,7 @@ export const StudyTrackDataTable = ({
   dataOfAllTracks: Record<string, (string | number)[][]>
   dataOfSingleTrack: (string | number)[][] | null
   otherCountriesStats: Record<string, Record<string, Record<string, number>>>
+  populationLinkVisible: boolean
   showPercentages: boolean
   singleTrack: string | null
   studyProgramme: string
@@ -82,14 +82,6 @@ export const StudyTrackDataTable = ({
   years: string[]
 }) => {
   const [show, setShow] = useState<boolean[]>([])
-  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
-  const studyProgrammeRights = programmeRights.map(({ code }) => code)
-  const populationLinkVisible = hasAccessToProgrammePopulation(
-    combinedProgramme,
-    fullAccessToStudentData,
-    studyProgramme,
-    studyProgrammeRights
-  )
 
   if (!dataOfAllTracks && !dataOfSingleTrack) {
     return null

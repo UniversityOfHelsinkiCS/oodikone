@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Stack } from '@mui/material'
+import { Alert, AlertTitle, Divider, Stack } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { getTargetCreditsForProgramme } from '@/common'
@@ -9,13 +9,16 @@ import { MedianTimeBarChart } from '@/components/material/MedianTimeBarChart'
 import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@/shared/types'
+import { hasAccessToProgrammePopulation } from '@/util/access'
 import { calculateStats } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
 import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
+import { YearSelector } from './YearSelector'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
@@ -35,6 +38,15 @@ export const StudyTracksAndClassStatisticsTab = ({
   const [studyTrack, setStudyTrack] = useState(studyProgramme)
   const [showMedian, setShowMedian] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
+
+  const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
+  const studyProgrammeRights = programmeRights.map(({ code }) => code)
+  const hasAccessToPopulation = hasAccessToProgrammePopulation(
+    combinedProgramme,
+    fullAccessToStudentData,
+    studyProgramme,
+    studyProgrammeRights
+  )
 
   const {
     data: studyTrackStats,
@@ -199,33 +211,45 @@ export const StudyTracksAndClassStatisticsTab = ({
         isLoading={isFetchingOrLoading}
         title={`Students of the study ${isStudyProgrammeMode ? 'programme' : `track ${studyTrack}`} by starting year`}
       >
-        <Stack gap={2}>
-          <ToggleContainer>
-            <Toggle
-              firstLabel="Hide percentages"
-              secondLabel="Show percentages"
-              setValue={setShowPercentages}
-              value={showPercentages}
-            />
-          </ToggleContainer>
-          {/* Implement a way to select a subset of years */}
-          {studyTrackStats && (
-            <StudyTrackDataTable
-              combinedProgramme={combinedProgramme}
-              dataOfAllTracks={studyTrackStats?.mainStatsByYear}
-              dataOfSingleTrack={
-                studyTrack && studyTrack !== studyProgramme ? studyTrackStats?.mainStatsByTrack[studyTrack] : null
-              }
-              otherCountriesStats={studyTrackStats?.otherCountriesCount}
-              showPercentages={showPercentages}
-              singleTrack={studyTrack !== studyProgramme ? studyTrack : null}
-              studyProgramme={studyProgramme}
-              studyTracks={studyTrackStats?.studyTracks}
-              titles={studyTrackStats?.populationTitles}
-              years={studyTrackStats?.years}
-            />
-          )}
-        </Stack>
+        {studyTrackStats && (
+          <Stack gap={2}>
+            {hasAccessToPopulation && (
+              <>
+                <YearSelector
+                  studyProgramme={studyProgramme}
+                  studyTrack={studyTrack !== studyProgramme ? studyTrack : undefined}
+                  years={studyTrackStats.years}
+                />
+                <Divider />
+              </>
+            )}
+            <ToggleContainer>
+              <Toggle
+                firstLabel="Hide percentages"
+                secondLabel="Show percentages"
+                setValue={setShowPercentages}
+                value={showPercentages}
+              />
+            </ToggleContainer>
+            {studyTrackStats && (
+              <StudyTrackDataTable
+                combinedProgramme={combinedProgramme}
+                dataOfAllTracks={studyTrackStats.mainStatsByYear}
+                dataOfSingleTrack={
+                  studyTrack && studyTrack !== studyProgramme ? studyTrackStats.mainStatsByTrack[studyTrack] : null
+                }
+                otherCountriesStats={studyTrackStats.otherCountriesCount}
+                populationLinkVisible={hasAccessToPopulation}
+                showPercentages={showPercentages}
+                singleTrack={studyTrack !== studyProgramme ? studyTrack : null}
+                studyProgramme={studyProgramme}
+                studyTracks={studyTrackStats.studyTracks}
+                titles={studyTrackStats.populationTitles}
+                years={studyTrackStats.years}
+              />
+            )}
+          </Stack>
+        )}
       </Section>
 
       {isStudyProgrammeMode ? (
