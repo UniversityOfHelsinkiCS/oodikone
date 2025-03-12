@@ -7,20 +7,18 @@ import { TableCell, IconButton, Stack } from '@mui/material'
 import { PopulationLink } from '@/components/material/PopulationLink'
 
 export const YearCell = ({
-  allRights,
   calendarYears,
   combinedProgramme,
-  fullAccessToStudentData,
+  populationLinkVisible,
   setShow,
   show,
   studyProgramme,
   year,
   yearlyData,
 }: {
-  allRights: string[]
   calendarYears: number[]
   combinedProgramme: string
-  fullAccessToStudentData: boolean
+  populationLinkVisible: boolean
   setShow: () => void
   show: boolean
   studyProgramme: string
@@ -28,7 +26,7 @@ export const YearCell = ({
   yearlyData: (string | number)[][]
 }) => {
   return (
-    <TableCell>
+    <TableCell sx={{ whiteSpace: 'nowrap' }}>
       <Stack alignItems="center" direction="row">
         {yearlyData.length > 1 && (
           <IconButton data-cy="show-study-tracks-button" onClick={setShow} size="small">
@@ -36,7 +34,7 @@ export const YearCell = ({
           </IconButton>
         )}
         {year}
-        {(fullAccessToStudentData || allRights.includes(studyProgramme) || allRights.includes(combinedProgramme)) && (
+        {populationLinkVisible && (
           <PopulationLink
             combinedProgramme={combinedProgramme}
             cypress={year.split(' - ')[0]}

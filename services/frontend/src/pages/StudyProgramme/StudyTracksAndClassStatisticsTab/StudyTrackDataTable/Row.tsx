@@ -9,11 +9,10 @@ import { getCellKey, shouldBeHidden } from './util'
 import { YearCell } from './YearCell'
 
 export const Row = ({
-  allRights,
   calendarYears,
   combinedProgramme,
-  fullAccessToStudentData,
   otherCountriesStats,
+  populationLinkVisible,
   row,
   setShow,
   show,
@@ -23,11 +22,10 @@ export const Row = ({
   yearlyData,
   years,
 }: {
-  allRights: string[]
   calendarYears: number[]
   combinedProgramme: string
-  fullAccessToStudentData: boolean
   otherCountriesStats: Record<string, Record<string, Record<string, number>>>
+  populationLinkVisible: boolean
   row: (string | number)[]
   setShow: () => void
   show: boolean
@@ -51,11 +49,10 @@ export const Row = ({
           if (index === 0) {
             return (
               <YearCell
-                allRights={allRights}
                 calendarYears={calendarYears}
                 combinedProgramme={combinedProgramme}
-                fullAccessToStudentData={fullAccessToStudentData}
                 key={getCellKey(year, index)}
+                populationLinkVisible={populationLinkVisible}
                 setShow={setShow}
                 show={show}
                 studyProgramme={studyProgramme}
@@ -99,11 +96,9 @@ export const Row = ({
         }
         if (index === 0) {
           return (
-            <TableCell align="left" key={getCellKey(year, index)}>
+            <TableCell align="left" key={getCellKey(year, index)} sx={{ whiteSpace: 'nowrap' }}>
               {title}
-              {(fullAccessToStudentData ||
-                allRights.includes(studyProgramme) ||
-                allRights.includes(combinedProgramme)) && (
+              {populationLinkVisible && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   cypress={year.split(' - ')[0]}

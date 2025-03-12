@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { InfoBox } from '@/components/material/InfoBox'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { Name } from '@/shared/types'
+import { hasAccessToProgrammePopulation } from '@/util/access'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Row } from './Row'
 import { SingleStudyTrackRow } from './SingleStudyTrackRow'
@@ -82,7 +83,13 @@ export const StudyTrackDataTable = ({
 }) => {
   const [show, setShow] = useState<boolean[]>([])
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
-  const allRights = programmeRights.map(({ code }) => code)
+  const studyProgrammeRights = programmeRights.map(({ code }) => code)
+  const populationLinkVisible = hasAccessToProgrammePopulation(
+    combinedProgramme,
+    fullAccessToStudentData,
+    studyProgramme,
+    studyProgrammeRights
+  )
 
   if (!dataOfAllTracks && !dataOfSingleTrack) {
     return null
@@ -141,13 +148,12 @@ export const StudyTrackDataTable = ({
             {singleTrack
               ? sortedTrackStats.map((row, index) => (
                   <SingleStudyTrackRow
-                    allRights={allRights}
                     calendarYears={calendarYears}
                     code={singleTrack}
                     combinedProgramme={combinedProgramme}
-                    fullAccessToStudentData={fullAccessToStudentData}
                     key={getRowKey(singleTrack, index)}
                     otherCountriesStats={otherCountriesStats}
+                    populationLinkVisible={populationLinkVisible}
                     row={row}
                     showPercentages={showPercentages}
                     studyProgramme={studyProgramme}
@@ -156,12 +162,11 @@ export const StudyTrackDataTable = ({
               : sortedMainStats?.map((yearlyData, index) =>
                   yearlyData.map(row => (
                     <Row
-                      allRights={allRights}
                       calendarYears={calendarYears}
                       combinedProgramme={combinedProgramme}
-                      fullAccessToStudentData={fullAccessToStudentData}
                       key={getRowKey(row[0].toString(), index)}
                       otherCountriesStats={otherCountriesStats}
+                      populationLinkVisible={populationLinkVisible}
                       row={row}
                       setShow={() => firstCellClicked(index)}
                       show={show[index]}

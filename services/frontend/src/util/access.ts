@@ -23,3 +23,16 @@ export const hasFullAccessToTeacherData = (roles: Role[], iamGroups: string[]) =
     iamGroups.some(iamGroup => ['hy-dekaanit', 'hy-varadekaanit-opetus'].includes(iamGroup))
   )
 }
+
+export const hasAccessToProgrammePopulation = (
+  combinedProgramme: string,
+  fullAccessToStudentData: boolean,
+  studyProgramme: string,
+  studyProgrammeRights: string[]
+) => {
+  return (
+    fullAccessToStudentData ||
+    studyProgrammeRights.includes(studyProgramme) ||
+    studyProgrammeRights.includes(combinedProgramme)
+  )
+}
