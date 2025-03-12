@@ -215,7 +215,11 @@ export const StudyTracksAndClassStatisticsTab = ({
           <Stack gap={2}>
             {hasAccessToPopulation && (
               <>
-                <YearSelector studyProgramme={studyProgramme} years={studyTrackStats.years} />
+                <YearSelector
+                  studyProgramme={studyProgramme}
+                  studyTrack={studyTrack !== studyProgramme ? studyTrack : undefined}
+                  years={studyTrackStats.years}
+                />
                 <Divider />
               </>
             )}

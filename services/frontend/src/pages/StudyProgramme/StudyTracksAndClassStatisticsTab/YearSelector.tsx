@@ -3,7 +3,15 @@ import { useEffect, useState } from 'react'
 
 import { PopulationLink } from '@/components/material/PopulationLink'
 
-export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string; years: string[] }) => {
+export const YearSelector = ({
+  studyProgramme,
+  studyTrack,
+  years,
+}: {
+  studyProgramme: string
+  studyTrack?: string
+  years: string[]
+}) => {
   const [startYear, setStartYear] = useState<number | null>(null)
   const [endYear, setEndYear] = useState<number | null>(null)
   const [yearRange, setYearRange] = useState<number[]>([0, 1])
@@ -48,6 +56,7 @@ export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string
         <Stack alignItems="center" gap={2}>
           <Slider
             color={disabled ? 'error' : 'primary'}
+            data-cy="year-selector-slider"
             disabled={endYear - startYear < 1}
             marks={marks}
             max={endYear}
@@ -66,7 +75,13 @@ export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string
                 Show population between <b>{yearRange[0]}</b> and <b>{yearRange[1]}</b>
               </Typography>
             )}
-            <PopulationLink studyProgramme={studyProgramme} variant="button" year="Total" years={getYears()} />
+            <PopulationLink
+              studyProgramme={studyProgramme}
+              studyTrack={studyTrack}
+              variant="button"
+              year="Total"
+              years={getYears()}
+            />
           </Stack>
         </Stack>
       )}
