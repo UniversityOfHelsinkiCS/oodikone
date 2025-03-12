@@ -1,15 +1,13 @@
-import { Box, Button, Slider, Stack, Typography } from '@mui/material'
+import { Box, Slider, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
 
-import { getMonths, getStudyRights, getUrl } from '@/util/populationLink'
+import { PopulationLink } from '@/components/material/PopulationLink'
 
 export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string; years: string[] }) => {
   const [startYear, setStartYear] = useState<number | null>(null)
   const [endYear, setEndYear] = useState<number | null>(null)
   const [yearRange, setYearRange] = useState<number[]>([0, 1])
   const [marks, setMarks] = useState<{ value: number; label?: string }[]>([])
-  const [url, setUrl] = useState<string>('')
 
   useEffect(() => {
     const availableYears = years
@@ -31,20 +29,10 @@ export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string
     setMarks(newMarks)
   }, [studyProgramme, years])
 
-  useEffect(() => {
+  const getYears = () => {
     const [start, end] = yearRange
-    const allYearsInRange = Array.from({ length: end - start + 1 }, (_, i) => start + i)
-    const yearsParam = allYearsInRange.join('&years=')
-
-    setUrl(
-      getUrl({
-        months: getMonths(Math.min(...yearRange)),
-        studyRights: getStudyRights(studyProgramme),
-        year: 'Total',
-        years: yearsParam,
-      })
-    )
-  }, [studyProgramme, yearRange])
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+  }
 
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
@@ -78,11 +66,7 @@ export const YearSelector = ({ studyProgramme, years }: { studyProgramme: string
                 Show population between <b>{yearRange[0]}</b> and <b>{yearRange[1]}</b>
               </Typography>
             )}
-            <Link to={url}>
-              <Button disabled={disabled} variant="contained">
-                Show
-              </Button>
-            </Link>
+            <PopulationLink studyProgramme={studyProgramme} variant="button" year="Total" years={getYears()} />
           </Stack>
         </Stack>
       )}

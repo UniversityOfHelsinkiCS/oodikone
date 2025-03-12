@@ -1,5 +1,5 @@
 import { NorthEast as NorthEastIcon } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
 import moment from 'moment'
 import { Link } from 'react-router'
 
@@ -12,6 +12,7 @@ export const PopulationLink = ({
   studyProgramme,
   studyTrack,
   tag,
+  variant,
   year,
   years,
 }: {
@@ -20,6 +21,7 @@ export const PopulationLink = ({
   studyProgramme: string
   studyTrack?: string
   tag?: Tag
+  variant?: 'button'
   year: string
   years?: number[]
 }) => {
@@ -39,6 +41,22 @@ export const PopulationLink = ({
     years: year === 'Total' ? (years ?? []).join('&years=') : undefined,
     tag: tag?.id,
   })
+
+  if (variant === 'button') {
+    return (
+      <Link title={title} to={url}>
+        <Button
+          color="primary"
+          disabled={years?.length === 1}
+          endIcon={<NorthEastIcon fontSize="small" />}
+          size="small"
+          variant="contained"
+        >
+          Show
+        </Button>
+      </Link>
+    )
+  }
 
   return (
     <Link title={title} to={url}>
