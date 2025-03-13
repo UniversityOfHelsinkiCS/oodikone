@@ -2,8 +2,13 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
+import { Curriculum, CurriculumDetails } from '@/shared/types'
 
-const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
+const chooseCurriculumToFetch = (
+  curriculums: Curriculum[],
+  selectedCurriculum: Curriculum | undefined,
+  startYear: string
+) => {
   if (selectedCurriculum?.curriculum_period_ids) {
     return selectedCurriculum
   }
@@ -23,14 +28,14 @@ export const CurriculumPicker = ({
 }: {
   disabled?: boolean
   programmeCodes: string[]
-  setCurriculum: (curriculum: any) => void
+  setCurriculum: (curriculum: (CurriculumDetails & { version: string[] }) | null) => void
   year: string
 }) => {
   const { data: curriculums = [] } = useGetCurriculumOptionsQuery(
     { code: programmeCodes[0] },
     { skip: !programmeCodes[0] }
   )
-  const [selectedCurriculum, setSelectedCurriculum] = useState(null)
+  const [selectedCurriculum, setSelectedCurriculum] = useState<Curriculum | undefined>(undefined)
   const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
   const { data: chosenCurriculumData } = useGetCurriculumsQuery(
     {
@@ -43,9 +48,9 @@ export const CurriculumPicker = ({
   useEffect(() => {
     if (!chosenCurriculumData) {
       setCurriculum(null)
-      return
+    } else {
+      setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
     }
-    setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
   }, [chosenCurriculumData])
 
   if (curriculums.length === 0) {

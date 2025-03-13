@@ -19,7 +19,10 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['ProgressCriteria'],
     }),
-    addProgressCriteriaCredits: builder.mutation({
+    addProgressCriteriaCredits: builder.mutation<
+      ProgressCriteria,
+      { programmeCode: string; credits: Record<string, number> }
+    >({
       query: ({ programmeCode, credits }) => ({
         url: '/programme-criteria/credits',
         method: 'POST',

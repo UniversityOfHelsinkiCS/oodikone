@@ -1,27 +1,39 @@
+import { Stack } from '@mui/material'
 import { orderBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Container } from 'semantic-ui-react'
 
-import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
-import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
-import { CreditCriteriaForm } from './CreditCriteriaForm'
-import { DegreeCourseTableView } from './DegreeCourseTableView'
+import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
+import { CurriculumDetails, Module, ProgrammeCourse, ProgressCriteria } from '@/shared/types'
+import { CreditCriteriaSection } from './CreditCriteriaSection'
+import { CurriculumSection } from './CurriculumSection'
+import { DegreeCourseTable } from './DegreeCourseTable'
 
-export const DegreeCoursesTab = ({ studyProgramme, combinedProgramme, year }) => {
-  const [defaultModules, setDefaultModules] = useState([])
-  const [curriculum, setCurriculum] = useState(null)
-  const [secondProgrammeModules, setSecondProgrammeModules] = useState([])
+export const DegreeCoursesTab = ({
+  combinedProgramme,
+  studyProgramme,
+  year,
+}: {
+  combinedProgramme: string
+  studyProgramme: string
+  year: string
+}) => {
+  const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
+  const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
+  const [curriculum, setCurriculum] = useState<(CurriculumDetails & { version: string[] }) | null>(null)
   const { data: progressCriteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
-  const emptyCriteria = {
+  const emptyCriteria: ProgressCriteria = {
+    allCourses: {},
     courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
     credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
   }
   const criteria = progressCriteria ?? emptyCriteria
 
   useEffect(() => {
-    if (!curriculum || !curriculum?.defaultProgrammeCourses?.length) return
-    const defaultModules = {}
-    const secondProgrammeModules = {}
+    if (!curriculum?.defaultProgrammeCourses?.length) {
+      return
+    }
+    const defaultModules: Record<string, ProgrammeCourse[]> = {}
+    const secondProgrammeModules: Record<string, ProgrammeCourse[]> = {}
     curriculum.defaultProgrammeCourses.forEach(course => {
       const code = course.parent_code
       if (!defaultModules[code]) {
@@ -39,14 +51,14 @@ export const DegreeCoursesTab = ({ studyProgramme, combinedProgramme, year }) =>
       })
     }
 
-    setDefaultModules(
+    setDefaultProgrammeModules(
       orderBy(
         Object.entries(defaultModules).map(([module, courses]) => ({
           module,
           courses,
           module_order: courses[0].module_order,
         })),
-        m => m.code
+        module => module.module
       )
     )
     setSecondProgrammeModules(
@@ -56,37 +68,32 @@ export const DegreeCoursesTab = ({ studyProgramme, combinedProgramme, year }) =>
           courses,
           module_order: courses[0].module_order,
         })),
-        m => m.code
+        module => module.module
       )
     )
-  }, [curriculum])
+  }, [combinedProgramme, curriculum])
 
   return (
-    <Container>
-      <div>
-        <h3 style={{ marginTop: '15px', marginBottom: '15px' }}>
-          Select curriculum to edit:
-          <CurriculumPicker
-            programmeCodes={[studyProgramme, combinedProgramme]}
-            setCurriculum={setCurriculum}
-            year={year}
-          />
-        </h3>
-      </div>
+    <Stack gap={2}>
+      <CurriculumSection
+        programmeCodes={[studyProgramme, combinedProgramme]}
+        setCurriculum={setCurriculum}
+        year={year}
+      />
       {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
-        <CreditCriteriaForm criteria={criteria} studyProgramme={studyProgramme} />
+        <CreditCriteriaSection criteria={criteria} studyProgramme={studyProgramme} />
       )}
-      {defaultModules && defaultModules.length > 1 && (
-        <DegreeCourseTableView
+      {defaultProgrammeModules && defaultProgrammeModules.length > 1 && (
+        <DegreeCourseTable
           combinedProgramme=""
           criteria={criteria}
           curriculum={curriculum}
-          modules={defaultModules}
+          modules={defaultProgrammeModules}
           studyProgramme={studyProgramme}
         />
       )}
       {secondProgrammeModules.length > 0 && (
-        <DegreeCourseTableView
+        <DegreeCourseTable
           combinedProgramme={combinedProgramme}
           criteria={criteria}
           curriculum={curriculum}
@@ -94,6 +101,6 @@ export const DegreeCoursesTab = ({ studyProgramme, combinedProgramme, year }) =>
           studyProgramme={studyProgramme}
         />
       )}
-    </Container>
+    </Stack>
   )
 }
