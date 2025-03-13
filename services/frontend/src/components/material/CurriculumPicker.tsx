@@ -9,12 +9,12 @@ const chooseCurriculumToFetch = (
   selectedCurriculum: Curriculum | undefined,
   startYear: string
 ) => {
-  if (selectedCurriculum?.curriculum_period_ids) {
+  if (selectedCurriculum?.periodIds) {
     return selectedCurriculum
   }
 
   return (
-    curriculums?.find(curriculum => new Date(curriculum.valid_from) <= new Date(`${startYear}-08-01`)) ??
+    curriculums?.find(curriculum => new Date(curriculum.validFrom) <= new Date(`${startYear}-08-01`)) ??
     curriculums[0] ??
     null
   )
@@ -40,18 +40,18 @@ export const CurriculumPicker = ({
   const { data: chosenCurriculumData } = useGetCurriculumsQuery(
     {
       code: programmeCodes[0],
-      periodIds: chosenCurriculum?.curriculum_period_ids,
+      periodIds: chosenCurriculum?.periodIds,
     },
-    { skip: !chosenCurriculum?.curriculum_period_ids }
+    { skip: !chosenCurriculum?.periodIds }
   )
 
   useEffect(() => {
     if (!chosenCurriculumData) {
       setCurriculum(null)
     } else {
-      setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum?.curriculum_period_ids })
+      setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum.periodIds })
     }
-  }, [chosenCurriculumData])
+  }, [chosenCurriculum, chosenCurriculumData])
 
   if (curriculums.length === 0) {
     return null
@@ -69,7 +69,7 @@ export const CurriculumPicker = ({
       >
         {curriculums.map(curriculum => (
           <MenuItem key={curriculum.id} value={curriculum.id}>
-            {curriculum.curriculumName}
+            {curriculum.name}
           </MenuItem>
         ))}
       </Select>

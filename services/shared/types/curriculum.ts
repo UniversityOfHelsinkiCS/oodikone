@@ -1,23 +1,10 @@
 import { Name } from './name'
 
-// TODO: Format for frontend and drop irrelevant fields
 export type Curriculum = {
-  code: string
-  createdAt: string
-  curriculumName: string
-  curriculum_period_ids: string[]
-  degreeProgrammeType: string
-  group_id: string
   id: string
-  minimumCredits: number
-  name: Name
-  order: number
-  organization_id: number
-  studyLevel: string | null
-  type: string
-  updatedAt: string
-  valid_from: string
-  valid_to: string | null
+  name: string
+  periodIds: string[]
+  validFrom: Date
 }
 
 export type Module = {
