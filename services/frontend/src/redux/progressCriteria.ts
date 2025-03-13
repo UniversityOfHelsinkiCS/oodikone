@@ -4,12 +4,12 @@ import { ProgressCriteria } from '@/shared/types/progressCriteria'
 const programmeProgressCriteria = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getProgressCriteria: builder.query<ProgressCriteria, { programmeCode: string }>({
-      query: ({ programmeCode }) => `/programmecriteria?programmecode=${programmeCode}`,
+      query: ({ programmeCode }) => `/programme-criteria?programmeCode=${programmeCode}`,
       providesTags: ['ProgressCriteria'],
     }),
     addProgressCriteriaCourse: builder.mutation({
       query: ({ programmeCode, courses, year }) => ({
-        url: '/programmecriteria/courses',
+        url: '/programme-criteria/courses',
         method: 'POST',
         body: {
           code: programmeCode,
@@ -21,7 +21,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
     }),
     addProgressCriteriaCredits: builder.mutation({
       query: ({ programmeCode, credits }) => ({
-        url: '/programmecriteria/credits',
+        url: '/programme-criteria/credits',
         method: 'POST',
         body: {
           code: programmeCode,

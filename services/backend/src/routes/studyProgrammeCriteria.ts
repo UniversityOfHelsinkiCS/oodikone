@@ -10,12 +10,12 @@ const router = Router()
 
 interface StudyProgrammeCriteriaRequest extends Request {
   query: {
-    programmecode: string
+    programmeCode: string
   }
 }
 
 router.get('/', async (req: StudyProgrammeCriteriaRequest, res: Response) => {
-  const studyProgramme = req.query.programmecode
+  const studyProgramme = req.query.programmeCode
   if (studyProgramme !== '' && !studyProgramme) {
     return res.status(422).end()
   }

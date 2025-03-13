@@ -8,6 +8,7 @@ export type {
   ProgrammeMedians,
 } from './graduations'
 export type { Name, NameWithCode } from './name'
+export type { ProgressCriteria } from './progressCriteria'
 export type { Release } from './release'
 export type { Role } from './role'
 export type {

@@ -1,6 +1,5 @@
 export { CourseWithSubsId, ParsedCourse } from './course'
 export { CreditTypeCode } from './creditTypeCode'
-export { Criteria } from './criteria'
 export { DegreeProgrammeType } from './degreeProgrammeType'
 export { EnrollmentState } from './enrollmentState'
 export { EnrollmentType } from './enrollmentType'

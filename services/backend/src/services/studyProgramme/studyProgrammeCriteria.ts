@@ -1,12 +1,12 @@
 import { Course } from '../../models'
-import { ProgressCriteria } from '../../models/kone'
-import { Criteria } from '../../types'
+import { ProgressCriteria as ProgressCriteriaModel } from '../../models/kone'
+import { ProgressCriteria } from '../../shared/types'
 import logger from '../../util/logger'
 
-type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteria, 'curriculumVersion'>
+type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>
 
 const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithoutCurriculumVersion | null> => {
-  return await ProgressCriteria.findOne({
+  return await ProgressCriteriaModel.findOne({
     attributes: { exclude: ['curriculumVersion'] },
     where: { code },
   })
@@ -38,9 +38,9 @@ const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null)
   const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
   const allCourses = await getSubstitutions(courseCodes)
 
-  const formattedCriteria: Criteria = {
-    courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
+  const formattedCriteria: ProgressCriteria = {
     allCourses,
+    courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     credits: {
       yearOne: criteria?.creditsYearOne ?? 0,
       yearTwo: criteria?.creditsYearTwo ?? 0,
@@ -74,7 +74,7 @@ const createCriteria = async (
     creditsYearSix: credits.year6,
   }
   try {
-    const createdCriteria = await ProgressCriteria.create(newProgrammeCriteria)
+    const createdCriteria = await ProgressCriteriaModel.create(newProgrammeCriteria)
     return await formatCriteria(createdCriteria)
   } catch (error) {
     logger.error(`Creating criteria failed: ${error}`)
@@ -154,7 +154,7 @@ export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: 
   }
 }
 
-export const getCriteria = async (studyProgramme: string): Promise<Criteria> => {
+export const getCriteria = async (studyProgramme: string) => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
 
   return await formatCriteria(studyProgrammeCriteria)
