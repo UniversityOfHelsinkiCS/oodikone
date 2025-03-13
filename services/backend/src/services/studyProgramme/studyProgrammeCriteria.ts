@@ -5,17 +5,11 @@ import logger from '../../util/logger'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteria, 'curriculumVersion'>
 
-const getCriteriaByStudyProgramme = async (code: string) => {
-  if (code === '') {
-    return null
-  }
-  const criteria: CriteriaWithoutCurriculumVersion | null = await ProgressCriteria.findOne({
+const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithoutCurriculumVersion | null> => {
+  return await ProgressCriteria.findOne({
     attributes: { exclude: ['curriculumVersion'] },
-    where: {
-      code,
-    },
+    where: { code },
   })
-  return criteria
 }
 
 const getSubstitutions = async (codes: string[]) => {
@@ -34,13 +28,13 @@ const getSubstitutions = async (codes: string[]) => {
   return substitutions
 }
 
-const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion) => {
-  const yearOne = criteria.coursesYearOne || []
-  const yearTwo = criteria.coursesYearTwo || []
-  const yearThree = criteria.coursesYearThree || []
-  const yearFour = criteria.coursesYearFour || []
-  const yearFive = criteria.coursesYearFive || []
-  const yearSix = criteria.coursesYearSix || []
+const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null) => {
+  const yearOne = criteria?.coursesYearOne ?? []
+  const yearTwo = criteria?.coursesYearTwo ?? []
+  const yearThree = criteria?.coursesYearThree ?? []
+  const yearFour = criteria?.coursesYearFour ?? []
+  const yearFive = criteria?.coursesYearFive ?? []
+  const yearSix = criteria?.coursesYearSix ?? []
   const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
   const allCourses = await getSubstitutions(courseCodes)
 
@@ -48,12 +42,12 @@ const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion) => {
     courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     allCourses,
     credits: {
-      yearOne: criteria.creditsYearOne || 0,
-      yearTwo: criteria.creditsYearTwo || 0,
-      yearThree: criteria.creditsYearThree || 0,
-      yearFour: criteria.creditsYearFour || 0,
-      yearFive: criteria.creditsYearFive || 0,
-      yearSix: criteria.creditsYearSix || 0,
+      yearOne: criteria?.creditsYearOne ?? 0,
+      yearTwo: criteria?.creditsYearTwo ?? 0,
+      yearThree: criteria?.creditsYearThree ?? 0,
+      yearFour: criteria?.creditsYearFour ?? 0,
+      yearFive: criteria?.creditsYearFive ?? 0,
+      yearSix: criteria?.creditsYearSix ?? 0,
     },
   }
   return formattedCriteria
@@ -160,15 +154,8 @@ export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: 
   }
 }
 
-export const getCriteria = async (studyProgramme: string) => {
+export const getCriteria = async (studyProgramme: string): Promise<Criteria> => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
-  if (studyProgrammeCriteria) {
-    return await formatCriteria(studyProgrammeCriteria)
-  }
-  const emptyCriteria: Criteria = {
-    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
-    allCourses: {},
-    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
-  }
-  return emptyCriteria
+
+  return await formatCriteria(studyProgrammeCriteria)
 }

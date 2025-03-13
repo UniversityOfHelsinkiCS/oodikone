@@ -393,17 +393,11 @@ export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
   }
 }
 
-export const getOptionsForStudents = async (
-  studentNumbers: string[],
-  code: string,
-  level: DegreeProgrammeType.BACHELOR | DegreeProgrammeType.MASTER
-) => {
-  if (!code || !studentNumbers.length) {
+export const getOptionsForStudents = async (studentNumbers: string[], code: string, level?: DegreeProgrammeType) => {
+  if (!studentNumbers.length) {
     return {}
-  }
-
-  if (![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(level)) {
-    throw new Error(`Invalid study level ${level}`)
+  } else if (level && ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(level)) {
+    return {}
   }
 
   const studyRightElementsForStudyRight = await SISStudyRightElement.findAll({

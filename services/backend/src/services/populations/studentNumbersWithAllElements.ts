@@ -34,30 +34,28 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
     filteredExtents.push(...nondegreeStudents)
   }
 
-  const studyRightIds = (
-    await SISStudyRight.findAll({
-      attributes: ['id'],
-      include: {
-        model: SISStudyRightElement,
-        attributes: [],
-        where: {
-          code: {
-            [Op.in]: studyRights,
-          },
-          startDate: {
-            [Op.gte]: startDate,
-            [Op.lt]: endDate,
-          },
-        },
-      },
+  const studyRightIds = await SISStudyRight.findAll({
+    attributes: ['id'],
+    include: {
+      model: SISStudyRightElement,
+      attributes: [],
       where: {
-        extentCode: {
-          [Op.notIn]: filteredExtents,
+        code: {
+          [Op.in]: studyRights,
+        },
+        startDate: {
+          [Op.gte]: startDate,
+          [Op.lt]: endDate,
         },
       },
-      raw: true,
-    })
-  ).map(studyRight => studyRight.id)
+    },
+    where: {
+      extentCode: {
+        [Op.notIn]: filteredExtents,
+      },
+    },
+    raw: true,
+  })
 
   const studentsStudyRights = (
     await SISStudyRight.findAll({
@@ -69,28 +67,22 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
       },
       where: {
         id: {
-          [Op.in]: studyRightIds,
+          [Op.in]: studyRightIds.map(studyRight => studyRight.id),
         },
       },
     })
   ).map(studyRight => studyRight.toJSON())
 
-  const studentNumbers = studentsStudyRights.map(student => student.studentNumber)
+  return studentsStudyRights
+    .filter(student => {
+      if (includeTransferredOutStudents) return true
 
-  if (includeTransferredOutStudents) {
-    return studentNumbers
-  }
+      const [hasTransferredFromProgramme, _] = hasTransferredFromOrToProgramme(
+        student,
+        student.studyRightElements.find(element => studyRights.includes(element.code))!
+      )
 
-  const transferredStudentNumbers = studentsStudyRights.reduce<string[]>((acc, student) => {
-    const [hasTransferredFromProgramme] = hasTransferredFromOrToProgramme(
-      student,
-      student.studyRightElements.find(element => studyRights.includes(element.code))!
-    )
-    if (hasTransferredFromProgramme) {
-      acc.push(student.studentNumber)
-    }
-    return acc
-  }, [])
-
-  return studentNumbers.filter(studentNumber => !transferredStudentNumbers.includes(studentNumber))
+      return !hasTransferredFromProgramme
+    })
+    .map(student => student.studentNumber)
 }
