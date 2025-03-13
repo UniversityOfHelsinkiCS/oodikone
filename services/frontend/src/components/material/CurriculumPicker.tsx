@@ -1,7 +1,7 @@
 import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/populationCourses'
+import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
 
 const chooseCurriculumToFetch = (curriculums, selectedCurriculum, startYear) => {
   if (selectedCurriculum?.curriculum_period_ids) {
