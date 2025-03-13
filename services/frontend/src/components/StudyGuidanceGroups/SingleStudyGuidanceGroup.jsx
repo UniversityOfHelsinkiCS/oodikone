@@ -17,7 +17,7 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
-import { useGetProgressCriteriaQuery } from '@/redux/programmeProgressCriteria'
+import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,

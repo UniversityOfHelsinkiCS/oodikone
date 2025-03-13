@@ -1,8 +1,9 @@
 import { RTKApi } from '@/apiConnection'
+import { ProgressCriteria } from '@/shared/types/progressCriteria'
 
 const programmeProgressCriteria = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getProgressCriteria: builder.query({
+    getProgressCriteria: builder.query<ProgressCriteria, { programmeCode: string }>({
       query: ({ programmeCode }) => `/programmecriteria?programmecode=${programmeCode}`,
       providesTags: ['ProgressCriteria'],
     }),

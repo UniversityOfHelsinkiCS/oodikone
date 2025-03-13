@@ -3,7 +3,7 @@ import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
-import { useAddProgressCriteriaCourseMutation } from '@/redux/programmeProgressCriteria'
+import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
 
 const getYear = criterionYear => {
   if (criterionYear === 1) return 'yearOne'
