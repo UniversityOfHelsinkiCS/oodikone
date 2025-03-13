@@ -25,7 +25,7 @@ const moduleVisibilityColor = visibility => {
   }
 }
 
-export const DegreeCourseTableView = ({
+export const DegreeCourseTable = ({
   combinedProgramme,
   criteria,
   curriculum,
