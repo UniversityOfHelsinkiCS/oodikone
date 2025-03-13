@@ -6,12 +6,12 @@ export const StatusNotification = () => {
 
   return (
     <Snackbar
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      autoHideDuration={5000}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      autoHideDuration={30000}
       onClose={closeNotification}
       open={open}
     >
-      <Alert onClose={closeNotification} severity={severity}>
+      <Alert onClose={closeNotification} severity={severity} sx={{ bgcolor: 'background.paper' }} variant="outlined">
         {message}
       </Alert>
     </Snackbar>
