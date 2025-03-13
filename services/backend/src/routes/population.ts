@@ -11,7 +11,7 @@ import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../
 import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
-import { formatToArray, mapToProviders } from '../shared/util'
+import { mapToProviders } from '../shared/util'
 import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
@@ -87,7 +87,7 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
 export type PopulationstatisticsResBody = { students: any } | { error: string }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
-  semesters: string | string[]
+  semesters: string[]
   studentStatuses?: string[]
   // NOTE: This param is a JSON -object
   studyRights: string
@@ -100,7 +100,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
   '/v3/populationstatistics',
   async (req, res) => {
     const { roles: userRoles, programmeRights: userProgrammeRights } = req.user
-    const { year, semesters, studyRights: requestedStudyRightsJSON } = req.query
+    const { year, semesters, studyRights: requestedStudyRightsJSON, studentStatuses } = req.query
 
     const months = req.query.months ?? '12'
 
@@ -108,6 +108,16 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     const requiredFields = [year, semesters, requestedStudyRightsJSON]
     if (requiredFields.some(field => !field)) {
       return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
+    }
+
+    if (!semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
+      return res.status(400).json({ error: 'Semester should be either SPRING OR FALL' })
+    }
+
+    const hasCorrectStatus = (studentStatuses: string[]) =>
+      studentStatuses.every(status => ['EXCHANGE', 'NONDEGREE', 'TRANSFERRED'].includes(status))
+    if (studentStatuses && !hasCorrectStatus(studentStatuses)) {
+      return res.status(400).json({ error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' })
     }
 
     const requestedStudyRights: { programme: string; combinedProgramme: string } | null =
@@ -128,7 +138,6 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     }
 
     let result: { students: any[]; courses: any[] } | { error: string }
-    // DONE:
     if (req.query.years) {
       const upperYearBound = new Date().getFullYear() + 1
       const multiYearStudents = Promise.all(
@@ -140,7 +149,6 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
             studyRights: requestedStudyRights.programme,
             year,
             months: monthsForCurrentYear,
-            semesters: formatToArray(semesters),
           })
         })
       )
@@ -169,13 +177,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
         studyRights: requestedStudyRights.programme,
         year,
         months,
-        semesters: formatToArray(semesters),
       })
-    }
-
-    if ('error' in result) {
-      Sentry.captureException(new Error(result.error))
-      return res.status(400).end()
     }
 
     // Obfuscate if user has only limited study programme rights and there are any students
@@ -296,11 +298,6 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     obfuscated: true,
   })
 
-  if ('error' in result && result.error) {
-    Sentry.captureException(new Error(result.error))
-    return res.status(400).end()
-  }
-
   if ('students' in result) {
     result.students = result.students.map(student =>
       studentsUserCanAccess.has(student.studentNumber) ? student : obfuscateStudent(student)
@@ -337,10 +334,6 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
     },
     filteredStudentNumbers
   )
-  if ('error' in result) {
-    Sentry.captureException(new Error(result.error))
-    return res.status(500).json({ error: result.error })
-  }
 
   const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
   const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
