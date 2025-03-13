@@ -11,8 +11,8 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { AgeStats } from './AgeStats'
+import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
-import { CourseTableModeSelector } from './CurriculumPicker'
 import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({
