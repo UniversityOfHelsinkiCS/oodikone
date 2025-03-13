@@ -3,7 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
-import { Tag, TagStudent } from '../../models/kone'
+import { TagStudent } from '../../models/kone'
 import { Name } from '../../shared/types'
 import { formatToArray } from '../../shared/util'
 import { Criteria, DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
@@ -346,7 +346,6 @@ export type QueryParams = {
   selectedStudentsByYear?: Record<string, string[]>
   studentStatuses?: string[]
   years?: string[]
-  tag?: string
   courses?: string[]
 }
 
@@ -358,11 +357,10 @@ export type ParsedQueryParams = {
   includeTransferredStudents: boolean
   studyRights: string[]
   months?: string
-  tag?: Tag
 }
 
 export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
-  const { semesters, studentStatuses, studyRights, months, year, tag } = query
+  const { semesters, studentStatuses, studyRights, months, year } = query
   const yearAsNumber = +year
 
   const hasFall = semesters.includes('FALL')
@@ -389,7 +387,6 @@ export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
     months,
     startDate,
     endDate,
-    tag: tag as unknown as Tag | undefined,
   }
 }
 

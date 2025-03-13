@@ -190,38 +190,28 @@ export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
   endDate: Date,
-  studyRights: string[],
-  tag?: Tag
+  studyRights: string[]
 ) => {
   const studentTags = await getStudentTags(studyRights, studentNumbers)
 
-  const { studentNumbersWithTag, studentNumberToTags } = studentTags.reduce(
+  const { studentNumberToTags } = studentTags.reduce(
     (acc, studentTag) => {
       acc.studentNumberToTags[studentTag.studentnumber] = acc.studentNumberToTags[studentTag.studentnumber] || []
       acc.studentNumberToTags[studentTag.studentnumber].push(studentTag)
-      if (tag && studentTag.tag_id === tag.tag_id) {
-        acc.studentNumbersWithTag.push(studentTag.studentnumber)
-      }
       return acc
     },
-    { studentNumbersWithTag: [] as string[], studentNumberToTags: {} as Record<string, TagStudent[]> }
+    { studentNumberToTags: {} as Record<string, TagStudent[]> }
   )
-
-  if (tag) {
-    studentNumbers = studentNumbersWithTag
-  }
 
   if (studentNumbers.length === 0) {
     return { students: [], enrollments: [], credits: [], courses: [] } as StudentsIncludeCoursesBetween
   }
 
-  const attainmentDateFrom = tag && tag.year !== null ? moment(startDate).year(Number(tag.year)) : startDate
-
-  const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, attainmentDateFrom, endDate)
+  const creditsOfStudent = await getCreditsOfStudent(studentNumbers, studyRights, startDate, endDate)
 
   const [courses, enrollments, students, credits] = await Promise.all([
     getCourses(creditsOfStudent),
-    getEnrollments(studentNumbers, attainmentDateFrom, endDate),
+    getEnrollments(studentNumbers, startDate, endDate),
     getStudents(studentNumbers),
     getCredits(creditsOfStudent),
   ])

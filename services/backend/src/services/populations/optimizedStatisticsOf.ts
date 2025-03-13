@@ -27,7 +27,6 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     includeExchangeStudents,
     includeNondegreeStudents,
     includeTransferredStudents: includeTransferredOutStudents,
-    tag,
   } = parseQueryParams(query as QueryParams)
 
   const studentNumbers =
@@ -48,8 +47,7 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     studentNumbers,
     startDate,
     dateMonthsFromNow(startDate, months),
-    studyRights,
-    tag
+    studyRights
   )
 
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType ?? undefined)
