@@ -1,6 +1,5 @@
 import { CropSquare as CropSquareIcon } from '@mui/icons-material'
-import { Box } from '@mui/material'
-import { grey } from '@mui/material/colors'
+import { Box, Tooltip, Typography } from '@mui/material'
 import {
   type MRT_ColumnDef,
   type MRT_VisibilityState,
@@ -60,6 +59,7 @@ export const ModulesTab = ({
       {
         accessorKey: 'studentNumber',
         header: 'Student number',
+        Header: () => <Typography fontWeight="bold">Student number</Typography>,
         Cell: ({ cell }) => (
           <StudentInfoItem sisPersonId={cell.row.original.sis_person_id} studentNumber={cell.getValue<string>()} />
         ),
@@ -75,15 +75,38 @@ export const ModulesTab = ({
       accessorFn: (row: FormattedStudent) => (hasModuleInHOPS(row, code) ? 'X' : null),
       header: `${code} – ${getTextIn(formattedModules[code])}`,
       Header: () => (
-        <>
-          <Box>{code}</Box>
-          <Box sx={{ color: 'text.secondary', fontWeight: 'normal' }}>{getTextIn(formattedModules[code])}</Box>
-        </>
+        <Tooltip title={`${code} – ${getTextIn(formattedModules[code])}`}>
+          <Box
+            sx={{
+              display: 'inline flow-root',
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              whiteSpace: 'normal',
+              overflow: 'visible',
+              maxWidth: '15em',
+              minHeight: '160px',
+              maxHeight: '240px',
+              padding: '0.4em 0',
+            }}
+          >
+            <>
+              <Typography fontWeight="bold">{code}</Typography>
+              <Typography
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 'normal',
+                }}
+              >
+                {getTextIn(formattedModules[code])}
+              </Typography>
+            </>
+          </Box>
+        </Tooltip>
       ),
       Cell: ({ cell }) => (
         <>
           <Box sx={{ display: 'flex', justifyContent: 'center' }} title="Has the module in their primary study plan">
-            {hasModuleInHOPS(cell.row.original, code) && <CropSquareIcon sx={{ color: grey[500] }} />}
+            {hasModuleInHOPS(cell.row.original, code) && <CropSquareIcon sx={{ color: 'grey.500' }} />}
           </Box>
         </>
       ),
@@ -104,7 +127,35 @@ export const ModulesTab = ({
       isLoading,
       columnPinning: { left: ['studentNumber'] },
     },
+    enableColumnActions: false,
+    enableColumnFilters: false,
+    defaultColumn: { size: 0 },
+
     onColumnVisibilityChange: setColumnVisibility,
+    muiTableHeadCellProps: {
+      sx: {
+        overflow: 'visible',
+        verticalAlign: 'top',
+        borderWidth: '1px 1px 1px 0',
+        borderStyle: 'solid',
+        borderColor: 'grey.300',
+        '& .MuiBadge-root': {
+          display: 'none',
+        },
+        '& .Mui-TableHeadCell-Content': {
+          flexDirection: 'column',
+        },
+        '& .Mui-TableHeadCell-Content-Wrapper': {
+          display: 'inline-grid', // This will fix writing-mode: vertical-rl text collapsing issue on firefox
+        },
+      },
+    },
+    muiTableContainerProps: {
+      sx: {
+        tableLayout: 'auto',
+        whiteSpace: 'nowrap',
+      },
+    },
   })
 
   return (
