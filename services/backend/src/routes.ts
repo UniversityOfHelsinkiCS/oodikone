@@ -53,7 +53,7 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/semesters/codes`, semesters)
   app.use(url, tags)
   app.use(url, programmeModules)
-  app.use(`${url}/v3/course_exclusions`, courseExclusions)
+  app.use(`${url}/v3/course-exclusions`, courseExclusions)
   app.use(`${url}/v2/studyprogrammes`, studyProgramme)
   app.use(`${url}/programme-criteria`, studyProgrammeCriteria)
   app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)

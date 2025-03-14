@@ -2,7 +2,7 @@ import { Op } from 'sequelize'
 
 import { ExcludedCourse } from '../models/kone'
 
-export const addExcludedCourses = async (programmeCode: string, courseCodes: string[], curriculumVersion: string) => {
+export const addExcludedCourses = async (courseCodes: string[], curriculumVersion: string, programmeCode: string) => {
   return ExcludedCourse.bulkCreate(
     courseCodes.map(courseCode => ({
       programme_code: programmeCode,
@@ -13,9 +13,9 @@ export const addExcludedCourses = async (programmeCode: string, courseCodes: str
 }
 
 export const removeExcludedCourses = async (
-  programmeCode: string,
   courseCodes: string[],
-  curriculumVersion: string
+  curriculumVersion: string,
+  programmeCode: string
 ) => {
   return ExcludedCourse.destroy({
     where: {
