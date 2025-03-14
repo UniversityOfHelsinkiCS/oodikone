@@ -40,12 +40,12 @@ export const DegreeCoursesTab = ({
     })
 
     return orderBy(
-      Object.entries(modules).map(([moduleName, courses]) => ({
+      Object.entries(modules).map(([code, courses]) => ({
+        code,
         courses,
-        moduleName,
-        moduleOrder: courses[0].module_order,
+        order: courses[0].module_order,
       })),
-      module => module.moduleName
+      module => module.code
     )
   }
 

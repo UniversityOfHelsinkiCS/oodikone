@@ -1,33 +1,30 @@
+import {
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+} from '@mui/icons-material'
+import {
+  Box,
+  Button,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import { Fragment, useEffect, useState } from 'react'
-import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
+import { Label } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
-import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
-import { Module, ProgressCriteria } from '@/shared/types'
-import { isBachelorOrLicentiateProgramme, isMedicalProgramme } from '@/util/studyProgramme'
-
-const getYear = (criterionYear: number) => {
-  return {
-    1: 'yearOne',
-    2: 'yearTwo',
-    3: 'yearThree',
-    4: 'yearFour',
-    5: 'yearFive',
-    6: 'yearSix',
-  }[criterionYear]
-}
-
-const moduleVisibilityColor = visibility => {
-  switch (visibility) {
-    case 'visible':
-      return 'green'
-    case 'hidden':
-      return 'red'
-    default:
-      return 'yellow'
-  }
-}
+import { Module, ProgrammeCourse, ProgressCriteria } from '@/shared/types'
+import { CourseVisibility } from '@/types/courseVisibility'
+import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
+import { LabelSelect } from './LabelSelect'
+import { VisibilityChip } from './VisibilityChip'
 
 export const DegreeCourseTable = ({
   combinedProgramme,
@@ -47,16 +44,17 @@ export const DegreeCourseTable = ({
   const [modules, setModules] = useState(initialModules)
   const [setExclusion] = useSetCourseExclusionMutation()
   const [removeExclusion] = useRemoveCourseExclusionMutation()
-  const [addProgressCriteriaCourse] = useAddProgressCriteriaCourseMutation()
 
   const version = curriculumVersion.join(',')
   useEffect(() => {
     setModules(initialModules)
   }, [initialModules])
 
-  const setModuleVisibility = (code, newVisibility) => {
+  const getModule = (moduleCode: string) => modules.find(module => module.code === moduleCode)!
+
+  const setModuleVisibility = (moduleCode: string, newVisibility: boolean) => {
     // Same course can be in many modules, so change them all
-    const courseCodes = modules.find(module => module.moduleName === code).courses.map(course => course.code)
+    const courseCodes = getModule(moduleCode).courses.map(course => course.code)
     setModules(
       modules.map(module => ({
         ...module,
@@ -65,7 +63,7 @@ export const DegreeCourseTable = ({
             return {
               ...course,
               visible: { ...course.visible, visibility: newVisibility },
-            }
+            } as ProgrammeCourse
           }
           return course
         }),
@@ -73,22 +71,24 @@ export const DegreeCourseTable = ({
     )
   }
 
-  const setCourseVisibility = (code, newVisibility) => {
+  const setCourseVisibility = (moduleCode: string, newVisibility: boolean) => {
     setModules(
-      modules.map(mod => ({
-        ...mod,
-        courses: mod.courses.map(course => {
-          if (course.code !== code) return course
+      modules.map(module => ({
+        ...module,
+        courses: module.courses.map(course => {
+          if (course.code !== moduleCode) {
+            return course
+          }
           return {
             ...course,
             visible: { ...course.visible, visibility: newVisibility },
-          }
+          } as ProgrammeCourse
         }),
       }))
     )
   }
 
-  const isVisible = moduleCode => {
+  const isVisible = (moduleCode: string) => {
     if (!visible[version]) {
       setVisible[version] = {}
       return false
@@ -96,68 +96,54 @@ export const DegreeCourseTable = ({
     return visible[version][moduleCode]
   }
 
-  const excludeAll = code => {
-    const module = modules.find(module => module.moduleName === code)
+  const excludeAll = (moduleCode: string) => {
+    const module = getModule(moduleCode)
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
-    setExclusion({
-      programmeCode: excludeFromProgramme,
+    void setExclusion({
       courseCodes: module.courses.filter(course => course.visible.visibility).map(course => course.code),
       curriculumVersion: version,
+      programmeCode: excludeFromProgramme,
     })
-    setModuleVisibility(code, false)
+    setModuleVisibility(moduleCode, false)
   }
 
-  const deleteAll = code => {
-    const module = modules.find(module => module.moduleName === code)
-    removeExclusion({
-      programmeCode: studyProgramme,
+  const deleteAll = (moduleCode: string) => {
+    const module = getModule(moduleCode)
+    void removeExclusion({
       courseCodes: module.courses.map(course => course.code),
       curriculumVersion: version,
+      programmeCode: studyProgramme,
     })
-    setModuleVisibility(code, true)
+    setModuleVisibility(moduleCode, true)
   }
 
-  const showAllButton = module => (
-    <Button color="blue" onClick={() => deleteAll(module)}>
+  const showAllButton = (moduleCode: string) => (
+    <Button color="primary" onClick={() => deleteAll(moduleCode)}>
       Set visible
     </Button>
   )
 
-  const hideAllButton = module => (
-    <Button color="blue" onClick={() => excludeAll(module)}>
+  const hideAllButton = (moduleCode: string) => (
+    <Button color="primary" onClick={() => excludeAll(moduleCode)}>
       Set hidden
     </Button>
   )
 
-  const toggleVisible = code => {
-    const newState = !isVisible(code)
-    setVisible({ ...visible, [version]: { ...visible[version], [code]: newState } })
+  const toggleVisible = (moduleCode: string) => {
+    const newState = !isVisible(moduleCode)
+    setVisible({ ...visible, [version]: { ...visible[version], [moduleCode]: newState } })
   }
 
-  const calculateModuleVisibility = code => {
-    const module = modules.find(module => module.moduleName === code)
-    if (!module.courses) {
-      return 'no courses'
-    }
-    if (module.courses.every(course => course.visible.visibility)) {
-      return 'visible'
-    }
-    if (module.courses.every(course => !course.visible.visibility)) {
-      return 'hidden'
-    }
-    return 'partial'
-  }
-
-  const setExclusionButton = course => {
+  const setExclusionButton = (course: ProgrammeCourse) => {
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     return (
       <Button
-        color="blue"
+        color="primary"
         onClick={() => {
-          setExclusion({
-            programmeCode: excludeFromProgramme,
+          void setExclusion({
             courseCodes: [course.code],
             curriculumVersion: version,
+            programmeCode: excludeFromProgramme,
           })
           setCourseVisibility(course.code, false)
         }}
@@ -166,14 +152,15 @@ export const DegreeCourseTable = ({
       </Button>
     )
   }
-  const deleteButton = course => (
+
+  const deleteButton = (course: ProgrammeCourse) => (
     <Button
-      color="blue"
+      color="primary"
       onClick={() => {
-        removeExclusion({
-          programmeCode: studyProgramme,
-          courseCodes: [course.visible.id],
+        void removeExclusion({
+          courseCodes: course.visible.id ? [course.visible.id] : [],
           curriculumVersion: version,
+          programmeCode: studyProgramme,
         })
         setCourseVisibility(course.code, true)
       }}
@@ -182,161 +169,92 @@ export const DegreeCourseTable = ({
     </Button>
   )
 
-  const setCriteriaButton = (course, criterionYear) => (
-    <Button
-      color="green"
-      onClick={() => {
-        const year = getYear(criterionYear)
-        const courses = criteria.courses ? [...criteria.courses[year], course.code] : [course.code]
-        void addProgressCriteriaCourse({
-          programmeCode: studyProgramme,
-          courses,
-          year: criterionYear,
-          version: curriculumVersion,
-        })
-      }}
-    >
-      {`Set criterion for year ${criterionYear}`}
-    </Button>
-  )
-  const deleteCriteriaButton = (course, criterionYear) => (
-    <Button
-      color="red"
-      onClick={() => {
-        const year = getYear(criterionYear)
-        const filteredCourses = criteria?.courses[year]?.filter(courseCode => courseCode !== course.code)
-        void addProgressCriteriaCourse({ programmeCode: studyProgramme, courses: filteredCourses, year: criterionYear })
-      }}
-    >
-      {`Remove criterion for year ${criterionYear}`}
-    </Button>
-  )
-
-  const labelDropdown = course => {
-    if (isMedicalProgramme(studyProgramme)) {
-      return (
-        <Dropdown className="link item" text="Modify labels">
-          <Dropdown.Menu>
-            {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearOne?.includes(course.code)
-              ? deleteCriteriaButton(course, 1)
-              : setCriteriaButton(course, 1)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearTwo?.includes(course.code)
-              ? deleteCriteriaButton(course, 2)
-              : setCriteriaButton(course, 2)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearThree?.includes(course.code)
-              ? deleteCriteriaButton(course, 3)
-              : setCriteriaButton(course, 3)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearFour?.includes(course.code)
-              ? deleteCriteriaButton(course, 4)
-              : setCriteriaButton(course, 4)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearFive?.includes(course.code)
-              ? deleteCriteriaButton(course, 5)
-              : setCriteriaButton(course, 5)}
-            <Dropdown.Divider />
-            {criteria?.courses?.yearSix?.includes(course.code)
-              ? deleteCriteriaButton(course, 6)
-              : setCriteriaButton(course, 6)}
-          </Dropdown.Menu>
-        </Dropdown>
-      )
+  const getVisibility = (moduleCode: string) => {
+    const module = getModule(moduleCode)
+    if (!module.courses) {
+      return CourseVisibility.NO_COURSES
     }
-    return (
-      <Dropdown className="link item" text="Modify labels">
-        <Dropdown.Menu>
-          {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
-          <Dropdown.Divider />
-          {criteria?.courses?.yearOne?.includes(course.code)
-            ? deleteCriteriaButton(course, 1)
-            : setCriteriaButton(course, 1)}
-          <Dropdown.Divider />
-          {criteria?.courses?.yearTwo?.includes(course.code)
-            ? deleteCriteriaButton(course, 2)
-            : setCriteriaButton(course, 2)}
-          <Dropdown.Divider />
-          {criteria?.courses?.yearThree?.includes(course.code)
-            ? deleteCriteriaButton(course, 3)
-            : setCriteriaButton(course, 3)}
-        </Dropdown.Menu>
-      </Dropdown>
-    )
+    if (module.courses.every(course => course.visible.visibility)) {
+      return CourseVisibility.VISIBLE
+    }
+    if (module.courses.every(course => !course.visible.visibility)) {
+      return CourseVisibility.HIDDEN
+    }
+    return CourseVisibility.PARTIAL
   }
 
   return (
-    <Table>
-      <Table.Header>
-        <Table.Row key="HeaderRow">
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Code</Table.HeaderCell>
-          <Table.HeaderCell>Visibility label</Table.HeaderCell>
-          {isBachelorOrLicentiateProgramme(studyProgramme) && <Table.HeaderCell>Criterion labels</Table.HeaderCell>}
-          <Table.HeaderCell>
-            {isBachelorOrLicentiateProgramme(studyProgramme) ? 'Set labels' : 'Set visibility'}
-          </Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {modules.map(({ moduleName, courses }) => (
-          <Fragment key={`fragment-${moduleName}`}>
-            <Table.Row key={moduleName}>
-              <Table.Cell onClick={() => toggleVisible(moduleName)} style={{ cursor: 'pointer' }}>
-                <Icon name={isVisible(moduleName) ? 'angle down' : 'angle right'} />
-                <b>{courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleName}</b>
-              </Table.Cell>
-              <Table.Cell>{moduleName}</Table.Cell>
-              <Table.Cell>
-                <Label
-                  color={moduleVisibilityColor(calculateModuleVisibility(moduleName))}
-                  content={calculateModuleVisibility(moduleName)}
-                />
-              </Table.Cell>
-              {isBachelorOrLicentiateProgramme(studyProgramme) && <Table.Cell />}
-              <Table.Cell>
-                {calculateModuleVisibility(moduleName) === 'hidden'
-                  ? showAllButton(moduleName)
-                  : hideAllButton(moduleName)}
-              </Table.Cell>
-            </Table.Row>
-            {isVisible(moduleName) &&
-              courses
-                .sort((a, b) => a.code.localeCompare(b.code))
-                .map(course => (
-                  <Table.Row key={`${moduleName}/${course.code}`}>
-                    <Table.Cell>{getTextIn(course.name)}</Table.Cell>
-                    <Table.Cell>{course.code}</Table.Cell>
-                    <Table.Cell>
-                      <Label
-                        color={course.visible.visibility ? 'green' : 'red'}
-                        content={course.visible.visibility ? 'visible' : 'hidden'}
-                      />
-                    </Table.Cell>
-                    {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                      <Table.Cell>
-                        {criteria?.courses?.yearOne?.includes(course.code) && <Label color="blue" content="year 1" />}
-                        {criteria?.courses?.yearTwo?.includes(course.code) && <Label color="blue" content="year 2" />}
-                        {criteria?.courses?.yearThree?.includes(course.code) && <Label color="blue" content="year 3" />}
-                        {criteria?.courses?.yearFour?.includes(course.code) && <Label color="blue" content="year 4" />}
-                        {criteria?.courses?.yearFive?.includes(course.code) && <Label color="blue" content="year 5" />}
-                        {criteria?.courses?.yearSix?.includes(course.code) && <Label color="blue" content="year 6" />}
-                      </Table.Cell>
-                    )}
-                    {isBachelorOrLicentiateProgramme(studyProgramme) ? (
-                      <Table.Cell>{labelDropdown(course)}</Table.Cell>
-                    ) : (
-                      <Table.Cell>
-                        {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
-                      </Table.Cell>
-                    )}
-                  </Table.Row>
-                ))}
-          </Fragment>
-        ))}
-      </Table.Body>
-    </Table>
+    <TableContainer component={Paper} variant="outlined">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Code</TableCell>
+            <TableCell>Visibility</TableCell>
+            {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell>Criterion labels</TableCell>}
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {modules.map(({ code: moduleCode, courses }) => (
+            <Fragment key={`${moduleCode}-fragment`}>
+              <TableRow key={moduleCode}>
+                <TableCell>
+                  <Box alignItems="center" display="flex" justifyContent="left">
+                    <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
+                      {isVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                    </IconButton>
+                    <Typography variant="body2">
+                      {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
+                    </Typography>
+                  </Box>
+                </TableCell>
+                <TableCell>{moduleCode}</TableCell>
+                <TableCell>
+                  <VisibilityChip visibility={getVisibility(moduleCode)} />
+                </TableCell>
+                {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell />}
+                <TableCell>
+                  {getVisibility(moduleCode) === CourseVisibility.HIDDEN
+                    ? showAllButton(moduleCode)
+                    : hideAllButton(moduleCode)}
+                </TableCell>
+              </TableRow>
+              {isVisible(moduleCode) &&
+                courses
+                  .sort((a, b) => a.code.localeCompare(b.code))
+                  .map(course => (
+                    <TableRow key={`${moduleCode}/${course.code}`}>
+                      <TableCell>{getTextIn(course.name)}</TableCell>
+                      <TableCell>{course.code}</TableCell>
+                      <TableCell>
+                        <VisibilityChip visibility={getVisibility(moduleCode)} />
+                      </TableCell>
+                      {isBachelorOrLicentiateProgramme(studyProgramme) && (
+                        <TableCell>
+                          {criteria.courses.yearOne.includes(course.code) && <Label color="blue" content="year 1" />}
+                          {criteria.courses.yearTwo.includes(course.code) && <Label color="blue" content="year 2" />}
+                          {criteria.courses.yearThree.includes(course.code) && <Label color="blue" content="year 3" />}
+                          {criteria.courses.yearFour.includes(course.code) && <Label color="blue" content="year 4" />}
+                          {criteria.courses.yearFive.includes(course.code) && <Label color="blue" content="year 5" />}
+                          {criteria.courses.yearSix.includes(course.code) && <Label color="blue" content="year 6" />}
+                        </TableCell>
+                      )}
+                      {isBachelorOrLicentiateProgramme(studyProgramme) ? (
+                        <TableCell>
+                          <LabelSelect course={course} criteria={criteria} studyProgramme={studyProgramme} />
+                        </TableCell>
+                      ) : (
+                        <TableCell>
+                          {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+            </Fragment>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }

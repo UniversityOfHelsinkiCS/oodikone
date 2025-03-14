@@ -59,6 +59,7 @@ export type ProgrammeModule = {
   organization_id: string | null
   parent_code: string | null
   parent_id: string | null
+  parent_name: Name
   study_level: string | null
   type: string
   updated_at: string
@@ -73,14 +74,14 @@ export type ProgrammeCourse = ProgrammeModule & {
     label: string
     orderNumber: number
   }
-  visibility: {
+  visible: {
     id: string | null
-    visible: boolean
+    visibility: boolean
   }
 }
 
 export type Module = {
+  code: string
   courses: ProgrammeCourse[]
-  moduleName: string
-  moduleOrder: number
+  order: number
 }
