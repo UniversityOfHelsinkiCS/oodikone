@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { literal, Op } from 'sequelize'
+import { literal, Op, WhereOptions } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
@@ -40,7 +40,7 @@ const getCreditsOfStudent = async (
   })
   const studyPlanCourses = Array.from(new Set([...studyPlans.map(plan => plan.included_courses)].flat()))
 
-  const creditsOfStudent = {
+  const creditsOfStudent: WhereOptions = {
     [Op.or]: [
       {
         attainment_date: {
