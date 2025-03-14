@@ -5,7 +5,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
 import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
 import { Module, ProgressCriteria } from '@/shared/types'
-import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
+import { isBachelorOrLicentiateProgramme, isMedicalProgramme } from '@/util/studyProgramme'
 
 const getYear = (criterionYear: number) => {
   return {
@@ -213,7 +213,7 @@ export const DegreeCourseTable = ({
   )
 
   const labelDropdown = course => {
-    if (['MH30_001', 'MH30_003', 'KH90_001'].includes(studyProgramme)) {
+    if (isMedicalProgramme(studyProgramme)) {
       return (
         <Dropdown className="link item" text="Modify labels">
           <Dropdown.Menu>
@@ -276,9 +276,7 @@ export const DegreeCourseTable = ({
           <Table.HeaderCell>Visibility label</Table.HeaderCell>
           {isBachelorOrLicentiateProgramme(studyProgramme) && <Table.HeaderCell>Criterion labels</Table.HeaderCell>}
           <Table.HeaderCell>
-            {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)
-              ? 'Set labels'
-              : 'Set visibility'}
+            {isBachelorOrLicentiateProgramme(studyProgramme) ? 'Set labels' : 'Set visibility'}
           </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -327,7 +325,7 @@ export const DegreeCourseTable = ({
                         {criteria?.courses?.yearSix?.includes(course.code) && <Label color="blue" content="year 6" />}
                       </Table.Cell>
                     )}
-                    {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme) ? (
+                    {isBachelorOrLicentiateProgramme(studyProgramme) ? (
                       <Table.Cell>{labelDropdown(course)}</Table.Cell>
                     ) : (
                       <Table.Cell>

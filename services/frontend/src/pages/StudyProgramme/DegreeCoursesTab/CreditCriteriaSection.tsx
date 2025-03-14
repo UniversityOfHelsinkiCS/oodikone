@@ -6,6 +6,7 @@ import { Section } from '@/components/material/Section'
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
 import { ProgressCriteria } from '@/shared/types'
+import { isMedicalProgramme } from '@/util/studyProgramme'
 
 const emptyCredits = {
   year1: null,
@@ -76,7 +77,7 @@ export const CreditCriteriaSection = ({
     },
   ]
 
-  if (['MH30_001', 'MH30_003', 'KH90_001'].includes(studyProgramme)) {
+  if (isMedicalProgramme(studyProgramme)) {
     inputs.push(
       {
         key: 'year4',

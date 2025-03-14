@@ -10,6 +10,7 @@ import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
+import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
@@ -192,7 +193,7 @@ const PopulationStudents = ({
 }
 
 const getTabs = programmeCode => {
-  if (programmeCode && (programmeCode.includes('KH') || ['MH30_001', 'MH30_003'].includes(programmeCode))) {
+  if (programmeCode && isBachelorOrLicentiateProgramme(programmeCode)) {
     return ['General', 'Courses', 'Modules', 'Progress']
   }
   if (programmeCode) {
@@ -209,10 +210,7 @@ export const PopulationStudentsContainer = ({ ...props }) => {
   const contentByVariant = {
     population: {
       panesToInclude:
-        props.year === 'All' ||
-        (props.programmeCode &&
-          !props.programmeCode.includes('KH') &&
-          !['MH30_001', 'MH30_003'].includes(props.programmeCode))
+        props.year === 'All' || (props.programmeCode && !isBachelorOrLicentiateProgramme(props.programmeCode))
           ? ['General', 'Courses', 'Modules', 'Tags']
           : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
       infotoolTipContent: populationStatisticsToolTips.studentsClass,

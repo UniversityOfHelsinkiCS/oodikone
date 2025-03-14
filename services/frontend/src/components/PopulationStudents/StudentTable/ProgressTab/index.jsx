@@ -11,6 +11,7 @@ import { useStudentNameVisibility } from '@/components/material/StudentNameVisib
 import { SortableTable } from '@/components/SortableTable'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { isMedicalProgramme } from '@/util/studyProgramme'
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(
@@ -110,15 +111,13 @@ const createEmptyHidden = nthHiddenColumn => {
   ]
 }
 
-const isMedicalDegree = programme => ['MH30_001', 'MH30_003', 'KH90_001'].includes(programme)
-
 const getCriteriaHeaders = (months, programme) => {
   const criteriaHeaders = [
     { title: months < 12 ? 'Academic year 1 (in progress)' : 'Academic year 1', year: 'year1', label: 'yearOne' },
     { title: months < 24 ? 'Academic year 2 (in progress)' : 'Academic year 2', year: 'year2', label: 'yearTwo' },
     { title: months < 36 ? 'Academic year 3 (in progress)' : 'Academic year 3', year: 'year3', label: 'yearThree' },
   ]
-  if (isMedicalDegree(programme)) {
+  if (isMedicalProgramme(programme)) {
     criteriaHeaders.push(
       { title: months < 48 ? 'Academic year 4 (in progress)' : 'Academic year 4', year: 'year4', label: 'yearFour' },
       { title: months < 60 ? 'Academic year 5 (in progress)' : 'Academic year 5', year: 'year5', label: 'yearFive' },
