@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { literal, Op, WhereOptions } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
@@ -30,7 +29,7 @@ const getStudentTags = async (studyRights: string[], studentNumbers: string[]) =
 const getCreditsOfStudent = async (
   studentNumbers: string[],
   studyRights: string[],
-  attainmentDateFrom: string | moment.Moment,
+  attainmentDateFrom: string,
   endDate: Date
 ) => {
   const studyPlans = await Studyplan.findAll({
@@ -75,7 +74,7 @@ const getCourses = async (creditsOfStudent: any) => {
   })
 }
 
-const getEnrollments = async (studentNumbers: string[], attainmentDateFrom: moment.Moment | string, endDate: Date) => {
+const getEnrollments = async (studentNumbers: string[], attainmentDateFrom: string, endDate: Date) => {
   return await Enrollment.findAll({
     attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
     where: {
