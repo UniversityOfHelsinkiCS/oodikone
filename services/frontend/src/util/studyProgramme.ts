@@ -9,3 +9,7 @@ export const getGraduationGraphTitle = (studyProgramme: string, doCombo = false)
   if (studyProgramme.includes('MH')) return 'Master study right'
   return 'Doctoral study right'
 }
+
+export const isBachelorOrLicentiateProgramme = (studyProgramme: string) => {
+  return studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)
+}

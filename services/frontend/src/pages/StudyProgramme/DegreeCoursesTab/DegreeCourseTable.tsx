@@ -4,15 +4,18 @@ import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
 import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
-import { Module } from '@/shared/types'
+import { Module, ProgressCriteria } from '@/shared/types'
+import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 
-const getYear = criterionYear => {
-  if (criterionYear === 1) return 'yearOne'
-  if (criterionYear === 2) return 'yearTwo'
-  if (criterionYear === 3) return 'yearThree'
-  if (criterionYear === 4) return 'yearFour'
-  if (criterionYear === 5) return 'yearFive'
-  return 'yearSix'
+const getYear = (criterionYear: number) => {
+  return {
+    1: 'yearOne',
+    2: 'yearTwo',
+    3: 'yearThree',
+    4: 'yearFour',
+    5: 'yearFive',
+    6: 'yearSix',
+  }[criterionYear]
 }
 
 const moduleVisibilityColor = visibility => {
@@ -29,13 +32,13 @@ const moduleVisibilityColor = visibility => {
 export const DegreeCourseTable = ({
   combinedProgramme,
   criteria,
-  curriculum,
+  curriculumVersion,
   modules: initialModules,
   studyProgramme,
 }: {
   combinedProgramme: string
-  criteria
-  curriculum
+  criteria: ProgressCriteria
+  curriculumVersion: string[]
   modules: Module[]
   studyProgramme: string
 }) => {
@@ -46,14 +49,14 @@ export const DegreeCourseTable = ({
   const [removeExclusion] = useRemoveCourseExclusionMutation()
   const [addProgressCriteriaCourse] = useAddProgressCriteriaCourseMutation()
 
-  const version = curriculum.version?.join(',')
+  const version = curriculumVersion.join(',')
   useEffect(() => {
     setModules(initialModules)
   }, [initialModules])
 
   const setModuleVisibility = (code, newVisibility) => {
     // Same course can be in many modules, so change them all
-    const courseCodes = modules.find(({ module }) => module === code).courses.map(course => course.code)
+    const courseCodes = modules.find(module => module.moduleName === code).courses.map(course => course.code)
     setModules(
       modules.map(module => ({
         ...module,
@@ -94,7 +97,7 @@ export const DegreeCourseTable = ({
   }
 
   const excludeAll = code => {
-    const module = modules.find(({ module }) => module === code)
+    const module = modules.find(module => module.moduleName === code)
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     setExclusion({
       programmeCode: excludeFromProgramme,
@@ -105,7 +108,7 @@ export const DegreeCourseTable = ({
   }
 
   const deleteAll = code => {
-    const module = modules.find(({ module }) => module === code)
+    const module = modules.find(module => module.moduleName === code)
     removeExclusion({
       programmeCode: studyProgramme,
       courseCodes: module.courses.map(course => course.code),
@@ -132,7 +135,7 @@ export const DegreeCourseTable = ({
   }
 
   const calculateModuleVisibility = code => {
-    const module = modules.find(({ module }) => module === code)
+    const module = modules.find(module => module.moduleName === code)
     if (!module.courses) {
       return 'no courses'
     }
@@ -185,11 +188,11 @@ export const DegreeCourseTable = ({
       onClick={() => {
         const year = getYear(criterionYear)
         const courses = criteria.courses ? [...criteria.courses[year], course.code] : [course.code]
-        addProgressCriteriaCourse({
+        void addProgressCriteriaCourse({
           programmeCode: studyProgramme,
           courses,
           year: criterionYear,
-          version: curriculum.version,
+          version: curriculumVersion,
         })
       }}
     >
@@ -202,7 +205,7 @@ export const DegreeCourseTable = ({
       onClick={() => {
         const year = getYear(criterionYear)
         const filteredCourses = criteria?.courses[year]?.filter(courseCode => courseCode !== course.code)
-        addProgressCriteriaCourse({ programmeCode: studyProgramme, courses: filteredCourses, year: criterionYear })
+        void addProgressCriteriaCourse({ programmeCode: studyProgramme, courses: filteredCourses, year: criterionYear })
       }}
     >
       {`Remove criterion for year ${criterionYear}`}
@@ -271,9 +274,7 @@ export const DegreeCourseTable = ({
           <Table.HeaderCell>Name</Table.HeaderCell>
           <Table.HeaderCell>Code</Table.HeaderCell>
           <Table.HeaderCell>Visibility label</Table.HeaderCell>
-          {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
-            <Table.HeaderCell>Criterion labels</Table.HeaderCell>
-          )}
+          {isBachelorOrLicentiateProgramme(studyProgramme) && <Table.HeaderCell>Criterion labels</Table.HeaderCell>}
           <Table.HeaderCell>
             {studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)
               ? 'Set labels'
@@ -282,30 +283,32 @@ export const DegreeCourseTable = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {modules.map(({ module, courses }) => (
-          <Fragment key={`fragment-${module}`}>
-            <Table.Row key={module}>
-              <Table.Cell onClick={() => toggleVisible(module)} style={{ cursor: 'pointer' }}>
-                <Icon name={isVisible(module) ? 'angle down' : 'angle right'} />
-                <b>{courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : module}</b>
+        {modules.map(({ moduleName, courses }) => (
+          <Fragment key={`fragment-${moduleName}`}>
+            <Table.Row key={moduleName}>
+              <Table.Cell onClick={() => toggleVisible(moduleName)} style={{ cursor: 'pointer' }}>
+                <Icon name={isVisible(moduleName) ? 'angle down' : 'angle right'} />
+                <b>{courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleName}</b>
               </Table.Cell>
-              <Table.Cell>{module}</Table.Cell>
+              <Table.Cell>{moduleName}</Table.Cell>
               <Table.Cell>
                 <Label
-                  color={moduleVisibilityColor(calculateModuleVisibility(module))}
-                  content={calculateModuleVisibility(module)}
+                  color={moduleVisibilityColor(calculateModuleVisibility(moduleName))}
+                  content={calculateModuleVisibility(moduleName)}
                 />
               </Table.Cell>
-              {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && <Table.Cell />}
+              {isBachelorOrLicentiateProgramme(studyProgramme) && <Table.Cell />}
               <Table.Cell>
-                {calculateModuleVisibility(module) === 'hidden' ? showAllButton(module) : hideAllButton(module)}
+                {calculateModuleVisibility(moduleName) === 'hidden'
+                  ? showAllButton(moduleName)
+                  : hideAllButton(moduleName)}
               </Table.Cell>
             </Table.Row>
-            {isVisible(module) &&
+            {isVisible(moduleName) &&
               courses
                 .sort((a, b) => a.code.localeCompare(b.code))
                 .map(course => (
-                  <Table.Row key={`${module}/${course.code}`}>
+                  <Table.Row key={`${moduleName}/${course.code}`}>
                     <Table.Cell>{getTextIn(course.name)}</Table.Cell>
                     <Table.Cell>{course.code}</Table.Cell>
                     <Table.Cell>
@@ -314,7 +317,7 @@ export const DegreeCourseTable = ({
                         content={course.visible.visibility ? 'visible' : 'hidden'}
                       />
                     </Table.Cell>
-                    {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
+                    {isBachelorOrLicentiateProgramme(studyProgramme) && (
                       <Table.Cell>
                         {criteria?.courses?.yearOne?.includes(course.code) && <Label color="blue" content="year 1" />}
                         {criteria?.courses?.yearTwo?.includes(course.code) && <Label color="blue" content="year 2" />}

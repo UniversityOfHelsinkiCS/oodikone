@@ -1,11 +1,4 @@
-export type {
-  CurriculumDetails,
-  CurriculumOption,
-  CurriculumPeriod,
-  Module,
-  ProgrammeCourse,
-  ProgrammeModule,
-} from './curriculum'
+export type { CurriculumDetails, CurriculumOption, CurriculumPeriod } from './curriculum'
 export type { DetailedProgrammeRights } from './detailedProgrammeRights'
 export type { Graduated, SpecialGroups, ProgrammeFilter, StatsType, YearType } from './faculty'
 export type {
@@ -22,6 +15,9 @@ export type { Role } from './role'
 export type {
   GraduationTimes,
   MedianEntry,
+  Module,
+  ProgrammeCourse,
+  ProgrammeModule,
   ProgrammeOrStudyTrackGraduationStats,
   StudyTrackStats,
 } from './studyProgramme'

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { CurriculumDetails, Module, ProgrammeCourse, ProgressCriteria } from '@/shared/types'
+import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { CreditCriteriaSection } from './CreditCriteriaSection'
 import { CurriculumSection } from './CurriculumSection'
 import { DegreeCourseTable } from './DegreeCourseTable'
@@ -28,49 +29,35 @@ export const DegreeCoursesTab = ({
   }
   const criteria = progressCriteria ?? emptyCriteria
 
+  const getModules = (courses: ProgrammeCourse[]): Module[] => {
+    const modules: Record<string, ProgrammeCourse[]> = {}
+    courses.forEach(course => {
+      const code = course.parent_code!
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
+    })
+
+    return orderBy(
+      Object.entries(modules).map(([moduleName, courses]) => ({
+        courses,
+        moduleName,
+        moduleOrder: courses[0].module_order,
+      })),
+      module => module.moduleName
+    )
+  }
+
   useEffect(() => {
     if (!curriculum?.defaultProgrammeCourses?.length) {
       return
     }
-    const defaultModules: Record<string, ProgrammeCourse[]> = {}
-    const secondProgrammeModules: Record<string, ProgrammeCourse[]> = {}
-    curriculum.defaultProgrammeCourses.forEach(course => {
-      const code = course.parent_code
-      if (!defaultModules[code]) {
-        defaultModules[code] = []
-      }
-      defaultModules[code].push(course)
-    })
-    if (combinedProgramme) {
-      curriculum.secondProgrammeCourses.forEach(course => {
-        const code = course.parent_code
-        if (!secondProgrammeModules[code]) {
-          secondProgrammeModules[code] = []
-        }
-        secondProgrammeModules[code].push(course)
-      })
-    }
 
-    setDefaultProgrammeModules(
-      orderBy(
-        Object.entries(defaultModules).map(([module, courses]) => ({
-          module,
-          courses,
-          module_order: courses[0].module_order,
-        })),
-        module => module.module
-      )
-    )
-    setSecondProgrammeModules(
-      orderBy(
-        Object.entries(secondProgrammeModules).map(([module, courses]) => ({
-          module,
-          courses,
-          module_order: courses[0].module_order,
-        })),
-        module => module.module
-      )
-    )
+    setDefaultProgrammeModules(getModules(curriculum.defaultProgrammeCourses))
+    if (combinedProgramme) {
+      setSecondProgrammeModules(getModules(curriculum.secondProgrammeCourses))
+    }
   }, [combinedProgramme, curriculum])
 
   return (
@@ -80,23 +67,23 @@ export const DegreeCoursesTab = ({
         setCurriculum={setCurriculum}
         year={year}
       />
-      {(studyProgramme.includes('KH') || ['MH30_001', 'MH30_003'].includes(studyProgramme)) && (
+      {isBachelorOrLicentiateProgramme(studyProgramme) && (
         <CreditCriteriaSection criteria={criteria} studyProgramme={studyProgramme} />
       )}
-      {defaultProgrammeModules && defaultProgrammeModules.length > 1 && (
+      {defaultProgrammeModules.length > 1 && curriculum && (
         <DegreeCourseTable
           combinedProgramme=""
           criteria={criteria}
-          curriculum={curriculum}
+          curriculumVersion={curriculum.version}
           modules={defaultProgrammeModules}
           studyProgramme={studyProgramme}
         />
       )}
-      {secondProgrammeModules.length > 0 && (
+      {secondProgrammeModules.length > 0 && curriculum && (
         <DegreeCourseTable
           combinedProgramme={combinedProgramme}
           criteria={criteria}
-          curriculum={curriculum}
+          curriculumVersion={curriculum.version}
           modules={secondProgrammeModules}
           studyProgramme={studyProgramme}
         />
