@@ -1,6 +1,6 @@
 export type {
-  Curriculum,
   CurriculumDetails,
+  CurriculumOption,
   CurriculumPeriod,
   Module,
   ProgrammeCourse,

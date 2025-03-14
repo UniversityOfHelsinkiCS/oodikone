@@ -1,9 +1,9 @@
 import { RTKApi } from '@/apiConnection'
-import { Curriculum, CurriculumDetails } from '@/shared/types'
+import { CurriculumOption, CurriculumDetails } from '@/shared/types'
 
 const curriculumsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getCurriculumOptions: builder.query<Curriculum[], { code: string }>({
+    getCurriculumOptions: builder.query<CurriculumOption[], { code: string }>({
       query: ({ code }) => `/v3/curriculum-options/${code}`,
     }),
     getCurriculums: builder.query<CurriculumDetails, { code: string; periodIds: string[] }>({

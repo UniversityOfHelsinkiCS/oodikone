@@ -3,11 +3,11 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../database/connection'
 import { CurriculumPeriod, ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
-import { Curriculum, Name } from '../shared/types'
+import { CurriculumOption, Name } from '../shared/types'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 
-const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: string }): Curriculum => {
+const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: string }): CurriculumOption => {
   return {
     id: curriculum.id,
     name: curriculum.curriculumName!,
@@ -16,7 +16,7 @@ const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: strin
   }
 }
 
-export const getCurriculums = async (code: string) => {
+export const getCurriculumOptions = async (code: string) => {
   try {
     const result: Array<ProgrammeModule & { curriculumName?: string }> = await ProgrammeModule.findAll({
       where: { code },

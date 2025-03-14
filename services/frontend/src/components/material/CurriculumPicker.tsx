@@ -2,11 +2,11 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
-import { Curriculum, CurriculumDetails } from '@/shared/types'
+import { CurriculumOption, CurriculumDetails } from '@/shared/types'
 
 const chooseCurriculumToFetch = (
-  curriculums: Curriculum[],
-  selectedCurriculum: Curriculum | undefined,
+  curriculums: CurriculumOption[],
+  selectedCurriculum: CurriculumOption | undefined,
   startYear: string
 ) => {
   if (selectedCurriculum?.periodIds) {
@@ -35,7 +35,7 @@ export const CurriculumPicker = ({
     { code: programmeCodes[0] },
     { skip: !programmeCodes[0] }
   )
-  const [selectedCurriculum, setSelectedCurriculum] = useState<Curriculum | undefined>(undefined)
+  const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | undefined>()
   const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
   const { data: chosenCurriculumData } = useGetCurriculumsQuery(
     {

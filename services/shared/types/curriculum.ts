@@ -1,6 +1,6 @@
 import { Name } from './name'
 
-export type Curriculum = {
+export type CurriculumOption = {
   id: string
   name: string
   periodIds: string[]
