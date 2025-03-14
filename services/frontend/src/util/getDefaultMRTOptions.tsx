@@ -59,12 +59,12 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
       rowsPerPageOptions: [50, 100, 200, 300, 400, 500],
     },
     muiTableHeadCellProps: {
-      sx: theme => ({
+      sx: {
         verticalAlign: 'bottom',
         borderWidth: '1px 1px 1px 0',
         borderStyle: 'solid',
-        borderColor: theme.palette.grey[300],
-      }),
+        borderColor: 'grey.300',
+      },
     },
     muiTableHeadRowProps: {
       sx: {
@@ -72,16 +72,18 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
       },
     },
     muiTableBodyCellProps: {
-      sx: theme => ({
-        borderRight: `1px solid ${theme.palette.grey[300]}`,
-      }),
+      sx: {
+        borderWidth: '0 1px 0 0',
+        borderStyle: 'solid',
+        borderColor: 'grey.300',
+      },
     },
     muiTableBodyProps: {
-      sx: theme => ({
+      sx: {
         '& tr:nth-of-type(odd) > td': {
-          backgroundColor: theme.palette.grey[100],
+          backgroundColor: 'grey.100',
         },
-      }),
+      },
     },
     renderTopToolbarCustomActions: ({ table }) => (
       <Button
@@ -89,7 +91,7 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
         onClick={() => handleExportRows(table.getPrePaginationRowModel().rows)}
         startIcon={<DownloadIcon />}
         sx={{
-          backgroundColor: theme => theme.palette.export,
+          backgroundColor: 'export',
         }}
         variant="contained"
       >
