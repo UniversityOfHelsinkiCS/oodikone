@@ -4,9 +4,10 @@ import {
 } from '@mui/icons-material'
 import {
   Box,
-  Button,
+  Chip,
   IconButton,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -16,7 +17,6 @@ import {
   Typography,
 } from '@mui/material'
 import { Fragment, useEffect, useState } from 'react'
-import { Label } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
@@ -24,6 +24,7 @@ import { Module, ProgrammeCourse, ProgressCriteria } from '@/shared/types'
 import { CourseVisibility } from '@/types/courseVisibility'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { LabelSelect } from './LabelSelect'
+import { ToggleVisibilityButton } from './ToggleVisibilityButton'
 import { VisibilityChip } from './VisibilityChip'
 
 export const DegreeCourseTable = ({
@@ -39,7 +40,7 @@ export const DegreeCourseTable = ({
   modules: Module[]
   studyProgramme: string
 }) => {
-  const [visible, setVisible] = useState({})
+  const [moduleCoursesVisible, setModuleCoursesVisible] = useState<Record<string, Record<string, boolean>>>({})
   const { getTextIn } = useLanguage()
   const [modules, setModules] = useState(initialModules)
   const [setExclusion] = useSetCourseExclusionMutation()
@@ -88,12 +89,21 @@ export const DegreeCourseTable = ({
     )
   }
 
-  const isVisible = (moduleCode: string) => {
-    if (!visible[version]) {
-      setVisible[version] = {}
+  const areModuleCoursesVisible = (moduleCode: string) => {
+    if (!moduleCoursesVisible[version]) {
+      setModuleCoursesVisible[version] = {}
       return false
     }
-    return visible[version][moduleCode]
+    return moduleCoursesVisible[version][moduleCode]
+  }
+
+  const excludeOne = (course: ProgrammeCourse) => {
+    void setExclusion({
+      courseCodes: [course.code],
+      curriculumVersion: version,
+      programmeCode: combinedProgramme === '' ? studyProgramme : combinedProgramme,
+    })
+    setCourseVisibility(course.code, false)
   }
 
   const excludeAll = (moduleCode: string) => {
@@ -107,6 +117,15 @@ export const DegreeCourseTable = ({
     setModuleVisibility(moduleCode, false)
   }
 
+  const removeOne = (course: ProgrammeCourse) => {
+    void removeExclusion({
+      courseCodes: course.visible.id ? [course.visible.id] : [],
+      curriculumVersion: version,
+      programmeCode: studyProgramme,
+    })
+    setCourseVisibility(course.code, true)
+  }
+
   const deleteAll = (moduleCode: string) => {
     const module = getModule(moduleCode)
     void removeExclusion({
@@ -117,57 +136,13 @@ export const DegreeCourseTable = ({
     setModuleVisibility(moduleCode, true)
   }
 
-  const showAllButton = (moduleCode: string) => (
-    <Button color="primary" onClick={() => deleteAll(moduleCode)}>
-      Set visible
-    </Button>
-  )
-
-  const hideAllButton = (moduleCode: string) => (
-    <Button color="primary" onClick={() => excludeAll(moduleCode)}>
-      Set hidden
-    </Button>
-  )
-
   const toggleVisible = (moduleCode: string) => {
-    const newState = !isVisible(moduleCode)
-    setVisible({ ...visible, [version]: { ...visible[version], [moduleCode]: newState } })
+    const newState = !areModuleCoursesVisible(moduleCode)
+    setModuleCoursesVisible({
+      ...moduleCoursesVisible,
+      [version]: { ...moduleCoursesVisible[version], [moduleCode]: newState },
+    })
   }
-
-  const setExclusionButton = (course: ProgrammeCourse) => {
-    const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
-    return (
-      <Button
-        color="primary"
-        onClick={() => {
-          void setExclusion({
-            courseCodes: [course.code],
-            curriculumVersion: version,
-            programmeCode: excludeFromProgramme,
-          })
-          setCourseVisibility(course.code, false)
-        }}
-      >
-        Set hidden
-      </Button>
-    )
-  }
-
-  const deleteButton = (course: ProgrammeCourse) => (
-    <Button
-      color="primary"
-      onClick={() => {
-        void removeExclusion({
-          courseCodes: course.visible.id ? [course.visible.id] : [],
-          curriculumVersion: version,
-          programmeCode: studyProgramme,
-        })
-        setCourseVisibility(course.code, true)
-      }}
-    >
-      Set visible
-    </Button>
-  )
 
   const getVisibility = (moduleCode: string) => {
     const module = getModule(moduleCode)
@@ -202,7 +177,7 @@ export const DegreeCourseTable = ({
                 <TableCell>
                   <Box alignItems="center" display="flex" justifyContent="left">
                     <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
-                      {isVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                      {areModuleCoursesVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
                     </IconButton>
                     <Typography variant="body2">
                       {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
@@ -215,12 +190,17 @@ export const DegreeCourseTable = ({
                 </TableCell>
                 {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell />}
                 <TableCell>
-                  {getVisibility(moduleCode) === CourseVisibility.HIDDEN
-                    ? showAllButton(moduleCode)
-                    : hideAllButton(moduleCode)}
+                  <ToggleVisibilityButton
+                    onClick={() =>
+                      getVisibility(moduleCode) === CourseVisibility.HIDDEN
+                        ? deleteAll(moduleCode)
+                        : excludeAll(moduleCode)
+                    }
+                    visible={getVisibility(moduleCode) !== CourseVisibility.HIDDEN}
+                  />
                 </TableCell>
               </TableRow>
-              {isVisible(moduleCode) &&
+              {areModuleCoursesVisible(moduleCode) &&
                 courses
                   .sort((a, b) => a.code.localeCompare(b.code))
                   .map(course => (
@@ -232,12 +212,14 @@ export const DegreeCourseTable = ({
                       </TableCell>
                       {isBachelorOrLicentiateProgramme(studyProgramme) && (
                         <TableCell>
-                          {criteria.courses.yearOne.includes(course.code) && <Label color="blue" content="year 1" />}
-                          {criteria.courses.yearTwo.includes(course.code) && <Label color="blue" content="year 2" />}
-                          {criteria.courses.yearThree.includes(course.code) && <Label color="blue" content="year 3" />}
-                          {criteria.courses.yearFour.includes(course.code) && <Label color="blue" content="year 4" />}
-                          {criteria.courses.yearFive.includes(course.code) && <Label color="blue" content="year 5" />}
-                          {criteria.courses.yearSix.includes(course.code) && <Label color="blue" content="year 6" />}
+                          <Stack direction="row" spacing={1}>
+                            {Object.keys(criteria.courses).map(
+                              (year, index) =>
+                                criteria.courses[year].includes(course.code) && (
+                                  <Chip color="primary" key={year} label={`year ${index + 1}`} />
+                                )
+                            )}
+                          </Stack>
                         </TableCell>
                       )}
                       {isBachelorOrLicentiateProgramme(studyProgramme) ? (
@@ -246,7 +228,10 @@ export const DegreeCourseTable = ({
                         </TableCell>
                       ) : (
                         <TableCell>
-                          {course.visible.visibility ? setExclusionButton(course) : deleteButton(course)}
+                          <ToggleVisibilityButton
+                            onClick={() => (course.visible.visibility ? excludeOne(course) : removeOne(course))}
+                            visible={course.visible.visibility}
+                          />
                         </TableCell>
                       )}
                     </TableRow>
