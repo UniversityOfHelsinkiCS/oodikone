@@ -1,6 +1,5 @@
 import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
-import moment from 'moment'
 
 import { getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode, getCoursesByCodes } from '../services/courses/courseFinders'
@@ -51,10 +50,10 @@ router.get('/v2/coursesmulti', async (req: GetCoursesRequest, res: Response) => 
       }
     } else {
       const mergedCourse = mergedCourses[groupId]
-      if (moment(mergedCourse.max_attainment_date).isBefore(course.max_attainment_date)) {
+      if (mergedCourse.max_attainment_date < course.max_attainment_date) {
         mergedCourse.max_attainment_date = course.max_attainment_date
       }
-      if (moment(mergedCourse.min_attainment_date).isAfter(course.min_attainment_date)) {
+      if (mergedCourse.min_attainment_date > course.min_attainment_date) {
         mergedCourse.min_attainment_date = course.min_attainment_date
       }
     }

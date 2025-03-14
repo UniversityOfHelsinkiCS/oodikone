@@ -1,11 +1,11 @@
 import crypto from 'crypto'
-import moment from 'moment'
 import { Op } from 'sequelize'
 
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
 import { Name } from '../../shared/types'
 import { EnrollmentState, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
+import { dateIsBetween } from '../../util/datetime'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
@@ -76,7 +76,7 @@ const parseCredit = (
   if (!programmeOfCredit) {
     programmeOfCredit = studyRightElements
       .filter(studyRightElement =>
-        moment(attainmentDate).isBetween(moment(studyRightElement.startDate), moment(studyRightElement.endDate))
+        dateIsBetween(attainmentDate, studyRightElement.startDate, studyRightElement.endDate)
       )
       .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())[0] // The newest studyRightElement
   }

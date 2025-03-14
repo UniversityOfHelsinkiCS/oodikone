@@ -7,6 +7,7 @@ import { TagStudent } from '../../models/kone'
 import { Name } from '../../shared/types'
 import { formatToArray } from '../../shared/util'
 import { Criteria, DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
+import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
@@ -33,32 +34,6 @@ const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear
     coursesSatisfied,
   }
 }
-
-/**
- * @returns A new date with year incremented by the given amount
- */
-const dateYearsFromNow = (date: Date, years: number) => {
-  const newDate = new Date(date)
-  newDate.setFullYear(newDate.getFullYear() + years)
-  return newDate
-}
-
-/**
- * @param date The initial Date as ISOString
- * @param months Number of months to add to the start date
- * @returns A new date with months incremented by the given amount
- */
-export const dateMonthsFromNow = (date: string, months?: string) => {
-  const initialDate = new Date(date)
-  // NOTE: Cast to number, uses "MAGIC_NUMBER" if undefined or NaN
-  const acualMonths = +(months ?? NaN) || 10000
-  return new Date(initialDate.setMonth(initialDate.getMonth() + acualMonths))
-}
-
-/**
- * @returns A new Date with amount of days added to the start date
- */
-const dateDaysFromNow = (date: Date, days: number) => new Date(date.getTime() + 24 * 60 * 60 * 1000 * days)
 
 const getCreditAmount = (course: ParsedCourse, hops: Studyplan[], courseCode: string, startDate: string) => {
   const courseDate = new Date(course.date)

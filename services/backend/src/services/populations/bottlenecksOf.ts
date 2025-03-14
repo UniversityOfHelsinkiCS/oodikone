@@ -56,13 +56,17 @@ export const bottlenecksOf = async (
 
     coursestats.addCourseSubstitutions(course.substitutions)
     course.enrollments?.forEach(({ studentnumber, state, enrollment_date_time }) => {
-      const semester = getPassingSemester(getYear(studentnumber), enrollment_date_time)
+      // HACK: date should already be Date object
+      const initialDate = new Date(enrollment_date_time)
+      const semester = getPassingSemester(getYear(studentnumber), initialDate)
       coursestats.markEnrollment(studentnumber, state, semester)
     })
     course.credits
       ?.map(parseCreditInfo)
       .forEach(({ studentnumber, passingGrade, improvedGrade, failingGrade, grade, date }) => {
-        const semester = getPassingSemester(getYear(studentnumber), date)
+        // HACK: date should already be Date object
+        const initialDate = new Date(date)
+        const semester = getPassingSemester(getYear(studentnumber), initialDate)
         coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
       })
 

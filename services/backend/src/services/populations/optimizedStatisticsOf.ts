@@ -1,13 +1,8 @@
 import { getDegreeProgrammeType } from '../../util'
+import { dateMonthsFromNow } from '../../util/datetime'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
-import {
-  type QueryParams,
-  dateMonthsFromNow,
-  formatStudentsForApi,
-  getOptionsForStudents,
-  parseQueryParams,
-} from './shared'
+import { type QueryParams, formatStudentsForApi, getOptionsForStudents, parseQueryParams } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
 export type OptimizedStatisticsQuery = {

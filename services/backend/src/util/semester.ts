@@ -1,20 +1,20 @@
-import moment from 'moment'
+import { dateDaysFromNow } from './datetime'
 
-const isSpring = (date: moment.Moment) => {
-  return 0 <= date.month() && date.month() <= 6
+const isSpring = (date: Date) => {
+  return 0 <= date.getMonth() && date.getMonth() <= 6
 }
 
-const getSemester = (date: moment.Moment) => (isSpring(date) ? 'SPRING' : 'FALL')
+const getSemester = (date: Date) => (isSpring(date) ? 'SPRING' : 'FALL')
 
 export enum SemesterStart {
   SPRING = '01-01',
   FALL = '08-01',
 }
 
-export const getPassingSemester = (startYear: number, date: Date): string => {
-  const mDate = moment(date).add(1, 'day')
-  const year = mDate.year()
-  const semester = getSemester(mDate)
+export const getPassingSemester = (startYear: number, initialDate: Date): string => {
+  const date = dateDaysFromNow(initialDate, 1)
+  const year = date.getFullYear()
+  const semester = getSemester(date)
   const yearDiff = year - startYear
   const yearCount = semester === 'SPRING' ? yearDiff - 1 : yearDiff
 

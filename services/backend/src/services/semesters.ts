@@ -1,15 +1,26 @@
-import moment from 'moment'
 import { Op } from 'sequelize'
 
 import { Semester } from '../models'
 import { Name } from '../shared/types'
+import { dateMinFromList, dateMaxFromList } from '../util/datetime'
 
 type SemestersAndYears = {
   years: {
-    [yearcode: string]: { yearcode: number; yearname: string; startdate: moment.Moment; enddate: moment.Moment }
+    [yearcode: string]: {
+      yearcode: number
+      yearname: string
+      startdate: Date
+      enddate: Date
+    }
   }
   semesters: {
-    [semestercode: string]: { semestercode: number; name: Name; yearcode: number; startdate: Date; enddate: Date }
+    [semestercode: string]: {
+      semestercode: number
+      name: Name
+      yearcode: number
+      startdate: Date
+      enddate: Date
+    }
   }
 }
 
@@ -40,28 +51,19 @@ export const getCurrentSemester = async () => {
 
 export const getSemestersAndYears = async () => {
   const semesters = await Semester.findAll()
-  const result = semesters.reduce(
+  return semesters.reduce(
     (acc, semester) => {
       const { semestercode, name, yearcode, yearname, startdate, enddate } = semester
       acc.semesters[semestercode] = { semestercode, name, yearcode, startdate, enddate }
-      if (!acc.years[yearcode]) {
-        acc.years[yearcode] = {
-          yearcode,
-          yearname,
-          startdate: moment(startdate),
-          enddate: moment(enddate),
-        }
-      } else {
-        acc.years[yearcode] = {
-          yearcode,
-          yearname,
-          startdate: moment.min(acc.years[yearcode].startdate, moment(startdate)),
-          enddate: moment.max(acc.years[yearcode].enddate, moment(enddate)),
-        }
+      acc.years[yearcode] = {
+        yearcode,
+        yearname,
+        startdate: dateMinFromList(startdate, acc.years[yearcode]?.startdate)!,
+        enddate: dateMaxFromList(enddate, acc.years[yearcode]?.enddate)!,
       }
+
       return acc
     },
     { years: {}, semesters: {} } as SemestersAndYears
   )
-  return result
 }
