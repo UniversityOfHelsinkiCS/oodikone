@@ -7,10 +7,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
       query: ({ programmeCode }) => `/programme-criteria?programmeCode=${programmeCode}`,
       providesTags: ['ProgressCriteria'],
     }),
-    addProgressCriteriaCourse: builder.mutation<
-      ProgressCriteria,
-      { courses: string[]; programmeCode: string; year: number }
-    >({
+    addProgressCriteriaCourse: builder.mutation<void, { courses: string[]; programmeCode: string; year: number }>({
       query: ({ courses, programmeCode, year }) => ({
         url: '/programme-criteria/courses',
         method: 'POST',
@@ -22,10 +19,7 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['ProgressCriteria'],
     }),
-    addProgressCriteriaCredits: builder.mutation<
-      ProgressCriteria,
-      { credits: Record<string, number>; programmeCode: string }
-    >({
+    addProgressCriteriaCredits: builder.mutation<void, { credits: Record<string, number>; programmeCode: string }>({
       query: ({ credits, programmeCode }) => ({
         url: '/programme-criteria/credits',
         method: 'POST',

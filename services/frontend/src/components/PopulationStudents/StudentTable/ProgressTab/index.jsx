@@ -429,7 +429,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     addYearColumns(1)
     addYearColumns(2)
 
-    if (isMedicalDegree(programme)) {
+    if (isMedicalProgramme(programme)) {
       addYearColumns(3)
       addYearColumns(4)
       addYearColumns(5)

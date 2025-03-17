@@ -37,7 +37,10 @@ router.post('/courses', async (req: CriteriaCoursesRequest, res: Response) => {
     return res.status(400).end()
   }
   const studyProgrammeCriteria = await saveYearlyCourseCriteria(code, courses, year)
-  return res.json(studyProgrammeCriteria)
+  if (!studyProgrammeCriteria) {
+    return res.status(404).end()
+  }
+  return res.status(201).end()
 })
 
 interface CriteriaCreditsRequest extends Request {
@@ -53,7 +56,10 @@ router.post('/credits', async (req: CriteriaCreditsRequest, res: Response) => {
     return res.status(400).end()
   }
   const studyProgrammeCriteria = await saveYearlyCreditCriteria(code, credits)
-  return res.json(studyProgrammeCriteria)
+  if (!studyProgrammeCriteria) {
+    return res.status(404).end()
+  }
+  return res.status(201).end()
 })
 
 export default router
