@@ -1,4 +1,4 @@
-import { CropSquare as CropSquareIcon } from '@mui/icons-material'
+import { Check as CheckIcon, CropSquare as CropSquareIcon } from '@mui/icons-material'
 import { Box, Tooltip, Typography } from '@mui/material'
 import {
   type MRT_ColumnDef,
@@ -17,8 +17,8 @@ import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 
 import type { FormattedModules, FormattedStudent } from '.'
 
-const hasModuleInHOPS = (student: FormattedStudent, moduleCode: string) =>
-  student.modulesInHOPS?.includes(moduleCode) ?? false
+const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>
+  student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
 
 export const ModulesTab = ({
   formattedModules,
@@ -72,7 +72,10 @@ export const ModulesTab = ({
   const dynamicColumns = useMemo<MRT_ColumnDef<any>[]>(() => {
     if (!formattedModules) return []
     return Object.keys(formattedModules).map(code => ({
-      accessorFn: (row: FormattedStudent) => (hasModuleInHOPS(row, code) ? 'X' : null),
+      accessorFn: (row: FormattedStudent) => {
+        const studyModule = getModuleIfExists(row, code)
+        return studyModule ? (studyModule.completed ? '1' : '0') : null
+      },
       header: `${code} – ${getTextIn(formattedModules[code])}`,
       Header: () => (
         <Tooltip title={`${code} – ${getTextIn(formattedModules[code])}`}>
@@ -103,13 +106,19 @@ export const ModulesTab = ({
           </Box>
         </Tooltip>
       ),
-      Cell: ({ cell }) => (
-        <>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }} title="Has the module in their primary study plan">
-            {hasModuleInHOPS(cell.row.original, code) && <CropSquareIcon sx={{ color: 'grey.500' }} />}
+      Cell: ({ cell }) => {
+        const studyModule = getModuleIfExists(cell.row.original, code)
+        if (!studyModule) return <Box />
+        return studyModule.completed ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }} title={`Completed on ${studyModule.completionDate}`}>
+            <CheckIcon color="success" />
           </Box>
-        </>
-      ),
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }} title="Has the module in their primary study plan">
+            <CropSquareIcon sx={{ color: 'grey.500' }} />
+          </Box>
+        )
+      },
       filterFn: 'empty',
     }))
   }, [formattedModules, getTextIn])

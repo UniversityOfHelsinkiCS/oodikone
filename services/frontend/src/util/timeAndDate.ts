@@ -29,3 +29,15 @@ export const getCalendarYears = (years: string[]) => {
     return all.concat(Number(year.slice(0, 4)))
   }, [] as number[])
 }
+
+/**
+ * Returns date formatted as 'DD-MM-YYYY' using UTC time.
+ */
+export const formatUTCDate = (initialDate: string | Date) => {
+  const date = new Date(initialDate)
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+
+  return `${day}-${month}-${year}`
+}
