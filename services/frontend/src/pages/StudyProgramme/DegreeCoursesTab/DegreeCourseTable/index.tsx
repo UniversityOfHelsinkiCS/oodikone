@@ -23,7 +23,7 @@ import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from 
 import { Module, ProgrammeCourse, ProgressCriteria } from '@/shared/types'
 import { CourseVisibility } from '@/types/courseVisibility'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
-import { LabelSelect } from './LabelSelect'
+import { CriterionLabelSelectButton } from './CriterionLabelSelectButton'
 import { ToggleVisibilityButton } from './ToggleVisibilityButton'
 import { VisibilityChip } from './VisibilityChip'
 
@@ -160,7 +160,7 @@ export const DegreeCourseTable = ({
 
   return (
     <TableContainer component={Paper} variant="outlined">
-      <Table>
+      <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
@@ -179,7 +179,7 @@ export const DegreeCourseTable = ({
                     <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
                       {areModuleCoursesVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
                     </IconButton>
-                    <Typography variant="body2">
+                    <Typography fontWeight="bold" variant="body2">
                       {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
                     </Typography>
                   </Box>
@@ -204,7 +204,7 @@ export const DegreeCourseTable = ({
                 courses
                   .sort((a, b) => a.code.localeCompare(b.code))
                   .map(course => (
-                    <TableRow key={`${moduleCode}/${course.code}`}>
+                    <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
                       <TableCell>{getTextIn(course.name)}</TableCell>
                       <TableCell>{course.code}</TableCell>
                       <TableCell>
@@ -212,28 +212,37 @@ export const DegreeCourseTable = ({
                       </TableCell>
                       {isBachelorOrLicentiateProgramme(studyProgramme) && (
                         <TableCell>
-                          <Stack direction="row" spacing={1}>
-                            {Object.keys(criteria.courses).map(
-                              (year, index) =>
-                                criteria.courses[year].includes(course.code) && (
-                                  <Chip color="primary" key={year} label={`year ${index + 1}`} />
-                                )
-                            )}
-                          </Stack>
+                          {Object.values(criteria.courses).length > 0 ? (
+                            <Stack direction="row" gap={1}>
+                              {Object.keys(criteria.courses).map(
+                                (year, index) =>
+                                  criteria.courses[year].includes(course.code) && (
+                                    <Chip color="primary" key={year} label={`year ${index + 1}`} size="small" />
+                                  )
+                              )}
+                            </Stack>
+                          ) : (
+                            <Typography color="text.secondary" variant="body2">
+                              No labels set
+                            </Typography>
+                          )}
                         </TableCell>
                       )}
-                      {isBachelorOrLicentiateProgramme(studyProgramme) ? (
-                        <TableCell>
-                          <LabelSelect course={course} criteria={criteria} studyProgramme={studyProgramme} />
-                        </TableCell>
-                      ) : (
-                        <TableCell>
+                      <TableCell>
+                        <Stack direction="row" gap={1}>
                           <ToggleVisibilityButton
                             onClick={() => (course.visible.visibility ? excludeOne(course) : removeOne(course))}
                             visible={course.visible.visibility}
                           />
-                        </TableCell>
-                      )}
+                          {isBachelorOrLicentiateProgramme(studyProgramme) && (
+                            <CriterionLabelSelectButton
+                              course={course}
+                              criteria={criteria}
+                              studyProgramme={studyProgramme}
+                            />
+                          )}
+                        </Stack>
+                      </TableCell>
                     </TableRow>
                   ))}
             </Fragment>
