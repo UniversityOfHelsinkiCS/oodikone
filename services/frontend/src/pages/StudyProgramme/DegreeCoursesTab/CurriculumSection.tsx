@@ -13,7 +13,7 @@ export const CurriculumSection = ({
   year: string
 }) => {
   return (
-    <Section title="Curriculum">
+    <Section cypress="curriculum" title="Curriculum">
       <Stack alignItems="center" direction="row" gap={1}>
         <Typography>Select curriculum to edit:</Typography>
         <CurriculumPicker programmeCodes={programmeCodes} setCurriculum={setCurriculum} year={year} />

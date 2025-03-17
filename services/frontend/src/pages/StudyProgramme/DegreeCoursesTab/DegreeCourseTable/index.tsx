@@ -160,7 +160,7 @@ export const DegreeCourseTable = ({
 
   return (
     <TableContainer component={Paper} variant="outlined">
-      <Table size="small">
+      <Table data-cy="degree-course-table" size="small">
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>

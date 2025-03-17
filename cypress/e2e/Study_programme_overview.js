@@ -692,17 +692,32 @@ describe('Study programme overview', () => {
       cy.cs('degree-courses-tab').click()
     })
 
-    it('content loads', () => {
-      cy.contains('h3', 'Select curriculum to edit:')
+    it('Curriculum section', () => {
+      cy.cs('curriculum-section')
+      cy.contains('Select curriculum to edit:')
       cy.cs('curriculum-picker').contains('2023–2026')
-      cy.contains('Change visibility of degree courses and select criteria for academic years')
-      cy.contains('form', 'First year (12 months) last set: 0')
-      cy.get('table').within(() => {
-        cy.contains('Muut opinnot')
-        cy.contains('Matematiikka, perusopinnot')
-        cy.contains('div.green.label', 'visible')
-        cy.contains('button', 'Set hidden')
+      // TODO: Test changing the curriculum
+    })
+
+    describe('Credit criteria section', () => {
+      it('info box', () => {
+        cy.cs('credit-criteria-section')
+        cy.cs('credit-criteria-info-box-button').click()
+        cy.cs('credit-criteria-info-box-content').contains('Here you can change')
       })
+
+      it.skip('changing the credit criteria works', () => {
+        // TODO: Test using the inputs
+        // TODO: Button status
+        // TODO: Test "previously set to _" text changing when saving
+      })
+    })
+
+    it('Degree course table', () => {
+      cy.cs('degree-course-table')
+      // TODO: Test clicking the arrow buttons
+      // TODO: Test toggling visibility for MODULES and COURSES
+      // TODO: Test changing criterion labels
     })
   })
 

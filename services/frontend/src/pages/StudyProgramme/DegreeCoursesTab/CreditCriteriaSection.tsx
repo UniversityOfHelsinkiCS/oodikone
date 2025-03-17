@@ -100,7 +100,7 @@ export const CreditCriteriaSection = ({
   const disabled = Object.values(creditLimits).every(value => value === null || value < 0)
 
   return (
-    <Section infoBoxContent={studyProgrammeToolTips.creditCriteria} title="Credit criteria">
+    <Section cypress="credit-criteria" infoBoxContent={studyProgrammeToolTips.creditCriteria} title="Credit criteria">
       <Stack gap={2}>
         <Grid container spacing={1}>
           {inputs.map((input, index) => {
