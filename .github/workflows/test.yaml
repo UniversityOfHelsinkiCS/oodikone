@@ -199,7 +199,7 @@ jobs:
             spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
-          - name: 'Test study_programme overview'
+          - name: 'Test study programme overview'
             spec: cypress/e2e/Study_programme_overview.js
           - name: 'Test teachers and users'
             spec: |
