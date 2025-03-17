@@ -2,11 +2,11 @@ import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-export const useTabs = (totalTabs: number) => {
+export const useTabs = (totalTabs: number, prefix?: string) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const id = 'tab'
+  const id = prefix ? `${prefix}-tab` : 'tab'
   const initialTab = 0
 
   const normalizeTab = (tab: unknown) => {
