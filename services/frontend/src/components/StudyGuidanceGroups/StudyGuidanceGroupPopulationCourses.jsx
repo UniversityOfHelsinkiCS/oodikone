@@ -3,7 +3,7 @@ import { Form, Input, Segment } from 'semantic-ui-react'
 
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { CourseTableModeSelector } from '@/components/PopulationDetails/CurriculumPicker'
+import { CourseTableModeSelector } from '@/components/PopulationDetails/CourseTableModeSelector'
 
 export const StudyGuidanceGroupPopulationCourses = ({
   courses,

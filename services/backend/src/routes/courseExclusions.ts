@@ -17,23 +17,23 @@ interface ExcludedCoursesRequest extends Request {
 router.post('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
   const { code: programmeCode } = req.params
   const { courseCodes, curriculumVersion } = req.body
-  const result = await addExcludedCourses(programmeCode, courseCodes, curriculumVersion)
+  const result = await addExcludedCourses(courseCodes, curriculumVersion, programmeCode)
   if (!result) {
     res.status(400).end()
     return
   }
-  res.json(result)
+  res.status(201).end()
 })
 
 router.delete('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
   const { code: programmeCode } = req.params
   const { courseCodes, curriculumVersion } = req.body
-  const result = await removeExcludedCourses(programmeCode, courseCodes, curriculumVersion)
+  const result = await removeExcludedCourses(courseCodes, curriculumVersion, programmeCode)
   if (!result) {
     res.status(400).end()
     return
   }
-  res.json(result)
+  res.status(204).end()
 })
 
 export default router

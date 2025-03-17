@@ -3,11 +3,20 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../database/connection'
 import { CurriculumPeriod, ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
-import { Name } from '../shared/types'
+import { CurriculumOption, Name } from '../shared/types'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 
-export const getCurriculumVersions = async (code: string) => {
+const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: string }): CurriculumOption => {
+  return {
+    id: curriculum.id,
+    name: curriculum.curriculumName!,
+    periodIds: curriculum.curriculum_period_ids,
+    validFrom: curriculum.valid_from,
+  }
+}
+
+export const getCurriculumOptions = async (code: string) => {
   try {
     const result: Array<ProgrammeModule & { curriculumName?: string }> = await ProgrammeModule.findAll({
       where: { code },
@@ -28,7 +37,8 @@ export const getCurriculumVersions = async (code: string) => {
       const endYear = curriculumPeriods.map(({ endDate }) => endDate).sort((a, b) => b.getTime() - a.getTime())[0]
       curriculum.curriculumName = `${startYear.getFullYear()}–${endYear.getFullYear()}`
     }
-    return result
+    const curriculums = result.map(curriculum => formatCurriculum(curriculum))
+    return curriculums
   } catch (error) {
     logger.error(`Error when searching curriculum versions for code: ${code}`)
     logger.error(error)
@@ -104,7 +114,7 @@ const modifyParent = (course: ModuleWithChildren, moduleMap: Record<string, Modu
   return { ...course, parent_id: parent.id, parent_code: parent.code, parent_name: parent.name }
 }
 
-const labelProgammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourse[]) => {
+const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourse[]) => {
   return modules.map(module => {
     const label = {
       id: module.parent_name.fi,
@@ -147,7 +157,7 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
         index
     )
 
-  return { courses: labelProgammes(modifiedCourses, excludedCourses), modules }
+  return { courses: labelProgrammes(modifiedCourses, excludedCourses), modules }
 }
 
 export const getCoursesAndModules = async (code: string, periodIds: string) => {

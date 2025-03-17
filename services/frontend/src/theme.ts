@@ -1,4 +1,4 @@
-import { blue, blueGrey, deepPurple, green, indigo, orange, purple, red } from '@mui/material/colors'
+import { blue, blueGrey, deepPurple, green, grey, indigo, orange, purple, red } from '@mui/material/colors'
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
 const baseTheme = {
@@ -38,6 +38,12 @@ const baseTheme = {
     roles: {
       admin: red[300],
       fullSisuAccess: orange[300],
+    },
+    courseVisibility: {
+      noCourses: grey[800],
+      hidden: red[800],
+      partial: orange[800],
+      visible: green[800],
     },
   },
 } as const

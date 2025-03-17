@@ -1,15 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { Name } from '@/shared/types'
-
-type CurriculumPeriod = {
-  createdAt: string
-  endDate: string
-  id: string
-  name: Name
-  startDate: string
-  universityOrgId: string
-  updatedAt: string
-}
+import { CurriculumPeriod } from '@/shared/types'
 
 const curriculumPeriodsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

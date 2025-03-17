@@ -19,10 +19,10 @@ import {
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
 } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { CurriculumPicker } from '@/components/material/CurriculumPicker'
 import { Section } from '@/components/material/Section'
 import { StyledAccordion } from '@/components/material/StyledAccordion'
 import { StyledTable } from '@/components/material/StyledTable'
-import { CurriculumPicker } from '@/components/PopulationDetails/CurriculumPicker'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 
@@ -141,10 +141,9 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
         <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
         <CurriculumPicker
-          curriculum={curriculum}
           programmeCodes={[programmeCode]}
           setCurriculum={setCurriculum}
-          year={new Date().getFullYear()}
+          year={new Date().getFullYear().toString()}
         />
       </Stack>
       {honours && (

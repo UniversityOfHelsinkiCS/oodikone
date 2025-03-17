@@ -4,9 +4,9 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
 import { TagStudent } from '../../models/kone'
-import { Name } from '../../shared/types'
+import { Name, ProgressCriteria } from '../../shared/types'
 import { formatToArray } from '../../shared/util'
-import { Criteria, DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
+import { DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -21,7 +21,7 @@ type CriteriaYear = {
   coursesSatisfied: CoursesSatisfied
 }
 
-const createEmptyCriteriaYear = (criteria: Criteria, year: string): CriteriaYear => {
+const createEmptyCriteriaYear = (criteria: ProgressCriteria, year: string): CriteriaYear => {
   const coursesSatisfied: CoursesSatisfied = criteria?.courses?.[year]
     ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
         acc[course] = null
@@ -55,7 +55,7 @@ const getCreditAmount = (course: ParsedCourse, hops: Studyplan[], courseCode: st
 }
 
 const updateCourseByYear = (
-  criteria: Criteria,
+  criteria: ProgressCriteria,
   course: ParsedCourse,
   criteriaChecked: Record<string, CriteriaYear>,
   correctCode: string
@@ -101,7 +101,7 @@ const updateCourseByYear = (
 }
 
 const updateCreditCriteriaInfo = (
-  criteria: Criteria,
+  criteria: ProgressCriteria,
   criteriaYear: string,
   criteriaChecked: Record<string, CriteriaYear>,
   yearToAdd: string,
@@ -141,7 +141,7 @@ const formatStudentForPopulationStatistics = (
   credits: Record<string, Credit[]>,
   startDate: string,
   endDate: string,
-  criteria: Criteria,
+  criteria: ProgressCriteria,
   code: string,
   optionData: Record<string, { name: Name }>
 ) => {
@@ -423,7 +423,7 @@ export const formatStudentsForApi = (
   startDate: string,
   endDate: string,
   optionData: Record<string, { name: Name }>,
-  criteria: Criteria,
+  criteria: ProgressCriteria,
   code: string
 ) => {
   const creditsByStudent = credits.reduce(

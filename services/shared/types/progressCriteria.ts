@@ -1,4 +1,5 @@
-export type Criteria = {
+export type ProgressCriteria = {
+  allCourses: Record<string, string[]>
   courses: {
     yearOne: string[]
     yearTwo: string[]
@@ -7,7 +8,6 @@ export type Criteria = {
     yearFive: string[]
     yearSix: string[]
   }
-  allCourses: Record<string, string[]>
   credits: {
     yearOne: number
     yearTwo: number

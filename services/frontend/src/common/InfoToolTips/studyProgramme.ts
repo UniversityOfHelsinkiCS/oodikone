@@ -143,6 +143,14 @@ export const studyProgrammeToolTips: Record<string, string> = {
     'Associated start year' means what year you want to use as a start year for the students in that tag. For example with this you can move student from earlier starting year to next year if the student was absent during first year.
     However this is optional and you can create a new tag without selecting year.
   `,
+  creditCriteria: `
+    Here you can change visibility of degree courses as and set course and credits criteria, for each year their
+    own. Credits criteria is computed as follows: for the first academic year the credits are taken into account
+    if they are completed during the first 12 months. For the second year, we take into account the completions
+    during the first 24 months, for the third year the first 36 months.
+
+    The progress of the students by these criteria will be shown in class statistics view.
+  `,
 }
 
 studyProgrammeToolTips.studyTrackOverviewCombinedProgramme = studyProgrammeToolTips.studyTrackOverview
