@@ -1,50 +1,67 @@
-import { Form } from 'semantic-ui-react'
+import { FormControl, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { Toggle } from '../Toggle'
+import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 
-export const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear = false, setAcademicYear }) =>
-  years ? (
-    <div className="toggle-container" data-cy="CoursesYearFilter">
-      <div style={{ marginTop: '0.5rem' }}>
-        <Form>
-          <Form.Group inline>
-            <Form.Dropdown
-              data-cy="fromYear"
-              inline
-              label="From:"
-              name="fromYear"
-              onChange={handleChange}
-              options={toYear ? years.filter(({ value }) => value <= toYear) : years}
-              placeholder="Select what ever year"
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              selection
-              value={fromYear}
-            />
-            <Form.Dropdown
-              data-cy="toYear"
-              inline
-              label="To:"
-              name="toYear"
-              onChange={handleChange}
-              options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
-              placeholder="Select ending year"
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              selection
-              value={toYear}
-            />
-          </Form.Group>
-        </Form>
-      </div>
-      <Toggle
-        cypress="calendarAcademicYearToggle"
-        firstLabel="Calendar year"
-        secondLabel="Academic year"
-        setValue={setAcademicYear}
-        toolTips={studyProgrammeToolTips.yearToggle}
-        value={academicYear}
-      />
-    </div>
-  ) : null
+export const CourseYearFilter = ({
+  academicYear,
+  fromYear,
+  handleFromYearChange,
+  handleToYearChange,
+  setAcademicYear,
+  toYear,
+  years,
+}: {
+  academicYear: boolean
+  fromYear: number
+  handleFromYearChange: (event) => void
+  handleToYearChange: (event) => void
+  setAcademicYear: (value: boolean) => void
+  toYear: number
+  years: { text: string; value: number }[]
+}) => {
+  return (
+    <>
+      <Typography component="h4" variant="h6">
+        Time range
+      </Typography>
+      <Stack direction="row" gap={1}>
+        <FormControl fullWidth>
+          <InputLabel>From</InputLabel>
+          <Select data-cy="from-year-toggle" label="From" onChange={handleFromYearChange} value={fromYear}>
+            {years
+              .filter(({ value }) => !toYear || value <= toYear)
+              .map(({ text, value }) => (
+                <MenuItem key={value} value={value}>
+                  {text}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel>To</InputLabel>
+          <Select data-cy="to-year-select" label="To" onChange={handleToYearChange} value={toYear}>
+            {years
+              .filter(({ value }) => !fromYear || value >= fromYear)
+              .map(({ text, value }) => (
+                <MenuItem key={value} value={value}>
+                  {text}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      </Stack>
+      <ToggleContainer>
+        <Toggle
+          cypress="year-toggle"
+          firstLabel="Calendar year"
+          infoBoxContent={studyProgrammeToolTips.yearToggle}
+          secondLabel="Academic year"
+          setValue={setAcademicYear}
+          value={academicYear}
+        />
+      </ToggleContainer>
+    </>
+  )
+}

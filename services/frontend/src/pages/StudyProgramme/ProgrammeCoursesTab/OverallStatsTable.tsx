@@ -1,17 +1,20 @@
+import { Stack } from '@mui/material'
 import { max, min, range } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { Header, Item, Icon, Loader, Segment } from 'semantic-ui-react'
+import { Item, Icon } from 'semantic-ui-react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Section } from '@/components/material/Section'
+import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { SortableTable } from '@/components/SortableTable'
-import { Toggle } from '@/pages/StudyProgramme/Toggle'
 import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
+import { StudyProgrammeCourse } from '@/shared/types'
 import { CourseYearFilter } from './CourseYearFilter'
 
-const getColumns = (getTextIn, showStudents) => {
+const getColumns = (getTextIn: GetTextIn, showStudents: boolean) => {
   let columns = null
 
   if (showStudents) {
@@ -92,10 +95,10 @@ const getColumns = (getTextIn, showStudents) => {
             getRowVal: course => course.totalOtherProgrammeStudents,
           },
           {
-            key: 'totalWithoutStudyright',
+            key: 'totalWithoutStudyRight',
             title: 'Non-degree\nstudents',
             filterType: 'range',
-            getRowVal: course => course.totalWithoutStudyrightStudents,
+            getRowVal: course => course.totalWithoutStudyRightStudents,
           },
         ],
       },
@@ -167,10 +170,10 @@ const getColumns = (getTextIn, showStudents) => {
         getRowVal: course => course.totalOtherProgrammeCredits,
       },
       {
-        key: 'totalWithoutStudyright',
+        key: 'totalWithoutStudyRight',
         title: 'Non-degree\ncredits',
         filterType: 'range',
-        getRowVal: course => course.totalWithoutStudyrightCredits,
+        getRowVal: course => course.totalWithoutStudyRightCredits,
       },
       {
         key: 'totalTransfer',
@@ -188,144 +191,167 @@ const getColumns = (getTextIn, showStudents) => {
   return [...columns, typeColumn]
 }
 
-export const OverallStatsTable = ({ studyProgramme, combinedProgramme, academicYear, setAcademicYear }) => {
-  const { data, error, isLoading } = useGetProgrammeCoursesStatsQuery({
-    id: studyProgramme,
-    academicyear: academicYear ? 'ACADEMIC_YEAR' : 'NOT_ACADEMIC_YEAR',
-    combinedProgramme,
-  })
-  const { getTextIn } = useLanguage()
-
-  const [fromYear, setFromYear] = useState(null)
-  const [toYear, setToYear] = useState(null)
-  const [years, setYears] = useState({})
-  const [showStudents, setShowStudents] = useState(false)
-  // fromYear and toYear initial values are calculated from data and hence useEffect
-  useEffect(() => {
-    if (data) {
-      const yearcodes = [...new Set(data.map(s => Object.keys(s.years)).flat())]
-      const initFromYear = Number(min(yearcodes))
-      const initToYear = Number(max(yearcodes))
-      if (!fromYear) setFromYear(initFromYear)
-      if (!toYear) setToYear(initToYear)
-      const normal = []
-      const academic = []
-      for (let i = initFromYear; i <= initToYear; i++) {
-        normal.push({ key: i, text: i.toString(), value: i })
-        academic.push({ key: i, text: `${i}-${i + 1}`, value: i })
-      }
-      if (!fromYear && !toYear) setYears({ normal, academic })
-    }
-  }, [data])
-
-  if (isLoading) {
-    return <Loader active style={{ marginTop: '10em' }} />
-  }
-
-  if (error) {
-    return <h3>Something went wrong, please try refreshing the page.</h3>
-  }
-
-  const handleYearChange = (_event, { name, value }) => {
-    if (name === 'fromYear' && value <= toYear) {
-      setFromYear(value)
-    } else if (name === 'toYear' && value >= fromYear) {
-      setToYear(value)
-    }
-  }
-
-  const filterDataByYear = (data, fromYear, toYear) => {
-    const yearRange = range(fromYear, Number(toYear) + 1)
-    const filteredAndMergedCourses = data
-      .filter(course => {
-        const arr = Object.keys(course.years).some(key => yearRange.includes(Number(key)))
-        return arr
-      })
-      .map(course => {
-        const values = Object.entries(course.years).reduce(
-          (acc, curr) => {
-            if (yearRange.includes(Number(curr[0]))) {
-              acc.totalAllStudents += curr[1].totalAllStudents
-              acc.totalAllPassed += curr[1].totalPassed
-              acc.totalAllNotCompleted += curr[1].totalNotCompleted
-              acc.totalAllCredits += curr[1].totalAllCredits
-              acc.totalProgrammeStudents += curr[1].totalProgrammeStudents
-              acc.totalProgrammeCredits += curr[1].totalProgrammeCredits
-              acc.totalOtherProgrammeStudents += curr[1].totalOtherProgrammeStudents
-              acc.totalOtherProgrammeCredits += curr[1].totalOtherProgrammeCredits
-              acc.totalWithoutStudyrightStudents += curr[1].totalWithoutStudyrightStudents
-              acc.totalWithoutStudyrightCredits += curr[1].totalWithoutStudyrightCredits
-              acc.totalTransferCredits += curr[1].totalTransferCredits
-              acc.totalTransferStudents += curr[1].totalTransferStudents
-            }
-
-            return acc
-          },
-          {
-            totalAllStudents: 0,
-            totalAllPassed: 0,
-            totalAllNotCompleted: 0,
-            totalAllCredits: 0,
-            totalProgrammeStudents: 0,
-            totalProgrammeCredits: 0,
-            totalOtherProgrammeStudents: 0,
-            totalOtherProgrammeCredits: 0,
-            totalWithoutStudyrightStudents: 0,
-            totalWithoutStudyrightCredits: 0,
-            totalTransferCredits: 0,
-            totalTransferStudents: 0,
+const filterDataByYear = (data: StudyProgrammeCourse[], fromYear: number, toYear: number) => {
+  const yearRange = range(fromYear, Number(toYear) + 1)
+  const filteredAndMergedCourses = data
+    .filter(course => {
+      const arr = Object.keys(course.years).some(key => yearRange.includes(Number(key)))
+      return arr
+    })
+    .map(course => {
+      const values = Object.entries(course.years).reduce(
+        (acc, curr) => {
+          if (yearRange.includes(Number(curr[0]))) {
+            acc.totalAllStudents += curr[1].totalAllStudents
+            acc.totalAllPassed += curr[1].totalPassed
+            acc.totalAllNotCompleted += curr[1].totalNotCompleted
+            acc.totalAllCredits += curr[1].totalAllCredits
+            acc.totalProgrammeStudents += curr[1].totalProgrammeStudents
+            acc.totalProgrammeCredits += curr[1].totalProgrammeCredits
+            acc.totalOtherProgrammeStudents += curr[1].totalOtherProgrammeStudents
+            acc.totalOtherProgrammeCredits += curr[1].totalOtherProgrammeCredits
+            acc.totalWithoutStudyRightStudents += curr[1].totalWithoutStudyRightStudents
+            acc.totalWithoutStudyRightCredits += curr[1].totalWithoutStudyRightCredits
+            acc.totalTransferCredits += curr[1].totalTransferCredits
+            acc.totalTransferStudents += curr[1].totalTransferStudents
           }
-        )
-        return {
-          ...values,
-          code: course.code,
-          name: course.name,
-          isStudyModule: course.isStudyModule,
-        }
-      })
 
-    return filteredAndMergedCourses
+          return acc
+        },
+        {
+          totalAllStudents: 0,
+          totalAllPassed: 0,
+          totalAllNotCompleted: 0,
+          totalAllCredits: 0,
+          totalProgrammeStudents: 0,
+          totalProgrammeCredits: 0,
+          totalOtherProgrammeStudents: 0,
+          totalOtherProgrammeCredits: 0,
+          totalWithoutStudyRightStudents: 0,
+          totalWithoutStudyRightCredits: 0,
+          totalTransferCredits: 0,
+          totalTransferStudents: 0,
+        }
+      )
+      return {
+        ...values,
+        code: course.code,
+        name: course.name,
+        isStudyModule: course.isStudyModule,
+      }
+    })
+
+  return filteredAndMergedCourses
+}
+
+type YearOption = {
+  key: number
+  text: string
+  value: number
+}
+
+export const OverallStatsTable = ({
+  academicYear,
+  combinedProgramme,
+  setAcademicYear,
+  studyProgramme,
+}: {
+  academicYear: boolean
+  combinedProgramme: string
+  studyProgramme: string
+  setAcademicYear: (value: boolean) => void
+}) => {
+  const { getTextIn } = useLanguage()
+  const { data, isError, isLoading } = useGetProgrammeCoursesStatsQuery({
+    id: studyProgramme,
+    combinedProgramme,
+    yearType: academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
+  })
+
+  const [fromYear, setFromYear] = useState<number | null>(null)
+  const [toYear, setToYear] = useState<number | null>(null)
+  const [years, setYears] = useState<Record<string, YearOption[]>>({})
+  const [showStudents, setShowStudents] = useState(false)
+
+  useEffect(() => {
+    if (!data) {
+      return
+    }
+    const yearCodes = [...new Set(data.map(course => Object.keys(course.years)).flat())]
+    const initFromYear = Number(min(yearCodes))
+    const initToYear = Number(max(yearCodes))
+    if (!fromYear) {
+      setFromYear(initFromYear)
+    }
+    if (!toYear) {
+      setToYear(initToYear)
+    }
+    const academic: YearOption[] = []
+    const calendar: YearOption[] = []
+    for (let i = initFromYear; i <= initToYear; i++) {
+      academic.push({ key: i, text: `${i}-${i + 1}`, value: i })
+      calendar.push({ key: i, text: i.toString(), value: i })
+    }
+    if (!fromYear && !toYear) {
+      setYears({ academic, calendar })
+    }
+  }, [data, fromYear, toYear])
+
+  const handleFromYearChange = event => {
+    const year = event.target.value
+    if (toYear && year <= toYear) {
+      setFromYear(year)
+    }
+  }
+
+  const handleToYearChange = event => {
+    const year = event.target.value
+    if (fromYear && year >= fromYear) {
+      setToYear(year)
+    }
   }
 
   return (
-    <>
-      <Segment style={{ marginTop: '1rem' }}>
-        <Header as="h4">Time range</Header>
-        <CourseYearFilter
-          academicYear={academicYear}
-          fromYear={fromYear}
-          handleChange={handleYearChange}
-          setAcademicYear={setAcademicYear}
-          toYear={toYear}
-          years={academicYear ? years.academic : years.normal}
-        />
-      </Segment>
-      <Toggle
-        cypress="creditsStudentsToggle"
-        firstLabel="Show credits"
-        secondLabel="Show students"
-        setValue={setShowStudents}
-        value={showStudents}
-      />
-      <div style={{ marginBottom: '1em' }}>
-        <InfoBox
-          content={
-            showStudents
-              ? studyProgrammeToolTips.studentsOfProgrammeCourses
-              : studyProgrammeToolTips.creditsOfProgrammeCourses
-          }
-          cypress="programme-courses"
-        />
-      </div>
-      <div data-cy="CoursesSortableTable">
-        <SortableTable
-          columns={getColumns(getTextIn, showStudents)}
-          data={filterDataByYear(data, fromYear, toYear)}
-          defaultSort={['name', 'asc']}
-          featureName="programme_courses"
-          title="Student statistics for study programme courses"
-        />
-      </div>
-    </>
+    <Section
+      cypress="by-credit-type"
+      infoBoxContent={
+        showStudents
+          ? studyProgrammeToolTips.studentsOfProgrammeCourses
+          : studyProgrammeToolTips.creditsOfProgrammeCourses
+      }
+      isError={isError}
+      isLoading={isLoading || !fromYear || !toYear || !years}
+      title="Programme courses by credit type"
+    >
+      {data && fromYear && toYear && years && (
+        <Stack gap={2}>
+          <CourseYearFilter
+            academicYear={academicYear}
+            fromYear={fromYear}
+            handleFromYearChange={handleFromYearChange}
+            handleToYearChange={handleToYearChange}
+            setAcademicYear={setAcademicYear}
+            toYear={toYear}
+            years={academicYear ? years.academic : years.calendar}
+          />
+          <ToggleContainer>
+            <Toggle
+              cypress="creditsStudentsToggle"
+              firstLabel="Show credits"
+              secondLabel="Show students"
+              setValue={setShowStudents}
+              value={showStudents}
+            />
+          </ToggleContainer>
+          <SortableTable
+            columns={getColumns(getTextIn, showStudents)}
+            data={filterDataByYear(data, fromYear, toYear)}
+            defaultSort={['name', 'asc']}
+            featureName="programme_courses"
+            title="Student statistics for study programme courses"
+          />
+        </Stack>
+      )}
+    </Section>
   )
 }
