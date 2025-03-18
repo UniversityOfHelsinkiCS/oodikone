@@ -339,8 +339,8 @@ export const getStudentsWithoutStudyRightForProgrammeCourses = async (
       code: course.code,
       name: course.courseName,
       type: 'noStudyright',
-      totalWithoutStudyrightStudents: parseInt(course.totalStudents, 10),
-      totalWithoutStudyrightCredits: course.totalCredits,
+      totalWithoutStudyRightStudents: parseInt(course.totalStudents, 10),
+      totalWithoutStudyRightCredits: course.totalCredits,
     }))
   } catch (error) {
     logger.error(`getStudentsWithoutStudyRightForProgrammeCourses() function failed ${error}`)

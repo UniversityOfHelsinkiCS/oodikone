@@ -105,20 +105,19 @@ router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) =
 
 interface GetCourseStatsRequest extends Request {
   query: {
-    academicyear: string
-    combined_programme: string
+    combinedProgramme: string
+    yearType: YearType
   }
 }
 
 router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response) => {
   const code = req.params.id
-  const showByYear = req.query.academicyear
-  const combinedProgramme = req.query?.combined_programme
+  const { combinedProgramme, yearType } = req.query
   const date = new Date()
   date.setHours(23, 59, 59, 999)
   void logInfoForGrafana(code, combinedProgramme)
   try {
-    const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, showByYear, combinedProgramme)
+    const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, yearType, combinedProgramme)
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${error}` })

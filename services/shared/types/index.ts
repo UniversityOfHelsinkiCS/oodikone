@@ -19,6 +19,7 @@ export type {
   ProgrammeCourse,
   ProgrammeModule,
   ProgrammeOrStudyTrackGraduationStats,
+  StudyProgrammeCourse,
   StudyTrackStats,
 } from './studyProgramme'
 export type { NewTag, StudentTag, Tag } from './tag'
