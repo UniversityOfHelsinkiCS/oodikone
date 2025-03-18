@@ -4,7 +4,7 @@ import { Stack, Tab, Tabs } from '@mui/material'
 import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
 import { useTabs } from '@/hooks/tabs'
 import { useGetColorizedTableCourseStatsQuery } from '@/redux/studyProgramme'
-import { OverallStatsTable } from './OverallStatsTable'
+import { ByCreditTypeTab } from './ByCreditTypeTab'
 
 export const ProgrammeCoursesTab = ({
   academicYear,
@@ -26,7 +26,7 @@ export const ProgrammeCoursesTab = ({
       label: 'By credit type',
       icon: <SchoolIcon />,
       component: (
-        <OverallStatsTable
+        <ByCreditTypeTab
           academicYear={academicYear}
           combinedProgramme={combinedProgramme}
           setAcademicYear={setAcademicYear}

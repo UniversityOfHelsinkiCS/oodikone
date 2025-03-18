@@ -250,7 +250,7 @@ type YearOption = {
   value: number
 }
 
-export const OverallStatsTable = ({
+export const ByCreditTypeTab = ({
   academicYear,
   combinedProgramme,
   setAcademicYear,
@@ -270,7 +270,7 @@ export const OverallStatsTable = ({
 
   const [fromYear, setFromYear] = useState<number | null>(null)
   const [toYear, setToYear] = useState<number | null>(null)
-  const [years, setYears] = useState<Record<string, YearOption[]>>({})
+  const [years, setYears] = useState<{ academic: YearOption[]; calendar: YearOption[] } | null>(null)
   const [showStudents, setShowStudents] = useState(false)
 
   useEffect(() => {
