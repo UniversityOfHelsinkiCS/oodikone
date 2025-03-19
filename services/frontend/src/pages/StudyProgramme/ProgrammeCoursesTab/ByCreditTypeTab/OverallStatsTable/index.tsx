@@ -47,7 +47,8 @@ export const OverallStatsTable = ({
       },
       {
         accessorKey: 'totalAllStudents',
-        header: 'Total',
+        header: showStudents ? 'Total' : 'Total credits',
+        Header: <HeaderCell value={showStudents ? 'Total' : 'Total credits'} />,
         Cell: ({ cell }) => cell.getValue<number>(),
         muiTableHeadCellProps: {
           align: 'right',
@@ -57,7 +58,7 @@ export const OverallStatsTable = ({
         },
       },
     ],
-    [getTextIn]
+    [getTextIn, showStudents]
   )
 
   const getCreditColumns = (): MRT_ColumnDef<any>[] => [
@@ -229,5 +230,5 @@ export const OverallStatsTable = ({
     },
   })
 
-  return <MaterialReactTable table={table} />
+  return <MaterialReactTable data-cy="overall-stats-table" table={table} />
 }

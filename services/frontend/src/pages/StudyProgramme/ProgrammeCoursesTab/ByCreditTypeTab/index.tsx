@@ -102,7 +102,7 @@ export const ByCreditTypeTab = ({
           />
           <ToggleContainer>
             <Toggle
-              cypress="creditsStudentsToggle"
+              cypress="show-credits-students-toggle"
               firstLabel="Show credits"
               secondLabel="Show students"
               setValue={setShowStudents}

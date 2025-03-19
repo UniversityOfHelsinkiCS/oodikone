@@ -29,11 +29,11 @@ export const CourseYearFilter = ({
       <Stack direction="row" gap={1}>
         <FormControl fullWidth>
           <InputLabel>From</InputLabel>
-          <Select data-cy="from-year-toggle" label="From" onChange={handleFromYearChange} value={fromYear}>
+          <Select data-cy="from-year-select" label="From" onChange={handleFromYearChange} value={fromYear}>
             {years
               .filter(({ value }) => !toYear || value <= toYear)
               .map(({ text, value }) => (
-                <MenuItem key={value} value={value}>
+                <MenuItem data-cy={`from-year-select-option-${value}`} key={value} value={value}>
                   {text}
                 </MenuItem>
               ))}
@@ -45,7 +45,7 @@ export const CourseYearFilter = ({
             {years
               .filter(({ value }) => !fromYear || value >= fromYear)
               .map(({ text, value }) => (
-                <MenuItem key={value} value={value}>
+                <MenuItem data-cy={`to-year-select-option-${value}`} key={value} value={value}>
                   {text}
                 </MenuItem>
               ))}
