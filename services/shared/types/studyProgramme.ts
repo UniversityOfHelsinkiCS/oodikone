@@ -1,6 +1,30 @@
 import { GraduationStatistics } from './graduations'
 import { Name } from './name'
 
+export type StudyProgrammeCourse = {
+  code: string
+  isStudyModule: boolean
+  name: Name
+  years: Record<
+    number,
+    {
+      isStudyModule?: boolean
+      totalAllStudents: number
+      totalPassed: number
+      totalNotCompleted: number
+      totalAllCredits: number
+      totalProgrammeStudents: number
+      totalProgrammeCredits: number
+      totalOtherProgrammeStudents: number
+      totalOtherProgrammeCredits: number
+      totalWithoutStudyRightStudents: number
+      totalWithoutStudyRightCredits: number
+      totalTransferCredits: number
+      totalTransferStudents: number
+    }
+  >
+}
+
 export type MedianEntry = {
   amount: number
   classSize: number

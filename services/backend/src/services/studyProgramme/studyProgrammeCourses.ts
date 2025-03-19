@@ -2,7 +2,7 @@ import { orderBy, range } from 'lodash'
 import { Op } from 'sequelize'
 
 import { Credit, Enrollment } from '../../models'
-import { Name } from '../../shared/types'
+import { Name, StudyProgrammeCourse } from '../../shared/types'
 import { mapToProviders } from '../../shared/util'
 import { CreditTypeCode, EnrollmentState } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
@@ -52,8 +52,8 @@ type Students = {
   totalNotCompleted?: number
   totalProgrammeStudents?: number
   totalProgrammeCredits?: number
-  totalWithoutStudyrightStudents?: number
-  totalWithoutStudyrightCredits?: number
+  totalWithoutStudyRightStudents?: number
+  totalWithoutStudyRightCredits?: number
   totalOtherProgrammeStudents?: number
   totalOtherProgrammeCredits?: number
   totalTransferStudents?: number
@@ -117,13 +117,6 @@ type Attempt = {
   date: Date
   semestercode: number
   enrolled?: boolean
-}
-
-type Course = {
-  code: string
-  name: Name
-  isStudyModule: boolean
-  years: Record<number, any>
 }
 
 export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgramme: string) => {
@@ -293,6 +286,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
 
       if (!acc[curr.code].years[curr.year!]) {
         acc[curr.code].years[curr.year!] = {
+          isStudyModule: curr.isStudyModule ?? false,
           totalAllStudents: 0,
           totalPassed: 0,
           totalNotCompleted: 0,
@@ -301,45 +295,44 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
           totalProgrammeCredits: 0,
           totalOtherProgrammeStudents: 0,
           totalOtherProgrammeCredits: 0,
-          totalWithoutStudyrightStudents: 0,
-          totalWithoutStudyrightCredits: 0,
+          totalWithoutStudyRightStudents: 0,
+          totalWithoutStudyRightCredits: 0,
           totalTransferStudents: 0,
           totalTransferCredits: 0,
-          isStudyModule: curr.isStudyModule,
         }
       }
       switch (curr.type) {
         case 'passed':
-          acc[curr.code].years[curr.year!].totalPassed += curr.totalPassed
+          acc[curr.code].years[curr.year!].totalPassed += curr.totalPassed ?? 0
           acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalPassed
-          acc[curr.code].years[curr.year!].totalAllCredits += curr.totalAllCredits
+          acc[curr.code].years[curr.year!].totalAllCredits += curr.totalAllCredits ?? 0
           break
         case 'notCompleted':
-          acc[curr.code].years[curr.year!].totalNotCompleted += curr.totalNotCompleted
+          acc[curr.code].years[curr.year!].totalNotCompleted += curr.totalNotCompleted ?? 0
           acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalNotCompleted
           break
         case 'ownProgramme':
-          acc[curr.code].years[curr.year!].totalProgrammeStudents += curr.totalProgrammeStudents
-          acc[curr.code].years[curr.year!].totalProgrammeCredits += curr.totalProgrammeCredits
+          acc[curr.code].years[curr.year!].totalProgrammeStudents += curr.totalProgrammeStudents ?? 0
+          acc[curr.code].years[curr.year!].totalProgrammeCredits += curr.totalProgrammeCredits ?? 0
           break
         case 'otherProgramme':
-          acc[curr.code].years[curr.year!].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents
-          acc[curr.code].years[curr.year!].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits
+          acc[curr.code].years[curr.year!].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents ?? 0
+          acc[curr.code].years[curr.year!].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits ?? 0
           break
         case 'noStudyright':
-          acc[curr.code].years[curr.year!].totalWithoutStudyrightStudents += curr.totalWithoutStudyrightStudents
-          acc[curr.code].years[curr.year!].totalWithoutStudyrightCredits += curr.totalWithoutStudyrightCredits
+          acc[curr.code].years[curr.year!].totalWithoutStudyRightStudents += curr.totalWithoutStudyRightStudents ?? 0
+          acc[curr.code].years[curr.year!].totalWithoutStudyRightCredits += curr.totalWithoutStudyRightCredits ?? 0
           break
         case 'transfer':
-          acc[curr.code].years[curr.year!].totalTransferStudents += curr.totalTransferStudents
-          acc[curr.code].years[curr.year!].totalTransferCredits += curr.totalTransferCredits
+          acc[curr.code].years[curr.year!].totalTransferStudents += curr.totalTransferStudents ?? 0
+          acc[curr.code].years[curr.year!].totalTransferCredits += curr.totalTransferCredits ?? 0
           break
         default:
           break
       }
       return acc
     },
-    {} as Record<string, Course>
+    {} as Record<string, StudyProgrammeCourse>
   )
   const ayCourses = Object.keys(allCourses).filter(courseCode => courseCode.startsWith('AY'))
   const properties = [
@@ -364,7 +357,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     const normCode = openUniCourseCode[1]
 
     if (allCourses[normCode]) {
-      const mergedCourse = {} as Course
+      const mergedCourse = {} as StudyProgrammeCourse
       mergedCourse.code = allCourses[normCode].code
       mergedCourse.name = allCourses[normCode].name
       mergedCourse.years = {}
@@ -382,8 +375,8 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
               totalProgrammeCredits: 0,
               totalOtherProgrammeStudents: 0,
               totalOtherProgrammeCredits: 0,
-              totalWithoutStudyrightStudents: 0,
-              totalWithoutStudyrightCredits: 0,
+              totalWithoutStudyRightStudents: 0,
+              totalWithoutStudyRightCredits: 0,
               totalTransferCredits: 0,
               totalTransferStudents: 0,
             }

@@ -1,25 +1,39 @@
 import { RTKApi } from '@/apiConnection'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Graduated, SpecialGroups, StudyTrackStats } from '@/shared/types'
+import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Language } from '@/shared/language'
+import { Graduated, Name, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@/shared/types'
+import { DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getBasicStats: builder.query({
+    getBasicStats: builder.query<
+      any, // TODO: Type
+      { id: string; yearType: YearType; specialGroups: SpecialGroups; combinedProgramme: string }
+    >({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
-    getColorizedTableCourseStats: builder.query({
+    getColorizedTableCourseStats: builder.query<
+      any, // TODO: Type
+      { id: string }
+    >({
       query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
     }),
-    getCreditStats: builder.query({
-      query: ({ codes, isAcademicYear, specialGroups }) =>
+    getCreditStats: builder.query<
+      any, // TODO: Type
+      { codes: string[]; specialGroups: SpecialGroups; yearType: YearType }
+    >({
+      query: ({ codes, specialGroups, yearType }) =>
         `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
           codes
-        )}&isAcademicYear=${isAcademicYear}&includeSpecials=${specialGroups}`,
+        )}&yearType=${yearType}&specialGroups=${specialGroups}`,
     }),
-    getGraduationStats: builder.query({
+    getGraduationStats: builder.query<
+      any, // TODO: Type
+      { id: string; yearType: YearType; specialGroups: SpecialGroups; combinedProgramme: string }
+    >({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
@@ -30,18 +44,30 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, graduated, specialGroups, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/studytrackstats?graduated=${graduated}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
-    getProgrammeCoursesStats: builder.query({
-      query: ({ id, academicyear, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}&combined_programme=${combinedProgramme}`,
+    getProgrammeCoursesStats: builder.query<
+      StudyProgrammeCourse[],
+      { id: string; yearType: YearType; combinedProgramme: string }
+    >({
+      query: ({ id, yearType, combinedProgramme }) =>
+        `/v2/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}`,
     }),
-    getStudyTracks: builder.query({
+    getStudyTracks: builder.query<
+      any, // TODO: Type
+      { id: string }
+    >({
       query: ({ id }) => `/v2/studyprogrammes/${id}/studytracks`,
     }),
-    updateBasicView: builder.query({
+    updateBasicView: builder.query<
+      any, // TODO: Type
+      { id: string; combinedProgramme: string }
+    >({
       query: ({ id, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/update_basicview?combined_programme=${combinedProgramme}`,
     }),
-    updateStudyTrackView: builder.query({
+    updateStudyTrackView: builder.query<
+      any, // TODO: Type
+      { id: string; combinedProgramme: string }
+    >({
       query: ({ id, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
     }),
@@ -61,7 +87,7 @@ export const {
   useUpdateStudyTrackViewQuery,
 } = studyProgrammeApi
 
-const getFilteredAndFormattedStudyProgrammes = (getTextIn, studyProgrammes) => {
+const getFilteredAndFormattedStudyProgrammes = (getTextIn: GetTextIn, studyProgrammes: DegreeProgramme[]) => {
   return studyProgrammes
     .filter(studyProgramme => studyProgramme.code.startsWith('KH') || studyProgramme.code.startsWith('MH'))
     .map(studyProgramme => ({
@@ -72,14 +98,17 @@ const getFilteredAndFormattedStudyProgrammes = (getTextIn, studyProgrammes) => {
     }))
 }
 
-const getDataForCombined = studyProgrammes => {
+const getDataForCombined = (studyProgrammes: DegreeProgramme[]) => {
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
   return studyProgrammes
     .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
-    .reduce((acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }), {})
+    .reduce(
+      (acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }),
+      {} as Record<string, Name>
+    )
 }
 
-const getCombinedOptions = (dataForCombined, getTextIn, language) => {
+const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn, language: Language) => {
   return [
     {
       key: 'KH90_001+MH90_001',

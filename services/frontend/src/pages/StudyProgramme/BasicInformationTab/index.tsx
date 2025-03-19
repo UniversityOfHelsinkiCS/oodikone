@@ -44,23 +44,23 @@ export const BasicInformationTab = ({
   const [showMedian, setShowMedian] = useState(false)
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const specialGroups = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({
     id: studyProgramme,
     combinedProgramme,
     yearType,
-    specialGroups: special,
+    specialGroups,
   })
   const credits = useGetCreditStatsQuery({
     codes: [studyProgramme, combinedProgramme].filter(Boolean),
-    isAcademicYear: academicYear,
-    specialGroups: !specialGroupsExcluded,
+    specialGroups,
+    yearType,
   })
   const graduations = useGetGraduationStatsQuery({
     id: studyProgramme,
     combinedProgramme,
+    specialGroups,
     yearType,
-    specialGroups: special,
   })
 
   const creditStats = credits?.data?.stats?.[studyProgramme]?.stats

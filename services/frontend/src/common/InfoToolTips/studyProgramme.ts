@@ -132,9 +132,6 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
     Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
   `,
-  name: `
-    Pitkät kurssinimet on lyhennetty. Näet ne kokonaan laittamalla hiiren nimen yläpuolelle.
-  `,
   notCompleted: `
     Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
   `,
