@@ -66,7 +66,7 @@ export const RolesCard = ({ user }: { user: User }) => {
                 <Checkbox
                   checked={selected.includes(role)}
                   color="success"
-                  disabled={!editing || !['admin', 'teachers'].includes(role) && isDefaultServiceProvider()}
+                  disabled={!editing || (!['admin', 'teachers'].includes(role) && isDefaultServiceProvider())}
                   onChange={() => toggleRole(role)}
                 />
               </Stack>
