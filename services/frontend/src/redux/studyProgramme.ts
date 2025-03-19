@@ -22,7 +22,7 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
     }),
     getCreditStats: builder.query<
       any, // TODO: Type
-      { codes: string[]; isAcademicYear: boolean; specialGroups: SpecialGroups }
+      { codes: string[]; isAcademicYear: boolean; specialGroups: boolean } // TODO: Use types for consistency
     >({
       query: ({ codes, isAcademicYear, specialGroups }) =>
         `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
