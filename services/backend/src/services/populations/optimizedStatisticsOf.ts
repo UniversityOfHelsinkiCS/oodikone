@@ -38,7 +38,7 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   const code = studyRights[0] ?? ''
   const degreeProgrammeType = await getDegreeProgrammeType(code)
 
-  const { students, enrollments, credits, courses } = await getStudentsIncludeCoursesBetween(
+  const { courses, enrollments, credits, students } = await getStudentsIncludeCoursesBetween(
     studentNumbers,
     startDate,
     dateMonthsFromNow(startDate, months),

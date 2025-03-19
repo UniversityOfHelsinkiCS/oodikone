@@ -426,22 +426,16 @@ export const formatStudentsForApi = (
   criteria: ProgressCriteria,
   code: string
 ) => {
-  const creditsByStudent = credits.reduce(
-    (acc, credit) => {
-      acc[credit.student_studentnumber] = acc[credit.student_studentnumber] || []
-      acc[credit.student_studentnumber].push(credit)
-      return acc
-    },
-    {} as Record<string, Credit[]>
-  )
-  const enrollmentsByStudent = enrollments.reduce(
-    (acc, enrollment) => {
-      acc[enrollment.studentnumber] = acc[enrollment.studentnumber] || []
-      acc[enrollment.studentnumber].push(enrollment)
-      return acc
-    },
-    {} as Record<string, Enrollment[]>
-  )
+  const creditsByStudent = credits.reduce((acc: Record<string, Credit[]>, credit) => {
+    const { student_studentnumber: studentnumber } = credit
+    acc[studentnumber] = [...(acc[studentnumber] || []), credit]
+    return acc
+  }, {})
+  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, Enrollment[]>, enrollment) => {
+    const { studentnumber } = enrollment
+    acc[studentnumber] = [...(acc[studentnumber] || []), enrollment]
+    return acc
+  }, {})
 
   return {
     students: students.map(student =>

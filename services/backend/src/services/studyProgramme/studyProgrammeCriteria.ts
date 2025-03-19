@@ -5,27 +5,20 @@ import logger from '../../util/logger'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>
 
-const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithoutCurriculumVersion | null> => {
-  return await ProgressCriteriaModel.findOne({
+const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithoutCurriculumVersion | null> =>
+  ProgressCriteriaModel.findOne({
     attributes: { exclude: ['curriculumVersion'] },
     where: { code },
   })
-}
 
 const getSubstitutions = async (codes: string[]) => {
-  if (!codes.length) {
-    return {}
-  }
   const courses: Array<Pick<Course, 'code' | 'substitutions'>> = await Course.findAll({
     attributes: ['code', 'substitutions'],
     where: { code: codes },
     raw: true,
   })
-  const substitutions: Record<string, string[]> = courses.reduce(
-    (acc, { code, substitutions }) => ({ ...acc, [code]: substitutions }),
-    {}
-  )
-  return substitutions
+
+  return Object.fromEntries(courses.map(({ code, substitutions }) => [code, substitutions]))
 }
 
 const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null) => {
@@ -36,10 +29,9 @@ const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null)
   const yearFive = criteria?.coursesYearFive ?? []
   const yearSix = criteria?.coursesYearSix ?? []
   const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
-  const allCourses = await getSubstitutions(courseCodes)
 
   const formattedCriteria: ProgressCriteria = {
-    allCourses,
+    allCourses: await getSubstitutions(courseCodes),
     courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     credits: {
       yearOne: criteria?.creditsYearOne ?? 0,
