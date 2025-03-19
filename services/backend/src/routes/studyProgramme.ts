@@ -27,16 +27,16 @@ const router = Router()
 interface GetCreditStatsRequest extends Request {
   query: {
     codes: string
-    isAcademicYear: string
-    includeSpecials: string
+    specialGroups: SpecialGroups
+    yearType: YearType
   }
 }
 
 router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => {
-  const { codes, isAcademicYear, includeSpecials } = req.query
+  const { codes, specialGroups, yearType } = req.query
   const stats = {}
   for (const code of JSON.parse(codes)) {
-    stats[code] = await getCreditsProduced(code, isAcademicYear !== 'false', includeSpecials !== 'false')
+    stats[code] = await getCreditsProduced(code, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
   }
   return res.json({ stats })
 })

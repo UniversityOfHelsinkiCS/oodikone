@@ -22,12 +22,18 @@ export const OverallStatsTable = ({
 
   const filteredData = useMemo(() => filterDataByYear(data, fromYear, toYear), [data, fromYear, toYear])
 
+  // TODO: Filters don't work for most of the columns
   const getCommonColumns = useCallback(
     (): MRT_ColumnDef<any>[] => [
       {
         accessorKey: 'isStudyModule',
         header: 'Type',
         Cell: ({ cell }) => (cell.getValue<boolean>() ? 'Module' : 'Course'),
+        filterVariant: 'select',
+        filterSelectOptions: [
+          { label: 'Module', value: true },
+          { label: 'Course', value: false },
+        ],
       },
       {
         accessorKey: 'code',

@@ -1,6 +1,7 @@
 import { RTKApi } from '@/apiConnection'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Graduated, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@/shared/types'
+import { Language } from '@/shared/language'
+import { Graduated, Name, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@/shared/types'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { useGetProgrammesQuery } from './populations'
@@ -22,12 +23,12 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
     }),
     getCreditStats: builder.query<
       any, // TODO: Type
-      { codes: string[]; isAcademicYear: boolean; specialGroups: boolean } // TODO: Use types for consistency
+      { codes: string[]; specialGroups: SpecialGroups; yearType: YearType }
     >({
-      query: ({ codes, isAcademicYear, specialGroups }) =>
+      query: ({ codes, specialGroups, yearType }) =>
         `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
           codes
-        )}&isAcademicYear=${isAcademicYear}&includeSpecials=${specialGroups}`,
+        )}&yearType=${yearType}&specialGroups=${specialGroups}`,
     }),
     getGraduationStats: builder.query<
       any, // TODO: Type
@@ -97,14 +98,17 @@ const getFilteredAndFormattedStudyProgrammes = (getTextIn: GetTextIn, studyProgr
     }))
 }
 
-const getDataForCombined = studyProgrammes => {
+const getDataForCombined = (studyProgrammes: DegreeProgramme[]) => {
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
   return studyProgrammes
     .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
-    .reduce((acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }), {})
+    .reduce(
+      (acc, studyProgramme) => ({ ...acc, [studyProgramme.code]: studyProgramme.name }),
+      {} as Record<string, Name>
+    )
 }
 
-const getCombinedOptions = (dataForCombined, getTextIn, language) => {
+const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn, language: Language) => {
   return [
     {
       key: 'KH90_001+MH90_001',
