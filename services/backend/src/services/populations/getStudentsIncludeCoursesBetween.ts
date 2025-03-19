@@ -76,7 +76,52 @@ const getEnrollments = (studentNumbers: string[], startDate: string, endDate: Da
     raw: true,
   })
 
-const getStudents = (studentNumbers: string[]): Promise<Array<Student>> =>
+type StudentPersonalData = Pick<
+  Student,
+  | 'firstnames'
+  | 'lastname'
+  | 'studentnumber'
+  | 'citizenships'
+  | 'dateofuniversityenrollment'
+  | 'creditcount'
+  | 'abbreviatedname'
+  | 'email'
+  | 'secondary_email'
+  | 'phone_number'
+  | 'updatedAt'
+  | 'gender_code'
+  | 'birthdate'
+  | 'sis_person_id'
+>
+
+type StudentStudyRightElement = Pick<
+  SISStudyRightElement,
+  'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
+>
+
+type StudentStudyRight = Pick<
+  SISStudyRight,
+  'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate'
+> & {
+  studyRightElements: Array<StudentStudyRightElement>
+}
+
+type StudentStudyPlanData = Pick<
+  Studyplan,
+  | 'included_courses'
+  | 'programme_code'
+  | 'includedModules'
+  | 'completed_credits'
+  | 'curriculum_period_id'
+  | 'sis_study_right_id'
+>
+
+type StudentData = StudentPersonalData & {
+  studyplans: Array<StudentStudyPlanData>
+  studyRights: Array<StudentStudyRight>
+}
+
+const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
   Student.findAll({
     attributes: [
       'firstnames',
