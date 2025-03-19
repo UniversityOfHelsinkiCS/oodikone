@@ -2,14 +2,20 @@ import { orderBy } from 'lodash'
 import { Op, QueryTypes } from 'sequelize'
 
 import { dbConnections } from '../../database/connection'
-import { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../../models'
-import { TagStudent } from '../../models/kone'
+import { Credit, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Name, ProgressCriteria } from '../../shared/types'
 import { formatToArray } from '../../shared/util'
 import { DegreeProgrammeType, EnrollmentState, ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
+import type {
+  TaggetStudentData,
+  StudentStudyPlan,
+  StudentCourse,
+  StudentEnrollment,
+  StudentCredit,
+} from './getStudentsIncludeCoursesBetween'
 
 const { sequelize } = dbConnections
 
@@ -35,7 +41,7 @@ const createEmptyCriteriaYear = (criteria: ProgressCriteria, year: string): Crit
   }
 }
 
-const getCreditAmount = (course: ParsedCourse, hops: Studyplan[], courseCode: string, startDate: string) => {
+const getCreditAmount = (course: ParsedCourse, hops: StudentStudyPlan[], courseCode: string, startDate: string) => {
   const courseDate = new Date(course.date)
   const startDateFromString = new Date(startDate)
 
@@ -136,9 +142,9 @@ export const getCurriculumVersion = (curriculumPeriodId: string) => {
 }
 
 const formatStudentForPopulationStatistics = (
-  student: Student & { tags?: TagStudent[] },
-  enrollments: Record<string, Enrollment[]>,
-  credits: Record<string, Credit[]>,
+  student: TaggetStudentData,
+  enrollments: Record<string, StudentEnrollment[]>,
+  credits: Record<string, StudentCredit[]>,
   startDate: string,
   endDate: string,
   criteria: ProgressCriteria,
@@ -148,7 +154,7 @@ const formatStudentForPopulationStatistics = (
   const startDateFromISO = new Date(startDate)
   const endDateFromISO = new Date(endDate)
 
-  const toCourse = (credit: Credit, normalizeDate: boolean): ParsedCourse => {
+  const toCourse = (credit: StudentCredit, normalizeDate: boolean): ParsedCourse => {
     const attainmentDateNormalized =
       normalizeDate && credit.attainment_date < startDateFromISO
         ? dateDaysFromNow(startDateFromISO, 1).toISOString()
@@ -183,7 +189,6 @@ const formatStudentForPopulationStatistics = (
     studyRights,
     studyplans,
     updatedAt,
-    createdAt,
     gender_code,
     tags,
     birthdate,
@@ -216,10 +221,11 @@ const formatStudentForPopulationStatistics = (
       studyRight.studyRightElements.some(element => element.code === code)
     )
     if (correctStudyRight) {
+      // NOTE: This must never be undefined
       const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
       const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
-        correctStudyRight,
-        correctStudyRightElement!
+        correctStudyRight as SISStudyRight,
+        correctStudyRightElement as SISStudyRightElement
       )
       if (hasTransferredToProgramme) {
         const transferredFromProgramme = correctStudyRight.studyRightElements.find(element => {
@@ -296,8 +302,8 @@ const formatStudentForPopulationStatistics = (
     email,
     secondaryEmail: secondary_email,
     phoneNumber: phone_number,
-    updatedAt: updatedAt || createdAt,
-    tags: tags ?? [],
+    updatedAt,
+    tags,
     studyrightStart: startDate,
     starting,
     option,
@@ -416,22 +422,22 @@ export const getOptionsForStudents = async (studentNumbers: string[], code: stri
 }
 
 export const formatStudentsForApi = (
-  students: Array<Student & { tags?: TagStudent[] }>,
-  enrollments: Enrollment[],
-  credits: Credit[],
-  courses: Course[],
+  students: Array<TaggetStudentData>,
+  enrollments: StudentEnrollment[],
+  credits: StudentCredit[],
+  courses: StudentCourse[],
   startDate: string,
   endDate: string,
   optionData: Record<string, { name: Name }>,
   criteria: ProgressCriteria,
   code: string
 ) => {
-  const creditsByStudent = credits.reduce((acc: Record<string, Credit[]>, credit) => {
+  const creditsByStudent = credits.reduce((acc: Record<string, StudentCredit[]>, credit) => {
     const { student_studentnumber: studentnumber } = credit
     acc[studentnumber] = [...(acc[studentnumber] || []), credit]
     return acc
   }, {})
-  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, Enrollment[]>, enrollment) => {
+  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, StudentEnrollment[]>, enrollment) => {
     const { studentnumber } = enrollment
     acc[studentnumber] = [...(acc[studentnumber] || []), enrollment]
     return acc

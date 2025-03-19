@@ -1,10 +1,13 @@
-import { literal, Op, WhereOptions } from 'sequelize'
+import { literal, Op, type WhereOptions } from 'sequelize'
 
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
 
-const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promise<TagStudent[]> =>
+type StudentTags = TagStudent & {
+  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
+}
+const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promise<StudentTags[]> =>
   TagStudent.findAll({
     attributes: ['tag_id', 'studentnumber'],
     include: {
@@ -19,7 +22,8 @@ const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promis
     },
   })
 
-const queryStudyplanCourses = (studentNumbers: string[]) =>
+type StudyplanIncludedCourses = Pick<Studyplan, 'included_courses'>
+const queryStudyplanCourses = (studentNumbers: string[]): Promise<Array<StudyplanIncludedCourses>> =>
   Studyplan.findAll({
     where: {
       studentnumber: { [Op.in]: studentNumbers },
@@ -48,7 +52,8 @@ const creditFilterBuilder = async (
   }
 }
 
-const getCourses = (creditFilter: WhereOptions) =>
+export type StudentCourse = Pick<Course, 'code' | 'name'>
+const getCourses = (creditFilter: WhereOptions): Promise<Array<StudentCourse>> =>
   Course.findAll({
     attributes: [[literal('DISTINCT ON("code") code'), 'code'], 'name'],
     include: [
@@ -61,7 +66,15 @@ const getCourses = (creditFilter: WhereOptions) =>
     raw: true,
   })
 
-const getEnrollments = (studentNumbers: string[], startDate: string, endDate: Date) =>
+export type StudentEnrollment = Pick<
+  Enrollment,
+  'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber' | 'semestercode' | 'studyright_id'
+>
+const getEnrollments = (
+  studentNumbers: string[],
+  startDate: string,
+  endDate: Date
+): Promise<Array<StudentEnrollment>> =>
   Enrollment.findAll({
     attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
     where: {
@@ -106,7 +119,7 @@ type StudentStudyRight = Pick<
   studyRightElements: Array<StudentStudyRightElement>
 }
 
-type StudentStudyPlanData = Pick<
+export type StudentStudyPlan = Pick<
   Studyplan,
   | 'included_courses'
   | 'programme_code'
@@ -117,8 +130,12 @@ type StudentStudyPlanData = Pick<
 >
 
 type StudentData = StudentPersonalData & {
-  studyplans: Array<StudentStudyPlanData>
+  studyplans: Array<StudentStudyPlan>
   studyRights: Array<StudentStudyRight>
+}
+
+export type TaggetStudentData = StudentData & {
+  tags: StudentTags[]
 }
 
 const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
@@ -189,7 +206,19 @@ const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
     },
   })
 
-const getCredits = (creditFilter: WhereOptions) =>
+export type StudentCredit = Pick<
+  Credit,
+  | 'grade'
+  | 'credits'
+  | 'credittypecode'
+  | 'attainment_date'
+  | 'isStudyModule'
+  | 'student_studentnumber'
+  | 'course_code'
+  | 'language'
+  | 'studyright_id'
+>
+const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCredit>> =>
   Credit.findAll({
     attributes: [
       'grade',
@@ -207,10 +236,10 @@ const getCredits = (creditFilter: WhereOptions) =>
   })
 
 type StudentsIncludeCoursesBetween = {
-  courses: Course[]
-  enrollments: Enrollment[]
-  credits: Credit[]
-  students: Array<Student & { tags: TagStudent[] }>
+  courses: StudentCourse[]
+  enrollments: StudentEnrollment[]
+  credits: StudentCredit[]
+  students: Array<TaggetStudentData>
 }
 
 export const getStudentsIncludeCoursesBetween = async (
@@ -238,7 +267,7 @@ export const getStudentsIncludeCoursesBetween = async (
     courses,
     enrollments,
     credits,
-    students: (students as Array<Student & { tags: TagStudent[] }>).map(student => {
+    students: (students as Array<TaggetStudentData>).map(student => {
       student.tags = studentNumberToTags[student.studentnumber] || []
       return student
     }),
