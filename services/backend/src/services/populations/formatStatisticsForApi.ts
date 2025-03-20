@@ -20,19 +20,14 @@ type CriteriaYear = {
   coursesSatisfied: CoursesSatisfied
 }
 
-const createEmptyCriteriaYear = (criteria: ProgressCriteria, year: string): CriteriaYear => {
-  const coursesSatisfied: CoursesSatisfied = criteria?.courses?.[year]
-    ? criteria.courses[year]?.reduce((acc: CoursesSatisfied, course: string) => {
-        acc[course] = null
-        return acc
-      }, {} as CoursesSatisfied)
-    : {}
-  return {
-    credits: false,
-    totalSatisfied: 0,
-    coursesSatisfied,
-  }
-}
+const createEmptyCriteriaYear = (
+  criteria: ProgressCriteria,
+  year: keyof ProgressCriteria['courses']
+): CriteriaYear => ({
+  credits: false,
+  totalSatisfied: 0,
+  coursesSatisfied: Object.fromEntries(criteria.courses[year].map(course => [course, null])),
+})
 
 const getCreditAmount = (course: ParsedCourse, hops: StudentStudyPlan[], courseCode: string, startDate: string) => {
   const courseDate = new Date(course.date)
@@ -112,15 +107,14 @@ const updateCreditCriteriaInfo = (
   }
   if (criteriaChecked?.[yearToAdd]) {
     criteriaChecked[yearToAdd].totalSatisfied +=
-      Object.keys(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(
-        course => criteriaChecked?.[yearToAdd].coursesSatisfied[course] !== null
-      ).length || 0
+      Object.values(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(course => course !== null).length || 0
   }
   if (academicYears[academicYear] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
     criteriaChecked[yearToAdd].credits = true
     criteriaChecked[yearToAdd].totalSatisfied += 1
   }
 }
+
 export const formatStudentsForApi = (
   students: Array<TaggetStudentData>,
   enrollments: StudentEnrollment[],
@@ -173,28 +167,6 @@ const formatStudentForPopulationStatistics = (
   const startDateFromISO = new Date(startDate)
   const endDateFromISO = new Date(endDate)
 
-  const toCourse = (credit: StudentCredit, normalizeDate: boolean): ParsedCourse => {
-    const attainmentDateNormalized =
-      normalizeDate && credit.attainment_date < startDateFromISO
-        ? dateDaysFromNow(startDateFromISO, 1).toISOString()
-        : credit.attainment_date.toISOString()
-    const passed =
-      Credit.passed({ credittypecode: credit.credittypecode }) ||
-      Credit.improved({ credittypecode: credit.credittypecode })
-
-    return {
-      course_code: credit.course_code,
-      date: attainmentDateNormalized,
-      passed,
-      grade: passed ? credit.grade : 'Hyl.',
-      credits: credit.credits,
-      isStudyModuleCredit: credit.isStudyModule,
-      credittypecode: credit.credittypecode,
-      language: credit.language,
-      studyright_id: credit.studyright_id,
-    }
-  }
-
   const {
     firstnames,
     lastname,
@@ -215,20 +187,17 @@ const formatStudentForPopulationStatistics = (
     citizenships,
   } = student
 
-  const criteriaCoursesBySubstitutions = criteria?.allCourses
-    ? Object.keys(criteria.allCourses).reduce(
-        (acc, courseCode) => {
-          acc[courseCode] = courseCode
-          criteria.allCourses[courseCode].forEach(substitutionCode => {
-            acc[substitutionCode] = courseCode
-          })
-          return acc
-        },
-        {} as Record<string, string>
-      )
-    : ({} as Record<string, string>)
+  const started = dateofuniversityenrollment
+  const starting = +startDateFromISO <= +started && +started <= +endDateFromISO
 
-  const correctStudyplan = studyplans ? studyplans.filter(plan => plan.programme_code === code) : []
+  const criteriaCoursesBySubstitutions: Record<string, string> = Object.fromEntries(
+    Object.entries(criteria.allCourses).flatMap(([courseCode, substitutionCodes]) => [
+      [courseCode, courseCode],
+      ...substitutionCodes.map(code => [code, courseCode]),
+    ])
+  )
+
+  const correctStudyplan = studyplans.filter(plan => plan.programme_code === code)
 
   const option = studentnumber in optionData ? optionData[studentnumber] : null
 
@@ -265,6 +234,28 @@ const formatStudentForPopulationStatistics = (
     }
   }
 
+  const parseCourse = (credit: StudentCredit, normalizeDate: boolean): ParsedCourse => {
+    const attainmentDateNormalized =
+      normalizeDate && credit.attainment_date < startDateFromISO
+        ? dateDaysFromNow(startDateFromISO, 1).toISOString()
+        : credit.attainment_date.toISOString()
+    const passed =
+      Credit.passed({ credittypecode: credit.credittypecode }) ||
+      Credit.improved({ credittypecode: credit.credittypecode })
+
+    return {
+      course_code: credit.course_code,
+      date: attainmentDateNormalized,
+      passed,
+      grade: passed ? credit.grade : 'Hyl.',
+      credits: credit.credits,
+      isStudyModuleCredit: credit.isStudyModule,
+      credittypecode: credit.credittypecode,
+      language: credit.language,
+      studyright_id: credit.studyright_id,
+    }
+  }
+
   const toProgressCriteria = () => {
     const criteriaChecked = {
       year1: createEmptyCriteriaYear(criteria, 'yearOne'),
@@ -278,7 +269,7 @@ const formatStudentForPopulationStatistics = (
     const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
 
     if (criteria.courses || criteria.credits) {
-      const courses = credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, true)) : []
+      const courses = credits[studentnumber] ? credits[studentnumber].map(credit => parseCourse(credit, true)) : []
 
       courses
         .filter(course => course.passed)
@@ -304,9 +295,6 @@ const formatStudentForPopulationStatistics = (
     return criteriaChecked
   }
 
-  const started = dateofuniversityenrollment
-  const starting = +startDateFromISO <= +started && +started <= +endDateFromISO
-
   return {
     firstnames,
     lastname,
@@ -314,7 +302,7 @@ const formatStudentForPopulationStatistics = (
     started,
     studentNumber: studentnumber,
     credits: creditcount || 0,
-    courses: credits[studentnumber] ? credits[studentnumber].map(credit => toCourse(credit, false)) : [],
+    courses: credits[studentnumber]?.map(credit => parseCourse(credit, false)) ?? [],
     enrollments: enrollments[studentnumber],
     name: abbreviatedname,
     gender_code,

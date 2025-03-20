@@ -75,7 +75,11 @@ export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
   }
 }
 
-export const getOptionsForStudents = async (studentNumbers: string[], code: string, level?: DegreeProgrammeType) => {
+export const getOptionsForStudents = async (
+  studentNumbers: string[],
+  code: string,
+  level?: DegreeProgrammeType
+): Promise<Record<string, { name: Name }>> => {
   if (!studentNumbers.length) {
     return {}
   } else if (level && ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(level)) {
