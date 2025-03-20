@@ -7,15 +7,13 @@ import { EnrollmentState } from '../../types'
 type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
-const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promise<StudentTags[]> =>
+const getStudentTags = (studytrack: string, studentNumbers: string[]): Promise<StudentTags[]> =>
   TagStudent.findAll({
     attributes: ['tag_id', 'studentnumber'],
     include: {
       model: Tag,
       attributes: ['tag_id', 'tagname', 'personal_user_id'],
-      where: {
-        studytrack: { [Op.in]: studyRights },
-      },
+      where: { studytrack },
     },
     where: {
       studentnumber: { [Op.in]: studentNumbers },
@@ -34,7 +32,7 @@ const queryStudyplanCourses = (studentNumbers: string[]): Promise<Array<Studypla
 
 const creditFilterBuilder = async (
   studentNumbers: string[],
-  studyRights: string[],
+  studyRights: string | undefined,
   attainmentDateFrom: string,
   endDate: Date
 ): Promise<WhereOptions> => {
@@ -42,7 +40,7 @@ const creditFilterBuilder = async (
 
   const studyPlanCourses = new Set(studyPlans.flatMap(plan => plan.included_courses))
   // takes into account possible progress tests taken earlier than the start date
-  const courseCodes = ['320001', 'MH30_001'].includes(studyRights[0])
+  const courseCodes = ['320001', 'MH30_001'].includes(studyRights!)
     ? [...studyPlanCourses, '375063', '339101']
     : [...studyPlanCourses]
 
@@ -246,9 +244,9 @@ export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
   endDate: Date,
-  studyRights: string[]
+  studyRights: string | undefined
 ): Promise<StudentsIncludeCoursesBetween> => {
-  const studentTags = await getStudentTags(studyRights, studentNumbers)
+  const studentTags = studyRights ? await getStudentTags(studyRights, studentNumbers) : []
   const studentNumberToTags = studentTags.reduce((acc: Record<string, TagStudent[]>, studentTag) => {
     const { studentnumber } = studentTag
     acc[studentnumber] = [...(acc[studentnumber] || []), studentTag]
