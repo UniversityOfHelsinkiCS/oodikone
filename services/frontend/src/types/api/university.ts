@@ -1,4 +1,4 @@
-import { GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { FacultyClassSizes, GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
 
 // ? Almost identical to GetFacultyGraduationTimesResponse, could be combined?
 export interface GetAllGraduationStatsResponse {
@@ -18,20 +18,7 @@ export interface GetAllGraduationStatsResponse {
       }
     }
   }
-  classSizes: {
-    bachelor: Record<string, number>
-    bcMsCombo: Record<string, number>
-    doctor: Record<string, number>
-    master: Record<string, number>
-    programmes: {
-      [code: string]: {
-        bachelor: Record<string, number>
-        bcMsCombo: Record<string, number>
-        master: Record<string, number>
-        doctor: Record<string, number>
-      }
-    }
-  }
+  classSizes: FacultyClassSizes
   goals: {
     bachelor: number
     bcMsCombo: number

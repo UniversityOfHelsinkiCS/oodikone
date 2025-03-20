@@ -1,8 +1,9 @@
 // TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
 
-import { FacultyClassSizes, GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { Name, NameWithCode } from '@/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
 import { GraphStat } from '@/types/graphStat'
+import { GetAllGraduationStatsResponse } from './university'
 
 type Info = {
   graphStats: GraphStat[]
@@ -60,34 +61,11 @@ export type GetFacultyThesisStatsRequest = {
   specialGroups: SpecialGroups
 }
 
-export type GetFacultyGraduationTimesResponse = {
-  byGradYear: {
-    medians: {
-      bachelor: GraduationStats[]
-      bcMsCombo: GraduationStats[]
-      doctor: GraduationStats[]
-      master: GraduationStats[]
-    }
-    programmes: {
-      medians: {
-        bachelor: ProgrammeMedians
-        bcMsCombo: ProgrammeMedians
-        doctor: ProgrammeMedians
-        master: ProgrammeMedians
-      }
-    }
-  }
-  classSizes: FacultyClassSizes
-  goals: {
-    bachelor: number
-    bcMsCombo: number
-    doctor: number
-    master: number
-    exceptions?: Record<string, number> // ? Is this used or needed?
-  }
+export type GetFacultyGraduationTimesResponse = GetAllGraduationStatsResponse & {
+  // NOTE: This is NameWithCode in GetAllGraduationStatsResponse
+  programmeNames: Record<string, Name>
   id: string
   lastUpdated: string
-  programmeNames: Record<string, Name>
   status: string
 }
 
