@@ -125,13 +125,14 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const findDegreeProgrammes = programId => {
+  const findDegreeProgrammes = (programId, handledProgrammeIds) => {
     if (programmeModuleIdToType[programId] === 'DegreeProgramme') return [programId]
     if (!childModules[programId]) return []
+    handledProgrammeIds.add(programId)
 
     const programmes = []
     childModules[programId].forEach(child => {
-      programmes.push(...findDegreeProgrammes(child))
+      if (!handledProgrammeIds.has(child)) programmes.push(...findDegreeProgrammes(child, handledProgrammeIds))
     })
     return programmes
   }
@@ -166,26 +167,27 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }
 
   const studyplanIdToDegreeProgrammes = studyplans.reduce((res, cur) => {
-    res[cur.id] = findDegreeProgrammes(cur.root_id)
+    res[cur.id] = findDegreeProgrammes(cur.root_id, new Set())
     return res
   }, {})
 
   const moduleIdToParentDegreeProgramme = {}
-  const mapParentDegreeProgrammes = (moduleId, degreeProgrammeId) => {
+  const mapParentDegreeProgrammes = (moduleId, degreeProgrammeId, handledModuleIds) => {
     if (!moduleIdToParentDegreeProgramme[moduleId]) {
       moduleIdToParentDegreeProgramme[moduleId] = []
     }
     moduleIdToParentDegreeProgramme[moduleId].push(degreeProgrammeId)
+    handledModuleIds.add(moduleId)
     if (!childModules[moduleId]) return
 
     childModules[moduleId].forEach(child => {
-      mapParentDegreeProgrammes(child, degreeProgrammeId)
+      if (!handledModuleIds.has(child)) mapParentDegreeProgrammes(child, degreeProgrammeId, handledModuleIds)
     })
   }
 
   studyplans.forEach(plan => {
     studyplanIdToDegreeProgrammes[plan.id].forEach(programmeId => {
-      mapParentDegreeProgrammes(programmeId, programmeId)
+      mapParentDegreeProgrammes(programmeId, programmeId, new Set())
     })
   })
 
