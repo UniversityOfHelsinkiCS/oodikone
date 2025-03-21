@@ -1,3 +1,4 @@
+import { formatToArray } from '../../shared/util'
 import { getDegreeProgrammeType } from '../../util'
 import { dateMonthsFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
@@ -7,21 +8,21 @@ import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBet
 import { getOptionsForStudents } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
-type OptimizedStatisticsQuery = {
+export type OptimizedStatisticsQuery = {
   semesters: string[]
   studentStatuses?: string[]
-  studyRights?: string
+  studyRights?: string | string[]
   year: string
   months?: string
 }
 
-type ParsedQueryParams = {
+export type ParsedQueryParams = {
   startDate: string
   endDate: string
   includeExchangeStudents: boolean
   includeNondegreeStudents: boolean
   includeTransferredStudents: boolean
-  studyRights?: string
+  studyRights: string[]
   months?: string
 }
 
@@ -49,7 +50,7 @@ const parseQueryParams = (query: OptimizedStatisticsQuery): ParsedQueryParams =>
     includeNondegreeStudents,
     includeTransferredStudents,
     // Remove falsy values so the query doesn't break
-    studyRights,
+    studyRights: formatToArray(studyRights).filter(Boolean) as string[],
     months,
     startDate,
     endDate,
@@ -67,19 +68,18 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     includeTransferredStudents: includeTransferredOutStudents,
   } = parseQueryParams(query)
 
-  const code = studyRights ?? ''
-
   const studentNumbers =
     studentNumberList ??
-    (await getStudentNumbersWithAllStudyRightElements(
-      code,
+    (await getStudentNumbersWithAllStudyRightElements({
+      studyRights,
       startDate,
       endDate,
       includeExchangeStudents,
       includeNondegreeStudents,
-      includeTransferredOutStudents
-    ))
+      includeTransferredOutStudents,
+    }))
 
+  const code = studyRights[0] ?? ''
   const degreeProgrammeType = await getDegreeProgrammeType(code)
 
   const { courses, enrollments, credits, students } = await getStudentsIncludeCoursesBetween(
