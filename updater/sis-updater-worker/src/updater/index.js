@@ -1,4 +1,4 @@
-const { selectFromByIds, selectFromSnapshotsByIds } = require('../db')
+const { selectFromByIds, selectLatestFromActiveSnapshotsByIds } = require('../db')
 const { creditTypeIdsToCreditTypes } = require('./shared')
 const {
   updateOrganisations,
@@ -33,7 +33,7 @@ const update = async ({ entityIds, type }) => {
     case 'credit_types':
       return await updateHandler(creditTypeIdsToCreditTypes(entityIds))
     case 'organisations':
-      return await updateHandler(await selectFromSnapshotsByIds(type, entityIds))
+      return await updateHandler(await selectLatestFromActiveSnapshotsByIds(type, entityIds))
     case 'course_units':
       return await updateHandler(await selectFromByIds(type, entityIds, 'group_id'))
     case 'study_modules':
