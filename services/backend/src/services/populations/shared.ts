@@ -4,9 +4,7 @@ import { Op, QueryTypes } from 'sequelize'
 import { dbConnections } from '../../database/connection'
 import { Credit, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Name } from '../../shared/types'
-import { formatToArray } from '../../shared/util'
 import { DegreeProgrammeType, EnrollmentState } from '../../types'
-import { SemesterStart } from '../../util/semester'
 
 const { sequelize } = dbConnections
 
@@ -20,59 +18,6 @@ export const getCurriculumVersion = (curriculumPeriodId: string) => {
   const endYear = startYear + 3
   const curriculumVersion = `${startYear}-${endYear}`
   return curriculumVersion
-}
-
-export type QueryParams = {
-  year: string
-  months?: string
-  semesters: string[]
-  studyRights: string | string[]
-  selectedStudents?: string[]
-  selectedStudentsByYear?: Record<string, string[]>
-  studentStatuses?: string[]
-  years?: string[]
-  courses?: string[]
-}
-
-export type ParsedQueryParams = {
-  startDate: string
-  endDate: string
-  includeExchangeStudents: boolean
-  includeNondegreeStudents: boolean
-  includeTransferredStudents: boolean
-  studyRights: string[]
-  months?: string
-}
-
-export const parseQueryParams = (query: QueryParams): ParsedQueryParams => {
-  const { semesters, studentStatuses, studyRights, months, year } = query
-  const yearAsNumber = +year
-
-  const hasFall = semesters.includes('FALL')
-  const hasSpring = semesters.includes('SPRING')
-
-  const startDate = hasFall
-    ? new Date(`${yearAsNumber}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
-
-  const endDate = hasSpring
-    ? new Date(`${yearAsNumber + 1}-${SemesterStart.FALL}`).toISOString()
-    : new Date(`${yearAsNumber + 1}-${SemesterStart.SPRING}`).toISOString()
-
-  const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
-  const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
-  const includeTransferredStudents = !!studentStatuses?.includes('TRANSFERRED')
-
-  return {
-    includeExchangeStudents,
-    includeNondegreeStudents,
-    includeTransferredStudents,
-    // Remove falsy values so the query doesn't break
-    studyRights: formatToArray(studyRights).filter(Boolean),
-    months,
-    startDate,
-    endDate,
-  }
 }
 
 export const getOptionsForStudents = async (
