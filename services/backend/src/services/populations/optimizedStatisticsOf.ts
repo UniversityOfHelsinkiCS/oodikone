@@ -89,7 +89,7 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     studyRights
   )
 
-  const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType ?? undefined)
+  const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   const criteria = await getCriteria(code)
 
   const formattedStudents = formatStudentsForApi(

@@ -23,42 +23,39 @@ export const getCurriculumVersion = (curriculumPeriodId: string) => {
 export const getOptionsForStudents = async (
   studentNumbers: string[],
   code: string,
-  level?: DegreeProgrammeType
+  degreeProgrammeType: DegreeProgrammeType | null
 ): Promise<Record<string, { name: Name }>> => {
   if (!studentNumbers.length) {
     return {}
-  } else if (level && ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(level)) {
+  } else if (
+    degreeProgrammeType &&
+    ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(degreeProgrammeType)
+  ) {
     return {}
   }
 
   const studyRightElementsForStudyRight = await SISStudyRightElement.findAll({
     attributes: [],
-    where: {
-      code,
-    },
-    include: [
-      {
-        model: SISStudyRight,
-        attributes: ['studentNumber'],
-        where: {
-          studentNumber: {
-            [Op.in]: studentNumbers,
-          },
-        },
-        include: [
-          {
-            model: SISStudyRightElement,
-            attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
-          },
-        ],
+    where: { code },
+    include: {
+      model: SISStudyRight,
+      attributes: ['studentNumber'],
+      where: {
+        studentNumber: { [Op.in]: studentNumbers },
       },
-    ],
+      include: [
+        {
+          model: SISStudyRightElement,
+          attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
+        },
+      ],
+    },
   })
 
   return Object.fromEntries(
     studyRightElementsForStudyRight
       .map(({ studyRight }) => {
-        const levelIsMasters = level === DegreeProgrammeType.MASTER
+        const levelIsMasters = degreeProgrammeType === DegreeProgrammeType.MASTER
         const filter = levelIsMasters ? DegreeProgrammeType.BACHELOR : DegreeProgrammeType.MASTER
 
         // NOTE: If in masters, then select latest finished bachlor studyRight otherwise select first started masters studyRight
