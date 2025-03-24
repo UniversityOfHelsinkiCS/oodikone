@@ -18,14 +18,14 @@ const nondegreeStudents = [
   ExtentCode.SUMMER_AND_WINTER_SCHOOL,
 ]
 
-export const getStudentNumbersWithAllStudyRightElements = async (
-  code: string,
-  startDate: string,
-  endDate: string,
-  includeExchangeStudents: boolean,
-  includeNondegreeStudents: boolean,
-  includeTransferredOutStudents: boolean
-) => {
+export const getStudentNumbersWithAllStudyRightElements = async ({
+  studyRights,
+  startDate,
+  endDate,
+  includeExchangeStudents,
+  includeNondegreeStudents,
+  includeTransferredOutStudents,
+}) => {
   const filteredExtents = [ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS]
   if (!includeExchangeStudents) {
     filteredExtents.push(...exchangeStudents)
@@ -40,7 +40,9 @@ export const getStudentNumbersWithAllStudyRightElements = async (
       model: SISStudyRightElement,
       attributes: [],
       where: {
-        code,
+        code: {
+          [Op.in]: studyRights,
+        },
         startDate: {
           [Op.gte]: startDate,
           [Op.lt]: endDate,
@@ -77,7 +79,7 @@ export const getStudentNumbersWithAllStudyRightElements = async (
 
       const [hasTransferredFromProgramme, _] = hasTransferredFromOrToProgramme(
         student,
-        student.studyRightElements.find(element => element.code === code)!
+        student.studyRightElements.find(element => studyRights.includes(element.code))!
       )
 
       return !hasTransferredFromProgramme
