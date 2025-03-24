@@ -121,7 +121,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     }
 
     const requestedStudyRights: { programme: string; combinedProgramme: string } | null =
-      safeJSONParse(requestedStudyRightsJSON)
+      await safeJSONParse(requestedStudyRightsJSON)
     if (requestedStudyRights === null) {
       return res.status(400).json({ error: 'Invalid studyrights value!' })
     }

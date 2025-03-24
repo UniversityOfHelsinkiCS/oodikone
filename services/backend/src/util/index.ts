@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/node'
 
 import { ProgrammeModule } from '../models'
 import { DetailedProgrammeRights, Role } from '../shared/types'
+import { tryCatch } from '../shared/util'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
   return typeof obj === 'object' && obj !== null && key in obj
@@ -95,11 +96,9 @@ export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
   return programmeModule?.minimumCredits ?? null
 }
 
-export const safeJSONParse = <T>(json: string): T | null => {
-  try {
-    return JSON.parse(json)
-  } catch (error) {
-    Sentry.captureException(error)
-    return null
-  }
+export const safeJSONParse = async <T>(json: string): Promise<T | null> => {
+  const { data, error } = await tryCatch(JSON.parse(json))
+  if (error) Sentry.captureException(error)
+
+  return data
 }
