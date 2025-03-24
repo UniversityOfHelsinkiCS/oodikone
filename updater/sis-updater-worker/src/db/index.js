@@ -47,7 +47,14 @@ const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
-const bulkCreate = async (model, entities, transaction = null, properties = ['id'], upsertStyle = true) => {
+const bulkCreate = async (
+  model,
+  entities,
+  transaction = null,
+  properties = ['id'],
+  upsertStyle = true,
+  findBy = 'id'
+) => {
   try {
     let options
     if (upsertStyle) options = { updateOnDuplicate: getColumnsToUpdate(model, properties), transaction }
@@ -57,11 +64,14 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
     for (const entity of entities) {
       try {
         if (upsertStyle) await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })
-        else
+        else {
+          const whereClause = {}
+          whereClause[findBy] = entity[findBy]
           await model.findOrCreate({
-            where: { composite: entity.composite },
+            where: whereClause,
             defaults: entity,
           })
+        }
       } catch (error) {
         logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
           error,

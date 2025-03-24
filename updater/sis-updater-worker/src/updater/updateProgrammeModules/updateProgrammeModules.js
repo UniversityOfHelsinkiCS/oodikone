@@ -81,7 +81,7 @@ const updateProgrammeModulesChunk = async programmeIds => {
   }
 
   await bulkCreate(ProgrammeModule, Object.values(moduleMap))
-  await bulkCreate(ProgrammeModuleChild, Object.values(joinMap), null, [], false)
+  await bulkCreate(ProgrammeModuleChild, Object.values(joinMap), null, [], false, 'composite')
 }
 
 const updateProgrammeModules = async programmeIds => {
