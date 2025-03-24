@@ -12,7 +12,7 @@ import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksO
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
 import { mapToProviders } from '../shared/util'
-import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
+import { CanError, GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
 const router = Router()
@@ -37,7 +37,7 @@ const isEncryptedStudent = (student?: string | EncryptedStudent) => {
   return (student as EncryptedStudent)?.encryptedData !== undefined
 }
 
-export type PopulationstatisticsCoursesResBody = Bottlenecks | { error: string }
+export type PopulationstatisticsCoursesResBody = CanError<Bottlenecks>
 export type PopulationstatisticsCoursesReqBody = {
   // NOTE: Encrypted students have their iv in selectedStudents
   selectedStudents: string[] | EncryptedStudent[]
@@ -84,7 +84,7 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
   }
 )
 
-export type PopulationstatisticsResBody = { students: any } | { error: string }
+export type PopulationstatisticsResBody = CanError<{ students: any }>
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
   semesters: string[]
@@ -137,7 +137,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    let result: { students: any[]; courses: any[] } | { error: string }
+    let result: CanError<{ students: any[]; courses: any[] }>
     if (req.query.years) {
       const upperYearBound = new Date().getFullYear() + 1
       const multiYearStudents = Promise.all(
