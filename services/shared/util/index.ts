@@ -31,6 +31,31 @@ export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(programmeCodeToProviderCode)
 }
 
+type Ok<T> = {
+  data: T
+  error: null
+}
+
+type Err<E> = {
+  data: null
+  error: E
+}
+
+type Result<T, E = Error> = Ok<T> | Err<E>
+
+/**
+ * @returns data, error object with distinct values.
+ * This should make it easier to read and write error catching code.
+ */
+export const tryCatch = async <T, E = Error>(ret: Promise<T> | T): Promise<Result<T, E>> => {
+  try {
+    const data = await ret
+    return { data, error: null }
+  } catch (error) {
+    return { data: null, error: error as E }
+  }
+}
+
 export const formatToArray = <T>(param: T | T[]): T[] => {
   return Array.isArray(param) ? param : [param]
 }
