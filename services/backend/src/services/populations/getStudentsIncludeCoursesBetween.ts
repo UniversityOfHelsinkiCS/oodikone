@@ -1,5 +1,6 @@
 import { literal, Op, type WhereOptions } from 'sequelize'
 
+import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
@@ -7,13 +8,15 @@ import { EnrollmentState } from '../../types'
 type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
-const getStudentTags = (studytrack: string, studentNumbers: string[]): Promise<StudentTags[]> =>
+const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promise<StudentTags[]> =>
   TagStudent.findAll({
     attributes: ['tag_id', 'studentnumber'],
     include: {
       model: Tag,
       attributes: ['tag_id', 'tagname', 'personal_user_id'],
-      where: { studytrack },
+      where: {
+        studytrack: { [Op.in]: studyRights },
+      },
     },
     where: {
       studentnumber: { [Op.in]: studentNumbers },
@@ -32,7 +35,7 @@ const queryStudyplanCourses = (studentNumbers: string[]): Promise<Array<Studypla
 
 const creditFilterBuilder = async (
   studentNumbers: string[],
-  studyRights: string | undefined,
+  studyRights: string[],
   attainmentDateFrom: string,
   endDate: Date
 ): Promise<WhereOptions> => {
@@ -40,9 +43,10 @@ const creditFilterBuilder = async (
 
   const studyPlanCourses = new Set(studyPlans.flatMap(plan => plan.included_courses))
   // takes into account possible progress tests taken earlier than the start date
-  const courseCodes = ['320001', 'MH30_001'].includes(studyRights!)
-    ? [...studyPlanCourses, '375063', '339101']
-    : [...studyPlanCourses]
+  const courseCodes =
+    ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
+      ? [...studyPlanCourses, '375063', '339101']
+      : [...studyPlanCourses]
 
   return {
     student_studentnumber: { [Op.in]: studentNumbers },
@@ -244,9 +248,9 @@ export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
   endDate: Date,
-  studyRights: string | undefined
+  studyRights: string[]
 ): Promise<StudentsIncludeCoursesBetween> => {
-  const studentTags = studyRights ? await getStudentTags(studyRights, studentNumbers) : []
+  const studentTags = await getStudentTags(studyRights, studentNumbers)
   const studentNumberToTags = studentTags.reduce((acc: Record<string, TagStudent[]>, studentTag) => {
     const { studentnumber } = studentTag
     acc[studentnumber] = [...(acc[studentnumber] || []), studentTag]
