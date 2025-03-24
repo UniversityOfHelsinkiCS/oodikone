@@ -6,6 +6,7 @@ import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser
 import * as userService from '../services/userService'
 import { LANGUAGE_CODES, Language } from '../shared/language'
 import { Role } from '../shared/types'
+import { tryCatch } from '../shared/util'
 import logger from '../util/logger'
 
 const router = Router()
@@ -26,13 +27,11 @@ interface UidRequest extends Request {
 }
 
 router.get('/:uid', auth.roles(['admin']), async (req: UidRequest, res: Response) => {
-  try {
-    const { uid } = req.params
-    const user = await userService.findOne(uid)
-    return res.json(user)
-  } catch (error: any) {
-    return res.status(400).json({ error: error.message })
-  }
+  const { uid } = req.params
+  const { data: user, error } = await tryCatch(userService.findOne(uid))
+  if (error) return res.status(400).json({ error: error.message })
+
+  return res.json(user)
 })
 
 interface ModifyRolesRequest extends Request {
@@ -44,12 +43,13 @@ interface ModifyRolesRequest extends Request {
 
 router.post('/modify-roles', auth.roles(['admin']), async (req: ModifyRolesRequest, res: Response) => {
   const { username, roles } = req.body
-  try {
-    await userService.modifyAccess(username, roles)
-    res.status(204).end()
-  } catch (error) {
-    res.status(400).json(error)
+  const { error } = await tryCatch(userService.modifyAccess(username, roles))
+
+  if (error) {
+    return res.status(400).json(error)
   }
+
+  return res.status(204).end()
 })
 
 router.get('/email/preview', auth.roles(['admin']), (_req: Request, res: Response) => {
@@ -64,18 +64,14 @@ interface EmailRequest extends Request {
 }
 
 router.post('/email', auth.roles(['admin']), async (req: EmailRequest, res: Response) => {
-  const userEmail = req.body.email
-  if (!userEmail) {
-    return res.status(400).json({ error: 'Email address is missing' })
-  }
+  const { email } = req.body
+  if (!email) return res.status(400).json({ error: 'Email address is missing' })
 
-  try {
-    await sendNotificationAboutAccessToUser(userEmail)
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message })
-  }
+  const { error } = await tryCatch(sendNotificationAboutAccessToUser(email))
+  if (error) return res.status(500).json({ error: error.message })
+
   logger.info('Succesfully sent message about Oodikone access to user')
-  res.status(200).end()
+  return res.status(200).end()
 })
 
 interface ElementsRequest extends Request {
@@ -108,18 +104,16 @@ interface ChangeLanguageRequest extends Request {
 }
 
 router.post('/language', async (req: ChangeLanguageRequest, res: Response) => {
-  const {
-    body: { language },
-  } = req
+  const { language } = req.body
+
   if (!LANGUAGE_CODES.includes(language)) {
     return res.status(400).json('Invalid language')
   }
-  try {
-    await userService.updateUser(req.user.username, { language })
-    return res.status(204).end()
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message })
-  }
+
+  const { error } = await tryCatch(userService.updateUser(req.user.username, { language }))
+  if (error) return res.status(500).json({ error: error.message })
+
+  return res.status(204).end()
 })
 
 export default router
