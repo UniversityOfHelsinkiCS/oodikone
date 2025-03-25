@@ -1,4 +1,4 @@
-const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
+const { getLatestSnapshot, isActive, getActiveSnapshot, getLatestActiveSnapshot } = require('../utils')
 const { logger } = require('../utils/logger')
 const { dbConnections } = require('./connection')
 
@@ -33,6 +33,17 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
     .map(({ data }) => getLatestSnapshot(data))
     .filter(s => !!s)
     .filter(isActive)
+
+const selectLatestActiveFromSnapshotsByIds = async (table, ids, col = 'id') =>
+  (
+    await dbConnections.knex
+      .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
+      .from(table)
+      .whereIn(col, ids)
+      .groupBy('id')
+  )
+    .map(({ data }) => getLatestActiveSnapshot(data))
+    .filter(s => !!s)
 
 const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
   (
@@ -79,4 +90,5 @@ module.exports = {
   selectAllFromSnapshots,
   getCourseUnitsByCodes,
   selectFromActiveSnapshotsByIds,
+  selectLatestActiveFromSnapshotsByIds,
 }
