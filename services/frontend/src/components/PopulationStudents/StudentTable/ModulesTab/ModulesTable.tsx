@@ -1,5 +1,5 @@
 import { Check as CheckIcon, CropSquare as CropSquareIcon } from '@mui/icons-material'
-import { Box, Tooltip, Typography } from '@mui/material'
+import { Box, Divider, Tooltip, Typography } from '@mui/material'
 import {
   type MRT_ColumnDef,
   type MRT_VisibilityState,
@@ -19,6 +19,14 @@ import type { FormattedModules, FormattedStudent } from '.'
 
 const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
+
+const DividedTableCell = ({ top, bottom }: { top: string | number; bottom: string | number }) => (
+  <Box sx={{ alignItems: 'end', display: 'flex', flexDirection: 'column' }}>
+    <Typography sx={{ color: 'text.primary', padding: '8px' }}>{top}</Typography>
+    <Divider aria-hidden="true" flexItem sx={{ position: 'absolute', left: 0, right: 0, top: '50%' }} />
+    <Typography sx={{ color: 'text.primary', padding: '8px' }}>{bottom}</Typography>
+  </Box>
+)
 
 export const ModulesTab = ({
   formattedModules,
@@ -64,6 +72,7 @@ export const ModulesTab = ({
           <StudentInfoItem sisPersonId={cell.row.original.sis_person_id} studentNumber={cell.getValue<string>()} />
         ),
         filterFn: 'startsWith',
+        Footer: () => <DividedTableCell bottom="Completed" top="Planned" />,
       },
     ],
     []
@@ -74,7 +83,22 @@ export const ModulesTab = ({
     return Object.keys(formattedModules).map(code => ({
       accessorFn: (row: FormattedStudent) => {
         const studyModule = getModuleIfExists(row, code)
-        return studyModule ? (studyModule.completed ? '1' : '0') : null
+        return studyModule ? (studyModule.completed ? 1 : 0) : null // 1 for completed, 0 for in HOPS
+      },
+      Footer: ({ table, column }) => {
+        const { planned, completed } = table.getFilteredRowModel().rows.reduce(
+          (acc, row) => {
+            const value = row.getValue<number>(column.id)
+            if (value === 0) {
+              acc.planned += 1
+            } else if (value === 1) {
+              acc.completed += 1
+            }
+            return acc
+          },
+          { planned: 0, completed: 0 }
+        )
+        return <DividedTableCell bottom={completed} top={planned} />
       },
       header: `${code} – ${getTextIn(formattedModules[code])}`,
       Header: () => (
@@ -138,6 +162,7 @@ export const ModulesTab = ({
     },
     enableColumnActions: false,
     enableColumnFilters: false,
+    enableStickyFooter: true,
     defaultColumn: { size: 0 },
 
     onColumnVisibilityChange: setColumnVisibility,

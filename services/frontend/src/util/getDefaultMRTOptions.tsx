@@ -85,6 +85,14 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
         },
       },
     },
+    muiTableFooterCellProps: {
+      sx: {
+        padding: 0,
+        borderWidth: '1px 1px 1px 0',
+        borderStyle: 'solid',
+        borderColor: 'grey.300',
+      },
+    },
     renderTopToolbarCustomActions: ({ table }) => (
       <Button
         disabled={table.getPrePaginationRowModel().rows.length === 0}
