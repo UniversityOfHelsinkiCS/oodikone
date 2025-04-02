@@ -20,11 +20,11 @@ import type { FormattedModules, FormattedStudent } from '.'
 const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
 
-const DividedTableCell = ({ top, bottom }: { top: string | number; bottom: string | number }) => (
+const DividedTableCell = ({ top, bottom }: { top?: string | number; bottom?: string | number }) => (
   <Box sx={{ alignItems: 'end', display: 'flex', flexDirection: 'column' }}>
-    <Typography sx={{ color: 'text.primary', padding: '8px' }}>{top}</Typography>
+    {top !== undefined && <Typography sx={{ color: 'text.primary', padding: '8px' }}>{top}</Typography>}
     <Divider aria-hidden="true" flexItem sx={{ position: 'absolute', left: 0, right: 0, top: '50%' }} />
-    <Typography sx={{ color: 'text.primary', padding: '8px' }}>{bottom}</Typography>
+    {bottom !== undefined && <Typography sx={{ color: 'text.primary', padding: '8px' }}>{bottom}</Typography>}
   </Box>
 )
 
@@ -59,10 +59,12 @@ export const ModulesTab = ({
       {
         accessorKey: 'lastName',
         header: 'Last name',
+        Footer: () => <DividedTableCell />,
       },
       {
         accessorKey: 'firstNames',
         header: 'First names',
+        Footer: () => <DividedTableCell />,
       },
       {
         accessorKey: 'studentNumber',
