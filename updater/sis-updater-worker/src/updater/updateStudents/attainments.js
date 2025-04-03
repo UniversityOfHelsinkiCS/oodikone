@@ -87,9 +87,9 @@ const updateAttainments = async (
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
       if (att.module_group_id) {
-        const module = await selectOneById('modules', att.module_group_id)
+        const studyModule = await selectOneById('modules', att.module_group_id)
         // Fix attainments with missing modules (see for example issue #4761)
-        if (!module) {
+        if (!studyModule) {
           if (att.module_group_id === 'hy-SM-89304486') {
             const course = await Course.findOne({ where: { code: '71066' } })
             return { ...att, module_group_id: course.id }
