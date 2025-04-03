@@ -22,9 +22,13 @@ const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>
 
 const DividedTableCell = ({ top, bottom }: { top?: string | number; bottom?: string | number }) => (
   <Box sx={{ alignItems: 'end', display: 'flex', flexDirection: 'column' }}>
-    {top !== undefined && <Typography sx={{ color: 'text.primary', padding: '8px' }}>{top}</Typography>}
+    {top !== undefined && (
+      <Typography sx={{ color: 'text.primary', padding: '8px', fontSize: '0.875rem' }}>{top}</Typography>
+    )}
     <Divider aria-hidden="true" flexItem sx={{ position: 'absolute', left: 0, right: 0, top: '50%' }} />
-    {bottom !== undefined && <Typography sx={{ color: 'text.primary', padding: '8px' }}>{bottom}</Typography>}
+    {bottom !== undefined && (
+      <Typography sx={{ color: 'text.primary', padding: '8px', fontSize: '0.875rem' }}>{bottom}</Typography>
+    )}
   </Box>
 )
 
