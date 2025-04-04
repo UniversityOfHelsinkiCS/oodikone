@@ -87,7 +87,8 @@ const updateAttainments = async (
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
       if (att.module_group_id) {
-        const studyModule = await selectOneById('modules', att.module_group_id)
+        const studyModule = await selectOneById('modules', att.module_group_id, 'group_id')
+
         // Fix attainments with missing modules (see for example issue #4761)
         if (!studyModule) {
           if (att.module_group_id === 'hy-SM-89304486') {
@@ -99,6 +100,7 @@ const updateAttainments = async (
             return { ...att, module_group_id: course.id }
           }
           const education = await selectOneById('educations', att.module_group_id.replace('DP', 'EDU'))
+
           if (education) {
             coursesToBeCreated.set(education.code, {
               id: att.module_group_id,
@@ -111,6 +113,7 @@ const updateAttainments = async (
             })
             return att
           }
+
           coursesToBeCreated.set(att.module_group_id, {
             id: att.module_group_id,
             name: {
@@ -197,6 +200,7 @@ const updateAttainments = async (
               substitutions: [],
               course_unit_type: att.course_unit_type_urn,
             }
+
             coursesToBeCreated.set(parsedCourseCode, courseUnit)
             courseProvider = await CourseProvider.findOne({
               where: {
@@ -326,6 +330,7 @@ const updateAttainments = async (
   }
 
   const courses = Array.from(coursesToBeCreated.values())
+
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
   await bulkCreate(
