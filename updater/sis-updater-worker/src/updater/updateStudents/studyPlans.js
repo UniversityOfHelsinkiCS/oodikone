@@ -139,20 +139,39 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
   const getCourseCodesFromAttainment = attainment => {
     if (!attainment) return []
+
     if (attainment.code && attainment.type === 'CustomCourseUnitAttainment')
       return [sanitizeCourseCode(attainment.code)]
-    if (attainment.nodes && attainment.nodes.length)
+
+    if (attainment.nodes?.length)
       return _.flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getCourseCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
+
     if (attainment.code) return [attainment.code]
 
     const { course_unit_id, module_id } = attainment
     const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
-    if (!code) return []
-    return [code]
+
+    return code ? [code] : []
+  }
+
+  const getModuleCodesFromAttainment = attainment => {
+    if (!attainment) return []
+
+    if (attainment.code && attainment.type === 'CustomModuleAttainment') return [sanitizeCourseCode(attainment.code)]
+
+    if (attainment.type === 'DegreeProgrammeAttainment')
+      return _.flatten(
+        attainment.nodes
+          .filter(node => node.attainmentId)
+          .map(node => getModuleCodesFromAttainment(attainmentIdToAttainment[node.attainmentId], 'module'))
+      )
+
+    const code = programmeModuleIdToStudyModuleCode[attainment.module_id]
+    return code ? [code] : []
   }
 
   const getAttainmentsFromAttainment = attainment => {
@@ -221,6 +240,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     studyPlanIdToDegrees,
     educationStudyrights,
     getCourseCodesFromAttainment,
+    getModuleCodesFromAttainment,
     getAttainmentsFromAttainment,
     attainments
   )

@@ -351,6 +351,7 @@ const studyplanMapper =
     studyPlanIdToDegrees,
     educationStudyrights,
     getCourseCodesFromAttainment,
+    getModuleCodesFromAttainment,
     getAttainmentsFromAttainment,
     attainments
   ) =>
@@ -458,15 +459,18 @@ const studyplanMapper =
         : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules)
       if (includedCourses.length === 0) return null
 
-      const includedModules = Array.from(
-        studyplan.module_selections.reduce((modules, { moduleId }) => {
-          const studyModuleCode = programmeModuleIdToStudyModuleCode[moduleId]
-          if (studyModuleCode) {
-            modules.add(studyModuleCode)
-          }
-          return modules
-        }, new Set())
-      )
+      const includedModules = graduated
+        ? // If graduated, find modules from within the graduated programme attainment
+          getModuleCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+        : Array.from(
+            studyplan.module_selections.reduce((modules, { moduleId }) => {
+              const studyModuleCode = programmeModuleIdToStudyModuleCode[moduleId]
+              if (studyModuleCode) {
+                modules.add(studyModuleCode)
+              }
+              return modules
+            }, new Set())
+          )
 
       return {
         id,
