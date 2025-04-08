@@ -167,7 +167,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
       return _.flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
-          .map(node => getModuleCodesFromAttainment(attainmentIdToAttainment[node.attainmentId], 'module'))
+          .map(node => getModuleCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
 
     const code = programmeModuleIdToStudyModuleCode[attainment.module_id]
