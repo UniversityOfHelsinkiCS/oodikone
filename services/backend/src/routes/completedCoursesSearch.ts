@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { difference, intersection } from 'lodash'
 
 import { getCompletedCourses } from '../services/completedCoursesSearch'
@@ -8,6 +8,7 @@ import {
   deleteSearch,
   updateSearch,
 } from '../services/openUni/openUniManageSearches'
+import { CanError } from '../types'
 import { hasFullAccessToStudentData } from '../util'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
@@ -16,14 +17,18 @@ const router = Router()
 
 const importerClient = getImporterClient()
 
-interface GetSearchRequest extends Request {
-  query: {
-    studentlist: string
-    courselist: string
-  }
+type SearchResBody = CanError<
+  {
+    discardedStudentNumbers: string[]
+  } & Awaited<ReturnType<typeof getCompletedCourses>>
+>
+type SearchReqBody = never
+type SearchQuery = {
+  studentlist: string
+  courselist: string
 }
 
-router.get('/', async (req: GetSearchRequest, res: Response) => {
+router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, res) => {
   const studentNumbers = JSON.parse(req.query?.studentlist) || []
   const courseCodes = JSON.parse(req.query?.courselist) || []
   const { roles, studentsUserCanAccess, sisPersonId: teacherId } = req.user
@@ -62,20 +67,26 @@ router.get('/', async (req: GetSearchRequest, res: Response) => {
   return res.json({ discardedStudentNumbers, ...completedCourses })
 })
 
-router.get('/searches', async (req: Request, res: Response) => {
+type GetSearchResBody = Awaited<ReturnType<typeof getOpenUniSearches>>
+router.get<never, GetSearchResBody>('/searches', async (req, res) => {
   const userId = req.user.id
   const foundSearches = await getOpenUniSearches(userId)
   return res.json(foundSearches)
 })
 
-interface CreateSearchRequest extends Request {
-  body: {
-    courselist: string[]
-    name: string
-  }
+type CreateSearchResBody = CanError<{
+  id: string
+  userId: string
+  name: string
+  courseList: string[]
+  updatedAt: string
+}>
+type CreateSearchReqBody = {
+  courselist: string[]
+  name: string
 }
 
-router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
+router.post<never, CreateSearchResBody, CreateSearchReqBody>('/searches', async (req, res) => {
   const courseCodes = req.body?.courselist || []
   const name = req.body?.name
   const userId = req.user.id
@@ -98,16 +109,21 @@ router.post('/searches', async (req: CreateSearchRequest, res: Response) => {
   })
 })
 
-interface UpdateSearchRequest extends Request {
-  body: {
-    courselist: string[]
-  }
-  params: {
-    id: string
-  }
+type UpdateSearchParams = {
+  id: string
+}
+type UpdateSearchResBody = CanError<{
+  id: string
+  userId: string
+  name: string
+  courseList: string[]
+  updatedAt: string
+}>
+type UpdateSearchReqBody = {
+  courselist: string[]
 }
 
-router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
+router.put<UpdateSearchParams, UpdateSearchResBody, UpdateSearchReqBody>('/searches/:id', async (req, res) => {
   const id = req.params?.id
   const courseCodes = req.body?.courselist || []
   const userId = req.user.id
@@ -127,13 +143,12 @@ router.put('/searches/:id', async (req: UpdateSearchRequest, res: Response) => {
   })
 })
 
-interface DeleteSearchRequest extends Request {
-  params: {
-    id: string
-  }
+type DeleteSearchParams = {
+  id: string
 }
+type DeleteSearchResBody = CanError<string>
 
-router.delete('/searches/:id', async (req: DeleteSearchRequest, res: Response) => {
+router.delete<DeleteSearchParams, DeleteSearchResBody>('/searches/:id', async (req, res) => {
   const id = req.params?.id
   const userId = req.user.id
   if (!id || !userId) {
