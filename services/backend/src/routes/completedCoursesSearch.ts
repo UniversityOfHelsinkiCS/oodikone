@@ -8,8 +8,9 @@ import {
   deleteSearch,
   updateSearch,
 } from '../services/openUni/openUniManageSearches'
+import { tryCatch } from '../shared/util'
 import { CanError } from '../types'
-import { hasFullAccessToStudentData } from '../util'
+import { hasFullAccessToStudentData, safeJSONParse } from '../util'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
 
@@ -29,9 +30,12 @@ type SearchQuery = {
 }
 
 router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, res) => {
-  const studentNumbers = JSON.parse(req.query?.studentlist) || []
-  const courseCodes = JSON.parse(req.query?.courselist) || []
+  const { studentlist, courselist } = req.query
+  const studentNumbers: string[] = (await safeJSONParse(studentlist)) ?? []
+  const courseCodes: string[] = (await safeJSONParse(courselist)) ?? []
+
   const { roles, studentsUserCanAccess, sisPersonId: teacherId } = req.user
+
   if (!Array.isArray(studentNumbers)) {
     return res.status(400).json({ error: 'Student numbers must be of type array' })
   }
@@ -39,21 +43,22 @@ router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, re
     return res.status(400).json({ error: 'Courses must be of type array' })
   }
 
-  const answerTimeout = new Promise(resolve => setTimeout(resolve, 6000))
+  const answerTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 6000))
 
-  try {
-    // Teachers can also get rights to students via Importer if
-    // the students have enrolled to their courses in last 8 months
-    // (acual logic a bit different, see Importer)
-    const teacherRightsToStudents = (await Promise.race([
-      importerClient!.post('/teacher-rights/', { teacherId, studentNumbers }),
-      answerTimeout,
-    ])) as { data: string[] }
-    if (teacherRightsToStudents && Array.isArray(teacherRightsToStudents.data)) {
-      studentsUserCanAccess.push(...teacherRightsToStudents.data)
-    }
-  } catch (error: any) {
+  // Teachers can also get rights to students via Importer if
+  // the students have enrolled to their courses in last 8 months
+  // (acual logic a bit different, see Importer)
+  const { data: teacherRightsToStudents, error } = await Promise.race([
+    tryCatch<{ data: string[] }>(importerClient!.post('/teacher-rights/', { teacherId, studentNumbers })),
+    tryCatch<any>(answerTimeout), // This will always reject with an Error
+  ])
+
+  if (error) {
     logger.error(`Importer teacher-rights request failed with message: ${error?.message}`)
+  }
+
+  if (teacherRightsToStudents && Array.isArray(teacherRightsToStudents.data)) {
+    studentsUserCanAccess.push(...teacherRightsToStudents.data)
   }
 
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
@@ -64,6 +69,7 @@ router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, re
     studentNumbers,
     completedCourses.students.map(student => student.studentNumber)
   )
+
   return res.json({ discardedStudentNumbers, ...completedCourses })
 })
 
@@ -124,16 +130,19 @@ type UpdateSearchReqBody = {
 }
 
 router.put<UpdateSearchParams, UpdateSearchResBody, UpdateSearchReqBody>('/searches/:id', async (req, res) => {
-  const id = req.params?.id
-  const courseCodes = req.body?.courselist || []
-  const userId = req.user.id
+  const { id } = req.params
+  const { courselist: courseCodes = [] } = req.body
+  const { id: userId } = req.user
+
   if (!id || !userId) {
     return res.status(422).end()
   }
+
   const updatedSearch = await updateSearch(userId, id, courseCodes)
   if (!updatedSearch) {
     return res.status(404).json({ error: 'Courselist could not be found' })
   }
+
   return res.json({
     id: updatedSearch.id,
     userId: updatedSearch.userId,
@@ -149,15 +158,18 @@ type DeleteSearchParams = {
 type DeleteSearchResBody = CanError<string>
 
 router.delete<DeleteSearchParams, DeleteSearchResBody>('/searches/:id', async (req, res) => {
-  const id = req.params?.id
-  const userId = req.user.id
+  const { id } = req.params
+  const { id: userId } = req.user
+
   if (!id || !userId) {
     return res.status(422).end()
   }
+
   const deletedSearch = await deleteSearch(userId, id)
   if (!deletedSearch) {
     return res.status(404).json({ error: 'Courselist could not be found' })
   }
+
   return res.json(id)
 })
 
