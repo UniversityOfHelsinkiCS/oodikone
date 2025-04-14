@@ -103,18 +103,18 @@ export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
     studyRights?.flatMap(studyRight =>
       studyRight.studyRightElements
         .filter(element => element.degreeProgrammeType !== null)
-        .map(element => ({ ...element, studyRight }))
+        .map(element => ({
+          code: element.code,
+          name: element.name,
+          graduated: element.graduated,
+          startDate: element.startDate,
+          active: programmeIsActive(studyRight, element.graduated, currentSemester),
+          facultyCode: studyRight.facultyCode,
+        }))
     ),
-    ['startDate'],
-    ['desc']
-  ).map(({ code, name, graduated, studyRight, startDate }) => ({
-    code,
-    name,
-    graduated,
-    startDate,
-    active: programmeIsActive(studyRight, graduated, currentSemester),
-    facultyCode: studyRight.facultyCode,
-  }))
+    ['active', 'startDate'],
+    ['desc', 'desc']
+  )
 
 export const getNewestProgrammeOfStudentAt = (studyRights, currentSemester, date) => {
   const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
