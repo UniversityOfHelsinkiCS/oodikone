@@ -1,5 +1,6 @@
 import { literal, Op, type WhereOptions } from 'sequelize'
 
+import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
@@ -42,9 +43,10 @@ const creditFilterBuilder = async (
 
   const studyPlanCourses = new Set(studyPlans.flatMap(plan => plan.included_courses))
   // takes into account possible progress tests taken earlier than the start date
-  const courseCodes = ['320001', 'MH30_001'].includes(studyRights[0])
-    ? [...studyPlanCourses, '375063', '339101']
-    : [...studyPlanCourses]
+  const courseCodes =
+    ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
+      ? [...studyPlanCourses, '375063', '339101']
+      : [...studyPlanCourses]
 
   return {
     student_studentnumber: { [Op.in]: studentNumbers },
