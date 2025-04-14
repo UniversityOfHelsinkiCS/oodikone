@@ -25,7 +25,7 @@ export const getOptionsForStudents = async (
   code: string,
   degreeProgrammeType: DegreeProgrammeType | null
 ): Promise<Record<string, { name: Name }>> => {
-  if (!studentNumbers.length) {
+  if (!code || !studentNumbers.length) {
     return {}
   } else if (
     degreeProgrammeType &&
