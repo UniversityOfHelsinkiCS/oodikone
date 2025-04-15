@@ -8,7 +8,7 @@ import { EnrollmentState } from '../../types'
 type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
-const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promise<StudentTags[]> =>
+const getStudentTags = (studyRights: string[], studentNumbers: string[], userId: string): Promise<StudentTags[]> =>
   TagStudent.findAll({
     attributes: ['tag_id', 'studentnumber'],
     include: {
@@ -16,6 +16,7 @@ const getStudentTags = (studyRights: string[], studentNumbers: string[]): Promis
       attributes: ['tag_id', 'tagname', 'personal_user_id'],
       where: {
         studytrack: { [Op.in]: studyRights },
+        personal_user_id: { [Op.or]: [userId, null] },
       },
     },
     where: {
@@ -248,9 +249,10 @@ export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
   endDate: Date,
-  studyRights: string[]
+  studyRights: string[],
+  userId: string
 ): Promise<StudentsIncludeCoursesBetween> => {
-  const studentTags = await getStudentTags(studyRights, studentNumbers)
+  const studentTags = await getStudentTags(studyRights, studentNumbers, userId)
   const studentNumberToTags = studentTags.reduce((acc: Record<string, TagStudent[]>, studentTag) => {
     const { studentnumber } = studentTag
     acc[studentnumber] = [...(acc[studentnumber] || []), studentTag]

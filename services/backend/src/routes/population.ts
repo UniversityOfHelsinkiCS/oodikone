@@ -17,21 +17,6 @@ import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse 
 
 const router = Router()
 
-type populationPersonalTagFilter = {
-  [key: string]: any
-  students: any[]
-}
-
-const filterPersonalTags = (population: populationPersonalTagFilter, userId: string) => {
-  return {
-    ...population,
-    students: population.students.map(student => {
-      student.tags = student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
-      return student
-    }),
-  }
-}
-
 type EncryptedStudent = EncrypterData
 const isEncryptedStudent = (student?: string | EncryptedStudent) => {
   return (student as EncryptedStudent)?.encryptedData !== undefined
@@ -99,7 +84,7 @@ export type PopulationstatisticsQuery = {
 router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
   '/v3/populationstatistics',
   async (req, res) => {
-    const { roles: userRoles, programmeRights: userProgrammeRights } = req.user
+    const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user
     const { year, semesters, studyRights: requestedStudyRightsJSON, studentStatuses } = req.query
 
     const months = req.query.months ?? '12'
@@ -137,7 +122,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    let result: CanError<{ students: any[]; courses: any[] }>
+    let result
     if (req.query.years) {
       const upperYearBound = new Date().getFullYear() + 1
       const multiYearStudents = Promise.all(
@@ -146,6 +131,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
           const monthsForCurrentYear = String((upperYearBound - yearAsNumber) * 12)
           return optimizedStatisticsOf({
             ...req.query,
+            userId,
             studyRights: requestedStudyRights.programme,
             year,
             months: monthsForCurrentYear,
@@ -174,6 +160,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     } else {
       result = await optimizedStatisticsOf({
         ...req.query,
+        userId,
         studyRights: requestedStudyRights.programme,
         year,
         months,
@@ -210,8 +197,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       })
     }
 
-    const { id: userId } = req.user
-    return res.json(filterPersonalTags(result, userId))
+    return res.json(result)
   }
 )
 
@@ -227,7 +213,7 @@ interface GetPopulationStatisticsByCourseRequest extends Request {
 
 router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisticsByCourseRequest, res: Response) => {
   const { coursecodes, from, to, separate: separateString, unifyCourses } = req.query
-  const { id, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
+  const { id: userId, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
 
   if (!coursecodes || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
@@ -252,6 +238,7 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     {
       // Useless, because studentnumbers are already filtered above by from & to.
       // We should probably refactor this to avoid more confusement.
+      userId,
       year: '1900',
       studyRights: undefined,
       semesters: ['FALL', 'SPRING'],
@@ -304,7 +291,7 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     )
   }
 
-  res.json(filterPersonalTags(result, id))
+  res.json(result)
 })
 
 interface PostByStudentNumbersRequest extends Request {
@@ -319,7 +306,7 @@ interface PostByStudentNumbersRequest extends Request {
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStudentNumbersRequest, res: Response) => {
   const { studentnumberlist, tags } = req.body
-  const { roles, id, studentsUserCanAccess } = req.user
+  const { id: userId, roles, studentsUserCanAccess } = req.user
   const filteredStudentNumbers = hasFullAccessToStudentData(roles)
     ? studentnumberlist
     : intersection(studentnumberlist, studentsUserCanAccess)
@@ -328,6 +315,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
 
   const result = await optimizedStatisticsOf(
     {
+      userId,
       year: tags?.year ?? '1900',
       studyRights: studyProgrammeCode,
       semesters: ['FALL', 'SPRING'],
@@ -338,7 +326,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
   const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
   const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
 
-  res.status(200).json({ ...filterPersonalTags(resultWithStudyProgramme, id), discardedStudentNumbers })
+  res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req: Request, res: Response) => {

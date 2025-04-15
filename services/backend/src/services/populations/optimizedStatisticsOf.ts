@@ -9,6 +9,7 @@ import { getOptionsForStudents } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
 export type OptimizedStatisticsQuery = {
+  userId: string
   semesters: string[]
   studentStatuses?: string[]
   studyRights?: string | string[]
@@ -58,6 +59,7 @@ const parseQueryParams = (query: OptimizedStatisticsQuery): ParsedQueryParams =>
 }
 
 export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, studentNumberList?: string[]) => {
+  const { userId } = query
   const {
     studyRights,
     startDate,
@@ -86,7 +88,8 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     studentNumbers,
     startDate,
     dateMonthsFromNow(startDate, months),
-    studyRights
+    studyRights,
+    userId
   )
 
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
