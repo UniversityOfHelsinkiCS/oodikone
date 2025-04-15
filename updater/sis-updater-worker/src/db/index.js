@@ -56,9 +56,9 @@ const bulkCreate = async (
   findBy = 'id'
 ) => {
   try {
-    let options
-    if (upsertStyle) options = { updateOnDuplicate: getColumnsToUpdate(model, properties), transaction }
-    else options = { ignoreDuplicates: true, transaction }
+    const options = upsertStyle
+      ? { updateOnDuplicate: getColumnsToUpdate(model, properties), transaction }
+      : { ignoreDuplicates: true, transaction }
     await model.bulkCreate(entities, options)
   } catch (error) {
     for (const entity of entities) {
