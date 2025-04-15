@@ -18,6 +18,10 @@ const nondegreeStudents = [
   ExtentCode.SUMMER_AND_WINTER_SCHOOL,
 ]
 
+type StudentStudyRights = Pick<SISStudyRight, 'studentNumber' | 'studyRightElements'> & {
+  studyRightElements: Array<Pick<SISStudyRightElement, 'code' | 'endDate' | 'startDate' | 'phase'>>
+}
+
 export const getStudentNumbersWithAllStudyRightElements = async ({
   studyRights,
   startDate,
@@ -26,38 +30,29 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
   includeNondegreeStudents,
   includeTransferredOutStudents,
 }) => {
-  const filteredExtents = [ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS]
-  if (!includeExchangeStudents) {
-    filteredExtents.push(...exchangeStudents)
-  }
-  if (!includeNondegreeStudents) {
-    filteredExtents.push(...nondegreeStudents)
-  }
+  const filteredExtents = [
+    ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS,
+    ...(!includeExchangeStudents ? exchangeStudents : []),
+    ...(!includeNondegreeStudents ? nondegreeStudents : []),
+  ] as const
 
-  const studyRightIds = await SISStudyRight.findAll({
+  const studyRightIds: Array<Pick<SISStudyRight, 'id'>> = await SISStudyRight.findAll({
     attributes: ['id'],
     include: {
       model: SISStudyRightElement,
       attributes: [],
       where: {
-        code: {
-          [Op.in]: studyRights,
-        },
-        startDate: {
-          [Op.gte]: startDate,
-          [Op.lt]: endDate,
-        },
+        code: { [Op.in]: studyRights },
+        startDate: { [Op.gte]: startDate, [Op.lt]: endDate },
       },
     },
     where: {
-      extentCode: {
-        [Op.notIn]: filteredExtents,
-      },
+      extentCode: { [Op.notIn]: filteredExtents },
     },
     raw: true,
   })
 
-  const studentsStudyRights = (
+  const studentsStudyRights: Array<StudentStudyRights> = (
     await SISStudyRight.findAll({
       attributes: ['studentNumber'],
       include: {
@@ -67,7 +62,7 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
       },
       where: {
         id: {
-          [Op.in]: studyRightIds.map(studyRight => studyRight.id),
+          [Op.in]: studyRightIds.map(({ id }) => id),
         },
       },
     })
@@ -77,12 +72,11 @@ export const getStudentNumbersWithAllStudyRightElements = async ({
     .filter(student => {
       if (includeTransferredOutStudents) return true
 
-      const [hasTransferredFromProgramme, _] = hasTransferredFromOrToProgramme(
-        student,
-        student.studyRightElements.find(element => studyRights.includes(element.code))!
-      )
+      // NOTE: We know that this will always return a value because of the first query in the function
+      const element = student.studyRightElements.find(element => studyRights.includes(element.code))!
+      const [hasTransferredFromProgramme, _] = hasTransferredFromOrToProgramme(student, element)
 
       return !hasTransferredFromProgramme
     })
-    .map(student => student.studentNumber)
+    .map(({ studentNumber }) => studentNumber)
 }

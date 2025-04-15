@@ -1,5 +1,5 @@
 import { orderBy } from 'lodash'
-import { InferAttributes, Op } from 'sequelize'
+import { Op } from 'sequelize'
 
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
@@ -197,7 +197,7 @@ export const getGoal = async (programme?: string) => {
 
 export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code)
 
-export const getStudyRightElementsWithPhase = (studyRight: InferAttributes<SISStudyRight>, phase: Phase) => {
+export const getStudyRightElementsWithPhase = (studyRight: Pick<SISStudyRight, 'studyRightElements'>, phase: Phase) => {
   return orderBy(
     studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],
@@ -206,7 +206,7 @@ export const getStudyRightElementsWithPhase = (studyRight: InferAttributes<SISSt
 }
 
 export const hasTransferredFromOrToProgramme = (
-  studyRight: InferAttributes<SISStudyRight>,
+  studyRight: Pick<SISStudyRight, 'studyRightElements'>,
   studyRightElement: SISStudyRightElement
 ): [boolean, boolean] => {
   const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
