@@ -111,17 +111,17 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   const criteria = await getCriteria(code)
 
-  const creditsByStudent = credits.reduce((acc: Record<string, StudentCredit[]>, credit) => {
+  const creditsByStudent: Record<string, StudentCredit[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  credits.forEach(credit => {
     const { student_studentnumber: studentnumber } = credit
-    acc[studentnumber] = [...(acc[studentnumber] || []), credit]
-    return acc
-  }, {})
+    creditsByStudent[studentnumber].push(credit)
+  })
 
-  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, StudentEnrollment[]>, enrollment) => {
+  const enrollmentsByStudent: Record<string, StudentEnrollment[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  enrollments.forEach(enrollment => {
     const { studentnumber } = enrollment
-    acc[studentnumber] = [...(acc[studentnumber] || []), enrollment]
-    return acc
-  }, {})
+    enrollmentsByStudent[studentnumber].push(enrollment)
+  })
 
   return {
     students: students
