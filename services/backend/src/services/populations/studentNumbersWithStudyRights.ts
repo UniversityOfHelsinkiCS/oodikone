@@ -22,7 +22,7 @@ type StudentStudyRights = Pick<SISStudyRight, 'studentNumber' | 'studyRightEleme
   studyRightElements: Array<Pick<SISStudyRightElement, 'code' | 'endDate' | 'startDate' | 'phase'>>
 }
 
-export const getStudentNumbersWithAllStudyRightElements = async ({
+export const getStudentNumbersWithStudyRights = async ({
   studyRights,
   startDate,
   endDate,

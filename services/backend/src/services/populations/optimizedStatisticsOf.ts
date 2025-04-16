@@ -15,7 +15,7 @@ import {
   getCredits,
 } from './getStudentData'
 import { getOptionsForStudents } from './shared'
-import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
+import { getStudentNumbersWithStudyRights } from './studentNumbersWithStudyRights'
 
 export type OptimizedStatisticsQuery = {
   userId: string
@@ -81,7 +81,7 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
 
   const studentNumbers =
     studentNumberList ??
-    (await getStudentNumbersWithAllStudyRightElements({
+    (await getStudentNumbersWithStudyRights({
       studyRights,
       startDate,
       endDate,
