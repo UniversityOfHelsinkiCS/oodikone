@@ -2,7 +2,38 @@ import { literal, Op, type WhereOptions } from 'sequelize'
 
 import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
+import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
+
+type StudentTags = TagStudent & {
+  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
+}
+
+export type TaggetStudentData = StudentData & {
+  tags: StudentTags[]
+}
+
+export const getStudentTags = async (studyRights: string[], studentNumbers: string[], userId: string) => {
+  const studentTags = await TagStudent.findAll({
+    attributes: ['tag_id', 'studentnumber'],
+    include: {
+      model: Tag,
+      attributes: ['tag_id', 'tagname', 'personal_user_id'],
+      where: {
+        studytrack: { [Op.in]: studyRights },
+        personal_user_id: { [Op.or]: [userId, null] },
+      },
+    },
+    where: {
+      studentnumber: { [Op.in]: studentNumbers },
+    },
+  })
+
+  const studentTagList: Record<string, TagStudent[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  studentTags.forEach(studentTag => studentTagList[studentTag.studentnumber].push(studentTag))
+
+  return studentTagList
+}
 
 export const creditFilterBuilder = async (
   studentNumbers: string[],

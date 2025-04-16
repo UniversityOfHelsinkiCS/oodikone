@@ -3,8 +3,13 @@ import { Name, ProgressCriteria } from '../../shared/types'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import type { StudentStudyPlan, StudentCourse, StudentEnrollment, StudentCredit } from './getStudentData'
-import type { TaggetStudentData } from './optimizedStatisticsOf'
+import type {
+  TaggetStudentData,
+  StudentStudyPlan,
+  StudentCourse,
+  StudentEnrollment,
+  StudentCredit,
+} from './getStudentData'
 import { getCurriculumVersion } from './shared'
 
 type CoursesSatisfied = Record<string, string | null>
