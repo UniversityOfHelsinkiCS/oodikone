@@ -1,3 +1,5 @@
+import { Op } from 'sequelize'
+import { Tag, TagStudent } from '../../models/kone'
 import { formatToArray } from '../../shared/util'
 import { getDegreeProgrammeType } from '../../util'
 import { dateMonthsFromNow } from '../../util/datetime'
@@ -5,8 +7,39 @@ import { SemesterStart } from '../../util/semester'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { formatStudentsForApi } from './formatStatisticsForApi'
 import { getStudentsIncludeCoursesBetween } from './getStudentsIncludeCoursesBetween'
+import type { StudentData } from './getStudentsIncludeCoursesBetween'
 import { getOptionsForStudents } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
+
+type StudentTags = TagStudent & {
+  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
+}
+
+export type TaggetStudentData = StudentData & {
+  tags: StudentTags[]
+}
+
+export const getStudentTags = async (studyRights: string[], studentNumbers: string[], userId: string) => {
+  const studentTags = await TagStudent.findAll({
+    attributes: ['tag_id', 'studentnumber'],
+    include: {
+      model: Tag,
+      attributes: ['tag_id', 'tagname', 'personal_user_id'],
+      where: {
+        studytrack: { [Op.in]: studyRights },
+        personal_user_id: { [Op.or]: [userId, null] },
+      },
+    },
+    where: {
+      studentnumber: { [Op.in]: studentNumbers },
+    },
+  })
+
+  const studentTagList: Record<string, TagStudent[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  studentTags.forEach(studentTag => studentTagList[studentTag.studentnumber].push(studentTag))
+
+  return studentTagList
+}
 
 export type OptimizedStatisticsQuery = {
   userId: string
@@ -88,15 +121,16 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     studentNumbers,
     startDate,
     dateMonthsFromNow(startDate, months),
-    studyRights,
-    userId
+    studyRights
   )
+
+  const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   const criteria = await getCriteria(code)
 
   const formattedStudents = formatStudentsForApi(
-    students,
+    students.map(student => ({ ...student, tags: tagList[student.studentnumber] })),
     enrollments,
     credits,
     courses,

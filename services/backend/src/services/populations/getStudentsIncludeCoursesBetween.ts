@@ -2,37 +2,7 @@ import { literal, Op, type WhereOptions } from 'sequelize'
 
 import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Tag, TagStudent } from '../../models/kone'
 import { EnrollmentState } from '../../types'
-
-type StudentTags = TagStudent & {
-  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
-}
-const getStudentTags = (studyRights: string[], studentNumbers: string[], userId: string): Promise<StudentTags[]> =>
-  TagStudent.findAll({
-    attributes: ['tag_id', 'studentnumber'],
-    include: {
-      model: Tag,
-      attributes: ['tag_id', 'tagname', 'personal_user_id'],
-      where: {
-        studytrack: { [Op.in]: studyRights },
-        personal_user_id: { [Op.or]: [userId, null] },
-      },
-    },
-    where: {
-      studentnumber: { [Op.in]: studentNumbers },
-    },
-  })
-
-type StudyplanIncludedCourses = Pick<Studyplan, 'included_courses'>
-const queryStudyplanCourses = (studentNumbers: string[]): Promise<Array<StudyplanIncludedCourses>> =>
-  Studyplan.findAll({
-    where: {
-      studentnumber: { [Op.in]: studentNumbers },
-    },
-    attributes: ['included_courses'],
-    raw: true,
-  })
 
 const creditFilterBuilder = async (
   studentNumbers: string[],
@@ -40,14 +10,21 @@ const creditFilterBuilder = async (
   attainmentDateFrom: string,
   endDate: Date
 ): Promise<WhereOptions> => {
-  const studyPlans = await queryStudyplanCourses(studentNumbers)
+  const includedCoursesInStudyPlans: Array<Pick<Studyplan, 'included_courses'>> = await Studyplan.findAll({
+    attributes: ['included_courses'],
+    where: {
+      studentnumber: { [Op.in]: studentNumbers },
+    },
+    raw: true,
+  })
 
-  const studyPlanCourses = new Set(studyPlans.flatMap(plan => plan.included_courses))
+  const uniqueCourses = new Set(includedCoursesInStudyPlans.flatMap(plan => plan.included_courses))
+
   // takes into account possible progress tests taken earlier than the start date
   const courseCodes =
     ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
-      ? [...studyPlanCourses, '375063', '339101']
-      : [...studyPlanCourses]
+      ? [...uniqueCourses, '375063', '339101']
+      : [...uniqueCourses]
 
   return {
     student_studentnumber: { [Op.in]: studentNumbers },
@@ -132,13 +109,9 @@ export type StudentStudyPlan = Pick<
   | 'sis_study_right_id'
 >
 
-type StudentData = StudentPersonalData & {
+export type StudentData = StudentPersonalData & {
   studyplans: Array<StudentStudyPlan>
   studyRights: Array<StudentStudyRight>
-}
-
-export type TaggetStudentData = StudentData & {
-  tags: StudentTags[]
 }
 
 const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
@@ -207,7 +180,7 @@ const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
         [Op.in]: studentNumbers,
       },
     },
-  })
+  }).then(data => data.map(x => x.get({ plain: true })))
 
 export type StudentCredit = Pick<
   Credit,
@@ -242,24 +215,17 @@ type StudentsIncludeCoursesBetween = {
   courses: StudentCourse[]
   enrollments: StudentEnrollment[]
   credits: StudentCredit[]
-  students: Array<TaggetStudentData>
+  students: Array<StudentData>
 }
 
 export const getStudentsIncludeCoursesBetween = async (
   studentNumbers: string[],
   startDate: string,
   endDate: Date,
-  studyRights: string[],
-  userId: string
+  studyRights: string[]
 ): Promise<StudentsIncludeCoursesBetween> => {
-  const studentTags = await getStudentTags(studyRights, studentNumbers, userId)
-  const studentNumberToTags = studentTags.reduce((acc: Record<string, TagStudent[]>, studentTag) => {
-    const { studentnumber } = studentTag
-    acc[studentnumber] = [...(acc[studentnumber] || []), studentTag]
-    return acc
-  }, {})
-
   const creditsFilter = await creditFilterBuilder(studentNumbers, studyRights, startDate, endDate)
+
   const [courses, enrollments, credits, students] = await Promise.all([
     getCourses(creditsFilter),
     getEnrollments(studentNumbers, startDate, endDate),
@@ -271,9 +237,6 @@ export const getStudentsIncludeCoursesBetween = async (
     courses,
     enrollments,
     credits,
-    students: (students as Array<TaggetStudentData>).map(student => {
-      student.tags = studentNumberToTags[student.studentnumber] || []
-      return student
-    }),
+    students,
   }
 }

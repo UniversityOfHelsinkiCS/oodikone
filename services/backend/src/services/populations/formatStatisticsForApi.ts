@@ -4,12 +4,12 @@ import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 import type {
-  TaggetStudentData,
   StudentStudyPlan,
   StudentCourse,
   StudentEnrollment,
   StudentCredit,
 } from './getStudentsIncludeCoursesBetween'
+import type { TaggetStudentData } from './optimizedStatisticsOf'
 import { getCurriculumVersion } from './shared'
 
 type CoursesSatisfied = Record<string, string | null>
