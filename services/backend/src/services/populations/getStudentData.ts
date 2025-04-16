@@ -4,7 +4,7 @@ import { serviceProvider } from '../../config'
 import { Course, Credit, Enrollment, Student, Studyplan, SISStudyRight, SISStudyRightElement } from '../../models'
 import { EnrollmentState } from '../../types'
 
-const creditFilterBuilder = async (
+export const creditFilterBuilder = async (
   studentNumbers: string[],
   studyRights: string[],
   attainmentDateFrom: string,
@@ -33,7 +33,7 @@ const creditFilterBuilder = async (
 }
 
 export type StudentCourse = Pick<Course, 'code' | 'name'>
-const getCourses = (creditFilter: WhereOptions): Promise<Array<StudentCourse>> =>
+export const getCourses = (creditFilter: WhereOptions): Promise<Array<StudentCourse>> =>
   Course.findAll({
     attributes: [[literal('DISTINCT ON("code") code'), 'code'], 'name'],
     include: [
@@ -50,7 +50,7 @@ export type StudentEnrollment = Pick<
   Enrollment,
   'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber' | 'semestercode' | 'studyright_id'
 >
-const getEnrollments = (
+export const getEnrollments = (
   studentNumbers: string[],
   startDate: string,
   endDate: Date
@@ -114,7 +114,7 @@ export type StudentData = StudentPersonalData & {
   studyRights: Array<StudentStudyRight>
 }
 
-const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
+export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData>> =>
   Student.findAll({
     attributes: [
       'firstnames',
@@ -194,7 +194,7 @@ export type StudentCredit = Pick<
   | 'language'
   | 'studyright_id'
 >
-const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCredit>> =>
+export const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCredit>> =>
   Credit.findAll({
     attributes: [
       'grade',
@@ -210,33 +210,3 @@ const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCredit>> =
     where: creditFilter,
     raw: true,
   })
-
-type StudentsIncludeCoursesBetween = {
-  courses: StudentCourse[]
-  enrollments: StudentEnrollment[]
-  credits: StudentCredit[]
-  students: Array<StudentData>
-}
-
-export const getStudentsIncludeCoursesBetween = async (
-  studentNumbers: string[],
-  startDate: string,
-  endDate: Date,
-  studyRights: string[]
-): Promise<StudentsIncludeCoursesBetween> => {
-  const creditsFilter = await creditFilterBuilder(studentNumbers, studyRights, startDate, endDate)
-
-  const [courses, enrollments, credits, students] = await Promise.all([
-    getCourses(creditsFilter),
-    getEnrollments(studentNumbers, startDate, endDate),
-    getCredits(creditsFilter),
-    getStudents(studentNumbers),
-  ])
-
-  return {
-    courses,
-    enrollments,
-    credits,
-    students,
-  }
-}

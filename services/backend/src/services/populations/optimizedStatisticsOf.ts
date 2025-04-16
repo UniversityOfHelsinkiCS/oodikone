@@ -6,7 +6,14 @@ import { dateMonthsFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { formatStudentsForApi } from './formatStatisticsForApi'
-import { StudentData, getStudentsIncludeCoursesBetween } from './getStudentData'
+import {
+  type StudentData,
+  getStudents,
+  creditFilterBuilder,
+  getCourses,
+  getEnrollments,
+  getCredits,
+} from './getStudentData'
 import { getOptionsForStudents } from './shared'
 import { getStudentNumbersWithAllStudyRightElements } from './studentNumbersWithAllElements'
 
@@ -116,12 +123,18 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   const code = studyRights[0] ?? ''
   const degreeProgrammeType = await getDegreeProgrammeType(code)
 
-  const { courses, enrollments, credits, students } = await getStudentsIncludeCoursesBetween(
+  const creditsFilter = await creditFilterBuilder(
     studentNumbers,
+    studyRights,
     startDate,
-    dateMonthsFromNow(startDate, months),
-    studyRights
+    dateMonthsFromNow(startDate, months)
   )
+  const [students, courses, enrollments, credits] = await Promise.all([
+    getStudents(studentNumbers),
+    getCourses(creditsFilter),
+    getEnrollments(studentNumbers, startDate, dateMonthsFromNow(startDate, months)),
+    getCredits(creditsFilter),
+  ])
 
   const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
