@@ -3,8 +3,10 @@ import { getDegreeProgrammeType } from '../../util'
 import { dateMonthsFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
-import { formatStudentsForApi } from './formatStatisticsForApi'
+import { formatStudentForAPI } from './formatStatisticsForApi'
 import {
+  type StudentEnrollment,
+  type StudentCredit,
   getStudents,
   getStudentTags,
   creditFilterBuilder,
@@ -109,17 +111,33 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   const criteria = await getCriteria(code)
 
-  const formattedStudents = formatStudentsForApi(
-    students.map(student => ({ ...student, tags: tagList[student.studentnumber] })),
-    enrollments,
-    credits,
-    courses,
-    startDate,
-    endDate,
-    optionData,
-    criteria,
-    code
-  )
+  const creditsByStudent = credits.reduce((acc: Record<string, StudentCredit[]>, credit) => {
+    const { student_studentnumber: studentnumber } = credit
+    acc[studentnumber] = [...(acc[studentnumber] || []), credit]
+    return acc
+  }, {})
 
-  return formattedStudents
+  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, StudentEnrollment[]>, enrollment) => {
+    const { studentnumber } = enrollment
+    acc[studentnumber] = [...(acc[studentnumber] || []), enrollment]
+    return acc
+  }, {})
+
+  return {
+    students: students
+      .map(student => ({ ...student, tags: tagList[student.studentnumber] }))
+      .map(student =>
+        formatStudentForAPI(
+          student,
+          enrollmentsByStudent,
+          creditsByStudent,
+          startDate,
+          endDate,
+          criteria,
+          code,
+          optionData
+        )
+      ),
+    courses,
+  }
 }

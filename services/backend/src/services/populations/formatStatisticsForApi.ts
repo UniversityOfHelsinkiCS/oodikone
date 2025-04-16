@@ -3,13 +3,7 @@ import { Name, ProgressCriteria } from '../../shared/types'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import type {
-  TaggetStudentData,
-  StudentStudyPlan,
-  StudentCourse,
-  StudentEnrollment,
-  StudentCredit,
-} from './getStudentData'
+import type { TaggetStudentData, StudentStudyPlan, StudentEnrollment, StudentCredit } from './getStudentData'
 import { getCurriculumVersion } from './shared'
 
 type CoursesSatisfied = Record<string, string | null>
@@ -115,46 +109,7 @@ const updateCreditCriteriaInfo = (
   }
 }
 
-export const formatStudentsForApi = (
-  students: Array<TaggetStudentData>,
-  enrollments: StudentEnrollment[],
-  credits: StudentCredit[],
-  courses: StudentCourse[],
-  startDate: string,
-  endDate: string,
-  optionData: Record<string, { name: Name }>,
-  criteria: ProgressCriteria,
-  code: string
-) => {
-  const creditsByStudent = credits.reduce((acc: Record<string, StudentCredit[]>, credit) => {
-    const { student_studentnumber: studentnumber } = credit
-    acc[studentnumber] = [...(acc[studentnumber] || []), credit]
-    return acc
-  }, {})
-  const enrollmentsByStudent = enrollments.reduce((acc: Record<string, StudentEnrollment[]>, enrollment) => {
-    const { studentnumber } = enrollment
-    acc[studentnumber] = [...(acc[studentnumber] || []), enrollment]
-    return acc
-  }, {})
-
-  return {
-    students: students.map(student =>
-      formatStudentForPopulationStatistics(
-        student,
-        enrollmentsByStudent,
-        creditsByStudent,
-        startDate,
-        endDate,
-        criteria,
-        code,
-        optionData
-      )
-    ),
-    courses,
-  }
-}
-
-const formatStudentForPopulationStatistics = (
+export const formatStudentForAPI = (
   student: TaggetStudentData,
   enrollments: Record<string, StudentEnrollment[]>,
   credits: Record<string, StudentCredit[]>,
