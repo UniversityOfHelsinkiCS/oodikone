@@ -3,12 +3,7 @@ import { Name, ProgressCriteria } from '../../shared/types'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import type {
-  StudentStudyPlan,
-  StudentCourse,
-  StudentEnrollment,
-  StudentCredit,
-} from './getStudentsIncludeCoursesBetween'
+import type { StudentStudyPlan, StudentCourse, StudentEnrollment, StudentCredit } from './getStudentData'
 import type { TaggetStudentData } from './optimizedStatisticsOf'
 import { getCurriculumVersion } from './shared'
 
