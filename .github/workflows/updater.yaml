@@ -42,8 +42,6 @@ jobs:
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
           tags: toska/sis-updater-worker:latest
-          build-args: |
-            NO_CACHE=true
         env:
           DOCKER_BUILD_SUMMARY: false
       - name: 'Upload image for other jobs'
