@@ -15,15 +15,6 @@ type CriteriaYear = {
   coursesSatisfied: CoursesSatisfied
 }
 
-const createEmptyCriteriaYear = (
-  criteria: ProgressCriteria,
-  year: keyof ProgressCriteria['courses']
-): CriteriaYear => ({
-  credits: false,
-  totalSatisfied: 0,
-  coursesSatisfied: Object.fromEntries(criteria.courses[year].map(course => [course, null])),
-})
-
 const getCreditAmount = (course: ParsedCourse, hops: StudentStudyPlan[], courseCode: string, startDate: string) => {
   const courseDate = new Date(course.date)
   const startDateFromString = new Date(startDate)
@@ -49,7 +40,10 @@ const updateCourseByYear = (
   criteriaChecked: Record<string, CriteriaYear>,
   correctCode: string
 ) => {
-  const yearMap = [
+  const yearMap: {
+    criteriaYear: keyof ProgressCriteria['courses']
+    yearToAdd: string
+  }[] = [
     { criteriaYear: 'yearOne', yearToAdd: 'year1' },
     { criteriaYear: 'yearTwo', yearToAdd: 'year2' },
     { criteriaYear: 'yearThree', yearToAdd: 'year3' },
@@ -58,35 +52,24 @@ const updateCourseByYear = (
     { criteriaYear: 'yearSix', yearToAdd: 'year6' },
   ]
 
-  const courseSets = yearMap.reduce(
-    (acc, { criteriaYear }) => {
-      const yearCourses = criteria?.courses?.[criteriaYear] || []
-      const expandedCodes = new Set<string>()
+  yearMap.forEach(
+    ({ criteriaYear, yearToAdd }: { criteriaYear: keyof ProgressCriteria['courses']; yearToAdd: string }) => {
+      const mainCourseCodes = criteria.courses[criteriaYear]
 
-      yearCourses.forEach((mainCode: string) => {
-        expandedCodes.add(mainCode)
+      // Each mainCode will have their substitutions fetched.
+      // Therefore theses will always be valid keys to the allCourses -object.
+      const substitutions = mainCourseCodes.flatMap(mainCode => criteria.allCourses[mainCode])
 
-        criteria.allCourses[mainCode]?.forEach((subCode: string) => {
-          expandedCodes.add(subCode)
-        })
-      })
+      const yearSet = new Set([...mainCourseCodes, ...substitutions])
 
-      acc[criteriaYear] = expandedCodes
-      return acc
-    },
-    {} as Record<string, Set<string>>
-  )
-
-  yearMap.forEach(({ criteriaYear, yearToAdd }) => {
-    const yearSet = courseSets[criteriaYear]
-
-    if (yearSet?.has(course.course_code)) {
-      const currentDate = criteriaChecked[yearToAdd].coursesSatisfied[correctCode]
-      if (!currentDate || new Date(currentDate) > new Date(course.date)) {
-        criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+      if (yearSet?.has(course.course_code)) {
+        const currentDate = criteriaChecked[yearToAdd].coursesSatisfied[correctCode]
+        if (!currentDate || new Date(currentDate) > new Date(course.date)) {
+          criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+        }
       }
     }
-  })
+  )
 }
 
 const updateCreditCriteriaInfo = (
@@ -94,17 +77,13 @@ const updateCreditCriteriaInfo = (
   criteriaYear: string,
   criteriaChecked: Record<string, CriteriaYear>,
   yearToAdd: string,
-  academicYears: Record<string, number>,
-  academicYear: string
+  academicYears: Record<string, number>
 ) => {
-  if (!criteria.courses) {
-    return
-  }
-  if (criteriaChecked?.[yearToAdd]) {
+  if (criteriaChecked[yearToAdd]) {
     criteriaChecked[yearToAdd].totalSatisfied +=
       Object.values(criteriaChecked?.[yearToAdd].coursesSatisfied).filter(course => course !== null).length || 0
   }
-  if (academicYears[academicYear] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
+  if (academicYears[yearToAdd] >= criteria?.credits[criteriaYear] && criteria?.credits[criteriaYear] > 0) {
     criteriaChecked[yearToAdd].credits = true
     criteriaChecked[yearToAdd].totalSatisfied += 1
   }
@@ -213,6 +192,15 @@ export const formatStudentForAPI = (
   }
 
   const toProgressCriteria = () => {
+    const createEmptyCriteriaYear = (
+      criteria: ProgressCriteria,
+      year: keyof ProgressCriteria['courses']
+    ): CriteriaYear => ({
+      credits: false,
+      totalSatisfied: 0,
+      coursesSatisfied: Object.fromEntries(criteria.courses[year].map(course => [course, null])),
+    })
+
     const criteriaChecked = {
       year1: createEmptyCriteriaYear(criteria, 'yearOne'),
       year2: createEmptyCriteriaYear(criteria, 'yearTwo'),
@@ -222,10 +210,10 @@ export const formatStudentForAPI = (
       year6: createEmptyCriteriaYear(criteria, 'yearSix'),
     }
 
-    const academicYears = { first: 0, second: 0, third: 0, fourth: 0, fifth: 0, sixth: 0 }
+    const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
     if (criteria.courses || criteria.credits) {
-      const courses = credits[studentnumber] ? credits[studentnumber].map(credit => parseCourse(credit, true)) : []
+      const courses = credits[studentnumber]?.map(credit => parseCourse(credit, true)) ?? []
 
       courses
         .filter(course => course.passed)
@@ -240,14 +228,15 @@ export const formatStudentForAPI = (
             academicYears[year] += creditAmounts[index]
           })
         })
+
+      updateCreditCriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears)
+      updateCreditCriteriaInfo(criteria, 'yearTwo', criteriaChecked, 'year2', academicYears)
+      updateCreditCriteriaInfo(criteria, 'yearThree', criteriaChecked, 'year3', academicYears)
+      updateCreditCriteriaInfo(criteria, 'yearFour', criteriaChecked, 'year4', academicYears)
+      updateCreditCriteriaInfo(criteria, 'yearFive', criteriaChecked, 'year5', academicYears)
+      updateCreditCriteriaInfo(criteria, 'yearSix', criteriaChecked, 'year6', academicYears)
     }
 
-    updateCreditCriteriaInfo(criteria, 'yearOne', criteriaChecked, 'year1', academicYears, 'first')
-    updateCreditCriteriaInfo(criteria, 'yearTwo', criteriaChecked, 'year2', academicYears, 'second')
-    updateCreditCriteriaInfo(criteria, 'yearThree', criteriaChecked, 'year3', academicYears, 'third')
-    updateCreditCriteriaInfo(criteria, 'yearFour', criteriaChecked, 'year4', academicYears, 'fourth')
-    updateCreditCriteriaInfo(criteria, 'yearFive', criteriaChecked, 'year5', academicYears, 'fifth')
-    updateCreditCriteriaInfo(criteria, 'yearSix', criteriaChecked, 'year6', academicYears, 'sixth')
     return criteriaChecked
   }
 
