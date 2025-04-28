@@ -189,7 +189,6 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
           email: '',
           secondaryEmail: '',
           sis_person_id: '',
-          enrollments: student.enrollments?.map(enrollment => ({ ...enrollment, studentnumber: studentNumber })),
           tags: [],
           birthdate: obfuscatedBirthDate,
           obfuscated: true,

@@ -1,4 +1,4 @@
-import { formatToArray } from '../../shared/util'
+import { formatToArray, omitKeys } from '../../shared/util'
 import { getDegreeProgrammeType } from '../../util'
 import { dateMonthsFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'
@@ -67,6 +67,12 @@ const parseQueryParams = (query: OptimizedStatisticsQuery): ParsedQueryParams =>
   }
 }
 
+export type AnonymousEnrollment = Omit<StudentEnrollment, 'studentnumber'>
+export type AnonymousCredit = Omit<StudentCredit, 'student_studentnumber'>
+
+export type StudentEnrollmentObject = Record<StudentEnrollment['studentnumber'], AnonymousEnrollment[]>
+export type StudentCreditObject = Record<StudentCredit['student_studentnumber'], AnonymousCredit[]>
+
 export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, studentNumberList?: string[]) => {
   const { userId } = query
   const {
@@ -111,16 +117,16 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   const optionData = await getOptionsForStudents(studentNumbers, code, degreeProgrammeType)
   const criteria = await getCriteria(code)
 
-  const creditsByStudent: Record<string, StudentCredit[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  const creditsByStudent: StudentCreditObject = Object.fromEntries(studentNumbers.map(n => [n, []]))
   credits.forEach(credit => {
     const { student_studentnumber: studentnumber } = credit
-    creditsByStudent[studentnumber].push(credit)
+    creditsByStudent[studentnumber].push(omitKeys(credit, ['student_studentnumber']))
   })
 
-  const enrollmentsByStudent: Record<string, StudentEnrollment[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  const enrollmentsByStudent: StudentEnrollmentObject = Object.fromEntries(studentNumbers.map(n => [n, []]))
   enrollments.forEach(enrollment => {
     const { studentnumber } = enrollment
-    enrollmentsByStudent[studentnumber].push(enrollment)
+    enrollmentsByStudent[studentnumber].push(omitKeys(enrollment, ['studentnumber']))
   })
 
   return {

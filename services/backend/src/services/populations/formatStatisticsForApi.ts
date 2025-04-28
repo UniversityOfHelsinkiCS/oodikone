@@ -3,7 +3,8 @@ import { Name, ProgressCriteria } from '../../shared/types'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import type { TaggetStudentData, StudentStudyPlan, StudentEnrollment, StudentCredit } from './getStudentData'
+import type { TaggetStudentData, StudentStudyPlan } from './getStudentData'
+import type { StudentEnrollmentObject, StudentCreditObject, AnonymousCredit } from './optimizedStatisticsOf'
 import { getCurriculumVersion } from './shared'
 
 type CoursesSatisfied = Record<string, string | null>
@@ -111,8 +112,8 @@ const updateCreditCriteriaInfo = (
 
 export const formatStudentForAPI = (
   student: TaggetStudentData,
-  enrollments: Record<string, StudentEnrollment[]>,
-  credits: Record<string, StudentCredit[]>,
+  enrollments: StudentEnrollmentObject,
+  credits: StudentCreditObject,
   startDate: string,
   endDate: string,
   criteria: ProgressCriteria,
@@ -189,7 +190,7 @@ export const formatStudentForAPI = (
     }
   }
 
-  const parseCourse = (credit: StudentCredit, normalizeDate: boolean): ParsedCourse => {
+  const parseCourse = (credit: AnonymousCredit, normalizeDate: boolean): ParsedCourse => {
     const attainmentDateNormalized =
       normalizeDate && credit.attainment_date < startDateFromISO
         ? dateDaysFromNow(startDateFromISO, 1).toISOString()
