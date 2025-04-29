@@ -24,9 +24,10 @@
     "baseUrl": ".",
     "types": ["node"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     }
   },
+  "references": [{ "path": "./tsconfig.node.json" }],
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["../backend"]
 }

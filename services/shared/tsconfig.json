@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "rootDir": ".",
+    "baseUrl": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
@@ -17,6 +17,5 @@
     "sourceRoot": "/",
     "inlineSources": true,
     "resolveJsonModule": true
-  },
-  "include": ["**/*.ts"]
+  }
 }

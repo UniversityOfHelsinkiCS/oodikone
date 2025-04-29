@@ -8,7 +8,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "rootDir": ".",
+    "baseUrl": ".",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,5 +19,6 @@
     "inlineSources": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "index.js"]
+  "include": ["index.js", "src"],
+  "exclude": ["../frontend"]
 }
