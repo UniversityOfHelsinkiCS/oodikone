@@ -15,6 +15,7 @@ import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
+import { GeneralTabContainer as GeneralTabNew } from './StudentTable/GeneralTab/Material'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
@@ -49,6 +50,22 @@ const Panes = ({
       menuItem: 'General',
       render: () => (
         <GeneralTab
+          coursecode={coursecode}
+          customPopulationProgramme={customPopulationProgramme}
+          filteredStudents={filteredStudents}
+          from={from}
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          studyGuidanceGroup={studyGuidanceGroup}
+          to={to}
+          variant={variant}
+          year={year}
+        />
+      ),
+    },
+    {
+      menuItem: 'General V2',
+      render: () => (
+        <GeneralTabNew
           coursecode={coursecode}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
@@ -211,8 +228,8 @@ export const PopulationStudentsContainer = ({ ...props }) => {
     population: {
       panesToInclude:
         props.year === 'All' || (props.programmeCode && !isBachelorOrLicentiateProgramme(props.programmeCode))
-          ? ['General', 'Courses', 'Modules', 'Tags']
-          : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
+          ? ['General', 'General V2', 'Courses', 'Modules', 'Tags']
+          : ['General', 'General V2', 'Courses', 'Modules', 'Tags', 'Progress'],
       infotoolTipContent: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
