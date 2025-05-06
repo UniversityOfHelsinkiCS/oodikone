@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { extractItems } from '@/common'
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useCreateStudentTagsMutation } from '@/redux/tags'
-import { Tag } from '@/shared/types'
+import { Tag } from '@oodikone/shared/types'
 
 export const AddStudentsDialog = ({
   combinedProgramme,

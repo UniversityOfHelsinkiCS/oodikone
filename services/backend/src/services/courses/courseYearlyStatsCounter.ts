@@ -1,6 +1,6 @@
 import { max, min } from 'lodash'
 
-import { Name } from '../../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { getSemesterNameByCode } from '../semesters'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 

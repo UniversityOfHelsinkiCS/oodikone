@@ -1,4 +1,4 @@
-import { formatToArray, omitKeys } from '../../shared/util'
+import { formatToArray, omitKeys } from '@oodikone/shared/util'
 import { getDegreeProgrammeType } from '../../util'
 import { dateMonthsFromNow } from '../../util/datetime'
 import { SemesterStart } from '../../util/semester'

@@ -1,8 +1,8 @@
 // TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
 
-import { Name, NameWithCode } from '@/shared/types'
-import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@/shared/types/faculty'
 import { GraphStat } from '@/types/graphStat'
+import { Name, NameWithCode } from '@oodikone/shared/types'
+import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
 import { GetAllGraduationStatsResponse } from './university'
 
 type Info = {

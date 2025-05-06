@@ -1,0 +1,10 @@
+{
+  "name": "@oodikone/shared",
+  "private": true,
+  "devDependencies": {
+    "sequelize": "^6.37.6",
+    "sequelize-typescript": "^2.1.6",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,9 +1,9 @@
 import { utils, writeFile } from 'xlsx'
 
 import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
-import { NameWithCode } from '@/shared/types'
 import { sortProgrammeKeys } from '@/util/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { NameWithCode } from '@oodikone/shared/types'
 
 export const exportProgressTable = (
   progressStats,

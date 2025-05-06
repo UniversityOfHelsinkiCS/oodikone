@@ -1,11 +1,11 @@
 import { Request, Response, Router } from 'express'
 
+import { mapToProviders } from '@oodikone/shared/util'
 import { serviceProvider } from '../config'
 import * as auth from '../middleware/auth'
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
 import { CategoryID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } from '../services/teachers/top'
-import { mapToProviders } from '../shared/util'
 import { getFullStudyProgrammeRights, splitByEmptySpace } from '../util'
 
 const router = Router()

@@ -4,8 +4,8 @@ import { Dropdown, Icon, Input } from 'semantic-ui-react'
 import { useContextSelector } from 'use-context-selector'
 
 import { SortableTableContext, getColumnValue } from '@/components/SortableTable/common'
-import { formatToArray } from '@/shared/util'
 import { createLocaleComparator } from '@/util/comparator'
+import { formatToArray } from '@oodikone/shared/util'
 
 const ValueFilterType = {
   Include: 'include',

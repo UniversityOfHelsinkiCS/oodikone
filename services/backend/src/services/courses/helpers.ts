@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 
-import { Name } from '../../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { Unification } from '../../types'
 
 export type FormattedProgramme = {

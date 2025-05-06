@@ -45,8 +45,8 @@ services:
       - oodikone
     volumes:
       - backend-nodemod:/opt/app-root/src/node_modules
-      - ./services/backend/:/opt/app-root/src
-      - ./services/shared/:/opt/app-root/src/src/shared
+      - ./services/backend/:/opt/app-root/backend
+      - ./services/shared/:/opt/app-root/shared
 
   frontend:
     <<: *defaults
@@ -60,8 +60,8 @@ services:
       - oodikone
     volumes:
       - frontend-nodemod:/opt/app-root/src/node_modules
-      - ./services/frontend/:/opt/app-root/src
-      - ./services/shared/:/opt/app-root/src/src/shared
+      - ./services/frontend/:/opt/app-root/frontend
+      - ./services/shared/:/opt/app-root/shared
 
   kone-db:
     <<: *defaults

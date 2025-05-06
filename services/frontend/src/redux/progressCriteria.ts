@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { ProgressCriteria } from '@/shared/types/progressCriteria'
+import { ProgressCriteria } from '@oodikone/shared/types/progressCriteria'
 
 const programmeProgressCriteria = RTKApi.injectEndpoints({
   endpoints: builder => ({

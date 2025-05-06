@@ -1,4 +1,4 @@
-import { Name } from '../../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { getCreditsProduced } from '../providerCredits'
 import { isRelevantProgramme } from '../studyProgramme/studyProgrammeHelpers'
 import { getDegreeProgrammesOfFaculty } from './faculty'

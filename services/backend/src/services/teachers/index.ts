@@ -1,8 +1,8 @@
 import { Op, QueryTypes } from 'sequelize'
 
+import { Name } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
 import { Credit, Course, Semester, Teacher } from '../../models'
-import { Name } from '../../shared/types'
 import { CreditTypeCode } from '../../types'
 import { splitByEmptySpace } from '../../util'
 import { isRegularCourse, TeacherStats } from './helpers'

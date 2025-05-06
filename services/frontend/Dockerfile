@@ -2,11 +2,12 @@ FROM registry.access.redhat.com/ubi9/nodejs-22-minimal
 
 ENV TZ="Europe/Helsinki"
 
-WORKDIR /opt/app-root/src
-
-EXPOSE 5000
-
 ENV NODE_ENV=production
+
+WORKDIR /opt/app-root/shared
+COPY ./shared .
+
+WORKDIR /opt/app-root/frontend
 
 ARG BASE_PATH
 ENV PUBLIC_URL=$BASE_PATH
@@ -35,11 +36,11 @@ ENV REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED=$LANGUAGE_CENTER_VIEW_ENABLED
 ARG SIS_URL
 ENV REACT_APP_SIS_URL=$SIS_URL
 
-COPY ./frontend/package* ./
+COPY ./frontend/package* .
 RUN npm ci --include=dev
 COPY ./frontend .
-COPY ./shared/ ./src/shared
 
 RUN npm run build && npm install -g serve@12.0.0
 
+EXPOSE 5000
 CMD ["serve", "--single", "--listen", "5000", "build"]

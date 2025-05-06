@@ -1,8 +1,8 @@
 import { indexOf, orderBy } from 'lodash'
 import moment from 'moment'
 
-import { GraduationStatistics, Name } from '../../shared/types'
-import { mapToProviders } from '../../shared/util'
+import { GraduationStatistics, Name } from '@oodikone/shared/types'
+import { mapToProviders } from '@oodikone/shared/util'
 import { DegreeProgrammeType, ExtentCode, Phase, SemesterEnrollment, StudyTrack } from '../../types'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'

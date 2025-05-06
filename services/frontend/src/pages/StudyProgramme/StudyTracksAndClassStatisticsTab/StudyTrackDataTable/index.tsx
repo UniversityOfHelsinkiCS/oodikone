@@ -2,8 +2,8 @@ import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 import { useState } from 'react'
 
 import { InfoBox } from '@/components/material/InfoBox'
-import { Name } from '@/shared/types'
 import { getCalendarYears } from '@/util/timeAndDate'
+import { Name } from '@oodikone/shared/types'
 import { Row } from './Row'
 import { SingleStudyTrackRow } from './SingleStudyTrackRow'
 import { getRowKey } from './util'

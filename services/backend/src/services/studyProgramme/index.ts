@@ -1,9 +1,9 @@
 import { memoize } from 'lodash'
 import { Op, QueryTypes } from 'sequelize'
 
+import { Name } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
 import { Course, Credit, Enrollment, Organization, ProgrammeModule } from '../../models'
-import { Name } from '../../shared/types'
 import { CreditTypeCode, EnrollmentState } from '../../types'
 import logger from '../../util/logger'
 

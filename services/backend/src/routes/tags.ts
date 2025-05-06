@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { difference } from 'lodash'
 
+import { NewTag, Role, StudentTag, Tag } from '@oodikone/shared/types'
 import { filterStudentNumbersByAccessRights } from '../services/students'
 import {
   findTagsByStudyTrack,
@@ -11,7 +12,6 @@ import {
   findTagsFromStudyTrackById,
   deleteMultipleStudentTags,
 } from '../services/tags'
-import { NewTag, Role, StudentTag, Tag } from '../shared/types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()

@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express'
 
+import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '@oodikone/shared/types'
 import * as auth from '../middleware/auth'
 import { getDegreeProgrammesOfFaculty, getFacultyCodeById } from '../services/faculty/faculty'
 import { combineFacultyBasics } from '../services/faculty/facultyBasics'
@@ -22,7 +23,6 @@ import { combineFacultyStudentProgress } from '../services/faculty/facultyStuden
 import { combineFacultyStudents } from '../services/faculty/facultyStudents'
 import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWriters'
 import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
-import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '../shared/types'
 import logger from '../util/logger'
 
 // Faculty uses a lot of tools designed for Study programme.

@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { Name } from '@/shared/types'
+import { Name } from '@oodikone/shared/types'
 
 export type SemestersData = {
   semesters: Record<

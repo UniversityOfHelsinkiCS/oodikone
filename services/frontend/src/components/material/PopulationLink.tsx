@@ -3,8 +3,8 @@ import { Button, IconButton } from '@mui/material'
 import moment from 'moment'
 import { Link } from 'react-router'
 
-import { Tag } from '@/shared/types'
 import { getMonths, getStudyRights, getTitle, getUrl } from '@/util/populationLink'
+import { Tag } from '@oodikone/shared/types'
 
 export const PopulationLink = ({
   combinedProgramme,

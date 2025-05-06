@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { difference, intersection } from 'lodash'
 
+import { tryCatch } from '@oodikone/shared/util'
 import { getCompletedCourses } from '../services/completedCoursesSearch'
 import {
   getOpenUniSearches,
@@ -8,7 +9,6 @@ import {
   deleteSearch,
   updateSearch,
 } from '../services/openUni/openUniManageSearches'
-import { tryCatch } from '../shared/util'
 import { CanError } from '../types'
 import { hasFullAccessToStudentData, safeJSONParse } from '../util'
 import { getImporterClient } from '../util/importerClient'

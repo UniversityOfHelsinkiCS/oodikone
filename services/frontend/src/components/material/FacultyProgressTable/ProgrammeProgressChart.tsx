@@ -7,8 +7,8 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { NameWithCode } from '@/shared/types'
 import { generateGradientColors } from '@/util/color'
+import { NameWithCode } from '@oodikone/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

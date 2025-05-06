@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/node'
 
+import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
+import { tryCatch } from '@oodikone/shared/util'
 import { ProgrammeModule } from '../models'
-import { DetailedProgrammeRights, Role } from '../shared/types'
-import { tryCatch } from '../shared/util'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
   return typeof obj === 'object' && obj !== null && key in obj

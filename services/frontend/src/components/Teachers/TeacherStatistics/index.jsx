@@ -9,9 +9,9 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
-import { mapToProviders } from '@/shared/util'
 import { getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { createLocaleComparator } from '@/util/comparator'
+import { mapToProviders } from '@oodikone/shared/util'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()

@@ -8,7 +8,7 @@ import {
   NameWithCode,
   ProgrammeClassSizes,
   ProgrammeMedians,
-} from '@/shared/types'
+} from '@oodikone/shared/types'
 import { BreakdownDisplay } from './BreakdownDisplay'
 import { MedianDisplay } from './MedianDisplay'
 

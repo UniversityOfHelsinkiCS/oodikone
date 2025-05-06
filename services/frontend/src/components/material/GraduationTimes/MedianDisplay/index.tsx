@@ -7,7 +7,7 @@ import {
   NameWithCode,
   ProgrammeClassSizes,
   ProgrammeMedians,
-} from '@/shared/types'
+} from '@oodikone/shared/types'
 import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({

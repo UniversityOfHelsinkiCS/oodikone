@@ -1,6 +1,6 @@
 import { range } from 'lodash'
 
-import { StudyProgrammeCourse } from '@/shared/types'
+import { StudyProgrammeCourse } from '@oodikone/shared/types'
 
 export const filterDataByYear = (data: StudyProgrammeCourse[], fromYear: number, toYear: number) => {
   const yearRange = range(fromYear, Number(toYear) + 1)

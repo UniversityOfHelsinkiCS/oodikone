@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Button, Icon } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
-import { formatToArray } from '@/shared/util'
+import { formatToArray } from '@oodikone/shared/util'
 import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (

@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { Release } from '@/shared/types'
+import { Release } from '@oodikone/shared/types'
 
 const changelogApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

@@ -2,8 +2,8 @@ import { createSelector } from '@reduxjs/toolkit'
 import { flatten } from 'lodash'
 
 import { RootState } from '@/redux'
-import { Name } from '@/shared/types'
 import { CourseStat, Realisation } from '@/types/courseStat'
+import { Name } from '@oodikone/shared/types'
 
 const courseStatsSelector = (state: RootState) => state.courseStats.data // TODO: Type at source
 const openOrRegularSelector = (state: RootState) => state.courseSearch.openOrRegular

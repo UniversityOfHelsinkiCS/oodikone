@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
+import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { SISStudyRight } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
@@ -11,7 +12,6 @@ import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../
 import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
-import { mapToProviders } from '../shared/util'
 import { CanError, GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 

@@ -9,9 +9,9 @@ import { Section } from '@/components/material/Section'
 import { Toggle } from '@/components/material/Toggle'
 import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
-import { Name } from '@/shared/types'
 import { GetFacultiesResponse, GetFacultyGraduationTimesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+import { Name } from '@oodikone/shared/types'
 
 export const GraduationTimesTab = ({
   faculty,

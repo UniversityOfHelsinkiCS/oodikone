@@ -14,7 +14,6 @@ import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
-import { Name } from '@/shared/types'
 import {
   Attempts,
   AvailableStats,
@@ -25,6 +24,7 @@ import {
   Students,
 } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
+import { Name } from '@oodikone/shared/types'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
 import { YearFilter } from './YearFilter'

@@ -4,7 +4,7 @@ import { MRT_RowData, MRT_TableOptions, MRT_Row } from 'material-react-table'
 import { MRT_Localization_EN } from 'material-react-table/locales/en'
 import { MRT_Localization_FI } from 'material-react-table/locales/fi'
 
-import { DEFAULT_LANG } from '@/shared/language'
+import { DEFAULT_LANG } from '@oodikone/shared/language'
 
 export const getDefaultMRTOptions = <TData extends MRT_RowData>(
   setExportData: (data: Record<string, unknown>[]) => void,

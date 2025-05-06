@@ -1,8 +1,8 @@
 import { cloneDeep } from 'lodash'
 import moment from 'moment'
 
+import { Graduated, SpecialGroups } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'
-import { Graduated, SpecialGroups } from '../../shared/types'
 import { Unarray } from '../../types'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'

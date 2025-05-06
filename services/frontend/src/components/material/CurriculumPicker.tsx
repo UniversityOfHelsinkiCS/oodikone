@@ -2,7 +2,7 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
-import { CurriculumOption, CurriculumDetails } from '@/shared/types'
+import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
 
 const chooseCurriculumToFetch = (
   curriculums: CurriculumOption[],

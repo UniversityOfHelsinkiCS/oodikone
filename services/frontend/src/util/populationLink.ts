@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { Tag } from '@/shared/types'
+import { Tag } from '@oodikone/shared/types'
 
 export const getMonths = (year: number) => {
   const end = moment()

@@ -1,6 +1,6 @@
+import { ProgressCriteria } from '@oodikone/shared/types'
 import { Course } from '../../models'
 import { ProgressCriteria as ProgressCriteriaModel } from '../../models/kone'
-import { ProgressCriteria } from '../../shared/types'
 import logger from '../../util/logger'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>

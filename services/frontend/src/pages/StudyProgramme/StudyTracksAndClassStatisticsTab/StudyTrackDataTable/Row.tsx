@@ -2,7 +2,7 @@ import { TableCell, TableRow } from '@mui/material'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationLink } from '@/components/material/PopulationLink'
-import { Name } from '@/shared/types'
+import { Name } from '@oodikone/shared/types'
 import { BasicCell } from './BasicCell'
 import { OtherCountriesCell } from './OtherCountriesCell'
 import { getCellKey, shouldBeHidden } from './util'

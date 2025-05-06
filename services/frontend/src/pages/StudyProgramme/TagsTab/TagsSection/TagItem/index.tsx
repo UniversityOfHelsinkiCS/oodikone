@@ -8,7 +8,7 @@ import { IconButton, ListItem, ListItemIcon, ListItemText, Stack, Tooltip } from
 import { useState } from 'react'
 
 import { PopulationLink } from '@/components/material/PopulationLink'
-import { Tag } from '@/shared/types'
+import { Tag } from '@oodikone/shared/types'
 import { AddStudentsDialog } from './AddStudentsDialog'
 import { DeleteTagDialog } from './DeleteTagDialog'
 

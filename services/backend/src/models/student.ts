@@ -1,7 +1,7 @@
 import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { GenderCode } from '../types'
 import { Credit, Enrollment, SISStudyRight, Studyplan } from '.'
 

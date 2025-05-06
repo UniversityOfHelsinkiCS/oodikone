@@ -1,6 +1,6 @@
 import { indexOf } from 'lodash'
 
-import { Name } from '../../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { EnrollmentType, SemesterEnrollment } from '../../types'
 import { getSemestersAndYears } from '../semesters'
 import {

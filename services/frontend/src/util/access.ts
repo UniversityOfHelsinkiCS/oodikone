@@ -1,6 +1,6 @@
 import { intersection } from 'lodash'
 
-import { DetailedProgrammeRights, Role } from '@/shared/types'
+import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 
 export const checkUserAccess = (requiredRoles: Role[], roles: Role[]) => {
   return intersection(requiredRoles, roles).length > 0

@@ -163,7 +163,7 @@ export default [
   },
   {
     settings: {
-      'import/internal-regex': '^@/shared/',
+      'import/internal-regex': '^@oodikone/shared/',
       'import/resolver': {
         typescript: {
           project: [

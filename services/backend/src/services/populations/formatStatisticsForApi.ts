@@ -1,5 +1,5 @@
+import { Name, ProgressCriteria } from '@oodikone/shared/types'
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Name, ProgressCriteria } from '../../shared/types'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'

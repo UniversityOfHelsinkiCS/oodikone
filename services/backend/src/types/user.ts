@@ -1,8 +1,8 @@
 import { InferAttributes } from 'sequelize'
 
+import { Language } from '@oodikone/shared/language'
+import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { User } from '../models/user'
-import { Language } from '../shared/language'
-import { DetailedProgrammeRights, Role } from '../shared/types'
 
 export type ExpandedUser = InferAttributes<User> & {
   iamGroups: string[]

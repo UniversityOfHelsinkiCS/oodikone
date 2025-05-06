@@ -3,8 +3,8 @@ import { Checkbox, IconButton, ListItemText, Menu, MenuItem, Tooltip } from '@mu
 import { useEffect, useState } from 'react'
 
 import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
-import { ProgrammeCourse, ProgressCriteria } from '@/shared/types'
 import { isMedicalProgramme } from '@/util/studyProgramme'
+import { ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
 
 export const CriterionLabelSelectButton = ({
   course,

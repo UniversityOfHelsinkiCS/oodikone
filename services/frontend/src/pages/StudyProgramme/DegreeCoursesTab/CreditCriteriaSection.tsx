@@ -5,8 +5,8 @@ import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
-import { ProgressCriteria } from '@/shared/types'
 import { isMedicalProgramme } from '@/util/studyProgramme'
+import { ProgressCriteria } from '@oodikone/shared/types'
 
 const emptyCredits = {
   year1: null,

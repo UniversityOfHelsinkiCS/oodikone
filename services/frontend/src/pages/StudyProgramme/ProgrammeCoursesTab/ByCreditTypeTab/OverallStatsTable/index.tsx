@@ -2,7 +2,7 @@ import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'materi
 import { useCallback, useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name, StudyProgrammeCourse } from '@/shared/types'
+import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
 import { CodeCell } from './CodeCell'
 import { HeaderCell } from './HeaderCell'
 import { filterDataByYear } from './util'

@@ -11,7 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { Course, CourseProvider, ProgrammeModule, SISStudyRight } from '.'
 
 @Table({
