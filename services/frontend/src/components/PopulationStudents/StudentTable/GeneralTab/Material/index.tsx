@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { reformatDate } from '@/util/timeAndDate'
 import { createMaps } from '../columnHelpers/createMaps'
@@ -29,12 +30,17 @@ export type FormattedStudentData = {
   curriculumPeriod: string
   mostRecentAttainment: string
   tags: any
+  priority?: string
+  extent?: string
+  updatedAt?: string
 }
 
-export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramme, group, year }) => {
+export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramme, group, year, variant }) => {
   // undefined, population
   // console.log(studyGuidanceGroup, variant)
   const { getTextIn } = useLanguage()
+  const { isAdmin } = useGetAuthorizedUserQuery()
+  // console.log("variant", variant)
   const currentSemester = useCurrentSemester()
   const selectedColumns: string[] = []
   const { data: programmes = {} } = useGetProgrammesQuery()
@@ -172,5 +178,5 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   }
   const formattedData = filteredStudents.map(student => formatStudent(student))
   // console.log(formattedData)
-  return <GeneralTab formattedData={formattedData} />
+  return <GeneralTab formattedData={formattedData} showAdminColumns={isAdmin} variant={variant} />
 }
