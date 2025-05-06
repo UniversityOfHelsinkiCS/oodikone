@@ -4,11 +4,6 @@ ENV TZ="Europe/Helsinki"
 
 ENV NODE_ENV=production
 
-WORKDIR /opt/app-root/shared
-COPY ./shared .
-
-WORKDIR /opt/app-root/frontend
-
 ARG BASE_PATH
 ENV PUBLIC_URL=$BASE_PATH
 
@@ -36,7 +31,11 @@ ENV REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED=$LANGUAGE_CENTER_VIEW_ENABLED
 ARG SIS_URL
 ENV REACT_APP_SIS_URL=$SIS_URL
 
-COPY ./frontend/package* .
+WORKDIR /opt/app-root/shared
+COPY ./shared .
+
+WORKDIR /opt/app-root/frontend
+COPY ./frontend/package*.json .
 RUN npm ci --include=dev
 COPY ./frontend .
 

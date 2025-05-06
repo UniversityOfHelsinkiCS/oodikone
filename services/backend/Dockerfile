@@ -5,11 +5,6 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-WORKDIR /opt/app-root/shared
-COPY ./shared .
-
-WORKDIR /opt/app-root/backend
-
 ARG BASE_PATH
 ENV PUBLIC_URL=$BASE_PATH
 
@@ -22,7 +17,11 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./backend/package*.json ./
+WORKDIR /opt/app-root/shared
+COPY ./shared .
+
+WORKDIR /opt/app-root/backend
+COPY ./backend/package*.json .
 RUN npm ci --include=dev
 COPY ./backend .
 
@@ -33,8 +32,6 @@ RUN npm run build
 FROM registry.access.redhat.com/ubi9/nodejs-22-minimal
 
 ENV TZ="Europe/Helsinki"
-
-WORKDIR /opt/app-root/src
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
@@ -51,7 +48,8 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY --from=build /opt/app-root/backend/package*.json ./
+WORKDIR /opt/app-root/src
+COPY --from=build /opt/app-root/backend/package*.json .
 COPY --from=build /opt/app-root/backend/dist ./dist
 
 RUN npm ci
