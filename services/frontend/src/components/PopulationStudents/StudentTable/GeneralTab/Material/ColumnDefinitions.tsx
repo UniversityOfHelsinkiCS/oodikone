@@ -28,7 +28,7 @@ export const columnsByVariant: Record<Variant, Set<string>> = {
       'studyRightStart',
       'programmeStart',
       'master',
-      'semestersPresent',
+      'semesterEnrollments',
       'graduationDate',
       'startYearAtUniversity',
       'otherProgrammes',
@@ -94,8 +94,13 @@ export const useColumnDefinitions = () => {
         header: 'Master',
       },
       {
-        accessorKey: 'semestersPresent',
+        accessorKey: 'semesterEnrollments',
         header: 'Semesters present',
+        Cell: ({ cell }) => {
+          // @ts-expect-error fix unknown type
+          const { content } = cell.getValue()
+          return content ?? null
+        },
       },
       {
         accessorKey: 'graduationDate',

@@ -30,6 +30,8 @@ export const GeneralTab = ({
     email: namesVisible,
   })
 
+  // console.log(formattedData)
+
   useEffect(() => {
     setColumnVisibility({
       lastName: namesVisible,

@@ -2,10 +2,13 @@ import { useSelector } from 'react-redux'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
+import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { createMaps } from '../columnHelpers/createMaps'
+import { getSemestersPresentFunctions } from '../columnHelpers/semestersPresent'
 
 import { GeneralTab } from './GeneralTab'
 
@@ -16,10 +19,10 @@ export type FormattedStudentData = {
   totalCredits: number
   hopsCredits: number
   creditsSinceStart: number
-  studyRightStart: string // date
+  studyRightStart: string
   programmeStart: string
   master: string
-  semestersPresent: any // placeholder
+  semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
   startYearAtUniversity: number | string
   otherProgrammes: string[]
@@ -36,24 +39,36 @@ export type FormattedStudentData = {
 }
 
 export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramme, group, year, variant }) => {
-  // undefined, population
-  // console.log(studyGuidanceGroup, variant)
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
-  // console.log("variant", variant)
   const currentSemester = useCurrentSemester()
-  const selectedColumns: string[] = []
+
+  const { data: semesterData } = useGetSemestersQuery()
+  const allSemesters = Object.values(semesterData?.semesters ?? {})
+  const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
+    obj[index + 1] = cur
+    return obj
+  }, {})
+
+  const selectedColumns: string[] = ['semesterEnrollments']
   const { data: programmes = {} } = useGetProgrammesQuery()
 
   // Data only used to return null? is filteredstudents also null in that case rendering this useless
   // @ts-expect-error fix type to not be unknown..
   const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
+
+  const queryStudyrights = Object.values(query?.studyrights ?? {}).filter(studyright => !!studyright) as string[]
+  const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
+
   if (!populationStatistics) return null
 
   const studyGuidanceGroupProgrammes = group?.tags?.studyProgramme?.includes('+')
     ? group?.tags?.studyProgramme.split('+')
     : [group?.tags?.studyProgramme]
   const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
+
+  // const isBachelorsProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:bachelors-degree'
+  const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
   const getTransferredFrom = (student: any) =>
     getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
@@ -67,7 +82,6 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
 
   const createSemesterEnrollmentsMap = student => {
     const semesterEnrollments = getStudyRight(student)?.semesterEnrollments
-
     if (!semesterEnrollments) return null
 
     return semesterEnrollments.reduce((enrollments, { type, semester, statutoryAbsence }) => {
@@ -136,7 +150,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     studentToStudyrightStartMap,
     studentToStudyrightEndMap,
     studentToProgrammeStartMap,
-    // studentToSecondStudyrightEndMap,
+    studentToSecondStudyrightEndMap,
     studentToOtherProgrammesMap,
   } = createMaps({
     students,
@@ -147,6 +161,18 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     getTextIn,
     currentSemester: currentSemester?.semestercode,
     showBachelorAndMaster,
+  })
+
+  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
+    allSemesters,
+    allSemestersMap,
+    filteredStudents,
+    getTextIn,
+    programmeCode,
+    studentToSecondStudyrightEndMap,
+    studentToStudyrightEndMap,
+    year,
+    semestersToAddToStart: showBachelorAndMaster && isMastersProgramme ? 6 : 0,
   })
 
   // console.log(filteredStudents)
@@ -161,7 +187,10 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       studyRightStart: reformatDate(studentToStudyrightStartMap[student.studentNumber], ISO_DATE_FORMAT),
       programmeStart: reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT),
       master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters
-      semestersPresent: 'placeholder', // TODO: implement
+      semesterEnrollments: {
+        exportValue: getSemesterEnrollmentsVal(student),
+        content: getSemesterEnrollmentsContent(student) ?? null,
+      },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
       otherProgrammes: studentToOtherProgrammesMap[student.studentNumber]?.programmes.map(programme =>
@@ -176,7 +205,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       tags: parseTags(student.tags),
     }
   }
-  const formattedData = filteredStudents.map(student => formatStudent(student))
-  // console.log(formattedData)
+  // console.log("Lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
+  const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
   return <GeneralTab formattedData={formattedData} showAdminColumns={isAdmin} variant={variant} />
 }
