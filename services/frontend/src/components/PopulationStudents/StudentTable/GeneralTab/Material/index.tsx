@@ -16,6 +16,7 @@ export type FormattedStudentData = {
   firstNames: string
   lastName: string
   studentNumber: string
+  email: string
   totalCredits: number
   hopsCredits: number
   creditsSinceStart: number
@@ -181,6 +182,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       firstNames: student.firstnames,
       lastName: student.lastname,
       studentNumber: student.studentNumber,
+      email: student.email,
       totalCredits: student.allCredits,
       hopsCredits: student.hopsCredits,
       creditsSinceStart: 0,
