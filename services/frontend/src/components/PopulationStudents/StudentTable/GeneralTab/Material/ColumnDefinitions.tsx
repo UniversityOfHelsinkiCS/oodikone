@@ -11,7 +11,7 @@ const baseColumns = [
   'firstNames',
   'email',
   'credits',
-  'totalCredits',
+  'creditsTotal',
   'studentNumber',
   'tags',
   'phoneNumber',
@@ -24,7 +24,8 @@ export const adminColumns = ['priority', 'extent', 'updatedAt']
 export const columnsByVariant: Record<Variant, Set<string>> = {
   population: new Set(
     baseColumns.concat([
-      'creditsSinceStart',
+      'creditsHops',
+      'creditsSince',
       'studyRightStart',
       'programmeStart',
       'master',
@@ -45,7 +46,7 @@ export const columnsByVariant: Record<Variant, Set<string>> = {
   ),
 }
 
-export const useColumnDefinitions = () => {
+export const useColumnDefinitions = (creditFilterText: string) => {
   return useMemo<MRT_ColumnDef<any>[]>(
     () => [
       {
@@ -70,16 +71,16 @@ export const useColumnDefinitions = () => {
         header: 'Email',
       },
       {
-        accessorKey: 'totalCredits',
-        header: 'All',
+        accessorKey: 'creditsTotal',
+        header: 'All credits',
       },
       {
-        accessorKey: 'hopsCredits',
-        header: 'HOPS',
+        accessorKey: 'creditsHops',
+        header: 'Credits in HOPS',
       },
       {
-        accessorKey: 'creditsSinceStart',
-        header: 'Since start in programme',
+        accessorKey: 'creditsSince',
+        header: `${creditFilterText}`,
       },
       {
         accessorKey: 'studyRightStart',
@@ -155,6 +156,6 @@ export const useColumnDefinitions = () => {
         header: 'Last updated at',
       },
     ],
-    []
+    [creditFilterText]
   )
 }

@@ -13,14 +13,16 @@ export const GeneralTab = ({
   formattedData,
   variant,
   showAdminColumns,
+  creditFilterText,
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
   showAdminColumns: boolean
+  creditFilterText: string
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const columnDefinitions = useColumnDefinitions()
+  const columnDefinitions = useColumnDefinitions(creditFilterText)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
 

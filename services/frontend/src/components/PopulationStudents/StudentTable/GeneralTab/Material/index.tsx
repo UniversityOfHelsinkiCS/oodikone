@@ -1,12 +1,16 @@
+import moment from 'moment'
 import { useSelector } from 'react-redux'
+import { getStudentTotalCredits } from '@/common'
+import { creditDateFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { ISO_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { reformatDate } from '@/util/timeAndDate'
+import { reformatDate, formatDisplayDate } from '@/util/timeAndDate'
 import { createMaps } from '../columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from '../columnHelpers/semestersPresent'
 
@@ -17,9 +21,9 @@ export type FormattedStudentData = {
   lastName: string
   studentNumber: string
   email: string
-  totalCredits: number
-  hopsCredits: number
-  creditsSinceStart: number
+  creditsTotal: number
+  creditsHops: number
+  creditsSince: number
   studyRightStart: string
   programmeStart: string
   master: string
@@ -54,12 +58,16 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const selectedColumns: string[] = ['semesterEnrollments']
   const { data: programmes = {} } = useGetProgrammesQuery()
 
+  const { useFilterSelector } = useFilters()
+
   // Data only used to return null? is filteredstudents also null in that case rendering this useless
   // @ts-expect-error fix type to not be unknown..
   const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
 
   const queryStudyrights = Object.values(query?.studyrights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
+
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
   if (!populationStatistics) return null
 
@@ -147,6 +155,59 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       ? reformatDate(studentToStudyrightEndMap[studentNumber], ISO_DATE_FORMAT)
       : ''
 
+  const getCreditsFromHops = student =>
+    student.hopsCredits ??
+    student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ??
+    0
+
+  const getCreditsBetween = student => {
+    if (group?.tags?.year) {
+      return getStudentTotalCredits({
+        ...student,
+        courses: student.courses.filter(course => new Date(course.date) > new Date(group?.tags?.year, 7, 1)),
+      })
+    }
+
+    let { sinceDate, untilDate } = creditDateFilterOptions ?? {}
+
+    if (!sinceDate && !untilDate) {
+      return getStudentTotalCredits({
+        ...student,
+        courses: student.courses.filter(
+          course =>
+            new Date(course.date).getTime() >= new Date(studentToProgrammeStartMap[student.studentNumber]).getTime()
+        ),
+      })
+    }
+
+    sinceDate = sinceDate ?? new Date(1970, 0, 1)
+    untilDate = untilDate ?? new Date()
+
+    return getStudentTotalCredits({
+      ...student,
+      courses: student.courses.filter(
+        course => new Date(course.date) >= sinceDate && new Date(course.date) <= untilDate
+      ),
+    })
+  }
+
+  const getCreditDisplayText = () => {
+    if (creditDateFilterOptions) {
+      const { startDate, endDate } = creditDateFilterOptions
+
+      if (startDate && endDate) {
+        {
+          return `Between ${formatDisplayDate(startDate)} and ${formatDisplayDate(endDate)}`
+        }
+      } else if (endDate) {
+        return `Before ${formatDisplayDate(endDate)}`
+      } else if (startDate) {
+        return `Since ${moment(startDate).format(DISPLAY_DATE_FORMAT)}`
+      }
+    }
+    return 'Credits since start in programme'
+  }
+
   const {
     studentToStudyrightStartMap,
     studentToStudyrightEndMap,
@@ -183,9 +244,9 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       lastName: student.lastname,
       studentNumber: student.studentNumber,
       email: student.email,
-      totalCredits: student.allCredits,
-      hopsCredits: student.hopsCredits,
-      creditsSinceStart: 0,
+      creditsTotal: student.allCredits ?? student.credits,
+      creditsHops: getCreditsFromHops(student),
+      creditsSince: getCreditsBetween(student),
       studyRightStart: reformatDate(studentToStudyrightStartMap[student.studentNumber], ISO_DATE_FORMAT),
       programmeStart: reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT),
       master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters
@@ -209,5 +270,12 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   }
   // console.log("Lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
   const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
-  return <GeneralTab formattedData={formattedData} showAdminColumns={isAdmin} variant={variant} />
+  return (
+    <GeneralTab
+      creditFilterText={getCreditDisplayText()}
+      formattedData={formattedData}
+      showAdminColumns={isAdmin}
+      variant={variant}
+    />
+  )
 }
