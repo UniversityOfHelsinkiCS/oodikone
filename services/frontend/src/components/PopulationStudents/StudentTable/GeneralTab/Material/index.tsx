@@ -275,7 +275,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       mostRecentAttainment: getMostRecentAttainment(student),
       tags: parseTags(student.tags),
       extent: isAdmin && getExtent(student),
-      updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE),
+      updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
   }
   // console.log("Lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
