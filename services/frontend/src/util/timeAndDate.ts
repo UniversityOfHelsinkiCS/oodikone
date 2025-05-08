@@ -33,7 +33,7 @@ export const getCalendarYears = (years: string[]) => {
 /**
  * Returns date formatted as 'DD-MM-YYYY' using UTC time.
  */
-export const formatUTCDate = (initialDate: string | Date) => {
+export const formatISODate = (initialDate: string | Date) => {
   const date = new Date(initialDate)
   const year = date.getUTCFullYear()
   const month = String(date.getUTCMonth() + 1).padStart(2, '0')

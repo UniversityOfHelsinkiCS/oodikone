@@ -4,13 +4,13 @@ import { getStudentTotalCredits } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { ISO_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { reformatDate, formatDisplayDate } from '@/util/timeAndDate'
+import { formatISODate, formatDisplayDate } from '@/util/timeAndDate'
 import { createMaps } from '../columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from '../columnHelpers/semestersPresent'
 
@@ -141,7 +141,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       .map(course => course.date)
     if (!dates.length) return ''
     const latestDate = dates.sort((a, b) => +new Date(b) - +new Date(a))[0]
-    return reformatDate(latestDate, ISO_DATE_FORMAT)
+    return formatISODate(latestDate)
   }
   const parseTags = tags => {
     const studentTags = tags.map(tag => tag.tag.tagname)
@@ -151,9 +151,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const getStartingYear = ({ started }) => (started ? new Date(started).getFullYear() : '')
 
   const getGraduationDate = ({ studentNumber }) =>
-    studentToStudyrightEndMap[studentNumber]
-      ? reformatDate(studentToStudyrightEndMap[studentNumber], ISO_DATE_FORMAT)
-      : ''
+    studentToStudyrightEndMap[studentNumber] ? formatISODate(studentToStudyrightEndMap[studentNumber]) : ''
 
   const getCreditsFromHops = student =>
     student.hopsCredits ??
@@ -247,8 +245,8 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
-      studyRightStart: reformatDate(studentToStudyrightStartMap[student.studentNumber], ISO_DATE_FORMAT),
-      programmeStart: reformatDate(studentToProgrammeStartMap[student.studentNumber], ISO_DATE_FORMAT),
+      studyRightStart: formatISODate(studentToStudyrightStartMap[student.studentNumber]),
+      programmeStart: formatISODate(studentToProgrammeStartMap[student.studentNumber]),
       master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),

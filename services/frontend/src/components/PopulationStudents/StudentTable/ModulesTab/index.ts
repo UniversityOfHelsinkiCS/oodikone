@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { createLocaleComparator } from '@/util/comparator'
-import { formatUTCDate } from '@/util/timeAndDate'
+import { formatISODate } from '@/util/timeAndDate'
 import { ModulesTab } from './ModulesTable'
 
 export type FormattedStudent = {
@@ -38,7 +38,7 @@ const getModulesFromRelevantStudyPlan = (student: any, degreeProgrammeCodes: str
       return {
         code: studyModule,
         completed: !!completion,
-        completionDate: completion ? formatUTCDate(completion.date) : null,
+        completionDate: completion ? formatISODate(completion.date) : null,
       }
     })
   }
