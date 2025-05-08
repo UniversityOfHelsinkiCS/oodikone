@@ -23,6 +23,7 @@ export type FormattedStudentData = {
   creditsTotal: number
   creditsHops: number
   creditsSince: number
+  studyTrack?: string
   studyRightStart: string
   programmeStart: string
   master: string
@@ -62,7 +63,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   // @ts-expect-error fix type to not be unknown..
   const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
 
-  const queryStudyrights = Object.values(query?.studyrights ?? {}).filter(studyright => !!studyright) as string[]
+  const queryStudyrights = Object.values(query?.studyRights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
 
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
@@ -206,6 +207,20 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     return 'Credits since start in programme'
   }
 
+  const getCorrectStudyRight = studyRights =>
+    studyRights?.find(studyRight =>
+      queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
+    )
+
+  const getStudyTracks = studyRights => {
+    const correctStudyRight = getCorrectStudyRight(studyRights)
+    if (!correctStudyRight) return []
+    return queryStudyrights
+      .map(code => correctStudyRight.studyRightElements.find(element => element.code === code))
+      .filter(element => element?.studyTrack)
+      .map(element => getTextIn(element.studyTrack.name))
+  }
+
   const getStudyProgrammes = ({ studentNumber }) => {
     const { programmes, getProgrammesList } = studentToOtherProgrammesMap[studentNumber] ?? {}
     return {
@@ -213,6 +228,9 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       programmeList: getProgrammesList('\n'),
     }
   }
+
+  const containsStudyTracks: boolean = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
+
   const getExtent = student =>
     student.studyRights
       .filter(
@@ -262,6 +280,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
+      studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : '',
       studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
       programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
       master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters

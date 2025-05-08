@@ -26,6 +26,7 @@ export const columnsByVariant: Record<Variant, Set<string>> = {
     baseColumns.concat([
       'creditsHops',
       'creditsSince',
+      'studyTrack',
       'studyRightStart',
       'programmeStart',
       'master',
@@ -80,6 +81,10 @@ export const useColumnDefinitions = (creditFilterText: string) => {
       {
         accessorKey: 'creditsSince',
         header: `${creditFilterText}`,
+      },
+      {
+        accessorKey: 'studyTrack',
+        header: 'Study track',
       },
       {
         accessorKey: 'studyRightStart',
