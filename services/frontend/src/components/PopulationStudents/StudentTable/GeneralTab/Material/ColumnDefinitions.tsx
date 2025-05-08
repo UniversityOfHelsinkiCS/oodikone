@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material'
+import { Tooltip, Typography } from '@mui/material'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
@@ -113,6 +113,20 @@ export const useColumnDefinitions = (creditFilterText: string) => {
       {
         accessorKey: 'otherProgrammes',
         header: 'Other programmes',
+        Cell: ({ cell }) => {
+          // @ts-expect-error add typing
+          const { programmes, programmeList } = cell.getValue()
+          if (programmes.length === 0) return null
+
+          const formattedProgramme = programmes[0].length > 45 ? `${programmes[0].substring(0, 43)}...` : programmes[0]
+          return (
+            <Tooltip arrow title={programmeList}>
+              <span>
+                {programmes.length > 1 ? `${formattedProgramme} +${programmes.length - 1}` : `${formattedProgramme}`}
+              </span>
+            </Tooltip>
+          )
+        },
       },
       {
         accessorKey: 'transferredFrom',

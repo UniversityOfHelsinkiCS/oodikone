@@ -29,7 +29,7 @@ export type FormattedStudentData = {
   semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
   startYearAtUniversity: number | string
-  otherProgrammes: string[]
+  otherProgrammes: { programmes: string[]; programmeList: () => string[] }
   transferredFrom: string
   admissionType: string
   gender: string
@@ -206,6 +206,13 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     return 'Credits since start in programme'
   }
 
+  const getStudyProgrammes = ({ studentNumber }) => {
+    const { programmes, getProgrammesList } = studentToOtherProgrammesMap[studentNumber] ?? {}
+    return {
+      programmes: programmes.map(programme => getTextIn(programme.name)) ?? [],
+      programmeList: getProgrammesList('\n'),
+    }
+  }
   const getExtent = student =>
     student.studyRights
       .filter(
@@ -264,13 +271,11 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
-      otherProgrammes: studentToOtherProgrammesMap[student.studentNumber]?.programmes.map(programme =>
-        getTextIn(programme.name)
-      ),
+      otherProgrammes: getStudyProgrammes(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType && getAdmissiontype(student),
       gender: getGender(student.gender_code),
-      citizenships: student.citizenships.map(getTextIn).sort(),
+      citizenships: student.citizenships.map(getTextIn).sort().join(', '),
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
       tags: parseTags(student.tags),
