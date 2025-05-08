@@ -79,8 +79,8 @@ export const getSemestersPresentFunctions = ({
   }
 
   const getSemesterEnrollmentsContent = (student, studyright) => {
-    if (allSemesters.length === 0) return ''
-    if (!student.semesterEnrollmentsMap && !studyright) return ''
+    if (allSemesters.length === 0) return null
+    if (!student.semesterEnrollmentsMap && !studyright) return null
     const semesterIcons = []
 
     const getSemesterJSX = (semester, enrollmenttype, statutoryAbsence, graduated, key) => {
@@ -166,7 +166,6 @@ export const getSemestersPresentFunctions = ({
   }
 
   const getSemesterEnrollmentsVal = (student, studyright) => {
-    if (!student && !studyright) return 0
     const enrollmentsToCount = studyright
       ? studyright.semesterEnrollments
       : Object.keys(student.semesterEnrollmentsMap || {}).reduce((acc, semester) => {
