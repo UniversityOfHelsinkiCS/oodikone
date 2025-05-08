@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { ISO_DATE_FORMAT, DateFormat } from '@/constants/date'
 
 export const getAge = (birthDate: string, integer = true, dateToCompare = moment()) => {
   const age = dateToCompare.diff(moment(birthDate), 'years', true)
@@ -19,6 +19,59 @@ export const reformatDate = (date: string | Date | null | undefined, outputForma
   }
   const parsedDate = moment(date).local().format(outputFormat)
   return parsedDate
+}
+
+// Prefer this to using moment as the library is MEGA slow
+// goal is to get rid of moment completely
+export const formatDate = (dateToFormat: string | Date | null | undefined, outputFormat: DateFormat) => {
+  if (!dateToFormat) return 'Unavailable'
+
+  const date = new Date(dateToFormat)
+  if (isNaN(date.getTime())) return 'Unavailable'
+
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const hour = String(date.getUTCHours() + 1).padStart(2, '0')
+  const minute = String(date.getUTCMinutes() + 1).padStart(2, '0')
+  const second = String(date.getUTCSeconds() + 1).padStart(2, '0')
+
+  switch (outputFormat) {
+    case DateFormat.YEAR_DATE:
+      return `${year}`
+    case DateFormat.ISO_DATE:
+      return `${year}-${month}-${day}`
+    case DateFormat.ISO_DATE_DEV:
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    case DateFormat.DISPLAY_DATE:
+      return `${day}.${month}.${year}`
+    case DateFormat.DISPLAY_DATE_DEV:
+      return `${day}.${month}.${year} ${hour}:${minute}:${second}`
+    case DateFormat.DISPLAY_DATETIME:
+      return `${day}.${month}.${year} ${hour}:${minute}`
+    case DateFormat.LONG_DATE_TIME:
+      return `${day} ${getMonthName(date.getUTCMonth())} ${year} at ${hour}:${minute}:${second}`
+    default:
+      return `${year}-${month}-${day}`
+  }
+}
+
+const getMonthName = (monthIndex: number) => {
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ]
+  return months[monthIndex]
 }
 
 export const getCalendarYears = (years: string[]) => {
@@ -40,16 +93,4 @@ export const formatISODate = (initialDate: string | Date) => {
   const day = String(date.getUTCDate()).padStart(2, '0')
 
   return `${day}-${month}-${year}`
-}
-
-/**
- * Returns date formatted as 'DD.MM.YYYY'
- */
-export const formatDisplayDate = (initialDate: string | Date) => {
-  const date = new Date(initialDate)
-  const year = date.getUTCFullYear()
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-
-  return `${day}.${month}.${year}`
 }
