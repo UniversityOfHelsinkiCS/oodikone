@@ -1,16 +1,15 @@
-import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { getStudentTotalCredits } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { formatISODate, formatDisplayDate } from '@/util/timeAndDate'
+import { formatDate } from '@/util/timeAndDate'
 import { createMaps } from '../columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from '../columnHelpers/semestersPresent'
 
@@ -38,7 +37,6 @@ export type FormattedStudentData = {
   curriculumPeriod: string
   mostRecentAttainment: string
   tags: any
-  priority?: string
   extent?: string
   updatedAt?: string
 }
@@ -141,7 +139,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       .map(course => course.date)
     if (!dates.length) return ''
     const latestDate = dates.sort((a, b) => +new Date(b) - +new Date(a))[0]
-    return formatISODate(latestDate)
+    return formatDate(latestDate, DateFormat.ISO_DATE)
   }
   const parseTags = tags => {
     const studentTags = tags.map(tag => tag.tag.tagname)
@@ -151,7 +149,9 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const getStartingYear = ({ started }) => (started ? new Date(started).getFullYear() : '')
 
   const getGraduationDate = ({ studentNumber }) =>
-    studentToStudyrightEndMap[studentNumber] ? formatISODate(studentToStudyrightEndMap[studentNumber]) : ''
+    studentToStudyrightEndMap[studentNumber]
+      ? formatDate(studentToStudyrightEndMap[studentNumber], DateFormat.ISO_DATE)
+      : ''
 
   const getCreditsFromHops = student =>
     student.hopsCredits ??
@@ -195,16 +195,26 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
 
       if (startDate && endDate) {
         {
-          return `Between ${formatDisplayDate(startDate)} and ${formatDisplayDate(endDate)}`
+          return `Between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
         }
       } else if (endDate) {
-        return `Before ${formatDisplayDate(endDate)}`
+        return `Before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
       } else if (startDate) {
-        return `Since ${moment(startDate).format(DISPLAY_DATE_FORMAT)}`
+        return `Since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
       }
     }
     return 'Credits since start in programme'
   }
+
+  const getExtent = student =>
+    student.studyRights
+      .filter(
+        studyRight =>
+          studyRight.studyRightElements.filter(element => queryStudyrights.includes(element.code)).length >=
+          queryStudyrights.length
+      )
+      .map(studyRight => studyRight.extentCode)
+      .join(', ')
 
   const {
     studentToStudyrightStartMap,
@@ -245,8 +255,8 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
-      studyRightStart: formatISODate(studentToStudyrightStartMap[student.studentNumber]),
-      programmeStart: formatISODate(studentToProgrammeStartMap[student.studentNumber]),
+      studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
+      programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
       master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
@@ -264,6 +274,8 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
       tags: parseTags(student.tags),
+      extent: isAdmin && getExtent(student),
+      updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE),
     }
   }
   // console.log("Lengths match?", selectedStudentNumbers.length === Object.keys(students).length)

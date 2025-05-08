@@ -18,7 +18,7 @@ const baseColumns = [
 ]
 
 // Filter away unless user is an admin
-export const adminColumns = ['priority', 'extent', 'updatedAt']
+export const adminColumns = ['extent', 'updatedAt']
 
 // Population specifics
 export const columnsByVariant: Record<Variant, Set<string>> = {
@@ -39,7 +39,6 @@ export const columnsByVariant: Record<Variant, Set<string>> = {
       'citizenships',
       'curriculumPeriod',
       'mostRecentAttainment',
-      'priority',
       'extent',
       'updatedAt',
     ])
@@ -138,10 +137,6 @@ export const useColumnDefinitions = (creditFilterText: string) => {
       {
         accessorKey: 'mostRecentAttainment',
         header: 'Latest attainment date',
-      },
-      {
-        accessorKey: 'priority',
-        header: 'Priority',
       },
       {
         accessorKey: 'extent',
