@@ -1,5 +1,5 @@
-import { Language } from '@/shared/language'
-import { DetailedProgrammeRights, Role } from '@/shared/types'
+import { Language } from '@oodikone/shared/language'
+import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 
 export type User = {
   email: string

@@ -2,8 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useState, ReactNode 
 
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useModifyLanguageMutation } from '@/redux/users'
-import { DEFAULT_LANG, isLanguage, Language } from '@/shared/language'
-import { Name } from '@/shared/types'
+import { DEFAULT_LANG, isLanguage, Language } from '@oodikone/shared/language'
+import { Name } from '@oodikone/shared/types'
 
 type LanguageContextType = [Language, React.Dispatch<React.SetStateAction<Language>>]
 

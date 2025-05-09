@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 
+import { NewTag, StudentTag, Tag } from '@oodikone/shared/types'
 import { Tag as TagModel, TagStudent as TagStudentModel } from '../models/kone'
-import { NewTag, StudentTag, Tag } from '../shared/types'
 
 const formatTag = (tag: TagModel): Tag => {
   return {

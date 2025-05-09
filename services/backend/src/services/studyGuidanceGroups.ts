@@ -2,8 +2,8 @@ import * as Sentry from '@sentry/node'
 import { AxiosError } from 'axios'
 import { uniq } from 'lodash'
 
+import { Name } from '@oodikone/shared/types'
 import { StudyGuidanceGroupTag } from '../models/kone'
-import { Name } from '../shared/types'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
 

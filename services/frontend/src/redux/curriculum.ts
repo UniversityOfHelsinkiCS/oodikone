@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { CurriculumOption, CurriculumDetails } from '@/shared/types'
+import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
 
 const curriculumsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

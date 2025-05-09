@@ -1,4 +1,4 @@
-import { StatsType } from '../../shared/types'
+import { StatsType } from '@oodikone/shared/types'
 import { setCreditStats } from '../analyticsService'
 import { computeCreditsProduced } from '../providerCredits'
 import { getDegreeProgrammesOfFaculty } from './faculty'

@@ -1,7 +1,7 @@
 import { InferAttributes } from 'sequelize'
 
+import { mapToProviders } from '@oodikone/shared/util'
 import { SISStudyRight } from '../models'
-import { mapToProviders } from '../shared/util'
 import { EnrollmentType, ExtentCode } from '../types'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'

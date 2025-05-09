@@ -225,21 +225,6 @@ set_up_oodikone_from_scratch() {
   infomsg "Building images"
   "$PROJECT_ROOT"/run.sh both anon build
 
-  TARGET_PATH="$PROJECT_ROOT/services/shared"
-  LINK_PATHS=(
-    "$PROJECT_ROOT/services/backend/src/shared"
-    "$PROJECT_ROOT/services/frontend/src/shared"
-  )
-
-  for SYMLINK_PATH in "${LINK_PATHS[@]}"; do
-    infomsg "Linking $TARGET_PATH to $SYMLINK_PATH"
-    if [ ! -L "$SYMLINK_PATH" ]; then
-      ln -s "$TARGET_PATH" "$SYMLINK_PATH"
-    else
-      infomsg "Symbolic link $SYMLINK_PATH already exists. Skipping creation."
-    fi
-  done
-
   successmsg "Setup ready, Oodikone can be started! See README for more info."
 }
 

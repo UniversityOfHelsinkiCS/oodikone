@@ -1,5 +1,5 @@
-import { Name } from '@/shared/types'
 import { CourseStat } from '@/types/courseStat'
+import { Name } from '@oodikone/shared/types'
 
 export type GetCourseSearchResultResponse = {
   courses: Array<{

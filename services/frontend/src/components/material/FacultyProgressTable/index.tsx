@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'
 import { StyledTable } from '@/components/material/StyledTable'
-import { NameWithCode } from '@/shared/types'
+import { NameWithCode } from '@oodikone/shared/types'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
 export const FacultyProgressTable = ({

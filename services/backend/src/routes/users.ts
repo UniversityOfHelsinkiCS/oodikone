@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express'
 
+import { LANGUAGE_CODES, Language } from '@oodikone/shared/language'
+import { Role } from '@oodikone/shared/types'
+import { tryCatch } from '@oodikone/shared/util'
 import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
-import { LANGUAGE_CODES, Language } from '../shared/language'
-import { Role } from '../shared/types'
-import { tryCatch } from '../shared/util'
 import logger from '../util/logger'
 
 const router = Router()

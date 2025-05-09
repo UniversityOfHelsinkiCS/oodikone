@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash'
 
-import { NameWithCode } from '../../shared/types'
+import { NameWithCode } from '@oodikone/shared/types'
 import { DegreeProgrammeType } from '../../types'
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'

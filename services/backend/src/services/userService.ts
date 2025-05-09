@@ -2,11 +2,11 @@ import { isEqual, keyBy, omit, uniq } from 'lodash'
 import { LRUCache } from 'lru-cache'
 import { InferAttributes } from 'sequelize'
 
+import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { User } from '../models/user'
-import { DetailedProgrammeRights, Role } from '../shared/types'
 import { ExpandedUser, FormattedUser, IamAccess } from '../types'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'

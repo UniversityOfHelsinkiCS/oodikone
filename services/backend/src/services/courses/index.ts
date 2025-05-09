@@ -1,8 +1,8 @@
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
+import { Name } from '@oodikone/shared/types'
 import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
-import { Name } from '../../shared/types'
 import { EnrollmentState, Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { dateIsBetween } from '../../util/datetime'

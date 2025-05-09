@@ -1,9 +1,9 @@
 import { orderBy } from 'lodash'
 import { Op, QueryTypes } from 'sequelize'
 
+import { Name } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
 import { Credit, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
-import { Name } from '../../shared/types'
 import { DegreeProgrammeType, EnrollmentState } from '../../types'
 
 const { sequelize } = dbConnections

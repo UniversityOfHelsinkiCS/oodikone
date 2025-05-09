@@ -1,8 +1,13 @@
 import moment from 'moment'
 import { InferAttributes } from 'sequelize'
 
+import {
+  GraduationTimes,
+  MedianEntry,
+  ProgrammeOrStudyTrackGraduationStats,
+  StudyTrackStats,
+} from '@oodikone/shared/types'
 import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { GraduationTimes, MedianEntry, ProgrammeOrStudyTrackGraduationStats, StudyTrackStats } from '../../shared/types'
 import { GenderCode, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'

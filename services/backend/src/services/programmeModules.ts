@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize'
 
+import { CurriculumOption, Name } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
 import { CurriculumPeriod, ProgrammeModule } from '../models'
 import { ExcludedCourse } from '../models/kone'
-import { CurriculumOption, Name } from '../shared/types'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 

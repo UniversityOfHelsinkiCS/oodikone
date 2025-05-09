@@ -1,7 +1,7 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
+import { Name } from '@oodikone/shared/types'
 import { Student, SISStudyRight, SISStudyRightElement, Credit } from '../../models'
-import { Name } from '../../shared/types'
 import { CreditTypeCode } from '../../types'
 
 export const getStudyRightsInProgramme = async (

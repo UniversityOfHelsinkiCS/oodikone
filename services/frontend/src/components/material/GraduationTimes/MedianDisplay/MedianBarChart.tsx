@@ -14,7 +14,7 @@ import {
   Name,
   NameWithCode,
   ProgrammeClassSizes,
-} from '@/shared/types'
+} from '@oodikone/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

@@ -5,7 +5,7 @@ import { Link } from 'react-router'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
-import { Name } from '@/shared/types'
+import { Name } from '@oodikone/shared/types'
 
 type Tag = {
   programme: {

@@ -1,7 +1,7 @@
 import { List, Stack, Typography } from '@mui/material'
 
 import { Section } from '@/components/material/Section'
-import { Tag } from '@/shared/types'
+import { Tag } from '@oodikone/shared/types'
 import { TagItem } from './TagItem'
 
 export const TagsSection = ({

@@ -1,7 +1,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name } from '@/shared/types'
+import { Name } from '@oodikone/shared/types'
 
 export const StudyTrackSelector = ({
   setStudyTrack,

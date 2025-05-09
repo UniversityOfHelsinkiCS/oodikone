@@ -11,7 +11,7 @@ import {
   useDeleteOpenUniCourseSearchMutation,
   useUpdateOpenUniCourseSearchMutation,
 } from '@/redux/openUniPopulations'
-import { formatToArray } from '@/shared/util'
+import { formatToArray } from '@oodikone/shared/util'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const location = useLocation()

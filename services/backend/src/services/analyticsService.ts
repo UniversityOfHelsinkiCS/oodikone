@@ -1,7 +1,7 @@
 import moment from 'moment'
 
+import { Graduated, SpecialGroups, YearType } from '@oodikone/shared/types'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
-import { Graduated, SpecialGroups, YearType } from '../shared/types'
 import { redisClient } from './redis'
 import { isRelevantProgramme } from './studyProgramme/studyProgrammeHelpers'
 

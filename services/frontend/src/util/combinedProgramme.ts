@@ -1,4 +1,4 @@
-import { Language } from '@/shared/language'
+import { Language } from '@oodikone/shared/language'
 
 export const getCombinedProgrammeName = (bachelor: string, masterLicentiate: string, language: Language) => {
   if (language === 'fi') {

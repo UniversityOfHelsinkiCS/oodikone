@@ -18,9 +18,9 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useTitle } from '@/hooks/title'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { getFullLanguage } from '@/shared/language'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
+import { getFullLanguage } from '@oodikone/shared/language'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
 

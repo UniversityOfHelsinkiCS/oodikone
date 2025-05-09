@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { useDeleteTagMutation } from '@/redux/tags'
-import { Tag } from '@/shared/types'
+import { Tag } from '@oodikone/shared/types'
 
 export const DeleteTagDialog = ({
   setTagToDelete,

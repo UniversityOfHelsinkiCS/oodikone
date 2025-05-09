@@ -21,9 +21,9 @@ import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
-import { formatQueryParamsToArrays } from '@/shared/util'
 import { createPinnedFirstComparator } from '@/util/comparator'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
+import { formatQueryParamsToArrays } from '@oodikone/shared/util'
 import { getMonths } from './common'
 import './populationSearch.css'
 

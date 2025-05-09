@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { DEFAULT_LANG } from '@/shared/language'
+import { DEFAULT_LANG } from '@oodikone/shared/language'
 
 const settingsSlice = createSlice({
   name: 'settings',

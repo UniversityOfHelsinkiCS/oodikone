@@ -1,9 +1,9 @@
 import { RTKApi } from '@/apiConnection'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Language } from '@/shared/language'
-import { Graduated, Name, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@/shared/types'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
+import { Language } from '@oodikone/shared/language'
+import { Graduated, Name, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@oodikone/shared/types'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({

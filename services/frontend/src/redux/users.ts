@@ -1,7 +1,6 @@
 import { RTKApi } from '@/apiConnection'
-import { Role } from '@/shared/types'
-
 import { Email, User } from '@/types/api/users'
+import { Role } from '@oodikone/shared/types'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

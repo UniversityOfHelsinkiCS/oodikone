@@ -1,4 +1,4 @@
-import { FacultyClassSizes, GraduationStats, NameWithCode, ProgrammeMedians } from '@/shared/types'
+import { FacultyClassSizes, GraduationStats, NameWithCode, ProgrammeMedians } from '@oodikone/shared/types'
 
 // ? Almost identical to GetFacultyGraduationTimesResponse, could be combined?
 export interface GetAllGraduationStatsResponse {

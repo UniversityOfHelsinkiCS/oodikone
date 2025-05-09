@@ -5,6 +5,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@oodikone/shared": "file:../shared",
     "@sentry/node": "^8.55.0",
     "@sentry/profiling-node": "^8.55.0",
     "axios": "^1.8.1",

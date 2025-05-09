@@ -1,6 +1,6 @@
 import { RTKApi } from '@/apiConnection'
 
-import { NewTag, StudentTag, Tag } from '@/shared/types'
+import { NewTag, StudentTag, Tag } from '@oodikone/shared/types'
 
 const tagsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

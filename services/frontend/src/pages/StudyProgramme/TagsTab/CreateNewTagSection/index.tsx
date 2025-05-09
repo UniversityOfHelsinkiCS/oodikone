@@ -10,8 +10,8 @@ import { useStatusNotification } from '@/components/material/StatusNotificationC
 import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation } from '@/redux/tags'
-import { Tag } from '@/shared/types'
 import { reformatDate } from '@/util/timeAndDate'
+import { Tag } from '@oodikone/shared/types'
 
 export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; tags: Tag[] }) => {
   const [tagName, setTagName] = useState<string>('')

@@ -1,4 +1,4 @@
-import { Name } from '../../shared/types'
+import { Name } from '@oodikone/shared/types'
 import { EnrollmentState } from '../../types'
 
 const lengthOf = (obj: object) => Object.keys(obj).length
