@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 18
       - name: 'Install dependencies'
-        run: npm ci && cd updater/sis-updater-scheduler && npm ci && cd ../sis-updater-worker && npm ci
+        run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
       - name: 'Run linter'
         run: npm run eslint -- updater
 

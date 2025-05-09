@@ -24,7 +24,7 @@
     "flushredis": "docker exec -it redis redis-cli flushall",
     "prepare": "husky",
     "rapodiff": "docker exec -t oodikone_backend_1 /opt/app-root/src/node_modules/.bin/tsx /opt/app-root/src/src/rapodiff/rapodiff.js",
-    "install:local": "npm i && cd services/frontend && npm i && cd ../backend && npm i && cd ../../updater/sis-updater-scheduler && npm i && cd ../sis-updater-worker && npm i && cd ../..",
+    "install:local": "npm i && npm i --prefix services/frontend && npm i --prefix services/backend && npm i --prefix updater/sis-updater-scheduler && npm i --prefix updater/sis-updater-worker",
     "install:docker": "docker exec frontend npm i && docker exec oodikone_backend_1 npm i && docker exec sis-updater-scheduler npm i && docker exec oodikone_sis-updater-worker_1 npm i",
     "install:both": "npm run install:local && npm run install:docker"
   },
