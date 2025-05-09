@@ -10,9 +10,6 @@ runs:
     - name: 'Install dependencies'
       shell: bash
       run: npm ci && cd services/frontend && npm ci && cd ../backend && npm ci
-    - name: 'Create symlink for shared'
-      shell: bash
-      run: ln -s $PWD/services/shared $PWD/services/backend/src/shared && ln -s $PWD/services/shared $PWD/services/frontend/src/shared
     - name: 'Run Stylelint for CSS files'
       shell: bash
       run: npm run stylelint "services/frontend/src/**/*.css"
