@@ -12,12 +12,12 @@ on:
 
 jobs:
   # === Static tests / linting ===
-  lint_backend_and_frontend:
-    name: 'Lint backend and frontend'
+  lint_packages:
+    name: 'Lint packages'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Lint backend and frontend
+      - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
   # === Build database images ===
