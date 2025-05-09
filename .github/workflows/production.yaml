@@ -95,7 +95,7 @@ jobs:
         run: docker create --name frontend quay.io/toska/oodikone-frontend:production
 
       - name: Copy assets from the frontend container
-        run: docker cp frontend:/opt/app-root/src/build ./build
+        run: docker cp frontend:/opt/app-root/frontend/build ./build
 
       - name: Create Sentry release
         uses: getsentry/action-release@v3
@@ -129,7 +129,7 @@ jobs:
         run: docker create --name backend quay.io/toska/oodikone-backend:production
 
       - name: Copy assets from the backend container
-        run: docker cp backend:/opt/app-root/src/dist ./dist
+        run: docker cp backend:/opt/app-root/backend/dist ./dist
 
       - name: Create Sentry release
         uses: getsentry/action-release@v3
@@ -142,7 +142,7 @@ jobs:
           environment: production
           set_commits: 'skip'
           sourcemaps: './dist'
-          url_prefix: '~/opt/app-root/src/dist/'
+          url_prefix: '~/opt/app-root/backend/dist/'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
   report_success:

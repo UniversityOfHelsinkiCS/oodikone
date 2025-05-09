@@ -44,7 +44,7 @@ services:
     profiles:
       - oodikone
     volumes:
-      - backend-nodemod:/opt/app-root/src/node_modules
+      - backend-nodemod:/opt/app-root/backend/node_modules
       - ./services/backend/:/opt/app-root/backend
       - ./services/shared/:/opt/app-root/shared
 
@@ -59,7 +59,7 @@ services:
     profiles:
       - oodikone
     volumes:
-      - frontend-nodemod:/opt/app-root/src/node_modules
+      - frontend-nodemod:/opt/app-root/frontend/node_modules
       - ./services/frontend/:/opt/app-root/frontend
       - ./services/shared/:/opt/app-root/shared
 

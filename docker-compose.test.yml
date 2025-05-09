@@ -1,5 +1,5 @@
 services:
   frontend:
     volumes:
-      - frontend-nodemod:/opt/app-root/src/node_modules
-      - ./services/frontend/instrumented:/opt/app-root/src/src
+      - frontend-nodemod:/opt/app-root/frontend/node_modules
+      - ./services/frontend/instrumented:/opt/app-root/frontend/src
