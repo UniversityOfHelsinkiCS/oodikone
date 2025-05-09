@@ -5,11 +5,8 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=development
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-WORKDIR /opt/app-root/shared
-COPY . .
-
 WORKDIR /opt/app-root/backend
-COPY ./package*.json .
+COPY . .
 RUN npm ci
 
 EXPOSE 8080
