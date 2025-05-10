@@ -8,7 +8,9 @@ const router = Router()
 
 const changelog: { data?: Release[] } = {}
 
-router.get('/', async (_req: Request, res: Response) => {
+export type ChangelogResBody = Release[]
+
+router.get<never, ChangelogResBody>('/', async (_req: Request, res: Response) => {
   if (changelog.data) {
     return res.status(200).send(changelog.data)
   }
