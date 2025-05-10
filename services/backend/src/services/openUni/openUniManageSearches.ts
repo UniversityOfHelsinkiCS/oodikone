@@ -6,7 +6,7 @@ import {
   deleteOpenUniSearch,
 } from './openUniSearches'
 
-type FoundSearch = {
+export type FoundSearch = {
   id: string
   userId: string
   name: string

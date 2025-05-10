@@ -1,9 +1,10 @@
 import { col, fn, Op, where } from 'sequelize'
 
-import { Course, Credit, Enrollment, Student, Studyplan } from '../models/index'
+import { omitKeys } from '@oodikone/shared/util'
+import { Course, Credit, Enrollment, Student, Studyplan } from '../models'
 import { CreditTypeCode, EnrollmentState } from '../types'
 
-type Courses = Array<Pick<Course, 'code' | 'name' | 'substitutions'>>
+export type Courses = Array<Pick<Course, 'code' | 'name' | 'substitutions'>>
 
 interface StudentCredit {
   date: Date
@@ -37,7 +38,7 @@ type StudentCredits = Record<
   }
 >
 
-interface FormattedStudent extends StudentInfo {
+export interface FormattedStudent extends StudentInfo {
   studentNumber: string
   allEnrollments: StudentEnrollment[]
 }
@@ -148,7 +149,10 @@ const getStudents = async (studentNumbers: string[]) => {
   })
 }
 
-export const getCompletedCourses = async (studentNumbers: string[], courseCodes: string[]) => {
+export const getCompletedCourses = async (
+  studentNumbers: string[],
+  courseCodes: string[]
+): Promise<{ students: Omit<FormattedStudent, 'allEnrollments'>[]; courses: Courses }> => {
   const courses = await getCourses(courseCodes)
   const courseCodesSet = new Set(courseCodes)
   courses.forEach(course => {
@@ -244,7 +248,7 @@ export const getCompletedCourses = async (studentNumbers: string[], courseCodes:
   // Omit allEnrollments, we're only supposed to show the recent, relevant enrollment,
   // the user does not have rights to see all enrollments.
   return {
-    students: students.map(({ allEnrollments, ...rest }) => rest),
+    students: students.map(student => omitKeys(student, ['allEnrollments'])),
     courses,
   }
 }
