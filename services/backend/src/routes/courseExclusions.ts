@@ -1,20 +1,17 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
 import { addExcludedCourses, removeExcludedCourses } from '../services/excludedCourses'
 
 const router = Router()
 
-interface ExcludedCoursesRequest extends Request {
-  body: {
-    courseCodes: string[]
-    curriculumVersion: string
-  }
-  params: {
-    code: string
-  }
+export type ExcludedCoursesParams = { code: string }
+export type ExcludedCoursesResBody = void
+export type ExcludedCoursesReqBody = {
+  courseCodes: string[]
+  curriculumVersion: string
 }
 
-router.post('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
+router.post<ExcludedCoursesParams, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/:code', async (req, res) => {
   const { code: programmeCode } = req.params
   const { courseCodes, curriculumVersion } = req.body
   const result = await addExcludedCourses(courseCodes, curriculumVersion, programmeCode)
@@ -25,7 +22,7 @@ router.post('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
   res.status(201).end()
 })
 
-router.delete('/:code', async (req: ExcludedCoursesRequest, res: Response) => {
+router.delete<ExcludedCoursesParams, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/:code', async (req, res) => {
   const { code: programmeCode } = req.params
   const { courseCodes, curriculumVersion } = req.body
   const result = await removeExcludedCourses(courseCodes, curriculumVersion, programmeCode)
