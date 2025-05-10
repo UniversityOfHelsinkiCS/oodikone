@@ -1,6 +1,7 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { difference } from 'lodash'
 
+import { CanError } from '@oodikone/shared/routes'
 import { NewTag, Role, StudentTag, Tag } from '@oodikone/shared/types'
 import { filterStudentNumbersByAccessRights } from '../services/students'
 import {
@@ -36,13 +37,10 @@ const getStudyTrackCode = (studyTrack: string, combinedProgramme: string) => {
   return combinedProgramme ? `${studyTrack}-${combinedProgramme}` : studyTrack
 }
 
-interface GetTagsByStudyTrackRequest extends Request {
-  params: {
-    studyTrack: string
-  }
-}
+export type GetTagsByStudyTrackParams = { studyTrack: string }
+export type GetTagsByStudyTrackResBody = Tag[] | null
 
-router.get('/tags/:studyTrack', async (req: GetTagsByStudyTrackRequest, res: Response) => {
+router.get<GetTagsByStudyTrackParams, GetTagsByStudyTrackResBody>('/tags/:studyTrack', async (req, res) => {
   const { studyTrack } = req.params
   const { roles, id, programmeRights } = req.user
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -58,11 +56,10 @@ router.get('/tags/:studyTrack', async (req: GetTagsByStudyTrackRequest, res: Res
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface PostTagRequest extends Request {
-  body: { tag: NewTag }
-}
+export type PostTagResBody = CanError<Tag[] | void>
+export type PostTagReqBody = { tag: NewTag }
 
-router.post('/tags', async (req: PostTagRequest, res: Response) => {
+router.post<never, PostTagResBody, PostTagReqBody>('/tags', async (req, res) => {
   const {
     tag: { name, personalUserId, studyTrack, year },
   } = req.body
@@ -83,11 +80,10 @@ router.post('/tags', async (req: PostTagRequest, res: Response) => {
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface DeleteTagRequest extends Request {
-  body: { tag: Tag }
-}
+export type DeleteTagResBody = Tag[] | void
+export type DeleteTagReqBody = { tag: Tag }
 
-router.delete('/tags', async (req: DeleteTagRequest, res: Response) => {
+router.delete<never, DeleteTagResBody, DeleteTagReqBody>('/tags', async (req, res) => {
   const {
     tag: { id, personalUserId, studyTrack },
   } = req.body
@@ -105,37 +101,36 @@ router.delete('/tags', async (req: DeleteTagRequest, res: Response) => {
   res.status(200).json(filterRelevantTags(tags, id))
 })
 
-interface GetStudentTagsByStudyTrackRequest extends Request {
-  params: {
-    studyTrack: string
+export type GetStudentTagsByStudyTrackParams = { studyTrack: string }
+export type GetStudentTagsByStudyTrackResBody = StudentTag[] | null
+
+router.get<GetStudentTagsByStudyTrackParams, GetStudentTagsByStudyTrackResBody>(
+  '/studenttags/:studyTrack',
+  async (req, res) => {
+    const { studyTrack } = req.params
+    const { roles, id, programmeRights } = req.user
+
+    const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+    const programmeCodes = getProgrammeCodes(studyTrack)
+    const lacksProgrammeAccess = programmeCodes.every(code => !fullStudyProgrammeRights.includes(code))
+    if (lacksProgrammeAccess && !roles?.includes('admin')) {
+      return res.json(null)
+    }
+
+    const tags = await getStudentTagsByStudyTrack(studyTrack)
+    const relevantTags = filterRelevantStudentTags(tags, id)
+    res.status(200).json(relevantTags)
   }
+)
+
+export type PostStudentTagsResBody = CanError<void>
+export type PostStudentTagsReqBody = {
+  combinedProgramme: string
+  studentTags: StudentTag[]
+  studyTrack: string
 }
 
-router.get('/studenttags/:studyTrack', async (req: GetStudentTagsByStudyTrackRequest, res: Response) => {
-  const { studyTrack } = req.params
-  const { roles, id, programmeRights } = req.user
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const programmeCodes = getProgrammeCodes(studyTrack)
-  const lacksProgrammeAccess = programmeCodes.every(code => !fullStudyProgrammeRights.includes(code))
-  if (lacksProgrammeAccess && !roles?.includes('admin')) {
-    return res.json(null)
-  }
-
-  const tags = await getStudentTagsByStudyTrack(studyTrack)
-  const relevantTags = filterRelevantStudentTags(tags, id)
-  res.status(200).json(relevantTags)
-})
-
-interface PostStudentTagsRequest extends Request {
-  body: {
-    combinedProgramme: string
-    studentTags: StudentTag[]
-    studyTrack: string
-  }
-}
-
-router.post('/studenttags', async (req: PostStudentTagsRequest, res: Response) => {
+router.post<never, PostStudentTagsResBody, PostStudentTagsReqBody>('/studenttags', async (req, res) => {
   const { combinedProgramme, studentTags, studyTrack } = req.body
   const { roles, programmeRights } = req.user
 
@@ -170,16 +165,15 @@ router.post('/studenttags', async (req: PostStudentTagsRequest, res: Response) =
   res.status(204).end()
 })
 
-interface DeleteStudentTagsRequest extends Request {
-  body: {
-    combinedProgramme: string
-    tagId: string
-    studentNumbers: string[]
-    studyTrack: string
-  }
+export type DeleteStudentTagsResBody = CanError<void>
+export type DeleteStudentTagsReqBody = {
+  combinedProgramme: string
+  tagId: string
+  studentNumbers: string[]
+  studyTrack: string
 }
 
-router.delete('/studenttags', async (req: DeleteStudentTagsRequest, res: Response) => {
+router.delete<never, DeleteStudentTagsResBody, DeleteStudentTagsReqBody>('/studenttags', async (req, res) => {
   const { combinedProgramme, tagId, studentNumbers, studyTrack } = req.body
   const { roles, programmeRights } = req.user
 
