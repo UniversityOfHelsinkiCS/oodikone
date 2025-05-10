@@ -11,7 +11,6 @@ export { SemesterEnrollment } from './semesterEnrollment'
 export { StudyTrack } from './studyTrack'
 export { Unification, UnifyStatus } from './unification'
 export { ExpandedUser, FormattedUser } from './user'
-export { CanError } from './routes'
 
 /**
  * A utility type that extracts the type of the elements of an array. This type

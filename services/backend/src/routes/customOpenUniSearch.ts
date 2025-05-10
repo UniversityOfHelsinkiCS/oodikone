@@ -1,5 +1,6 @@
 import { Router } from 'express'
 
+import { CanError } from '@oodikone/shared/routes'
 import {
   getOpenUniSearches,
   createNewSearch,
@@ -7,7 +8,6 @@ import {
   updateSearch,
 } from '../services/openUni/openUniManageSearches'
 import { getCustomOpenUniCourses } from '../services/openUni/openUniStats'
-import { CanError } from '../types'
 import { safeJSONParse } from '../util'
 
 const router = Router()
