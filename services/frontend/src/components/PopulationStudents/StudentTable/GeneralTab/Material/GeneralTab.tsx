@@ -92,6 +92,14 @@ export const GeneralTab = ({
     'semesterEnrollments',
     'studyRightStart',
     'programmeStart',
+    'option',
+    'transferredFrom',
+    'admissionType',
+    'gender',
+    'citizenships',
+    'curriculumPeriod',
+    'mostRecentAttainment',
+    'extent',
   ]
 
   const populationColumns = [
