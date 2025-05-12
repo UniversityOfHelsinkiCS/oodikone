@@ -190,18 +190,22 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     })
   }
 
-  const getCreditDisplayText = () => {
+  const getCreditsSinceDisplayText = () => {
     if (creditDateFilterOptions) {
       const { startDate, endDate } = creditDateFilterOptions
 
       if (startDate && endDate) {
-        {
-          return `Between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+        return `Credits between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+      } else if (startDate) {
+        return `Credits since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
+      } else if (group?.tags?.year) {
+        if (endDate) {
+          return `Credits between 1.8.${group.tags.year} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+        } else {
+          return `Credits since 1.8.${group.tags.year}`
         }
       } else if (endDate) {
-        return `Before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
-      } else if (startDate) {
-        return `Since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
+        return `Credits before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
       }
     }
     return 'Credits since start in programme'
@@ -308,7 +312,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
   return (
     <GeneralTab
-      creditFilterText={getCreditDisplayText()}
+      creditFilterText={getCreditsSinceDisplayText()}
       formattedData={formattedData}
       group={group}
       showAdminColumns={isAdmin}
