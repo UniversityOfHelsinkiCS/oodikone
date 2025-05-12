@@ -10,23 +10,24 @@ import { type FormattedStudentData } from '.'
 import { useColumnDefinitions } from './ColumnDefinitions'
 
 type Variant = 'population' | 'studyGuidanceGroupPopulation'
+export type DynamicColumnTitles = { creditsSince: string; option: string }
 
 export const GeneralTab = ({
   formattedData,
   variant,
   showAdminColumns,
-  creditFilterText,
+  dynamicTitles,
   group,
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
   showAdminColumns: boolean
-  creditFilterText: string
+  dynamicTitles: DynamicColumnTitles
   group: any
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const columnDefinitions = useColumnDefinitions(creditFilterText)
+  const columnDefinitions = useColumnDefinitions(dynamicTitles)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
 
@@ -86,7 +87,7 @@ export const GeneralTab = ({
     'studyTrack',
     'studyRightStart',
     'programmeStart',
-    'master',
+    'option',
     'semesterEnrollments',
     'graduationDate',
     'startYearAtUniversity',

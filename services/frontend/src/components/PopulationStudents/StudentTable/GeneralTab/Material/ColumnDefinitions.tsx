@@ -2,8 +2,9 @@ import { Tooltip, Typography } from '@mui/material'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
+import { DynamicColumnTitles } from './GeneralTab'
 
-export const useColumnDefinitions = (creditFilterText: string) => {
+export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
   return useMemo<MRT_ColumnDef<any>[]>(
     () => [
       {
@@ -37,7 +38,7 @@ export const useColumnDefinitions = (creditFilterText: string) => {
       },
       {
         accessorKey: 'creditsSince',
-        header: `${creditFilterText}`,
+        header: `${dynamicTitles.creditsSince}`,
       },
       {
         accessorKey: 'studyTrack',
@@ -52,8 +53,17 @@ export const useColumnDefinitions = (creditFilterText: string) => {
         header: 'Started in programme',
       },
       {
-        accessorKey: 'master',
-        header: 'Master',
+        accessorKey: 'option',
+        header: `${dynamicTitles.option}`,
+        Cell: ({ cell }) => {
+          const value = cell.getValue<string>()
+          const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
+          return (
+            <Tooltip arrow title={value}>
+              <span>{formattedValue}</span>
+            </Tooltip>
+          )
+        },
       },
       {
         accessorKey: 'semesterEnrollments',
@@ -82,7 +92,7 @@ export const useColumnDefinitions = (creditFilterText: string) => {
 
           const formattedProgramme = programmes[0].length > 45 ? `${programmes[0].substring(0, 43)}...` : programmes[0]
           return (
-            <Tooltip arrow title={programmeList}>
+            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{programmeList}</div>}>
               <span>
                 {programmes.length > 1 ? `${formattedProgramme} +${programmes.length - 1}` : `${formattedProgramme}`}
               </span>
@@ -127,6 +137,6 @@ export const useColumnDefinitions = (creditFilterText: string) => {
         header: 'Last updated at',
       },
     ],
-    [creditFilterText]
+    [dynamicTitles]
   )
 }

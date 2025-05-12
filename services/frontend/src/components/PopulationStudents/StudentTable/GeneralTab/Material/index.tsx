@@ -26,7 +26,7 @@ export type FormattedStudentData = {
   studyTrack?: string
   studyRightStart: string
   programmeStart: string
-  master: string
+  option: string
   semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
   startYearAtUniversity: number | string
@@ -208,6 +208,8 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     return 'Credits since start in programme'
   }
 
+  const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
+
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>
       queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
@@ -284,7 +286,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : '',
       studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
       programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
-      master: (student.option ? getTextIn(student.option.name) : '') ?? '', // TODO: fix, consider also bsc vs masters
+      option: (student.option ? getTextIn(student.option.name) : '') ?? '',
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
         content: getSemesterEnrollmentsContent(student) ?? null,
@@ -309,7 +311,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
   return (
     <GeneralTab
-      creditFilterText={getCreditsSinceDisplayText()}
+      dynamicTitles={{ creditsSince: getCreditsSinceDisplayText(), option: getOptionDisplayText() }}
       formattedData={formattedData}
       group={group}
       showAdminColumns={isAdmin}
