@@ -59,16 +59,13 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
 
   const { useFilterSelector } = useFilters()
 
-  // Data only used to return null? is filteredstudents also null in that case rendering this useless
-  // @ts-expect-error fix type to not be unknown..
-  const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
+  // @ts-expect-error add typing
+  const { query } = useSelector(({ populations }) => populations)
 
   const queryStudyrights = Object.values(query?.studyRights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
 
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
-
-  if (!populationStatistics) return null
 
   const studyGuidanceGroupProgrammes = group?.tags?.studyProgramme?.includes('+')
     ? group?.tags?.studyProgramme.split('+')
