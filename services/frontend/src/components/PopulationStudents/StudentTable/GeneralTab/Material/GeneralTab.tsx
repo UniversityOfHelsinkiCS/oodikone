@@ -19,6 +19,7 @@ export const GeneralTab = ({
   dynamicTitles,
   group,
   customPopulationProgramme,
+  studyTrackVisible,
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
@@ -26,6 +27,7 @@ export const GeneralTab = ({
   dynamicTitles: DynamicColumnTitles
   group: any
   customPopulationProgramme: any
+  studyTrackVisible: boolean
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -37,6 +39,7 @@ export const GeneralTab = ({
     lastName: namesVisible,
     firstNames: namesVisible,
     email: namesVisible,
+    studyTrack: studyTrackVisible,
   })
 
   // console.log('FormattedData:', formattedData)
@@ -46,8 +49,9 @@ export const GeneralTab = ({
       lastName: namesVisible,
       firstNames: namesVisible,
       email: namesVisible,
+      studyTrack: studyTrackVisible,
     })
-  }, [namesVisible])
+  }, [namesVisible, studyTrackVisible])
 
   const baseColumns = [
     'lastName',
@@ -92,6 +96,7 @@ export const GeneralTab = ({
     'semesterEnrollments',
     'studyRightStart',
     'programmeStart',
+    'studyTrack',
     'option',
     'transferredFrom',
     'admissionType',

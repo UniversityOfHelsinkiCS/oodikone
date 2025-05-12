@@ -318,6 +318,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       formattedData={formattedData}
       group={group}
       showAdminColumns={isAdmin}
+      studyTrackVisible={containsStudyTracks}
       variant={variant}
     />
   )
