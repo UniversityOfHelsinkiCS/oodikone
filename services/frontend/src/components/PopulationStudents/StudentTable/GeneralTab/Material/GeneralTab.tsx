@@ -7,18 +7,22 @@ import { useStudentNameVisibility } from '@/components/material/StudentNameVisib
 
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { type FormattedStudentData } from '.'
-import { adminColumns, columnsByVariant, useColumnDefinitions, type Variant } from './ColumnDefinitions'
+import { useColumnDefinitions } from './ColumnDefinitions'
+
+type Variant = 'population' | 'studyGuidanceGroupPopulation'
 
 export const GeneralTab = ({
   formattedData,
   variant,
   showAdminColumns,
   creditFilterText,
+  group,
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
   showAdminColumns: boolean
   creditFilterText: string
+  group: any
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -42,13 +46,78 @@ export const GeneralTab = ({
     })
   }, [namesVisible])
 
+  const baseColumns = [
+    'lastName',
+    'firstNames',
+    'email',
+    'creditsTotal',
+    'studentNumber',
+    'tags',
+    'phoneNumber',
+    'updatedAt',
+  ]
+
+  const adminColumns = ['extent', 'updatedAt']
+
+  const baseStudyGuidanceGroupColumns = ['creditsSince', 'programmes', 'startYearAtUniversity']
+
+  const studyGuidanceGroupWithProgrammeColumns = [
+    'citizenships',
+    'creditsHops',
+    'curriculumPeriod',
+    'graduationDate',
+    'extent',
+    'gender',
+    'mostRecentAttainment',
+    'semesterEnrollments',
+  ]
+
+  const studyGuidanceGroupYearColumns = [
+    'admissionType',
+    'studyRightStart',
+    'programmeStart',
+    'studyTrack',
+    'transferredFrom',
+  ]
+
+  const populationColumns = [
+    'creditsHops',
+    'creditsSince',
+    'studyTrack',
+    'studyRightStart',
+    'programmeStart',
+    'master',
+    'semesterEnrollments',
+    'graduationDate',
+    'startYearAtUniversity',
+    'programmes',
+    'transferredFrom',
+    'admissionType',
+    'gender',
+    'citizenships',
+    'curriculumPeriod',
+    'mostRecentAttainment',
+    'extent',
+    'updatedAt',
+  ]
+
+  const columnsByVariant: Record<Variant, Set<string>> = {
+    population: new Set([...baseColumns, ...populationColumns]),
+    studyGuidanceGroupPopulation: new Set([
+      ...baseColumns,
+      ...baseStudyGuidanceGroupColumns,
+      ...(group?.tags?.studyProgramme ? studyGuidanceGroupWithProgrammeColumns : []),
+      ...(group?.tags?.studyProgramme && group?.tags?.year ? studyGuidanceGroupYearColumns : []),
+    ]),
+  }
+
   const columns = useMemo(() => {
     return columnDefinitions.filter(col => {
       const isIncluded = columnsByVariant[variant].has(col.accessorKey ?? '')
       if (!showAdminColumns && adminColumns.includes(col.accessorKey ?? '')) return false
       return isIncluded
     })
-  }, [variant, columnDefinitions, showAdminColumns])
+  }, [variant, columnDefinitions, showAdminColumns, adminColumns, columnsByVariant])
 
   const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
 

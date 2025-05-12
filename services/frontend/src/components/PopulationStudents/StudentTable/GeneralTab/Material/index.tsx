@@ -30,7 +30,7 @@ export type FormattedStudentData = {
   semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
   startYearAtUniversity: number | string
-  otherProgrammes: { programmes: string[]; programmeList: () => string[] }
+  programmes: { programmes: string[]; programmeList: string[] }
   transferredFrom: string
   admissionType: string
   gender: string
@@ -46,13 +46,13 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const currentSemester = useCurrentSemester()
-
   const { data: semesterData } = useGetSemestersQuery()
   const allSemesters = Object.values(semesterData?.semesters ?? {})
   const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
     obj[index + 1] = cur
     return obj
   }, {})
+  // console.log("group arg:", group)
 
   const selectedColumns: string[] = ['semesterEnrollments']
   const { data: programmes = {} } = useGetProgrammesQuery()
@@ -270,7 +270,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     semestersToAddToStart: showBachelorAndMaster && isMastersProgramme ? 6 : 0,
   })
 
-  // console.log(filteredStudents)
+  // console.log("filteredStudents:", filteredStudents)
   const formatStudent = (student: any): FormattedStudentData => {
     return {
       firstNames: student.firstnames,
@@ -290,7 +290,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
-      otherProgrammes: getStudyProgrammes(student),
+      programmes: getStudyProgrammes(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType && getAdmissiontype(student),
       gender: getGender(student.gender_code),
@@ -302,12 +302,15 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
   }
-  // console.log("Lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
+  // console.log("populationstatistics", populationStatistics)
+  // console.log("populationstats length:", populationStatistics?.students?.length, "students length:", Object.keys(students).length)
+  // console.log("selectedstudentnumbers and students lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
   const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
   return (
     <GeneralTab
       creditFilterText={getCreditDisplayText()}
       formattedData={formattedData}
+      group={group}
       showAdminColumns={isAdmin}
       variant={variant}
     />

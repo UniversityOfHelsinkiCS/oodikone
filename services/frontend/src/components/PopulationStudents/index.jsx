@@ -66,13 +66,9 @@ const Panes = ({
       menuItem: 'General V2',
       render: () => (
         <GeneralTabNew
-          coursecode={coursecode}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
-          from={from}
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          studyGuidanceGroup={studyGuidanceGroup}
-          to={to}
+          group={studyGuidanceGroup}
           variant={variant}
           year={year}
         />
@@ -211,12 +207,12 @@ const PopulationStudents = ({
 
 const getTabs = programmeCode => {
   if (programmeCode && isBachelorOrLicentiateProgramme(programmeCode)) {
-    return ['General', 'Courses', 'Modules', 'Progress']
+    return ['General', 'General V2', 'Courses', 'Modules', 'Progress']
   }
   if (programmeCode) {
-    return ['General', 'Courses', 'Modules']
+    return ['General', 'General V2', 'Courses', 'Modules']
   }
-  return ['General']
+  return ['General', 'General V2']
 }
 
 export const PopulationStudentsContainer = ({ ...props }) => {

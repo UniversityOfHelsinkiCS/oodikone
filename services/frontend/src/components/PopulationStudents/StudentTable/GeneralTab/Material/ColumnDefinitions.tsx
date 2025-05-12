@@ -3,49 +3,6 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 
-export type Variant = 'population'
-
-// Visible for each population, fallback for unknown variant
-const baseColumns = [
-  'lastName',
-  'firstNames',
-  'email',
-  'credits',
-  'creditsTotal',
-  'studentNumber',
-  'tags',
-  'phoneNumber',
-]
-
-// Filter away unless user is an admin
-export const adminColumns = ['extent', 'updatedAt']
-
-// Population specifics
-export const columnsByVariant: Record<Variant, Set<string>> = {
-  population: new Set(
-    baseColumns.concat([
-      'creditsHops',
-      'creditsSince',
-      'studyTrack',
-      'studyRightStart',
-      'programmeStart',
-      'master',
-      'semesterEnrollments',
-      'graduationDate',
-      'startYearAtUniversity',
-      'otherProgrammes',
-      'transferredFrom',
-      'admissionType',
-      'gender',
-      'citizenships',
-      'curriculumPeriod',
-      'mostRecentAttainment',
-      'extent',
-      'updatedAt',
-    ])
-  ),
-}
-
 export const useColumnDefinitions = (creditFilterText: string) => {
   return useMemo<MRT_ColumnDef<any>[]>(
     () => [
@@ -102,7 +59,7 @@ export const useColumnDefinitions = (creditFilterText: string) => {
         accessorKey: 'semesterEnrollments',
         header: 'Semesters present',
         Cell: ({ cell }) => {
-          // @ts-expect-error fix unknown type
+          // @ts-expect-error add typing
           const { content } = cell.getValue()
           return content ?? null
         },
@@ -116,7 +73,7 @@ export const useColumnDefinitions = (creditFilterText: string) => {
         header: 'Start year at uni',
       },
       {
-        accessorKey: 'otherProgrammes',
+        accessorKey: 'programmes',
         header: 'Other programmes',
         Cell: ({ cell }) => {
           // @ts-expect-error add typing
