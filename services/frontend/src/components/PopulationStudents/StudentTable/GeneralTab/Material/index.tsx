@@ -54,7 +54,6 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     return obj
   }, {})
 
-  const selectedColumns: string[] = ['semesterEnrollments']
   const { data: programmes = {} } = useGetProgrammesQuery()
 
   const { useFilterSelector } = useFilters()
@@ -72,7 +71,6 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     : [group?.tags?.studyProgramme]
   const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
 
-  // const isBachelorsProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:bachelors-degree'
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
   const getTransferredFrom = (student: any) =>
@@ -97,11 +95,13 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       return enrollments
     }, {})
   }
+
   const selectedStudentNumbers = filteredStudents.map(student => student.studentNumber)
   const students = filteredStudents.reduce((acc, student) => {
-    acc[student.studentNumber] = selectedColumns.includes('semesterEnrollments')
-      ? { ...student, semesterEnrollmentsMap: programmeCode != null ? createSemesterEnrollmentsMap(student) : null }
-      : student
+    acc[student.studentNumber] = {
+      ...student,
+      semesterEnrollmentsMap: programmeCode != null ? createSemesterEnrollmentsMap(student) : null,
+    }
     return acc
   }, {})
 
@@ -205,6 +205,9 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
         return `Credits before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
       }
     }
+    if (variant === 'studyGuidanceGroupPopulation') {
+      return 'Credits since 1.1.1970'
+    }
     return 'Credits since start in programme'
   }
 
@@ -260,7 +263,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     currentSemester: currentSemester?.semestercode,
     showBachelorAndMaster,
   })
-
+  // console.log("programmeCode", programmeCode)
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
     allSemesters,
     allSemestersMap,
