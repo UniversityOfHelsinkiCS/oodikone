@@ -53,7 +53,6 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
     obj[index + 1] = cur
     return obj
   }, {})
-  // console.log("group arg:", group)
 
   const selectedColumns: string[] = ['semesterEnrollments']
   const { data: programmes = {} } = useGetProgrammesQuery()
@@ -307,12 +306,14 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
   }
+  // console.log("filteredStudents:", filteredStudents)
   // console.log("populationstatistics", populationStatistics)
   // console.log("populationstats length:", populationStatistics?.students?.length, "students length:", Object.keys(students).length)
   // console.log("selectedstudentnumbers and students lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
   const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
   return (
     <GeneralTab
+      customPopulationProgramme={customPopulationProgramme}
       dynamicTitles={{ creditsSince: getCreditsSinceDisplayText(), option: getOptionDisplayText() }}
       formattedData={formattedData}
       group={group}

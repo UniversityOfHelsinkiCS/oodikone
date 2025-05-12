@@ -9,7 +9,7 @@ import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { type FormattedStudentData } from '.'
 import { useColumnDefinitions } from './ColumnDefinitions'
 
-type Variant = 'population' | 'studyGuidanceGroupPopulation'
+type Variant = 'population' | 'studyGuidanceGroupPopulation' | 'customPopulation'
 export type DynamicColumnTitles = { creditsSince: string; option: string }
 
 export const GeneralTab = ({
@@ -18,12 +18,14 @@ export const GeneralTab = ({
   showAdminColumns,
   dynamicTitles,
   group,
+  customPopulationProgramme,
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
   showAdminColumns: boolean
   dynamicTitles: DynamicColumnTitles
   group: any
+  customPopulationProgramme: any
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -37,7 +39,7 @@ export const GeneralTab = ({
     email: namesVisible,
   })
 
-  // console.log(formattedData)
+  // console.log('FormattedData:', formattedData)
 
   useEffect(() => {
     setColumnVisibility({
@@ -81,6 +83,17 @@ export const GeneralTab = ({
     'transferredFrom',
   ]
 
+  const baseCustomPopulationColumns = ['programmes', 'startYearAtUniversity']
+
+  const customPopulationWithProgrammeColumns = [
+    'creditsHops',
+    'creditsSince',
+    'graduationDate',
+    'semesterEnrollments',
+    'studyRightStart',
+    'programmeStart',
+  ]
+
   const populationColumns = [
     'creditsHops',
     'creditsSince',
@@ -109,6 +122,11 @@ export const GeneralTab = ({
       ...baseStudyGuidanceGroupColumns,
       ...(group?.tags?.studyProgramme ? studyGuidanceGroupWithProgrammeColumns : []),
       ...(group?.tags?.studyProgramme && group?.tags?.year ? studyGuidanceGroupYearColumns : []),
+    ]),
+    customPopulation: new Set([
+      ...baseColumns,
+      ...baseCustomPopulationColumns,
+      ...(customPopulationProgramme ? customPopulationWithProgrammeColumns : []),
     ]),
   }
 

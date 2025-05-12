@@ -233,7 +233,7 @@ export const PopulationStudentsContainer = ({ ...props }) => {
       infotoolTipContent: coursePopulationToolTips.students,
     },
     customPopulation: {
-      panesToInclude: ['General'],
+      panesToInclude: ['General', 'General V2'],
       infotoolTipContent: populationStatisticsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {
