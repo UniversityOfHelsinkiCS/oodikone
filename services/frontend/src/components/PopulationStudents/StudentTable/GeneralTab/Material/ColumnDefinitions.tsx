@@ -12,7 +12,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: 'Student number',
         Header: () => <Typography fontWeight="bold">Student number</Typography>,
         Cell: ({ cell }) => (
-          <StudentInfoItem sisPersonId={cell.row.original.sis_person_id} studentNumber={cell.getValue<string>()} />
+          <StudentInfoItem sisPersonId={cell.row.original.sisuID} studentNumber={cell.getValue<string>()} />
         ),
         filterFn: 'startsWith',
       },

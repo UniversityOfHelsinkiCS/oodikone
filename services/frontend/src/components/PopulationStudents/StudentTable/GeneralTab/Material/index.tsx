@@ -19,6 +19,7 @@ export type FormattedStudentData = {
   firstNames: string
   lastName: string
   studentNumber: string
+  sisuID: string
   email: string
   creditsTotal: number
   creditsHops: number
@@ -280,6 +281,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       lastName: student.lastname,
       studentNumber: student.studentNumber,
       email: student.email,
+      sisuID: student.sis_person_id,
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
