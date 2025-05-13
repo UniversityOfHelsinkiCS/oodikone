@@ -87,23 +87,27 @@ export const GeneralTab = ({
     'transferredFrom',
   ]
 
-  const baseCustomPopulationColumns = ['programmes', 'startYearAtUniversity']
-
-  const customPopulationWithProgrammeColumns = [
+  const baseCustomPopulationColumns = [
+    'programmes',
+    'startYearAtUniversity',
     'creditsHops',
     'creditsSince',
     'graduationDate',
-    'semesterEnrollments',
     'studyRightStart',
     'programmeStart',
     'studyTrack',
     'option',
-    'transferredFrom',
-    'admissionType',
     'gender',
     'citizenships',
-    'curriculumPeriod',
     'mostRecentAttainment',
+    'extent',
+  ]
+
+  const customPopulationWithProgrammeColumns = [
+    'admissionType',
+    'transferredFrom',
+    'semesterEnrollments',
+    'curriculumPeriod',
     'extent',
   ]
 

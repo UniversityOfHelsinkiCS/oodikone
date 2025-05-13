@@ -115,16 +115,16 @@ export const GeneralTab = ({
     studentToProgrammeStartMap,
     studentToSecondStudyrightEndMap,
     studentToOtherProgrammesMap,
-  } = createMaps({
-    students,
+  } = createMaps(
     selectedStudents,
+    students,
     programmeCode,
     combinedProgrammeCode,
     year,
+    currentSemester?.semestercode,
     getTextIn,
-    currentSemester: currentSemester?.semestercode,
-    showBachelorAndMaster,
-  })
+    showBachelorAndMaster
+  )
 
   const transferFrom = student => getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
 
