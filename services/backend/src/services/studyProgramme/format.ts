@@ -1,8 +1,6 @@
-import { InferAttributes } from 'sequelize'
+import { Credit } from '@oodikone/shared/models'
 
-import { CreditModel } from '../../models'
-
-export const formatCredit = (credit: InferAttributes<CreditModel>) => {
+export const formatCredit = (credit: Credit) => {
   const code = credit.course_code.replace('AY', '')
   return {
     id: `${credit.student_studentnumber}-${code}`, // For getting unique credits for each course code and student number

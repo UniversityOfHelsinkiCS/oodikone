@@ -1,7 +1,7 @@
 import { isEqual, keyBy, omit, uniq } from 'lodash'
 import { LRUCache } from 'lru-cache'
-import { InferAttributes } from 'sequelize'
 
+import { User } from '@oodikone/shared/models/user'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
@@ -59,7 +59,7 @@ export const modifyElementDetails = async (id: string, codes: string[], enable: 
   userDataCache.delete(user.username)
 }
 
-export const updateUser = async (username: string, fields: Partial<Record<keyof InferAttributes<UserModel>, any>>) => {
+export const updateUser = async (username: string, fields: Partial<User>) => {
   const user = await UserModel.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)

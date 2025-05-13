@@ -1,5 +1,6 @@
-import { InferAttributes, Op, WhereOptions } from 'sequelize'
+import { Op, WhereOptions } from 'sequelize'
 
+import { SISStudyRight } from '@oodikone/shared/models'
 import { EnrollmentState, ExtentCode } from '@oodikone/shared/types'
 import { CourseModel, CreditModel, EnrollmentModel, StudentModel, SISStudyRightModel } from '../../models'
 import { OpenUniPopulationSearchModel } from '../../models/kone'
@@ -65,7 +66,7 @@ export const getCourseNames = async (courseCodes: string[]) =>
   ).map(formatCourseInfo)
 
 export const getStudyRights = async (studentNumbers: string[]) => {
-  const where: WhereOptions<InferAttributes<SISStudyRightModel>> = {
+  const where: WhereOptions<SISStudyRight> = {
     extentCode: {
       [Op.in]: [
         ExtentCode.BACHELOR,

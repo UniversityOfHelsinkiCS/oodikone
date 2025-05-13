@@ -1,6 +1,6 @@
-import { col, InferAttributes, Op, where } from 'sequelize'
+import { col, Op, where } from 'sequelize'
 
-import { Credit, Studyplan } from '@oodikone/shared/models'
+import { Credit, Student, Studyplan } from '@oodikone/shared/models'
 import {
   Name,
   CreditTypeCode,
@@ -108,11 +108,7 @@ const findThesisAndLatestAndEarliestAttainments = (
   return { attainmentDates, thesisData }
 }
 
-const formatStudent = (
-  student: InferAttributes<StudentModel>,
-  facultyMap: Record<string, Name>,
-  currentSemesterCode: number
-) => {
+const formatStudent = (student: Student, facultyMap: Record<string, Name>, currentSemesterCode: number) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,

@@ -1,8 +1,6 @@
-import { InferAttributes } from 'sequelize'
-
+import { SISStudyRight } from '@oodikone/shared/models'
 import { EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { SISStudyRightModel } from '../models'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
@@ -83,11 +81,7 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
   }
 }
 
-const getBasicDegreeStudyRight = (
-  studyRights: Array<InferAttributes<SISStudyRightModel>> | undefined,
-  date: Date,
-  semestercode: number
-) => {
+const getBasicDegreeStudyRight = (studyRights: Array<SISStudyRight> | undefined, date: Date, semestercode: number) => {
   return studyRights?.find(studyRight => {
     const rightDates =
       new Date(studyRight.startDate).getTime() <= new Date(date).getTime() &&
@@ -124,24 +118,18 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   const studyRights = await getSISStudyRightsOfStudents(students)
 
-  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, InferAttributes<SISStudyRightModel>>>(
-    (obj, cur) => {
-      obj[cur.id] = cur
-      return obj
-    },
-    {}
-  )
+  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, SISStudyRight>>((obj, cur) => {
+    obj[cur.id] = cur
+    return obj
+  }, {})
 
-  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<InferAttributes<SISStudyRightModel>>>>(
-    (obj, cur) => {
-      if (!obj[cur.studentNumber]) {
-        obj[cur.studentNumber] = []
-      }
-      obj[cur.studentNumber].push(cur)
-      return obj
-    },
-    {}
-  )
+  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<SISStudyRight>>>((obj, cur) => {
+    if (!obj[cur.studentNumber]) {
+      obj[cur.studentNumber] = []
+    }
+    obj[cur.studentNumber].push(cur)
+    return obj
+  }, {})
 
   const stats: Record<string, Record<string, number>> = {}
 
