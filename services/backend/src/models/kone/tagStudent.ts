@@ -1,25 +1,27 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
-import { Student } from '../student'
-import { Tag } from './tag'
+import type { Tag, TagStudent, TagStudentCreation } from '@oodikone/shared/models/kone'
+
+import { StudentModel } from '../student'
+import { TagModel } from './tag'
 
 @Table({
   modelName: 'tag_student',
   tableName: 'tag_student',
 })
-export class TagStudent extends Model<InferAttributes<TagStudent>, InferCreationAttributes<TagStudent>> {
+export class TagStudentModel extends Model<TagStudent, TagStudentCreation> implements TagStudent {
   @PrimaryKey
   @AutoIncrement
-  @ForeignKey(() => Tag)
+  @ForeignKey(() => TagModel)
   @Column(DataType.BIGINT)
   tag_id!: string
 
   @PrimaryKey
-  @ForeignKey(() => Student)
+  @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
   studentnumber!: string
 
-  @BelongsTo(() => Tag)
+  @BelongsTo(() => TagModel)
   tag!: CreationOptional<Tag>
 }

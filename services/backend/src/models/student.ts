@@ -1,16 +1,20 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { GenderCode } from '../types'
-import { Credit, Enrollment, SISStudyRight, Studyplan } from '.'
+import type { Student, Credit, Enrollment, SISStudyRight, Studyplan } from '@oodikone/shared/models'
+import type { Name } from '@oodikone/shared/types'
+import { GenderCode } from '@oodikone/shared/types'
+
+import { CreditModel } from './credit'
+import { EnrollmentModel } from './enrollment'
+import { SISStudyRightModel } from './SISStudyRight'
+import { StudyplanModel } from './studyplan'
 
 @Table({
   underscored: true,
   modelName: 'student',
   tableName: 'student',
 })
-export class Student extends Model<InferAttributes<Student>> {
+export class StudentModel extends Model<Student> implements Student {
   @PrimaryKey
   @Column(DataType.STRING)
   studentnumber!: string
@@ -24,16 +28,16 @@ export class Student extends Model<InferAttributes<Student>> {
   @Column(DataType.STRING)
   abbreviatedname!: string
 
-  @HasMany(() => Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  @HasMany(() => EnrollmentModel, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   enrollments!: Enrollment[]
 
-  @HasMany(() => SISStudyRight, { foreignKey: 'studentNumber', sourceKey: 'studentnumber' })
+  @HasMany(() => SISStudyRightModel, { foreignKey: 'studentNumber', sourceKey: 'studentnumber' })
   studyRights!: SISStudyRight[]
 
-  @HasMany(() => Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+  @HasMany(() => StudyplanModel, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
   studyplans!: Studyplan[]
 
-  @HasMany(() => Credit, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
+  @HasMany(() => CreditModel, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
   credits!: Credit[]
 
   @Column(DataType.DATE)

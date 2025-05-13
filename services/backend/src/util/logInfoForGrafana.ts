@@ -1,8 +1,8 @@
-import { SISStudyRightElement } from '../models'
+import { SISStudyRightElementModel } from '../models'
 import logger from './logger'
 
 export const logInfoForGrafana = async (code: string, combinedProgramme: string) => {
-  const programme = await SISStudyRightElement.findOne({ where: { code } })
+  const programme = await SISStudyRightElementModel.findOne({ where: { code } })
   if (!programme) {
     logger.error('Study programme not found', { studyprogrammeCode: code })
     return

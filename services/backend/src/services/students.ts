@@ -1,25 +1,27 @@
 import { InferAttributes, Op, QueryTypes } from 'sequelize'
 
+import type { Credit } from '@oodikone/shared/models'
+import { EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
 import {
-  Student,
-  Credit,
-  Course,
-  ProgrammeModule,
-  Semester,
-  Studyplan,
-  SISStudyRight,
-  SISStudyRightElement,
+  StudentModel,
+  CreditModel,
+  CourseModel,
+  ProgrammeModuleModel,
+  SemesterModel,
+  StudyplanModel,
+  SISStudyRightModel,
+  SISStudyRightElementModel,
 } from '../models'
-import { Tag, TagStudent } from '../models/kone'
-import { EnrollmentState, UnifyStatus } from '../types'
+import { TagModel, TagStudentModel } from '../models/kone'
+import { UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
 
 const { sequelize } = dbConnections
 
 const byStudentNumber = async (studentNumber: string) => {
   const [student, tags] = await Promise.all([
-    Student.findByPk(studentNumber, {
+    StudentModel.findByPk(studentNumber, {
       attributes: [
         'firstnames',
         'lastname',
@@ -35,46 +37,46 @@ const byStudentNumber = async (studentNumber: string) => {
       ],
       include: [
         {
-          model: Credit,
+          model: CreditModel,
           attributes: ['grade', 'credits', 'credittypecode', 'is_open', 'attainment_date', 'isStudyModule'],
           separate: true,
           include: [
             {
-              model: Course,
+              model: CourseModel,
               attributes: ['code', 'name'],
               required: true,
             },
           ],
         },
         {
-          model: SISStudyRight,
+          model: SISStudyRightModel,
           as: 'studyRights',
           include: [
             {
               required: true,
-              model: SISStudyRightElement,
+              model: SISStudyRightElementModel,
               as: 'studyRightElements',
             },
           ],
         },
         {
-          model: Studyplan,
+          model: StudyplanModel,
           attributes: ['id', 'included_courses', 'programme_code', 'completed_credits', 'sis_study_right_id'],
         },
       ],
       order: [
         [
-          { model: SISStudyRight, as: 'studyRights' },
-          { model: SISStudyRightElement, as: 'studyRightElements' },
+          { model: SISStudyRightModel, as: 'studyRights' },
+          { model: SISStudyRightElementModel, as: 'studyRightElements' },
           'endDate',
           'desc',
         ],
       ],
     }),
-    TagStudent.findAll({
+    TagStudentModel.findAll({
       attributes: ['tag_id'],
       include: {
-        model: Tag,
+        model: TagModel,
         attributes: ['personal_user_id', 'studytrack', 'tagname', 'year'],
       },
       where: {
@@ -83,7 +85,7 @@ const byStudentNumber = async (studentNumber: string) => {
     }),
   ])
   if (!student) return null
-  const tagprogrammes = await ProgrammeModule.findAll({
+  const tagprogrammes = await ProgrammeModuleModel.findAll({
     attributes: ['code', 'name'],
     where: {
       code: {
@@ -93,7 +95,7 @@ const byStudentNumber = async (studentNumber: string) => {
   })
 
   return {
-    ...student.dataValues,
+    ...student.toJSON(),
     tags: tags.map(tag => ({
       ...tag.get(),
       programme: tagprogrammes.find(programme => programme.code === tag.tag.studytrack),
@@ -122,7 +124,7 @@ export const findByCourseAndSemesters = async (
   separate: boolean,
   unifyCourses: UnifyStatus = 'unifyStats'
 ) => {
-  const startSemester = await Semester.findOne({
+  const startSemester = await SemesterModel.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
     },
@@ -131,7 +133,7 @@ export const findByCourseAndSemesters = async (
     raw: true,
   })
 
-  const endSemester = await Semester.findOne({
+  const endSemester = await SemesterModel.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: to,
     },
@@ -215,17 +217,15 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: InferAttributes<Student>) => {
+}: InferAttributes<StudentModel>) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
-    course = course.toJSON()
-
     return {
       course: {
         code: course.code,
         name: course.name,
       },
       date: attainment_date,
-      passed: Credit.passed({ credittypecode }) || Credit.improved({ credittypecode }),
+      passed: CreditModel.passed({ credittypecode }) || CreditModel.improved({ credittypecode }),
       grade,
       credits,
       credittypecode,
@@ -305,7 +305,7 @@ const formatStudentForSearch = ({
   lastname,
   studentnumber,
   studyRights,
-}: InferAttributes<Student>) => {
+}: InferAttributes<StudentModel>) => {
   return {
     activeStudyRights: studyRights || [],
     credits: creditcount || 0,
@@ -319,15 +319,15 @@ const formatStudentForSearch = ({
 export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentNumbers?: string[]) => {
   const terms = splitByEmptySpace(searchTerm)
   return (
-    await Student.findAll({
+    await StudentModel.findAll({
       attributes: ['studentnumber', 'firstnames', 'lastname', 'creditcount', 'dateofuniversityenrollment'],
       include: {
-        model: SISStudyRight,
+        model: SISStudyRightModel,
         as: 'studyRights',
         attributes: ['id'],
         include: [
           {
-            model: SISStudyRightElement,
+            model: SISStudyRightElementModel,
             as: 'studyRightElements',
             attributes: ['name'],
             required: true,
@@ -356,16 +356,16 @@ export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentN
 
 export const filterStudentNumbersByAccessRights = async (studentnumbers: string[], codes: string[]) =>
   (
-    await Student.findAll({
+    await StudentModel.findAll({
       attributes: ['studentnumber'],
       include: {
         attributes: [],
-        model: SISStudyRight,
+        model: SISStudyRightModel,
         as: 'studyRights',
         required: true,
         include: [
           {
-            model: SISStudyRightElement,
+            model: SISStudyRightElementModel,
             as: 'studyRightElements',
             where: {
               code: {
@@ -386,16 +386,16 @@ export const filterStudentNumbersByAccessRights = async (studentnumbers: string[
 
 export const getStudentnumbersByElementdetails = async (codes: string[]) =>
   (
-    await Student.findAll({
+    await StudentModel.findAll({
       attributes: ['studentnumber'],
       include: {
         attributes: [],
-        model: SISStudyRight,
+        model: SISStudyRightModel,
         as: 'studyRights',
         required: true,
         include: [
           {
-            model: SISStudyRightElement,
+            model: SISStudyRightElementModel,
             as: 'studyRightElements',
             where: {
               code: {

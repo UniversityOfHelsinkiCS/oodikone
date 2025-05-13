@@ -1,9 +1,9 @@
 import { Op } from 'sequelize'
 
-import { StudyProgrammePin } from '../models/kone'
+import { StudyProgrammePinModel } from '../models/kone'
 
 const findPinsByUserId = async (userId: string) => {
-  return await StudyProgrammePin.findOne({
+  return await StudyProgrammePinModel.findOne({
     where: {
       userId: {
         [Op.eq]: userId,
@@ -19,7 +19,7 @@ export const getStudyProgrammePins = async (userId: string) => {
 export const createStudyProgrammePin = async (userId: string, programmeCode: string) => {
   const existingPin = await findPinsByUserId(userId)
   if (!existingPin) {
-    return await StudyProgrammePin.create({
+    return await StudyProgrammePinModel.create({
       userId: Number(userId),
       studyProgrammes: [programmeCode],
     })

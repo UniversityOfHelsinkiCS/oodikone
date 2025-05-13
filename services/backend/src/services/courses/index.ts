@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
-import { Course, Credit, Enrollment, Organization, SISStudyRightElement } from '../../models'
-import { EnrollmentState, Unification } from '../../types'
+import { Name, EnrollmentState } from '@oodikone/shared/types'
+import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
+import { Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { dateIsBetween } from '../../util/datetime'
 import { getSortRank } from '../../util/sortRank'
@@ -22,7 +22,7 @@ const sortMainCode = (codes: string[]) => {
   return codes.sort((a, b) => getSortRank(b) - getSortRank(a))
 }
 
-const formatStudyRightElement = (studyRightElement: SISStudyRightElement): FormattedProgramme => ({
+const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): FormattedProgramme => ({
   code: studyRightElement.code,
   name: studyRightElement.name,
   startDate: studyRightElement.startDate,
@@ -55,9 +55,9 @@ type FormattedCredit = {
 }
 
 const parseCredit = (
-  credit: Credit,
+  credit: CreditModel,
   anonymizationSalt: string | null,
-  studentNumberToSrElementsMap: Record<string, Array<SISStudyRightElement>>
+  studentNumberToSrElementsMap: Record<string, Array<SISStudyRightElementModel>>
 ) => {
   const {
     semester,
@@ -71,7 +71,7 @@ const parseCredit = (
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
   const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
-  let programmeOfCredit: SISStudyRightElement | undefined
+  let programmeOfCredit: SISStudyRightElementModel | undefined
   programmeOfCredit = studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId)
   if (!programmeOfCredit) {
     programmeOfCredit = studyRightElements
@@ -91,7 +91,7 @@ const parseCredit = (
     attainmentDate,
     courseCode,
     grade,
-    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
+    passed: !CreditModel.failed(credit) || CreditModel.passed(credit) || CreditModel.improved(credit),
     studentNumber,
     programmes,
     credits,
@@ -118,9 +118,9 @@ type FormattedEnrollment = {
 }
 
 const parseEnrollment = (
-  enrollment: Enrollment,
+  enrollment: EnrollmentModel,
   anonymizationSalt: string | null,
-  studentNumberToSrElementsMap: Record<string, SISStudyRightElement[]>
+  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
 ) => {
   const {
     studentnumber: studentNumber,
@@ -157,9 +157,9 @@ const getYearlyStatsOfNew = async (
   unification: Unification,
   anonymizationSalt: string | null,
   combineSubstitutions: boolean,
-  studentNumberToSrElementsMap: Record<string, SISStudyRightElement[]>
+  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
 ) => {
-  const courseForSubs = await Course.findOne({
+  const courseForSubs = await CourseModel.findOne({
     where: { code: courseCode },
   })
 
@@ -175,7 +175,7 @@ const getYearlyStatsOfNew = async (
   const [credits, enrollments, course] = await Promise.all([
     getCreditsForCourses(codes, unification),
     getEnrollmentsForCourses(codes, unification),
-    Course.findOne({
+    CourseModel.findOne({
       where: {
         code: courseCode,
       },
@@ -242,9 +242,9 @@ const getYearlyStatsOfNew = async (
 
   const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
-  let substitutionCourses: Course[] | undefined
+  let substitutionCourses: CourseModel[] | undefined
   if (combineSubstitutions && courseForSubs?.substitutions && courseForSubs.substitutions.length > 0) {
-    substitutionCourses = await Course.findAll({
+    substitutionCourses = await CourseModel.findAll({
       where: {
         code: {
           [Op.in]: codes,
@@ -266,7 +266,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
-        await Course.findAll({
+        await CourseModel.findAll({
           where: {
             code: {
               [Op.in]: courseCodes,
@@ -281,7 +281,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
   attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
 
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     where: {
       course_code: {
         [Op.in]: courseCodes,
@@ -324,11 +324,11 @@ export const getCourseYearlyStats = async (
   anonymizationSalt: string | null,
   combineSubstitutions: boolean
 ) => {
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     attributes: ['student_studentnumber'],
     where: { course_code: { [Op.in]: courseCodes } },
   })
-  const enrollments = await Enrollment.findAll({
+  const enrollments = await EnrollmentModel.findAll({
     attributes: ['studentnumber'],
     where: {
       course_code: {
@@ -385,10 +385,10 @@ export const getCourseYearlyStats = async (
 
 export const getCourseProvidersForCourses = async (codes: string[]) => {
   return (
-    await Organization.findAll({
+    await OrganizationModel.findAll({
       attributes: ['code'],
       include: {
-        model: Course,
+        model: CourseModel,
         where: {
           code: {
             [Op.in]: codes,

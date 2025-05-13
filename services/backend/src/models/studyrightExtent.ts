@@ -1,14 +1,14 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { ExtentCode } from '../types'
+import type { StudyrightExtent } from '@oodikone/shared/models'
+import { ExtentCode } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'studyright_extent',
   tableName: 'studyright_extents',
 })
-export class StudyrightExtent extends Model<InferAttributes<StudyrightExtent>> {
+export class StudyrightExtentModel extends Model<StudyrightExtent> implements StudyrightExtent {
   @PrimaryKey
   @Column(DataType.INTEGER)
   extentcode!: ExtentCode

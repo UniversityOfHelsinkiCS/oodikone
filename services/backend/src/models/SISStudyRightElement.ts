@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -11,15 +10,17 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { DegreeProgrammeType, Phase, StudyTrack } from '../types'
-import { SISStudyRight } from './SISStudyRight'
+import type { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import type { Name, StudyTrack } from '@oodikone/shared/types'
+import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
+
+import { SISStudyRightModel } from './SISStudyRight'
 
 @Table({
   underscored: true,
   tableName: 'sis_study_right_elements',
 })
-export class SISStudyRightElement extends Model<InferAttributes<SISStudyRightElement>> {
+export class SISStudyRightElementModel extends Model<SISStudyRightElement> implements SISStudyRightElement {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
@@ -36,11 +37,11 @@ export class SISStudyRightElement extends Model<InferAttributes<SISStudyRightEle
   @Column(DataType.INTEGER)
   phase!: Phase
 
-  @ForeignKey(() => SISStudyRight)
+  @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
   studyRightId!: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyRightId' })
+  @BelongsTo(() => SISStudyRightModel, { foreignKey: 'studyRightId' })
   studyRight!: SISStudyRight
 
   @Column(DataType.STRING)

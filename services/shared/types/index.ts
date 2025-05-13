@@ -1,3 +1,6 @@
+/** Borrowed from sequelize */
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
 export type { CurriculumDetails, CurriculumOption, CurriculumPeriod } from './curriculum'
 export type { DetailedProgrammeRights } from './detailedProgrammeRights'
 export type { Graduated, SpecialGroups, ProgrammeFilter, StatsType, YearType } from './faculty'
@@ -23,3 +26,14 @@ export type {
   StudyTrackStats,
 } from './studyProgramme'
 export type { NewTag, StudentTag, Tag } from './tag'
+export type { SemesterEnrollment } from './semesterEnrollment'
+export type { StudyTrack } from './studyTrack'
+
+// ENUMS
+export { CreditTypeCode } from './creditTypeCode'
+export { GenderCode } from './genderCode'
+export { EnrollmentState } from './enrollmentState'
+export { EnrollmentType } from './enrollmentType'
+export { ExtentCode } from './extentCode'
+export { DegreeProgrammeType } from './degreeProgrammeType'
+export { Phase } from './phase'

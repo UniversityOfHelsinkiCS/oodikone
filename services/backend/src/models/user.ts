@@ -1,8 +1,10 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-import { Language } from '@oodikone/shared/language'
-import { Role } from '@oodikone/shared/types'
+import type { Language } from '@oodikone/shared/language'
+import type { User, UserCreation } from '@oodikone/shared/models/user'
+
+import type { Role } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
@@ -10,7 +12,7 @@ import { Role } from '@oodikone/shared/types'
   modelName: 'users',
   tableName: 'users',
 })
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+export class UserModel extends Model<User, UserCreation> implements User {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)

@@ -1,13 +1,13 @@
 import { InferAttributes, Op, WhereOptions } from 'sequelize'
 
-import { Course, Credit, Enrollment, Student, SISStudyRight } from '../../models'
-import { OpenUniPopulationSearch } from '../../models/kone'
-import { EnrollmentState, ExtentCode } from '../../types'
+import { EnrollmentState, ExtentCode } from '@oodikone/shared/types'
+import { CourseModel, CreditModel, EnrollmentModel, StudentModel, SISStudyRightModel } from '../../models'
+import { OpenUniPopulationSearchModel } from '../../models/kone'
 import { formatCourseInfo, formatOpenCredits, formatOpenEnrollments, formatStudentInfo } from './format'
 
 export const getCredits = async (courseCodes: string[], startdate: Date) =>
   (
-    await Credit.findAll({
+    await CreditModel.findAll({
       attributes: ['attainment_date', 'course_code', 'grade', 'student_studentnumber'],
       where: {
         course_code: {
@@ -22,7 +22,7 @@ export const getCredits = async (courseCodes: string[], startdate: Date) =>
 
 export const getStudentInfo = async (studentNumbers: string[]) =>
   (
-    await Student.findAll({
+    await StudentModel.findAll({
       attributes: ['studentnumber', 'email', 'secondary_email'],
       where: {
         studentnumber: {
@@ -34,7 +34,7 @@ export const getStudentInfo = async (studentNumbers: string[]) =>
 
 export const getEnrollments = async (courseCodes: string[], startDate: Date, endDate: Date) =>
   (
-    await Enrollment.findAll({
+    await EnrollmentModel.findAll({
       attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
       where: {
         course_code: {
@@ -54,7 +54,7 @@ export const getEnrollments = async (courseCodes: string[], startDate: Date, end
 
 export const getCourseNames = async (courseCodes: string[]) =>
   (
-    await Course.findAll({
+    await CourseModel.findAll({
       attributes: ['code', 'name'],
       where: {
         code: {
@@ -65,7 +65,7 @@ export const getCourseNames = async (courseCodes: string[]) =>
   ).map(formatCourseInfo)
 
 export const getStudyRights = async (studentNumbers: string[]) => {
-  const where: WhereOptions<InferAttributes<SISStudyRight>> = {
+  const where: WhereOptions<InferAttributes<SISStudyRightModel>> = {
     extentCode: {
       [Op.in]: [
         ExtentCode.BACHELOR,
@@ -83,14 +83,14 @@ export const getStudyRights = async (studentNumbers: string[]) => {
     }
   }
 
-  return await SISStudyRight.findAll({
+  return await SISStudyRightModel.findAll({
     attributes: ['startDate', 'endDate', 'studentNumber'],
     where,
   })
 }
 
 export const getOpenUniSearchesByUser = async (userId: string) => {
-  return await OpenUniPopulationSearch.findAll({
+  return await OpenUniPopulationSearchModel.findAll({
     where: {
       userId,
     },
@@ -98,7 +98,7 @@ export const getOpenUniSearchesByUser = async (userId: string) => {
 }
 
 export const createOpenUniPopulationSearch = async (userId: string, name: string, courseCodes: string[]) => {
-  return await OpenUniPopulationSearch.create({
+  return await OpenUniPopulationSearchModel.create({
     userId,
     name,
     courseCodes,
@@ -106,7 +106,7 @@ export const createOpenUniPopulationSearch = async (userId: string, name: string
 }
 
 export const updateOpenUniPopulationSearch = async (userId: string, id: string, courseCodes: string[]) => {
-  const searchToUpdate = await OpenUniPopulationSearch.findOne({
+  const searchToUpdate = await OpenUniPopulationSearchModel.findOne({
     where: {
       userId,
       id,
@@ -121,7 +121,7 @@ export const updateOpenUniPopulationSearch = async (userId: string, id: string, 
 }
 
 export const deleteOpenUniSearch = async (userId: string, id: string) => {
-  return await OpenUniPopulationSearch.destroy({
+  return await OpenUniPopulationSearchModel.destroy({
     where: {
       userId,
       id,

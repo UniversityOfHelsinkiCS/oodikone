@@ -1,18 +1,27 @@
 import { Op } from 'sequelize'
 
-import { Credit, Student, Semester, Organization, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
-import { EnrollmentState, Unification } from '../../types'
+import { EnrollmentState } from '@oodikone/shared/types'
+import {
+  CreditModel,
+  StudentModel,
+  SemesterModel,
+  OrganizationModel,
+  EnrollmentModel,
+  SISStudyRightModel,
+  SISStudyRightElementModel,
+} from '../../models'
+import { Unification } from '../../types'
 import { getIsOpen } from './helpers'
 
 export const getCreditsForCourses = async (codes: string[], unification: Unification) => {
-  return await Credit.findAll({
+  return await CreditModel.findAll({
     include: [
       {
-        model: Student,
+        model: StudentModel,
         attributes: ['studentnumber'],
       },
       {
-        model: Semester,
+        model: SemesterModel,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
         where: {
           startdate: {
@@ -32,7 +41,7 @@ export const getCreditsForCourses = async (codes: string[], unification: Unifica
 }
 
 export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
-  const studyRights = await SISStudyRight.findAll({
+  const studyRights = await SISStudyRightModel.findAll({
     attributes: ['facultyCode', 'id', 'studentNumber'],
     where: {
       studentNumber: {
@@ -40,7 +49,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
       },
     },
     include: {
-      model: Organization,
+      model: OrganizationModel,
       attributes: ['name', 'code'],
     },
   })
@@ -52,7 +61,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
 
   const studyRightIds = Object.keys(studyRightMap)
 
-  const studyRightElements = await SISStudyRightElement.findAll({
+  const studyRightElements = await SISStudyRightElementModel.findAll({
     attributes: ['code', 'name', 'startDate', 'endDate', 'studyRightId'],
     where: {
       studyRightId: {
@@ -74,14 +83,14 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
 }
 
 export const getEnrollmentsForCourses = async (codes: string[], unification: Unification) => {
-  return await Enrollment.findAll({
+  return await EnrollmentModel.findAll({
     include: [
       {
-        model: Student,
+        model: StudentModel,
         attributes: ['studentnumber'],
       },
       {
-        model: Semester,
+        model: SemesterModel,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
         where: {
           startdate: {

@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 
-import { SISStudyRight, SISStudyRightElement } from '../../models'
-import { ExtentCode } from '../../types'
+import { ExtentCode } from '@oodikone/shared/types'
+import { SISStudyRightModel, SISStudyRightElementModel } from '../../models'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
 const exchangeStudents = [ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE]
@@ -18,8 +18,8 @@ const nondegreeStudents = [
   ExtentCode.SUMMER_AND_WINTER_SCHOOL,
 ]
 
-type StudentStudyRights = Pick<SISStudyRight, 'studentNumber' | 'studyRightElements'> & {
-  studyRightElements: Array<Pick<SISStudyRightElement, 'code' | 'endDate' | 'startDate' | 'phase'>>
+type StudentStudyRights = Pick<SISStudyRightModel, 'studentNumber' | 'studyRightElements'> & {
+  studyRightElements: Array<Pick<SISStudyRightElementModel, 'code' | 'endDate' | 'startDate' | 'phase'>>
 }
 
 export const getStudentNumbersWithStudyRights = async ({
@@ -36,10 +36,10 @@ export const getStudentNumbersWithStudyRights = async ({
     ...(!includeNondegreeStudents ? nondegreeStudents : []),
   ] as const
 
-  const studyRightIds: Array<Pick<SISStudyRight, 'id'>> = await SISStudyRight.findAll({
+  const studyRightIds: Array<Pick<SISStudyRightModel, 'id'>> = await SISStudyRightModel.findAll({
     attributes: ['id'],
     include: {
-      model: SISStudyRightElement,
+      model: SISStudyRightElementModel,
       attributes: [],
       where: {
         code: { [Op.in]: studyRights },
@@ -53,10 +53,10 @@ export const getStudentNumbersWithStudyRights = async ({
   })
 
   const studentsStudyRights: Array<StudentStudyRights> = (
-    await SISStudyRight.findAll({
+    await SISStudyRightModel.findAll({
       attributes: ['studentNumber'],
       include: {
-        model: SISStudyRightElement,
+        model: SISStudyRightElementModel,
         as: 'studyRightElements',
         attributes: ['code', 'endDate', 'startDate', 'phase'],
       },

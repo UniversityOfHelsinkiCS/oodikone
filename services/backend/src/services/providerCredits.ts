@@ -1,8 +1,8 @@
 import { InferAttributes } from 'sequelize'
 
+import { EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { SISStudyRight } from '../models'
-import { EnrollmentType, ExtentCode } from '../types'
+import { SISStudyRightModel } from '../models'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
@@ -84,7 +84,7 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
 }
 
 const getBasicDegreeStudyRight = (
-  studyRights: Array<InferAttributes<SISStudyRight>> | undefined,
+  studyRights: Array<InferAttributes<SISStudyRightModel>> | undefined,
   date: Date,
   semestercode: number
 ) => {
@@ -124,12 +124,15 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   const studyRights = await getSISStudyRightsOfStudents(students)
 
-  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, InferAttributes<SISStudyRight>>>((obj, cur) => {
-    obj[cur.id] = cur
-    return obj
-  }, {})
+  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, InferAttributes<SISStudyRightModel>>>(
+    (obj, cur) => {
+      obj[cur.id] = cur
+      return obj
+    },
+    {}
+  )
 
-  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<InferAttributes<SISStudyRight>>>>(
+  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<InferAttributes<SISStudyRightModel>>>>(
     (obj, cur) => {
       if (!obj[cur.studentNumber]) {
         obj[cur.studentNumber] = []

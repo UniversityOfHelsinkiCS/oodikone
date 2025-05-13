@@ -1,7 +1,7 @@
 import { col, Op } from 'sequelize'
 
-import { Credit, Semester, Teacher } from '../../models'
-import { CreditTypeCode } from '../../types'
+import { CreditTypeCode } from '@oodikone/shared/types'
+import { CreditModel, SemesterModel, TeacherModel } from '../../models'
 import logger from '../../util/logger'
 import { redisClient } from '../redis'
 import { getCurrentSemester, getSemestersAndYears } from '../semesters'
@@ -38,7 +38,7 @@ export const getCategoriesAndYears = async () => {
 }
 
 const getCreditsWithTeachersForYear = async (semesters: string[]) => {
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     attributes: [
       'credits',
       'credittypecode',
@@ -48,7 +48,7 @@ const getCreditsWithTeachersForYear = async (semesters: string[]) => {
       [col('teachers.name'), 'teacherName'],
     ],
     include: {
-      model: Teacher,
+      model: TeacherModel,
       through: {
         attributes: [],
       },
@@ -67,7 +67,7 @@ const getCreditsWithTeachersForYear = async (semesters: string[]) => {
     raw: true,
   })
   return credits as unknown as Array<
-    Pick<Credit, 'credits' | 'credittypecode' | 'isStudyModule' | 'is_open'> & {
+    Pick<CreditModel, 'credits' | 'credittypecode' | 'isStudyModule' | 'is_open'> & {
       teacherId: string
       teacherName: string
     }
@@ -108,7 +108,7 @@ const filterTopTeachers = (stats: Record<string, TeacherStats>, limit = 50) => {
 
 const findTopTeachers = async (yearCode: number) => {
   const semesters = (
-    await Semester.findAll({
+    await SemesterModel.findAll({
       where: {
         yearcode: yearCode,
       },
@@ -121,8 +121,8 @@ const findTopTeachers = async (yearCode: number) => {
   for (const credit of credits) {
     const { credits, credittypecode, isStudyModule, is_open, teacherId, teacherName } = credit
     if (isStudyModule) continue
-    const passed = Credit.passed(credit) || Credit.improved(credit)
-    const failed = Credit.failed(credit)
+    const passed = CreditModel.passed(credit) || CreditModel.improved(credit)
+    const failed = CreditModel.failed(credit)
     const transferred = credittypecode === CreditTypeCode.APPROVED
     const teacher = { id: teacherId, name: teacherName }
     updatedStats(all, teacher, credits, passed, failed, transferred)

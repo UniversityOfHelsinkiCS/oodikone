@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -12,25 +11,26 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { DegreeProgrammeType } from '../types'
-import { Organization } from './organization'
-import { ProgrammeModuleChild } from './programmeModuleChild'
+import type { Organization, ProgrammeModule } from '@oodikone/shared/models'
+import { DegreeProgrammeType, Name } from '@oodikone/shared/types'
+
+import { OrganizationModel } from './organization'
+import { ProgrammeModuleChildModel } from './programmeModuleChild'
 
 @Table({
   underscored: true,
   modelName: 'programme_module',
   tableName: 'programme_modules',
 })
-export class ProgrammeModule extends Model<InferAttributes<ProgrammeModule>> {
+export class ProgrammeModuleModel extends Model<ProgrammeModule> implements ProgrammeModule {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
 
-  @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'child_id')
+  @BelongsToMany(() => ProgrammeModuleModel, () => ProgrammeModuleChildModel, 'child_id')
   parents!: ProgrammeModule[]
 
-  @BelongsToMany(() => ProgrammeModule, () => ProgrammeModuleChild, 'parent_id')
+  @BelongsToMany(() => ProgrammeModuleModel, () => ProgrammeModuleChildModel, 'parent_id')
   children!: ProgrammeModule[]
 
   @Column(DataType.STRING)
@@ -51,11 +51,11 @@ export class ProgrammeModule extends Model<InferAttributes<ProgrammeModule>> {
   @Column(DataType.STRING)
   studyLevel!: string
 
-  @ForeignKey(() => Organization)
+  @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
   organization_id!: string
 
-  @BelongsTo(() => Organization, { foreignKey: 'organization_id' })
+  @BelongsTo(() => OrganizationModel, { foreignKey: 'organization_id' })
   organization!: Organization
 
   @Column(DataType.DATE)

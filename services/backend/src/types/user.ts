@@ -1,10 +1,8 @@
-import { InferAttributes } from 'sequelize'
-
 import { Language } from '@oodikone/shared/language'
+import type { User } from '@oodikone/shared/models/user'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
-import { User } from '../models/user'
 
-export type ExpandedUser = InferAttributes<User> & {
+export type ExpandedUser = User & {
   iamGroups: string[]
   mockedBy?: string | undefined
   detailedProgrammeRights: DetailedProgrammeRights[]

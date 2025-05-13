@@ -1,14 +1,14 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
+import type { CurriculumPeriod } from '@oodikone/shared/models'
+import type { Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'curriculum_period',
   tableName: 'curriculum_periods',
 })
-export class CurriculumPeriod extends Model<InferAttributes<CurriculumPeriod>> {
+export class CurriculumPeriodModel extends Model<CurriculumPeriod> implements CurriculumPeriod {
   @Column({ type: DataType.STRING, primaryKey: true })
   id!: string
 

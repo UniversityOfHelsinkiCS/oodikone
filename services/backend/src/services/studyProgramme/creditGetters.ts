@@ -1,11 +1,11 @@
 import { Op } from 'sequelize'
 
-import { Course, CourseProvider, Credit, Organization } from '../../models'
-import { CreditTypeCode } from '../../types'
+import { CreditTypeCode } from '@oodikone/shared/types'
+import { CourseModel, CourseProviderModel, CreditModel, OrganizationModel } from '../../models'
 import { formatCredit } from './format'
 
 export const getCreditsForProvider = async (provider: string, codes: string[], since: Date) => {
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     where: {
       course_code: { [Op.in]: codes },
       attainment_date: { [Op.gte]: since },
@@ -17,14 +17,14 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
 
   const courseIds = credits.map(cr => cr.course_id)
 
-  const providers = await CourseProvider.findAll({
+  const providers = await CourseProviderModel.findAll({
     where: {
       coursecode: { [Op.in]: courseIds },
     },
     raw: true,
   })
   const organizationIds = providers.map(p => p.organizationcode)
-  const organizations = await Organization.findAll({
+  const organizations = await OrganizationModel.findAll({
     where: {
       id: {
         [Op.in]: organizationIds,
@@ -38,7 +38,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
     return obj
   }, {})
 
-  const courseIdToShareMap = providers.reduce<Record<string, CourseProvider[]>>((obj, provider) => {
+  const courseIdToShareMap = providers.reduce<Record<string, CourseProviderModel[]>>((obj, provider) => {
     if (!obj[provider.coursecode]) obj[provider.coursecode] = []
     obj[provider.coursecode].push(provider)
     return obj
@@ -87,15 +87,15 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
 }
 
 export const getTransferredCredits = async (provider: string, since: Date) =>
-  await Credit.findAll({
+  await CreditModel.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'createdate'],
     include: {
-      model: Course,
+      model: CourseModel,
       attributes: ['code'],
       required: true,
       include: [
         {
-          model: Organization,
+          model: OrganizationModel,
           required: true,
           where: {
             code: provider,
@@ -115,10 +115,10 @@ export const getTransferredCredits = async (provider: string, since: Date) =>
   })
 
 export const getStudyRightThesisCredits = async (thesisType: string[], studyRightIds: string[]) =>
-  await Credit.findAll({
+  await CreditModel.findAll({
     attributes: ['attainment_date', 'student_studentnumber'],
     include: {
-      model: Course,
+      model: CourseModel,
       attributes: [],
       where: {
         course_unit_type: {
@@ -138,10 +138,10 @@ export const getStudyRightThesisCredits = async (thesisType: string[], studyRigh
   })
 
 export const getOrganizationThesisCredits = async (provider: string, thesisType: string[], studentnumbers: string[]) =>
-  await Credit.findAll({
+  await CreditModel.findAll({
     attributes: ['attainment_date', 'student_studentnumber'],
     include: {
-      model: Course,
+      model: CourseModel,
       attributes: [],
       where: {
         course_unit_type: {
@@ -150,7 +150,7 @@ export const getOrganizationThesisCredits = async (provider: string, thesisType:
       },
       include: [
         {
-          model: Organization,
+          model: OrganizationModel,
           attributes: [],
           through: {
             attributes: [],

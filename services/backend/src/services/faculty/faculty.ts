@@ -5,7 +5,7 @@ import { InferAttributes, QueryTypes } from 'sequelize'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
-import { Organization, ProgrammeModule } from '../../models'
+import { OrganizationModel, ProgrammeModuleModel } from '../../models'
 import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
@@ -21,7 +21,7 @@ const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPerio
 }
 
 type ProgrammeModuleWithRelevantAttributes = Pick<
-  InferAttributes<ProgrammeModule>,
+  InferAttributes<ProgrammeModuleModel>,
   'code' | 'name' | 'degreeProgrammeType'
 > & { curriculumPeriodIds: string[]; progId: string }
 
@@ -103,7 +103,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 export type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfOrganization>>
 
 export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
-  const organization = await Organization.findOne({
+  const organization = await OrganizationModel.findOne({
     attributes: ['id'],
     where: {
       code: facultyCode,
@@ -116,7 +116,7 @@ export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurr
 }
 
 export const getFacultyCodeById = async (facultyId: string) => {
-  const organization = await Organization.findOne({
+  const organization = await OrganizationModel.findOne({
     attributes: ['code'],
     where: {
       id: facultyId,

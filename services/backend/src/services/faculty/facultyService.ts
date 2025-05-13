@@ -1,7 +1,6 @@
 import moment from 'moment'
 
-import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
-import { DegreeProgrammeType } from '../../types'
+import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType, DegreeProgrammeType } from '@oodikone/shared/types'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
 

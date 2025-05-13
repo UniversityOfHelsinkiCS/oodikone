@@ -1,19 +1,8 @@
-import { CustomPopulationSearch } from './customPopulationSearch'
-import { ExcludedCourse } from './excludedCourse'
-import { OpenUniPopulationSearch } from './openUniPopulationSearch'
-import { ProgressCriteria } from './progressCriteria'
-import { StudyGuidanceGroupTag } from './studyGuidanceGroupTag'
-import { StudyProgrammePin } from './studyProgrammePin'
-import { Tag } from './tag'
-import { TagStudent } from './tagStudent'
-
-export {
-  CustomPopulationSearch,
-  ExcludedCourse,
-  OpenUniPopulationSearch,
-  ProgressCriteria,
-  StudyGuidanceGroupTag,
-  StudyProgrammePin,
-  Tag,
-  TagStudent,
-}
+export { CustomPopulationSearchModel } from './customPopulationSearch'
+export { ExcludedCourseModel } from './excludedCourse'
+export { OpenUniPopulationSearchModel } from './openUniPopulationSearch'
+export { ProgressCriteriaModel } from './progressCriteria'
+export { StudyGuidanceGroupTagModel } from './studyGuidanceGroupTag'
+export { StudyProgrammePinModel } from './studyProgrammePin'
+export { TagModel } from './tag'
+export { TagStudentModel } from './tagStudent'

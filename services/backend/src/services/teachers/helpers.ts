@@ -1,4 +1,4 @@
-import { Credit } from '../../models'
+import { Credit } from '@oodikone/shared/models'
 
 export const isRegularCourse = (credit: Credit) => !credit.isStudyModule
 

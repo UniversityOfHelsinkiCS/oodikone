@@ -1,14 +1,18 @@
 import moment from 'moment'
 import { InferAttributes } from 'sequelize'
 
+import { Credit, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
   MedianEntry,
   ProgrammeOrStudyTrackGraduationStats,
   StudyTrackStats,
+  GenderCode,
+  EnrollmentType,
+  ExtentCode,
+  SemesterEnrollment,
 } from '@oodikone/shared/types'
-import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
-import { GenderCode, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
+import { SISStudyRightModel } from '../../models'
 import { createLocaleComparator, keysOf } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
@@ -99,7 +103,7 @@ const getEmptyYear = () => ({
 
 type YearlyData = Record<string, ReturnType<typeof getEmptyYear>>
 
-type StudyRightWithSemesterEnrollments = InferAttributes<SISStudyRight> & {
+type StudyRightWithSemesterEnrollments = InferAttributes<SISStudyRightModel> & {
   semesterEnrollments: SemesterEnrollment[]
 }
 
@@ -181,7 +185,7 @@ const getMainStatsByTrackAndYear = async (
   includeGraduated: boolean,
   includeAllSpecials: boolean,
   doCombo: boolean,
-  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>,
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRightModel>>,
   combinedProgramme?: string
 ) => {
   const yearlyStats: Record<string, YearlyData> = {}
@@ -462,7 +466,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   studyProgramme: string
   combinedProgramme?: string
   settings: { graduated: boolean; specialGroups: boolean }
-  studyRightsOfProgramme: Array<InferAttributes<SISStudyRight>>
+  studyRightsOfProgramme: Array<InferAttributes<SISStudyRightModel>>
 }) => {
   const isAcademicYear = true
   const includeYearsCombined = true

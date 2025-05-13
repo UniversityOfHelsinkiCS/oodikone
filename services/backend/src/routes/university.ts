@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash'
 import { Graduated, NameWithCode } from '@oodikone/shared/types'
 import { serviceProvider } from '../config'
 import { magicFacultyCode } from '../config/organizationConstants'
-import { Organization } from '../models'
+import { OrganizationModel } from '../models'
 import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
 import { countGraduationTimes, LevelGraduationStats } from '../services/faculty/facultyGraduationTimes'
 import { getSortedFaculties } from '../services/faculty/facultyHelpers'
@@ -22,9 +22,9 @@ const router = Router()
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'doctor'] as const
 
-const getProgrammeNames = (faculties: Organization[]) => {
+const getProgrammeNames = (faculties: OrganizationModel[]) => {
   return faculties.reduce<Record<string, NameWithCode>>((obj, faculty) => {
-    const { name, code } = faculty.dataValues
+    const { name, code } = faculty.toJSON()
     obj[faculty.code] = { code, ...name }
     return obj
   }, {})

@@ -1,4 +1,4 @@
-import { Name } from '@oodikone/shared/types'
+import { Name } from '../types'
 
 export interface StudyTrack {
   code: string

@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsToMany,
   Column,
@@ -11,15 +10,20 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { Course, CourseProvider, ProgrammeModule, SISStudyRight } from '.'
+import type { Organization, ProgrammeModule, SISStudyRight } from '@oodikone/shared/models'
+import type { Name } from '@oodikone/shared/types'
+
+import { CourseModel } from './course'
+import { CourseProviderModel } from './courseProvider'
+import { ProgrammeModuleModel } from './programmeModule'
+import { SISStudyRightModel } from './SISStudyRight'
 
 @Table({
   underscored: true,
   modelName: 'organization',
   tableName: 'organization',
 })
-export class Organization extends Model<InferAttributes<Organization>> {
+export class OrganizationModel extends Model<Organization> implements Organization {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
@@ -33,17 +37,17 @@ export class Organization extends Model<InferAttributes<Organization>> {
   @Column(DataType.STRING)
   parent_id!: string
 
-  @HasMany(() => Organization, { foreignKey: 'parent_id', as: 'children' })
+  @HasMany(() => OrganizationModel, { foreignKey: 'parent_id', as: 'children' })
   children!: Organization[]
 
-  @HasMany(() => ProgrammeModule, { foreignKey: 'organization_id' })
+  @HasMany(() => ProgrammeModuleModel, { foreignKey: 'organization_id' })
   programmeModules!: ProgrammeModule[]
 
-  @HasMany(() => SISStudyRight, { foreignKey: 'facultyCode', sourceKey: 'code' })
+  @HasMany(() => SISStudyRightModel, { foreignKey: 'facultyCode', sourceKey: 'code' })
   SISStudyRights!: SISStudyRight[]
 
-  @BelongsToMany(() => Course, () => CourseProvider, 'organizationcode')
-  courses!: Course[]
+  @BelongsToMany(() => CourseModel, () => CourseProviderModel, 'organizationcode')
+  courses!: CourseModel[]
 
   @CreatedAt
   @Column(DataType.DATE)

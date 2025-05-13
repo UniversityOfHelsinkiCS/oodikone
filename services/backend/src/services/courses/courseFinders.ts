@@ -1,7 +1,7 @@
 import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
-import { Course } from '../../models'
+import { CourseModel } from '../../models'
 import { CourseWithSubsId } from '../../types'
 import { getSortRank } from '../../util/sortRank'
 
@@ -41,7 +41,7 @@ const codeLikeTerm = (code: string) => {
 }
 
 const getRawCourses = async (name: string, code: string) => {
-  return await Course.findAll({
+  return await CourseModel.findAll({
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
@@ -102,7 +102,7 @@ export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
 }
 
 export const getCoursesByCodes = (codes: string[]) => {
-  return Course.findAll({
+  return CourseModel.findAll({
     where: {
       code: {
         [Op.in]: codes,

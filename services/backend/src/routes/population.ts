@@ -4,16 +4,17 @@ import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
 import { CanError } from '@oodikone/shared/routes'
+import { GenderCode } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
-import { SISStudyRight } from '../models'
+import { SISStudyRightModel } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
 import { encrypt, type EncrypterData } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
-import { GenderCode, ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
+import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
 const router = Router()
@@ -265,7 +266,7 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     courses,
     gender_code,
   }: {
-    studyRights: SISStudyRight[]
+    studyRights: SISStudyRightModel[]
     studentNumber: string
     courses: ParsedCourse[]
     gender_code: GenderCode

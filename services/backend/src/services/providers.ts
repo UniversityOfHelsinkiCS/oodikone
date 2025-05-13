@@ -1,17 +1,17 @@
-import { Course, Organization } from '../models'
+import { CourseModel, OrganizationModel } from '../models'
 
 export const getAllProviders = async () => {
-  const providers = Organization.findAll({
+  const providers = OrganizationModel.findAll({
     attributes: ['code', 'name'],
   })
   return providers
 }
 
 export const getCourseCodesOfProvider = async (provider: string) => {
-  const coursesByProvider = await Course.findAll({
+  const coursesByProvider = await CourseModel.findAll({
     attributes: ['id', 'code', 'substitutions'],
     include: {
-      model: Organization,
+      model: OrganizationModel,
       required: true,
       where: {
         code: provider,

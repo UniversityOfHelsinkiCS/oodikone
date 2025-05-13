@@ -1,15 +1,17 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
+import type { CustomPopulationSearch, CustomPopulationSearchCreation } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: false,
   modelName: 'custom_population_search',
   tableName: 'custom_population_searches',
 })
-export class CustomPopulationSearch extends Model<
-  InferAttributes<CustomPopulationSearch>,
-  InferCreationAttributes<CustomPopulationSearch>
-> {
+export class CustomPopulationSearchModel
+  extends Model<CustomPopulationSearch, CustomPopulationSearchCreation>
+  implements CustomPopulationSearch
+{
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)

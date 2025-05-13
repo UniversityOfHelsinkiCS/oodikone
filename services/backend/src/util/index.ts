@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/node'
 
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { tryCatch } from '@oodikone/shared/util'
-import { ProgrammeModule } from '../models'
+import { ProgrammeModuleModel } from '../models'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
   return typeof obj === 'object' && obj !== null && key in obj
@@ -81,7 +81,7 @@ export const sortByProgrammeCode = (a: string, b: string) => {
 }
 
 export const getDegreeProgrammeType = async (programmeCode: string) => {
-  const programmeModule = await ProgrammeModule.findOne({
+  const programmeModule = await ProgrammeModuleModel.findOne({
     attributes: ['degreeProgrammeType'],
     where: { code: programmeCode },
   })
@@ -89,7 +89,7 @@ export const getDegreeProgrammeType = async (programmeCode: string) => {
 }
 
 export const getMinimumCreditsOfProgramme = async (programmeCode: string) => {
-  const programmeModule = await ProgrammeModule.findOne({
+  const programmeModule = await ProgrammeModuleModel.findOne({
     attributes: ['minimumCredits'],
     where: { code: programmeCode },
   })

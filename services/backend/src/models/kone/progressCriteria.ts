@@ -1,5 +1,7 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
+
+import type { ProgressCriteria, ProgressCriteriaCreation } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
@@ -7,10 +9,10 @@ import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript
   modelName: 'progress_criteria',
   tableName: 'progress_criteria',
 })
-export class ProgressCriteria extends Model<
-  InferAttributes<ProgressCriteria>,
-  InferCreationAttributes<ProgressCriteria>
-> {
+export class ProgressCriteriaModel
+  extends Model<ProgressCriteria, ProgressCriteriaCreation>
+  implements ProgressCriteria
+{
   @PrimaryKey
   @Column(DataType.STRING)
   code!: string
