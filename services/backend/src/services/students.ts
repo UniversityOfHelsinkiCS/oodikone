@@ -1,6 +1,6 @@
-import { InferAttributes, Op, QueryTypes } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 
-import type { Credit } from '@oodikone/shared/models'
+import type { Credit, Student } from '@oodikone/shared/models'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
 import {
@@ -217,7 +217,7 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: InferAttributes<StudentModel>) => {
+}: Student) => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     return {
       course: {
@@ -305,7 +305,7 @@ const formatStudentForSearch = ({
   lastname,
   studentnumber,
   studyRights,
-}: InferAttributes<StudentModel>) => {
+}: Student) => {
   return {
     activeStudyRights: studyRights || [],
     credits: creditcount || 0,
