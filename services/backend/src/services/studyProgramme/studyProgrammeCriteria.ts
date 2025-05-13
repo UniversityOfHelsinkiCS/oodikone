@@ -1,6 +1,6 @@
 import { ProgressCriteria } from '@oodikone/shared/types'
-import { Course } from '../../models'
-import { ProgressCriteria as ProgressCriteriaModel } from '../../models/kone'
+import { CourseModel } from '../../models'
+import { ProgressCriteriaModel } from '../../models/kone'
 import logger from '../../util/logger'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>
@@ -12,7 +12,7 @@ const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithou
   })
 
 const getSubstitutions = async (codes: string[]) => {
-  const courses: Array<Pick<Course, 'code' | 'substitutions'>> = await Course.findAll({
+  const courses: Array<Pick<CourseModel, 'code' | 'substitutions'>> = await CourseModel.findAll({
     attributes: ['code', 'substitutions'],
     where: { code: codes },
     raw: true,

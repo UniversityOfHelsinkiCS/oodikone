@@ -1,19 +1,20 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { ProgrammeModule } from './programmeModule'
+import type { ProgrammeModuleChild } from '@oodikone/shared/models'
+
+import { ProgrammeModuleModel } from './programmeModule'
 
 @Table({
   underscored: true,
   modelName: 'programme_module_child',
   tableName: 'programme_module_children',
 })
-export class ProgrammeModuleChild extends Model<InferAttributes<ProgrammeModuleChild>> {
+export class ProgrammeModuleChildModel extends Model<ProgrammeModuleChild> implements ProgrammeModuleChild {
   @PrimaryKey
   @Column(DataType.STRING)
   composite!: string
 
-  @ForeignKey(() => ProgrammeModule)
+  @ForeignKey(() => ProgrammeModuleModel)
   @Column(DataType.STRING)
   parentId!: string
 

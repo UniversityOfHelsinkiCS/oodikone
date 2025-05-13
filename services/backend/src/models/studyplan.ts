@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -11,30 +10,33 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Student, SISStudyRight } from '.'
+import type { SISStudyRight, Student, Studyplan } from '@oodikone/shared/models'
+
+import { SISStudyRightModel } from './SISStudyRight'
+import { StudentModel } from './student'
 
 @Table({
   underscored: false,
   modelName: 'studyplan',
   tableName: 'studyplan',
 })
-export class Studyplan extends Model<InferAttributes<Studyplan>> {
+export class StudyplanModel extends Model<Studyplan> implements Studyplan {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
 
-  @ForeignKey(() => Student)
+  @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
   studentnumber!: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => StudentModel, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
   student!: Student
 
-  @ForeignKey(() => SISStudyRight)
+  @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
   sis_study_right_id!: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'sis_study_right_id', targetKey: 'id', as: 'studyRight' })
+  @BelongsTo(() => SISStudyRightModel, { foreignKey: 'sis_study_right_id', targetKey: 'id', as: 'studyRight' })
   studyRight!: SISStudyRight
 
   @Column(DataType.STRING)

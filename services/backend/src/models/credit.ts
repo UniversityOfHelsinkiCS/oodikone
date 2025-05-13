@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -12,15 +11,23 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { CreditTypeCode } from '../types'
-import { Course, CreditTeacher, CreditType, Semester, SISStudyRight, Student, Teacher } from '.'
+import type { Credit, Course, CreditType, Semester, SISStudyRight, Student, Teacher } from '@oodikone/shared/models'
+import { CreditTypeCode } from '@oodikone/shared/types'
+
+import { CourseModel } from './course'
+import { CreditTeacherModel } from './creditTeacher'
+import { CreditTypeModel } from './creditType'
+import { SemesterModel } from './semester'
+import { SISStudyRightModel } from './SISStudyRight'
+import { StudentModel } from './student'
+import { TeacherModel } from './teacher'
 
 @Table({
   underscored: false,
   modelName: 'credit',
   tableName: 'credit',
 })
-export class Credit extends Model<InferAttributes<Credit>> {
+export class CreditModel extends Model<Credit> implements Credit {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
@@ -28,24 +35,24 @@ export class Credit extends Model<InferAttributes<Credit>> {
   @Column(DataType.STRING)
   grade!: string
 
-  @ForeignKey(() => Student)
+  @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
   student_studentnumber!: string
 
-  @BelongsTo(() => Student, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => StudentModel, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
   student!: Student
 
-  @BelongsTo(() => Semester, { foreignKey: 'semester_composite' })
+  @BelongsTo(() => SemesterModel, { foreignKey: 'semester_composite' })
   semester!: Semester
 
   @Column(DataType.DOUBLE)
   credits!: number
 
-  @ForeignKey(() => CreditType)
+  @ForeignKey(() => CreditTypeModel)
   @Column(DataType.INTEGER)
   credittypecode!: CreditTypeCode
 
-  @BelongsTo(() => CreditType, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
+  @BelongsTo(() => CreditTypeModel, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
   creditType!: CreditType
 
   @Column(DataType.DATE)
@@ -54,16 +61,16 @@ export class Credit extends Model<InferAttributes<Credit>> {
   @Column(DataType.DATE)
   attainment_date!: Date
 
-  @BelongsToMany(() => Teacher, () => CreditTeacher, 'credit_id')
+  @BelongsToMany(() => TeacherModel, () => CreditTeacherModel, 'credit_id')
   teachers!: Teacher[]
 
   @Column(DataType.STRING)
   course_code!: string
 
-  @BelongsTo(() => Course, { foreignKey: 'course_id' })
+  @BelongsTo(() => CourseModel, { foreignKey: 'course_id' })
   course!: Course
 
-  @ForeignKey(() => Course)
+  @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
   course_id!: string
 
@@ -85,11 +92,11 @@ export class Credit extends Model<InferAttributes<Credit>> {
   @Column(DataType.BOOLEAN)
   is_open!: boolean
 
-  @ForeignKey(() => SISStudyRight)
+  @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
   studyright_id!: string
 
-  @BelongsTo(() => SISStudyRight)
+  @BelongsTo(() => SISStudyRightModel)
   studyright!: SISStudyRight
 
   @CreatedAt
@@ -108,3 +115,8 @@ export class Credit extends Model<InferAttributes<Credit>> {
 
   static notUnnecessary: ({ credits }: { credits: number }) => boolean
 }
+
+CreditModel.passed = ({ credittypecode }) => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)
+CreditModel.failed = ({ credittypecode }) => credittypecode === CreditTypeCode.FAILED
+CreditModel.improved = ({ credittypecode }) => credittypecode === CreditTypeCode.IMPROVED
+CreditModel.notUnnecessary = ({ credits }) => credits > 0 && credits <= 12

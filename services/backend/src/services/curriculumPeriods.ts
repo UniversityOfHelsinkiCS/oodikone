@@ -1,11 +1,11 @@
-import { CurriculumPeriod } from '../models'
+import { CurriculumPeriodModel } from '../models'
 
 export type CurriculumPeriods = Awaited<ReturnType<typeof getCurriculumPeriods>>
 
 export const getCurriculumPeriods = async () => {
-  const curriculumPeriods = await CurriculumPeriod.findAll()
+  const curriculumPeriods = await CurriculumPeriodModel.findAll()
   const result = curriculumPeriods.reduce<
-    Record<string, Pick<CurriculumPeriod, 'id' | 'name' | 'universityOrgId' | 'startDate' | 'endDate'>>
+    Record<string, Pick<CurriculumPeriodModel, 'id' | 'name' | 'universityOrgId' | 'startDate' | 'endDate'>>
   >((acc, curriculumPeriod) => {
     const { id, name, universityOrgId, startDate, endDate } = curriculumPeriod
     acc[id] = { id, name, universityOrgId, startDate, endDate }

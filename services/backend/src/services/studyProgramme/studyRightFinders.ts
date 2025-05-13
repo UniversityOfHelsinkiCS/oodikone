@@ -1,8 +1,7 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
-import { Student, SISStudyRight, SISStudyRightElement, Credit } from '../../models'
-import { CreditTypeCode } from '../../types'
+import { Name, CreditTypeCode } from '@oodikone/shared/types'
+import { StudentModel, SISStudyRightModel, SISStudyRightElementModel, CreditModel } from '../../models'
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,
@@ -14,10 +13,10 @@ export const getStudyRightsInProgramme = async (
     where.graduated = true
   }
 
-  const studyRights = await SISStudyRight.findAll({
+  const studyRights = await SISStudyRightModel.findAll({
     attributes: ['id'],
     include: {
-      model: SISStudyRightElement,
+      model: SISStudyRightElementModel,
       as: 'studyRightElements',
       attributes: [],
       where,
@@ -26,7 +25,7 @@ export const getStudyRightsInProgramme = async (
 
   const include: Includeable[] = [
     {
-      model: SISStudyRightElement,
+      model: SISStudyRightElementModel,
       as: 'studyRightElements',
       attributes: ['phase', 'code', 'name', 'startDate', 'endDate', 'graduated', 'studyTrack'],
     },
@@ -34,11 +33,11 @@ export const getStudyRightsInProgramme = async (
 
   if (includeStudentsAndCredits) {
     include.push({
-      model: Student,
+      model: StudentModel,
       attributes: ['gender_code', 'citizenships'],
       include: [
         {
-          model: Credit,
+          model: CreditModel,
           attributes: ['attainment_date', 'credits'],
           where: {
             isStudyModule: false,
@@ -53,7 +52,7 @@ export const getStudyRightsInProgramme = async (
   }
 
   return (
-    await SISStudyRight.findAll({
+    await SISStudyRightModel.findAll({
       attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber'],
       include,
       where: {
@@ -66,7 +65,7 @@ export const getStudyRightsInProgramme = async (
 }
 
 export const getStudyTracksForProgramme = async (studyProgramme: string) => {
-  const result: Array<Pick<SISStudyRightElement, 'studyTrack'>> = await SISStudyRightElement.findAll({
+  const result: Array<Pick<SISStudyRightElementModel, 'studyTrack'>> = await SISStudyRightElementModel.findAll({
     attributes: [[fn('DISTINCT', col('study_track')), 'studyTrack']],
     where: {
       code: studyProgramme,
@@ -88,7 +87,7 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
 
 export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) => {
   return (
-    await SISStudyRight.findAll({
+    await SISStudyRightModel.findAll({
       where: {
         studentNumber: {
           [Op.in]: studentNumbers,

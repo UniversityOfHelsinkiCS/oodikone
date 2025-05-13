@@ -1,10 +1,9 @@
 import { orderBy, range } from 'lodash'
 import { Op } from 'sequelize'
 
-import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
+import { Name, StudyProgrammeCourse, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { Credit, Enrollment } from '../../models'
-import { CreditTypeCode, EnrollmentState } from '../../types'
+import { CreditModel, EnrollmentModel } from '../../models'
 import { isOpenUniCourseCode } from '../../util'
 import { createArrayOfCourses } from '../languageCenterData'
 import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
@@ -124,7 +123,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
   const autumnSemester2017 = 135
   const courseCodes = courses.map(course => course.code)
 
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
     where: {
       course_code: { [Op.in]: courseCodes },
@@ -134,7 +133,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
     raw: true,
   })
 
-  const enrollments = await Enrollment.findAll({
+  const enrollments = await EnrollmentModel.findAll({
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
     where: {
       course_code: { [Op.in]: courseCodes },

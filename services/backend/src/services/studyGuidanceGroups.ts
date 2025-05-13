@@ -3,7 +3,7 @@ import { AxiosError } from 'axios'
 import { uniq } from 'lodash'
 
 import { Name } from '@oodikone/shared/types'
-import { StudyGuidanceGroupTag } from '../models/kone'
+import { StudyGuidanceGroupTagModel } from '../models/kone'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
 
@@ -75,7 +75,7 @@ type TagsByGroupId = {
 type GroupsWithTags = StudyGuidanceGroup & { tags: Tags }
 
 export const getAllGroupsAndStudents = async (sisPersonId: string) => {
-  const tags = await StudyGuidanceGroupTag.findAll()
+  const tags = await StudyGuidanceGroupTagModel.findAll()
   const tagsByGroupId = tags.reduce((acc, curr) => {
     const { studyProgramme, year, studyGuidanceGroupId } = curr
     acc[studyGuidanceGroupId] = { studyProgramme, year }
@@ -108,7 +108,7 @@ export const changeGroupTags = async (groupId: string, tags: Tags) => {
   const { studyProgramme, year } = tags
   const tagToUpdate = getTagToUpdate(studyProgramme, year)
 
-  const [result] = await StudyGuidanceGroupTag.upsert({
+  const [result] = await StudyGuidanceGroupTagModel.upsert({
     studyGuidanceGroupId: groupId,
     ...tagToUpdate,
   })

@@ -1,7 +1,7 @@
 const { orderBy } = require('lodash')
 const { Op } = require('sequelize')
 
-const { Course, Credit, Enrollment, SISStudyRight } = require('../models')
+const { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } = require('../models')
 const { redisClient } = require('./redis')
 
 const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
@@ -23,7 +23,7 @@ const getDifference = stats => {
 }
 
 const getLanguageCenterCourses = async () => {
-  const courses = await Course.findAll({
+  const courses = await CourseModel.findAll({
     attributes: ['code', 'name'],
     where: {
       [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
@@ -92,7 +92,7 @@ const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
   const autumnSemester2017 = 135
 
-  const credits = await Credit.findAll({
+  const credits = await CreditModel.findAll({
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
@@ -102,7 +102,7 @@ const computeLanguageCenterData = async () => {
     raw: true,
   })
 
-  const enrollments = await Enrollment.findAll({
+  const enrollments = await EnrollmentModel.findAll({
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
@@ -112,7 +112,7 @@ const computeLanguageCenterData = async () => {
     raw: true,
   })
 
-  const studyRights = await SISStudyRight.findAll({ raw: true })
+  const studyRights = await SISStudyRightModel.findAll({ raw: true })
 
   const attemptStudyRightToFacultyMap = studyRights.reduce((obj, cur) => {
     if (!cur.id) return obj

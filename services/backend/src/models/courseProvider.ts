@@ -1,23 +1,24 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Course } from './course'
-import { Organization } from './organization'
+import type { CourseProvider } from '@oodikone/shared/models'
+
+import { CourseModel } from './course'
+import { OrganizationModel } from './organization'
 
 @Table({
   underscored: true,
   modelName: 'course_provider',
   tableName: 'course_providers',
 })
-export class CourseProvider extends Model<InferAttributes<CourseProvider>> {
-  @ForeignKey(() => Course)
+export class CourseProviderModel extends Model<CourseProvider> implements CourseProvider {
+  @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
   coursecode!: string
 
   @Column(DataType.JSONB)
   shares!: Array<{ share: number; startDate?: string; endDate?: string }> | null
 
-  @ForeignKey(() => Organization)
+  @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
   organizationcode!: string
 

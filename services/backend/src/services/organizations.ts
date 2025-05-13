@@ -2,10 +2,10 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { facultyCodes } from '../config/organizationConstants'
 import { dbConnections } from '../database/connection'
-import { Organization } from '../models'
+import { OrganizationModel } from '../models'
 
 export const getOrganizations = () => {
-  return Organization.findAll({
+  return OrganizationModel.findAll({
     where: {
       code: {
         [Op.in]: facultyCodes,

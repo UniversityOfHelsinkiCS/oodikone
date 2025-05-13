@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 
 import { Name } from '@oodikone/shared/types'
-import { Semester } from '../models'
+import { SemesterModel } from '../models'
 import { dateMinFromList, dateMaxFromList } from '../util/datetime'
 
 type SemestersAndYears = {
@@ -25,7 +25,7 @@ type SemestersAndYears = {
 }
 
 export const getSemesterNameByCode = async (semesterCode: number) => {
-  const semester = await Semester.findOne({
+  const semester = await SemesterModel.findOne({
     attributes: ['name'],
     where: {
       semestercode: semesterCode,
@@ -36,7 +36,7 @@ export const getSemesterNameByCode = async (semesterCode: number) => {
 
 export const getCurrentSemester = async () => {
   const today = new Date()
-  const currentSemester = await Semester.findOne({
+  const currentSemester = await SemesterModel.findOne({
     where: {
       startdate: {
         [Op.lte]: today,
@@ -50,7 +50,7 @@ export const getCurrentSemester = async () => {
 }
 
 export const getSemestersAndYears = async () => {
-  const semesters = await Semester.findAll()
+  const semesters = await SemesterModel.findAll()
   return semesters.reduce(
     (acc, semester) => {
       const { semestercode, name, yearcode, yearname, startdate, enddate } = semester

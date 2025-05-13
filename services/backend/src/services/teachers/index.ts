@@ -1,9 +1,9 @@
 import { Op, QueryTypes } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
+import { Credit } from '@oodikone/shared/models'
+import { Name, CreditTypeCode } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
-import { Credit, Course, Semester, Teacher } from '../../models'
-import { CreditTypeCode } from '../../types'
+import { CreditModel, CourseModel, SemesterModel, TeacherModel } from '../../models'
 import { splitByEmptySpace } from '../../util'
 import { isRegularCourse, TeacherStats } from './helpers'
 
@@ -22,7 +22,7 @@ export const getTeachersBySearchTerm = async (searchTerm: string) => {
     return []
   }
   const searchTerms = splitByEmptySpace(searchTerm)
-  return Teacher.findAll({
+  return TeacherModel.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt'],
     },
@@ -33,19 +33,19 @@ export const getTeachersBySearchTerm = async (searchTerm: string) => {
 }
 
 const findTeacherCredits = async (teacherId: string) => {
-  return await Teacher.findByPk(teacherId, {
+  return await TeacherModel.findByPk(teacherId, {
     attributes: ['name', 'id'],
     include: {
-      model: Credit,
+      model: CreditModel,
       attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
       include: [
         {
-          model: Course,
+          model: CourseModel,
           attributes: ['name', 'code'],
           required: true,
         },
         {
-          model: Semester,
+          model: SemesterModel,
           attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
         },
       ],
@@ -56,8 +56,8 @@ const findTeacherCredits = async (teacherId: string) => {
 const parseCreditInfo = (credit: Credit) => ({
   credits: credit.credits,
   transferred: credit.credittypecode === CreditTypeCode.APPROVED,
-  passed: Credit.passed(credit) || Credit.improved(credit),
-  failed: Credit.failed(credit),
+  passed: CreditModel.passed(credit) || CreditModel.improved(credit),
+  failed: CreditModel.failed(credit),
   course: credit.course,
   semester: credit.semester,
 })

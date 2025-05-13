@@ -1,5 +1,7 @@
-import { CreationOptional, InferAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
+
+import type { StudyGuidanceGroupTag, StudyGuidanceGroupTagCreation } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
@@ -7,7 +9,10 @@ import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } fro
   modelName: 'study_guidance_group_tag',
   tableName: 'study_guidance_group_tags',
 })
-export class StudyGuidanceGroupTag extends Model<InferAttributes<StudyGuidanceGroupTag>> {
+export class StudyGuidanceGroupTagModel
+  extends Model<StudyGuidanceGroupTag, StudyGuidanceGroupTagCreation>
+  implements StudyGuidanceGroupTag
+{
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)

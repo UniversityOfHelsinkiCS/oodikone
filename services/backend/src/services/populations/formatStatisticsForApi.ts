@@ -1,5 +1,5 @@
 import { Name, ProgressCriteria } from '@oodikone/shared/types'
-import { Credit, SISStudyRight, SISStudyRightElement } from '../../models'
+import { CreditModel, SISStudyRightModel, SISStudyRightElementModel } from '../../models'
 import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
@@ -147,8 +147,8 @@ export const formatStudentForAPI = (
       // NOTE: This must never be undefined
       const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
       const [, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
-        correctStudyRight as SISStudyRight,
-        correctStudyRightElement as SISStudyRightElement
+        correctStudyRight as SISStudyRightModel,
+        correctStudyRightElement as SISStudyRightElementModel
       )
       if (hasTransferredToProgramme) {
         const transferredFromProgramme = correctStudyRight.studyRightElements.find(element => {
@@ -175,8 +175,8 @@ export const formatStudentForAPI = (
         ? dateDaysFromNow(startDateFromISO, 1).toISOString()
         : credit.attainment_date.toISOString()
     const passed =
-      Credit.passed({ credittypecode: credit.credittypecode }) ||
-      Credit.improved({ credittypecode: credit.credittypecode })
+      CreditModel.passed({ credittypecode: credit.credittypecode }) ||
+      CreditModel.improved({ credittypecode: credit.credittypecode })
 
     return {
       course_code: credit.course_code,

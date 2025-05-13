@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -12,29 +11,45 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { ExtentCode, SemesterEnrollment } from '../types'
-import { Credit, Enrollment, Organization, SISStudyRightElement, Student, Studyplan, StudyrightExtent } from '.'
+import type {
+  Credit,
+  Enrollment,
+  Organization,
+  SISStudyRight,
+  SISStudyRightElement,
+  Student,
+  Studyplan,
+} from '@oodikone/shared/models'
+import { ExtentCode, SemesterEnrollment } from '@oodikone/shared/types'
+
+import { CreditModel } from './credit'
+import { EnrollmentModel } from './enrollment'
+import { OrganizationModel } from './organization'
+import { SISStudyRightElementModel } from './SISStudyRightElement'
+import { StudentModel } from './student'
+import { StudyplanModel } from './studyplan'
+import { StudyrightExtentModel } from './studyrightExtent'
 
 @Table({
   underscored: true,
   tableName: 'sis_study_rights',
 })
-export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
+export class SISStudyRightModel extends Model<SISStudyRight> implements SISStudyRight {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
 
-  @ForeignKey(() => Organization)
+  @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
   facultyCode!: string
 
-  @BelongsTo(() => Organization, { foreignKey: 'facultyCode', targetKey: 'code' })
+  @BelongsTo(() => OrganizationModel, { foreignKey: 'facultyCode', targetKey: 'code' })
   organization!: Organization
 
-  @HasMany(() => Studyplan)
+  @HasMany(() => StudyplanModel)
   studyPlans!: Studyplan[]
 
-  @HasMany(() => SISStudyRightElement, { foreignKey: 'studyRightId' })
+  @HasMany(() => SISStudyRightElementModel, { foreignKey: 'studyRightId' })
   studyRightElements!: SISStudyRightElement[]
 
   @Column(DataType.DATE)
@@ -52,10 +67,10 @@ export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
   @Column(DataType.STRING)
   studentNumber!: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentNumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => StudentModel, { foreignKey: 'studentNumber', targetKey: 'studentnumber' })
   student!: Student
 
-  @ForeignKey(() => StudyrightExtent)
+  @ForeignKey(() => StudyrightExtentModel)
   @Column(DataType.INTEGER)
   extentCode!: ExtentCode
 
@@ -65,10 +80,10 @@ export class SISStudyRight extends Model<InferAttributes<SISStudyRight>> {
   @Column(DataType.JSONB)
   semesterEnrollments!: SemesterEnrollment[] | null
 
-  @HasMany(() => Credit, { foreignKey: 'studyright_id', sourceKey: 'id' })
+  @HasMany(() => CreditModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
   credits!: Credit[]
 
-  @HasMany(() => Enrollment, { foreignKey: 'studyright_id', sourceKey: 'id' })
+  @HasMany(() => EnrollmentModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
   enrollments!: Enrollment[]
 
   @CreatedAt

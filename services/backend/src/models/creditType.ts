@@ -1,15 +1,14 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { CreditTypeCode } from '../types'
+import type { CreditType } from '@oodikone/shared/models'
+import { CreditTypeCode, Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'credit_type',
   tableName: 'credit_types',
 })
-export class CreditType extends Model<InferAttributes<CreditType>> {
+export class CreditTypeModel extends Model<CreditType> implements CreditType {
   @PrimaryKey
   @Column(DataType.INTEGER)
   credittypecode!: CreditTypeCode

@@ -1,14 +1,14 @@
-import { InferAttributes } from 'sequelize'
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
+import type { Semester } from '@oodikone/shared/models'
+import type { Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'semester',
   tableName: 'semesters',
 })
-export class Semester extends Model<InferAttributes<Semester>> {
+export class SemesterModel extends Model<Semester> implements Semester {
   @PrimaryKey
   @Column(DataType.STRING)
   composite!: string

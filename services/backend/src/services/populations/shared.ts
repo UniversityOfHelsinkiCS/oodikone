@@ -1,10 +1,9 @@
 import { orderBy } from 'lodash'
 import { Op, QueryTypes } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
+import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
-import { Credit, Enrollment, SISStudyRight, SISStudyRightElement } from '../../models'
-import { DegreeProgrammeType, EnrollmentState } from '../../types'
+import { CreditModel, EnrollmentModel, SISStudyRightModel, SISStudyRightElementModel } from '../../models'
 
 const { sequelize } = dbConnections
 
@@ -34,18 +33,18 @@ export const getOptionsForStudents = async (
     return {}
   }
 
-  const studyRightElementsForStudyRight = await SISStudyRightElement.findAll({
+  const studyRightElementsForStudyRight = await SISStudyRightElementModel.findAll({
     attributes: [],
     where: { code },
     include: {
-      model: SISStudyRight,
+      model: SISStudyRightModel,
       attributes: ['studentNumber'],
       where: {
         studentNumber: { [Op.in]: studentNumbers },
       },
       include: [
         {
-          model: SISStudyRightElement,
+          model: SISStudyRightElementModel,
           attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
         },
       ],
@@ -76,10 +75,13 @@ export type EnrollmentsQueryResult = Array<{
   name: Name
   substitutions: string[]
   main_course_code: string
-  enrollments: Array<Pick<Enrollment, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
+  enrollments: Array<Pick<EnrollmentModel, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
 }>
 
-type CreditPick = Pick<Credit, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'>
+type CreditPick = Pick<
+  CreditModel,
+  'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'
+>
 
 export type CoursesQueryResult = Array<
   EnrollmentsQueryResult[number] & {
@@ -194,9 +196,9 @@ export const parseCreditInfo = (credit: CreditPick) => {
   return {
     studentnumber: credit.student_studentnumber,
     grade: credit.grade,
-    passingGrade: Credit.passed(credit),
-    failingGrade: Credit.failed(credit),
-    improvedGrade: Credit.improved(credit),
+    passingGrade: CreditModel.passed(credit),
+    failingGrade: CreditModel.failed(credit),
+    improvedGrade: CreditModel.improved(credit),
     date: credit.attainment_date,
   }
 }

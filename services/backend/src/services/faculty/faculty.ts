@@ -1,11 +1,12 @@
 import { groupBy, orderBy } from 'lodash'
 import moment from 'moment'
-import { InferAttributes, QueryTypes } from 'sequelize'
+import { QueryTypes } from 'sequelize'
 
+import { ProgrammeModule } from '@oodikone/shared/models'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
-import { Organization, ProgrammeModule } from '../../models'
+import { OrganizationModel } from '../../models'
 import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
@@ -20,10 +21,10 @@ const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPerio
   return { startDate: new Date('1800-08-01'), endDate: new Date('1801-08-01') }
 }
 
-type ProgrammeModuleWithRelevantAttributes = Pick<
-  InferAttributes<ProgrammeModule>,
-  'code' | 'name' | 'degreeProgrammeType'
-> & { curriculumPeriodIds: string[]; progId: string }
+type ProgrammeModuleWithRelevantAttributes = Pick<ProgrammeModule, 'code' | 'name' | 'degreeProgrammeType'> & {
+  curriculumPeriodIds: string[]
+  progId: string
+}
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
@@ -103,7 +104,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 export type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfOrganization>>
 
 export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
-  const organization = await Organization.findOne({
+  const organization = await OrganizationModel.findOne({
     attributes: ['id'],
     where: {
       code: facultyCode,
@@ -116,7 +117,7 @@ export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurr
 }
 
 export const getFacultyCodeById = async (facultyId: string) => {
-  const organization = await Organization.findOne({
+  const organization = await OrganizationModel.findOne({
     attributes: ['code'],
     where: {
       id: facultyId,

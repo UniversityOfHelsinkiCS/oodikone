@@ -2,12 +2,12 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { CurriculumOption, Name } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
-import { CurriculumPeriod, ProgrammeModule } from '../models'
-import { ExcludedCourse } from '../models/kone'
+import { CurriculumPeriodModel, ProgrammeModuleModel } from '../models'
+import { ExcludedCourseModel } from '../models/kone'
 import logger from '../util/logger'
 import { combinedStudyProgrammes } from './studyProgramme/studyProgrammeHelpers'
 
-const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: string }): CurriculumOption => {
+const formatCurriculum = (curriculum: ProgrammeModuleModel & { curriculumName?: string }): CurriculumOption => {
   return {
     id: curriculum.id,
     name: curriculum.curriculumName!,
@@ -18,13 +18,13 @@ const formatCurriculum = (curriculum: ProgrammeModule & { curriculumName?: strin
 
 export const getCurriculumOptions = async (code: string) => {
   try {
-    const result: Array<ProgrammeModule & { curriculumName?: string }> = await ProgrammeModule.findAll({
+    const result: Array<ProgrammeModuleModel & { curriculumName?: string }> = await ProgrammeModuleModel.findAll({
       where: { code },
       order: [['valid_from', 'DESC']],
       raw: true,
     })
     for (const curriculum of result) {
-      const curriculumPeriods = await CurriculumPeriod.findAll({
+      const curriculumPeriods = await CurriculumPeriodModel.findAll({
         attributes: ['startDate', 'endDate'],
         where: {
           id: {
@@ -47,7 +47,7 @@ export const getCurriculumOptions = async (code: string) => {
 }
 
 type ModuleWithChildren = Pick<
-  ProgrammeModule,
+  ProgrammeModuleModel,
   | 'id'
   | 'code'
   | 'name'
@@ -114,7 +114,7 @@ const modifyParent = (course: ModuleWithChildren, moduleMap: Record<string, Modu
   return { ...course, parent_id: parent.id, parent_code: parent.code, parent_name: parent.name }
 }
 
-const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourse[]) => {
+const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourseModel[]) => {
   return modules.map(module => {
     const label = {
       id: module.parent_name.fi,
@@ -137,7 +137,7 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
   }
   const courses = result.filter(r => r.type === 'course')
   const modules = result.filter(r => r.type === 'module')
-  const excludedCourses = await ExcludedCourse.findAll({
+  const excludedCourses = await ExcludedCourseModel.findAll({
     where: {
       programme_code: {
         [Op.eq]: code,

@@ -1,18 +1,17 @@
 import { memoize } from 'lodash'
 import { Op, QueryTypes } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
+import { Name, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
-import { Course, Credit, Enrollment, Organization, ProgrammeModule } from '../../models'
-import { CreditTypeCode, EnrollmentState } from '../../types'
+import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, ProgrammeModuleModel } from '../../models'
 import logger from '../../util/logger'
 
 export const getAllProgrammeCourses = async (providerCode: string) => {
-  const courses = await Course.findAll({
+  const courses = await CourseModel.findAll({
     attributes: ['id', 'code', 'name', 'substitutions'],
     include: [
       {
-        model: Organization,
+        model: OrganizationModel,
         attributes: ['id'],
         required: true,
         where: {
@@ -40,7 +39,7 @@ const getCourseCode = (code: string) => {
 
 export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   try {
-    const enrollmentsCourses = await Enrollment.findAll({
+    const enrollmentsCourses = await EnrollmentModel.findAll({
       attributes: ['studentnumber', 'course_code'],
       where: {
         course_code: {
@@ -64,7 +63,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       }
     }
 
-    const credits = await Credit.findAll({
+    const credits = await CreditModel.findAll({
       attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
       where: {
         course_code: {
@@ -77,7 +76,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     })
 
     const courseNames = (
-      await Course.findAll({
+      await CourseModel.findAll({
         attributes: ['code', 'name'],
         where: {
           code: programmeCourses,
@@ -169,7 +168,7 @@ export const getCurrentStudyYearStartDate = memoize(async (unixMillis: number) =
 })
 
 export const getProgrammeName = async (code: string) => {
-  const programmeName = await ProgrammeModule.findOne({
+  const programmeName = await ProgrammeModuleModel.findOne({
     attributes: ['name'],
     where: {
       code,

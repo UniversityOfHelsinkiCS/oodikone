@@ -1,12 +1,14 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes } from 'sequelize'
+import { CreationOptional } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table, AutoIncrement, Default } from 'sequelize-typescript'
+
+import type { ExcludedCourse, ExcludedCourseCreation } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
   modelName: 'excluded_course',
   tableName: 'excluded_courses',
 })
-export class ExcludedCourse extends Model<InferAttributes<ExcludedCourse>, InferCreationAttributes<ExcludedCourse>> {
+export class ExcludedCourseModel extends Model<ExcludedCourse, ExcludedCourseCreation> implements ExcludedCourse {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)

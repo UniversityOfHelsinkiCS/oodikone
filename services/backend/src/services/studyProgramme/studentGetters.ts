@@ -1,8 +1,7 @@
 import { QueryTypes } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
+import { Name, ExtentCode } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
-import { ExtentCode } from '../../types'
 import logger from '../../util/logger'
 
 const { sequelize } = dbConnections

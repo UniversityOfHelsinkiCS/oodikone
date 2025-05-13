@@ -1,12 +1,12 @@
 import { isEqual, keyBy, omit, uniq } from 'lodash'
 import { LRUCache } from 'lru-cache'
-import { InferAttributes } from 'sequelize'
 
+import { User } from '@oodikone/shared/models/user'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
-import { User } from '../models/user'
+import { UserModel } from '../models/user'
 import { ExpandedUser, FormattedUser, IamAccess } from '../types'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
@@ -35,7 +35,7 @@ const isRole = (role: string) => {
 }
 
 export const modifyAccess = async (username: string, rolesOfUser: Record<Role, boolean>) => {
-  const user = await User.findOne({ where: { username } })
+  const user = await UserModel.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)
   }
@@ -46,7 +46,7 @@ export const modifyAccess = async (username: string, rolesOfUser: Record<Role, b
 }
 
 export const modifyElementDetails = async (id: string, codes: string[], enable: boolean) => {
-  const user = await User.findOne({ where: { id } })
+  const user = await UserModel.findOne({ where: { id } })
   if (!user) {
     throw new Error(`User with id ${id} not found`)
   }
@@ -59,8 +59,8 @@ export const modifyElementDetails = async (id: string, codes: string[], enable: 
   userDataCache.delete(user.username)
 }
 
-export const updateUser = async (username: string, fields: Partial<Record<keyof InferAttributes<User>, any>>) => {
-  const user = await User.findOne({ where: { username } })
+export const updateUser = async (username: string, fields: Partial<User>) => {
+  const user = await UserModel.findOne({ where: { username } })
   if (!user) {
     throw new Error(`User ${username} not found`)
   }
@@ -151,7 +151,7 @@ const updateAccessGroups = async (
   sisId: string
 ) => {
   const { jory, superAdmin, openUni, fullSisuAccess } = specialGroup
-  const userFromDb = await User.findOne({ where: { username } })
+  const userFromDb = await UserModel.findOne({ where: { username } })
   if (!userFromDb) {
     throw new Error(`User ${username} not found`)
   }
@@ -176,7 +176,7 @@ const updateAccessGroups = async (
 }
 
 export const findAll = async () => {
-  const users = (await User.findAll()).map(user => user.toJSON())
+  const users = (await UserModel.findAll()).map(user => user.toJSON())
   const userAccess = await getAllUserAccess(users.map(user => user.sisuPersonId))
   const userAccessMap = keyBy(userAccess, 'id')
 
@@ -192,7 +192,7 @@ export const findAll = async () => {
 }
 
 export const findOne = async (id: string) => {
-  const user = (await User.findOne({ where: { id } }))?.toJSON()
+  const user = (await UserModel.findOne({ where: { id } }))?.toJSON()
   if (!user) {
     throw new Error(`User with id ${id} not found`)
   }
@@ -204,7 +204,7 @@ export const findOne = async (id: string) => {
 }
 
 export const findByUsername = async (username: string) => {
-  return (await User.findOne({ where: { username } }))?.toJSON()
+  return (await UserModel.findOne({ where: { username } }))?.toJSON()
 }
 
 export const getOrganizationAccess = async (sisPersonId: string, iamGroups: string[]) => {
@@ -228,7 +228,7 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
     return cachedUser
   }
 
-  const userFromDb = (await User.findOne({ where: { username: userToMock } }))?.toJSON()
+  const userFromDb = (await UserModel.findOne({ where: { username: userToMock } }))?.toJSON()
   if (!userFromDb) {
     return null
   }
@@ -241,7 +241,7 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
 }
 
 export const getMockedUserFd = async ({ userToMock, mockedBy }: { userToMock: string; mockedBy: string }) => {
-  const mockedByFromDb = (await User.findOne({ where: { username: mockedBy } }))?.toJSON()
+  const mockedByFromDb = (await UserModel.findOne({ where: { username: mockedBy } }))?.toJSON()
   if (!mockedByFromDb) {
     return null
   }
@@ -269,10 +269,10 @@ export const getUserToska = async ({
     return userDataCache.get(username) as FormattedUser
   }
 
-  const isNewUser = !(await User.findOne({ where: { username } }))
-  await User.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
+  const isNewUser = !(await UserModel.findOne({ where: { username } }))
+  await UserModel.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
   await updateAccessGroups(username, iamGroups, specialGroup, sisId)
-  const userFromDb = (await User.findOne({ where: { username } }))!.toJSON()
+  const userFromDb = (await UserModel.findOne({ where: { username } }))!.toJSON()
 
   const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, userFromDb.programmeRights)
   const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
@@ -288,7 +288,7 @@ export const getUserFd = async ({ username }: { username: string }) => {
     return userDataCache.get(username) as FormattedUser
   }
 
-  const userFromDbOrm = await User.findOne({ where: { username } })
+  const userFromDbOrm = await UserModel.findOne({ where: { username } })
   if (!userFromDbOrm) {
     return null
   }
@@ -308,7 +308,7 @@ export const getUserFd = async ({ username }: { username: string }) => {
 export const addNewUser = async user => {
   const name = user.first_name.concat(' ', user.last_name)
   try {
-    await User.upsert({
+    await UserModel.upsert({
       fullName: name,
       username: user.eppn,
       email: user.email_address,
@@ -333,7 +333,7 @@ export const getUserFromSisuByEppn = async (requesterEppn: string, newUserEppn: 
 }
 
 export const deleteUserById = async userId => {
-  await User.destroy({
+  await UserModel.destroy({
     where: {
       id: userId,
     },

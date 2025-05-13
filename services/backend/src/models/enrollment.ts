@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   Column,
@@ -11,24 +10,29 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { EnrollmentState } from '../types'
-import { Course, Semester, SISStudyRight, Student } from '.'
+import type { Enrollment, Semester, SISStudyRight, Student } from '@oodikone/shared/models'
+import { EnrollmentState } from '@oodikone/shared/types'
+
+import { CourseModel } from './course'
+import { SemesterModel } from './semester'
+import { SISStudyRightModel } from './SISStudyRight'
+import { StudentModel } from './student'
 
 @Table({
   underscored: false,
   modelName: 'enrollment',
   tableName: 'enrollment',
 })
-export class Enrollment extends Model<InferAttributes<Enrollment>> {
+export class EnrollmentModel extends Model<Enrollment> implements Enrollment {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
 
-  @ForeignKey(() => Student)
+  @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
   studentnumber!: string
 
-  @BelongsTo(() => Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+  @BelongsTo(() => StudentModel, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
   student!: Student
 
   @Column(DataType.STRING)
@@ -40,15 +44,15 @@ export class Enrollment extends Model<InferAttributes<Enrollment>> {
   @Column(DataType.DATE)
   enrollment_date_time!: Date
 
-  @ForeignKey(() => Course)
+  @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
   course_id!: string
 
-  @ForeignKey(() => Semester)
+  @ForeignKey(() => SemesterModel)
   @Column(DataType.STRING)
   semester_composite!: string
 
-  @BelongsTo(() => Semester, { foreignKey: 'semester_composite', targetKey: 'composite' })
+  @BelongsTo(() => SemesterModel, { foreignKey: 'semester_composite', targetKey: 'composite' })
   semester!: Semester
 
   @Column(DataType.INTEGER)
@@ -57,15 +61,15 @@ export class Enrollment extends Model<InferAttributes<Enrollment>> {
   @Column(DataType.BOOLEAN)
   is_open!: boolean
 
-  @ForeignKey(() => SISStudyRight)
+  @ForeignKey(() => SISStudyRightModel)
   @Column({ type: DataType.STRING, allowNull: true })
   studyright_id!: string
 
-  @BelongsTo(() => SISStudyRight, { foreignKey: 'studyright_id', targetKey: 'id', constraints: false })
+  @BelongsTo(() => SISStudyRightModel, { foreignKey: 'studyright_id', targetKey: 'id', constraints: false })
   studyright!: SISStudyRight
 
-  @BelongsTo(() => Course, { foreignKey: 'course_id', targetKey: 'id' })
-  course!: Course
+  @BelongsTo(() => CourseModel, { foreignKey: 'course_id', targetKey: 'id' })
+  course!: CourseModel
 
   @CreatedAt
   @Column(DataType.DATE)

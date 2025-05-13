@@ -1,9 +1,7 @@
-import { InferAttributes } from 'sequelize'
+import { Course } from '@oodikone/shared/models'
+import { CreditTypeCode } from '@oodikone/shared/types'
 
-import { Course } from '../models'
-import { CreditTypeCode } from './creditTypeCode'
-
-export type CourseWithSubsId = InferAttributes<Course> & { subsId?: number }
+export type CourseWithSubsId = Course & { subsId?: number }
 
 export type ParsedCourse = {
   course_code: string

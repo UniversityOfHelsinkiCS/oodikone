@@ -1,4 +1,3 @@
-import { InferAttributes } from 'sequelize'
 import {
   BelongsTo,
   BelongsToMany,
@@ -13,41 +12,43 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import { Name } from '@oodikone/shared/types'
-import { CourseProvider } from './courseProvider'
-import { CourseType } from './courseType'
-import { Credit } from './credit'
-import { Enrollment } from './enrollment'
-import { Organization } from './organization'
+import type { Course, CourseType, Credit, Enrollment, Organization } from '@oodikone/shared/models'
+import type { Name } from '@oodikone/shared/types'
+
+import { CourseProviderModel } from './courseProvider'
+import { CourseTypeModel } from './courseType'
+import { CreditModel } from './credit'
+import { EnrollmentModel } from './enrollment'
+import { OrganizationModel } from './organization'
 
 @Table({
   underscored: false,
   modelName: 'course',
   tableName: 'course',
 })
-export class Course extends Model<InferAttributes<Course>> {
+export class CourseModel extends Model<Course> implements Course {
   @PrimaryKey
   @Column(DataType.STRING)
   id!: string
 
-  @ForeignKey(() => Course)
+  @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
   code!: string
 
-  @ForeignKey(() => CourseType)
+  @ForeignKey(() => CourseTypeModel)
   @Column(DataType.STRING)
   coursetypecode!: string
 
-  @BelongsTo(() => CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+  @BelongsTo(() => CourseTypeModel, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
   courseType!: CourseType
 
-  @HasMany(() => Credit, { foreignKey: 'course_id', sourceKey: 'id' })
+  @HasMany(() => CreditModel, { foreignKey: 'course_id', sourceKey: 'id' })
   credits!: Credit[]
 
-  @HasMany(() => Enrollment, { foreignKey: 'course_id' })
+  @HasMany(() => EnrollmentModel, { foreignKey: 'course_id' })
   enrollments!: Enrollment[]
 
-  @BelongsToMany(() => Organization, () => CourseProvider, 'coursecode')
+  @BelongsToMany(() => OrganizationModel, () => CourseProviderModel, 'coursecode')
   organizations!: Organization[]
 
   @Column(DataType.BOOLEAN)
@@ -63,17 +64,11 @@ export class Course extends Model<InferAttributes<Course>> {
   min_attainment_date!: Date
 
   @CreatedAt
-  @Column({
-    field: 'created_at',
-    type: DataType.DATE,
-  })
+  @Column({ field: 'created_at', type: DataType.DATE })
   createdAt!: Date
 
   @UpdatedAt
-  @Column({
-    field: 'updated_at',
-    type: DataType.DATE,
-  })
+  @Column({ field: 'updated_at', type: DataType.DATE })
   updatedAt!: Date
 
   @Column(DataType.JSONB)
@@ -82,9 +77,6 @@ export class Course extends Model<InferAttributes<Course>> {
   @Column(DataType.STRING)
   course_unit_type!: string
 
-  @Column({
-    field: 'main_course_code',
-    type: DataType.STRING,
-  })
+  @Column({ field: 'main_course_code', type: DataType.STRING })
   mainCourseCode!: string
 }

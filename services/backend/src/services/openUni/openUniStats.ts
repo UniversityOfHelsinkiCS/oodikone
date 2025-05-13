@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { SISStudyRight } from '../../models'
+import { SISStudyRightModel } from '../../models'
 import { getCourseNames, getCredits, getEnrollments, getStudentInfo, getStudyRights } from './openUniSearches'
 
 type CourseInfo = {
@@ -46,15 +46,15 @@ const getAllCourseCodes = (courseCodes: string[]) => {
   return courseCodes.concat(ayCourseCodes)
 }
 
-const isStartDateOutsideInterval = (studyRight: SISStudyRight, startDate: Date) => {
+const isStartDateOutsideInterval = (studyRight: SISStudyRightModel, startDate: Date) => {
   return moment(studyRight.startDate).isBetween(startDate, moment())
 }
 
-const isStartDateInsideAndEndDateOutside = (studyRight: SISStudyRight, startDate: Date) => {
+const isStartDateInsideAndEndDateOutside = (studyRight: SISStudyRightModel, startDate: Date) => {
   return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
 }
 
-const isEndDateBeforeNow = (studyRight: SISStudyRight) => moment(studyRight.endDate).isSameOrBefore(moment())
+const isEndDateBeforeNow = (studyRight: SISStudyRightModel) => moment(studyRight.endDate).isSameOrBefore(moment())
 
 const getEmptyCourseInfo = (): CourseInfo => ({
   status: {

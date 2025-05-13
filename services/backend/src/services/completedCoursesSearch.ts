@@ -1,10 +1,10 @@
 import { col, fn, Op, where } from 'sequelize'
 
+import { CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
 import { omitKeys } from '@oodikone/shared/util'
-import { Course, Credit, Enrollment, Student, Studyplan } from '../models'
-import { CreditTypeCode, EnrollmentState } from '../types'
+import { CourseModel, CreditModel, EnrollmentModel, StudentModel, StudyplanModel } from '../models'
 
-export type Courses = Array<Pick<Course, 'code' | 'name' | 'substitutions'>>
+export type Courses = Array<Pick<CourseModel, 'code' | 'name' | 'substitutions'>>
 
 interface StudentCredit {
   date: Date
@@ -44,7 +44,10 @@ export interface FormattedStudent extends StudentInfo {
 }
 
 interface StudentWithStudyplanNested
-  extends Pick<Student, 'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'> {
+  extends Pick<
+    StudentModel,
+    'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'
+  > {
   studyplans: { included_courses: string[] }[]
 }
 
@@ -54,7 +57,7 @@ interface StudentWithCourses extends Omit<StudentWithStudyplanNested, 'studyplan
 
 const getCourses = async (courseCodes: string[]) => {
   const courses: Courses = (
-    await Course.findAll({
+    await CourseModel.findAll({
       attributes: ['code', 'name', 'substitutions'],
       where: where(fn('LOWER', col('code')), {
         [Op.in]: courseCodes.map(code => code.toLowerCase()),
@@ -70,18 +73,19 @@ const getCredits = async (
   courseCodes: string[],
   studentNumbers: string[]
 ) => {
-  const credits: Array<Pick<Credit, 'course_code' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'>> =
-    await Credit.findAll({
-      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
-      where: {
-        course_code: {
-          [Op.in]: fullCourseCodes,
-        },
-        student_studentnumber: {
-          [Op.in]: studentNumbers,
-        },
+  const credits: Array<
+    Pick<CreditModel, 'course_code' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'>
+  > = await CreditModel.findAll({
+    attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
+    where: {
+      course_code: {
+        [Op.in]: fullCourseCodes,
       },
-    })
+      student_studentnumber: {
+        [Op.in]: studentNumbers,
+      },
+    },
+  })
   const formattedCredits = credits.map(credit => {
     const originalCode = courseCodes.includes(credit.course_code)
       ? null
@@ -98,8 +102,8 @@ const getCredits = async (
 }
 
 const getEnrollments = async (courses: Courses, fullCourseCodes: string[], studentNumbers: string[]) => {
-  const enrollments: Array<Pick<Enrollment, 'course_code' | 'enrollment_date_time' | 'studentnumber'>> =
-    await Enrollment.findAll({
+  const enrollments: Array<Pick<EnrollmentModel, 'course_code' | 'enrollment_date_time' | 'studentnumber'>> =
+    await EnrollmentModel.findAll({
       attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
       where: {
         course_code: {
@@ -126,7 +130,7 @@ const getEnrollments = async (courses: Courses, fullCourseCodes: string[], stude
 }
 
 const getStudents = async (studentNumbers: string[]) => {
-  const students = await Student.findAll({
+  const students = await StudentModel.findAll({
     attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id', 'secondary_email'],
     where: {
       studentnumber: {
@@ -135,7 +139,7 @@ const getStudents = async (studentNumbers: string[]) => {
     },
     include: [
       {
-        model: Studyplan,
+        model: StudyplanModel,
         as: 'studyplans',
         attributes: ['included_courses'],
       },

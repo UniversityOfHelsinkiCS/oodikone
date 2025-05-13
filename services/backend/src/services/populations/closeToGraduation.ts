@@ -1,17 +1,24 @@
-import { col, InferAttributes, Op, where } from 'sequelize'
+import { col, Op, where } from 'sequelize'
 
-import { Name } from '@oodikone/shared/types'
+import { Credit, Student, Studyplan } from '@oodikone/shared/models'
 import {
-  Course,
-  Credit,
-  Organization,
-  ProgrammeModule,
-  Student,
-  Studyplan,
-  SISStudyRight,
-  SISStudyRightElement,
+  Name,
+  CreditTypeCode,
+  DegreeProgrammeType,
+  EnrollmentType,
+  ExtentCode,
+  SemesterEnrollment,
+} from '@oodikone/shared/types'
+import {
+  CourseModel,
+  CreditModel,
+  OrganizationModel,
+  ProgrammeModuleModel,
+  StudentModel,
+  StudyplanModel,
+  SISStudyRightModel,
+  SISStudyRightElementModel,
 } from '../../models'
-import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode, SemesterEnrollment } from '../../types'
 import { redisClient } from '../redis'
 import { getCurrentSemester } from '../semesters'
 import { getCurriculumVersion } from './shared'
@@ -101,11 +108,7 @@ const findThesisAndLatestAndEarliestAttainments = (
   return { attainmentDates, thesisData }
 }
 
-const formatStudent = (
-  student: InferAttributes<Student>,
-  facultyMap: Record<string, Name>,
-  currentSemesterCode: number
-) => {
+const formatStudent = (student: Student, facultyMap: Record<string, Name>, currentSemesterCode: number) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
@@ -191,7 +194,7 @@ const formatStudent = (
 
 export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) => {
   const students = (
-    await Student.findAll({
+    await StudentModel.findAll({
       attributes: [
         'abbreviatedname',
         'creditcount',
@@ -211,18 +214,18 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         : {},
       include: [
         {
-          model: Studyplan,
+          model: StudyplanModel,
           attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_id'],
           required: true,
           include: [
             {
-              model: SISStudyRight,
+              model: SISStudyRightModel,
               as: 'studyRight',
               attributes: ['id', 'semesterEnrollments', 'startDate', 'extentCode'],
               where: { cancelled: false },
               include: [
                 {
-                  model: SISStudyRightElement,
+                  model: SISStudyRightElementModel,
                   as: 'studyRightElements',
                   where: {
                     graduated: false,
@@ -279,23 +282,23 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
           ],
         },
         {
-          model: Credit,
+          model: CreditModel,
           attributes: ['attainment_date', 'grade', 'studyright_id'],
           where: { credittypecode: CreditTypeCode.PASSED },
           include: [
             {
-              model: Course,
+              model: CourseModel,
               attributes: ['code', 'course_unit_type'],
             },
           ],
         },
       ],
-      order: [[{ model: Credit, as: 'credits' }, 'attainment_date', 'DESC']],
+      order: [[{ model: CreditModel, as: 'credits' }, 'attainment_date', 'DESC']],
     })
   ).map(student => student.toJSON())
 
   const programmeCodes = [...new Set(students.flatMap(student => student.studyplans.map(sp => sp.programme_code)))]
-  const programmesWithFaculties = await ProgrammeModule.findAll({
+  const programmesWithFaculties = await ProgrammeModuleModel.findAll({
     attributes: ['code'],
     where: {
       code: {
@@ -303,7 +306,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
       },
     },
     include: {
-      model: Organization,
+      model: OrganizationModel,
       attributes: ['name'],
     },
     raw: true,

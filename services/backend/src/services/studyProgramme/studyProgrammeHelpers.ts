@@ -1,10 +1,11 @@
 import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
+import { SISStudyRightElement } from '@oodikone/shared/models'
+import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
-import { ProgrammeModule, SISStudyRight, SISStudyRightElement } from '../../models'
-import { DegreeProgrammeType, Phase } from '../../types'
+import { ProgrammeModuleModel, SISStudyRightModel } from '../../models'
 import { getDegreeProgrammeType } from '../../util'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
@@ -172,7 +173,7 @@ export const getId = (code: string) => {
 
 export const getGoal = async (programme?: string) => {
   if (!programme) return 0
-  const programmeInfo = await ProgrammeModule.findAll({
+  const programmeInfo = await ProgrammeModuleModel.findAll({
     attributes: ['degreeProgrammeType', 'minimumCredits'],
     where: {
       code: programme,
@@ -197,7 +198,10 @@ export const getGoal = async (programme?: string) => {
 
 export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code)
 
-export const getStudyRightElementsWithPhase = (studyRight: Pick<SISStudyRight, 'studyRightElements'>, phase: Phase) => {
+export const getStudyRightElementsWithPhase = (
+  studyRight: Pick<SISStudyRightModel, 'studyRightElements'>,
+  phase: Phase
+) => {
   return orderBy(
     studyRight.studyRightElements.filter(element => element.phase === phase),
     ['startDate'],
@@ -206,7 +210,7 @@ export const getStudyRightElementsWithPhase = (studyRight: Pick<SISStudyRight, '
 }
 
 export const hasTransferredFromOrToProgramme = (
-  studyRight: Pick<SISStudyRight, 'studyRightElements'>,
+  studyRight: Pick<SISStudyRightModel, 'studyRightElements'>,
   studyRightElement: SISStudyRightElement
 ): [boolean, boolean] => {
   const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
