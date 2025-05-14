@@ -2,6 +2,7 @@ import { Tooltip, Typography } from '@mui/material'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
+import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { DynamicColumnTitles } from './GeneralTab'
 
 export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
@@ -27,6 +28,25 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       {
         accessorKey: 'email',
         header: 'Email',
+      },
+      {
+        accessorKey: 'primaryProgramme',
+        header: 'Primary study programme',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Primary study programme"
+            tooltipText="Programme associated with the most recently acquired active study right. Columns showing study programme specific data (e.g. Started in programme or Credits in HOPS) refer to the programme displayed here."
+          />
+        ),
+        Cell: ({ cell }) => {
+          const value = cell.getValue<string>()
+          const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
+          return (
+            <Tooltip arrow title={value}>
+              <span>{formattedValue}</span>
+            </Tooltip>
+          )
+        },
       },
       {
         accessorKey: 'creditsTotal',
@@ -89,6 +109,12 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       {
         accessorKey: 'programmes',
         header: `${dynamicTitles.programmes}`,
+        Header: (
+          <TableHeaderWithTooltip
+            header={dynamicTitles.programmes}
+            tooltipText="If a student has more than one programme, hover your mouse on the cell to view the rest. They are also displayed in the exported Excel file."
+          />
+        ),
         Cell: ({ cell }) => {
           // @ts-expect-error add typing
           const { programmes, programmeList } = cell.getValue()
@@ -139,6 +165,12 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       {
         accessorKey: 'mostRecentAttainment',
         header: 'Latest attainment date',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Latest attainment date"
+            tooltipText="Date of the most recent course completion that is included in the HOPS"
+          />
+        ),
       },
       {
         accessorKey: 'extent',

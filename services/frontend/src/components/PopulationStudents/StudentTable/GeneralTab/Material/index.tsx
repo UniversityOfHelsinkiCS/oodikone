@@ -30,6 +30,7 @@ export type FormattedStudentData = {
   semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
   startYearAtUniversity: number | string
+  primaryProgramme?: string
   programmes: { programmes: string[]; programmeList: string[] }
   transferredFrom: string
   admissionType: string
@@ -39,7 +40,7 @@ export type FormattedStudentData = {
   mostRecentAttainment: string
   tags: any
   extent?: string
-  studyTrack?: string
+  studyTrack?: string | null
   updatedAt?: string
   grade?: string
   attainmentDate?: string
@@ -238,8 +239,7 @@ export const GeneralTabContainer = ({
     return 'Credits since start in programme'
   }
 
-  const getOptionDisplayText = () =>
-    programmeCode ? (isMastersProgramme ? 'Bachelor' : 'Master') : 'Primary study programme'
+  const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
 
   const getProgrammesDisplayText = () => (variant === 'coursePopulation' ? 'Study programmes' : 'Other programmes')
 
@@ -341,12 +341,10 @@ export const GeneralTabContainer = ({
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
-      studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : '',
+      studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : null,
       studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
       programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
-      option: programmeCode
-        ? (getTextIn(student.option?.name) ?? '')
-        : (getTextIn(studentToPrimaryProgrammeMap[student.studentNumber]?.name) ?? ''),
+      option: getTextIn(student.option?.name) ?? '',
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
         content: getSemesterEnrollmentsContent(student) ?? null,
@@ -363,6 +361,10 @@ export const GeneralTabContainer = ({
       tags: parseTags(student.tags),
       extent: isAdmin && getExtent(student),
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
+    }
+
+    if (variant === 'customPopulation' && !programmeCode) {
+      result.primaryProgramme = getTextIn(studentToPrimaryProgrammeMap[student.studentNumber]?.name) ?? ''
     }
 
     if (variant === 'coursePopulation') {

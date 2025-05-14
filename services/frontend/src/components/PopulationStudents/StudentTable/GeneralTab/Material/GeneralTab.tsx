@@ -96,7 +96,6 @@ export const GeneralTab = ({
     'studyRightStart',
     'programmeStart',
     'studyTrack',
-    'option',
     'gender',
     'citizenships',
     'mostRecentAttainment',
@@ -105,11 +104,14 @@ export const GeneralTab = ({
 
   const customPopulationWithProgrammeColumns = [
     'admissionType',
+    'option',
     'transferredFrom',
     'semesterEnrollments',
     'curriculumPeriod',
     'extent',
   ]
+
+  const customPopulationWithNoProgrammeColumns = ['primaryProgramme']
 
   const populationColumns = [
     'creditsHops',
@@ -151,7 +153,7 @@ export const GeneralTab = ({
     customPopulation: new Set([
       ...baseColumns,
       ...baseCustomPopulationColumns,
-      ...(customPopulationProgramme ? customPopulationWithProgrammeColumns : []),
+      ...(customPopulationProgramme ? customPopulationWithProgrammeColumns : customPopulationWithNoProgrammeColumns),
     ]),
     coursePopulation: new Set([...baseColumns, ...coursePopulationColumns]),
   }
