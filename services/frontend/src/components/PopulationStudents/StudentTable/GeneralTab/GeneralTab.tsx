@@ -1,4 +1,9 @@
-import { type MRT_VisibilityState, MaterialReactTable, useMaterialReactTable } from 'material-react-table'
+import {
+  type MRT_VisibilityState,
+  type MRT_ColumnDef,
+  MaterialReactTable,
+  useMaterialReactTable,
+} from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -53,6 +58,8 @@ export const GeneralTab = ({
     phoneNumber: namesVisible,
     studyTrack: studyTrackVisible,
     admissionType: admissionTypeVisible,
+    semesterEnrollmentExport: false,
+    programmeExport: false,
   })
 
   useEffect(() => {
@@ -63,8 +70,10 @@ export const GeneralTab = ({
       phoneNumber: namesVisible,
       studyTrack: studyTrackVisible,
       admissionType: admissionTypeVisible,
+      semesterEnrollmentExport: false,
+      programmesExport: false,
     })
-  }, [namesVisible, studyTrackVisible])
+  }, [namesVisible, studyTrackVisible, admissionTypeVisible])
 
   const baseColumns = [
     'lastName',
@@ -174,13 +183,39 @@ export const GeneralTab = ({
     coursePopulation: new Set([...baseColumns, ...coursePopulationColumns]),
   }
 
-  const columns = useMemo(() => {
-    return columnDefinitions.filter(col => {
-      const isIncluded = columnsByVariant[variant].has(col.accessorKey ?? '')
-      if (!showAdminColumns && adminColumns.includes(col.accessorKey ?? '')) return false
-      return isIncluded
-    })
-  }, [variant, columnDefinitions, showAdminColumns, adminColumns, columnsByVariant])
+  const visibleColumns = columnDefinitions.filter(col => {
+    const isIncluded = columnsByVariant[variant].has(col.accessorKey ?? '')
+    if (!showAdminColumns && adminColumns.includes(col.accessorKey ?? '')) return false
+    return isIncluded
+  })
+
+  const exportExclusiveColumns = [
+    {
+      accessorKey: 'semesterEnrollments.exportValue',
+      id: 'semesterEnrollmentExport',
+      header: 'Semester enrollment amount',
+      visibleInShowHideMenu: false,
+    },
+    {
+      accessorKey: 'programmes.exportValue',
+      id: 'programmesExport',
+      header: `${dynamicTitles.programmes}`,
+      visibleInShowHideMenu: false,
+    },
+  ]
+
+  const columns = useMemo<MRT_ColumnDef<any>[]>(
+    () => [...visibleColumns, ...exportExclusiveColumns],
+    [
+      exportExclusiveColumns,
+      visibleColumns,
+      variant,
+      columnDefinitions,
+      showAdminColumns,
+      adminColumns,
+      columnsByVariant,
+    ]
+  )
 
   const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
 
@@ -196,10 +231,13 @@ export const GeneralTab = ({
     onColumnVisibilityChange: setColumnVisibility,
   })
 
+  const keysToIgnoreInExport = ['semesterEnrollments', 'programmes']
+  const exportCols = columns.filter(column => !keysToIgnoreInExport.includes(column.accessorKey ?? ''))
+
   return (
     <>
       <ExportToExcelDialog
-        exportColumns={columns}
+        exportColumns={exportCols}
         exportData={exportData}
         featureName="general_student_information"
         onClose={() => setExportModalOpen(false)}

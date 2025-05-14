@@ -10,8 +10,8 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
-import { createMaps } from '../columnHelpers/createMaps'
-import { getSemestersPresentFunctions } from '../columnHelpers/semestersPresent'
+import { createMaps } from './columnHelpers/createMaps'
+import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 
 import { GeneralTab } from './GeneralTab'
 
@@ -34,14 +34,14 @@ export type FormattedStudentData = {
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
   primaryProgramme?: string
-  programmes: { programmes: string[]; programmeList: string[] }
+  programmes: { programmes: string[]; programmeList: string; exportValue: string }
   transferredFrom: string
   admissionType: string | null
   gender: string
   citizenships: string[]
   curriculumPeriod: string
   mostRecentAttainment: string
-  tags: any
+  tags: string | null
   extent?: string
   studyTrack?: string | null
   updatedAt?: string
@@ -288,6 +288,7 @@ export const GeneralTabContainer = ({
     return {
       programmes: programmes.map(programme => getTextIn(programme.name)) ?? [],
       programmeList: getProgrammesList('\n'),
+      exportValue: getProgrammesList('; '),
     }
   }
 
@@ -384,7 +385,7 @@ export const GeneralTabContainer = ({
       citizenships: student.citizenships.map(getTextIn).sort().join(', '),
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
-      tags: parseTags(student.tags),
+      tags: parseTags(student.tags) ?? null,
       extent: isAdmin && getExtent(student),
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }

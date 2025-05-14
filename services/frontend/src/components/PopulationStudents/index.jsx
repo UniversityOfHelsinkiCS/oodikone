@@ -15,7 +15,6 @@ import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
-import { GeneralTabContainer as GeneralTabNew } from './StudentTable/GeneralTab/Material'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
@@ -31,7 +30,6 @@ const Panes = ({
   from,
   mainProgramme,
   months,
-  studentToTargetCourseDateMap,
   studyGuidanceGroup,
   to,
   variant,
@@ -50,22 +48,6 @@ const Panes = ({
       menuItem: 'General',
       render: () => (
         <GeneralTab
-          coursecode={coursecode}
-          customPopulationProgramme={customPopulationProgramme}
-          filteredStudents={filteredStudents}
-          from={from}
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          studyGuidanceGroup={studyGuidanceGroup}
-          to={to}
-          variant={variant}
-          year={year}
-        />
-      ),
-    },
-    {
-      menuItem: 'General V2',
-      render: () => (
-        <GeneralTabNew
           courseCode={coursecode}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
@@ -151,7 +133,6 @@ const PopulationStudents = ({
   filteredStudents,
   from,
   to,
-  studentToTargetCourseDateMap,
   studyGuidanceGroup,
   variant,
   year,
@@ -197,7 +178,6 @@ const PopulationStudents = ({
         from={from}
         mainProgramme={mainProgramme}
         months={months}
-        studentToTargetCourseDateMap={studentToTargetCourseDateMap}
         studyGuidanceGroup={studyGuidanceGroup}
         to={to}
         variant={variant}
@@ -210,12 +190,12 @@ const PopulationStudents = ({
 
 const getTabs = programmeCode => {
   if (programmeCode && isBachelorOrLicentiateProgramme(programmeCode)) {
-    return ['General', 'General V2', 'Courses', 'Modules', 'Progress']
+    return ['General', 'Courses', 'Modules', 'Progress']
   }
   if (programmeCode) {
-    return ['General', 'General V2', 'Courses', 'Modules']
+    return ['General', 'Courses', 'Modules']
   }
-  return ['General', 'General V2']
+  return ['General']
 }
 
 export const PopulationStudentsContainer = ({ ...props }) => {
@@ -227,16 +207,16 @@ export const PopulationStudentsContainer = ({ ...props }) => {
     population: {
       panesToInclude:
         props.year === 'All' || (props.programmeCode && !isBachelorOrLicentiateProgramme(props.programmeCode))
-          ? ['General', 'General V2', 'Courses', 'Modules', 'Tags']
-          : ['General', 'General V2', 'Courses', 'Modules', 'Tags', 'Progress'],
+          ? ['General', 'Courses', 'Modules', 'Tags']
+          : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
       infotoolTipContent: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
-      panesToInclude: ['General', 'General V2'],
+      panesToInclude: ['General'],
       infotoolTipContent: coursePopulationToolTips.students,
     },
     customPopulation: {
-      panesToInclude: ['General', 'General V2'],
+      panesToInclude: ['General'],
       infotoolTipContent: populationStatisticsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {

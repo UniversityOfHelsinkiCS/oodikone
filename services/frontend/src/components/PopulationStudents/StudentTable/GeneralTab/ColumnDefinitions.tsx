@@ -16,6 +16,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           <StudentInfoItem sisPersonId={cell.row.original.sisuID} studentNumber={cell.getValue<string>()} />
         ),
         filterFn: 'startsWith',
+        enableClickToCopy: true,
       },
       {
         accessorKey: 'lastName',
@@ -28,6 +29,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       {
         accessorKey: 'email',
         header: 'Email',
+        enableClickToCopy: true,
       },
       {
         accessorKey: 'phoneNumber',
