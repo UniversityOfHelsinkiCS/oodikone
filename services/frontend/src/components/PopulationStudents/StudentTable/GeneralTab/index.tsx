@@ -267,7 +267,10 @@ export const GeneralTabContainer = ({
 
   const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
 
-  const getProgrammesDisplayText = () => (variant === 'coursePopulation' ? 'Study programmes' : 'Other programmes')
+  const getProgrammesDisplayText = () =>
+    variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
+      ? 'Study programmes'
+      : 'Other programmes'
 
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>

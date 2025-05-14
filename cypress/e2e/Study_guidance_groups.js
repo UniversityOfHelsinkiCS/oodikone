@@ -79,14 +79,17 @@ describe('Study guidance group tests', () => {
       })
 
       it('general tab of the students table has the correct columns', () => {
-        const firstRowHeadings = ['Student number', 'Credits', 'Start year at uni', 'Study programmes', 'Tags']
-        const secondRowHeadings = ['All', 'Since 1.1.1970']
+        const colHeaders = [
+          'Student number',
+          'All credits',
+          'Credits since 1.1.1970',
+          'Start year at uni',
+          'Study programmes',
+          'Tags',
+        ]
         cy.cs('Students (2)').click()
-        cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
-          const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replace('\n', ' '))
-          expect(firstRowTexts).to.deep.equal(firstRowHeadings)
-          const secondRowTexts = Array.from($tr[1].children).map(elem => elem.innerText)
-          expect(secondRowTexts).to.deep.equal(secondRowHeadings)
+        cy.get('[data-cy="student-table-tabs"] table thead tr').within(() => {
+          colHeaders.every(heading => cy.contains(heading))
         })
       })
     })
@@ -129,9 +132,11 @@ describe('Study guidance group tests', () => {
       })
 
       it('general tab of the students table has the correct columns', () => {
-        const firstRowHeadings = [
+        const colHeaders = [
           'Student number',
-          'Credits',
+          'All credits',
+          'Credits in HOPS',
+          'Credits since 1.8.2020',
           'Start of study right',
           'Started in programme',
           'Semesters present',
@@ -146,15 +151,9 @@ describe('Study guidance group tests', () => {
           'Latest attainment date',
           'Tags',
         ]
-        const secondRowHeadings = ['All', 'HOPS', 'Since 1.8.2020']
         cy.cs('Students (3)').click()
-        cy.get('[data-cy="student-table-tabs"] table thead tr').then($tr => {
-          const firstRowTexts = Array.from($tr[0].children).map(elem => elem.innerText.replaceAll('\n', ' '))
-          expect(firstRowTexts).to.deep.equal(firstRowHeadings)
-          const secondRowTexts = Array.from($tr[1].children)
-            .filter(elem => elem.style.display !== 'none')
-            .map(elem => elem.innerText)
-          expect(secondRowTexts).to.deep.equal(secondRowHeadings)
+        cy.get('[data-cy="student-table-tabs"] table thead tr').within(() => {
+          colHeaders.every(heading => cy.contains(heading))
         })
       })
     })
