@@ -320,8 +320,10 @@ describe('Population statistics tests', () => {
           cy.contains('522142')
           cy.contains('Tilastotiede')
           cy.contains('Matematiikka')
-          cy.contains('Teoreettisten ja laskennallisten menetelmien maisteriohjelma')
+          cy.contains('Taloustieteen maisteriohjelma')
           cy.contains('Todistusvalinta')
+          cy.contains('Saksa')
+          cy.contains('Female')
         })
       })
 
