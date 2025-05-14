@@ -24,12 +24,14 @@ export type FormattedStudentData = {
   phoneNumber: string
   creditsTotal: number
   creditsHops: number
+  creditsCombinedProg?: number
   creditsSince: number
   studyRightStart: string
   programmeStart: string
   option: string
   semesterEnrollments: { exportValue: number; content: JSX.Element | null }
   graduationDate: string
+  graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
   primaryProgramme?: string
   programmes: { programmes: string[]; programmeList: string[] }
@@ -137,6 +139,17 @@ export const GeneralTabContainer = ({
       ? studyGuidanceGroupProgrammes[1]
       : null
 
+  const getCombinedProgrammeCredits = student =>
+    student.studyplans?.find(plan => {
+      if (combinedProgrammeCode) {
+        return plan.programme_code === combinedProgrammeCode
+      }
+      const studyRightIdOfProgramme = student.studyRights.find(studyRight =>
+        studyRight.studyRightElements?.some(element => element.code === programmeCode)
+      )?.id
+      return plan.sis_study_right_id === studyRightIdOfProgramme && plan.programme_code !== programmeCode
+    })?.completed_credits ?? 0
+
   const shouldShowAdmissionType =
     parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020 || variant === 'customPopulation'
   const getAdmissiontype = student => {
@@ -239,6 +252,17 @@ export const GeneralTabContainer = ({
       return 'Credits since 1.1.1970'
     }
     return 'Credits since start in programme'
+  }
+
+  const getSecondaryProgCreditsDisplayText = () => {
+    if (combinedProgrammeCode === 'MH90_001') return 'Credits in licentiate HOPS'
+    if (isMastersProgramme) return 'Credits in Bachelor HOPS'
+    return 'Credits in Master HOPS'
+  }
+  const getSecondaryEndDateDisplayText = () => {
+    if (combinedProgrammeCode === 'MH90_001') return 'Licentiate graduation date'
+    if (isMastersProgramme) return 'Bachelor graduation date'
+    return 'Master graduation date'
   }
 
   const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
@@ -365,6 +389,14 @@ export const GeneralTabContainer = ({
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
 
+    if (combinedProgrammeCode || showBachelorAndMaster) {
+      const secondaryStudyRightEnd = studentToSecondStudyrightEndMap[student.studentNumber]
+      result.creditsCombinedProg = getCombinedProgrammeCredits(student)
+      result.graduationDateCombinedProg = secondaryStudyRightEnd
+        ? formatDate(secondaryStudyRightEnd, DateFormat.ISO_DATE)
+        : null
+    }
+
     if (variant === 'customPopulation' && !programmeCode) {
       result.primaryProgramme = getTextIn(studentToPrimaryProgrammeMap[student.studentNumber]?.name) ?? ''
     }
@@ -380,24 +412,27 @@ export const GeneralTabContainer = ({
 
     return result
   }
-  // console.log("populationstatistics", populationStatistics)
-  // console.log("populationstats length:", populationStatistics?.students?.length, "students length:", Object.keys(students).length)
-  // console.log("selectedstudentnumbers and students lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
+
   const formattedData: FormattedStudentData[] = selectedStudentNumbers.map(studentNumber =>
     formatStudent(students[studentNumber])
   )
   const containsAdmissionTypes = formattedData.some(student => student.admissionType !== 'Ei valintatapaa')
+
   return (
     <GeneralTab
       admissionTypeVisible={containsAdmissionTypes}
       customPopulationProgramme={customPopulationProgramme}
       dynamicTitles={{
+        primaryEndDate: combinedProgrammeCode ? 'Bachelor graduation date' : 'Graduation date',
+        secondaryEndDate: getSecondaryEndDateDisplayText(),
         creditsSince: getCreditsSinceDisplayText(),
+        creditsCombinedProg: getSecondaryProgCreditsDisplayText(),
         option: getOptionDisplayText(),
         programmes: getProgrammesDisplayText(),
       }}
       formattedData={formattedData}
       group={group}
+      isCombinedProg={!!combinedProgrammeCode || showBachelorAndMaster}
       showAdminColumns={isAdmin}
       studyTrackVisible={containsStudyTracks}
       variant={variant}

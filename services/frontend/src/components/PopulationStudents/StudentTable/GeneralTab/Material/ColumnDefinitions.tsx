@@ -61,6 +61,10 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: 'Credits in HOPS',
       },
       {
+        accessorKey: 'creditsCombinedProg',
+        header: `${dynamicTitles.creditsCombinedProg}`,
+      },
+      {
         accessorKey: 'creditsSince',
         header: `${dynamicTitles.creditsSince}`,
       },
@@ -104,7 +108,11 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       },
       {
         accessorKey: 'graduationDate',
-        header: 'Graduation date',
+        header: `${dynamicTitles.primaryEndDate}`,
+      },
+      {
+        accessorKey: 'graduationDateCombinedProg',
+        header: `${dynamicTitles.secondaryEndDate}`,
       },
       {
         accessorKey: 'startYearAtUniversity',

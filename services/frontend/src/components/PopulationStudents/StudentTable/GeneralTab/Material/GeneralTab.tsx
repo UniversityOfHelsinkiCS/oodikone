@@ -10,11 +10,19 @@ import { type FormattedStudentData } from '.'
 import { useColumnDefinitions } from './ColumnDefinitions'
 
 type Variant = 'population' | 'studyGuidanceGroupPopulation' | 'customPopulation' | 'coursePopulation'
-export type DynamicColumnTitles = { creditsSince: string; option: string; programmes: string }
+export type DynamicColumnTitles = {
+  creditsSince: string
+  creditsCombinedProg: string
+  option: string
+  programmes: string
+  primaryEndDate: string
+  secondaryEndDate: string
+}
 
 export const GeneralTab = ({
   formattedData,
   variant,
+  isCombinedProg,
   showAdminColumns,
   dynamicTitles,
   group,
@@ -24,6 +32,7 @@ export const GeneralTab = ({
 }: {
   formattedData: FormattedStudentData[]
   variant: Variant
+  isCombinedProg: boolean
   showAdminColumns: boolean
   dynamicTitles: DynamicColumnTitles
   group: any
@@ -81,6 +90,7 @@ export const GeneralTab = ({
     'gender',
     'mostRecentAttainment',
     'semesterEnrollments',
+    ...(isCombinedProg ? ['graduationDateCombinedProg', 'creditsCombinedProg'] : []),
   ]
 
   const studyGuidanceGroupYearColumns = [
@@ -105,6 +115,7 @@ export const GeneralTab = ({
     'citizenships',
     'mostRecentAttainment',
     'extent',
+    ...(isCombinedProg ? ['graduationDateCombinedProg', 'creditsCombinedProg'] : []),
   ]
 
   const customPopulationWithProgrammeColumns = [
@@ -135,6 +146,7 @@ export const GeneralTab = ({
     'curriculumPeriod',
     'mostRecentAttainment',
     'extent',
+    ...(isCombinedProg ? ['graduationDateCombinedProg', 'creditsCombinedProg'] : []),
   ]
 
   const coursePopulationColumns = [
@@ -180,18 +192,8 @@ export const GeneralTab = ({
       columnVisibility,
       columnPinning: { left: ['studentNumber'] },
     },
-    enableColumnActions: false,
     enableColumnFilters: false,
-    enableStickyFooter: true,
-    defaultColumn: { size: 0 },
-
     onColumnVisibilityChange: setColumnVisibility,
-    muiTableContainerProps: {
-      sx: {
-        tableLayout: 'auto',
-        whiteSpace: 'nowrap',
-      },
-    },
   })
 
   return (
