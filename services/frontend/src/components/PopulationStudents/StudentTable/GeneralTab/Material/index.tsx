@@ -21,6 +21,7 @@ export type FormattedStudentData = {
   studentNumber: string
   sisuID: string
   email: string
+  phoneNumber: string
   creditsTotal: number
   creditsHops: number
   creditsSince: number
@@ -33,7 +34,7 @@ export type FormattedStudentData = {
   primaryProgramme?: string
   programmes: { programmes: string[]; programmeList: string[] }
   transferredFrom: string
-  admissionType: string
+  admissionType: string | null
   gender: string
   citizenships: string[]
   curriculumPeriod: string
@@ -103,10 +104,10 @@ export const GeneralTabContainer = ({
 
   const showBachelorAndMaster = query?.showBachelorAndMaster === 'true'
 
-  const getStudyRight = student =>
-    student.studyRights.find(studyRight =>
-      studyRight.studyRightElements.some(element => element.code === programmeCode)
-    )
+  const getStudyRight = student => {
+    const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
+    return student.studyRights.find(studyRight => studyRight.studyRightElements.some(element => element.code === code))
+  }
 
   const createSemesterEnrollmentsMap = student => {
     const semesterEnrollments = getStudyRight(student)?.semesterEnrollments
@@ -136,7 +137,8 @@ export const GeneralTabContainer = ({
       ? studyGuidanceGroupProgrammes[1]
       : null
 
-  const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
+  const shouldShowAdmissionType =
+    parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020 || variant === 'customPopulation'
   const getAdmissiontype = student => {
     const studyRight = getStudyRight(student)
     const admissionType = studyRight?.admissionType ?? 'Ei valintatapaa'
@@ -330,13 +332,13 @@ export const GeneralTabContainer = ({
     semestersToAddToStart: showBachelorAndMaster && isMastersProgramme ? 6 : 0,
   })
 
-  // console.log("filteredStudents:", filteredStudents)
   const formatStudent = (student: any): FormattedStudentData => {
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
       studentNumber: student.studentNumber,
       email: student.email,
+      phoneNumber: student.phoneNumber,
       sisuID: student.sis_person_id,
       creditsTotal: student.allCredits ?? student.credits,
       creditsHops: getCreditsFromHops(student),
@@ -378,13 +380,16 @@ export const GeneralTabContainer = ({
 
     return result
   }
-  // console.log("filteredStudents:", filteredStudents)
   // console.log("populationstatistics", populationStatistics)
   // console.log("populationstats length:", populationStatistics?.students?.length, "students length:", Object.keys(students).length)
   // console.log("selectedstudentnumbers and students lengths match?", selectedStudentNumbers.length === Object.keys(students).length)
-  const formattedData = selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber]))
+  const formattedData: FormattedStudentData[] = selectedStudentNumbers.map(studentNumber =>
+    formatStudent(students[studentNumber])
+  )
+  const containsAdmissionTypes = formattedData.some(student => student.admissionType !== 'Ei valintatapaa')
   return (
     <GeneralTab
+      admissionTypeVisible={containsAdmissionTypes}
       customPopulationProgramme={customPopulationProgramme}
       dynamicTitles={{
         creditsSince: getCreditsSinceDisplayText(),

@@ -19,6 +19,7 @@ export const GeneralTab = ({
   dynamicTitles,
   group,
   customPopulationProgramme,
+  admissionTypeVisible,
   studyTrackVisible,
 }: {
   formattedData: FormattedStudentData[]
@@ -28,6 +29,7 @@ export const GeneralTab = ({
   group: any
   customPopulationProgramme: any
   studyTrackVisible: boolean
+  admissionTypeVisible: boolean
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -39,17 +41,19 @@ export const GeneralTab = ({
     lastName: namesVisible,
     firstNames: namesVisible,
     email: namesVisible,
+    phoneNumber: namesVisible,
     studyTrack: studyTrackVisible,
+    admissionType: admissionTypeVisible,
   })
-
-  // console.log('FormattedData:', formattedData)
 
   useEffect(() => {
     setColumnVisibility({
       lastName: namesVisible,
       firstNames: namesVisible,
       email: namesVisible,
+      phoneNumber: namesVisible,
       studyTrack: studyTrackVisible,
+      admissionType: admissionTypeVisible,
     })
   }, [namesVisible, studyTrackVisible])
 
@@ -57,16 +61,16 @@ export const GeneralTab = ({
     'lastName',
     'firstNames',
     'email',
+    'phoneNumber',
     'creditsTotal',
     'studentNumber',
     'tags',
-    'phoneNumber',
     'updatedAt',
   ]
 
   const adminColumns = ['extent', 'updatedAt']
 
-  const baseStudyGuidanceGroupColumns = ['creditsSince', 'programmes', 'startYearAtUniversity']
+  const studyGuidanceGroupColumns = ['creditsSince', 'programmes', 'startYearAtUniversity']
 
   const studyGuidanceGroupWithProgrammeColumns = [
     'citizenships',
@@ -87,7 +91,8 @@ export const GeneralTab = ({
     'transferredFrom',
   ]
 
-  const baseCustomPopulationColumns = [
+  const customPopulationColumns = [
+    'admissionType',
     'programmes',
     'startYearAtUniversity',
     'creditsHops',
@@ -103,7 +108,6 @@ export const GeneralTab = ({
   ]
 
   const customPopulationWithProgrammeColumns = [
-    'admissionType',
     'option',
     'transferredFrom',
     'semesterEnrollments',
@@ -146,13 +150,13 @@ export const GeneralTab = ({
     population: new Set([...baseColumns, ...populationColumns]),
     studyGuidanceGroupPopulation: new Set([
       ...baseColumns,
-      ...baseStudyGuidanceGroupColumns,
+      ...studyGuidanceGroupColumns,
       ...(group?.tags?.studyProgramme ? studyGuidanceGroupWithProgrammeColumns : []),
       ...(group?.tags?.studyProgramme && group?.tags?.year ? studyGuidanceGroupYearColumns : []),
     ]),
     customPopulation: new Set([
       ...baseColumns,
-      ...baseCustomPopulationColumns,
+      ...customPopulationColumns,
       ...(customPopulationProgramme ? customPopulationWithProgrammeColumns : customPopulationWithNoProgrammeColumns),
     ]),
     coursePopulation: new Set([...baseColumns, ...coursePopulationColumns]),

@@ -30,6 +30,10 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: 'Email',
       },
       {
+        accessorKey: 'phoneNumber',
+        header: 'Phone number',
+      },
+      {
         accessorKey: 'primaryProgramme',
         header: 'Primary study programme',
         Header: (
@@ -149,6 +153,12 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       {
         accessorKey: 'admissionType',
         header: 'Admission type',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Admission type"
+            tooltipText="Not available for study rights granted prior to 2020"
+          />
+        ),
       },
       {
         accessorKey: 'gender',
