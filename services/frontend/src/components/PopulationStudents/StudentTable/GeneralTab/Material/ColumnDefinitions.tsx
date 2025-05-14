@@ -41,6 +41,10 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: `${dynamicTitles.creditsSince}`,
       },
       {
+        accessorKey: 'grade',
+        header: 'Grade',
+      },
+      {
         accessorKey: 'studyTrack',
         header: 'Study track',
       },
@@ -84,7 +88,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       },
       {
         accessorKey: 'programmes',
-        header: 'Other programmes',
+        header: `${dynamicTitles.programmes}`,
         Cell: ({ cell }) => {
           // @ts-expect-error add typing
           const { programmes, programmeList } = cell.getValue()
@@ -99,6 +103,18 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             </Tooltip>
           )
         },
+      },
+      {
+        accessorKey: 'attainmentDate',
+        header: 'Attainment date',
+      },
+      {
+        accessorKey: 'enrollmentDate',
+        header: 'Enrollment date',
+      },
+      {
+        accessorKey: 'language',
+        header: 'Language',
       },
       {
         accessorKey: 'transferredFrom',

@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { getStudentTotalCredits } from '@/common'
+import { getStudentTotalCredits, getHighestGradeOfCourseBetweenRange } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -24,7 +24,6 @@ export type FormattedStudentData = {
   creditsTotal: number
   creditsHops: number
   creditsSince: number
-  studyTrack?: string
   studyRightStart: string
   programmeStart: string
   option: string
@@ -40,10 +39,24 @@ export type FormattedStudentData = {
   mostRecentAttainment: string
   tags: any
   extent?: string
+  studyTrack?: string
   updatedAt?: string
+  grade?: string
+  attainmentDate?: string
+  enrollmentDate?: string
+  language?: string
 }
 
-export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramme, group, year, variant }) => {
+export const GeneralTabContainer = ({
+  filteredStudents,
+  customPopulationProgramme,
+  group,
+  year,
+  variant,
+  courseCode,
+  from,
+  to,
+}) => {
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const currentSemester = useCurrentSemester()
@@ -71,6 +84,18 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
 
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
+
+  const fromSemester = from
+    ? Object.values(semesterData?.semesters ?? {})
+        .filter(({ startdate }) => new Date(startdate) <= new Date(from))
+        .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))[0]?.semestercode
+    : null
+
+  const toSemester = to
+    ? Object.values(semesterData?.semesters ?? {})
+        .filter(({ enddate }) => new Date(enddate) >= new Date(to))
+        .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))[0]?.semestercode
+    : null
 
   const getTransferredFrom = (student: any) =>
     getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
@@ -216,6 +241,8 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   const getOptionDisplayText = () =>
     programmeCode ? (isMastersProgramme ? 'Bachelor' : 'Master') : 'Primary study programme'
 
+  const getProgrammesDisplayText = () => (variant === 'coursePopulation' ? 'Study programmes' : 'Other programmes')
+
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>
       queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
@@ -239,6 +266,29 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   }
 
   const containsStudyTracks: boolean = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
+
+  const getCourseInformation = student => {
+    const courses = student.courses.filter(course => courseCode.includes(course.course_code))
+    const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
+    if (!highestGrade) return { grade: '-', date: '', language: '' }
+    const { date, language } = courses
+      .filter(course => course.grade === highestGrade.grade)
+      .sort((a, b) => +new Date(b.date) - +new Date(a.date))[0]
+    return {
+      grade: highestGrade.grade,
+      attainmentDate: date,
+      language,
+    }
+  }
+
+  const getEnrollmentDate = student => {
+    if (!fromSemester || !toSemester) return ''
+    const enrollments =
+      student.enrollments
+        ?.filter(enrollment => courseCode.includes(enrollment.course_code))
+        ?.filter(enrollment => enrollment.semestercode >= fromSemester && enrollment.semestercode <= toSemester) ?? null
+    return enrollments[0]?.enrollment_date_time ?? ''
+  }
 
   const getExtent = student =>
     student.studyRights
@@ -282,7 +332,7 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
 
   // console.log("filteredStudents:", filteredStudents)
   const formatStudent = (student: any): FormattedStudentData => {
-    return {
+    const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
       studentNumber: student.studentNumber,
@@ -314,6 +364,17 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
       extent: isAdmin && getExtent(student),
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
+
+    if (variant === 'coursePopulation') {
+      const { attainmentDate, grade, language } = getCourseInformation(student)
+      const enrollmentDate = getEnrollmentDate(student)
+      result.attainmentDate = attainmentDate ? formatDate(attainmentDate, DateFormat.ISO_DATE) : 'No attainment'
+      result.grade = grade
+      result.language = language
+      result.enrollmentDate = enrollmentDate ? formatDate(enrollmentDate, DateFormat.ISO_DATE) : 'No enrollment'
+    }
+
+    return result
   }
   // console.log("filteredStudents:", filteredStudents)
   // console.log("populationstatistics", populationStatistics)
@@ -323,7 +384,11 @@ export const GeneralTabContainer = ({ filteredStudents, customPopulationProgramm
   return (
     <GeneralTab
       customPopulationProgramme={customPopulationProgramme}
-      dynamicTitles={{ creditsSince: getCreditsSinceDisplayText(), option: getOptionDisplayText() }}
+      dynamicTitles={{
+        creditsSince: getCreditsSinceDisplayText(),
+        option: getOptionDisplayText(),
+        programmes: getProgrammesDisplayText(),
+      }}
       formattedData={formattedData}
       group={group}
       showAdminColumns={isAdmin}

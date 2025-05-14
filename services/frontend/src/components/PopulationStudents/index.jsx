@@ -66,9 +66,12 @@ const Panes = ({
       menuItem: 'General V2',
       render: () => (
         <GeneralTabNew
+          courseCode={coursecode}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
+          from={from}
           group={studyGuidanceGroup}
+          to={to}
           variant={variant}
           year={year}
         />
@@ -229,7 +232,7 @@ export const PopulationStudentsContainer = ({ ...props }) => {
       infotoolTipContent: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
-      panesToInclude: ['General'],
+      panesToInclude: ['General', 'General V2'],
       infotoolTipContent: coursePopulationToolTips.students,
     },
     customPopulation: {

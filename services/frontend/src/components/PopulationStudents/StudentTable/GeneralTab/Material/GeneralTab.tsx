@@ -9,8 +9,8 @@ import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { type FormattedStudentData } from '.'
 import { useColumnDefinitions } from './ColumnDefinitions'
 
-type Variant = 'population' | 'studyGuidanceGroupPopulation' | 'customPopulation'
-export type DynamicColumnTitles = { creditsSince: string; option: string }
+type Variant = 'population' | 'studyGuidanceGroupPopulation' | 'customPopulation' | 'coursePopulation'
+export type DynamicColumnTitles = { creditsSince: string; option: string; programmes: string }
 
 export const GeneralTab = ({
   formattedData,
@@ -129,7 +129,15 @@ export const GeneralTab = ({
     'curriculumPeriod',
     'mostRecentAttainment',
     'extent',
-    'updatedAt',
+  ]
+
+  const coursePopulationColumns = [
+    'grade',
+    'startYearAtUniversity',
+    'programmes',
+    'attainmentDate',
+    'enrollmentDate',
+    'language',
   ]
 
   const columnsByVariant: Record<Variant, Set<string>> = {
@@ -145,6 +153,7 @@ export const GeneralTab = ({
       ...baseCustomPopulationColumns,
       ...(customPopulationProgramme ? customPopulationWithProgrammeColumns : []),
     ]),
+    coursePopulation: new Set([...baseColumns, ...coursePopulationColumns]),
   }
 
   const columns = useMemo(() => {
