@@ -1,5 +1,4 @@
 import { indexOf, orderBy } from 'lodash'
-import moment from 'moment'
 
 import {
   GraduationStatistics,
@@ -49,15 +48,19 @@ const calculateAbsenceInMonths = (
   startDate: Date,
   endDate: Date
 ) => {
-  const absenceStart = moment(absence.startdate)
-  const absenceEnd = moment(absence.enddate)
+  const { startdate: absenceStart, enddate: absenceEnd } = absence
 
-  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) {
+  if (endDate < absenceStart || absenceEnd < startDate) {
     return 0
   }
 
-  // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
-  return Math.round(absenceEnd.diff(absenceStart, 'months', true))
+  const years = absenceEnd.getFullYear() - absenceStart.getFullYear()
+  const months = absenceEnd.getMonth() - absenceStart.getMonth()
+  const days = absenceEnd.getDay() - absenceStart.getDay()
+
+  const total = years * 12 + months + days / 30
+
+  return Math.round(total)
 }
 
 export const calculateDurationOfStudies = (
@@ -73,7 +76,17 @@ export const calculateDurationOfStudies = (
     (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
     0
   )
-  return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
+
+  const graduationDateAdjusted = graduationDate
+  graduationDateAdjusted.setMonth(graduationDateAdjusted.getMonth() - monthsToSubtract)
+
+  const years = graduationDateAdjusted.getFullYear() - startDate.getFullYear()
+  const months = graduationDateAdjusted.getMonth() - startDate.getMonth()
+  const days = graduationDateAdjusted.getDay() - startDate.getDay()
+
+  const total = years * 12 + months + days / 30
+
+  return Math.round(total)
 }
 
 export type GraduationTimes = {
