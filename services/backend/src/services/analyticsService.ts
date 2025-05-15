@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import { Graduated, SpecialGroups, YearType } from '@oodikone/shared/types'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
 import { redisClient } from './redis'
@@ -49,7 +47,7 @@ export const setBasicStats = async (data, yearType: YearType, specialGroups: Spe
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   if (!shouldSaveToRedis(id)) {
     return dataToRedis
@@ -84,7 +82,7 @@ export const setCreditStats = async (data, isAcademicYear: boolean, specialGroup
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   if (!isRelevantProgramme(id) && !isFaculty(id)) {
     return dataToRedis
@@ -117,7 +115,7 @@ export const setGraduationStats = async (data, yearType: YearType, specialGroups
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   if (!shouldSaveToRedis(id)) {
     return dataToRedis
@@ -150,7 +148,7 @@ export const setStudyTrackStats = async (data, graduated: Graduated, specialGrou
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   if (!shouldSaveToRedis(id)) {
     return dataToRedis

@@ -1,5 +1,4 @@
 import { groupBy, orderBy } from 'lodash'
-import moment from 'moment'
 import { QueryTypes } from 'sequelize'
 
 import { ProgrammeModule } from '@oodikone/shared/models'
@@ -7,6 +6,7 @@ import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import { OrganizationModel } from '../../models'
+import { dateIsBetween } from '../../util/datetime'
 import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
@@ -86,7 +86,8 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       .flat()
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
-      (onlyCurrentProgrammes && yearsOfProgramme.some(year => moment().isBetween(year.startDate, year.endDate)))
+      (onlyCurrentProgrammes &&
+        yearsOfProgramme.some(({ startDate, endDate }) => dateIsBetween(new Date(), startDate, endDate)))
 
     if (isRelevantProgramme) {
       relevantProgrammes.push({
