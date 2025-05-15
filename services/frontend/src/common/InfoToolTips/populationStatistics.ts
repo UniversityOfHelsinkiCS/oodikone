@@ -196,15 +196,19 @@ export const populationStatisticsToolTips = {
   studentsCustom: `
     **Students**
 
-    Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
+    Mikäli **"custom population"** -näkymää tarkasteltaessa ei ole erikseen valittu opinto-ohjelmaa, sarakkeissa olevat tiedot näytetään kunkin opiskelijan **Primary study programme**  -sarakkeessa olevan (uusimman aktiivisen) ohjelman pohjalta
 
-    Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
+    Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden muut yhteystiedot
 
-    Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+    Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan **"student statistic"** -näkymään
+
+    Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä
 
     **All credits** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
 
-    **Programme**-sarake näyttää opiskelijan uusimman opinto-oikeuden. Jos opiskelijalla on opinto-oikeuksia muihinkin koulutusohjelmiin, ne näkyvät aikajärjestyksessä uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri koulutusohjelman päälle.
+    **Credits in HOPS** listaa tarkasteltavaan opinto-ohjelmaan liitettyyn opintosuunnitelmaan kuuluvat opintopisteet
+
+    **Credits since start** listaa kuinka paljon opintopisteitä on kertynyt valitussa opinto-ohjelmassa aloittamisen jälkeen
   `,
   programmeDistributionCoursePopulation: `
     Koulutusohjelma määritetään seuraavasti:

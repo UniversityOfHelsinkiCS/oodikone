@@ -2,24 +2,31 @@ import { orderBy } from 'lodash'
 
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
 
-export const createMaps = ({
-  selectedStudents,
-  students,
-  programmeCode,
-  combinedProgrammeCode,
-  year,
-  currentSemester,
-  getTextIn,
-  showBachelorAndMaster,
-}) => {
+export const createMaps = (
+  selectedStudents: string[],
+  students: any,
+  programmeCodeArg: string | null,
+  combinedProgrammeCode: string | null,
+  year: string | null | undefined,
+  currentSemester: any,
+  getTextIn: (arg0: any) => any,
+  showBachelorAndMaster: boolean
+) => {
   const studentToStudyrightStartMap = {}
   const studentToStudyrightEndMap = {}
   const studentToSecondStudyrightEndMap = {}
   const studentToProgrammeStartMap = {}
   const studentToOtherProgrammesMap = {}
+  const studentToPrimaryProgrammeMap = {}
 
   for (const studentNumber of selectedStudents) {
     const { studyRights } = students[studentNumber]
+
+    const programmes = getAllProgrammesOfStudent(students[studentNumber]?.studyRights ?? [], currentSemester)
+
+    // In case of custompopulation with no programmeCode, use code of latest active studyRightElement
+    const programmeCode = programmeCodeArg ?? programmes[0]?.code
+
     const studyRight = findStudyRightForClass(studyRights, programmeCode, year)
     const studyRightElement = studyRight?.studyRightElements?.find(element => element.code === programmeCode)
     const secondStudyRightElement = orderBy(
@@ -39,7 +46,7 @@ export const createMaps = ({
       ['startDate'],
       ['desc']
     )[0]
-    const programmes = getAllProgrammesOfStudent(students[studentNumber]?.studyRights ?? [], currentSemester)
+
     const programmesToUse = programmeCode ? programmes.filter(p => p.code !== programmeCode) : programmes
 
     studentToStudyrightStartMap[studentNumber] = studyRight?.startDate ?? null
@@ -60,6 +67,9 @@ export const createMaps = ({
           })
           .join(delimiter),
     }
+    studentToPrimaryProgrammeMap[studentNumber] = programmeCodeArg
+      ? null
+      : programmes.find(programme => programme.code === programmeCode)
   }
 
   return {
@@ -68,5 +78,6 @@ export const createMaps = ({
     studentToSecondStudyrightEndMap,
     studentToProgrammeStartMap,
     studentToOtherProgrammesMap,
+    studentToPrimaryProgrammeMap,
   }
 }

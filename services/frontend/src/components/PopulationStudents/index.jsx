@@ -30,7 +30,6 @@ const Panes = ({
   from,
   mainProgramme,
   months,
-  studentToTargetCourseDateMap,
   studyGuidanceGroup,
   to,
   variant,
@@ -49,12 +48,11 @@ const Panes = ({
       menuItem: 'General',
       render: () => (
         <GeneralTab
-          coursecode={coursecode}
+          courseCode={coursecode}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
           from={from}
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          studyGuidanceGroup={studyGuidanceGroup}
+          group={studyGuidanceGroup}
           to={to}
           variant={variant}
           year={year}
@@ -135,7 +133,6 @@ const PopulationStudents = ({
   filteredStudents,
   from,
   to,
-  studentToTargetCourseDateMap,
   studyGuidanceGroup,
   variant,
   year,
@@ -181,7 +178,6 @@ const PopulationStudents = ({
         from={from}
         mainProgramme={mainProgramme}
         months={months}
-        studentToTargetCourseDateMap={studentToTargetCourseDateMap}
         studyGuidanceGroup={studyGuidanceGroup}
         to={to}
         variant={variant}

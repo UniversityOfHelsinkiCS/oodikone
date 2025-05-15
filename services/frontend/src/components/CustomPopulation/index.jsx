@@ -168,7 +168,7 @@ const CustomPopulationContent = ({
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          customPopulationProgramme={associatedProgramme || ''}
+          customPopulationProgramme={associatedProgramme || null}
           dataExport={<UnihowDataExport students={filteredStudents} />}
           filteredStudents={filteredStudents}
           variant="customPopulation"
