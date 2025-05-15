@@ -10,8 +10,8 @@ import {
   Phase,
 } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { dateDiff } from 'src/util/datetime'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
+import { dateDiff } from '../../util/datetime'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getStudyRightThesisCredits, getOrganizationThesisCredits } from './creditGetters'
