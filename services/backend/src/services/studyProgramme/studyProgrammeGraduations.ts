@@ -10,6 +10,7 @@ import {
   Phase,
 } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
+import { dateDiff } from 'src/util/datetime'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
@@ -54,13 +55,7 @@ const calculateAbsenceInMonths = (
     return 0
   }
 
-  const years = absenceEnd.getFullYear() - absenceStart.getFullYear()
-  const months = absenceEnd.getMonth() - absenceStart.getMonth()
-  const days = absenceEnd.getDay() - absenceStart.getDay()
-
-  const total = years * 12 + months + days / 30
-
-  return Math.round(total)
+  return Math.round(dateDiff(absenceEnd, absenceStart, 'months'))
 }
 
 export const calculateDurationOfStudies = (
@@ -80,13 +75,7 @@ export const calculateDurationOfStudies = (
   const graduationDateAdjusted = graduationDate
   graduationDateAdjusted.setMonth(graduationDateAdjusted.getMonth() - monthsToSubtract)
 
-  const years = graduationDateAdjusted.getFullYear() - startDate.getFullYear()
-  const months = graduationDateAdjusted.getMonth() - startDate.getMonth()
-  const days = graduationDateAdjusted.getDay() - startDate.getDay()
-
-  const total = years * 12 + months + days / 30
-
-  return Math.round(total)
+  return Math.round(dateDiff(graduationDateAdjusted, startDate, 'months'))
 }
 
 export type GraduationTimes = {
