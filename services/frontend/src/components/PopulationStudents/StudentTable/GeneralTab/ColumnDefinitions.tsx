@@ -12,9 +12,14 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         accessorKey: 'studentNumber',
         header: 'Student number',
         Header: () => <Typography fontWeight="bold">Student number</Typography>,
-        Cell: ({ cell }) => (
-          <StudentInfoItem sisPersonId={cell.row.original.sisuID} studentNumber={cell.getValue<string>()} />
-        ),
+        Cell: ({ cell }) => {
+          const studentNumber = cell.getValue<string>()
+          return studentNumber === 'Hidden' ? (
+            'Hidden'
+          ) : (
+            <StudentInfoItem sisPersonId={cell.row.original.sisuID} studentNumber={studentNumber} />
+          )
+        },
         filterFn: 'startsWith',
         enableClickToCopy: true,
       },

@@ -351,8 +351,8 @@ describe('Course Statistics tests', () => {
       cy.cs('course-population-for-2019-2020').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
       cy.contains('Students (33)').click()
-      cy.contains('td', '394776').siblings().eq(2).contains('3')
-      cy.contains('td', '497388').siblings().eq(2).contains('2')
+      cy.contains('td', '394776').siblings().eq(1).contains('3')
+      cy.contains('td', '497388').siblings().eq(1).contains('2')
     })
 
     it("In 'Course population' view, student numbers of students that the user isn't allowed to see are hidden", () => {
@@ -365,7 +365,7 @@ describe('Course Statistics tests', () => {
       cy.cs('course-population-for-2019-2020').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
       cy.contains('Students (33)').click()
-      cy.get('table tbody td').filter(':contains("hidden")').should('have.length', 9)
+      cy.get('table tbody td').filter(':contains("Hidden")').should('have.length', 9)
     })
 
     it('Language distribution is correct', () => {

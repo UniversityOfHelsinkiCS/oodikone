@@ -38,7 +38,7 @@ export type FormattedStudentData = {
   transferredFrom: string
   admissionType: string | null
   gender: string
-  citizenships: string[]
+  citizenships: string | null
   curriculumPeriod: string
   mostRecentAttainment: string
   tags: string | null
@@ -170,7 +170,7 @@ export const GeneralTabContainer = ({
 
   const getMostRecentAttainment = student => {
     const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
-    const studyPlan = student.studyplans.find(plan => plan.programme_code === code) ?? null
+    const studyPlan = student.studyplans?.find(plan => plan.programme_code === code) ?? null
     if (!studyPlan) return ''
 
     const { included_courses } = studyPlan
@@ -183,7 +183,7 @@ export const GeneralTabContainer = ({
   }
 
   const parseTags = tags => {
-    const studentTags = tags.map(tag => tag.tag.tagname)
+    const studentTags = tags?.map(tag => tag.ta.tagname)
     return studentTags.join(', ')
   }
 
@@ -312,12 +312,13 @@ export const GeneralTabContainer = ({
   }
 
   const getEnrollmentDate = student => {
-    if (!fromSemester || !toSemester) return ''
+    if (!fromSemester || !toSemester || student?.enrollments) return null
     const enrollments =
       student.enrollments
-        ?.filter(enrollment => courseCode.includes(enrollment.course_code))
-        ?.filter(enrollment => enrollment.semestercode >= fromSemester && enrollment.semestercode <= toSemester) ?? null
-    return enrollments[0]?.enrollment_date_time ?? ''
+        ?.filter(enrollment => courseCode.includes(enrollment?.course_code))
+        ?.filter(enrollment => enrollment?.semestercode >= fromSemester && enrollment?.semestercode <= toSemester) ??
+      null
+    return enrollments ? (enrollments[0].enrollment_date_time ?? null) : null
   }
 
   const getExtent = student =>
@@ -364,7 +365,7 @@ export const GeneralTabContainer = ({
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
-      studentNumber: student.studentNumber,
+      studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
       email: student.email,
       phoneNumber: student.phoneNumber,
       sisuID: student.sis_person_id,
@@ -385,7 +386,7 @@ export const GeneralTabContainer = ({
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType && getAdmissiontype(student),
       gender: getGender(student.gender_code),
-      citizenships: student.citizenships.map(getTextIn).sort().join(', '),
+      citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
       tags: parseTags(student.tags) ?? null,
