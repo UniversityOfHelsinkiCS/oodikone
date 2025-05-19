@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
@@ -44,7 +43,6 @@ const getYearText = year => {
 }
 
 export const PopulationStatistics = () => {
-  const location = useLocation()
   const { language, getTextIn } = useLanguage()
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
@@ -52,7 +50,7 @@ export const PopulationStatistics = () => {
 
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const onlyIamRights = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
+  const hasRestrictedAccess = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
   useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
@@ -70,12 +68,58 @@ export const PopulationStatistics = () => {
       },
     },
   }
-  const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
-  const combinedProgrammeName = programmes && combinedProgrammeCode ? programmes[combinedProgrammeCode]?.name : ''
+  const programmeName = programmes[programmeCode]?.name ?? ''
+  const combinedProgrammeName = programmes[combinedProgrammeCode]?.name ?? ''
   const showBachelorAndMaster = query?.showBachelorAndMaster === 'true' || combinedProgrammeCode !== ''
 
+  const degreeProgrammeType = useDegreeProgrammeTypes([programmeCode])
+
+  const programmeCodes = [programmeCode, combinedProgrammeCode].filter(Boolean)
+
+  const students = useMemo(
+    () =>
+      samples.map(student => {
+        const hopsCredits =
+          student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
+        const hopsCombinedProgrammeCredits =
+          student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
+        const studyrightStartDate = new Date(student.studyrightStart)
+        const courses = student.courses.filter(({ date }) => studyrightStartDate <= new Date(date))
+        const credits = getStudentTotalCredits({ courses })
+        return {
+          ...student,
+          allCredits: student.credits,
+          hopsCredits,
+          hopsCombinedProgrammeCredits,
+          credits,
+        }
+      }),
+    [samples, programmeCode, combinedProgrammeCode]
+  )
+
+  const programmeText =
+    query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
+      ? getCombinedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
+      : getTextIn(programmeName)
+  const title = !queryIsSet ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
+
+  const noStudentsMessage = () => (
+    <div style={{ maxWidth: '80%' }}>
+      <Message
+        content={`
+          Choose “Advanced settings” below and make sure you have the correct student groups included
+          in the class. For example, if you are looking for students of a specialist training in
+          medicine or dentistry, you must choose “Students with non-degree study right”.`}
+        header="Not seeing any students?"
+        icon="question"
+        info
+        size="large"
+      />
+    </div>
+  )
+
   const filters = [
-    !onlyIamRights ? ageFilter : null,
+    !hasRestrictedAccess ? ageFilter : null,
     citizenshipFilter,
     courseFilter({ courses }),
     creditDateFilter,
@@ -98,114 +142,63 @@ export const PopulationStatistics = () => {
     studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
     tagsFilter,
     transferredToProgrammeFilter,
+
+    degreeProgrammeType[programmeCode] === 'urn:code:degree-program-type:masters-degree'
+      ? studyRightTypeFilter({
+          programme: programmeCode,
+          year: query?.year,
+        })
+      : null,
+
+    // For combined programme admission type is the same as they started in bachelor programme
+    parseInt(query?.year, 10) >= 2020
+      ? admissionTypeFilter({
+          programme: programmeCode,
+        })
+      : null,
   ].filter(Boolean)
 
-  const degreeProgrammeType = useDegreeProgrammeTypes([programmeCode])
-
-  if (programmeCode && degreeProgrammeType[programmeCode] === 'urn:code:degree-program-type:masters-degree') {
-    filters.push(
-      studyRightTypeFilter({
-        programme: programmeCode,
-        year: query?.year,
-      })
-    )
+  const initialOptions = {
+    [transferredToProgrammeFilter.key]: {
+      transferred: false,
+    },
+    [hopsFilter.key]: {
+      studyStart: (students[0] || {}).studyrightStart,
+    },
+    [studyTrackFilter.key]: {
+      selected: query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : [],
+    },
+    [tagsFilter.key]: {
+      includedTags: query?.tag ? [query.tag] : [],
+      excludedTags: [],
+    },
   }
-
-  // For combined programme admission type is the same as they started in bachelor programme
-  if (parseInt(query?.year, 10) >= 2020) {
-    filters.push(
-      admissionTypeFilter({
-        programme: programmeCode,
-      })
-    )
-  }
-
-  const programmeCodes = []
-  if (programmeCode) programmeCodes.push(programmeCode)
-  if (combinedProgrammeCode) programmeCodes.push(combinedProgrammeCode)
-
-  const students = useMemo(() => {
-    if (!samples) {
-      return []
-    }
-    return samples.map(student => {
-      const hopsCredits =
-        student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
-      const hopsCombinedProgrammeCredits =
-        student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
-      const studyrightStartDate = new Date(student.studyrightStart)
-      const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
-      const credits = getStudentTotalCredits({ courses })
-      return {
-        ...student,
-        allCredits: student.credits,
-        hopsCredits,
-        hopsCombinedProgrammeCredits,
-        credits,
-      }
-    })
-  }, [samples, programmeCode, combinedProgrammeCode])
-
-  const programmeText =
-    query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
-      ? getCombinedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
-      : getTextIn(programmeName)
-  const title = location.search === '' ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
-
-  const noStudentsMessage = () => (
-    <div style={{ maxWidth: '80%' }}>
-      <Message
-        content={`
-          Choose “Advanced settings” below and make sure you have the correct student groups included
-          in the class. For example, if you are looking for students of a specialist training in
-          medicine or dentistry, you must choose “Students with non-degree study right”.`}
-        header="Not seeing any students?"
-        icon="question"
-        info
-        size="large"
-      />
-    </div>
-  )
 
   return (
     <FilterView
-      displayTray={location.search !== ''}
+      displayTray={queryIsSet}
       filters={filters}
-      initialOptions={{
-        [transferredToProgrammeFilter.key]: {
-          transferred: false,
-        },
-        [hopsFilter.key]: {
-          studyStart: (students[0] || {}).studyrightStart,
-        },
-        [studyTrackFilter.key]: {
-          selected: query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : [],
-        },
-        [tagsFilter.key]: {
-          includedTags: query?.tag ? [query.tag] : [],
-          excludedTags: [],
-        },
-      }}
+      initialOptions={initialOptions}
       name="PopulationStatistics"
       students={students}
     >
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
-            {title} {query?.showBachelorAndMaster === 'true' && ' (Bachelor + Master view)'}
-            {location.search !== '' && query?.studyRights?.studyTrack && (
+            {title} {query?.showBachelorAndMaster === 'true' && '(Bachelor + Master view)'}
+            {queryIsSet && query?.studyRights?.studyTrack && (
               <Header.Subheader>studytrack {query.studyRights.studyTrack}</Header.Subheader>
             )}
-            {location.search !== '' && (
+            {queryIsSet && (
               <Header.Subheader>
                 studytime {query?.months} months, class size {students.length} students
               </Header.Subheader>
             )}
           </Header>
-          {students?.length === 0 && location.search !== '' && !isLoading && noStudentsMessage()}
+          {students?.length === 0 && queryIsSet && !isLoading && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
-            {location.search !== '' && (
+            {queryIsSet && (
               <PopulationDetails
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
