@@ -40,7 +40,7 @@ export const FilterView = ({
             key,
             precompute({
               students,
-              options: filterOptions[key] ?? filtersByKey[key].defaultOptions,
+              options: filterOptions[key],
               precomputed: null,
               args: filtersByKey[key].args,
             }),
@@ -61,7 +61,12 @@ export const FilterView = ({
       .map(filter => [filter, getFilterContext(filter.key)])
       .filter(([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx))
       .reduce((students, [{ filter }, ctx]) => {
-        return students.filter(student => filter(student, ctx.options, ctx))
+        return students
+          .map(student => {
+            const newStudent = structuredClone(student)
+            return filter(newStudent, ctx.options, ctx) ? newStudent : null
+          })
+          .filter(Boolean)
       }, students)
 
   const filteredStudents = useMemo(() => applyFilters(orderedFilters), [orderedFilters])
