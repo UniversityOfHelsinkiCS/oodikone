@@ -1,23 +1,16 @@
-import { produce } from 'immer'
-import { find, get, keyBy } from 'lodash'
-import fp from 'lodash/fp'
 import { useMemo } from 'react'
+
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { keyBy } from '@oodikone/shared/util'
 
 import { FilterTray } from './FilterTray'
 import { FilterViewContext } from './FilterViewContext'
 
-const resolveFilterOptions = (store, filters, initialOptions) => {
-  return fp.flow(
-    fp.map(({ key, defaultOptions }) => [
-      key,
-      [store[key]?.options, !store[key] ? get(initialOptions, key) : null, defaultOptions],
-    ]),
-    fp.fromPairs,
-    fp.mapValues(values => find(values))
-  )(filters)
-}
+const resolveFilterOptions = (store, filters, initialOptions) =>
+  Object.fromEntries(
+    filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
+  )
 
 export const FilterView = ({
   children,
@@ -38,55 +31,40 @@ export const FilterView = ({
 
   const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
 
-  const precompute = fp.flow(
-    fp.filter(({ precompute }) => precompute),
-    fp.keyBy('key'),
-    fp.mapValues(({ precompute, key }) =>
-      precompute({
-        students,
-        options: filterOptions[key] ?? filtersByKey[key].defaultOptions,
-        precomputed: null,
-        args: filtersByKey[key].args,
-      })
-    )
+  const precomputed = useMemo(
+    () =>
+      Object.fromEntries(
+        orderedFilters
+          .filter(({ precompute }) => precompute)
+          .map(({ precompute, key }) => [
+            key,
+            precompute({
+              students,
+              options: filterOptions[key] ?? filtersByKey[key].defaultOptions,
+              precomputed: null,
+              args: filtersByKey[key].args,
+            }),
+          ])
+      ),
+    [orderedFilters]
   )
 
-  const precomputed = useMemo(() => precompute(orderedFilters), [precompute, orderedFilters])
+  const getFilterContext = key => ({
+    students,
+    options: filterOptions[key] ?? null,
+    precomputed: precomputed[key] ?? null,
+    args: filtersByKey[key].args ?? null,
+  })
 
-  const getFilterContext = key => {
-    const filter = filtersByKey[key]
+  const applyFilters = filter =>
+    filter
+      .map(filter => [filter, getFilterContext(filter.key)])
+      .filter(([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx))
+      .reduce((students, [{ filter }, ctx]) => {
+        return students.filter(student => filter(student, ctx.options, ctx))
+      }, students)
 
-    if (filter === undefined) {
-      return { students, options: null, precomputed: null, args: null }
-    }
-
-    return {
-      students,
-      options: filterOptions[key],
-      precomputed: precomputed[key],
-      args: filtersByKey[key].args,
-    }
-  }
-
-  const applyFilters = fp.flow(
-    fp.map(filter => [filter, getFilterContext(filter.key)]),
-    fp.filter(([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx)),
-    fp.reduce((students, [{ filter }, ctx]) => {
-      return students
-        .map(student => {
-          const res = []
-          const newStudent = produce(student, s => {
-            res.push(filter(s, ctx.options, ctx))
-          })
-          res.push(newStudent)
-          return res
-        })
-        .filter(([keep]) => keep)
-        .map(([, student]) => student)
-    }, students)
-  )
-
-  const filteredStudents = useMemo(() => applyFilters(orderedFilters), [applyFilters, orderedFilters])
+  const filteredStudents = useMemo(() => applyFilters(orderedFilters), [orderedFilters])
 
   const areOptionsDirty = key => !!storeFilterOptions[key]
 
