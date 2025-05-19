@@ -2,12 +2,11 @@ import { Person as PersonIcon, Replay as ReplayIcon } from '@mui/icons-material'
 import { Tab, Tabs } from '@mui/material'
 import qs from 'query-string'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 
 import { useProgress } from '@/hooks/progress'
-import { RootState } from '@/redux'
 import { getCourseStats } from '@/redux/courseStats'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { ResultTab } from './tabs/ResultTab'
 
@@ -25,10 +24,10 @@ export const ResultTabs = ({
   const navigate = useNavigate()
   const location = useLocation()
   const [tab, setTab] = useState(0)
-  const courseStats = useSelector((state: RootState) => state.courseStats)
+  const courseStats = useAppSelector(state => state.courseStats)
   const { pending: loading } = courseStats
   const { onProgress } = useProgress(loading)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   if (!primary) {
     return null

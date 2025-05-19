@@ -1,5 +1,5 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/redux/hooks'
 
 import { setSelectedCourse } from '@/redux/selectedCourse'
 
@@ -12,7 +12,7 @@ export const CourseSelector = ({
   selected: string
   setSelected: (courseCode: string) => void
 }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const onCourseChange = (event: SelectChangeEvent<string>) => {
     const selectedCourse = event.target.value

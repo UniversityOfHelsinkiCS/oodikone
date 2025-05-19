@@ -3,13 +3,12 @@ import { Box, Button, Stack, Tooltip } from '@mui/material'
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
-import { RootState } from '@/redux'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -56,15 +55,15 @@ export const SingleCourseStats = ({
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { getTextIn } = useLanguage()
   const [primary, setPrimary] = useState<string[]>([ALL.value])
   const [comparison, setComparison] = useState<string[]>([])
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
   const [separate, setSeparate] = useState<boolean>(false)
-  const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
-  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
+  const programmes = useAppSelector(state => getAllStudyProgrammes(state))
+  const unifyCourses = useAppSelector(state => state.courseSearch.openOrRegular)
   const { coursecode } = stats
 
   const { data: semesterData } = useGetSemestersQuery()

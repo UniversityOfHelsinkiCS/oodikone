@@ -1,7 +1,6 @@
 import { Box, Container, Tab, Tabs } from '@mui/material'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 
 import { PageTitle } from '@/components/material/PageTitle'
@@ -9,9 +8,9 @@ import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useProgress } from '@/hooks/progress'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
-import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getCourseStats } from '@/redux/courseStats'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { CourseTab } from './CourseTab'
 import { FacultyStatisticsTab } from './FacultyStatisticsTab'
@@ -21,9 +20,9 @@ import { SummaryTab } from './SummaryTab'
 
 export const CourseStatistics = () => {
   const location = useLocation()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
-  const { pending: loading, data: courseStatsData } = useSelector((state: RootState) => state.courseStats)
+  const { pending: loading, data: courseStatsData } = useAppSelector(state => state.courseStats)
   const courses = Object.keys(courseStatsData)
   const statsIsEmpty = courses.length === 0
   const singleCourseStats = courses.length === 1

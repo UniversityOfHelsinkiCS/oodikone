@@ -2,9 +2,9 @@ import { produce } from 'immer'
 import { find, get, keyBy } from 'lodash'
 import fp from 'lodash/fp'
 import { useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+
 import { FilterTray } from './FilterTray'
 import { FilterViewContext } from './FilterViewContext'
 
@@ -27,7 +27,7 @@ export const FilterView = ({
   displayTray: displayTrayProp,
   initialOptions,
 }) => {
-  const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
+  const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
   const filterOptions = useMemo(
@@ -90,7 +90,7 @@ export const FilterView = ({
 
   const areOptionsDirty = key => !!storeFilterOptions[key]
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const value = {
     viewName: name,

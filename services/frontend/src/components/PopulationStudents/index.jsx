@@ -1,6 +1,5 @@
 import moment from 'moment'
 import { useRef } from 'react'
-import { useSelector } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -9,6 +8,7 @@ import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVi
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useAppSelector } from '@/redux/hooks'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { CheckStudentList } from './CheckStudentList'
@@ -138,7 +138,7 @@ const PopulationStudents = ({
   year,
 }) => {
   const studentRef = useRef()
-  const { query } = useSelector(({ populations }) => populations)
+  const { query } = useAppSelector(state => state.populations)
   let mainProgramme = query?.studyRights?.programme || ''
   let combinedProgramme = query?.studyRights?.combinedProgramme || ''
   let months = query ? query.months : 0

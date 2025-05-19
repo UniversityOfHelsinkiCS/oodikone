@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
+import { useAppSelector } from '@/redux/hooks'
 
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 
@@ -11,7 +11,7 @@ export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students
     year: studyGuidanceGroup?.tags?.year,
   })
 
-  const { data: populationCourses } = useSelector(state => state?.populationSelectedStudentCourses)
+  const { data: populationCourses } = useAppSelector(state => state.populationSelectedStudentCourses)
 
   const studyGuidanceGroupLoading = isLoading || !curriculum || !students
   const loading = !curriculum || !students || !populationCourses

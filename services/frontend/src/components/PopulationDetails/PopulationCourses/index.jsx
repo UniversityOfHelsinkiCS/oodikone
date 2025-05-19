@@ -1,6 +1,5 @@
 import { isEqual } from 'lodash'
 import { useCallback, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -9,6 +8,7 @@ import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useDeepMemo } from '@/hooks/deepMemo'
+import { useAppSelector, useAppDispatch } from '@/redux/hooks'
 import { getPopulationSelectedStudentCourses } from '@/redux/populationSelectedStudentCourses'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
@@ -21,8 +21,8 @@ export const PopulationCourses = ({
   courseTableMode,
   studentAmountLimit,
 }) => {
-  const dispatch = useDispatch()
-  const populationSelectedStudentCourses = useSelector(
+  const dispatch = useAppDispatch()
+  const populationSelectedStudentCourses = useAppSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 

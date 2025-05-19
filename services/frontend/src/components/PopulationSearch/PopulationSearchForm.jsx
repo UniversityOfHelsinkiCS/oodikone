@@ -4,7 +4,6 @@ import moment from 'moment'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
-import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router'
 import { Button, Form, Message, Radio } from 'semantic-ui-react'
 
@@ -17,6 +16,7 @@ import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
 import { clearSelected } from '@/redux/populationSelectedStudentCourses'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
@@ -39,8 +39,8 @@ const initialQuery = () => ({
 export const PopulationSearchForm = ({ onProgress }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const dispatch = useDispatch()
-  const populations = useSelector(state => state.populations)
+  const dispatch = useAppDispatch()
+  const populations = useAppSelector(state => state.populations)
   const previousQuery = populations.query || {}
   const { getTextIn } = useLanguage()
   const { fullAccessToStudentData } = useGetAuthorizedUserQuery()

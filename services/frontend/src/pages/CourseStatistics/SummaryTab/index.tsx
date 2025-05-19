@@ -1,14 +1,13 @@
 import { Stack } from '@mui/material'
 import { flatten } from 'lodash'
-import { useDispatch, useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { setProgrammes } from '@/redux/coursesSummaryForm'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { ALL, getAllStudyProgrammes, getSummaryStatistics } from '@/selectors/courseStats'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
@@ -36,10 +35,10 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   const { roles, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
-  const dispatch = useDispatch()
-  const programmes = useSelector((state: RootState) => getAllStudyProgrammes(state))
-  const form = useSelector((state: RootState) => state.courseSummaryForm)
-  const statistics = useSelector((state: RootState) => getSummaryStatistics(state, userHasAccessToAllStats))
+  const dispatch = useAppDispatch()
+  const programmes = useAppSelector(state => getAllStudyProgrammes(state))
+  const form = useAppSelector(state => state.courseSummaryForm)
+  const statistics = useAppSelector(state => getSummaryStatistics(state, userHasAccessToAllStats))
   const { getTextIn } = useLanguage()
 
   const handleChange = (newProgrammes: string[]) => {

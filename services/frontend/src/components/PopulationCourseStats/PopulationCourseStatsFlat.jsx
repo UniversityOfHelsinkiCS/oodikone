@@ -1,13 +1,13 @@
-import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
 import { clearCourseStats } from '@/redux/courseStats'
+import { useAppDispatch } from '@/redux/hooks'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PopulationCourseContext } from './PopulationCourseContext'
 
 export const PopulationCourseStatsFlat = ({ courses, studentAmountLimit }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   if (!courses) return null
 

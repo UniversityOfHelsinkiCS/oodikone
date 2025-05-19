@@ -1,13 +1,12 @@
 import { FormControlLabel, Switch } from '@mui/material'
 import { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 
-import { RootState } from '@/redux'
 import { toggleStudentNameVisibility } from '@/redux/settings'
 
 export const useStudentNameVisibility = () => {
-  const visible = useSelector((state: RootState) => state.settings.namesVisible)
-  const dispatch = useDispatch()
+  const visible = useAppSelector(state => state.settings.namesVisible)
+  const dispatch = useAppDispatch()
 
   const toggle = useCallback(() => {
     dispatch(toggleStudentNameVisibility())

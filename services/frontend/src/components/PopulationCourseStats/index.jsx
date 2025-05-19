@@ -1,10 +1,10 @@
 import { orderBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Tab } from 'semantic-ui-react'
 
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { clearCourseStats } from '@/redux/courseStats'
+import { useAppDispatch } from '@/redux/hooks'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
@@ -17,9 +17,8 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
-
 export const PopulationCourseStats = ({ mandatoryCourses, courses, pending, onlyIamRights }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const { handleTabChange } = useTabChangeAnalytics()

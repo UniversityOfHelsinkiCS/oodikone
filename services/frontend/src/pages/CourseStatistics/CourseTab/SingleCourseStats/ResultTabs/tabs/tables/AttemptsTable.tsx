@@ -2,12 +2,10 @@ import { uniq } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import qs from 'query-string'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSelector } from 'react-redux'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { RootState } from '@/redux'
+import { useAppSelector } from '@/redux/hooks'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
@@ -58,8 +56,8 @@ export const AttemptsTable = ({
 }) => {
   const { language } = useLanguage()
 
-  const alternatives = useSelector(getCourseAlternatives)
-  const unifyCourses = useSelector((state: RootState) => state.courseSearch.openOrRegular)
+  const alternatives = useAppSelector(getCourseAlternatives)
+  const unifyCourses = useAppSelector(state => state.courseSearch.openOrRegular)
 
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])

@@ -1,16 +1,15 @@
 import { FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material'
 import { flatten, uniq } from 'lodash'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from '@/redux/hooks'
 
-import { RootState } from '@/redux'
 import { CourseStat } from '@/types/courseStat'
 import { CourseTable } from './CourseTable'
 
 export const FacultyStatisticsTab = () => {
-  const openOrRegular = useSelector((state: RootState) => state.courseSearch.openOrRegular)
-  const courseStats: Record<string, Record<'unifyStats' | 'openStats' | 'regularStats', CourseStat>> = useSelector(
-    (state: RootState) => state.courseStats.data
+  const openOrRegular = useAppSelector(state => state.courseSearch.openOrRegular)
+  const courseStats: Record<string, Record<'unifyStats' | 'openStats' | 'regularStats', CourseStat>> = useAppSelector(
+    state => state.courseStats.data
   )
 
   const yearCodes = uniq(

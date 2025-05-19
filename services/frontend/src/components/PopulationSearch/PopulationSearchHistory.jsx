@@ -1,19 +1,19 @@
 import qs from 'query-string'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Button, Form } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
+import { useAppSelector } from '@/redux/hooks'
 import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
 export const PopulationSearchHistory = () => {
   const navigate = useNavigate()
-  const populations = useSelector(state => state.populations)
+  const populations = useAppSelector(state => state.populations)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(populations.query?.semesters || ['FALL', 'SPRING'])
   const [studentStatuses, setStudentStatus] = useState(populations.query?.studentStatuses || [])

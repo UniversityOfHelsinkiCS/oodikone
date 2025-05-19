@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import { getStudentTotalCredits, getHighestGradeOfCourseBetweenRange } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
@@ -7,6 +6,7 @@ import { DateFormat } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
@@ -75,8 +75,7 @@ export const GeneralTabContainer = ({
 
   const { useFilterSelector } = useFilters()
 
-  // @ts-expect-error add typing
-  const { query } = useSelector(({ populations }) => populations)
+  const { query } = useAppSelector(state => state.populations)
 
   const queryStudyrights = Object.values(query?.studyRights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)

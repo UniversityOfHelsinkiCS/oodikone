@@ -13,7 +13,6 @@ import {
 import { omit, sortBy } from 'lodash'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 
 import { validateInputLength } from '@/common'
@@ -24,9 +23,9 @@ import { ToggleWithTooltip } from '@/components/material/ToggleWithTooltip'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
-import { RootState } from '@/redux'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { getCourseStats, clearCourseStats } from '@/redux/courseStats'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { MemoizedCourseTable as CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
@@ -38,10 +37,10 @@ const MAX_SELECTED_COURSES = 99999
 
 export const SearchForm = ({ onProgress, progress }) => {
   const { getTextIn } = useLanguage()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const location = useLocation()
   const navigate = useNavigate()
-  const isLoadingCourseStats = useSelector((state: RootState) => state.courseStats.pending)
+  const isLoadingCourseStats = useAppSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
   const [courseName, setCourseName] = useState('')

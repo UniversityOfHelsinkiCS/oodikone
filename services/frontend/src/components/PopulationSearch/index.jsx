@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
@@ -8,12 +7,13 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useProgress } from '@/hooks/progress'
+import { useAppSelector } from '@/redux/hooks'
 import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 export const PopulationSearch = ({ combinedProgrammeCode }) => {
   const location = useLocation()
-  const populations = useSelector(state => state.populations)
+  const populations = useAppSelector(state => state.populations)
   const populationFound = populations.data.students !== undefined
   const loading = !!populations.pending
   const { onProgress, progress } = useProgress(loading)

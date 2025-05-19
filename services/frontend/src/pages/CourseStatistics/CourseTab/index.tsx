@@ -1,8 +1,8 @@
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material'
-import { useSelector } from 'react-redux'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
+import { useAppSelector } from '@/redux/hooks'
 import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
 import { CourseLabel } from './CourseLabel'
 import { CourseSelector } from './CourseSelector'
@@ -18,9 +18,9 @@ export const CourseTab = ({
   userHasAccessToAllStats: boolean
 }) => {
   const { getTextIn } = useLanguage()
-  const stats = useSelector(getCourseStats)
-  const availableStats = useSelector(getAvailableStats)
-  const courses = useSelector(getCourses).map(({ code, name }) => ({
+  const stats = useAppSelector(getCourseStats)
+  const availableStats = useAppSelector(getAvailableStats)
+  const courses = useAppSelector(getCourses).map(({ code, name }) => ({
     key: code,
     code,
     name: getTextIn(name)!,

@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
@@ -32,6 +31,7 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { makePopulationsToData } from '@/selectors/populationDetails'
@@ -46,8 +46,8 @@ const getYearText = year => {
 export const PopulationStatistics = () => {
   const location = useLocation()
   const { language, getTextIn } = useLanguage()
-  const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
-  const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(makePopulationsToData)
+  const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
+  const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useAppSelector(makePopulationsToData)
   const currentSemester = useCurrentSemester()
 
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
