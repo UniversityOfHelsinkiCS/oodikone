@@ -6,6 +6,10 @@ import { MRT_Localization_FI } from 'material-react-table/locales/fi'
 
 import { DEFAULT_LANG } from '@oodikone/shared/language'
 
+/**
+ * Oodikone-wide default properties for MRT tables
+ * !! Remember to provide the type of table data as a generic !!
+ */
 export const getDefaultMRTOptions = <TData extends MRT_RowData>(
   setExportData: (data: Record<string, unknown>[]) => void,
   setExportModalOpen: (value: boolean) => void,

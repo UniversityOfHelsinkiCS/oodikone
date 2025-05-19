@@ -1,7 +1,7 @@
 import {
   type MRT_VisibilityState,
-  type MRT_ColumnDef,
   MaterialReactTable,
+  createMRTColumnHelper,
   useMaterialReactTable,
 } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -189,22 +189,24 @@ export const GeneralTab = ({
     return isIncluded
   })
 
-  const exportExclusiveColumns = [
-    {
-      accessorKey: 'semesterEnrollments.exportValue',
-      id: 'semesterEnrollmentExport',
-      header: 'Semester enrollment amount',
-      visibleInShowHideMenu: false,
-    },
-    {
-      accessorKey: 'programmes.exportValue',
-      id: 'programmesExport',
-      header: `${dynamicTitles.programmes}`,
-      visibleInShowHideMenu: false,
-    },
-  ]
+  const columnHelper = createMRTColumnHelper<FormattedStudentData>()
+  const exportExclusiveColumns = useMemo(
+    () => [
+      columnHelper.accessor('semesterEnrollments.exportValue', {
+        id: 'semesterEnrollmentExport',
+        header: 'Semester enrollment amount',
+        visibleInShowHideMenu: false,
+      }),
+      columnHelper.accessor('programmes.exportValue', {
+        id: 'programmesExport',
+        header: `${dynamicTitles.programmes}`,
+        visibleInShowHideMenu: false,
+      }),
+    ],
+    []
+  )
 
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
+  const columns = useMemo(
     () => [...visibleColumns, ...exportExclusiveColumns],
     [
       exportExclusiveColumns,
@@ -217,7 +219,7 @@ export const GeneralTab = ({
     ]
   )
 
-  const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
+  const defaultOptions = getDefaultMRTOptions<FormattedStudentData>(setExportData, setExportModalOpen, language)
 
   const table = useMaterialReactTable({
     ...defaultOptions,
@@ -236,7 +238,7 @@ export const GeneralTab = ({
 
   return (
     <>
-      <ExportToExcelDialog
+      <ExportToExcelDialog<FormattedStudentData>
         exportColumns={exportCols}
         exportData={exportData}
         featureName="general_student_information"

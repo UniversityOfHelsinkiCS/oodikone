@@ -1,19 +1,20 @@
 import { Tooltip, Typography } from '@mui/material'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { createMRTColumnHelper } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
+import { FormattedStudentData } from '.'
 import { DynamicColumnTitles } from './GeneralTab'
 
 export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
-  return useMemo<MRT_ColumnDef<any>[]>(
+  const columnHelper = createMRTColumnHelper<FormattedStudentData>()
+  return useMemo(
     () => [
-      {
-        accessorKey: 'studentNumber',
+      columnHelper.accessor('studentNumber', {
         header: 'Student number',
         Header: () => <Typography fontWeight="bold">Student number</Typography>,
         Cell: ({ cell }) => {
-          const studentNumber = cell.getValue<string>()
+          const studentNumber = cell.getValue()
           return studentNumber === 'Hidden' ? (
             'Hidden'
           ) : (
@@ -22,26 +23,21 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         },
         filterFn: 'startsWith',
         enableClickToCopy: true,
-      },
-      {
-        accessorKey: 'lastName',
+      }),
+      columnHelper.accessor('lastName', {
         header: 'Last name',
-      },
-      {
-        accessorKey: 'firstNames',
+      }),
+      columnHelper.accessor('firstNames', {
         header: 'Given names',
-      },
-      {
-        accessorKey: 'email',
+      }),
+      columnHelper.accessor('email', {
         header: 'Email',
         enableClickToCopy: true,
-      },
-      {
-        accessorKey: 'phoneNumber',
+      }),
+      columnHelper.accessor('phoneNumber', {
         header: 'Phone number',
-      },
-      {
-        accessorKey: 'primaryProgramme',
+      }),
+      columnHelper.accessor('primaryProgramme', {
         header: 'Primary study programme',
         Header: (
           <TableHeaderWithTooltip
@@ -50,7 +46,8 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           />
         ),
         Cell: ({ cell }) => {
-          const value = cell.getValue<string>()
+          const value = cell.getValue()
+          if (!value) return null
           const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
           return (
             <Tooltip arrow title={value}>
@@ -58,44 +55,35 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             </Tooltip>
           )
         },
-      },
-      {
-        accessorKey: 'creditsTotal',
+      }),
+      columnHelper.accessor('creditsTotal', {
         header: 'All credits',
-      },
-      {
-        accessorKey: 'creditsHops',
+      }),
+      columnHelper.accessor('creditsHops', {
         header: 'Credits in HOPS',
-      },
-      {
-        accessorKey: 'creditsCombinedProg',
+      }),
+      columnHelper.accessor('creditsCombinedProg', {
         header: `${dynamicTitles.creditsCombinedProg}`,
-      },
-      {
-        accessorKey: 'creditsSince',
+      }),
+      columnHelper.accessor('creditsSince', {
         header: `${dynamicTitles.creditsSince}`,
-      },
-      {
-        accessorKey: 'grade',
+      }),
+      columnHelper.accessor('grade', {
         header: 'Grade',
-      },
-      {
-        accessorKey: 'studyTrack',
+      }),
+      columnHelper.accessor('studyTrack', {
         header: 'Study track',
-      },
-      {
-        accessorKey: 'studyRightStart',
+      }),
+      columnHelper.accessor('studyRightStart', {
         header: 'Start of study right',
-      },
-      {
-        accessorKey: 'programmeStart',
+      }),
+      columnHelper.accessor('programmeStart', {
         header: 'Started in programme',
-      },
-      {
-        accessorKey: 'option',
+      }),
+      columnHelper.accessor('option', {
         header: `${dynamicTitles.option}`,
         Cell: ({ cell }) => {
-          const value = cell.getValue<string>()
+          const value = cell.getValue()
           const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
           return (
             <Tooltip arrow title={value}>
@@ -103,30 +91,24 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             </Tooltip>
           )
         },
-      },
-      {
-        accessorKey: 'semesterEnrollments',
+      }),
+      columnHelper.accessor('semesterEnrollments', {
         header: 'Semesters present',
         Cell: ({ cell }) => {
-          // @ts-expect-error add typing
           const { content } = cell.getValue()
           return content ?? null
         },
-      },
-      {
-        accessorKey: 'graduationDate',
+      }),
+      columnHelper.accessor('graduationDate', {
         header: `${dynamicTitles.primaryEndDate}`,
-      },
-      {
-        accessorKey: 'graduationDateCombinedProg',
+      }),
+      columnHelper.accessor('graduationDateCombinedProg', {
         header: `${dynamicTitles.secondaryEndDate}`,
-      },
-      {
-        accessorKey: 'startYearAtUniversity',
+      }),
+      columnHelper.accessor('startYearAtUniversity', {
         header: 'Start year at uni',
-      },
-      {
-        accessorKey: 'programmes',
+      }),
+      columnHelper.accessor('programmes', {
         header: `${dynamicTitles.programmes}`,
         Header: (
           <TableHeaderWithTooltip
@@ -135,7 +117,6 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           />
         ),
         Cell: ({ cell }) => {
-          // @ts-expect-error add typing
           const { programmes, programmeList } = cell.getValue()
           if (programmes.length === 0) return null
 
@@ -148,25 +129,20 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             </Tooltip>
           )
         },
-      },
-      {
-        accessorKey: 'attainmentDate',
+      }),
+      columnHelper.accessor('attainmentDate', {
         header: 'Attainment date',
-      },
-      {
-        accessorKey: 'enrollmentDate',
+      }),
+      columnHelper.accessor('enrollmentDate', {
         header: 'Enrollment date',
-      },
-      {
-        accessorKey: 'language',
+      }),
+      columnHelper.accessor('language', {
         header: 'Language',
-      },
-      {
-        accessorKey: 'transferredFrom',
-        header: 'Transferred from',
-      },
-      {
-        accessorKey: 'admissionType',
+      }),
+      columnHelper.accessor('transferredFrom', {
+        header: 'TransferredFrom',
+      }),
+      columnHelper.accessor('admissionType', {
         header: 'Admission type',
         Header: (
           <TableHeaderWithTooltip
@@ -174,21 +150,17 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             tooltipText="Not available for study rights granted prior to 2020"
           />
         ),
-      },
-      {
-        accessorKey: 'gender',
+      }),
+      columnHelper.accessor('gender', {
         header: 'Gender',
-      },
-      {
-        accessorKey: 'citizenships',
+      }),
+      columnHelper.accessor('citizenships', {
         header: 'Citizenships',
-      },
-      {
-        accessorKey: 'curriculumPeriod',
+      }),
+      columnHelper.accessor('curriculumPeriod', {
         header: 'Curriculum period',
-      },
-      {
-        accessorKey: 'mostRecentAttainment',
+      }),
+      columnHelper.accessor('mostRecentAttainment', {
         header: 'Latest attainment date',
         Header: (
           <TableHeaderWithTooltip
@@ -196,19 +168,16 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
             tooltipText="Date of the most recent course completion that is included in the HOPS"
           />
         ),
-      },
-      {
-        accessorKey: 'extent',
+      }),
+      columnHelper.accessor('extent', {
         header: 'Extent',
-      },
-      {
-        accessorKey: 'tags',
+      }),
+      columnHelper.accessor('tags', {
         header: 'Tags',
-      },
-      {
-        accessorKey: 'updatedAt',
+      }),
+      columnHelper.accessor('updatedAt', {
         header: 'Last updated at',
-      },
+      }),
     ],
     [dynamicTitles]
   )

@@ -183,7 +183,7 @@ export const GeneralTabContainer = ({
   }
 
   const parseTags = tags => {
-    const studentTags = tags?.map(tag => tag.tag.tagname)
+    const studentTags = tags?.map(studentTag => studentTag.tag.tagname)
     return studentTags.join(', ')
   }
 

@@ -10,14 +10,14 @@ import {
   Typography,
 } from '@mui/material'
 import { pick, sampleSize } from 'lodash'
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
+import { MaterialReactTable, MRT_ColumnDef, MRT_RowData, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useMemo } from 'react'
 import { utils, writeFile } from 'xlsx'
 
 import { ISO_DATE_FORMAT } from '@/constants/date'
 import { getTimestamp, reformatDate } from '@/util/timeAndDate'
 
-export const ExportToExcelDialog = ({
+export const ExportToExcelDialog = <T extends MRT_RowData>({
   open,
   onClose,
   exportColumns,
@@ -26,7 +26,7 @@ export const ExportToExcelDialog = ({
 }: {
   open: boolean
   onClose: () => void
-  exportColumns: MRT_ColumnDef<any>[]
+  exportColumns: MRT_ColumnDef<T, any>[]
   exportData: Record<string, unknown>[]
   featureName: string
 }) => {
