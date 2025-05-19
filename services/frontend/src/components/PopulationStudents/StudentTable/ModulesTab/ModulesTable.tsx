@@ -1,9 +1,9 @@
 import { Check as CheckIcon, CropSquare as CropSquareIcon } from '@mui/icons-material'
 import { Box, Divider, Tooltip, Typography } from '@mui/material'
 import {
-  type MRT_ColumnDef,
   type MRT_VisibilityState,
   MaterialReactTable,
+  createMRTColumnHelper,
   useMaterialReactTable,
 } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -58,104 +58,121 @@ export const ModulesTab = ({
 
   const isLoading = Object.keys(formattedModules).length === 0
 
-  const staticColumns = useMemo<MRT_ColumnDef<any>[]>(
+  const columnHelper = createMRTColumnHelper<FormattedStudent>()
+  const staticColumns = useMemo(
     () => [
-      {
-        accessorKey: 'lastName',
+      columnHelper.accessor('lastName', {
         header: 'Last name',
         Footer: () => <DividedTableCell />,
-      },
-      {
-        accessorKey: 'firstNames',
+      }),
+      columnHelper.accessor('firstNames', {
         header: 'First names',
         Footer: () => <DividedTableCell />,
-      },
-      {
-        accessorKey: 'studentNumber',
+      }),
+      columnHelper.accessor('studentNumber', {
         header: 'Student number',
         Header: () => <Typography fontWeight="bold">Student number</Typography>,
         Cell: ({ cell }) => (
-          <StudentInfoItem sisPersonId={cell.row.original.sis_person_id} studentNumber={cell.getValue<string>()} />
+          <StudentInfoItem sisPersonId={cell.row.original.sisPersonID} studentNumber={cell.getValue()} />
         ),
         filterFn: 'startsWith',
         Footer: () => <DividedTableCell bottom="Completed" top="Planned" />,
-      },
+      }),
+      columnHelper.accessor('studentNumber', {
+        header: 'Student number',
+        Header: () => <Typography fontWeight="bold">Student number</Typography>,
+        Cell: ({ cell }) => (
+          <StudentInfoItem sisPersonId={cell.row.original.sisPersonID} studentNumber={cell.getValue()} />
+        ),
+        filterFn: 'startsWith',
+        Footer: () => <DividedTableCell bottom="Completed" top="Planned" />,
+      }),
     ],
     []
   )
 
-  const dynamicColumns = useMemo<MRT_ColumnDef<any>[]>(() => {
+  const dynamicColumns = useMemo(() => {
     if (!formattedModules) return []
-    return Object.keys(formattedModules).map(code => ({
-      accessorFn: (row: FormattedStudent) => {
-        const studyModule = getModuleIfExists(row, code)
-        return studyModule ? (studyModule.completed ? 1 : 0) : null // 1 for completed, 0 for in HOPS
-      },
-      Footer: ({ table, column }) => {
-        const { planned, completed } = table.getFilteredRowModel().rows.reduce(
-          (acc, row) => {
-            const value = row.getValue<number>(column.id)
-            if (value === 0) {
-              acc.planned += 1
-            } else if (value === 1) {
-              acc.completed += 1
-            }
-            return acc
+    return Object.keys(formattedModules).map(code =>
+      columnHelper.accessor(
+        row => {
+          const studyModule = getModuleIfExists(row, code)
+          return studyModule ? (studyModule.completed ? 1 : 0) : null // 1 for completed, 0 for in HOPS
+        },
+        {
+          Footer: ({ table, column }) => {
+            const { planned, completed } = table.getFilteredRowModel().rows.reduce(
+              (acc, row) => {
+                const value = row.getValue(column.id)
+                if (value === 0) {
+                  acc.planned += 1
+                } else if (value === 1) {
+                  acc.completed += 1
+                }
+                return acc
+              },
+              { planned: 0, completed: 0 }
+            )
+            return <DividedTableCell bottom={completed} top={planned} />
           },
-          { planned: 0, completed: 0 }
-        )
-        return <DividedTableCell bottom={completed} top={planned} />
-      },
-      header: `${code} – ${getTextIn(formattedModules[code])}`,
-      Header: () => (
-        <Tooltip title={`${code} – ${getTextIn(formattedModules[code])}`}>
-          <Box
-            sx={{
-              display: 'inline flow-root',
-              writingMode: 'vertical-rl',
-              textOrientation: 'mixed',
-              whiteSpace: 'normal',
-              overflow: 'visible',
-              maxWidth: '15em',
-              minHeight: '160px',
-              maxHeight: '240px',
-              padding: '0.4em 0',
-            }}
-          >
-            <>
-              <Typography fontWeight="bold">{code}</Typography>
-              <Typography
+          header: `${code} – ${getTextIn(formattedModules[code])}`,
+          Header: () => (
+            <Tooltip title={`${code} – ${getTextIn(formattedModules[code])}`}>
+              <Box
                 sx={{
-                  color: 'text.secondary',
-                  fontWeight: 'normal',
+                  display: 'inline flow-root',
+                  writingMode: 'vertical-rl',
+                  textOrientation: 'mixed',
+                  whiteSpace: 'normal',
+                  overflow: 'visible',
+                  maxWidth: '15em',
+                  minHeight: '160px',
+                  maxHeight: '240px',
+                  padding: '0.4em 0',
                 }}
               >
-                {getTextIn(formattedModules[code])}
-              </Typography>
-            </>
-          </Box>
-        </Tooltip>
-      ),
-      Cell: ({ cell }) => {
-        const studyModule = getModuleIfExists(cell.row.original, code)
-        if (!studyModule) return <Box />
-        return studyModule.completed ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center' }} title={`Completed on ${studyModule.completionDate}`}>
-            <CheckIcon color="success" />
-          </Box>
-        ) : (
-          <Box sx={{ display: 'flex', justifyContent: 'center' }} title="Has the module in their primary study plan">
-            <CropSquareIcon sx={{ color: 'grey.500' }} />
-          </Box>
-        )
-      },
-      filterFn: 'empty',
-    }))
+                <>
+                  <Typography fontWeight="bold">{code}</Typography>
+                  <Typography
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 'normal',
+                    }}
+                  >
+                    {getTextIn(formattedModules[code])}
+                  </Typography>
+                </>
+              </Box>
+            </Tooltip>
+          ),
+          Cell: ({ cell }) => {
+            const studyModule = getModuleIfExists(cell.row.original, code)
+            if (!studyModule) return <Box />
+            return studyModule.completed ? (
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center' }}
+                title={`Completed on ${studyModule.completionDate}`}
+              >
+                <CheckIcon color="success" />
+              </Box>
+            ) : (
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center' }}
+                title="Has the module in their primary study plan"
+              >
+                <CropSquareIcon sx={{ color: 'grey.500' }} />
+              </Box>
+            )
+          },
+          filterFn: 'empty',
+        }
+      )
+    )
   }, [formattedModules, getTextIn])
 
   const columns = useMemo(() => [...staticColumns, ...dynamicColumns], [staticColumns, dynamicColumns])
 
-  const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
+  const defaultOptions = getDefaultMRTOptions<FormattedStudent>(setExportData, setExportModalOpen, language)
 
   const table = useMaterialReactTable({
     ...defaultOptions,
@@ -200,7 +217,7 @@ export const ModulesTab = ({
 
   return (
     <>
-      <ExportToExcelDialog
+      <ExportToExcelDialog<FormattedStudent>
         exportColumns={columns}
         exportData={exportData}
         featureName="modules_of_students"

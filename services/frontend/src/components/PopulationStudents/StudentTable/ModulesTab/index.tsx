@@ -9,7 +9,7 @@ export type FormattedStudent = {
   lastName: string
   studentNumber: string
   studyModulesInHOPS: StudyModuleData[]
-  sis_person_id: string
+  sisPersonID: string
 }
 
 export type FormattedModules = Record<string, Record<string, string>>
@@ -52,7 +52,7 @@ const formatStudent = (student: any, degreeProgrammeCodes: string[]): FormattedS
     lastName: student.lastname,
     studentNumber: student.studentNumber,
     studyModulesInHOPS: getModulesFromRelevantStudyPlan(student, degreeProgrammeCodes),
-    sis_person_id: student.sis_person_id,
+    sisPersonID: student.sis_person_id,
   }
 }
 
@@ -91,5 +91,5 @@ export const ModulesTabContainer = ({ curriculum, students }) => {
     [students, degreeProgrammeCodes]
   )
 
-  return ModulesTab({ formattedModules, formattedStudents })
+  return <ModulesTab formattedModules={formattedModules} formattedStudents={formattedStudents} />
 }
