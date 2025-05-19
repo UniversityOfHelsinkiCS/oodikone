@@ -140,7 +140,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: 'Language',
       }),
       columnHelper.accessor('transferredFrom', {
-        header: 'TransferredFrom',
+        header: 'Transferred from',
       }),
       columnHelper.accessor('admissionType', {
         header: 'Admission type',
