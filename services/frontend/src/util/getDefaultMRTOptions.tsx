@@ -6,6 +6,14 @@ import { MRT_Localization_FI } from 'material-react-table/locales/fi'
 
 import { DEFAULT_LANG } from '@oodikone/shared/language'
 
+// If defining sx props in a column definition, existing props definde here would be
+// completely overridden. Export and ...spread from here as needed to avoid copy pasting.
+export const muiTableBodyCellPropsDefaultSx = {
+  borderWidth: '0 1px 0 0',
+  borderStyle: 'solid',
+  borderColor: 'grey.300',
+}
+
 /**
  * Oodikone-wide default properties for MRT tables
  * !! Remember to provide the type of table data as a generic !!
@@ -76,11 +84,7 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
       },
     },
     muiTableBodyCellProps: {
-      sx: {
-        borderWidth: '0 1px 0 0',
-        borderStyle: 'solid',
-        borderColor: 'grey.300',
-      },
+      sx: muiTableBodyCellPropsDefaultSx,
     },
     muiTableBodyProps: {
       sx: {

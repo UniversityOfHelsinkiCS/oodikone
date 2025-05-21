@@ -402,7 +402,15 @@ export const GeneralTabContainer = ({
     }
 
     if (variant === 'customPopulation' && !programmeCode) {
-      result.primaryProgramme = getTextIn(studentToPrimaryProgrammeMap[student.studentNumber]?.name) ?? ''
+      const primaryProgramme = studentToPrimaryProgrammeMap[student.studentNumber]
+      if (primaryProgramme) {
+        const primaryProgrammeName = getTextIn(primaryProgramme.name) ?? ''
+        result.primaryProgramme = primaryProgramme.graduated
+          ? `${primaryProgrammeName} (Graduated)`
+          : !primaryProgramme.active
+            ? `${primaryProgrammeName} (Inactive)`
+            : primaryProgrammeName
+      }
     }
 
     if (variant === 'coursePopulation') {

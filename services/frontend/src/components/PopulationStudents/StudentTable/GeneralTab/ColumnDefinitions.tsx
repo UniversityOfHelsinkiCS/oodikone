@@ -3,6 +3,7 @@ import { createMRTColumnHelper } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
+import { muiTableBodyCellPropsDefaultSx } from '@/util/getDefaultMRTOptions'
 import { FormattedStudentData } from '.'
 import { DynamicColumnTitles } from './GeneralTab'
 
@@ -39,6 +40,13 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       }),
       columnHelper.accessor('primaryProgramme', {
         header: 'Primary study programme',
+        muiTableBodyCellProps: {
+          sx: {
+            ...muiTableBodyCellPropsDefaultSx,
+            width: '250px',
+            maxWidth: '380px',
+          },
+        },
         Header: (
           <TableHeaderWithTooltip
             header="Primary study programme"
@@ -46,12 +54,26 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           />
         ),
         Cell: ({ cell }) => {
-          const value = cell.getValue()
-          if (!value) return null
-          const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
+          const programmeName = cell.getValue()
+          if (!programmeName) return null
+          const indexToSplitAt = programmeName.lastIndexOf(' ')
+          const formattedValue = ['(Graduated)', '(Inactive)'].includes(programmeName.slice(indexToSplitAt + 1)) ? (
+            (() => {
+              const start = programmeName.slice(0, indexToSplitAt)
+              const end = programmeName.slice(indexToSplitAt + 1)
+              return (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{start}</span>
+                  <span style={{ paddingLeft: '0.5em' }}>{end}</span>
+                </div>
+              )
+            })()
+          ) : (
+            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
+          )
           return (
-            <Tooltip arrow title={value}>
-              <span>{formattedValue}</span>
+            <Tooltip arrow title={programmeName}>
+              {formattedValue}
             </Tooltip>
           )
         },
