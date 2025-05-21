@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { useAppDispatch } from '@/redux/hooks'
-import { FilterViewContext } from './FilterViewContext'
+import { FilterViewContext } from './context'
 
 export const useFilters = () => {
   const dispatch = useAppDispatch()
