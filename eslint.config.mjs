@@ -83,6 +83,7 @@ export default [
       'object-shorthand': ['error', 'always'],
       'prefer-const': 'error',
       'prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
+      "no-restricted-imports": ['error', { 'patterns': [{ 'regex': '^@mui/[^/]+$' }] }],
       quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
       'react/display-name': 'off', // TODO: Delete this override
       'react/function-component-definition': [

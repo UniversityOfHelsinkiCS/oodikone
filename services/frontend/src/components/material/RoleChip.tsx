@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material'
+import Chip from '@mui/material/Chip'
 
 import { Role } from '@oodikone/shared/types'
 

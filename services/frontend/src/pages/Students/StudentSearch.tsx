@@ -1,16 +1,15 @@
-import { Search as SearchIcon } from '@mui/icons-material'
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  InputAdornment,
-  Stack,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-} from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+import InputAdornment from '@mui/material/InputAdornment'
+import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import TextField from '@mui/material/TextField'
+
 import { debounce } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'

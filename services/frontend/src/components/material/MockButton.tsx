@@ -1,5 +1,6 @@
-import { Logout as LogoutIcon, PersonSearch as PersonSearchIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import LogoutIcon from '@mui/icons-material/Logout'
+import PersonSearchIcon from '@mui/icons-material/PersonSearch'
+import Button from '@mui/material/Button'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
 

@@ -1,5 +1,7 @@
-import { Person as PersonIcon } from '@mui/icons-material'
-import { IconButton, Stack } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+
 import { Link } from 'react-router'
 
 import { sisUrl } from '@/conf'

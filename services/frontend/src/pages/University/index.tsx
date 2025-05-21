@@ -1,4 +1,6 @@
-import { Container, Tab, Tabs } from '@mui/material'
+import Container from '@mui/material/Container'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'

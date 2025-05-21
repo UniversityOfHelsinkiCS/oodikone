@@ -1,5 +1,8 @@
-import { ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material'
-import { Menu, MenuItem, Typography } from '@mui/material'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
+
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
 

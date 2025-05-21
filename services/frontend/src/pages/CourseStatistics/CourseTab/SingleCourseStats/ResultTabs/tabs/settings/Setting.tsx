@@ -1,4 +1,7 @@
-import { Box, FormControlLabel, Paper } from '@mui/material'
+import Box from '@mui/material/Box'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Paper from '@mui/material/Paper'
+
 import { ReactElement } from 'react'
 
 export const Setting = ({ control, labelText }: { control: ReactElement; labelText: string }) => {

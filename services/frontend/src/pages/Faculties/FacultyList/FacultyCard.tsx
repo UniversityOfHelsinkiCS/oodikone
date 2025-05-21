@@ -1,4 +1,7 @@
-import { Card, Stack, Typography } from '@mui/material'
+import Card from '@mui/material/Card'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import { Link } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

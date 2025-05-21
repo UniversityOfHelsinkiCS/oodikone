@@ -1,4 +1,6 @@
-import { List, Stack, Typography } from '@mui/material'
+import List from '@mui/material/List'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { Section } from '@/components/material/Section'
 import { Tag } from '@oodikone/shared/types'

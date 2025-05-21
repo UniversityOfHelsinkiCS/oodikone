@@ -1,5 +1,15 @@
-import { AccountCircle as AccountCircleIcon, Check as CheckIcon, Language as LanguageIcon } from '@mui/icons-material'
-import { Badge, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import CheckIcon from '@mui/icons-material/Check'
+import LanguageIcon from '@mui/icons-material/Language'
+import Badge from '@mui/material/Badge'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
+
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

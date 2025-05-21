@@ -1,4 +1,5 @@
-import { TableCell, TableRow } from '@mui/material'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
 
 import { PopulationLink } from '@/components/material/PopulationLink'
 import { BasicCell } from './BasicCell'

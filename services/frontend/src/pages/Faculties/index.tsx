@@ -1,4 +1,7 @@
-import { Container, Stack, Tab, Tabs } from '@mui/material'
+import Container from '@mui/material/Container'
+import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 

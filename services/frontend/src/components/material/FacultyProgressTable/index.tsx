@@ -1,4 +1,10 @@
-import { Collapse, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Collapse from '@mui/material/Collapse'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+
 import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/material/ExpandableRow'

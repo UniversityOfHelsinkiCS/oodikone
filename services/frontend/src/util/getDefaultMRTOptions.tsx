@@ -1,5 +1,5 @@
-import { Download as DownloadIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import DownloadIcon from '@mui/icons-material/Download'
+import Button from '@mui/material/Button'
 import { MRT_RowData, MRT_TableOptions, MRT_Row } from 'material-react-table'
 import { MRT_Localization_EN } from 'material-react-table/locales/en'
 import { MRT_Localization_FI } from 'material-react-table/locales/fi'

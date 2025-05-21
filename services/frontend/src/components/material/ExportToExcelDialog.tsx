@@ -1,14 +1,13 @@
-import {
-  Alert,
-  Button,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Typography,
-} from '@mui/material'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import Typography from '@mui/material/Typography'
+
 import { pick, sampleSize } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, MRT_RowData, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useMemo } from 'react'

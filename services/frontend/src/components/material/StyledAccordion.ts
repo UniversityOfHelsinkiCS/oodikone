@@ -1,5 +1,5 @@
-import { Accordion } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import Accordion from '@mui/material/Accordion'
+import styled from '@mui/material/styles/styled'
 
 export const StyledAccordion = styled(Accordion)(() => ({
   boxShadow: 'none',

@@ -1,5 +1,10 @@
-import { Check as CheckIcon, CropSquare as CropSquareIcon } from '@mui/icons-material'
-import { Box, Divider, Tooltip, Typography } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
+import CropSquareIcon from '@mui/icons-material/CropSquare'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+
 import {
   type MRT_VisibilityState,
   MaterialReactTable,

@@ -1,5 +1,8 @@
-import { Person as PersonIcon, Replay as ReplayIcon } from '@mui/icons-material'
-import { Tab, Tabs } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import ReplayIcon from '@mui/icons-material/Replay'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+
 import qs from 'query-string'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'

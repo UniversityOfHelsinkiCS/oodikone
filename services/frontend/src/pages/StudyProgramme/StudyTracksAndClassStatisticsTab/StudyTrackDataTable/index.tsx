@@ -1,4 +1,12 @@
-import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Stack } from '@mui/material'
+import Card from '@mui/material/Card'
+import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+
 import { useState } from 'react'
 
 import { InfoBox } from '@/components/material/InfoBox'

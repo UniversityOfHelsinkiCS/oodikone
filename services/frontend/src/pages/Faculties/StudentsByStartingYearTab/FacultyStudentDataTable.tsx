@@ -1,19 +1,16 @@
-import {
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowRight as KeyboardArrowRightIcon,
-} from '@mui/icons-material'
-import {
-  Box,
-  IconButton,
-  Stack,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-} from '@mui/material'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+
 import { Fragment, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

@@ -1,5 +1,11 @@
-import { FormatListNumbered as FormatListNumberedIcon } from '@mui/icons-material'
-import { Checkbox, IconButton, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material'
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered'
+import Checkbox from '@mui/material/Checkbox'
+import IconButton from '@mui/material/IconButton'
+import ListItemText from '@mui/material/ListItemText'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Tooltip from '@mui/material/Tooltip'
+
 import { useEffect, useState } from 'react'
 
 import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'

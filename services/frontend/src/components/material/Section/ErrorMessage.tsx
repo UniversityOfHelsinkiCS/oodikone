@@ -1,5 +1,7 @@
-import { ErrorOutline as ErrorIcon } from '@mui/icons-material'
-import { Box, Stack, Typography } from '@mui/material'
+import ErrorIcon from '@mui/icons-material/ErrorOutline'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 export const ErrorMessage = () => {
   return (

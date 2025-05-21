@@ -1,15 +1,14 @@
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import TextField from '@mui/material/TextField'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'

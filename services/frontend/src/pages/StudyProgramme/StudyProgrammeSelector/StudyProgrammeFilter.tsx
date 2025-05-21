@@ -1,5 +1,6 @@
-import { Search as SearchIcon } from '@mui/icons-material'
-import { InputAdornment, TextField } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import InputAdornment from '@mui/material/InputAdornment'
+import TextField from '@mui/material/TextField'
 
 import { DegreeProgramme } from '@/types/api/faculty'
 

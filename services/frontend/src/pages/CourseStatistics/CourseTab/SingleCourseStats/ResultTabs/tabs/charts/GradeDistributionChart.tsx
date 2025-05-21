@@ -1,4 +1,5 @@
-import { useTheme } from '@mui/material'
+import useTheme from '@mui/material/styles/useTheme'
+
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'

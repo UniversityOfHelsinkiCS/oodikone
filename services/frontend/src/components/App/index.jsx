@@ -1,7 +1,8 @@
-import { CssBaseline } from '@mui/material'
-import { ThemeProvider } from '@mui/material/styles'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import CssBaseline from '@mui/material/CssBaseline'
+import ThemeProvider from '@mui/material/styles/ThemeProvider'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment/AdapterMoment'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider'
+
 import * as Sentry from '@sentry/browser'
 import HighCharts from 'highcharts'
 import moment from 'moment'

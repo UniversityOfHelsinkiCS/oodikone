@@ -1,5 +1,7 @@
-import { ExitToApp as ExitToAppIcon } from '@mui/icons-material'
-import { ListItemIcon, MenuItem, Typography } from '@mui/material'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
 
 import { useShowAsUser } from '@/redux/auth'
 

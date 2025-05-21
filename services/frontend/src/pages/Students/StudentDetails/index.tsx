@@ -1,4 +1,7 @@
-import { Alert, CircularProgress, Stack } from '@mui/material'
+import Alert from '@mui/material/Alert'
+import CircularProgress from '@mui/material/CircularProgress'
+import Stack from '@mui/material/Stack'
+
 import { isEmpty, orderBy } from 'lodash'
 import { useState } from 'react'
 import { useParams } from 'react-router'

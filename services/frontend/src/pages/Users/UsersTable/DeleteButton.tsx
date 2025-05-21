@@ -1,5 +1,7 @@
-import { PersonRemove as PersonRemoveIcon, Warning as WarningIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
+import WarningIcon from '@mui/icons-material/Warning'
+import Button from '@mui/material/Button'
+
 import { useEffect, useState } from 'react'
 
 import { useDeleteUserMutation } from '@/redux/users'

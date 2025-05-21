@@ -1,4 +1,5 @@
-import { Stack } from '@mui/material'
+import Stack from '@mui/material/Stack'
+
 import { isEqual, sortBy } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'

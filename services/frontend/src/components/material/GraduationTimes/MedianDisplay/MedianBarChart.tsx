@@ -1,5 +1,7 @@
 /* eslint-disable react/no-this-in-sfc */
-import { Box, useTheme } from '@mui/material'
+import Box from '@mui/material/Box'
+import useTheme from '@mui/material/styles/useTheme'
+
 import Highcharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'

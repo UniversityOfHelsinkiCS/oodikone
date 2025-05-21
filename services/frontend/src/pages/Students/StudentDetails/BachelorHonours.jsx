@@ -1,15 +1,15 @@
-import { ArrowDropDown as ArrowDropDownIcon, Close as CloseIcon, Done as DoneIcon } from '@mui/icons-material'
-import {
-  AccordionDetails,
-  AccordionSummary,
-  Chip,
-  Stack,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import CloseIcon from '@mui/icons-material/Close'
+import DoneIcon from '@mui/icons-material/Done'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
 import moment from 'moment'
 import { useState } from 'react'
 

@@ -1,4 +1,9 @@
-import { FormControl, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/material/Toggle'

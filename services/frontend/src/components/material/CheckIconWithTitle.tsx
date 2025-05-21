@@ -1,5 +1,5 @@
-import { Check as CheckIcon } from '@mui/icons-material'
-import { Box } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
+import Box from '@mui/material/Box'
 
 export const CheckIconWithTitle = ({ visible, title }: { visible: boolean; title?: string }) => (
   <Box sx={{ display: 'flex', justifyContent: 'center' }} title={title}>

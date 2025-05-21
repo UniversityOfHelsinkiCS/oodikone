@@ -1,4 +1,5 @@
-import { Stack } from '@mui/material'
+import Stack from '@mui/material/Stack'
+
 import { max, min } from 'lodash'
 import { useEffect, useState } from 'react'
 

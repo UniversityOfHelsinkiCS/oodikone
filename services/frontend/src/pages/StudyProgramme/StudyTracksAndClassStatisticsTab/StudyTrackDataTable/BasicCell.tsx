@@ -1,4 +1,6 @@
-import { TableCell, Tooltip, Typography } from '@mui/material'
+import TableCell from '@mui/material/TableCell'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 
 export const BasicCell = ({ tooltip = null, value }: { tooltip?: JSX.Element | null; value: string | number }) => {
   const cellContent = (

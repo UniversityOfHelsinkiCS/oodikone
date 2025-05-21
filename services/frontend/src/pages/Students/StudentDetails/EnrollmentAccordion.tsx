@@ -1,5 +1,12 @@
-import { ArrowDropDown as ArrowForwardIosSharpIcon } from '@mui/icons-material'
-import { AccordionDetails, AccordionSummary, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowDropDown'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'

@@ -1,16 +1,14 @@
 /* eslint-disable no-alert */
-import { Refresh as RefreshIcon } from '@mui/icons-material'
-import {
-  Button,
-  Container,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import Button from '@mui/material/Button'
+import Container from '@mui/material/Container'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
 import { callApi } from '@/apiConnection'

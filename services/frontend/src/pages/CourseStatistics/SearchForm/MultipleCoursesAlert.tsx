@@ -1,4 +1,4 @@
-import { Alert } from '@mui/material'
+import Alert from '@mui/material/Alert'
 
 export const MultipleCoursesAlert = ({ selectedCourses }: { selectedCourses: number }) => {
   return (

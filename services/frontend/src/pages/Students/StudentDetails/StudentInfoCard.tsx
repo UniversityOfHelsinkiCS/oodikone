@@ -1,5 +1,10 @@
-import { Refresh as RefreshIcon } from '@mui/icons-material'
-import { Box, Card, CardContent, Typography, Button, Stack } from '@mui/material'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/ExternalLink'

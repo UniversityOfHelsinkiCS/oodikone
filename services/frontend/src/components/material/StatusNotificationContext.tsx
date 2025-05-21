@@ -1,4 +1,5 @@
-import { AlertColor } from '@mui/material'
+import { AlertColor } from '@mui/material/Alert'
+
 import { createContext, useState, useContext, ReactNode } from 'react'
 
 interface StatusNotificationContext {

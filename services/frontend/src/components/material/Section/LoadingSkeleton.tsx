@@ -1,4 +1,8 @@
-import { Box, CircularProgress, Skeleton, Stack, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+import Skeleton from '@mui/material/Skeleton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 export const LoadingSkeleton = () => {
   return (

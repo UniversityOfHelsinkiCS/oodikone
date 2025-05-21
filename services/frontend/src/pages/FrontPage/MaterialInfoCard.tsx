@@ -1,5 +1,9 @@
-import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material'
-import { Alert, AlertTitle, Box, Link } from '@mui/material'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
+import Link from '@mui/material/Link'
+
 import { NavLink } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'

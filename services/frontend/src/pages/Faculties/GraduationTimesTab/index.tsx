@@ -1,4 +1,5 @@
-import { Stack } from '@mui/material'
+import Stack from '@mui/material/Stack'
+
 import { useState } from 'react'
 import { utils, writeFile } from 'xlsx'
 

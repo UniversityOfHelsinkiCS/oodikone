@@ -1,4 +1,5 @@
-import { Stack } from '@mui/material'
+import Stack from '@mui/material/Stack'
+
 import { useEffect, useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'

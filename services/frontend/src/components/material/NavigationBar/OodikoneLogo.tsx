@@ -1,4 +1,7 @@
-import { Chip, Stack, Typography } from '@mui/material'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import { Link } from 'react-router'
 
 import { isDev } from '@/conf'

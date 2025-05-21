@@ -1,4 +1,10 @@
-import { AppBar, Box, Container, Tab, Tabs, Toolbar } from '@mui/material'
+import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import Toolbar from '@mui/material/Toolbar'
+
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router'
 

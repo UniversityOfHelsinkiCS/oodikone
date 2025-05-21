@@ -1,4 +1,6 @@
-import { Tooltip, Typography } from '@mui/material'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+
 import { createMRTColumnHelper } from 'material-react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'

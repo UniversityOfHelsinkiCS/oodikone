@@ -1,5 +1,5 @@
-import { Table } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import styled from '@mui/material/styles/styled'
+import Table from '@mui/material/Table'
 
 export const StyledTable = styled(Table, {
   shouldForwardProp: prop => prop !== 'showCellBorders',

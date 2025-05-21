@@ -1,5 +1,5 @@
-import { Download as DownloadIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import DownloadIcon from '@mui/icons-material/Download'
+import Button from '@mui/material/Button'
 
 export const ExportButton = ({
   cypress = '',

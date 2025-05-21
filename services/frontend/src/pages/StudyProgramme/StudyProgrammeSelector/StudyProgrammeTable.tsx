@@ -1,5 +1,8 @@
-import { PushPin as PushPinIcon } from '@mui/icons-material'
-import { IconButton, Stack, Typography } from '@mui/material'
+import PushPinIcon from '@mui/icons-material/PushPin'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useMemo } from 'react'
 import { Link } from 'react-router'

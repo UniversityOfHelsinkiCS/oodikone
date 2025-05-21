@@ -1,4 +1,6 @@
-import { Stack, Switch, Typography } from '@mui/material'
+import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
+import Typography from '@mui/material/Typography'
 
 import { InfoBox } from '@/components/material/InfoBox'
 

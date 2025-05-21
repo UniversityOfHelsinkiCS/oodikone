@@ -1,10 +1,14 @@
-import {
-  Delete as DeleteIcon,
-  PersonAddAlt1 as PersonAddAlt1Icon,
-  Sell as SellIcon,
-  Visibility as VisibilityIcon,
-} from '@mui/icons-material'
-import { IconButton, ListItem, ListItemIcon, ListItemText, Stack, Tooltip } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
+import SellIcon from '@mui/icons-material/Sell'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import IconButton from '@mui/material/IconButton'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
+
 import { useState } from 'react'
 
 import { PopulationLink } from '@/components/material/PopulationLink'

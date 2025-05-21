@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material'
+import Stack from '@mui/material/Stack'
 
 import { GetAllGraduationStatsResponse } from '@/types/api/university'
 import { GraduationTimes } from './GraduationTimes'

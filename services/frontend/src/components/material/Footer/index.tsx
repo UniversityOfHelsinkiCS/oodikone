@@ -1,4 +1,8 @@
-import { Box, Container, Divider, Stack, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Divider from '@mui/material/Divider'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { isDefaultServiceProvider } from '@/common'
 import { ExternalLink } from '@/components/material/ExternalLink'

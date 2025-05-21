@@ -1,4 +1,7 @@
-import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid2'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'

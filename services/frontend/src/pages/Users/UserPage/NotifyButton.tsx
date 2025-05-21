@@ -1,5 +1,12 @@
-import { Email as EmailIcon, Send as SendIcon } from '@mui/icons-material'
-import { Button, Card, CardContent, CardHeader, Modal, Stack } from '@mui/material'
+import EmailIcon from '@mui/icons-material/Email'
+import SendIcon from '@mui/icons-material/Send'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Modal from '@mui/material/Modal'
+import Stack from '@mui/material/Stack'
+
 import { useEffect, useState } from 'react'
 
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'

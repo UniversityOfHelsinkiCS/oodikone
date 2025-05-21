@@ -1,4 +1,8 @@
-import { Box, Container, Tab, Tabs } from '@mui/material'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'

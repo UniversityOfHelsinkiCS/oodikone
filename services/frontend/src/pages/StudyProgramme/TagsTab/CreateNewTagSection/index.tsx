@@ -1,6 +1,11 @@
-import { Add as AddIcon } from '@mui/icons-material'
-import { Button, FormControlLabel, Stack, Switch, TextField } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
+import AddIcon from '@mui/icons-material/Add'
+import Button from '@mui/material/Button'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
+import TextField from '@mui/material/TextField'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker/DatePicker'
+
 import { Moment } from 'moment'
 import { useEffect, useState } from 'react'
 

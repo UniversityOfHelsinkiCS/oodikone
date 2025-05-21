@@ -1,5 +1,8 @@
-import { CalendarMonth as CalendarMonthIcon, School as SchoolIcon } from '@mui/icons-material'
-import { Stack, Tab, Tabs } from '@mui/material'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import SchoolIcon from '@mui/icons-material/School'
+import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 
 import { useTabs } from '@/hooks/tabs'
 import { ByCreditTypeTab } from './ByCreditTypeTab'

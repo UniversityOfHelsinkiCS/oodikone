@@ -1,4 +1,5 @@
-import { Stack, Switch } from '@mui/material'
+import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 
 import { AvailableStats } from '@/types/courseStat'
 import { ProviderOrganizationSelect } from './ProviderOrganizationSelect'

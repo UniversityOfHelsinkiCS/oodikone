@@ -1,5 +1,15 @@
-import { blue, blueGrey, deepPurple, green, grey, indigo, orange, purple, red } from '@mui/material/colors'
-import { createTheme, ThemeOptions } from '@mui/material/styles'
+import blue from '@mui/material/colors/blue'
+import blueGrey from '@mui/material/colors/blueGrey'
+import deepPurple from '@mui/material/colors/deepPurple'
+import green from '@mui/material/colors/green'
+import grey from '@mui/material/colors/grey'
+import indigo from '@mui/material/colors/indigo'
+import orange from '@mui/material/colors/orange'
+import purple from '@mui/material/colors/purple'
+import red from '@mui/material/colors/red'
+
+import type { ThemeOptions } from '@mui/material/styles'
+import createTheme from '@mui/material/styles/createTheme'
 
 const baseTheme = {
   palette: {

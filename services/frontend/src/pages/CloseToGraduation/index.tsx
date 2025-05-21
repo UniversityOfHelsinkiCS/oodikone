@@ -1,4 +1,9 @@
-import { Box, Container, Tab, Tabs, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
+
 import { range } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'

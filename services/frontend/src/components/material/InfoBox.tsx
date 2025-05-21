@@ -1,6 +1,10 @@
-import { HelpOutline as HelpOutlineIcon } from '@mui/icons-material'
-import { Button, IconButton, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import styled from '@mui/material/styles/styled'
+import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+
 import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'

@@ -1,4 +1,8 @@
-import { Alert, Stack, Switch, Typography } from '@mui/material'
+import Alert from '@mui/material/Alert'
+import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
+import Typography from '@mui/material/Typography'
+
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'

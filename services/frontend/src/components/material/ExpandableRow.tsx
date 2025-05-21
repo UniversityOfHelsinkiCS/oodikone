@@ -1,8 +1,10 @@
-import {
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowRight as KeyboardArrowRightIcon,
-} from '@mui/icons-material'
-import { Box, IconButton, TableCell, TableRow, Typography } from '@mui/material'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
 
 const roundValue = (value: number | string | undefined) => {
   return typeof value === 'number' && !Number.isInteger(value) ? value.toFixed(1) : value

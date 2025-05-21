@@ -1,5 +1,6 @@
-import { CopyAll as CopyAllIcon } from '@mui/icons-material'
-import { Button, Tooltip } from '@mui/material'
+import CopyAllIcon from '@mui/icons-material/CopyAll'
+import Button from '@mui/material/Button'
+import Tooltip from '@mui/material/Tooltip'
 
 export const CopyEmailAddressesButton = ({ userEmails }: { userEmails: string[] }) => {
   const copyEmailsToClipboard = () => {

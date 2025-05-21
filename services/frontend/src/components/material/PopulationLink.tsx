@@ -1,5 +1,7 @@
-import { NorthEast as NorthEastIcon } from '@mui/icons-material'
-import { Button, IconButton } from '@mui/material'
+import NorthEastIcon from '@mui/icons-material/NorthEast'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+
 import moment from 'moment'
 import { Link } from 'react-router'
 

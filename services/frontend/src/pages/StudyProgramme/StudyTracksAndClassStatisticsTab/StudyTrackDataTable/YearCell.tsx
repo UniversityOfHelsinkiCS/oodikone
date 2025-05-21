@@ -1,8 +1,8 @@
-import {
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowRight as KeyboardArrowRightIcon,
-} from '@mui/icons-material'
-import { TableCell, IconButton, Stack } from '@mui/material'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import TableCell from '@mui/material/TableCell'
 
 import { PopulationLink } from '@/components/material/PopulationLink'
 

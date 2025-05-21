@@ -1,4 +1,8 @@
-import { Box, Slider, Stack, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Slider from '@mui/material/Slider'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import { useEffect, useState } from 'react'
 
 import { PopulationLink } from '@/components/material/PopulationLink'

@@ -1,4 +1,8 @@
-import { Alert, AlertTitle, Divider, Stack } from '@mui/material'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Divider from '@mui/material/Divider'
+import Stack from '@mui/material/Stack'
+
 import { useEffect, useState } from 'react'
 
 import { getTargetCreditsForProgramme } from '@/common'

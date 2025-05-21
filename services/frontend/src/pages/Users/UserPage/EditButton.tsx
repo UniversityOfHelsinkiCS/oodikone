@@ -1,5 +1,6 @@
-import { Check as CheckIcon, Edit as EditIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
+import EditIcon from '@mui/icons-material/Edit'
+import Button from '@mui/material/Button'
 
 export const EditButton = ({ disabled, editing, onClick }: { disabled: boolean; editing: boolean; onClick: any }) => {
   return (

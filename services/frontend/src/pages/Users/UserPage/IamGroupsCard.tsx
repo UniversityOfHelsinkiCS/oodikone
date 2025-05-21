@@ -1,4 +1,7 @@
-import { Card, CardContent, Chip, Stack } from '@mui/material'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
 
 import { User } from '@/types/api/users'
 import { CardHeader } from './CardHeader'

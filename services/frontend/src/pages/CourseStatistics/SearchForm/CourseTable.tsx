@@ -1,5 +1,13 @@
-import { DeleteOutline as DeleteOutlineIcon } from '@mui/icons-material'
-import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import IconButton from '@mui/material/IconButton'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
+
 import { sortBy } from 'lodash'
 import { memo } from 'react'
 

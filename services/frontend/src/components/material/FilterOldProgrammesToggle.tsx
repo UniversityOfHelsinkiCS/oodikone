@@ -1,4 +1,5 @@
-import { FormControlLabel, Switch } from '@mui/material'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 export const FilterOldProgrammesToggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => {
   return (

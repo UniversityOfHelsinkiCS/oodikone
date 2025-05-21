@@ -1,4 +1,10 @@
-import { Chip, TableCell, TableHead, TableBody, TableRow, Stack } from '@mui/material'
+import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+
 import { sortBy } from 'lodash'
 import { Link } from 'react-router'
 

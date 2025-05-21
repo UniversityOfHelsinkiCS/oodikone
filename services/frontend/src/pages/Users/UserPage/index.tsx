@@ -1,4 +1,7 @@
-import { Alert, Box, Container, Stack } from '@mui/material'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Stack from '@mui/material/Stack'
 
 import { isDefaultServiceProvider } from '@/common'
 import { Loading } from '@/components/material/Loading'

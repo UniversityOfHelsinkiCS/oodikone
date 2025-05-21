@@ -1,5 +1,9 @@
-import { DoNotDisturb as DoNotDisturbIcon } from '@mui/icons-material'
-import { Alert, AlertTitle, Box, Container, Link } from '@mui/material'
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Link from '@mui/material/Link'
 
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTitle } from '@/hooks/title'

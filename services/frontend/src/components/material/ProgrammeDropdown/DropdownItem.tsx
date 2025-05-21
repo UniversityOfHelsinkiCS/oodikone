@@ -1,5 +1,7 @@
-import { Person as PersonIcon } from '@mui/icons-material'
-import { Box, Chip, Typography } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+import Typography from '@mui/material/Typography'
 
 export const DropdownItem = ({
   code,

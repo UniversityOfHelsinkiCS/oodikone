@@ -1,5 +1,5 @@
-import { Search as SearchIcon } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import Button from '@mui/material/Button'
 import { useNavigate } from 'react-router'
 
 export const NewQueryButton = () => {

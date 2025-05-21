@@ -1,4 +1,7 @@
-import { Box, Paper, Stack, Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { InfoBox } from '@/components/material/InfoBox'
 import { ErrorMessage } from './ErrorMessage'

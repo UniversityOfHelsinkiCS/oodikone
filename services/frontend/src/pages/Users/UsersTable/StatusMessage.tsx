@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material'
+import Typography from '@mui/material/Typography'
 
 export const StatusMessage = ({ isError, isLoading }: { isError: boolean; isLoading: boolean }) => {
   if (isError) {

@@ -1,4 +1,6 @@
-import { FormControlLabel, Switch } from '@mui/material'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
+
 import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 

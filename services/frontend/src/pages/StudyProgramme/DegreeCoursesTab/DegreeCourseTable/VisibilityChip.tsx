@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material'
+import Chip from '@mui/material/Chip'
 
 import { CourseVisibility } from '@/types/courseVisibility'
 

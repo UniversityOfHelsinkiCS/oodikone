@@ -1,4 +1,10 @@
-import { Box, Button, Grid2 as Grid, InputAdornment, Stack, TextField } from '@mui/material'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid2'
+import InputAdornment from '@mui/material/InputAdornment'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+
 import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
