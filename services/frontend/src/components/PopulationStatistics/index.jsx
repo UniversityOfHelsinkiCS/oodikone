@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
@@ -43,6 +44,7 @@ const getYearText = year => {
 }
 
 export const PopulationStatistics = () => {
+  const location = useLocation()
   const { language, getTextIn } = useLanguage()
   const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useAppSelector(makePopulationsToData)
@@ -101,7 +103,7 @@ export const PopulationStatistics = () => {
     query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
       ? getCombinedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
       : getTextIn(programmeName)
-  const title = !queryIsSet ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
+  const title = !location.search ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 
   const filters = [
     !hasRestrictedAccess ? ageFilter : null,
@@ -176,7 +178,7 @@ export const PopulationStatistics = () => {
 
   return (
     <FilterView
-      displayTray={queryIsSet}
+      displayTray={!!location.search}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
@@ -186,19 +188,19 @@ export const PopulationStatistics = () => {
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
             {title} {query?.showBachelorAndMaster === 'true' && '(Bachelor + Master view)'}
-            {queryIsSet && query?.studyRights?.studyTrack && (
+            {!!location.search && query?.studyRights?.studyTrack && (
               <Header.Subheader>studytrack {query.studyRights.studyTrack}</Header.Subheader>
             )}
-            {queryIsSet && (
+            {!!location.search && (
               <Header.Subheader>
                 studytime {query?.months} months, class size {students.length} students
               </Header.Subheader>
             )}
           </Header>
-          {students?.length === 0 && queryIsSet && !isLoading && noStudentsMessage()}
+          {!!location.search && students?.length === 0 && !isLoading && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} />
-            {queryIsSet && (
+            {!!location.search && (
               <PopulationDetails
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
