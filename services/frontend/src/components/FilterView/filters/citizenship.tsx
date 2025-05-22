@@ -10,23 +10,23 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const { selected } = options
 
   const dropdownOptions = withoutSelf().reduce((options, student) => {
-    for (const citizenship of student.citizenships) {
-      const countryName = citizenship.en
-      if (options.some(option => option.value === countryName)) {
-        continue
-      }
-      const count = withoutSelf().filter(student =>
-        student.citizenships.some(citizenship => citizenship.en === countryName)
-      ).length
-      const country = getTextIn(citizenship)
+    student.citizenships
+      .filter(({ en: countryName }) => !options.some(option => option.value === countryName))
+      .forEach(citizenship => {
+        const countryName = citizenship.en
+        const country = getTextIn(citizenship)
 
-      options.push({
-        key: countryName,
-        value: countryName,
-        text: `${country} (${count})`,
-        count,
+        const count = withoutSelf().filter(({ citizenships: otherCitizenships }) =>
+          otherCitizenships.some(({ en: otherCountryName }) => otherCountryName === countryName)
+        ).length
+
+        options.push({
+          key: countryName,
+          value: countryName,
+          text: `${country} (${count})`,
+          count,
+        })
       })
-    }
 
     return options
   }, [])
@@ -66,7 +66,7 @@ export const citizenshipFilter = createFilter({
   isActive: ({ selected }) => selected !== '',
 
   filter(student, { selected }) {
-    return student.citizenships.some(citizenship => citizenship.en === selected)
+    return student.citizenships.some(({ en: countryName }) => countryName === selected)
   },
 
   component: CitizenshipFilterCard,

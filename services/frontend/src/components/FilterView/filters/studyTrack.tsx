@@ -1,4 +1,5 @@
 import { Dropdown, Form } from 'semantic-ui-react'
+import type { DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
@@ -30,7 +31,7 @@ const StudyTrackFilterCard = ({ code, onOptionsChange, options, withoutSelf }) =
       return acc
     }, [])
 
-  const handleChange = (_, { value }) => {
+  const handleChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
     onOptionsChange({
       selected: value,
     })

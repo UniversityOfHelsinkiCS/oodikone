@@ -6,16 +6,10 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
-  const tagCounts = withoutSelf().reduce((acc, student) => {
-    student.tags.forEach(tag => {
-      const {
-        tag_id: id,
-        tag: { tagname },
-      } = tag
-      if (!acc[id]) {
-        acc[id] = { count: 0, name: tagname }
-      }
-      acc[id].count += 1
+  const tagCounts: Record<string, any> = withoutSelf().reduce((acc, student) => {
+    student.tags.forEach(({ tag_id: id, tag: { tagname } }) => {
+      acc[id] ??= { count: 0, name: tagname }
+      acc[id].count++
     })
     return acc
   }, {})
@@ -77,17 +71,14 @@ export const tagsFilter = createFilter({
     excludedTags: [],
   },
 
-  isActive: ({ includedTags, excludedTags }) => includedTags.length > 0 || excludedTags.length > 0,
+  isActive: ({ includedTags, excludedTags }) => includedTags.length || excludedTags.length,
 
   filter(student, { includedTags, excludedTags }) {
     const tags = (student.tags ?? []).map(tag => tag.tag_id)
-    if (includedTags.length > 0 && excludedTags.length > 0) {
+    if (includedTags.length && excludedTags.length)
       return includedTags.some(tag => tags.includes(tag)) && !excludedTags.some(tag => tags.includes(tag))
-    }
-
-    if (includedTags.length > 0) return includedTags.some(tag => tags.includes(tag))
-
-    if (excludedTags.length > 0) return !excludedTags.some(tag => tags.includes(tag))
+    else if (includedTags.length) return includedTags.some(tag => tags.includes(tag))
+    else if (excludedTags.length) return !excludedTags.some(tag => tags.includes(tag))
 
     return true
   },

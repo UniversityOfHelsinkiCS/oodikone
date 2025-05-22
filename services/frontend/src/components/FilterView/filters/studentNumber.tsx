@@ -27,12 +27,13 @@ const EditableList = ({ value, onChange, renderLabel }) => {
           scrollbarWidth: 'thin',
         }}
       >
-        {value.map((studentNumber, index) => (
+        {value.map((studentNumber, index: number) => (
           <li
+            className={'asdasd'}
             key={studentNumber}
             style={{
               alignItems: 'center',
-              borderTop: index > 0 && '0px solid #e6e6e7',
+              borderTop: index ? '1px solid #e6e6e7' : undefined,
               display: 'flex',
               height: '1.75em',
             }}

@@ -46,7 +46,7 @@ export const creditsEarnedFilter = createFilter({
   isActive: ({ min, max }) => min !== null || max !== null,
 
   precompute: ({ students }) => {
-    const credits = students.map(getStudentTotalCredits).filter(n => !Number.isNaN(n))
+    const credits = students.map(student => getStudentTotalCredits(student)).filter(n => !Number.isNaN(n))
 
     return {
       max: max(credits),
@@ -54,18 +54,8 @@ export const creditsEarnedFilter = createFilter({
     }
   },
 
-  filter(student, { min, max }) {
-    const { credits } = student
-
-    if (min !== null && credits < min) {
-      return false
-    }
-
-    if (max !== null && credits > max) {
-      return false
-    }
-
-    return true
+  filter({ credits }, { min, max }) {
+    return !(min !== null && credits < min) && !(max !== null && credits > max)
   },
 
   render: (props, { precomputed }) => <CreditsEarnedFilterCard {...props} bounds={precomputed} />,

@@ -10,7 +10,7 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => 
   const { selected } = options
 
   const countsByYear = fp.flow(
-    fp.groupBy(student => new Date(student.started).getFullYear()),
+    fp.groupBy((student: any) => new Date(student.started).getFullYear()),
     fp.mapValues(students => students.length)
   )(withoutSelf())
 
