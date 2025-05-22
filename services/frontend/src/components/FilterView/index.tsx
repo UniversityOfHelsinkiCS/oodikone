@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
@@ -7,11 +7,9 @@ import { keyBy } from '@oodikone/shared/util'
 
 import { FilterViewContext, type FilterViewContextState } from './context'
 
-import { createFilter } from './filters/createFilter'
+import type { Filter, FilterFactory } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
-type FilterFactory = ReturnType<typeof createFilter>
-export type Filter = ReturnType<FilterFactory>
 // TODO: Use acual Student type when available
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
@@ -24,21 +22,14 @@ const resolveFilterOptions = (
     filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
   )
 
-export const FilterView = ({
-  children,
-  name,
-  filters: pFilters,
-  students,
-  displayTray: displayTrayProp,
-  initialOptions,
-}: {
+export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
   filters: (FilterFactory | Filter)[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
-}) => {
+}> = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
@@ -57,7 +48,7 @@ export const FilterView = ({
           .filter(({ precompute }) => precompute)
           .map(({ precompute, key }) => [
             key,
-            precompute({
+            precompute!({
               students,
               options: filterOptions[key],
               precomputed: null,
