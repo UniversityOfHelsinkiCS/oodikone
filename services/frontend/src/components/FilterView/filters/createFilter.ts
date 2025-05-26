@@ -5,7 +5,8 @@ import { FC, ReactNode } from 'react'
 import { setFilterOptions } from '@/redux/filters'
 
 import { Student } from '..'
-import type { FilterViewContextState, FilterContext } from '../context'
+import type { FilterContext, FilterViewContextState } from '../context'
+import type { FilterTrayProps } from '../FilterTray'
 
 /** TODO: Find acual types */
 type FilterOptionBaseCase = {
@@ -39,20 +40,15 @@ type FilterOptionBaseCase = {
    * @param{object} getFilterContext.options
    * @returns{boolean} student passed the filter
    */
-  filter: (students: Student[], opts, ctx: FilterContext) => boolean
+  filter: (students: Student[], opts: FilterContext['options'], ctx: FilterContext) => boolean
 
-  /**
-   * @param{object} filterOptions
-   * @param{object} getFilterContext
-   * @returns{boolean}
-   */
-  isActive: (opts, ctx?) => boolean
+  isActive: <T>(opts: T, ctx?: FilterContext) => boolean
 
   /**
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, (options, args?) => any>
+  selectors?: Record<string, (options: FilterViewContextState['filterOptions'][string], args?) => any>
 
   /**
    * `setOptions` and `reset` will be overwriten.
@@ -72,13 +68,13 @@ type FilterOptionBaseCase = {
 
 type FilterOptions = FilterWithRender | FilterWithComponent
 type FilterWithRender = FilterOptionBaseCase & {
-  render: (props: any, ctx: any) => ReactNode
+  render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
   component: undefined
 }
 
 type FilterWithComponent = FilterOptionBaseCase & {
   render: undefined
-  component: FC<FilterViewContextState>
+  component: FC<FilterTrayProps>
 }
 
 export type Filter = {
@@ -95,7 +91,7 @@ export type Filter = {
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
 
-  render: NonNullable<FilterOptions['render'] | ((props: any) => FilterOptions['component']) | ((_) => null)>
+  render: NonNullable<FilterOptions['render'] | ((props: FilterTrayProps) => FilterOptions['component'] | null)>
   priority: NonNullable<FilterOptions['priority']>
   actions: any
   selectors: any
@@ -154,16 +150,18 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
       setOptions: (_options, value) => value,
       reset: () => null,
     },
-    (action: NonNullable<FilterOptions['actions']>[string], name) => payload => (view, getContext) => {
-      const ctx = getContext(options.key)
+    (action: NonNullable<FilterOptions['actions']>[string], name) =>
+      payload =>
+      (view: string, getContext: FilterViewContextState['getContextByKey']) => {
+        const ctx = getContext(options.key)
 
-      return setFilterOptions({
-        view,
-        filter: options.key,
-        action: `${options.key}/${name}`,
-        options: produce(ctx.options, draft => action(draft, payload, ctx)),
-      })
-    }
+        return setFilterOptions({
+          view,
+          filter: options.key,
+          action: `${options.key}/${name}`,
+          options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload, ctx)),
+        })
+      }
   )
 
   /**
@@ -236,7 +234,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
 
     // NOTE: Factory.render wants to call the component,
     //       we need to return React.FC to satisfy it.
-    render: options.render ?? options.component ?? (_ => null),
+    render: options.render ?? options.component ?? ((_: FilterTrayProps) => null),
     priority: options.priority ?? 0,
     actions,
     selectors,

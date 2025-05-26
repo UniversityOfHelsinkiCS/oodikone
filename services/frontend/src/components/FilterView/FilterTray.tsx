@@ -2,7 +2,14 @@ import { useContext } from 'react'
 import { Button, Header, Segment } from 'semantic-ui-react'
 
 import { FilterViewContext } from './context'
+import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
+
+export type FilterTrayProps = {
+  options: FilterContext['options']
+  onOptionsChange: (options) => void
+  withoutSelf: () => void
+}
 
 export const FilterTray = () => {
   const {
@@ -18,14 +25,13 @@ export const FilterTray = () => {
   } = useContext(FilterViewContext)
 
   const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
-
   const filterSet = filters
     .sort((a, b) => (a.title ?? a.key).localeCompare(b.title ?? b.key))
     .map(filter => {
       const { key, render } = filter
       const ctx = getContextByKey(key)
 
-      const props = {
+      const props: FilterTrayProps = {
         options: ctx.options,
         onOptionsChange: options => {
           setFilterOptions(key, options)

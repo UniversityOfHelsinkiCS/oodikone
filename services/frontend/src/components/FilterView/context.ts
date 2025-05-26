@@ -19,11 +19,10 @@ export type FilterViewContextState = {
   filteredStudents: Student[]
   getContextByKey: (key: string) => FilterContext
   withoutFilter: (key: string) => any[]
-  setFilterOptions: (filter: Filter, options: any) => void
-  resetFilter: (filter: Filter) => void
+  setFilterOptions: (filter: string, options: any) => void
+  resetFilter: (filter: string) => void
   resetFilters: () => void
-
-  areOptionsDirty?: (key: string) => boolean
+  areOptionsDirty: (key: string) => boolean
 }
 
 const defaultState = {
@@ -43,6 +42,7 @@ const defaultState = {
   setFilterOptions: () => {},
   resetFilter: () => {},
   resetFilters: () => {},
+  areOptionsDirty: () => false,
 }
 
 export const FilterViewContext = createContext<FilterViewContextState>(defaultState)

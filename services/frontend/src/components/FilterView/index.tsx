@@ -5,7 +5,8 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { keyBy } from '@oodikone/shared/util'
 
-import { FilterViewContext, type FilterViewContextState } from './context'
+import { FilterViewContext } from './context'
+import type { FilterContext, FilterViewContextState } from './context'
 
 import type { Filter, FilterFactory } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
@@ -13,10 +14,10 @@ import { FilterTray } from './FilterTray'
 // TODO: Use acual Student type when available
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
-const resolveFilterOptions = (
-  store: Record<Filter['key'], any>,
+const resolveFilterOptions = <T,>(
+  store: Record<Filter['key'], { options: T }>,
   filters: Filter[],
-  initialOptions?: Record<Filter['key'], any>
+  initialOptions?: Record<Filter['key'], T>
 ): Record<Filter['key'], any> =>
   Object.fromEntries(
     filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
@@ -37,10 +38,9 @@ export const FilterView: FC<{
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
     [storeFilterOptions, filters, initialOptions]
   )
-  const orderedFilters = filters.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+  const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
 
-  const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
-
+  const displayTray = displayTrayProp === undefined || !!displayTrayProp
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
@@ -59,7 +59,7 @@ export const FilterView: FC<{
     [orderedFilters]
   )
 
-  const getFilterContext = (key: string) => ({
+  const getFilterContext = (key: string): FilterContext => ({
     students,
     options: filterOptions[key] ?? null,
     precomputed: precomputed[key] ?? null,
