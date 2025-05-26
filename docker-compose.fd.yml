@@ -49,9 +49,10 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./environments/ha:/opt/app-root/src/src/environment
-      - ./services/backend/src:/opt/app-root/src/src
-      - ./services/shared/:/opt/app-root/src/src/shared
+      - backend-nodemod:/opt/app-root/backend/node_modules
+      - ./environments/testu:/opt/app-root/backend/src/environment
+      - ./services/backend/:/opt/app-root/backend
+      - ./services/shared/:/opt/app-root/shared
 
   frontend:
     <<: *defaults
@@ -66,8 +67,9 @@ services:
       REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED: 'false'
       REACT_APP_SIS_URL: 'https://sis-qa.funidata.fi'
     volumes:
-      - ./services/frontend/src/:/opt/app-root/src/src
-      - ./services/shared/:/opt/app-root/src/src/shared
+      - frontend-nodemod:/opt/app-root/frontend/node_modules
+      - ./services/frontend/:/opt/app-root/frontend
+      - ./services/shared/:/opt/app-root/shared
 
   kone-db:
     <<: *defaults
@@ -171,6 +173,8 @@ services:
       - 12347:5432
 
 volumes:
+  backend-nodemod:
+  frontend-nodemod:
   kone-db-data:
   redis-data:
   sis-db-data:
