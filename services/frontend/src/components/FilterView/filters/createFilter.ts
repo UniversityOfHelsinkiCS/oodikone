@@ -91,7 +91,9 @@ export type Filter = {
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
 
-  render: NonNullable<FilterOptions['render'] | ((props: FilterTrayProps) => FilterOptions['component'] | null)>
+  render: NonNullable<
+    FilterWithRender['render'] | ((props: FilterTrayProps) => ReturnType<FilterWithComponent['component']> | null)
+  >
   priority: NonNullable<FilterOptions['priority']>
   actions: any
   selectors: any
