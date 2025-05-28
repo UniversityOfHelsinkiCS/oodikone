@@ -1,12 +1,22 @@
 const os = require('os')
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
+const LokiTransport = require('winston-loki')
 
 const { isProduction, serviceProvider } = require('../config')
 
 const { colorize, combine, timestamp, printf } = winston.format
 
 const transports = [new winston.transports.Console()]
+
+if (serviceProvider !== 'fd') {
+  transports.push(
+    new LokiTransport({
+      host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+      labels: { app: 'oodikone', environment: process.env.NODE_ENV ?? 'production' },
+    })
+  )
+}
 
 if (isProduction && serviceProvider !== 'fd') {
   transports.push(
