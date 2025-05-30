@@ -1,3 +1,4 @@
+import CheckIcon from '@mui/icons-material/Check'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
@@ -180,6 +181,25 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       }),
       columnHelper.accessor('citizenships', {
         header: 'Citizenships',
+      }),
+      columnHelper.accessor('tvex', {
+        header: 'TVEX',
+        Header: (
+          <TableHeaderWithTooltip
+            header="TVEX"
+            tooltipText="Student is enrolled to a bilingual programme (kaksikielinen tutkinto, tvåspråkig examen)"
+          />
+        ),
+        Cell: ({ cell }) => {
+          const isTVEX = cell.getValue()
+          return (
+            isTVEX && (
+              <span style={{ display: 'flex', justifyContent: 'center' }}>
+                <CheckIcon />
+              </span>
+            )
+          )
+        },
       }),
       columnHelper.accessor('curriculumPeriod', {
         header: 'Curriculum period',

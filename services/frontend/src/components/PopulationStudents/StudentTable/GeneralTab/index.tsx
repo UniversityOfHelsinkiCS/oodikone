@@ -49,6 +49,7 @@ export type FormattedStudentData = {
   attainmentDate?: string
   enrollmentDate?: string
   language?: string
+  tvex?: boolean
 }
 
 export const GeneralTabContainer = ({
@@ -361,6 +362,7 @@ export const GeneralTabContainer = ({
   })
 
   const formatStudent = (student: any): FormattedStudentData => {
+    const correctStudyRight = getStudyRight(student)
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
@@ -388,6 +390,7 @@ export const GeneralTabContainer = ({
       citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
+      tvex: !!correctStudyRight.tvex,
       tags: parseTags(student.tags) ?? null,
       extent: isAdmin && getExtent(student),
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),

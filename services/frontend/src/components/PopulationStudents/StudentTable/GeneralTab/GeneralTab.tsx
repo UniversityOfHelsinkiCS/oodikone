@@ -82,6 +82,7 @@ export const GeneralTab = ({
     'phoneNumber',
     'creditsTotal',
     'studentNumber',
+    'tvex',
     'tags',
     'updatedAt',
   ]
