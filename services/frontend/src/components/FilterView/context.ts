@@ -1,5 +1,14 @@
 import { createContext } from 'react'
-import type { Filter, Student } from '.'
+
+import type { Student } from '.'
+import type { Filter } from './filters/createFilter'
+
+export type FilterContext = {
+  students: Student[]
+  precomputed: any // can be null
+  options: Record<string, any>
+  args: any // can be null
+}
 
 export type FilterViewContextState = {
   viewName: string
@@ -8,18 +17,12 @@ export type FilterViewContextState = {
   precomputed: Record<string, any>
   filterOptions: Record<string, any>
   filteredStudents: Student[]
-  getContextByKey: (key: string) => {
-    students: Student[]
-    precomputed: any // can be null
-    options: any // can be null
-    args: any // can be null
-  }
+  getContextByKey: (key: string) => FilterContext
   withoutFilter: (key: string) => any[]
-  setFilterOptions: (filter: Filter, options: any) => void
-  resetFilter: (filter: Filter) => void
+  setFilterOptions: (filter: string, options: any) => void
+  resetFilter: (filter: string) => void
   resetFilters: () => void
-
-  areOptionsDirty?: (key: string) => boolean
+  areOptionsDirty: (key: string) => boolean
 }
 
 const defaultState = {
@@ -32,13 +35,14 @@ const defaultState = {
   getContextByKey: () => ({
     students: [],
     precomputed: null,
-    options: null,
+    options: {},
     args: null,
   }),
   withoutFilter: () => [],
   setFilterOptions: () => {},
   resetFilter: () => {},
   resetFilters: () => {},
+  areOptionsDirty: () => false,
 }
 
 export const FilterViewContext = createContext<FilterViewContextState>(defaultState)

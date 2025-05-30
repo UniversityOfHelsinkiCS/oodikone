@@ -1,44 +1,36 @@
-import { useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { keyBy } from '@oodikone/shared/util'
 
-import { FilterViewContext, type FilterViewContextState } from './context'
+import { FilterViewContext } from './context'
+import type { FilterContext, FilterViewContextState } from './context'
 
-import { createFilter } from './filters/createFilter'
+import type { Filter, FilterFactory } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
-type FilterFactory = ReturnType<typeof createFilter>
-export type Filter = ReturnType<FilterFactory>
 // TODO: Use acual Student type when available
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
-const resolveFilterOptions = (
-  store: Record<Filter['key'], any>,
+const resolveFilterOptions = <T,>(
+  store: Record<Filter['key'], { options: T }>,
   filters: Filter[],
-  initialOptions?: Record<Filter['key'], any>
+  initialOptions?: Record<Filter['key'], T>
 ): Record<Filter['key'], any> =>
   Object.fromEntries(
     filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
   )
 
-export const FilterView = ({
-  children,
-  name,
-  filters: pFilters,
-  students,
-  displayTray: displayTrayProp,
-  initialOptions,
-}: {
+export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
   filters: (FilterFactory | Filter)[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
-}) => {
+}> = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
@@ -46,10 +38,9 @@ export const FilterView = ({
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
     [storeFilterOptions, filters, initialOptions]
   )
-  const orderedFilters = filters.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+  const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
 
-  const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
-
+  const displayTray = displayTrayProp === undefined || !!displayTrayProp
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
@@ -57,7 +48,7 @@ export const FilterView = ({
           .filter(({ precompute }) => precompute)
           .map(({ precompute, key }) => [
             key,
-            precompute({
+            precompute!({
               students,
               options: filterOptions[key],
               precomputed: null,
@@ -68,7 +59,7 @@ export const FilterView = ({
     [orderedFilters]
   )
 
-  const getFilterContext = (key: string) => ({
+  const getFilterContext = (key: string): FilterContext => ({
     students,
     options: filterOptions[key] ?? null,
     precomputed: precomputed[key] ?? null,
