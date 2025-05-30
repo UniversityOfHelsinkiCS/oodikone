@@ -6,7 +6,7 @@ import type { Filter } from './filters/createFilter'
 export type FilterContext = {
   students: Student[]
   precomputed: any // can be null
-  options: any // can be null
+  options: Record<string, any> | null
   args: any // can be null
 }
 

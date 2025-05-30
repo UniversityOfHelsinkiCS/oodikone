@@ -36,13 +36,13 @@ type FilterOptionBaseCase = {
   /**
    * Function used to filter the students.
    *
-   * @param{Array} studentList
+   * @param{object} studentList element
    * @param{object} getFilterContext.options
    * @returns{boolean} student passed the filter
    */
-  filter: (students: Student[], opts: FilterContext['options'], ctx: FilterContext) => boolean
+  filter: (students: Student, opts: FilterContext['options'], ctx: FilterContext) => boolean
 
-  isActive: <T>(opts: T, ctx?: FilterContext) => boolean
+  isActive: (opts: any, ctx?: FilterContext) => boolean
 
   /**
    * Redux selectors.
@@ -58,7 +58,7 @@ type FilterOptionBaseCase = {
   /**
    * Precompute filter. Calculated once per studentlist???
    */
-  precompute?: (ctx: FilterContext) => Student[]
+  precompute?: (ctx: FilterContext) => any
 
   /**
    * Used to determine sort order.
@@ -69,11 +69,11 @@ type FilterOptionBaseCase = {
 type FilterOptions = FilterWithRender | FilterWithComponent
 type FilterWithRender = FilterOptionBaseCase & {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
-  component: undefined
+  component?: void
 }
 
 type FilterWithComponent = FilterOptionBaseCase & {
-  render: undefined
+  render?: void
   component: FC<FilterTrayProps>
 }
 
