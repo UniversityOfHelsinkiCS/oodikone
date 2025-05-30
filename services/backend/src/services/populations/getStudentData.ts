@@ -133,7 +133,7 @@ type StudentStudyRightElement = Pick<
 
 type StudentStudyRight = Pick<
   SISStudyRightModel,
-  'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate'
+  'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
 > & {
   studyRightElements: Array<StudentStudyRightElement>
 }
@@ -182,6 +182,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
           'cancelled',
           'semesterEnrollments',
           'startDate',
+          'tvex',
         ],
         separate: true,
         include: [

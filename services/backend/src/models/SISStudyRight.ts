@@ -86,6 +86,9 @@ export class SISStudyRightModel extends Model<SISStudyRight> implements SISStudy
   @HasMany(() => EnrollmentModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
   enrollments!: Enrollment[]
 
+  @Column(DataType.BOOLEAN)
+  tvex!: boolean
+
   @CreatedAt
   @Column(DataType.DATE)
   createdAt!: Date
