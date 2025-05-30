@@ -21,6 +21,7 @@ SISStudyRight.init(
     admissionType: STRING,
     semesterEnrollments: JSONB,
     facultyCode: STRING,
+    tvex: BOOLEAN,
     createdAt: DATE,
     updatedAt: DATE,
   },

@@ -10,6 +10,8 @@ const {
   getOrganisationCode,
 } = require('../shared')
 
+const TVEX_URN_CODE = 'urn:code:custom:hy-university-root-id:katu:katu1'
+
 // This needs to be done because snapshot date times seem to be saved in UTC time (based on the fact that there are a lot of entries with time being 21:00 or 22:00)
 const normalizeDateTime = date =>
   new Date(
@@ -62,6 +64,7 @@ const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterE
       admissionType: admissionNamesById[studyRight.admission_type_urn],
       semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
       facultyCode: getOrganisationCode(studyRight.organisation_id),
+      tvex: !!studyRight.code_urns?.includes(TVEX_URN_CODE),
     }
   } catch (error) {
     logger.error(`Study right mapping failed for studyRightId ${studyRight.id}`, error)
