@@ -390,7 +390,7 @@ export const GeneralTabContainer = ({
       citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
-      tvex: !!correctStudyRight.tvex,
+      tvex: !!correctStudyRight?.tvex,
       tags: parseTags(student.tags) ?? null,
       extent: isAdmin && getExtent(student),
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
