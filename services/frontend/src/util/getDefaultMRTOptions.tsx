@@ -6,7 +6,7 @@ import { MRT_Localization_FI } from 'material-react-table/locales/fi'
 
 import { DEFAULT_LANG } from '@oodikone/shared/language'
 
-// If defining sx props in a column definition, existing props definde here would be
+// If defining sx props in a column definition, existing props defined here would be
 // completely overridden. Export and ...spread from here as needed to avoid copy pasting.
 export const muiTableBodyCellPropsDefaultSx = {
   borderWidth: '0 1px 0 0',
@@ -44,6 +44,7 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
       muiFilterDatePickerProps: {
         format: 'YYYY-MM-DD',
       },
+      size: 100,
     },
     enableColumnOrdering: true,
     enableColumnDragging: false,

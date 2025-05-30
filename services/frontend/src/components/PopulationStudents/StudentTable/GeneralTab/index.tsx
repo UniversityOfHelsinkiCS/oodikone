@@ -385,7 +385,7 @@ export const GeneralTabContainer = ({
       startYearAtUniversity: getStartingYear(student),
       programmes: getStudyProgrammes(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
-      admissionType: shouldShowAdmissionType && getAdmissiontype(student),
+      admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
       gender: getGender(student.gender_code),
       citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,

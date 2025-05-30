@@ -34,13 +34,6 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       columnHelper.accessor('firstNames', {
         header: 'Given names',
       }),
-      columnHelper.accessor('email', {
-        header: 'Email',
-        enableClickToCopy: true,
-      }),
-      columnHelper.accessor('phoneNumber', {
-        header: 'Phone number',
-      }),
       columnHelper.accessor('primaryProgramme', {
         header: 'Primary study programme',
         muiTableBodyCellProps: {

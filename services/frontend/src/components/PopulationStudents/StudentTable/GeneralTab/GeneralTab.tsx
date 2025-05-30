@@ -54,8 +54,8 @@ export const GeneralTab = ({
   const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>({
     lastName: namesVisible,
     firstNames: namesVisible,
-    email: namesVisible,
-    phoneNumber: namesVisible,
+    email: false,
+    phoneNumber: false,
     studyTrack: studyTrackVisible,
     admissionType: admissionTypeVisible,
     semesterEnrollmentExport: false,
@@ -66,8 +66,8 @@ export const GeneralTab = ({
     setColumnVisibility({
       lastName: namesVisible,
       firstNames: namesVisible,
-      email: namesVisible,
-      phoneNumber: namesVisible,
+      email: false,
+      phoneNumber: false,
       studyTrack: studyTrackVisible,
       admissionType: admissionTypeVisible,
       semesterEnrollmentExport: false,
@@ -75,17 +75,7 @@ export const GeneralTab = ({
     })
   }, [namesVisible, studyTrackVisible, admissionTypeVisible])
 
-  const baseColumns = [
-    'lastName',
-    'firstNames',
-    'email',
-    'phoneNumber',
-    'creditsTotal',
-    'studentNumber',
-    'tvex',
-    'tags',
-    'updatedAt',
-  ]
+  const baseColumns = ['lastName', 'firstNames', 'creditsTotal', 'studentNumber', 'tvex', 'tags', 'updatedAt']
 
   const adminColumns = ['extent', 'updatedAt']
 
@@ -201,6 +191,14 @@ export const GeneralTab = ({
       columnHelper.accessor('programmes.exportValue', {
         id: 'programmesExport',
         header: `${dynamicTitles.programmes}`,
+        visibleInShowHideMenu: false,
+      }),
+      columnHelper.accessor('email', {
+        header: 'Email',
+        visibleInShowHideMenu: false,
+      }),
+      columnHelper.accessor('phoneNumber', {
+        header: 'Phone number',
         visibleInShowHideMenu: false,
       }),
     ],
