@@ -44,18 +44,13 @@ export const creditDateFilter = createFilter({
 
   isActive: ({ startDate, endDate }) => startDate !== null || endDate !== null,
 
+  /**
+   * startDate and endDate are both moment.Moment
+   */
   filter(student, { startDate, endDate }) {
-    student.courses = student.courses.filter(course => {
-      if (startDate && startDate.isAfter(course.date, 'day')) {
-        return false
-      }
-
-      if (endDate && endDate.isBefore(course.date, 'day')) {
-        return false
-      }
-
-      return true
-    })
+    student.courses = student.courses.filter(
+      course => !startDate?.isAfter(course.date, 'day') && !endDate?.isBefore(course.date, 'day')
+    )
 
     return true
   },
