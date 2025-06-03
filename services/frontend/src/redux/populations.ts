@@ -121,8 +121,6 @@ export const reducer = (state = initialState, action) => {
         updating: false,
         customPopulationFlag: false,
       }
-    case 'REMOVE_POPULATION':
-      return initialState
     case 'CLEAR_POPULATIONS':
       return initialState
     default:
