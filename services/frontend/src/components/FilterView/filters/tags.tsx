@@ -83,5 +83,5 @@ export const tagsFilter = createFilter({
     return true
   },
 
-  component: TagsFilterCard,
+  render: TagsFilterCard,
 })

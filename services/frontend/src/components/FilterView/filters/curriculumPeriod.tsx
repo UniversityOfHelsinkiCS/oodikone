@@ -57,5 +57,5 @@ export const curriculumPeriodFilter = createFilter({
     return selected === curriculumVersion
   },
 
-  component: CurriculumPeriodFilterCard,
+  render: CurriculumPeriodFilterCard,
 })

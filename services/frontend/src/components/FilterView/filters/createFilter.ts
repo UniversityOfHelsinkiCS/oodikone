@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import { mapValues } from 'lodash'
 
-import { FC, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { setFilterOptions } from '@/redux/filters'
 
 import { Student } from '..'
@@ -9,7 +9,7 @@ import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
 /** TODO: Find acual types */
-type FilterOptionBaseCase = {
+type FilterOptions = {
   /**
    * Non-user visible (unique) identifier for the filter.
    */
@@ -64,17 +64,11 @@ type FilterOptionBaseCase = {
    * Used to determine sort order.
    */
   priority?: number
-}
 
-type FilterOptions = FilterWithRender | FilterWithComponent
-type FilterWithRender = FilterOptionBaseCase & {
+  /**
+   * Filter tray render component.
+   */
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
-  component?: void
-}
-
-type FilterWithComponent = FilterOptionBaseCase & {
-  render?: void
-  component: FC<FilterTrayProps>
 }
 
 export type Filter = {
@@ -91,9 +85,7 @@ export type Filter = {
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
 
-  render: NonNullable<
-    FilterWithRender['render'] | ((props: FilterTrayProps) => ReturnType<FilterWithComponent['component']> | null)
-  >
+  render: NonNullable<FilterOptions['render']>
   priority: NonNullable<FilterOptions['priority']>
   actions: any
   selectors: any
@@ -234,9 +226,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
     filter: options.filter,
     precompute: options.precompute,
 
-    // NOTE: Factory.render wants to call the component,
-    //       we need to return React.FC to satisfy it.
-    render: options.render ?? options.component ?? ((_: FilterTrayProps) => null),
+    render: options.render,
     priority: options.priority ?? 0,
     actions,
     selectors,

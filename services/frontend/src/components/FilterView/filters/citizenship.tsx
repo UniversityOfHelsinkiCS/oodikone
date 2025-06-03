@@ -69,5 +69,5 @@ export const citizenshipFilter = createFilter({
     return student.citizenships.some(({ en: countryName }) => countryName === selected)
   },
 
-  component: CitizenshipFilterCard,
+  render: CitizenshipFilterCard,
 })

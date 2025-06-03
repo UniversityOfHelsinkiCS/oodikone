@@ -60,5 +60,5 @@ export const genderFilter = createFilter({
     return Number(student.gender_code) === selected
   },
 
-  component: GenderFilterCard,
+  render: GenderFilterCard,
 })

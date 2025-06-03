@@ -59,5 +59,5 @@ export const startYearAtUniFilter = createFilter({
 
   filter: (student, { selected }) => selected.includes(new Date(student.started).getFullYear()),
 
-  component: StartYearAtUniFilterCard,
+  render: StartYearAtUniFilterCard,
 })

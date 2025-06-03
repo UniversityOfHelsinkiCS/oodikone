@@ -60,5 +60,5 @@ export const studyRightTypeFilter = createFilter({
     return mode === 1 ? studyRight.extentCode === 5 : studyRight.extentCode === 2
   },
 
-  component: StudyRightTypeFilterCard,
+  render: StudyRightTypeFilterCard,
 })

@@ -61,5 +61,5 @@ export const transferredToProgrammeFilter = createFilter({
     },
   },
 
-  component: TransferredToProgrammeFilterCard,
+  render: TransferredToProgrammeFilterCard,
 })

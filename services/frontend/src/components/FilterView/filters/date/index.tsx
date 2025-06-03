@@ -59,5 +59,5 @@ export const creditDateFilter = createFilter({
     selectedStartDate: ({ startDate }, _) => startDate,
   },
 
-  component: CreditDateFilterCard,
+  render: CreditDateFilterCard,
 })
