@@ -101,7 +101,7 @@ export const PopulationStatistics = () => {
 
   const programmeText =
     query?.studyRights?.combinedProgramme !== '' && query?.studyRights?.combinedProgramme !== undefined
-      ? getCombinedProgrammeName(getTextIn(programmeName), getTextIn(combinedProgrammeName), language)
+      ? getCombinedProgrammeName(getTextIn(programmeName)!, getTextIn(combinedProgrammeName)!, language)
       : getTextIn(programmeName)
   const title = !location.search ? 'Class statistics' : `${programmeText} ${getYearText(query?.year)}`
 
@@ -143,14 +143,14 @@ export const PopulationStatistics = () => {
           programme: programmeCode,
         })
       : null,
-  ].filter(Boolean)
+  ].filter(item => !!item)
 
   const initialOptions = {
     [transferredToProgrammeFilter.key]: {
       transferred: false,
     },
     [hopsFilter.key]: {
-      studyStart: (students[0] || {}).studyrightStart,
+      studyStart: (students[0] || {})?.studyrightStart,
     },
     [studyTrackFilter.key]: {
       selected: query?.studyRights?.studyTrack ? [query?.studyRights?.studyTrack] : [],
