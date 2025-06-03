@@ -48,7 +48,8 @@ type FilterOptions = {
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, (options: FilterViewContextState['filterOptions'][string], args?) => any>
+  // Based on defaultOptions
+  selectors?: Record<string, (options: any, args?) => any>
 
   /**
    * `setOptions` and `reset` will be overwriten.
@@ -71,8 +72,8 @@ type FilterOptions = {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
-export type Filter = {
-  args: any
+export type Filter<Args = any> = {
+  args?: Args
 
   key: FilterOptions['key']
   title: NonNullable<FilterOptions['title'] | FilterOptions['key']>
@@ -91,17 +92,17 @@ export type Filter = {
   selectors: any
 }
 
-export type FilterFactory = {
+export type FilterFactory<Args> = {
   key: Filter['key']
   actions: Filter['actions']
   selectors: Filter['selectors']
-  (args?: any): Filter
+  (args?: Args): Filter<Args>
 }
 
 /**
  * Unlike the name suggests, this function returns a filter factory.
  */
-export const createFilter = (options: FilterOptions): FilterFactory => {
+export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<Args> => {
   const opt_selectors = options.selectors ?? {}
   const opt_actions = options.actions ?? {}
 
@@ -212,7 +213,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    *
    * @dogamak
    */
-  const factory = (args?: any): Filter => ({
+  const factory = (args?: Args): Filter<Args> => ({
     args,
 
     key: options.key,

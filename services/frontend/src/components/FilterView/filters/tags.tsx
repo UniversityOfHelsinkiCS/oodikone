@@ -23,13 +23,12 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const includeOptions = dropdownOptions.filter(({ value }) => !excludedTags.includes(value))
   const excludeOptions = dropdownOptions.filter(({ value }) => !includedTags.includes(value))
 
-  if (Object.entries(tagCounts).length === 0) {
+  if (!Object.entries(tagCounts).length)
     return (
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.
       </Message>
     )
-  }
 
   return (
     <Form>
@@ -71,7 +70,7 @@ export const tagsFilter = createFilter({
     excludedTags: [],
   },
 
-  isActive: ({ includedTags, excludedTags }) => includedTags.length || excludedTags.length,
+  isActive: ({ includedTags, excludedTags }) => !!includedTags.length || !!excludedTags.length,
 
   filter(student, { includedTags, excludedTags }) {
     const tags = (student.tags ?? []).map(tag => tag.tag_id)

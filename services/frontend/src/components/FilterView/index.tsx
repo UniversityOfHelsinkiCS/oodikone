@@ -26,7 +26,7 @@ const resolveFilterOptions = <T,>(
 export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
-  filters: (FilterFactory | Filter)[]
+  filters: (FilterFactory<any> | Filter)[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
@@ -63,7 +63,7 @@ export const FilterView: FC<{
     students,
     options: filterOptions[key] ?? null,
     precomputed: precomputed[key] ?? null,
-    args: filtersByKey[key].args ?? null,
+    args: filtersByKey[key]?.args ?? null,
   })
 
   const applyFilters = (filters: Filter[]) =>
@@ -87,8 +87,6 @@ export const FilterView: FC<{
     viewName: name,
     allStudents: students,
     filters,
-    precomputed,
-    filterOptions,
     filteredStudents,
     getContextByKey: getFilterContext,
     areOptionsDirty: key => !!storeFilterOptions[key],

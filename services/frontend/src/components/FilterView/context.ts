@@ -10,34 +10,35 @@ export type FilterContext = {
   args: any // can be null
 }
 
+export const getDefaultFilterContext = () => ({ ...defaultFilterContext })
+const defaultFilterContext: FilterContext = {
+  students: [],
+  precomputed: null,
+  options: {},
+  args: null,
+}
+
 export type FilterViewContextState = {
   viewName: string
   allStudents: Student[]
   filters: Filter[]
-  precomputed: Record<string, any>
-  filterOptions: Record<string, any>
   filteredStudents: Student[]
   getContextByKey: (key: string) => FilterContext
-  withoutFilter: (key: string) => any[]
+  /** Filterlist without the selected filter */
+  withoutFilter: (key: string) => Filter[]
+  /** Set filter options */
   setFilterOptions: (filter: string, options: any) => void
   resetFilter: (filter: string) => void
   resetFilters: () => void
   areOptionsDirty: (key: string) => boolean
 }
 
-const defaultState = {
+const defaultState: FilterViewContextState = {
   viewName: '<Unset>',
   allStudents: [],
   filters: [],
-  precomputed: {},
-  filterOptions: {},
   filteredStudents: [],
-  getContextByKey: () => ({
-    students: [],
-    precomputed: null,
-    options: {},
-    args: null,
-  }),
+  getContextByKey: () => getDefaultFilterContext(),
   withoutFilter: () => [],
   setFilterOptions: () => {},
   resetFilter: () => {},

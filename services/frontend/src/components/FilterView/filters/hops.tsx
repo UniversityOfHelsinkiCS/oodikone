@@ -167,7 +167,7 @@ export const hopsFilter = createFilter({
     return args.combinedProgrammeCode
   },
 
-  isActive: arg => arg?.activeProgramme || arg?.activeCombinedProgramme,
+  isActive: arg => !!arg?.activeProgramme || !!arg?.activeCombinedProgramme,
 
   filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
     const studyRights = student.studyRights.filter(({ cancelled }) => !cancelled).map(({ id }) => id)

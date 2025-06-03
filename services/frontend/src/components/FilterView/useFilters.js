@@ -4,7 +4,7 @@ import { FilterViewContext } from './context'
 
 export const useFilters = () => {
   const dispatch = useAppDispatch()
-  const { getContextByKey, viewName, filterOptions } = useContext(FilterViewContext)
+  const { getContextByKey, viewName } = useContext(FilterViewContext)
 
   const filterDispatch = filterAction => {
     dispatch({
@@ -14,7 +14,7 @@ export const useFilters = () => {
   }
 
   const useFilterSelector = filterSelector => {
-    const options = filterOptions[filterSelector.filter]
+    const { options } = getContextByKey(filterSelector.filter)
     return filterSelector(options)
   }
 
