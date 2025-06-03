@@ -121,21 +121,6 @@ export const reducer = (state = initialState, action) => {
         updating: false,
         customPopulationFlag: false,
       }
-    case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':
-      return {
-        ...state,
-        updating: true,
-      }
-    case 'UPDATE_POPULATION_STUDENTS_FAILURE':
-      return {
-        ...state,
-        updating: false,
-      }
-    case 'UPDATE_POPULATION_STUDENTS_SUCCESS':
-      return {
-        ...state,
-        updating: false,
-      }
     case 'REMOVE_POPULATION':
       return initialState
     case 'CLEAR_POPULATIONS':
