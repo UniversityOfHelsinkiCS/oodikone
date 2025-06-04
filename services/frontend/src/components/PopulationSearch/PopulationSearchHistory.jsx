@@ -6,6 +6,7 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
+import { formatToArray } from '@oodikone/shared/util'
 import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
@@ -13,7 +14,9 @@ import './populationSearch.css'
 export const PopulationSearchHistory = ({ query }) => {
   const navigate = useNavigate()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-  const [semesters, setSemesters] = useState(query?.semesters ?? ['FALL', 'SPRING'])
+  const [semesters, setSemesters] = useState(
+    query?.semesters.length ? formatToArray(query?.semesters) : ['FALL', 'SPRING']
+  )
   const [studentStatuses, setStudentStatus] = useState(query?.studentStatuses ?? [])
   const [months, setMonths] = useState(query?.months ?? 0)
 
