@@ -1,5 +1,6 @@
 import { RTKApi } from '@/apiConnection'
 import { DegreeProgramme } from '@/types/api/faculty'
+import { formatToArray } from '@oodikone/shared/util'
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -8,8 +9,21 @@ const populationApi = RTKApi.injectEndpoints({
         url: '/v3/populationstatistics/',
         method: 'GET',
         params: years
-          ? { semesters, studentStatuses, studyRights: JSON.stringify(studyRights), months, year, years }
-          : { semesters, studentStatuses, studyRights: JSON.stringify(studyRights), months, year },
+          ? {
+              semesters: formatToArray(semesters),
+              studentStatuses,
+              studyRights: JSON.stringify(studyRights),
+              months,
+              year,
+              years,
+            }
+          : {
+              semesters: formatToArray(semesters),
+              studentStatuses,
+              studyRights: JSON.stringify(studyRights),
+              months,
+              year,
+            },
       }),
     }),
     getCustomPopulation: builder.query({
