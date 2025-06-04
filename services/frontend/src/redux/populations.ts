@@ -4,28 +4,13 @@ import { DegreeProgramme } from '@/types/api/faculty'
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getPopulationStatistics: builder.query({
-      query: ({ semesters, studentStatuses, studyRights, months, year, years }) => {
-        const params = new URLSearchParams({
-          studyRights: JSON.stringify(studyRights),
-          year,
-          months,
-        })
-
-        if (semesters && !Array.isArray(semesters)) params.append('semesters[]', semesters)
-        else if (semesters) semesters.forEach(s => params.append('semesters[]', s))
-
-        if (years && !Array.isArray(years)) params.append('years[]', years)
-        else if (years) years.forEach(y => params.append('years[]', y))
-
-        if (studentStatuses && !Array.isArray(studentStatuses)) params.append('studentStatuses[]', studentStatuses)
-        else if (studentStatuses) studentStatuses.forEach(s => params.append('studentStatuses[]', s))
-
-        return {
-          url: '/v3/populationstatistics/',
-          method: 'GET',
-          params,
-        }
-      },
+      query: ({ semesters, studentStatuses, studyRights, months, year, years }) => ({
+        url: '/v3/populationstatistics/',
+        method: 'GET',
+        params: years
+          ? { semesters, studentStatuses, studyRights: JSON.stringify(studyRights), months, year, years }
+          : { semesters, studentStatuses, studyRights: JSON.stringify(studyRights), months, year },
+      }),
     }),
     getCustomPopulation: builder.query({
       query: ({ studentNumbers, tags }) => ({
