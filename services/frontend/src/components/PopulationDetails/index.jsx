@@ -122,7 +122,9 @@ export const PopulationDetails = ({
             criteria={criteria?.data}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
+            months={query?.months ?? 0}
             programmeCode={query?.studyRights?.programme}
+            studyRights={query?.studyRights}
             variant="population"
             year={query?.year}
           />
