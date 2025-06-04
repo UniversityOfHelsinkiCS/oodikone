@@ -15,14 +15,7 @@ import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
-export const PopulationDetails = ({
-  filteredStudents,
-  isLoading,
-  programmeCodes,
-  query,
-  queryIsSet,
-  selectedStudentsByYear,
-}) => {
+export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes, query, selectedStudentsByYear }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
@@ -44,7 +37,7 @@ export const PopulationDetails = ({
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  if (isLoading || !queryIsSet) {
+  if (isLoading || !Object.keys(query).length) {
     return null
   }
 

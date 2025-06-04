@@ -1,53 +1,26 @@
-import { RTKApi, callController } from '@/apiConnection'
+import { RTKApi } from '@/apiConnection'
 import { DegreeProgramme } from '@/types/api/faculty'
-
-const initialState = {
-  pending: false,
-  error: false,
-  data: {},
-  query: undefined,
-  updating: false,
-  customPopulationFlag: false,
-}
-
-export const getPopulationStatistics = ({
-  semesters,
-  studentStatuses,
-  studyRights,
-  months,
-  uuid,
-  year,
-  years,
-  onProgress,
-  tag,
-  showBachelorAndMaster,
-}) => {
-  const route = '/v3/populationstatistics/'
-  const prefix = 'GET_POPULATION_STATISTICS_'
-  const query = {
-    semesters,
-    studentStatuses,
-    studyRights,
-    uuid,
-    months,
-    year,
-    years,
-    tag,
-    showBachelorAndMaster,
-  }
-  const params = {
-    semesters,
-    studentStatuses,
-    months,
-    studyRights: JSON.stringify(studyRights),
-    year,
-    years,
-  }
-  return callController(route, prefix, null, 'get', query, params, onProgress)
-}
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
+    getPopulationStatistics: builder.query({
+      query: ({ semesters, studentStatuses, studyRights, months, year, years }) => {
+        const params = new URLSearchParams({
+          studyRights: JSON.stringify(studyRights),
+          year,
+          months,
+        })
+        semesters?.forEach(s => params.append('semesters', s))
+        years?.forEach(y => params.append('years', y))
+        studentStatuses?.forEach(s => params.append('studentStatuses', s))
+
+        return {
+          url: '/v3/populationstatistics/',
+          method: 'GET',
+          params,
+        }
+      },
+    }),
     getCustomPopulation: builder.query({
       query: ({ studentNumbers, tags }) => ({
         url: '/v3/populationstatisticsbystudentnumbers',
@@ -79,51 +52,11 @@ const populationApi = RTKApi.injectEndpoints({
 })
 
 export const {
+  useGetPopulationStatisticsQuery,
   useGetCustomPopulationQuery,
   useGetPopulationStatisticsByCourseQuery,
   useGetMaxYearsToCreatePopulationFromQuery,
   useGetProgrammesQuery,
 } = populationApi
 
-export const clearPopulations = () => ({
-  type: 'CLEAR_POPULATIONS',
-})
-
-export const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'GET_POPULATION_STATISTICS_ATTEMPT':
-      return {
-        ...state,
-        pending: true,
-        error: false,
-        data: {},
-        query: action.requestSettings.query,
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'GET_POPULATION_STATISTICS_FAILURE':
-      return {
-        ...state,
-        pending: false,
-        error: true,
-        data: action.response,
-        query: action.query,
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'GET_POPULATION_STATISTICS_SUCCESS':
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response,
-        query: action.query,
-        updating: false,
-        customPopulationFlag: false,
-      }
-    case 'CLEAR_POPULATIONS':
-      return initialState
-    default:
-      return state
-  }
-}
+// export const clearPopulations = () => populationApi.util.resetApiState()

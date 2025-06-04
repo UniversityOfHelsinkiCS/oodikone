@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { isEqual, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import moment from 'moment'
 import qs from 'query-string'
 import { useEffect, useState } from 'react'
@@ -17,35 +17,27 @@ import { YEAR_DATE_FORMAT } from '@/constants/date'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { getPopulationStatistics, clearPopulations, useGetProgrammesQuery } from '@/redux/populations'
-import { clearSelected } from '@/redux/populationSelectedStudentCourses'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { createPinnedFirstComparator } from '@/util/comparator'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
-import { formatQueryParamsToArrays } from '@oodikone/shared/util'
 import { getMonths } from './common'
 import './populationSearch.css'
 
-const initialQuery = () => ({
-  year: '2017',
-  semesters: ['FALL', 'SPRING'],
-  studentStatuses: [],
-  studyRights: {},
-  months: getMonths('2017', 'FALL'),
-  showBachelorAndMaster: false,
-})
-
-export const PopulationSearchForm = ({ onProgress }) => {
+export const PopulationSearchForm = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const dispatch = useAppDispatch()
-  const populations = useAppSelector(state => state.populations)
-  const previousQuery = populations.query || {}
   const { getTextIn } = useLanguage()
   const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
-  const [query, setQuery] = useState(initialQuery())
+  const [query, setQuery] = useState({
+    year: '2017',
+    semesters: ['FALL', 'SPRING'],
+    studentStatuses: [],
+    studyRights: {},
+    months: getMonths('2017', 'FALL'),
+    showBachelorAndMaster: false,
+  })
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
@@ -77,61 +69,6 @@ export const PopulationSearchForm = ({ onProgress }) => {
     'urn:code:degree-program-type:masters-degree',
   ].includes(degreeProgrammeType[query.studyRights.programme])
 
-  const parseQueryFromUrl = () => {
-    const initial = initialQuery()
-    const { studyRights, months, ...rest } = qs.parse(location.search)
-    const query = {
-      ...initial,
-      ...rest,
-      studyRights: JSON.parse(studyRights),
-      months: JSON.parse(months),
-    }
-    return query
-  }
-
-  const checkPreviousQuery = (query, previousQuery) => {
-    const sameMonths = query.months === previousQuery.months
-    const sameYear = query.year === previousQuery.year
-    const sameSemesters = isEqual(previousQuery.semesters, query.semesters)
-    const sameStudentStatuses = isEqual(previousQuery.studentStatuses, query.studentStatuses)
-    const sameYears = isEqual(previousQuery.years, query.years)
-    const sameStudyRights = isEqual(previousQuery.studyRights, query.studyRights)
-    const sameTag = query.tag === previousQuery.tag
-    return sameStudyRights && sameMonths && sameYear && sameSemesters && sameStudentStatuses && sameYears && sameTag
-  }
-
-  const fetchPopulation = async query => {
-    const uuid = crypto.randomUUID()
-    dispatch(clearSelected())
-    dispatch(getPopulationStatistics({ ...query, uuid, onProgress }))
-  }
-
-  // HACK: This function doesn't work as intended
-  const fetchPopulationFromUrlParams = () => {
-    const query = parseQueryFromUrl()
-    const formattedQuery = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
-    if (!checkPreviousQuery(formattedQuery, previousQuery)) {
-      setQuery(query)
-      fetchPopulation(formattedQuery)
-    }
-  }
-
-  useEffect(() => {
-    if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      setQuery(initialQuery())
-    }
-    if (location.search) {
-      fetchPopulationFromUrlParams()
-    }
-    if (!location.search) {
-      setQuery({
-        ...query,
-        studentStatuses: [],
-        semesters: ['FALL', 'SPRING'],
-      })
-    }
-  }, [location.search])
-
   const handleProgrammeChange = (_event, { value: programme }) => {
     setQuery({
       ...query,
@@ -157,22 +94,16 @@ export const PopulationSearchForm = ({ onProgress }) => {
   }, [])
 
   const pushQueryToUrl = query => {
-    if (!checkPreviousQuery(query, previousQuery)) {
-      dispatch(clearPopulations())
-    }
-    // Just to be sure that the previous population's data has been cleared
-    setTimeout(() => {
-      const { studyRights, ...rest } = query
-      studyRights.combinedProgramme =
-        studyRights.programme && studyRights.programme.includes('+') ? studyRights.programme.split('+')[1] : ''
-      studyRights.programme =
-        studyRights.programme && studyRights.programme.includes('+')
-          ? studyRights.programme.split('+')[0]
-          : studyRights.programme
-      const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
-      const searchString = qs.stringify(queryObject)
-      navigate({ search: searchString })
-    }, 0)
+    const { studyRights, ...rest } = query
+
+    const [programme, combinedProgramme] = studyRights.programme.split('+')
+    studyRights.programme = programme
+    studyRights.combinedProgramme = combinedProgramme ?? ''
+
+    const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
+    const searchString = qs.stringify(queryObject)
+
+    navigate({ search: searchString })
   }
 
   const getSearchHistoryTextFromQuery = () => {
@@ -199,6 +130,7 @@ export const PopulationSearchForm = ({ onProgress }) => {
       text: getSearchHistoryTextFromQuery(),
       params: query,
     })
+
     pushQueryToUrl(query)
   }
 

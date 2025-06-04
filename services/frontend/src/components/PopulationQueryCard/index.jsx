@@ -2,16 +2,19 @@ import { minBy } from 'lodash'
 import { Card } from 'semantic-ui-react'
 
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const PopulationQueryCard = ({ population, query }) => {
+export const PopulationQueryCard = ({ query }) => {
   const { studentStatuses, tag } = query
+  const { data: population } = useGetPopulationStatisticsQuery(query, { skip: !Object.keys(query).length })
+  const students = population?.students ?? []
+
   const { data: tags = [] } = useGetTagsByStudyTrackQuery(query?.studyRights?.programme, {
     skip: !query?.studyRights?.programme,
   })
   const tagName = tag ? tags.find(currentTag => currentTag.id === tag)?.name : ''
-  const { students } = population
 
   if (!students.length) return null
 

@@ -7,16 +7,15 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useProgress } from '@/hooks/progress'
-import { useAppSelector } from '@/redux/hooks'
+import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
-export const PopulationSearch = ({ combinedProgrammeCode }) => {
+export const PopulationSearch = ({ query, combinedProgrammeCode }) => {
   const location = useLocation()
-  const populations = useAppSelector(state => state.populations)
-  const populationFound = populations.data.students !== undefined
-  const loading = !!populations.pending
-  const { onProgress, progress } = useProgress(loading)
+  const { data: populations, isLoading } = useGetPopulationStatisticsQuery(query, { skip: !Object.keys(query).length })
+  const populationFound = populations?.students !== undefined
+  const { progress } = useProgress(isLoading)
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
@@ -32,8 +31,8 @@ export const PopulationSearch = ({ combinedProgrammeCode }) => {
           <Divider />
         </>
       )}
-      <PopulationSearchForm onProgress={onProgress} />
-      {location.search !== '' && !loading && (
+      <PopulationSearchForm />
+      {location.search !== '' && !isLoading && (
         <Form>
           <Form.Field>
             <Link to="/populations">
@@ -65,7 +64,7 @@ export const PopulationSearch = ({ combinedProgrammeCode }) => {
               />
             </Form.Field>
           )}
-          <PopulationSearchHistory />
+          <PopulationSearchHistory query={query} />
         </Form>
       )}
       <ProgressBar progress={progress} />
