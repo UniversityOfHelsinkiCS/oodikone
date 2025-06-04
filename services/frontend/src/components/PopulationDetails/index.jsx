@@ -124,6 +124,7 @@ export const PopulationDetails = ({
             filteredStudents={filteredStudents}
             months={query?.months ?? 0}
             programmeCode={query?.studyRights?.programme}
+            showBachelorAndMaster={query?.showBachelorAndMaster}
             studyRights={query?.studyRights}
             variant="population"
             year={query?.year}

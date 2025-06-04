@@ -34,6 +34,8 @@ const Panes = ({
   variant,
   visiblePanes,
   year,
+  studyRights,
+  showBachelorAndMaster,
 }) => {
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
@@ -52,6 +54,8 @@ const Panes = ({
           filteredStudents={filteredStudents}
           from={from}
           group={studyGuidanceGroup}
+          showBachelorAndMaster={showBachelorAndMaster}
+          studyRights={studyRights}
           to={to}
           variant={variant}
           year={year}
@@ -137,6 +141,7 @@ const PopulationStudents = ({
   studyGuidanceGroup,
   variant,
   year,
+  showBachelorAndMaster,
 }) => {
   const studentRef = useRef()
   let mainProgramme = studyRights?.programme || ''
@@ -179,7 +184,9 @@ const PopulationStudents = ({
         from={from}
         mainProgramme={mainProgramme}
         months={months}
+        showBachelorAndMaster={showBachelorAndMaster}
         studyGuidanceGroup={studyGuidanceGroup}
+        studyRights={studyRights}
         to={to}
         variant={variant}
         visiblePanes={contentToInclude.panesToInclude}
