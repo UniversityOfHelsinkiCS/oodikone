@@ -119,8 +119,9 @@ export const PopulationStatistics = () => {
   const programmeCodes = [programmeCode, combinedProgrammeCode].filter(Boolean)
 
   const selectedStudentsByYear = useMemo(() => {
-    const years = query.years ?? [query.year]
-    const selectedStudentsByYear = Object.fromEntries(years.map(y => [+y, [] as string[]]))
+    const selectedStudentsByYear = Object.fromEntries(
+      samples.map(student => new Date(student.studyrightStart).getFullYear()).map(y => [y, [] as string[]])
+    )
     samples.forEach(student => {
       selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
     })

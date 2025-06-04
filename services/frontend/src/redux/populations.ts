@@ -10,9 +10,15 @@ const populationApi = RTKApi.injectEndpoints({
           year,
           months,
         })
-        semesters?.forEach(s => params.append('semesters', s))
-        years?.forEach(y => params.append('years', y))
-        studentStatuses?.forEach(s => params.append('studentStatuses', s))
+
+        if (semesters && !Array.isArray(semesters)) params.append('semesters[]', semesters)
+        else if (semesters) semesters.forEach(s => params.append('semesters[]', s))
+
+        if (years && !Array.isArray(years)) params.append('years[]', years)
+        else if (years) years.forEach(y => params.append('years[]', y))
+
+        if (studentStatuses && !Array.isArray(studentStatuses)) params.append('studentStatuses[]', studentStatuses)
+        else if (studentStatuses) studentStatuses.forEach(s => params.append('studentStatuses[]', s))
 
         return {
           url: '/v3/populationstatistics/',
