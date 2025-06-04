@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
+import { formatToArray } from '@oodikone/shared/util'
 
 const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user
@@ -127,6 +128,13 @@ export const RTKApi = createApi({
       // Add possible default headers
       Object.entries(getHeaders()).forEach(([key, value]) => headers.set(key, value))
       return headers
+    },
+    paramsSerializer: params => {
+      const searchParams = new URLSearchParams()
+
+      Object.entries(params).map(([key, val]) => formatToArray(val).forEach(item => searchParams.append(key, item)))
+
+      return searchParams.toString()
     },
   }),
   endpoints: () => ({}),
