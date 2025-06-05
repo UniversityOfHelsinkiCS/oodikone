@@ -24,9 +24,29 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { reformatDate } from '@/util/timeAndDate'
 
+// For the most part we calculate if studyright is active by checking for term registrations
+// If study right doesn't have term registrations (non degree leading studyright) --
+// the state should be based on studyright validity period, see issue #4795
+const NON_DEGREE_LEADING_STUDY_RIGHT_URN = 'urn:code:study-right-expiration-rules:no-automatic-calculation'
+
+const isBetweenDays = (startDate: Date | string, endDate: Date | string) => {
+  const current = new Date()
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  current.setHours(0, 0, 0, 0)
+  start.setHours(0, 0, 0, 0)
+  end.setHours(0, 0, 0, 0)
+
+  return start <= current && current <= end
+}
+
 const studyRightIsActive = (studyRight, currentSemester) =>
-  studyRight.semesterEnrollments?.find(({ type, semester }) => semester === currentSemester && [1, 2].includes(type)) !=
-  null
+  studyRight.expirationRuleUrns?.includes(NON_DEGREE_LEADING_STUDY_RIGHT_URN)
+    ? isBetweenDays(studyRight.startDate, studyRight.endDate)
+    : studyRight.semesterEnrollments?.find(
+        ({ type, semester }) => semester === currentSemester && [1, 2].includes(type)
+      ) != null
 
 export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
