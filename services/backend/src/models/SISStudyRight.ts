@@ -89,6 +89,9 @@ export class SISStudyRightModel extends Model<SISStudyRight> implements SISStudy
   @Column(DataType.BOOLEAN)
   tvex!: boolean
 
+  @Column(DataType.ARRAY(DataType.STRING))
+  expirationRuleUrns!: string[]
+
   @CreatedAt
   @Column(DataType.DATE)
   createdAt!: Date
