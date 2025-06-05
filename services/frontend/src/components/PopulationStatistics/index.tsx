@@ -35,74 +35,97 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 
-const getYearText = year => {
-  if (year === 'All') return ''
-  return `${year} - ${Number(year) + 1}`
+type Query = {
+  months: string
+  year: string
+  years?: string[]
+  semesters: string[]
+  studentStatuses: string[]
+  studyRights: {
+    programme: string
+    combinedProgramme: string
+    studyTrack?: string
+  }
+  showBachelorAndMaster?: string
+  tag?: any
+}
+
+const getYearText = (year: string) => {
+  const yearIsNumber = !isNaN(+year)
+  return yearIsNumber ? `${year} - ${+year + 1}` : ''
 }
 
 import { getMonths } from '../PopulationSearch/common'
-const parseQueryFromUrl = () => {
-  const initial = {
+const parseQueryFromUrl = (location): [boolean, Query] => {
+  const skipQuery = !location.search
+
+  const { studyRights, ...rest } = qs.parse(location.search)
+
+  if (studyRights === null || Array.isArray(studyRights)) throw Error()
+
+  const query: Query = {
+    months: getMonths('2017', 'FALL').toString(),
     year: '2017',
     semesters: ['FALL', 'SPRING'],
     studentStatuses: [],
-    studyRights: {},
-    months: getMonths('2017', 'FALL'),
-    showBachelorAndMaster: false,
-  }
+    studyRights: studyRights ? JSON.parse(studyRights) : { programme: '', combinedProgramme: '' },
+    showBachelorAndMaster: 'false',
 
-  const { studyRights, months, ...rest } = qs.parse(location.search)
-
-  if (studyRights === null || Array.isArray(studyRights)) throw Error()
-  if (months === null || Array.isArray(months)) throw Error()
-
-  const query = {
-    ...initial,
     ...rest,
-    studyRights: JSON.parse(studyRights),
-    months: JSON.parse(months),
   }
-  return query
+
+  return [skipQuery, query]
 }
 
-export const PopulationStatistics = () => {
-  const location = useLocation()
-  const { language, getTextIn } = useLanguage()
-  const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
-  //
-  const query: {
-    months?: any
-    year?: any
-    years?: any[]
-    studyRights?: {
-      studyTrack?: any
-      programme: any
-      combinedProgramme: any
+const mapStudentNumbersToStartingYears = samples => {
+  const years = [...new Set<number>(samples.map(student => new Date(student.studyrightStart).getFullYear()))]
+  const studentsToYears: Record<number, string[]> = Object.fromEntries(years.map(y => [y, []]))
+
+  samples.forEach(student => {
+    studentsToYears[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+  })
+
+  return studentsToYears
+}
+
+const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode) =>
+  samples.map(student => {
+    const hopsCredits = student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
+    const hopsCombinedProgrammeCredits =
+      student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
+    const studyrightStartDate = new Date(student.studyrightStart)
+    const courses = student.courses.filter(({ date }) => studyrightStartDate <= new Date(date))
+    const credits = getStudentTotalCredits({ courses })
+    return {
+      ...student,
+      allCredits: student.credits,
+      hopsCredits,
+      hopsCombinedProgrammeCredits,
+      credits,
     }
-    showBachelorAndMaster?: any
-    tag?: any
-  } = location.search ? parseQueryFromUrl() : {}
+  })
 
-  const { data, isFetching: isLoading } = useGetPopulationStatisticsQuery(query, { skip: !Object.keys(query).length })
-  const samples = data?.students ?? []
-  const currentSemester = useCurrentSemester()
-
+const useUserHasRestrictedAccess = (): boolean => {
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const hasRestrictedAccess = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
-  useTitle('Class statistics')
 
-  const { data: allSemesters } = useGetSemestersQuery()
-  const programmeCode = query.studyRights?.programme
-  const combinedProgrammeCode = query.studyRights?.combinedProgramme ? query.studyRights?.combinedProgramme : ''
+  return !fullAccessToStudentData && !fullStudyProgrammeRights.length
+}
+
+const useGetProgrammes = (): Record<string, DegreeProgramme> => {
   const { data: studyProgrammes } = useGetProgrammesQuery()
-  const programmes = {
+
+  return {
     ...studyProgrammes,
     'KH90_001+MH90_001': {
       code: 'KH90_001+MH90_001',
+      curriculumPeriodIds: [],
+      degreeProgrammeType: '',
+      progId: '',
       name: {
         fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
         en: "Bachelor's and Degree Programme in Vetenary Medicine",
@@ -110,54 +133,46 @@ export const PopulationStatistics = () => {
       },
     },
   }
-  const programmeName = programmes[programmeCode]?.name ?? ''
-  const combinedProgrammeName = programmes[combinedProgrammeCode]?.name ?? ''
-  const showBachelorAndMaster = query.showBachelorAndMaster === 'true' || combinedProgrammeCode !== ''
+}
 
-  const degreeProgrammeType = useDegreeProgrammeTypes([programmeCode])
+const useGetProgrammeText = (programmeCode: string, combinedProgrammeCode: string): string => {
+  const { language, getTextIn } = useLanguage()
 
-  const programmeCodes = [programmeCode, combinedProgrammeCode].filter(Boolean)
+  const programmes = useGetProgrammes()
+  const programmeName = getTextIn(programmes[programmeCode]?.name) ?? ''
+  const combinedProgrammeName = getTextIn(programmes[combinedProgrammeCode]?.name) ?? ''
 
-  const selectedStudentsByYear = useMemo(() => {
-    const selectedStudentsByYear = Object.fromEntries(
-      samples.map(student => new Date(student.studyrightStart).getFullYear()).map(y => [y, [] as string[]])
-    )
-    samples.forEach(student => {
-      selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
-    })
+  return combinedProgrammeCode
+    ? getCombinedProgrammeName(programmeName, combinedProgrammeName, language)
+    : programmeName
+}
 
-    return selectedStudentsByYear
-  }, [samples])
+export const PopulationStatistics = () => {
+  useTitle('Class statistics')
+  const [skipQuery, query] = parseQueryFromUrl(useLocation())
+
+  const { data: allSemesters } = useGetSemestersQuery()
+  const currentSemester = useCurrentSemester()
+
+  const { data: population, isFetching } = useGetPopulationStatisticsQuery(query, { skip: skipQuery })
+  const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
+
+  const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query.studyRights
 
   const students = useMemo(
-    () =>
-      samples.map(student => {
-        const hopsCredits =
-          student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
-        const hopsCombinedProgrammeCredits =
-          student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
-        const studyrightStartDate = new Date(student.studyrightStart)
-        const courses = student.courses.filter(({ date }) => studyrightStartDate <= new Date(date))
-        const credits = getStudentTotalCredits({ courses })
-        return {
-          ...student,
-          allCredits: student.credits,
-          hopsCredits,
-          hopsCombinedProgrammeCredits,
-          credits,
-        }
-      }),
-    [samples, programmeCode, combinedProgrammeCode]
+    () => mapStudentDataToStudents(population?.students ?? [], programmeCode, combinedProgrammeCode),
+    [population, programmeCode, combinedProgrammeCode]
+  )
+  const selectedStudentsByYear = useMemo(
+    () => mapStudentNumbersToStartingYears(population?.students ?? []),
+    [population]
   )
 
-  const programmeText =
-    query.studyRights?.combinedProgramme !== '' && query.studyRights?.combinedProgramme !== undefined
-      ? getCombinedProgrammeName(getTextIn(programmeName)!, getTextIn(combinedProgrammeName)!, language)
-      : getTextIn(programmeName)
-  const title = !location.search ? 'Class statistics' : `${programmeText} ${getYearText(query.year)}`
+  const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
+  const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
 
   const filters = [
-    !hasRestrictedAccess ? ageFilter : null,
+    !useUserHasRestrictedAccess() ? ageFilter : null,
     citizenshipFilter,
     courseFilter({ courses }),
     creditDateFilter,
@@ -181,19 +196,12 @@ export const PopulationStatistics = () => {
     tagsFilter,
     transferredToProgrammeFilter,
 
-    degreeProgrammeType[programmeCode] === 'urn:code:degree-program-type:masters-degree'
-      ? studyRightTypeFilter({
-          programme: programmeCode,
-          year: query.year,
-        })
+    useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'
+      ? studyRightTypeFilter({ programme: programmeCode, year: query.year })
       : null,
 
     // For combined programme admission type is the same as they started in bachelor programme
-    parseInt(query.year, 10) >= 2020
-      ? admissionTypeFilter({
-          programme: programmeCode,
-        })
-      : null,
+    parseInt(query.year, 10) >= 2020 ? admissionTypeFilter({ programme: programmeCode }) : null,
   ].filter(item => !!item)
 
   const initialOptions = {
@@ -204,7 +212,7 @@ export const PopulationStatistics = () => {
       studyStart: (students[0] || {})?.studyrightStart,
     },
     [studyTrackFilter.key]: {
-      selected: query.studyRights?.studyTrack ? [query.studyRights?.studyTrack] : [],
+      selected: studyTrack ? [studyTrack] : [],
     },
     [tagsFilter.key]: {
       includedTags: query.tag ? [query.tag] : [],
@@ -212,6 +220,7 @@ export const PopulationStatistics = () => {
     },
   }
 
+  const showNoStudentsMessage = students?.length === 0 && !isFetching
   const noStudentsMessage = () => (
     <div style={{ maxWidth: '80%' }}>
       <Message
@@ -227,9 +236,11 @@ export const PopulationStatistics = () => {
     </div>
   )
 
+  const title = skipQuery ? 'Class statistics' : `${programmeText} ${getYearText(query.year)}`
+
   return (
     <FilterView
-      displayTray={!!location.search}
+      displayTray={!skipQuery}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
@@ -238,24 +249,22 @@ export const PopulationStatistics = () => {
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
-            {title} {query.showBachelorAndMaster === 'true' && '(Bachelor + Master view)'}
-            {!!location.search && query.studyRights?.studyTrack && (
-              <Header.Subheader>studytrack {query.studyRights.studyTrack}</Header.Subheader>
-            )}
-            {!!location.search && (
+            {title} {!skipQuery && showBachelorAndMaster && '(Bachelor + Master view)'}
+            {!skipQuery && studyTrack && <Header.Subheader>studytrack {studyTrack}</Header.Subheader>}
+            {!skipQuery && (
               <Header.Subheader>
                 studytime {query.months} months, class size {students.length} students
               </Header.Subheader>
             )}
           </Header>
-          {!!location.search && students?.length === 0 && !isLoading && noStudentsMessage()}
+          {!skipQuery && showNoStudentsMessage && noStudentsMessage()}
           <Segment className="contentSegment">
             <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} query={query} />
-            {!!location.search && (
+            {!skipQuery && (
               <PopulationDetails
                 filteredStudents={filteredStudents}
-                isLoading={isLoading}
-                programmeCodes={programmeCodes}
+                isLoading={isFetching}
+                programmeCodes={[programmeCode, combinedProgrammeCode].filter(Boolean)}
                 query={query}
                 selectedStudentsByYear={selectedStudentsByYear}
               />
