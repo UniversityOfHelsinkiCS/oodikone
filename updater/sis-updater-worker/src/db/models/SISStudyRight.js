@@ -1,4 +1,4 @@
-const { Model, BOOLEAN, DATE, INTEGER, JSONB, STRING } = require('sequelize')
+const { Model, ARRAY, BOOLEAN, DATE, INTEGER, JSONB, STRING } = require('sequelize')
 
 const {
   dbConnections: { sequelize },
@@ -21,6 +21,7 @@ SISStudyRight.init(
     admissionType: STRING,
     semesterEnrollments: JSONB,
     facultyCode: STRING,
+    expirationRuleUrns: ARRAY(STRING),
     tvex: BOOLEAN,
     createdAt: DATE,
     updatedAt: DATE,
