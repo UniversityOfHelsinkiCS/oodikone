@@ -258,8 +258,14 @@ export const PopulationStatistics = () => {
             )}
           </Header>
           {!skipQuery && showNoStudentsMessage && noStudentsMessage()}
-          <Segment className="contentSegment">
-            <PopulationSearch combinedProgrammeCode={combinedProgrammeCode} query={query} />
+          <Segment className="contentSegment" loading={isFetching}>
+            <PopulationSearch
+              combinedProgrammeCode={combinedProgrammeCode}
+              isLoading={isFetching}
+              populationFound={!!students.length}
+              query={query}
+              skipQuery={skipQuery}
+            />
             {!skipQuery && (
               <PopulationDetails
                 filteredStudents={filteredStudents}

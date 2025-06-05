@@ -1,30 +1,22 @@
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import { Button, Divider, Form, Header, Icon, Segment } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { hopsFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
-import { ProgressBar } from '@/components/ProgressBar'
-import { useProgress } from '@/hooks/progress'
-import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
-export const PopulationSearch = ({ query, combinedProgrammeCode }) => {
-  const location = useLocation()
-  const { data: populations, isLoading } = useGetPopulationStatisticsQuery(query, { skip: !Object.keys(query).length })
-  const populationFound = populations?.students !== undefined
-  const { progress } = useProgress(isLoading)
+export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound, combinedProgrammeCode }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
   const bothHopsSelected = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
-  const title = populationFound && location.search ? null : 'Search for class'
 
   return (
     <Segment>
-      {title && <Header size="medium">{title}</Header>}
+      {skipQuery && <Header size="medium">{'Search for class'}</Header>}
       {!populationFound && (
         <>
           <InfoBox content={populationStatisticsToolTips.search} cypress="PopulationSearch" />
@@ -32,7 +24,7 @@ export const PopulationSearch = ({ query, combinedProgrammeCode }) => {
         </>
       )}
       <PopulationSearchForm />
-      {location.search !== '' && !isLoading && (
+      {!skipQuery && !isLoading && (
         <Form>
           <Form.Field>
             <Link to="/populations">
@@ -67,7 +59,6 @@ export const PopulationSearch = ({ query, combinedProgrammeCode }) => {
           <PopulationSearchHistory query={query} />
         </Form>
       )}
-      <ProgressBar progress={progress} />
     </Segment>
   )
 }
