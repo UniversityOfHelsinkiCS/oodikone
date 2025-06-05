@@ -11,7 +11,7 @@ import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
-export const PopulationSearchHistory = ({ query }) => {
+export const PopulationSearchHistory = ({ query, skipQuery }) => {
   const navigate = useNavigate()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
@@ -131,7 +131,7 @@ export const PopulationSearchHistory = ({ query }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div>
-          <PopulationQueryCard query={query} />
+          <PopulationQueryCard query={query} skipQuery={skipQuery} />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
             <InfoBox content={populationStatisticsToolTips.advanced} />
           </div>

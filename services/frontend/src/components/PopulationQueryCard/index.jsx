@@ -6,9 +6,9 @@ import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { reformatDate } from '@/util/timeAndDate'
 
-export const PopulationQueryCard = ({ query }) => {
+export const PopulationQueryCard = ({ query, skipQuery }) => {
   const { studentStatuses, tag } = query
-  const { data: population } = useGetPopulationStatisticsQuery(query, { skip: !Object.keys(query).length })
+  const { data: population } = useGetPopulationStatisticsQuery(query, { skip: skipQuery })
   const students = population?.students ?? []
 
   const { data: tags = [] } = useGetTagsByStudyTrackQuery(query?.studyRights?.programme, {

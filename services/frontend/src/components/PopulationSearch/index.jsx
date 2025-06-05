@@ -56,7 +56,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
               />
             </Form.Field>
           )}
-          <PopulationSearchHistory query={query} />
+          <PopulationSearchHistory query={query} skipQuery={skipQuery} />
         </Form>
       )}
     </Segment>
