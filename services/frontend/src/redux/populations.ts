@@ -5,24 +5,24 @@ import { formatToArray } from '@oodikone/shared/util'
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getPopulationStatistics: builder.query({
-      query: ({ semesters, studentStatuses, studyRights, months, year, years }) => ({
+      query: ({ months, year, years, semesters, studentStatuses, studyRights }) => ({
         url: '/v3/populationstatistics/',
         method: 'GET',
         params: years
           ? {
-              semesters: formatToArray(semesters),
-              studentStatuses,
-              studyRights: JSON.stringify(studyRights),
               months,
               year,
-              years,
+              years: formatToArray(years),
+              semesters: formatToArray(semesters),
+              studentStatuses: formatToArray(studentStatuses),
+              studyRights: JSON.stringify(studyRights),
             }
           : {
-              semesters: formatToArray(semesters),
-              studentStatuses,
-              studyRights: JSON.stringify(studyRights),
               months,
               year,
+              semesters: formatToArray(semesters),
+              studentStatuses: formatToArray(studentStatuses),
+              studyRights: JSON.stringify(studyRights),
             },
       }),
     }),
