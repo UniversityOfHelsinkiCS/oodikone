@@ -8,7 +8,6 @@ import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVi
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useAppSelector } from '@/redux/hooks'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { CheckStudentList } from './CheckStudentList'
@@ -35,6 +34,8 @@ const Panes = ({
   variant,
   visiblePanes,
   year,
+  studyRights,
+  showBachelorAndMaster,
 }) => {
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
@@ -53,6 +54,8 @@ const Panes = ({
           filteredStudents={filteredStudents}
           from={from}
           group={studyGuidanceGroup}
+          showBachelorAndMaster={showBachelorAndMaster}
+          studyRights={studyRights}
           to={to}
           variant={variant}
           year={year}
@@ -133,15 +136,18 @@ const PopulationStudents = ({
   filteredStudents,
   from,
   to,
+  months: initMonths,
+  studyRights,
   studyGuidanceGroup,
   variant,
   year,
+  showBachelorAndMaster,
 }) => {
   const studentRef = useRef()
-  const { query } = useAppSelector(state => state.populations)
-  let mainProgramme = query?.studyRights?.programme || ''
-  let combinedProgramme = query?.studyRights?.combinedProgramme || ''
-  let months = query ? query.months : 0
+  let mainProgramme = studyRights?.programme || ''
+  let combinedProgramme = studyRights?.combinedProgramme || ''
+
+  let months = initMonths
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
     months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
@@ -178,7 +184,9 @@ const PopulationStudents = ({
         from={from}
         mainProgramme={mainProgramme}
         months={months}
+        showBachelorAndMaster={showBachelorAndMaster}
         studyGuidanceGroup={studyGuidanceGroup}
+        studyRights={studyRights}
         to={to}
         variant={variant}
         visiblePanes={contentToInclude.panesToInclude}

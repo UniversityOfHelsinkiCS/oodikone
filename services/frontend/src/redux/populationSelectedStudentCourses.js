@@ -36,9 +36,10 @@ export const getPopulationSelectedStudentCourses = ({
   return callController(route, prefix, body, 'post', query)
 }
 
-export const clearSelected = () => ({
-  type: 'CLEAR_SELECTED',
-})
+// TODO: This was used in the PopulationSearchForm
+// export const clearSelected = () => ({
+//   type: 'CLEAR_SELECTED',
+// })
 
 const defaultState = { pending: false, error: false, data: null, query: {} }
 export const reducer = (state = defaultState, action) => {

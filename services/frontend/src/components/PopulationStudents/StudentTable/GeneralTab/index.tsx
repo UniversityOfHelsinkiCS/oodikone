@@ -6,7 +6,6 @@ import { DateFormat } from '@/constants/date'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
@@ -61,6 +60,8 @@ export const GeneralTabContainer = ({
   courseCode,
   from,
   to,
+  studyRights,
+  showBachelorAndMaster,
 }) => {
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -76,16 +77,14 @@ export const GeneralTabContainer = ({
 
   const { useFilterSelector } = useFilters()
 
-  const { query } = useAppSelector(state => state.populations)
-
-  const queryStudyrights = Object.values(query?.studyRights ?? {}).filter(studyright => !!studyright) as string[]
+  const queryStudyrights = Object.values(studyRights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
   const studyGuidanceGroupProgrammes = group?.tags?.studyProgramme?.includes('+')
     ? group?.tags?.studyProgramme.split('+')
     : [group?.tags?.studyProgramme]
-  const programmeCode = query?.studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
+  const programmeCode = studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
 
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
@@ -104,7 +103,7 @@ export const GeneralTabContainer = ({
   const getTransferredFrom = (student: any) =>
     getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource
 
-  const showBachelorAndMaster = query?.showBachelorAndMaster === 'true'
+  const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
 
   const getStudyRight = student => {
     const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
@@ -133,8 +132,8 @@ export const GeneralTabContainer = ({
     return acc
   }, {})
 
-  const combinedProgrammeCode = query?.studyRights?.combinedProgramme
-    ? query.studyRights.combinedProgramme
+  const combinedProgrammeCode = studyRights?.combinedProgramme
+    ? studyRights.combinedProgramme
     : studyGuidanceGroupProgrammes.length > 1
       ? studyGuidanceGroupProgrammes[1]
       : null
@@ -151,7 +150,7 @@ export const GeneralTabContainer = ({
     })?.completed_credits ?? 0
 
   const shouldShowAdmissionType =
-    parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020 || variant === 'customPopulation'
+    parseInt(year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020 || variant === 'customPopulation'
   const getAdmissiontype = student => {
     const studyRight = getStudyRight(student)
     const admissionType = studyRight?.admissionType ?? 'Ei valintatapaa'
@@ -346,7 +345,7 @@ export const GeneralTabContainer = ({
     year,
     currentSemester?.semestercode,
     getTextIn,
-    showBachelorAndMaster
+    shouldShowBachelorAndMaster
   )
 
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
@@ -358,7 +357,7 @@ export const GeneralTabContainer = ({
     studentToSecondStudyrightEndMap,
     studentToStudyrightEndMap,
     year,
-    semestersToAddToStart: showBachelorAndMaster && isMastersProgramme ? 6 : 0,
+    semestersToAddToStart: shouldShowBachelorAndMaster && isMastersProgramme ? 6 : 0,
   })
 
   const formatStudent = (student: any): FormattedStudentData => {
@@ -396,7 +395,7 @@ export const GeneralTabContainer = ({
       updatedAt: isAdmin && formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV),
     }
 
-    if (combinedProgrammeCode || showBachelorAndMaster) {
+    if (combinedProgrammeCode || shouldShowBachelorAndMaster) {
       const secondaryStudyRightEnd = studentToSecondStudyrightEndMap[student.studentNumber]
       result.creditsCombinedProg = getCombinedProgrammeCredits(student)
       result.graduationDateCombinedProg = secondaryStudyRightEnd
@@ -447,7 +446,7 @@ export const GeneralTabContainer = ({
       }}
       formattedData={formattedData}
       group={group}
-      isCombinedProg={!!combinedProgrammeCode || showBachelorAndMaster}
+      isCombinedProg={!!combinedProgrammeCode || shouldShowBachelorAndMaster}
       showAdminColumns={isAdmin}
       studyTrackVisible={containsStudyTracks}
       variant={variant}

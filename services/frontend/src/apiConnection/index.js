@@ -132,7 +132,10 @@ export const RTKApi = createApi({
     paramsSerializer: params => {
       const searchParams = new URLSearchParams()
 
-      Object.entries(params).map(([key, val]) => formatToArray(val).forEach(item => searchParams.append(key, item)))
+      Object.entries(params).map(([key, val]) => {
+        const subfix = Array.isArray(val) ? '[]' : ''
+        formatToArray(val).forEach(item => searchParams.append(key + subfix, item))
+      })
 
       return searchParams.toString()
     },

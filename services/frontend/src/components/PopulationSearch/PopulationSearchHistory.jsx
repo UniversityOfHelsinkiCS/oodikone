@@ -6,26 +6,27 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
-import { useAppSelector } from '@/redux/hooks'
+import { formatToArray } from '@oodikone/shared/util'
 import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
 import './populationSearch.css'
 
-export const PopulationSearchHistory = () => {
+export const PopulationSearchHistory = ({ query, skipQuery }) => {
   const navigate = useNavigate()
-  const populations = useAppSelector(state => state.populations)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-  const [semesters, setSemesters] = useState(populations.query?.semesters || ['FALL', 'SPRING'])
-  const [studentStatuses, setStudentStatus] = useState(populations.query?.studentStatuses || [])
-  const [months, setMonths] = useState(populations.query?.months || 0)
+  const [semesters, setSemesters] = useState(
+    query.semesters.length ? formatToArray(query.semesters) : ['FALL', 'SPRING']
+  )
+  const [studentStatuses, setStudentStatus] = useState(query.studentStatuses)
+  const [months, setMonths] = useState(query.months ?? 0)
 
   const handleSemesterSelection = (_event, { value }) => {
     const newSemesters = semesters.includes(value)
       ? semesters.filter(semester => semester !== value)
       : [...semesters, value]
-    if (!populations.query.tag) {
+    if (!query.tag) {
       setSemesters(newSemesters)
-      setMonths(getMonths(populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
+      setMonths(getMonths(query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
     }
   }
 
@@ -36,7 +37,7 @@ export const PopulationSearchHistory = () => {
   }
 
   const pushQueryToUrl = () => {
-    const { studyRights, tag, year } = populations.query
+    const { studyRights, tag, year } = query
 
     const queryObject = {
       tag,
@@ -57,7 +58,7 @@ export const PopulationSearchHistory = () => {
 
     return (
       <Form.Group style={{ flexDirection: 'column' }}>
-        {!populations.query.tag ? (
+        {!query.tag && (
           <Form.Field style={{ marginTop: '15px' }}>
             <b>Starting semesters</b>
             <Form.Checkbox
@@ -81,7 +82,7 @@ export const PopulationSearchHistory = () => {
               value="SPRING"
             />
           </Form.Field>
-        ) : null}
+        )}
         <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
           <Form.Checkbox
@@ -122,7 +123,7 @@ export const PopulationSearchHistory = () => {
   }
 
   const renderQueryCards = () => {
-    if (!populations.query || !populations.data.students) {
+    if (!Object.keys(query).length) {
       return null
     }
 
@@ -130,13 +131,13 @@ export const PopulationSearchHistory = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div>
-          <PopulationQueryCard population={populations.data} query={populations.query} />
+          <PopulationQueryCard query={query} skipQuery={skipQuery} />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
             <InfoBox content={populationStatisticsToolTips.advanced} />
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>
-          {populations.query.year !== 'All' && (
+          {query.year !== 'All' && (
             <Form.Group>
               <Form.Field>
                 <Form.Radio

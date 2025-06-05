@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { FC, useMemo } from 'react'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
@@ -24,21 +24,14 @@ const resolveFilterOptions = (
     filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
   )
 
-export const FilterView = ({
-  children,
-  name,
-  filters: pFilters,
-  students,
-  displayTray: displayTrayProp,
-  initialOptions,
-}: {
+export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
   filters: (FilterFactory | Filter)[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
-}) => {
+}> = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
