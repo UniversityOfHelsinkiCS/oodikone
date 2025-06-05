@@ -15,10 +15,10 @@ export const PopulationSearchHistory = ({ query }) => {
   const navigate = useNavigate()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [semesters, setSemesters] = useState(
-    query?.semesters.length ? formatToArray(query?.semesters) : ['FALL', 'SPRING']
+    query.semesters.length ? formatToArray(query.semesters) : ['FALL', 'SPRING']
   )
-  const [studentStatuses, setStudentStatus] = useState(query?.studentStatuses ?? [])
-  const [months, setMonths] = useState(query?.months ?? 0)
+  const [studentStatuses, setStudentStatus] = useState(query.studentStatuses)
+  const [months, setMonths] = useState(query.months ?? 0)
 
   const handleSemesterSelection = (_event, { value }) => {
     const newSemesters = semesters.includes(value)
@@ -58,7 +58,7 @@ export const PopulationSearchHistory = ({ query }) => {
 
     return (
       <Form.Group style={{ flexDirection: 'column' }}>
-        {!query.tag ? (
+        {!query.tag && (
           <Form.Field style={{ marginTop: '15px' }}>
             <b>Starting semesters</b>
             <Form.Checkbox
@@ -82,7 +82,7 @@ export const PopulationSearchHistory = ({ query }) => {
               value="SPRING"
             />
           </Form.Field>
-        ) : null}
+        )}
         <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
           <Form.Checkbox
@@ -123,7 +123,7 @@ export const PopulationSearchHistory = ({ query }) => {
   }
 
   const renderQueryCards = () => {
-    if (!query) {
+    if (!Object.keys(query).length) {
       return null
     }
 
