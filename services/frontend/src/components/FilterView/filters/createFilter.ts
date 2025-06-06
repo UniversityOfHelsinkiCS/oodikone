@@ -1,8 +1,8 @@
 import { produce } from 'immer'
-import { mapValues } from 'lodash'
 
 import { ReactNode } from 'react'
 import { setFilterOptions } from '@/redux/filters'
+import { mapValues } from '@oodikone/shared/util'
 
 import { Student } from '..'
 import type { FilterContext, FilterViewContextState } from '../context'
@@ -31,29 +31,30 @@ type FilterOptions = {
    * Fallback for `resolveFilterOptions` if values are not stored
    * and initial values are not set.
    */
-  defaultOptions: object
+  defaultOptions: Record<any, any>
 
   /**
    * Function used to filter the students.
    */
   filter: (students: Student, ctx: FilterContext) => boolean
 
-  isActive: (opts: any, ctx?: FilterContext) => boolean
+  isActive: (opts: FilterContext['options']) => boolean
 
   /**
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  // Based on defaultOptions
-  selectors?: Record<string, (options: any, args?) => any>
+  selectors?: Record<string, (options: any, ...args: any[]) => any>
 
   /**
-   * `setOptions` and `reset` will be overwriten.
+   * By default `setOptions` and `reset` are assigned.
+   * NOTE: `reset` will set the value to null, this may not be desired!
    */
-  actions?: Record<string, (arg0, arg1, ctx) => void>
+  actions?: Record<string, (options: FilterContext['options'], payload: any) => void>
 
   /**
-   * Precompute filter. Calculated once per studentlist???
+   * Precompute filter;
+   * This value is used instead of running the filter again for the population.
    */
   precompute?: (ctx: FilterContext) => any
 
@@ -68,8 +69,8 @@ type FilterOptions = {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
-export type Filter<Args = any> = {
-  args?: Args
+export type Filter = {
+  args?: any
 
   key: FilterOptions['key']
   title: NonNullable<FilterOptions['title'] | FilterOptions['key']>
@@ -86,17 +87,32 @@ export type Filter<Args = any> = {
   priority: number
 }
 
-export type FilterFactory<Args> = {
+export type FilterFactory = {
   key: Filter['key']
-  actions: any
-  selectors: any
-  (args?: Args): Filter<Args>
+  actions: Record<
+    string,
+    (payload: any) => (
+      view: string,
+      getContext: FilterViewContextState['getContextByKey']
+    ) => {
+      payload: any
+      type: string
+    }
+  >
+  selectors: Record<
+    string,
+    (...args: any[]) => {
+      (opts: any): any
+      filter: string
+    }
+  >
+  (args?: any): Filter
 }
 
 /**
  * Unlike the name suggests, this function returns a filter factory.
  */
-export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<Args> => {
+export const createFilter = (options: FilterOptions): FilterFactory => {
   const opt_selectors = options.selectors ?? {}
   const opt_actions = options.actions ?? {}
 
@@ -106,23 +122,20 @@ export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<
   const selectors = mapValues(
     {
       ...opt_selectors,
-      selectOptions: opts => opts,
-      isActive: opts => options.isActive(opts),
+      selectOptions: (opts, _) => opts,
+      isActive: options.isActive,
     },
-    (selector: NonNullable<FilterOptions['selectors']>[string]) => {
-      if (selector.length === 1) {
-        const wrapper = options => selector(options)
+    ([key, selector]) => {
+      const gift = (...args) => {
+        const wrapper = opts => selector(opts, args)
         wrapper.filter = options.key
+
         return wrapper
       }
-      return (...args) => {
-        const wrapper = options => selector(options, args)
-        wrapper.filter = options.key
-        return wrapper
-      }
+
+      return [key, gift]
     }
   )
-
   /**
    * Actions are wrapped redux actions that act on the filter's options.
    *
@@ -132,22 +145,25 @@ export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<
    */
   const actions = mapValues(
     {
+      setOptions: (_, value) => value,
+      reset: (..._) => null,
       ...opt_actions,
-      setOptions: (_options, value) => value,
-      reset: () => null,
     },
-    (action: NonNullable<FilterOptions['actions']>[string], name) =>
-      payload =>
-      (view: string, getContext: FilterViewContextState['getContextByKey']) => {
-        const ctx = getContext(options.key)
+    ([key, action]) => {
+      return [
+        key,
+        payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
+          const ctx = getContext(options.key)
 
-        return setFilterOptions({
-          view,
-          filter: options.key,
-          action: `${options.key}/${name}`,
-          options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload, ctx)),
-        })
-      }
+          return setFilterOptions({
+            view,
+            filter: options.key,
+            action: `${options.key}/${key}`,
+            options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
+          })
+        },
+      ]
+    }
   )
 
   /**
@@ -204,7 +220,7 @@ export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<
    *
    * @dogamak
    */
-  const factory = (args?: Args): Filter<Args> => ({
+  const factory = (args?: any): Filter => ({
     args,
 
     key: options.key,

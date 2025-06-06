@@ -59,8 +59,8 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
 
   const coursesAreLoading = isLoading || isFetching
 
-  const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
+  const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   const toggleCreditDateFilter = () => {
     if (creditDateFilterActive) {

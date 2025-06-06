@@ -172,7 +172,7 @@ export const programmeFilter = createFilter({
   key: 'Programme',
 
   defaultOptions: {
-    selectedProgrammes: [],
+    selectedProgrammes: [] as string[],
     mode: 'active',
   },
 

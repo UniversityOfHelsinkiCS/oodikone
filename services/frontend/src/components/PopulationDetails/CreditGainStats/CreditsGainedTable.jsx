@@ -9,8 +9,8 @@ import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, year }) => {
   const { useFilterSelector } = useFilters()
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   if (!filteredStudents || !filteredStudents.length || !type) return null
   let creditList = []

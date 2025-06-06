@@ -26,7 +26,7 @@ const resolveFilterOptions = <T,>(
 export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
-  filters: (FilterFactory<any> | Filter)[]
+  filters: (FilterFactory | Filter)[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
@@ -69,7 +69,7 @@ export const FilterView: FC<{
   const applyFilters = (filters: Filter[]) =>
     filters
       .map(filter => ({ filter, ctx: getFilterContext(filter.key) }))
-      .filter(({ filter: { key, isActive }, ctx }) => isActive(filterOptions[key], ctx))
+      .filter(({ filter: { key, isActive } }) => isActive(filterOptions[key]))
       .reduce((students, { filter: { filter }, ctx }) => {
         return students
           .map(student => {
