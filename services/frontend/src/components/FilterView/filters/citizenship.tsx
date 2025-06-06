@@ -65,7 +65,9 @@ export const citizenshipFilter = createFilter({
 
   isActive: ({ selected }) => selected !== '',
 
-  filter(student, { selected }) {
+  filter(student, { options }) {
+    const { selected } = options
+
     return student.citizenships.some(({ en: countryName }) => countryName === selected)
   },
 

@@ -56,7 +56,9 @@ export const genderFilter = createFilter({
 
   isActive: ({ selected }) => selected !== '',
 
-  filter(student, { selected }) {
+  filter(student, { options }) {
+    const { selected } = options
+
     return Number(student.gender_code) === selected
   },
 

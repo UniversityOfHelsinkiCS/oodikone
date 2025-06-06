@@ -54,7 +54,9 @@ export const creditsEarnedFilter = createFilter({
     }
   },
 
-  filter({ credits }, { min, max }) {
+  filter({ credits }, { options }) {
+    const { min, max } = options
+
     return !(min !== null && credits < min) && !(max !== null && credits > max)
   },
 

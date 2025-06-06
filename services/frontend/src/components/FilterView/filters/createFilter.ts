@@ -35,12 +35,8 @@ type FilterOptions = {
 
   /**
    * Function used to filter the students.
-   *
-   * @param{object} studentList element
-   * @param{object} getFilterContext.options
-   * @returns{boolean} student passed the filter
    */
-  filter: (students: Student, opts: FilterContext['options'], ctx: FilterContext) => boolean
+  filter: (students: Student, ctx: FilterContext) => boolean
 
   isActive: (opts: any, ctx?: FilterContext) => boolean
 
@@ -86,8 +82,8 @@ export type Filter<Args = any> = {
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
 
-  render: NonNullable<FilterOptions['render']>
-  priority: NonNullable<FilterOptions['priority']>
+  render: FilterOptions['render']
+  priority: number
   actions: any
   selectors: any
 }

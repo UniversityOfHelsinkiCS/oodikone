@@ -74,7 +74,7 @@ export const FilterView: FC<{
         return students
           .map(student => {
             const newStudent = structuredClone(student)
-            return filter(newStudent, ctx.options, ctx) ? newStudent : null
+            return filter(newStudent, ctx) ? newStudent : null
           })
           .filter(Boolean)
       }, students)

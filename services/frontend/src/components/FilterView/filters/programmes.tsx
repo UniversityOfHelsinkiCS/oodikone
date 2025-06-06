@@ -204,7 +204,9 @@ export const programmeFilter = createFilter({
 
   isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
 
-  filter({ studentNumber }, { selectedProgrammes }, { precomputed: studentToProgrammeMap }) {
+  filter({ studentNumber }, { precomputed: studentToProgrammeMap, options }) {
+    const { selectedProgrammes } = options
+
     return selectedProgrammes.every(pcode => studentToProgrammeMap[studentNumber].some(({ code }) => code === pcode))
   },
 

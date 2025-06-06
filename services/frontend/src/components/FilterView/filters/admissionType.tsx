@@ -73,7 +73,9 @@ export const admissionTypeFilter = createFilter({
 
   isActive: ({ selected }) => !!selected,
 
-  filter(student, { selected }, { args }) {
+  filter(student, { args, options }) {
+    const { selected } = options
+
     return filter(args.programme)(selected)(student)
   },
 

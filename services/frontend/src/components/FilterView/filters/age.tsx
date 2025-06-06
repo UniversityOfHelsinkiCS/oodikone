@@ -48,7 +48,8 @@ export const ageFilter = createFilter({
     }
   },
 
-  filter: (student, { min, max }) => {
+  filter: (student, { options }) => {
+    const { min, max } = options
     const age = getAge(student.birthdate)
 
     return !(min !== null && min > age) && !(max !== null && max < age)

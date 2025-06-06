@@ -53,7 +53,9 @@ export const curriculumPeriodFilter = createFilter({
 
   isActive: ({ selected }) => !!selected,
 
-  filter({ curriculumVersion }, { selected }) {
+  filter({ curriculumVersion }, { options }) {
+    const { selected } = options
+
     return selected === curriculumVersion
   },
 

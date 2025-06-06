@@ -55,7 +55,9 @@ export const graduatedFromProgrammeFilter = createFilter({
 
   isActive: ({ mode }) => mode !== null,
 
-  filter(student, { mode }, { args }) {
+  filter(student, { args, options }) {
+    const { mode } = options
+
     const { code, showBachelorAndMaster } = args
     const BACHELORS = 'urn:code:degree-program-type:bachelors-degree'
     const MASTERS = 'urn:code:degree-program-type:masters-degree'

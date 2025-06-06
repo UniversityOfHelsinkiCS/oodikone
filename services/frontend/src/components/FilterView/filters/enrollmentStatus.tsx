@@ -93,7 +93,9 @@ export const enrollmentStatusFilter = createFilter({
 
   isActive: ({ status }) => status !== null,
 
-  filter({ studyRights }, { status, semesters }, { args }) {
+  filter({ studyRights }, { args, options }) {
+    const { status, semesters } = options
+
     if (args.programme) {
       const correctStudyRight = studyRights.find(({ studyRightElements }) =>
         studyRightElements.some(({ code }) => code === args.programme)

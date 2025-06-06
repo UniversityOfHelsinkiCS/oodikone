@@ -98,7 +98,7 @@ export const courseFilter = createFilter({
 
   isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
 
-  filter(student, options, { precomputed: courseMap }) {
+  filter(student, { precomputed: courseMap, options }) {
     const { courseFilters = {} } = options ?? { courseFilters: null }
 
     return Object.entries(courseFilters).reduce((result, [code, filterType]) => {

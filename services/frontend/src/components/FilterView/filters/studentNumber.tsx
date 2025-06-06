@@ -170,7 +170,9 @@ export const studentNumberFilter = createFilter({
 
   isActive: ({ allowlist, blocklist }) => allowlist.length > 0 || blocklist.length > 0,
 
-  filter(student, { allowlist, blocklist }) {
+  filter(student, { options }) {
+    const { allowlist, blocklist } = options
+
     return (
       (allowlist.length === 0 || includes(allowlist, student.studentNumber)) &&
       (blocklist.length === 0 || !includes(blocklist, student.studentNumber))

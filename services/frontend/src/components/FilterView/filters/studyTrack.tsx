@@ -64,10 +64,14 @@ export const studyTrackFilter = createFilter({
     selected: [],
   },
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
-  filter: (student, { selected }, { args }) =>
-    student.studyRights
+  filter: (student, { args, options }) => {
+    const { selected } = options
+
+    return student.studyRights
       .flatMap(studyRight => studyRight.studyRightElements)
       .filter(element => element.code === args.code && element.studyTrack !== null)
-      .some(element => selected.includes(element.studyTrack.code)),
+      .some(element => selected.includes(element.studyTrack.code))
+  },
+
   render: (props, { args }) => <StudyTrackFilterCard {...props} code={args.code} />,
 })

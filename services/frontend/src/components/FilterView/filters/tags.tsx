@@ -72,7 +72,8 @@ export const tagsFilter = createFilter({
 
   isActive: ({ includedTags, excludedTags }) => !!includedTags.length || !!excludedTags.length,
 
-  filter(student, { includedTags, excludedTags }) {
+  filter(student, { options }) {
+    const { includedTags, excludedTags } = options
     const tags = (student.tags ?? []).map(tag => tag.tag_id)
     if (includedTags.length && excludedTags.length)
       return includedTags.some(tag => tags.includes(tag)) && !excludedTags.some(tag => tags.includes(tag))

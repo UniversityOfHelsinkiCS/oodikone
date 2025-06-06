@@ -98,7 +98,9 @@ export const gradeFilter = createFilter({
       grades => ({ grades })
     )(students),
 
-  filter(student, { selected }, { precomputed }) {
+  filter(student, { precomputed, options }) {
+    const { selected } = options
+
     return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))
   },
 

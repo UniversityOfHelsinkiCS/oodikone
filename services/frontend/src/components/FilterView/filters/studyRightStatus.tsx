@@ -84,7 +84,8 @@ export const studyRightStatusFilter = createFilter({
   isActive: ({ activeProgramme, activeCombinedProgramme }) =>
     activeProgramme !== null || activeCombinedProgramme !== null,
 
-  filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
+  filter: (student, { args, options }) => {
+    const { activeProgramme, activeCombinedProgramme } = options
     const { code, currentSemester, showBachelorAndMaster } = args
     if (!currentSemester) {
       return true

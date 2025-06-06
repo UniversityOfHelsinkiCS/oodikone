@@ -57,7 +57,11 @@ export const startYearAtUniFilter = createFilter({
 
   isActive: ({ selected }) => selected.length > 0,
 
-  filter: (student, { selected }) => selected.includes(new Date(student.started).getFullYear()),
+  filter: (student, { options }) => {
+    const { selected } = options
+
+    return selected.includes(new Date(student.started).getFullYear())
+  },
 
   render: StartYearAtUniFilterCard,
 })
