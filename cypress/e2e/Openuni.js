@@ -43,10 +43,16 @@ describe('Open uni population tests', () => {
         cy.contains('01.01.2015')
         cy.contains('End of the search for enrollments:')
         cy.contains('01.01.2020')
-        cy.url().should(
-          'include',
-          '/openunipopulation?courseCode=TKT10001&courseCode=TKT10002&enddate=01-01-2020&startdate=01-01-2015'
-        )
+        cy.location('pathname').should('eq', '/openunipopulation')
+        cy.location('search').then(search => {
+          const params = new URLSearchParams(search)
+
+          const courseCodes = params.getAll('courseCode')
+          expect(courseCodes).to.include.members(['TKT10001', 'TKT10002'])
+
+          expect(params.get('startdate')).to.eq('01-01-2015')
+          expect(params.get('enddate')).to.eq('01-01-2020')
+        })
         cy.get('[data-cy="open-uni-table-div"]').should('contain.text', courseCodesSet1[0])
         cy.get('[data-cy="open-uni-table-div"]').should('contain.text', courseCodesSet1[1])
       })
