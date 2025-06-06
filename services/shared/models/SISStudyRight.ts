@@ -25,6 +25,7 @@ export type SISStudyRight = {
   credits: Credit[]
   enrollments: Enrollment[]
   tvex: boolean
+  expirationRuleUrns: string[]
   createdAt: Date
   updatedAt: Date
 }
