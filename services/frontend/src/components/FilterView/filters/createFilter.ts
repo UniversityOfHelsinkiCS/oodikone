@@ -84,14 +84,12 @@ export type Filter<Args = any> = {
 
   render: FilterOptions['render']
   priority: number
-  actions: any
-  selectors: any
 }
 
 export type FilterFactory<Args> = {
   key: Filter['key']
-  actions: Filter['actions']
-  selectors: Filter['selectors']
+  actions: any
+  selectors: any
   (args?: Args): Filter<Args>
 }
 
@@ -112,15 +110,12 @@ export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<
       isActive: opts => options.isActive(opts),
     },
     (selector: NonNullable<FilterOptions['selectors']>[string]) => {
-      // console.log("Going through:", options.key)
       if (selector.length === 1) {
-        // console.log("Passing the selector")
         const wrapper = options => selector(options)
         wrapper.filter = options.key
         return wrapper
       }
       return (...args) => {
-        // console.log("selector called:", options.key, {options, args})
         const wrapper = options => selector(options, args)
         wrapper.filter = options.key
         return wrapper
@@ -225,8 +220,6 @@ export const createFilter = <Args = any>(options: FilterOptions): FilterFactory<
 
     render: options.render,
     priority: options.priority ?? 0,
-    actions,
-    selectors,
   })
 
   factory.key = options.key
