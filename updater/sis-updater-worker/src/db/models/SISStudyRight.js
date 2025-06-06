@@ -1,8 +1,5 @@
-const { Model, ARRAY, BOOLEAN, DATE, INTEGER, JSONB, STRING } = require('sequelize')
-
-const {
-  dbConnections: { sequelize },
-} = require('../connection')
+import { Model, ARRAY, BOOLEAN, DATE, INTEGER, JSONB, STRING } from 'sequelize'
+import { sequelize } from '../connection.js'
 
 class SISStudyRight extends Model {}
 
@@ -33,4 +30,4 @@ SISStudyRight.init(
   }
 )
 
-module.exports = SISStudyRight
+export default SISStudyRight

@@ -1,9 +1,9 @@
-const EventEmitter = require('events')
-const knex = require('knex')
-const Sequelize = require('sequelize')
-const Umzug = require('umzug')
+import { EventEmitter } from 'events'
+import knex from 'knex'
+import { Sequelize } from 'sequelize'
+import { Umzug, SequelizeStorage } from 'umzug'
 
-const {
+import {
   MIGRATIONS_LOCK,
   isDev,
   runningInCI,
@@ -14,9 +14,9 @@ const {
   SIS_IMPORTER_PASSWORD,
   SIS_IMPORTER_DATABASE,
   SIS_PASSWORD,
-} = require('../config')
-const { logger } = require('../utils/logger')
-const { lock } = require('../utils/redis')
+} from '../config.js'
+import logger from '../utils/logger.js'
+import { lock } from '../utils/redis.js'
 
 class DbConnections extends EventEmitter {
   constructor() {
@@ -33,8 +33,8 @@ class DbConnections extends EventEmitter {
         acquire: 20000,
         idle: 300000000,
       },
-      password: SIS_PASSWORD,
       logging: false,
+      password: SIS_PASSWORD,
     })
   }
 
@@ -84,18 +84,26 @@ class DbConnections extends EventEmitter {
     const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
     try {
       const migrator = new Umzug({
-        storage: 'sequelize',
-        storageOptions: {
+        storage: new SequelizeStorage({
           sequelize: this.sequelize,
           tableName: 'migrations',
-        },
+        }),
         migrations: {
-          params: [this.sequelize.getQueryInterface(), Sequelize],
-          path: `${process.cwd()}/src/db/migrations`,
-          pattern: /\.js$/,
+          glob: `${process.cwd()}/src/db/migrations`,
+          resolve: ({ name, path, context }) => {
+            const migration = require(path || '')
+            return {
+              name,
+              up: async () => migration.up(context, Sequelize),
+              down: async () => migration.down(context, Sequelize),
+            }
+          },
         },
+        context: this.sequelize.getQueryInterface(),
+        logger,
       })
-      const migrations = (await migrator.up()).map(m => m.file)
+
+      const migrations = (await migrator.up()).map(m => m.name)
       logger.info({ message: 'Migrations up to date', meta: migrations })
     } catch (error) {
       logger.error({ message: 'Migration error', meta: JSON.stringify(error) })
@@ -106,7 +114,5 @@ class DbConnections extends EventEmitter {
   }
 }
 
-const dbConnections = new DbConnections()
-module.exports = {
-  dbConnections,
-}
+export const dbConnections = new DbConnections()
+export const { sequelize } = dbConnections

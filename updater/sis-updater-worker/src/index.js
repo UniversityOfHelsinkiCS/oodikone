@@ -1,6 +1,6 @@
-const { dbConnections } = require('./db/connection')
-const { logger } = require('./utils/logger')
-require('./worker')
+import { dbConnections } from './db/connection.js'
+import logger from './utils/logger.js'
+import './worker.js'
 
 dbConnections
   .connect()

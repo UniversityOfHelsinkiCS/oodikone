@@ -1,6 +1,6 @@
-const { Model, DATE, STRING } = require('sequelize')
+import { Model, DATE, STRING } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class Teacher extends Model {}
 
@@ -22,10 +22,10 @@ Teacher.init(
   },
   {
     underscored: true,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'teacher',
     tableName: 'teacher',
   }
 )
 
-module.exports = Teacher
+export default Teacher

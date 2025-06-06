@@ -1,20 +1,20 @@
-const _ = require('lodash')
-const { Op } = require('sequelize')
-const { rootOrgId, serviceProvider } = require('../../config')
-const { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } = require('../../db')
-const { dbConnections } = require('../../db/connection')
-const { Course, Teacher, Credit, CreditTeacher, CourseProvider } = require('../../db/models')
-const {
+import { flatten, sortBy, uniqBy } from 'lodash-es'
+import { Op } from 'sequelize'
+import { rootOrgId, serviceProvider } from '../../config.js'
+import { dbConnections } from '../../db/connection.js'
+import { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } from '../../db/index.js'
+import { Course, Teacher, Credit, CreditTeacher, CourseProvider } from '../../db/models/index.js'
+import {
   mapTeacher,
   creditMapper,
   courseProviderMapper,
   validAttainmentTypes,
   customAttainmentTypes,
   isModule,
-} = require('../mapper')
+} from '../mapper.js'
 
 const updateTeachers = async attainments => {
-  const acceptorPersonIds = _.flatten(
+  const acceptorPersonIds = flatten(
     attainments.map(attainment =>
       attainment.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by')
@@ -25,10 +25,10 @@ const updateTeachers = async attainments => {
   const teachers = (await selectFromByIds('persons', acceptorPersonIds)).map(p => mapTeacher(p))
 
   // Sort to avoid deadlocks
-  await bulkCreate(Teacher, _.sortBy(teachers, ['id']))
+  await bulkCreate(Teacher, sortBy(teachers, ['id']))
 }
 
-const updateAttainments = async (
+export const updateAttainments = async (
   attainments,
   personIdToStudentNumber,
   attainmentsToBeExluced,
@@ -335,18 +335,14 @@ const updateAttainments = async (
   await bulkCreate(Credit, credits)
   await bulkCreate(
     CreditTeacher,
-    _.uniqBy(creditTeachers, cT => `${cT.credit_id}-${cT.teacher_id}`),
+    uniqBy(creditTeachers, cT => `${cT.credit_id}-${cT.teacher_id}`),
     null,
     ['credit_id', 'teacher_id']
   )
   await bulkCreate(
     CourseProvider,
-    _.uniqBy(courseProvidersToBeCreated, cP => `${cP.coursecode}-${cP.organizationcode}`),
+    uniqBy(courseProvidersToBeCreated, cP => `${cP.coursecode}-${cP.organizationcode}`),
     null,
     ['coursecode', 'organizationcode']
   )
-}
-
-module.exports = {
-  updateAttainments,
 }

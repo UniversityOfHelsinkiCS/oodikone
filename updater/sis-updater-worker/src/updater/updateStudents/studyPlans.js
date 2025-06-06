@@ -1,19 +1,24 @@
-const _ = require('lodash')
-const { Op } = require('sequelize')
+import { flatten, flattenDeep } from 'lodash-es'
+import { Op } from 'sequelize'
 
-const { selectFromByIds, bulkCreate } = require('../../db')
-const { Studyplan } = require('../../db/models')
-const { isBaMa } = require('../../utils')
-const { studyplanMapper, sanitizeCourseCode } = require('../mapper')
-const { getEducation } = require('../shared')
+import { selectFromByIds, bulkCreate } from '../../db/index.js'
+import { Studyplan } from '../../db/models/index.js'
+import { isBaMa } from '../../utils/index.js'
+import { studyplanMapper, sanitizeCourseCode } from '../mapper.js'
+import { getEducation } from '../shared.js'
 
-const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
+export const updateStudyplans = async (
+  studyplansAll,
+  personIds,
+  personIdToStudentNumber,
+  groupedStudyRightSnapshots
+) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
   const attainments = await selectFromByIds('attainments', personIds, 'person_id')
   const programmeModules = (
     await selectFromByIds(
       'modules',
-      Array.from(new Set(_.flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))))
+      Array.from(new Set(flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))))
     )
   ).concat(
     await selectFromByIds(
@@ -55,8 +60,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     p => educationHasStudyRight[p.root_id] && educationHasStudyRight[p.root_id][p.user_id]
   )
 
-  const courseUnitSelections = _.flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId)))
-  const courseUnitSelectionSubstitutedBy = _.flattenDeep(
+  const courseUnitSelections = flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId)))
+  const courseUnitSelectionSubstitutedBy = flattenDeep(
     studyplans.map(plan =>
       plan.course_unit_selections.filter(cu => cu.substitutedBy.length).map(cu => cu.substitutedBy.map(sub => sub))
     )
@@ -144,7 +149,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
       return [sanitizeCourseCode(attainment.code)]
 
     if (attainment.nodes?.length)
-      return _.flatten(
+      return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getCourseCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
@@ -164,7 +169,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     if (attainment.code && attainment.type === 'CustomModuleAttainment') return [sanitizeCourseCode(attainment.code)]
 
     if (attainment.type === 'DegreeProgrammeAttainment')
-      return _.flatten(
+      return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getModuleCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
@@ -177,7 +182,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   const getAttainmentsFromAttainment = attainment => {
     if (!attainment) return []
     if (attainment.nodes && attainment.nodes.length)
-      return _.flatten(
+      return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getAttainmentsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
@@ -245,7 +250,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     attainments
   )
 
-  const mappedPlans = _.flatten(
+  const mappedPlans = flatten(
     filteredPlans
       .filter(p => educationHasStudyRight[p.root_id] && educationHasStudyRight[p.root_id][p.user_id])
       .map(mapStudyplan)
@@ -254,7 +259,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 }
 
 // When updating students, studyplans sometimes are not updated. Check which aren't updated
-const findStudentsToReupdate = async (personIds, personIdToStudentNumber, iteration = 0) => {
+export const findStudentsToReupdate = async (personIds, personIdToStudentNumber, iteration = 0) => {
   if (iteration > 0) return
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
@@ -273,9 +278,4 @@ const findStudentsToReupdate = async (personIds, personIdToStudentNumber, iterat
   }, {})
 
   return students.map(s => studentNumberToPersonId[s.studentnumber])
-}
-
-module.exports = {
-  updateStudyplans,
-  findStudentsToReupdate,
 }

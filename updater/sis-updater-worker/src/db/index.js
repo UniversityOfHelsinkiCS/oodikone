@@ -1,17 +1,17 @@
-const { getLatestSnapshot, isActive, getActiveSnapshot, getLatestActiveSnapshot } = require('../utils')
-const { logger } = require('../utils/logger')
-const { dbConnections } = require('./connection')
+import { getLatestSnapshot, isActive, getActiveSnapshot, getLatestActiveSnapshot } from '../utils/index.js'
+import logger from '../utils/logger.js'
+import { dbConnections } from './connection.js'
 
-const selectOneById = async (table, id, col = 'id') => dbConnections.knex(table).where(col, id).first()
+export const selectOneById = async (table, id, col = 'id') => dbConnections.knex(table).where(col, id).first()
 
-const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
+export const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
-const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc') =>
+export const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc') =>
   dbConnections.knex(table).whereIn(col, ids).orderBy(by, order)
 
-const selectAllFrom = async table => dbConnections.knex(table)
+export const selectAllFrom = async table => dbConnections.knex(table)
 
-const selectAllFromSnapshots = async table =>
+export const selectAllFromSnapshots = async table =>
   (
     await dbConnections.knex
       .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
@@ -22,7 +22,7 @@ const selectAllFromSnapshots = async table =>
     .filter(s => !!s)
     .filter(isActive)
 
-const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
+export const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
   (
     await dbConnections.knex
       .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
@@ -34,7 +34,7 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
     .filter(s => !!s)
     .filter(isActive)
 
-const selectLatestActiveFromSnapshotsByIds = async (table, ids, col = 'id') =>
+export const selectLatestActiveFromSnapshotsByIds = async (table, ids, col = 'id') =>
   (
     await dbConnections.knex
       .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
@@ -45,7 +45,7 @@ const selectLatestActiveFromSnapshotsByIds = async (table, ids, col = 'id') =>
     .map(({ data }) => getLatestActiveSnapshot(data))
     .filter(s => !!s)
 
-const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
+export const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
   (
     await dbConnections.knex
       .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
@@ -58,7 +58,7 @@ const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
-const bulkCreate = async (
+export const bulkCreate = async (
   model,
   entities,
   transaction = null,
@@ -93,17 +93,4 @@ const bulkCreate = async (
   }
 }
 
-const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')
-
-module.exports = {
-  selectOneById,
-  selectFromByIds,
-  selectFromByIdsOrderBy,
-  selectFromSnapshotsByIds,
-  bulkCreate,
-  selectAllFrom,
-  selectAllFromSnapshots,
-  getCourseUnitsByCodes,
-  selectFromActiveSnapshotsByIds,
-  selectLatestActiveFromSnapshotsByIds,
-}
+export const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')

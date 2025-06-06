@@ -1,21 +1,21 @@
-const Course = require('./course')
-const CourseProvider = require('./courseProvider')
-const CourseType = require('./courseType')
-const Credit = require('./credit')
-const CreditTeacher = require('./creditTeacher')
-const CreditType = require('./creditType')
-const CurriculumPeriod = require('./curriculumPeriod')
-const Enrollment = require('./enrollment')
-const Organization = require('./organization')
-const ProgrammeModule = require('./programmeModule')
-const ProgrammeModuleChild = require('./programmeModuleChild')
-const Semester = require('./semester')
-const SISStudyRight = require('./SISStudyRight')
-const SISStudyRightElement = require('./SISStudyRightElement')
-const Student = require('./student')
-const Studyplan = require('./studyplan')
-const StudyrightExtent = require('./studyrightExtent')
-const Teacher = require('./teacher')
+import Course from './course.js'
+import CourseProvider from './courseProvider.js'
+import CourseType from './courseType.js'
+import Credit from './credit.js'
+import CreditTeacher from './creditTeacher.js'
+import CreditType from './creditType.js'
+import CurriculumPeriod from './curriculumPeriod.js'
+import Enrollment from './enrollment.js'
+import Organization from './organization.js'
+import ProgrammeModule from './programmeModule.js'
+import ProgrammeModuleChild from './programmeModuleChild.js'
+import Semester from './semester.js'
+import SISStudyRight from './SISStudyRight.js'
+import SISStudyRightElement from './SISStudyRightElement.js'
+import Student from './student.js'
+import Studyplan from './studyplan.js'
+import StudyrightExtent from './studyrightExtent.js'
+import Teacher from './teacher.js'
 
 const CREDIT_TYPE_CODES = {
   PASSED: 4,
@@ -85,7 +85,7 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
 
 Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
 
-module.exports = {
+export {
   Course,
   CourseProvider,
   Credit,

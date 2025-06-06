@@ -1,9 +1,9 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { selectFromByIds } = require('../../db')
-const { SISStudyRight, SISStudyRightElement } = require('../../db/models')
+import { selectFromByIds } from '../../db/index.js'
+import { SISStudyRight, SISStudyRightElement } from '../../db/models/index.js'
 
-const studentsThatNeedToBeFixed = [
+export const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-109316006', started: '2019-04-30' },
   { id: 'hy-hlo-111165291', started: '2017-10-18' },
   { id: 'hy-hlo-114813057', started: '2019-02-22' },
@@ -23,7 +23,7 @@ const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-62121710', started: '2020-12-19' },
 ]
 
-const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
+export const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
   const students = await selectFromByIds('persons', studentsToBeFixed)
   for (const student of students) {
     const studentInfo = studentsThatNeedToBeFixed.find(s => s.id === student.id)
@@ -59,9 +59,4 @@ const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
       }
     }
   }
-}
-
-module.exports = {
-  fixVarhaiskasvatusStudyRights,
-  studentsThatNeedToBeFixed,
 }

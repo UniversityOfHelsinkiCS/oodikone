@@ -1,6 +1,6 @@
-const { Model, ARRAY, DATE, INTEGER, JSONB, STRING, TEXT } = require('sequelize')
+import { Model, ARRAY, DATE, INTEGER, JSONB, STRING, TEXT } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class ProgrammeModule extends Model {}
 
@@ -59,10 +59,10 @@ ProgrammeModule.init(
   },
   {
     underscored: true,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'programme_module',
     tableName: 'programme_modules',
   }
 )
 
-module.exports = ProgrammeModule
+export default ProgrammeModule

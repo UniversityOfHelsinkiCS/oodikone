@@ -1,11 +1,11 @@
-const { serviceProvider } = require('../../config')
+import { serviceProvider } from '../../config.js'
 
 const anyModule = rule => ({ id: rule.localId, name: 'Any module' })
 const anyCourse = rule => ({ id: rule.localId, name: 'Any course' })
 const unknownRule = rule => ({ type: rule.type, fact: 'Unhandled rule' })
 const unknownModule = mod => ({ name: mod.name, type: 'unknown' })
 
-class ModuleResolver {
+export class ModuleResolver {
   constructor(knex) {
     this.knex = knex
     this.moduleCache = {}
@@ -130,5 +130,3 @@ class ModuleResolver {
     return unknownRule(rule)
   }
 }
-
-module.exports = ModuleResolver

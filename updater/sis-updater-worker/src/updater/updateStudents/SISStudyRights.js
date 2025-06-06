@@ -1,14 +1,14 @@
-const { selectAllFrom, bulkCreate, selectOneById } = require('../../db')
-const { SISStudyRight, SISStudyRightElement } = require('../../db/models')
-const { logger } = require('../../utils')
-const { termRegistrationTypeToEnrollmenttype } = require('../mapper')
-const {
+import { selectAllFrom, bulkCreate, selectOneById } from '../../db/index.js'
+import { SISStudyRight, SISStudyRightElement } from '../../db/models/index.js'
+import logger from '../../utils/logger.js'
+import { termRegistrationTypeToEnrollmenttype } from '../mapper.js'
+import {
   getEducation,
   getSemester,
   getEducationType,
   educationTypeToExtentcode,
   getOrganisationCode,
-} = require('../shared')
+} from '../shared.js'
 
 const TVEX_URN_CODE = 'urn:code:custom:hy-university-root-id:katu:katu1'
 
@@ -207,7 +207,7 @@ const findFirstSnapshotDatesForProgrammesAndStudytracks = studyRightSnapshots =>
   }
 }
 
-const updateSISStudyRights = async (groupedStudyRights, personIdToStudentNumber, semesterEnrollments) => {
+export const updateSISStudyRights = async (groupedStudyRights, personIdToStudentNumber, semesterEnrollments) => {
   const admissionTypes = (await selectAllFrom('admission_types')).reduce(
     (acc, curr) => ({ ...acc, [curr.id]: curr.name.fi }),
     {}
@@ -226,7 +226,7 @@ const updateSISStudyRights = async (groupedStudyRights, personIdToStudentNumber,
   return new Set(formattedStudyRights.map(studyRight => studyRight.id))
 }
 
-const updateSISStudyRightElements = async (groupedStudyRights, moduleGroupIdToCode, createdStudyRights) => {
+export const updateSISStudyRightElements = async (groupedStudyRights, moduleGroupIdToCode, createdStudyRights) => {
   const studyRightElements = []
 
   for (const group of groupedStudyRights) {
@@ -262,9 +262,4 @@ const updateSISStudyRightElements = async (groupedStudyRights, moduleGroupIdToCo
   }
 
   await bulkCreate(SISStudyRightElement, studyRightElements)
-}
-
-module.exports = {
-  updateSISStudyRights,
-  updateSISStudyRightElements,
 }

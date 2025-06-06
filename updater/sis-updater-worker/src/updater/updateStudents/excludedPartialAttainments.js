@@ -1,10 +1,11 @@
-const { readFileSync } = require('fs')
+import { readFileSync } from 'fs'
+import logger from '../../utils/logger.js'
 
-const { logger } = require('../../utils/logger')
+const __dir = import.meta.dirname
 
-const getAttainmentsToBeExcluded = () => {
+export const getAttainmentsToBeExcluded = () => {
   try {
-    const data = readFileSync(`${__dirname}/excludedPartialAttainments.csv`).toString()
+    const data = readFileSync(`${__dir}/excludedPartialAttainments.csv`).toString()
     if (!data) return new Set()
     const attainmentIds = data.split('\n')
     return new Set(attainmentIds)
@@ -12,5 +13,3 @@ const getAttainmentsToBeExcluded = () => {
     logger.error({ message: 'Reading excluded attainments from csv failed', meta: error.stack })
   }
 }
-
-module.exports = { getAttainmentsToBeExcluded }

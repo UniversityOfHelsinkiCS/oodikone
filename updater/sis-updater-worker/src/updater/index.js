@@ -1,6 +1,6 @@
-const { selectFromByIds, selectLatestActiveFromSnapshotsByIds } = require('../db')
-const { creditTypeIdsToCreditTypes } = require('./shared')
-const {
+import { selectFromByIds, selectLatestActiveFromSnapshotsByIds } from '../db/index.js'
+import { creditTypeIdsToCreditTypes } from './shared.js'
+import {
   updateOrganisations,
   updateStudyModules,
   updateCourseUnits,
@@ -8,9 +8,9 @@ const {
   updateCreditTypes,
   updateStudyrightExtents,
   updateCurriculumPeriods,
-} = require('./updateMeta')
-const { updateProgrammeModules } = require('./updateProgrammeModules/updateProgrammeModules')
-const { updateStudents } = require('./updateStudents')
+} from './updateMeta.js'
+import { updateProgrammeModules } from './updateProgrammeModules/updateProgrammeModules.js'
+import { updateStudents } from './updateStudents/index.js'
 
 const idToHandler = {
   students: updateStudents,
@@ -24,7 +24,7 @@ const idToHandler = {
   curriculum_periods: updateCurriculumPeriods,
 }
 
-const update = async ({ entityIds, type }) => {
+export const update = async ({ entityIds, type }) => {
   const updateHandler = idToHandler[type]
 
   switch (type) {
@@ -49,8 +49,4 @@ const update = async ({ entityIds, type }) => {
     default:
       break
   }
-}
-
-module.exports = {
-  update,
 }

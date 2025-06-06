@@ -1,14 +1,17 @@
-const { createClient } = require('redis')
-const redisLock = require('redis-lock')
+import { createRequire } from 'module'
+const legacyRequire = createRequire(import.meta.url)
+const redisLock = legacyRequire('redis-lock')
 
-const { REDIS_HOST, REDIS_PORT } = require('../config')
-const { logger } = require('./logger')
+import { createClient } from 'redis'
 
-const redisClient = createClient({
+import { REDIS_HOST, REDIS_PORT } from '../config.js'
+import logger from './logger.js'
+
+export const redisClient = createClient({
   url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
 })
 
-const lock = redisLock(redisClient)
+export const lock = redisLock(redisClient)
 
 redisClient
   .connect()
@@ -20,8 +23,3 @@ redisClient
   })
 
 redisClient.on('error', error => logger.error('Redis Client Error', { error }))
-
-module.exports = {
-  redisClient,
-  lock,
-}

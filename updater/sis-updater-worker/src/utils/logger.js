@@ -1,10 +1,10 @@
-const os = require('os')
-const winston = require('winston')
-const { WinstonGelfTransporter } = require('winston-gelf-transporter')
-const LokiTransport = require('winston-loki')
-const Sentry = require('winston-transport-sentry-node').default
+import os from 'os'
+import winston from 'winston'
+import { WinstonGelfTransporter } from 'winston-gelf-transporter'
+import LokiTransport from 'winston-loki'
+import Sentry from 'winston-transport-sentry-node'
 
-const { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DSN } = require('../config')
+import { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DSN } from '../config.js'
 
 const { colorize, combine, timestamp, printf, uncolorize } = winston.format
 
@@ -67,6 +67,4 @@ const logger = winston.createLogger({ transports })
 
 logger.on('error', error => console.error('Logging failed. Reason: ', error)) // eslint-disable-line no-console
 
-module.exports = {
-  logger,
-}
+export default logger

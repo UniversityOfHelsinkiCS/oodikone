@@ -1,10 +1,10 @@
-const { chunk } = require('lodash')
+import { chunk } from 'lodash-es'
 
-const { bulkCreate, selectFromByIds } = require('../../db')
-const { dbConnections } = require('../../db/connection')
-const { ProgrammeModule, ProgrammeModuleChild } = require('../../db/models')
-const { logger } = require('../../utils/logger')
-const ModuleResolver = require('./resolver')
+import { dbConnections } from '../../db/connection.js'
+import { bulkCreate, selectFromByIds } from '../../db/index.js'
+import { ProgrammeModule, ProgrammeModuleChild } from '../../db/models/index.js'
+import logger from '../../utils/logger.js'
+import { ModuleResolver } from './resolver.js'
 
 const resolveProgramme = async programme => {
   const responsibleOrg = programme.organisations
@@ -84,7 +84,7 @@ const updateProgrammeModulesChunk = async programmeIds => {
   await bulkCreate(ProgrammeModuleChild, Object.values(joinMap), null, [], false, 'composite')
 }
 
-const updateProgrammeModules = async programmeIds => {
+export const updateProgrammeModules = async programmeIds => {
   await ProgrammeModuleChild.destroy({ where: {} })
   await ProgrammeModule.destroy({ where: {} })
   const programmeChunks = chunk(programmeIds, 25)
@@ -92,5 +92,3 @@ const updateProgrammeModules = async programmeIds => {
     await updateProgrammeModulesChunk(chunk)
   }
 }
-
-module.exports = { updateProgrammeModules }

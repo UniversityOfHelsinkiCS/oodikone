@@ -1,6 +1,6 @@
-const { Model, ARRAY, DATE, DOUBLE, STRING, TEXT } = require('sequelize')
+import { Model, ARRAY, DATE, DOUBLE, STRING, TEXT } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class Studyplan extends Model {}
 
@@ -53,10 +53,10 @@ Studyplan.init(
   },
   {
     underscored: false,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'studyplan',
     tableName: 'studyplan',
   }
 )
 
-module.exports = Studyplan
+export default Studyplan

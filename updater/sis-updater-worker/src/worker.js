@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-redeclare
-const { Worker } = require('bullmq')
+import { Worker } from 'bullmq'
 
-const { REDIS_HOST, REDIS_PORT } = require('./config')
-const processor = require('./processor')
-const { logger } = require('./utils/logger')
+import { REDIS_HOST, REDIS_PORT } from './config.js'
+import processor from './processor.js'
+import logger from './utils/logger.js'
 
 const connection = {
   host: REDIS_HOST,

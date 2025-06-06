@@ -1,7 +1,7 @@
-const { Op } = require('sequelize')
+import { Op } from 'sequelize'
 
-const { PURGE_LOCK } = require('../config')
-const {
+import { PURGE_LOCK } from '../config.js'
+import {
   Organization,
   Course,
   CourseType,
@@ -14,9 +14,9 @@ const {
   StudyrightExtent,
   SISStudyRightElement,
   SISStudyRight,
-} = require('../db/models')
-const { logger } = require('../utils/logger')
-const { lock } = require('../utils/redis')
+} from '../db/models/index.js'
+import logger from '../utils/logger.js'
+import { lock } from '../utils/redis.js'
 
 const tableToModel = {
   course: Course,
@@ -32,7 +32,7 @@ const tableToModel = {
   teacher: Teacher,
 }
 
-const prePurge = async ({ tables, before }) => {
+export const prePurge = async ({ tables, before }) => {
   const beforeDate = new Date(before)
 
   const counts = await Promise.all(
@@ -57,7 +57,7 @@ const prePurge = async ({ tables, before }) => {
   return counts.filter(Boolean).reduce((acc, curr) => ({ ...acc, ...curr }), {})
 }
 
-const purge = async ({ tables, before }) => {
+export const purge = async ({ tables, before }) => {
   const unlock = await lock(PURGE_LOCK, 1000 * 60 * 60)
   const beforeDate = new Date(before)
 
@@ -90,14 +90,8 @@ const purge = async ({ tables, before }) => {
   }
 }
 
-const purgeByStudentNumber = async studentNumbers => {
+export const purgeByStudentNumber = async studentNumbers => {
   await Student.destroy({
     where: { studentnumber: studentNumbers },
   })
-}
-
-module.exports = {
-  purge,
-  prePurge,
-  purgeByStudentNumber,
 }

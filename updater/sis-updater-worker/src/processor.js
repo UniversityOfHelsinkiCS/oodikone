@@ -1,12 +1,12 @@
-const { intersection } = require('lodash')
+import { intersection } from 'lodash-es'
 
-const { update } = require('./updater')
-const { purgeByStudentNumber, prePurge, purge } = require('./updater/purge')
-const { loadMapsOnDemand } = require('./updater/shared')
-const {
+import { update } from './updater/index.js'
+import { purgeByStudentNumber, prePurge, purge } from './updater/purge.js'
+import { loadMapsOnDemand } from './updater/shared.js'
+import {
   fixVarhaiskasvatusStudyRights,
   studentsThatNeedToBeFixed,
-} = require('./updater/updateStudents/varhaiskasvatusFixer')
+} from './updater/updateStudents/varhaiskasvatusFixer.js'
 
 const updateMsgHandler = async updateMsg => {
   await update(updateMsg)
@@ -21,7 +21,7 @@ const updateMsgHandler = async updateMsg => {
   }
 }
 
-module.exports = async job => {
+export default async job => {
   switch (job.name) {
     case 'students_with_purge': {
       const studentNumbers = job.data.map(student => student.student_number)

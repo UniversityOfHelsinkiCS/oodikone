@@ -1,15 +1,15 @@
-const { sortBy, flatten, uniqBy } = require('lodash')
+import { sortBy, flatten, uniqBy } from 'lodash-es'
 
-const { serviceProvider } = require('../config')
-const { logger } = require('../utils/logger')
-const {
+import { serviceProvider } from '../config.js'
+import logger from '../utils/logger.js'
+import {
   educationTypeToExtentcode,
   getCountry,
   getCreditTypeCodeFromAttainment,
   getGrade,
   getSemesterByDate,
   getUniOrgId,
-} = require('./shared')
+} from './shared.js'
 
 // Keeping previous oodi logic:
 // 0 = Not known 'urn:code:gender:not-known'
@@ -31,18 +31,18 @@ const parseGender = genderUrn => genderCodes[genderUrn] ?? '0'
 // See, e.g., TKT5
 const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 
-const customAttainmentTypes = ['CustomCourseUnitAttainment', 'CustomModuleAttainment']
+export const customAttainmentTypes = ['CustomCourseUnitAttainment', 'CustomModuleAttainment']
 
 const moduleTypes = ['ModuleAttainment', 'CustomModuleAttainment', 'DegreeProgrammeAttainment']
 
 // Basically all types at the moment
-const validAttainmentTypes = [...customAttainmentTypes, ...moduleTypes, 'CourseUnitAttainment']
+export const validAttainmentTypes = [...customAttainmentTypes, ...moduleTypes, 'CourseUnitAttainment']
 
-const isModule = courseType => moduleTypes.includes(courseType)
+export const isModule = courseType => moduleTypes.includes(courseType)
 
 const now = new Date()
 
-const sanitizeCourseCode = code => {
+export const sanitizeCourseCode = code => {
   if (!code) return null
   // Custom course unit attainments includes an Oodi surrogate in the end of course code
   const codeParts = code.split('-')
@@ -68,7 +68,7 @@ const calculateTotalCreditsFromAttainments = attainments => {
   return attainments.reduce((sum, att) => (isValidAttainment(att) ? sum + Number(att.credits) : sum), 0)
 }
 
-const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
+export const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const {
     last_name,
     first_names,
@@ -128,12 +128,12 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
   }
 }
 
-const mapTeacher = person => ({
+export const mapTeacher = person => ({
   id: person.id,
   name: person.first_names ? `${person.last_name} ${person.first_names}`.trim() : person.last_name,
 })
 
-const creditMapper =
+export const creditMapper =
   (
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
@@ -229,10 +229,10 @@ const creditMapper =
     }
   }
 
-const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
+export const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
   ({ ATTENDING: 1, NONATTENDING: 2 })[termRegistrationType] ?? 3
 
-const courseProviderMapper =
+export const courseProviderMapper =
   courseGroupId =>
   ({ organisationId, shares }) => ({
     coursecode: courseGroupId,
@@ -242,7 +242,7 @@ const courseProviderMapper =
 
 const timify = date => new Date(date).getTime()
 
-const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
+export const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
   const [groupId, courses] = groupedCourse
   const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
 
@@ -277,17 +277,17 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
   }
 }
 
-const mapCourseType = studyLevel => ({
+export const mapCourseType = studyLevel => ({
   coursetypecode: studyLevel.id,
   name: studyLevel.name,
 })
 
-const mapStudyrightExtent = educationType => ({
+export const mapStudyrightExtent = educationType => ({
   extentcode: educationTypeToExtentcode[educationType.id],
   name: educationType.name,
 })
 
-const mapCurriculumPeriod = curriculumPeriod => ({
+export const mapCurriculumPeriod = curriculumPeriod => ({
   id: curriculumPeriod.id,
   name: curriculumPeriod.name,
   universityOrgId: curriculumPeriod.university_org_id,
@@ -295,7 +295,7 @@ const mapCurriculumPeriod = curriculumPeriod => ({
   endDate: new Date(curriculumPeriod.active_period.endDate),
 })
 
-const enrollmentMapper =
+export const enrollmentMapper =
   (
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
@@ -338,7 +338,7 @@ const getCorrectAttainment = (attainments, courseUnitIdToCode, courseUnitId, stu
   )
 }
 
-const studyplanMapper =
+export const studyplanMapper =
   (
     personIdToStudentNumber,
     programmeModuleIdToCode,
@@ -485,21 +485,3 @@ const studyplanMapper =
       }
     })
   }
-
-module.exports = {
-  studentMapper,
-  mapTeacher,
-  creditMapper,
-  termRegistrationTypeToEnrollmenttype,
-  courseProviderMapper,
-  courseMapper,
-  mapCourseType,
-  mapStudyrightExtent,
-  mapCurriculumPeriod,
-  enrollmentMapper,
-  studyplanMapper,
-  sanitizeCourseCode,
-  validAttainmentTypes,
-  customAttainmentTypes,
-  isModule,
-}

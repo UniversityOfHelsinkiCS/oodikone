@@ -1,8 +1,8 @@
-const { each } = require('async')
+import { each } from 'async'
 
-const { selectAllFrom, selectAllFromSnapshots } = require('../db')
-const { Semester, Organization, CREDIT_TYPE_CODES } = require('../db/models')
-const { redisClient, lock: redisLock } = require('../utils/redis')
+import { selectAllFrom, selectAllFromSnapshots } from '../db/index.js'
+import { Semester, Organization, CREDIT_TYPE_CODES } from '../db/models/index.js'
+import { redisClient, lock as redisLock } from '../utils/redis.js'
 
 const getRedisJSON = async key => JSON.parse(await redisClient.get(key))
 const setRedisJSON = async (key, value) => redisClient.set(key, JSON.stringify(value))
@@ -61,7 +61,7 @@ const initDaysToSemesters = async () => {
   )
 }
 
-const getSemesterByDate = date => localMaps.daysToSemesters[date.toDateString()]
+export const getSemesterByDate = date => localMaps.daysToSemesters[date.toDateString()]
 
 const initEducationTypes = async () =>
   setRedisJSON(
@@ -72,7 +72,7 @@ const initEducationTypes = async () =>
     }, {})
   )
 
-const getEducationType = id => localMaps.educationTypes[id]
+export const getEducationType = id => localMaps.educationTypes[id]
 
 const initOrganisationIdToCode = async () =>
   setRedisJSON(
@@ -83,7 +83,7 @@ const initOrganisationIdToCode = async () =>
     }, {})
   )
 
-const getOrganisationCode = id => localMaps.organisationIdToCode[id]
+export const getOrganisationCode = id => localMaps.organisationIdToCode[id]
 
 const initEducationIdToEducation = async () =>
   setRedisJSON(
@@ -94,7 +94,7 @@ const initEducationIdToEducation = async () =>
     }, {})
   )
 
-const getEducation = id => localMaps.educationIdToEducation[id]
+export const getEducation = id => localMaps.educationIdToEducation[id]
 
 const initGradeScaleIdToGradeIdsToGrades = async () =>
   setRedisJSON(
@@ -115,7 +115,7 @@ const initGradeScaleIdToGradeIdsToGrades = async () =>
     }, {})
   )
 
-const getGrade = (scaleId, gradeId) => localMaps.gradeScaleIdToGradeIdsToGrades[scaleId][gradeId]
+export const getGrade = (scaleId, gradeId) => localMaps.gradeScaleIdToGradeIdsToGrades[scaleId][gradeId]
 
 const initOrgToUniOrgId = async () => {
   const organisations = await selectAllFromSnapshots('organisations')
@@ -128,7 +128,7 @@ const initOrgToUniOrgId = async () => {
   )
 }
 
-const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
+export const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
 
 const initStartYearToSemesters = async () =>
   setRedisJSON(
@@ -147,7 +147,7 @@ const initStartYearToSemesters = async () =>
     }, {})
   )
 
-const getSemester = (studyYearStartYear, termIndex) => {
+export const getSemester = (studyYearStartYear, termIndex) => {
   return localMaps.startYearToSemesters[studyYearStartYear][termIndex]
 }
 
@@ -172,7 +172,7 @@ const calculateMapsToRedis = async () =>
     initCountries(),
   ])
 
-const loadMapsIfNeeded = async () => {
+export const loadMapsIfNeeded = async () => {
   const now = new Date().getTime()
   if (!loadedAt || now - loadedAt > TIME_LIMIT_BETWEEN_RELOADS) {
     const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
@@ -188,7 +188,7 @@ const loadMapsIfNeeded = async () => {
   }
 }
 
-const loadMapsOnDemand = async () => {
+export const loadMapsOnDemand = async () => {
   // TODO: hotfix for frontend, refactor this to more logical place
   const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
   await calculateMapsToRedis()
@@ -198,9 +198,9 @@ const loadMapsOnDemand = async () => {
   loadedAt = new Date().getTime()
 }
 
-const getCountry = countryId => localMaps.countries[countryId]
+export const getCountry = countryId => localMaps.countries[countryId]
 
-const educationTypeToExtentcode = {
+export const educationTypeToExtentcode = {
   'urn:code:education-type:degree-education:bachelors-degree': 1,
   'urn:code:education-type:degree-education:masters-degree': 2,
   'urn:code:education-type:degree-education:lic': 3,
@@ -228,7 +228,7 @@ const educationTypeToExtentcode = {
   'urn:code:education-type:non-degree-education:separate-studies:adult-educator-pedagogical-studies': null, // Parent is 99
 }
 
-const getCreditTypeCodeFromAttainment = (attainment, passed) => {
+export const getCreditTypeCodeFromAttainment = (attainment, passed) => {
   const { primary, state } = attainment
   if (!passed || state === 'FAILED') return CREDIT_TYPE_CODES.FAILED
   if (!primary) return CREDIT_TYPE_CODES.IMPROVED
@@ -255,21 +255,4 @@ const creditTypeIdToCreditType = {
   },
 }
 
-const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])
-
-module.exports = {
-  getSemesterByDate,
-  getCreditTypeCodeFromAttainment,
-  educationTypeToExtentcode,
-  creditTypeIdsToCreditTypes,
-  getEducationType,
-  getOrganisationCode,
-  getEducation,
-  getGrade,
-  getUniOrgId,
-  getSemester,
-  getCountry,
-  loadMapsIfNeeded,
-  loadMapsOnDemand,
-  CREDIT_TYPE_CODES,
-}
+export const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])

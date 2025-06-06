@@ -1,6 +1,6 @@
-const { Model, DATE, INTEGER, JSONB, STRING } = require('sequelize')
+import { Model, DATE, INTEGER, JSONB, STRING } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class Semester extends Model {}
 
@@ -46,10 +46,10 @@ Semester.init(
   },
   {
     underscored: true,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'semester',
     tableName: 'semesters',
   }
 )
 
-module.exports = Semester
+export default Semester

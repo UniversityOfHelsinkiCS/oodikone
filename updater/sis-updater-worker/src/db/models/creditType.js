@@ -1,6 +1,6 @@
-const { Model, DATE, INTEGER, JSONB } = require('sequelize')
+import { Model, DATE, INTEGER, JSONB } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class CreditType extends Model {}
 
@@ -22,10 +22,10 @@ CreditType.init(
   },
   {
     underscored: true,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'credit_type',
     tableName: 'credit_types',
   }
 )
 
-module.exports = CreditType
+export default CreditType

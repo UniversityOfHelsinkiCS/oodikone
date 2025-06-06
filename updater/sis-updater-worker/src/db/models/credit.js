@@ -1,6 +1,6 @@
-const { Model, BOOLEAN, DATE, DOUBLE, INTEGER, STRING } = require('sequelize')
+import { Model, BOOLEAN, DATE, DOUBLE, INTEGER, STRING } from 'sequelize'
 
-const { dbConnections } = require('../connection')
+import { sequelize } from '../connection.js'
 
 class Credit extends Model {}
 
@@ -89,10 +89,10 @@ Credit.init(
   },
   {
     underscored: false,
-    sequelize: dbConnections.sequelize,
+    sequelize,
     modelName: 'credit',
     tableName: 'credit',
   }
 )
 
-module.exports = Credit
+export default Credit

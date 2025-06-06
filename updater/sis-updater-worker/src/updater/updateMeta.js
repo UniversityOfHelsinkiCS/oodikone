@@ -1,8 +1,7 @@
-const { uniqBy, flatten, groupBy } = require('lodash')
-const _ = require('lodash')
-const { rootOrgId } = require('../config')
-const { bulkCreate, selectFromByIdsOrderBy } = require('../db')
-const {
+import { uniqBy, flatten, groupBy, memoize } from 'lodash-es'
+import { rootOrgId } from '../config.js'
+import { bulkCreate, selectFromByIdsOrderBy } from '../db/index.js'
+import {
   Course,
   CourseProvider,
   CourseType,
@@ -10,17 +9,17 @@ const {
   CurriculumPeriod,
   Organization,
   StudyrightExtent,
-} = require('../db/models')
-const { logger } = require('../utils/logger')
-const {
+} from '../db/models/index.js'
+import logger from '../utils/logger.js'
+import {
   courseMapper,
   courseProviderMapper,
   mapCourseType,
   mapStudyrightExtent,
   mapCurriculumPeriod,
-} = require('./mapper')
+} from './mapper.js'
 
-const updateOrganisations = async organisations => {
+export const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
 
@@ -38,7 +37,7 @@ const codeRegexes = [openUniCodeA, openUniCode, bscsCode, oldNumericCode, newLet
 // compared to executing each one independently.
 const codeRegex = RegExp(codeRegexes.map(r => `(${r.source})`).join('|'))
 
-const getSubstitutionPriority = _.memoize(code => {
+const getSubstitutionPriority = memoize(code => {
   const match = codeRegex.exec(code)
 
   if (!match) {
@@ -136,7 +135,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   )
 }
 
-const updateStudyModules = async studyModules => {
+export const updateStudyModules = async studyModules => {
   const organizationStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
@@ -151,7 +150,7 @@ const updateStudyModules = async studyModules => {
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
 
-const updateCourseUnits = async courseUnits => {
+export const updateCourseUnits = async courseUnits => {
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
     courseUnits.map(course => course.id),
@@ -165,31 +164,21 @@ const updateCourseUnits = async courseUnits => {
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
 
-const updateCourseTypes = async studyLevels => {
+export const updateCourseTypes = async studyLevels => {
   await bulkCreate(CourseType, studyLevels.map(mapCourseType))
 }
 
-const updateCreditTypes = async creditTypes => {
+export const updateCreditTypes = async creditTypes => {
   await bulkCreate(CreditType, creditTypes)
 }
 
-const updateStudyrightExtents = async educationTypes => {
+export const updateStudyrightExtents = async educationTypes => {
   const studyrightExtents = educationTypes.map(mapStudyrightExtent).filter(eT => eT.extentcode)
-  const uniqueExtents = _.uniqBy(studyrightExtents, 'extentcode')
+  const uniqueExtents = uniqBy(studyrightExtents, 'extentcode')
   await bulkCreate(StudyrightExtent, uniqueExtents, null, ['extentcode'])
 }
 
-const updateCurriculumPeriods = async curriculumPeriods => {
+export const updateCurriculumPeriods = async curriculumPeriods => {
   const mappedCurriculumPeriods = curriculumPeriods.map(mapCurriculumPeriod)
   await bulkCreate(CurriculumPeriod, mappedCurriculumPeriods)
-}
-
-module.exports = {
-  updateOrganisations,
-  updateStudyModules,
-  updateCourseUnits,
-  updateCourseTypes,
-  updateCreditTypes,
-  updateStudyrightExtents,
-  updateCurriculumPeriods,
 }

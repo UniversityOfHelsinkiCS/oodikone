@@ -1,15 +1,15 @@
-const { flatten, groupBy, orderBy } = require('lodash')
-const { Op } = require('sequelize')
+import { flatten, groupBy, orderBy } from 'lodash-es'
+import { Op } from 'sequelize'
 
-const { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds } = require('../../db')
-const { Course, Enrollment, Student } = require('../../db/models')
-const { logger } = require('../../utils/logger')
-const { studentMapper, enrollmentMapper } = require('../mapper')
-const { getEducation, loadMapsIfNeeded } = require('../shared')
-const { updateAttainments } = require('./attainments')
-const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
-const { updateSISStudyRights, updateSISStudyRightElements } = require('./SISStudyRights')
-const { updateStudyplans, findStudentsToReupdate } = require('./studyPlans')
+import { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds } from '../../db/index.js'
+import { Course, Enrollment, Student } from '../../db/models/index.js'
+import logger from '../../utils/logger.js'
+import { studentMapper, enrollmentMapper } from '../mapper.js'
+import { getEducation, loadMapsIfNeeded } from '../shared.js'
+import { updateAttainments } from './attainments.js'
+import { getAttainmentsToBeExcluded } from './excludedPartialAttainments.js'
+import { updateSISStudyRights, updateSISStudyRightElements } from './SISStudyRights.js'
+import { updateStudyplans, findStudentsToReupdate } from './studyPlans.js'
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -170,7 +170,7 @@ const createModuleGroupIdToCodeMap = async studyRights => {
   }, {})
 }
 
-const updateStudents = async (personIds, iteration = 0) => {
+export const updateStudents = async (personIds, iteration = 0) => {
   await loadMapsIfNeeded()
 
   const [students, studyrightSnapshots, attainments, termRegistrations, enrollments, studyplans] = await Promise.all([
@@ -260,8 +260,4 @@ const updateStudents = async (personIds, iteration = 0) => {
     logger.info(`Updating ${studentsToReupdate.length} students again due to studyplans not updating.`)
     await updateStudents(studentsToReupdate, iteration + 1)
   }
-}
-
-module.exports = {
-  updateStudents,
 }
