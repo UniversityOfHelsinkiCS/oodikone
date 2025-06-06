@@ -2,9 +2,11 @@ import os from 'os'
 import winston from 'winston'
 import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
-import Sentry from 'winston-transport-sentry-node'
+import WinstonSentry from 'winston-transport-sentry-node'
 
 import { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DSN } from '../config.js'
+
+const Sentry = WinstonSentry.default
 
 const { colorize, combine, timestamp, printf, uncolorize } = winston.format
 
