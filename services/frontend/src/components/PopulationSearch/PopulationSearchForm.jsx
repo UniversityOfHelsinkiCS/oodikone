@@ -2,7 +2,6 @@ import Stack from '@mui/material/Stack'
 
 import { sortBy } from 'lodash'
 import moment from 'moment'
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useNavigate, useLocation } from 'react-router'
@@ -21,6 +20,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { createPinnedFirstComparator } from '@/util/comparator'
+import { queryParamsToString } from '@/util/queryparams'
 import { momentFromFormat, reformatDate } from '@/util/timeAndDate'
 import { getMonths } from './common'
 import './populationSearch.css'
@@ -101,7 +101,7 @@ export const PopulationSearchForm = () => {
     studyRights.combinedProgramme = combinedProgramme ?? ''
 
     const queryObject = { ...rest, studyRights: JSON.stringify(studyRights) }
-    const searchString = qs.stringify(queryObject)
+    const searchString = queryParamsToString(queryObject)
 
     navigate({ search: searchString })
   }

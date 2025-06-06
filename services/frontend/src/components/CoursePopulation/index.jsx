@@ -1,4 +1,3 @@
-import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 import { Form, Header, Input, Segment } from 'semantic-ui-react'
@@ -32,6 +31,7 @@ import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourse
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
+import { parseQueryParams } from '@/util/queryparams'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
@@ -42,7 +42,7 @@ export const CoursePopulation = () => {
   const [codes, setCodes] = useState([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = qs.parse(
+  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = parseQueryParams(
     location.search
   )
 

@@ -1,4 +1,3 @@
-import qs from 'query-string'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, Form } from 'semantic-ui-react'
@@ -6,6 +5,7 @@ import { Button, Form } from 'semantic-ui-react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationQueryCard } from '@/components/PopulationQueryCard'
+import { queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
 import { getMonths } from './common'
 import { FilterActiveNote } from './FilterActiveNote'
@@ -47,7 +47,7 @@ export const PopulationSearchHistory = ({ query, skipQuery }) => {
       semesters,
       studyRights: JSON.stringify(studyRights),
     }
-    const searchString = qs.stringify(queryObject)
+    const searchString = queryParamsToString(queryObject)
     navigate({ search: searchString })
   }
 

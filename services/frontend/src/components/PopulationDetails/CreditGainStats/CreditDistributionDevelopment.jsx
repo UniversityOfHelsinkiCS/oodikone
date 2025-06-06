@@ -3,7 +3,6 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chain, range, sortBy } from 'lodash'
 import moment from 'moment'
-import qs from 'query-string'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router'
@@ -16,6 +15,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useDeepMemo } from '@/hooks/deepMemo'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { generateGradientColors } from '@/util/color'
+import { parseQueryParams } from '@/util/queryparams'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -148,7 +148,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.DESCENDING)
   const location = useLocation()
-  const { months } = qs.parse(location.search)
+  const { months } = parseQueryParams(location.search)
   const { data: semestersAndYears = {} } = useGetSemestersQuery()
   const { semesters = {} } = semestersAndYears
   const { getTextIn } = useLanguage()

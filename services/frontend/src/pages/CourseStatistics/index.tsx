@@ -3,7 +3,6 @@ import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 
@@ -16,6 +15,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { getCourseStats } from '@/redux/courseStats'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
+import { parseQueryParams } from '@/util/queryparams'
 import { CourseTab } from './CourseTab'
 import { FacultyStatisticsTab } from './FacultyStatisticsTab'
 import { NewQueryButton } from './NewQueryButton'
@@ -42,7 +42,7 @@ export const CourseStatistics = () => {
   }, [initialCourseCode])
 
   useEffect(() => {
-    const { courseCodes, ...params } = qs.parse(location.search)
+    const { courseCodes, ...params } = parseQueryParams(location.search)
     if (!courseCodes) {
       return
     }

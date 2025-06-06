@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
-import qs from 'query-string'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -27,6 +26,7 @@ import {
   Students,
 } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
+import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
@@ -92,7 +92,7 @@ export const SingleCourseStats = ({
   }, [semesterData])
 
   const parseQueryFromUrl = () => {
-    const { separate } = qs.parse(location.search)
+    const { separate } = parseQueryParams(location.search)
     return {
       separate: JSON.parse((separate ?? 'false') as string),
     }
@@ -424,7 +424,7 @@ export const SingleCourseStats = ({
       separate: false,
       unifyCourses,
     }
-    const searchString = qs.stringify(queryObject)
+    const searchString = queryParamsToString(queryObject)
     void navigate(`/coursepopulation?${searchString}`)
   }
 

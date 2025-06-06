@@ -1,5 +1,4 @@
 import moment from 'moment'
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useLocation, useNavigate } from 'react-router'
@@ -11,6 +10,7 @@ import {
   useDeleteOpenUniCourseSearchMutation,
   useUpdateOpenUniCourseSearchMutation,
 } from '@/redux/openUniPopulations'
+import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
@@ -53,13 +53,13 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
 
   const pushQueryToUrl = query => {
     setTimeout(() => {
-      const searchString = qs.stringify(query)
+      const searchString = queryParamsToString(query)
       navigate({ search: searchString }, { replace: true })
     }, 0)
   }
 
   const parseQueryFromUrl = () => {
-    const { courseCode, startdate, enddate } = qs.parse(location.search)
+    const { courseCode, startdate, enddate } = parseQueryParams(location.search)
     const courseCodes = formatToArray(courseCode)
     const query = {
       courseList: courseCodes,

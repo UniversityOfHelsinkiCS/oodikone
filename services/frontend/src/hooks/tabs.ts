@@ -1,6 +1,6 @@
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 
 export const useTabs = (totalTabs: number, prefix?: string) => {
   const navigate = useNavigate()
@@ -15,20 +15,20 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
   }
 
   const [tab, setTab] = useState<number>(() => {
-    const params = qs.parse(location.search)
+    const params = parseQueryParams(location.search)
     return normalizeTab(params[id])
   })
 
   const pushToUrl = (newTab: number) => {
-    const search = qs.stringify({
-      ...qs.parse(location.search),
+    const search = queryParamsToString({
+      ...parseQueryParams(location.search),
       [id]: newTab,
     })
     void navigate({ pathname: location.pathname, search }, { replace: true })
   }
 
   useEffect(() => {
-    const params = qs.parse(location.search)
+    const params = parseQueryParams(location.search)
     const queryTab = normalizeTab(params[id])
     if (queryTab !== tab) {
       setTab(queryTab)
@@ -54,12 +54,12 @@ export const useSemanticTabs = (id: string, initialTab: number, { location, repl
   const pushToUrl = newTab => {
     replace({
       pathname: location.pathname,
-      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab }),
+      search: queryParamsToString({ ...parseQueryParams(location.search), [id]: newTab }),
     })
   }
 
   useEffect(() => {
-    const params = qs.parse(location.search)
+    const params = parseQueryParams(location.search)
     const queryTab = params[id]
     setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab as string))
     setDidMount(true)

@@ -3,7 +3,6 @@ import ReplayIcon from '@mui/icons-material/Replay'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
-import qs from 'query-string'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -11,6 +10,7 @@ import { useProgress } from '@/hooks/progress'
 import { getCourseStats } from '@/redux/courseStats'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
+import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'
 
 export const ResultTabs = ({
@@ -41,7 +41,7 @@ export const ResultTabs = ({
       return
     }
 
-    const { courseCodes, ...params } = qs.parse(location.search)
+    const { courseCodes, ...params } = parseQueryParams(location.search)
     const query = {
       ...params,
       courseCodes: JSON.parse(courseCodes as string),
@@ -49,7 +49,7 @@ export const ResultTabs = ({
     }
     dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    void navigate({ search: qs.stringify(queryToString) }, { replace: true })
+    void navigate({ search: queryParamsToString(queryToString) }, { replace: true })
   }
 
   return (

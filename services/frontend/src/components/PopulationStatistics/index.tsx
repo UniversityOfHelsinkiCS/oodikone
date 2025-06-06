@@ -1,4 +1,3 @@
-import qs from 'query-string'
 import { useMemo } from 'react'
 import { useLocation } from 'react-router'
 import { Header, Message, Segment } from 'semantic-ui-react'
@@ -59,11 +58,12 @@ const getYearText = (year: string) => {
   return yearIsNumber ? `${year} - ${+year + 1}` : ''
 }
 
+import { parseQueryParams } from '@/util/queryparams'
 import { getMonths } from '../PopulationSearch/common'
 const parseQueryFromUrl = (location): [boolean, Query] => {
   const skipQuery = !location.search
 
-  const { studyRights, ...rest } = qs.parse(location.search)
+  const { studyRights, ...rest } = parseQueryParams(location.search)
 
   if (studyRights === null || Array.isArray(studyRights)) throw Error()
 

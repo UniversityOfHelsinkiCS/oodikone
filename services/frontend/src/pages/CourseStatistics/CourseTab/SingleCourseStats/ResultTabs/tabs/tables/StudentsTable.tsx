@@ -1,6 +1,5 @@
 import { uniq } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import qs from 'query-string'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
@@ -10,6 +9,7 @@ import { useAppSelector } from '@/redux/hooks'
 import { getCourseAlternatives } from '@/selectors/courseStats'
 import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
+import { queryParamsToString } from '@/util/queryparams'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
 import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
@@ -58,7 +58,7 @@ export const StudentsTable = ({
         separate,
         unifyCourses,
       }
-      const searchString = qs.stringify(queryObject)
+      const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`
     },
     [alternatives, separate, unifyCourses]

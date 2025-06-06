@@ -11,7 +11,6 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-import qs from 'query-string'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
@@ -23,6 +22,7 @@ import {
   useGetSavedCourseListsQuery,
   useUpdateCourseListMutation,
 } from '@/redux/completedCoursesSearch'
+import { queryParamsToString } from '@/util/queryparams'
 
 export const SearchModal = ({ setValues }) => {
   const [searchParams] = useSearchParams()
@@ -66,7 +66,7 @@ export const SearchModal = ({ setValues }) => {
   }
 
   const pushQueryToUrl = query => {
-    const searchString = qs.stringify(query)
+    const searchString = queryParamsToString(query)
     void navigate({ search: searchString })
   }
 

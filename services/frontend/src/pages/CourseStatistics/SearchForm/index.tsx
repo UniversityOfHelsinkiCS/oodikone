@@ -11,7 +11,6 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 
 import { omit, sortBy } from 'lodash'
-import qs from 'query-string'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -27,6 +26,7 @@ import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { getCourseStats, clearCourseStats } from '@/redux/courseStats'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { SearchHistoryItem } from '@/types/searchHistory'
+import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { MemoizedCourseTable as CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
@@ -72,7 +72,7 @@ export const SearchForm = ({ onProgress, progress }) => {
   }
 
   const parseQueryFromUrl = () => {
-    const search = qs.parse(location.search)
+    const search = parseQueryParams(location.search)
     const query = {
       courseCodes: JSON.parse(search.courseCodes as string),
       separate: JSON.parse(search.separate as string),
@@ -118,7 +118,7 @@ export const SearchForm = ({ onProgress, progress }) => {
       courseCodes: JSON.stringify(courseCodes),
       combineSubstitutions: JSON.stringify(combineSubstitutions),
     }
-    const searchString = qs.stringify(queryObject)
+    const searchString = queryParamsToString(queryObject)
     void navigate({ search: searchString })
   }
 
