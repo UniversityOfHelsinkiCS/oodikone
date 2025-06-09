@@ -44,7 +44,7 @@ type FilterOptions = {
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, (options: any, ...args: any[]) => any>
+  selectors?: Record<string, (options: FilterContext['options'], args: any) => any>
 
   /**
    * By default `setOptions` and `reset` are assigned.
@@ -126,8 +126,8 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
       isActive: options.isActive,
     },
     ([key, selector]) => {
-      const gift = (...args) => {
-        const wrapper = opts => selector(opts, args)
+      const gift = args => {
+        const wrapper = (opts: FilterContext['options']) => selector(opts, args)
         wrapper.filter = options.key
 
         return wrapper
