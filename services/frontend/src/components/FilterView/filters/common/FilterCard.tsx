@@ -1,39 +1,38 @@
 import { isEqual } from 'lodash'
-import { useState, useRef } from 'react'
+import { FC, useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
 import './FilterCard.css'
 
-const useChange = value => {
-  const prevValue = useRef()
+import { FilterContext, FilterViewContextState } from '../../context'
+import type { Filter } from '../createFilter'
 
-  if (prevValue.current === undefined) {
-    prevValue.current = value
-    return true
-  }
-
-  const change = !isEqual(value, prevValue.current)
-
+const useChange = (value: FilterContext['options']) => {
+  const prevValue = useRef<typeof value>()
   prevValue.current = value
 
-  return change
+  return !isEqual(value, prevValue.current)
 }
 
-export const FilterCard = ({ filter, options, children, onClear }) => {
-  const title = filter.title ?? filter.key
-  const active = filter.isActive(options)
-  const { info, key } = filter
+export const FilterCard: FC<{
+  filter: Filter
+  options: FilterContext['options']
+  children: ReturnType<Filter['render']>
+  onClear: () => ReturnType<FilterViewContextState['resetFilter']>
+}> = ({ filter, options, children, onClear }) => {
+  const { info, key, title, isActive } = filter
+  const active = isActive(options)
 
   const hasChanged = useChange(options)
 
-  const [manuallyOpened, setManuallyOpened] = useState(null)
+  const [manuallyOpened, setManuallyOpened] = useState<boolean | null>(null)
 
   if (hasChanged && manuallyOpened === false) {
     setManuallyOpened(null)
   }
 
-  const open = manuallyOpened !== null ? manuallyOpened : active
+  const open = manuallyOpened ?? active
 
   return (
     <div data-cy={`${key}-filter-card`} data-open={open} style={{ margin: '1rem 0' }}>

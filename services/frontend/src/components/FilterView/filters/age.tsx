@@ -48,18 +48,11 @@ export const ageFilter = createFilter({
     }
   },
 
-  filter: (student, { min, max }) => {
+  filter: (student, { options }) => {
+    const { min, max } = options
     const age = getAge(student.birthdate)
 
-    if (min !== null && min > age) {
-      return false
-    }
-
-    if (max !== null && max < age) {
-      return false
-    }
-
-    return true
+    return !(min !== null && min > age) && !(max !== null && max < age)
   },
 
   render: (props, { precomputed }) => <AgeFilterCard {...props} bounds={precomputed} />,

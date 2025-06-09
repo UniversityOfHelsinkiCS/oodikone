@@ -77,3 +77,7 @@ export const omitKeys = <T extends object, K extends keyof T>(input: T, toOmit: 
 
 export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): Record<K, T> =>
   Object.fromEntries(input.map(item => [item[key], item]))
+
+export const mapValues = <T extends object, K extends keyof T, R>(input: T, f: (value: [K, T[K]]) => [K, R]) => {
+  return Object.fromEntries(Object.entries(input).map(entry => f(entry as [K, T[K]])))
+}

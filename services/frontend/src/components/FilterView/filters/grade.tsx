@@ -1,4 +1,5 @@
 import fp from 'lodash/fp'
+import { FC } from 'react'
 import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
@@ -8,11 +9,18 @@ import { createFilter } from './createFilter'
  * Grade filter.
  * Only applicable to a single course.
  */
-const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
+const GradeFilterCard: FC<{
+  options: any
+  onOptionsChange: any
+  grades: any
+  withoutSelf: any
+}> = ({ options, onOptionsChange, grades, withoutSelf }) => {
   const { selected } = options
   const name = 'gradeFilter'
 
-  const choices = Object.keys(grades).sort((a, b) => b - a)
+  // There are grades 1..5 (inclusive) and 'No grade'
+  // Therefore this cannot be filtered by Number
+  const choices = Object.keys(grades).sort((a, b) => +b - +a)
 
   const checked = grade => selected.includes(grade)
 
@@ -32,9 +40,7 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
 
   const studentsWithoutSelf = withoutSelf()
   const gradesWithoutSelf = fp.mapValues(
-    fp.filter(
-      studentNumber => studentsWithoutSelf.find(student => student.studentNumber === studentNumber) !== undefined
-    )
+    fp.filter(studentNumber => studentsWithoutSelf.some(student => student.studentNumber === studentNumber))
   )(grades)
 
   return (
@@ -70,10 +76,10 @@ export const gradeFilter = createFilter({
 
   precompute: ({ students, args }) =>
     fp.flow(
-      fp.map(student => [
+      fp.map((student: any) => [
         student.studentNumber,
-        fp.filter(course => args.courseCodes.includes(course.course_code))(student.courses),
-        fp.filter(enrollment => args.courseCodes.includes(enrollment.course_code))(student.enrollments),
+        fp.filter((course: any) => args.courseCodes.includes(course.course_code))(student.courses),
+        fp.filter((enrollment: any) => args.courseCodes.includes(enrollment.course_code))(student.enrollments),
       ]),
       /* fp.filter(
       fp.flow(
@@ -92,7 +98,9 @@ export const gradeFilter = createFilter({
       grades => ({ grades })
     )(students),
 
-  filter(student, { selected }, { precomputed }) {
+  filter(student, { precomputed, options }) {
+    const { selected } = options
+
     return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))
   },
 

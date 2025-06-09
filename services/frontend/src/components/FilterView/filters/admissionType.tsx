@@ -10,14 +10,6 @@ export const filter = code => value => student => {
   const programmeStudyRights = findAllStudyRightsForProgramme(student, code)
   const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
 
-  if (programmeStudyRights.length === 0) return false
-
-  if (programmeStudyRights.length === 1) {
-    return value === null || value === 'Ei valintatapaa'
-      ? !programmeStudyRights[0].admissionType
-      : programmeStudyRights[0].admissionType === fixedValue
-  }
-
   return programmeStudyRights.some(
     studyRight =>
       !studyRight.cancelled &&
@@ -34,10 +26,11 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
   const count = admissionType => withoutSelf().filter(filter(code)(admissionType)).length
 
   const dropdownOptions = Object.entries(ADMISSION_TYPES)
+    .filter(([_, admissionType]) => !!admissionType)
     .map(([key, admissionType]) => {
-      const value = admissionType || 'Ei valintatapaa'
+      const value = admissionType ?? 'Ei valintatapaa'
       const numberOfStudents = count(admissionType)
-      if (numberOfStudents === 0) return null
+
       return {
         key,
         text: `${value} (${numberOfStudents})`,
@@ -45,7 +38,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
         numberOfStudents,
       }
     })
-    .filter(a => a !== null)
+    .filter(a => a.numberOfStudents)
     .sort((a, b) => b.numberOfStudents - a.numberOfStudents)
 
   return (
@@ -80,7 +73,9 @@ export const admissionTypeFilter = createFilter({
 
   isActive: ({ selected }) => !!selected,
 
-  filter(student, { selected }, { args }) {
+  filter(student, { args, options }) {
+    const { selected } = options
+
     return filter(args.programme)(selected)(student)
   },
 

@@ -53,7 +53,11 @@ export const transferredToProgrammeFilter = createFilter({
 
   isActive: ({ transferred }) => transferred !== null,
 
-  filter: (student, { transferred }) => student.transferredStudyright === transferred,
+  filter: (student, { options }) => {
+    const { transferred } = options
+
+    return student.transferredStudyright === transferred
+  },
 
   actions: {
     set: (options, value) => {
@@ -61,5 +65,5 @@ export const transferredToProgrammeFilter = createFilter({
     },
   },
 
-  component: TransferredToProgrammeFilterCard,
+  render: TransferredToProgrammeFilterCard,
 })

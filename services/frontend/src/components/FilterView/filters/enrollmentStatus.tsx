@@ -1,3 +1,4 @@
+import { FC } from 'react'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
@@ -10,15 +11,19 @@ const STATUS_OPTIONS = [
   { key: 'enrl-status-inactive', text: 'Passive', value: 3 },
 ]
 
-const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters }) => {
+const EnrollmentStatusFilterCard: FC<{
+  options: any
+  onOptionsChange: any
+  allSemesters: Record<string, any>
+}> = ({ options, onOptionsChange, allSemesters }) => {
   const name = 'enrollmentStatusFilter'
   const { getTextIn } = useLanguage()
-
-  const { semesters, status } = options
 
   if (!Object.keys(allSemesters).length) {
     return null
   }
+
+  const { semesters, status } = options
 
   const semesterOptions = Object.values(allSemesters)
     .filter(semester => new Date(semester.startdate) <= new Date())
@@ -88,29 +93,29 @@ export const enrollmentStatusFilter = createFilter({
 
   isActive: ({ status }) => status !== null,
 
-  filter(student, { status, semesters }, { args }) {
+  filter({ studyRights }, { args, options }) {
+    const { status, semesters } = options
+
     if (args.programme) {
-      const correctStudyRight = student.studyRights.find(studyRight =>
-        studyRight.studyRightElements.some(element => element.code === args.programme)
+      const correctStudyRight = studyRights.find(({ studyRightElements }) =>
+        studyRightElements.some(({ code }) => code === args.programme)
       )
-      return correctStudyRight
-        ? semesters.every(semester => {
-            const enrollment = correctStudyRight.semesterEnrollments.find(
-              enrollment => enrollment.semester === semester
-            )
-            return enrollment ? enrollment.type === status : false
-          })
-        : false
+
+      return semesters.every(
+        semester =>
+          correctStudyRight.semesterEnrollments.find(
+            ({ semester: enrollmentSemester }) => enrollmentSemester === semester
+          )?.type === status
+      )
     }
 
-    const allEnrollments = student.studyRights
-      .flatMap(studyRight => studyRight.semesterEnrollments)
-      .filter(enrollment => enrollment != null)
+    const allEnrollments = studyRights.flatMap(studyRight => studyRight.semesterEnrollments).filter(Boolean)
 
     return semesters.every(semester => {
-      const enrollments = allEnrollments.filter(enrl => enrl.semester === semester)
-      // If enrollment info not found, return false. This may or may not be what we want?
-      return enrollments.length ? enrollments.some(enrl => enrl.type === status) : false
+      // HACK: If enrollment info not found, return false. This may or may not be what we want?
+      return allEnrollments
+        .filter(({ semester: enrollmentSemester }) => enrollmentSemester === semester)
+        .some(({ type }) => type === status)
     })
   },
 

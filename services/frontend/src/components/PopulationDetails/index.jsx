@@ -31,7 +31,7 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
     { skip: !query?.studyRights?.programme }
   )
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))

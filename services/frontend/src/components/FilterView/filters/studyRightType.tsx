@@ -48,7 +48,9 @@ export const studyRightTypeFilter = createFilter({
 
   isActive: ({ mode }) => mode !== 0,
 
-  filter(student, { mode }, { args }) {
+  filter(student, { args, options }) {
+    const { mode } = options
+
     if (mode === 0) return true
 
     const studyRight = student.studyRights.find(studyRight =>
@@ -60,5 +62,5 @@ export const studyRightTypeFilter = createFilter({
     return mode === 1 ? studyRight.extentCode === 5 : studyRight.extentCode === 2
   },
 
-  component: StudyRightTypeFilterCard,
+  render: StudyRightTypeFilterCard,
 })

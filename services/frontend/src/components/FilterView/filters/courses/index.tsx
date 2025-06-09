@@ -1,29 +1,38 @@
 import { produce } from 'immer'
 import { keyBy } from 'lodash'
-import { Dropdown } from 'semantic-ui-react'
+import { FC } from 'react'
+import { Dropdown, type DropdownProps } from 'semantic-ui-react'
+
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import type { FilterContext } from '../../context'
+import type { FilterTrayProps } from '../../FilterTray'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
 
-const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
-  const { courseFilters } = options
+type CourseStats = Record<string, any>
+
+const CourseFilterCard: FC<{
+  courseStats: CourseStats
+  options: FilterTrayProps['options']
+  onOptionsChange: FilterContext['precomputed']
+}> = ({ courseStats, options, onOptionsChange }) => {
+  const { courseFilters } = options ?? {}
   const { getTextIn } = useLanguage()
+
   const name = 'course-filter-card'
-  // Wrestle course stats into something semantic-ui eats without throwing up.
-  const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name)}`
   const dropdownOptions = Object.values(courseStats)
     .filter(cs => !courseFilters[cs.course.code])
-    .sort((a, b) => makeLabel(a).localeCompare(makeLabel(b)))
+    .sort((a, b) => a.course.code.localeCompare(b.course.code))
     .map(cs => ({
       key: `course-filter-option-${cs.course.code}`,
-      text: makeLabel(cs),
+      text: `${cs.course.code} - ${getTextIn(cs.course.name)}`,
       value: cs.course.code,
     }))
 
   const setCourseFilter = (code, type) =>
     onOptionsChange(
-      produce(options, draft => {
+      produce(options ?? {}, draft => {
         if (type === null) {
           delete draft.courseFilters[code]
         } else {
@@ -32,8 +41,8 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
       })
     )
 
-  const onChange = (_, { value }) => {
-    setCourseFilter(value[0], FilterType.ALL)
+  const onChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
+    setCourseFilter(value?.[0], FilterType.ALL)
   }
 
   return (
@@ -89,11 +98,12 @@ export const courseFilter = createFilter({
 
   isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
 
-  filter(student, { courseFilters }, { precomputed: courseMap }) {
+  filter(student, { precomputed: courseMap, options }) {
+    const { courseFilters = {} } = options ?? { courseFilters: null }
+
     return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
       const stats = courseMap[code]
-      if (!stats) return false
-      return result && filterFunctions[filterType](student, stats)
+      return !!stats && result && filterFunctions[filterType as string](student, stats)
     }, true)
   },
 

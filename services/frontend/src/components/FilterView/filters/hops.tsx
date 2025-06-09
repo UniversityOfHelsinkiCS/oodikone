@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { FC } from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
 
 import { useFilters } from '@/components/FilterView/useFilters'
@@ -29,7 +30,11 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
   )
 }
 
-const HopsFilterCard = ({ options, onOptionsChange, combinedProgramme }) => {
+const HopsFilterCard: FC<{
+  options: any
+  onOptionsChange: any
+  combinedProgramme: any
+}> = ({ options, onOptionsChange, combinedProgramme }) => {
   const { selectedStartDate } = creditDateFilter.selectors
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
@@ -162,12 +167,15 @@ export const hopsFilter = createFilter({
     return args.combinedProgrammeCode
   },
 
-  isActive: arg => arg?.activeProgramme || arg?.activeCombinedProgramme,
+  isActive: arg => !!arg?.activeProgramme || !!arg?.activeCombinedProgramme,
 
-  filter: (student, { activeProgramme, activeCombinedProgramme }, { args }) => {
-    const studyRights = student.studyRights.filter(studyRight => !studyRight.cancelled).map(({ id }) => id)
+  filter: (student, { args, options }) => {
+    const { activeProgramme, activeCombinedProgramme } = options
+
+    const studyRights = student.studyRights.filter(({ cancelled }) => !cancelled).map(({ id }) => id)
     const hops = student.studyplans.find(
-      plan => plan.programme_code === args.programmeCode && studyRights.includes(plan.sis_study_right_id)
+      ({ programme_code, sis_study_right_id }) =>
+        programme_code === args.programmeCode && studyRights.includes(sis_study_right_id)
     )
     const secondHops = args.combinedProgrammeCode
       ? student.studyplans.find(
@@ -183,7 +191,7 @@ export const hopsFilter = createFilter({
       const courses = new Set(hops && activeProgramme ? hops.included_courses : [])
       const secondProgrammeCourses = new Set(secondHops && activeCombinedProgramme ? secondHops.included_courses : [])
       const hopsCourses = student.courses.filter(
-        course => courses.has(course.course_code) || secondProgrammeCourses.has(course.course_code)
+        ({ course_code }) => courses.has(course_code) || secondProgrammeCourses.has(course_code)
       )
       student.courses = [...new Set(hopsCourses)]
       return true
@@ -213,8 +221,6 @@ export const hopsFilter = createFilter({
       options.combinedIsSelected = combinedProgrammeCode
     },
   },
-
-  component: HopsFilterCard,
 
   render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
 })

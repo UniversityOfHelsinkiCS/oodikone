@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
@@ -10,36 +10,40 @@ const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studen
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
 
-  const visibleProgrammes = withoutSelf().reduce((acc, student) => {
-    const studentsProgrammes = studentToProgrammeMap[student.studentNumber]
-    for (const programme of studentsProgrammes) {
-      const existingProgramme = acc.find(prog => prog.code === programme.code)
-      if (existingProgramme) {
-        existingProgramme.studentCount += 1
-      } else {
-        acc.push({ ...programme, studentCount: 1 })
-      }
-    }
-    return acc
-  }, [])
+  // TODO: retype
+  const visibleProgrammes: {
+    code
+    name
+    studentCount
+  }[] = []
+  withoutSelf().forEach(student => {
+    studentToProgrammeMap[student.studentNumber].forEach(programme => {
+      const prog = visibleProgrammes.find(prog => prog.code === programme.code)
+
+      if (!prog) {
+        visibleProgrammes.push({ ...programme, studentCount: 1 })
+      } else prog.studentCount += 1
+    })
+  })
 
   const dropdownOptions = visibleProgrammes
     .map(({ code, name, studentCount }) => ({
       key: `programme-filter-value-${code}`,
-      text: getTextIn(name),
+      text: getTextIn(name) ?? '',
       value: code,
       content: (
         <>
-          {getTextIn(name)}{' '}
+          {getTextIn(name)}
+          <br />
           <span style={{ color: '#888', whiteSpace: 'nowrap' }}>
-            ({studentCount} student{studentCount === 1 ? '' : 's'})
+            ({studentCount} student{studentCount !== 1 && 's'})
           </span>
         </>
       ),
     }))
     .sort((a, b) => a.text.localeCompare(b.text))
 
-  const handleChange = (_, { value }) => {
+  const handleChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
     onOptionsChange({
       ...options,
       selectedProgrammes: value,
@@ -127,8 +131,8 @@ const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studen
 }
 
 const getStudentProgrammes = student =>
-  (student?.studyRights ?? []).flatMap(studyRight =>
-    studyRight.studyRightElements.map(element => ({ ...element, cancelled: studyRight.cancelled }))
+  (student?.studyRights ?? []).flatMap(({ studyRightElements, cancelled }) =>
+    studyRightElements.map(element => ({ ...element, cancelled }))
   )
 
 const createStudentToProgrammeMap = (students, studyRightPredicate) => {
@@ -168,12 +172,12 @@ export const programmeFilter = createFilter({
   key: 'Programme',
 
   defaultOptions: {
-    selectedProgrammes: [],
+    selectedProgrammes: [] as string[],
     mode: 'active',
   },
 
   precompute: ({ students, options, args }) => {
-    let predicate = () => true
+    let predicate = (..._: any[]) => true
 
     if (args?.studyRightPredicate) {
       predicate = args.studyRightPredicate
@@ -200,7 +204,9 @@ export const programmeFilter = createFilter({
 
   isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
 
-  filter({ studentNumber }, { selectedProgrammes }, { precomputed: studentToProgrammeMap }) {
+  filter({ studentNumber }, { precomputed: studentToProgrammeMap, options }) {
+    const { selectedProgrammes } = options
+
     return selectedProgrammes.every(pcode => studentToProgrammeMap[studentNumber].some(({ code }) => code === pcode))
   },
 

@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
+import { getDefaultFilterContext } from '@/components/FilterView/context'
 
 const slice = createSlice({
   name: 'filters',
@@ -9,14 +10,8 @@ const slice = createSlice({
     setFilterOptions(state, action) {
       const { view, filter, options } = action.payload
 
-      if (!state.views[view]) {
-        state.views[view] = {}
-      }
-
-      if (!state.views[view][filter]) {
-        state.views[view][filter] = {}
-      }
-
+      state.views[view] ??= {}
+      state.views[view][filter] ??= getDefaultFilterContext()
       state.views[view][filter].options = options
     },
 

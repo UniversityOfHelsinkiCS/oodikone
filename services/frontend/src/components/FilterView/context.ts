@@ -1,44 +1,49 @@
 import { createContext } from 'react'
-import type { Filter, Student } from '.'
+
+import type { Student } from '.'
+import type { Filter } from './filters/createFilter'
+
+export type FilterContext = {
+  students: Student[]
+  precomputed: any // can be null
+  options: Record<string, any>
+  args: any // can be null
+}
+
+export const getDefaultFilterContext = () => ({ ...defaultFilterContext })
+const defaultFilterContext: FilterContext = {
+  students: [],
+  precomputed: null,
+  options: {},
+  args: null,
+}
 
 export type FilterViewContextState = {
   viewName: string
   allStudents: Student[]
   filters: Filter[]
-  precomputed: Record<string, any>
-  filterOptions: Record<string, any>
   filteredStudents: Student[]
-  getContextByKey: (key: string) => {
-    students: Student[]
-    precomputed: any // can be null
-    options: any // can be null
-    args: any // can be null
-  }
-  withoutFilter: (key: string) => any[]
-  setFilterOptions: (filter: Filter, options: any) => void
-  resetFilter: (filter: Filter) => void
+  getContextByKey: (key: string) => FilterContext
+  /** Filterlist without the selected filter */
+  withoutFilter: (key: string) => Filter[]
+  /** Set filter options */
+  setFilterOptions: (filter: string, options: any) => void
+  resetFilter: (filter: string) => void
   resetFilters: () => void
-
-  areOptionsDirty?: (key: string) => boolean
+  areOptionsDirty: (key: string) => boolean
 }
 
-const defaultState = {
+const defaultState: FilterViewContextState = {
   viewName: '<Unset>',
   allStudents: [],
   filters: [],
-  precomputed: {},
-  filterOptions: {},
   filteredStudents: [],
-  getContextByKey: () => ({
-    students: [],
-    precomputed: null,
-    options: null,
-    args: null,
-  }),
+  getContextByKey: () => getDefaultFilterContext(),
   withoutFilter: () => [],
   setFilterOptions: () => {},
   resetFilter: () => {},
   resetFilters: () => {},
+  areOptionsDirty: () => false,
 }
 
 export const FilterViewContext = createContext<FilterViewContextState>(defaultState)

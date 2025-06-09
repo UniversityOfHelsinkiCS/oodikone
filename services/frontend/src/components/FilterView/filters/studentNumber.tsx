@@ -27,12 +27,13 @@ const EditableList = ({ value, onChange, renderLabel }) => {
           scrollbarWidth: 'thin',
         }}
       >
-        {value.map((studentNumber, index) => (
+        {value.map((studentNumber, index: number) => (
           <li
+            className={'asdasd'}
             key={studentNumber}
             style={{
               alignItems: 'center',
-              borderTop: index > 0 && '0px solid #e6e6e7',
+              borderTop: index ? '1px solid #e6e6e7' : undefined,
               display: 'flex',
               height: '1.75em',
             }}
@@ -169,7 +170,9 @@ export const studentNumberFilter = createFilter({
 
   isActive: ({ allowlist, blocklist }) => allowlist.length > 0 || blocklist.length > 0,
 
-  filter(student, { allowlist, blocklist }) {
+  filter(student, { options }) {
+    const { allowlist, blocklist } = options
+
     return (
       (allowlist.length === 0 || includes(allowlist, student.studentNumber)) &&
       (blocklist.length === 0 || !includes(blocklist, student.studentNumber))

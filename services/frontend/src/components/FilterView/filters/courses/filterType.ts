@@ -3,4 +3,4 @@ export const FilterType = {
   PASSED: 'PASSED',
   FAILED: 'FAILED',
   ENROLLED_NO_GRADE: 'ENROLLED_NO_GRADE',
-}
+} as const

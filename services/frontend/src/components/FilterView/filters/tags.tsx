@@ -6,16 +6,10 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
-  const tagCounts = withoutSelf().reduce((acc, student) => {
-    student.tags.forEach(tag => {
-      const {
-        tag_id: id,
-        tag: { tagname },
-      } = tag
-      if (!acc[id]) {
-        acc[id] = { count: 0, name: tagname }
-      }
-      acc[id].count += 1
+  const tagCounts: Record<string, any> = withoutSelf().reduce((acc, student) => {
+    student.tags.forEach(({ tag_id: id, tag: { tagname } }) => {
+      acc[id] ??= { count: 0, name: tagname }
+      acc[id].count++
     })
     return acc
   }, {})
@@ -29,13 +23,12 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const includeOptions = dropdownOptions.filter(({ value }) => !excludedTags.includes(value))
   const excludeOptions = dropdownOptions.filter(({ value }) => !includedTags.includes(value))
 
-  if (Object.entries(tagCounts).length === 0) {
+  if (!Object.entries(tagCounts).length)
     return (
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.
       </Message>
     )
-  }
 
   return (
     <Form>
@@ -77,20 +70,18 @@ export const tagsFilter = createFilter({
     excludedTags: [],
   },
 
-  isActive: ({ includedTags, excludedTags }) => includedTags.length > 0 || excludedTags.length > 0,
+  isActive: ({ includedTags, excludedTags }) => !!includedTags.length || !!excludedTags.length,
 
-  filter(student, { includedTags, excludedTags }) {
+  filter(student, { options }) {
+    const { includedTags, excludedTags } = options
     const tags = (student.tags ?? []).map(tag => tag.tag_id)
-    if (includedTags.length > 0 && excludedTags.length > 0) {
+    if (includedTags.length && excludedTags.length)
       return includedTags.some(tag => tags.includes(tag)) && !excludedTags.some(tag => tags.includes(tag))
-    }
-
-    if (includedTags.length > 0) return includedTags.some(tag => tags.includes(tag))
-
-    if (excludedTags.length > 0) return !excludedTags.some(tag => tags.includes(tag))
+    else if (includedTags.length) return includedTags.some(tag => tags.includes(tag))
+    else if (excludedTags.length) return !excludedTags.some(tag => tags.includes(tag))
 
     return true
   },
 
-  component: TagsFilterCard,
+  render: TagsFilterCard,
 })

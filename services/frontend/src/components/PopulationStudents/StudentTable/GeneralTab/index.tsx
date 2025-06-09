@@ -79,7 +79,7 @@ export const GeneralTabContainer = ({
 
   const queryStudyrights = Object.values(studyRights ?? {}).filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
   const studyGuidanceGroupProgrammes = group?.tags?.studyProgramme?.includes('+')
     ? group?.tags?.studyProgramme.split('+')

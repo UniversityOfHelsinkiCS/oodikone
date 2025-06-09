@@ -10,7 +10,7 @@ import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound, combinedProgrammeCode }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
-  const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive)
+  const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive())
   const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
   const bothHopsSelected = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
 

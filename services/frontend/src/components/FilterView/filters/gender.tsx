@@ -1,4 +1,6 @@
+import { FC } from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
+
 import { createFilter } from './createFilter'
 
 const GENDERS = {
@@ -8,10 +10,15 @@ const GENDERS = {
   unknown: { label: 'Unknown', value: 0 },
 }
 
-const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const GenderFilterCard: FC<{
+  options: any
+  onOptionsChange: any
+  withoutSelf: any
+}> = ({ options, onOptionsChange, withoutSelf }) => {
   const { selected } = options
 
-  const count = genderCode => withoutSelf().filter(student => Number(student.gender_code) === genderCode).length
+  const count = (genderCode: number) =>
+    withoutSelf().filter(student => Number(student.gender_code) === genderCode).length
 
   const dropdownOptions = Object.entries(GENDERS).map(([key, gender]) => ({
     key,
@@ -49,9 +56,11 @@ export const genderFilter = createFilter({
 
   isActive: ({ selected }) => selected !== '',
 
-  filter(student, { selected }) {
-    return selected === Number(student.gender_code)
+  filter(student, { options }) {
+    const { selected } = options
+
+    return Number(student.gender_code) === selected
   },
 
-  component: GenderFilterCard,
+  render: GenderFilterCard,
 })

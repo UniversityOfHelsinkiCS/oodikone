@@ -1,4 +1,5 @@
 import { Dropdown, Form } from 'semantic-ui-react'
+import type { DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
@@ -30,7 +31,7 @@ const StudyTrackFilterCard = ({ code, onOptionsChange, options, withoutSelf }) =
       return acc
     }, [])
 
-  const handleChange = (_, { value }) => {
+  const handleChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
     onOptionsChange({
       selected: value,
     })
@@ -63,10 +64,14 @@ export const studyTrackFilter = createFilter({
     selected: [],
   },
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
-  filter: (student, { selected }, { args }) =>
-    student.studyRights
+  filter: (student, { args, options }) => {
+    const { selected } = options
+
+    return student.studyRights
       .flatMap(studyRight => studyRight.studyRightElements)
       .filter(element => element.code === args.code && element.studyTrack !== null)
-      .some(element => selected.includes(element.studyTrack.code)),
+      .some(element => selected.includes(element.studyTrack.code))
+  },
+
   render: (props, { args }) => <StudyTrackFilterCard {...props} code={args.code} />,
 })
