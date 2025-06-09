@@ -16,7 +16,7 @@
     "@mui/x-date-pickers": "^7.27.3",
     "@oodikone/shared": "file:../shared",
     "@reduxjs/toolkit": "^2.6.1",
-    "@sentry/browser": "^8.55.0",
+    "@sentry/browser": "^9.27.0",
     "axios": "^1.8.2",
     "highcharts": "^11.4.8",
     "immer": "^10.1.1",
