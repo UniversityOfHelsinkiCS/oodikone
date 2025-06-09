@@ -18,7 +18,7 @@ import { FilterTray } from './FilterTray'
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
 const resolveFilterOptions = <T,>(
-  store: Record<Filter['key'], { options: T }>,
+  store: Record<Filter['key'], FilterContext>,
   filters: Filter[],
   initialOptions?: Record<Filter['key'], T>
 ): Record<Filter['key'], any> =>
@@ -63,8 +63,8 @@ export const FilterView: FC<{
 
   const getFilterContext = (key: string): FilterContext => ({
     students,
-    options: filterOptions[key] ?? null,
     precomputed: precomputed[key] ?? null,
+    options: filterOptions[key] ?? {},
     args: filtersByKey[key]?.args ?? null,
   })
 
