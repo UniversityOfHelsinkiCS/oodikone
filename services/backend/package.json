@@ -8,7 +8,7 @@
     "@oodikone/shared": "file:../shared",
     "@sentry/node": "^9.27.0",
     "@sentry/profiling-node": "^9.27.0",
-    "axios": "^1.8.1",
+    "axios": "^1.9.0",
     "bullmq": "^5.41.8",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
