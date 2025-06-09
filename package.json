@@ -55,7 +55,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.0.0",
     "husky": "^9.1.7",
-    "lint-staged": "^15.4.3",
+    "lint-staged": "^16.1.0",
     "node-actionlint": "^1.2.2",
     "nyc": "^17.1.0",
     "prettier": "3.5.3",
