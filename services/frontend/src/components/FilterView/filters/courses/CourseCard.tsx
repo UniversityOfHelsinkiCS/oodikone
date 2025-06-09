@@ -54,7 +54,7 @@ export const CourseCard: FC<{
         <Dropdown.Menu>
           {Object.entries(filterTexts).map(([type, { key, label }]) => (
             <Dropdown.Item
-              disabled={!Object.keys(course?.students[key]).length}
+              disabled={!Object.keys(course?.students[key] ?? {}).length}
               key={label}
               onClick={onClick}
               text={label}
