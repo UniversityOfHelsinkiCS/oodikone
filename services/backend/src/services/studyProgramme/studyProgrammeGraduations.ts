@@ -1,5 +1,4 @@
 import { indexOf, orderBy } from 'lodash'
-import moment from 'moment'
 
 import {
   GraduationStatistics,
@@ -12,6 +11,7 @@ import {
 } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
+import { dateDiff } from '../../util/datetime'
 import { countTimeCategories } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getStudyRightThesisCredits, getOrganizationThesisCredits } from './creditGetters'
@@ -49,15 +49,13 @@ const calculateAbsenceInMonths = (
   startDate: Date,
   endDate: Date
 ) => {
-  const absenceStart = moment(absence.startdate)
-  const absenceEnd = moment(absence.enddate)
+  const { startdate: absenceStart, enddate: absenceEnd } = absence
 
-  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) {
+  if (endDate < absenceStart || absenceEnd < startDate) {
     return 0
   }
 
-  // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
-  return Math.round(absenceEnd.diff(absenceStart, 'months', true))
+  return Math.round(dateDiff(absenceEnd, absenceStart, 'months'))
 }
 
 export const calculateDurationOfStudies = (
@@ -73,7 +71,11 @@ export const calculateDurationOfStudies = (
     (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
     0
   )
-  return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
+
+  const graduationDateAdjusted = graduationDate
+  graduationDateAdjusted.setMonth(graduationDateAdjusted.getMonth() - monthsToSubtract)
+
+  return Math.round(dateDiff(graduationDateAdjusted, startDate, 'months'))
 }
 
 export type GraduationTimes = {

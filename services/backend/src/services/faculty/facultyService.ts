@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType, DegreeProgrammeType } from '@oodikone/shared/types'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
@@ -83,7 +81,7 @@ export const setBasicStats = async (
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
@@ -134,7 +132,7 @@ export const setThesisWritersStats = async (
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
@@ -183,7 +181,7 @@ export const setGraduationStats = async (data: GraduationData, programmeFilter: 
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
@@ -215,7 +213,7 @@ export const setFacultyProgressStats = async (
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {
@@ -256,7 +254,7 @@ export const setFacultyStudentStats = async (
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format(),
+    lastUpdated: new Date().toISOString(),
   }
   const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') {

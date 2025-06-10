@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import { Credit, SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
@@ -31,9 +29,7 @@ import {
 import { getStudyTracksForProgramme } from './studyRightFinders'
 
 const getCreditCount = (credits: Credit[], startDate: Date) =>
-  credits
-    .filter(credit => moment(credit.attainment_date).isSameOrAfter(startDate))
-    .reduce((prev, curr) => prev + curr.credits, 0)
+  credits.filter(credit => startDate <= credit.attainment_date).reduce((prev, curr) => prev + curr.credits, 0)
 
 const getGraduationTimeStats = async (
   studyProgramme: string,
