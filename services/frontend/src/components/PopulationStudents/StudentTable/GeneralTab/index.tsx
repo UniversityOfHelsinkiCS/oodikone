@@ -81,7 +81,7 @@ export const GeneralTabContainer = ({
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
-  const [sggProgramme, sggCombinedProgramme] = group?.tags?.studyProgramme.split('+') ?? []
+  const [sggProgramme, sggCombinedProgramme] = group?.tags?.studyProgramme?.split('+') ?? []
   const programmeCode = studyRights?.programme ?? sggProgramme ?? customPopulationProgramme
 
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
