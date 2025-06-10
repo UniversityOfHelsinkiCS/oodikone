@@ -80,8 +80,8 @@ export const StudentsByStartingYearTab = ({
             'urn:code:degree-program-type:masters-degree': 2,
           }
 
-          const aPriority = priority[studentStats?.data?.programmeNames[a]?.degreeProgrammeType ?? ''] || 3
-          const bPriority = priority[studentStats?.data?.programmeNames[b]?.degreeProgrammeType ?? ''] || 3
+          const aPriority = priority[studentStats?.data?.programmeNames[a]?.degreeProgrammeType ?? ''] ?? 3
+          const bPriority = priority[studentStats?.data?.programmeNames[b]?.degreeProgrammeType ?? ''] ?? 3
 
           return aPriority - bPriority
         })

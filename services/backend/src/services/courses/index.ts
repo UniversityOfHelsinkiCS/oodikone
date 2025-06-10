@@ -71,15 +71,13 @@ const parseCredit = (
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
   const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
-  let programmeOfCredit: SISStudyRightElementModel | undefined
-  programmeOfCredit = studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId)
-  if (!programmeOfCredit) {
-    programmeOfCredit = studyRightElements
+  const programmeOfCredit: SISStudyRightElementModel | undefined =
+    studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
+    studyRightElements
       .filter(studyRightElement =>
         dateIsBetween(attainmentDate, studyRightElement.startDate, studyRightElement.endDate)
       )
       .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())[0] // The newest studyRightElement
-  }
 
   const programmes = programmeOfCredit ? [programmeOfCredit].map(formatStudyRightElement) : []
 

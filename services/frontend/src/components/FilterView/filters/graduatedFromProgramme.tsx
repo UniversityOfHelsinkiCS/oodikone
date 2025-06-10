@@ -87,7 +87,7 @@ export const graduatedFromProgrammeFilter = createFilter({
   render: (props, { args }) => (
     <GraduatedFromProgrammeFilterCard
       {...props}
-      isCombinedExtent={args.code && (args.combinedProgrammeCode || args.showBachelorAndMaster)}
+      isCombinedExtent={args.code && (args.combinedProgrammeCode ?? args.showBachelorAndMaster)}
       isLicentiate={args.combinedProgrammeCode === 'MH90_001'}
     />
   ),

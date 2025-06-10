@@ -47,8 +47,8 @@ const getGradeSeries = (series: Array<Record<string, number>>) => {
 
 const getGrades = students => {
   const grades = { ...students.grades }
-  const enrolledWithNoGrade = students.enrolledStudentsWithNoGrade || 0
-  grades[0] = (grades[0] || 0) + enrolledWithNoGrade
+  const enrolledWithNoGrade = students.enrolledStudentsWithNoGrade ?? 0
+  grades[0] = (grades[0] ?? 0) + enrolledWithNoGrade
   return grades
 }
 

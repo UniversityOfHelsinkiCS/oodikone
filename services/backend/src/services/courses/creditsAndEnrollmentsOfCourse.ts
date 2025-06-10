@@ -73,9 +73,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
   const studentNumberToSrElementsMap = studyRightElements.reduce((obj, cur) => {
     const studyRight = studyRightMap[cur.studyRightId]
     const { studentNumber } = studyRight
-    if (!obj[studentNumber]) {
-      obj[studentNumber] = []
-    }
+    obj[studentNumber] ??= []
     obj[studentNumber].push({ ...cur.toJSON(), studyRight })
     return obj
   }, {})

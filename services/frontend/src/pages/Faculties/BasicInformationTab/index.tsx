@@ -29,11 +29,11 @@ const calculateTotals = stats => {
     const providerStats = stats[id].stats
     for (const year of Object.keys(providerStats)) {
       const yearStats = providerStats[year]
-      if (!totals[year]) totals[year] = {}
+      totals[year] ??= {}
       for (const field of Object.keys(yearStats)) {
         if (field === 'total') continue
-        if (!totals[year][field]) totals[year][field] = 0
-        if (!totals[year].total) totals[year].total = 0
+        totals[year][field] ??= 0
+        totals[year].total ??= 0
         totals[year][field] += Math.round(yearStats[field])
         totals[year].total += Math.round(yearStats[field])
       }

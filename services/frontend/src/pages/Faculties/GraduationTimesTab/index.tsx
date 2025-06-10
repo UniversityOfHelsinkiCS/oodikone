@@ -86,10 +86,10 @@ export const GraduationTimesTab = ({
             Abbreviation: item.name,
             Name: getTextIn(programmeNames[programmes[index]]),
             [yearLabel]: year,
-            'On time': item.statistics.onTime || 0,
-            'Max. year overtime': item.statistics.yearOver || 0,
-            Overtime: item.statistics.wayOver || 0,
-            'Median study time (months)': item.median || 0,
+            'On time': item.statistics.onTime ?? 0,
+            'Max. year overtime': item.statistics.yearOver ?? 0,
+            Overtime: item.statistics.wayOver ?? 0,
+            'Median study time (months)': item.median ?? 0,
           })
         })
       })

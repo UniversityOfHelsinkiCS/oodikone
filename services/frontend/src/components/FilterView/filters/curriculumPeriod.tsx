@@ -13,7 +13,7 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, withoutSelf }) =
       curriculumPeriods.push({
         key: curriculumPeriod,
         value: curriculumPeriod,
-        text: `${curriculumPeriod || 'No period selected'} (${count})`,
+        text: `${curriculumPeriod ?? 'No period selected'} (${count})`,
         count,
       })
     }

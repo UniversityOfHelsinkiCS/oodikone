@@ -64,10 +64,10 @@ const getCellTitle = (student, courseCode) => {
   }
   const title = credit
     ? `Passed on ${moment(credit.date).format(ISO_DATE_FORMAT)}\nCourse code: ${
-        credit.substitution ? credit.substitution : credit.courseCode
+        credit.substitution ?? credit.courseCode
       }`
     : `Last enrollment on ${moment(enrollment.date).format(ISO_DATE_FORMAT)}\nCourse code ${
-        enrollment.substitution ? enrollment.substitution : enrollment.courseCode
+        enrollment.substitution ?? enrollment.courseCode
       }`
   return title
 }

@@ -23,7 +23,7 @@ type SearchQuery = {
 router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, res) => {
   const { courselist, startdate, enddate } = req.query
 
-  const courseCodes = (await safeJSONParse(courselist)) || []
+  const courseCodes = (await safeJSONParse(courselist)) ?? []
   if (!Array.isArray(courseCodes)) {
     return res.status(400).json({ error: 'Courses must be of type array' })
   }

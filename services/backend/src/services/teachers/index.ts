@@ -102,7 +102,7 @@ const markCreditForSemester = (semesters: Record<string, { id: number; name: Nam
 const markCreditForYear = (years: Record<number, any>, credit: Credit) => {
   const { passed, failed, credits, semester, transferred } = parseCreditInfo(credit)
   const { yearcode, yearname } = semester
-  const { stats, ...rest } = years[yearcode] || { id: yearcode, name: yearname }
+  const { stats, ...rest } = years[yearcode] ?? { id: yearcode, name: yearname }
   return {
     ...years,
     [yearcode]: {
@@ -116,7 +116,7 @@ const markCreditForCourse = (courses: Record<string, any>, credit: Credit) => {
   const { passed, failed, credits, course, semester, transferred } = parseCreditInfo(credit)
   const { code, name } = course
   const { semestercode } = semester
-  const { stats, semesters = {}, ...rest } = courses[code] || { id: code, name }
+  const { stats, semesters = {}, ...rest } = courses[code] ?? { id: code, name }
   return {
     ...courses,
     [code]: {

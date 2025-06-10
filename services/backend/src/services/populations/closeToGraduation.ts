@@ -89,13 +89,9 @@ const findThesisAndLatestAndEarliestAttainments = (
     ) {
       thesisData = attainment
     }
-    if (!attainmentDates.latestTotal) {
-      attainmentDates.latestTotal = attainment.attainment_date
-    }
+    attainmentDates.latestTotal ??= attainment.attainment_date
     if (studyPlan.included_courses.includes(attainment.course?.code)) {
-      if (!attainmentDates.latestHops) {
-        attainmentDates.latestHops = attainment.attainment_date
-      }
+      attainmentDates.latestHops ??= attainment.attainment_date
       if (
         !attainmentDates.earliestHops ||
         attainment.attainment_date.getTime() < attainmentDates.earliestHops.getTime()

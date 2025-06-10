@@ -41,7 +41,7 @@ const getCoursesIncludedInStudyPlan = (student, studyPlan) =>
 const resolveGraphStartDate = (student, graphYearStart, selectedStudyPlan, studyRightTargetStart) => {
   const earliestAttainmentDate = getEarliestAttainmentDate(student)
   if (!selectedStudyPlan)
-    return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart || new Date()).getTime())
+    return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart ?? new Date()).getTime())
   const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
   return Math.min(

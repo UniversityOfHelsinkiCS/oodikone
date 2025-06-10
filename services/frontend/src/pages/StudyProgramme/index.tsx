@@ -80,8 +80,8 @@ export const StudyProgramme = () => {
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
 
   const otherTabsVisible: boolean =
-    fullAccessToStudentData ||
-    fullStudyProgrammeRights.includes(programmeId) ||
+    fullAccessToStudentData ??
+    fullStudyProgrammeRights.includes(programmeId) ??
     fullStudyProgrammeRights.includes(secondProgrammeId)
 
   const tabs = [

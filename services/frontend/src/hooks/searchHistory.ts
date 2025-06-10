@@ -26,7 +26,7 @@ export const useSearchHistory = (id: string, capacity = 5) => {
       localStorage.setItem('searchHistoryVersion', SEARCH_HISTORY_VERSION)
     }
 
-    setSearchHistory(getSearchHistoryStore()[id] || [])
+    setSearchHistory(getSearchHistoryStore()[id] ?? [])
     setDidMount(true)
   }, [])
 

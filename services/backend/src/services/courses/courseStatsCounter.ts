@@ -180,16 +180,10 @@ export class CourseStatsCounter {
   }
 
   public markEnrollment(studentNumber: string, state: EnrollmentState, semester: string) {
-    if (!this.enrollments[state]) {
-      this.enrollments[state] = new Set()
-    }
+    this.enrollments[state] ??= new Set()
     this.enrollments[state].add(studentNumber)
-    if (!this.enrollments.semesters[semester]) {
-      this.enrollments.semesters[semester] = {}
-    }
-    if (!this.enrollments.semesters[semester][state]) {
-      this.enrollments.semesters[semester][state] = new Set()
-    }
+    this.enrollments.semesters[semester] ??= {}
+    this.enrollments.semesters[semester][state] ??= new Set()
     this.enrollments.semesters[semester][state].add(studentNumber)
   }
 

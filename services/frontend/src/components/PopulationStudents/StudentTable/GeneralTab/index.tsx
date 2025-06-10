@@ -81,10 +81,8 @@ export const GeneralTabContainer = ({
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
-  const studyGuidanceGroupProgrammes = group?.tags?.studyProgramme?.includes('+')
-    ? group?.tags?.studyProgramme.split('+')
-    : [group?.tags?.studyProgramme]
-  const programmeCode = studyRights?.programme || studyGuidanceGroupProgrammes[0] || customPopulationProgramme
+  const [sggProgramme, sggCombinedProgramme] = group?.tags?.studyProgramme.split('+') ?? []
+  const programmeCode = studyRights?.programme ?? sggProgramme ?? customPopulationProgramme
 
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
@@ -132,11 +130,7 @@ export const GeneralTabContainer = ({
     return acc
   }, {})
 
-  const combinedProgrammeCode = studyRights?.combinedProgramme
-    ? studyRights.combinedProgramme
-    : studyGuidanceGroupProgrammes.length > 1
-      ? studyGuidanceGroupProgrammes[1]
-      : null
+  const combinedProgrammeCode = studyRights?.combinedProgramme ?? sggCombinedProgramme ?? null
 
   const getCombinedProgrammeCredits = student =>
     student.studyplans?.find(plan => {

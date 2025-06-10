@@ -13,7 +13,7 @@ export const getGradeColumns = (grades: { key: string; title: string }[]) => {
     id: `grades.${key}`,
     accessorFn: row => row.grades[key],
     header: title,
-    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue() || 0),
+    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : (cell.getValue() ?? 0)),
   }))
 }
 

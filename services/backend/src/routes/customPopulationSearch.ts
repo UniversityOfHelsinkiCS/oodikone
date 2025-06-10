@@ -26,7 +26,7 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Students must be of type array' })
   }
 
-  const customPopulationSearch = await createCustomPopulationSearch(name, id, students || [])
+  const customPopulationSearch = await createCustomPopulationSearch(name, id, students ?? [])
   res.json(customPopulationSearch)
 })
 

@@ -51,9 +51,7 @@ const getGraduationTimeStats = async (
   ) => {
     for (const programmeOrTrack of Object.keys(graduationTimes)) {
       const stats = graduationTimes[programmeOrTrack]
-      if (!finalGraduationTimes[programmeOrTrack]) {
-        finalGraduationTimes[programmeOrTrack] = { medians: { basic: [] as MedianEntry[], combo: [] as MedianEntry[] } }
-      }
+      finalGraduationTimes[programmeOrTrack] ??= { medians: { basic: [] as MedianEntry[], combo: [] as MedianEntry[] } }
       for (const [year, oneYearStats] of Object.entries(stats)) {
         const classSize = mainStatsByTrack[combinedProgramme ? studyProgramme : programmeOrTrack].find(
           stats => stats[0] === year

@@ -234,11 +234,7 @@ const formatSharedStudentData = ({
     }
   }
 
-  if (credits === undefined) {
-    credits = []
-  }
-
-  const formattedCredits = credits
+  const formattedCredits = (credits ?? [])
     .sort((a, b) => new Date(a.attainment_date).getTime() - new Date(b.attainment_date).getTime())
     .map(toCourse)
 

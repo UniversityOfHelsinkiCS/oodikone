@@ -25,7 +25,7 @@ const creditsColumnIndex = 3
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
 const isInStudyPlan = (plan, code: string) =>
-  plan && (plan.included_courses.includes(code) || plan.included_courses.includes(code.replace('AY', '')))
+  plan && (plan.included_courses.includes(code) ?? plan.included_courses.includes(code.replace('AY', '')))
 
 const getAcademicYear = (date: string) => {
   const year = new Date(date).getFullYear()

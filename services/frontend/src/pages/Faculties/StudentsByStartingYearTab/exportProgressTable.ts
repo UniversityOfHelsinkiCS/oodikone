@@ -22,10 +22,10 @@ export const exportProgressTable = (
 
   const book = utils.book_new()
 
-  const progressStatsBachelor = bachelorStats.tableStats || []
-  const progressStatsBachelorMaster = bachelorMasterStats.tableStats || []
-  const progressStatsMaster = masterStats.tableStats || []
-  const progressStatsDoctor = doctorStats.tableStats || []
+  const progressStatsBachelor = bachelorStats.tableStats ?? []
+  const progressStatsBachelorMaster = bachelorMasterStats.tableStats ?? []
+  const progressStatsMaster = masterStats.tableStats ?? []
+  const progressStatsDoctor = doctorStats.tableStats ?? []
 
   const tableData = [progressStatsBachelor, progressStatsMaster, progressStatsBachelorMaster, progressStatsDoctor]
   const tableHeadersData = [
@@ -51,10 +51,10 @@ export const exportProgressTable = (
     }
   })
 
-  const progressStatsBachelorProg = progressStats?.data?.bachelorsProgStats || {}
-  const progressStatsBcMsProg = progressStats?.data?.bcMsProgStats || {}
-  const progressStatsMastersProg = progressStats?.data?.mastersProgStats || {}
-  const progressStatsDoctorProg = progressStats?.data?.doctoralProgStats || {}
+  const progressStatsBachelorProg = progressStats?.data?.bachelorsProgStats ?? {}
+  const progressStatsBcMsProg = progressStats?.data?.bcMsProgStats ?? {}
+  const progressStatsMastersProg = progressStats?.data?.mastersProgStats ?? {}
+  const progressStatsDoctorProg = progressStats?.data?.doctoralProgStats ?? {}
   const programmeData = [
     progressStatsBachelorProg,
     progressStatsMastersProg,

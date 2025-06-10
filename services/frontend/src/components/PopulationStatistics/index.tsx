@@ -209,7 +209,7 @@ export const PopulationStatistics = () => {
       transferred: false,
     },
     [hopsFilter.key]: {
-      studyStart: (students[0] || {})?.studyrightStart,
+      studyStart: (students[0] ?? {})?.studyrightStart,
     },
     [studyTrackFilter.key]: {
       selected: studyTrack ? [studyTrack] : [],
