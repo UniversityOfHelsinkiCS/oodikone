@@ -11,11 +11,11 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.4.7",
-    "@mui/material": "^6.4.7",
-    "@mui/x-date-pickers": "^7.27.3",
+    "@mui/icons-material": "^6.4.12",
+    "@mui/material": "^6.4.12",
+    "@mui/x-date-pickers": "^7.29.4",
     "@oodikone/shared": "file:../shared",
-    "@reduxjs/toolkit": "^2.6.1",
+    "@reduxjs/toolkit": "^2.8.2",
     "@sentry/browser": "^9.27.0",
     "axios": "^1.9.0",
     "highcharts": "^11.4.8",
@@ -40,14 +40,14 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.16",
-    "@types/node": "^22.13.10",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@types/react-highcharts": "^16.0.6",
-    "@vitejs/plugin-react-swc": "^3.8.0",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.1"
+    "@types/lodash": "^4.17.17",
+    "@types/node": "^22.15.31",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@types/react-highcharts": "^16.0.7",
+    "@vitejs/plugin-react-swc": "^3.10.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   },
   "overrides": {
     "react-highcharts": {
