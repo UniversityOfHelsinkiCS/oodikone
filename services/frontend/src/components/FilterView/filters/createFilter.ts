@@ -69,6 +69,30 @@ type FilterOptions = {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
+type FilterFactory = {
+  key: string
+  actions: Record<
+    string,
+    <T>(payload: T) => (
+      view: string,
+      getContext: FilterViewContextState['getContextByKey']
+    ) => {
+      payload: T
+      type: string
+    }
+  >
+  selectors: Record<
+    string,
+    <T, R = any>(
+      args?: T
+    ) => {
+      (opts: FilterContext['options']): R
+      filter: string
+    }
+  >
+  (args?: any): Filter
+}
+
 export type Filter = {
   args?: any
 
@@ -85,28 +109,6 @@ export type Filter = {
 
   render: FilterOptions['render']
   priority: number
-}
-
-export type FilterFactory = {
-  key: Filter['key']
-  actions: Record<
-    string,
-    (payload: any) => (
-      view: string,
-      getContext: FilterViewContextState['getContextByKey']
-    ) => {
-      payload: any
-      type: string
-    }
-  >
-  selectors: Record<
-    string,
-    (...args: any[]) => {
-      (opts: any): any
-      filter: string
-    }
-  >
-  (args?: any): Filter
 }
 
 /**
