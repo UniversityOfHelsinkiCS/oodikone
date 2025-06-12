@@ -39,7 +39,7 @@ COPY ./frontend/package*.json .
 RUN npm ci --include=dev
 COPY ./frontend .
 
-RUN npm run build && npm install -g serve@12.0.0
+RUN npm run build && npm install -g serve@^14
 
 EXPOSE 5000
 CMD ["serve", "--single", "--listen", "5000", "build"]
