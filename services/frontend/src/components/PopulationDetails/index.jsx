@@ -15,21 +15,18 @@ import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
-export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes, query, selectedStudentsByYear }) => {
+export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes, query }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
   const [curriculum, setCurriculum] = useState(null)
 
-  useEffect(() => {
-    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
+  const filteredStudentsLength = filteredStudents?.length ?? 0
+  useEffect(() => setStudentAmountLimit(filteredStudentsLength * 0.3), [filteredStudentsLength])
 
-  const criteria = useGetProgressCriteriaQuery(
-    { programmeCode: query?.studyRights?.programme },
-    { skip: !query?.studyRights?.programme }
-  )
+  const programme = programmeCodes[0]
+  const criteria = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
@@ -55,7 +52,7 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           {filteredStudents.length > 0 && (
             <CreditAccumulationGraphHighCharts
-              programmeCodes={programmeCodes}
+              programmeCodes={programmeCodes.filter(Boolean)}
               showBachelorAndMaster={query?.showBachelorAndMaster === 'true'}
               students={filteredStudents}
               studyPlanFilterIsActive={studyPlanFilterIsActive}
@@ -88,7 +85,7 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
             setCurriculum={setCurriculum}
             setStudentAmountLimit={setStudentAmountLimit}
             studentAmountLimit={studentAmountLimit}
-            studyProgramme={query?.studyRights?.programme}
+            studyProgramme={programme}
             year={query?.year}
           />
           <PopulationCourses
@@ -97,34 +94,33 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
             filteredStudents={filteredStudents}
             onlyIamRights={onlyIamRights}
             query={query}
-            selectedStudentsByYear={selectedStudentsByYear}
             studentAmountLimit={studentAmountLimit}
           />
         </div>
       ),
       alwaysRender: true,
     },
-  ]
+    !onlyIamRights
+      ? {
+          title: `Students (${filteredStudents.length})`,
+          content: (
+            <div>
+              <PopulationStudents
+                criteria={criteria?.data}
+                curriculum={curriculum}
+                filteredStudents={filteredStudents}
+                months={query?.months ?? 0}
+                programmeCode={programme}
+                showBachelorAndMaster={query?.showBachelorAndMaster}
+                studyRights={query?.studyRights}
+                variant="population"
+                year={query?.year}
+              />
+            </div>
+          ),
+        }
+      : null,
+  ].filter(item => !!item)
 
-  if (!onlyIamRights) {
-    panels.push({
-      title: `Students (${filteredStudents.length})`,
-      content: (
-        <div>
-          <PopulationStudents
-            criteria={criteria?.data}
-            curriculum={curriculum}
-            filteredStudents={filteredStudents}
-            months={query?.months ?? 0}
-            programmeCode={query?.studyRights?.programme}
-            showBachelorAndMaster={query?.showBachelorAndMaster}
-            studyRights={query?.studyRights}
-            variant="population"
-            year={query?.year}
-          />
-        </div>
-      ),
-    })
-  }
   return <PanelView panels={panels} viewTitle="classstatistics" />
 }

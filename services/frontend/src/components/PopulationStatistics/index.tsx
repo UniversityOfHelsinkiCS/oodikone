@@ -81,17 +81,6 @@ const parseQueryFromUrl = (location): [boolean, Query] => {
   return [skipQuery, query]
 }
 
-const mapStudentNumbersToStartingYears = samples => {
-  const years = [...new Set<number>(samples.map(student => new Date(student.studyrightStart).getFullYear()))]
-  const studentsToYears: Record<number, string[]> = Object.fromEntries(years.map(y => [y, []]))
-
-  samples.forEach(student => {
-    studentsToYears[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
-  })
-
-  return studentsToYears
-}
-
 const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode) =>
   samples.map(student => {
     const hopsCredits = student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
@@ -162,10 +151,6 @@ export const PopulationStatistics = () => {
   const students = useMemo(
     () => mapStudentDataToStudents(population?.students ?? [], programmeCode, combinedProgrammeCode),
     [population, programmeCode, combinedProgrammeCode]
-  )
-  const selectedStudentsByYear = useMemo(
-    () => mapStudentNumbersToStartingYears(population?.students ?? []),
-    [population]
   )
 
   const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
@@ -270,9 +255,8 @@ export const PopulationStatistics = () => {
               <PopulationDetails
                 filteredStudents={filteredStudents}
                 isLoading={isFetching}
-                programmeCodes={[programmeCode, combinedProgrammeCode].filter(Boolean)}
+                programmeCodes={[programmeCode, combinedProgrammeCode]}
                 query={query}
-                selectedStudentsByYear={selectedStudentsByYear}
               />
             )}
           </Segment>

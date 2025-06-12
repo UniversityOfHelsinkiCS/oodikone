@@ -12,17 +12,29 @@ import { useAppSelector, useAppDispatch } from '@/redux/hooks'
 import { getPopulationSelectedStudentCourses } from '@/redux/populationSelectedStudentCourses'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
+const mapStudentNumbersToStartingYears = samples => {
+  const years = [...new Set(samples.map(student => new Date(student.studyrightStart).getFullYear()))]
+  const studentsToYears = Object.fromEntries(years.map(y => [y, []]))
+
+  samples.forEach(student => {
+    studentsToYears[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+  })
+
+  return studentsToYears
+}
+
 export const PopulationCourses = ({
-  query = {},
+  query,
   filteredStudents,
-  selectedStudentsByYear,
   onlyIamRights,
   curriculum: mandatoryCourses,
   courseTableMode,
   studentAmountLimit,
 }) => {
   const dispatch = useAppDispatch()
-  const populationSelectedStudentCourses = useAppSelector(
+  const selectedStudentsByYear = mapStudentNumbersToStartingYears(filteredStudents ?? [])
+
+  const { courseQuery, data, pending } = useAppSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 
@@ -53,10 +65,10 @@ export const PopulationCourses = ({
   }, [mandatoryCourses])
 
   useEffect(() => {
-    if (programmeCourses == null || populationSelectedStudentCourses?.query == null) {
+    if (programmeCourses == null || courseQuery == null) {
       return
     }
-    const { courses, selectedStudents } = populationSelectedStudentCourses.query
+    const { courses, selectedStudents } = courseQuery
     if (
       !isEqual(programmeCourses, courses) ||
       selectedStudents.length !== filteredStudents.length ||
@@ -67,9 +79,9 @@ export const PopulationCourses = ({
     ) {
       fetch(programmeCourses)
     }
-  }, [programmeCourses, filteredStudents, populationSelectedStudentCourses.query, onlyIamRights, fetch])
+  }, [programmeCourses, filteredStudents, courseQuery, onlyIamRights, fetch])
 
-  const pending = populationSelectedStudentCourses.pending || !mandatoryCourses
+  const isPending = pending || !mandatoryCourses
 
   return (
     <Segment basic>
@@ -89,18 +101,18 @@ export const PopulationCourses = ({
           </div>
         )}
       </div>
-      <SegmentDimmer isLoading={pending} />
+      <SegmentDimmer isLoading={isPending} />
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
-          courses={populationSelectedStudentCourses.data ?? []}
-          key={populationSelectedStudentCourses.query.uuid}
+          courses={data ?? []}
+          key={courseQuery?.uuid}
           mandatoryCourses={mandatoryCourses}
           onlyIamRights={onlyIamRights}
-          pending={pending}
+          pending={isPending}
         />
       ) : (
         <PopulationCourseStatsFlat
-          courses={pending ? null : (populationSelectedStudentCourses.data ?? [])}
+          courses={isPending ? null : (data ?? [])}
           filteredStudents={filteredStudents}
           studentAmountLimit={studentAmountLimit}
         />
