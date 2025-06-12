@@ -53,7 +53,6 @@ export const FilterView: FC<{
             precompute!({
               students,
               options: filterOptions[key],
-              precomputed: null,
               args: filtersByKey[key].args,
             }),
           ])
