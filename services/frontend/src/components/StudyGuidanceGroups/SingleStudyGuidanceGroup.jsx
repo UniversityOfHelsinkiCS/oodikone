@@ -9,7 +9,18 @@ import { PanelView } from '@/components/common/PanelView'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { FilterView } from '@/components/FilterView'
 import * as filters from '@/components/FilterView/filters'
-import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
+import {
+  ageFilter,
+  creditDateFilter,
+  creditsEarnedFilter,
+  courseFilter,
+  enrollmentStatusFilter,
+  genderFilter,
+  startYearAtUniFilter,
+  tagsFilter,
+  hopsFilter as studyPlanFilter,
+  studentNumberFilter,
+} from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -157,20 +168,20 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
   const viewFilters = [
-    filters.studentNumberFilter,
-    filters.enrollmentStatusFilter({
+    studentNumberFilter(),
+    enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
       programme: group?.tags?.studyProgramme,
     }),
-    filters.ageFilter,
-    filters.genderFilter,
-    filters.startYearAtUniFilter,
-    filters.tagsFilter,
-    filters.courseFilter({
+    ageFilter(),
+    genderFilter(),
+    startYearAtUniFilter(),
+    tagsFilter(),
+    courseFilter({
       courses: courses?.coursestatistics ?? [],
     }),
-    filters.creditDateFilter,
-    filters.creditsEarnedFilter,
+    creditDateFilter(),
+    creditsEarnedFilter(),
   ]
 
   if (!group?.tags?.studyProgramme) {

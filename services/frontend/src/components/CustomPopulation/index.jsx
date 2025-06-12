@@ -61,27 +61,26 @@ export const CustomPopulation = () => {
   const custompop = studentData?.students ?? []
   const associatedProgramme = studentData?.studyProgramme
 
-  const filters = useMemo(() => {
-    const filtersList = [
-      genderFilter,
-      ageFilter,
-      courseFilter({ courses: courseStats?.coursestatistics ?? [] }),
-      creditsEarnedFilter,
-      transferredToProgrammeFilter,
-      startYearAtUniFilter,
-      tagsFilter,
-      programmeFilter,
-      creditDateFilter,
-      enrollmentStatusFilter({
-        allSemesters,
-        programme: associatedProgramme,
-      }),
-    ]
-    if (associatedProgramme) {
-      filtersList.push(hopsFilter({ programmeCode: associatedProgramme, combinedProgrammeCode: '' }))
-    }
-    return filtersList
-  }, [courseStats, allSemesters, associatedProgramme])
+  const filters = useMemo(
+    () =>
+      [
+        genderFilter(),
+        ageFilter(),
+        courseFilter({ courses: courseStats?.coursestatistics ?? [] }),
+        creditsEarnedFilter(),
+        transferredToProgrammeFilter(),
+        startYearAtUniFilter(),
+        tagsFilter(),
+        programmeFilter(),
+        creditDateFilter(),
+        enrollmentStatusFilter({
+          allSemesters,
+          programme: associatedProgramme,
+        }),
+        associatedProgramme ? hopsFilter({ programmeCode: associatedProgramme, combinedProgrammeCode: '' }) : null,
+      ].filter(item => !!item),
+    [courseStats, allSemesters, associatedProgramme]
+  )
 
   return (
     <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>

@@ -168,12 +168,12 @@ export const CoursePopulation = () => {
   return (
     <FilterView
       filters={[
-        genderFilter,
-        studentNumberFilter,
-        ageFilter,
+        genderFilter(),
+        studentNumberFilter(),
+        ageFilter(),
         courseFilter({ courses: courseStatistics?.coursestatistics }),
-        creditsEarnedFilter,
-        startYearAtUniFilter,
+        creditsEarnedFilter(),
+        startYearAtUniFilter(),
         programmeFilter({
           additionalModes: [
             {
