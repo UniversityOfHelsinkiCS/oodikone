@@ -194,7 +194,7 @@ describe('Population Statistics', () => {
       cy.cs('startYearAtUni-dropdown').selectFromDropdown(0)
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(6)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(7)
       checkFilteringResult(21)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
