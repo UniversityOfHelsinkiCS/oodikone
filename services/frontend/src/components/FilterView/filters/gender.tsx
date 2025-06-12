@@ -17,13 +17,13 @@ const GenderFilterCard: FC<{
 }> = ({ options, onOptionsChange, withoutSelf }) => {
   const { selected } = options
 
-  const count = (genderCode: number) =>
-    withoutSelf().filter(student => Number(student.gender_code) === genderCode).length
+  const students = withoutSelf()
+  const count = (genderCode: number) => students.filter(student => Number(student.gender_code) === genderCode).length
 
-  const dropdownOptions = Object.entries(GENDERS).map(([key, gender]) => ({
+  const dropdownOptions = Object.entries(GENDERS).map(([key, { label, value }]) => ({
     key,
-    text: `${gender.label} (${count(gender.value)})`,
-    value: gender.value,
+    text: `${label} (${count(value)})`,
+    value,
   }))
 
   return (

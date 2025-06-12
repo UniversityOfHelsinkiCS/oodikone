@@ -6,9 +6,10 @@ import { createFilter } from './createFilter'
 const CurriculumPeriodFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const { selected } = options
 
-  const dropdownOptions = withoutSelf().reduce((curriculumPeriods, { curriculumPeriod }) => {
+  const students = withoutSelf()
+  const dropdownOptions = students.reduce((curriculumPeriods, { curriculumPeriod }) => {
     if (curriculumPeriods.every(option => option.value !== curriculumPeriod)) {
-      const count = withoutSelf().filter(({ curriculumVersion }) => curriculumVersion === curriculumPeriod).length
+      const count = students.filter(({ curriculumVersion }) => curriculumVersion === curriculumPeriod).length
 
       curriculumPeriods.push({
         key: curriculumPeriod,

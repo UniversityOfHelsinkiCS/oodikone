@@ -9,27 +9,24 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const { getTextIn } = useLanguage()
   const { selected } = options
 
-  const dropdownOptions = withoutSelf().reduce((options, student) => {
-    student.citizenships
-      .filter(({ en: countryName }) => !options.some(option => option.value === countryName))
-      .forEach(citizenship => {
-        const countryName = citizenship.en
-        const country = getTextIn(citizenship)
+  const students = withoutSelf()
+  const uniqueContryNames = new Map<string, string>(
+    students.flatMap(({ citizenships }) => citizenships).map(citizenship => [citizenship.en, getTextIn(citizenship)])
+  )
 
-        const count = withoutSelf().filter(({ citizenships: otherCitizenships }) =>
-          otherCitizenships.some(({ en: otherCountryName }) => otherCountryName === countryName)
-        ).length
+  const dropdownOptions = [] as any[]
+  for (const [countryName, country] of uniqueContryNames.entries()) {
+    const count = students.filter(({ citizenships: otherCitizenships }) =>
+      otherCitizenships.some(({ en: otherCountryName }) => otherCountryName === countryName)
+    ).length
 
-        options.push({
-          key: countryName,
-          value: countryName,
-          text: `${country} (${count})`,
-          count,
-        })
-      })
-
-    return options
-  }, [])
+    dropdownOptions.push({
+      key: countryName,
+      value: countryName,
+      text: `${country} (${count})`,
+      count,
+    })
+  }
 
   const sortedDropdownOptions = orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
 
