@@ -56,7 +56,7 @@ type FilterOptions = {
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (ctx: FilterContext) => any
+  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
 
   /**
    * Used to determine sort order.
@@ -69,7 +69,7 @@ type FilterOptions = {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
-type FilterFactory = {
+export type FilterFactory = {
   key: string
   actions: Record<
     string,
@@ -101,14 +101,11 @@ export type Filter = {
   info: FilterOptions['info']
 
   defaultOptions: FilterOptions['defaultOptions']
-
-  isActive: FilterOptions['isActive']
-
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
-
   render: FilterOptions['render']
   priority: number
+  isActive: FilterOptions['isActive']
 }
 
 /**
@@ -230,14 +227,11 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
     info: options.info,
 
     defaultOptions: options.defaultOptions,
-
-    isActive: options.isActive,
-
     filter: options.filter,
     precompute: options.precompute,
-
     render: options.render,
     priority: options.priority ?? 0,
+    isActive: options.isActive,
   })
 
   factory.key = options.key
