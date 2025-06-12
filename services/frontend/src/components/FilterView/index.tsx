@@ -8,7 +8,7 @@ import { keyBy } from '@oodikone/shared/util'
 import { FilterViewContext } from './context'
 import type { FilterContext, FilterViewContextState } from './context'
 
-import type { Filter, FilterFactory } from './filters/createFilter'
+import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 // TODO: Use acual Student type when available
@@ -26,13 +26,12 @@ const resolveFilterOptions = <T,>(
 export const FilterView: FC<{
   children: (filteredStudents: Student[]) => any
   name: string
-  filters: (FilterFactory | Filter)[]
+  filters: Filter[]
   students: Student[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
-}> = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
+}> = ({ children, name, filters, students, displayTray: displayTrayProp, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
-  const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
   const filterOptions = useMemo(
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
