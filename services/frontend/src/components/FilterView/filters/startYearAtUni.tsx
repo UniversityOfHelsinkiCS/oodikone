@@ -1,22 +1,23 @@
-import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
-const StartYearAtUniFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }) => {
   const name = 'startYearAtUni'
-
   const { selected } = options
 
-  const countsByYear = fp.flow(
-    fp.groupBy((student: any) => new Date(student.started).getFullYear()),
-    fp.mapValues(students => students.length)
-  )(withoutSelf())
+  const countsByYear = {}
+  for (const { started } of students) {
+    const year = new Date(started).getFullYear()
 
-  const dropdownOptions = Object.keys(countsByYear).map(year => ({
+    countsByYear[year] ??= 0
+    countsByYear[year]++
+  }
+
+  const dropdownOptions = Object.entries(countsByYear).map(([year, count]) => ({
     key: `year-${year}`,
-    text: `${year} (${countsByYear[year]})`,
+    text: `${year} (${count})`,
     value: Number(year),
   }))
 

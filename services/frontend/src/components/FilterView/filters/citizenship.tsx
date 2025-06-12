@@ -5,11 +5,10 @@ import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
-const CitizenshipFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
   const { getTextIn } = useLanguage()
   const { selected } = options
 
-  const students = withoutSelf()
   const uniqueContryNames = new Map<string, string>(
     students.flatMap(({ citizenships }) => citizenships).map(citizenship => [citizenship.en, getTextIn(citizenship)])
   )

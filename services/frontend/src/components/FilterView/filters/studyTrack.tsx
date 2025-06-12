@@ -4,11 +4,11 @@ import type { DropdownProps } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
 
-const StudyTrackFilterCard = ({ code, onOptionsChange, options, withoutSelf }) => {
+const StudyTrackFilterCard = ({ code, onOptionsChange, options, students }) => {
   const { selected } = options
   const { getTextIn } = useLanguage()
 
-  const dropdownOptions = withoutSelf()
+  const dropdownOptions = students
     .flatMap(student => student.studyRights)
     .flatMap(studyRight => studyRight.studyRightElements)
     .filter(element => element.code === code && element.studyTrack !== null)

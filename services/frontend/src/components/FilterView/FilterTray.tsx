@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { Button, Header, Segment } from 'semantic-ui-react'
 
+import { Student } from '.'
 import { FilterViewContext } from './context'
 import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
@@ -8,7 +9,7 @@ import { FilterCard } from './filters/common/FilterCard'
 export type FilterTrayProps = {
   options: FilterContext['options']
   onOptionsChange: (options) => void
-  withoutSelf: () => void
+  students: Student[]
 }
 
 export const FilterTray = () => {
@@ -16,7 +17,6 @@ export const FilterTray = () => {
     filteredStudents,
     allStudents,
     filters,
-    withoutFilter,
     setFilterOptions,
     resetFilter,
     resetFilters,
@@ -26,7 +26,7 @@ export const FilterTray = () => {
 
   const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
   const filterSet = filters
-    .sort((a, b) => (a.title ?? a.key).localeCompare(b.title ?? b.key))
+    .sort(({ title: a }, { title: b }) => a.localeCompare(b))
     .map(filter => {
       const { key, render } = filter
       const ctx = getContextByKey(key)
@@ -36,7 +36,7 @@ export const FilterTray = () => {
         onOptionsChange: options => {
           setFilterOptions(key, options)
         },
-        withoutSelf: () => withoutFilter(key),
+        students: allStudents.slice(), // Copy instead of move
       }
 
       return (

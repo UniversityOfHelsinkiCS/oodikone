@@ -2,19 +2,22 @@ import { Form, Dropdown, Message } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
 
-const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const TagsFilterCard = ({ options, onOptionsChange, students }) => {
   const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
-  const tagCounts: Record<string, any> = withoutSelf().reduce((acc, student) => {
-    student.tags.forEach(({ tag_id: id, tag: { tagname } }) => {
-      acc[id] ??= { count: 0, name: tagname }
-      acc[id].count++
-    })
-    return acc
-  }, {})
+  const tagCounts = new Map<string, { count: number; name: string }>()
+  for (const student of students) {
+    for (const {
+      tag_id: id,
+      tag: { tagname },
+    } of student.tags) {
+      tagCounts[id] ??= { count: 0, name: tagname }
+      tagCounts[id].count++
+    }
+  }
 
-  const dropdownOptions = Object.entries(tagCounts).map(([tagId, { count, name }]) => ({
+  const dropdownOptions = Array.from(tagCounts.entries()).map(([tagId, { count, name }]) => ({
     key: `tag-${tagId}`,
     text: `${name} (${count})`,
     value: tagId,
@@ -23,7 +26,7 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const includeOptions = dropdownOptions.filter(({ value }) => !excludedTags.includes(value))
   const excludeOptions = dropdownOptions.filter(({ value }) => !includedTags.includes(value))
 
-  if (!Object.entries(tagCounts).length)
+  if (!tagCounts.size)
     return (
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.

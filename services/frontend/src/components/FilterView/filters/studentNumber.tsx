@@ -104,9 +104,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
   )
 }
 
-const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
-  const students = withoutSelf()
-
+const StudentNumberFilterCard = ({ options, onOptionsChange, students }) => {
   const swapLists = () => {
     onOptionsChange({
       allowlist: options.blocklist,

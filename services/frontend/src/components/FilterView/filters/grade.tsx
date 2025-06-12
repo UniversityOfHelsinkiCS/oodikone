@@ -1,5 +1,4 @@
 import fp from 'lodash/fp'
-import { FC } from 'react'
 import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
@@ -9,12 +8,7 @@ import { createFilter } from './createFilter'
  * Grade filter.
  * Only applicable to a single course.
  */
-const GradeFilterCard: FC<{
-  options: any
-  onOptionsChange: any
-  grades: any
-  withoutSelf: any
-}> = ({ options, onOptionsChange, grades, withoutSelf }) => {
+const GradeFilterCard = ({ options, onOptionsChange, grades, students }) => {
   const { selected } = options
   const name = 'gradeFilter'
 
@@ -38,9 +32,8 @@ const GradeFilterCard: FC<{
     }
   }
 
-  const studentsWithoutSelf = withoutSelf()
   const gradesWithoutSelf = fp.mapValues(
-    fp.filter(studentNumber => studentsWithoutSelf.some(student => student.studentNumber === studentNumber))
+    fp.filter(studentNumber => students.some(student => student.studentNumber === studentNumber))
   )(grades)
 
   return (

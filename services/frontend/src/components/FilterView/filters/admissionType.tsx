@@ -19,11 +19,11 @@ export const filter = code => value => student => {
   )
 }
 
-const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }) => {
+const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) => {
   const { selected } = options
   const name = 'admissionTypeFilter'
 
-  const count = admissionType => withoutSelf().filter(filter(code)(admissionType)).length
+  const count = admissionType => students.filter(filter(code)(admissionType)).length
 
   const dropdownOptions = Object.entries(ADMISSION_TYPES)
     .filter(([_, admissionType]) => !!admissionType)

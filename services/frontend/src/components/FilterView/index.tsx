@@ -90,7 +90,6 @@ export const FilterView: FC<{
     filteredStudents,
     getContextByKey: getFilterContext,
     areOptionsDirty: key => !!storeFilterOptions[key],
-    withoutFilter: key => applyFilters(orderedFilters.filter(filter => filter.key !== key)),
     setFilterOptions: (filter, options) => dispatch(setFilterOptions({ view: name, filter, options })),
     resetFilter: filter => dispatch(resetFilter({ view: name, filter })),
     resetFilters: () => dispatch(resetViewFilters({ view: name })),

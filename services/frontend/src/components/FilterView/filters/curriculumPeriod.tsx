@@ -3,10 +3,9 @@ import { Form, Dropdown } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
 
-const CurriculumPeriodFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
   const { selected } = options
 
-  const students = withoutSelf()
   const dropdownOptions = students.reduce((curriculumPeriods, { curriculumPeriod }) => {
     if (curriculumPeriods.every(option => option.value !== curriculumPeriod)) {
       const count = students.filter(({ curriculumVersion }) => curriculumVersion === curriculumPeriod).length

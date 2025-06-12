@@ -6,7 +6,7 @@ import { createFilter } from './createFilter'
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studentToProgrammeMap, withoutSelf }) => {
+const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studentToProgrammeMap, students }) => {
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
 
@@ -16,7 +16,7 @@ const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studen
     name
     studentCount
   }[] = []
-  withoutSelf().forEach(student => {
+  students.forEach(student => {
     studentToProgrammeMap[student.studentNumber].forEach(programme => {
       const prog = visibleProgrammes.find(prog => prog.code === programme.code)
 
