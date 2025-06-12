@@ -32,12 +32,9 @@ const CourseFilterCard: FC<{
 
   const setCourseFilter = (code, type) =>
     onOptionsChange(
-      produce(options ?? {}, draft => {
-        if (type === null) {
-          delete draft.courseFilters[code]
-        } else {
-          draft.courseFilters[code] = type
-        }
+      produce(options, draft => {
+        draft.courseFilters[code] = type
+        if (type === null) delete draft.courseFilters[code]
       })
     )
 
@@ -65,26 +62,13 @@ const CourseFilterCard: FC<{
       {Object.entries(courseFilters).map(([code]) => (
         <CourseCard
           course={courseStats[code]}
-          filterType={courseFilters[code] ?? FilterType.ALL}
+          filterType={courseFilters[code]}
           key={`course-filter-selected-course-${code}`}
           onChange={type => setCourseFilter(code, type)}
         />
       ))}
     </>
   )
-}
-
-const createFilterFunc =
-  key =>
-  ({ studentNumber }, { students }) => {
-    return Object.keys(students[key]).includes(studentNumber)
-  }
-
-const filterFunctions = {
-  [FilterType.ALL]: createFilterFunc('all'),
-  [FilterType.PASSED]: createFilterFunc('passed'),
-  [FilterType.FAILED]: createFilterFunc('failed'),
-  [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('enrolledNoGrade'),
 }
 
 export const courseFilter = createFilter({
@@ -96,15 +80,24 @@ export const courseFilter = createFilter({
 
   precompute: ({ args }) => keyBy(args.courses, 'course.code'),
 
-  isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
+  isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter(student, { precomputed: courseMap, options }) {
-    const { courseFilters = {} } = options ?? { courseFilters: null }
+  filter({ studentNumber }, { precomputed, options }) {
+    const filterKeys = {
+      [FilterType.ALL]: 'all',
+      [FilterType.PASSED]: 'passed',
+      [FilterType.FAILED]: 'failed',
+      [FilterType.ENROLLED_NO_GRADE]: 'enrolledNoGrade',
+    }
 
-    return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
-      const stats = courseMap[code]
-      return !!stats && result && filterFunctions[filterType as string](student, stats)
-    }, true)
+    for (const [code, filterType] of Object.entries(options.courseFilters)) {
+      const { students = {} } = precomputed[code]
+      const key = filterKeys[filterType as string]
+
+      if (!Object.keys(students[key] ?? {}).includes(studentNumber)) return false
+    }
+
+    return true
   },
 
   render: (props, { precomputed }) => <CourseFilterCard {...props} courseStats={precomputed} />,
