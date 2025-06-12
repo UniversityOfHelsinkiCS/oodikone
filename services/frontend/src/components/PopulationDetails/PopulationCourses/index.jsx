@@ -34,9 +34,11 @@ export const PopulationCourses = ({
   const dispatch = useAppDispatch()
   const selectedStudentsByYear = mapStudentNumbersToStartingYears(filteredStudents ?? [])
 
-  const { courseQuery, data, pending } = useAppSelector(
-    ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
-  )
+  const {
+    query: courseQuery,
+    data,
+    pending,
+  } = useAppSelector(({ populationSelectedStudentCourses }) => populationSelectedStudentCourses)
 
   const fetch = useCallback(
     courses => {
