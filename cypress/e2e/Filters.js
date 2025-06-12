@@ -249,7 +249,7 @@ describe('Population Statistics', () => {
     cy.cs('genderFilter-dropdown').selectFromDropdown(0)
     checkFilteringResult(13)
     cy.cs('StartYearAtUni-header').click()
-    cy.cs('startYearAtUni-dropdown').selectFromDropdown(5)
+    cy.cs('startYearAtUni-dropdown').selectFromDropdown(7)
     checkFilteringResult(8)
     cy.cs('reset-all-filters').click()
     checkFilteringResult(defaultAmountOfStudents)
