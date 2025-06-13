@@ -1,8 +1,6 @@
 import { Tab } from 'semantic-ui-react'
-import { useAppSelector } from '@/redux/hooks'
 
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
-
 import { CoursesTable } from './CoursesTable'
 
 export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, studyGuidanceGroup, variant }) => {
@@ -11,7 +9,9 @@ export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students
     year: studyGuidanceGroup?.tags?.year,
   })
 
-  const { data: populationCourses } = useAppSelector(state => state.populationSelectedStudentCourses)
+  // TODO: Replace this with a cache fetcher
+  // const { data: populationCourses } = useAppSelector(state => state.populationSelectedStudentCourses)
+  const populationCourses = null
 
   const studyGuidanceGroupLoading = isLoading || !curriculum || !students
   const loading = !curriculum || !students || !populationCourses

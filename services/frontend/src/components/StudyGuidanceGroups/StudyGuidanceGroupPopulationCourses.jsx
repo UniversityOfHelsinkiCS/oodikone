@@ -35,7 +35,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats courses={courses} mandatoryCourses={curriculum} />
+        <PopulationCourseStats courses={courses} curriculum={curriculum} />
       ) : (
         <>
           {!curriculumsAvailable && (

@@ -31,8 +31,8 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
+import { useGetPopulationSelectedStudentCoursesQuery } from '@/redux/populationSelectedStudentCourses'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
@@ -79,6 +79,17 @@ const parseQueryFromUrl = (location): [boolean, Query] => {
   }
 
   return [skipQuery, query]
+}
+
+const mapStudentNumbersToStartingYears = samples => {
+  const years = [...new Set(samples.map(student => new Date(student.studyrightStart).getFullYear()))]
+  const studentsToYears = Object.fromEntries(years.map(y => [y, []]))
+
+  samples.forEach(student => {
+    studentsToYears[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+  })
+
+  return studentsToYears
 }
 
 const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode) =>
@@ -143,8 +154,35 @@ export const PopulationStatistics = () => {
   const { data: allSemesters } = useGetSemestersQuery()
   const currentSemester = useCurrentSemester()
 
-  const { data: population, isFetching } = useGetPopulationStatisticsQuery(query, { skip: skipQuery })
-  const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
+  const { data: population, isFetching: populationFetching } = useGetPopulationStatisticsQuery(query, {
+    skip: skipQuery,
+  })
+
+  const selectedStudents = useUserHasRestrictedAccess()
+    ? population?.students?.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
+    : population?.students?.map(({ studentNumber }) => studentNumber)
+
+  // // TODO: This should be used to fetch the "mandatory courses"
+  // const programmeCourses = useDeepMemo(() => {
+  //   if (!curriculum) {
+  //     return null
+  //   }
+  //   const mandatoryCourseCodes = curriculum.defaultProgrammeCourses.map(({ code }) => code)
+  //   const mandatoryCourseCodesSecondProg = curriculum.secondProgrammeCourses.map(({ code }) => code)
+  //   return [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
+  // }, [curriculum])
+
+  // TODO: This implementation fetches ALL the courses for the population.
+  //       We want to only fetch the relevant or "mandatory courses" like in the old implementation.
+  const { data: courseData, isFetching: coursesFetching } = useGetPopulationSelectedStudentCoursesQuery(
+    {
+      selectedStudents,
+      selectedStudentsByYear: mapStudentNumbersToStartingYears(population?.students ?? []),
+    },
+    { skip: skipQuery || !population }
+  )
+
+  const isLoading = populationFetching || coursesFetching
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query.studyRights
 
@@ -159,7 +197,7 @@ export const PopulationStatistics = () => {
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter : null,
     citizenshipFilter,
-    courseFilter({ courses }),
+    courseFilter({ courses: courseData?.coursestatistics }),
     creditDateFilter,
     creditsEarnedFilter,
     curriculumPeriodFilter,
@@ -205,7 +243,7 @@ export const PopulationStatistics = () => {
     },
   }
 
-  const showNoStudentsMessage = students?.length === 0 && !isFetching
+  const showNoStudentsMessage = !students.length && !isLoading
   const noStudentsMessage = () => (
     <div style={{ maxWidth: '80%' }}>
       <Message
@@ -243,18 +281,19 @@ export const PopulationStatistics = () => {
             )}
           </Header>
           {!skipQuery && showNoStudentsMessage && noStudentsMessage()}
-          <Segment className="contentSegment" loading={isFetching}>
+          <Segment className="contentSegment" loading={isLoading}>
             <PopulationSearch
               combinedProgrammeCode={combinedProgrammeCode}
-              isLoading={isFetching}
+              isLoading={isLoading}
               populationFound={!!students.length}
               query={query}
               skipQuery={skipQuery}
             />
             {!skipQuery && (
               <PopulationDetails
+                courses={courseData}
                 filteredStudents={filteredStudents}
-                isLoading={isFetching}
+                isLoading={isLoading}
                 programmeCodes={[programmeCode, combinedProgrammeCode]}
                 query={query}
               />

@@ -17,7 +17,7 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
-export const PopulationCourseStats = ({ mandatoryCourses, courses, pending, onlyIamRights }) => {
+export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRights }) => {
   const dispatch = useAppDispatch()
   const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
@@ -27,17 +27,17 @@ export const PopulationCourseStats = ({ mandatoryCourses, courses, pending, only
     const coursestatistics = courses.coursestatistics ?? []
 
     const filteredCourses =
-      coursestatistics && mandatoryCourses
+      coursestatistics && curriculum
         ? coursestatistics
-            .filter(course => visibleCoursesFilter(course, mandatoryCourses))
+            .filter(course => visibleCoursesFilter(course, curriculum))
             // it needs to be with flatMap and filter and not map and find
             // because there can be many mandatoryCourses with the same course code
             // as they can belong to many categories
             .flatMap(course => {
-              const defaultProgrammeCourses = mandatoryCourses.defaultProgrammeCourses.filter(
+              const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
                 mandatoryCourse => mandatoryCourse.code === course.course.code
               )
-              const secondProgrammeCourses = mandatoryCourses.secondProgrammeCourses.filter(
+              const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
                 mandatoryCourse => mandatoryCourse.code === course.course.code
               )
               return [
@@ -74,7 +74,7 @@ export const PopulationCourseStats = ({ mandatoryCourses, courses, pending, only
         item => item.module.code
       )
     )
-  }, [courses.coursestatistics, mandatoryCourses])
+  }, [courses.coursestatistics, curriculum])
 
   const onGoToCourseStatisticsClick = () => {
     dispatch(clearCourseStats())
