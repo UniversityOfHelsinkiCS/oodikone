@@ -1,14 +1,9 @@
 import { Tab } from 'semantic-ui-react'
 
-import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { CoursesTable } from './CoursesTable'
 
-export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students }) => {
-  const { data: populationCourses, isFetching } = useGetPopulationCourseStatisticsQuery({
-    selectedStudents: students.map(({ studentNumber }) => studentNumber),
-  })
-
-  const loading = isFetching || !curriculum || !students || !populationCourses
+export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, courses }) => {
+  const loading = !curriculum || !students || !courses
 
   return (
     <Tab.Pane loading={loading}>
@@ -16,7 +11,7 @@ export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students
         <CoursesTable
           curriculum={curriculum}
           includeSubstitutions={includeSubstitutions}
-          populationCourses={populationCourses}
+          populationCourses={courses}
           students={students}
         />
       )}

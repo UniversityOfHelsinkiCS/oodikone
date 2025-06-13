@@ -26,6 +26,7 @@ const Panes = ({
   criteria,
   dataExport,
   filteredStudents,
+  courses,
   from,
   mainProgramme,
   months,
@@ -65,7 +66,12 @@ const Panes = ({
     {
       menuItem: 'Courses',
       render: () => (
-        <CoursesTab curriculum={curriculum} includeSubstitutions={includeSubstitutions} students={filteredStudents} />
+        <CoursesTab
+          courses={courses}
+          curriculum={curriculum}
+          includeSubstitutions={includeSubstitutions}
+          students={filteredStudents}
+        />
       ),
     },
     {
@@ -128,6 +134,7 @@ const PopulationStudents = ({
   criteria,
   dataExport,
   filteredStudents,
+  courses,
   from,
   to,
   months: initMonths,
@@ -170,6 +177,7 @@ const PopulationStudents = ({
       <Panes
         combinedProgramme={combinedProgramme}
         coursecode={coursecode}
+        courses={courses}
         criteria={criteria}
         curriculum={curriculum}
         customPopulationProgramme={customPopulationProgramme}

@@ -131,6 +131,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       content: (
         <div>
           <PopulationStudents
+            courses={courses}
             criteria={criteria}
             curriculum={curriculum}
             filteredStudents={filteredStudents}

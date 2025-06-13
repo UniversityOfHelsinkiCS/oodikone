@@ -108,6 +108,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           content: (
             <div>
               <PopulationStudents
+                courses={courses}
                 criteria={criteria?.data}
                 curriculum={curriculum}
                 filteredStudents={filteredStudents}
