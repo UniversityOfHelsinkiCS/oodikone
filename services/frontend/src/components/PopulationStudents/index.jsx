@@ -65,13 +65,7 @@ const Panes = ({
     {
       menuItem: 'Courses',
       render: () => (
-        <CoursesTab
-          curriculum={curriculum}
-          includeSubstitutions={includeSubstitutions}
-          students={filteredStudents}
-          studyGuidanceGroup={studyGuidanceGroup}
-          variant={variant}
-        />
+        <CoursesTab curriculum={curriculum} includeSubstitutions={includeSubstitutions} students={filteredStudents} />
       ),
     },
     {

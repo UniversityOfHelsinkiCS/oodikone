@@ -8,6 +8,7 @@ import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
 export const PopulationCourses = ({
+  isPending,
   query,
   courses,
   filteredStudents,
@@ -15,42 +16,38 @@ export const PopulationCourses = ({
   curriculum,
   courseTableMode,
   studentAmountLimit,
-}) => {
-  const isPending = !curriculum
-
-  return (
-    <Segment basic>
-      <div style={{ display: 'flex' }}>
-        {courseTableMode === 'curriculum' ? (
-          <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-            <InfoBox content={populationStatisticsToolTips.coursesOfClass} />
-          </div>
-        ) : (
-          <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-            <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-          </div>
-        )}
-        {query.studyRights.programme && !onlyIamRights && (
-          <div style={{ marginBottom: '20px' }}>
-            <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
-          </div>
-        )}
-      </div>
-      <SegmentDimmer isLoading={isPending} />
+}) => (
+  <Segment basic>
+    <div style={{ display: 'flex' }}>
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats
-          courses={courses ?? []}
-          curriculum={curriculum}
-          onlyIamRights={onlyIamRights}
-          pending={isPending}
-        />
+        <div style={{ marginBottom: '20px', marginRight: '10px' }}>
+          <InfoBox content={populationStatisticsToolTips.coursesOfClass} />
+        </div>
       ) : (
-        <PopulationCourseStatsFlat
-          courses={isPending ? null : (courses ?? [])}
-          filteredStudents={filteredStudents}
-          studentAmountLimit={studentAmountLimit}
-        />
+        <div style={{ marginBottom: '20px', marginRight: '10px' }}>
+          <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
+        </div>
       )}
-    </Segment>
-  )
-}
+      {query.studyRights.programme && !onlyIamRights && (
+        <div style={{ marginBottom: '20px' }}>
+          <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
+        </div>
+      )}
+    </div>
+    <SegmentDimmer isLoading={isPending} />
+    {courseTableMode === 'curriculum' ? (
+      <PopulationCourseStats
+        courses={courses ?? []}
+        curriculum={curriculum}
+        onlyIamRights={onlyIamRights}
+        pending={isPending}
+      />
+    ) : (
+      <PopulationCourseStatsFlat
+        courses={isPending ? null : (courses ?? [])}
+        filteredStudents={filteredStudents}
+        studentAmountLimit={studentAmountLimit}
+      />
+    )}
+  </Segment>
+)

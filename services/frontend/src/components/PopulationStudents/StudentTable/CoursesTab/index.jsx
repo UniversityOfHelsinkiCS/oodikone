@@ -3,33 +3,12 @@ import { Tab } from 'semantic-ui-react'
 import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
 import { CoursesTable } from './CoursesTable'
 
-export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students, studyGuidanceGroup, variant }) => {
-  const { data: studyGuidanceGroupPopulationsCourses, isLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: students.map(student => student.studentNumber).sort(),
-    year: studyGuidanceGroup?.tags?.year,
+export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students }) => {
+  const { data: populationCourses, isFetching } = useGetStudyGuidanceGroupPopulationCoursesQuery({
+    studentnumberlist: students.map(({ studentNumber }) => studentNumber),
   })
 
-  // TODO: Replace this with a cache fetcher
-  // const { data: populationCourses } = useAppSelector(state => state.populationSelectedStudentCourses)
-  const populationCourses = null
-
-  const studyGuidanceGroupLoading = isLoading || !curriculum || !students
-  const loading = !curriculum || !students || !populationCourses
-
-  if (variant === 'studyGuidanceGroupPopulation') {
-    return (
-      <Tab.Pane loading={studyGuidanceGroupLoading}>
-        {!studyGuidanceGroupLoading && (
-          <CoursesTable
-            curriculum={curriculum}
-            includeSubstitutions={includeSubstitutions}
-            populationCourses={studyGuidanceGroupPopulationsCourses}
-            students={students}
-          />
-        )}
-      </Tab.Pane>
-    )
-  }
+  const loading = isFetching || !curriculum || !students || !populationCourses
 
   return (
     <Tab.Pane loading={loading}>

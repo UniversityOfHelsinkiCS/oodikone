@@ -93,6 +93,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
             courses={courses}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
+            isPending={isLoading}
             onlyIamRights={onlyIamRights}
             query={query}
             studentAmountLimit={studentAmountLimit}
