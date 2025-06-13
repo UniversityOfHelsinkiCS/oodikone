@@ -31,8 +31,8 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
-import { useGetPopulationSelectedStudentCoursesQuery } from '@/redux/populationSelectedStudentCourses'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
@@ -174,7 +174,7 @@ export const PopulationStatistics = () => {
 
   // TODO: This implementation fetches ALL the courses for the population.
   //       We want to only fetch the relevant or "mandatory courses" like in the old implementation.
-  const { data: courseData, isFetching: coursesFetching } = useGetPopulationSelectedStudentCoursesQuery(
+  const { data: courseData, isFetching: coursesFetching } = useGetPopulationCourseStatisticsQuery(
     {
       selectedStudents,
       selectedStudentsByYear: mapStudentNumbersToStartingYears(population?.students ?? []),

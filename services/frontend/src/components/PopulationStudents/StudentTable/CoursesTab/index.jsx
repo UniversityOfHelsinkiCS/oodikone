@@ -1,11 +1,11 @@
 import { Tab } from 'semantic-ui-react'
 
-import { useGetStudyGuidanceGroupPopulationCoursesQuery } from '@/redux/studyGuidanceGroups'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { CoursesTable } from './CoursesTable'
 
 export const CoursesTabContainer = ({ curriculum, includeSubstitutions, students }) => {
-  const { data: populationCourses, isFetching } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: students.map(({ studentNumber }) => studentNumber),
+  const { data: populationCourses, isFetching } = useGetPopulationCourseStatisticsQuery({
+    selectedStudents: students.map(({ studentNumber }) => studentNumber),
   })
 
   const loading = isFetching || !curriculum || !students || !populationCourses

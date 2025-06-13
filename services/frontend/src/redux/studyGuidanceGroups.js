@@ -25,13 +25,6 @@ const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
         body: { studentnumberlist, tags, usingStudyGuidanceGroups: true },
       }),
     }),
-    getStudyGuidanceGroupPopulationCourses: builder.query({
-      query: ({ studentnumberlist }) => ({
-        url: '/v4/populationstatistics/courses',
-        method: 'POST',
-        body: { selectedStudents: studentnumberlist },
-      }),
-    }),
   }),
   overrideExisting: false,
 })
@@ -40,5 +33,4 @@ export const {
   useGetAllStudyGuidanceGroupsQuery,
   useChangeStudyGuidanceGroupTagsMutation,
   useGetStudyGuidanceGroupPopulationQuery,
-  useGetStudyGuidanceGroupPopulationCoursesQuery,
 } = studyGuidanceGroupsApi

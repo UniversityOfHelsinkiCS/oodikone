@@ -2,14 +2,17 @@ import { RTKApi } from '@/apiConnection'
 
 const courseStatisticsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getStudentListCourseStatistics: builder.query({
-      query: ({ studentNumbers }) => ({
+    getPopulationCourseStatistics: builder.query({
+      query: ({ selectedStudents, selectedStudentsByYear, courses }) => ({
         url: '/v4/populationstatistics/courses',
         method: 'POST',
-        body: { selectedStudents: studentNumbers },
+        body: { selectedStudents, selectedStudentsByYear, courses },
       }),
     }),
   }),
 })
 
-export const { useGetStudentListCourseStatisticsQuery } = courseStatisticsApi
+export const { useGetPopulationCourseStatisticsQuery } = courseStatisticsApi
+
+// TODO: This was used in the PopulationSearchForm
+// export const clearSelected = () => populationCoursesApi.util.resetApiState()

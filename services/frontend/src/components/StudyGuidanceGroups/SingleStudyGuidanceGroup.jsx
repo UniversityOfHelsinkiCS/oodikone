@@ -17,12 +17,10 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import {
-  useGetStudyGuidanceGroupPopulationCoursesQuery,
-  useGetStudyGuidanceGroupPopulationQuery,
-} from '@/redux/studyGuidanceGroups'
+import { useGetStudyGuidanceGroupPopulationQuery } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
@@ -52,9 +50,8 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
     data: courses,
     isLoading,
     isFetching,
-  } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: filteredStudents.map(student => student.studentNumber).sort(),
-    year: group?.tags?.year,
+  } = useGetPopulationCourseStatisticsQuery({
+    selectedStudents: filteredStudents.map(({ studentNumber }) => studentNumber),
   })
 
   const coursesAreLoading = isLoading || isFetching
@@ -297,9 +294,8 @@ export const SingleStudyGuidanceGroupContainer = ({ group }) => {
       studyProgramme: group?.tags?.studyProgramme,
     },
   })
-  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery({
-    studentnumberlist: groupStudentNumbers,
-    year: group?.tags?.year,
+  const { data: courses, isLoading: coursesAreLoading } = useGetPopulationCourseStatisticsQuery({
+    selectedStudents: groupStudentNumbers,
   })
 
   if (!group) {
