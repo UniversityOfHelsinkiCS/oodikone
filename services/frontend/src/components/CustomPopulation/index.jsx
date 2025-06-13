@@ -25,7 +25,7 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
@@ -43,8 +43,8 @@ export const CustomPopulation = () => {
   const { data } = useGetSemestersQuery()
   const allSemesters = data?.semesters ?? []
 
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: customPopulationState.studentNumbers },
+  const { data: courseStats } = useGetPopulationCourseStatisticsQuery(
+    { selectedStudents: customPopulationState.studentNumbers },
     { skip: !customPopulationState.studentNumbers.length }
   )
 
@@ -120,8 +120,8 @@ const CustomPopulationContent = ({
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: filteredStudents.map(student => student.studentNumber) },
+  const { data: courseStats } = useGetPopulationCourseStatisticsQuery(
+    { selectedStudents: filteredStudents.map(student => student.studentNumber) },
     { skip: !filteredStudents.map(student => student.studentNumber).length }
   )
 

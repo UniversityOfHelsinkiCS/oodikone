@@ -15,7 +15,7 @@ import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
-export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes, query }) => {
+export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, courses }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
@@ -25,7 +25,7 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
   const filteredStudentsLength = filteredStudents?.length ?? 0
   useEffect(() => setStudentAmountLimit(filteredStudentsLength * 0.3), [filteredStudentsLength])
 
-  const programme = programmeCodes[0]
+  const [programme, combinedProgramme] = programmeCodes
   const criteria = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -41,8 +41,8 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
   const onlyIamRights =
     !authLoading &&
     !fullAccessToStudentData &&
-    !fullStudyProgrammeRights.includes(query?.studyRights?.programme) &&
-    !fullStudyProgrammeRights.includes(query?.studyRights?.combinedProgramme)
+    !fullStudyProgrammeRights.includes(programme) &&
+    !fullStudyProgrammeRights.includes(combinedProgramme)
 
   const panels = [
     {
@@ -90,8 +90,10 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
           />
           <PopulationCourses
             courseTableMode={courseTableMode}
+            courses={courses}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
+            isPending={isLoading}
             onlyIamRights={onlyIamRights}
             query={query}
             studentAmountLimit={studentAmountLimit}
@@ -106,6 +108,7 @@ export const PopulationDetails = ({ filteredStudents, isLoading, programmeCodes,
           content: (
             <div>
               <PopulationStudents
+                courses={courses}
                 criteria={criteria?.data}
                 curriculum={curriculum}
                 filteredStudents={filteredStudents}
