@@ -264,9 +264,11 @@ describe('Population statistics tests', () => {
       it('Courses data is changed when curriculum is changed', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
+        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
+        cy.wait('@courseData')
+
         cy.get('[data-cy=curriculum-picker]').click()
         cy.contains('2020–2023').click({ force: true })
-
         cy.get('[data-cy=toggle-group-module-MAT-yht]').should('exist')
         cy.contains('Students (27)')
         cy.get('[data-cy=toggle-group-module-MAT-yht]').click()
@@ -280,6 +282,9 @@ describe('Population statistics tests', () => {
       it('Courses data is changed when filtered students change', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
+        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
+        cy.wait('@courseData')
+
         cy.get('[data-cy=GraduatedFromProgramme-filter-card]').within(() => {
           cy.get('[data-cy=GraduatedFromProgramme-header]').click()
           cy.get('[data-cy=option-graduated-true]').click()
