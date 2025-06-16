@@ -395,7 +395,7 @@ describe('Population statistics tests', () => {
     })
 
     it('Population statistics is visible', () => {
-      cy.get('.card').within(() => {
+      cy.get('#query-card').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
