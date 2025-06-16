@@ -27,7 +27,12 @@ import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulat
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
-const SingleStudyGroupContent = ({ filteredStudents, group }) => {
+// TODO: make a filter :D
+const filterCourses = (courseStatistics, _) => {
+  return courseStatistics
+}
+
+const SingleStudyGroupContent = ({ filteredStudents, courses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
 
@@ -46,15 +51,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
     },
   }
 
-  const {
-    data: courses,
-    isLoading,
-    isFetching,
-  } = useGetPopulationCourseStatisticsQuery({
-    selectedStudents: filteredStudents.map(({ studentNumber }) => studentNumber),
-  })
-
-  const coursesAreLoading = isLoading || isFetching
+  const filteredCourses = filterCourses(courses, filteredStudents)
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -111,18 +108,14 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       title: 'Courses of population',
       content: (
         <div>
-          {coursesAreLoading ? (
-            <SegmentDimmer isLoading={coursesAreLoading} />
-          ) : (
-            <StudyGuidanceGroupPopulationCourses
-              courses={courses}
-              curriculum={curriculum}
-              filteredStudents={filteredStudents}
-              setCurriculum={setCurriculum}
-              studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
-              year={year}
-            />
-          )}
+          <StudyGuidanceGroupPopulationCourses
+            courses={filteredCourses}
+            curriculum={curriculum}
+            filteredStudents={filteredStudents}
+            setCurriculum={setCurriculum}
+            studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+            year={year}
+          />
         </div>
       ),
     },
@@ -131,7 +124,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
       content: (
         <div>
           <PopulationStudents
-            courses={courses}
+            courses={filteredCourses}
             criteria={criteria}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
@@ -151,7 +144,7 @@ const SingleStudyGroupContent = ({ filteredStudents, group }) => {
   )
 }
 
-const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps }) => {
+const SingleStudyGroupFilterView = ({ courses, group, population }) => {
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
   const viewFilters = [
@@ -241,13 +234,12 @@ const SingleStudyGroupFilterView = ({ courses, group, population, ...otherProps 
       name={`StudyGuidanceGroup(${group.id})`}
       students={population?.students ?? []}
     >
-      {students => (
+      {filteredStudents => (
         <SingleStudyGroupContent
           courses={courses}
+          filteredStudents={filteredStudents}
           group={group}
           population={population}
-          {...otherProps}
-          filteredStudents={students}
         />
       )}
     </FilterView>

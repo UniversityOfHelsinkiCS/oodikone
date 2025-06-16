@@ -50,12 +50,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
               </Form.Field>
             </Form>
           )}
-          <PopulationCourseStatsFlat
-            courses={courses}
-            filteredStudents={filteredStudents}
-            pending={false}
-            studentAmountLimit={studentAmountLimit}
-          />
+          <PopulationCourseStatsFlat courses={courses} studentAmountLimit={studentAmountLimit} />
         </>
       )}
     </Segment>

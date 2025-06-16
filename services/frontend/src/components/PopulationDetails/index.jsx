@@ -15,6 +15,11 @@ import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
+// TODO: make a filter :D
+const filterCourses = (courseStatistics, _) => {
+  return courseStatistics
+}
+
 export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, courses }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -37,6 +42,8 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   if (isLoading || !Object.keys(query).length) {
     return null
   }
+
+  const filteredCourses = filterCourses(courses, filteredStudents)
 
   const onlyIamRights =
     !authLoading &&
@@ -90,7 +97,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           />
           <PopulationCourses
             courseTableMode={courseTableMode}
-            courses={courses}
+            courses={filteredCourses}
             curriculum={curriculum}
             filteredStudents={filteredStudents}
             isPending={isLoading}
@@ -108,7 +115,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           content: (
             <div>
               <PopulationStudents
-                courses={courses}
+                courses={filteredCourses}
                 criteria={criteria?.data}
                 curriculum={curriculum}
                 filteredStudents={filteredStudents}
