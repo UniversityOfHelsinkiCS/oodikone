@@ -4,14 +4,18 @@ import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
 import { CanError } from '@oodikone/shared/routes'
-import { GenderCode } from '@oodikone/shared/types'
+import {
+  PopulationstatisticsCoursesResBody,
+  PopulationstatisticsCoursesReqBody,
+} from '@oodikone/shared/routes/populations'
+import { GenderCode, EncrypterData as EncryptedStudent } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { SISStudyRightModel } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
-import { encrypt, type EncrypterData } from '../services/encrypt'
+import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
-import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
+import { bottlenecksOf } from '../services/populations/bottlenecksOf'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { findByCourseAndSemesters } from '../services/students'
 import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
@@ -19,21 +23,12 @@ import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse 
 
 const router = Router()
 
-type EncryptedStudent = EncrypterData
 const isEncryptedStudent = (student?: string | EncryptedStudent) => {
   return (student as EncryptedStudent)?.encryptedData !== undefined
 }
 
-export type PopulationstatisticsCoursesResBody = CanError<Bottlenecks>
-export type PopulationstatisticsCoursesReqBody = {
-  // NOTE: Encrypted students have their iv in selectedStudents
-  selectedStudents: string[] | EncryptedStudent[]
-  selectedStudentsByYear?: { [year: string]: string[] }
-  courses?: string[]
-}
-
 // NOTE: POST instead of GET because of too long params and "sensitive" data
-router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCoursesReqBody>(
+router.post<never, CanError<PopulationstatisticsCoursesResBody>, PopulationstatisticsCoursesReqBody>(
   '/v4/populationstatistics/courses',
   async (req, res) => {
     const { roles, studentsUserCanAccess } = req.user
@@ -42,16 +37,16 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
     const hasFullAccess = hasFullAccessToStudentData(roles)
 
     const isEncrypted = selectedStudents.some(isEncryptedStudent)
+    if (isEncrypted && !selectedStudents.every(isEncryptedStudent)) {
+      Sentry.captureException(new Error('Trying to request unencrypted student data as encrypted'))
+      return res.status(403).json({ error: 'Trying to request unauthorized student data' })
+    }
+
     const hasAccessToStudents =
       isEncrypted || (selectedStudents as string[]).every(student => studentsUserCanAccess.includes(student))
 
     if (!hasAccessToStudents && !hasFullAccess) {
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
-    }
-
-    if (isEncrypted && !selectedStudents.every(isEncryptedStudent)) {
-      Sentry.captureException(new Error('Trying to request unencrypted student data as encrypted'))
-      return res.status(403).json({ error: 'Trying to request unauthorized student data' })
     }
 
     const requiredFields = [selectedStudents, selectedCourses]
@@ -60,14 +55,9 @@ router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCours
       return res.status(400).json({ error: 'The request body should countain: selected students and courses' })
     }
 
-    const result = await bottlenecksOf(
-      selectedStudents as string[],
-      selectedStudentsByYear,
-      selectedCourses,
-      isEncrypted
+    return res.json(
+      await bottlenecksOf(selectedStudents as string[], selectedStudentsByYear, selectedCourses, isEncrypted)
     )
-
-    return res.json(result)
   }
 )
 
