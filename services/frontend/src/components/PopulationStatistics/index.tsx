@@ -157,29 +157,29 @@ export const PopulationStatistics = () => {
   const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
 
   const filters = [
-    !useUserHasRestrictedAccess() ? ageFilter : null,
-    citizenshipFilter,
+    !useUserHasRestrictedAccess() ? ageFilter() : null,
+    citizenshipFilter(),
     courseFilter({ courses }),
-    creditDateFilter,
-    creditsEarnedFilter,
-    curriculumPeriodFilter,
+    creditDateFilter(),
+    creditsEarnedFilter(),
+    curriculumPeriodFilter(),
     enrollmentStatusFilter({
       allSemesters: allSemesters?.semesters ?? [],
       programme: programmeCode,
     }),
-    genderFilter,
+    genderFilter(),
     graduatedFromProgrammeFilter({
       code: programmeCode,
       combinedProgrammeCode,
       showBachelorAndMaster,
     }),
     hopsFilter({ programmeCode, combinedProgrammeCode }),
-    studentNumberFilter,
-    startYearAtUniFilter,
+    studentNumberFilter(),
+    startYearAtUniFilter(),
     studyTrackFilter({ code: programmeCode }),
     studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
-    tagsFilter,
-    transferredToProgrammeFilter,
+    tagsFilter(),
+    transferredToProgrammeFilter(),
 
     useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'
       ? studyRightTypeFilter({ programme: programmeCode, year: query.year })

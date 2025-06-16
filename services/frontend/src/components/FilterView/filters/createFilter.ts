@@ -44,7 +44,7 @@ type FilterOptions = {
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, (options: any, ...args: any[]) => any>
+  selectors?: Record<string, (options: FilterContext['options'], args: any) => any>
 
   /**
    * By default `setOptions` and `reset` are assigned.
@@ -56,7 +56,7 @@ type FilterOptions = {
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (ctx: FilterContext) => any
+  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
 
   /**
    * Used to determine sort order.
@@ -69,6 +69,30 @@ type FilterOptions = {
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
+type FilterFactory = {
+  key: string
+  actions: Record<
+    string,
+    <T>(payload: T) => (
+      view: string,
+      getContext: FilterViewContextState['getContextByKey']
+    ) => {
+      payload: T
+      type: string
+    }
+  >
+  selectors: Record<
+    string,
+    <T, R = any>(
+      args?: T
+    ) => {
+      (opts: FilterContext['options']): R
+      filter: string
+    }
+  >
+  (args?: any): Filter
+}
+
 export type Filter = {
   args?: any
 
@@ -77,36 +101,11 @@ export type Filter = {
   info: FilterOptions['info']
 
   defaultOptions: FilterOptions['defaultOptions']
-
-  isActive: FilterOptions['isActive']
-
   filter: FilterOptions['filter']
   precompute: FilterOptions['precompute']
-
   render: FilterOptions['render']
   priority: number
-}
-
-export type FilterFactory = {
-  key: Filter['key']
-  actions: Record<
-    string,
-    (payload: any) => (
-      view: string,
-      getContext: FilterViewContextState['getContextByKey']
-    ) => {
-      payload: any
-      type: string
-    }
-  >
-  selectors: Record<
-    string,
-    (...args: any[]) => {
-      (opts: any): any
-      filter: string
-    }
-  >
-  (args?: any): Filter
+  isActive: FilterOptions['isActive']
 }
 
 /**
@@ -126,8 +125,8 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
       isActive: options.isActive,
     },
     ([key, selector]) => {
-      const gift = (...args) => {
-        const wrapper = opts => selector(opts, args)
+      const gift = args => {
+        const wrapper = (opts: FilterContext['options']) => selector(opts, args)
         wrapper.filter = options.key
 
         return wrapper
@@ -228,14 +227,11 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
     info: options.info,
 
     defaultOptions: options.defaultOptions,
-
-    isActive: options.isActive,
-
     filter: options.filter,
     precompute: options.precompute,
-
     render: options.render,
     priority: options.priority ?? 0,
+    isActive: options.isActive,
   })
 
   factory.key = options.key
