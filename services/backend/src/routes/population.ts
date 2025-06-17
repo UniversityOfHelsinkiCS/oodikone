@@ -32,7 +32,7 @@ router.post<never, CanError<PopulationstatisticsCoursesResBody>, Populationstati
   '/v4/populationstatistics/courses',
   async (req, res) => {
     const { roles, studentsUserCanAccess } = req.user
-    const { selectedStudents, courses: selectedCourses = [], selectedStudentsByYear = {} } = req.body
+    const { selectedStudents, selectedStudentsByYear = {} } = req.body
 
     const hasFullAccess = hasFullAccessToStudentData(roles)
 
@@ -49,15 +49,13 @@ router.post<never, CanError<PopulationstatisticsCoursesResBody>, Populationstati
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    const requiredFields = [selectedStudents, selectedCourses]
+    const requiredFields = [selectedStudents]
     if (requiredFields.some(field => !field)) {
       Sentry.captureException(new Error('The request body should countain: selected students and courses'))
       return res.status(400).json({ error: 'The request body should countain: selected students and courses' })
     }
 
-    return res.json(
-      await bottlenecksOf(selectedStudents as string[], selectedStudentsByYear, selectedCourses, isEncrypted)
-    )
+    return res.json(await bottlenecksOf(selectedStudents as string[], selectedStudentsByYear, isEncrypted))
   }
 )
 

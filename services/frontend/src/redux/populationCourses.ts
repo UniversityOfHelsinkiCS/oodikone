@@ -11,10 +11,10 @@ const courseStatisticsApi = RTKApi.injectEndpoints({
       PopulationstatisticsCoursesResBody,
       PopulationstatisticsCoursesReqBody
     >({
-      query: ({ selectedStudents, selectedStudentsByYear, courses }) => ({
+      query: ({ selectedStudents, selectedStudentsByYear }) => ({
         url: '/v4/populationstatistics/courses',
         method: 'POST',
-        body: { selectedStudents, selectedStudentsByYear, courses },
+        body: { selectedStudents, selectedStudentsByYear },
       }),
       transformResponse: (res: CanError<PopulationstatisticsCoursesResBody>) => {
         if ('error' in res) throw new Error(res.error)

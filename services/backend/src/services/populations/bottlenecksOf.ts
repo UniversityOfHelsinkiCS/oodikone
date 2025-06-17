@@ -26,7 +26,6 @@ const encryptStudentNumbers = (bottlenecks: Bottlenecks) => {
 export const bottlenecksOf = async (
   selectedStudents: string[],
   selectedStudentsByYear: { [year: string]: string[] },
-  selectedCourses: string[],
   isEncrypted: boolean
 ) => {
   // HACK: Encrypted students can't be decrypted if passed as strings
@@ -46,7 +45,7 @@ export const bottlenecksOf = async (
   const selectedStudentCount = selectedStudents.length
   const stats = new Map<string, CourseStatsCounter>()
 
-  const courses = await findCourses(selectedStudents, selectedCourses)
+  const courses = await findCourses(selectedStudents)
   for (const course of courses) {
     const { code: mainCode, name: mainName } = courses.find(({ code }) => code == course?.main_course_code) ?? course
     const coursestats = stats.get(mainCode) ?? new CourseStatsCounter(mainCode, mainName)
