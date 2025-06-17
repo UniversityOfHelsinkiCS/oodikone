@@ -18,19 +18,8 @@ const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ({ studyGuidanceGroupId }) => [{ type: 'StudyGuidanceGroups', id: studyGuidanceGroupId }],
     }),
-    getStudyGuidanceGroupPopulation: builder.query({
-      query: ({ studentnumberlist, tags }) => ({
-        url: '/v3/populationstatisticsbystudentnumbers',
-        method: 'POST',
-        body: { studentnumberlist, tags, usingStudyGuidanceGroups: true },
-      }),
-    }),
   }),
   overrideExisting: false,
 })
 
-export const {
-  useGetAllStudyGuidanceGroupsQuery,
-  useChangeStudyGuidanceGroupTagsMutation,
-  useGetStudyGuidanceGroupPopulationQuery,
-} = studyGuidanceGroupsApi
+export const { useGetAllStudyGuidanceGroupsQuery, useChangeStudyGuidanceGroupTagsMutation } = studyGuidanceGroupsApi

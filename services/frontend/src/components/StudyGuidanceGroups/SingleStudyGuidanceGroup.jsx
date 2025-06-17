@@ -18,9 +18,9 @@ import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { useGetStudyGuidanceGroupPopulationQuery } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
@@ -281,8 +281,8 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   // Sorting is needed for RTK query cache to work properly
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() || []
-  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery({
-    studentnumberlist: groupStudentNumbers,
+  const { data, isLoading } = useGetCustomPopulationQuery({
+    studentNumbers: groupStudentNumbers,
     tags: {
       studyProgramme: group?.tags?.studyProgramme,
     },
