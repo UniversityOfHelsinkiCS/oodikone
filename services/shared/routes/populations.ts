@@ -50,12 +50,7 @@ export type CourseStatistics = {
   grades: Grades
 }
 
-export type Bottlenecks = {
-  allStudents: number
-  coursestatistics: CourseStatistics[]
-}
-
-export type PopulationstatisticsCoursesResBody = Bottlenecks
+export type PopulationstatisticsCoursesResBody = { coursestatistics: CourseStatistics[] }
 export type PopulationstatisticsCoursesReqBody = {
   // NOTE: Encrypted students have their iv in selectedStudents
   selectedStudents: string[] | EncrypterData[]

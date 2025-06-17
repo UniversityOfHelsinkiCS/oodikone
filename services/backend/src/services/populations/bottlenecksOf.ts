@@ -1,4 +1,4 @@
-import type { Bottlenecks } from '@oodikone/shared/routes/populations'
+import type { CourseStatistics } from '@oodikone/shared/routes/populations'
 import type { EncrypterData } from '@oodikone/shared/types'
 import { getPassingSemester } from '../../util/semester'
 import { encrypt, decrypt } from '../encrypt'
@@ -8,7 +8,7 @@ import { findCourses, parseCreditInfo } from './shared'
 /**
  * Encrypts the data in-place.
  */
-const encryptStudentNumbers = (bottlenecks: Bottlenecks) => {
+const encryptStudentNumbers = (bottlenecks: { coursestatistics: CourseStatistics[] }) => {
   for (const course of Object.keys(bottlenecks.coursestatistics)) {
     const encryptedStudentStats = {}
     for (const data of Object.keys(bottlenecks.coursestatistics[course].students)) {
@@ -67,8 +67,7 @@ export const bottlenecksOf = async (
     stats.set(mainCode, coursestats)
   }
 
-  const bottlenecks: Bottlenecks = {
-    allStudents: selectedStudentCount,
+  const bottlenecks = {
     coursestatistics: Array.from(stats.values()).map(coursestatistics =>
       coursestatistics.getFinalStats(selectedStudentCount)
     ),
