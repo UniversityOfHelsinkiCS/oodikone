@@ -29,6 +29,7 @@ import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -97,11 +98,6 @@ export const CustomPopulation = () => {
       )}
     </FilterView>
   )
-}
-
-// TODO: make a filter :D
-const filterCourses = (courseStatistics, _) => {
-  return courseStatistics
 }
 
 const CustomPopulationContent = ({

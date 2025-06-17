@@ -10,15 +10,11 @@ import { PopulationStudentsContainer as PopulationStudents } from '@/components/
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { getFullStudyProgrammeRights } from '@/util/access'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
-
-// TODO: make a filter :D
-const filterCourses = (courseStatistics, _) => {
-  return courseStatistics
-}
 
 export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, courses }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()

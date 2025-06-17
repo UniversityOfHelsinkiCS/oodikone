@@ -31,6 +31,7 @@ import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
@@ -225,11 +226,6 @@ export const CoursePopulation = () => {
       )}
     </FilterView>
   )
-}
-
-// TODO: make a filter :D
-const filterCourses = (courseStatistics, _) => {
-  return courseStatistics
 }
 
 const CustomPopulationCoursesWrapper = ({ courseStatistics, filteredStudents }) => {

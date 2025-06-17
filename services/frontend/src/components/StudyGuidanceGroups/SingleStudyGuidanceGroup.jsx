@@ -22,15 +22,11 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
-
-// TODO: make a filter :D
-const filterCourses = (courseStatistics, _) => {
-  return courseStatistics
-}
 
 const SingleStudyGroupContent = ({ filteredStudents, courses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
