@@ -13,6 +13,7 @@ import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 
 import { GeneralTab } from './GeneralTab'
+import { joinProgrammes, Programme } from './util'
 
 export type FormattedStudentData = {
   firstNames: string
@@ -33,7 +34,7 @@ export type FormattedStudentData = {
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
   primaryProgramme?: string
-  programmes: { programmes: string[]; programmeList: string; exportValue: string }
+  programmes: { exportValue: string | null; programmes: Programme[] | undefined }
   transferredFrom: string
   admissionType: string | null
   gender: string
@@ -182,11 +183,10 @@ export const GeneralTabContainer = ({
 
   const getStartingYear = ({ started }) => (started ? new Date(started).getFullYear() : '')
 
-  const getGraduationDate = ({ studentNumber }) =>
-    studentToStudyrightEndMap[studentNumber]
-      ? formatDate(studentToStudyrightEndMap[studentNumber], DateFormat.ISO_DATE)
-      : ''
-
+  const getGraduationDate = ({ studentNumber }) => {
+    const studyRightEnd = studentToStudyrightEndMap.get(studentNumber)
+    return studyRightEnd ? formatDate(studyRightEnd, DateFormat.ISO_DATE) : ''
+  }
   const getCreditsFromHops = student => {
     const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
     return student.hopsCredits ?? student.studyplans?.find(plan => plan.programme_code === code)?.completed_credits ?? 0
@@ -207,7 +207,8 @@ export const GeneralTabContainer = ({
         ...student,
         courses: student.courses.filter(
           course =>
-            new Date(course.date).getTime() >= new Date(studentToProgrammeStartMap[student.studentNumber]).getTime()
+            new Date(course.date).getTime() >=
+            new Date(studentToProgrammeStartMap.get(student.studentNumber) ?? 0).getTime()
         ),
       })
     }
@@ -279,15 +280,6 @@ export const GeneralTabContainer = ({
       .map(element => getTextIn(element.studyTrack.name))
   }
 
-  const getStudyProgrammes = ({ studentNumber }) => {
-    const { programmes, getProgrammesList } = studentToOtherProgrammesMap[studentNumber] ?? {}
-    return {
-      programmes: programmes.map(programme => getTextIn(programme.name)) ?? [],
-      programmeList: getProgrammesList('\n'),
-      exportValue: getProgrammesList('; '),
-    }
-  }
-
   const containsStudyTracks: boolean = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
 
   const getCourseInformation = student => {
@@ -338,7 +330,6 @@ export const GeneralTabContainer = ({
     combinedProgrammeCode,
     year,
     currentSemester?.semestercode,
-    getTextIn,
     shouldShowBachelorAndMaster
   )
 
@@ -356,6 +347,7 @@ export const GeneralTabContainer = ({
 
   const formatStudent = (student: any): FormattedStudentData => {
     const correctStudyRight = getStudyRight(student)
+    const otherProgrammes = studentToOtherProgrammesMap.get(student.studentNumber)
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
@@ -367,8 +359,8 @@ export const GeneralTabContainer = ({
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
       studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : null,
-      studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
-      programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
+      studyRightStart: formatDate(studentToStudyrightStartMap.get(student.studentNumber), DateFormat.ISO_DATE),
+      programmeStart: formatDate(studentToProgrammeStartMap.get(student.studentNumber), DateFormat.ISO_DATE),
       option: getTextIn(student.option?.name) ?? '',
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
@@ -376,7 +368,7 @@ export const GeneralTabContainer = ({
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
-      programmes: getStudyProgrammes(student),
+      programmes: { programmes: otherProgrammes, exportValue: joinProgrammes(otherProgrammes, getTextIn, '; ') },
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
       gender: getGender(student.gender_code),
@@ -390,7 +382,7 @@ export const GeneralTabContainer = ({
     }
 
     if (combinedProgrammeCode || shouldShowBachelorAndMaster) {
-      const secondaryStudyRightEnd = studentToSecondStudyrightEndMap[student.studentNumber]
+      const secondaryStudyRightEnd = studentToSecondStudyrightEndMap.get(student.studentNumber)
       result.creditsCombinedProg = getCombinedProgrammeCredits(student)
       result.graduationDateCombinedProg = secondaryStudyRightEnd
         ? formatDate(secondaryStudyRightEnd, DateFormat.ISO_DATE)
@@ -398,7 +390,7 @@ export const GeneralTabContainer = ({
     }
 
     if (variant === 'customPopulation' && !programmeCode) {
-      const primaryProgramme = studentToPrimaryProgrammeMap[student.studentNumber]
+      const primaryProgramme = studentToPrimaryProgrammeMap.get(student.studentNumber)
       if (primaryProgramme) {
         const primaryProgrammeName = getTextIn(primaryProgramme.name) ?? ''
         result.primaryProgramme = primaryProgramme.graduated

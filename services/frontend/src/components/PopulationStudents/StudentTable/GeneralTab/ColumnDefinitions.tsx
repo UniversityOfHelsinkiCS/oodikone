@@ -4,13 +4,16 @@ import Typography from '@mui/material/Typography'
 
 import { createMRTColumnHelper } from 'material-react-table'
 import { useMemo } from 'react'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { muiTableBodyCellPropsDefaultSx } from '@/util/getDefaultMRTOptions'
 import { FormattedStudentData } from '.'
 import { DynamicColumnTitles } from './GeneralTab'
+import { joinProgrammes } from './util'
 
 export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
+  const { getTextIn } = useLanguage()
   const columnHelper = createMRTColumnHelper<FormattedStudentData>()
   return useMemo(
     () => [
@@ -135,12 +138,15 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           />
         ),
         Cell: ({ cell }) => {
-          const { programmes, programmeList } = cell.getValue()
-          if (programmes.length === 0) return null
+          const { programmes } = cell.getValue()
+          if (!programmes || programmes.length === 0) return null
 
-          const formattedProgramme = programmes[0].length > 45 ? `${programmes[0].substring(0, 43)}...` : programmes[0]
+          const programmeName = getTextIn(programmes[0].name) ?? ''
+          const formattedProgramme = programmeName.length > 45 ? `${programmeName.substring(0, 43)}...` : programmeName
+          const tooltipProgrammeList = joinProgrammes(programmes, getTextIn, '\n')
+
           return (
-            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{programmeList}</div>}>
+            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{tooltipProgrammeList}</div>}>
               <span>
                 {programmes.length > 1 ? `${formattedProgramme} +${programmes.length - 1}` : `${formattedProgramme}`}
               </span>
