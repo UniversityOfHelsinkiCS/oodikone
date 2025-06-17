@@ -78,10 +78,7 @@ export type EnrollmentsQueryResult = Array<{
   enrollments: Array<Pick<EnrollmentModel, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
 }>
 
-type CreditPick = Pick<
-  CreditModel,
-  'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'
->
+type CreditPick = Pick<CreditModel, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode'>
 
 export type CoursesQueryResult = Array<
   EnrollmentsQueryResult[number] & {
@@ -119,8 +116,7 @@ const findDefinedCourseStatsForStudents = `
         'grade', grade,
         'student_studentnumber', student_studentnumber,
         'attainment_date', attainment_date,
-        'credittypecode', credittypecode,
-        'course_code', course_code
+        'credittypecode', credittypecode
       )) AS data
     FROM credit
     WHERE student_studentnumber IN (:studentnumbers)
@@ -169,8 +165,7 @@ const findAllCourseStatsForStudents = `
         'grade', grade,
         'student_studentnumber', student_studentnumber,
         'attainment_date', attainment_date,
-        'credittypecode', credittypecode,
-        'course_code', course_code
+        'credittypecode', credittypecode
       )) AS data
     FROM credit
     WHERE student_studentnumber IN (:studentnumbers)

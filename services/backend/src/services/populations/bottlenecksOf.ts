@@ -61,9 +61,7 @@ export const bottlenecksOf = async (
     course.credits
       ?.map(parseCreditInfo)
       .forEach(({ studentnumber, passingGrade, improvedGrade, failingGrade, grade, date }) => {
-        // HACK: date should already be Date object
-        const initialDate = new Date(date)
-        const semester = getPassingSemester(getYear(studentnumber), initialDate)
+        const semester = getPassingSemester(getYear(studentnumber), new Date(date))
         coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
       })
 
