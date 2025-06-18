@@ -35,6 +35,7 @@ export type FormattedStudentData = {
   startYearAtUniversity: number | string
   primaryProgramme?: string
   programmes: { exportValue: string | null; programmes: Programme[] | undefined }
+  programmeStatus: string | null
   transferredFrom: string
   admissionType: string | null
   gender: string
@@ -190,6 +191,14 @@ export const GeneralTabContainer = ({
   const getCreditsFromHops = student => {
     const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
     return student.hopsCredits ?? student.studyplans?.find(plan => plan.programme_code === code)?.completed_credits ?? 0
+  }
+
+  const getStudyRightStatus = ({ studentNumber }) => {
+    const primaryProgramme = studentToPrimaryProgrammeMap.get(studentNumber)
+    if (!primaryProgramme) return null
+    if (primaryProgramme.graduated) return 'Graduated'
+    if (primaryProgramme.active) return 'Active'
+    return 'Inactive'
   }
 
   const getCreditsBetween = student => {
@@ -369,6 +378,7 @@ export const GeneralTabContainer = ({
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
       programmes: { programmes: otherProgrammes, exportValue: joinProgrammes(otherProgrammes, getTextIn, '; ') },
+      programmeStatus: getStudyRightStatus(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
       gender: getGender(student.gender_code),
@@ -392,12 +402,7 @@ export const GeneralTabContainer = ({
     if (variant === 'customPopulation' && !programmeCode) {
       const primaryProgramme = studentToPrimaryProgrammeMap.get(student.studentNumber)
       if (primaryProgramme) {
-        const primaryProgrammeName = getTextIn(primaryProgramme.name) ?? ''
-        result.primaryProgramme = primaryProgramme.graduated
-          ? `${primaryProgrammeName} (Graduated)`
-          : !primaryProgramme.active
-            ? `${primaryProgrammeName} (Inactive)`
-            : primaryProgrammeName
+        result.primaryProgramme = getTextIn(primaryProgramme.name) ?? ''
       }
     }
 

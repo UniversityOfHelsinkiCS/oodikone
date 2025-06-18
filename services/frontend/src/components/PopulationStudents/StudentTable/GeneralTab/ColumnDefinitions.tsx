@@ -43,7 +43,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           sx: {
             ...muiTableBodyCellPropsDefaultSx,
             width: '250px',
-            maxWidth: '380px',
+            maxWidth: '340px',
           },
         },
         Header: (
@@ -55,27 +55,21 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         Cell: ({ cell }) => {
           const programmeName = cell.getValue()
           if (!programmeName) return null
-          const indexToSplitAt = programmeName.lastIndexOf(' ')
-          const formattedValue = ['(Graduated)', '(Inactive)'].includes(programmeName.slice(indexToSplitAt + 1)) ? (
-            (() => {
-              const start = programmeName.slice(0, indexToSplitAt)
-              const end = programmeName.slice(indexToSplitAt + 1)
-              return (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{start}</span>
-                  <span style={{ paddingLeft: '0.5em' }}>{end}</span>
-                </div>
-              )
-            })()
-          ) : (
-            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
-          )
           return (
             <Tooltip arrow title={programmeName}>
-              {formattedValue}
+              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
             </Tooltip>
           )
         },
+      }),
+      columnHelper.accessor('programmeStatus', {
+        header: 'Status',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Status"
+            tooltipText="Shows the status of the current semester enrollment of the student in the corresponding programme."
+          />
+        ),
       }),
       columnHelper.accessor('creditsTotal', {
         header: 'All credits',

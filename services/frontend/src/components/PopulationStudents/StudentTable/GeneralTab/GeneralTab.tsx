@@ -15,6 +15,7 @@ import { type FormattedStudentData } from '.'
 import { useColumnDefinitions } from './ColumnDefinitions'
 
 type Variant = 'population' | 'studyGuidanceGroupPopulation' | 'customPopulation' | 'coursePopulation'
+
 export type DynamicColumnTitles = {
   creditsSince: string
   creditsCombinedProg: string
@@ -75,11 +76,21 @@ export const GeneralTab = ({
     })
   }, [namesVisible, studyTrackVisible, admissionTypeVisible])
 
-  const baseColumns = ['lastName', 'firstNames', 'creditsTotal', 'studentNumber', 'tvex', 'tags', 'updatedAt']
+  const baseColumns = [
+    'lastName',
+    'firstNames',
+    'programmes',
+    'programmeStatus',
+    'creditsTotal',
+    'studentNumber',
+    'tvex',
+    'tags',
+    'updatedAt',
+  ]
 
   const adminColumns = ['extent', 'updatedAt']
 
-  const studyGuidanceGroupColumns = ['creditsSince', 'programmes', 'startYearAtUniversity']
+  const studyGuidanceGroupColumns = ['creditsSince', 'startYearAtUniversity']
 
   const studyGuidanceGroupWithProgrammeColumns = [
     'citizenships',
@@ -103,7 +114,6 @@ export const GeneralTab = ({
 
   const customPopulationColumns = [
     'admissionType',
-    'programmes',
     'startYearAtUniversity',
     'creditsHops',
     'creditsSince',
@@ -138,7 +148,6 @@ export const GeneralTab = ({
     'semesterEnrollments',
     'graduationDate',
     'startYearAtUniversity',
-    'programmes',
     'transferredFrom',
     'admissionType',
     'gender',
@@ -149,14 +158,7 @@ export const GeneralTab = ({
     ...(isCombinedProg ? ['graduationDateCombinedProg', 'creditsCombinedProg'] : []),
   ]
 
-  const coursePopulationColumns = [
-    'grade',
-    'startYearAtUniversity',
-    'programmes',
-    'attainmentDate',
-    'enrollmentDate',
-    'language',
-  ]
+  const coursePopulationColumns = ['grade', 'startYearAtUniversity', 'attainmentDate', 'enrollmentDate', 'language']
 
   const columnsByVariant: Record<Variant, Set<string>> = {
     population: new Set([...baseColumns, ...populationColumns]),
