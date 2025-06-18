@@ -34,7 +34,7 @@ export type FormattedStudentData = {
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
   primaryProgramme?: string
-  programmes: { exportValue: string | null; programmes: Programme[] | undefined }
+  programmes: { exportValue: string | null; programmes: Programme[] }
   programmeStatus: string | null
   transferredFrom: string
   admissionType: string | null
@@ -133,6 +133,9 @@ export const GeneralTabContainer = ({
   }, {})
 
   const combinedProgrammeCode = studyRights?.combinedProgramme ?? sggCombinedProgramme ?? null
+
+  const includePrimaryProgramme =
+    variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
 
   const getCombinedProgrammeCredits = student =>
     student.studyplans?.find(plan => {
@@ -271,11 +274,6 @@ export const GeneralTabContainer = ({
 
   const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
 
-  const getProgrammesDisplayText = () =>
-    variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
-      ? 'Study programmes'
-      : 'Other programmes'
-
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>
       queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
@@ -326,6 +324,16 @@ export const GeneralTabContainer = ({
       .map(studyRight => studyRight.extentCode)
       .join(', ')
 
+  // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.
+  const getProgrammeList = ({ studentNumber }) => {
+    const other = studentToOtherProgrammesMap.get(studentNumber)
+    if (includePrimaryProgramme) {
+      const primary = studentToPrimaryProgrammeMap.get(studentNumber)
+      return [...(primary ? [primary] : []), ...(other ?? [])]
+    }
+    return other ?? []
+  }
+
   const {
     studentToStudyrightStartMap,
     studentToStudyrightEndMap,
@@ -357,7 +365,8 @@ export const GeneralTabContainer = ({
 
   const formatStudent = (student: any): FormattedStudentData => {
     const correctStudyRight = getStudyRight(student)
-    const otherProgrammes = studentToOtherProgrammesMap.get(student.studentNumber)
+    const programmesList = getProgrammeList(student)
+
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
@@ -378,7 +387,7 @@ export const GeneralTabContainer = ({
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
-      programmes: { programmes: otherProgrammes, exportValue: joinProgrammes(otherProgrammes, getTextIn, '; ') },
+      programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       programmeStatus: getStudyRightStatus(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
@@ -434,7 +443,7 @@ export const GeneralTabContainer = ({
         creditsSince: getCreditsSinceDisplayText(),
         creditsCombinedProg: getSecondaryProgCreditsDisplayText(),
         option: getOptionDisplayText(),
-        programmes: getProgrammesDisplayText(),
+        programmes: includePrimaryProgramme ? 'Study programmes' : 'Other programmes',
       }}
       formattedData={formattedData}
       group={group}

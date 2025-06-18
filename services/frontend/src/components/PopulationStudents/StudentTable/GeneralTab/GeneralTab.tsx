@@ -80,7 +80,6 @@ export const GeneralTab = ({
     'lastName',
     'firstNames',
     'programmes',
-    'programmeStatus',
     'creditsTotal',
     'studentNumber',
     'tvex',
@@ -94,6 +93,7 @@ export const GeneralTab = ({
 
   const studyGuidanceGroupWithProgrammeColumns = [
     'citizenships',
+    'programmeStatus',
     'creditsHops',
     'curriculumPeriod',
     'graduationDate',
@@ -120,6 +120,7 @@ export const GeneralTab = ({
     'graduationDate',
     'studyRightStart',
     'programmeStart',
+    'programmeStatus',
     'studyTrack',
     'gender',
     'citizenships',
@@ -144,6 +145,7 @@ export const GeneralTab = ({
     'studyTrack',
     'studyRightStart',
     'programmeStart',
+    'programmeStatus',
     'option',
     'semesterEnrollments',
     'graduationDate',
