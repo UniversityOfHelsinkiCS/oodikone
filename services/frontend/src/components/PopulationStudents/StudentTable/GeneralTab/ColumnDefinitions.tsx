@@ -67,7 +67,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         Header: (
           <TableHeaderWithTooltip
             header="Status"
-            tooltipText="Shows the status of the current semester enrollment of the student in the corresponding programme."
+            tooltipText="Shows the status of the studyright associated with the corresponding programme. Status is active only if an active semester enrollment for the ongoing semester exists."
           />
         ),
       }),

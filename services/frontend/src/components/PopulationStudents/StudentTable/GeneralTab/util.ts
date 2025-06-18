@@ -5,6 +5,7 @@ export type Programme = {
   code: string
   facultyCode: string
   graduated: boolean
+  cancelled: boolean
   name: Name
 }
 

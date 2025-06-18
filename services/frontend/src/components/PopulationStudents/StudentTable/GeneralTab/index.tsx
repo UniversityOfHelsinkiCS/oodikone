@@ -197,6 +197,7 @@ export const GeneralTabContainer = ({
     const primaryProgramme = studentToPrimaryProgrammeMap.get(studentNumber)
     if (!primaryProgramme) return null
     if (primaryProgramme.graduated) return 'Graduated'
+    if (primaryProgramme.cancelled) return 'Cancelled'
     if (primaryProgramme.active) return 'Active'
     return 'Inactive'
   }
