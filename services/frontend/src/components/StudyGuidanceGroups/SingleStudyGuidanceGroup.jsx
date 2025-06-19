@@ -17,7 +17,6 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
-import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -28,7 +27,7 @@ import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulat
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
-const SingleStudyGroupContent = ({ filteredStudents, courses, group }) => {
+const SingleStudyGroupContent = ({ filteredStudents, coursestatistics, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
 
@@ -47,7 +46,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, group }) => {
     },
   }
 
-  const filteredCourses = filterCourses(courses, filteredStudents)
+  const filteredCourses = filterCourses(coursestatistics, filteredStudents)
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -140,7 +139,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, group }) => {
   )
 }
 
-const SingleStudyGroupFilterView = ({ courses, group, population }) => {
+const SingleStudyGroupFilterView = ({ group, population }) => {
   const semesterQuery = useGetSemestersQuery()
   const allSemesters = semesterQuery.data?.semesters
   const viewFilters = [
@@ -154,7 +153,7 @@ const SingleStudyGroupFilterView = ({ courses, group, population }) => {
     filters.startYearAtUniFilter,
     filters.tagsFilter,
     filters.courseFilter({
-      courses: courses?.coursestatistics ?? [],
+      courses: population?.coursestatistics ?? [],
     }),
     filters.creditDateFilter,
     filters.creditsEarnedFilter,
@@ -232,10 +231,9 @@ const SingleStudyGroupFilterView = ({ courses, group, population }) => {
     >
       {filteredStudents => (
         <SingleStudyGroupContent
-          courses={courses}
+          coursestatistics={population?.coursestatistics}
           filteredStudents={filteredStudents}
           group={group}
-          population={population}
         />
       )}
     </FilterView>
@@ -277,14 +275,11 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   // Sorting is needed for RTK query cache to work properly
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() || []
-  const { data, isLoading } = useGetCustomPopulationQuery({
+  const { data: population, isLoading } = useGetCustomPopulationQuery({
     studentNumbers: groupStudentNumbers,
     tags: {
       studyProgramme: group?.tags?.studyProgramme,
     },
-  })
-  const { data: courses, isLoading: coursesAreLoading } = useGetPopulationCourseStatisticsQuery({
-    selectedStudents: groupStudentNumbers,
   })
 
   if (!group) {
@@ -302,11 +297,11 @@ export const SingleStudyGuidanceGroupContainer = ({ group }) => {
 
   return (
     <SingleStudyGroupViewWrapper group={group} isLoading={isLoading}>
-      {isLoading || coursesAreLoading ? (
+      {isLoading ? (
         <SegmentDimmer isLoading />
       ) : (
         <div style={{ marginTop: '1rem' }}>
-          <SingleStudyGroupFilterView courses={courses} group={group} population={data} />
+          <SingleStudyGroupFilterView group={group} population={population} />
         </div>
       )}
     </SingleStudyGroupViewWrapper>

@@ -27,7 +27,6 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
@@ -47,7 +46,7 @@ export const CoursePopulation = () => {
     location.search
   )
 
-  const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
+  const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
     to,
@@ -62,17 +61,8 @@ export const CoursePopulation = () => {
 
   const { progress } = useProgress(isFetching)
   const studentToTargetCourseDateMap = useMemo(
-    () => getStudentToTargetCourseDateMap(populationStatistics?.students ?? [], codes),
-    [populationStatistics?.students, codes]
-  )
-
-  const { data: courseStatistics } = useGetPopulationCourseStatisticsQuery(
-    {
-      selectedStudents: populationStatistics
-        ? populationStatistics.students.map(({ studentNumber }) => studentNumber)
-        : [],
-    },
-    { skip: !populationStatistics }
+    () => getStudentToTargetCourseDateMap(population?.students ?? [], codes),
+    [population?.students, codes]
   )
 
   const { data: semesters = {} } = useGetSemestersQuery()
@@ -105,7 +95,7 @@ export const CoursePopulation = () => {
 
   const subHeader = codes.join(', ')
 
-  if (!populationStatistics || !semesters) {
+  if (!population || !semesters) {
     return (
       <Segment className="contentSegment">
         <ProgressBar progress={progress} />
@@ -149,7 +139,9 @@ export const CoursePopulation = () => {
     },
     {
       title: 'Courses of population',
-      content: <CustomPopulationCoursesWrapper courseStatistics={courseStatistics} filteredStudents={filtered} />,
+      content: (
+        <CustomPopulationCoursesWrapper courseStatistics={population?.coursestatistics} filteredStudents={filtered} />
+      ),
     },
     {
       title: 'Credit gains',
@@ -176,7 +168,7 @@ export const CoursePopulation = () => {
         genderFilter,
         studentNumberFilter,
         ageFilter,
-        courseFilter({ courses: courseStatistics?.coursestatistics }),
+        courseFilter({ courses: population?.coursestatistics }),
         creditsEarnedFilter,
         startYearAtUniFilter,
         programmeFilter({
@@ -209,7 +201,7 @@ export const CoursePopulation = () => {
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
       name="CoursePopulation"
-      students={populationStatistics.students ?? []}
+      students={population.students ?? []}
     >
       {filtered => (
         <div className="segmentContainer">

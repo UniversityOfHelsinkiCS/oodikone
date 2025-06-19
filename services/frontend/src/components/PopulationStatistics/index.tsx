@@ -31,7 +31,6 @@ import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { DegreeProgramme } from '@/types/api/faculty'
@@ -79,17 +78,6 @@ const parseQueryFromUrl = (location): [boolean, Query] => {
   }
 
   return [skipQuery, query]
-}
-
-const mapStudentNumbersToStartingYears = samples => {
-  const years = [...new Set(samples.map(student => new Date(student.studyrightStart).getFullYear()))]
-  const studentsToYears = Object.fromEntries(years.map(y => [y, []]))
-
-  samples.forEach(student => {
-    studentsToYears[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
-  })
-
-  return studentsToYears
 }
 
 const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode) =>
@@ -154,35 +142,9 @@ export const PopulationStatistics = () => {
   const { data: allSemesters } = useGetSemestersQuery()
   const currentSemester = useCurrentSemester()
 
-  const { data: population, isFetching: populationFetching } = useGetPopulationStatisticsQuery(query, {
+  const { data: population, isFetching: isLoading } = useGetPopulationStatisticsQuery(query, {
     skip: skipQuery,
   })
-
-  const selectedStudents = useUserHasRestrictedAccess()
-    ? population?.students?.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
-    : population?.students?.map(({ studentNumber }) => studentNumber)
-
-  // // TODO: This should be used to fetch the "mandatory courses"
-  // const programmeCourses = useDeepMemo(() => {
-  //   if (!curriculum) {
-  //     return null
-  //   }
-  //   const mandatoryCourseCodes = curriculum.defaultProgrammeCourses.map(({ code }) => code)
-  //   const mandatoryCourseCodesSecondProg = curriculum.secondProgrammeCourses.map(({ code }) => code)
-  //   return [...mandatoryCourseCodes, ...mandatoryCourseCodesSecondProg]
-  // }, [curriculum])
-
-  // TODO: This implementation fetches ALL the courses for the population.
-  //       We want to only fetch the relevant or "mandatory courses" like in the old implementation.
-  const { data: courseData, isFetching: coursesFetching } = useGetPopulationCourseStatisticsQuery(
-    {
-      selectedStudents,
-      selectedStudentsByYear: mapStudentNumbersToStartingYears(population?.students ?? []),
-    },
-    { skip: skipQuery || !population }
-  )
-
-  const isLoading = populationFetching || coursesFetching
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query.studyRights
 
@@ -197,7 +159,7 @@ export const PopulationStatistics = () => {
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter : null,
     citizenshipFilter,
-    courseFilter({ courses: courseData?.coursestatistics }),
+    courseFilter({ courses: population?.coursestatistics }),
     creditDateFilter,
     creditsEarnedFilter,
     curriculumPeriodFilter,
@@ -291,7 +253,7 @@ export const PopulationStatistics = () => {
             />
             {!skipQuery && (
               <PopulationDetails
-                courses={courseData}
+                courses={population?.coursestatistics}
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
                 programmeCodes={[programmeCode, combinedProgrammeCode]}

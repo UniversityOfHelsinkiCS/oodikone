@@ -4,7 +4,7 @@ import { ParsedCourse } from '../../types'
 import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 import type { TaggetStudentData, StudentStudyPlan } from './getStudentData'
-import type { StudentEnrollmentObject, StudentCreditObject, AnonymousCredit } from './optimizedStatisticsOf'
+import type { AnonymousCredit, AnonymousEnrollment } from './optimizedStatisticsOf'
 import { getCurriculumVersion } from './shared'
 
 type CoursesSatisfied = Record<string, string | null>
@@ -91,8 +91,8 @@ const updateCreditCriteriaInfo = (
 
 export const formatStudentForAPI = (
   student: TaggetStudentData,
-  enrollments: StudentEnrollmentObject,
-  credits: StudentCreditObject,
+  enrollments: AnonymousEnrollment[],
+  credits: AnonymousCredit[],
   startDate: string,
   criteria: ProgressCriteria,
   code: string,
@@ -210,7 +210,7 @@ export const formatStudentForAPI = (
     const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
     if (criteria.courses || criteria.credits) {
-      const courses = credits[studentnumber]?.map(credit => parseCourse(credit, true)) ?? []
+      const courses = credits.map(credit => parseCourse(credit, true)) ?? []
 
       courses
         .filter(course => course.passed)
@@ -244,8 +244,8 @@ export const formatStudentForAPI = (
     started,
     studentNumber: studentnumber,
     credits: creditcount || 0,
-    courses: credits[studentnumber]?.map(credit => parseCourse(credit, false)) ?? [],
-    enrollments: enrollments[studentnumber],
+    courses: credits.map(credit => parseCourse(credit, false)),
+    enrollments,
     name: abbreviatedname,
     gender_code,
     email,
