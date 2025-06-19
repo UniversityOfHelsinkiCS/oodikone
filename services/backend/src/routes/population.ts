@@ -129,24 +129,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
         })
       )
 
-      const populationStudentsMerger = (multiYearStudents: any) => {
-        const samples = { students: [], courses: [] as any[] }
-        const uniqueCourseCodes = new Set<string>()
-
-        for (const year of multiYearStudents) {
-          samples.students = samples.students.concat(year.students)
-          for (const course of year.courses) {
-            if (!uniqueCourseCodes.has(course.code)) {
-              uniqueCourseCodes.add(course.code)
-              samples.courses.push(course)
-            }
-          }
-        }
-
-        return samples
-      }
-
-      result = populationStudentsMerger(await multiYearStudents)
+      result = { students: (await multiYearStudents).flatMap(({ students }) => students) }
     } else {
       result = await optimizedStatisticsOf({
         ...req.query,

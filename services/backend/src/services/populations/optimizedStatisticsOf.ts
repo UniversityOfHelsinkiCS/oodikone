@@ -10,7 +10,6 @@ import {
   getStudents,
   getStudentTags,
   creditFilterBuilder,
-  getCourses,
   getEnrollments,
   getCredits,
 } from './getStudentData'
@@ -105,9 +104,8 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
     startDate,
     dateMonthsFromNow(startDate, months)
   )
-  const [students, courses, enrollments, credits] = await Promise.all([
+  const [students, enrollments, credits] = await Promise.all([
     getStudents(studentNumbers),
-    getCourses(creditsFilter),
     getEnrollments(studentNumbers, startDate, dateMonthsFromNow(startDate, months)),
     getCredits(creditsFilter),
   ])
@@ -130,20 +128,17 @@ export const optimizedStatisticsOf = async (query: OptimizedStatisticsQuery, stu
   })
 
   return {
-    students: students
-      .map(student => ({ ...student, tags: tagList[student.studentnumber] }))
-      .map(student =>
-        formatStudentForAPI(
-          student,
-          enrollmentsByStudent,
-          creditsByStudent,
-          startDate,
-          endDate,
-          criteria,
-          code,
-          optionData
-        )
-      ),
-    courses,
+    students: students.map(student =>
+      formatStudentForAPI(
+        { ...student, tags: tagList[student.studentnumber] },
+        enrollmentsByStudent,
+        creditsByStudent,
+        startDate,
+        endDate,
+        criteria,
+        code,
+        optionData
+      )
+    ),
   }
 }

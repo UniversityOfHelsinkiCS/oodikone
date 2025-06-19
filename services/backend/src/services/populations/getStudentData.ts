@@ -1,9 +1,8 @@
-import { literal, Op, type WhereOptions } from 'sequelize'
+import { Op, type WhereOptions } from 'sequelize'
 
 import { EnrollmentState } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import {
-  CourseModel,
   CreditModel,
   EnrollmentModel,
   StudentModel,
@@ -70,20 +69,6 @@ export const creditFilterBuilder = async (
     [Op.or]: [{ attainment_date: { [Op.between]: [attainmentDateFrom, endDate] } }, { course_code: courseCodes }],
   }
 }
-
-export type StudentCourse = Pick<CourseModel, 'code' | 'name'>
-export const getCourses = (creditFilter: WhereOptions): Promise<Array<StudentCourse>> =>
-  CourseModel.findAll({
-    attributes: [[literal('DISTINCT ON("code") code'), 'code'], 'name'],
-    include: [
-      {
-        model: CreditModel,
-        attributes: [],
-        where: creditFilter,
-      },
-    ],
-    raw: true,
-  })
 
 export type StudentEnrollment = Pick<
   EnrollmentModel,
