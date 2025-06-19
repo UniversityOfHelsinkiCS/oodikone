@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
 
+import type { EncrypterData } from '@oodikone/shared/types'
 import { CRYPT_KEY } from '../config'
 
 const algorithm = 'aes-256-cbc'
@@ -17,7 +18,6 @@ export const encrypt = (text: string) => {
   }
 }
 
-export type EncrypterData = { iv: string; encryptedData: string }
 export const decrypt = (data: EncrypterData) => {
   if (!CRYPT_KEY) throw Error('Define crypt key in environment variables')
   const iv = Buffer.from(data.iv, 'hex')

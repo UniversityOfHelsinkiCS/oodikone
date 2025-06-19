@@ -4,9 +4,38 @@ import { Op, QueryTypes } from 'sequelize'
 import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
 import { CreditModel, EnrollmentModel, SISStudyRightModel, SISStudyRightElementModel } from '../../models'
+import { SemesterStart } from '../../util/semester'
 
 const { sequelize } = dbConnections
 
+type QueryParams = {
+  semesters: string[]
+  years: string[]
+}
+
+type ParsedQueryParams = {
+  startDate: string
+  endDate: string
+}
+
+export const parseDateRangeFromParams = (query: QueryParams): ParsedQueryParams => {
+  const { semesters, years } = query
+  const startingYear = Math.min(...years.map(y => +y))
+  const endingYear = Math.max(...years.map(y => +y))
+
+  const hasFall = semesters.includes('FALL')
+  const hasSpring = semesters.includes('SPRING')
+
+  const startDate = hasFall
+    ? new Date(`${startingYear}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${startingYear + 1}-${SemesterStart.SPRING}`).toISOString()
+
+  const endDate = hasSpring
+    ? new Date(`${endingYear + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${endingYear + 1}-${SemesterStart.SPRING}`).toISOString()
+
+  return { startDate, endDate }
+}
 export const getCurriculumVersion = (curriculumPeriodId: string) => {
   if (!curriculumPeriodId) {
     return null
@@ -78,66 +107,13 @@ export type EnrollmentsQueryResult = Array<{
   enrollments: Array<Pick<EnrollmentModel, 'studentnumber' | 'state' | 'enrollment_date_time'>> | null
 }>
 
-type CreditPick = Pick<
-  CreditModel,
-  'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode' | 'course_code'
->
+type CreditPick = Pick<CreditModel, 'grade' | 'student_studentnumber' | 'attainment_date' | 'credittypecode'>
 
 export type CoursesQueryResult = Array<
   EnrollmentsQueryResult[number] & {
     credits: Array<CreditPick>
   }
 >
-
-const findDefinedCourseStatsForStudents = `
-  SELECT
-    course.code,
-    course.name,
-    course.substitutions,
-    course.main_course_code,
-    enrollment.data AS enrollments,
-    credit.data AS credits
-  FROM course
-  LEFT JOIN (
-    SELECT
-      course_code,
-      ARRAY_AGG(JSONB_BUILD_OBJECT(
-        'studentnumber', studentnumber,
-        'state', state,
-        'enrollment_date_time', enrollment_date_time
-      )) AS data
-    FROM enrollment
-    WHERE studentnumber IN (:studentnumbers)
-      AND state = :enrollmentState
-    GROUP BY course_code
-  ) AS enrollment
-    ON enrollment.course_code = course.code
-  LEFT JOIN (
-    SELECT
-      course_code,
-      ARRAY_AGG(JSONB_BUILD_OBJECT(
-        'grade', grade,
-        'student_studentnumber', student_studentnumber,
-        'attainment_date', attainment_date,
-        'credittypecode', credittypecode,
-        'course_code', course_code
-      )) AS data
-    FROM credit
-    WHERE student_studentnumber IN (:studentnumbers)
-    GROUP BY course_code
-  ) AS credit
-    ON credit.course_code = course.code
-  WHERE
-    (
-      course.code IN (:courseCodes)
-      OR (
-        SELECT
-          JSONB_AGG(DISTINCT alt_code)
-        FROM course, LATERAL JSONB_ARRAY_ELEMENTS(substitutions) as alt_code
-        WHERE code IN (:courseCodes)
-      ) ? course.code
-    ) AND (enrollment.data IS NOT NULL OR credit.data IS NOT NULL)
-`
 
 const findAllCourseStatsForStudents = `
   SELECT
@@ -169,8 +145,7 @@ const findAllCourseStatsForStudents = `
         'grade', grade,
         'student_studentnumber', student_studentnumber,
         'attainment_date', attainment_date,
-        'credittypecode', credittypecode,
-        'course_code', course_code
+        'credittypecode', credittypecode
       )) AS data
     FROM credit
     WHERE student_studentnumber IN (:studentnumbers)
@@ -181,11 +156,10 @@ const findAllCourseStatsForStudents = `
     enrollment.data IS NOT NULL OR credit.data IS NOT NULL
 `
 
-export const findCourses = async (studentNumbers: string[], courses: string[] = []) => {
-  return sequelize.query(courses.length ? findDefinedCourseStatsForStudents : findAllCourseStatsForStudents, {
+export const findCourses = async (studentNumbers: string[]) => {
+  return sequelize.query(findAllCourseStatsForStudents, {
     replacements: {
       studentnumbers: studentNumbers.length > 0 ? studentNumbers : ['DUMMY'],
-      courseCodes: courses.length ? courses : ['DUMMY'],
       enrollmentState: EnrollmentState.ENROLLED,
     },
     type: QueryTypes.SELECT,

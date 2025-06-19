@@ -1,3 +1,4 @@
+import { CourseStatistics } from '@oodikone/shared/routes/populations'
 import { Name, EnrollmentState } from '@oodikone/shared/types'
 
 const lengthOf = (obj: object) => Object.keys(obj).length
@@ -91,13 +92,6 @@ type Grades = {
       failingGrade: boolean
     }
   }
-}
-
-export type CourseStatistics = {
-  stats: Stats
-  students: Students
-  course: Course
-  grades: Grades
 }
 
 export class CourseStatsCounter {

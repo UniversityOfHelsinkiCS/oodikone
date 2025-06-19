@@ -27,10 +27,11 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
@@ -65,8 +66,12 @@ export const CoursePopulation = () => {
     [populationStatistics?.students, codes]
   )
 
-  const { data: courseStatistics } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: populationStatistics ? populationStatistics.students.map(student => student.studentNumber) : [] },
+  const { data: courseStatistics } = useGetPopulationCourseStatisticsQuery(
+    {
+      selectedStudents: populationStatistics
+        ? populationStatistics.students.map(({ studentNumber }) => studentNumber)
+        : [],
+    },
     { skip: !populationStatistics }
   )
 
@@ -223,22 +228,19 @@ export const CoursePopulation = () => {
   )
 }
 
-const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
-  const { data: courseStatistics, isLoading } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: filteredStudents.map(student => student.studentNumber),
-  })
-
+const CustomPopulationCoursesWrapper = ({ courseStatistics, filteredStudents }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
-  useEffect(() => {
-    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
+  const filteredCourses = useMemo(
+    () => filterCourses(courseStatistics, filteredStudents),
+    [courseStatistics, filteredStudents]
+  )
+
+  useEffect(() => setStudentAmountLimit(Math.round(filteredStudents.length * 0.3)), [filteredStudents.length])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
-  if (isLoading) return null
 
   return (
     <>
@@ -253,11 +255,7 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
           />
         </Form.Field>
       </Form>
-      <PopulationCourseStatsFlat
-        courses={courseStatistics}
-        filteredStudents={filteredStudents}
-        studentAmountLimit={studentAmountLimit}
-      />
+      <PopulationCourseStatsFlat courses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
 }

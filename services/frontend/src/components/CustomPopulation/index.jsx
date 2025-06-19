@@ -25,10 +25,11 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
+import { useGetPopulationCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { filterCourses } from '@/util/courseOfPopulation'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -43,9 +44,9 @@ export const CustomPopulation = () => {
   const { data } = useGetSemestersQuery()
   const allSemesters = data?.semesters ?? []
 
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: customPopulationState.studentNumbers },
-    { skip: !customPopulationState.studentNumbers.length }
+  const { data: courseStats } = useGetPopulationCourseStatisticsQuery(
+    { selectedStudents: customPopulationState.studentNumbers },
+    { skip: !customPopulationState.selectedSearch || !customPopulationState.studentNumbers.length }
   )
 
   const { data: studentData, isFetching } = useGetCustomPopulationQuery(
@@ -87,6 +88,7 @@ export const CustomPopulation = () => {
     <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>
       {filteredStudents => (
         <CustomPopulationContent
+          courseStats={courseStats}
           customPopulationState={customPopulationState}
           filteredStudents={filteredStudents}
           isFetchingPopulation={isFetching}
@@ -100,6 +102,7 @@ export const CustomPopulation = () => {
 
 const CustomPopulationContent = ({
   filteredStudents,
+  courseStats,
   customPopulationState,
   studentData,
   setCustomPopulationState,
@@ -120,10 +123,7 @@ const CustomPopulationContent = ({
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: filteredStudents.map(student => student.studentNumber) },
-    { skip: !filteredStudents.map(student => student.studentNumber).length }
-  )
+  const filteredCourses = filterCourses(courseStats, filteredStudents)
 
   const { progress } = useProgress(isFetchingPopulation)
 
@@ -157,7 +157,7 @@ const CustomPopulationContent = ({
             </Form.Field>
           </Form>
           <PopulationCourseStatsFlat
-            courses={courseStats}
+            courses={filteredCourses}
             filteredStudents={filteredStudents}
             studentAmountLimit={studentAmountLimit}
           />

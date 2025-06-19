@@ -19,7 +19,7 @@ export const PopulationQueryCard = ({ query, skipQuery }) => {
   if (!students.length) return null
 
   return (
-    <Card style={{ minWidth: '500px', padding: '0.5em', margin: '0.5em 0' }}>
+    <Card id={'query-card'} style={{ minWidth: '500px', padding: '0.5em', margin: '0.5em 0' }}>
       <Card.Header>
         <div>Result details</div>
       </Card.Header>

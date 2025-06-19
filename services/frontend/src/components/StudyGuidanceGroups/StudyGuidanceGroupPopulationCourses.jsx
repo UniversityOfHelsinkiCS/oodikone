@@ -35,7 +35,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats courses={courses} mandatoryCourses={curriculum} />
+        <PopulationCourseStats courses={courses} curriculum={curriculum} />
       ) : (
         <>
           {!curriculumsAvailable && (
@@ -50,12 +50,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
               </Form.Field>
             </Form>
           )}
-          <PopulationCourseStatsFlat
-            courses={courses}
-            filteredStudents={filteredStudents}
-            pending={false}
-            studentAmountLimit={studentAmountLimit}
-          />
+          <PopulationCourseStatsFlat courses={courses} studentAmountLimit={studentAmountLimit} />
         </>
       )}
     </Segment>
