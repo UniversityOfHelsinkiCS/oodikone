@@ -17,7 +17,7 @@ export const FilterActiveNote = () => {
     filterDispatch(transferredToProgrammeFilter.actions.set(null))
   }
 
-  if (clicked) return <></>
+  if (clicked) return null
 
   return (
     <Card sx={{ mt: '2.25rem', backgroundColor: blue[50] }} variant="outlined">

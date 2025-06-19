@@ -34,7 +34,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
           <FormControlLabel
             control={
               <Switch
-                checked={onlyHopsCredit && (bothHopsSelected || !combinedHopsSelected)}
+                checked={onlyHopsCredit && (bothHopsSelected ?? !combinedHopsSelected)}
                 onChange={() => filterDispatch(hopsFilter.actions.toggle(undefined))}
               />
             }
