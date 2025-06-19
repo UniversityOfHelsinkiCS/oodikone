@@ -20,6 +20,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
 
   return (
     <Section
+      cypress="PopulationSearch"
       infoBoxContent={!populationFound ? populationStatisticsToolTips.search : undefined}
       title={skipQuery && 'Search for class'}
     >
