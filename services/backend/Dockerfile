@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal AS build
+FROM registry.access.redhat.com/ubi10/nodejs-22-minimal AS build
 
 ENV TZ="Europe/Helsinki"
 
@@ -29,7 +29,7 @@ RUN npm ci --include=dev --prefix shared && npm ci --include=dev --prefix backen
 RUN npm run build --prefix shared && npm run build --prefix backend
 
 
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal
+FROM registry.access.redhat.com/ubi10/nodejs-22-minimal
 
 ENV TZ="Europe/Helsinki"
 
