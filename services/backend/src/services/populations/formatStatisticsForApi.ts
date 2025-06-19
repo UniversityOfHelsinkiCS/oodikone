@@ -94,13 +94,11 @@ export const formatStudentForAPI = (
   enrollments: StudentEnrollmentObject,
   credits: StudentCreditObject,
   startDate: string,
-  endDate: string,
   criteria: ProgressCriteria,
   code: string,
   optionData: Record<string, { name: Name }>
 ) => {
   const startDateFromISO = new Date(startDate)
-  const endDateFromISO = new Date(endDate)
 
   const {
     firstnames,
@@ -123,7 +121,6 @@ export const formatStudentForAPI = (
   } = student
 
   const started = dateofuniversityenrollment
-  const starting = +startDateFromISO <= +started && +started <= +endDateFromISO
 
   const criteriaCoursesBySubstitutions: Record<string, string> = Object.fromEntries(
     Object.entries(criteria.allCourses).flatMap(([courseCode, substitutionCodes]) => [
@@ -257,7 +254,6 @@ export const formatStudentForAPI = (
     updatedAt,
     tags,
     studyrightStart: startDate,
-    starting,
     option,
     birthdate,
     studyplans,

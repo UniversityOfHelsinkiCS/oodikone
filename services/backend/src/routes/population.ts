@@ -16,7 +16,10 @@ import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '..
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { bottlenecksOf } from '../services/populations/bottlenecksOf'
+import { getStudentTags } from '../services/populations/getStudentData'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
+import { parseDateRangeFromParams } from '../services/populations/shared'
+import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
 import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
@@ -67,7 +70,6 @@ export type PopulationstatisticsQuery = {
   // NOTE: This param is a JSON -object
   studyRights: string
   year: string
-  months?: string
   years?: string[]
 }
 
@@ -76,8 +78,6 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user
     const { year, semesters, studyRights: requestedStudyRightsJSON, studentStatuses } = req.query
-
-    const months = req.query.months ?? '12'
 
     // NOTE: `year` isn't needed anymore if `years` is defined
     const requiredFields = [year, semesters, requestedStudyRightsJSON]
@@ -112,33 +112,22 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    let result
-    if (req.query.years) {
-      const upperYearBound = new Date().getFullYear() + 1
-      const multiYearStudents = Promise.all(
-        req.query.years.map(year => {
-          const yearAsNumber = +year
-          const monthsForCurrentYear = String((upperYearBound - yearAsNumber) * 12)
-          return optimizedStatisticsOf({
-            ...req.query,
-            userId,
-            studyRights: requestedStudyRights.programme,
-            year,
-            months: monthsForCurrentYear,
-          })
-        })
-      )
+    const { startDate, endDate } = parseDateRangeFromParams({
+      ...req.query,
+      years: req.query.years ?? [req.query.year],
+    })
 
-      result = { students: (await multiYearStudents).flatMap(({ students }) => students) }
-    } else {
-      result = await optimizedStatisticsOf({
-        ...req.query,
-        userId,
-        studyRights: requestedStudyRights.programme,
-        year,
-        months,
-      })
-    }
+    const studentNumbers = await getStudentNumbersWithStudyRights({
+      studyRights: [requestedStudyRights.programme],
+      startDate,
+      endDate,
+      studentStatuses,
+    })
+
+    const studyRights = [requestedStudyRights.programme]
+    const tagList = await getStudentTags(studyRights, studentNumbers, userId)
+
+    const result = await optimizedStatisticsOf(studentNumbers, studyRights, tagList, startDate)
 
     // Obfuscate if user has only limited study programme rights and there are any students
     if (
@@ -206,17 +195,11 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     separate,
     unifyCourses
   )
-  const result: any = await optimizedStatisticsOf(
-    {
-      // Useless, because studentnumbers are already filtered above by from & to.
-      // We should probably refactor this to avoid more confusement.
-      userId,
-      year: '1900',
-      studyRights: undefined,
-      semesters: ['FALL', 'SPRING'],
-    },
-    studentNumbers
-  )
+
+  const studyRights = []
+  const tagList = await getStudentTags(studyRights, studentNumbers, userId)
+
+  const result: any = await optimizedStatisticsOf(studentNumbers, studyRights, tagList)
   let courseProviders: string[] = []
   if (!hasFullAccessToStudentData(roles)) {
     courseProviders = await getCourseProvidersForCourses(JSON.parse(coursecodes))
@@ -285,15 +268,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
 
   const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
-  const result = await optimizedStatisticsOf(
-    {
-      userId,
-      year: tags?.year ?? '1900',
-      studyRights: studyProgrammeCode,
-      semesters: ['FALL', 'SPRING'],
-    },
-    filteredStudentNumbers
-  )
+  const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
+  const tagList = await getStudentTags(studyRights, filteredStudentNumbers, userId)
+
+  const { startDate } = tags?.year
+    ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
+    : { startDate: undefined }
+
+  const result = await optimizedStatisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
 
   const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
   const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)

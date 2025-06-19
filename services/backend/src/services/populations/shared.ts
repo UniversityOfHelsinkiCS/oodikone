@@ -4,9 +4,38 @@ import { Op, QueryTypes } from 'sequelize'
 import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
 import { dbConnections } from '../../database/connection'
 import { CreditModel, EnrollmentModel, SISStudyRightModel, SISStudyRightElementModel } from '../../models'
+import { SemesterStart } from '../../util/semester'
 
 const { sequelize } = dbConnections
 
+type QueryParams = {
+  semesters: string[]
+  years: string[]
+}
+
+type ParsedQueryParams = {
+  startDate: string
+  endDate: string
+}
+
+export const parseDateRangeFromParams = (query: QueryParams): ParsedQueryParams => {
+  const { semesters, years } = query
+  const startingYear = Math.min(...years.map(y => +y))
+  const endingYear = Math.max(...years.map(y => +y))
+
+  const hasFall = semesters.includes('FALL')
+  const hasSpring = semesters.includes('SPRING')
+
+  const startDate = hasFall
+    ? new Date(`${startingYear}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${startingYear + 1}-${SemesterStart.SPRING}`).toISOString()
+
+  const endDate = hasSpring
+    ? new Date(`${endingYear + 1}-${SemesterStart.FALL}`).toISOString()
+    : new Date(`${endingYear + 1}-${SemesterStart.SPRING}`).toISOString()
+
+  return { startDate, endDate }
+}
 export const getCurriculumVersion = (curriculumPeriodId: string) => {
   if (!curriculumPeriodId) {
     return null
