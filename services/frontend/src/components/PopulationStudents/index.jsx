@@ -134,7 +134,7 @@ const PopulationStudents = ({
   criteria,
   dataExport,
   filteredStudents,
-  courses,
+  filteredCourses,
   from,
   to,
   months: initMonths,
@@ -177,7 +177,7 @@ const PopulationStudents = ({
       <Panes
         combinedProgramme={combinedProgramme}
         coursecode={coursecode}
-        courses={courses}
+        courses={filteredCourses}
         criteria={criteria}
         curriculum={curriculum}
         customPopulationProgramme={customPopulationProgramme}

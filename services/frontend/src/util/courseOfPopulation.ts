@@ -25,10 +25,14 @@ const getFinalStats = (course, populationCount) => {
   return stats
 }
 
-export const filterCourses = (courseStatistics = [], filteredStudents = []) => {
-  const courses = courseStatistics.map((course: object) => {
-    return { ...course, stats: getFinalStats(course, filteredStudents.length) }
-  })
+export const filterCourses = (courseStatistics: any[], filteredStudents: any[]) => {
+  const courses = courseStatistics
+    .filter(course =>
+      course.students.all.some(student => !!filteredStudents.find(({ studentNumber: other }) => other == student))
+    )
+    .map((course: object) => {
+      return { ...course, stats: getFinalStats(course, filteredStudents.length) }
+    })
 
-  return { coursestatistics: courses }
+  return courses
 }

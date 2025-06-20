@@ -10,13 +10,12 @@ import { PopulationStudentsContainer as PopulationStudents } from '@/components/
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { getFullStudyProgrammeRights } from '@/util/access'
-import { filterCourses } from '@/util/courseOfPopulation'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
-export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, courses }) => {
+export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, filteredCourses }) => {
   const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
@@ -38,8 +37,6 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   if (isLoading || !Object.keys(query).length) {
     return null
   }
-
-  const filteredCourses = filterCourses(courses, filteredStudents)
 
   const onlyIamRights =
     !authLoading &&
@@ -93,8 +90,8 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           />
           <PopulationCourses
             courseTableMode={courseTableMode}
-            courses={filteredCourses}
             curriculum={curriculum}
+            filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             isPending={isLoading}
             onlyIamRights={onlyIamRights}
@@ -111,9 +108,9 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           content: (
             <div>
               <PopulationStudents
-                courses={filteredCourses}
                 criteria={criteria?.data}
                 curriculum={curriculum}
+                filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
                 months={query?.months ?? 0}
                 programmeCode={programme}

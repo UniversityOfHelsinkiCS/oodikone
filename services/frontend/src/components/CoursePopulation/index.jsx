@@ -30,7 +30,6 @@ import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
-import { filterCourses } from '@/util/courseOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
@@ -103,7 +102,7 @@ export const CoursePopulation = () => {
     )
   }
 
-  const createPanels = filtered => [
+  const createPanels = (filteredStudents, filteredCourses) => [
     {
       title: 'Grade distribution',
       content: (
@@ -113,7 +112,7 @@ export const CoursePopulation = () => {
             courseCodes={codes}
             from={dateFrom}
             singleCourseStats={courseData}
-            students={filtered}
+            students={filteredStudents}
             to={dateTo}
           />
         </div>
@@ -124,7 +123,7 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.languageDistributionCoursePopulation} />
-          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filtered} to={dateTo} />
+          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filteredStudents} to={dateTo} />
         </div>
       ),
     },
@@ -133,26 +132,26 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.programmeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filtered} to={dateTo} />
+          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
         </div>
       ),
     },
     {
       title: 'Courses of population',
-      content: (
-        <CustomPopulationCoursesWrapper courseStatistics={population?.coursestatistics} filteredStudents={filtered} />
-      ),
+      content: <CustomPopulationCoursesWrapper filteredCourses={filteredCourses} filteredStudents={filteredStudents} />,
     },
     {
       title: 'Credit gains',
-      content: <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filtered} to={dateTo} />,
+      content: (
+        <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+      ),
     },
     {
-      title: `Students (${filtered.length})`,
+      title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
           coursecode={codes}
-          filteredStudents={filtered}
+          filteredStudents={filteredStudents}
           from={dateFrom}
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           to={dateTo}
@@ -164,6 +163,7 @@ export const CoursePopulation = () => {
 
   return (
     <FilterView
+      courses={population?.coursestatistics ?? []}
       filters={[
         genderFilter,
         studentNumberFilter,
@@ -201,9 +201,9 @@ export const CoursePopulation = () => {
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
       name="CoursePopulation"
-      students={population.students ?? []}
+      students={population?.students ?? []}
     >
-      {filtered => (
+      {(filteredStudents, filteredCourses) => (
         <div className="segmentContainer">
           <Segment className="contentSegment">
             <Header className="segmentTitle" size="large" textAlign="center">
@@ -212,7 +212,7 @@ export const CoursePopulation = () => {
             <Header className="segmentTitle" size="medium" textAlign="center">
               {subHeader}
             </Header>
-            <PanelView panels={createPanels(filtered)} viewTitle="coursepopulation" />
+            <PanelView panels={createPanels(filteredStudents, filteredCourses)} viewTitle="coursepopulation" />
           </Segment>
         </div>
       )}
@@ -220,13 +220,8 @@ export const CoursePopulation = () => {
   )
 }
 
-const CustomPopulationCoursesWrapper = ({ courseStatistics, filteredStudents }) => {
+const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-
-  const filteredCourses = useMemo(
-    () => filterCourses(courseStatistics, filteredStudents),
-    [courseStatistics, filteredStudents]
-  )
 
   useEffect(() => setStudentAmountLimit(Math.round(filteredStudents.length * 0.3)), [filteredStudents.length])
 
@@ -247,7 +242,7 @@ const CustomPopulationCoursesWrapper = ({ courseStatistics, filteredStudents }) 
           />
         </Form.Field>
       </Form>
-      <PopulationCourseStatsFlat courses={filteredCourses} studentAmountLimit={studentAmountLimit} />
+      <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
 }

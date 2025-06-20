@@ -10,7 +10,7 @@ import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 export const PopulationCourses = ({
   isPending,
   query,
-  courses,
+  filteredCourses,
   filteredStudents,
   onlyIamRights,
   curriculum,
@@ -37,14 +37,14 @@ export const PopulationCourses = ({
     <SegmentDimmer isLoading={isPending} />
     {courseTableMode === 'curriculum' ? (
       <PopulationCourseStats
-        courses={courses ?? []}
         curriculum={curriculum}
+        filteredCourses={filteredCourses}
         onlyIamRights={onlyIamRights}
         pending={isPending}
       />
     ) : (
       <PopulationCourseStatsFlat
-        courses={isPending ? null : (courses ?? [])}
+        filteredCourses={filteredCourses}
         filteredStudents={filteredStudents}
         studentAmountLimit={studentAmountLimit}
       />

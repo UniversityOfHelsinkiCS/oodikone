@@ -28,7 +28,6 @@ import { useTitle } from '@/hooks/title'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { filterCourses } from '@/util/courseOfPopulation'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -79,10 +78,17 @@ export const CustomPopulation = () => {
   }, [population, allSemesters, associatedProgramme])
 
   return (
-    <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>
-      {filteredStudents => (
+    <FilterView
+      courses={population?.coursestatistics ?? []}
+      displayTray={custompop.length > 0}
+      filters={filters}
+      name="CustomPopulation"
+      students={custompop}
+    >
+      {(filteredStudents, filteredCourses) => (
         <CustomPopulationContent
           customPopulationState={customPopulationState}
+          filteredCourses={filteredCourses}
           filteredStudents={filteredStudents}
           isFetchingPopulation={isFetching}
           population={population}
@@ -95,6 +101,7 @@ export const CustomPopulation = () => {
 
 const CustomPopulationContent = ({
   filteredStudents,
+  filteredCourses,
   customPopulationState,
   population,
   setCustomPopulationState,
@@ -114,8 +121,6 @@ const CustomPopulationContent = ({
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
-  const filteredCourses = filterCourses(population?.coursestatistics, filteredStudents)
 
   const { progress } = useProgress(isFetchingPopulation)
 
@@ -149,7 +154,7 @@ const CustomPopulationContent = ({
             </Form.Field>
           </Form>
           <PopulationCourseStatsFlat
-            courses={filteredCourses}
+            filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             studentAmountLimit={studentAmountLimit}
           />

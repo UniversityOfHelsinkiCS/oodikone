@@ -21,13 +21,12 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { filterCourses } from '@/util/courseOfPopulation'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
-const SingleStudyGroupContent = ({ filteredStudents, coursestatistics, group }) => {
+const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const [curriculum, setCurriculum] = useState(null)
 
@@ -45,8 +44,6 @@ const SingleStudyGroupContent = ({ filteredStudents, coursestatistics, group }) 
       combinedProgramme: programmeCodes[1] ? programmeCodes[1] : undefined,
     },
   }
-
-  const filteredCourses = filterCourses(coursestatistics, filteredStudents)
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -104,8 +101,8 @@ const SingleStudyGroupContent = ({ filteredStudents, coursestatistics, group }) 
       content: (
         <div>
           <StudyGuidanceGroupPopulationCourses
-            courses={filteredCourses}
             curriculum={curriculum}
+            filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             setCurriculum={setCurriculum}
             studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
@@ -119,9 +116,9 @@ const SingleStudyGroupContent = ({ filteredStudents, coursestatistics, group }) 
       content: (
         <div>
           <PopulationStudents
-            courses={filteredCourses}
             criteria={criteria}
             curriculum={curriculum}
+            filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
@@ -224,17 +221,14 @@ const SingleStudyGroupFilterView = ({ group, population }) => {
 
   return (
     <FilterView
+      courses={population?.coursestatistics ?? []}
       filters={viewFilters}
       initialOptions={initialOptions}
       name={`StudyGuidanceGroup(${group.id})`}
       students={population?.students ?? []}
     >
-      {filteredStudents => (
-        <SingleStudyGroupContent
-          coursestatistics={population?.coursestatistics}
-          filteredStudents={filteredStudents}
-          group={group}
-        />
+      {(filteredStudents, filteredCourses) => (
+        <SingleStudyGroupContent filteredCourses={filteredCourses} filteredStudents={filteredStudents} group={group} />
       )}
     </FilterView>
   )

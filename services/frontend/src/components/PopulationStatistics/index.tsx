@@ -139,9 +139,6 @@ export const PopulationStatistics = () => {
   useTitle('Class statistics')
   const [skipQuery, query] = parseQueryFromUrl(useLocation())
 
-  const { data: allSemesters } = useGetSemestersQuery()
-  const currentSemester = useCurrentSemester()
-
   const { data: population, isFetching: isLoading } = useGetPopulationStatisticsQuery(query, {
     skip: skipQuery,
   })
@@ -155,6 +152,9 @@ export const PopulationStatistics = () => {
 
   const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
   const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
+
+  const { data: allSemesters } = useGetSemestersQuery()
+  const currentSemester = useCurrentSemester()
 
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter : null,
@@ -225,13 +225,14 @@ export const PopulationStatistics = () => {
 
   return (
     <FilterView
+      courses={population?.coursestatistics ?? []}
       displayTray={!skipQuery}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
       students={students}
     >
-      {filteredStudents => (
+      {(filteredStudents, filteredCourses) => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
             {title} {!skipQuery && showBachelorAndMaster && '(Bachelor + Master view)'}
@@ -253,7 +254,7 @@ export const PopulationStatistics = () => {
             />
             {!skipQuery && (
               <PopulationDetails
-                courses={population?.coursestatistics}
+                filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
                 programmeCodes={[programmeCode, combinedProgrammeCode]}

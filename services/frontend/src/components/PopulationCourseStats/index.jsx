@@ -17,18 +17,18 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
-export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRights }) => {
+export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, onlyIamRights }) => {
   const dispatch = useAppDispatch()
   const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const { handleTabChange } = useTabChangeAnalytics()
 
   useEffect(() => {
-    const coursestatistics = courses.coursestatistics ?? []
+    const modules = {}
 
-    const filteredCourses =
-      coursestatistics && curriculum
-        ? coursestatistics
+    const programmeCourses =
+      filteredCourses && curriculum
+        ? filteredCourses
             .filter(course => visibleCoursesFilter(course, curriculum))
             // it needs to be with flatMap and filter and not map and find
             // because there can be many mandatoryCourses with the same course code
@@ -47,9 +47,7 @@ export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRig
             })
         : []
 
-    const modules = {}
-
-    filteredCourses?.forEach(course => {
+    programmeCourses.forEach(course => {
       if (!modules[course.parent_code]) {
         modules[course.parent_code] = {
           module: { code: course.parent_code, name: course.parent_name },
@@ -74,7 +72,7 @@ export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRig
         item => item.module.code
       )
     )
-  }, [courses.coursestatistics, curriculum])
+  }, [filteredCourses, curriculum])
 
   const onGoToCourseStatisticsClick = () => {
     dispatch(clearCourseStats())
@@ -98,7 +96,7 @@ export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRig
 
   const contextValue = {
     modules,
-    courseStatistics: courses.coursestatistics,
+    courseStatistics: filteredCourses,
     onGoToCourseStatisticsClick,
     toggleGroupExpansion,
     expandedGroups,
@@ -131,7 +129,7 @@ export const PopulationCourseStats = ({ curriculum, courses, pending, onlyIamRig
     },
   ]
 
-  if (!courses || pending) {
+  if (!filteredCourses || pending) {
     return null
   }
 

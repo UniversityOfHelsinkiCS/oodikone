@@ -6,7 +6,7 @@ import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/Po
 import { CourseTableModeSelector } from '@/components/PopulationDetails/CourseTableModeSelector'
 
 export const StudyGuidanceGroupPopulationCourses = ({
-  courses,
+  filteredCourses,
   filteredStudents,
   studyProgramme,
   year,
@@ -35,7 +35,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats courses={courses} curriculum={curriculum} />
+        <PopulationCourseStats curriculum={curriculum} filteredCourses={filteredCourses} />
       ) : (
         <>
           {!curriculumsAvailable && (
@@ -50,7 +50,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
               </Form.Field>
             </Form>
           )}
-          <PopulationCourseStatsFlat courses={courses} studentAmountLimit={studentAmountLimit} />
+          <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
         </>
       )}
     </Segment>
