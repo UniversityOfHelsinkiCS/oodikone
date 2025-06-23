@@ -41,7 +41,17 @@ export const optimizedStatisticsOf = async (
     getCredits(studentNumbers, studyRights, mockedStartDate),
   ])
 
-  const formattedCoursestats = parseCourseData(code, mockedStartDate, students, enrollments, credits)
+  const studentStartingYears = new Map(
+    students.map(({ studentnumber, studyRights }) => [
+      studentnumber,
+      studyRights
+        ?.flatMap(({ studyRightElements }) => studyRightElements)
+        .find(element => element.code === code)
+        ?.startDate.getFullYear() ?? +mockedStartDate,
+    ])
+  )
+
+  const formattedCoursestats = await parseCourseData(studentStartingYears, enrollments, credits)
 
   const creditsByStudent: StudentCreditObject = new Map<string, AnonymousCredit[]>(studentNumbers.map(n => [n, []]))
   const enrollmentsByStudent: StudentEnrollmentObject = new Map<string, AnonymousEnrollment[]>(

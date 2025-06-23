@@ -59,10 +59,13 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(400).json({ error: 'Invalid studyrights value!' })
     }
 
-    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
-    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
-
     const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
+
+    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
+    const hasFullRightsToProgramme = userFullProgrammeRights.includes(requestedStudyRights.programme)
+    const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
+
+    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
     const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
     const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
 
@@ -88,12 +91,7 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
     const result = await optimizedStatisticsOf(studentNumbers, studyRights, tagList, startDate)
 
     // Obfuscate if user has only limited study programme rights and there are any students
-    if (
-      'students' in result &&
-      !hasFullAccessToStudentData(userRoles) &&
-      !userFullProgrammeRights.includes(requestedStudyRights.programme) &&
-      !userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
-    ) {
+    if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
       result.students = result.students.map(student => {
         const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
         // correct year for age distribution calculation but the date is always January 1st

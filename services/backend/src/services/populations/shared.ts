@@ -2,9 +2,9 @@ import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
 import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
-import { SISStudyRightModel, SISStudyRightElementModel, CreditModel } from '../../models'
+import { SISStudyRightModel, SISStudyRightElementModel, CreditModel, CourseModel } from '../../models'
 import { getPassingSemester, SemesterStart } from '../../util/semester'
-import { StudentCredit, StudentData, StudentEnrollment } from './getStudentData'
+import { StudentCredit, StudentEnrollment } from './getStudentData'
 
 type QueryParams = {
   semesters: string[]
@@ -96,6 +96,15 @@ export const getOptionsForStudents = async (
       .filter(([_, { name }]) => !!name)
   )
 }
+
+export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, 'code' | 'name'>>> =>
+  CourseModel.findAll({
+    attributes: ['code', 'name'],
+    where: {
+      code: { [Op.in]: courses },
+    },
+    raw: true,
+  })
 
 const defaultCourse = {
   attempts: 0,
@@ -191,23 +200,12 @@ const defaultCourse = {
   },
 }
 
-export const parseCourseData = (
-  studyRightCode: string,
-  studyRightStartDate: string,
-  students: StudentData[],
+export const parseCourseData = async (
+  studentStartingYears: Map<string, number>,
   enrollments: StudentEnrollment[],
   credits: StudentCredit[]
 ) => {
-  const getYear = (studentnumber: string) => {
-    const student = students.find(student => student.studentnumber === studentnumber)
-
-    return (
-      student?.studyRights
-        .flatMap(({ studyRightElements }) => studyRightElements)
-        .find(element => element.code === studyRightCode)
-        ?.startDate.getFullYear() ?? +studyRightStartDate
-    )
-  }
+  const getYear = (studentnumber: string) => studentStartingYears.get(studentnumber)!
 
   const coursestats = new Map<string, typeof defaultCourse>()
   for (const enrollment of enrollments) {
@@ -263,11 +261,14 @@ export const parseCourseData = (
     }
   }
 
+  const courses = await getCourses(Array.from(coursestats.keys()))
+  const courseMap = new Map(courses.map(({ code, name }) => [code, name]))
+
   return Array.from(coursestats.entries()).map(([code, { attempts, enrollments, grades, students, stats }]) => {
     return {
       course: {
         code,
-        name: { en: code },
+        name: courseMap.get(code) ?? { en: code },
         substitutions: [],
       },
       attempts,
