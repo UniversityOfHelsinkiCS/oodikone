@@ -1,9 +1,5 @@
 export const getPassedStudents = (curriculum, populationCourses) => {
-  if (
-    !curriculum?.defaultProgrammeCourses ||
-    !curriculum?.secondProgrammeCourses ||
-    !populationCourses?.coursestatistics
-  ) {
+  if (!curriculum?.defaultProgrammeCourses || !curriculum?.secondProgrammeCourses || !populationCourses) {
     return {}
   }
 
@@ -14,11 +10,9 @@ export const getPassedStudents = (curriculum, populationCourses) => {
     ]
   }
 
-  const { coursestatistics } = populationCourses
-
   const courseCodes = getCourseCodes(curriculum)
 
-  const findCourseByCode = courseCode => coursestatistics.find(item => item.course.code === courseCode)
+  const findCourseByCode = courseCode => populationCourses.find(item => item.course.code === courseCode)
 
   const getPassedStudentsForCourse = course => {
     const students = Object.keys(course.students.passed)

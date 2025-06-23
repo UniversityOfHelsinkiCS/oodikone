@@ -1,4 +1,4 @@
-import { Name, EncrypterData } from '../types'
+import { Name, EncrypterData, EnrollmentState } from '../types'
 
 type Stats = {
   students: number
@@ -56,4 +56,40 @@ export type PopulationstatisticsCoursesReqBody = {
   selectedStudents: string[] | EncrypterData[]
   selectedStudentsByYear?: { [year: string]: string[] }
   courses?: string[]
+}
+
+type EnrollmentObject = {
+  [EnrollmentState.ENROLLED]: string[]
+  [EnrollmentState.REJECTED]: string[]
+}
+
+export type CourseStats = {
+  course: Course
+  attempts: number
+  enrollments: EnrollmentObject & {
+    [semester: string]: EnrollmentObject
+  }
+  grades: {
+    [grade: string]: {
+      count: number
+      status: {
+        passingGrade: boolean
+        failingGrade: boolean
+        improvedGrade: boolean
+      }
+    }
+  }
+  students: {
+    all: string[]
+    passed: string[]
+    failed: string[]
+    improvedPassedGrade: string[]
+    markedToSemester: string[]
+    enrolledNoGrade: string[]
+  }
+  stats: {
+    passingSemesters: {
+      [semester: string]: number
+    }
+  }
 }
