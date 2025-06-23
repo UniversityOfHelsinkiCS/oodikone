@@ -4,6 +4,7 @@ import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } fr
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { filterCourses } from '@/util/courseOfPopulation'
+import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { keyBy } from '@oodikone/shared/util'
 
 import { FilterViewContext } from './context'
@@ -29,7 +30,7 @@ export const FilterView: FC<{
   name: string
   filters: (FilterFactory | Filter)[]
   students: Student[]
-  courses: any[]
+  courses: CourseStats[]
   displayTray?: boolean
   initialOptions?: Record<Filter['key'], any>
 }> = ({ children, name, filters: pFilters, students, courses, displayTray: displayTrayProp, initialOptions }) => {

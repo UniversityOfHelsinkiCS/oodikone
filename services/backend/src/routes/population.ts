@@ -2,7 +2,12 @@ import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
-import { CanError } from '@oodikone/shared/routes'
+import type { CanError } from '@oodikone/shared/routes'
+import type {
+  PopulationstatisticsQuery,
+  PopulationstatisticsReqBody,
+  PopulationstatisticsResBody,
+} from '@oodikone/shared/routes/populations'
 import { GenderCode } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
@@ -20,18 +25,7 @@ import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse 
 
 const router = Router()
 
-export type PopulationstatisticsResBody = CanError<{ students: any }>
-export type PopulationstatisticsReqBody = never
-export type PopulationstatisticsQuery = {
-  semesters: string[]
-  studentStatuses?: string[]
-  // NOTE: This param is a JSON -object
-  studyRights: string
-  year: string
-  years?: string[]
-}
-
-router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
+router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
   '/v3/populationstatistics',
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user

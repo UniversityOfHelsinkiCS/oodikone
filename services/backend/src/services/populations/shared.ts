@@ -1,6 +1,7 @@
 import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
+import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
 import { SISStudyRightModel, SISStudyRightElementModel, CreditModel, CourseModel } from '../../models'
 import { getPassingSemester, SemesterStart } from '../../util/semester'
@@ -109,75 +110,75 @@ export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, '
 const defaultCourse = {
   attempts: 0,
   enrollments: {
-    [EnrollmentState.ENROLLED]: new Set(),
-    [EnrollmentState.REJECTED]: new Set(),
+    [EnrollmentState.ENROLLED]: new Set<string>(),
+    [EnrollmentState.REJECTED]: new Set<string>(),
     semesters: {
       BEFORE: {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '0-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '0-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '1-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '1-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '2-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '2-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '3-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '3-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '4-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '4-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '5-FALL': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       '5-SPRING': {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
       LATER: {
-        [EnrollmentState.ENROLLED]: new Set(),
-        [EnrollmentState.REJECTED]: new Set(),
+        [EnrollmentState.ENROLLED]: new Set<string>(),
+        [EnrollmentState.REJECTED]: new Set<string>(),
       },
     },
   },
   grades: {},
   students: {
-    all: new Set(),
-    passed: new Set(),
-    failed: new Set(),
-    improvedPassedGrade: new Set(),
-    markedToSemester: new Set(),
-    enrolledNoGrade: new Set(),
+    all: new Set<string>(),
+    passed: new Set<string>(),
+    failed: new Set<string>(),
+    improvedPassedGrade: new Set<string>(),
+    markedToSemester: new Set<string>(),
+    enrolledNoGrade: new Set<string>(),
   },
 
   stats: {
@@ -204,7 +205,7 @@ export const parseCourseData = async (
   studentStartingYears: Map<string, number>,
   enrollments: StudentEnrollment[],
   credits: StudentCredit[]
-) => {
+): Promise<CourseStats[]> => {
   const getYear = (studentnumber: string) => studentStartingYears.get(studentnumber)!
 
   const coursestats = new Map<string, typeof defaultCourse>()

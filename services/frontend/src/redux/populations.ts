@@ -1,10 +1,11 @@
 import { RTKApi } from '@/apiConnection'
 import { DegreeProgramme } from '@/types/api/faculty'
+import type { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
 import { formatToArray } from '@oodikone/shared/util'
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getPopulationStatistics: builder.query({
+    getPopulationStatistics: builder.query<PopulationstatisticsResBody, any>({
       query: ({ months, year, years, semesters, studentStatuses, studyRights }) => ({
         url: '/v3/populationstatistics/',
         method: 'GET',
