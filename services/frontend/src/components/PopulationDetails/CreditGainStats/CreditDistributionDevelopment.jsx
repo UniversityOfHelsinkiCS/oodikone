@@ -149,8 +149,8 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.DESCENDING)
   const location = useLocation()
   const { months } = parseQueryParams(location.search)
-  const { data: semestersAndYears = {} } = useGetSemestersQuery()
-  const { semesters = {} } = semestersAndYears
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
   const timeSlots = (() => {
@@ -166,7 +166,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     }
 
     if (timeDivision === TimeDivision.ACADEMIC_YEAR) {
-      return chain(semesters)
+      return chain(allSemesters)
         .groupBy('yearcode')
         .values()
         .map(([a, b]) => {
@@ -183,7 +183,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     }
 
     if (timeDivision === TimeDivision.SEMESTER) {
-      return Object.values(semesters)
+      return Object.values(allSemesters)
         .filter(semester => startDate.isBefore(semester.enddate) && moment().isAfter(semester.startdate))
         .map(semester => ({
           start: semester.startdate,

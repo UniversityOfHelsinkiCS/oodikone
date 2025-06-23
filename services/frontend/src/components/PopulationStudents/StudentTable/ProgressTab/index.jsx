@@ -130,7 +130,8 @@ const getCriteriaHeaders = (months, programme) => {
 export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
-  const { data: semestersAndYears } = useGetSemestersQuery()
+  const { data } = useGetSemestersQuery()
+  const { semesters: allSemesters } = data ?? { semesters: {} }
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
   const defaultCourses = keyBy(curriculum.defaultProgrammeCourses, 'code')
@@ -338,7 +339,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
 
   const columns = useMemo(() => {
     const generateYearColumns = (startYear, endYear, criteriaIndex) => {
-      const semesters = Object.values(semestersAndYears?.semesters || {})
+      const semesters = Object.values(allSemesters)
         .filter(
           semester =>
             moment(semester.startdate).isSameOrAfter(startYear) &&
@@ -470,7 +471,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
 
   const isCriteriaSet =
     criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
-  const data = useMemo(() => {
+  const studentData = useMemo(() => {
     return students
   }, [students])
 
@@ -505,7 +506,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             {isCriteriaSet ? (
               <SortableTable
                 columns={columns}
-                data={data}
+                data={studentData}
                 featureName="progress"
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"

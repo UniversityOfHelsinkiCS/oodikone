@@ -137,8 +137,8 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
 }
 
 const SingleStudyGroupFilterView = ({ group, population }) => {
-  const semesterQuery = useGetSemestersQuery()
-  const allSemesters = semesterQuery.data?.semesters
+  const { data } = useGetSemestersQuery()
+  const { semesters: allSemesters } = data ?? { semesters: {} }
   const viewFilters = [
     filters.studentNumberFilter,
     filters.enrollmentStatusFilter({

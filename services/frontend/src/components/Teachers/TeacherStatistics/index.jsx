@@ -23,10 +23,11 @@ export const TeacherStatistics = () => {
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
   const { data: providersData = [] } = useGetProvidersQuery()
   const { data: semesterData } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesterData ?? { semesters: {} }
 
-  const semesters = !semesterData?.semesters
+  const semesters = allSemesters
     ? []
-    : Object.values(semesterData?.semesters)
+    : Object.values(allSemesters)
         .reverse()
         .map(({ semestercode, name }, index) => ({
           key: index,
@@ -60,7 +61,7 @@ export const TeacherStatistics = () => {
       }))
     : []
 
-  const currentSemesterCode = getCurrentSemester(semesterData?.semesters)?.semestercode
+  const currentSemesterCode = getCurrentSemester(allSemesters)?.semestercode
 
   const userProviders = mapToProviders(fullStudyProgrammeRights)
   const invalidQueryParams = providers.length === 0 || !semesterStart

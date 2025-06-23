@@ -67,7 +67,9 @@ export const StudentDetails = () => {
   useTitle(studentNumber ? `${studentNumber} - Student statistics` : 'Student statistics')
   const [graphYearStart, setGraphYear] = useState(null)
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
-  const { data: semestersAndYears } = useGetSemestersQuery()
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+
   const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery({ studentNumber })
   let honoursCode
 
@@ -79,7 +81,7 @@ export const StudentDetails = () => {
     return <Alert severity="error">Student not found or no sufficient permissions</Alert>
   }
 
-  if (!student || !studentNumber || isEmpty(student) || !semestersAndYears) {
+  if (!student || !studentNumber || isEmpty(student) || !allSemesters) {
     return null
   }
 
@@ -113,7 +115,7 @@ export const StudentDetails = () => {
     }
   }
 
-  const absences = getAbsentYears(student.studyRights, semestersAndYears.semesters)
+  const absences = getAbsentYears(student.studyRights, allSemesters)
 
   return (
     <Stack spacing={2} width="100%">

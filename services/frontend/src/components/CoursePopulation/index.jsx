@@ -24,7 +24,6 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
@@ -64,19 +63,22 @@ export const CoursePopulation = () => {
     [population?.students, codes]
   )
 
-  const { data: semesters = {} } = useGetSemestersQuery()
+  const { data: semesters } = useGetSemestersQuery()
+  const {
+    semesters: allSemesters,
+    years: semesterYears,
+    currentSemester,
+  } = semesters ?? { semesters: {}, years: {}, currentSemester: null }
 
   const { data: [courseData = undefined] = [] } = useGetSingleCourseStatsQuery(
     { courseCodes: codes, separate, combineSubstitutions },
     { skip: codes.length === 0 }
   )
 
-  const currentSemester = useCurrentSemester()
-
   const getFromToDates = (from, to, separate) => {
-    if (!semesters.years || !semesters.semesters) return {}
+    if (!semesterYears || !allSemesters) return {}
     const targetProp = separate ? 'semestercode' : 'yearcode'
-    const data = separate ? semesters.semesters : semesters.years
+    const data = separate ? allSemesters : semesterYears
     const dataValues = Object.values(data)
     const findDateByCode = code => dataValues.find(data => data[targetProp] === code)
 
@@ -180,7 +182,7 @@ export const CoursePopulation = () => {
                 const correctProgramme = findCorrectProgramme(
                   student,
                   codes,
-                  semesters.semesters,
+                  allSemesters,
                   dateFrom,
                   dateTo,
                   currentSemester?.semestercode

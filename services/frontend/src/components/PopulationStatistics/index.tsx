@@ -27,7 +27,6 @@ import {
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -153,8 +152,8 @@ export const PopulationStatistics = () => {
   const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
   const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
 
-  const { data: allSemesters } = useGetSemestersQuery()
-  const currentSemester = useCurrentSemester()
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
 
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter : null,
@@ -164,7 +163,7 @@ export const PopulationStatistics = () => {
     creditsEarnedFilter,
     curriculumPeriodFilter,
     enrollmentStatusFilter({
-      allSemesters: allSemesters?.semesters ?? [],
+      allSemesters: allSemesters ?? [],
       programme: programmeCode,
     }),
     genderFilter,

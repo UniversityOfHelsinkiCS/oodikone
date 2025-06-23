@@ -39,8 +39,8 @@ export const CustomPopulation = () => {
     associatedProgramme: '',
   })
 
-  const { data } = useGetSemestersQuery()
-  const allSemesters = data?.semesters ?? []
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
 
   const { data: population, isFetching } = useGetCustomPopulationQuery(
     {

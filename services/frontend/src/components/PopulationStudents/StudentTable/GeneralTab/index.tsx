@@ -3,7 +3,6 @@ import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
@@ -65,10 +64,10 @@ export const GeneralTabContainer = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
-  const currentSemester = useCurrentSemester()
-  const { data: semesterData } = useGetSemestersQuery()
-  const allSemesters = Object.values(semesterData?.semesters ?? {})
-  const allSemestersMap = allSemesters.reduce((obj, cur, index) => {
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
+
+  const allSemestersMap = Object.values(allSemesters).reduce((obj, cur, index) => {
     obj[index + 1] = cur
     return obj
   }, {})
@@ -87,13 +86,13 @@ export const GeneralTabContainer = ({
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
   const fromSemester = from
-    ? Object.values(semesterData?.semesters ?? {})
+    ? Object.values(allSemesters ?? {})
         .filter(({ startdate }) => new Date(startdate) <= new Date(from))
         .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))[0]?.semestercode
     : null
 
   const toSemester = to
-    ? Object.values(semesterData?.semesters ?? {})
+    ? Object.values(allSemesters ?? {})
         .filter(({ enddate }) => new Date(enddate) >= new Date(to))
         .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))[0]?.semestercode
     : null

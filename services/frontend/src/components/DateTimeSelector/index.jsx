@@ -19,8 +19,8 @@ const semesterListStyles = {
 
 export const DateTimeSelector = ({ value, onChange, before, after, showSemesters }) => {
   const datetimeRef = useRef()
-  const semesterRequest = useGetSemestersQuery()
-  const allSemesters = semesterRequest.data?.semesters ?? []
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
   const today = moment().endOf('day')
   const { getTextIn } = useLanguage()
   // Do not allow to select dates after today. At least some cases program just crashed.
