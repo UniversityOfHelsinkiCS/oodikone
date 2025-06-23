@@ -1,10 +1,9 @@
-import { minBy } from 'lodash'
-import { Card } from 'semantic-ui-react'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
 
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
-import { reformatDate } from '@/util/timeAndDate'
 
 export const PopulationQueryCard = ({ query, skipQuery }) => {
   const { studentStatuses, tag } = query
@@ -19,22 +18,23 @@ export const PopulationQueryCard = ({ query, skipQuery }) => {
   if (!students.length) return null
 
   return (
-    <Card style={{ minWidth: '500px', padding: '0.5em', margin: '0.5em 0' }}>
-      <Card.Header>
-        <div>Result details</div>
-      </Card.Header>
-      <Card.Meta>
-        {tag ? <div style={{ color: 'black', fontWeight: 'bold' }}>{`Tagged with: ${tagName}`}</div> : null}
-        <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
-        <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
-        <div>
+    <Card variant="outlined">
+      <CardContent>
+        <Typography sx={{ color: 'text.primary' }} variant="subtitle1">
+          Result details
+        </Typography>
+        {tag && <Typography>{`Tagged with: ${tagName}`}</Typography>}
+        <Typography sx={{ color: 'text.secondary' }}>
+          {studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students
+        </Typography>
+        <Typography sx={{ color: 'text.secondary' }}>
           {studentStatuses.includes('NONDEGREE') ? 'Includes' : 'Excludes'} students with non-degree study right
-        </div>
-        <div>
+        </Typography>
+        <Typography sx={{ color: 'text.secondary' }}>
           {studentStatuses.includes('TRANSFERRED') ? 'Includes' : 'Excludes'} students who have transferred out of this
           programme
-        </div>
-      </Card.Meta>
+        </Typography>
+      </CardContent>
     </Card>
   )
 }
