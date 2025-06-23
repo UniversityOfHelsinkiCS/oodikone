@@ -213,6 +213,9 @@ export const parseCourseData = (
   for (const enrollment of enrollments) {
     const { course_code, studentnumber, state, enrollment_date_time } = enrollment
 
+    // We cannot display these
+    if (course_code === null) continue
+
     if (!coursestats.has(course_code)) coursestats.set(course_code, structuredClone(defaultCourse))
     const course = coursestats.get(course_code)!
 
@@ -225,6 +228,10 @@ export const parseCourseData = (
 
   for (const credit of credits) {
     const { course_code, student_studentnumber: studentnumber, grade, attainment_date: date } = credit
+
+    // We cannot display these
+    if (course_code === null) continue
+
     const passingGrade = CreditModel.passed(credit)
     const failingGrade = CreditModel.failed(credit)
     const improvedGrade = CreditModel.improved(credit)

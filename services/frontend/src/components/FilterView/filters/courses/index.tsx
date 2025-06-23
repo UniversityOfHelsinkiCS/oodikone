@@ -94,7 +94,7 @@ export const courseFilter = createFilter({
       const { students = {} } = precomputed[code]
       const key = filterKeys[filterType as string]
 
-      if (!Object.keys(students[key] ?? {}).includes(studentNumber)) return false
+      if (!students?.[key]?.includes(studentNumber)) return false
     }
 
     return true
