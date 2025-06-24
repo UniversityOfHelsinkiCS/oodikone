@@ -6,7 +6,6 @@ import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 
@@ -28,7 +27,7 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
     if (programme) return programme
   }
 
-  const correctSemesters = Object.values(semesters.semesters || {})
+  const correctSemesters = Object.values(semesters)
     .filter(
       semester =>
         moment(semester.startdate).isSameOrAfter(startDate, 'day') &&
@@ -76,14 +75,14 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
 export const CustomPopulationProgrammeDist = ({ students, coursecode, from, to }) => {
   const { getTextIn } = useLanguage()
   const { data: semesters } = useGetSemestersQuery()
-  const currentSemester = useCurrentSemester()
-  if (!semesters || !currentSemester) return null
+  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
+  if (!allSemesters || !currentSemester) return null
   const allProgrammes = {}
 
   for (const student of students) {
     let programme
     if (coursecode) {
-      programme = findCorrectProgramme(student, coursecode, semesters, from, to, currentSemester?.semestercode)
+      programme = findCorrectProgramme(student, coursecode, allSemesters, from, to, currentSemester?.semestercode)
     } else {
       programme = getNewestProgrammeOfStudentAt(student.studyRights, currentSemester?.semestercode)
     }

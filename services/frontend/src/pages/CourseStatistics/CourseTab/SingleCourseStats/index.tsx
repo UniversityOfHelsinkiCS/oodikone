@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -70,26 +70,23 @@ export const SingleCourseStats = ({
   const unifyCourses = useAppSelector(state => state.courseSearch.openOrRegular)
   const { coursecode } = stats
 
-  const { data: semesterData } = useGetSemestersQuery()
-  const { semesters, years } = useMemo(() => {
-    const semesters = Object.values(semesterData?.semesters ?? [])
-      .map(({ semestercode, name, yearcode }) => ({
-        key: semestercode,
-        texts: Object.values(name) as string[],
-        value: yearcode,
-      }))
-      .reverse()
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters, years: semesterYears } = semesters ?? { semesters: {}, years: {} }
+  const semestersReversed = Object.values(allSemesters ?? [])
+    .map(({ semestercode, name, yearcode }) => ({
+      key: semestercode,
+      texts: Object.values(name) as string[],
+      value: yearcode,
+    }))
+    .reverse()
 
-    const years = Object.values(semesterData?.years ?? [])
-      .map(({ yearcode, yearname }) => ({
-        key: yearcode,
-        text: yearname,
-        value: yearcode,
-      }))
-      .reverse()
-
-    return { semesters, years }
-  }, [semesterData])
+  const semesterYearsReversed = Object.values(semesterYears ?? [])
+    .map(({ yearcode, yearname }) => ({
+      key: yearcode,
+      text: yearname,
+      value: yearcode,
+    }))
+    .reverse()
 
   const parseQueryFromUrl = () => {
     const { separate } = parseQueryParams(location.search)
@@ -197,21 +194,21 @@ export const SingleCourseStats = ({
     const to = max(yearCodes)
     if (from == null || to == null) {
       return {
-        filteredYears: years,
-        filteredSemesters: semesters,
+        filteredYears: semesterYearsReversed,
+        filteredSemesters: semestersReversed,
       }
     }
     const timeFilter = ({ value }: { value: number }) => value >= from && value <= to
     return {
-      filteredYears: years.filter(timeFilter),
-      filteredSemesters: semesters.filter(timeFilter),
+      filteredYears: semesterYearsReversed.filter(timeFilter),
+      filteredSemesters: semestersReversed.filter(timeFilter),
     }
   }
 
   const isStatInYearRange = ({ name }: { name: Name | string }) => {
     const timeFilter = ({ value }: { value: number }) => value >= fromYear && value <= toYear
-    const filteredSemesters = semesters.filter(timeFilter)
-    const filteredYears = years.filter(timeFilter)
+    const filteredSemesters = semestersReversed.filter(timeFilter)
+    const filteredYears = semesterYearsReversed.filter(timeFilter)
     if (separate) {
       return filteredSemesters.find(year => year.texts.includes(getTextIn(name as Name)!))
     }
@@ -413,8 +410,8 @@ export const SingleCourseStats = ({
   const showPopulation = () => {
     const from = fromYear
     const to = toYear
-    const years2 = `${years.find(year => year.value === from)?.text.split('-')[0]}-${
-      years.find(year => year.value === to)?.text.split('-')[1]
+    const years2 = `${semesterYearsReversed.find(year => year.value === from)?.text.split('-')[0]}-${
+      semesterYearsReversed.find(year => year.value === to)?.text.split('-')[1]
     }`
     const queryObject = {
       from,

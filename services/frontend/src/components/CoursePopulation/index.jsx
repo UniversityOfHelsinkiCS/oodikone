@@ -24,10 +24,8 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
@@ -46,7 +44,7 @@ export const CoursePopulation = () => {
     location.search
   )
 
-  const { data: populationStatistics, isFetching } = useGetPopulationStatisticsByCourseQuery({
+  const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
     to,
@@ -61,28 +59,26 @@ export const CoursePopulation = () => {
 
   const { progress } = useProgress(isFetching)
   const studentToTargetCourseDateMap = useMemo(
-    () => getStudentToTargetCourseDateMap(populationStatistics?.students ?? [], codes),
-    [populationStatistics?.students, codes]
+    () => getStudentToTargetCourseDateMap(population?.students ?? [], codes),
+    [population?.students, codes]
   )
 
-  const { data: courseStatistics } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: populationStatistics ? populationStatistics.students.map(student => student.studentNumber) : [] },
-    { skip: !populationStatistics }
-  )
-
-  const { data: semesters = {} } = useGetSemestersQuery()
+  const { data: semesters, isFetching: semestersFetching } = useGetSemestersQuery()
+  const {
+    semesters: allSemesters,
+    years: semesterYears,
+    currentSemester,
+  } = semesters ?? { semesters: {}, years: {}, currentSemester: null }
 
   const { data: [courseData = undefined] = [] } = useGetSingleCourseStatsQuery(
     { courseCodes: codes, separate, combineSubstitutions },
     { skip: codes.length === 0 }
   )
 
-  const currentSemester = useCurrentSemester()
-
   const getFromToDates = (from, to, separate) => {
-    if (!semesters.years || !semesters.semesters) return {}
+    if (semestersFetching) return {}
     const targetProp = separate ? 'semestercode' : 'yearcode'
-    const data = separate ? semesters.semesters : semesters.years
+    const data = separate ? allSemesters : semesterYears
     const dataValues = Object.values(data)
     const findDateByCode = code => dataValues.find(data => data[targetProp] === code)
 
@@ -100,7 +96,7 @@ export const CoursePopulation = () => {
 
   const subHeader = codes.join(', ')
 
-  if (!populationStatistics || !semesters) {
+  if (!population || !semesters) {
     return (
       <Segment className="contentSegment">
         <ProgressBar progress={progress} />
@@ -108,7 +104,7 @@ export const CoursePopulation = () => {
     )
   }
 
-  const createPanels = filtered => [
+  const createPanels = (filteredStudents, filteredCourses) => [
     {
       title: 'Grade distribution',
       content: (
@@ -118,7 +114,7 @@ export const CoursePopulation = () => {
             courseCodes={codes}
             from={dateFrom}
             singleCourseStats={courseData}
-            students={filtered}
+            students={filteredStudents}
             to={dateTo}
           />
         </div>
@@ -129,7 +125,7 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.languageDistributionCoursePopulation} />
-          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filtered} to={dateTo} />
+          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filteredStudents} to={dateTo} />
         </div>
       ),
     },
@@ -138,24 +134,26 @@ export const CoursePopulation = () => {
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.programmeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filtered} to={dateTo} />
+          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
         </div>
       ),
     },
     {
       title: 'Courses of population',
-      content: <CustomPopulationCoursesWrapper courseStatistics={courseStatistics} filteredStudents={filtered} />,
+      content: <CustomPopulationCoursesWrapper filteredCourses={filteredCourses} filteredStudents={filteredStudents} />,
     },
     {
       title: 'Credit gains',
-      content: <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filtered} to={dateTo} />,
+      content: (
+        <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+      ),
     },
     {
-      title: `Students (${filtered.length})`,
+      title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
           coursecode={codes}
-          filteredStudents={filtered}
+          filteredStudents={filteredStudents}
           from={dateFrom}
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
           to={dateTo}
@@ -167,11 +165,13 @@ export const CoursePopulation = () => {
 
   return (
     <FilterView
+      courses={population?.coursestatistics ?? []}
+      displayTray={!isFetching}
       filters={[
         genderFilter,
         studentNumberFilter,
         ageFilter,
-        courseFilter({ courses: courseStatistics?.coursestatistics }),
+        courseFilter({ courses: population?.coursestatistics }),
         creditsEarnedFilter,
         startYearAtUniFilter,
         programmeFilter({
@@ -183,7 +183,7 @@ export const CoursePopulation = () => {
                 const correctProgramme = findCorrectProgramme(
                   student,
                   codes,
-                  semesters.semesters,
+                  allSemesters,
                   dateFrom,
                   dateTo,
                   currentSemester?.semestercode
@@ -204,9 +204,9 @@ export const CoursePopulation = () => {
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
       name="CoursePopulation"
-      students={populationStatistics.students ?? []}
+      students={population?.students ?? []}
     >
-      {filtered => (
+      {(filteredStudents, filteredCourses) => (
         <div className="segmentContainer">
           <Segment className="contentSegment">
             <Header className="segmentTitle" size="large" textAlign="center">
@@ -215,7 +215,7 @@ export const CoursePopulation = () => {
             <Header className="segmentTitle" size="medium" textAlign="center">
               {subHeader}
             </Header>
-            <PanelView panels={createPanels(filtered)} viewTitle="coursepopulation" />
+            <PanelView panels={createPanels(filteredStudents, filteredCourses)} viewTitle="coursepopulation" />
           </Segment>
         </div>
       )}
@@ -223,22 +223,14 @@ export const CoursePopulation = () => {
   )
 }
 
-const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
-  const { data: courseStatistics, isLoading } = useGetStudentListCourseStatisticsQuery({
-    studentNumbers: filteredStudents.map(student => student.studentNumber),
-  })
-
+const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
-  useEffect(() => {
-    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
+  useEffect(() => setStudentAmountLimit(Math.round(filteredStudents.length * 0.3)), [filteredStudents.length])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
-  if (isLoading) return null
 
   return (
     <>
@@ -253,11 +245,7 @@ const CustomPopulationCoursesWrapper = ({ filteredStudents }) => {
           />
         </Form.Field>
       </Form>
-      <PopulationCourseStatsFlat
-        courses={courseStatistics}
-        filteredStudents={filteredStudents}
-        studentAmountLimit={studentAmountLimit}
-      />
+      <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
 }

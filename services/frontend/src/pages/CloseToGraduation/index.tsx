@@ -19,7 +19,6 @@ import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useTitle } from '@/hooks/title'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -33,17 +32,18 @@ export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
   const { data: students } = useGetStudentsCloseToGraduationQuery()
   const { data: semesterData } = useGetSemestersQuery()
+  const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
+
   const [selectedTab, setSelectedTab] = useState(0)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
   const { getTextIn, language } = useLanguage()
-  const allSemesters = useMemo(() => Object.values(semesterData?.semesters ?? {}), [semesterData?.semesters])
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = useMemo(
     () =>
       getSemestersPresentFunctions({
         getTextIn,
         allSemesters,
-        allSemestersMap: semesterData?.semesters ?? {},
+        allSemestersMap: allSemesters ?? {},
         filteredStudents: students,
         year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
         programmeCode: null,
@@ -51,9 +51,9 @@ export const CloseToGraduation = () => {
         studentToStudyrightEndMap: null,
         semestersToAddToStart: null,
       }),
-    [allSemesters, getTextIn, semesterData?.semesters, students]
+    [allSemesters, getTextIn, students]
   )
-  const currentSemesterCode = useCurrentSemester()?.semestercode
+  const currentSemesterCode = currentSemester?.semestercode
   const semestersToInclude = useMemo(
     () =>
       currentSemesterCode != null
@@ -280,8 +280,8 @@ export const CloseToGraduation = () => {
         filterVariant: 'date-range',
       },
       ...semestersToInclude.map(semester => ({
-        id: getTextIn(semesterData?.semesters[`${semester}`]?.name)!,
-        header: `Enrollment status – ${getTextIn(semesterData?.semesters[`${semester}`]?.name)}`,
+        id: getTextIn(allSemesters[`${semester}`]?.name)!,
+        header: `Enrollment status – ${getTextIn(allSemesters[`${semester}`]?.name)}`,
         accessorFn: row => {
           if (!row.studyright.semesterEnrollments) {
             return 'Not enrolled'
@@ -292,7 +292,7 @@ export const CloseToGraduation = () => {
         visibleInShowHideMenu: false,
       })),
     ],
-    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, semesterData?.semesters, semestersToInclude]
+    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, allSemesters, semestersToInclude]
   )
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({

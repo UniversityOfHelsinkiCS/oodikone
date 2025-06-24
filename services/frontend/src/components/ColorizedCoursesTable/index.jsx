@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Divider, Loader, Tab } from 'semantic-ui-react'
 
-import { getCurrentSemester } from '@/common'
 import { useTitle } from '@/hooks/title'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ColorizedCoursesTableContext } from './common'
@@ -12,13 +11,11 @@ import './index.css'
 export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, panes, infoBox, dividerText }) => {
   useTitle(title)
   const { data: semesterData } = useGetSemestersQuery()
-  const currentSemester = semesterData && getCurrentSemester(semesterData.semesters)
-  const semesters =
-    semesterData &&
-    Object.values(semesterData.semesters).filter(
-      // 135 = Fall 2017
-      semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode
-    )
+  const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
+  const semesters = Object.values(allSemesters).filter(
+    // 135 = Fall 2017
+    semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode
+  )
 
   const { data, isFetching, isLoading, isError } = fetchDataHook({ id: studyProgramme })
 

@@ -6,13 +6,13 @@ import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PopulationCourseContext } from './PopulationCourseContext'
 
-export const PopulationCourseStatsFlat = ({ courses, studentAmountLimit }) => {
+export const PopulationCourseStatsFlat = ({ filteredCourses, studentAmountLimit }) => {
   const dispatch = useAppDispatch()
 
-  if (!courses) return null
+  if (!filteredCourses) return null
 
   const contextValue = {
-    courseStatistics: courses?.coursestatistics.filter(({ stats }) => stats.students >= studentAmountLimit),
+    courseStatistics: filteredCourses?.filter(({ stats }) => stats.students >= studentAmountLimit),
     onGoToCourseStatisticsClick: () => dispatch(clearCourseStats()),
   }
 

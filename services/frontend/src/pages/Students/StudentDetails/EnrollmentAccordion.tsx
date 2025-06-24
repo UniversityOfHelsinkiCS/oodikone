@@ -16,8 +16,7 @@ import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithToo
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
-const calculateSemesterEnrollmentsByStudyright = (semestersAndYears, studyrights) => {
-  const { semesters, years } = semestersAndYears
+const calculateSemesterEnrollmentsByStudyright = (semesters, years, studyrights) => {
   const programmeNames = {}
   let firstYear
 
@@ -93,12 +92,14 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
   }, {})
 
 export const EnrollmentAccordion = ({ student }) => {
-  const { data: semestersAndYears } = useGetSemestersQuery()
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters, years: semesterYears } = semesters ?? { semesters: {}, years: {} }
+
   const [active, setActive] = useState(false)
   const { getTextIn } = useLanguage()
 
   if (
-    !semestersAndYears ||
+    !semesters ||
     !student?.studyRights?.length ||
     !student.studyRights.some(studyRight => studyRight.semesterEnrollments)
   ) {
@@ -108,13 +109,14 @@ export const EnrollmentAccordion = ({ student }) => {
   const { studyRights } = student
 
   const { studyRightsWithSemesterEnrollments, programmeNames, firstYear } = calculateSemesterEnrollmentsByStudyright(
-    semestersAndYears,
+    allSemesters,
+    semesterYears,
     studyRights
   )
 
   const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
 
-  const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semestersAndYears)
+  const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semesters)
 
   return (
     <StyledAccordion expanded={active} onChange={() => setActive(!active)}>

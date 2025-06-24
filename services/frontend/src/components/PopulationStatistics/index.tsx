@@ -27,11 +27,9 @@ import {
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useAppSelector } from '@/redux/hooks'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { DegreeProgramme } from '@/types/api/faculty'
@@ -140,11 +138,9 @@ export const PopulationStatistics = () => {
   useTitle('Class statistics')
   const [skipQuery, query] = parseQueryFromUrl(useLocation())
 
-  const { data: allSemesters } = useGetSemestersQuery()
-  const currentSemester = useCurrentSemester()
-
-  const { data: population, isFetching } = useGetPopulationStatisticsQuery(query, { skip: skipQuery })
-  const courses = useAppSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
+  const { data: population, isFetching: isLoading } = useGetPopulationStatisticsQuery(query, {
+    skip: skipQuery,
+  })
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query.studyRights
 
@@ -156,15 +152,18 @@ export const PopulationStatistics = () => {
   const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
   const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
 
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
+
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter : null,
     citizenshipFilter,
-    courseFilter({ courses }),
+    courseFilter({ courses: population?.coursestatistics }),
     creditDateFilter,
     creditsEarnedFilter,
     curriculumPeriodFilter,
     enrollmentStatusFilter({
-      allSemesters: allSemesters?.semesters ?? [],
+      allSemesters: allSemesters ?? [],
       programme: programmeCode,
     }),
     genderFilter,
@@ -205,7 +204,7 @@ export const PopulationStatistics = () => {
     },
   }
 
-  const showNoStudentsMessage = students?.length === 0 && !isFetching
+  const showNoStudentsMessage = !students.length && !isLoading
   const noStudentsMessage = () => (
     <div style={{ maxWidth: '80%' }}>
       <Message
@@ -225,13 +224,14 @@ export const PopulationStatistics = () => {
 
   return (
     <FilterView
+      courses={population?.coursestatistics ?? []}
       displayTray={!skipQuery}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
       students={students}
     >
-      {filteredStudents => (
+      {(filteredStudents, filteredCourses) => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
             {title} {!skipQuery && showBachelorAndMaster && '(Bachelor + Master view)'}
@@ -243,18 +243,19 @@ export const PopulationStatistics = () => {
             )}
           </Header>
           {!skipQuery && showNoStudentsMessage && noStudentsMessage()}
-          <Segment className="contentSegment" loading={isFetching}>
+          <Segment className="contentSegment" loading={isLoading}>
             <PopulationSearch
               combinedProgrammeCode={combinedProgrammeCode}
-              isLoading={isFetching}
+              isLoading={isLoading}
               populationFound={!!students.length}
               query={query}
               skipQuery={skipQuery}
             />
             {!skipQuery && (
               <PopulationDetails
+                filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
-                isLoading={isFetching}
+                isLoading={isLoading}
                 programmeCodes={[programmeCode, combinedProgrammeCode]}
                 query={query}
               />

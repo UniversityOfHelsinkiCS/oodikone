@@ -25,9 +25,26 @@ export type SemestersData = {
 
 const semestersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getSemesters: builder.query<SemestersData, void>({
+    getSemesters: builder.query<
+      SemestersData & {
+        currentSemester: SemestersData['semesters'][string] | null
+      },
+      void
+    >({
       query: () => '/semesters/codes',
       providesTags: ['Semester'],
+      transformResponse: (
+        semesterData: SemestersData
+      ): SemestersData & {
+        currentSemester: SemestersData['semesters'][string] | null
+      } => {
+        const currentSemester =
+          Object.values(semesterData.semesters).find(
+            semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
+          ) ?? null
+
+        return { ...semesterData, currentSemester }
+      },
     }),
   }),
 })

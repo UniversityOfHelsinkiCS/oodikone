@@ -1,9 +1,10 @@
-import { literal, Op, type WhereOptions } from 'sequelize'
+import { Op } from 'sequelize'
 
+import { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
+import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import {
-  CourseModel,
   CreditModel,
   EnrollmentModel,
   StudentModel,
@@ -13,8 +14,8 @@ import {
 } from '../../models'
 import { TagModel, TagStudentModel } from '../../models/kone'
 
-type StudentTags = TagStudentModel & {
-  tag: Pick<TagModel, 'tag_id' | 'tagname' | 'personal_user_id'>
+export type StudentTags = TagStudent & {
+  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
 export type TaggetStudentData = StudentData & {
@@ -37,79 +38,30 @@ export const getStudentTags = async (studyRights: string[], studentNumbers: stri
     },
   })
 
-  const studentTagList: Record<string, TagStudentModel[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
+  const studentTagList: Record<string, StudentTags[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
   studentTags.forEach(studentTag => studentTagList[studentTag.studentnumber].push(studentTag))
 
   return studentTagList
 }
 
-export const creditFilterBuilder = async (
-  studentNumbers: string[],
-  studyRights: string[],
-  attainmentDateFrom: string,
-  endDate: Date
-): Promise<WhereOptions> => {
-  const includedCoursesInStudyPlans: Array<Pick<StudyplanModel, 'included_courses'>> = await StudyplanModel.findAll({
-    attributes: ['included_courses'],
-    where: {
-      studentnumber: { [Op.in]: studentNumbers },
-    },
-    raw: true,
-  })
-
-  const uniqueCourses = new Set(includedCoursesInStudyPlans.flatMap(plan => plan.included_courses))
-
-  // takes into account possible progress tests taken earlier than the start date
-  const courseCodes =
-    ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
-      ? [...uniqueCourses, '375063', '339101']
-      : [...uniqueCourses]
-
-  return {
-    student_studentnumber: { [Op.in]: studentNumbers },
-    [Op.or]: [{ attainment_date: { [Op.between]: [attainmentDateFrom, endDate] } }, { course_code: courseCodes }],
-  }
-}
-
-export type StudentCourse = Pick<CourseModel, 'code' | 'name'>
-export const getCourses = (creditFilter: WhereOptions): Promise<Array<StudentCourse>> =>
-  CourseModel.findAll({
-    attributes: [[literal('DISTINCT ON("code") code'), 'code'], 'name'],
-    include: [
-      {
-        model: CreditModel,
-        attributes: [],
-        where: creditFilter,
-      },
-    ],
-    raw: true,
-  })
-
-export type StudentEnrollment = Pick<
-  EnrollmentModel,
-  'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber' | 'semestercode' | 'studyright_id'
->
-export const getEnrollments = (
-  studentNumbers: string[],
-  startDate: string,
-  endDate: Date
-): Promise<Array<StudentEnrollment>> =>
+export type StudentEnrollment = Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber'>
+export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> =>
   EnrollmentModel.findAll({
-    attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
+    attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
       },
       state: EnrollmentState.ENROLLED,
       enrollment_date_time: {
-        [Op.between]: [startDate, endDate],
+        [Op.gte]: startDate,
       },
     },
     raw: true,
   })
 
 type StudentPersonalData = Pick<
-  StudentModel,
+  Student,
   | 'firstnames'
   | 'lastname'
   | 'studentnumber'
@@ -127,19 +79,19 @@ type StudentPersonalData = Pick<
 >
 
 type StudentStudyRightElement = Pick<
-  SISStudyRightElementModel,
+  SISStudyRightElement,
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
 
 type StudentStudyRight = Pick<
-  SISStudyRightModel,
+  SISStudyRight,
   'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
 > & {
   studyRightElements: Array<StudentStudyRightElement>
 }
 
 export type StudentStudyPlan = Pick<
-  StudyplanModel,
+  Studyplan,
   | 'included_courses'
   | 'programme_code'
   | 'includedModules'
@@ -223,7 +175,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
   }).then(data => data.map(x => x.get({ plain: true })))
 
 export type StudentCredit = Pick<
-  CreditModel,
+  Credit,
   | 'grade'
   | 'credits'
   | 'credittypecode'
@@ -234,8 +186,29 @@ export type StudentCredit = Pick<
   | 'language'
   | 'studyright_id'
 >
-export const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCredit>> =>
-  CreditModel.findAll({
+
+export const getCredits = async (
+  studentNumbers: string[],
+  studyRights: string[],
+  attainmentDateFrom: string
+): Promise<Array<StudentCredit>> => {
+  const includedCoursesInStudyPlans: Array<Pick<Studyplan, 'included_courses'>> = await StudyplanModel.findAll({
+    attributes: ['included_courses'],
+    where: {
+      studentnumber: { [Op.in]: studentNumbers },
+    },
+    raw: true,
+  })
+
+  const uniqueCourses = new Set(includedCoursesInStudyPlans.flatMap(plan => plan.included_courses))
+
+  // takes into account possible progress tests taken earlier than the start date
+  const courseCodes =
+    ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
+      ? [...uniqueCourses, '375063', '339101']
+      : [...uniqueCourses]
+
+  return CreditModel.findAll({
     attributes: [
       'grade',
       'credits',
@@ -247,6 +220,10 @@ export const getCredits = (creditFilter: WhereOptions): Promise<Array<StudentCre
       'language',
       'studyright_id',
     ],
-    where: creditFilter,
+    where: {
+      student_studentnumber: { [Op.in]: studentNumbers },
+      [Op.or]: [{ attainment_date: { [Op.gte]: attainmentDateFrom } }, { course_code: courseCodes }],
+    },
     raw: true,
   })
+}

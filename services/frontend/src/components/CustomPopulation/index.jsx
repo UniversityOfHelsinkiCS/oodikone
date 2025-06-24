@@ -25,7 +25,6 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
-import { useGetStudentListCourseStatisticsQuery } from '@/redux/populationCourses'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
@@ -40,15 +39,10 @@ export const CustomPopulation = () => {
     associatedProgramme: '',
   })
 
-  const { data } = useGetSemestersQuery()
-  const allSemesters = data?.semesters ?? []
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
 
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: customPopulationState.studentNumbers },
-    { skip: !customPopulationState.studentNumbers.length }
-  )
-
-  const { data: studentData, isFetching } = useGetCustomPopulationQuery(
+  const { data: population, isFetching } = useGetCustomPopulationQuery(
     {
       studentNumbers: customPopulationState.studentNumbers,
       tags: { studyProgramme: customPopulationState.associatedProgramme },
@@ -58,14 +52,14 @@ export const CustomPopulation = () => {
 
   useTitle('Custom population')
 
-  const custompop = studentData?.students ?? []
-  const associatedProgramme = studentData?.studyProgramme
+  const custompop = population?.students ?? []
+  const associatedProgramme = population?.studyProgramme
 
   const filters = useMemo(() => {
     const filtersList = [
       genderFilter,
       ageFilter,
-      courseFilter({ courses: courseStats?.coursestatistics ?? [] }),
+      courseFilter({ courses: population?.coursestatistics ?? [] }),
       creditsEarnedFilter,
       transferredToProgrammeFilter,
       startYearAtUniFilter,
@@ -81,17 +75,24 @@ export const CustomPopulation = () => {
       filtersList.push(hopsFilter({ programmeCode: associatedProgramme, combinedProgrammeCode: '' }))
     }
     return filtersList
-  }, [courseStats, allSemesters, associatedProgramme])
+  }, [population, allSemesters, associatedProgramme])
 
   return (
-    <FilterView displayTray={custompop.length > 0} filters={filters} name="CustomPopulation" students={custompop}>
-      {filteredStudents => (
+    <FilterView
+      courses={population?.coursestatistics ?? []}
+      displayTray={custompop.length > 0}
+      filters={filters}
+      name="CustomPopulation"
+      students={custompop}
+    >
+      {(filteredStudents, filteredCourses) => (
         <CustomPopulationContent
           customPopulationState={customPopulationState}
+          filteredCourses={filteredCourses}
           filteredStudents={filteredStudents}
           isFetchingPopulation={isFetching}
+          population={population}
           setCustomPopulationState={setCustomPopulationState}
-          studentData={studentData}
         />
       )}
     </FilterView>
@@ -100,17 +101,18 @@ export const CustomPopulation = () => {
 
 const CustomPopulationContent = ({
   filteredStudents,
+  filteredCourses,
   customPopulationState,
-  studentData,
+  population,
   setCustomPopulationState,
   isFetchingPopulation,
 }) => {
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
 
-  const discardedStudentNumbers = studentData?.discardedStudentNumbers
-  const allStudents = studentData?.students ?? []
-  const associatedProgramme = studentData?.studyProgramme
+  const discardedStudentNumbers = population?.discardedStudentNumbers
+  const allStudents = population?.students ?? []
+  const associatedProgramme = population?.studyProgramme
 
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
@@ -119,11 +121,6 @@ const CustomPopulationContent = ({
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
-  const { data: courseStats } = useGetStudentListCourseStatisticsQuery(
-    { studentNumbers: filteredStudents.map(student => student.studentNumber) },
-    { skip: !filteredStudents.map(student => student.studentNumber).length }
-  )
 
   const { progress } = useProgress(isFetchingPopulation)
 
@@ -157,7 +154,7 @@ const CustomPopulationContent = ({
             </Form.Field>
           </Form>
           <PopulationCourseStatsFlat
-            courses={courseStats}
+            filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             studentAmountLimit={studentAmountLimit}
           />

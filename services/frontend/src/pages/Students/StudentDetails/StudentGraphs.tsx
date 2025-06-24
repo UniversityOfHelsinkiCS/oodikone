@@ -144,7 +144,7 @@ const semesterChunkify = (courses, semesters, getTextIn: ReturnType<typeof useLa
 const gradeMeanSeries = (
   student: any,
   chunksize: number,
-  semesters: SemestersData | undefined,
+  semesters: SemestersData['semesters'] | undefined,
   getTextIn: ReturnType<typeof useLanguage>['getTextIn']
 ) => {
   const filteredCourses = student.courses.filter(
@@ -191,7 +191,7 @@ const gradeMeanSeries = (
     return acc
   }, [])
 
-  const semesterMeans = semesterChunkify(gradesAndMeans.grades, Object.values(semesters?.semesters ?? {}), getTextIn)
+  const semesterMeans = semesterChunkify(gradesAndMeans.grades, Object.values(semesters ?? {}), getTextIn)
 
   return {
     totalMeans: [{ data: gradesAndMeans.mean }],
@@ -205,8 +205,10 @@ const GradeGraph = ({ student }: { student: any }) => {
   const [groupSize, setGroupSize] = useState(5)
   const [graphMode, setGraphMode] = useState('total')
   const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+
   const series = useMemo(
-    () => gradeMeanSeries(student, groupSize, semesters, getTextIn),
+    () => gradeMeanSeries(student, groupSize, allSemesters, getTextIn),
     [student, groupSize, semesters, getTextIn]
   )
   const { totalMeans, groupMeans, semesterMeans } = series

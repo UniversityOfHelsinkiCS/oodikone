@@ -182,7 +182,7 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
     }
 
     const findBestGrade = (courses, code) => {
-      const course = populationCourses?.coursestatistics?.find(course => course.course.code === code)
+      const course = populationCourses?.find(course => course.course.code === code)
       if (!course) {
         return null
       }
@@ -349,7 +349,7 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
     includeSubstitutions,
     hasPassedCourse,
     hasPassedSubstitutionCourse,
-    populationCourses?.coursestatistics,
+    populationCourses,
     totalPassed,
   ])
 

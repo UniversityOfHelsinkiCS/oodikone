@@ -1,95 +1,35 @@
-import * as Sentry from '@sentry/node'
 import crypto from 'crypto'
 import { Request, Response, Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
-import { CanError } from '@oodikone/shared/routes'
+import type { CanError } from '@oodikone/shared/routes'
+import type {
+  PopulationstatisticsQuery,
+  PopulationstatisticsReqBody,
+  PopulationstatisticsResBody,
+} from '@oodikone/shared/routes/populations'
 import { GenderCode } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { SISStudyRightModel } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
-import { encrypt, type EncrypterData } from '../services/encrypt'
+import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
-import { Bottlenecks, bottlenecksOf } from '../services/populations/bottlenecksOf'
+import { getStudentTags } from '../services/populations/getStudentData'
 import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
+import { parseDateRangeFromParams } from '../services/populations/shared'
+import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
 import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
 const router = Router()
 
-type EncryptedStudent = EncrypterData
-const isEncryptedStudent = (student?: string | EncryptedStudent) => {
-  return (student as EncryptedStudent)?.encryptedData !== undefined
-}
-
-export type PopulationstatisticsCoursesResBody = CanError<Bottlenecks>
-export type PopulationstatisticsCoursesReqBody = {
-  // NOTE: Encrypted students have their iv in selectedStudents
-  selectedStudents: string[] | EncryptedStudent[]
-  selectedStudentsByYear?: { [year: string]: string[] }
-  courses?: string[]
-}
-
-// NOTE: POST instead of GET because of too long params and "sensitive" data
-router.post<never, PopulationstatisticsCoursesResBody, PopulationstatisticsCoursesReqBody>(
-  '/v4/populationstatistics/courses',
-  async (req, res) => {
-    const { roles, studentsUserCanAccess } = req.user
-    const { selectedStudents, courses: selectedCourses = [], selectedStudentsByYear = {} } = req.body
-
-    const hasFullAccess = hasFullAccessToStudentData(roles)
-
-    const isEncrypted = selectedStudents.some(isEncryptedStudent)
-    const hasAccessToStudents =
-      isEncrypted || (selectedStudents as string[]).every(student => studentsUserCanAccess.includes(student))
-
-    if (!hasAccessToStudents && !hasFullAccess) {
-      return res.status(403).json({ error: 'Trying to request unauthorized students data' })
-    }
-
-    if (isEncrypted && !selectedStudents.every(isEncryptedStudent)) {
-      Sentry.captureException(new Error('Trying to request unencrypted student data as encrypted'))
-      return res.status(403).json({ error: 'Trying to request unauthorized student data' })
-    }
-
-    const requiredFields = [selectedStudents, selectedCourses]
-    if (requiredFields.some(field => !field)) {
-      Sentry.captureException(new Error('The request body should countain: selected students and courses'))
-      return res.status(400).json({ error: 'The request body should countain: selected students and courses' })
-    }
-
-    const result = await bottlenecksOf(
-      selectedStudents as string[],
-      selectedStudentsByYear,
-      selectedCourses,
-      isEncrypted
-    )
-
-    return res.json(result)
-  }
-)
-
-export type PopulationstatisticsResBody = CanError<{ students: any }>
-export type PopulationstatisticsReqBody = never
-export type PopulationstatisticsQuery = {
-  semesters: string[]
-  studentStatuses?: string[]
-  // NOTE: This param is a JSON -object
-  studyRights: string
-  year: string
-  months?: string
-  years?: string[]
-}
-
-router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
+router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
   '/v3/populationstatistics',
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user
     const { year, semesters, studyRights: requestedStudyRightsJSON, studentStatuses } = req.query
-
-    const months = req.query.months ?? '12'
 
     // NOTE: `year` isn't needed anymore if `years` is defined
     const requiredFields = [year, semesters, requestedStudyRightsJSON]
@@ -113,10 +53,13 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(400).json({ error: 'Invalid studyrights value!' })
     }
 
-    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
-    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
-
     const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
+
+    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
+    const hasFullRightsToProgramme = userFullProgrammeRights.includes(requestedStudyRights.programme)
+    const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
+
+    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
     const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
     const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
 
@@ -124,58 +67,25 @@ router.get<never, PopulationstatisticsResBody, PopulationstatisticsReqBody, Popu
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
-    let result
-    if (req.query.years) {
-      const upperYearBound = new Date().getFullYear() + 1
-      const multiYearStudents = Promise.all(
-        req.query.years.map(year => {
-          const yearAsNumber = +year
-          const monthsForCurrentYear = String((upperYearBound - yearAsNumber) * 12)
-          return optimizedStatisticsOf({
-            ...req.query,
-            userId,
-            studyRights: requestedStudyRights.programme,
-            year,
-            months: monthsForCurrentYear,
-          })
-        })
-      )
+    const { startDate, endDate } = parseDateRangeFromParams({
+      ...req.query,
+      years: req.query.years ?? [req.query.year],
+    })
 
-      const populationStudentsMerger = (multiYearStudents: any) => {
-        const samples = { students: [], courses: [] as any[] }
-        const uniqueCourseCodes = new Set<string>()
+    const studentNumbers = await getStudentNumbersWithStudyRights({
+      studyRights: [requestedStudyRights.programme],
+      startDate,
+      endDate,
+      studentStatuses,
+    })
 
-        for (const year of multiYearStudents) {
-          samples.students = samples.students.concat(year.students)
-          for (const course of year.courses) {
-            if (!uniqueCourseCodes.has(course.code)) {
-              uniqueCourseCodes.add(course.code)
-              samples.courses.push(course)
-            }
-          }
-        }
+    const studyRights = [requestedStudyRights.programme]
+    const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
-        return samples
-      }
-
-      result = populationStudentsMerger(await multiYearStudents)
-    } else {
-      result = await optimizedStatisticsOf({
-        ...req.query,
-        userId,
-        studyRights: requestedStudyRights.programme,
-        year,
-        months,
-      })
-    }
+    const result = await optimizedStatisticsOf(studentNumbers, studyRights, tagList, startDate)
 
     // Obfuscate if user has only limited study programme rights and there are any students
-    if (
-      'students' in result &&
-      !hasFullAccessToStudentData(userRoles) &&
-      !userFullProgrammeRights.includes(requestedStudyRights.programme) &&
-      !userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
-    ) {
+    if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
       result.students = result.students.map(student => {
         const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
         // correct year for age distribution calculation but the date is always January 1st
@@ -235,17 +145,11 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
     separate,
     unifyCourses
   )
-  const result: any = await optimizedStatisticsOf(
-    {
-      // Useless, because studentnumbers are already filtered above by from & to.
-      // We should probably refactor this to avoid more confusement.
-      userId,
-      year: '1900',
-      studyRights: undefined,
-      semesters: ['FALL', 'SPRING'],
-    },
-    studentNumbers
-  )
+
+  const studyRights = []
+  const tagList = await getStudentTags(studyRights, studentNumbers, userId)
+
+  const result: any = await optimizedStatisticsOf(studentNumbers, studyRights, tagList)
   let courseProviders: string[] = []
   if (!hasFullAccessToStudentData(roles)) {
     courseProviders = await getCourseProvidersForCourses(JSON.parse(coursecodes))
@@ -314,15 +218,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStuden
 
   const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
-  const result = await optimizedStatisticsOf(
-    {
-      userId,
-      year: tags?.year ?? '1900',
-      studyRights: studyProgrammeCode,
-      semesters: ['FALL', 'SPRING'],
-    },
-    filteredStudentNumbers
-  )
+  const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
+  const tagList = await getStudentTags(studyRights, filteredStudentNumbers, userId)
+
+  const { startDate } = tags?.year
+    ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
+    : { startDate: undefined }
+
+  const result = await optimizedStatisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
 
   const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
   const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)

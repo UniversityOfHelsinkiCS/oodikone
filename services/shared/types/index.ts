@@ -11,6 +11,7 @@ export type {
   ProgrammeClassSizes,
   ProgrammeMedians,
 } from './graduations'
+export type { EncrypterData } from './encryption'
 export type { Name, NameWithCode } from './name'
 export type { ProgressCriteria } from './progressCriteria'
 export type { Release } from './release'

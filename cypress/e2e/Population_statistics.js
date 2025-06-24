@@ -261,47 +261,35 @@ describe('Population statistics tests', () => {
         cy.get('[data-cy=toggle-group-module-MAT-tyo]').should('not.exist')
       })
 
-      it('New fetch of courses data is done when curriculum is changed', () => {
+      it('Courses data is changed when curriculum is changed', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
-        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
-        cy.get('[data-cy=curriculum-picker]').click()
-        cy.contains('2020–2023').click({ force: true })
 
-        cy.wait('@courseData').then(({ response }) => {
-          expect(response.body).to.have.property('allStudents')
-          expect(response.body).to.have.property('coursestatistics')
-          expect(response.body.allStudents).to.equal(27)
-          expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.equal(true)
-        })
-        cy.get('[data-cy=curriculum-picker]').click()
-        cy.contains('2023–2026').click()
-        cy.wait('@courseData').then(({ response }) => {
-          expect(response.body).to.have.property('allStudents')
-          expect(response.body).to.have.property('coursestatistics')
-          expect(response.body.allStudents).to.equal(27)
-          expect(response.body.coursestatistics.some(stat => stat.course.code === 'DIGI-100')).to.equal(false)
-        })
+        cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
+        cy.contains('2020–2023').click({ force: true })
+        cy.contains('Students (27)')
+        cy.get('[data-cy=toggle-group-module-DIGI-k]')
+          .should('exist')
+          .scrollIntoView()
+          .should('be.visible')
+          .click({ force: true })
+        cy.contains('DIGI-100').should('exist')
+
+        cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
+        cy.contains('2023–2026').click({ force: true })
+        cy.get('[data-cy=toggle-group-module-DIGI-k]').should('exist')
+        cy.contains('DIGI-100').should('not.exist')
       })
 
-      it('New fetch of courses data is done when filtered students change', () => {
+      it('Courses data is changed when filtered students change', () => {
         cy.visit(pathToMathBSc2020)
-        cy.contains('Courses of class').click()
-        cy.intercept('/api/v4/populationstatistics/courses').as('courseData')
-        cy.wait('@courseData').then(({ response }) => {
-          expect(response.body).to.have.property('allStudents')
-          expect(response.body).to.have.property('coursestatistics')
-          expect(response.body.allStudents).to.equal(27)
-        })
+
         cy.get('[data-cy=GraduatedFromProgramme-filter-card]').within(() => {
           cy.get('[data-cy=GraduatedFromProgramme-header]').click()
           cy.get('[data-cy=option-graduated-true]').click()
-          cy.wait('@courseData').then(({ response }) => {
-            expect(response.body).to.have.property('allStudents')
-            expect(response.body).to.have.property('coursestatistics')
-            expect(response.body.allStudents).to.equal(16)
-          })
         })
+
+        cy.contains('Students (16)')
       })
     })
 

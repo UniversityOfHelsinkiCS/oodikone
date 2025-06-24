@@ -18,6 +18,10 @@ const clearSingleDropdownSelection = dataCyAttribute => {
 }
 
 const testRangeFilter = (parentEl, min, max, expected) => {
+  const minText = min.toString()
+  const maxText = max.toString()
+  const expectedText = expected.toString()
+
   cy.cs(parentEl)
     .cs('range-selector-min')
     .find('input')
@@ -29,16 +33,22 @@ const testRangeFilter = (parentEl, min, max, expected) => {
         .invoke('val')
         .then(initialMax => {
           cy.cs(parentEl).cs('range-selector-min').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(min)
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(minText)
           cy.cs(parentEl).cs('range-selector-max').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(max)
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(maxText)
 
-          checkFilteringResult(expected)
+          checkFilteringResult(expectedText)
 
           cy.cs(parentEl).cs('range-selector-min').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(initialMin)
+          cy.cs(parentEl)
+            .cs('range-selector-min')
+            .find('input')
+            .type(initialMin || '0')
           cy.cs(parentEl).cs('range-selector-max').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(initialMax)
+          cy.cs(parentEl)
+            .cs('range-selector-max')
+            .find('input')
+            ?.type(initialMax || '9000')
         })
     })
 }
@@ -216,14 +226,14 @@ describe('Population Statistics', () => {
       ]
       cy.cs('courseFilter-course-dropdown').click()
       cy.contains(`${courses[0].code} - ${courses[0].name}`).click()
-      checkFilteringResult(10)
+      checkFilteringResult(9)
       cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1) // Passed students
-      checkFilteringResult(8)
+      checkFilteringResult(7)
       cy.cs('courseFilter-course-dropdown').click()
       cy.contains(`${courses[1].code} - ${courses[1].name}`).click()
-      checkFilteringResult(6)
-      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
       checkFilteringResult(5)
+      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
+      checkFilteringResult(4)
       courses.forEach(({ code }) => {
         cy.cs(`courseFilter-${code}-clear`).click()
       })

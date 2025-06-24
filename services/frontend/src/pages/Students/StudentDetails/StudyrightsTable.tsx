@@ -20,8 +20,8 @@ import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
-import { useCurrentSemester } from '@/hooks/currentSemester'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 
 // For the most part we calculate if studyright is active by checking for term registrations
@@ -51,8 +51,8 @@ const studyRightIsActive = (studyRight, currentSemester) =>
 export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
   const { getTextIn } = useLanguage()
   const { data: studyProgrammes } = useGetProgrammesQuery()
-  const currentSemester = useCurrentSemester()
-  const currentSemesterCode = currentSemester?.semestercode
+  const { data: semesters } = useGetSemestersQuery()
+  const { currentSemester } = semesters ?? { currentSemester: null }
 
   if (!student) return null
 
@@ -67,7 +67,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
       graduated: programmes[0].graduated,
       endDate: programmes[0].endDate,
       studyPlanId,
-      active: studyRightIsActive(studyRight, currentSemesterCode),
+      active: studyRightIsActive(studyRight, currentSemester?.semestercode),
       cancelled: studyRight.cancelled,
       programmes,
     }

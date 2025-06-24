@@ -3,6 +3,8 @@ import { FC, useMemo } from 'react'
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
+import { filterCourses } from '@/util/coursesOfPopulation'
+import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { keyBy } from '@oodikone/shared/util'
 
 import { FilterViewContext } from './context'
@@ -24,13 +26,14 @@ const resolveFilterOptions = <T,>(
   )
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[]) => any
+  children: (filteredStudents: Student[], filteredCourses: any[]) => any
   name: string
   filters: (FilterFactory | Filter)[]
   students: Student[]
-  displayTray?: boolean
+  courses: CourseStats[]
+  displayTray: boolean
   initialOptions?: Record<Filter['key'], any>
-}> = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
+}> = ({ children, name, filters: pFilters, students, courses, displayTray, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
@@ -39,8 +42,6 @@ export const FilterView: FC<{
     [storeFilterOptions, filters, initialOptions]
   )
   const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
-
-  const displayTray = displayTrayProp === undefined || !!displayTrayProp
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
@@ -80,6 +81,7 @@ export const FilterView: FC<{
       }, students)
 
   const filteredStudents = useMemo(() => applyFilters(orderedFilters), [orderedFilters])
+  const filteredCourses = filterCourses(courses, filteredStudents)
 
   const dispatch = useAppDispatch()
 
@@ -101,9 +103,7 @@ export const FilterView: FC<{
         <div style={{ zIndex: 1, alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
           {displayTray && <FilterTray />}
         </div>
-        <div style={{ flexGrow: 1, minWidth: 0 }}>
-          {typeof children === 'function' ? children(filteredStudents) : children}
-        </div>
+        <div style={{ flexGrow: 1, minWidth: 0 }}>{children(filteredStudents, filteredCourses)}</div>
       </div>
     </FilterViewContext.Provider>
   )
