@@ -3,7 +3,7 @@ import { FC, useMemo } from 'react'
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
-import { filterCourses } from '@/util/courseOfPopulation'
+import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { keyBy } from '@oodikone/shared/util'
 
