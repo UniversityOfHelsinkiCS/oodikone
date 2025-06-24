@@ -51,7 +51,7 @@ export const getOptionsForStudents = async (
   studentNumbers: string[],
   code: string,
   degreeProgrammeType: DegreeProgrammeType | null
-): Promise<Record<string, { name: Name }>> => {
+): Promise<Record<string, Name>> => {
   if (!code || !studentNumbers.length) {
     return {}
   } else if (
@@ -92,9 +92,9 @@ export const getOptionsForStudents = async (
           [levelIsMasters ? 'desc' : 'asc']
         )
 
-        return [studyRight.studentNumber, { name: latestProgramme?.name }] as [string, { name: Name }]
+        return [studyRight.studentNumber, latestProgramme?.name]
       })
-      .filter(([_, { name }]) => !!name)
+      .filter(([_, name]) => !!name)
   )
 }
 

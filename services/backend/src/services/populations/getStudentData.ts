@@ -1,5 +1,7 @@
 import { Op } from 'sequelize'
 
+import { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
+import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import {
@@ -12,8 +14,8 @@ import {
 } from '../../models'
 import { TagModel, TagStudentModel } from '../../models/kone'
 
-export type StudentTags = TagStudentModel & {
-  tag: Pick<TagModel, 'tag_id' | 'tagname' | 'personal_user_id'>
+export type StudentTags = TagStudent & {
+  tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
 export type TaggetStudentData = StudentData & {
@@ -42,13 +44,10 @@ export const getStudentTags = async (studyRights: string[], studentNumbers: stri
   return studentTagList
 }
 
-export type StudentEnrollment = Pick<
-  EnrollmentModel,
-  'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber' | 'semestercode' | 'studyright_id'
->
+export type StudentEnrollment = Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'studentnumber'>
 export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> =>
   EnrollmentModel.findAll({
-    attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode', 'studyright_id'],
+    attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -62,7 +61,7 @@ export const getEnrollments = (studentNumbers: string[], startDate: string): Pro
   })
 
 type StudentPersonalData = Pick<
-  StudentModel,
+  Student,
   | 'firstnames'
   | 'lastname'
   | 'studentnumber'
@@ -80,19 +79,19 @@ type StudentPersonalData = Pick<
 >
 
 type StudentStudyRightElement = Pick<
-  SISStudyRightElementModel,
+  SISStudyRightElement,
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
 
 type StudentStudyRight = Pick<
-  SISStudyRightModel,
+  SISStudyRight,
   'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
 > & {
   studyRightElements: Array<StudentStudyRightElement>
 }
 
 export type StudentStudyPlan = Pick<
-  StudyplanModel,
+  Studyplan,
   | 'included_courses'
   | 'programme_code'
   | 'includedModules'
@@ -176,7 +175,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
   }).then(data => data.map(x => x.get({ plain: true })))
 
 export type StudentCredit = Pick<
-  CreditModel,
+  Credit,
   | 'grade'
   | 'credits'
   | 'credittypecode'
@@ -193,7 +192,7 @@ export const getCredits = async (
   studyRights: string[],
   attainmentDateFrom: string
 ): Promise<Array<StudentCredit>> => {
-  const includedCoursesInStudyPlans: Array<Pick<StudyplanModel, 'included_courses'>> = await StudyplanModel.findAll({
+  const includedCoursesInStudyPlans: Array<Pick<Studyplan, 'included_courses'>> = await StudyplanModel.findAll({
     attributes: ['included_courses'],
     where: {
       studentnumber: { [Op.in]: studentNumbers },

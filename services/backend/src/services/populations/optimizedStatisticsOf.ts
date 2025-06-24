@@ -35,10 +35,10 @@ export const optimizedStatisticsOf = async (
   const code = studyRights[0] ?? ''
   const mockedStartDate = startDate ?? new Date(1900).toISOString()
 
-  const [students, enrollments, credits] = await Promise.all([
-    getStudents(studentNumbers),
+  const [enrollments, credits, students] = await Promise.all([
     getEnrollments(studentNumbers, mockedStartDate),
     getCredits(studentNumbers, studyRights, mockedStartDate),
+    getStudents(studentNumbers),
   ])
 
   const studentStartingYears = new Map(
@@ -54,15 +54,8 @@ export const optimizedStatisticsOf = async (
   const formattedCoursestats = await parseCourseData(studentStartingYears, enrollments, credits)
 
   const creditsByStudent: StudentCreditObject = new Map<string, AnonymousCredit[]>(studentNumbers.map(n => [n, []]))
-  const enrollmentsByStudent: StudentEnrollmentObject = new Map<string, AnonymousEnrollment[]>(
-    studentNumbers.map(n => [n, []])
-  )
-
   credits.forEach(credit =>
-    creditsByStudent.get(credit.student_studentnumber)?.push(omitKeys(credit, ['student_studentnumber']))
-  )
-  enrollments.forEach(enrollment =>
-    enrollmentsByStudent.get(enrollment.studentnumber)?.push(omitKeys(enrollment, ['studentnumber']))
+    creditsByStudent.get(credit.student_studentnumber)!.push(omitKeys(credit, ['student_studentnumber']))
   )
 
   const criteria = await getCriteria(code)
@@ -72,13 +65,12 @@ export const optimizedStatisticsOf = async (
     coursestatistics: formattedCoursestats,
     students: students.map(student =>
       formatStudentForAPI(
-        { ...student, tags: tagList[student.studentnumber] },
-        enrollmentsByStudent.get(student.studentnumber) ?? [],
-        creditsByStudent.get(student.studentnumber) ?? [],
-        mockedStartDate,
-        criteria,
         code,
-        optionData
+        mockedStartDate,
+        { ...student, tags: tagList[student.studentnumber] },
+        creditsByStudent.get(student.studentnumber) ?? [],
+        optionData?.[student.studentnumber],
+        criteria
       )
     ),
   }
