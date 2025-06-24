@@ -18,6 +18,10 @@ const clearSingleDropdownSelection = dataCyAttribute => {
 }
 
 const testRangeFilter = (parentEl, min, max, expected) => {
+  const minText = min.toString()
+  const maxText = max.toString()
+  const expectedText = expected.toString()
+
   cy.cs(parentEl)
     .cs('range-selector-min')
     .find('input')
@@ -29,22 +33,22 @@ const testRangeFilter = (parentEl, min, max, expected) => {
         .invoke('val')
         .then(initialMax => {
           cy.cs(parentEl).cs('range-selector-min').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(min)
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(minText)
           cy.cs(parentEl).cs('range-selector-max').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(max)
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(maxText)
 
-          checkFilteringResult(expected)
+          checkFilteringResult(expectedText)
 
           cy.cs(parentEl).cs('range-selector-min').find('input').clear()
           cy.cs(parentEl)
             .cs('range-selector-min')
             .find('input')
-            .type(initialMin ?? '0')
+            .type(initialMin || '0')
           cy.cs(parentEl).cs('range-selector-max').find('input').clear()
           cy.cs(parentEl)
             .cs('range-selector-max')
             .find('input')
-            .type(initialMax ?? '9000')
+            ?.type(initialMax || '9000')
         })
     })
 }

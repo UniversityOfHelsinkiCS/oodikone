@@ -63,7 +63,7 @@ export const CoursePopulation = () => {
     [population?.students, codes]
   )
 
-  const { data: semesters } = useGetSemestersQuery()
+  const { data: semesters, isFetching: semestersFetching } = useGetSemestersQuery()
   const {
     semesters: allSemesters,
     years: semesterYears,
@@ -76,7 +76,7 @@ export const CoursePopulation = () => {
   )
 
   const getFromToDates = (from, to, separate) => {
-    if (!semesterYears || !allSemesters) return {}
+    if (semestersFetching) return {}
     const targetProp = separate ? 'semestercode' : 'yearcode'
     const data = separate ? allSemesters : semesterYears
     const dataValues = Object.values(data)
