@@ -222,7 +222,7 @@ export const getCredits = async (
     ],
     where: {
       student_studentnumber: { [Op.in]: studentNumbers },
-      [Op.or]: [{ attainment_date: { [Op.gt]: attainmentDateFrom } }, { course_code: courseCodes }],
+      [Op.or]: [{ attainment_date: { [Op.gte]: attainmentDateFrom } }, { course_code: courseCodes }],
     },
     raw: true,
   })
