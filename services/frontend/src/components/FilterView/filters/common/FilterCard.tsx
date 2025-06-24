@@ -1,5 +1,4 @@
-import { isEqual } from 'lodash'
-import { FC, useState, useRef } from 'react'
+import { FC, useState } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 
 import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
@@ -7,13 +6,6 @@ import './FilterCard.css'
 
 import { FilterContext, FilterViewContextState } from '../../context'
 import type { Filter } from '../createFilter'
-
-const useChange = (value: FilterContext['options']) => {
-  const prevValue = useRef<typeof value>()
-  prevValue.current = value
-
-  return !isEqual(value, prevValue.current)
-}
 
 export const FilterCard: FC<{
   filter: Filter
@@ -24,15 +16,8 @@ export const FilterCard: FC<{
   const { info, key, title, isActive } = filter
   const active = isActive(options)
 
-  const hasChanged = useChange(options)
-
-  const [manuallyOpened, setManuallyOpened] = useState<boolean | null>(null)
-
-  if (hasChanged && manuallyOpened === false) {
-    setManuallyOpened(null)
-  }
-
-  const open = manuallyOpened ?? active
+  const [manuallyOpened, setManuallyOpened] = useState<boolean>(false)
+  const open = active || manuallyOpened
 
   return (
     <div data-cy={`${key}-filter-card`} data-open={open} style={{ margin: '1rem 0' }}>
