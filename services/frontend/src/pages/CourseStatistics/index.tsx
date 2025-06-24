@@ -12,7 +12,7 @@ import { useProgress } from '@/hooks/progress'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { getCourseStats } from '@/redux/courseStats'
+import { clearCourseStats, getCourseStats } from '@/redux/courseStats'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { parseQueryParams } from '@/util/queryparams'
@@ -44,13 +44,19 @@ export const CourseStatistics = () => {
   useEffect(() => {
     const { courseCodes, ...params } = parseQueryParams(location.search)
     if (!courseCodes) {
+      if (Object.keys(courseStatsData).length) dispatch(clearCourseStats())
       return
     }
-    const query = {
-      ...params,
-      courseCodes: JSON.parse(courseCodes as string),
-    }
-    dispatch(getCourseStats(query, onProgress))
+
+    dispatch(
+      getCourseStats(
+        {
+          ...params,
+          courseCodes: JSON.parse(courseCodes as string),
+        },
+        onProgress
+      )
+    )
   }, [location.search])
 
   useEffect(() => {
@@ -76,7 +82,7 @@ export const CourseStatistics = () => {
     <Container maxWidth="lg">
       <PageTitle title="Course statistics" />
       {statsIsEmpty || location.search === '' ? (
-        <SearchForm onProgress={onProgress} progress={progress} />
+        <SearchForm isPending={loading} progress={progress} />
       ) : (
         <>
           <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>

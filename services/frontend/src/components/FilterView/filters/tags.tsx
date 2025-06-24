@@ -6,7 +6,7 @@ const TagsFilterCard = ({ options, onOptionsChange, students }) => {
   const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
-  const tagCounts = new Map<string, { count: number; name: string }>()
+  const tagCounts: Record<string, { count: number; name: string }> = {}
   for (const student of students) {
     for (const {
       tag_id: id,
@@ -17,7 +17,7 @@ const TagsFilterCard = ({ options, onOptionsChange, students }) => {
     }
   }
 
-  const dropdownOptions = Array.from(tagCounts.entries()).map(([tagId, { count, name }]) => ({
+  const dropdownOptions = Object.entries(tagCounts).map(([tagId, { count, name }]) => ({
     key: `tag-${tagId}`,
     text: `${name} (${count})`,
     value: tagId,
@@ -26,7 +26,7 @@ const TagsFilterCard = ({ options, onOptionsChange, students }) => {
   const includeOptions = dropdownOptions.filter(({ value }) => !excludedTags.includes(value))
   const excludeOptions = dropdownOptions.filter(({ value }) => !includedTags.includes(value))
 
-  if (!tagCounts.size)
+  if (!Object.keys(tagCounts).length)
     return (
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.

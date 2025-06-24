@@ -27,12 +27,12 @@ describe('Population statistics tests', () => {
 
     describe('Population search', () => {
       it('Info box works', () => {
-        cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
-        cy.get('[data-cy="PopulationSearch-open-info"]').click()
-        cy.get('[data-cy="PopulationSearch-info-content"]').should('be.visible')
-        cy.get('[data-cy="PopulationSearch-info-content"]').should('contain', 'Tässä osiossa voi tarkastella')
-        cy.get('[data-cy="PopulationSearch-close-info"]').click()
-        cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
+        cy.cs('PopulationSearch-info-box-content').should('not.exist')
+        cy.cs('PopulationSearch-info-box-button').trigger('mouseover')
+        cy.cs('PopulationSearch-info-box-content').should('be.visible')
+        cy.cs('PopulationSearch-info-box-content').contains('Tässä osiossa voi tarkastella')
+        cy.cs('PopulationSearch-info-box-button').trigger('mouseout')
+        cy.cs('PopulationSearch-info-box-content').should('not.exist')
       })
 
       it('Form is usable', () => {

@@ -1,6 +1,7 @@
 import { orderBy } from 'lodash'
 
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
+import { type Programme } from '../util'
 
 export const createMaps = (
   selectedStudents: string[],
@@ -9,15 +10,14 @@ export const createMaps = (
   combinedProgrammeCode: string | null,
   year: string | null | undefined,
   currentSemester: any,
-  getTextIn: (arg0: any) => any,
   showBachelorAndMaster: boolean
 ) => {
-  const studentToStudyrightStartMap = {}
-  const studentToStudyrightEndMap = {}
-  const studentToSecondStudyrightEndMap = {}
-  const studentToProgrammeStartMap = {}
-  const studentToOtherProgrammesMap = {}
-  const studentToPrimaryProgrammeMap = {}
+  const studentToStudyrightStartMap = new Map<string, Date | null>()
+  const studentToStudyrightEndMap = new Map<string, Date | null>()
+  const studentToSecondStudyrightEndMap = new Map<string, Date | null>()
+  const studentToProgrammeStartMap = new Map<string, Date | null>()
+  const studentToPrimaryProgrammeMap = new Map<string, Programme | undefined>()
+  const studentToOtherProgrammesMap = new Map<string, Programme[] | undefined>()
 
   for (const studentNumber of selectedStudents) {
     const { studyRights } = students[studentNumber]
@@ -47,29 +47,21 @@ export const createMaps = (
       ['desc']
     )[0]
 
-    const programmesToUse = programmeCode ? programmes.filter(p => p.code !== programmeCode) : programmes
-
-    studentToStudyrightStartMap[studentNumber] = studyRight?.startDate ?? null
-    studentToProgrammeStartMap[studentNumber] = studyRightElement?.startDate ?? null
-    studentToStudyrightEndMap[studentNumber] = studyRightElement?.graduated ? studyRightElement.endDate : null
-    studentToSecondStudyrightEndMap[studentNumber] = secondStudyRightElement?.graduated
-      ? secondStudyRightElement.endDate
-      : null
-    studentToOtherProgrammesMap[studentNumber] = {
-      programmes: programmesToUse,
-      getProgrammesList: delimiter =>
-        programmesToUse
-          .map(programme => {
-            const programmeName = getTextIn(programme.name)
-            if (programme.graduated) return `${programmeName} (graduated)`
-            if (!programme.active) return `${programmeName} (inactive)`
-            return programmeName
-          })
-          .join(delimiter),
-    }
-    studentToPrimaryProgrammeMap[studentNumber] = programmeCodeArg
-      ? null
-      : programmes.find(programme => programme.code === programmeCode)
+    studentToStudyrightStartMap.set(studentNumber, studyRight?.startDate ?? null)
+    studentToProgrammeStartMap.set(studentNumber, studyRightElement?.startDate ?? null)
+    studentToStudyrightEndMap.set(studentNumber, studyRightElement?.graduated ? studyRightElement.endDate : null)
+    studentToSecondStudyrightEndMap.set(
+      studentNumber,
+      secondStudyRightElement?.graduated ? secondStudyRightElement.endDate : null
+    )
+    studentToPrimaryProgrammeMap.set(
+      studentNumber,
+      programmes.find(programme => programme.code === programmeCode)
+    )
+    studentToOtherProgrammesMap.set(
+      studentNumber,
+      programmes.filter(p => p.code !== programmeCode)
+    )
   }
 
   return {

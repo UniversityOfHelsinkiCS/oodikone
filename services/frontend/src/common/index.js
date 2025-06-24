@@ -108,6 +108,7 @@ export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
           name: element.name,
           graduated: element.graduated,
           startDate: element.startDate,
+          cancelled: studyRight.cancelled,
           active: programmeIsActive(studyRight, element.graduated, currentSemester),
           facultyCode: studyRight.facultyCode,
         }))

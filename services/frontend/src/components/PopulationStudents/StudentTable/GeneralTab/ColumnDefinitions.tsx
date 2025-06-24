@@ -4,13 +4,16 @@ import Typography from '@mui/material/Typography'
 
 import { createMRTColumnHelper } from 'material-react-table'
 import { useMemo } from 'react'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { muiTableBodyCellPropsDefaultSx } from '@/util/getDefaultMRTOptions'
 import { FormattedStudentData } from '.'
 import { DynamicColumnTitles } from './GeneralTab'
+import { joinProgrammes } from './util'
 
 export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
+  const { getTextIn } = useLanguage()
   const columnHelper = createMRTColumnHelper<FormattedStudentData>()
   return useMemo(
     () => [
@@ -40,7 +43,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           sx: {
             ...muiTableBodyCellPropsDefaultSx,
             width: '250px',
-            maxWidth: '380px',
+            maxWidth: '340px',
           },
         },
         Header: (
@@ -52,27 +55,21 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         Cell: ({ cell }) => {
           const programmeName = cell.getValue()
           if (!programmeName) return null
-          const indexToSplitAt = programmeName.lastIndexOf(' ')
-          const formattedValue = ['(Graduated)', '(Inactive)'].includes(programmeName.slice(indexToSplitAt + 1)) ? (
-            (() => {
-              const start = programmeName.slice(0, indexToSplitAt)
-              const end = programmeName.slice(indexToSplitAt + 1)
-              return (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{start}</span>
-                  <span style={{ paddingLeft: '0.5em' }}>{end}</span>
-                </div>
-              )
-            })()
-          ) : (
-            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
-          )
           return (
             <Tooltip arrow title={programmeName}>
-              {formattedValue}
+              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
             </Tooltip>
           )
         },
+      }),
+      columnHelper.accessor('programmeStatus', {
+        header: 'Status',
+        Header: (
+          <TableHeaderWithTooltip
+            header="Status"
+            tooltipText="Shows the status of the studyright associated with the corresponding programme. Status is active only if an active semester enrollment for the ongoing semester exists."
+          />
+        ),
       }),
       columnHelper.accessor('creditsTotal', {
         header: 'All credits',
@@ -135,12 +132,15 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
           />
         ),
         Cell: ({ cell }) => {
-          const { programmes, programmeList } = cell.getValue()
-          if (programmes.length === 0) return null
+          const { programmes } = cell.getValue()
+          if (!programmes || programmes.length === 0) return null
 
-          const formattedProgramme = programmes[0].length > 45 ? `${programmes[0].substring(0, 43)}...` : programmes[0]
+          const programmeName = getTextIn(programmes[0].name) ?? ''
+          const formattedProgramme = programmeName.length > 45 ? `${programmeName.substring(0, 43)}...` : programmeName
+          const tooltipProgrammeList = joinProgrammes(programmes, getTextIn, '\n')
+
           return (
-            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{programmeList}</div>}>
+            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{tooltipProgrammeList}</div>}>
               <span>
                 {programmes.length > 1 ? `${formattedProgramme} +${programmes.length - 1}` : `${formattedProgramme}`}
               </span>

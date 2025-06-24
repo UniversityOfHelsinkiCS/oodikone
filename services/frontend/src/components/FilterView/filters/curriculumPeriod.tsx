@@ -1,27 +1,27 @@
-import { orderBy } from 'lodash'
-import { Form, Dropdown } from 'semantic-ui-react'
+import { Form, Dropdown, type DropdownItemProps } from 'semantic-ui-react'
 
 import { createFilter } from './createFilter'
 
 const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
   const { selected } = options
 
-  const dropdownOptions = students.reduce((curriculumPeriods, { curriculumPeriod }) => {
-    if (curriculumPeriods.every(option => option.value !== curriculumPeriod)) {
-      const count = students.filter(({ curriculumVersion }) => curriculumVersion === curriculumPeriod).length
+  const dropdownOptions: DropdownItemProps[] = Array.from(
+    students
+      .map(({ curriculumVersion }) => curriculumVersion)
+      .filter(Boolean)
+      .sort()
+      .reverse()
+      .reduce((versions: Map<string, DropdownItemProps>, curriculumVersion: string) => {
+        versions.set(curriculumVersion, {
+          key: curriculumVersion,
+          text: curriculumVersion,
+          value: curriculumVersion,
+        })
 
-      curriculumPeriods.push({
-        key: curriculumPeriod,
-        value: curriculumPeriod,
-        text: `${curriculumPeriod ?? 'No period selected'} (${count})`,
-        count,
-      })
-    }
-
-    return curriculumPeriods
-  }, [])
-
-  const sortedDropdownOptions = orderBy(dropdownOptions, ['text', 'count'], ['asc', 'desc'])
+        return versions
+      }, new Map())
+      .values()
+  )
 
   return (
     <div className="card-content">
@@ -33,7 +33,7 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
           data-cy="curriculumPeriodFilter-dropdown"
           fluid
           onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
-          options={sortedDropdownOptions}
+          options={dropdownOptions}
           placeholder="Choose curriculum period"
           selectOnBlur={false}
           selection
@@ -47,9 +47,7 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
 export const curriculumPeriodFilter = createFilter({
   key: 'Curriculum period',
 
-  defaultOptions: {
-    selected: '',
-  },
+  defaultOptions: { selected: null },
 
   isActive: ({ selected }) => !!selected,
 

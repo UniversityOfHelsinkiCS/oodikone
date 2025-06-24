@@ -12,6 +12,7 @@ import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 
 import { GeneralTab } from './GeneralTab'
+import { joinProgrammes, Programme } from './util'
 
 export type FormattedStudentData = {
   firstNames: string
@@ -32,7 +33,8 @@ export type FormattedStudentData = {
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
   primaryProgramme?: string
-  programmes: { programmes: string[]; programmeList: string; exportValue: string }
+  programmes: { exportValue: string | null; programmes: Programme[] }
+  programmeStatus: string | null
   transferredFrom: string
   admissionType: string | null
   gender: string
@@ -131,6 +133,9 @@ export const GeneralTabContainer = ({
 
   const combinedProgrammeCode = studyRights?.combinedProgramme ?? sggCombinedProgramme ?? null
 
+  const includePrimaryProgramme =
+    variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
+
   const getCombinedProgrammeCredits = student =>
     student.studyplans?.find(plan => {
       if (combinedProgrammeCode) {
@@ -181,14 +186,22 @@ export const GeneralTabContainer = ({
 
   const getStartingYear = ({ started }) => (started ? new Date(started).getFullYear() : '')
 
-  const getGraduationDate = ({ studentNumber }) =>
-    studentToStudyrightEndMap[studentNumber]
-      ? formatDate(studentToStudyrightEndMap[studentNumber], DateFormat.ISO_DATE)
-      : ''
-
+  const getGraduationDate = ({ studentNumber }) => {
+    const studyRightEnd = studentToStudyrightEndMap.get(studentNumber)
+    return studyRightEnd ? formatDate(studyRightEnd, DateFormat.ISO_DATE) : ''
+  }
   const getCreditsFromHops = student => {
     const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
     return student.hopsCredits ?? student.studyplans?.find(plan => plan.programme_code === code)?.completed_credits ?? 0
+  }
+
+  const getStudyRightStatus = ({ studentNumber }) => {
+    const primaryProgramme = studentToPrimaryProgrammeMap.get(studentNumber)
+    if (!primaryProgramme) return null
+    if (primaryProgramme.graduated) return 'Graduated'
+    if (primaryProgramme.cancelled) return 'Cancelled'
+    if (primaryProgramme.active) return 'Active'
+    return 'Inactive'
   }
 
   const getCreditsBetween = student => {
@@ -206,7 +219,8 @@ export const GeneralTabContainer = ({
         ...student,
         courses: student.courses.filter(
           course =>
-            new Date(course.date).getTime() >= new Date(studentToProgrammeStartMap[student.studentNumber]).getTime()
+            new Date(course.date).getTime() >=
+            new Date(studentToProgrammeStartMap.get(student.studentNumber) ?? 0).getTime()
         ),
       })
     }
@@ -259,11 +273,6 @@ export const GeneralTabContainer = ({
 
   const getOptionDisplayText = () => (isMastersProgramme ? 'Bachelor' : 'Master')
 
-  const getProgrammesDisplayText = () =>
-    variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
-      ? 'Study programmes'
-      : 'Other programmes'
-
   const getCorrectStudyRight = studyRights =>
     studyRights?.find(studyRight =>
       queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
@@ -276,15 +285,6 @@ export const GeneralTabContainer = ({
       .map(code => correctStudyRight.studyRightElements.find(element => element.code === code))
       .filter(element => element?.studyTrack)
       .map(element => getTextIn(element.studyTrack.name))
-  }
-
-  const getStudyProgrammes = ({ studentNumber }) => {
-    const { programmes, getProgrammesList } = studentToOtherProgrammesMap[studentNumber] ?? {}
-    return {
-      programmes: programmes.map(programme => getTextIn(programme.name)) ?? [],
-      programmeList: getProgrammesList('\n'),
-      exportValue: getProgrammesList('; '),
-    }
   }
 
   const containsStudyTracks: boolean = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
@@ -323,6 +323,16 @@ export const GeneralTabContainer = ({
       .map(studyRight => studyRight.extentCode)
       .join(', ')
 
+  // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.
+  const getProgrammeList = ({ studentNumber }) => {
+    const other = studentToOtherProgrammesMap.get(studentNumber)
+    if (includePrimaryProgramme) {
+      const primary = studentToPrimaryProgrammeMap.get(studentNumber)
+      return [...(primary ? [primary] : []), ...(other ?? [])]
+    }
+    return other ?? []
+  }
+
   const {
     studentToStudyrightStartMap,
     studentToStudyrightEndMap,
@@ -337,7 +347,6 @@ export const GeneralTabContainer = ({
     combinedProgrammeCode,
     year,
     currentSemester?.semestercode,
-    getTextIn,
     shouldShowBachelorAndMaster
   )
 
@@ -355,6 +364,8 @@ export const GeneralTabContainer = ({
 
   const formatStudent = (student: any): FormattedStudentData => {
     const correctStudyRight = getStudyRight(student)
+    const programmesList = getProgrammeList(student)
+
     const result: FormattedStudentData = {
       firstNames: student.firstnames,
       lastName: student.lastname,
@@ -366,8 +377,8 @@ export const GeneralTabContainer = ({
       creditsHops: getCreditsFromHops(student),
       creditsSince: getCreditsBetween(student),
       studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : null,
-      studyRightStart: formatDate(studentToStudyrightStartMap[student.studentNumber], DateFormat.ISO_DATE),
-      programmeStart: formatDate(studentToProgrammeStartMap[student.studentNumber], DateFormat.ISO_DATE),
+      studyRightStart: formatDate(studentToStudyrightStartMap.get(student.studentNumber), DateFormat.ISO_DATE),
+      programmeStart: formatDate(studentToProgrammeStartMap.get(student.studentNumber), DateFormat.ISO_DATE),
       option: getTextIn(student.option?.name) ?? '',
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
@@ -375,7 +386,8 @@ export const GeneralTabContainer = ({
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),
-      programmes: getStudyProgrammes(student),
+      programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
+      programmeStatus: getStudyRightStatus(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
       admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
       gender: getGender(student.gender_code),
@@ -389,7 +401,7 @@ export const GeneralTabContainer = ({
     }
 
     if (combinedProgrammeCode || shouldShowBachelorAndMaster) {
-      const secondaryStudyRightEnd = studentToSecondStudyrightEndMap[student.studentNumber]
+      const secondaryStudyRightEnd = studentToSecondStudyrightEndMap.get(student.studentNumber)
       result.creditsCombinedProg = getCombinedProgrammeCredits(student)
       result.graduationDateCombinedProg = secondaryStudyRightEnd
         ? formatDate(secondaryStudyRightEnd, DateFormat.ISO_DATE)
@@ -397,14 +409,9 @@ export const GeneralTabContainer = ({
     }
 
     if (variant === 'customPopulation' && !programmeCode) {
-      const primaryProgramme = studentToPrimaryProgrammeMap[student.studentNumber]
+      const primaryProgramme = studentToPrimaryProgrammeMap.get(student.studentNumber)
       if (primaryProgramme) {
-        const primaryProgrammeName = getTextIn(primaryProgramme.name) ?? ''
-        result.primaryProgramme = primaryProgramme.graduated
-          ? `${primaryProgrammeName} (Graduated)`
-          : !primaryProgramme.active
-            ? `${primaryProgrammeName} (Inactive)`
-            : primaryProgrammeName
+        result.primaryProgramme = getTextIn(primaryProgramme.name) ?? ''
       }
     }
 
@@ -435,7 +442,7 @@ export const GeneralTabContainer = ({
         creditsSince: getCreditsSinceDisplayText(),
         creditsCombinedProg: getSecondaryProgCreditsDisplayText(),
         option: getOptionDisplayText(),
-        programmes: getProgrammesDisplayText(),
+        programmes: includePrimaryProgramme ? 'Study programmes' : 'Other programmes',
       }}
       formattedData={formattedData}
       group={group}

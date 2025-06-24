@@ -12,7 +12,7 @@ import TextField from '@mui/material/TextField'
 
 import { omit, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { validateInputLength } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -23,10 +23,8 @@ import { useDebouncedState } from '@/hooks/debouncedState'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
-import { getCourseStats, clearCourseStats } from '@/redux/courseStats'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { SearchHistoryItem } from '@/types/searchHistory'
-import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { queryParamsToString } from '@/util/queryparams'
 import { MemoizedCourseTable as CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
@@ -35,12 +33,9 @@ import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 // fail if the courses have small populations (this used to be limited to 40)
 const MAX_SELECTED_COURSES = 99999
 
-export const SearchForm = ({ onProgress, progress }) => {
+export const SearchForm = ({ progress, isPending }) => {
   const { getTextIn } = useLanguage()
-  const dispatch = useAppDispatch()
-  const location = useLocation()
   const navigate = useNavigate()
-  const isLoadingCourseStats = useAppSelector(state => state.courseStats.pending)
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
   const [courseName, setCourseName] = useState('')
@@ -70,33 +65,6 @@ export const SearchForm = ({ onProgress, progress }) => {
     setCourseCode(event.target.value)
     setDebouncedCourseCode(event.target.value)
   }
-
-  const parseQueryFromUrl = () => {
-    const search = parseQueryParams(location.search)
-    const query = {
-      courseCodes: JSON.parse(search.courseCodes as string),
-      separate: JSON.parse(search.separate as string),
-      combineSubstitutions: search.combineSubstitutionsFrom ?? JSON.parse(combineSubstitutions.toString()),
-    }
-    return query
-  }
-
-  const fetchStatisticsFromUrlParams = () => {
-    const query = parseQueryFromUrl()
-    dispatch(getCourseStats(query, onProgress))
-  }
-
-  useEffect(() => {
-    if (!location.search) {
-      dispatch(clearCourseStats())
-    }
-  }, [])
-
-  useEffect(() => {
-    if (location.search && location.search !== '?tab=0') {
-      fetchStatisticsFromUrlParams()
-    }
-  }, [location.search])
 
   const onSelectCourse = course => {
     const isSelected = !!selectedCourses[course.code]
@@ -166,8 +134,8 @@ export const SearchForm = ({ onProgress, progress }) => {
   const courses = matchingCourses.filter(course => !selectedCourses[course.code])
 
   const selected = Object.values(selectedCourses)
-  const noSelectedCourses = selected.length === 0
-  const disabled = isLoadingCourseStats || noSelectedCourses || selected.length > MAX_SELECTED_COURSES
+  const noSelectedCourses = !selected.length
+  const disabled = isPending ?? noSelectedCourses ?? selected.length > MAX_SELECTED_COURSES
 
   const addAllCourses = () => {
     const newSelectedCourses = courses.reduce((newSelected, course) => {
@@ -183,7 +151,7 @@ export const SearchForm = ({ onProgress, progress }) => {
 
   return (
     <Stack gap={2}>
-      <Backdrop open={isLoadingCourseStats} sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}>
+      <Backdrop open={isPending} sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}>
         <CircularProgress color="inherit" value={progress} variant="determinate" />
       </Backdrop>
       <Section title="Search for courses">
@@ -279,10 +247,7 @@ export const SearchForm = ({ onProgress, progress }) => {
                 )}
                 <CourseTable
                   courses={courses}
-                  hidden={
-                    isLoadingCourseStats ||
-                    (Object.keys(courses).length === 0 && Object.keys(selectedCourses).length > 0)
-                  }
+                  hidden={isPending ?? (!Object.keys(courses).length && !Object.keys(selectedCourses).length)}
                   onSelectCourse={onSelectCourse}
                   title="Searched courses"
                 />
