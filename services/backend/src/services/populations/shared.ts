@@ -222,6 +222,7 @@ export const parseCourseData = async (
     const semester = getPassingSemester(getYear(studentnumber), initialDate)
 
     course.students.all.add(studentnumber)
+    course.students.enrolledNoGrade.add(studentnumber)
     course.enrollments[state].add(studentnumber)
     course.enrollments.semesters[semester][state].add(studentnumber)
   }
@@ -244,6 +245,7 @@ export const parseCourseData = async (
     course.grades[grade] = { count: gradeCount + 1, status: { passingGrade, failingGrade, improvedGrade } }
 
     course.students.all.add(studentnumber)
+    course.students.enrolledNoGrade.delete(studentnumber)
     if (passingGrade) {
       if (!course.students.markedToSemester.has(studentnumber)) {
         course.students.markedToSemester.add(studentnumber)

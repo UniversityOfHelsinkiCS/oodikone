@@ -25,17 +25,6 @@ const getCumulativePassingSemesters = semesters => {
   return attemptStats
 }
 
-const getEnrolledNoGrade = course => {
-  const enrollments = new Set(course.enrollments.ENROLLED)
-
-  const { passed, failed, improvedPassedGrade } = course.students
-  passed.forEach(student => enrollments.delete(student))
-  failed.forEach(student => enrollments.delete(student))
-  improvedPassedGrade.forEach(student => enrollments.delete(student))
-
-  return Array.from(enrollments)
-}
-
 // courseStatsCounter legacy solution
 const getFinalStats = (course, populationCount) => {
   const stats = { ...course.stats }
@@ -62,10 +51,7 @@ const reconstructCourse = (course: CourseStats, populationCount: number) => ({
   ...course,
   // courseStatsCounter legacy solution
   students: Object.fromEntries(
-    Object.entries({
-      ...course.students,
-      enrolledNoGrade: getEnrolledNoGrade(course),
-    }).map(([key, val]) => [key, Object.fromEntries(val.map(n => [n, true]))])
+    Object.entries(course.students).map(([key, val]) => [key, Object.fromEntries(val.map(n => [n, true]))])
   ),
   stats: getFinalStats(course, populationCount),
 })
