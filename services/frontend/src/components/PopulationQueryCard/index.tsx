@@ -18,12 +18,12 @@ export const PopulationQueryCard = ({ query, skipQuery }) => {
   if (!students.length) return null
 
   return (
-    <Card variant="outlined">
+    <Card sx={{ height: 'fit-content' }} variant="outlined">
       <CardContent>
-        <Typography sx={{ color: 'text.primary' }} variant="subtitle1">
+        <Typography sx={{ fontWeight: '600' }} variant="subtitle1">
           Result details
         </Typography>
-        {tag && <Typography>{`Tagged with: ${tagName}`}</Typography>}
+        {tag && <Typography sx={{ fontWeight: '500' }}>{`Tagged with: ${tagName}`}</Typography>}
         <Typography sx={{ color: 'text.secondary' }}>
           {studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students
         </Typography>
