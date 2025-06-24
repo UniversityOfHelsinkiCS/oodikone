@@ -166,6 +166,7 @@ export const CoursePopulation = () => {
   return (
     <FilterView
       courses={population?.coursestatistics ?? []}
+      displayTray={!isFetching}
       filters={[
         genderFilter,
         studentNumberFilter,

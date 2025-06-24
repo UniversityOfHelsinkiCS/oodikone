@@ -31,9 +31,9 @@ export const FilterView: FC<{
   filters: (FilterFactory | Filter)[]
   students: Student[]
   courses: CourseStats[]
-  displayTray?: boolean
+  displayTray: boolean
   initialOptions?: Record<Filter['key'], any>
-}> = ({ children, name, filters: pFilters, students, courses, displayTray: displayTrayProp, initialOptions }) => {
+}> = ({ children, name, filters: pFilters, students, courses, displayTray, initialOptions }) => {
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = keyBy(filters, 'key')
@@ -42,8 +42,6 @@ export const FilterView: FC<{
     [storeFilterOptions, filters, initialOptions]
   )
   const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
-
-  const displayTray = displayTrayProp === undefined || !!displayTrayProp
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
@@ -105,9 +103,7 @@ export const FilterView: FC<{
         <div style={{ zIndex: 1, alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
           {displayTray && <FilterTray />}
         </div>
-        <div style={{ flexGrow: 1, minWidth: 0 }}>
-          {typeof children === 'function' ? children(filteredStudents, filteredCourses) : children}
-        </div>
+        <div style={{ flexGrow: 1, minWidth: 0 }}>{children(filteredStudents, filteredCourses)}</div>
       </div>
     </FilterViewContext.Provider>
   )

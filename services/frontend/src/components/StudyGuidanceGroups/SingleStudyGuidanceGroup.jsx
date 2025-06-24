@@ -222,6 +222,7 @@ const SingleStudyGroupFilterView = ({ group, population }) => {
   return (
     <FilterView
       courses={population?.coursestatistics ?? []}
+      displayTray={!!population?.coursestatistics}
       filters={viewFilters}
       initialOptions={initialOptions}
       name={`StudyGuidanceGroup(${group.id})`}
