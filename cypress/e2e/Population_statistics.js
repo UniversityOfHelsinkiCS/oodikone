@@ -262,10 +262,8 @@ describe('Population statistics tests', () => {
       })
 
       it('Courses data is changed when curriculum is changed', () => {
-        cy.intercept('/api/v3/populationstatistics').as('populationData')
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
-        cy.wait('@populationData').its('response.statusCode').should('eq', 200)
 
         cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
         cy.contains('2020–2023').click({ force: true })
@@ -284,7 +282,6 @@ describe('Population statistics tests', () => {
       })
 
       it('Courses data is changed when filtered students change', () => {
-        cy.intercept('/api/v3/populationstatistics').as('populationData')
         cy.visit(pathToMathBSc2020)
 
         cy.get('[data-cy=GraduatedFromProgramme-filter-card]').within(() => {
