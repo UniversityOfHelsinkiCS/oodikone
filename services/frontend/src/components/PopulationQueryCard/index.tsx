@@ -1,10 +1,7 @@
-import { minBy } from 'lodash'
 import { Card } from 'semantic-ui-react'
 
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { useGetPopulationStatisticsQuery } from '@/redux/populations'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
-import { reformatDate } from '@/util/timeAndDate'
 
 export const PopulationQueryCard = ({ query, skipQuery }) => {
   const { studentStatuses, tag } = query
@@ -25,7 +22,6 @@ export const PopulationQueryCard = ({ query, skipQuery }) => {
       </Card.Header>
       <Card.Meta>
         {tag ? <div style={{ color: 'black', fontWeight: 'bold' }}>{`Tagged with: ${tagName}`}</div> : null}
-        <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
         <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
         <div>
           {studentStatuses.includes('NONDEGREE') ? 'Includes' : 'Excludes'} students with non-degree study right
