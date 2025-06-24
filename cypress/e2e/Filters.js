@@ -36,9 +36,15 @@ const testRangeFilter = (parentEl, min, max, expected) => {
           checkFilteringResult(expected)
 
           cy.cs(parentEl).cs('range-selector-min').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-min').find('input').type(initialMin)
+          cy.cs(parentEl)
+            .cs('range-selector-min')
+            .find('input')
+            .type(initialMin ?? '0')
           cy.cs(parentEl).cs('range-selector-max').find('input').clear()
-          cy.cs(parentEl).cs('range-selector-max').find('input').type(initialMax)
+          cy.cs(parentEl)
+            .cs('range-selector-max')
+            .find('input')
+            .type(initialMax ?? '9000')
         })
     })
 }

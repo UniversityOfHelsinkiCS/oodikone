@@ -43,8 +43,8 @@ export const ageFilter = createFilter({
     const ages = students.map(student => getAge(student.birthdate))
 
     return {
-      min: ages.length > 0 ? Math.min(...ages) : undefined,
-      max: ages.length > 0 ? Math.max(...ages) : undefined,
+      min: ages.length ? Math.min(...ages) : null,
+      max: ages.length ? Math.max(...ages) : null,
     }
   },
 
