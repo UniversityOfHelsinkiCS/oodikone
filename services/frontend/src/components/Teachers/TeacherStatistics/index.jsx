@@ -25,15 +25,13 @@ export const TeacherStatistics = () => {
   const { data: semesterData } = useGetSemestersQuery()
   const { semesters: allSemesters } = semesterData ?? { semesters: {} }
 
-  const semesters = allSemesters
-    ? []
-    : Object.values(allSemesters)
-        .reverse()
-        .map(({ semestercode, name }, index) => ({
-          key: index,
-          value: semestercode,
-          text: getTextIn(name),
-        }))
+  const semesters = Object.values(allSemesters)
+    .reverse()
+    .map(({ semestercode, name }, index) => ({
+      key: index,
+      value: semestercode,
+      text: getTextIn(name),
+    }))
 
   const setStartSemester = (_, { value }) => {
     setSemesterStart(value)
