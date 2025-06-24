@@ -54,7 +54,7 @@ export const getEnrollments = (studentNumbers: string[], startDate: string): Pro
       },
       state: EnrollmentState.ENROLLED,
       enrollment_date_time: {
-        [Op.gt]: startDate,
+        [Op.gte]: startDate,
       },
     },
     raw: true,
