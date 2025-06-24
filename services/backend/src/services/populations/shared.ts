@@ -221,6 +221,7 @@ export const parseCourseData = async (
     const initialDate = new Date(enrollment_date_time)
     const semester = getPassingSemester(getYear(studentnumber), initialDate)
 
+    course.students.all.add(studentnumber)
     course.enrollments[state].add(studentnumber)
     course.enrollments.semesters[semester][state].add(studentnumber)
   }

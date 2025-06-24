@@ -224,14 +224,14 @@ describe('Population Statistics', () => {
       ]
       cy.cs('courseFilter-course-dropdown').click()
       cy.contains(`${courses[0].code} - ${courses[0].name}`).click()
-      checkFilteringResult(10)
+      checkFilteringResult(9)
       cy.cs(`courseFilter-${courses[0].code}-dropdown`).selectFromDropdown(1) // Passed students
-      checkFilteringResult(8)
+      checkFilteringResult(7)
       cy.cs('courseFilter-course-dropdown').click()
       cy.contains(`${courses[1].code} - ${courses[1].name}`).click()
-      checkFilteringResult(6)
-      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
       checkFilteringResult(5)
+      cy.cs(`courseFilter-${courses[1].code}-dropdown`).selectFromDropdown(1)
+      checkFilteringResult(4)
       courses.forEach(({ code }) => {
         cy.cs(`courseFilter-${code}-clear`).click()
       })

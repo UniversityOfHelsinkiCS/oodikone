@@ -27,9 +27,11 @@ const getCumulativePassingSemesters = semesters => {
 
 const getEnrolledNoGrade = course => {
   const enrollments = new Set(course.enrollments.ENROLLED)
-  for (const student of course.students.all) {
-    enrollments.delete(student)
-  }
+
+  const { passed, failed, improvedPassedGrade } = course.students
+  passed.forEach(student => enrollments.delete(student))
+  failed.forEach(student => enrollments.delete(student))
+  improvedPassedGrade.forEach(student => enrollments.delete(student))
 
   return Array.from(enrollments)
 }
@@ -39,7 +41,7 @@ const getFinalStats = (course, populationCount) => {
   const stats = { ...course.stats }
   const { students } = course
 
-  stats.students = Array.from(new Set([...course.students.all, ...course.enrollments.ENROLLED])).length
+  stats.students = course.students.all.length
   stats.passed = students.passed.length
   stats.failed = students.failed.length
   stats.attempts = course.attempts
@@ -50,7 +52,7 @@ const getFinalStats = (course, populationCount) => {
   stats.perStudent = percentageOf(course.attempts, stats.passed + stats.failed) / 100
   stats.passingSemestersCumulative = getCumulativePassingSemesters(stats.passingSemesters)
   stats.totalStudents = stats.students
-  stats.totalEnrolledNoGrade = getEnrolledNoGrade(course).length
+  stats.totalEnrolledNoGrade = students.enrolledNoGrade.length
   stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
   return stats
@@ -62,7 +64,7 @@ const reconstructCourse = (course: CourseStats, populationCount: number) => ({
   students: Object.fromEntries(
     Object.entries({
       ...course.students,
-      all: Array.from(new Set([...course.students.all, ...course.enrollments.ENROLLED])),
+      enrolledNoGrade: getEnrolledNoGrade(course),
     }).map(([key, val]) => [key, Object.fromEntries(val.map(n => [n, true]))])
   ),
   stats: getFinalStats(course, populationCount),

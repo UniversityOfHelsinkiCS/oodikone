@@ -33,7 +33,7 @@ export type CourseStats = {
    * failed: string[]
    * improvedPassedGrade: string[]
    * markedToSemester: string[]
-   * enrolledNoGrade: string[]
+   * enrolledNoGrade: string[] - this is not set in the backend
    */
   students: {
     [key: string]: string[]
