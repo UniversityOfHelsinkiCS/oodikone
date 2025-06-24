@@ -44,7 +44,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
               <FormControlLabel
                 control={
                   <Switch
-                    checked={primaryHopsCreditFilter || bothHopsCreditFilter}
+                    checked={!!primaryHopsCreditFilter || !!bothHopsCreditFilter}
                     onChange={() => filterDispatch(hopsFilter.actions.toggle(undefined))}
                   />
                 }
@@ -59,7 +59,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={combinedHopsCreditFilter || bothHopsCreditFilter}
+                      checked={!!combinedHopsCreditFilter || !!bothHopsCreditFilter}
                       onChange={() => filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))}
                     />
                   }

@@ -65,9 +65,9 @@ export const transferredToProgrammeFilter = createFilter({
     },
     // Toggle between 'null' -> 'All' and 'false' -> 'Not transferred'
     toggle: options => {
-      if (options.transferred || options.transferred === null) {
+      if (options.transferred !== false) {
         options.transferred = false
-      } else if (!options.transferred) {
+      } else {
         options.transferred = null
       }
     },
