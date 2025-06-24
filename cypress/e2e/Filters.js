@@ -132,8 +132,6 @@ describe('Population Statistics', () => {
   })
 
   it("Transfer filter is set to 'not transferred' by default", () => {
-    cy.contains('By default only students who have not transferred to this study programme are shown.')
-
     runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
       cy.cs('TransferredToProgramme-filter-card').get('[data-cy="option-havenot"] input').should('be.checked')
     })

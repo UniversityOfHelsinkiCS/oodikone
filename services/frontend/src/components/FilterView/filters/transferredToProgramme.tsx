@@ -63,6 +63,18 @@ export const transferredToProgrammeFilter = createFilter({
     set: (options, value) => {
       options.transferred = value
     },
+    // Toggle between 'null' -> 'All' and 'false' -> 'Not transferred'
+    toggle: options => {
+      if (options.transferred !== false) {
+        options.transferred = false
+      } else {
+        options.transferred = null
+      }
+    },
+  },
+
+  selectors: {
+    getState: ({ transferred }, _value) => transferred,
   },
 
   render: TransferredToProgrammeFilterCard,

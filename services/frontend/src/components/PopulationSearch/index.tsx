@@ -1,22 +1,29 @@
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import Button from '@mui/material/Button'
-import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
+import FormGroup from '@mui/material/FormGroup'
+import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
+import { useState } from 'react'
 import { Link } from 'react-router'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { hopsFilter } from '@/components/FilterView/filters'
+import { hopsFilter, transferredToProgrammeFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { Section } from '@/components/material/Section'
+import { AdvancedSettings } from './AdvancedSettings'
 import { PopulationSearchForm } from './PopulationSearchForm'
 import { PopulationSearchHistory } from './PopulationSearchHistory'
 
 export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound, combinedProgrammeCode }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
-  const onlyHopsCredit = useFilterSelector(hopsFilter.selectors.isActive())
-  const combinedHopsSelected = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
-  const bothHopsSelected = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
+
+  const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected())
+  const combinedHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgrammeCode))
+  const bothHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgrammeCode))
+
+  const transferredSelected = useFilterSelector(transferredToProgrammeFilter.selectors.getState())
 
   return (
     <Section
@@ -26,40 +33,66 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
     >
       <PopulationSearchForm />
       {!skipQuery && !isLoading && (
-        <FormControl sx={{ gap: 1 }} variant="standard">
-          <Link style={{ width: 'fit-content' }} to="/populations">
-            <Button startIcon={<KeyboardBackspaceIcon />} variant="contained">
-              Search new class
-            </Button>
-          </Link>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={onlyHopsCredit && (bothHopsSelected ?? !combinedHopsSelected)}
-                onChange={() => filterDispatch(hopsFilter.actions.toggle(undefined))}
+        <>
+          <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+            <FormGroup sx={{ gap: 1 }}>
+              <Link style={{ width: 'fit-content' }} to="/populations">
+                <Button startIcon={<KeyboardBackspaceIcon />} sx={{ mb: '10px' }} variant="contained">
+                  Search for a new class
+                </Button>
+              </Link>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!primaryHopsCreditFilter || !!bothHopsCreditFilter}
+                    onChange={() => filterDispatch(hopsFilter.actions.toggle(undefined))}
+                  />
+                }
+                label={
+                  combinedProgrammeCode
+                    ? 'Show only credits included in bachelor study plan'
+                    : 'Show only credits included in study plan'
+                }
+                sx={{ width: 'fit-content' }}
               />
-            }
-            label={
-              combinedProgrammeCode
-                ? 'Show only credits included in bachelor study plan'
-                : 'Show only credits included in study plan'
-            }
-            sx={{ width: 'fit-content' }}
-          />
-          {combinedProgrammeCode && (
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={!!combinedHopsSelected}
-                  onChange={() => filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))}
+              {combinedProgrammeCode && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={!!combinedHopsCreditFilter || !!bothHopsCreditFilter}
+                      onChange={() => filterDispatch(hopsFilter.actions.toggleCombinedProgramme(combinedProgrammeCode))}
+                    />
+                  }
+                  label="Show only credits included in licentiate study plan"
+                  sx={{ width: 'fit-content' }}
                 />
-              }
-              label="Show only credits included in licentiate study plan"
-              sx={{ width: 'fit-content' }}
-            />
-          )}
-          <PopulationSearchHistory query={query} skipQuery={skipQuery} />
-        </FormControl>
+              )}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={transferredSelected !== false}
+                    onChange={() => filterDispatch(transferredToProgrammeFilter.actions.toggle(undefined))}
+                  />
+                }
+                label="Show students who have transferred to the programme"
+              />
+              {query.year !== 'All' && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={showAdvancedSettings}
+                      data-cy="advanced-toggle"
+                      onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                    />
+                  }
+                  label="View advanced settings"
+                />
+              )}
+            </FormGroup>
+            <PopulationSearchHistory query={query} skipQuery={skipQuery} />
+          </Stack>
+          {showAdvancedSettings && <AdvancedSettings cleanUp={() => setShowAdvancedSettings(false)} query={query} />}
+        </>
       )}
     </Section>
   )
