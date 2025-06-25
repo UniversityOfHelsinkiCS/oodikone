@@ -12,12 +12,13 @@ router.get('/v3/curriculum-options/:code', async (req: Request, res: Response) =
 
 router.get('/v3/curriculum/:code/:periodIds', async (req: Request, res: Response) => {
   const { code, periodIds } = req.params
-  const result = await getCoursesAndModules(code, periodIds)
+  const { defaultProgrammeCourses, secondProgrammeCourses } = await getCoursesAndModules(code, periodIds)
+
   res.json({
-    defaultProgrammeCourses: result.defaultProgrammeCourses.courses,
-    defaultProgrammeModules: result.defaultProgrammeCourses.modules,
-    secondProgrammeCourses: result.secondProgrammeCourses?.courses,
-    secondProgrammeModules: result.secondProgrammeCourses?.modules,
+    defaultProgrammeCourses: defaultProgrammeCourses.courses,
+    defaultProgrammeModules: defaultProgrammeCourses.modules,
+    secondProgrammeCourses: secondProgrammeCourses.courses,
+    secondProgrammeModules: secondProgrammeCourses.modules,
   })
 })
 

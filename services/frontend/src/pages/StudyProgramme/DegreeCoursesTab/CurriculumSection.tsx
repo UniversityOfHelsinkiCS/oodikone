@@ -5,11 +5,11 @@ import { CurriculumPicker } from '@/components/material/CurriculumPicker'
 import { Section } from '@/components/material/Section'
 
 export const CurriculumSection = ({
-  programmeCodes,
+  programmeCode,
   setCurriculum,
   year,
 }: {
-  programmeCodes: string[]
+  programmeCode: string
   setCurriculum: (curriculum: any) => void
   year: string
 }) => {
@@ -17,7 +17,7 @@ export const CurriculumSection = ({
     <Section cypress="curriculum" title="Curriculum">
       <Stack alignItems="center" direction="row" gap={1}>
         <Typography>Select curriculum to edit:</Typography>
-        <CurriculumPicker programmeCodes={programmeCodes} setCurriculum={setCurriculum} year={year} />
+        <CurriculumPicker programmeCode={programmeCode} setCurriculum={setCurriculum} year={year} />
       </Stack>
     </Section>
   )

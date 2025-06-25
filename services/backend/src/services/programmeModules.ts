@@ -1,6 +1,7 @@
 import { Op, QueryTypes } from 'sequelize'
 
-import { CurriculumOption, Name } from '@oodikone/shared/types'
+import { ProgrammeModule } from '@oodikone/shared/models'
+import { CurriculumOption, DegreeProgrammeType, Name } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
 import { CurriculumPeriodModel, ProgrammeModuleModel } from '../models'
 import { ExcludedCourseModel } from '../models/kone'
@@ -46,27 +47,14 @@ export const getCurriculumOptions = async (code: string) => {
   }
 }
 
-type ModuleWithChildren = Pick<
-  ProgrammeModuleModel,
-  | 'id'
-  | 'code'
-  | 'name'
-  | 'type'
-  | 'order'
-  | 'organization_id'
-  | 'valid_from'
-  | 'valid_to'
-  | 'group_id'
-  | 'curriculum_period_ids'
-> & {
-  parent_id: string
-  created_at: Date
-  updated_at: Date
-  study_level: string | null
-  degree_programme_type: string | null
-  module_order: number | null
-  parent_name: Name
+type ModuleWithChildren = Pick<ProgrammeModule, 'id' | 'type' | 'code' | 'name'> & {
+  // TODO: This is supposed to be in the ProgrammeModule
+  degree_programme_type: DegreeProgrammeType | null
+
+  module_order: number
+  parent_name: Name | null
   parent_code: string | null
+  parent_id: string | null
 }
 
 const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_ids: string[]) => {
@@ -75,15 +63,47 @@ const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_i
   try {
     const result: ModuleWithChildren[] = await connection.query(
       `WITH RECURSIVE children as (
-        SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS parent_name, NULL AS parent_code, NULL as parent_id FROM programme_modules pm
-        WHERE pm.code = ? AND ARRAY[?]::text[] && curriculum_period_ids
+        SELECT
+          DISTINCT pm.*,
+          0 AS module_order,
+          NULL::jsonb AS parent_name,
+          NULL AS parent_code,
+          NULL as parent_id
+        FROM programme_modules pm
+        WHERE pm.code = :code
+          AND ARRAY[:curriculum_period_ids]::text[] && curriculum_period_ids
         UNION ALL
-        SELECT pm.*, c.order AS module_order, c.name AS parent_name, c.code AS parent_code, c.id as parent_id
+        SELECT
+          pm.*,
+          c.order AS module_order,
+          c.name AS parent_name,
+          c.code AS parent_code,
+          c.id as parent_id
         FROM children c, programme_modules pm, programme_module_children pmc
-        WHERE c.id = pmc.parent_id AND pm.group_id = pmc.child_id AND (ARRAY[?]::text[] && pm.curriculum_period_ids OR pm.type = 'course' OR pm.code is null)
+        WHERE c.id = pmc.parent_id
+          AND pm.group_id = pmc.child_id
+          AND (
+           ARRAY[:curriculum_period_ids]::text[] && pm.curriculum_period_ids
+           OR pm.type = 'course'
+           OR pm.code is null
+          )
         GROUP BY pm.id, c.name, c.code, c.order, c.id
-      ) SELECT * FROM children`,
-      { replacements: [code, curriculum_period_ids, curriculum_period_ids], type: QueryTypes.SELECT }
+      ) SELECT
+        id,
+        type,
+        module_order,
+        parent_code,
+        parent_name,
+        parent_id,
+
+        code,
+        name,
+        degree_programme_type
+      FROM children`,
+      {
+        replacements: { code, curriculum_period_ids },
+        type: QueryTypes.SELECT,
+      }
     )
     return result
   } catch (error) {
@@ -94,11 +114,11 @@ const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_i
 }
 
 const modifyParent = (course: ModuleWithChildren, moduleMap: Record<string, ModuleWithChildren>) => {
-  let parent = moduleMap[course.parent_id]
+  let parent = moduleMap[course.parent_id!]
   const parents: any[] = []
   while (parent) {
     parents.push(parent)
-    parent = moduleMap[parent.parent_id]
+    parent = moduleMap[parent.parent_id!]
   }
 
   const skip = 0
@@ -117,12 +137,13 @@ const modifyParent = (course: ModuleWithChildren, moduleMap: Record<string, Modu
 const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: ExcludedCourseModel[]) => {
   return modules.map(module => {
     const label = {
-      id: module.parent_name.fi,
-      label: `${module.parent_code}\n${module.parent_name.fi}`,
+      id: module.parent_name?.fi,
+      label: `${module.parent_code}\n${module.parent_name?.fi}`,
       orderNumber: module.module_order,
     }
     const foundCourse = excludedCourses.find(course => course.course_code === module.code)
     const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
+
     return { ...module, label, visible }
   })
 }
@@ -157,15 +178,36 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
         index
     )
 
-  return { courses: labelProgrammes(modifiedCourses, excludedCourses), modules }
+  return {
+    courses: labelProgrammes(modifiedCourses, excludedCourses).map(mod => ({
+      code: mod.code,
+      name: mod.name,
+      degree_programme_type: mod.degree_programme_type,
+      module_order: mod.module_order,
+      parent_code: mod.parent_code,
+      parent_name: mod.parent_name,
+      label: mod.label,
+      visible: mod.visible,
+    })),
+    modules: modules.map(mod => ({
+      code: mod.code,
+      name: mod.name,
+      degree_programme_type: mod.degree_programme_type,
+      module_order: mod.module_order,
+      parent_code: mod.parent_code,
+      parent_name: mod.parent_name,
+    })),
+  }
 }
 
 export const getCoursesAndModules = async (code: string, periodIds: string) => {
   const defaultProgrammeCourses = await getCoursesAndModulesForProgramme(code, periodIds)
+
   if (code in combinedStudyProgrammes) {
     const secondProgramme = combinedStudyProgrammes[code as keyof typeof combinedStudyProgrammes]
     const secondProgrammeCourses = await getCoursesAndModulesForProgramme(secondProgramme, periodIds)
     return { defaultProgrammeCourses, secondProgrammeCourses }
   }
+
   return { defaultProgrammeCourses, secondProgrammeCourses: { courses: [], modules: [] } }
 }

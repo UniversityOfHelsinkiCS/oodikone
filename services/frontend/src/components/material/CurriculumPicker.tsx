@@ -7,58 +7,45 @@ import { useEffect, useState } from 'react'
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
 import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
 
-const chooseCurriculumToFetch = (
-  curriculums: CurriculumOption[],
-  selectedCurriculum: CurriculumOption | undefined,
-  startYear: string
-) => {
-  if (selectedCurriculum?.periodIds) {
-    return selectedCurriculum
-  }
-
-  return (
-    curriculums?.find(curriculum => new Date(curriculum.validFrom) <= new Date(`${startYear}-08-01`)) ??
-    curriculums[0] ??
-    null
-  )
-}
-
 export const CurriculumPicker = ({
-  disabled = false,
-  programmeCodes,
+  programmeCode,
   setCurriculum,
   year,
+  disabled = false,
 }: {
   disabled?: boolean
-  programmeCodes: string[]
+  programmeCode: string
   setCurriculum: (curriculum: (CurriculumDetails & { version: string[] }) | null) => void
   year: string
 }) => {
-  const { data: curriculums = [] } = useGetCurriculumOptionsQuery(
-    { code: programmeCodes[0] },
-    { skip: !programmeCodes[0] }
+  const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | undefined>(undefined)
+
+  const { data: curriculums = [], isFetching: curriculumsLoading } = useGetCurriculumOptionsQuery(
+    { code: programmeCode },
+    { skip: !programmeCode }
   )
-  const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | undefined>()
-  const chosenCurriculum = chooseCurriculumToFetch(curriculums, selectedCurriculum, year)
+
+  const chosenCurriculum: CurriculumOption | null =
+    selectedCurriculum ??
+    curriculums?.find(curriculum => new Date(curriculum.validFrom) <= new Date(`${year}-08-01`)) ??
+    curriculums?.[0] ??
+    null
+
   const { data: chosenCurriculumData } = useGetCurriculumsQuery(
     {
-      code: programmeCodes[0],
+      code: programmeCode,
       periodIds: chosenCurriculum?.periodIds,
     },
-    { skip: !chosenCurriculum?.periodIds }
+    { skip: curriculumsLoading || !chosenCurriculum?.periodIds }
   )
 
   useEffect(() => {
-    if (!chosenCurriculumData) {
-      setCurriculum(null)
-    } else {
+    if (chosenCurriculumData) {
       setCurriculum({ ...chosenCurriculumData, version: chosenCurriculum.periodIds })
     }
-  }, [chosenCurriculum, chosenCurriculumData])
+  }, [chosenCurriculumData])
 
-  if (curriculums.length === 0) {
-    return null
-  }
+  if (curriculumsLoading) return null
 
   return (
     <FormControl disabled={disabled} variant="standard">
@@ -70,9 +57,9 @@ export const CurriculumPicker = ({
         onChange={event => setSelectedCurriculum(curriculums.find(({ id }) => id === event.target.value))}
         value={chosenCurriculum.id}
       >
-        {curriculums.map(curriculum => (
-          <MenuItem key={curriculum.id} value={curriculum.id}>
-            {curriculum.name}
+        {curriculums.map(({ id, name }) => (
+          <MenuItem key={id} value={id}>
+            {name}
           </MenuItem>
         ))}
       </Select>

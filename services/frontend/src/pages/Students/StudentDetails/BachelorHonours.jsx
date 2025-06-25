@@ -141,7 +141,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
         <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
         <CurriculumPicker
-          programmeCodes={[programmeCode]}
+          programmeCode={programmeCode}
           setCurriculum={setCurriculum}
           year={new Date().getFullYear().toString()}
         />

@@ -34,7 +34,7 @@ export const CourseTableModeSelector = ({
       <div>
         <CurriculumPicker
           disabled={courseTableMode !== 'curriculum'}
-          programmeCodes={[studyProgramme]}
+          programmeCode={studyProgramme}
           setCurriculum={setCurriculum}
           year={year}
         />

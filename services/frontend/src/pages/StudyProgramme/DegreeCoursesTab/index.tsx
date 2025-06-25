@@ -63,11 +63,7 @@ export const DegreeCoursesTab = ({
 
   return (
     <Stack gap={2}>
-      <CurriculumSection
-        programmeCodes={[studyProgramme, combinedProgramme]}
-        setCurriculum={setCurriculum}
-        year={year}
-      />
+      <CurriculumSection programmeCode={studyProgramme} setCurriculum={setCurriculum} year={year} />
       {isBachelorOrLicentiateProgramme(studyProgramme) && (
         <CreditCriteriaSection criteria={criteria} studyProgramme={studyProgramme} />
       )}
