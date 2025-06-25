@@ -1,7 +1,7 @@
 import { max, min } from 'lodash'
 
 import { Name } from '@oodikone/shared/types'
-import { getSemesterNameByCode } from '../semesters'
+import { getSemesterNames } from '../semesters'
 import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
@@ -301,16 +301,21 @@ export class CourseYearlyStatsCounter {
       return `${startYear}-${endYear}`
     }
 
-    for (let i = first + 1; i <= last; i++) {
-      if (this.groups[i]) {
-        continue
-      }
+    const groups = Object.keys(this.groups)
+    const a = first
+    const b = last + 1
+    const range = [...Array(b - a).keys()].map(v => v + a)
+    const diff = range.filter(v => !groups.includes(v.toString()))
 
+    const semesters = await getSemesterNames(diff)
+
+    diff.forEach(i => {
       const previous = this.groups[i - 1]
-      const semester = await getSemesterNameByCode(i)
-      const name = typeof previous.name === 'string' ? getNextYear(previous.name) : semester.name
-      this.initGroup(i, name, this.groups[i - 1].coursecode, i)
-    }
+      const semester = semesters[i]
+      const name = typeof previous.name === 'string' ? getNextYear(previous.name) : semester
+
+      this.initGroup(i, name, previous.coursecode, i)
+    })
   }
 
   private async parseGroupStatistics(anonymizationSalt: string | null) {
