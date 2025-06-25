@@ -1,23 +1,16 @@
-import { useEffect } from 'react'
 import { Form, Input, Radio } from 'semantic-ui-react'
 
 import { CurriculumPicker } from '@/components/material/CurriculumPicker'
 
 export const CourseTableModeSelector = ({
   courseTableMode,
-  filteredStudents,
   onStudentAmountLimitChange,
   setCourseTableMode,
   setCurriculum,
-  setStudentAmountLimit,
   studentAmountLimit,
   studyProgramme,
   year,
 }) => {
-  useEffect(() => {
-    setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
-
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>

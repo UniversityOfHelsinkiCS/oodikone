@@ -16,14 +16,15 @@ import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
 export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, filteredCourses }) => {
-  const { isLoading: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const { useFilterSelector } = useFilters()
-  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-  const [curriculum, setCurriculum] = useState(null)
 
-  const filteredStudentsLength = filteredStudents?.length ?? 0
-  useEffect(() => setStudentAmountLimit(filteredStudentsLength * 0.3), [filteredStudentsLength])
+  const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
+
+  const [curriculum, setCurriculum] = useState(null)
+  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+
+  useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
   const [programme, combinedProgramme] = programmeCodes
   const criteria = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
@@ -31,15 +32,12 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   const onStudentAmountLimitChange = value => {
-    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
+    if (!Number.isNaN(Number(value))) setStudentAmountLimit(+value)
   }
 
-  if (isLoading || !Object.keys(query).length) {
-    return null
-  }
+  if (isLoading || authLoading) return null
 
   const onlyIamRights =
-    !authLoading &&
     !fullAccessToStudentData &&
     !fullStudyProgrammeRights.includes(programme) &&
     !fullStudyProgrammeRights.includes(combinedProgramme)
@@ -50,14 +48,12 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
-          {filteredStudents.length > 0 && (
-            <CreditAccumulationGraphHighCharts
-              programmeCodes={programmeCodes.filter(Boolean)}
-              showBachelorAndMaster={query?.showBachelorAndMaster === 'true'}
-              students={filteredStudents}
-              studyPlanFilterIsActive={studyPlanFilterIsActive}
-            />
-          )}
+          <CreditAccumulationGraphHighCharts
+            programmeCodes={programmeCodes.filter(Boolean)}
+            showBachelorAndMaster={query?.showBachelorAndMaster === 'true'}
+            students={filteredStudents}
+            studyPlanFilterIsActive={studyPlanFilterIsActive}
+          />
         </div>
       ),
     },
@@ -79,11 +75,9 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
         <div>
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
-            filteredStudents={filteredStudents}
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             setCourseTableMode={setCourseTableMode}
             setCurriculum={setCurriculum}
-            setStudentAmountLimit={setStudentAmountLimit}
             studentAmountLimit={studentAmountLimit}
             studyProgramme={programme}
             year={query?.year}
@@ -92,7 +86,6 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
             courseTableMode={courseTableMode}
             curriculum={curriculum}
             filteredCourses={filteredCourses}
-            filteredStudents={filteredStudents}
             isPending={isLoading}
             onlyIamRights={onlyIamRights}
             query={query}

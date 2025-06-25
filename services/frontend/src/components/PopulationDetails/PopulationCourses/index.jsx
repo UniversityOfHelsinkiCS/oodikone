@@ -11,7 +11,6 @@ export const PopulationCourses = ({
   isPending,
   query,
   filteredCourses,
-  filteredStudents,
   onlyIamRights,
   curriculum,
   courseTableMode,
@@ -43,11 +42,7 @@ export const PopulationCourses = ({
         pending={isPending}
       />
     ) : (
-      <PopulationCourseStatsFlat
-        filteredCourses={filteredCourses}
-        filteredStudents={filteredStudents}
-        studentAmountLimit={studentAmountLimit}
-      />
+      <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     )}
   </Segment>
 )

@@ -6,11 +6,8 @@ export const checkUserAccess = (requiredRoles: Role[], roles: Role[]) => {
   return intersection(requiredRoles, roles).length > 0
 }
 
-export const getFullStudyProgrammeRights = (programmeRights: DetailedProgrammeRights[]) => {
-  if (programmeRights) {
-    return programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
-  }
-  return []
+export const getFullStudyProgrammeRights = (programmeRights: DetailedProgrammeRights[] = []) => {
+  return programmeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 }
 
 export const hasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {

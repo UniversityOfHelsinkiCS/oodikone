@@ -79,7 +79,7 @@ const parseQueryFromUrl = (location): [boolean, Query] => {
   return [skipQuery, query]
 }
 
-const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode) =>
+const mapStudentDataToStudents = (programmeCode: string, combinedProgrammeCode: string, samples: any[] = []) =>
   samples.map(student => {
     const hopsCredits = student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
     const hopsCombinedProgrammeCredits =
@@ -87,6 +87,7 @@ const mapStudentDataToStudents = (samples, programmeCode, combinedProgrammeCode)
     const studyrightStartDate = new Date(student.studyrightStart)
     const courses = student.courses.filter(({ date }) => studyrightStartDate <= new Date(date))
     const credits = getStudentTotalCredits({ courses })
+
     return {
       ...student,
       allCredits: student.credits,
@@ -138,15 +139,25 @@ export const PopulationStatistics = () => {
   useTitle('Class statistics')
   const [skipQuery, query] = parseQueryFromUrl(useLocation())
 
-  const { data: population, isFetching: isLoading } = useGetPopulationStatisticsQuery(query, {
+  const {
+    data: population,
+    isFetching: isLoading,
+    isSuccess,
+  } = useGetPopulationStatisticsQuery(query, {
     skip: skipQuery,
   })
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query.studyRights
 
   const students = useMemo(
-    () => mapStudentDataToStudents(population?.students ?? [], programmeCode, combinedProgrammeCode),
-    [population, programmeCode, combinedProgrammeCode]
+    () => mapStudentDataToStudents(programmeCode, combinedProgrammeCode, population?.students ?? []),
+    [programmeCode, combinedProgrammeCode, population?.students]
+  )
+
+  const populationTags = useMemo(
+    () =>
+      new Map(population?.students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname])) ?? []),
+    [population?.students]
   )
 
   const showBachelorAndMaster = !!combinedProgrammeCode || query?.showBachelorAndMaster === 'true'
@@ -225,7 +236,7 @@ export const PopulationStatistics = () => {
   return (
     <FilterView
       courses={population?.coursestatistics ?? []}
-      displayTray={!skipQuery}
+      displayTray={!skipQuery && isSuccess}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
@@ -235,7 +246,7 @@ export const PopulationStatistics = () => {
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header align="center" className="segmentTitle" size="large">
             {title} {!skipQuery && showBachelorAndMaster && '(Bachelor + Master view)'}
-            {!skipQuery && studyTrack && <Header.Subheader>studytrack {studyTrack}</Header.Subheader>}
+            {!skipQuery && !!studyTrack && <Header.Subheader>studytrack {studyTrack}</Header.Subheader>}
             {!skipQuery && (
               <Header.Subheader>
                 studytime {query.months} months, class size {students.length} students
@@ -248,10 +259,11 @@ export const PopulationStatistics = () => {
               combinedProgrammeCode={combinedProgrammeCode}
               isLoading={isLoading}
               populationFound={!!students.length}
+              populationTags={populationTags}
               query={query}
               skipQuery={skipQuery}
             />
-            {!skipQuery && (
+            {!skipQuery && isSuccess && (
               <PopulationDetails
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}

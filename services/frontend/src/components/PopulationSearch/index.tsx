@@ -12,10 +12,17 @@ import { hopsFilter, transferredToProgrammeFilter } from '@/components/FilterVie
 import { useFilters } from '@/components/FilterView/useFilters'
 import { Section } from '@/components/material/Section'
 import { AdvancedSettings } from './AdvancedSettings'
+import { PopulationQueryCard } from './PopulationQueryCard'
 import { PopulationSearchForm } from './PopulationSearchForm'
-import { PopulationSearchHistory } from './PopulationSearchHistory'
 
-export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound, combinedProgrammeCode }) => {
+export const PopulationSearch = ({
+  query,
+  skipQuery,
+  isLoading,
+  populationFound,
+  combinedProgrammeCode,
+  populationTags,
+}) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
 
@@ -89,7 +96,7 @@ export const PopulationSearch = ({ query, skipQuery, isLoading, populationFound,
                 />
               )}
             </FormGroup>
-            <PopulationSearchHistory query={query} skipQuery={skipQuery} />
+            <PopulationQueryCard populationTags={populationTags} query={query} />
           </Stack>
           {showAdvancedSettings && <AdvancedSettings cleanUp={() => setShowAdvancedSettings(false)} query={query} />}
         </>

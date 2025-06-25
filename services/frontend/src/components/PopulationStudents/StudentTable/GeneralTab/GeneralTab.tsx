@@ -4,7 +4,7 @@ import {
   createMRTColumnHelper,
   useMaterialReactTable,
 } from 'material-react-table'
-import { useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
@@ -25,17 +25,18 @@ export type DynamicColumnTitles = {
   secondaryEndDate: string
 }
 
-export const GeneralTab = ({
-  formattedData,
-  variant,
-  isCombinedProg,
-  showAdminColumns,
-  dynamicTitles,
-  group,
-  customPopulationProgramme,
-  admissionTypeVisible,
-  studyTrackVisible,
-}: {
+const getDefaultState = (namesVisible: boolean, studyTrackVisible: boolean, admissionTypeVisible: boolean) => ({
+  lastName: namesVisible,
+  firstNames: namesVisible,
+  email: false,
+  phoneNumber: false,
+  studyTrack: studyTrackVisible,
+  admissionType: admissionTypeVisible,
+  semesterEnrollmentExport: false,
+  programmeExport: false,
+})
+
+export const GeneralTab: FC<{
   formattedData: FormattedStudentData[]
   variant: Variant
   isCombinedProg: boolean
@@ -45,6 +46,16 @@ export const GeneralTab = ({
   customPopulationProgramme: any
   studyTrackVisible: boolean
   admissionTypeVisible: boolean
+}> = ({
+  formattedData,
+  variant,
+  isCombinedProg,
+  showAdminColumns,
+  dynamicTitles,
+  group,
+  customPopulationProgramme,
+  admissionTypeVisible,
+  studyTrackVisible,
 }) => {
   const { language } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -52,29 +63,14 @@ export const GeneralTab = ({
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
 
-  const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>({
-    lastName: namesVisible,
-    firstNames: namesVisible,
-    email: false,
-    phoneNumber: false,
-    studyTrack: studyTrackVisible,
-    admissionType: admissionTypeVisible,
-    semesterEnrollmentExport: false,
-    programmeExport: false,
-  })
+  const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>(
+    getDefaultState(namesVisible, studyTrackVisible, admissionTypeVisible)
+  )
 
-  useEffect(() => {
-    setColumnVisibility({
-      lastName: namesVisible,
-      firstNames: namesVisible,
-      email: false,
-      phoneNumber: false,
-      studyTrack: studyTrackVisible,
-      admissionType: admissionTypeVisible,
-      semesterEnrollmentExport: false,
-      programmesExport: false,
-    })
-  }, [namesVisible, studyTrackVisible, admissionTypeVisible])
+  useEffect(
+    () => setColumnVisibility(getDefaultState(namesVisible, studyTrackVisible, admissionTypeVisible)),
+    [namesVisible, studyTrackVisible, admissionTypeVisible]
+  )
 
   const baseColumns = [
     'lastName',
@@ -227,7 +223,7 @@ export const GeneralTab = ({
   const table = useMaterialReactTable({
     ...defaultOptions,
     columns,
-    data: formattedData ?? [],
+    data: formattedData,
     state: {
       columnVisibility,
       columnPinning: { left: ['studentNumber'] },

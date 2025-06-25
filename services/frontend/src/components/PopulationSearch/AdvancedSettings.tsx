@@ -14,18 +14,24 @@ import { formatToArray } from '@oodikone/shared/util'
 import { getMonths } from './common'
 
 export const AdvancedSettings = ({ query, cleanUp }) => {
+  const {
+    studyRights,
+    studentStatuses: queryStudentStatuses,
+    tag,
+    months: queryMonths,
+    year,
+    semesters: querySemesters,
+  } = query
   const navigate = useNavigate()
 
-  const [semesters, setSemesters] = useState(
-    query.semesters.length ? formatToArray(query.semesters) : ['FALL', 'SPRING']
-  )
-  const [studentStatuses, setStudentStatuses] = useState(query.studentStatuses)
-  const [months, setMonths] = useState(query.months ?? 0)
+  const [semesters, setSemesters] = useState(querySemesters ? formatToArray(querySemesters) : ['FALL', 'SPRING'])
+  const [studentStatuses, setStudentStatuses] = useState(queryStudentStatuses)
+  const [months, setMonths] = useState(queryMonths ?? 0)
 
   const handleSemesterSelection = ({ target: { name } }: React.ChangeEvent<HTMLInputElement>) => {
-    if (!query.tag) {
+    if (!tag) {
       const newSemesters = semesters.includes(name) ? semesters.filter(sem => sem !== name) : [...semesters, name]
-      const newMonths = getMonths(query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
+      const newMonths = getMonths(year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
       setSemesters(newSemesters)
       setMonths(newMonths)
     }
@@ -39,8 +45,6 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
   }
 
   const pushQueryToUrl = () => {
-    const { studyRights, tag, year } = query
-
     const queryObject = {
       tag,
       year,
@@ -90,7 +94,7 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
             label="Students who have transferred out of the programme"
           />
         </FormGroup>
-        {!query.tag && (
+        {!tag && (
           <FormGroup sx={{ width: 'fit-content' }}>
             <FormLabel component="legend">Starting semesters</FormLabel>
             <FormControlLabel
