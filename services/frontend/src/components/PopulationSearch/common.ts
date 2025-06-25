@@ -1,6 +1,5 @@
-import moment from 'moment'
-
 export const getMonths = (year: string, term: 'FALL' | 'SPRING') => {
-  const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
-  return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
+  const now = new Date()
+  const start = term === 'FALL' ? new Date(`${year}-08-01`) : new Date(`${Number(year) + 1}-01-01`)
+  return (now.getFullYear() - start.getFullYear()) * 12 + now.getMonth() - start.getMonth() + 1
 }
