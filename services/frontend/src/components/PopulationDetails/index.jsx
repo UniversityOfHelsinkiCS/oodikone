@@ -10,6 +10,7 @@ import { PopulationStudentsContainer as PopulationStudents } from '@/components/
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { getFullStudyProgrammeRights } from '@/util/access'
+import { useCurriculumState } from '../../hooks/useCurriculums'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
@@ -21,8 +22,8 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const [curriculum, setCurriculum] = useState(null)
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.year)
 
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
@@ -75,12 +76,12 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
         <div>
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
+            curriculum={curriculum}
+            curriculumList={curriculumList}
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             setCourseTableMode={setCourseTableMode}
             setCurriculum={setCurriculum}
             studentAmountLimit={studentAmountLimit}
-            studyProgramme={programme}
-            year={query?.year}
           />
           <PopulationCourses
             courseTableMode={courseTableMode}
@@ -93,7 +94,6 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           />
         </div>
       ),
-      alwaysRender: true,
     },
     !onlyIamRights
       ? {

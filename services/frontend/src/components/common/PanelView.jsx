@@ -48,7 +48,7 @@ export const PanelView = ({ panels: initialPanels, viewTitle }) => {
             ),
           },
           content: {
-            content: (activeIndex.includes(index) || panel.alwaysRender) && (
+            content: activeIndex.includes(index) && (
               <div
                 key={panel.key}
                 ref={element => {

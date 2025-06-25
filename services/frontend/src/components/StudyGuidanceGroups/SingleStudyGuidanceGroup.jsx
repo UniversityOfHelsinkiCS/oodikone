@@ -1,5 +1,4 @@
 import moment from 'moment'
-import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, Divider, Header, Label } from 'semantic-ui-react'
 
@@ -21,6 +20,7 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { useCurriculumState } from '../../hooks/useCurriculums'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
@@ -28,7 +28,6 @@ const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
 const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
-  const [curriculum, setCurriculum] = useState(null)
 
   const criteria = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
@@ -44,6 +43,8 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
       combinedProgramme: programmeCodes[1] ? programmeCodes[1] : undefined,
     },
   }
+
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.year)
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -102,6 +103,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
         <div>
           <StudyGuidanceGroupPopulationCourses
             curriculum={curriculum}
+            curriculumList={curriculumList}
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             setCurriculum={setCurriculum}

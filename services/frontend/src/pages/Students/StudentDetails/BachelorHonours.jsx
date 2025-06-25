@@ -25,6 +25,7 @@ import { StyledAccordion } from '@/components/material/StyledAccordion'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DISPLAY_DATE_FORMAT } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
+import { useCurriculumState } from '../../../hooks/useCurriculums'
 
 const ModuleTable = ({ data, cypress, getTextIn }) => (
   <StyledTable data-cy={cypress}>
@@ -50,7 +51,11 @@ const ModuleTable = ({ data, cypress, getTextIn }) => (
 )
 
 export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
-  const [curriculum, setCurriculum] = useState(null)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(
+    programmeCode,
+    new Date().getFullYear().toString()
+  )
+
   const [showHonoursModules, setShowHonoursModules] = useState(false)
   const { defaultProgrammeModules: mandatoryModules } = curriculum ?? {}
   const { getTextIn } = useLanguage()
@@ -140,11 +145,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
       </Stack>
       <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
         <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
-        <CurriculumPicker
-          programmeCode={programmeCode}
-          setCurriculum={setCurriculum}
-          year={new Date().getFullYear().toString()}
-        />
+        <CurriculumPicker curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
       </Stack>
       {honours && (
         <StyledAccordion expanded={showHonoursModules} onChange={() => setShowHonoursModules(!showHonoursModules)}>

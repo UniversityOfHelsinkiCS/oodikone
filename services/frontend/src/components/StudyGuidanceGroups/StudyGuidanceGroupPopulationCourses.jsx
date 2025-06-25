@@ -11,6 +11,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
   studyProgramme,
   year,
   curriculum,
+  curriculumList,
   setCurriculum,
 }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
@@ -24,14 +25,14 @@ export const StudyGuidanceGroupPopulationCourses = ({
       {curriculumsAvailable && (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
+          curriculum={curriculum}
+          curriculumList={curriculumList}
           filteredStudents={filteredStudents}
           onStudentAmountLimitChange={onStudentAmountLimitChange}
           setCourseTableMode={setCourseTableMode}
           setCurriculum={setCurriculum}
           setStudentAmountLimit={setStudentAmountLimit}
           studentAmountLimit={studentAmountLimit}
-          studyProgramme={studyProgramme}
-          year={year}
         />
       )}
       {courseTableMode === 'curriculum' ? (

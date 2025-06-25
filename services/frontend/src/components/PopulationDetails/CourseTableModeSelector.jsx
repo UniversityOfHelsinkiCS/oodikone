@@ -6,10 +6,10 @@ export const CourseTableModeSelector = ({
   courseTableMode,
   onStudentAmountLimitChange,
   setCourseTableMode,
+  curriculum,
+  curriculumList,
   setCurriculum,
   studentAmountLimit,
-  studyProgramme,
-  year,
 }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -33,10 +33,10 @@ export const CourseTableModeSelector = ({
       </div>
       <div>
         <CurriculumPicker
+          curriculum={curriculum}
+          curriculumList={curriculumList}
           disabled={courseTableMode !== 'curriculum'}
-          programmeCode={studyProgramme}
           setCurriculum={setCurriculum}
-          year={year}
         />
         <Form style={{ padding: '4px 4px 4px 8px' }}>
           <Form.Field inline>

@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
-import { CurriculumDetails, Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
+import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
+import { useCurriculumState } from '../../../hooks/useCurriculums'
 import { CreditCriteriaSection } from './CreditCriteriaSection'
 import { CurriculumSection } from './CurriculumSection'
 import { DegreeCourseTable } from './DegreeCourseTable'
@@ -21,7 +22,7 @@ export const DegreeCoursesTab = ({
 }) => {
   const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
-  const [curriculum, setCurriculum] = useState<(CurriculumDetails & { version: string[] }) | null>(null)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(studyProgramme, year)
   const { data: progressCriteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
   const emptyCriteria: ProgressCriteria = {
     allCourses: {},
@@ -63,7 +64,7 @@ export const DegreeCoursesTab = ({
 
   return (
     <Stack gap={2}>
-      <CurriculumSection programmeCode={studyProgramme} setCurriculum={setCurriculum} year={year} />
+      <CurriculumSection curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
       {isBachelorOrLicentiateProgramme(studyProgramme) && (
         <CreditCriteriaSection criteria={criteria} studyProgramme={studyProgramme} />
       )}
