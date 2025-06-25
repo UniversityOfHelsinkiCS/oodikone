@@ -24,14 +24,16 @@ type SemestersAndYears = {
   }
 }
 
-export const getSemesterNameByCode = async (semesterCode: number) => {
-  const semester = await SemesterModel.findOne({
-    attributes: ['name'],
+export const getSemesterNames = async (semesterCodes: number[]) => {
+  const semesters = await SemesterModel.findAll({
+    attributes: ['name', 'semestercode'],
     where: {
-      semestercode: semesterCode,
+      semestercode: { [Op.in]: semesterCodes },
     },
+    raw: true,
   })
-  return semester!
+
+  return Object.fromEntries(semesters?.map(({ name, semestercode }) => [semestercode, name]) ?? [])
 }
 
 export const getCurrentSemester = async () => {
