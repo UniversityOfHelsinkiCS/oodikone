@@ -2,7 +2,7 @@ import NorthEastIcon from '@mui/icons-material/NorthEast'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { Link } from 'react-router'
 
 import { getMonths, getStudyRights, getTitle, getUrl } from '@/util/populationLink'
@@ -31,7 +31,7 @@ export const PopulationLink = ({
   const months =
     year === 'Total'
       ? getMonths(Math.min(...(years ?? [])))
-      : Math.ceil(moment.duration(moment().diff(`${selectedYear}-08-01`)).asMonths())
+      : Math.ceil(dayjs().diff(`${selectedYear}-08-01`, 'months', true))
 
   const title = getTitle(selectedYear, year, tag)
 

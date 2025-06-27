@@ -1,8 +1,13 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { createFilter } from './createFilter'
+
+dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
@@ -164,8 +169,8 @@ const MODE_PREDICATES = {
   any: () => true,
   active: (_, studyRightElement) =>
     !studyRightElement.cancelled &&
-    moment().isSameOrAfter(studyRightElement.startDate, 'day') &&
-    (moment().isSameOrBefore(studyRightElement.endDate, 'day') || studyRightElement.endDate == null),
+    dayjs().isSameOrAfter(studyRightElement.startDate, 'day') &&
+    (dayjs().isSameOrBefore(studyRightElement.endDate, 'day') || studyRightElement.endDate == null),
 }
 
 export const programmeFilter = createFilter({

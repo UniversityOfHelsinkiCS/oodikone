@@ -18,7 +18,7 @@ import { PageTitle } from '@/components/material/PageTitle'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
-import { ISO_DATE_FORMAT, LONG_DATE_TIME_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -124,14 +124,14 @@ export const CloseToGraduation = () => {
       {
         accessorFn: row => new Date(row.studyright.startDate),
         id: 'startOfStudyRight',
-        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), DateFormat.ISO_DATE),
         header: 'Start of study right',
         filterVariant: 'date-range',
       },
       {
         accessorFn: row => new Date(row.programme.startedAt),
         id: 'startedInProgramme',
-        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), DateFormat.ISO_DATE),
         header: 'Started in programme',
         Header: (
           <TableHeaderWithTooltip
@@ -224,7 +224,7 @@ export const CloseToGraduation = () => {
             title={
               cell.getValue()
                 ? [
-                    `Attainment date: ${reformatDate(row.original.thesisInfo.attainmentDate, ISO_DATE_FORMAT)}`,
+                    `Attainment date: ${reformatDate(row.original.thesisInfo.attainmentDate, DateFormat.ISO_DATE)}`,
                     `Course code: ${row.original.thesisInfo.courseCode}`,
                     `Grade: ${row.original.thesisInfo.grade}`,
                   ].join('\n')
@@ -244,7 +244,7 @@ export const CloseToGraduation = () => {
         header: 'Latest attainment date – HOPS',
         accessorFn: row => new Date(row.attainmentDates.latestHops),
         id: 'latestAttainmentDateHops',
-        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), DateFormat.ISO_DATE),
         Header: (
           <TableHeaderWithTooltip
             header="Latest attainment date – HOPS"
@@ -257,7 +257,7 @@ export const CloseToGraduation = () => {
         header: 'Latest attainment date – Total',
         accessorFn: row => new Date(row.attainmentDates.latestTotal),
         id: 'latestAttainmentDateTotal',
-        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), DateFormat.ISO_DATE),
         Header: (
           <TableHeaderWithTooltip
             header="Latest attainment date – Total"
@@ -270,7 +270,7 @@ export const CloseToGraduation = () => {
         header: 'Earliest attainment date – HOPS',
         accessorFn: row => new Date(row.attainmentDates.earliestHops),
         id: 'earlistAttainmentDateHops',
-        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), ISO_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<Date>(), DateFormat.ISO_DATE),
         Header: (
           <TableHeaderWithTooltip
             header="Earliest attainment date – HOPS"
@@ -350,7 +350,7 @@ export const CloseToGraduation = () => {
       <Box sx={{ minHeight: '1.25rem' }}>
         {students?.lastUpdated ? (
           <Typography color="textSecondary" variant="body2">
-            Last updated: {reformatDate(students.lastUpdated, LONG_DATE_TIME_FORMAT)}
+            Last updated: {reformatDate(students.lastUpdated, DateFormat.LONG_DATE_TIME)}
           </Typography>
         ) : null}
       </Box>

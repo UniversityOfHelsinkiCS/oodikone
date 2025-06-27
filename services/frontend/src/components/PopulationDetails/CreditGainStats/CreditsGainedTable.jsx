@@ -1,11 +1,15 @@
-import moment from 'moment/moment'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import { Table } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
 import { hopsFilter as studyPlanFilter, creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { DISPLAY_DATE_FORMAT, ISO_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
+import { formatDate } from '@/util/timeAndDate'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
+
+dayjs.extend(isBetween)
 
 export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, year }) => {
   const { useFilterSelector } = useFilters()
@@ -23,16 +27,16 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
           .map(student => student.studentNumber)
 
   const getMonths = (start, end) => {
-    const lastDayOfMonth = moment(end).endOf('month')
-    return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+    const lastDayOfMonth = dayjs(end).endOf('month')
+    return Math.round(dayjs(lastDayOfMonth).diff(dayjs(start), 'months', true))
   }
 
-  const start = moment(`${year}-08-01`)
-  const end = moment().format(ISO_DATE_FORMAT)
+  const start = dayjs(`${year}-08-01`)
+  const end = formatDate(new Date(), DateFormat.ISO_DATE)
 
   const { startDate, endDate } = creditDateFilterOptions
   const months = getMonths(startDate ?? start, endDate ?? end)
-  const title = `${moment(startDate ?? start).format(DISPLAY_DATE_FORMAT)} and ${moment(endDate ?? end).format(DISPLAY_DATE_FORMAT)}`
+  const title = `${formatDate(startDate ?? start, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate ?? end, DateFormat.DISPLAY_DATE)}`
 
   if (studyPlanFilterIsActive) {
     creditList = filteredStudents.map(({ studentNumber, hopsCredits: credits }) => ({ studentNumber, credits }))
@@ -40,7 +44,7 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
     creditList = filteredStudents.map(({ studentNumber, courses }) => ({
       studentNumber,
       credits: getStudentTotalCredits({
-        courses: courses.filter(course => moment(course.date).isBetween(startDate ?? start, endDate ?? end)),
+        courses: courses.filter(course => dayjs(course.date).isBetween(startDate ?? start, endDate ?? end)),
       }),
     }))
   }

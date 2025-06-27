@@ -1,5 +1,5 @@
+import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash'
-import moment from 'moment'
 
 import { Graduated, SpecialGroups } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'
@@ -61,8 +61,8 @@ const calculateProgressStats = (
   const allYears = Object.keys(creditCounts)
   const limitsForYears = allYears.reduce<Record<string, ReturnType<typeof createLimits>>>((acc, year) => {
     const startDate = new Date(`${year.slice(0, 4)}-08-01`)
-    const lastDayOfMonth = moment().endOf('month')
-    const months = Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(startDate))).asMonths())
+    const lastDayOfMonth = dayjs().endOf('month')
+    const months = Math.round(dayjs(lastDayOfMonth).diff(startDate, 'months', true))
     const goalMonths = goalMonthsForLevels[level]
 
     acc[year] = createLimits(Math.min(months, goalMonths), 0, level === 'bcMs' ? 'master' : level)

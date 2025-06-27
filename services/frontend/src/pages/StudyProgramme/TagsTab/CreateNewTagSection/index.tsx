@@ -6,13 +6,13 @@ import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker/DatePicker'
 
-import { Moment } from 'moment'
+import type { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
-import { YEAR_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation } from '@/redux/tags'
 import { reformatDate } from '@/util/timeAndDate'
@@ -20,7 +20,7 @@ import { Tag } from '@oodikone/shared/types'
 
 export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; tags: Tag[] }) => {
   const [tagName, setTagName] = useState<string>('')
-  const [year, setYear] = useState<Moment | null>(null)
+  const [year, setYear] = useState<Dayjs | null>(null)
   const [personal, setPersonal] = useState(false)
   const { setStatusNotification } = useStatusNotification()
   const { id: userId } = useGetAuthorizedUserQuery()
@@ -32,7 +32,7 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
       name: tagName.trim(),
       personalUserId: personal ? userId : null,
       studyTrack,
-      year: year ? reformatDate(year.toDate(), YEAR_DATE_FORMAT) : null,
+      year: year ? reformatDate(year.toDate(), DateFormat.YEAR_DATE) : null,
     }
     void createTag(newTag)
     setTagName('')

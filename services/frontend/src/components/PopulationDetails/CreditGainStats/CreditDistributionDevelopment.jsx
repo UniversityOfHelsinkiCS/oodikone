@@ -1,8 +1,8 @@
+import dayjs from 'dayjs'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chain, range, sortBy } from 'lodash'
-import moment from 'moment'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 import { useLocation } from 'react-router'
@@ -34,10 +34,10 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
   const results = new Array(timeSlots.length).fill(0)
 
   chain(student.courses)
-    .filter(course => course.passed && !course.isStudyModuleCredit && moment(course.date).isAfter(timeSlots[0].start))
-    .orderBy(course => moment(course.date), ['asc'])
+    .filter(course => course.passed && !course.isStudyModuleCredit && dayjs(course.date).isAfter(timeSlots[0].start))
+    .orderBy(course => dayjs(course.date), ['asc'])
     .forEach(course => {
-      while (timeSlotN < timeSlots.length && moment(course.date).isAfter(timeSlots[timeSlotN].end)) {
+      while (timeSlotN < timeSlots.length && dayjs(course.date).isAfter(timeSlots[timeSlotN].end)) {
         timeSlotN++
       }
 
@@ -88,7 +88,7 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
     students
       .map((student, i) => [student, i])
       .forEach(([student, studentIndex]) => {
-        const hasGraduated = programme && hasGraduatedBeforeDate(student, programme, moment(slot.end))
+        const hasGraduated = programme && hasGraduatedBeforeDate(student, programme, dayjs(slot.end))
         const credits = studentCredits[studentIndex][timeSlotIndex]
 
         const rangeIndex = hasGraduated
@@ -154,13 +154,13 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
   const timeSlots = (() => {
-    const startDate = year ? moment([year]).endOf('year') : moment().subtract({ months }).endOf('year')
+    const startDate = year ? dayjs([year]).endOf('year') : dayjs().subtract({ months }).endOf('year')
 
     if (timeDivision === TimeDivision.CALENDAR_YEAR) {
-      const startYear = months === undefined ? year : moment().year() - Math.ceil(months / 12)
-      return range(startYear, moment().year() + 1).map(year => ({
-        start: moment({ year }),
-        end: moment({ year }).endOf('year'),
+      const startYear = months === undefined ? year : dayjs().year() - Math.ceil(months / 12)
+      return range(startYear, dayjs().year() + 1).map(year => ({
+        start: dayjs({ year }),
+        end: dayjs({ year }).endOf('year'),
         label: year,
       }))
     }
@@ -170,10 +170,10 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
         .groupBy('yearcode')
         .values()
         .map(([a, b]) => {
-          const s = sortBy([moment(a.startdate), moment(a.enddate), moment(b.startdate), moment(b.enddate)])
+          const s = sortBy([dayjs(a.startdate), dayjs(a.enddate), dayjs(b.startdate), dayjs(b.enddate)])
           return [s[0], s[s.length - 1]]
         })
-        .filter(([a, b]) => startDate.isBefore(b) && moment().isAfter(a))
+        .filter(([a, b]) => startDate.isBefore(b) && dayjs().isAfter(a))
         .map(([start, end]) => ({
           start,
           end,
@@ -184,7 +184,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
 
     if (timeDivision === TimeDivision.SEMESTER) {
       return Object.values(allSemesters)
-        .filter(semester => startDate.isBefore(semester.enddate) && moment().isAfter(semester.startdate))
+        .filter(semester => startDate.isBefore(semester.enddate) && dayjs().isAfter(semester.startdate))
         .map(semester => ({
           start: semester.startdate,
           end: semester.enddate,

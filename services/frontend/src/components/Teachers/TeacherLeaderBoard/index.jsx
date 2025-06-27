@@ -1,8 +1,8 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Message, Segment } from 'semantic-ui-react'
 
-import { LONG_DATE_TIME_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetTopTeachersCategoriesQuery, useGetTopTeachersQuery } from '@/redux/teachers'
 import { reformatDate } from '@/util/timeAndDate'
 import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
@@ -37,7 +37,7 @@ export const TeacherLeaderBoard = () => {
     .sort((y1, y2) => y2.value - y1.value)
     .filter(year => {
       const options =
-        moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
+        dayjs(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
           ? year.text.slice(0, 4) <= new Date().getFullYear()
           : year.text.slice(0, 4) < new Date().getFullYear()
       return options
@@ -66,7 +66,7 @@ export const TeacherLeaderBoard = () => {
       />
       <Segment loading={statsAreLoading}>
         {topTeachers.stats?.length > 0 && (
-          <Message>{`Last updated: ${reformatDate(topTeachers?.updated, LONG_DATE_TIME_FORMAT)}`}</Message>
+          <Message>{`Last updated: ${reformatDate(topTeachers?.updated, DateFormat.LONG_DATE_TIME)}`}</Message>
         )}
         <TeacherStatisticsTable statistics={topTeachers.stats ?? []} variant="leaderboard" />
       </Segment>

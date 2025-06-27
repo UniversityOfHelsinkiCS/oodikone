@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { useLocation, useNavigate } from 'react-router'
@@ -11,6 +11,7 @@ import {
   useUpdateOpenUniCourseSearchMutation,
 } from '@/redux/openUniPopulations'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { formatDate } from '@/util/timeAndDate'
 import { formatToArray } from '@oodikone/shared/util'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
@@ -20,8 +21,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const [input, setInput] = useState('')
   const [searchList, setSearches] = useState(savedSearches)
   const [name, setName] = useState('')
-  const [startdate, setStartdate] = useState(moment('01-08-2017 00:00:00', 'DD-MM-YYYY'))
-  const [enddate, setEnddate] = useState(moment().endOf('day'))
+  const [startdate, setStartdate] = useState(dayjs('01-08-2017 00:00:00', 'DD-MM-YYYY'))
+  const [enddate, setEnddate] = useState(dayjs().endOf('day'))
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const [updateOpenUniCourseSearch, { isLoading: updateIsLoading, data: updatedData }] =
     useUpdateOpenUniCourseSearchMutation()
@@ -63,8 +64,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     const courseCodes = formatToArray(courseCode)
     const query = {
       courseList: courseCodes,
-      startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),
-      enddate: moment(enddate, 'DD-MM-YYYY').endOf('day').toISOString(),
+      startdate: dayjs(startdate, 'DD-MM-YYYY').toISOString(),
+      enddate: dayjs(enddate, 'DD-MM-YYYY').endOf('day').toISOString(),
     }
     return query
   }
@@ -86,8 +87,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const clearForm = () => {
     setInput('')
     setName('')
-    setStartdate(moment('01-08-2017 00-00-00', 'DD-MM-YYYY'))
-    setEnddate(moment().endOf('day'))
+    setStartdate(dayjs('01-08-2017 00-00-00', 'DD-MM-YYYY'))
+    setEnddate(dayjs().endOf('day'))
     setSelectedSearchId('')
   }
 
@@ -101,18 +102,18 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     const query = {
       courseCode: courseList,
-      startdate: moment(startdate).isValid()
-        ? moment(startdate).format('DD-MM-YYYY')
-        : moment('01-08-2017', 'DD-MM-YYYY').format('DD-MM-YYYY'),
-      enddate: moment(enddate).isValid() ? moment(enddate).format('DD-MM-YYYY') : moment().format('DD-MM-YYYY'),
+      startdate: dayjs(startdate).isValid()
+        ? formatDate(startdate, 'DD-MM-YYYY')
+        : formatDate(new Date('01-08-2017'), 'DD-MM-YYYY'),
+      enddate: dayjs(enddate).isValid() ? formatDate(enddate, 'DD-MM-YYYY') : formatDate(new Date(), 'DD-MM-YYYY'),
     }
 
     setValues({
       courseList,
-      startdate: moment(startdate).isValid()
-        ? moment(startdate).toISOString()
-        : moment('01-08-2017', 'DD-MM-YYYY').toISOString(),
-      enddate: moment(enddate).isValid() ? moment(enddate).toISOString() : moment().toISOString(),
+      startdate: dayjs(startdate).isValid()
+        ? dayjs(startdate).toISOString()
+        : dayjs('01-08-2017', 'DD-MM-YYYY').toISOString(),
+      enddate: dayjs(enddate).isValid() ? dayjs(enddate).toISOString() : dayjs().toISOString(),
     })
     pushQueryToUrl(query)
     handleClose()

@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { FC } from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
 
@@ -15,7 +15,7 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
       onClick={() =>
         filterDispatch(
           creditDateFilter.actions.setOptions({
-            startDate: moment(options.studyStart),
+            startDate: dayjs(options.studyStart),
             endDate: null,
           })
         )

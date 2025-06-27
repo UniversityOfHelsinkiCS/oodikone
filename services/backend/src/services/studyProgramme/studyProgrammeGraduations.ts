@@ -1,5 +1,5 @@
+import dayjs from 'dayjs'
 import { indexOf, orderBy } from 'lodash'
-import moment from 'moment'
 
 import {
   GraduationStatistics,
@@ -49,15 +49,12 @@ const calculateAbsenceInMonths = (
   startDate: Date,
   endDate: Date
 ) => {
-  const absenceStart = moment(absence.startdate)
-  const absenceEnd = moment(absence.enddate)
-
-  if (absenceStart.isAfter(endDate) || absenceEnd.isBefore(startDate)) {
+  if (endDate < absence.startdate || absence.enddate < startDate) {
     return 0
   }
 
   // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
-  return Math.round(absenceEnd.diff(absenceStart, 'months', true))
+  return Math.round(dayjs(absence.enddate).diff(absence.startdate, 'months', true))
 }
 
 export const calculateDurationOfStudies = (
@@ -73,7 +70,7 @@ export const calculateDurationOfStudies = (
     (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
     0
   )
-  return Math.round(moment(graduationDate).subtract(monthsToSubtract, 'months').diff(moment(startDate), 'months', true))
+  return Math.round(dayjs(graduationDate).subtract(monthsToSubtract, 'months').diff(startDate, 'months', true))
 }
 
 export type GraduationTimes = {

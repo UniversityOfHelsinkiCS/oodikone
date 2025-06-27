@@ -10,7 +10,7 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useState } from 'react'
 
 import {
@@ -23,7 +23,7 @@ import { CurriculumPicker } from '@/components/material/CurriculumPicker'
 import { Section } from '@/components/material/Section'
 import { StyledAccordion } from '@/components/material/StyledAccordion'
 import { StyledTable } from '@/components/material/StyledTable'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { useCurriculumState } from '../../../hooks/useCurriculums'
 
@@ -39,7 +39,7 @@ const ModuleTable = ({ data, cypress, getTextIn }) => (
     <TableBody>
       {data.map(module => (
         <TableRow key={module.course.code}>
-          <TableCell>{reformatDate(module.date, DISPLAY_DATE_FORMAT)}</TableCell>
+          <TableCell>{reformatDate(module.date, DateFormat.DISPLAY_DATE)}</TableCell>
           <TableCell>
             {getTextIn(module.course.name)} ({module.course.code})
           </TableCell>
@@ -73,7 +73,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   )
 
   if (studyRightWithCorrectProgramme) {
-    studyStartDate = moment(studyRightWithCorrectProgramme.startDate)
+    studyStartDate = dayjs(studyRightWithCorrectProgramme.startDate)
     graduated = !!studyRightWithCorrectProgramme.studyRightElements.find(element => element.code === programmeCode)
       .graduated
   }
@@ -97,17 +97,17 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
   )
 
   if (degreeModule) {
-    const graduationDate = moment(degreeModule.date)
-    const yearsForGraduation = moment.duration(graduationDate.diff(studyStartDate)).asYears()
+    const graduationDate = dayjs(degreeModule.date)
+    const yearsForGraduation = dayjs.duration(graduationDate.diff(studyStartDate)).asYears()
 
     // calculate time student has been absent during bachelors degree
     const timeAbsent = absentYears.reduce((acc, curr) => {
-      const start = moment(curr.startdate)
-      const end = moment(curr.enddate)
+      const start = dayjs(curr.startdate)
+      const end = dayjs(curr.enddate)
 
       // if absent years are not in the degree start and end range return acc
       if (start < studyStartDate || start > graduationDate) return acc
-      const diff = moment.duration(end.diff(start)).asYears()
+      const diff = end.diff(start, 'years')
       return acc + diff
     }, 0)
     // round because absent count too accurate i.e. if a person has been absent a whole year

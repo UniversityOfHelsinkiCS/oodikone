@@ -18,7 +18,7 @@ import { getTextInWithOpen } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 
 const creditsColumnIndex = 3
@@ -59,7 +59,7 @@ export const CourseTables = ({ student, selectedStudyPlanId }) => {
 
     groupedCourses[academicYear].push([
       isIncluded,
-      reformatDate(date, DISPLAY_DATE_FORMAT),
+      reformatDate(date, DateFormat.DISPLAY_DATE),
       <div
         key={`${course.code}-${new Date(date).getTime()}-course-${grade}`}
         style={{ display: 'flex', justifyContent: 'space-between' }}

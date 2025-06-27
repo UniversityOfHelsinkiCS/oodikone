@@ -10,7 +10,7 @@ import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/ExternalLink'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { sisUrl } from '@/conf'
-import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { reformatDate } from '@/util/timeAndDate'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
@@ -21,7 +21,10 @@ export const StudentInfoCard = ({ student }) => {
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
 
-  const formattedTimestamp = reformatDate(student.updatedAt, isAdmin ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT)
+  const formattedTimestamp = reformatDate(
+    student.updatedAt,
+    isAdmin ? DateFormat.DISPLAY_DATE_DEV : DateFormat.DISPLAY_DATE
+  )
 
   const updateStudent = async () => {
     await callApi('/updater/update/v2/customlist/students', 'post', [student.studentNumber])

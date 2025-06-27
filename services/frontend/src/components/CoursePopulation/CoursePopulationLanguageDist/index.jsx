@@ -1,7 +1,10 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import { Table, Progress } from 'semantic-ui-react'
 
 import { languageAbbreviations } from '@/common'
+
+dayjs.extend(isBetween)
 
 export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
   let total = 0
@@ -11,7 +14,7 @@ export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
     samples.forEach(student => {
       const courses = student.courses.filter(course => codes.includes(course.course_code))
       const filteredCourses = courses
-        .filter(course => moment(course.date).isBetween(moment(from), moment(to)))
+        .filter(course => dayjs(course.date).isBetween(dayjs(from), dayjs(to)))
         .sort((a, b) => (new Date(a.date) <= new Date(b.date) ? -1 : 1))
 
       if (filteredCourses[0] && filteredCourses[0].language !== null) {

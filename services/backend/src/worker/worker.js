@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node')
 // eslint-disable-next-line no-redeclare
 const { Worker } = require('bullmq')
-const moment = require('moment')
+const dayjs = require('dayjs')
 
 const { redis, concurrentWorkers } = require('../config')
 const logger = require('../util/logger')
@@ -22,11 +22,12 @@ const worker = new Worker(queueName, `${__dirname}/processor.js`, {
 })
 
 worker.on('completed', job => {
-  const timeUsed = moment.duration(moment(job.finishedOn).diff(job.processedOn, undefined, true))
+  const timeUsedInSeconds = dayjs(job.finishedOn).diff(job.processedOn, 'seconds', true)
+  const timeUsedInMinutes = timeUsedInSeconds / 60
+
   const formattedTime =
-    timeUsed.asSeconds() > 60
-      ? `${timeUsed.asMinutes().toFixed(3)} minutes`
-      : `${timeUsed.asSeconds().toFixed(3)} seconds`
+    timeUsedInSeconds > 60 ? `${timeUsedInMinutes.toFixed(3)} minutes` : `${timeUsedInSeconds.toFixed(3)} seconds`
+
   logger.info(`Completed job: ${job.id} (took ${formattedTime})`)
 })
 

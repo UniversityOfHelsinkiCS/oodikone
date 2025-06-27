@@ -1,4 +1,7 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { getNewestProgrammeOfStudentAt } from '@/common'
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
@@ -9,13 +12,17 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 
+dayjs.extend(isBetween)
+dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
+
 export const findCorrectProgramme = (student, coursecodes, semesters, startDate, endDate, currentSemester) => {
   let programme
 
   const courseAttainment = student.courses.find(
     a =>
       coursecodes.includes(a.course_code) &&
-      moment(a.date).isBetween(startDate, endDate, 'date', '[]') &&
+      dayjs(a.date).isBetween(startDate, endDate, 'date', '[]') &&
       a.credittypecode !== 7
   )
 
@@ -30,8 +37,8 @@ export const findCorrectProgramme = (student, coursecodes, semesters, startDate,
   const correctSemesters = Object.values(semesters)
     .filter(
       semester =>
-        moment(semester.startdate).isSameOrAfter(startDate, 'day') &&
-        moment(semester.enddate).isSameOrBefore(endDate, 'day')
+        dayjs(semester.startdate).isSameOrAfter(startDate, 'day') &&
+        dayjs(semester.enddate).isSameOrBefore(endDate, 'day')
     )
     .map(semester => semester.semestercode)
   const courseEnrollment = student.enrollments?.find(

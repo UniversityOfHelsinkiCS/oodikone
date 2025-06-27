@@ -1,11 +1,12 @@
 import CssBaseline from '@mui/material/CssBaseline'
 import ThemeProvider from '@mui/material/styles/ThemeProvider'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment/AdapterMoment'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider'
 
 import * as Sentry from '@sentry/browser'
+import dayjs from 'dayjs'
+import updateLocale from 'dayjs/plugin/updateLocale'
 import HighCharts from 'highcharts'
-import moment from 'moment'
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
@@ -36,7 +37,8 @@ HighCharts.setOptions({
   },
 })
 
-moment.updateLocale('en', {
+dayjs.extend(updateLocale)
+dayjs.updateLocale('en', {
   week: {
     dow: 1, // First day of week is Monday
   },
@@ -58,7 +60,7 @@ const Layout = ({ children }) => (
     }}
   >
     <LanguageProvider>
-      <LocalizationProvider dateAdapter={AdapterMoment}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ThemeProvider theme={theme}>
           <StatusNotificationProvider>
             <CssBaseline />

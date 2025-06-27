@@ -1,7 +1,12 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
 import { getColumnValue } from '@/components/SortableTable/common'
+
+dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
 
 const DateColumnFilterComponent = ({ options, dispatch }) => {
   return (
@@ -38,11 +43,11 @@ export const dateColumnFilter = {
   filter: (ctx, column, options) => {
     const value = getColumnValue(ctx, column)
 
-    if (options?.range?.[0] && !moment(value).isSameOrAfter(options?.range?.[0])) {
+    if (options?.range?.[0] && !dayjs(value).isSameOrAfter(options?.range?.[0])) {
       return false
     }
 
-    if (options?.range?.[1] && !moment(value).isSameOrBefore(options?.range?.[1])) {
+    if (options?.range?.[1] && !dayjs(value).isSameOrBefore(options?.range?.[1])) {
       return false
     }
 

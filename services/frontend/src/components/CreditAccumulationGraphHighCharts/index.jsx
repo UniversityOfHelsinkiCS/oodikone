@@ -1,7 +1,7 @@
+import dayjs from 'dayjs'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chain, flatten, flow } from 'lodash'
-import moment from 'moment'
 import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
@@ -9,7 +9,7 @@ import { Button, Radio } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useDeepMemo } from '@/hooks/deepMemo'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditGraphTooltip } from './CreditGraphTooltip'
@@ -139,7 +139,7 @@ const filterCoursesByStudyPlan = (plan, courses) => {
   })
 }
 
-const filterCoursesByDate = (courses, date) => courses.filter(course => moment(course.date).isSameOrAfter(moment(date)))
+const filterCoursesByDate = (courses, date) => courses.filter(course => dayjs(course.date).isSameOrAfter(dayjs(date)))
 
 const filterCourses = (student, singleStudent, byStudyPlanOfCode, cutStudyPlanCredits, startDate, studyrightid) => {
   if (byStudyPlanOfCode && cutStudyPlanCredits)
@@ -200,7 +200,7 @@ const singleStudentTooltipFormatter = (point, student, getTextIn) => {
         ...targetCourse,
         courseCode: targetCourse.course.code,
         courseName: getTextIn(targetCourse.course.name),
-        date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
+        date: reformatDate(targetCourse.date, DateFormat.DISPLAY_DATE),
       },
     },
   ]
@@ -227,9 +227,9 @@ const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
     )
     .reduce((res, { startdate, enddate, enrollmenttype, statutoryAbsence }) => {
       const targetCreditsBeforeAbsence =
-        (moment(startdate).diff(moment(graphStartDate), 'years', true) - totalAbsenceYears) * 60
+        (dayjs(startdate).diff(dayjs(graphStartDate), 'years', true) - totalAbsenceYears) * 60
 
-      const absenceInYears = moment(enddate).diff(moment(startdate), 'years', true)
+      const absenceInYears = dayjs(enddate).diff(dayjs(startdate), 'years', true)
       totalAbsenceYears += absenceInYears
 
       res.push([startdate, targetCreditsBeforeAbsence, null, null])
@@ -247,7 +247,7 @@ const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
   }
   zones.push({ color: '#96d7c3' })
 
-  const yearsFromStart = moment(graphEndDate).diff(moment(graphStartDate), 'years', true)
+  const yearsFromStart = dayjs(graphEndDate).diff(dayjs(graphStartDate), 'years', true)
   const endingCredits = (yearsFromStart - totalAbsenceYears) * 60
   const data = [[graphStartDate, 0], ...absencePoints, [graphEndDate, endingCredits]].sort((a, b) => a[0] - b[0])
 
@@ -364,7 +364,7 @@ const createStudentCreditLines = (
 
     if (points?.length > 0) {
       if (!singleStudent && points[0].y !== 0 && students.length < 100) {
-        const xMinusTwoMonths = moment(new Date(points[0].x)).subtract(2, 'months').toDate().getTime()
+        const xMinusTwoMonths = dayjs(new Date(points[0].x)).subtract(2, 'months').toDate().getTime()
         points.unshift({
           x: studyPlanFilterIsActive ? xMinusTwoMonths : Math.max(new Date(studyrightStart), xMinusTwoMonths),
           y: 0,

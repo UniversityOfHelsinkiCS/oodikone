@@ -1,9 +1,9 @@
 import { sortBy } from 'lodash'
-import moment from 'moment'
 import { useState } from 'react'
 import { Form, Header, HeaderContent, Icon, Segment } from 'semantic-ui-react'
 
-import { DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
+import { formatDate } from '@/util/timeAndDate'
 
 export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searches', items, updateItem }) => {
   const [selected, setSelected] = useState(null)
@@ -43,7 +43,7 @@ export const SearchHistory = ({ disabled, handleSearch, header = 'Previous searc
           key: id,
           value: id,
           text,
-          description: moment(timestamp).format(DISPLAY_DATE_FORMAT_DEV),
+          description: formatDate(timestamp, DateFormat.DISPLAY_DATE_DEV),
         }))}
         placeholder="Select a previous search"
         search

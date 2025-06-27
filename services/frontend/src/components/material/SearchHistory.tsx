@@ -8,11 +8,11 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { sortBy } from 'lodash'
-import moment from 'moment'
 import { useEffect, useState } from 'react'
 
-import { DISPLAY_DATE_FORMAT_DEV } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { SearchHistoryItem } from '@/types/searchHistory'
+import { formatDate } from '@/util/timeAndDate'
 
 export const SearchHistory = ({
   handleSearch,
@@ -65,7 +65,7 @@ export const SearchHistory = ({
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     {option.text}
                     <Typography color="text.secondary">
-                      {moment(option.timestamp).format(DISPLAY_DATE_FORMAT_DEV)}
+                      {formatDate(option.timestamp, DateFormat.DISPLAY_DATE_DEV)}
                     </Typography>
                   </Stack>
                 </Box>

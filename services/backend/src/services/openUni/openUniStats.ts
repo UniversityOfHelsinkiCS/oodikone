@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import { SISStudyRightModel } from '../../models'
 import { getCourseNames, getCredits, getEnrollments, getStudentInfo, getStudyRights } from './openUniSearches'
@@ -47,14 +47,14 @@ const getAllCourseCodes = (courseCodes: string[]) => {
 }
 
 const isStartDateOutsideInterval = (studyRight: SISStudyRightModel, startDate: Date) => {
-  return moment(studyRight.startDate).isBetween(startDate, moment())
+  return startDate <= studyRight.startDate && studyRight.startDate <= new Date()
 }
 
 const isStartDateInsideAndEndDateOutside = (studyRight: SISStudyRightModel, startDate: Date) => {
-  return moment(studyRight.startDate).isSameOrBefore(startDate) && moment(studyRight.endDate).isSameOrAfter(moment())
+  return studyRight.startDate <= startDate && new Date() <= studyRight.endDate
 }
 
-const isEndDateBeforeNow = (studyRight: SISStudyRightModel) => moment(studyRight.endDate).isSameOrBefore(moment())
+const isEndDateBeforeNow = (studyRight: SISStudyRightModel) => studyRight.endDate <= new Date()
 
 const getEmptyCourseInfo = (): CourseInfo => ({
   status: {
@@ -65,7 +65,7 @@ const getEmptyCourseInfo = (): CourseInfo => ({
 })
 
 const updatePassedStatus = (courseInfo: CourseInfo, attainmentDate: Date) => {
-  if (!courseInfo.status.passed || moment(courseInfo.status.passed).isBefore(attainmentDate, 'day')) {
+  if (!courseInfo.status.passed || dayjs(courseInfo.status.passed).isBefore(attainmentDate, 'day')) {
     courseInfo.status.passed = attainmentDate
   }
 }
@@ -73,7 +73,7 @@ const updatePassedStatus = (courseInfo: CourseInfo, attainmentDate: Date) => {
 const updateFailedStatus = (courseInfo: CourseInfo, attainmentDate: Date) => {
   if (
     !courseInfo.status.passed &&
-    (!courseInfo.status.failed || moment(courseInfo.status.failed).isBefore(attainmentDate, 'day'))
+    (!courseInfo.status.failed || dayjs(courseInfo.status.failed).isBefore(attainmentDate, 'day'))
   ) {
     courseInfo.status.failed = attainmentDate
   }
@@ -83,7 +83,7 @@ const updateUnfinishedStatus = (courseInfo: CourseInfo, enrollmentDateTime: Date
   if (
     !courseInfo.status.passed &&
     !courseInfo.status.failed &&
-    (!courseInfo.status.unfinished || moment(courseInfo.status.unfinished).isBefore(enrollmentDateTime, 'day'))
+    (!courseInfo.status.unfinished || dayjs(courseInfo.status.unfinished).isBefore(enrollmentDateTime, 'day'))
   ) {
     courseInfo.status.unfinished = enrollmentDateTime
   }

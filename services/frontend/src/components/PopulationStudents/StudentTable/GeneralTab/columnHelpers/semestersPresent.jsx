@@ -1,7 +1,10 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import { Popup } from 'semantic-ui-react'
 
 import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'
+
+dayjs.extend(isBetween)
 
 export const getSemestersPresentFunctions = ({
   allSemesters,
@@ -63,14 +66,14 @@ export const getSemestersPresentFunctions = ({
     const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
     if (
       firstGraduation &&
-      moment(firstGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
+      dayjs(firstGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
     ) {
       if (!isMastersProgramme(programmeCode)) return 1
       return 2
     }
     if (
       secondGraduation &&
-      moment(secondGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
+      dayjs(secondGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
     ) {
       if (isMastersProgramme(programmeCode)) return 1
       return 2

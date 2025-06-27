@@ -1,7 +1,7 @@
 import { SISStudyRight } from '@oodikone/shared/models'
 import { Name, ProgressCriteria } from '@oodikone/shared/types'
+import { dateYearsFromNow, dateDaysFromNow } from '@oodikone/shared/util/datetime'
 import { CreditModel } from '../../models'
-import { dateYearsFromNow, dateDaysFromNow } from '../../util/datetime'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 import type { TaggetStudentData } from './getStudentData'
 import type { AnonymousCredit } from './optimizedStatisticsOf'

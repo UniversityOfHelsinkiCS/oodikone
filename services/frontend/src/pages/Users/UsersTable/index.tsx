@@ -10,7 +10,7 @@ import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { MockButton } from '@/components/material/MockButton'
 import { RoleChip } from '@/components/material/RoleChip'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetRolesQuery } from '@/redux/users'
 import { User } from '@/types/api/users'
@@ -119,7 +119,7 @@ export const UsersTable = ({
       {
         accessorKey: 'lastLogin',
         header: 'Last login',
-        Cell: ({ cell }) => reformatDate(cell.getValue<string>(), DISPLAY_DATE_FORMAT),
+        Cell: ({ cell }) => reformatDate(cell.getValue<string>(), DateFormat.DISPLAY_DATE),
         enableColumnFilter: false,
       },
       {

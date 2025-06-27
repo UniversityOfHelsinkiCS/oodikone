@@ -1,9 +1,9 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
 
-const isSpring = date => moment(date).month() < 9
+const isSpring = date => dayjs(date).month() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year, spring) => (spring ? `Spring ${year}` : `Fall ${year}`)
 
@@ -15,8 +15,8 @@ export const formatPassRate = (passRate: string | null) => {
 }
 
 const getCourseYears = course => ({
-  startYear: moment(course.min_attainment_date).year(),
-  endYear: moment(course.max_attainment_date).year(),
+  startYear: dayjs(course.min_attainment_date).year(),
+  endYear: dayjs(course.max_attainment_date).year(),
 })
 
 export const getActiveYears = course => {

@@ -1,10 +1,10 @@
-import moment from 'moment'
 import { useState } from 'react'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useGetSavedSearchesQuery } from '@/redux/openUniPopulations'
+import { formatDate } from '@/util/timeAndDate'
 import { CustomOpenUniSearch } from './CustomOpenUniSearch'
 import { OpenUniPopulationResults } from './OpenUniPopulationResults'
 
@@ -37,12 +37,12 @@ export const CustomOpenUniPopulation = () => {
           <p>
             <span style={{ color: '#484848' }}>Beginning of the search for all fields:</span>
             <span style={{ paddingLeft: '10px', fontWeight: '600' }}>
-              {moment(fieldValues.startdate).format(DISPLAY_DATE_FORMAT)}
+              {formatDate(fieldValues.startdate, DateFormat.DISPLAY_DATE)}
             </span>
             <br />
             <span style={{ color: '#484848' }}>End of the search for enrollments:</span>
             <span style={{ paddingLeft: '30px', fontWeight: '600' }}>
-              {moment(fieldValues.enddate).format(DISPLAY_DATE_FORMAT)}
+              {formatDate(fieldValues.enddate, DateFormat.DISPLAY_DATE)}
             </span>
           </p>
         )}

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 import { isDefaultServiceProvider } from '@/common'
 import { ExternalLink } from '@/components/material/ExternalLink'
 import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
-import { DISPLAY_DATETIME_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { InternalLink } from './InternalLink'
 import { ToskaLogo } from './ToskaLogo'
@@ -42,7 +42,7 @@ export const Footer = () => {
               <Typography variant="subtitle1">Build</Typography>
               <InternalLink href="/changelog" text="Changelog" />
               <Typography color="text.secondary" variant="body2">
-                Updated {reformatDate(builtAt || new Date().toISOString(), DISPLAY_DATETIME_FORMAT)}
+                Updated {reformatDate(builtAt || new Date().toISOString(), DateFormat.DISPLAY_DATETIME)}
               </Typography>
               <Typography color="text.secondary" variant="body2">
                 Version {sentryRelease || 'dev'}

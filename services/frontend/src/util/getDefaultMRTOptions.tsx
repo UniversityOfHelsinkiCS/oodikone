@@ -4,6 +4,7 @@ import { MRT_RowData, MRT_TableOptions, MRT_Row } from 'material-react-table'
 import { MRT_Localization_EN } from 'material-react-table/locales/en'
 import { MRT_Localization_FI } from 'material-react-table/locales/fi'
 
+import { DateFormat } from '@/constants/date'
 import { DEFAULT_LANG } from '@oodikone/shared/language'
 
 // If defining sx props in a column definition, existing props defined here would be
@@ -42,7 +43,7 @@ export const getDefaultMRTOptions = <TData extends MRT_RowData>(
   return {
     defaultColumn: {
       muiFilterDatePickerProps: {
-        format: 'YYYY-MM-DD',
+        format: DateFormat.ISO_DATE,
       },
       size: 100,
     },

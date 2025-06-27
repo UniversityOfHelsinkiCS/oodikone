@@ -1,5 +1,5 @@
+import dayjs from 'dayjs'
 import { mean, groupBy } from 'lodash'
-import moment from 'moment'
 import { arrayOf, object, shape } from 'prop-types'
 import { Fragment, useState } from 'react'
 import { Icon, Radio, Table } from 'semantic-ui-react'
@@ -49,7 +49,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
         const startDateInProgramme = studyRight.studyRightElements.find(
           el => el.code === query.studyRights.programme
         ).startDate
-        ages.push(getAge(student.birthdate, false, moment(startDateInProgramme)))
+        ages.push(getAge(student.birthdate, false, dayjs(startDateInProgramme)))
       }
       return ages
     }, [])

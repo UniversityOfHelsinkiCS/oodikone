@@ -8,7 +8,6 @@ import yellow from '@mui/material/colors/yellow'
 import Stack from '@mui/material/Stack'
 
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
@@ -18,10 +17,10 @@ import {
   StudentNameVisibilityToggle,
   useStudentNameVisibility,
 } from '@/components/material/StudentNameVisibilityToggle'
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
-import { isWithinSixMonths } from '@/util/timeAndDate'
+import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 
 const isPassed = credit => [4, 7, 9].includes(credit)
 
@@ -48,7 +47,7 @@ const getCompletion = (student, courseCode, { icon }) => {
       return <RemoveIcon fontSize="small" style={{ color: grey[700] }} />
     }
 
-    return `Latest enrollment: ${moment(enrollment.date).format(ISO_DATE_FORMAT)}`
+    return `Latest enrollment: ${formatDate(enrollment.date, DateFormat.ISO_DATE)}`
   }
 
   const substitutionString = completion.substitution ? ` as ${completion.substitution}` : ''
@@ -63,10 +62,10 @@ const getCellTitle = (student, courseCode) => {
     return 'Student has the course in their primary study plan'
   }
   const title = credit
-    ? `Passed on ${moment(credit.date).format(ISO_DATE_FORMAT)}\nCourse code: ${
+    ? `Passed on ${formatDate(credit.date, DateFormat.ISO_DATE)}\nCourse code: ${
         credit.substitution ?? credit.courseCode
       }`
-    : `Last enrollment on ${moment(enrollment.date).format(ISO_DATE_FORMAT)}\nCourse code ${
+    : `Last enrollment on ${formatDate(enrollment.date, DateFormat.ISO_DATE)}\nCourse code ${
         enrollment.substitution ?? enrollment.courseCode
       }`
   return title

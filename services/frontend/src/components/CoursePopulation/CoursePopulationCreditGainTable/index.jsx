@@ -1,5 +1,5 @@
+import dayjs from 'dayjs'
 import { maxBy } from 'lodash'
-import moment from 'moment'
 import { Loader, Tab, Table } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -96,7 +96,7 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
 
     const coursesBetween = []
     courses.forEach(course => {
-      if (moment(course.date).isBetween(moment(from), moment(to)) && course.passed) {
+      if (dayjs(course.date).isBetween(dayjs(from), dayjs(to)) && course.passed) {
         if (course.grade === 'Hyv.') {
           coursesBetween.push({ grade: course.grade, value: 1, credits: course.credits })
         } else {

@@ -1,5 +1,8 @@
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { keyBy } from 'lodash'
-import moment from 'moment'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
 import { Icon, Message, Tab } from 'semantic-ui-react'
@@ -9,9 +12,14 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import './index.css'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { SortableTable } from '@/components/SortableTable'
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { isMedicalProgramme } from '@/util/studyProgramme'
+import { formatDate } from '@/util/timeAndDate'
+
+dayjs.extend(isBetween)
+dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(
@@ -27,7 +35,7 @@ const hasPassedDuringAcademicYear = (courses, start, end) => {
   return (
     courses &&
     courses.some(course => course.passed) &&
-    courses.some(course => moment(course.date).isBetween(moment(start), moment(end)))
+    courses.some(course => dayjs(course.date).isBetween(dayjs(start), dayjs(end)))
   )
 }
 
@@ -84,16 +92,16 @@ const getExcelText = (courseCode, criteria, student, year) => {
   const courses = getCourses(courseCode, criteria, student)
 
   if (hasPassedOutsideAcademicYear(courses)) {
-    return `Passed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}`
+    return `Passed-${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
   }
 
   if (hasFailed(courses)) {
-    return `Failed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}`
+    return `Failed-${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
   }
 
   if (hasEnrolled(student, courseCode)) {
     const enrollment = getEnrollment(student, courseCode)
-    return `Enrollment-${moment(enrollment[0].enrollment_date_time).format(ISO_DATE_FORMAT)}`
+    return `Enrollment-${formatDate(enrollment[0].enrollment_date_time, DateFormat.ISO_DATE)}`
   }
 
   return ''
@@ -195,18 +203,18 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     }
 
     if (hasPassedOutsideAcademicYear(courses)) {
-      return { ...propObj, title: `Passed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}` }
+      return { ...propObj, title: `Passed-${formatDate(courses[0].date, DateFormat.ISO_DATE)}` }
     }
 
     if (hasFailed(courses)) {
-      return { ...propObj, title: `Failed-${moment(courses[0].date).format(ISO_DATE_FORMAT)}` }
+      return { ...propObj, title: `Failed-${formatDate(courses[0].date, DateFormat.ISO_DATE)}` }
     }
 
     if (hasEnrolled(student, info.code)) {
       const enrollment = getEnrollment(student, info.code)
       return {
         ...propObj,
-        title: `Enrollment-${moment(enrollment[0].enrollment_date_time).format(ISO_DATE_FORMAT)}`,
+        title: `Enrollment-${formatDate(enrollment[0].enrollment_date_time, DateFormat.ISO_DATE)}`,
       }
     }
 
@@ -330,10 +338,10 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     }))
   }
 
-  const academicYearStart = moment()
+  const academicYearStart = dayjs()
     .subtract(months - 1, 'months')
     .startOf('month')
-  const academicYearEnd = moment()
+  const academicYearEnd = dayjs()
     .subtract(months - 12, 'months')
     .endOf('month')
 
@@ -342,8 +350,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       const semesters = Object.values(allSemesters)
         .filter(
           semester =>
-            moment(semester.startdate).isSameOrAfter(startYear) &&
-            moment(semester.enddate).isSameOrBefore(endYear.add(1, 'day'))
+            dayjs(semester.startdate).isSameOrAfter(startYear) &&
+            dayjs(semester.enddate).isSameOrBefore(endYear.add(1, 'day'))
         )
         .map(semester => semester.semestercode)
       return {
@@ -418,8 +426,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       if (months > year * 12) {
         columns.push(
           generateYearColumns(
-            moment(academicYearStart).add(year, 'years'),
-            moment(academicYearEnd).add(year, 'years'),
+            dayjs(academicYearStart).add(year, 'years'),
+            dayjs(academicYearEnd).add(year, 'years'),
             year
           ),
           generateHiddenColumn(year + 1)

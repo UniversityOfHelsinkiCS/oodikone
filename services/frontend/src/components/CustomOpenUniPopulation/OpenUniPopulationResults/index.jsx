@@ -1,11 +1,11 @@
-import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { Icon, Loader } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetOpenUniCourseStudentsQuery } from '@/redux/openUniPopulations'
+import { formatDate } from '@/util/timeAndDate'
 
 const getTableData = studentsData => {
   return Object.keys(studentsData).reduce(
@@ -96,13 +96,13 @@ const getColumns = (labelsToCourses, getTextIn) => {
   const findRowValue = (student, courseCode, hidden = false) => {
     if (student.courseInfo[courseCode] === undefined) return ''
     if (student.courseInfo[courseCode].status.passed && hidden) {
-      return `Passed: ${moment(student.courseInfo[courseCode].status.passed).format(ISO_DATE_FORMAT)}`
+      return `Passed: ${formatDate(student.courseInfo[courseCode].status.passed, DateFormat.ISO_DATE)}`
     }
     if (student.courseInfo[courseCode].status.failed && hidden) {
-      return `Failed: ${moment(student.courseInfo[courseCode].status.failed).format(ISO_DATE_FORMAT)}`
+      return `Failed: ${formatDate(student.courseInfo[courseCode].status.failed, DateFormat.ISO_DATE)}`
     }
     if (student.courseInfo[courseCode].status.unfinished && hidden) {
-      return `Enrollment: ${moment(student.courseInfo[courseCode].status.unfinished).format(ISO_DATE_FORMAT)}`
+      return `Enrollment: ${formatDate(student.courseInfo[courseCode].status.unfinished, DateFormat.ISO_DATE)}`
     }
     if (student.courseInfo[courseCode].status.passed) return 'Passed'
     if (student.courseInfo[courseCode].status.failed) return 'Failed'
@@ -118,17 +118,17 @@ const getColumns = (labelsToCourses, getTextIn) => {
     if (student.courseInfo[courseCode].status.passed)
       return {
         ...propObj,
-        title: `Passed: ${moment(student.courseInfo[courseCode].status.passed).format(ISO_DATE_FORMAT)}`,
+        title: `Passed: ${formatDate(student.courseInfo[courseCode].status.passed, DateFormat.ISO_DATE)}`,
       }
     if (student.courseInfo[courseCode].status.failed)
       return {
         ...propObj,
-        title: `Failed: ${moment(student.courseInfo[courseCode].status.failed).format(ISO_DATE_FORMAT)}`,
+        title: `Failed: ${formatDate(student.courseInfo[courseCode].status.failed, DateFormat.ISO_DATE)}`,
       }
     if (student.courseInfo[courseCode].status.unfinished)
       return {
         ...propObj,
-        title: `Enrollment: ${moment(student.courseInfo[courseCode].status.unfinished).format(ISO_DATE_FORMAT)}`,
+        title: `Enrollment: ${formatDate(student.courseInfo[courseCode].status.unfinished, DateFormat.ISO_DATE)}`,
       }
     return propObj
   }

@@ -1,8 +1,8 @@
 import { Op } from 'sequelize'
 
 import { Name } from '@oodikone/shared/types'
+import { dateMinFromList, dateMaxFromList } from '@oodikone/shared/util/datetime'
 import { SemesterModel } from '../models'
-import { dateMinFromList, dateMaxFromList } from '../util/datetime'
 
 type SemestersAndYears = {
   years: {

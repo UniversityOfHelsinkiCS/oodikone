@@ -9,8 +9,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 
+import dayjs from 'dayjs'
 import { orderBy } from 'lodash'
-import moment from 'moment'
 import { Link } from 'react-router'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
@@ -19,7 +19,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
@@ -97,7 +97,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
       text = (
         <>
           <div style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</div>
-          <div style={{ color: 'grey' }}>{reformatDate(studyright.endDate, DISPLAY_DATE_FORMAT)}</div>
+          <div style={{ color: 'grey' }}>{reformatDate(studyright.endDate, DateFormat.DISPLAY_DATE)}</div>
         </>
       )
     } else if (studyright.active) {
@@ -126,8 +126,8 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
 
   const showPopulationStatistics = (studyprogramme: string, date: string) => {
     const yearFromDate = parseInt(date.slice(0, 4), 10)
-    const year = moment(date).isBefore(`${yearFromDate}-08-01`, 'day') ? yearFromDate - 1 : yearFromDate
-    const months = Math.ceil(moment().diff(`${year}-08-01`, 'months', true))
+    const year = dayjs(date).isBefore(`${yearFromDate}-08-01`, 'day') ? yearFromDate - 1 : yearFromDate
+    const months = Math.ceil(dayjs().diff(`${year}-08-01`, 'months', true))
     return `/populations?months=${months}&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
   }
 
@@ -203,7 +203,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                   )}
                   <TableCell>
                     <Stack alignItems="center" direction="row">
-                      {`${getTextIn(name)} (${reformatDate(startDate, DISPLAY_DATE_FORMAT)}–${reformatDate(endDate, DISPLAY_DATE_FORMAT)})`}
+                      {`${getTextIn(name)} (${reformatDate(startDate, DateFormat.DISPLAY_DATE)}–${reformatDate(endDate, DateFormat.DISPLAY_DATE)})`}
                       {studyProgrammes != null && code in studyProgrammes && (
                         <IconButton
                           color="primary"

@@ -1,12 +1,12 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import { Tag } from '@oodikone/shared/types'
 
 export const getMonths = (year: number) => {
-  const end = moment()
-  const lastDayOfMonth = moment(end).endOf('month')
+  const end = dayjs()
+  const lastDayOfMonth = dayjs(end).endOf('month')
   const start = `${year}-08-01`
-  return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
+  return Math.round(dayjs(lastDayOfMonth).diff(dayjs(start), 'months', true))
 }
 
 export const getUrl = (params: {

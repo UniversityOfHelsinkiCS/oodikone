@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 import ReactMarkdown from 'react-markdown'
 
 import { getDescription } from '@/common'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { Release } from '@oodikone/shared/types'
 
@@ -17,7 +17,7 @@ export const ReleaseCard = ({ isLoading, release }: { isLoading: boolean; releas
       <Typography component="p" sx={{ color: 'text.secondary', mb: 2 }} variant="caption">
         {isLoading
           ? 'Loading date...'
-          : `Version ${release.version} • Released on ${reformatDate(release.time, DISPLAY_DATE_FORMAT)}`}
+          : `Version ${release.version} • Released on ${reformatDate(release.time, DateFormat.DISPLAY_DATE)}`}
       </Typography>
       <ReactMarkdown>{isLoading ? 'Loading description...' : getDescription(release.description)}</ReactMarkdown>
     </Card>

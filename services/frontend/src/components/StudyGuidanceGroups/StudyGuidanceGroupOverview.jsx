@@ -6,10 +6,11 @@ import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
 import { textAndDescriptionSearch } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SortableTable } from '@/components/SortableTable'
-import { YEAR_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { formatDate } from '@/util/timeAndDate'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
 
@@ -137,11 +138,11 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
           <Datetime
             className="guidance-group-overview-year-tag-selector"
             closeOnSelect
-            dateFormat={YEAR_DATE_FORMAT}
+            dateFormat={DateFormat.YEAR_DATE}
             initialValue={group.tags?.[tagName]}
             inputProps={{ readOnly: true }}
             name={tagName}
-            onChange={value => handleChange(tagName, value?.format(YEAR_DATE_FORMAT))}
+            onChange={value => handleChange(tagName, formatDate(value, DateFormat.YEAR_DATE))}
             renderInput={({ value, ...rest }) => {
               return (
                 <div>

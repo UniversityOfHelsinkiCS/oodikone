@@ -1,4 +1,4 @@
-import { dateDaysFromNow } from './datetime'
+import { dateDaysFromNow } from '@oodikone/shared/util/datetime'
 
 const isSpring = (date: Date) => {
   return 0 <= date.getMonth() && date.getMonth() <= 6

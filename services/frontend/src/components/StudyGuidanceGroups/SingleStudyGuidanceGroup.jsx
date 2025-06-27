@@ -1,4 +1,5 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import { useNavigate } from 'react-router'
 import { Button, Divider, Header, Label } from 'semantic-ui-react'
 
@@ -23,6 +24,8 @@ import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { useCurriculumState } from '../../hooks/useCurriculums'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
+
+dayjs.extend(isBetween)
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
@@ -55,7 +58,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
     } else {
       filterDispatch(
         creditDateFilter.actions.setOptions({
-          startDate: moment(createAcademicYearStartDate(group.tags?.year)),
+          startDate: dayjs(createAcademicYearStartDate(group.tags?.year)),
           endDate: null,
         })
       )
@@ -169,7 +172,7 @@ const SingleStudyGroupFilterView = ({ group, population }) => {
                 description:
                   'Student has had a study right since the start year associated with this study guidance group.',
                 predicate: (_student, studyRightElement) =>
-                  moment(createAcademicYearStartDate(group.tags?.year)).isBetween(
+                  dayjs(createAcademicYearStartDate(group.tags?.year)).isBetween(
                     studyRightElement.startDate,
                     studyRightElement.endDate,
                     'day',

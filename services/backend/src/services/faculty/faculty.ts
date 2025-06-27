@@ -1,5 +1,4 @@
 import { groupBy, orderBy } from 'lodash'
-import moment from 'moment'
 import { QueryTypes } from 'sequelize'
 
 import { ProgrammeModule } from '@oodikone/shared/models'
@@ -86,7 +85,8 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       .flat()
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
-      (onlyCurrentProgrammes && yearsOfProgramme.some(year => moment().isBetween(year.startDate, year.endDate)))
+      (onlyCurrentProgrammes &&
+        yearsOfProgramme.some(year => year.startDate <= new Date() && new Date() <= year.endDate))
 
     if (isRelevantProgramme) {
       relevantProgrammes.push({

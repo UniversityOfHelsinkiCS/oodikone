@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { StyledTable } from '@/components/material/StyledTable'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
 import { ActiveStudyRight } from '@/types/api/students'
 import { reformatDate } from '@/util/timeAndDate'
@@ -111,7 +111,7 @@ export const StudentSearch = () => {
                 )}
                 <TableCell>{student.studentNumber}</TableCell>
                 <TableCell>
-                  {student.started ? reformatDate(student.started, DISPLAY_DATE_FORMAT) : 'Unavailable'}
+                  {student.started ? reformatDate(student.started, DateFormat.DISPLAY_DATE) : 'Unavailable'}
                 </TableCell>
                 <TableCell align="right">{student.credits}</TableCell>
                 <TableCell>

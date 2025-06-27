@@ -1,12 +1,13 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useRef } from 'react'
 import Datetime from 'react-datetime'
 import { Icon, Button } from 'semantic-ui-react'
-import 'moment/locale/fi'
+import 'dayjs/locale/fi'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { formatDate } from '@/util/timeAndDate'
 import './style.css'
 
 const semesterListStyles = {
@@ -21,7 +22,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
   const datetimeRef = useRef()
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters } = semesters ?? { semesters: {} }
-  const today = moment().endOf('day')
+  const today = dayjs().endOf('day')
   const { getTextIn } = useLanguage()
   // Do not allow to select dates after today. At least some cases program just crashed.
   const startdate = before || today
@@ -29,7 +30,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
     <Datetime
       closeOnSelect
       isValidDate={date => {
-        return date.isBefore(moment(startdate)) && (!after || date.isAfter(moment(after)))
+        return date.isBefore(dayjs(startdate)) && (!after || date.isAfter(dayjs(after)))
       }}
       locale="fi"
       onChange={onChange}
@@ -46,7 +47,7 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
             paddingLeft: value ? '1em !important' : undefined,
           }}
         >
-          {value === null ? 'Select date' : moment(value).format(DISPLAY_DATE_FORMAT)}
+          {value === null ? 'Select date' : formatDate(value, DateFormat.DISPLAY_DATE)}
           {value !== null && (
             <Icon
               name="x"
@@ -64,8 +65,8 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
             className="date-picker-semester-button"
             key={label}
             onClick={() => {
-              datetimeRef.current.setViewDate(moment(date))
-              onChange(moment(date))
+              datetimeRef.current.setViewDate(dayjs(date))
+              onChange(dayjs(date))
             }}
             style={{
               height: '1.75em',
@@ -99,8 +100,8 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
                   {allSemesters &&
                     Object.values(allSemesters)
                       .filter(({ startdate, enddate }) => {
-                        const start = moment(startdate)
-                        const end = moment(enddate)
+                        const start = dayjs(startdate)
+                        const end = dayjs(enddate)
 
                         return start.isBefore() && (!before || start.isBefore(before)) && (!after || end.isAfter(after))
                       })
@@ -113,8 +114,8 @@ export const DateTimeSelector = ({ value, onChange, before, after, showSemesters
                           <span key={getTextIn(name)} style={{ flexGrow: 1 }}>
                             {getTextIn(name)}
                           </span>
-                          {createDateButton(moment(startdate), 'Start')}
-                          {createDateButton(moment(enddate).subtract(1, 'days'), 'End')}
+                          {createDateButton(dayjs(startdate), 'Start')}
+                          {createDateButton(dayjs(enddate).subtract(1, 'days'), 'End')}
                         </li>
                       ))}
                 </ul>

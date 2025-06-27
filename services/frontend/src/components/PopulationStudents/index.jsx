@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useRef } from 'react'
 import { Tab } from 'semantic-ui-react'
 
@@ -150,7 +150,7 @@ const PopulationStudents = ({
 
   let months = initMonths
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
-    months = moment().diff(moment(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
+    months = dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
 
   if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {

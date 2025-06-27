@@ -13,7 +13,7 @@ import { MaterialReactTable, MRT_ColumnDef, MRT_RowData, useMaterialReactTable }
 import { useCallback, useMemo } from 'react'
 import { utils, writeFile } from 'xlsx'
 
-import { ISO_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { getTimestamp, reformatDate } from '@/util/timeAndDate'
 
 export const ExportToExcelDialog = <T extends MRT_RowData>({
@@ -71,7 +71,7 @@ export const ExportToExcelDialog = <T extends MRT_RowData>({
         let displayValue: string | number
 
         if (value instanceof Date) {
-          displayValue = reformatDate(value, ISO_DATE_FORMAT)
+          displayValue = reformatDate(value, DateFormat.ISO_DATE)
         } else if (typeof value === 'boolean') {
           displayValue = value ? 'TRUE' : 'FALSE'
         } else {

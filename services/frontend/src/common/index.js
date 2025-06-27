@@ -1,5 +1,7 @@
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import { filter, maxBy, orderBy, range } from 'lodash'
-import moment from 'moment'
+dayjs.extend(isBetween)
 
 import irtomikko from '@/assets/irtomikko.png'
 import toskaLogo from '@/assets/toska.svg'
@@ -121,7 +123,7 @@ export const getNewestProgrammeOfStudentAt = (studyRights, currentSemester, date
   const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
   if (!programmes.length) return null
   if (!date) return programmes[0]
-  return programmes.find(programme => moment(date).isSameOrAfter(programme.startDate)) ?? null
+  return programmes.find(programme => dayjs(date).isSameOrAfter(programme.startDate)) ?? null
 }
 
 export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
@@ -156,7 +158,7 @@ export const findStudyRightForClass = (studyRights, programmeCode, year) =>
         element.code === programmeCode &&
         (year == null ||
           year === 'All' ||
-          moment(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
+          dayjs(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
     )
   )
 
@@ -193,8 +195,8 @@ export const getStudyRightElementTargetDates = (studyRightElement, absences = []
   const months = getMonthsForDegree(code)
   const end =
     code.includes('KH') || code.includes('ba') || ['MH30_001', 'MH30_003'].includes(code)
-      ? moment(startDate).add(months, 'months').set('month', 6).endOf('month')
-      : moment(startDate).add(months, 'months')
+      ? dayjs(startDate).add(months, 'months').set('month', 6).endOf('month')
+      : dayjs(startDate).add(months, 'months')
 
   if (!absences) return [new Date(startDate), new Date(end)]
   const absencesWithinStudyRightElement = absences.filter(
@@ -215,19 +217,17 @@ export const getStudyRightElementTargetDates = (studyRightElement, absences = []
       .filter(({ startdate }) => startdate < new Date(end).getTime())
       .reduce((acc, absent) => {
         const { startdate, enddate } = absent
-        const diff = moment(startdate).diff(moment(enddate), 'days') / 30
+        const diff = dayjs(startdate).diff(enddate, 'days') / 30
         return acc + Math.abs(diff)
       }, 0)
   )
   const absentMonthsBeforeStudy = absenceInStartOfStudyRight
     ? Math.round(
-        Math.abs(
-          moment(absenceInStartOfStudyRight.startdate).diff(moment(absenceInStartOfStudyRight.enddate), 'days') / 30
-        )
+        Math.abs(dayjs(absenceInStartOfStudyRight.startdate).diff(absenceInStartOfStudyRight.enddate, 'days') / 30)
       )
     : 0
   return [
-    new Date(moment(startDate).add(absentMonthsBeforeStudy, 'months')),
+    new Date(dayjs(startDate).add(absentMonthsBeforeStudy, 'months')),
     new Date(end.add(absentMonthsDuringStudy + absentMonthsBeforeStudy, 'months')),
   ]
 }

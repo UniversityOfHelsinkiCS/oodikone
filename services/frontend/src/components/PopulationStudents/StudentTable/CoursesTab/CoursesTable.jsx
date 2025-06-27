@@ -9,7 +9,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { SortableTable, row } from '@/components/SortableTable'
 
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { isWithinSixMonths, reformatDate } from '@/util/timeAndDate'
 
 import { getPassedStudents } from './GetPassedStudents'
@@ -264,10 +264,10 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
                 if (bestGrade) {
                   cellProps.title = `Grade: ${bestGrade}`
                   if (completionDate) {
-                    cellProps.title += `\nCompleted on ${reformatDate(completionDate, DISPLAY_DATE_FORMAT)}`
+                    cellProps.title += `\nCompleted on ${reformatDate(completionDate, DateFormat.DISPLAY_DATE)}`
                   }
                 } else if (hasActiveEnrollments(student, course.code)) {
-                  const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), DISPLAY_DATE_FORMAT)
+                  const enrollmentDate = reformatDate(getEnrollmentDate(student, course.code), DateFormat.DISPLAY_DATE)
                   cellProps.title = `Enrolled on ${enrollmentDate}`
                 } else if (hasCourseInStudyplan(student, course.code)) {
                   cellProps.title = 'In primary study plan'

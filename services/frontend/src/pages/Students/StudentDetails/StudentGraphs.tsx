@@ -9,22 +9,24 @@ import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 
+import dayjs from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import { chunk, flattenDeep, groupBy } from 'lodash'
-import moment from 'moment'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DISPLAY_DATE_FORMAT } from '@/constants/date'
+import { DateFormat } from '@/constants/date'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { Absence } from '.'
 
+dayjs.extend(isSameOrAfter)
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
@@ -115,7 +117,7 @@ const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }
 const semesterChunkify = (courses, semesters, getTextIn: ReturnType<typeof useLanguage>['getTextIn']) => {
   const semesterChunks = courses.reduce((acc, curr) => {
     const semester = semesters.find(
-      semester => moment(curr.date).isSameOrAfter(semester.startdate) && moment(curr.date).isBefore(semester.enddate)
+      semester => dayjs(curr.date).isSameOrAfter(semester.startdate) && dayjs(curr.date).isBefore(semester.enddate)
     )
     const semesterData = acc.find(data => data.semester === semester.name)
     if (semesterData) {
@@ -184,7 +186,7 @@ const gradeMeanSeries = (
     const creditSum = curr.reduce((a, b) => a + b.credits, 0)
     if (curr.length > 0)
       acc.push({
-        name: `${curr.length} courses between ${reformatDate(curr[0].date, DISPLAY_DATE_FORMAT)} and ${reformatDate(curr[curr.length - 1].date, DISPLAY_DATE_FORMAT)}`,
+        name: `${curr.length} courses between ${reformatDate(curr[0].date, DateFormat.DISPLAY_DATE)} and ${reformatDate(curr[curr.length - 1].date, DateFormat.DISPLAY_DATE)}`,
         y: gradeSum / creditSum,
         x: new Date(curr[curr.length - 1].date).getTime(),
       })
