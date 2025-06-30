@@ -17,7 +17,7 @@ export const getSemestersPresentFunctions = ({
   year,
   semestersToAddToStart,
 }) => {
-  if (allSemesters?.length === 0 || !filteredStudents)
+  if (!allSemesters || !filteredStudents)
     return {
       getSemesterEnrollmentsContent: () => null,
       getSemesterEnrollmentsVal: () => {},
@@ -30,7 +30,7 @@ export const getSemestersPresentFunctions = ({
   const getFirstAndLastSemester = () => {
     const associatedYear = year !== 'All' && year
     if (associatedYear) {
-      let first = allSemesters.find(
+      let first = Object.values(allSemesters).find(
         semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
       ).semestercode
       if (semestersToAddToStart) {
@@ -50,7 +50,7 @@ export const getSemestersPresentFunctions = ({
   }
 
   const { first: firstSemester, last: lastSemester } =
-    allSemesters.length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
+    Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
 
   const enrollmentTypeText = (type, statutoryAbsence) => {
     if (type === 1) return 'Enrolled as present'

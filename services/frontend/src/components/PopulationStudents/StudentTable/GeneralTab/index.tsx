@@ -126,7 +126,7 @@ export const GeneralTabContainer = ({
   const students = filteredStudents.reduce((acc, student) => {
     acc[student.studentNumber] = {
       ...student,
-      semesterEnrollmentsMap: programmeCode != null ? createSemesterEnrollmentsMap(student) : null,
+      semesterEnrollmentsMap: programmeCode ? createSemesterEnrollmentsMap(student) : null,
     }
     return acc
   }, {})
