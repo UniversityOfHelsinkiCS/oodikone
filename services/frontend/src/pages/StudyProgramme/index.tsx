@@ -66,8 +66,8 @@ export const StudyProgramme = () => {
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
 
-  const programmeId = studyProgrammeId?.includes('+') ? studyProgrammeId.split('+')[0] : studyProgrammeId
-  const secondProgrammeId = studyProgrammeId?.includes('+') ? studyProgrammeId.split('+')[1] : ''
+  const programmeId = studyProgrammeId?.split('+')[0]
+  const secondProgrammeId = studyProgrammeId?.split('+')[1] ?? ''
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
   useTitle(programmeName ? `${programmeName} - Study programmes` : 'Study programmes')

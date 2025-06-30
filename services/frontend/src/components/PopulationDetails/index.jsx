@@ -6,7 +6,7 @@ import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulati
 import { hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
-import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
+import { PopulationStudents } from '@/components/PopulationStudents'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { getFullStudyProgrammeRights } from '@/util/access'
@@ -28,7 +28,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
   const [programme, combinedProgramme] = programmeCodes
-  const criteria = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
+  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
@@ -101,7 +101,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           content: (
             <div>
               <PopulationStudents
-                criteria={criteria?.data}
+                criteria={criteria}
                 curriculum={curriculum}
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}

@@ -22,7 +22,7 @@ import {
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
+import { PopulationStudents } from '@/components/PopulationStudents'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'

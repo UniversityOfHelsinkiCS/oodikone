@@ -15,7 +15,7 @@ import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
-import { PopulationStudentsContainer as PopulationStudents } from '@/components/PopulationStudents'
+import { PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
@@ -32,18 +32,16 @@ const createAcademicYearStartDate = year => new Date(year, 7, 1)
 const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
 
-  const criteria = useGetProgressCriteriaQuery({
+  const { data: criteria } = useGetProgressCriteriaQuery({
     programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
-  }).data
+  })
   const year = group?.tags?.year
 
-  const programmeCodes = group?.tags?.studyProgramme?.includes('+')
-    ? group?.tags?.studyProgramme.split('+')
-    : [group?.tags?.studyProgramme]
+  const programmeCodes = group?.tags?.studyProgramme?.split('+') ?? []
   const query = {
     studyRights: {
       programme: programmeCodes[0],
-      combinedProgramme: programmeCodes[1] ? programmeCodes[1] : undefined,
+      combinedProgramme: programmeCodes[1],
     },
   }
 
@@ -203,13 +201,11 @@ const SingleStudyGroupFilterView = ({ group, population }) => {
   }
 
   if (group?.tags?.studyProgramme) {
-    const programmes = group?.tags?.studyProgramme.includes('+')
-      ? group?.tags?.studyProgramme.split('+')
-      : [group?.tags?.studyProgramme]
+    const programmes = group?.tags?.studyProgramme?.split('+')
     viewFilters.push(
       filters.hopsFilter({
         programmeCode: programmes[0],
-        combinedProgrammeCode: programmes.length > 1 ? programmes[1] : '',
+        combinedProgrammeCode: programmes[1] ?? '',
       })
     )
     viewFilters.push(filters.studyTrackFilter({ code: programmes[0] }))

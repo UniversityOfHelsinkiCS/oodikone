@@ -18,9 +18,9 @@ import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
 
-const Panes = ({
+const Panels = ({
   combinedProgramme,
-  coursecode,
+  coursecodes,
   curriculum,
   customPopulationProgramme,
   criteria,
@@ -33,7 +33,7 @@ const Panes = ({
   studyGuidanceGroup,
   to,
   variant,
-  visiblePanes,
+  selectedPanels,
   year,
   studyRights,
   showBachelorAndMaster,
@@ -41,16 +41,16 @@ const Panes = ({
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
-  const programme = studyGuidanceGroup?.tags?.studyProgramme || ''
+  const programme = studyGuidanceGroup?.tags?.studyProgramme ?? ''
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
-  const panesAvailable = [
+  const availablePanels = [
     {
       menuItem: 'General',
       render: () => (
         <GeneralTab
-          courseCode={coursecode}
+          coursecodes={coursecodes}
           customPopulationProgramme={customPopulationProgramme}
           filteredStudents={filteredStudents}
           from={from}
@@ -97,7 +97,7 @@ const Panes = ({
           criteria={criteria}
           curriculum={curriculum}
           months={months}
-          programme={mainProgramme || programme}
+          programme={mainProgramme ?? programme}
           students={filteredStudents}
           studyGuidanceGroupProgramme={programme}
         />
@@ -105,7 +105,7 @@ const Panes = ({
     },
   ]
 
-  const panes = panesAvailable.filter(pane => visiblePanes.includes(pane.menuItem))
+  const panels = availablePanels.filter(pane => selectedPanels.includes(pane.menuItem))
 
   return (
     <>
@@ -121,14 +121,23 @@ const Panes = ({
         </div>
         {dataExport}
       </div>
-      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={panes} />
+      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={panels} />
     </>
   )
 }
 
-const PopulationStudents = ({
-  contentToInclude,
-  coursecode = [],
+const getTabs = programmeCode => {
+  if (programmeCode && isBachelorOrLicentiateProgramme(programmeCode)) {
+    return ['General', 'Courses', 'Modules', 'Progress']
+  } else if (programmeCode) {
+    return ['General', 'Courses', 'Modules']
+  }
+
+  return ['General']
+}
+
+export const PopulationStudents = ({
+  coursecodes = [],
   curriculum,
   customPopulationProgramme,
   criteria,
@@ -143,23 +152,49 @@ const PopulationStudents = ({
   variant,
   year,
   showBachelorAndMaster,
+  programmeCode,
 }) => {
-  const studentRef = useRef()
-  let mainProgramme = studyRights?.programme || ''
-  let combinedProgramme = studyRights?.combinedProgramme || ''
+  if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
+    throw new Error(`${variant} is not a proper variant!`)
+  }
+  const contentByVariant = {
+    population: {
+      panesToInclude:
+        year === 'All' || (programmeCode && !isBachelorOrLicentiateProgramme(programmeCode))
+          ? ['General', 'Courses', 'Modules', 'Tags']
+          : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
+      infotoolTipContent: populationStatisticsToolTips.studentsClass,
+    },
+    coursePopulation: {
+      panesToInclude: ['General'],
+      infotoolTipContent: coursePopulationToolTips.students,
+    },
+    customPopulation: {
+      panesToInclude: ['General'],
+      infotoolTipContent: populationStatisticsToolTips.studentsCustom,
+    },
+    studyGuidanceGroupPopulation: {
+      panesToInclude: getTabs(studyGuidanceGroup?.tags?.studyProgramme),
+      infotoolTipContent: populationStatisticsToolTips.studentsGuidanceGroups,
+    },
+  }
+
+  const contentToInclude = contentByVariant[variant as keyof typeof contentByVariant]
+
+  const studentRef = useRef(null)
+  let mainProgramme = studyRights?.programme ?? ''
+  let combinedProgramme = studyRights?.combinedProgramme ?? ''
 
   let months = initMonths
-  if (studyGuidanceGroup && studyGuidanceGroup?.tags?.year) {
+  if (studyGuidanceGroup?.tags?.year) {
     months = dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
   }
 
-  if (studyGuidanceGroup && studyGuidanceGroup?.tags?.studyProgramme) {
-    const programmes = studyGuidanceGroup.tags.studyProgramme.includes('+')
-      ? studyGuidanceGroup.tags.studyProgramme.split('+')
-      : [studyGuidanceGroup.tags.studyProgramme]
+  if (studyGuidanceGroup?.tags?.studyProgramme) {
+    const programmes = studyGuidanceGroup.tags.studyProgramme.split('+')
 
     mainProgramme = programmes[0]
-    combinedProgramme = programmes.length > 1 ? programmes[1] : ''
+    combinedProgramme = programmes[1] ?? ''
   }
 
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -174,9 +209,9 @@ const PopulationStudents = ({
         <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
       {isAdmin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
-      <Panes
+      <Panels
         combinedProgramme={combinedProgramme}
-        coursecode={coursecode}
+        coursecodes={coursecodes}
         courses={filteredCourses}
         criteria={criteria}
         curriculum={curriculum}
@@ -186,54 +221,14 @@ const PopulationStudents = ({
         from={from}
         mainProgramme={mainProgramme}
         months={months}
+        selectedPanels={contentToInclude.panesToInclude}
         showBachelorAndMaster={showBachelorAndMaster}
         studyGuidanceGroup={studyGuidanceGroup}
         studyRights={studyRights}
         to={to}
         variant={variant}
-        visiblePanes={contentToInclude.panesToInclude}
         year={year}
       />
     </>
   )
-}
-
-const getTabs = programmeCode => {
-  if (programmeCode && isBachelorOrLicentiateProgramme(programmeCode)) {
-    return ['General', 'Courses', 'Modules', 'Progress']
-  }
-  if (programmeCode) {
-    return ['General', 'Courses', 'Modules']
-  }
-  return ['General']
-}
-
-export const PopulationStudentsContainer = ({ ...props }) => {
-  const { variant } = props
-  if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
-    throw new Error(`${variant} is not a proper variant!`)
-  }
-  const contentByVariant = {
-    population: {
-      panesToInclude:
-        props.year === 'All' || (props.programmeCode && !isBachelorOrLicentiateProgramme(props.programmeCode))
-          ? ['General', 'Courses', 'Modules', 'Tags']
-          : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
-      infotoolTipContent: populationStatisticsToolTips.studentsClass,
-    },
-    coursePopulation: {
-      panesToInclude: ['General'],
-      infotoolTipContent: coursePopulationToolTips.students,
-    },
-    customPopulation: {
-      panesToInclude: ['General'],
-      infotoolTipContent: populationStatisticsToolTips.studentsCustom,
-    },
-    studyGuidanceGroupPopulation: {
-      panesToInclude: getTabs(props.studyGuidanceGroup?.tags?.studyProgramme),
-      infotoolTipContent: populationStatisticsToolTips.studentsGuidanceGroups,
-    },
-  }
-
-  return <PopulationStudents contentToInclude={contentByVariant[variant]} {...props} />
 }

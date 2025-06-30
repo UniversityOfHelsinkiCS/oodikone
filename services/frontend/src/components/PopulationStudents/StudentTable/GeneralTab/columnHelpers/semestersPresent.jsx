@@ -27,30 +27,22 @@ export const getSemestersPresentFunctions = ({
 
   const { semestercode: currentSemesterCode } = getCurrentSemester(allSemestersMap) || {}
 
+  const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
   const getFirstAndLastSemester = () => {
     const associatedYear = year !== 'All' && year
     if (associatedYear) {
-      let first = Object.values(allSemesters).find(
+      const first = Object.values(allSemesters).find(
         semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
       ).semestercode
-      if (semestersToAddToStart) {
-        first -= semestersToAddToStart
-      }
-      return {
-        first,
-        last: isFall(currentSemesterCode) ? currentSemesterCode + 1 : currentSemesterCode,
-      }
+
+      return { first: first - (semestersToAddToStart ?? 0), last }
     }
 
-    const last = isFall(currentSemesterCode) ? currentSemesterCode + 1 : currentSemesterCode
-    return {
-      first: last - 13,
-      last,
-    }
+    return { first: last - 13, last }
   }
 
   const { first: firstSemester, last: lastSemester } =
-    Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 9999, last: 0 }
+    Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 0, last: 0 }
 
   const enrollmentTypeText = (type, statutoryAbsence) => {
     if (type === 1) return 'Enrolled as present'
@@ -170,15 +162,15 @@ export const getSemestersPresentFunctions = ({
 
   const getSemesterEnrollmentsVal = (student, studyright) => {
     const enrollmentsToCount = studyright
-      ? studyright.semesterEnrollments
-      : Object.keys(student.semesterEnrollmentsMap || {}).reduce((acc, semester) => {
-          acc.push({ semestercode: semester, enrollmenttype: student.semesterEnrollmentsMap[semester].enrollmenttype })
-          return acc
-        }, [])
-    return (enrollmentsToCount ?? []).reduce(
-      (prev, cur) =>
-        prev +
-        (cur.semestercode >= firstSemester && cur.semestercode <= lastSemester && cur.enrollmenttype === 1 ? 1 : 0),
+      ? (studyright.semesterEnrollments ?? [])
+      : Object.entries(student.semesterEnrollmentsMap || {}).map(([semester, data]) => ({
+          semestercode: semester,
+          enrollmenttype: data.enrollmenttype,
+        }))
+
+    return enrollmentsToCount.reduce(
+      (acc, cur) =>
+        acc + (cur.enrollmenttype === 1 && firstSemester <= cur.semestercode && cur.semestercode <= lastSemester),
       0
     )
   }

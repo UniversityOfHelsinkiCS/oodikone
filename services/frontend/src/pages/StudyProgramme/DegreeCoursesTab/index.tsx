@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
-import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
+import { Module, ProgrammeCourse } from '@oodikone/shared/types'
 import { useCurriculumState } from '../../../hooks/useCurriculums'
 import { CreditCriteriaSection } from './CreditCriteriaSection'
 import { CurriculumSection } from './CurriculumSection'
@@ -23,13 +23,7 @@ export const DegreeCoursesTab = ({
   const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(studyProgramme, year)
-  const { data: progressCriteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
-  const emptyCriteria: ProgressCriteria = {
-    allCourses: {},
-    courses: { yearOne: [], yearTwo: [], yearThree: [], yearFour: [], yearFive: [], yearSix: [] },
-    credits: { yearOne: 0, yearTwo: 0, yearThree: 0, yearFour: 0, yearFive: 0, yearSix: 0 },
-  }
-  const criteria = progressCriteria ?? emptyCriteria
+  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
 
   const getModules = (courses: ProgrammeCourse[]): Module[] => {
     const modules: Record<string, ProgrammeCourse[]> = {}
@@ -61,6 +55,8 @@ export const DegreeCoursesTab = ({
       setSecondProgrammeModules(getModules(curriculum.secondProgrammeCourses))
     }
   }, [combinedProgramme, curriculum])
+
+  if (!curriculum || !criteria) return null
 
   return (
     <Stack gap={2}>

@@ -58,7 +58,7 @@ export const GeneralTabContainer = ({
   group,
   year,
   variant,
-  courseCode,
+  coursecodes,
   from,
   to,
   studyRights,
@@ -290,7 +290,7 @@ export const GeneralTabContainer = ({
   const containsStudyTracks: boolean = filteredStudents.some(student => getStudyTracks(student.studyRights).length > 0)
 
   const getCourseInformation = student => {
-    const courses = student.courses.filter(course => courseCode.includes(course.course_code))
+    const courses = student.courses.filter(course => coursecodes.includes(course.course_code))
     const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
     if (!highestGrade) return { grade: '-', date: '', language: '' }
     const { date, language } = courses
@@ -307,7 +307,7 @@ export const GeneralTabContainer = ({
     if (!fromSemester || !toSemester || student?.enrollments) return null
     const enrollments =
       student.enrollments
-        ?.filter(enrollment => courseCode.includes(enrollment?.course_code))
+        ?.filter(enrollment => coursecodes.includes(enrollment?.course_code))
         ?.filter(enrollment => enrollment?.semestercode >= fromSemester && enrollment?.semestercode <= toSemester) ??
       null
     return enrollments ? (enrollments[0].enrollment_date_time ?? null) : null
