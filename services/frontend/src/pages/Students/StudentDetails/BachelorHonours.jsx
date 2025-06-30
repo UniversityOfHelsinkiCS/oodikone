@@ -98,7 +98,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   if (degreeModule) {
     const graduationDate = dayjs(degreeModule.date)
-    const yearsForGraduation = dayjs.duration(graduationDate.diff(studyStartDate)).asYears()
+    const yearsForGraduation = graduationDate.diff(studyStartDate, 'years')
 
     // calculate time student has been absent during bachelors degree
     const timeAbsent = absentYears.reduce((acc, curr) => {
