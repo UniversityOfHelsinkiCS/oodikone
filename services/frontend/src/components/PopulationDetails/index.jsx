@@ -116,7 +116,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           ),
         }
       : null,
-  ].filter(item => !!item)
+  ]
 
   return <PanelView panels={panels} viewTitle="classstatistics" />
 }
