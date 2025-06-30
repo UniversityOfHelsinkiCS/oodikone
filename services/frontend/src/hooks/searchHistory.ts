@@ -1,40 +1,18 @@
-import { useEffect, useState } from 'react'
-
+import { useEffect } from 'react'
 import { SEARCH_HISTORY_VERSION } from '@/constants'
+import { useLocalStorage } from '@/hooks/localStorage'
+
 import { SearchHistoryItem } from '@/types/searchHistory'
 
 export const useSearchHistory = (id: string, capacity = 5) => {
-  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([])
-  const [didMount, setDidMount] = useState(false)
-
-  const getSearchHistoryStore = () => {
-    const store = localStorage.getItem('searchHistoryStore')
-    return store ? JSON.parse(store) : {}
-  }
-
-  const saveSearchHistoryStore = newStore => localStorage.setItem('searchHistoryStore', JSON.stringify(newStore))
-
-  const saveSearchHistory = () => {
-    const searchHistoryStore = getSearchHistoryStore()
-    searchHistoryStore[id] = searchHistory
-    saveSearchHistoryStore(searchHistoryStore)
-  }
+  const [searchHistory, setSearchHistory] = useLocalStorage<SearchHistoryItem[]>(`searchHistoryStore_${id}`, [])
 
   useEffect(() => {
     if (localStorage.getItem('searchHistoryVersion') !== SEARCH_HISTORY_VERSION) {
-      saveSearchHistoryStore({})
+      setSearchHistory([])
       localStorage.setItem('searchHistoryVersion', SEARCH_HISTORY_VERSION)
     }
-
-    setSearchHistory(getSearchHistoryStore()[id] ?? [])
-    setDidMount(true)
   }, [])
-
-  useEffect(() => {
-    if (didMount) {
-      saveSearchHistory()
-    }
-  }, [searchHistory])
 
   const addItem = (item: SearchHistoryItem) => {
     const filteredSearchHistory = searchHistory.filter(sh => sh.text !== item.text)
