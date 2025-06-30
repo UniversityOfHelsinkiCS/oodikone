@@ -1,4 +1,4 @@
-import 'moment/locale/fi'
+import 'dayjs/locale/fi'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
@@ -45,7 +45,7 @@ export const creditDateFilter = createFilter({
   isActive: ({ startDate, endDate }) => startDate !== null || endDate !== null,
 
   /**
-   * startDate and endDate are both moment.Moment
+   * startDate and endDate are both dayjs.Dayjs
    */
   filter(student, { options }) {
     const { startDate, endDate } = options
