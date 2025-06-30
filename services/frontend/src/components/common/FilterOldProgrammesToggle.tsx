@@ -1,5 +1,9 @@
-import { Radio } from 'semantic-ui-react'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 export const FilterOldProgrammesToggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
-  <Radio checked={checked} label="Filter out old and specialized programmes" onChange={onChange} toggle />
+  <FormControlLabel
+    control={<Switch checked={checked} onChange={onChange} />}
+    label="Filter out old and specialized programmes"
+  />
 )

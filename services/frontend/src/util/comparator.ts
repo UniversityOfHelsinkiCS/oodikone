@@ -1,5 +1,7 @@
 import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
 
+type StrippedDegreeProgramme = Pick<DegreeProgramme, 'code'>
+
 /**
  * Returns a sorting function that can be used to sort strings so that Finnish alphabetical order is respected.
  *
@@ -15,8 +17,8 @@ export const createLocaleComparator = (field: string | null = null) => {
 export const createPinnedFirstComparator = (pinnedProgrammes: string[]) => {
   const localeComparator = createLocaleComparator('code')
   return (
-    programmeA: DegreeProgramme | CombinedDegreeProgramme,
-    programmeB: DegreeProgramme | CombinedDegreeProgramme
+    programmeA: DegreeProgramme | CombinedDegreeProgramme | StrippedDegreeProgramme,
+    programmeB: DegreeProgramme | CombinedDegreeProgramme | StrippedDegreeProgramme
   ) => {
     const pinnedA = pinnedProgrammes.includes(programmeA.code)
     const pinnedB = pinnedProgrammes.includes(programmeB.code)

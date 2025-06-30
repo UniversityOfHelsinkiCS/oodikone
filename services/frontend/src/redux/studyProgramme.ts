@@ -51,10 +51,7 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, combinedProgramme }) =>
         `/v2/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}`,
     }),
-    getStudyTracks: builder.query<
-      any, // TODO: Type
-      { id: string }
-    >({
+    getStudyTracks: builder.query<Record<string, Name | string>, { id: string }>({
       query: ({ id }) => `/v2/studyprogrammes/${id}/studytracks`,
     }),
     updateBasicView: builder.query<
