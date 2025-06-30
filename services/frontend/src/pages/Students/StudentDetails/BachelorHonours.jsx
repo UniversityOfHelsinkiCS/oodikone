@@ -98,7 +98,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   if (degreeModule) {
     const graduationDate = dayjs(degreeModule.date)
-    const yearsForGraduation = graduationDate.diff(studyStartDate, 'years')
+    const yearsForGraduation = graduationDate.diff(studyStartDate, 'years', true)
 
     // calculate time student has been absent during bachelors degree
     const timeAbsent = absentYears.reduce((acc, curr) => {
@@ -107,7 +107,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
       // if absent years are not in the degree start and end range return acc
       if (start < studyStartDate || start > graduationDate) return acc
-      const diff = end.diff(start, 'years')
+      const diff = end.diff(start, 'years', true)
       return acc + diff
     }, 0)
     // round because absent count too accurate i.e. if a person has been absent a whole year
