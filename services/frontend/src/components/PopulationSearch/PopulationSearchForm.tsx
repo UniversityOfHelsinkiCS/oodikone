@@ -151,6 +151,7 @@ export const PopulationSearchForm = () => {
         </Typography>
         <Stack direction="row" spacing={1} sx={{ mt: 0 }}>
           <IconButton
+            data-cy="population-year-decrement"
             disabled={year <= lowestYear}
             onClick={() => setYear(year => (year > lowestYear ? year - 1 : year))}
           >
@@ -164,6 +165,7 @@ export const PopulationSearchForm = () => {
                 },
               },
             }}
+            data-cy="population-year-selector"
             onChange={handleYearSelection}
             sx={{ width: 'fit-content', pl: 1, pr: 1 }}
             value={year.toString()}
@@ -176,7 +178,11 @@ export const PopulationSearchForm = () => {
               >{`${option} - ${option + 1}`}</MenuItem>
             ))}
           </Select>
-          <IconButton disabled={year >= currentYear} onClick={() => setYear(year => year + 1)}>
+          <IconButton
+            data-cy="population-year-increment"
+            disabled={year >= currentYear}
+            onClick={() => setYear(year => year + 1)}
+          >
             <AddIcon />
           </IconButton>
           {fullAccessToStudentData && (
@@ -222,17 +228,23 @@ export const PopulationSearchForm = () => {
         <Typography fontWeight="bold" sx={{ mb: 1 }} variant="subtitle1">
           Degree programme
         </Typography>
-        <Stack direction="row" spacing={2}>
+        <Stack data-cy="population-programme-selector-parent" direction="row" spacing={2}>
           <Autocomplete
             autoComplete
             autoHighlight
             clearOnEscape
+            disablePortal
             fullWidth
             getOptionLabel={opt => `${opt.name} - ${opt.code}`}
             onChange={handleProgrammeChange}
             options={programmeOptions}
             renderInput={params => (
-              <TextField {...params} placeholder="Select degree programme" sx={{ p: 0, border: 'none' }} />
+              <TextField
+                {...params}
+                data-cy="population-programme-selector"
+                placeholder="Select degree programme"
+                sx={{ p: 0, border: 'none' }}
+              />
             )}
             renderOption={(props, option) => {
               const { key, ...optionProps } = props
@@ -280,7 +292,7 @@ export const PopulationSearchForm = () => {
       : []
 
     return (
-      <Box sx={{ m: 1 }}>
+      <Box data-cy="population-studytrack-selector-parent" sx={{ m: 1 }}>
         <Typography
           color={studyTracksAvailable ? 'textPrimary' : 'textDisabled'}
           fontWeight="bold"
@@ -291,6 +303,8 @@ export const PopulationSearchForm = () => {
         </Typography>
         <Autocomplete
           autoComplete
+          data-cy="population-studytrack-selector"
+          disablePortal
           disabled={!studyTracksAvailable}
           getOptionLabel={opt => `${opt.name} - ${opt.code}`}
           onChange={handleStudyTrackChange}

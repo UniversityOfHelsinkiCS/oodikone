@@ -2,15 +2,23 @@
 // Now "Class statistics" in UI
 
 const selectStudyProgramme = programme => {
-  cy.contains('Select study programme')
-  cy.get('[data-cy=select-study-programme]').click()
-  cy.get('[data-cy=select-study-programme]').children().contains(programme).click()
+  cy.cs('population-programme-selector').within(() => {
+    cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
+  })
+  cy.cs('population-programme-selector').click()
+  cy.cs('population-programme-selector-parent').within(() => {
+    cy.contains(programme).click()
+  })
 }
 
 const selectStudyTrack = studyTrack => {
-  cy.contains('Select study track')
-  cy.get('[data-cy=select-study-track]').click()
-  cy.get('[data-cy=select-study-track]').children().contains(studyTrack).click()
+  cy.cs('population-studytrack-selector').within(() => {
+    cy.get('input').should('have.attr', 'placeholder', 'Select study track')
+  })
+  cy.cs('population-studytrack-selector').click()
+  cy.cs('population-studytrack-selector-parent').within(() => {
+    cy.contains(studyTrack).click()
+  })
 }
 
 describe('Population statistics tests', () => {
@@ -23,6 +31,8 @@ describe('Population statistics tests', () => {
   describe('When using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
+      cy.intercept('/api/v3/populationstatistics/studyprogrammes').as('studyprogrammes')
+      cy.intercept('/api/v2/studyprogrammes/**/studytracks').as('studytracks')
     })
 
     describe('Population search', () => {
@@ -41,19 +51,27 @@ describe('Population statistics tests', () => {
         cy.contains('Class of')
           .parent()
           .within(() => {
-            cy.get('.form-control').as('enrollmentSelect')
+            cy.cs('population-year-selector').as('yearSelect')
+            cy.cs('population-year-decrement').as('yearDecrement')
+            cy.cs('population-year-increment').as('yearIncrement')
           })
 
-        cy.get('@enrollmentSelect')
-          .its(`${[0]}.value`)
+        cy.get('@yearSelect')
+          .invoke('text')
           .then(beforeVal => {
-            cy.get('@enrollmentSelect').click()
-            cy.get('.yearSelectInput .rdtPrev').click({ force: true })
-            cy.get('.yearSelectInput table').contains('2018-2019').click({ force: true })
-            cy.get('@enrollmentSelect').should('not.have.value', beforeVal)
+            cy.get('@yearDecrement').click()
+            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
+            cy.get('@yearIncrement').click()
+            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
+
+            cy.get('@yearSelect').click()
+            cy.contains('2018 - 2019').click({ force: true })
+            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
           })
 
-        cy.contains('No study tracks available for this programme')
+        cy.cs('population-studytrack-selector').within(() => {
+          cy.get('input').should('have.attr', 'placeholder', 'No study tracks available')
+        })
         selectStudyProgramme('Matematiikan ja tilastotieteen maisteriohjelma')
         cy.contains('See class').should('be.enabled')
         selectStudyTrack('Matematiikka ja soveltava matematiikka')
@@ -61,8 +79,11 @@ describe('Population statistics tests', () => {
       })
 
       describe('Correct population is shown for programme', () => {
+        beforeEach(() => {
+          cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
+        })
+
         it('without study tracks', () => {
-          cy.contains('Select study programme')
           selectStudyProgramme('Matemaattisten tieteiden kandiohjelma')
           cy.contains('See class').click()
           cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
@@ -71,6 +92,7 @@ describe('Population statistics tests', () => {
 
         it('with study tracks', () => {
           selectStudyProgramme('Matematiikan ja tilastotieteen maisteriohjelma')
+          cy.wait('@studytracks').its('response.statusCode').should('be.oneOf', [200, 304])
           selectStudyTrack('Matematiikka ja soveltava matematiikka')
           cy.contains('See class').click()
           cy.contains('Matematiikan ja tilastotieteen maisteriohjelma 2017 - 2018')
@@ -399,18 +421,12 @@ describe('Population statistics tests', () => {
       })
     })
 
-    it('Only correct panes are visible', () => {
-      const correctPanes = [
-        'Credit accumulation (for 27 students)',
-        'Credit statistics',
-        'Age distribution',
-        'Courses of class',
-      ]
-      cy.get('.accordion.ui.fluid.styled').within(() => {
-        cy.get('.title').should('have.length', correctPanes.length)
-        correctPanes.forEach((pane, index) => {
-          cy.get('.title').eq(index).contains(pane)
-        })
+    it('Only correct panels are visible', () => {
+      cy.cs('panelview-parent').within(() => {
+        cy.cs('Credit accumulation (for 27 students)')
+        cy.cs('Credit statistics')
+        cy.cs('Age distribution')
+        cy.cs('Courses of class')
       })
     })
 

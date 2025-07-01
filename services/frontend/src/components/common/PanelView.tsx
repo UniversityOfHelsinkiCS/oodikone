@@ -2,6 +2,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { useMemo, useState } from 'react'
 
@@ -29,7 +30,7 @@ export const PanelView = ({ panels: initialPanels }) => {
   )
 
   return (
-    <div>
+    <Box data-cy="panelview-parent">
       {panels.map(({ key, onChange, title, content }) => (
         <Accordion
           disableGutters
@@ -53,6 +54,6 @@ export const PanelView = ({ panels: initialPanels }) => {
           <AccordionDetails>{content}</AccordionDetails>
         </Accordion>
       ))}
-    </div>
+    </Box>
   )
 }
