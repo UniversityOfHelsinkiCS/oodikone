@@ -2,23 +2,19 @@
 // Now "Class statistics" in UI
 
 const selectStudyProgramme = programme => {
-  cy.cs('population-programme-selector-parent').within(() => {
-    cy.cs('population-programme-selector').within(() => {
-      cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
-      cy.get('.MuiSelect-select').trigger('click', { force: true })
-    })
-    cy.contains(programme).click()
-  })
+  cy.cs('population-programme-selector').within(() =>
+    cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
+  )
+  cy.cs('population-programme-selector-parent').click()
+  cy.cs('population-programme-selector-parent').within(() => cy.contains(programme).click())
 }
 
 const selectStudyTrack = studyTrack => {
-  cy.cs('population-studytrack-selector-parent').within(() => {
-    cy.cs('population-studytrack-selector').within(() => {
-      cy.get('input').should('have.attr', 'placeholder', 'Select study track')
-      cy.get('.MuiSelect-select').trigger('click', { force: true })
-    })
-    cy.contains(studyTrack).click()
-  })
+  cy.cs('population-studytrack-selector').within(() =>
+    cy.get('input').should('have.attr', 'placeholder', 'Select study track')
+  )
+  cy.cs('population-studytrack-selector-parent').click()
+  cy.cs('population-studytrack-selector-parent').within(() => cy.contains(studyTrack).click())
 }
 
 describe('Population statistics tests', () => {

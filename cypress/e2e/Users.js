@@ -72,14 +72,19 @@ describe('Users tests', () => {
       })
 
       it("only the mocked user's programmes are visible", () => {
+        cy.intercept('/api/v3/populationstatistics/studyprogrammes').as('studyprogrammes')
         cy.visit('/populations')
-        cy.contains('label', 'Study programme')
-          .siblings()
-          .within(() => {
-            cy.get("div[role='option']").should('have.length', 2)
-            cy.get("div[role='option']").eq(0).contains('Matemaattisten tieteiden kandiohjelma')
-            cy.get("div[role='option']").eq(1).contains('Matematiikan ja tilastotieteen maisteriohjelma')
-          })
+        cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
+
+        cy.contains('h6', 'Degree programme')
+        cy.cs('population-programme-selector').within(() =>
+          cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
+        )
+        cy.cs('population-programme-selector-parent').click()
+        cy.cs('population-programme-selector-parent').within(() => cy.contains('Matemaattisten tieteiden kandiohjelma'))
+        cy.cs('population-programme-selector-parent').within(() =>
+          cy.contains('Matematiikan ja tilastotieteen maisteriohjelma')
+        )
       })
     })
   })
