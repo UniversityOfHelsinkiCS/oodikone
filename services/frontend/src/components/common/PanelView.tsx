@@ -51,7 +51,7 @@ export const PanelView = ({ panels: initialPanels }) => {
               {title}
             </Typography>
           </AccordionSummary>
-          <AccordionDetails>{content}</AccordionDetails>
+          <AccordionDetails data-cy={`${title}-data`}>{content}</AccordionDetails>
         </Accordion>
       ))}
     </Box>

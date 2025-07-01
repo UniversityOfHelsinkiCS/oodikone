@@ -2,21 +2,21 @@
 // Now "Class statistics" in UI
 
 const selectStudyProgramme = programme => {
-  cy.cs('population-programme-selector').within(() => {
-    cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
-  })
-  cy.cs('population-programme-selector').click()
   cy.cs('population-programme-selector-parent').within(() => {
+    cy.cs('population-programme-selector').within(() => {
+      cy.get('input').should('have.attr', 'placeholder', 'Select degree programme')
+      cy.get('.MuiSelect-select').trigger('click', { force: true })
+    })
     cy.contains(programme).click()
   })
 }
 
 const selectStudyTrack = studyTrack => {
-  cy.cs('population-studytrack-selector').within(() => {
-    cy.get('input').should('have.attr', 'placeholder', 'Select study track')
-  })
-  cy.cs('population-studytrack-selector').click()
   cy.cs('population-studytrack-selector-parent').within(() => {
+    cy.cs('population-studytrack-selector').within(() => {
+      cy.get('input').should('have.attr', 'placeholder', 'Select study track')
+      cy.get('.MuiSelect-select').trigger('click', { force: true })
+    })
     cy.contains(studyTrack).click()
   })
 }
@@ -48,26 +48,19 @@ describe('Population statistics tests', () => {
       it('Form is usable', () => {
         cy.contains('Search for class')
         cy.contains('See class').should('be.disabled')
-        cy.contains('Class of')
-          .parent()
-          .within(() => {
-            cy.cs('population-year-selector').as('yearSelect')
-            cy.cs('population-year-decrement').as('yearDecrement')
-            cy.cs('population-year-increment').as('yearIncrement')
-          })
+
+        cy.cs('population-year-selector').as('yearSelect')
+        cy.cs('population-year-decrement').as('yearDecrement')
+        cy.cs('population-year-increment').as('yearIncrement')
 
         cy.get('@yearSelect')
-          .invoke('text')
-          .then(beforeVal => {
-            cy.get('@yearDecrement').click()
-            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
-            cy.get('@yearIncrement').click()
-            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
-
-            cy.get('@yearSelect').click()
-            cy.contains('2018 - 2019').click({ force: true })
-            cy.get('@yearSelect').invoke('text').should('not.be', beforeVal)
-          })
+          .click()
+          .then(() => cy.contains('2018 - 2019').trigger('click', { force: true }))
+        cy.get('@yearSelect').within(() => cy.contains('2018 - 2019'))
+        cy.get('@yearDecrement').click()
+        cy.get('@yearSelect').within(() => cy.contains('2017 - 2018'))
+        cy.get('@yearIncrement').click()
+        cy.get('@yearSelect').within(() => cy.contains('2018 - 2019'))
 
         cy.cs('population-studytrack-selector').within(() => {
           cy.get('input').should('have.attr', 'placeholder', 'No study tracks available')

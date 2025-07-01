@@ -8,21 +8,27 @@
 const checkGradeTable = gradesTableContents => {
   cy.cs('Grade distribution')
     .parent()
-    .siblings('.Mui-expanded')
-    .get('table > tbody')
-    .first()
-    .within(() => {
-      gradesTableContents.forEach((values, trIndex) => {
-        cy.get('tr')
-          .eq(trIndex)
-          .within(() => {
-            values.forEach((value, tdIndex) => {
-              if (value === null) return
-              cy.get('td').eq(tdIndex).contains(value)
-            })
+    .then($el => {
+      if (!$el.hasClass('Mui-expanded')) {
+        cy.cs('Grade distribution').click()
+      }
+
+      cy.cs('Grade distribution-data')
+        .get('table > tbody')
+        .first()
+        .within(() => {
+          gradesTableContents.forEach((values, trIndex) => {
+            cy.get('tr')
+              .eq(trIndex)
+              .within(() => {
+                values.forEach((value, tdIndex) => {
+                  if (value === null) return
+                  cy.get('td').eq(tdIndex).contains(value)
+                })
+              })
           })
-      })
-      cy.get('tr').should('have.length', gradesTableContents.length)
+          cy.get('tr').should('have.length', gradesTableContents.length)
+        })
     })
 }
 
