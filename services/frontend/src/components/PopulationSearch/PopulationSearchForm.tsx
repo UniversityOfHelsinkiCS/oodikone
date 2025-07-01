@@ -3,7 +3,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
-import ButtonMui from '@mui/material/Button'
+import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
@@ -20,8 +20,8 @@ import { isNewStudyProgramme } from '@/common'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { InfoBox } from '@/components/material/InfoBox'
+import { SearchHistory } from '@/components/material/SearchHistory'
 import { ToggleablePin } from '@/components/material/ToggleablePin'
-import { SearchHistory } from '@/components/SearchHistory'
 
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useSearchHistory } from '@/hooks/searchHistory'
@@ -78,11 +78,11 @@ export const PopulationSearchForm = () => {
   const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
   const pinnedProgrammes = studyProgrammePins?.studyProgrammes ?? []
 
-  const _degreeProgrammeType = useDegreeProgrammeTypes([programme?.code ?? ''])
+  const degreeProgrammeType = useDegreeProgrammeTypes([programme?.code ?? ''])
 
   const bachelorOrMasterProgrammeIsSelected = programme
     ? ['urn:code:degree-program-type:bachelors-degree', 'urn:code:degree-program-type:masters-degree'].includes(
-        _degreeProgrammeType[programme.code] ?? ''
+        degreeProgrammeType[programme.code] ?? ''
       )
     : false
 
@@ -316,21 +316,10 @@ export const PopulationSearchForm = () => {
       <RenderEnrollmentDateSelector />
       <StudyProgrammeSelector />
       <StudyTrackSelector />
-      <ButtonMui
-        disabled={!programme}
-        onClick={handleSubmit}
-        size="large"
-        sx={{ maxWidth: '12rem' }}
-        variant="contained"
-      >
+      <Button disabled={!programme} onClick={handleSubmit} size="large" sx={{ maxWidth: '12rem' }} variant="contained">
         See class
-      </ButtonMui>
-      <SearchHistory
-        disabled={false}
-        handleSearch={pushQueryToUrl}
-        items={searchHistory}
-        updateItem={updateItemInSearchHistory}
-      />
+      </Button>
+      <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
     </Stack>
   )
 }

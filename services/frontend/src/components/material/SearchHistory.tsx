@@ -18,22 +18,29 @@ export const SearchHistory = ({
   handleSearch,
   header = 'Previous searches',
   items,
+  updateItem,
 }: {
   handleSearch: (params: any) => void
   header?: string
   items: SearchHistoryItem[]
+  updateItem?: (arg: SearchHistoryItem) => void
 }) => {
   const [selected, setSelected] = useState<SearchHistoryItem | null>(null)
 
   const sortedItems = sortBy(items, item => -new Date(item.timestamp!).getTime())
 
   const handleChange = (_event: React.SyntheticEvent, newValue: SearchHistoryItem | null) => {
-    if (newValue === null) {
-      handleSearch(newValue)
+    if (!newValue) {
+      handleSearch(null)
     } else {
       handleSearch(newValue.params)
     }
     setSelected(newValue)
+
+    if (updateItem) {
+      const target = sortedItems.find(item => item.id === newValue?.id)
+      if (target) updateItem(target)
+    }
   }
 
   useEffect(() => {
