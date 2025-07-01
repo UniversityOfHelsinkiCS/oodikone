@@ -1,21 +1,18 @@
 /// <reference types="cypress" />
 
 const deleteAllSearches = () => {
-  cy.contains('Saved populations')
-    .parent()
-    .parent()
-    .parent()
-    .parent()
-    .get('.dropdown')
-    .then(dropdown => {
-      const searchItems = dropdown.find('div[role=option] > span[class=text]')
-      for (let i = 0; i < searchItems.length; i++) {
-        if (searchItems[i].textContent.includes('TEST-')) {
-          cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type('{enter}')
-          cy.get('button').contains('Delete').click()
-        }
+  cy.cs('open-uni-search-button').click()
+  cy.contains('Saved populations').parent().parent().parent().parent().get('.search').as('search')
+
+  cy.get('@search').then($el => {
+    const searchItems = $el.find('div[role=option] > span[class=text]')
+    for (let i = searchItems.length - 1; 0 <= i; i--) {
+      if (searchItems[i].textContent.includes('TEST-')) {
+        cy.get('[data-cy="history-search"]').children().eq(0).type(`${searchItems[i].textContent}{enter}`)
+        cy.get('button').contains('Delete').click()
       }
-    })
+    }
+  })
 }
 
 describe('Open uni population tests', () => {
@@ -26,18 +23,27 @@ describe('Open uni population tests', () => {
     })
     after(() => {
       cy.init('/openunipopulation', 'admin')
-      cy.url().should('include', '/openunipopulation')
       cy.contains('Open uni student population')
-      cy.get('[data-cy="open-uni-search-button"]').click()
       deleteAllSearches()
     })
 
     it('Finds a proper population', () => {
       cy.fixture('openUniPopulation').then(({ courseCodesSet1 }) => {
         cy.get('[data-cy="open-uni-search-button"]').click()
-        cy.contains('Insert course code(s)').siblings().get('textarea').type(courseCodesSet1.join('\n'))
-        cy.get('[data-cy="begin-of-search"]').clear().type('01.01.2015')
-        cy.get('[data-cy="end-of-search"]').clear().type('01.01.2020')
+        cy.contains('Insert course code(s)').siblings().get('textarea').as('textarea')
+        cy.get('@textarea').type(courseCodesSet1.join('\n'))
+        cy.cs('begin-of-search')
+          .click()
+          .then(() => {
+            cy.cs('begin-of-search').clear()
+            cy.cs('begin-of-search').type('01.01.2015')
+          })
+        cy.cs('end-of-search')
+          .click()
+          .then(() => {
+            cy.cs('end-of-search').clear()
+            cy.cs('end-of-search').type('01.01.2020')
+          })
         cy.get('button').contains('Search population').click()
         cy.contains('Beginning of the search for all fields:')
         cy.contains('01.01.2015')

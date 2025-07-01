@@ -11,7 +11,7 @@ import {
   useUpdateOpenUniCourseSearchMutation,
 } from '@/redux/openUniPopulations'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
-import { formatDate } from '@/util/timeAndDate'
+import { formatISODate } from '@/util/timeAndDate'
 import { formatToArray } from '@oodikone/shared/util'
 
 export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
@@ -102,10 +102,8 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     const query = {
       courseCode: courseList,
-      startdate: dayjs(startdate).isValid()
-        ? formatDate(startdate, 'DD-MM-YYYY')
-        : formatDate(new Date('01-08-2017'), 'DD-MM-YYYY'),
-      enddate: dayjs(enddate).isValid() ? formatDate(enddate, 'DD-MM-YYYY') : formatDate(new Date(), 'DD-MM-YYYY'),
+      startdate: dayjs(startdate).isValid() ? formatISODate(startdate) : formatISODate(new Date('01-08-2017')),
+      enddate: dayjs(enddate).isValid() ? formatISODate(enddate) : formatISODate(new Date()),
     }
 
     setValues({
