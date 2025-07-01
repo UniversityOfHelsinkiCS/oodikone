@@ -152,7 +152,7 @@ export const CoursePopulation = () => {
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          coursecode={codes}
+          coursecodes={codes}
           filteredStudents={filteredStudents}
           from={dateFrom}
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}

@@ -8,7 +8,7 @@
 const checkGradeTable = gradesTableContents => {
   cy.cs('Grade distribution')
     .parent()
-    .siblings('.content.active')
+    .siblings('.Mui-expanded')
     .get('table > tbody')
     .first()
     .within(() => {
