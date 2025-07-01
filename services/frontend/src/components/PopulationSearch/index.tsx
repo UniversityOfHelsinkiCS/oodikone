@@ -15,14 +15,7 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { PopulationQueryCard } from './PopulationQueryCard'
 import { PopulationSearchForm } from './PopulationSearchForm'
 
-export const PopulationSearch = ({
-  query,
-  skipQuery,
-  isLoading,
-  populationFound,
-  combinedProgrammeCode,
-  populationTags,
-}) => {
+export const PopulationSearch = ({ query, skipQuery, isLoading, combinedProgrammeCode, populationTags }) => {
   const { filterDispatch, useFilterSelector } = useFilters()
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
 
@@ -35,7 +28,7 @@ export const PopulationSearch = ({
   return (
     <Section
       cypress="PopulationSearch"
-      infoBoxContent={!populationFound ? populationStatisticsToolTips.search : undefined}
+      infoBoxContent={skipQuery ? populationStatisticsToolTips.search : undefined}
       title={skipQuery && 'Search for class'}
     >
       <PopulationSearchForm />

@@ -1,5 +1,10 @@
 export const populationStatisticsToolTips = {
-  advanced: `
+  advanced: {
+    semesters:
+      'Halutessa tarkastella vain syyslukukaudella (1.8.–31.12.) tai kevätlukukaudella (1.1.–31.7.) aloittaneita, haluttu ajanjakso valitaan tästä.',
+    include:
+      'Oletusarvoisesti pois suodatettuja ryhmiä voi sisällyttää mukaan tästä. Muutokset astuvat voimaan painamalla ”Fetch class with new settings”-painiketta.',
+    legacy: `
     Tässä näkymässä on **oletusarvoisesti** suodatettu pois
     - vaihto-opiskelijat
     - opiskelijat, joilla ei ole tutkintoon johtavaa opinto-oikeutta
@@ -11,6 +16,7 @@ export const populationStatisticsToolTips = {
 
     **Include**: Oletusarvoisesti pois suodatetut ryhmät voi sisällyttää mukaan ja klikkaamalla ”Fetch class with new settings”-painiketta.
   `,
+  },
   creditAccumulation: `
     **Credit accumulation**
 

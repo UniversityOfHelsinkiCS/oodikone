@@ -9,8 +9,10 @@ import Stack from '@mui/material/Stack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
+import { InfoBox } from '../material/InfoBox'
 import { getMonths } from './common'
 
 export const AdvancedSettings = ({ query, cleanUp }) => {
@@ -62,7 +64,9 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
     <Paper sx={{ padding: '1rem', mt: '1rem', mr: '30px' }} variant="outlined">
       <Stack direction="row" gap={2}>
         <FormGroup>
-          <FormLabel component="legend">Include</FormLabel>
+          <FormLabel component="legend">
+            Include <InfoBox content={populationStatisticsToolTips.advanced.include} mini />
+          </FormLabel>
           <FormControlLabel
             control={
               <Checkbox
@@ -96,7 +100,9 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
         </FormGroup>
         {!tag && (
           <FormGroup sx={{ width: 'fit-content' }}>
-            <FormLabel component="legend">Starting semesters</FormLabel>
+            <FormLabel component="legend">
+              Starting semesters <InfoBox content={populationStatisticsToolTips.advanced.semesters} mini />
+            </FormLabel>
             <FormControlLabel
               control={
                 <Checkbox

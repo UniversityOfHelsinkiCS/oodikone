@@ -36,6 +36,9 @@ import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 
+import { parseQueryParams } from '@/util/queryparams'
+import { getMonths } from '../PopulationSearch/common'
+
 type Query = {
   months: string
   year: string
@@ -56,8 +59,6 @@ const getYearText = (year: string) => {
   return yearIsNumber ? `${year} - ${+year + 1}` : ''
 }
 
-import { parseQueryParams } from '@/util/queryparams'
-import { getMonths } from '../PopulationSearch/common'
 const parseQueryFromUrl = (location): [boolean, Query] => {
   const skipQuery = !location.search
 
@@ -258,7 +259,6 @@ export const PopulationStatistics = () => {
             <PopulationSearch
               combinedProgrammeCode={combinedProgrammeCode}
               isLoading={isLoading}
-              populationFound={!!students.length}
               populationTags={populationTags}
               query={query}
               skipQuery={skipQuery}
