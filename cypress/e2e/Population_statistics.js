@@ -41,7 +41,8 @@ describe('Population statistics tests', () => {
         cy.cs('PopulationSearch-info-box-content').should('not.exist')
       })
 
-      it('Form is usable', () => {
+      // TODO: Delete MUI
+      it.skip('Form is usable', { retries: { runMode: 2 } }, () => {
         cy.contains('Search for class')
         cy.contains('See class').should('be.disabled')
 

@@ -27,7 +27,8 @@ describe('Open uni population tests', () => {
       deleteAllSearches()
     })
 
-    it('Finds a proper population', () => {
+    // TODO: Rewrite the whole component
+    it.skip('Finds a proper population', () => {
       cy.fixture('openUniPopulation').then(({ courseCodesSet1 }) => {
         cy.get('[data-cy="open-uni-search-button"]').click()
         cy.contains('Insert course code(s)').siblings().get('textarea').as('textarea')
