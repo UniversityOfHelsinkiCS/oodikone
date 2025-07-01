@@ -88,7 +88,7 @@ export const getSemestersPresentFunctions = ({
       const onHoverString = () => {
         const graduationText = graduated !== 0 ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
         return `${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(
-          allSemestersMap[semester].name
+          allSemestersMap[semester]?.name
         )} ${graduationText}`
       }
 
