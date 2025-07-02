@@ -22,7 +22,7 @@ type StudentStudyRights = Pick<SISStudyRightModel, 'studentNumber' | 'studyRight
   studyRightElements: Array<Pick<SISStudyRightElementModel, 'code' | 'endDate' | 'startDate' | 'phase'>>
 }
 
-export const getStudentNumbersWithStudyRights = async ({ studyRights, startDate, endDate, studentStatuses }) => {
+export const getStudentNumbersWithStudyRights = async ({ programmeCodes, startDate, endDate, studentStatuses }) => {
   const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
   const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
   const includeTransferredOutStudents = !!studentStatuses?.includes('TRANSFERRED')
@@ -39,7 +39,7 @@ export const getStudentNumbersWithStudyRights = async ({ studyRights, startDate,
       model: SISStudyRightElementModel,
       attributes: [],
       where: {
-        code: { [Op.in]: studyRights },
+        code: { [Op.in]: programmeCodes },
         startDate: { [Op.gte]: startDate, [Op.lt]: endDate },
       },
     },
@@ -70,7 +70,7 @@ export const getStudentNumbersWithStudyRights = async ({ studyRights, startDate,
       if (includeTransferredOutStudents) return true
 
       // NOTE: We know that this will always return a value because of the first query in the function
-      const element = student.studyRightElements.find(element => studyRights.includes(element.code))!
+      const element = student.studyRightElements.find(element => programmeCodes.includes(element.code))!
       const [hasTransferredFromProgramme, _] = hasTransferredFromOrToProgramme(student, element)
 
       return !hasTransferredFromProgramme

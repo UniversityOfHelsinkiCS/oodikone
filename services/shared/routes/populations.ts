@@ -49,12 +49,12 @@ export type CourseStats = {
 export type PopulationstatisticsResBody = { students: any; coursestatistics: CourseStats[] }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
+  years: string[]
   semesters: string[]
+  programme: string
+  combinedProgramme?: string
+  studyTrack?: string
   studentStatuses?: string[]
-  // NOTE: This param is a JSON -object
-  studyRights: string
-  year: string
-  years?: string[]
 }
 
 // populationstatisticsbycourse

@@ -29,7 +29,13 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
-import type { PopulationSearchProgramme, PopulationSearchStudyTrack } from '@/types/populationSearch'
+import type {
+  PopulationSearchProgramme,
+  PopulationSearchStudyTrack,
+  PopulationQuery,
+  Semester,
+  StudentStatus,
+} from '@/types/populationSearch'
 import { createPinnedFirstComparator } from '@/util/comparator'
 import { queryParamsToString } from '@/util/queryparams'
 
@@ -47,8 +53,8 @@ export const PopulationSearchForm = () => {
   const [year, setYear] = useState(2017)
   const [programme, setProgramme] = useState<PopulationSearchProgramme | null>(null)
   const [studyTrack, setStudyTrack] = useState<PopulationSearchStudyTrack | null>(null)
-  const [semesters, _setSemesters] = useState(['FALL', 'SPRING'])
-  const [studentStatuses, _setStudentStatuses] = useState<string[]>([])
+  const [semesters, _setSemesters] = useState<Semester[]>(['FALL', 'SPRING'])
+  const [studentStatuses, _setStudentStatuses] = useState<StudentStatus[]>([])
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState(fullAccessToStudentData)
@@ -109,8 +115,20 @@ export const PopulationSearchForm = () => {
     }
   }
 
+  const buildModernQuery = (): PopulationQuery => {
+    const [primaryProgramme, combinedProgramme] = programme?.code?.split('+') ?? []
+    return {
+      programme: primaryProgramme,
+      ...(!!combinedProgramme && { combinedProgramme }),
+      ...(!!studyTrack?.code && { studyTrack: studyTrack?.code }),
+      years: [year],
+      semesters,
+      showBachelorAndMaster,
+    }
+  }
+
   const pushQueryToUrl = () => {
-    const searchString = queryParamsToString(buildLegacyQuery())
+    const searchString = queryParamsToString(buildModernQuery())
     void navigate({ search: searchString })
   }
 
