@@ -21,7 +21,7 @@ import { parseDateRangeFromParams } from '../services/populations/shared'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
 import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
-import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
+import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
@@ -29,12 +29,11 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
   '/v3/populationstatistics',
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user
-    const { year, semesters, studyRights: requestedStudyRightsJSON, studentStatuses } = req.query
+    const { years, semesters, programme, combinedProgramme, studentStatuses } = req.query
 
-    // NOTE: `year` isn't needed anymore if `years` is defined
-    const requiredFields = [year, semesters, requestedStudyRightsJSON]
+    const requiredFields = [years, semesters, programme]
     if (requiredFields.some(field => !field)) {
-      return res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
+      return res.status(400).json({ error: 'The query should have years, semesters and a programme defined' })
     }
 
     if (!semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
@@ -47,21 +46,15 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
       return res.status(400).json({ error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' })
     }
 
-    const requestedStudyRights: { programme: string; combinedProgramme: string } | null =
-      await safeJSONParse(requestedStudyRightsJSON)
-    if (requestedStudyRights === null) {
-      return res.status(400).json({ error: 'Invalid studyrights value!' })
-    }
-
     const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
 
     const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
-    const hasFullRightsToProgramme = userFullProgrammeRights.includes(requestedStudyRights.programme)
-    const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(requestedStudyRights.combinedProgramme)
+    const hasFullRightsToProgramme = userFullProgrammeRights.includes(programme)
+    const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(combinedProgramme!)
 
     const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
-    const hasAccessToProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.programme)
-    const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(requestedStudyRights.combinedProgramme)
+    const hasAccessToProgramme = userProgrammeRightsCodes.includes(programme)
+    const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(combinedProgramme!)
 
     if (!hasFullAccessToStudents && !hasAccessToProgramme && !hasAccessToCombinedProgramme) {
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
@@ -69,17 +62,17 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
     const { startDate, endDate } = parseDateRangeFromParams({
       ...req.query,
-      years: req.query.years ?? [req.query.year],
+      years: req.query.years,
     })
 
     const studentNumbers = await getStudentNumbersWithStudyRights({
-      studyRights: [requestedStudyRights.programme],
+      programmeCodes: [programme],
       startDate,
       endDate,
       studentStatuses,
     })
 
-    const studyRights = [requestedStudyRights.programme]
+    const studyRights = [programme]
     const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
     const result = await optimizedStatisticsOf(studentNumbers, studyRights, tagList, startDate)

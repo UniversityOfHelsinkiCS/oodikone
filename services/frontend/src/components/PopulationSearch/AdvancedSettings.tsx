@@ -13,29 +13,20 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
 import { InfoBox } from '../material/InfoBox'
-import { getMonths } from './common'
 
 export const AdvancedSettings = ({ query, cleanUp }) => {
-  const {
-    studyRights,
-    studentStatuses: queryStudentStatuses,
-    tag,
-    months: queryMonths,
-    year,
-    semesters: querySemesters,
-  } = query
+  const { studentStatuses: queryStudentStatuses, semesters: querySemesters, tag, ...rest } = query
   const navigate = useNavigate()
 
-  const [semesters, setSemesters] = useState(querySemesters ? formatToArray(querySemesters) : ['FALL', 'SPRING'])
-  const [studentStatuses, setStudentStatuses] = useState(queryStudentStatuses)
-  const [months, setMonths] = useState(queryMonths ?? 0)
+  const [semesters, setSemesters] = useState<string[]>(
+    querySemesters ? formatToArray(querySemesters) : ['FALL', 'SPRING']
+  )
+  const [studentStatuses, setStudentStatuses] = useState<string[]>(queryStudentStatuses ?? [])
 
   const handleSemesterSelection = ({ target: { name } }: React.ChangeEvent<HTMLInputElement>) => {
     if (!tag) {
       const newSemesters = semesters.includes(name) ? semesters.filter(sem => sem !== name) : [...semesters, name]
-      const newMonths = getMonths(year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
       setSemesters(newSemesters)
-      setMonths(newMonths)
     }
   }
 
@@ -48,12 +39,10 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
 
   const pushQueryToUrl = () => {
     const queryObject = {
-      tag,
-      year,
-      months,
+      ...rest,
       studentStatuses,
       semesters,
-      studyRights: JSON.stringify(studyRights),
+      tag,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate({ search: searchString })

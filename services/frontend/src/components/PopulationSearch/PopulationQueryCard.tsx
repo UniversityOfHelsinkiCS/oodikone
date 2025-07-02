@@ -19,13 +19,13 @@ export const PopulationQueryCard = ({ query, populationTags }) => {
             </Typography>
           )}
           <Typography sx={{ color: 'text.secondary' }}>
-            {studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students
+            {studentStatuses?.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>
-            {studentStatuses.includes('NONDEGREE') ? 'Includes' : 'Excludes'} students with non-degree study right
+            {studentStatuses?.includes('NONDEGREE') ? 'Includes' : 'Excludes'} students with non-degree study right
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>
-            {studentStatuses.includes('TRANSFERRED') ? 'Includes' : 'Excludes'} students who have transferred out of
+            {studentStatuses?.includes('TRANSFERRED') ? 'Includes' : 'Excludes'} students who have transferred out of
             this programme
           </Typography>
         </CardContent>
