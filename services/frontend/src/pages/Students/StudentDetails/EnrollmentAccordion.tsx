@@ -58,10 +58,9 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
     const studentToSecondStudyrightEndMap = { [student.studentNumber]: null }
 
     const baseArguments = {
-      allSemesters: Object.values(semestersAndYears.semesters),
-      allSemestersMap: semestersAndYears.semesters,
+      currentSemester: semestersAndYears.currentSemester,
+      allSemesters: semestersAndYears.semesters,
       year: firstDisplayedYear,
-      filteredStudents: [student],
       getTextIn,
       programmeCode: null,
     }

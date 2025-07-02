@@ -2,16 +2,15 @@ import Tooltip from '@mui/material/Tooltip'
 import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
-import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'
+import { isFall, isMastersProgramme } from '@/common'
 
 import './semestersPresent.css'
 
 dayjs.extend(isBetween)
 
 export const getSemestersPresentFunctions = ({
+  currentSemester,
   allSemesters,
-  allSemestersMap,
-  filteredStudents,
   getTextIn,
   programmeCode,
   studentToSecondStudyrightEndMap,
@@ -19,18 +18,11 @@ export const getSemestersPresentFunctions = ({
   year,
   semestersToAddToStart,
 }) => {
-  if (!allSemesters || !filteredStudents)
-    return {
-      getSemesterEnrollmentsContent: () => null,
-      getSemesterEnrollmentsVal: () => {},
-      getFirstSemester: () => {},
-      getLastSemester: () => {},
-    }
+  const { semestercode: currentSemesterCode } = currentSemester
 
-  const { semestercode: currentSemesterCode } = getCurrentSemester(allSemestersMap) || {}
-
-  const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
   const getFirstAndLastSemester = () => {
+    const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
+
     const associatedYear = year !== 'All' && year
     if (associatedYear) {
       const first = Object.values(allSemesters).find(
@@ -46,96 +38,75 @@ export const getSemestersPresentFunctions = ({
   const { first: firstSemester, last: lastSemester } =
     Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 0, last: 0 }
 
-  const enrollmentTypeText = (type, statutoryAbsence) => {
-    if (type === 1) return 'Enrolled as present'
-    if (type === 2 && statutoryAbsence) return 'Enrolled as absent (statutory)'
-    if (type === 2) return 'Enrolled as absent'
-    if (type === 3) return 'Not enrolled'
-    return 'No study right'
+  const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
+    switch (enrollmenttype) {
+      case 1:
+        return 'Enrolled as present'
+      case 2:
+        return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
+      case 3:
+        return 'Not enrolled'
+      default:
+        return 'No study right'
+    }
   }
 
-  const graduatedOnSemester = (student, semester, programmeCode) => {
-    if (!programmeCode) return 0
-    const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
-    const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
-    if (
-      firstGraduation &&
-      dayjs(firstGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
-    ) {
-      if (!isMastersProgramme(programmeCode)) return 1
-      return 2
+  const enrollmentTypeLabel = (enrollmenttype, statutoryAbsence) => {
+    switch (enrollmenttype) {
+      case 1:
+        return 'present'
+      case 2:
+        return statutoryAbsence ? 'absent-statutory' : 'absent'
+      case 3:
+        return 'passive'
+      default:
+        return 'none'
     }
-    if (
-      secondGraduation &&
-      dayjs(secondGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
-    ) {
-      if (isMastersProgramme(programmeCode)) return 1
-      return 2
-    }
-    return 0
   }
 
   const getSemesterEnrollmentsContent = (student, studyright) => {
-    if (allSemesters.length === 0) return null
     if (!student.semesterEnrollmentsMap && !studyright) return null
-    const semesterIcons = []
 
-    const getSemesterJSX = (semester, enrollmenttype, statutoryAbsence, graduated, key) => {
-      let type
-      switch (enrollmenttype) {
-        case 1:
-          type = 'present'
-          break
-        case 2:
-          type = statutoryAbsence ? 'absent-statutory' : 'absent'
-          break
-        case 3:
-          type = 'passive'
-          break
-        default:
-          type = 'none'
-          break
-      }
+    const isMasters = isMastersProgramme(programmeCode ?? '')
 
-      const graduationCrownClassName = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
+    const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
+    const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
+
+    const semesterIcons = Array.from(Array(lastSemester - firstSemester + 1).keys()).map((_, index) => {
+      const semester = index + firstSemester
+      const key = `${student.studentNumber}-${semester}`
+
+      const enrollmenttype =
+        student.semesterEnrollmentsMap?.[semester]?.enrollmenttype ??
+        studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.type
+      const statutoryAbsence =
+        student.semesterEnrollmentsMap?.[semester]?.statutoryAbsence ??
+        studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.statutoryAbsence
+
+      const { startdate, enddate, name: semesterName } = allSemesters[semester]
+      const graduated = programmeCode
+        ? (() => {
+            if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate)) return 1 + 1 * isMasters
+            if (secondGraduation && dayjs(secondGraduation).isBetween(startdate, enddate)) return 2 - 1 * isMasters
+            return 0
+          })()
+        : 0
+
+      const typeLabel = enrollmentTypeLabel(enrollmenttype, statutoryAbsence)
+      const typeText = enrollmentTypeText(enrollmenttype, statutoryAbsence)
 
       const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
-      const onHoverString = `
-        ${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(allSemestersMap[semester]?.name)} ${graduationText}
-      `
+      const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
+
+      const springMargin = isFall(semester) ? '' : 'margin-right'
+      const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
 
       return (
         <Tooltip key={key} placement="top" title={onHoverString}>
-          <span
-            className={`enrollment-label-no-margin label-${type} ${isFall(semester) ? '' : 'margin-right'} ${graduationCrownClassName}`}
-          />
+          <span className={`enrollment-label-no-margin ${springMargin} label-${typeLabel} ${graduationCrown}`} />
         </Tooltip>
       )
-    }
-
-    for (let semester = firstSemester; semester <= lastSemester; semester++) {
-      let enrollmenttype
-      let statutoryAbsence
-
-      if (student.semesterEnrollmentsMap) {
-        enrollmenttype = student.semesterEnrollmentsMap[semester]?.enrollmenttype
-        statutoryAbsence = student.semesterEnrollmentsMap[semester]?.statutoryAbsence
-      } else {
-        const enrollment = studyright.semesterEnrollments?.find(enrollment => enrollment.semester === semester)
-        enrollmenttype = enrollment?.type
-        statutoryAbsence = enrollment?.statutoryAbsence
-      }
-
-      semesterIcons.push(
-        getSemesterJSX(
-          semester,
-          enrollmenttype,
-          statutoryAbsence,
-          graduatedOnSemester(student, semester, programmeCode),
-          `${student.studentNumber}-${semester}`
-        )
-      )
-    }
+    })
 
     return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
   }
@@ -155,13 +126,7 @@ export const getSemestersPresentFunctions = ({
     )
   }
 
-  const getFirstSemester = () => firstSemester
-
-  const getLastSemester = () => lastSemester
-
   return {
-    getFirstSemester,
-    getLastSemester,
     getSemesterEnrollmentsContent,
     getSemesterEnrollmentsVal,
   }

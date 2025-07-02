@@ -42,9 +42,8 @@ export const CloseToGraduation = () => {
     () =>
       getSemestersPresentFunctions({
         getTextIn,
+        currentSemester,
         allSemesters,
-        allSemestersMap: allSemesters ?? {},
-        filteredStudents: students,
         year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
         programmeCode: null,
         studentToSecondStudyrightEndMap: null,

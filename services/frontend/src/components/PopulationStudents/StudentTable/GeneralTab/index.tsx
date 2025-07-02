@@ -70,11 +70,6 @@ export const GeneralTabContainer = ({
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
 
-  const allSemestersMap = Object.values(allSemesters).reduce((obj, cur, index) => {
-    obj[index + 1] = cur
-    return obj
-  }, {})
-
   const { data: programmes = {} } = useGetProgrammesQuery()
 
   const { useFilterSelector } = useFilters()
@@ -352,9 +347,8 @@ export const GeneralTabContainer = ({
   )
 
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
+    currentSemester,
     allSemesters,
-    allSemestersMap,
-    filteredStudents,
     getTextIn,
     programmeCode,
     studentToSecondStudyrightEndMap,
