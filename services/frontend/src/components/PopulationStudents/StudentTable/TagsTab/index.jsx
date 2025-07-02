@@ -1,10 +1,17 @@
+import CircularProgress from '@mui/material/CircularProgress'
 import { Link } from 'react-router'
 import { Tab } from 'semantic-ui-react'
 
 import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
+import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
-export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink, students, tags }) => {
+export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink, students }) => {
+  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
+  const { data: tags, isFetching } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+
+  if (isFetching) return <CircularProgress />
+
   return (
     <Tab.Pane>
       <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
@@ -36,7 +43,12 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink
               selectedStudents={students.map(student => student.studentNumber)}
               tags={tags}
             />
-            <TagList combinedProgramme={combinedProgramme} mainProgramme={mainProgramme} selectedStudents={students} />
+            <TagList
+              combinedProgramme={combinedProgramme}
+              mainProgramme={mainProgramme}
+              selectedStudents={students}
+              tags={tags}
+            />
           </>
         )}
       </div>

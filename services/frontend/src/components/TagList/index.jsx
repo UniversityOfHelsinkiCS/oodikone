@@ -3,7 +3,6 @@ import { Table } from 'semantic-ui-react'
 
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { TagStudent } from '@/components/TagStudent'
-import { useGetStudentTagsByStudyTrackQuery, useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
 const Row = memo(
   ({ studentTags, studentNumber, studyTrack, tagOptions, name, combinedProgramme }) => (
@@ -19,11 +18,21 @@ const Row = memo(
   (prevProps, newProps) => prevProps.studentTags.length === newProps.studentTags.length
 )
 
-export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents }) => {
-  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
-  const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
-  const { data: tagStudents } = useGetStudentTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
+export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents, tags }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
+  const tagStudents = selectedStudents
+    .filter(student => student.tags.length)
+    .flatMap(student =>
+      student.tags.map(tag => ({
+        studentNumber: student.studentNumber,
+        tagId: tag.tag_id,
+        tag: {
+          id: tag.tag.tag_id,
+          name: tag.tag.tagname,
+          personalUserId: tag.tag.personal_user_id,
+        },
+      }))
+    )
 
   const tagRows =
     tagStudents && tags

@@ -8,7 +8,6 @@ import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVi
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
@@ -42,8 +41,6 @@ const Panels = ({
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
   const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme ?? ''
-  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
-  const { data: tags } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
   const availablePanels = [
     {
@@ -86,7 +83,6 @@ const Panels = ({
           mainProgramme={mainProgramme}
           programmeForTagsLink={programmeForTagsLink}
           students={filteredStudents}
-          tags={tags}
         />
       ),
     },
