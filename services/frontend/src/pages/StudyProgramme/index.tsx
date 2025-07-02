@@ -145,8 +145,8 @@ export const StudyProgramme = () => {
         component: (
           <DegreeCoursesTab
             combinedProgramme={secondProgrammeId}
+            degreeProgramme={programmeId}
             key="DegreeCoursesTabContent"
-            studyProgramme={programmeId}
             year={`${new Date().getFullYear()}`}
           />
         ),

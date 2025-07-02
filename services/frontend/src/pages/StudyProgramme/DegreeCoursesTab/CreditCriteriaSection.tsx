@@ -25,10 +25,10 @@ const emptyCredits = {
 
 export const CreditCriteriaSection = ({
   criteria,
-  studyProgramme,
+  degreeProgramme,
 }: {
   criteria: ProgressCriteria
-  studyProgramme: string
+  degreeProgramme: string
 }) => {
   const [creditLimits, setCreditLimits] = useState<Record<string, null | number>>(emptyCredits)
 
@@ -44,7 +44,7 @@ export const CreditCriteriaSection = ({
       year5: creditLimits.year5 ?? criteria.credits.yearFive,
       year6: creditLimits.year6 ?? criteria.credits.yearSix,
     }
-    void addProgressCriteriaCredits({ programmeCode: studyProgramme, credits })
+    void addProgressCriteriaCredits({ programmeCode: degreeProgramme, credits })
   }
 
   const clearLimits = () => {
@@ -83,7 +83,7 @@ export const CreditCriteriaSection = ({
     },
   ]
 
-  if (isMedicalProgramme(studyProgramme)) {
+  if (isMedicalProgramme(degreeProgramme)) {
     inputs.push(
       {
         key: 'year4',
