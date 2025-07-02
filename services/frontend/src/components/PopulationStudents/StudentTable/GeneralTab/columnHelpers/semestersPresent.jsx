@@ -1,8 +1,10 @@
+import Tooltip from '@mui/material/Tooltip'
 import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
-import { Popup } from 'semantic-ui-react'
 
 import { getCurrentSemester, isFall, isMastersProgramme } from '@/common'
+
+import './semestersPresent.css'
 
 dayjs.extend(isBetween)
 
@@ -54,8 +56,8 @@ export const getSemestersPresentFunctions = ({
 
   const graduatedOnSemester = (student, semester, programmeCode) => {
     if (!programmeCode) return 0
-    const firstGraduation = studentToStudyrightEndMap[student.studentNumber]
-    const secondGraduation = studentToSecondStudyrightEndMap[student.studentNumber]
+    const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
+    const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
     if (
       firstGraduation &&
       dayjs(firstGraduation).isBetween(allSemestersMap[semester].startdate, allSemestersMap[semester].enddate)
@@ -79,57 +81,35 @@ export const getSemestersPresentFunctions = ({
     const semesterIcons = []
 
     const getSemesterJSX = (semester, enrollmenttype, statutoryAbsence, graduated, key) => {
-      let type = 'none'
-      if (enrollmenttype === 1) type = 'present'
-      if (enrollmenttype === 2) type = 'absent'
-      if (enrollmenttype === 2 && statutoryAbsence) type = 'absent-statutory'
-      if (enrollmenttype === 3) type = 'passive'
-
-      const onHoverString = () => {
-        const graduationText = graduated !== 0 ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
-        return `${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(
-          allSemestersMap[semester]?.name
-        )} ${graduationText}`
+      let type
+      switch (enrollmenttype) {
+        case 1:
+          type = 'present'
+          break
+        case 2:
+          type = statutoryAbsence ? 'absent-statutory' : 'absent'
+          break
+        case 3:
+          type = 'passive'
+          break
+        default:
+          type = 'none'
+          break
       }
 
-      const graduationCrown = (
-        <svg
-          fill="none"
-          height="23"
-          style={{ overflow: 'visible' }}
-          viewBox="17 54 70 70"
-          width="23"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M69.8203 29.1952L61.0704 56.1246H18.7499L10 29.1952L27.2632 38.9284L39.9102 15L52.5571 38.9284L69.8203 29.1952Z"
-            fill="#fff238"
-            stroke="#696969"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {graduated === 2 && (
-            <path d="M 40 52.5 l 9 -12 l -9 -12 l -9 12 l 9 12" fill="rgb(97, 218, 255)" stroke="rgb(232, 116, 14)" />
-          )}
-        </svg>
-      )
+      const graduationCrownClassName = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
+
+      const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
+      const onHoverString = `
+        ${enrollmentTypeText(enrollmenttype, statutoryAbsence)} in ${getTextIn(allSemestersMap[semester]?.name)} ${graduationText}
+      `
 
       return (
-        <Popup
-          content={onHoverString()}
-          key={key}
-          on="hover"
-          position="bottom center"
-          size="tiny"
-          trigger={
-            <div
-              className={`enrollment-label-no-margin label-${type} ${isFall(semester) ? '' : 'margin-right'}`}
-              key={key}
-            >
-              {graduated > 0 && graduationCrown}
-            </div>
-          }
-        />
+        <Tooltip key={key} placement="top" title={onHoverString}>
+          <span
+            className={`enrollment-label-no-margin label-${type} ${isFall(semester) ? '' : 'margin-right'} ${graduationCrownClassName}`}
+          />
+        </Tooltip>
       )
     }
 

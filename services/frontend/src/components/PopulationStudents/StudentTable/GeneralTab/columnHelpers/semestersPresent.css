@@ -1,0 +1,22 @@
+/* These should inherit the width and height from .enrollment-label-no-margin */
+
+/* Instead we inflate the size and offset the svg... */
+
+.graduated::after,
+.graduated-higher::after {
+  content: '';
+  position: relative;
+  top: -15px;
+  left: -4px;
+  display: inline-block;
+  width: 23px;
+  height: 23px;
+  background-image: url('/crown.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  overflow: visible;
+}
+
+.graduated-higher::after {
+  background-image: url('/crown-big.svg');
+}

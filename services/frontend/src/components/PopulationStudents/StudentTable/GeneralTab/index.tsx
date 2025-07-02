@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { getStudentTotalCredits, getHighestGradeOfCourseBetweenRange } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
@@ -105,7 +106,7 @@ export const GeneralTabContainer = ({
   const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
 
   const getStudyRight = student => {
-    const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
+    const code = programmeCode ?? studentToPrimaryProgrammeMap.get(student.studentNumber)?.code
     return student.studyRights.find(studyRight => studyRight.studyRightElements.some(element => element.code === code))
   }
 
@@ -166,7 +167,7 @@ export const GeneralTabContainer = ({
   }
 
   const getMostRecentAttainment = student => {
-    const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
+    const code = programmeCode ?? studentToPrimaryProgrammeMap.get(student.studentNumber)?.code
     const studyPlan = student.studyplans?.find(plan => plan.programme_code === code) ?? null
     if (!studyPlan) return ''
 
@@ -191,7 +192,7 @@ export const GeneralTabContainer = ({
     return studyRightEnd ? formatDate(studyRightEnd, DateFormat.ISO_DATE) : ''
   }
   const getCreditsFromHops = student => {
-    const code = programmeCode ?? studentToPrimaryProgrammeMap[student.studentNumber]?.code
+    const code = programmeCode ?? studentToPrimaryProgrammeMap.get(student.studentNumber)?.code
     return student.hopsCredits ?? student.studyplans?.find(plan => plan.programme_code === code)?.completed_credits ?? 0
   }
 
@@ -427,8 +428,9 @@ export const GeneralTabContainer = ({
     return result
   }
 
-  const formattedData: FormattedStudentData[] = selectedStudentNumbers.map(studentNumber =>
-    formatStudent(students[studentNumber])
+  const formattedData: FormattedStudentData[] = useMemo(
+    () => selectedStudentNumbers.map(studentNumber => formatStudent(students[studentNumber])),
+    [filteredStudents]
   )
   const containsAdmissionTypes = formattedData.some(student => student.admissionType !== 'Ei valintatapaa')
 
