@@ -3,7 +3,7 @@ import { Button, Icon, Modal, Container } from 'semantic-ui-react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 
-export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
+export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
   const [open, setOpen] = useState(false)
 
   const setModalOpenState = state => {
@@ -25,7 +25,7 @@ export const FilterDegreeCoursesModal = ({ studyProgramme, year }) => {
       <Modal.Header>Hide degree courses</Modal.Header>
       <Modal.Content image>
         <Container>
-          <DegreeCoursesTab studyProgramme={studyProgramme} year={year} />
+          <DegreeCoursesTab degreeProgramme={degreeProgramme} years={years} />
           <Button icon labelPosition="left" onClick={() => setModalOpenState(false)} style={{ marginTop: '10px' }}>
             <Icon name="save" />
             Save & Close

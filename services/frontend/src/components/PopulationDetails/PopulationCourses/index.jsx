@@ -27,9 +27,9 @@ export const PopulationCourses = ({
           <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
         </div>
       )}
-      {query.studyRights.programme && !onlyIamRights && (
+      {query.programme && !onlyIamRights && (
         <div style={{ marginBottom: '20px' }}>
-          <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} year={query.year} />
+          <FilterDegreeCoursesModal degreeProgramme={query.programme} years={query.years} />
         </div>
       )}
     </div>

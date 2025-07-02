@@ -13,17 +13,17 @@ import { DegreeCourseTable } from './DegreeCourseTable'
 
 export const DegreeCoursesTab = ({
   combinedProgramme,
-  studyProgramme,
+  degreeProgramme,
   year,
 }: {
   combinedProgramme: string
-  studyProgramme: string
+  degreeProgramme: string
   year: string
 }) => {
   const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(studyProgramme, year)
-  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(degreeProgramme, year)
+  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
 
   const getModules = (courses: ProgrammeCourse[]): Module[] => {
     const modules: Record<string, ProgrammeCourse[]> = {}
@@ -61,8 +61,8 @@ export const DegreeCoursesTab = ({
   return (
     <Stack gap={2}>
       <CurriculumSection curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
-      {isBachelorOrLicentiateProgramme(studyProgramme) && (
-        <CreditCriteriaSection criteria={criteria} studyProgramme={studyProgramme} />
+      {isBachelorOrLicentiateProgramme(degreeProgramme) && (
+        <CreditCriteriaSection criteria={criteria} degreeProgramme={degreeProgramme} />
       )}
       {defaultProgrammeModules.length > 1 && curriculum && (
         <DegreeCourseTable
@@ -70,7 +70,7 @@ export const DegreeCoursesTab = ({
           criteria={criteria}
           curriculumVersion={curriculum.version}
           modules={defaultProgrammeModules}
-          studyProgramme={studyProgramme}
+          studyProgramme={degreeProgramme}
         />
       )}
       {secondProgrammeModules.length > 0 && curriculum && (
@@ -79,7 +79,7 @@ export const DegreeCoursesTab = ({
           criteria={criteria}
           curriculumVersion={curriculum.version}
           modules={secondProgrammeModules}
-          studyProgramme={studyProgramme}
+          studyProgramme={degreeProgramme}
         />
       )}
     </Stack>
