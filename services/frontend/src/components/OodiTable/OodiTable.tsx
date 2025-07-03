@@ -6,6 +6,9 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+
 import { OodiTableHeader } from './components/Header'
 import { OodiTableCell } from './components/Cell'
 
@@ -33,11 +36,18 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
                       key={header.id}
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
+                      onClick={header.column.getToggleSortingHandler()}
+                      sx={{ cursor: header.column.getCanSort() ? 'pointer' : 'inherit' }}
                     >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
+                      {{
+                        asc: <ArrowUpwardIcon fontSize='small' />,
+                        desc: <ArrowDownwardIcon fontSize='small' />,
+                        false: " "
+                      }[header.column.getIsSorted() as string] ?? null}
                     </OodiTableHeader>
                   )
                 }

@@ -54,7 +54,7 @@ export const NewTable = ({
     // { accessorKey: 'phoneNumber', header: 'Phone number' },
     // { accessorKey: 'sisuID', header: 'sisuID' },
     {
-      header: 'Credits', columns: [
+      header: 'Credits', enableSorting: false, columns: [
         { accessorKey: 'creditsTotal', header: 'Total' },
         { accessorKey: 'creditsHops', header: 'In HOPS' },
         { accessorKey: 'creditsSince', header: 'Since' },
