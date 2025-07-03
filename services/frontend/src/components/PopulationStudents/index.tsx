@@ -17,6 +17,7 @@ import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
+import { NewTable as OodiTableTab } from './StudentTable/GeneralTab/NewTable'
 import { TagsTab } from './StudentTable/TagsTab'
 
 type PopulationDetails = {
@@ -98,20 +99,23 @@ export const PopulationStudents = ({
     throw new Error(`${variant} is not a proper variant!`)
 
   const availablePanels = {
+    // General: () => (
+    //   <GeneralTab
+    //     combinedProgramme={combinedProgramme}
+    //     coursecodes={coursecodes}
+    //     customPopulationProgramme={customPopulationProgramme}
+    //     filteredStudents={filteredStudents}
+    //     from={from}
+    //     group={studyGuidanceGroup}
+    //     programme={programme}
+    //     showBachelorAndMaster={showBachelorAndMaster}
+    //     to={to}
+    //     variant={variant}
+    //     year={year}
+    //   />
+    // ),
     General: () => (
-      <GeneralTab
-        combinedProgramme={combinedProgramme}
-        coursecodes={coursecodes}
-        customPopulationProgramme={customPopulationProgramme}
-        filteredStudents={filteredStudents}
-        from={from}
-        group={studyGuidanceGroup}
-        programme={programme}
-        showBachelorAndMaster={showBachelorAndMaster}
-        to={to}
-        variant={variant}
-        year={year}
-      />
+      <OodiTableTab filteredStudents={filteredStudents} />
     ),
     Courses: () => (
       <CoursesTab
