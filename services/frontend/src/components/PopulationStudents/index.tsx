@@ -15,6 +15,7 @@ import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
+import { NewTable as OodiTableTab } from './StudentTable/GeneralTab/NewTable'
 import { TagsTab } from './StudentTable/TagsTab'
 
 const Panels = ({
@@ -43,22 +44,28 @@ const Panels = ({
   const programme = studyGuidanceGroup?.tags?.studyProgramme ?? ''
 
   const availablePanels = [
+    // {
+    //   menuItem: 'General',
+    //   render: () => (
+    //     <GeneralTab
+    //       coursecodes={coursecodes}
+    //       customPopulationProgramme={customPopulationProgramme}
+    //       filteredStudents={filteredStudents}
+    //       from={from}
+    //       group={studyGuidanceGroup}
+    //       showBachelorAndMaster={showBachelorAndMaster}
+    //       studyRights={studyRights}
+    //       to={to}
+    //       variant={variant}
+    //       year={year}
+    //     />
+    //   ),
+    // },
     {
       menuItem: 'General',
       render: () => (
-        <GeneralTab
-          coursecodes={coursecodes}
-          customPopulationProgramme={customPopulationProgramme}
-          filteredStudents={filteredStudents}
-          from={from}
-          group={studyGuidanceGroup}
-          showBachelorAndMaster={showBachelorAndMaster}
-          studyRights={studyRights}
-          to={to}
-          variant={variant}
-          year={year}
-        />
-      ),
+        <OodiTableTab filteredStudents={filteredStudents} />
+      )
     },
     {
       menuItem: 'Courses',
