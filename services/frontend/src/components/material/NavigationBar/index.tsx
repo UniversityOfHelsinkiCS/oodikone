@@ -5,81 +5,82 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Toolbar from '@mui/material/Toolbar'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useLocation } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
+import { formatToArray } from '@oodikone/shared/util'
 import { NavigationButton } from './NavigationButton'
-import { NavigationItem, navigationItems } from './navigationItems'
+import { navigationItems } from './navigationItems'
 import { OodikoneLogo } from './OodikoneLogo'
 import { UserButton } from './UserButton'
 
 export const NavigationBar = () => {
+  const { isFetching, fullAccessToStudentData, isAdmin, programmeRights, roles, iamGroups } =
+    useGetAuthorizedUserQuery()
+
   const location = useLocation()
-  const { fullAccessToStudentData, isAdmin, isLoading, programmeRights, roles, iamGroups } = useGetAuthorizedUserQuery()
+  const [activeTab, setActiveTab] = useState<number>(-1)
+
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const [activeTab, setActiveTab] = useState<number | false>(false)
+  const visibleNavigationItems = useMemo(
+    () =>
+      Object.entries(!isFetching ? navigationItems : {})
+        .filter(([key, _]) => {
+          if (key === 'populations' && !fullAccessToStudentData && !programmeRights.length) return false
 
-  const isActivePath = (mainPath: string | undefined, subPaths: (string | undefined)[] = []) => {
-    const allPaths = [mainPath, ...subPaths].filter((path): path is string => Boolean(path))
-    return allPaths.some(currentPath => location.pathname.includes(currentPath))
-  }
+          if (
+            key === 'students' &&
+            !checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) &&
+            !fullStudyProgrammeRights.length
+          )
+            return false
 
-  const getVisibleNavigationItems = () => {
-    const visibleNavigationItems: Record<string, NavigationItem> = {}
-    if (isLoading) {
-      return visibleNavigationItems
-    }
-    Object.keys(navigationItems).forEach(key => {
-      if (key === 'populations') {
-        if (!fullAccessToStudentData && programmeRights.length === 0) return
-      }
-      if (key === 'students') {
-        if (
-          !checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) &&
-          fullStudyProgrammeRights.length === 0
-        ) {
-          return
-        }
-      } else if (key === 'courseStatistics') {
-        if (
-          !checkUserAccess(['admin', 'fullSisuAccess', 'courseStatistics'], roles) &&
-          fullStudyProgrammeRights.length === 0
-        ) {
-          return
-        }
-      } else if (key === 'faculty') {
-        if (!checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles)) return
-      } else if (key === 'feedback') {
-        if (!isDefaultServiceProvider()) return
-      } else if (key === 'admin') {
-        if (!isAdmin) return
-      } else if (key === 'teachers') {
-        if (!checkUserAccess(['teachers'], roles) && !hasFullAccessToTeacherData(roles, iamGroups)) {
-          return
-        }
-      }
-      const { reqRights } = navigationItems[key]
-      if (!reqRights || reqRights.every(role => roles.includes(role))) {
-        visibleNavigationItems[key] = navigationItems[key]
-      }
-    })
-    return { ...visibleNavigationItems }
-  }
+          if (
+            key === 'courseStatistics' &&
+            !checkUserAccess(['admin', 'fullSisuAccess', 'courseStatistics'], roles) &&
+            !fullStudyProgrammeRights.length
+          )
+            return false
 
-  const visibleNavigationItems = getVisibleNavigationItems()
+          if (key === 'faculty' && !checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles))
+            return false
 
-  useEffect(() => {
-    const activeTabIndex = Object.entries(visibleNavigationItems).findIndex(([_key, item]) => {
-      const subItemPaths = item.items ? item.items.map(subItem => subItem.path) : []
-      return isActivePath(item.path, subItemPaths)
-    })
+          if (key === 'feedback' && !isDefaultServiceProvider()) return false
 
-    setActiveTab(activeTabIndex >= 0 ? activeTabIndex : false)
-  }, [location.pathname, visibleNavigationItems])
+          if (key === 'admin' && !isAdmin) return false
+
+          if (
+            key === 'teachers' &&
+            !checkUserAccess(['teachers'], roles) &&
+            !hasFullAccessToTeacherData(roles, iamGroups)
+          )
+            return false
+
+          const { reqRights } = navigationItems[key]
+          if (!reqRights || reqRights.every(role => roles.includes(role))) return true
+
+          return false
+        })
+        .map(([_, value]) => value),
+    [isFetching, fullAccessToStudentData, isAdmin, programmeRights, roles, iamGroups]
+  )
+
+  const isActivePath = (paths: string[]) =>
+    paths.filter((path): path is string => Boolean(path)).some(currentPath => location.pathname.includes(currentPath))
+
+  useEffect(
+    () =>
+      setActiveTab(
+        visibleNavigationItems.findIndex(item =>
+          isActivePath(formatToArray(item.path ?? item.items?.map(subPath => subPath.path!) ?? []))
+        )
+      ),
+    [location.pathname, visibleNavigationItems]
+  )
 
   return (
     <AppBar elevation={0} position="static">
@@ -95,20 +96,16 @@ export const NavigationBar = () => {
             }}
           >
             <OodikoneLogo />
-            {!isLoading && location && (
+            {!isFetching && location && (
               <Tabs
-                sx={{
-                  '& .MuiTabs-indicator': {
-                    backgroundColor: theme => theme.palette.activeNavigationTab,
-                  },
-                }}
+                sx={{ '& .MuiTabs-indicator': { backgroundColor: 'activeNavigationTab' } }}
                 textColor="inherit"
-                value={activeTab}
+                value={0 <= activeTab ? activeTab : false}
                 variant="scrollable"
               >
                 {Object.entries(visibleNavigationItems).map(([key, item]) => (
                   <Tab
-                    component={item.path ? Link : 'div'}
+                    component={item?.path ? Link : 'div'}
                     data-cy={`nav-bar-button-${key}`}
                     key={key}
                     label={<NavigationButton item={item} />}

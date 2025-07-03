@@ -2,8 +2,8 @@ export type NavigationItem = {
   key: string
   label: string
   path?: string
-  reqRights?: string[]
   items?: NavigationItem[]
+  reqRights?: string[]
 }
 
 export const navigationItems: Record<string, NavigationItem> = {
@@ -11,11 +11,11 @@ export const navigationItems: Record<string, NavigationItem> = {
   faculty: { key: 'faculties', label: 'Faculties', path: '/faculties' },
   populations: {
     key: 'studyProgramme',
+    label: 'Programmes',
     items: [
       { key: 'class', label: 'Class statistics', path: '/populations' },
       { key: 'overview', label: 'Overview', path: '/study-programme' },
     ],
-    label: 'Programmes',
   },
   courseStatistics: { key: 'courseStatistics', label: 'Courses', path: '/coursestatistics' },
   students: { key: 'students', label: 'Students', path: '/students' },
@@ -28,6 +28,7 @@ export const navigationItems: Record<string, NavigationItem> = {
   },
   customPopulations: {
     key: 'customPopulation',
+    label: 'Special populations',
     items: [
       { key: 'customSearch', label: 'Custom population', path: '/custompopulation' },
       { key: 'openUniSearch', label: 'Fetch open uni students by courses', path: '/openunipopulation' },
@@ -35,15 +36,14 @@ export const navigationItems: Record<string, NavigationItem> = {
       { key: 'languageCenterView', label: 'Language center view', path: '/languagecenterview' },
       { key: 'closeToGraduation', label: 'Students close to graduation', path: '/close-to-graduation' },
     ],
-    label: 'Special populations',
   },
   feedback: { key: 'feedback', label: 'Feedback', path: '/feedback' },
   admin: {
     key: 'admin',
+    label: 'Admin',
     items: [
       { key: 'users', label: 'Users', path: '/users', reqRights: ['admin'] },
       { key: 'updater', label: 'Updater', path: '/updater', reqRights: ['admin'] },
     ],
-    label: 'Admin',
   },
 }
