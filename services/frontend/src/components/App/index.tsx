@@ -44,53 +44,34 @@ dayjs.updateLocale('en', {
   },
 })
 
-const addUserDetailsToLoggers = ({ id, username, mockedBy }) => {
-  if (!isProduction || !id || !username) {
-    return
-  }
-  Sentry.setUser({ id, username, mockedBy })
-}
-
 const Layout = ({ children }) => (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-    }}
-  >
-    <LanguageProvider>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <ThemeProvider theme={theme}>
-          <StatusNotificationProvider>
-            <CssBaseline />
-            <NavigationBar />
-            <main style={{ flex: 1 }}>{children}</main>
-            <StatusNotification />
-            <Footer />
-          </StatusNotificationProvider>
-        </ThemeProvider>
-      </LocalizationProvider>
-    </LanguageProvider>
-  </div>
+  <LanguageProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ThemeProvider theme={theme}>
+        <StatusNotificationProvider>
+          <CssBaseline />
+          <NavigationBar />
+          <main style={{ flex: 1 }}>{children}</main>
+          <StatusNotification />
+          <Footer />
+        </StatusNotificationProvider>
+      </ThemeProvider>
+    </LocalizationProvider>
+  </LanguageProvider>
 )
 
 export const App = () => {
   const { isLoading, error, id, username, mockedBy } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
-    if (isProduction) {
-      initShibbolethPinger()
-    }
+    if (isProduction) initShibbolethPinger()
   }, [])
 
   useEffect(() => {
-    addUserDetailsToLoggers({ id, username, mockedBy })
+    if (isProduction && !isLoading && id && username) Sentry.setUser({ id, username, mockedBy })
   }, [id, username, mockedBy])
 
-  if (error) {
-    return <AccessDenied notEnabled />
-  }
+  if (error) return <AccessDenied />
 
   return <Layout>{isLoading ? <SegmentDimmer isLoading={isLoading} /> : <Routes />}</Layout>
 }

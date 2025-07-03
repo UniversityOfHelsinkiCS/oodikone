@@ -8,7 +8,6 @@ import orange from '@mui/material/colors/orange'
 import purple from '@mui/material/colors/purple'
 import red from '@mui/material/colors/red'
 
-import type { ThemeOptions } from '@mui/material/styles'
 import createTheme from '@mui/material/styles/createTheme'
 
 const baseTheme = {
@@ -65,4 +64,4 @@ declare module '@mui/material/styles' {
   interface PaletteOptions extends CustomPalette {}
 }
 
-export const theme = createTheme(baseTheme as ThemeOptions)
+export const theme = createTheme(baseTheme)
