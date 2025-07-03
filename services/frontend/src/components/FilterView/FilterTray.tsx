@@ -52,11 +52,9 @@ export const FilterTray = () => {
     <div style={{ display: 'inline-flex', alignItems: 'flex-start', width: '100%' }}>
       <Segment
         style={{
-          marginLeft: '0.5rem',
+          padding: '0.75rem',
           width: '16rem',
           position: 'sticky',
-          top: '10px',
-          maxHeight: '100vh',
           overflowY: 'auto',
         }}
       >

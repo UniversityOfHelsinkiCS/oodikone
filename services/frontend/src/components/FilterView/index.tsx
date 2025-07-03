@@ -99,11 +99,9 @@ export const FilterView: FC<{
 
   return (
     <FilterViewContext.Provider value={value}>
-      <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', gap: '0.75rem' }}>
-        <div style={{ zIndex: 1, alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
-          {displayTray && <FilterTray />}
-        </div>
-        <div style={{ flexGrow: 1, minWidth: 0 }}>{children(filteredStudents, filteredCourses)}</div>
+      <div style={{ display: 'flex' }}>
+        <div style={{ position: 'sticky', top: '1rem' }}>{displayTray && <FilterTray />}</div>
+        <div style={{ flex: 1 }}>{children(filteredStudents, filteredCourses)}</div>
       </div>
     </FilterViewContext.Provider>
   )

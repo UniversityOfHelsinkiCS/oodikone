@@ -20,10 +20,10 @@ export const Footer = () => {
         bottom: 0,
         left: 0,
         position: 'relative',
-        py: 3,
+        my: 1,
       }}
     >
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ my: 1 }} />
       <Container maxWidth="lg">
         <Stack
           alignItems={{ md: 'center' }}

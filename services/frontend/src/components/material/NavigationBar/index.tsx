@@ -82,7 +82,7 @@ export const NavigationBar = () => {
   }, [location.pathname, visibleNavigationItems])
 
   return (
-    <AppBar position="static">
+    <AppBar elevation={0} position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box
