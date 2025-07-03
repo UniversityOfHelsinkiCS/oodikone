@@ -1,6 +1,6 @@
 // 03-06-2025 summer hackathon never forget
 
-import { useReactTable, getCoreRowModel, ColumnDef, TableOptions, getPaginationRowModel } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, ColumnDef, TableOptions, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { OodiTableContainer } from './OodiTable'
 
 /**
@@ -20,20 +20,23 @@ export const OodiTable = <TData,>({ data,
   options,
 }: { data: TData[], columns: ColumnDef<TData, any>[], options?: Partial<TableOptions<TData>> }): JSX.Element => {
 
-  // const baseOptions:
+  const config: Partial<TableOptions<TData>> = {
+    state: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 100,
+      },
+    },
+    ...options
+  }
 
   const table = useReactTable<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: Math.min(30, data.length),
-      }
-    },
-    ...options,
+    getSortedRowModel: getSortedRowModel(),
+    ...config,
   })
   return <OodiTableContainer table={table} />
 }

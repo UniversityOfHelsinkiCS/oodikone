@@ -12,7 +12,9 @@ export const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
       '& tr:nth-of-type(odd) > td': {
         backgroundColor: 'grey.100',
       },
-      border: '1px solid #e9e9e9'
+      border: '1px solid #e9e9e9',
+      paddingTop: 0,
+      paddingBottom: 0,
     }}>
       {children}
     </TableCell>
