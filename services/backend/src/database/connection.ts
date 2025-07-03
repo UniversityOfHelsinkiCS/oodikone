@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import { Sequelize } from 'sequelize-typescript'
 import { SequelizeStorage, Umzug } from 'umzug'
 
-import conf from '../config'
+import * as conf from '../config'
 import {
   CourseModel,
   CourseProviderModel,

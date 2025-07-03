@@ -1,16 +1,16 @@
-require('express-async-errors')
-const express = require('express')
+import 'express-async-errors'
+import express from 'express'
 
-const { baseUrl, backendPort } = require('./config')
-const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
-const { startCron } = require('./events')
-const routes = require('./routes').default
-const logger = require('./util/logger')
-require('./worker/worker')
+import { baseUrl, backendPort } from './config'
+import { initializeDatabaseConnection, dbConnections } from './database/connection'
+import { startCron } from './events'
+import routes from './routes'
+import logger from './util/logger'
+import './worker/worker'
 
 initializeDatabaseConnection()
   .then(() => {
-    dbConnections.connect()
+    void dbConnections.connect()
 
     dbConnections.on('connect', () => {
       logger.info('Connected to sis db successfully')

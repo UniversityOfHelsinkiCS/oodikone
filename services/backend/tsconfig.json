@@ -19,6 +19,6 @@
     "inlineSources": true,
     "resolveJsonModule": true
   },
-  "include": ["index.js", "src"],
+  "include": ["index.ts", "src"],
   "exclude": ["../frontend"]
 }
