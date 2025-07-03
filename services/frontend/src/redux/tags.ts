@@ -52,7 +52,6 @@ export const {
   useGetTagsByStudyTrackQuery,
   useCreateTagMutation,
   useDeleteTagMutation,
-  useGetStudentTagsByStudyTrackQuery,
   useCreateStudentTagsMutation,
   useDeleteStudentTagsMutation,
 } = tagsApi
