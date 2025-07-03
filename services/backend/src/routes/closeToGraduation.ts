@@ -1,12 +1,14 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
-import { getCloseToGraduationData } from '../services/populations/closeToGraduation'
+import { findStudentsCloseToGraduation, getCloseToGraduationData } from '../services/populations/closeToGraduation'
 import { getAllStudentsUserHasInGroups } from '../services/studyGuidanceGroups'
 import { hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response) => {
+type CloseToGraduationResBody = Awaited<ReturnType<typeof findStudentsCloseToGraduation>>
+
+router.get<never, CloseToGraduationResBody>('/', async (req, res) => {
   const { user } = req
   if (hasFullAccessToStudentData(user.roles)) {
     const result = await getCloseToGraduationData()
