@@ -53,9 +53,13 @@ export const NewTable = ({
     // { accessorKey: 'email', header: 'email' },
     // { accessorKey: 'phoneNumber', header: 'Phone number' },
     // { accessorKey: 'sisuID', header: 'sisuID' },
-    { accessorKey: 'creditsTotal', header: 'creditsTotal' },
-    { accessorKey: 'creditsHops', header: 'creditsHops' },
-    { accessorKey: 'creditsSince', header: 'creditsSince' },
+    {
+      header: 'Credits', columns: [
+        { accessorKey: 'creditsTotal', header: 'Total' },
+        { accessorKey: 'creditsHops', header: 'In HOPS' },
+        { accessorKey: 'creditsSince', header: 'Since' },
+      ]
+    },
     { accessorKey: 'studyTrack', header: 'studyTrack' },
     { accessorKey: 'studyRightStart', header: 'studyRightStart' },
     { accessorKey: 'programmeStart', header: 'programmeStart' },

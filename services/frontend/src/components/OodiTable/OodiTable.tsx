@@ -2,42 +2,61 @@
 import Paper from '@mui/material/Paper'
 import MuiTable from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
-import OodiTableHeader from './components/Header'
+import { OodiTableHeader } from './components/Header'
+import { OodiTableCell } from './components/Cell'
 
 import { flexRender, Table as TableType } from '@tanstack/react-table'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
-    <TableContainer component={Paper} elevation={0} sx={{ p: 2, border: '1px solid #d4d4d5', borderRadius: 0  }}>
+    <TableContainer component={Paper} elevation={0} sx={{ p: 2, border: '1px solid #d4d4d5', borderRadius: 0 }}>
       <MuiTable>
         <TableHead>
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <OodiTableHeader key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                </OodiTableHeader>
-              ))}
-            </TableRow>
-          ))}
+          {table.getHeaderGroups().map(headerGroup => {
+            return (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => {
+                  if (header.depth - header.column.depth > 1) return null
+
+                  let rowSpan = 1
+                  if (header.isPlaceholder) {
+                    const leafs = header.getLeafHeaders()
+                    rowSpan = leafs[leafs.length - 1].depth - header.depth
+                  }
+
+                  return (
+                    <OodiTableHeader
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      rowSpan={rowSpan}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </OodiTableHeader>
+                  )
+                }
+                )}
+              </TableRow>
+            )
+          })}
         </TableHead>
-        <TableBody>
+        <TableBody sx={{
+          '& tr:nth-of-type(odd) > td': {
+            backgroundColor: 'grey.100'
+          }
+        }}>
           {table.getRowModel().rows.map(row => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id}>
+                <OodiTableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
+                </OodiTableCell>
               ))}
             </TableRow>
           ))}

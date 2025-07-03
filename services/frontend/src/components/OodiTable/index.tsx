@@ -6,21 +6,23 @@ import { OodiTableContainer } from './OodiTable'
 /**
  * In loving memory of SortableTable
  *
- * @param data - Array of data objects of type OTData
- * @param columns - Array of column definitions for type OTData
+ * Documentation in ./README.md
+ *
+ * @param data - Array of data objects of type TData
+ * @param columns - Array of column definitions for type TData
  * @param options - Optional: Additional TableOptions
  * @returns Table instance
  */
 
 // eslint-disable-next-line
-export const OodiTable = <OTData,>({ data,
+export const OodiTable = <TData,>({ data,
   columns,
   options,
-}: { data: OTData[], columns: ColumnDef<OTData, any>[], options?: Partial<TableOptions<OTData>> }): JSX.Element => {
+}: { data: TData[], columns: ColumnDef<TData, any>[], options?: Partial<TableOptions<TData>> }): JSX.Element => {
 
   // const baseOptions:
 
-  const table = useReactTable<OTData>({
+  const table = useReactTable<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
