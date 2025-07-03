@@ -1,3 +1,4 @@
+
 import Paper from '@mui/material/Paper'
 import MuiTable from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -6,19 +7,26 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import OodiTableHeader from './components/Header'
+
 import { flexRender, Table as TableType } from '@tanstack/react-table'
 
-export const OodiTable = <OTData,>({ table }: { table: TableType<OTData> }) => {
+export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} elevation={0} sx={{ p: 2, border: '1px solid #d4d4d5', borderRadius: 0  }}>
       <MuiTable>
         <TableHead>
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <TableCell key={header.id}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableCell>
+                <OodiTableHeader key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                </OodiTableHeader>
               ))}
             </TableRow>
           ))}
@@ -27,7 +35,9 @@ export const OodiTable = <OTData,>({ table }: { table: TableType<OTData> }) => {
           {table.getRowModel().rows.map(row => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
               ))}
             </TableRow>
           ))}
