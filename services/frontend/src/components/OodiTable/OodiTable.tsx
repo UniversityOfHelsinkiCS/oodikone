@@ -13,6 +13,7 @@ import { OodiTableHeader } from './components/Header'
 import { OodiTableCell } from './components/Cell'
 
 import { flexRender, Table as TableType } from '@tanstack/react-table'
+import { Box } from '@mui/material'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
@@ -37,17 +38,29 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      sx={{ cursor: header.column.getCanSort() ? 'pointer' : 'inherit' }}
+                      sx={{ position: 'relative', cursor: header.column.getCanSort() ? 'pointer' : 'inherit' }}
                     >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                      {{
-                        asc: <ArrowUpwardIcon fontSize='small' />,
-                        desc: <ArrowDownwardIcon fontSize='small' />,
-                        false: " "
-                      }[header.column.getIsSorted() as string] ?? null}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          right: -2,
+                          bottom: 0,
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          justifyContent: 'flex-end',
+                          height: 'fit-content',
+                          width: 'fit-content',
+                        }}>
+                        {{
+                          asc: <ArrowUpwardIcon fontSize='small' />,
+                          desc: <ArrowDownwardIcon fontSize='small' />,
+                          false: " "
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </Box>
                     </OodiTableHeader>
                   )
                 }
