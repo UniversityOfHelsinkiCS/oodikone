@@ -21,15 +21,26 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
       component={Paper}
       elevation={0}
       sx={{
+        height: '75vh',
+        overflow: 'scroll',
         p: 0,
         borderWidth: '1px 0 0 1px',
         borderStyle: 'solid',
         borderColor: 'grey.300',
-        borderRadius: 0
+        borderRadius: 0,
       }}
     >
-      <MuiTable>
-        <TableHead>
+      <MuiTable
+        sx={{
+          borderCollapse: 'separate', // Prevents items clipping through borders when scrolling
+        }}>
+        <TableHead
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 2,
+          }}
+        >
           {table.getHeaderGroups().map(headerGroup => {
             return (
               <TableRow key={headerGroup.id}>
