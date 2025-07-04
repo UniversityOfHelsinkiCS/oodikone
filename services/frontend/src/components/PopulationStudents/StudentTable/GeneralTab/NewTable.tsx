@@ -6,7 +6,7 @@ import { DateFormat } from '@/constants/date'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useMemo } from 'react'
 
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef, ColumnPinning, TableOptions } from '@tanstack/react-table'
 
 export const NewTable = ({
   filteredStudents
@@ -48,8 +48,8 @@ export const NewTable = ({
   const isAdmin = true
   const columns: ColumnDef<FormattedStudentData>[] = [
     // { accessorKey: 'firstNames', header: 'First names' },
-    { accessorKey: 'lastName', header: 'Last name' },
-    // { accessorKey: 'studentNumber', header: 'Student number' },
+    // { accessorKey: 'lastName', header: 'Last name' },
+    { accessorKey: 'studentNumber', header: 'Student number' },
     // { accessorKey: 'email', header: 'email' },
     // { accessorKey: 'phoneNumber', header: 'Phone number' },
     // { accessorKey: 'sisuID', header: 'sisuID' },
@@ -60,11 +60,11 @@ export const NewTable = ({
         { accessorKey: 'creditsSince', header: 'Since' },
       ]
     },
-    { accessorKey: 'studyTrack', header: 'studyTrack' },
-    { accessorKey: 'studyRightStart', header: 'studyRightStart' },
-    { accessorKey: 'programmeStart', header: 'programmeStart' },
-    { accessorKey: 'option', header: 'option' },
-    { accessorKey: 'graduationDate', header: 'graduationDate' },
+    { accessorKey: 'studyTrack', header: 'Study track' },
+    { accessorKey: 'studyRightStart', header: 'Start of study right' },
+    { accessorKey: 'programmeStart', header: 'Started in programme' },
+    { accessorKey: 'option', header: 'Master' },
+    { accessorKey: 'graduationDate', header: 'Graduation date' },
     { accessorKey: 'startYearAtUniversity', header: 'startYearAtUniversity' },
     { accessorKey: 'programmeStatus', header: 'programmeStatus' },
     { accessorKey: 'transferredFrom', header: 'transferredFrom' },
@@ -85,8 +85,8 @@ export const NewTable = ({
 
     const result: FormattedStudentData = {
       // firstNames: student.firstnames,
-      lastName: student.lastname,
-      // studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
+      // lastName: student.lastname,
+      studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
       // email: student.email,
       // phoneNumber: student.phoneNumber,
       // sisuID: student.sis_person_id,
@@ -120,9 +120,15 @@ export const NewTable = ({
     return result
   }
 
-  console.time("formatStudents")
   const data = useMemo(() => filteredStudents.map(student => formatStudent(student)), [filteredStudents])
-  console.timeEnd("formatStudents")
 
-  return <OodiTable data={data} columns={columns} />
+  const tableOptions: Partial<TableOptions<FormattedStudentData>> = {
+    initialState: {
+      columnPinning: {
+        left: ['studentNumber']
+      }
+    }
+  }
+
+  return <OodiTable data={data} columns={columns} options={tableOptions} />
 }

@@ -20,19 +20,26 @@ export const OodiTable = <TData,>({ data,
   options,
 }: { data: TData[], columns: ColumnDef<TData, any>[], options?: Partial<TableOptions<TData>> }): JSX.Element => {
 
+  // should maybe use a deep merging tool or write own
   const config: Partial<TableOptions<TData>> = {
+    ...options,
     state: {
+      ...options?.state,
       pagination: {
         pageIndex: 0,
-        pageSize: 100,
+        pageSize: 15,
+        ...options?.state?.pagination,
       },
     },
-    ...options
   }
+  console.log(config)
 
   const table = useReactTable<TData>({
     data,
     columns,
+    debugTable: true,
+    debugHeaders:true,
+    debugColumns: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
