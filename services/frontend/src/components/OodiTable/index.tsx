@@ -2,6 +2,7 @@
 
 import { useReactTable, getCoreRowModel, ColumnDef, TableOptions, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { OodiTableContainer } from './OodiTable'
+import { useState } from 'react'
 
 /**
  * In loving memory of SortableTable
@@ -20,17 +21,14 @@ export const OodiTable = <TData,>({ data,
   options,
 }: { data: TData[], columns: ColumnDef<TData, any>[], options?: Partial<TableOptions<TData>> }): JSX.Element => {
 
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 50,
+  })
+
   // should maybe use a deep merging tool or write own
   const config: Partial<TableOptions<TData>> = {
     ...options,
-    state: {
-      ...options?.state,
-      pagination: {
-        pageIndex: 0,
-        pageSize: 100,
-        ...options?.state?.pagination,
-      },
-    },
   }
   console.log(config)
 
@@ -39,11 +37,13 @@ export const OodiTable = <TData,>({ data,
     columns,
     // TODO: remove debug when done
     debugTable: true,
-    debugHeaders:true,
+    debugHeaders: true,
     debugColumns: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    state: { pagination },
+    onPaginationChange: setPagination,
     ...config,
   })
   return <OodiTableContainer table={table} />
