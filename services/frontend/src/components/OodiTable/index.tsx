@@ -27,7 +27,7 @@ export const OodiTable = <TData,>({ data,
       ...options?.state,
       pagination: {
         pageIndex: 0,
-        pageSize: 15,
+        pageSize: 100,
         ...options?.state?.pagination,
       },
     },
@@ -37,6 +37,7 @@ export const OodiTable = <TData,>({ data,
   const table = useReactTable<TData>({
     data,
     columns,
+    // TODO: remove debug when done
     debugTable: true,
     debugHeaders:true,
     debugColumns: true,
