@@ -1,4 +1,3 @@
-
 import Paper from '@mui/material/Paper'
 import MuiTable from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -8,16 +7,27 @@ import TableRow from '@mui/material/TableRow'
 
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import { Box } from '@mui/material'
 
 import { OodiTableHeader } from './components/Header'
 import { OodiTableCell } from './components/Cell'
 
-import { flexRender, Table as TableType } from '@tanstack/react-table'
-import { Box } from '@mui/material'
+import { flexRender, type Table as TableType } from '@tanstack/react-table'
+import { getCommonPinningStyles } from './styles'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
-    <TableContainer component={Paper} elevation={0} sx={{ p: 2, border: '1px solid #d4d4d5', borderRadius: 0 }}>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{
+        p: 0,
+        borderWidth: '1px 0 0 1px',
+        borderStyle: 'solid',
+        borderColor: 'grey.300',
+        borderRadius: 0
+      }}
+    >
       <MuiTable>
         <TableHead>
           {table.getHeaderGroups().map(headerGroup => {
@@ -38,7 +48,7 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
                       colSpan={header.colSpan}
                       rowSpan={rowSpan}
                       onClick={header.column.getToggleSortingHandler()}
-                      sx={{ position: 'relative', cursor: header.column.getCanSort() ? 'pointer' : 'inherit' }}
+                      sx={{ cursor: header.column.getCanSort() ? 'pointer' : 'inherit', ...getCommonPinningStyles(header.column) }}
                     >
                       {flexRender(
                         header.column.columnDef.header,
@@ -58,7 +68,6 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
                         {{
                           asc: <ArrowUpwardIcon fontSize='small' />,
                           desc: <ArrowDownwardIcon fontSize='small' />,
-                          false: " "
                         }[header.column.getIsSorted() as string] ?? null}
                       </Box>
                     </OodiTableHeader>
@@ -72,12 +81,18 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
         <TableBody sx={{
           '& tr:nth-of-type(odd) > td': {
             backgroundColor: 'grey.100'
-          }
+          },
+          '& tr:nth-of-type(even) > td': {
+            backgroundColor: 'white'
+          },
         }}>
           {table.getRowModel().rows.map(row => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map(cell => (
-                <OodiTableCell key={cell.id}>
+                <OodiTableCell
+                  key={cell.id}
+                  sx={{ ...getCommonPinningStyles(cell.column) }}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </OodiTableCell>
               ))}
@@ -85,6 +100,6 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
           ))}
         </TableBody>
       </MuiTable>
-    </TableContainer>
+    </TableContainer >
   )
 }

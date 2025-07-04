@@ -2,6 +2,7 @@
 import type { FC, ReactNode } from 'react'
 
 import TableCell, { type TableCellProps } from '@mui/material/TableCell'
+import Box from '@mui/material/Box'
 
 export const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
   children,
@@ -9,14 +10,25 @@ export const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
 }) => {
   return (
     <TableCell {...props} sx={{
-      '& tr:nth-of-type(odd) > td': {
-        backgroundColor: 'grey.100',
-      },
-      border: '1px solid #e9e9e9',
+      borderWidth: '0 1px 1px 0',
+      borderStyle: 'solid',
+      borderColor: 'grey.300',
       paddingTop: 0,
       paddingBottom: 0,
+      height: '3em',
+      minHeight: '3em',
+      ...props?.sx
     }}>
-      {children}
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '20em',
+          whiteSpace: 'nowrap',
+        }}>
+        {children}
+      </Box>
     </TableCell>
   )
 

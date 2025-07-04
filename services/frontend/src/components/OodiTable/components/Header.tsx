@@ -7,7 +7,15 @@ export const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({
   ...props
 }) => {
   return (
-    <TableCell {...props} sx={{ ...props.sx, border: '1px solid #e9e9e9', fontWeight: 'bold' }}>
+    <TableCell {...props}
+      sx={{
+        ...props.sx,
+        borderWidth: '0 1px 1px 0',
+        borderStyle: 'solid',
+        borderColor: 'grey.300',
+        fontWeight: 'bold',
+        backgroundColor: 'white',
+      }}>
       {children}
     </TableCell>
   )
