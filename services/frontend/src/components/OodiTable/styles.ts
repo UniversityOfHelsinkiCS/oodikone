@@ -8,6 +8,13 @@ export const getCommonPinningStyles = <TData,>(column: Column<TData>): SxProps =
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     position: isPinned ? 'sticky' : 'relative',
     width: column.getSize(),
+
+    /*
+    * zIndices:
+    * 0, base
+    * 1, sticky cells
+    * 2, header tablerow
+    */
     zIndex: isPinned ? 1 : 0,
   }
 }
