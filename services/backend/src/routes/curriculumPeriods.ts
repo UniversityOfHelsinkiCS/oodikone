@@ -1,11 +1,17 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
+import { CurriculumPeriod } from '@oodikone/shared/models'
 import { CurriculumPeriodModel } from '../models'
 
 const router = Router()
 
-router.get('/', async (_req: Request, res: Response) => {
-  const result = await CurriculumPeriodModel.findAll()
+type CurriculumPeriodsResBody = CurriculumPeriod[]
+
+router.get<never, CurriculumPeriodsResBody>('/', async (_req, res) => {
+  const result: CurriculumPeriod[] = await CurriculumPeriodModel.findAll({
+    raw: true,
+  })
+
   res.json(result)
 })
 
