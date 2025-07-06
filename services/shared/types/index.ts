@@ -47,6 +47,7 @@ export type {
 export type { NewTag, StudentTag, Tag } from './tag'
 export type { SemesterEnrollment } from './semesterEnrollment'
 export type { StudyTrack } from './studyTrack'
+export type { UnifyStatus } from './unification'
 
 // ENUMS
 export { CreditTypeCode } from './creditTypeCode'
@@ -56,4 +57,4 @@ export { EnrollmentType } from './enrollmentType'
 export { ExtentCode } from './extentCode'
 export { DegreeProgrammeType } from './degreeProgrammeType'
 export { Phase } from './phase'
-export { Unification, UnifyStatus } from './unification'
+export { Unification } from './unification'
