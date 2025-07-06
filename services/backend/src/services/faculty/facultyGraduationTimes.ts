@@ -1,6 +1,6 @@
 import { cloneDeep, omit } from 'lodash'
 
-import { Name, DegreeProgrammeType } from '@oodikone/shared/types'
+import { Name, DegreeProgrammeType, Unarray } from '@oodikone/shared/types'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
@@ -8,7 +8,7 @@ import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
 
-export type LevelGraduationStats = Omit<GraduationTimes['medians'][number], 'y'> & { median: number }
+export type LevelGraduationStats = Omit<Unarray<GraduationTimes['medians']>, 'y'> & { median: number }
 
 type ProgrammeStats = {
   data: Array<Omit<LevelGraduationStats, 'times'> & { code: string }>

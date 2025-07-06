@@ -10,6 +10,7 @@ import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
 import { useTitle } from '@/hooks/title'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
+import { Unarray } from '@oodikone/shared/types'
 import { BachelorHonours } from './BachelorHonours'
 import { CourseTables } from './CourseTables'
 import { StudentGraphs } from './StudentGraphs'
@@ -60,7 +61,7 @@ const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters'
   return mergedEnrollments
 }
 
-export type Absence = ReturnType<typeof getAbsentYears>[number]
+export type Absence = Unarray<ReturnType<typeof getAbsentYears>>
 
 export const StudentDetails = () => {
   const { studentNumber } = useParams()
