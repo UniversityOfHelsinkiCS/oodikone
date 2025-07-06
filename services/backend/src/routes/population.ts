@@ -1,14 +1,22 @@
 import crypto from 'crypto'
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
 import type { CanError } from '@oodikone/shared/routes'
-import type {
-  PopulationstatisticsQuery,
-  PopulationstatisticsReqBody,
-  PopulationstatisticsResBody,
+import {
+  type PopulationstatisticsQuery,
+  type PopulationstatisticsReqBody,
+  type PopulationstatisticsResBody,
+  type PopulationstatisticsbycourseResBody,
+  type PopulationstatisticsbycourseReqBody,
+  type PopulationstatisticsbycourseParams,
+  type PostByStudentNumbersResBody,
+  type PostByStudentNumbersReqBody,
+  type PopulationstatisticsStudyprogrammesResBody,
+  PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
+  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
 } from '@oodikone/shared/routes/populations'
-import { GenderCode } from '@oodikone/shared/types'
+import { GenderCode, Unification, Unarray } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { SISStudyRightModel } from '../models'
@@ -20,7 +28,7 @@ import { optimizedStatisticsOf } from '../services/populations/optimizedStatisti
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
-import { ParsedCourse, Unarray, Unification, UnifyStatus } from '../types'
+import { ParsedCourse } from '../types'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, safeJSONParse } from '../util'
 
 const router = Router()
@@ -112,17 +120,12 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
   }
 )
 
-interface GetPopulationStatisticsByCourseRequest extends Request {
-  query: {
-    coursecodes: string
-    from: string
-    to: string
-    separate: string
-    unifyCourses: UnifyStatus
-  }
-}
-
-router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisticsByCourseRequest, res: Response) => {
+router.get<
+  never,
+  CanError<PopulationstatisticsbycourseResBody>,
+  PopulationstatisticsbycourseReqBody,
+  PopulationstatisticsbycourseParams
+>('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: separateString, unifyCourses } = req.query
   const { id: userId, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
 
@@ -199,79 +202,71 @@ router.get('/v3/populationstatisticsbycourse', async (req: GetPopulationStatisti
   res.json(result)
 })
 
-interface PostByStudentNumbersRequest extends Request {
-  body: {
-    studentnumberlist: string[]
-    tags?: {
-      studyProgramme: string | null
-      year: string | null
-    }
-  }
-}
+router.post<never, PostByStudentNumbersResBody, PostByStudentNumbersReqBody>(
+  '/v3/populationstatisticsbystudentnumbers',
+  async (req, res) => {
+    const { studentnumberlist, tags } = req.body
+    const { id: userId, roles, studentsUserCanAccess } = req.user
+    const filteredStudentNumbers = hasFullAccessToStudentData(roles)
+      ? studentnumberlist
+      : intersection(studentnumberlist, studentsUserCanAccess)
 
-router.post('/v3/populationstatisticsbystudentnumbers', async (req: PostByStudentNumbersRequest, res: Response) => {
-  const { studentnumberlist, tags } = req.body
-  const { id: userId, roles, studentsUserCanAccess } = req.user
-  const filteredStudentNumbers = hasFullAccessToStudentData(roles)
-    ? studentnumberlist
-    : intersection(studentnumberlist, studentsUserCanAccess)
+    const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
-  const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
+    const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
+    const tagList = await getStudentTags(studyRights, filteredStudentNumbers, userId)
 
-  const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
-  const tagList = await getStudentTags(studyRights, filteredStudentNumbers, userId)
+    const { startDate } = tags?.year
+      ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
+      : { startDate: undefined }
 
-  const { startDate } = tags?.year
-    ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
-    : { startDate: undefined }
+    const result = await optimizedStatisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
 
-  const result = await optimizedStatisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
+    const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
+    const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
 
-  const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
-  const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
-
-  res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
-})
-
-router.get('/v3/populationstatistics/studyprogrammes', async (req: Request, res: Response) => {
-  const { roles, programmeRights } = req.user
-  const programmes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
-  const allRights = uniq(programmeRights.map(programme => programme.code))
-  if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) {
-    allRights.push('KH90_001', 'MH90_001')
-  }
-  const filteredProgrammes = hasFullAccessToStudentData(roles)
-    ? programmes
-    : programmes.filter(programme => allRights.includes(programme.code))
-  const formattedProgrammes = filteredProgrammes.reduce<Record<string, Unarray<ProgrammesOfOrganization>>>(
-    (acc, curr) => {
-      acc[curr.code] = curr
-      return acc
-    },
-    {}
-  )
-  res.json(formattedProgrammes)
-})
-
-interface GetMaxYearsRequest extends Request {
-  query: {
-    courseCodes: string
-  }
-}
-
-router.get(
-  '/v3/populationstatistics/maxYearsToCreatePopulationFrom',
-  async (req: GetMaxYearsRequest, res: Response) => {
-    const courseCodes = JSON.parse(req.query.courseCodes) as string[]
-    const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
-    const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)
-    const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(courseCodes, Unification.UNIFY)
-    return res.json({
-      openCourses: maxYearsToCreatePopulationFromOpen,
-      uniCourses: maxYearsToCreatePopulationFromUni,
-      unifyCourses: maxYearsToCreatePopulationFromBoth,
-    })
+    res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
   }
 )
+
+router.get<never, PopulationstatisticsStudyprogrammesResBody>(
+  '/v3/populationstatistics/studyprogrammes',
+  async (req, res) => {
+    const { roles, programmeRights } = req.user
+    const programmes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
+    const allRights = uniq(programmeRights.map(programme => programme.code))
+    if (allRights.includes('KH90_001') || allRights.includes('MH90_001')) {
+      allRights.push('KH90_001', 'MH90_001')
+    }
+    const filteredProgrammes = hasFullAccessToStudentData(roles)
+      ? programmes
+      : programmes.filter(programme => allRights.includes(programme.code))
+    const formattedProgrammes = filteredProgrammes.reduce<Record<string, Unarray<ProgrammesOfOrganization>>>(
+      (acc, curr) => {
+        acc[curr.code] = curr
+        return acc
+      },
+      {}
+    )
+    res.json(formattedProgrammes)
+  }
+)
+
+router.get<
+  never,
+  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
+  never,
+  PopulationstatisticsMaxYearsToCreatePopulationFormQuery
+>('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
+  const courseCodes = JSON.parse(req.query.courseCodes) as string[]
+  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
+  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)
+  const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(courseCodes, Unification.UNIFY)
+  return res.json({
+    openCourses: maxYearsToCreatePopulationFromOpen,
+    uniCourses: maxYearsToCreatePopulationFromUni,
+    unifyCourses: maxYearsToCreatePopulationFromBoth,
+  })
+})
 
 export default router

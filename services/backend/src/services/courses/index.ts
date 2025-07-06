@@ -1,10 +1,9 @@
 import crypto from 'crypto'
 import { Op } from 'sequelize'
 
-import { Name, EnrollmentState } from '@oodikone/shared/types'
+import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
-import { Unification } from '../../types'
 import { isOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'

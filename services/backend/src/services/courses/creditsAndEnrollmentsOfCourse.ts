@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 
-import { EnrollmentState } from '@oodikone/shared/types'
+import { EnrollmentState, Unification } from '@oodikone/shared/types'
 import {
   CreditModel,
   StudentModel,
@@ -10,7 +10,6 @@ import {
   SISStudyRightModel,
   SISStudyRightElementModel,
 } from '../../models'
-import { Unification } from '../../types'
 import { getIsOpen } from './helpers'
 
 export const getCreditsForCourses = async (codes: string[], unification: Unification) => {

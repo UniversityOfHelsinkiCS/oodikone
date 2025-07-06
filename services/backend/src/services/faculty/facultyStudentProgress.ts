@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash'
 
-import { Graduated, SpecialGroups } from '@oodikone/shared/types'
+import { Graduated, SpecialGroups, Unarray } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'
-import { Unarray } from '../../types'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'

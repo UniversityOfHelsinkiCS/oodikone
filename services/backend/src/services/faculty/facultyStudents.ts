@@ -1,4 +1,4 @@
-import { Unarray } from '../../types'
+import { Unarray } from '@oodikone/shared/types'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getPercentage, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'

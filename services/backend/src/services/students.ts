@@ -1,7 +1,7 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
-import { EnrollmentState } from '@oodikone/shared/types'
+import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
 import { dbConnections } from '../database/connection'
 import {
   StudentModel,
@@ -14,7 +14,6 @@ import {
   SISStudyRightElementModel,
 } from '../models'
 import { TagModel, TagStudentModel } from '../models/kone'
-import { UnifyStatus } from '../types'
 import { splitByEmptySpace } from '../util'
 
 const { sequelize } = dbConnections

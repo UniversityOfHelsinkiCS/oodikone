@@ -1,7 +1,7 @@
 import { groupBy, orderBy } from 'lodash'
 import { QueryTypes } from 'sequelize'
 
-import { ProgrammeModule } from '@oodikone/shared/models'
+import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
@@ -18,11 +18,6 @@ const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPerio
   }
   // Returns impossible default if there is not curriculumPeriods for some reason
   return { startDate: new Date('1800-08-01'), endDate: new Date('1801-08-01') }
-}
-
-type ProgrammeModuleWithRelevantAttributes = Pick<ProgrammeModule, 'code' | 'name' | 'degreeProgrammeType'> & {
-  curriculumPeriodIds: string[]
-  progId: string
 }
 
 // Some programme modules are not directly associated to a faculty (organization).
@@ -101,7 +96,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
   return relevantProgrammes
 }
 
-export type ProgrammesOfOrganization = Awaited<ReturnType<typeof getDegreeProgrammesOfOrganization>>
+export type ProgrammesOfOrganization = ProgrammeModuleWithRelevantAttributes[]
 
 export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
   const organization = await OrganizationModel.findOne({

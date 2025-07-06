@@ -1,4 +1,4 @@
-import { Name, EnrollmentState } from '../types'
+import { Name, EnrollmentState, ProgrammeModuleWithRelevantAttributes, UnifyStatus, Unarray } from '../types'
 
 type Course = {
   code: string
@@ -45,6 +45,7 @@ export type CourseStats = {
   }
 }
 
+// populationstatistics
 export type PopulationstatisticsResBody = { students: any; coursestatistics: CourseStats[] }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
@@ -55,3 +56,42 @@ export type PopulationstatisticsQuery = {
   year: string
   years?: string[]
 }
+
+// populationstatisticsbycourse
+export type PopulationstatisticsbycourseResBody = { students: any; coursestatistics: CourseStats[] }
+export type PopulationstatisticsbycourseReqBody = never
+export type PopulationstatisticsbycourseParams = {
+  coursecodes: string
+  from: string
+  to: string
+  separate: string
+  unifyCourses: UnifyStatus
+}
+
+// populationstatisticsbystudentnumbers
+export type PostByStudentNumbersResBody = {
+  students: any
+  studyProgramme?: string | null
+  discardedStudentNumbers: string[]
+}
+export type PostByStudentNumbersReqBody = {
+  studentnumberlist: string[]
+  tags?: {
+    studyProgramme: string | null
+    year: string | null
+  }
+}
+
+// populationstatistics/studyprogrammes
+export type PopulationstatisticsStudyprogrammesResBody = Record<
+  string,
+  Unarray<ProgrammeModuleWithRelevantAttributes[]>
+>
+
+// populationstatistics/maxYearsToCreatePopulationFrom
+export type PopulationstatisticsMaxYearsToCreatePopulationFormResBody = {
+  openCourses: number
+  uniCourses: number
+  unifyCourses: number
+}
+export type PopulationstatisticsMaxYearsToCreatePopulationFormQuery = { courseCodes: string }

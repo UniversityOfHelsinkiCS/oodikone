@@ -1,3 +1,5 @@
+import { ProgrammeModule } from '../models'
+
 // TODO: These are used in StudyProgramme too, maybe rename the file?
 // TODO: Also, it would probably make sense to use enums for these types
 
@@ -6,3 +8,8 @@ export type ProgrammeFilter = 'NEW_STUDY_PROGRAMMES' | 'ALL_PROGRAMMES'
 export type SpecialGroups = 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
 export type StatsType = 'ALL' | 'CREDITS' | 'STUDENT' | 'THESIS'
 export type YearType = 'ACADEMIC_YEAR' | 'CALENDAR_YEAR'
+
+export type ProgrammeModuleWithRelevantAttributes = Pick<ProgrammeModule, 'code' | 'name' | 'degreeProgrammeType'> & {
+  curriculumPeriodIds: string[]
+  progId: string
+}
