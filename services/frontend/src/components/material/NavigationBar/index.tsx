@@ -103,11 +103,11 @@ export const NavigationBar = () => {
                 value={0 <= activeTab ? activeTab : false}
                 variant="scrollable"
               >
-                {Object.entries(visibleNavigationItems).map(([key, item]) => (
+                {visibleNavigationItems.map(item => (
                   <Tab
                     component={item?.path ? Link : 'div'}
-                    data-cy={`nav-bar-button-${key}`}
-                    key={key}
+                    data-cy={`nav-bar-button-${item.key}`}
+                    key={item.key}
                     label={<NavigationButton item={item} />}
                     sx={{
                       opacity: 1,
