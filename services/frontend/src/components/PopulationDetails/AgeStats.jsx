@@ -42,13 +42,9 @@ export const AgeStats = ({ filteredStudents, query }) => {
 
   const averageAgeAtStudiesStart = mean(
     filteredStudents.reduce((ages, student) => {
-      const studyRight = student.studyRights.find(sr =>
-        sr.studyRightElements.some(el => el.code === query.studyRights.programme)
-      )
+      const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === query.programme))
       if (studyRight) {
-        const startDateInProgramme = studyRight.studyRightElements.find(
-          el => el.code === query.studyRights.programme
-        ).startDate
+        const startDateInProgramme = studyRight.studyRightElements.find(el => el.code === query.programme).startDate
         ages.push(getAge(student.birthdate, false, dayjs(startDateInProgramme)))
       }
       return ages
@@ -60,7 +56,7 @@ export const AgeStats = ({ filteredStudents, query }) => {
   return (
     <div>
       <div>Current average age: {currentAverageAge}</div>
-      {query.studyRights?.programme && <div>Average age at studies start: {averageAgeAtStudiesStart}</div>}
+      {query.programme && <div>Average age at studies start: {averageAgeAtStudiesStart}</div>}
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         {!onlyIamRights && (
           <Radio

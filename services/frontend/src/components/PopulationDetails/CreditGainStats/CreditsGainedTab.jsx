@@ -6,13 +6,11 @@ import { CreditsGainedTable } from './CreditsGainedTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 
-export const CreditsGainedTab = ({ allStudents, programmeGoalTime, query, year }) => {
-  if (!allStudents || !allStudents.length || !query) return null
-
-  const { studyRights } = query
+export const CreditsGainedTab = ({ allStudents, programmeGoalTime, programme, year }) => {
+  if (!allStudents?.length || !programme) return null
 
   const getCreditsGainedTable = type => {
-    const filteredStudents = allStudents.filter(admissionTypeFilter(studyRights?.programme)(type))
+    const filteredStudents = allStudents.filter(admissionTypeFilter(programme)(type))
 
     return (
       <CreditsGainedTable
@@ -25,8 +23,7 @@ export const CreditsGainedTab = ({ allStudents, programmeGoalTime, query, year }
     )
   }
 
-  const admissionTypesAvailable =
-    allStudents.length !== allStudents.filter(admissionTypeFilter(studyRights?.programme)(null)).length
+  const admissionTypesAvailable = allStudents.length !== allStudents.filter(admissionTypeFilter(programme)(null)).length
 
   return (
     <Grid centered padded>

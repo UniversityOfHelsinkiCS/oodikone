@@ -9,11 +9,11 @@ import { StatisticsTab } from './StatisticsTab'
 import './creditGainStats.css'
 
 export const CreditGainStats = ({ filteredStudents, query, year }) => {
-  const combinedProgramme = query?.studyRights?.combinedProgramme || ''
+  const combinedProgramme = query.combinedProgramme ?? ''
 
   const programmeGoalTime = combinedProgramme
-    ? getMonthsForDegree(`${query?.studyRights?.programme}-${combinedProgramme}`)
-    : getMonthsForDegree(query?.studyRights?.programme)
+    ? getMonthsForDegree(`${query.programme}-${combinedProgramme}`)
+    : getMonthsForDegree(query.programme)
 
   return (
     <div id="credit-gain-stats">
@@ -32,8 +32,8 @@ export const CreditGainStats = ({ filteredStudents, query, year }) => {
                 <Tab.Pane>
                   <CreditsGainedTab
                     allStudents={filteredStudents}
+                    programme={query.programme}
                     programmeGoalTime={programmeGoalTime}
-                    query={query}
                     year={year}
                   />
                 </Tab.Pane>
@@ -43,7 +43,7 @@ export const CreditGainStats = ({ filteredStudents, query, year }) => {
               menuItem: 'Statistics',
               render: () => (
                 <Tab.Pane>
-                  <StatisticsTab allStudents={filteredStudents} query={query} />
+                  <StatisticsTab allStudents={filteredStudents} programme={query.programme} />
                 </Tab.Pane>
               ),
             },
@@ -53,7 +53,7 @@ export const CreditGainStats = ({ filteredStudents, query, year }) => {
                 <Tab.Pane>
                   <CreditDistributionDevelopment
                     combinedProgramme=""
-                    programme={query?.studyRights?.programme}
+                    programme={query.programme}
                     students={filteredStudents}
                     year={year}
                   />

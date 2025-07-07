@@ -23,7 +23,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.year)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.years?.[0])
 
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
@@ -51,7 +51,7 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           <CreditAccumulationGraphHighCharts
             programmeCodes={programmeCodes.filter(Boolean)}
-            showBachelorAndMaster={query?.showBachelorAndMaster === 'true'}
+            showBachelorAndMaster={!!query?.showBachelorAndMaster}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
           />
@@ -60,11 +60,12 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
     },
     {
       title: 'Credit statistics',
-      content: !query?.years ? (
-        <CreditGainStats filteredStudents={filteredStudents} query={query} year={query?.year} />
-      ) : (
-        <div>This table is omitted when searching population of multiple years</div>
-      ),
+      content:
+        query.years.length > 1 ? (
+          <div>This table is omitted when searching population of multiple years</div>
+        ) : (
+          <CreditGainStats filteredStudents={filteredStudents} query={query} year={query.years[0]} />
+        ),
     },
     {
       title: 'Age distribution',
