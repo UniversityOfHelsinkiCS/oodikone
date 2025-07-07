@@ -7,7 +7,7 @@ type ExtendedCurriculumDetails = CurriculumDetails & { id: string; version: stri
 
 export const useCurriculumState = (
   programmeCode: string,
-  year: string
+  year: string | number
 ): [
   ExtendedCurriculumDetails | null,
   CurriculumOption[],

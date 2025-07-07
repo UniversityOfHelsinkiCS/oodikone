@@ -6,13 +6,11 @@ import { StatisticsTable } from './StatisticsTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 
-export const StatisticsTab = ({ allStudents, query }) => {
-  if (!allStudents || !allStudents.length || !query) return null
-
-  const { studyRights } = query
+export const StatisticsTab = ({ allStudents, programme }) => {
+  if (!allStudents?.length || !programme) return null
 
   const getStatisticsTable = type => {
-    const filteredStudents = allStudents.filter(admissionTypeFilter(studyRights?.programme)(type))
+    const filteredStudents = allStudents.filter(admissionTypeFilter(programme)(type))
 
     return (
       <StatisticsTable
@@ -23,8 +21,7 @@ export const StatisticsTab = ({ allStudents, query }) => {
     )
   }
 
-  const admissionTypesAvailable =
-    allStudents.length !== allStudents.filter(admissionTypeFilter(studyRights?.programme)(null)).length
+  const admissionTypesAvailable = allStudents.length !== allStudents.filter(admissionTypeFilter(programme)(null)).length
 
   return (
     <Grid centered padded>
