@@ -18,7 +18,7 @@ export const Row = ({
   setShow,
   show,
   showPercentages,
-  studyProgramme,
+  degreeProgramme,
   studyTracks,
   yearlyData,
   years,
@@ -31,7 +31,7 @@ export const Row = ({
   setShow: () => void
   show: boolean
   showPercentages: boolean
-  studyProgramme: string
+  degreeProgramme: string
   studyTracks: Record<string, string | Name>
   yearlyData: (string | number)[][]
   years: string[]
@@ -52,11 +52,11 @@ export const Row = ({
               <YearCell
                 calendarYears={calendarYears}
                 combinedProgramme={combinedProgramme}
+                degreeProgramme={degreeProgramme}
                 key={getCellKey(year, index)}
                 populationLinkVisible={populationLinkVisible}
                 setShow={setShow}
                 show={show}
-                studyProgramme={studyProgramme}
                 year={row[0].toString()}
                 yearlyData={yearlyData}
               />
@@ -67,7 +67,7 @@ export const Row = ({
               <OtherCountriesCell
                 key={getCellKey('other-country', index)}
                 otherCountriesStats={otherCountriesStats}
-                studyProgramme={studyProgramme}
+                studyProgramme={degreeProgramme}
                 value={value}
                 year={row[0].toString()}
               />
@@ -103,10 +103,9 @@ export const Row = ({
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   cypress={year.split(' - ')[0]}
-                  studyProgramme={studyProgramme}
-                  studyTrack={correctStudyTrack.toString()}
-                  year={year}
-                  years={calendarYears}
+                  programme={degreeProgramme}
+                  studyTrack={correctStudyTrack}
+                  years={year === 'Total' ? calendarYears : [parseInt(year.split(' ')[0], 10)]}
                 />
               )}
             </TableCell>

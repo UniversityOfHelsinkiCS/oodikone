@@ -14,7 +14,7 @@ export const SingleStudyTrackRow = ({
   populationLinkVisible,
   row,
   showPercentages,
-  studyProgramme,
+  degreeProgramme,
 }: {
   calendarYears: number[]
   code: string
@@ -23,7 +23,7 @@ export const SingleStudyTrackRow = ({
   populationLinkVisible: boolean
   row: (string | number)[]
   showPercentages: boolean
-  studyProgramme: string
+  degreeProgramme: string
 }) => {
   const year = row[0].toString()
 
@@ -41,10 +41,9 @@ export const SingleStudyTrackRow = ({
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   cypress={year.split(' - ')[0]}
-                  studyProgramme={studyProgramme}
+                  programme={degreeProgramme}
                   studyTrack={code}
-                  year={year}
-                  years={calendarYears}
+                  years={year === 'Total' ? calendarYears : [parseInt(year.slice(0, 4), 10)]}
                 />
               )}
             </TableCell>

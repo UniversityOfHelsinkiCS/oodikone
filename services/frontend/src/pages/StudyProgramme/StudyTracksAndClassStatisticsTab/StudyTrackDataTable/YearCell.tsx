@@ -12,7 +12,7 @@ export const YearCell = ({
   populationLinkVisible,
   setShow,
   show,
-  studyProgramme,
+  degreeProgramme,
   year,
   yearlyData,
 }: {
@@ -21,10 +21,12 @@ export const YearCell = ({
   populationLinkVisible: boolean
   setShow: () => void
   show: boolean
-  studyProgramme: string
+  degreeProgramme: string
   year: string
   yearlyData: (string | number)[][]
 }) => {
+  const populationYears = year !== 'Total' ? [parseInt(year.slice(0, 4), 10)] : calendarYears
+
   return (
     <TableCell sx={{ whiteSpace: 'nowrap' }}>
       <Stack alignItems="center" direction="row">
@@ -38,9 +40,8 @@ export const YearCell = ({
           <PopulationLink
             combinedProgramme={combinedProgramme}
             cypress={year.split(' - ')[0]}
-            studyProgramme={studyProgramme}
-            year={year}
-            years={calendarYears}
+            programme={degreeProgramme}
+            years={populationYears}
           />
         )}
       </Stack>
