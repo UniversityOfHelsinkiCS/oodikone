@@ -39,7 +39,6 @@ const Panels = ({
 }) => {
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
-  const programmeForTagsLink = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const programme = studyGuidanceGroup?.tags?.studyProgramme ?? ''
 
   const availablePanels = [
@@ -81,7 +80,7 @@ const Panels = ({
         <TagsTab
           combinedProgramme={combinedProgramme}
           mainProgramme={mainProgramme}
-          programmeForTagsLink={programmeForTagsLink}
+          programmeForTagsLink={correctCode}
           students={filteredStudents}
         />
       ),

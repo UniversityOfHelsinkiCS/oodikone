@@ -15,7 +15,7 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink
   return (
     <Tab.Pane>
       <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-        {tags.length === 0 && (
+        {!tags?.length && (
           <div
             style={{
               alignItems: 'center',
@@ -35,7 +35,7 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink
             </h3>
           </div>
         )}
-        {tags.length > 0 && (
+        {tags?.length > 0 && (
           <>
             <TagPopulation
               combinedProgramme={combinedProgramme}
