@@ -79,13 +79,7 @@ export const YearSelector = ({
                 Show population between <b>{yearRange[0]}</b> and <b>{yearRange[1]}</b>
               </Typography>
             )}
-            <PopulationLink
-              studyProgramme={studyProgramme}
-              studyTrack={studyTrack}
-              variant="button"
-              year="Total"
-              years={getYears()}
-            />
+            <PopulationLink programme={studyProgramme} studyTrack={studyTrack} variant="button" years={getYears()} />
           </Stack>
         </Stack>
       )}

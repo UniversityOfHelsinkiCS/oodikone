@@ -2,46 +2,36 @@ import NorthEastIcon from '@mui/icons-material/NorthEast'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
-import dayjs from 'dayjs'
 import { Link } from 'react-router'
 
-import { getMonths, getStudyRights, getTitle, getUrl } from '@/util/populationLink'
+import { getTitle, getUrl } from '@/util/populationLink'
 import { Tag } from '@oodikone/shared/types'
 
 export const PopulationLink = ({
+  programme,
+  years,
   combinedProgramme,
-  cypress,
-  studyProgramme,
   studyTrack,
   tag,
   variant,
-  year,
-  years,
+  cypress,
 }: {
+  programme: string
+  years: number[]
   combinedProgramme?: string
-  cypress?: string
-  studyProgramme: string
   studyTrack?: string
   tag?: Tag
   variant?: 'button'
-  year: string
-  years?: number[]
+  cypress?: string
 }) => {
-  const selectedYear = tag?.year ?? (year === 'Total' ? Math.min(...(years ?? [])) : Number(year.slice(0, 4)))
-  const months =
-    year === 'Total'
-      ? getMonths(Math.min(...(years ?? [])))
-      : Math.ceil(dayjs().diff(`${selectedYear}-08-01`, 'months', true))
+  const title = getTitle(years[0], years.at(-1), tag)
 
-  const title = getTitle(selectedYear, year, tag)
-
-  const studyRights = getStudyRights(studyProgramme, combinedProgramme, studyTrack)
   const url = getUrl({
-    months,
-    studyRights,
-    year: year === 'Total' ? Math.min(...(years ?? [])) : selectedYear,
-    years: year === 'Total' ? (years ?? []).join('&years=') : undefined,
-    tag: tag?.id,
+    programme,
+    combinedProgramme,
+    studyTrack,
+    years,
+    tagId: tag?.id,
   })
 
   if (variant === 'button') {

@@ -18,7 +18,6 @@ import { InfoBox } from '@/components/material/InfoBox'
 import { PopulationLink } from '@/components/material/PopulationLink'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
-import { getCalendarYears } from '@/util/timeAndDate'
 
 const getTableCell = (year: string, programme: string, value: number | string) => {
   return (
@@ -146,6 +145,14 @@ export const FacultyStudentDataTable = ({
         </TableHead>
         <TableBody>
           {years.map((year, yearIndex) => {
+            // New queries only take in "years" number[]
+            const populationLinkYear =
+              year === 'Total'
+                ? years
+                    .filter(year => year !== 'Total')
+                    .map(year => Number(year.slice(0, 4)))
+                    .reverse()
+                : [Number(year.slice(0, 4))]
             return (
               <Fragment key={`${year}-fragment`}>
                 <TableRow key={`${year}-faculty-row}`}>
@@ -196,11 +203,7 @@ export const FacultyStudentDataTable = ({
                             </Tooltip>
                             {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
                               (requiredRights.fullAccessToStudentData && (
-                                <PopulationLink
-                                  studyProgramme={programmeNames[programme].code}
-                                  year={year}
-                                  years={getCalendarYears(years)}
-                                />
+                                <PopulationLink programme={programmeNames[programme].code} years={populationLinkYear} />
                               ))}
                           </Stack>
                         </TableCell>

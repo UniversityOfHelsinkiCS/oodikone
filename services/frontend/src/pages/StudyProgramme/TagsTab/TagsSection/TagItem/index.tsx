@@ -58,9 +58,9 @@ export const TagItem = ({
               {tag.year && (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
-                  studyProgramme={studyProgramme}
+                  programme={studyProgramme}
                   tag={tag}
-                  year={tag.year}
+                  years={[parseInt(tag.year, 10)]}
                 />
               )}
               {tag.personalUserId && (

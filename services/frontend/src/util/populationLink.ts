@@ -1,60 +1,42 @@
-import dayjs from 'dayjs'
-
 import { Tag } from '@oodikone/shared/types'
 
-export const getMonths = (year: number) => {
-  const end = dayjs()
-  const lastDayOfMonth = dayjs(end).endOf('month')
-  const start = `${year}-08-01`
-  return Math.round(dayjs(lastDayOfMonth).diff(dayjs(start), 'months', true))
-}
-
 export const getUrl = (params: {
-  months: number
-  studyRights: string
-  tag?: string
-  year: string | number
-  years?: string
+  programme: string
+  years: number[]
+  combinedProgramme?: string
+  studyTrack?: string
+  tagId?: string
 }) => {
   const baseUrl = '/populations'
-  const urlParts = [
-    `months=${params.months}`,
-    'semesters=FALL',
-    'semesters=SPRING',
-    `studyRights=${params.studyRights}`,
-  ]
+  const urlParts = [`programme=${params.programme}`, 'semesters=FALL', 'semesters=SPRING']
 
-  if (params.years) {
-    urlParts.push('year=All', `years=${params.years}`)
-  } else {
-    urlParts.push(`year=${params.year}`)
+  for (const year of params.years) {
+    urlParts.push(`years=${year}`)
   }
 
-  if (params.tag) {
-    urlParts.push(`tag=${params.tag}`)
+  if (params.combinedProgramme) {
+    urlParts.push(`combinedProgramme=${params.combinedProgramme}`)
+  }
+
+  if (params.studyTrack) {
+    urlParts.push(`studyTrack=${params.studyTrack}`)
+  }
+
+  if (params.tagId) {
+    urlParts.push(`tag=${params.tagId}`)
   }
 
   const url = `${baseUrl}?${urlParts.join('&')}`
   return url
 }
 
-export const getStudyRights = (studyProgramme: string, combinedProgramme?: string, studyTrack?: string) => {
-  const studyRights: Record<string, string> = { programme: studyProgramme }
-  if (studyTrack) {
-    studyRights.studyTrack = studyTrack
-  }
-  if (combinedProgramme) {
-    studyRights.combinedProgramme = combinedProgramme
-  }
-  return encodeURIComponent(JSON.stringify(studyRights))
-}
-
-export const getTitle = (selectedYear: string | number, year: string, tag?: Tag) => {
+// Either a rangeStart or a tag should be supplied
+export const getTitle = (rangeStart?: number, rangeEnd?: number, tag?: Tag) => {
   if (tag) {
-    return `Population statistics of class ${selectedYear} with tag ${tag.name}`
+    return `Population statistics of class ${tag.year} with tag ${tag.name}`
   }
-  if (year === 'Total') {
-    return 'Population statistics of all years'
+  if (!!rangeEnd && rangeStart !== rangeEnd) {
+    return `Population statistics of classes ${rangeStart} - ${rangeEnd}`
   }
-  return `Population statistics of class ${selectedYear}`
+  return `Population statistics of class ${rangeStart}`
 }

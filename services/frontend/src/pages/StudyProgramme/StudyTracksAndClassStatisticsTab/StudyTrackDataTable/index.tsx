@@ -151,12 +151,12 @@ export const StudyTrackDataTable = ({
                     calendarYears={calendarYears}
                     code={singleTrack}
                     combinedProgramme={combinedProgramme}
+                    degreeProgramme={studyProgramme}
                     key={getRowKey(singleTrack, index)}
                     otherCountriesStats={otherCountriesStats}
                     populationLinkVisible={populationLinkVisible}
                     row={row}
                     showPercentages={showPercentages}
-                    studyProgramme={studyProgramme}
                   />
                 ))
               : sortedMainStats?.map((yearlyData, index) =>
@@ -164,6 +164,7 @@ export const StudyTrackDataTable = ({
                     <Row
                       calendarYears={calendarYears}
                       combinedProgramme={combinedProgramme}
+                      degreeProgramme={studyProgramme}
                       key={getRowKey(row[0].toString(), index)}
                       otherCountriesStats={otherCountriesStats}
                       populationLinkVisible={populationLinkVisible}
@@ -171,7 +172,6 @@ export const StudyTrackDataTable = ({
                       setShow={() => firstCellClicked(index)}
                       show={show[index]}
                       showPercentages={showPercentages}
-                      studyProgramme={studyProgramme}
                       studyTracks={studyTracks}
                       yearlyData={yearlyData}
                       years={years}
