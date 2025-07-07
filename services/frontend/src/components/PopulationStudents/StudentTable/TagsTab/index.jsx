@@ -6,7 +6,7 @@ import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
-export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink, students }) => {
+export const TagsTab = ({ combinedProgramme, mainProgramme, students }) => {
   const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
   const { data: tags, isFetching } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
@@ -28,7 +28,7 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, programmeForTagsLink
           >
             <h3>
               No tags defined. You can define them{' '}
-              <Link onClick={() => {}} to={`/study-programme/${programmeForTagsLink}?tab=4`}>
+              <Link onClick={() => {}} to={`/study-programme/${correctCode}?tab=4`}>
                 here
               </Link>
               .

@@ -77,12 +77,7 @@ const Panels = ({
     {
       menuItem: 'Tags',
       render: () => (
-        <TagsTab
-          combinedProgramme={combinedProgramme}
-          mainProgramme={mainProgramme}
-          programmeForTagsLink={correctCode}
-          students={filteredStudents}
-        />
+        <TagsTab combinedProgramme={combinedProgramme} mainProgramme={mainProgramme} students={filteredStudents} />
       ),
     },
     {
