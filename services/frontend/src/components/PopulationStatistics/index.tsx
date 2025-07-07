@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useLocation } from 'react-router'
-import { Header, Message, Segment } from 'semantic-ui-react'
+import { useLocation, type Location } from 'react-router'
+import { Header, Segment } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
 import { FilterView } from '@/components/FilterView'
@@ -40,9 +40,11 @@ import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { parseQueryParams } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
 
+import { HelpInfoCard } from '../material/InfoCard'
+
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 
-const parseQueryFromUrl = (location): [boolean, PopulationQuery] => {
+const parseQueryFromUrl = (location: Location): [boolean, PopulationQuery] => {
   const skipQuery = !location.search
   const { years, semesters, programme, studentStatuses, combinedProgramme, studyTrack, showBachelorAndMaster, tag } =
     parseQueryParams(location.search)
@@ -125,7 +127,7 @@ export const PopulationStatistics = () => {
   const location = useLocation()
 
   const [skipQuery, query] = parseQueryFromUrl(location)
-  const isSingleYear = query.years?.length === 1
+  const isSingleYear = query.years.length === 1
 
   const {
     data: population,
@@ -204,20 +206,12 @@ export const PopulationStatistics = () => {
   }
 
   const showNoStudentsMessage = !students.length && !isLoading
-  const noStudentsMessage = () => (
-    <div style={{ maxWidth: '80%' }}>
-      <Message
-        content={`
-          Choose “Advanced settings” below and make sure you have the correct student groups included
-          in the class. For example, if you are looking for students of a specialist training in
-          medicine or dentistry, you must choose “Students with non-degree study right”.`}
-        header="Not seeing any students?"
-        icon="question"
-        info
-        size="large"
-      />
-    </div>
-  )
+
+  const helpCardTitle = 'Not seeing any students?'
+  const helpCardBody = `
+        Choose “View advanced settings” below and make sure you have the correct student groups included
+        in the class. For example, if you are looking for students of a specialist training in
+        medicine or dentistry, you must choose “Students with non-degree study right”.`
 
   const title = skipQuery ? 'Class statistics' : `${programmeText} ${getYearText(query.years)}`
 
@@ -237,7 +231,7 @@ export const PopulationStatistics = () => {
             {!skipQuery && !!studyTrack && <Header.Subheader>studytrack {studyTrack}</Header.Subheader>}
             {!skipQuery && <Header.Subheader>Class size {students.length} students</Header.Subheader>}
           </Header>
-          {!skipQuery && showNoStudentsMessage && noStudentsMessage()}
+          {!skipQuery && showNoStudentsMessage && <HelpInfoCard body={helpCardBody} title={helpCardTitle} />}
           <Segment className="contentSegment" loading={isLoading}>
             <PopulationSearch
               combinedProgrammeCode={combinedProgrammeCode}
