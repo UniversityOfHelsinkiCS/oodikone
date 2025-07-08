@@ -9,7 +9,6 @@ import { creditDateFilter } from './date'
 const getCutStudyStart = ({ options, filterDispatch }) => {
   return (
     <Button
-      className="credit-date-filter-input"
       content="Cut credits to study start"
       disabled={!options.activeProgramme && !options.activeCombinedProgramme}
       onClick={() =>

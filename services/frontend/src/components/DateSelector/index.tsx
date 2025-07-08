@@ -83,6 +83,7 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
 
   return (
     <DatePicker
+      className="date-picker"
       format={DateFormat.DISPLAY_DATE}
       formatDensity="dense"
       inputRef={datetimeRef}

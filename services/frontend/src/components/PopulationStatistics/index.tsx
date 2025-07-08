@@ -194,7 +194,7 @@ export const PopulationStatistics = () => {
       transferred: false,
     },
     [hopsFilter.key]: {
-      studyStart: (students[0] ?? {})?.studyrightStart,
+      studyStart: students.some(student => !!student?.studyrightStart),
     },
     [studyTrackFilter.key]: {
       selected: studyTrack ? [studyTrack] : [],
