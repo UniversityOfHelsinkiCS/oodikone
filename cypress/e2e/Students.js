@@ -159,9 +159,7 @@ describe('Students tests', () => {
       cy.cs('study-rights-section').within(() => {
         cy.contains('Matemaattisten tieteiden kandiohjelma')
           .parent()
-          .within(() => {
-            cy.get('a').click()
-          })
+          .within(() => cy.get('a').click())
       })
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
       cy.contains('Class size 30 students')

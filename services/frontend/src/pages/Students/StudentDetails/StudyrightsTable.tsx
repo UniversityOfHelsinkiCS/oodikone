@@ -128,7 +128,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
     const yearFromDate = parseInt(date.slice(0, 4), 10)
     const year = dayjs(date).isBefore(`${yearFromDate}-08-01`, 'day') ? yearFromDate - 1 : yearFromDate
     const months = Math.ceil(dayjs().diff(`${year}-08-01`, 'months', true))
-    return `/populations?months=${months}&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
+    return `/populations?months=${months}&semesters=FALL&semesters=SPRING&programme=${studyprogramme}&years=${year}`
   }
 
   return (
