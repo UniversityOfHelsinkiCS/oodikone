@@ -164,7 +164,7 @@ describe('Students tests', () => {
           })
       })
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
-      cy.contains('class size 30 students')
+      cy.contains('Class size 30 students')
     })
 
     it('Grade graph works in all three different modes', () => {

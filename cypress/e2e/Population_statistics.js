@@ -77,7 +77,7 @@ describe('Population statistics tests', () => {
           selectStudyProgramme('Matemaattisten tieteiden kandiohjelma')
           cy.contains('See class').click()
           cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
-          cy.contains('class size 47 students')
+          cy.contains('Class size 47 students')
         })
 
         it('with study tracks', () => {
@@ -87,7 +87,7 @@ describe('Population statistics tests', () => {
           cy.contains('See class').click()
           cy.contains('Matematiikan ja tilastotieteen maisteriohjelma 2017 - 2018')
           cy.contains('studytrack MAST-MSM')
-          cy.contains('class size 1 students')
+          cy.contains('Class size 1 students')
         })
       })
     })
@@ -96,7 +96,7 @@ describe('Population statistics tests', () => {
       cy.visit(pathToMathBSc2020)
       cy.cs('filtered-students')
       cy.contains('Matemaattisten tieteiden kandiohjelma')
-      cy.contains('class size 30 students')
+      cy.contains('Class size 30 students')
       cy.contains('Excludes exchange students')
       cy.contains('Excludes students with non-degree study right')
       cy.contains('Excludes students who have transferred out of this programme')
@@ -400,7 +400,7 @@ describe('Population statistics tests', () => {
     beforeEach(() => {
       cy.init(pathToMathBSc2020, 'onlyiamrights')
       cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
-      cy.contains('class size 30 students')
+      cy.contains('Class size 30 students')
     })
 
     it('Population statistics is visible', () => {

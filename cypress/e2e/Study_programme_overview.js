@@ -357,13 +357,13 @@ describe('Study programme overview', () => {
       it('a single year', () => {
         cy.cs('2023-population-link-button').first().click()
         cy.contains('Matemaattisten tieteiden kandiohjelma 2023 - 2024')
-        cy.contains('class size 8 students')
+        cy.contains('Class size 8 students')
       })
 
       it('total', () => {
         cy.cs('total-population-link-button').click()
         cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('class size 227 students')
+        cy.contains('Class size 227 students')
       })
 
       it('Links to class statistics page with study track info included work', () => {
@@ -374,7 +374,7 @@ describe('Study programme overview', () => {
 
         cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
         cy.contains('studytrack MAT-MAT')
-        cy.contains('class size 26 students')
+        cy.contains('Class size 26 students')
         cy.contains('3 students out of 26 shown')
       })
     })
@@ -465,7 +465,7 @@ describe('Study programme overview', () => {
 
         cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
         cy.contains('studytrack MAT-MAT')
-        cy.contains('class size 30 students')
+        cy.contains('Class size 30 students')
         cy.contains('10 students out of 30 shown')
       })
 
