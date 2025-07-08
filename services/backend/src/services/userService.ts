@@ -169,6 +169,8 @@ const updateAccessGroups = async (
     ...(fullSisuAccess ? ['fullSisuAccess'] : []),
   ] as Role[]
 
+  console.log({ newAccessGroups })
+
   if (!isEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
     userFromDb.roles = newAccessGroups
     await userFromDb.save()

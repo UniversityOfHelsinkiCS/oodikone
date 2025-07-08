@@ -20,6 +20,7 @@ router.get<never, CanError<LoginResBody>, LoginReqBody>('/', (req, res) => {
     throw new ApplicationError('User not found', 404)
   }
 
+  console.dir({ user }, { depth: null })
   res.send({
     user: omitKeys(user, ['studentsUserCanAccess']),
     logoutUrl,
