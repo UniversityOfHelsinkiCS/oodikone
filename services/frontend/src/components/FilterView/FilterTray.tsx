@@ -1,5 +1,8 @@
+import Button from '@mui/material/Button'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useContext } from 'react'
-import { Button, Header, Segment } from 'semantic-ui-react'
 
 import { Student } from '.'
 import { FilterViewContext } from './context'
@@ -40,42 +43,43 @@ export const FilterTray = () => {
       }
 
       return (
-        <div key={key}>
-          <FilterCard filter={filter} onClear={() => resetFilter(key)} options={ctx.options}>
-            {render(props, ctx)}
-          </FilterCard>
-        </div>
+        <FilterCard filter={filter} key={key} onClear={() => resetFilter(key)} options={ctx.options}>
+          {render(props, ctx)}
+        </FilterCard>
       )
     })
 
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'flex-start', width: '100%' }}>
-      <Segment
-        style={{
-          padding: '0.75rem',
-          width: '16rem',
-          position: 'sticky',
-          overflowY: 'auto',
-        }}
-      >
-        <Header data-cy="filtered-students" size="small" style={{ textAlign: 'center' }}>
+    <Paper
+      sx={{
+        py: 3,
+        px: 2,
+        borderRadius: 0,
+        maxWidth: '18em',
+        height: 'fit-content',
+      }}
+      variant="outlined"
+    >
+      <Stack spacing={1.5} sx={{ alignItems: 'center', textAlign: 'center', width: '100%', mb: 2 }}>
+        <Typography component="span" data-cy="filtered-students" fontSize="1.3em" fontWeight={500} variant="subtitle1">
           Filter students
-        </Header>
-        <div style={{ textAlign: 'center' }}>
-          <b>
-            {filteredStudents.length} {filteredStudents.length === 1 ? 'student' : 'students'}
-          </b>{' '}
-          out of {allStudents.length} shown
-        </div>
+        </Typography>
+        <Typography component="span" fontSize="1.1em">
+          Showing {filteredStudents.length} out of {allStudents.length} students
+        </Typography>
         {haveOptionsBeenChanged && (
-          <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-            <Button compact data-cy="reset-all-filters" onClick={resetFilters} size="mini">
-              Reset All Filters
-            </Button>
-          </div>
+          <Button
+            color="inherit"
+            data-cy="reset-all-filters"
+            disableElevation
+            onClick={resetFilters}
+            variant="contained"
+          >
+            Reset All Filters
+          </Button>
         )}
-        {filterSet}
-      </Segment>
-    </div>
+      </Stack>
+      {filterSet}
+    </Paper>
   )
 }

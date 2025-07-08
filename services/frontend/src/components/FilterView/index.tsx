@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import { FC, useMemo } from 'react'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
@@ -99,10 +100,10 @@ export const FilterView: FC<{
 
   return (
     <FilterViewContext.Provider value={value}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ position: 'sticky', top: '1rem' }}>{displayTray && <FilterTray />}</div>
-        <div style={{ flex: 1 }}>{children(filteredStudents, filteredCourses)}</div>
-      </div>
+      <Box sx={{ display: 'flex', flex: 1 }}>
+        {displayTray && <FilterTray />}
+        <Box sx={{ flex: 1 }}>{children(filteredStudents, filteredCourses)}</Box>
+      </Box>
     </FilterViewContext.Provider>
   )
 }

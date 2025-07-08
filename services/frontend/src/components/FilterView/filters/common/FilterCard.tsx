@@ -1,8 +1,14 @@
+import ClearIcon from '@mui/icons-material/Clear'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import Box from '@mui/material/Box'
+import Collapse from '@mui/material/Collapse'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { FC, useState } from 'react'
-import { Icon, Header } from 'semantic-ui-react'
 
-import { HoverableHelpPopup } from '@/components/common/HoverableHelpPopup'
-import './FilterCard.css'
+import { InfoBox } from '@/components/material/InfoBox'
 
 import { FilterContext, FilterViewContextState } from '../../context'
 import type { Filter } from '../createFilter'
@@ -16,53 +22,40 @@ export const FilterCard: FC<{
   const { info, key, title, isActive } = filter
   const active = isActive(options)
 
-  const [manuallyOpened, setManuallyOpened] = useState<boolean>(false)
-  const open = active || manuallyOpened
+  const [opened, setOpened] = useState<boolean>(active)
 
   return (
-    <div data-cy={`${key}-filter-card`} data-open={open} style={{ margin: '1rem 0' }}>
-      <div style={{ marginBottom: '1rem' }}>
-        <div
-          className="filter-card-header"
-          data-cy={`${key}-header`}
-          onClick={() => setManuallyOpened(!open)}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={open ? 'caret down' : 'caret right'} style={{ flexShrink: 0 }} />
-            <Header size="tiny" style={{ margin: '0' }}>
-              {title}
-            </Header>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5em' }}>
-            {active && (
-              <div
-                style={{
-                  backgroundColor: '#2185d0',
-                  marginRight: '0.15em',
-                  marginTop: '0.2em',
-                  borderRadius: '9999px',
-                  width: '0.5em',
-                  height: '0.5em',
-                }}
-              />
-            )}
-            {active && (
-              <Icon
-                className="filter-clear-icon"
-                name="trash alternate outline"
-                onClick={event => {
-                  event.stopPropagation()
-                  onClear()
-                }}
-                style={{ margin: 0 }}
-              />
-            )}
-            {info && <HoverableHelpPopup content={info} style={{ cursor: 'auto', margin: 0, color: '#888' }} />}
-          </div>
-        </div>
-      </div>
-      {open && <div onClick={() => setManuallyOpened(true)}>{children}</div>}
-    </div>
+    <Stack data-cy={`${key}-filter-card`} data-open={opened} spacing={1.2} sx={{ width: '100%' }}>
+      <Box
+        data-cy={`${key}-header`}
+        onClick={() => setOpened(state => !state)}
+        sx={{ alignItems: 'center', justifyContent: 'center', cursor: 'pointer', display: 'inline-flex' }}
+      >
+        <IconButton size="small">{opened ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}</IconButton>
+        <Typography component="span" fontWeight={500} sx={{ mr: 1, flex: 1, whiteSpace: 'wrap' }} variant="subtitle1">
+          {title}
+        </Typography>
+        {active && (
+          <ClearIcon
+            onClick={event => {
+              event.stopPropagation()
+              onClear()
+              setOpened(false)
+            }}
+            sx={{
+              color: theme => theme.palette.error.dark,
+              mr: info ? 0.5 : 0,
+              '&:hover': {
+                color: theme => theme.palette.error.light,
+              },
+            }}
+          />
+        )}
+        {info && <InfoBox content={info} mini />}
+      </Box>
+      <Collapse in={opened}>
+        <Box sx={{ p: 1, mb: 1 }}>{children}</Box>
+      </Collapse>
+    </Stack>
   )
 }
