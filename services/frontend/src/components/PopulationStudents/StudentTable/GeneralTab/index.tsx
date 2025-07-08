@@ -144,8 +144,6 @@ export const GeneralTabContainer = ({
       return plan.sis_study_right_id === studyRightIdOfProgramme && plan.programme_code !== programmeCode
     })?.completed_credits ?? 0
 
-  const shouldShowAdmissionType =
-    parseInt(year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020 || variant === 'customPopulation'
   const getAdmissiontype = student => {
     const studyRight = getStudyRight(student)
     const admissionType = studyRight?.admissionType ?? 'Ei valintatapaa'
@@ -385,7 +383,7 @@ export const GeneralTabContainer = ({
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       programmeStatus: getStudyRightStatus(student),
       transferredFrom: student.transferredStudyRight ?? getTransferredFrom(student),
-      admissionType: shouldShowAdmissionType ? getAdmissiontype(student) : null,
+      admissionType: getAdmissiontype(student),
       gender: getGender(student.gender_code),
       citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,
