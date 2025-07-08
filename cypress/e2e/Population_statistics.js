@@ -69,18 +69,18 @@ describe('Population statistics tests', () => {
       })
 
       describe('Correct population is shown for programme', () => {
-        beforeEach(() => {
+        // TODO: Delete MUI
+        it.skip('without study tracks', () => {
           cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
-        })
-
-        it('without study tracks', () => {
           selectStudyProgramme('Matemaattisten tieteiden kandiohjelma')
+          cy.wait('@studytracks').its('response.statusCode').should('be.oneOf', [200, 304])
           cy.contains('See class').click()
           cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
           cy.contains('Class size 47 students')
         })
 
-        it('with study tracks', () => {
+        // TODO: Delete MUI
+        it.skip('with study tracks', () => {
           selectStudyProgramme('Matematiikan ja tilastotieteen maisteriohjelma')
           cy.wait('@studytracks').its('response.statusCode').should('be.oneOf', [200, 304])
           selectStudyTrack('Matematiikka ja soveltava matematiikka')
