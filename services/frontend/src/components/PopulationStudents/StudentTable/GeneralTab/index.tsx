@@ -62,7 +62,8 @@ export const GeneralTabContainer = ({
   coursecodes,
   from,
   to,
-  studyRights,
+  programme,
+  combinedProgramme,
   showBachelorAndMaster,
 }) => {
   const { getTextIn } = useLanguage()
@@ -74,12 +75,12 @@ export const GeneralTabContainer = ({
 
   const { useFilterSelector } = useFilters()
 
-  const queryStudyrights = Object.values(studyRights ?? {}).filter(studyright => !!studyright) as string[]
+  const queryStudyrights = [programme, combinedProgramme].filter(studyright => !!studyright) as string[]
   const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
   const [sggProgramme, sggCombinedProgramme] = group?.tags?.studyProgramme?.split('+') ?? []
-  const programmeCode = studyRights?.programme ?? sggProgramme ?? customPopulationProgramme
+  const programmeCode = programme ?? sggProgramme ?? customPopulationProgramme
 
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
@@ -127,7 +128,7 @@ export const GeneralTabContainer = ({
     return acc
   }, {})
 
-  const combinedProgrammeCode = studyRights?.combinedProgramme ?? sggCombinedProgramme ?? null
+  const combinedProgrammeCode = combinedProgramme ?? sggCombinedProgramme ?? null
 
   const includePrimaryProgramme =
     variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)

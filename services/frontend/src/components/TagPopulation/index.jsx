@@ -3,7 +3,7 @@ import { Button, Confirm, Dropdown, List } from 'semantic-ui-react'
 
 import { useCreateStudentTagsMutation, useDeleteStudentTagsMutation } from '@/redux/tags'
 
-export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStudents, tags }) => {
+export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, tags }) => {
   const [options, setOptions] = useState([])
   const [selectedValue, setSelected] = useState('')
   const [selectedTag, setSelectedTag] = useState(null)
@@ -29,7 +29,7 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
       combinedProgramme,
       tagId: selectedValue,
       studentNumbers: selectedStudents,
-      studyTrack: mainProgramme,
+      studyTrack: programme,
     })
     setSelected('')
     setConfirmDelete(false)
@@ -44,7 +44,7 @@ export const TagPopulation = ({ combinedProgramme, mainProgramme, selectedStuden
       })
     })
     setSelected('')
-    createStudentTags({ combinedProgramme, studyTrack: mainProgramme, studentTags: tagList })
+    createStudentTags({ combinedProgramme, studyTrack: programme, studentTags: tagList })
     setConfirmAdd(false)
   }
 

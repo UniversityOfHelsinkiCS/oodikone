@@ -16,18 +16,25 @@ import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 
-export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredStudents, filteredCourses }) => {
+export const PopulationDetails = ({
+  isLoading,
+  query,
+  programme,
+  combinedProgramme,
+  showBachelorAndMaster,
+  filteredStudents,
+  filteredCourses,
+}) => {
   const { useFilterSelector } = useFilters()
 
   const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
   const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.years?.[0])
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
 
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
-  const [programme, combinedProgramme] = programmeCodes
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const [courseTableMode, setCourseTableMode] = useState('curriculum')
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -50,8 +57,8 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
         <div>
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           <CreditAccumulationGraphHighCharts
-            programmeCodes={programmeCodes.filter(Boolean)}
-            showBachelorAndMaster={!!query?.showBachelorAndMaster}
+            programmeCodes={[programme, combinedProgramme].filter(Boolean)}
+            showBachelorAndMaster={!!showBachelorAndMaster}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
           />
@@ -102,16 +109,14 @@ export const PopulationDetails = ({ isLoading, query, programmeCodes, filteredSt
           content: (
             <div>
               <PopulationStudents
+                combinedProgramme={combinedProgramme}
                 criteria={criteria}
                 curriculum={curriculum}
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
-                months={query?.months ?? 0}
-                programmeCode={programme}
-                showBachelorAndMaster={query?.showBachelorAndMaster}
-                studyRights={query?.studyRights}
+                programme={programme}
+                showBachelorAndMaster={showBachelorAndMaster}
                 variant="population"
-                year={query?.year}
               />
             </div>
           ),

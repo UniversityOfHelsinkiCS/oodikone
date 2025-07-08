@@ -242,11 +242,13 @@ export const PopulationStatistics = () => {
             />
             {!skipQuery && isSuccess && (
               <PopulationDetails
+                combinedProgramme={combinedProgrammeCode}
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
                 isLoading={isLoading}
-                programmeCodes={[programmeCode, combinedProgrammeCode]}
+                programme={programmeCode}
                 query={query}
+                showBachelorAndMaster={showBachelorAndMaster}
               />
             )}
           </Segment>

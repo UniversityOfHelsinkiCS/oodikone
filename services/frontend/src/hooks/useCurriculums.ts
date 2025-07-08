@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
 import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
 
-type ExtendedCurriculumDetails = CurriculumDetails & { id: string; version: string[] }
+export type ExtendedCurriculumDetails = CurriculumDetails & { id: string; version: string[] }
 
 export const useCurriculumState = (
   programmeCode: string,

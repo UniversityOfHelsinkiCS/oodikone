@@ -6,8 +6,8 @@ import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
 
-export const TagsTab = ({ combinedProgramme, mainProgramme, students }) => {
-  const correctCode = combinedProgramme ? `${mainProgramme}+${combinedProgramme}` : mainProgramme
+export const TagsTab = ({ programme, combinedProgramme, students }) => {
+  const correctCode = combinedProgramme ? `${programme}+${combinedProgramme}` : programme
   const { data: tags, isFetching } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
   if (isFetching) return <CircularProgress />
@@ -39,13 +39,13 @@ export const TagsTab = ({ combinedProgramme, mainProgramme, students }) => {
           <>
             <TagPopulation
               combinedProgramme={combinedProgramme}
-              mainProgramme={mainProgramme}
+              programme={programme}
               selectedStudents={students.map(student => student.studentNumber)}
               tags={tags}
             />
             <TagList
               combinedProgramme={combinedProgramme}
-              mainProgramme={mainProgramme}
+              programme={programme}
               selectedStudents={students}
               tags={tags}
             />

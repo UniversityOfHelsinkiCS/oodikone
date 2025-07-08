@@ -18,7 +18,7 @@ const Row = memo(
   (prevProps, newProps) => prevProps.studentTags.length === newProps.studentTags.length
 )
 
-export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents, tags }) => {
+export const TagList = ({ programme, combinedProgramme, selectedStudents, tags }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const tagStudents = selectedStudents
     .filter(student => student.tags.length)
@@ -53,7 +53,7 @@ export const TagList = ({ combinedProgramme, mainProgramme, selectedStudents, ta
               name={name}
               studentNumber={studentNumber}
               studentTags={studentTags}
-              studyTrack={mainProgramme}
+              studyTrack={programme}
               tagOptions={studentTagOptions}
             />
           )
