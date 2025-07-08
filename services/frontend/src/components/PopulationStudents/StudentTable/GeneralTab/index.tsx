@@ -84,13 +84,13 @@ export const GeneralTabContainer = ({
   const isMastersProgramme = degreeProgrammeTypes[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
   const fromSemester = from
-    ? Object.values(allSemesters ?? {})
+    ? Object.values(allSemesters)
         .filter(({ startdate }) => new Date(startdate) <= new Date(from))
         .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))[0]?.semestercode
     : null
 
   const toSemester = to
-    ? Object.values(allSemesters ?? {})
+    ? Object.values(allSemesters)
         .filter(({ enddate }) => new Date(enddate) >= new Date(to))
         .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))[0]?.semestercode
     : null

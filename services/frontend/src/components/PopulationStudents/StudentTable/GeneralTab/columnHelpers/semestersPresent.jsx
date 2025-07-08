@@ -83,7 +83,7 @@ export const getSemestersPresentFunctions = ({
         student.semesterEnrollmentsMap?.[semester]?.statutoryAbsence ??
         studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.statutoryAbsence
 
-      const { startdate, enddate, name: semesterName } = allSemesters[semester]
+      const { startdate, enddate, name: semesterName } = allSemesters[semester] ?? {}
       const graduated = programmeCode
         ? (() => {
             if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate)) return 1 + 1 * isMasters
