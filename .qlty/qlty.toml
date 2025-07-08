@@ -1,0 +1,51 @@
+[[source]]
+name = "master"
+branch = "master"
+repository = "https://github.com/UniversityOfHelsinkiCS/oodikone.git"
+default = true
+
+[[source]]
+name = "release"
+tag = "latest"
+repository = "https://github.com/UniversityOfHelsinkiCS/oodikone.git"
+
+exclude_patterns = [
+  ".github/",
+  ".husky/",
+  ".vscode/",
+  "adminer-plugins/",
+  "anonyymioodi/",
+  "cypress/",
+  "documentation/",
+  "scripts/",
+  "services/backend/src/database/migrations_kone/",
+  "services/backend/src/database/migrations_user/",
+  "services/backend/src/models/",
+  "updater/sis-updater-worker/src/db/migrations/",
+  "updater/sis-updater-worker/src/db/models/",
+  ".env.template",
+  ".lintstagedrc.js",
+  ".nycrc",
+  ".prettierrc",
+  ".stylelintrc",
+  "cypress.config.js",
+  "LICENSE",
+  "nginx.conf",
+  "nyc-config.js",
+  "**/.dockerignore",
+  "**/.eslintrc.json",
+  "**/.gitignore",
+  "**/dev.Dockerfile",
+  "**/Dockerfile",
+  "**/*.css",
+  "**/*.csv",
+  "**/*.html",
+  "**/*.json",
+  "**/*.md",
+  "**/*.png",
+  "**/*.sh",
+  "**/*.sql",
+  "**/*.svg",
+  "**/*.txt",
+  "**/*.yml",
+]
