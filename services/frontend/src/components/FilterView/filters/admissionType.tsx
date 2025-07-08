@@ -23,23 +23,23 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) =
   const { selected } = options
   const name = 'admissionTypeFilter'
 
-  const count = admissionType => students.filter(filter(code)(admissionType)).length
+  const count = (admissionType: string | null): number => students.filter(filter(code)(admissionType)).length
 
   const dropdownOptions = Object.entries(ADMISSION_TYPES)
     .filter(([_, admissionType]) => !!admissionType)
     .map(([key, admissionType]) => {
       const value = admissionType ?? 'Ei valintatapaa'
-      const numberOfStudents = count(admissionType)
+      const amount = count(admissionType)
 
       return {
         key,
-        text: `${value} (${numberOfStudents})`,
+        text: `${value} ${amount}`,
         value,
-        numberOfStudents,
+        amount,
       }
     })
-    .filter(a => a.numberOfStudents)
-    .sort((a, b) => b.numberOfStudents - a.numberOfStudents)
+    .filter(a => a.amount)
+    .sort((a, b) => b.amount - a.amount)
 
   return (
     <div className="card-content">

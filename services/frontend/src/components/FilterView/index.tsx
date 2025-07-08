@@ -100,9 +100,9 @@ export const FilterView: FC<{
 
   return (
     <FilterViewContext.Provider value={value}>
-      <Box sx={{ display: 'flex', flex: 1 }}>
+      <Box sx={{ display: 'flex' }}>
         {displayTray && <FilterTray />}
-        <Box sx={{ flex: 1 }}>{children(filteredStudents, filteredCourses)}</Box>
+        <Box>{children(filteredStudents, filteredCourses)}</Box>
       </Box>
     </FilterViewContext.Provider>
   )
