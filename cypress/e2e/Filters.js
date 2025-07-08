@@ -79,8 +79,7 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
 }
 
 describe("Population statistics with a master's programme", () => {
-  const pathToMathMSc2020 =
-    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"MH50_001"%7D&year=2020'
+  const pathToMathMSc2020 = '/populations?months=49&semesters=FALL&semesters=SPRING&programme=MH50_001&year=2020'
   const defaultAmountOfStudents = 26
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
   beforeEach(() => {
@@ -122,8 +121,7 @@ describe("Population statistics with a master's programme", () => {
 })
 
 describe('Population Statistics', () => {
-  const pathToMathBSc2020 =
-    '/populations?months=49&semesters=FALL&semesters=SPRING&studyRights=%7B"programme"%3A"KH50_001"%7D&year=2020'
+  const pathToMathBSc2020 = '/populations?months=49&semesters=FALL&semesters=SPRING&programme=KH50_001&year=2020'
   const defaultAmountOfStudents = 27
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
@@ -270,7 +268,7 @@ describe('Population Statistics', () => {
 
 describe('Population Statistics with Bachelor + Master', () => {
   const pathToMathBSc2017 =
-    '/populations?months=91&semesters=FALL&semesters=SPRING&showBachelorAndMaster=true&studyRights=%7B%22programme%22%3A%22KH50_001%22%2C%22combinedProgramme%22%3A%22%22%7D&year=2017'
+    '/populations?months=91&semesters=FALL&semesters=SPRING&showBachelorAndMaster=true&programme=KH50_001&combinedProgramme=&year=2017'
   const defaultAmountOfStudents = 47
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
