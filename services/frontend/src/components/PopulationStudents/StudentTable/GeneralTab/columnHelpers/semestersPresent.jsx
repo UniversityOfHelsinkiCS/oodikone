@@ -18,7 +18,7 @@ export const getSemestersPresentFunctions = ({
   year,
   semestersToAddToStart,
 }) => {
-  const { semestercode: currentSemesterCode } = currentSemester
+  const { semestercode: currentSemesterCode } = currentSemester ?? {}
 
   const getFirstAndLastSemester = () => {
     const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
