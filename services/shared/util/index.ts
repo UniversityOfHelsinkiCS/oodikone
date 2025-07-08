@@ -68,11 +68,7 @@ export const formatQueryParamsToArrays = (query: Record<string, any>, params: st
 }
 
 export const omitKeys = <T extends object, K extends keyof T>(input: T, toOmit: K[]): Omit<T, K> => {
-  for (const key of toOmit) {
-    delete input[key]
-  }
-
-  return input
+  return Object.fromEntries(Object.entries(input).filter(([key, _]) => !toOmit.includes(key as K))) as Omit<T, K>
 }
 
 export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): Record<K, T> =>
