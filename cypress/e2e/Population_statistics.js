@@ -19,7 +19,7 @@ const selectStudyTrack = studyTrack => {
 
 describe('Population statistics tests', () => {
   const getPath = programme => {
-    return `/populations?months=49&semesters=FALL&semesters=SPRING&programme=${programme}&year=2020`
+    return `/populations?months=49&semesters=FALL&semesters=SPRING&programme=${programme}&years=2020`
   }
   const pathToMathBSc2020 = getPath('KH50_001')
   const pathToMathMSc2020 = getPath('MH50_001')
