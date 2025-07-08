@@ -161,12 +161,11 @@ export const PopulationStudents = ({
       infotoolTipContent: populationStatisticsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {
-      panesToInclude:
-        programme && isBachelorOrLicentiateProgramme(programme)
+      panesToInclude: studyGuidanceGroup?.tags?.studyProgramme
+        ? isBachelorOrLicentiateProgramme(studyGuidanceGroup?.tags?.studyProgramme)
           ? ['General', 'Courses', 'Modules', 'Progress']
-          : programme
-            ? ['General', 'Courses', 'Modules']
-            : ['General'],
+          : ['General', 'Courses', 'Modules']
+        : ['General'],
       infotoolTipContent: populationStatisticsToolTips.studentsGuidanceGroups,
     },
   }
