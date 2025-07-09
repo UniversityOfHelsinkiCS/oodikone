@@ -375,7 +375,7 @@ describe('Study programme overview', () => {
         cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
         cy.contains('studytrack MAT-MAT')
         cy.contains('Class size 26 students')
-        cy.contains('3 students out of 26 shown')
+        cy.contains('Showing 3 out of 26 students')
       })
     })
 
@@ -466,7 +466,7 @@ describe('Study programme overview', () => {
         cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
         cy.contains('studytrack MAT-MAT')
         cy.contains('Class size 30 students')
-        cy.contains('10 students out of 30 shown')
+        cy.contains('Showing 10 out of 30 students')
       })
 
       it('Info message about missing progress stats is displayed', () => {

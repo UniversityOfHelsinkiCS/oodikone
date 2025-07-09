@@ -196,7 +196,7 @@ describe('Basic user', () => {
       cy.wait('@coursestats').its('response.statusCode').should('be.oneOf', [200, 304])
 
       cy.contains('Population of course Pro gradu -tutkielma tietojenkäsittelytieteessä 2007-2020 (open and normal)')
-      cy.contains('10 students out of 10 shown')
+      cy.contains('Showing 10 out of 10 students')
 
       const gradesTableContents = [
         [null, 'NSLA', 1],
@@ -229,7 +229,7 @@ describe('Basic user', () => {
       cy.contains(
         'Population of course Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
       )
-      cy.contains('4 students out of 4 shown')
+      cy.contains('Showing 4 out of 4 students')
 
       const gradesTableContents = [
         [null, 'Hyv.', 3],

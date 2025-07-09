@@ -59,7 +59,7 @@ const testRangeFilter = (parentEl, min, max, expected) => {
 const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   return (filterName, testStepFunctionToRun) => {
     cy.cs(`${filterName}-filter-card`)
-      .invoke('attr', 'data-open')
+      .invoke('attr', 'data-active')
       .then(open => {
         const getHeader = () => cy.cs(`${filterName}-header`)
 

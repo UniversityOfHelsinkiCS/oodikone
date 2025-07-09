@@ -25,7 +25,7 @@ export const FilterCard: FC<{
   const [opened, setOpened] = useState<boolean>(active)
 
   return (
-    <Stack data-cy={`${key}-filter-card`} data-open={opened} spacing={1.2} sx={{ width: '100%' }}>
+    <Stack data-active={active} data-cy={`${key}-filter-card`} spacing={1.2} sx={{ width: '100%' }}>
       <Box
         data-cy={`${key}-header`}
         onClick={() => setOpened(state => !state)}
