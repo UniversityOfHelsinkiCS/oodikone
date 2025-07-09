@@ -21,5 +21,5 @@ export type PopulationQuery = {
   studentStatuses?: StudentStatus[]
   combinedProgramme?: Code
   studyTrack?: Code
-  tag?: any
+  tag?: string
 }

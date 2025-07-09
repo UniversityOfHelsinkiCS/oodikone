@@ -1,6 +1,8 @@
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+
 import { useMemo } from 'react'
 import { useLocation, type Location } from 'react-router'
-import { Header, Segment } from 'semantic-ui-react'
 
 import { getStudentTotalCredits } from '@/common'
 import { FilterView } from '@/components/FilterView'
@@ -146,7 +148,9 @@ export const PopulationStatistics = () => {
 
   const populationTags = useMemo(
     () =>
-      new Map(population?.students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname])) ?? []),
+      new Map<string, string>(
+        population?.students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname])) ?? []
+      ),
     [population?.students]
   )
 
@@ -213,46 +217,45 @@ export const PopulationStatistics = () => {
         in the class. For example, if you are looking for students of a specialist training in
         medicine or dentistry, you must choose “Students with non-degree study right”.`
 
-  const title = skipQuery ? 'Class statistics' : `${programmeText} ${getYearText(query.years)}`
+  const title = `${programmeText} ${getYearText(query.years)}${showBachelorAndMaster ? ' (Bachelor & Master view)' : ''}`
 
+  // Show search form if URL contains no query
+  if (skipQuery) return <PopulationSearch />
+
+  // else display population from query
   return (
     <FilterView
       courses={population?.coursestatistics ?? []}
-      displayTray={!skipQuery && isSuccess}
+      displayTray={!isLoading}
       filters={filters}
       initialOptions={initialOptions}
       name="PopulationStatistics"
       students={students}
     >
       {(filteredStudents, filteredCourses) => (
-        <div className="segmentContainer" style={{ flexGrow: 1 }}>
-          <Header align="center" className="segmentTitle" size="large">
-            {title} {!skipQuery && showBachelorAndMaster && '(Bachelor + Master view)'}
-            {!skipQuery && !!studyTrack && <Header.Subheader>studytrack {studyTrack}</Header.Subheader>}
-            {!skipQuery && <Header.Subheader>Class size {students.length} students</Header.Subheader>}
-          </Header>
-          {!skipQuery && showNoStudentsMessage && <HelpInfoCard body={helpCardBody} title={helpCardTitle} />}
-          <Segment className="contentSegment" loading={isLoading}>
-            <PopulationSearch
-              combinedProgrammeCode={combinedProgrammeCode}
+        <Box sx={{ maxWidth: '80vw', flex: 1, pt: 2, mx: 'auto' }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4">{title}</Typography>
+            {!!studyTrack && (
+              <Typography fontWeight={300} variant="h6">
+                Studytrack {studyTrack}
+              </Typography>
+            )}
+            <Typography fontWeight={300} variant="h6">
+              Class size {students.length} students
+            </Typography>
+            {showNoStudentsMessage && <HelpInfoCard body={helpCardBody} title={helpCardTitle} />}
+          </Box>
+          {isSuccess && (
+            <PopulationDetails
+              filteredCourses={filteredCourses}
+              filteredStudents={filteredStudents}
               isLoading={isLoading}
               populationTags={populationTags}
               query={query}
-              skipQuery={skipQuery}
             />
-            {!skipQuery && isSuccess && (
-              <PopulationDetails
-                combinedProgramme={combinedProgrammeCode}
-                filteredCourses={filteredCourses}
-                filteredStudents={filteredStudents}
-                isLoading={isLoading}
-                programme={programmeCode}
-                query={query}
-                showBachelorAndMaster={showBachelorAndMaster}
-              />
-            )}
-          </Segment>
-        </div>
+          )}
+        </Box>
       )}
     </FilterView>
   )

@@ -5,7 +5,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 export const HelpInfoCard = ({ title, body }: { title: string; body: string }) => (
-  <Box sx={{ maxWidth: '80%' }}>
+  <Box sx={{ maxWidth: '80%', m: 2 }}>
     <Alert
       icon={<HelpOutlineIcon sx={{ fontSize: '2.5em', alignSelf: 'center', mx: 1.5 }} />}
       severity="info"

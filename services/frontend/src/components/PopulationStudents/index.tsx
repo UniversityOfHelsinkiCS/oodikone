@@ -27,7 +27,7 @@ type PopulationDetails = {
 
   showBachelorAndMaster: boolean
 
-  criteria: ProgressCriteria | null
+  criteria?: ProgressCriteria
   curriculum: ExtendedCurriculumDetails | null
 
   filteredCourses: any[]
@@ -65,7 +65,7 @@ type CustomPopulation = {
   dataExport: JSX.Element
 }
 
-type MyType = (PopulationDetails | CoursePopulation | StudyGuidanceGroup | CustomPopulation) & {
+type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuidanceGroup | CustomPopulation) & {
   [key: string]: undefined
 }
 
@@ -90,7 +90,7 @@ export const PopulationStudents = ({
   to,
   studyGuidanceGroup,
   year,
-}: MyType) => {
+}: PopulationStudentsProps) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
   const studentRef = useRef(null)
 
@@ -143,7 +143,10 @@ export const PopulationStudents = ({
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
 
   const contentByVariant: {
-    [K in MyType['variant']]: { panesToInclude: (keyof typeof availablePanels)[]; infotoolTipContent: string }
+    [K in PopulationStudentsProps['variant']]: {
+      panesToInclude: (keyof typeof availablePanels)[]
+      infotoolTipContent: string
+    }
   } = {
     population: {
       panesToInclude:

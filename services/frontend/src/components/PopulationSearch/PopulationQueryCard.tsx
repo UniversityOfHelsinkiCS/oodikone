@@ -1,19 +1,26 @@
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
+import { PopulationQuery } from '@/types/populationSearch'
 
-export const PopulationQueryCard = ({ query, populationTags }) => {
+type PopulationQueryCardProps = {
+  query: PopulationQuery
+  populationTags: Map<string, string>
+}
+
+export const PopulationQueryCard = ({ query, populationTags }: PopulationQueryCardProps) => {
   const { studentStatuses, tag } = query
-  const tagName = populationTags.get(tag)
+  const tagName = populationTags.get(tag!)
 
   return (
-    <div style={{ marginRight: '2rem', marginTop: '1rem' }}>
-      <Card sx={{ height: 'fit-content' }} variant="outlined">
+    <Box sx={{ my: '2em', mx: '1em' }}>
+      <Card sx={{ height: 'fit-content', p: '0.2em' }} variant="outlined">
         <CardContent>
           <Typography sx={{ fontWeight: '600' }} variant="subtitle1">
             Result details
           </Typography>
-          {tag && (
+          {!!tag && (
             <Typography sx={{ fontWeight: '500' }}>
               {tagName ? `Tagged with: ${tagName}` : `Invalid tag id: ${tag}`}
             </Typography>
@@ -30,6 +37,6 @@ export const PopulationQueryCard = ({ query, populationTags }) => {
           </Typography>
         </CardContent>
       </Card>
-    </div>
+    </Box>
   )
 }

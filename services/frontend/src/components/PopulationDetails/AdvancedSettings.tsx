@@ -10,11 +10,17 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PopulationQuery } from '@/types/populationSearch'
 import { queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
 import { InfoBox } from '../material/InfoBox'
 
-export const AdvancedSettings = ({ query, cleanUp }) => {
+type AdvancedSettingsProps = {
+  query: PopulationQuery
+  cleanUp: () => void
+}
+
+export const AdvancedSettings = ({ query, cleanUp }: AdvancedSettingsProps) => {
   const { studentStatuses: queryStudentStatuses, semesters: querySemesters, tag, ...rest } = query
   const navigate = useNavigate()
 
@@ -50,7 +56,7 @@ export const AdvancedSettings = ({ query, cleanUp }) => {
   }
 
   return (
-    <Paper sx={{ padding: '1rem', mt: '1rem', mr: '30px' }} variant="outlined">
+    <Paper sx={{ p: '1em', m: '0.5em', textAlign: 'left' }} variant="outlined">
       <Stack direction="row" gap={2}>
         <FormGroup>
           <FormLabel component="legend">

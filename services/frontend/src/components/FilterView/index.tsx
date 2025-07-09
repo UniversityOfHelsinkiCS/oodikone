@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import { FC, useMemo } from 'react'
 
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
@@ -100,10 +100,10 @@ export const FilterView: FC<{
 
   return (
     <FilterViewContext.Provider value={value}>
-      <Box sx={{ display: 'flex' }}>
+      <Stack direction="row" sx={{ alignContent: 'center' }}>
         {displayTray && <FilterTray />}
-        <Box>{children(filteredStudents, filteredCourses)}</Box>
-      </Box>
+        {children(filteredStudents, filteredCourses)}
+      </Stack>
     </FilterViewContext.Provider>
   )
 }

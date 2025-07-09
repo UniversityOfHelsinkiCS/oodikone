@@ -56,6 +56,7 @@ export const FilterTray = () => {
         px: 2,
         borderRadius: 0,
         maxWidth: '18em',
+        flex: '0 0 18em',
         height: 'fit-content',
       }}
       variant="outlined"

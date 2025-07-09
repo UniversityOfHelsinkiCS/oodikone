@@ -344,7 +344,7 @@ export const PopulationSearchForm = () => {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3} sx={{ maxWidth: '1200px', width: '100%' }}>
       <RenderEnrollmentDateSelector />
       <StudyProgrammeSelector />
       <StudyTrackSelector />
