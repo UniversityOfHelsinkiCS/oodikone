@@ -3,18 +3,12 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import { Box } from '@mui/material'
-
-import { OodiTableHeader } from './components/Header'
-import { OodiTableCell } from './components/Cell'
 import { OodiTablePagination } from './components/Pagination'
 
-import { flexRender, type Table as TableType } from '@tanstack/react-table'
-import { getCommonPinningStyles } from './styles'
+import { type Table as TableType } from '@tanstack/react-table'
+import { OodiTableHeaderGroup } from './components/Header'
+import { OodiTableDataRow } from './components/Cell'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
@@ -41,53 +35,7 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
               zIndex: 2,
             }}
           >
-            {table.getHeaderGroups().map(headerGroup => {
-              return (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map(header => {
-                    if (header.depth - header.column.depth > 1) return null
-
-                    let rowSpan = 1
-                    if (header.isPlaceholder) {
-                      const leafs = header.getLeafHeaders()
-                      rowSpan = leafs[leafs.length - 1].depth - header.depth
-                    }
-
-                    return (
-                      <OodiTableHeader
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        rowSpan={rowSpan}
-                        onClick={header.column.getToggleSortingHandler()}
-                        sx={{ cursor: header.column.getCanSort() ? 'pointer' : 'inherit', ...getCommonPinningStyles(header.column) }}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            right: -2,
-                            bottom: 0,
-                            display: 'flex',
-                            alignItems: 'flex-end',
-                            justifyContent: 'flex-end',
-                            height: 'fit-content',
-                            width: 'fit-content',
-                          }}>
-                          {{
-                            asc: <ArrowUpwardIcon fontSize='small' />,
-                            desc: <ArrowDownwardIcon fontSize='small' />,
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </Box>
-                      </OodiTableHeader>
-                    )
-                  }
-                  )}
-                </TableRow>
-              )
-            })}
+            {table.getHeaderGroups().map(OodiTableHeaderGroup)}
           </TableHead>
           <TableBody sx={{
             '& tr:nth-of-type(odd) > td': {
@@ -97,18 +45,7 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
               backgroundColor: 'white'
             },
           }}>
-            {table.getRowModel().rows.map(row => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map(cell => (
-                  <OodiTableCell
-                    key={cell.id}
-                    sx={{ ...getCommonPinningStyles(cell.column) }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </OodiTableCell>
-                ))}
-              </TableRow>
-            ))}
+            {table.getRowModel().rows.map(OodiTableDataRow)}
           </TableBody>
         </Table>
       </TableContainer >
