@@ -1,10 +1,14 @@
-
 import type { FC, ReactNode } from 'react'
 
 import TableCell, { type TableCellProps } from '@mui/material/TableCell'
 import Box from '@mui/material/Box'
+import TableRow from '@mui/material/TableRow'
+import { flexRender } from '@tanstack/react-table'
+import type { Row } from '@tanstack/react-table'
 
-export const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
+import { getCommonPinningStyles } from '../styles'
+
+const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
   children,
   ...props
 }) => {
@@ -33,3 +37,16 @@ export const OodiTableCell: FC<TableCellProps & { children?: ReactNode }> = ({
   )
 
 }
+
+export const OodiTableDataRow = <OTData,>(row: Row<OTData>) => (
+  <TableRow key={row.id}>
+    {row.getVisibleCells().map(cell => (
+      <OodiTableCell
+        key={cell.id}
+        sx={{ ...getCommonPinningStyles(cell.column) }}
+      >
+        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      </OodiTableCell>
+    ))}
+  </TableRow>
+) 
