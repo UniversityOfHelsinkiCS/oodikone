@@ -1,8 +1,10 @@
-// 03-06-2025 summer hackathon never forget
-
-import { useReactTable, getCoreRowModel, ColumnDef, TableOptions, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
-import { OodiTableContainer } from './OodiTable'
+// 03-07-2025 summer hackathon never forget
 import { useState } from 'react'
+
+import type { ColumnDef, TableOptions } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
+
+import { OodiTableContainer } from './OodiTable'
 
 /**
  * In loving memory of SortableTable
@@ -15,11 +17,15 @@ import { useState } from 'react'
  * @returns Table instance
  */
 
-// eslint-disable-next-line
-export const OodiTable = <TData,>({ data,
+export const OodiTable = <TData,>({
+  data,
   columns,
-  options,
-}: { data: TData[], columns: ColumnDef<TData, any>[], options?: Partial<TableOptions<TData>> }): JSX.Element => {
+  options = {},
+}: {
+  data: TData[]
+  columns: ColumnDef<TData, any>[]
+  options?: Partial<TableOptions<TData>>
+}) => {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,

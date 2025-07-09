@@ -113,7 +113,12 @@ export const PopulationStudents = ({
     //   />
     // ),
     General: () => (
-      <OodiTableTab filteredStudents={filteredStudents} />
+      <OodiTableTab
+        variant={variant}
+        programme={programme}
+        combinedProgramme={combinedProgramme}
+        filteredStudents={filteredStudents}
+      />
     ),
     Courses: () => (
       <CoursesTab

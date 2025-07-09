@@ -4,9 +4,9 @@ import type { SxProps } from '@mui/material'
 
 export const getCommonPinningStyles = <TData,>(column: Column<TData>): SxProps => {
   const isPinned = column.getIsPinned()
-  return {
+  return !!isPinned ? {
+    position: 'sticky',
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    position: isPinned ? 'sticky' : 'relative',
     width: column.getSize(),
 
     /*
@@ -15,6 +15,6 @@ export const getCommonPinningStyles = <TData,>(column: Column<TData>): SxProps =
     * 1, sticky cells
     * 2, header tablerow
     */
-    zIndex: isPinned ? 1 : 0,
-  }
+    zIndex: 1,
+  } : {}
 }
