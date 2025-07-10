@@ -54,7 +54,7 @@ export const FilterCard: FC<{
         {info && <InfoBox content={info} mini />}
       </Box>
       <Collapse in={opened}>
-        <Box sx={{ p: 1, mb: 1 }}>{children}</Box>
+        <Box sx={{ px: 1, mb: 1.5 }}>{children}</Box>
       </Collapse>
     </Stack>
   )

@@ -1,6 +1,8 @@
+import Slider from '@mui/material/Slider'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useCallback, useMemo } from 'react'
 
-import { RangeSelector } from '@/components/common/RangeSelector'
 import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
 import { createFilter } from './createFilter'
@@ -20,12 +22,21 @@ const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
   const [range, setRange] = useDebounce(value, 1000, onChange)
 
   return (
-    <div>
-      <p>Valitse ikähaitari, jolle asettuvat opiskelijat näytetään:</p>
-      <div className="card-content">
-        {min < max && <RangeSelector max={max} min={min} onChange={setRange} value={range} />}
-      </div>
-    </div>
+    <Stack spacing={2} sx={{ mb: 3.5 }}>
+      <Typography>Valitse ikähaitari, jolle asettuvat opiskelijat näytetään</Typography>
+      <Slider
+        marks={[
+          { value: range[0], label: range[0] },
+          { value: range[1], label: range[1] },
+        ]}
+        max={max}
+        min={min}
+        onChange={(_, newValue) => setRange(newValue)}
+        sx={{ width: '90%', alignSelf: 'center' }}
+        value={range}
+        valueLabelDisplay="off"
+      />
+    </Stack>
   )
 }
 
