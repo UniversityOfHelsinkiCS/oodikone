@@ -1,4 +1,5 @@
 # Oodikone
+[![Maintainability](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone/maintainability.svg)](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone)
 
 An application for analyzing university data, running at [https://oodikone.helsinki.fi/](https://oodikone.helsinki.fi/).
 
