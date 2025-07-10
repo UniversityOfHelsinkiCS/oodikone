@@ -1,4 +1,6 @@
+import Backdrop from '@mui/material/Backdrop'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
 import { useMemo } from 'react'
@@ -235,6 +237,12 @@ export const PopulationStatistics = () => {
       {(filteredStudents, filteredCourses) => (
         <Box sx={{ maxWidth: '80vw', flex: 1, pt: 2, mx: 'auto' }}>
           <Box sx={{ textAlign: 'center' }}>
+            <Backdrop
+              open={isLoading}
+              sx={theme => ({ zIndex: theme.zIndex.drawer + 1, color: theme.palette.grey[300] })}
+            >
+              <CircularProgress color="inherit" size="3em" />
+            </Backdrop>
             <Typography variant="h4">{title}</Typography>
             {!!studyTrack && (
               <Typography fontWeight={300} variant="h6">
