@@ -110,6 +110,7 @@ export const NavigationBar = () => {
                     key={item.key}
                     label={<NavigationButton item={item} />}
                     sx={{
+                      p: 0,
                       opacity: 1,
                       '&:hover': {
                         color: 'inherit',

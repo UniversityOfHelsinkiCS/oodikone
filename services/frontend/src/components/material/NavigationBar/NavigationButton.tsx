@@ -69,7 +69,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
         <Typography
           color="inherit"
           onClick={event => setAnchorEl(event.currentTarget)}
-          sx={{ display: 'flex' }}
+          sx={{ display: 'flex', py: 1.5, px: 2 }}
           variant="button"
         >
           {label} <ArrowDropDownIcon />
@@ -95,7 +95,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   }
 
   return (
-    <Typography color="inherit" variant="button">
+    <Typography color="inherit" sx={{ py: 1.5, px: 2 }} variant="button">
       {label}
     </Typography>
   )
