@@ -24,6 +24,7 @@ export const FilterRange = ({ text, min, max, range, setRange }: FilterRangeProp
     />
     <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', maxWidth: '90%', alignSelf: 'center' }}>
       <TextField
+        data-cy="FilterRangeStart"
         onChange={({ target }) => setRange([target.value === '' || +target.value, range[1]])}
         size="small"
         type="number"
@@ -33,6 +34,7 @@ export const FilterRange = ({ text, min, max, range, setRange }: FilterRangeProp
         -
       </Typography>
       <TextField
+        data-cy="FilterRangeEnd"
         onChange={({ target }) => setRange([range[0], target.value === '' || +target.value])}
         size="small"
         type="number"
