@@ -272,6 +272,10 @@ describe('Study programme overview', () => {
 
   describe('Study tracks and class statistics tab works for basic user', () => {
     beforeEach(() => {
+      cy.intercept(
+        'GET',
+        'api/v2/studyprogrammes/KH50_001/studytrackstats?graduated=GRADUATED_INCLUDED&special_groups=SPECIAL_INCLUDED&combined_programme='
+      ).as('stQuery')
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
       cy.cs('study-tracks-and-class-statistics-tab').click()
@@ -373,7 +377,7 @@ describe('Study programme overview', () => {
         })
 
         cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
-        cy.contains('studytrack MAT-MAT')
+        cy.contains('Studytrack MAT-MAT')
         cy.contains('Class size 26 students')
         cy.contains('Showing 3 out of 26 students')
       })
@@ -437,8 +441,9 @@ describe('Study programme overview', () => {
 
     describe('Study track can be changed', () => {
       beforeEach(() => {
-        cy.cs('study-track-select').click()
+        cy.wait('@stQuery')
         cy.contains('All students of the programme')
+        cy.cs('study-track-select').click()
         cy.contains('Ekonometria')
         cy.contains('Tietojenkäsittelyteoria')
         cy.contains('Tilastotiede')
@@ -464,7 +469,7 @@ describe('Study programme overview', () => {
         cy.cs('2020-population-link-button').first().click()
 
         cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
-        cy.contains('studytrack MAT-MAT')
+        cy.contains('Studytrack MAT-MAT')
         cy.contains('Class size 30 students')
         cy.contains('Showing 10 out of 30 students')
       })
