@@ -202,7 +202,7 @@ export const PopulationDetails = ({
                   onChange={() => filterDispatch(transferredToProgrammeFilter.actions.toggle(undefined))}
                 />
               }
-              label="Show students who have transferred to the programme"
+              label="Include students who have transferred to the programme"
             />
             {query.years.length === 1 && (
               <FormControlLabel

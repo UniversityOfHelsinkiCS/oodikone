@@ -19,5 +19,5 @@ export const filterToolTips = {
     Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Valmistuneet opiskelijat on **suodatettu pois** molemmista kategorioista.
   `,
   transferred:
-    'Mahdollisuus suodattaa opiskelijat, jotka ovat siirtyneet nykyiseen 2017 alkaneeseen tutkinto-ohjelmaan vanhasta tutkinto-ohjelmasta',
+    'Mahdollisuus suodattaa opiskelijat, jotka ovat siirtyneet nykyiseen 2017 alkaneeseen tutkinto-ohjelmaan vanhasta tutkinto-ohjelmasta. Oletusarvoisesti pois päältä Class statistics -näkymässä.',
 }
