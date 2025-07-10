@@ -10,7 +10,7 @@ export const getKey = data => {
   for (const column of columnsToCheck) {
     if (data[column]) return data[column]
   }
-  return crypto.randomUUID()
+  return `key_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
 }
 
 const mergeColumnDefinitions = (original, overlay) => {

@@ -127,7 +127,7 @@ export const ExportModal = ({ open, onOpen, onClose, data, columns, featureName 
                   <div style={{ width: '0' }}>
                     {sampledValues[column.key].map(value => (
                       <span
-                        key={crypto.randomUUID()}
+                        key={`${value}_${Math.floor(1000000 * Math.random())}`}
                         style={{
                           backgroundColor: '#f9fafb',
                           border: '1px solid #dedede',
