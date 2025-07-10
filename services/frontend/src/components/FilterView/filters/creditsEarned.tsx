@@ -2,8 +2,8 @@ import { max, min } from 'lodash'
 import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
-import { RangeSelector } from '@/components/common/RangeSelector'
 import { useDebounce } from '@/hooks/debounce'
+import { FilterRange } from './common/FilterRange'
 import { createFilter } from './createFilter'
 
 const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
@@ -16,7 +16,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
   const intMin = Math.floor(min)
   const intMax = Math.ceil(max)
 
-  const value = useMemo(
+  const value: [number, number] = useMemo(
     () => [options.min ?? intMin, options.max ?? intMax],
     [options.min, options.max, intMin, intMax]
   )
@@ -24,12 +24,13 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
   const [range, setRange] = useDebounce(value, 1000, onChange)
 
   return (
-    <div>
-      <p>Valitse opintopistehaitari, jolle asettuvat opiskelijat näytetään:</p>
-      <div className="card-content">
-        {min < max && <RangeSelector max={intMax} min={intMin} onChange={setRange} value={range} />}
-      </div>
-    </div>
+    <FilterRange
+      max={max}
+      min={min}
+      range={range}
+      setRange={setRange}
+      text="Valitse opintopistehaitari, jolle asettuvat opiskelijat näytetään"
+    />
   )
 }
 
