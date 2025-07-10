@@ -14,7 +14,7 @@ export const PopulationQueryCard = ({ query, populationTags }: PopulationQueryCa
   const tagName = populationTags.get(tag!)
 
   return (
-    <Box sx={{ my: '2em', mx: '1em' }}>
+    <Box data-cy="PopulationQueryCard" sx={{ my: '2em', mx: '1em' }}>
       <Card sx={{ height: 'fit-content', p: '0.2em' }} variant="outlined">
         <CardContent>
           <Typography sx={{ fontWeight: '600' }} variant="subtitle1">

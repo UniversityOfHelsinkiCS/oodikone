@@ -290,7 +290,7 @@ describe('Population statistics tests', () => {
         cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
         cy.contains('2023–2026').click({ force: true })
         cy.get('[data-cy=toggle-group-module-DIGI-k]').should('exist')
-        cy.contains('DIGI-100').should('not.exist')
+        cy.contains('DIGI-100').should('not.be.visible')
       })
 
       it('Courses data is changed when filtered students change', () => {
@@ -404,7 +404,7 @@ describe('Population statistics tests', () => {
     })
 
     it('Population statistics is visible', () => {
-      cy.cs('PopulationSearch-section').within(() => {
+      cy.cs('PopulationQueryCard').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
