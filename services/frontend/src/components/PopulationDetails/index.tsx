@@ -27,12 +27,12 @@ import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
-import { PopulationQueryCard } from '../PopulationSearch/PopulationQueryCard'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditGainStats } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
+import { PopulationQueryCard } from './PopulationQueryCard'
 
 type PopulationDetailsProps = {
   isLoading: boolean
