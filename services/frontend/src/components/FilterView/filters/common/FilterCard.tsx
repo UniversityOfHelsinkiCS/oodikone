@@ -37,6 +37,7 @@ export const FilterCard: FC<{
         </Typography>
         {active && (
           <ClearIcon
+            data-cy={`${key}-clear`}
             onClick={event => {
               event.stopPropagation()
               onClear()

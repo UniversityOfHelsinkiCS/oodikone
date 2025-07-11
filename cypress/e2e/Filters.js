@@ -208,11 +208,15 @@ describe('Population Statistics', () => {
 
   it('Admission type filter works', () => {
     runTestStepWithPreAndPostParts('AdmissionType', () => {
-      cy.cs('admissionTypeFilter-dropdown').selectFromDropdown(0)
+      cy.cs('admissionTypeFilter-selector').click()
+      cy.get('ul[role="listbox"] > li').eq(0).click()
       checkFilteringResult(18)
-      cy.cs('admissionTypeFilter-dropdown').selectFromDropdown(1)
+
+      cy.cs('admissionTypeFilter-selector').click()
+      cy.get('ul[role="listbox"] > li').eq(1).click()
       checkFilteringResult(6)
-      clearSingleDropdownSelection('admissionTypeFilter-dropdown')
+
+      cy.cs('AdmissionType-clear').click()
     })
   })
 
