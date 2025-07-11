@@ -61,6 +61,8 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, students }) => {
 export const gradeFilter = createFilter({
   key: 'Grade',
 
+  title: 'Grade',
+
   defaultOptions: {
     selected: [],
   },

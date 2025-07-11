@@ -176,6 +176,8 @@ const MODE_PREDICATES = {
 export const programmeFilter = createFilter({
   key: 'Programme',
 
+  title: 'Programme',
+
   defaultOptions: {
     selectedProgrammes: [] as string[],
     mode: 'active',

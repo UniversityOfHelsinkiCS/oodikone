@@ -8,8 +8,12 @@ import { Student } from '..'
 import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
-/** TODO: Find acual types */
-type FilterOptions = {
+type Selector<T, R> = (options: FilterContext['options'], args: T) => R
+type Action<P> = (options: FilterContext['options'], payload: P) => void
+
+export type Filter = {
+  args?: any
+
   /**
    * Non-user visible (unique) identifier for the filter.
    */
@@ -18,7 +22,7 @@ type FilterOptions = {
   /**
    * User visible identifier. Defaults to the key value.
    */
-  title?: string
+  title: string
 
   /**
    * User visible tooltip.
@@ -38,71 +42,53 @@ type FilterOptions = {
    */
   filter: (students: Student, ctx: FilterContext) => boolean
 
-  isActive: (opts: FilterContext['options']) => boolean
-
-  /**
-   * Redux selectors.
-   * `selectOptions` and `isActive` will be overwriten.
-   */
-  selectors?: Record<string, (options: any, ...args: any[]) => any>
-
-  /**
-   * By default `setOptions` and `reset` are assigned.
-   * NOTE: `reset` will set the value to null, this may not be desired!
-   */
-  actions?: Record<string, (options: FilterContext['options'], payload: any) => void>
-
   /**
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (ctx: FilterContext) => any
-
-  /**
-   * Used to determine sort order.
-   */
-  priority?: number
+  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
 
   /**
    * Filter tray render component.
    */
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
+
+  isActive: Selector<void, boolean>
 }
 
-export type Filter = {
-  args?: any
+/** TODO: Find acual types */
+type FilterOptions = Filter & {
+  /**
+   * Redux selectors.
+   * `selectOptions` and `isActive` will be overwriten.
+   */
+  selectors?: Record<string, Selector<any, any>>
 
-  key: FilterOptions['key']
-  title: NonNullable<FilterOptions['title'] | FilterOptions['key']>
-  info: FilterOptions['info']
-
-  defaultOptions: FilterOptions['defaultOptions']
-
-  isActive: FilterOptions['isActive']
-
-  filter: FilterOptions['filter']
-  precompute: FilterOptions['precompute']
-
-  render: FilterOptions['render']
-  priority: number
+  /**
+   * By default `setOptions` and `reset` are assigned.
+   * NOTE: `reset` will set the value to null, this may not be desired!
+   */
+  actions?: Record<string, Action<any>>
 }
 
 export type FilterFactory = {
-  key: Filter['key']
+  key: string
   actions: Record<
     string,
-    (payload: any) => (
+    <P>(payload: P) => (
       view: string,
       getContext: FilterViewContextState['getContextByKey']
     ) => {
-      payload: any
+      payload: P
       type: string
     }
   >
   selectors: Record<
     string,
-    (...args: any[]) => {
-      (opts: any): any
+    <T, R = any>(
+      args?: T
+    ) => {
+      (opts: FilterContext['options']): R
       filter: string
     }
   >
@@ -113,29 +99,30 @@ export type FilterFactory = {
  * Unlike the name suggests, this function returns a filter factory.
  */
 export const createFilter = (options: FilterOptions): FilterFactory => {
-  const opt_selectors = options.selectors ?? {}
-  const opt_actions = options.actions ?? {}
+  const opt_selectors: NonNullable<FilterOptions['selectors']> = Object.assign(options.selectors ?? {}, {
+    selectOptions: (opts, _) => opts,
+    isActive: options.isActive,
+  })
 
   /**
    * Selectors are wrapped redux selectors that act on the filter's options.
    */
-  const selectors = mapValues(
-    {
-      ...opt_selectors,
-      selectOptions: (opts, _) => opts,
-      isActive: options.isActive,
-    },
-    ([key, selector]) => {
-      const gift = (...args) => {
-        const wrapper = opts => selector(opts, args)
-        wrapper.filter = options.key
+  const selectors = mapValues(opt_selectors, ([key, selector]) => {
+    const gift = args => {
+      const wrapper = (opts: FilterContext['options']) => selector(opts, args)
+      wrapper.filter = options.key
 
-        return wrapper
-      }
-
-      return [key, gift]
+      return wrapper
     }
-  )
+
+    return [key, gift]
+  })
+
+  const opt_actions: NonNullable<FilterOptions['actions']> = Object.assign(options.actions ?? {}, {
+    setOptions: (_, value) => value,
+    reset: (..._) => null,
+  })
+
   /**
    * Actions are wrapped redux actions that act on the filter's options.
    *
@@ -143,28 +130,21 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * dispatch function. You need to use the dipatch function obtained form
    * the useFilterDispatch hook.
    */
-  const actions = mapValues(
-    {
-      setOptions: (_, value) => value,
-      reset: (..._) => null,
-      ...opt_actions,
-    },
-    ([key, action]) => {
-      return [
-        key,
-        payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
-          const ctx = getContext(options.key)
+  const actions = mapValues(opt_actions, ([key, action]) => {
+    return [
+      key,
+      payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
+        const ctx = getContext(options.key)
 
-          return setFilterOptions({
-            view,
-            filter: options.key,
-            action: `${options.key}/${key}`,
-            options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
-          })
-        },
-      ]
-    }
-  )
+        return setFilterOptions({
+          view,
+          filter: options.key,
+          action: `${options.key}/${key}`,
+          options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
+        })
+      },
+    ]
+  })
 
   /**
    * `filter`
@@ -207,35 +187,19 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * Returns whether the filter is active or not, based on the current options.
    * The filter is evaluated over the student list only when this function returns true.
    * Activity of the filter is also reflected in the user interface.
-   *
-   * ---
-   *
-   * `priority`
-   * Filters' priority determines the order in which filters are evaluated.
-   *
-   * In the normal case, this should not matter. But especially filters which
-   * modify the student data (ikr - sounds bad), this is important.
-   *
-   * The filters with lower priority are executed first.
-   *
-   * @dogamak
    */
-  const factory = (args?: any): Filter => ({
+  const factory: FilterFactory = (args?: any): Filter => ({
     args,
 
     key: options.key,
-    title: options.title ?? options.key,
+    title: options.title,
     info: options.info,
 
     defaultOptions: options.defaultOptions,
-
-    isActive: options.isActive,
-
     filter: options.filter,
     precompute: options.precompute,
-
     render: options.render,
-    priority: options.priority ?? 0,
+    isActive: options.isActive,
   })
 
   factory.key = options.key

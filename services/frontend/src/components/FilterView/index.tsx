@@ -18,7 +18,7 @@ import { FilterTray } from './FilterTray'
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
 const resolveFilterOptions = <T,>(
-  store: Record<Filter['key'], { options: T }>,
+  store: Record<Filter['key'], FilterContext>,
   filters: Filter[],
   initialOptions?: Record<Filter['key'], T>
 ): Record<Filter['key'], any> =>
@@ -42,29 +42,27 @@ export const FilterView: FC<{
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
     [storeFilterOptions, filters, initialOptions]
   )
-  const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
-        orderedFilters
+        filters
           .filter(({ precompute }) => precompute)
           .map(({ precompute, key }) => [
             key,
             precompute!({
               students,
               options: filterOptions[key],
-              precomputed: null,
               args: filtersByKey[key].args,
             }),
           ])
       ),
-    [orderedFilters]
+    [filters]
   )
 
   const getFilterContext = (key: string): FilterContext => ({
     students,
-    options: filterOptions[key] ?? null,
     precomputed: precomputed[key] ?? null,
+    options: filterOptions[key] ?? {},
     args: filtersByKey[key]?.args ?? null,
   })
 
@@ -81,7 +79,7 @@ export const FilterView: FC<{
           .filter(Boolean)
       }, students)
 
-  const filteredStudents = useMemo(() => applyFilters(orderedFilters), [orderedFilters])
+  const filteredStudents = useMemo(() => applyFilters(filters), [filters])
   const filteredCourses = filterCourses(courses, filteredStudents)
 
   const dispatch = useAppDispatch()
