@@ -1,6 +1,5 @@
-import { Form, Dropdown } from 'semantic-ui-react'
-
 import { ADMISSION_TYPES } from '@/common'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const findAllStudyRightsForProgramme = (student, programme) =>
@@ -21,11 +20,9 @@ export const filter = code => value => student => {
 
 const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) => {
   const { selected } = options
-  const name = 'admissionTypeFilter'
-
   const count = (admissionType: string | null): number => students.filter(filter(code)(admissionType)).length
 
-  const dropdownOptions = Object.entries(ADMISSION_TYPES)
+  const selectOptions = Object.entries(ADMISSION_TYPES)
     .filter(([_, admissionType]) => !!admissionType)
     .map(([key, admissionType]) => {
       const value = admissionType ?? 'Ei valintatapaa'
@@ -33,7 +30,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) =
 
       return {
         key,
-        text: `${value} ${amount}`,
+        text: `${value} (${amount})`,
         value,
         amount,
       }
@@ -42,23 +39,13 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) =
     .sort((a, b) => b.amount - a.amount)
 
   return (
-    <div className="card-content">
-      <Form>
-        <Dropdown
-          button
-          className="mini"
-          clearable
-          data-cy={`${name}-dropdown`}
-          fluid
-          onChange={(_, { value }) => onOptionsChange({ selected: value })}
-          options={dropdownOptions}
-          placeholder="Choose admission type"
-          selectOnBlur={false}
-          selection
-          value={selected}
-        />
-      </Form>
-    </div>
+    <FilterSelect
+      filterKey="admissionTypeFilter"
+      label="Choose admission type"
+      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      options={selectOptions}
+      value={selected}
+    />
   )
 }
 
