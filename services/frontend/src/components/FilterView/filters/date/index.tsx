@@ -35,8 +35,6 @@ export const creditDateFilter = createFilter({
 
   info: filterToolTips.courseCredits,
 
-  priority: 100,
-
   defaultOptions: {
     startDate: null,
     endDate: null,

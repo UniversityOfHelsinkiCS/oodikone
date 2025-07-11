@@ -154,8 +154,6 @@ export const hopsFilter = createFilter({
 
   title: 'Personal study plan',
 
-  priority: -200,
-
   defaultOptions: {
     activeProgramme: false,
     activeCombinedProgramme: false,
