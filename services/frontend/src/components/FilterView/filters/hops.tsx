@@ -201,14 +201,8 @@ export const hopsFilter = createFilter({
 
   selectors: {
     isPrimarySelected: ({ activeProgramme }) => !!activeProgramme,
-    isCombinedSelected: ({ combinedIsSelected }, code) => {
-      // TODO: fix args being needlessly cast into array in createFilter
-      return combinedIsSelected === code[0]
-    },
-    isBothSelected: ({ combinedIsSelected, activeProgramme }, code) => {
-      // TODO: fix args being needlessly cast into array in createFilter
-      return combinedIsSelected === code[0] && activeProgramme
-    },
+    isCombinedSelected: ({ combinedIsSelected }, code) => combinedIsSelected === code,
+    isBothSelected: ({ combinedIsSelected, activeProgramme }, code) => combinedIsSelected === code && activeProgramme,
   },
 
   actions: {
