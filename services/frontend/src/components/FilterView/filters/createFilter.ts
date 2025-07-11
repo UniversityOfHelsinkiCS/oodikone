@@ -8,6 +8,9 @@ import { Student } from '..'
 import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
+type Selector<T, R> = (options: FilterContext['options'], args: T) => R
+type Action<P> = (options: FilterContext['options'], payload: P) => void
+
 export type Filter = {
   args?: any
 
@@ -50,7 +53,7 @@ export type Filter = {
    */
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 
-  isActive: (opts: FilterContext['options']) => boolean
+  isActive: Selector<void, boolean>
 }
 
 /** TODO: Find acual types */
@@ -59,24 +62,24 @@ type FilterOptions = Filter & {
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, (options: FilterContext['options'], args: any) => any>
+  selectors?: Record<string, Selector<any, any>>
 
   /**
    * By default `setOptions` and `reset` are assigned.
    * NOTE: `reset` will set the value to null, this may not be desired!
    */
-  actions?: Record<string, (options: FilterContext['options'], payload: any) => void>
+  actions?: Record<string, Action<any>>
 }
 
 export type FilterFactory = {
   key: string
   actions: Record<
     string,
-    <T>(payload: T) => (
+    <P>(payload: P) => (
       view: string,
       getContext: FilterViewContextState['getContextByKey']
     ) => {
-      payload: T
+      payload: P
       type: string
     }
   >
@@ -96,29 +99,30 @@ export type FilterFactory = {
  * Unlike the name suggests, this function returns a filter factory.
  */
 export const createFilter = (options: FilterOptions): FilterFactory => {
-  const opt_selectors = options.selectors ?? {}
-  const opt_actions = options.actions ?? {}
+  const opt_selectors: NonNullable<FilterOptions['selectors']> = Object.assign(options.selectors ?? {}, {
+    selectOptions: (opts, _) => opts,
+    isActive: options.isActive,
+  })
 
   /**
    * Selectors are wrapped redux selectors that act on the filter's options.
    */
-  const selectors = mapValues(
-    {
-      ...opt_selectors,
-      selectOptions: (opts, _) => opts,
-      isActive: options.isActive,
-    },
-    ([key, selector]) => {
-      const gift = args => {
-        const wrapper = (opts: FilterContext['options']) => selector(opts, args)
-        wrapper.filter = options.key
+  const selectors = mapValues(opt_selectors, ([key, selector]) => {
+    const gift = args => {
+      const wrapper = (opts: FilterContext['options']) => selector(opts, args)
+      wrapper.filter = options.key
 
-        return wrapper
-      }
-
-      return [key, gift]
+      return wrapper
     }
-  )
+
+    return [key, gift]
+  })
+
+  const opt_actions: NonNullable<FilterOptions['actions']> = Object.assign(options.actions ?? {}, {
+    setOptions: (_, value) => value,
+    reset: (..._) => null,
+  })
+
   /**
    * Actions are wrapped redux actions that act on the filter's options.
    *
@@ -126,28 +130,21 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * dispatch function. You need to use the dipatch function obtained form
    * the useFilterDispatch hook.
    */
-  const actions = mapValues(
-    {
-      setOptions: (_, value) => value,
-      reset: (..._) => null,
-      ...opt_actions,
-    },
-    ([key, action]) => {
-      return [
-        key,
-        payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
-          const ctx = getContext(options.key)
+  const actions = mapValues(opt_actions, ([key, action]) => {
+    return [
+      key,
+      payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
+        const ctx = getContext(options.key)
 
-          return setFilterOptions({
-            view,
-            filter: options.key,
-            action: `${options.key}/${key}`,
-            options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
-          })
-        },
-      ]
-    }
-  )
+        return setFilterOptions({
+          view,
+          filter: options.key,
+          action: `${options.key}/${key}`,
+          options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
+        })
+      },
+    ]
+  })
 
   /**
    * `filter`
@@ -191,7 +188,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * The filter is evaluated over the student list only when this function returns true.
    * Activity of the filter is also reflected in the user interface.
    */
-  const factory = (args?: any): Filter => ({
+  const factory: FilterFactory = (args?: any): Filter => ({
     args,
 
     key: options.key,
