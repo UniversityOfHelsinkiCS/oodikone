@@ -1,13 +1,11 @@
-import { orderBy } from 'lodash'
-
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
 import { type Programme } from '../util'
 
 export const createMaps = (
   selectedStudents: string[],
   students: any,
-  programmeCodeArg: string | null,
-  combinedProgrammeCode: string | null,
+  programme: string | null,
+  combinedProgramme: string | null,
   year: string | null | undefined,
   currentSemester: any,
   showBachelorAndMaster: boolean
@@ -20,47 +18,48 @@ export const createMaps = (
   const studentToOtherProgrammesMap = new Map<string, Programme[] | undefined>()
 
   for (const studentNumber of selectedStudents) {
-    const { studyRights } = students[studentNumber]
+    const student = students[studentNumber]
 
-    const programmes = getAllProgrammesOfStudent(students[studentNumber]?.studyRights ?? [], currentSemester)
+    const studentProgrammes = getAllProgrammesOfStudent(student?.studyRights ?? [], currentSemester)
 
     // In case of custompopulation with no programmeCode, use code of latest active studyRightElement
-    const programmeCode = programmeCodeArg ?? programmes[0]?.code
+    const programmeCode: string | undefined = programme ?? studentProgrammes[0]?.code
 
-    const studyRight = findStudyRightForClass(studyRights, programmeCode, year)
-    const studyRightElement = studyRight?.studyRightElements?.find(element => element.code === programmeCode)
-    const secondStudyRightElement = orderBy(
-      (studyRight?.studyRightElements ?? []).filter(element => {
-        if (combinedProgrammeCode) {
-          return element.code === combinedProgrammeCode
-        }
-        if (showBachelorAndMaster && studyRightElement) {
-          const degreeProgrammeTypeToCheck =
-            studyRightElement.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
-              ? 'urn:code:degree-program-type:masters-degree'
-              : 'urn:code:degree-program-type:bachelors-degree'
+    const relevantStudyRight = findStudyRightForClass(student.studyRights, programmeCode, year)
+    const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code }) => code === programmeCode)
+
+    const degreeProgrammeTypeToCheck =
+      relevantStudyRightElement?.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
+        ? 'urn:code:degree-program-type:masters-degree'
+        : 'urn:code:degree-program-type:bachelors-degree'
+
+    const secondStudyRightElement = (relevantStudyRight?.studyRightElements ?? [])
+      .filter(element => {
+        if (combinedProgramme) return element.code === combinedProgramme
+        if (showBachelorAndMaster && !!relevantStudyRightElement)
           return element.degreeProgrammeType === degreeProgrammeTypeToCheck
-        }
-        return false
-      }),
-      ['startDate'],
-      ['desc']
-    )[0]
 
-    studentToStudyrightStartMap.set(studentNumber, studyRight?.startDate ?? null)
-    studentToProgrammeStartMap.set(studentNumber, studyRightElement?.startDate ?? null)
-    studentToStudyrightEndMap.set(studentNumber, studyRightElement?.graduated ? studyRightElement.endDate : null)
+        return false
+      })
+      .toSorted(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)[0]
+
+    studentToStudyrightStartMap.set(studentNumber, relevantStudyRight?.startDate ?? null)
+    studentToProgrammeStartMap.set(studentNumber, relevantStudyRightElement?.startDate ?? null)
+    studentToStudyrightEndMap.set(
+      studentNumber,
+      relevantStudyRightElement?.graduated ? relevantStudyRightElement.endDate : null
+    )
     studentToSecondStudyrightEndMap.set(
       studentNumber,
       secondStudyRightElement?.graduated ? secondStudyRightElement.endDate : null
     )
     studentToPrimaryProgrammeMap.set(
       studentNumber,
-      programmes.find(programme => programme.code === programmeCode)
+      studentProgrammes.find(({ code }) => code === programmeCode)
     )
     studentToOtherProgrammesMap.set(
       studentNumber,
-      programmes.filter(p => p.code !== programmeCode)
+      studentProgrammes.filter(({ code }) => code !== programmeCode)
     )
   }
 
