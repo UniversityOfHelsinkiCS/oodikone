@@ -42,11 +42,10 @@ export const FilterView: FC<{
     () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
     [storeFilterOptions, filters, initialOptions]
   )
-  const orderedFilters = filters.sort((a, b) => a.priority - b.priority)
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
-        orderedFilters
+        filters
           .filter(({ precompute }) => precompute)
           .map(({ precompute, key }) => [
             key,
@@ -57,7 +56,7 @@ export const FilterView: FC<{
             }),
           ])
       ),
-    [orderedFilters]
+    [filters]
   )
 
   const getFilterContext = (key: string): FilterContext => ({
@@ -80,7 +79,7 @@ export const FilterView: FC<{
           .filter(Boolean)
       }, students)
 
-  const filteredStudents = useMemo(() => applyFilters(orderedFilters), [orderedFilters])
+  const filteredStudents = useMemo(() => applyFilters(filters), [filters])
   const filteredCourses = filterCourses(courses, filteredStudents)
 
   const dispatch = useAppDispatch()

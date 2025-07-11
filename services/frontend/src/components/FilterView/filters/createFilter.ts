@@ -50,11 +50,6 @@ export type Filter = {
    */
   render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 
-  /**
-   * Used to determine sort order.
-   */
-  priority?: number
-
   isActive: (opts: FilterContext['options']) => boolean
 }
 
@@ -195,18 +190,6 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * Returns whether the filter is active or not, based on the current options.
    * The filter is evaluated over the student list only when this function returns true.
    * Activity of the filter is also reflected in the user interface.
-   *
-   * ---
-   *
-   * `priority`
-   * Filters' priority determines the order in which filters are evaluated.
-   *
-   * In the normal case, this should not matter. But especially filters which
-   * modify the student data (ikr - sounds bad), this is important.
-   *
-   * The filters with lower priority are executed first.
-   *
-   * @dogamak
    */
   const factory = (args?: any): Filter => ({
     args,
@@ -219,7 +202,6 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
     filter: options.filter,
     precompute: options.precompute,
     render: options.render,
-    priority: options.priority ?? 0,
     isActive: options.isActive,
   })
 
