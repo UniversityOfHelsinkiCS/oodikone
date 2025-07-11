@@ -36,6 +36,8 @@ const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
 export const ageFilter = createFilter({
   key: 'Age',
 
+  title: 'Age',
+
   defaultOptions: {
     min: null,
     max: null,

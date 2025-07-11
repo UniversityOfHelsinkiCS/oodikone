@@ -8,8 +8,9 @@ import { Student } from '..'
 import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
-/** TODO: Find acual types */
-type FilterOptions = {
+export type Filter = {
+  args?: any
+
   /**
    * Non-user visible (unique) identifier for the filter.
    */
@@ -18,7 +19,7 @@ type FilterOptions = {
   /**
    * User visible identifier. Defaults to the key value.
    */
-  title?: string
+  title: string
 
   /**
    * User visible tooltip.
@@ -38,8 +39,27 @@ type FilterOptions = {
    */
   filter: (students: Student, ctx: FilterContext) => boolean
 
-  isActive: (opts: FilterContext['options']) => boolean
+  /**
+   * Precompute filter;
+   * This value is used instead of running the filter again for the population.
+   */
+  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
 
+  /**
+   * Filter tray render component.
+   */
+  render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
+
+  /**
+   * Used to determine sort order.
+   */
+  priority?: number
+
+  isActive: (opts: FilterContext['options']) => boolean
+}
+
+/** TODO: Find acual types */
+type FilterOptions = Filter & {
   /**
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
@@ -51,22 +71,6 @@ type FilterOptions = {
    * NOTE: `reset` will set the value to null, this may not be desired!
    */
   actions?: Record<string, (options: FilterContext['options'], payload: any) => void>
-
-  /**
-   * Precompute filter;
-   * This value is used instead of running the filter again for the population.
-   */
-  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
-
-  /**
-   * Used to determine sort order.
-   */
-  priority?: number
-
-  /**
-   * Filter tray render component.
-   */
-  render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
 }
 
 export type FilterFactory = {
@@ -91,21 +95,6 @@ export type FilterFactory = {
     }
   >
   (args?: any): Filter
-}
-
-export type Filter = {
-  args?: any
-
-  key: FilterOptions['key']
-  title: NonNullable<FilterOptions['title'] | FilterOptions['key']>
-  info: FilterOptions['info']
-
-  defaultOptions: FilterOptions['defaultOptions']
-  filter: FilterOptions['filter']
-  precompute: FilterOptions['precompute']
-  render: FilterOptions['render']
-  priority: number
-  isActive: FilterOptions['isActive']
 }
 
 /**
@@ -223,7 +212,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
     args,
 
     key: options.key,
-    title: options.title ?? options.key,
+    title: options.title,
     info: options.info,
 
     defaultOptions: options.defaultOptions,

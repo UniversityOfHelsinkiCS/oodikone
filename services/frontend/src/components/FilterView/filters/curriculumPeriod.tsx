@@ -45,7 +45,9 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
 }
 
 export const curriculumPeriodFilter = createFilter({
-  key: 'Curriculum period',
+  key: 'CurriculumPeriod',
+
+  title: 'Curriculum period',
 
   defaultOptions: { selected: null },
 
