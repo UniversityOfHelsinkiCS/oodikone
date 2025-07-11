@@ -68,6 +68,8 @@ const TagsFilterCard = ({ options, onOptionsChange, students }) => {
 export const tagsFilter = createFilter({
   key: 'Tags',
 
+  title: 'Tags',
+
   defaultOptions: {
     includedTags: [],
     excludedTags: [],

@@ -53,6 +53,8 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
 export const citizenshipFilter = createFilter({
   key: 'Citizenship',
 
+  title: 'Citizenship',
+
   defaultOptions: {
     selected: '',
   },

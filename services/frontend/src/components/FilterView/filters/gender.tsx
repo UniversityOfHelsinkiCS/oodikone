@@ -44,6 +44,8 @@ const GenderFilterCard = ({ options, onOptionsChange, students }) => {
 export const genderFilter = createFilter({
   key: 'Gender',
 
+  title: 'Gender',
+
   defaultOptions: {
     selected: '',
   },

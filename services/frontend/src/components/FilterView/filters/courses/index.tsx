@@ -74,6 +74,8 @@ const CourseFilterCard: FC<{
 export const courseFilter = createFilter({
   key: 'Courses',
 
+  title: 'Courses',
+
   defaultOptions: {
     courseFilters: {},
   },
