@@ -168,12 +168,12 @@ export const CoursePopulation = () => {
       courses={population?.coursestatistics ?? []}
       displayTray={!isFetching}
       filters={[
-        genderFilter,
-        studentNumberFilter,
-        ageFilter,
+        genderFilter(),
+        studentNumberFilter(),
+        ageFilter(),
         courseFilter({ courses: population?.coursestatistics }),
-        creditsEarnedFilter,
-        startYearAtUniFilter,
+        creditsEarnedFilter(),
+        startYearAtUniFilter(),
         programmeFilter({
           additionalModes: [
             {

@@ -143,20 +143,20 @@ const SingleStudyGroupFilterView = ({ group, population }) => {
   const { data } = useGetSemestersQuery()
   const { semesters: allSemesters } = data ?? { semesters: {} }
   const viewFilters = [
-    filters.studentNumberFilter,
+    filters.studentNumberFilter(),
     filters.enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
       programme: group?.tags?.studyProgramme,
     }),
-    filters.ageFilter,
-    filters.genderFilter,
-    filters.startYearAtUniFilter,
-    filters.tagsFilter,
+    filters.ageFilter(),
+    filters.genderFilter(),
+    filters.startYearAtUniFilter(),
+    filters.tagsFilter(),
     filters.courseFilter({
       courses: population?.coursestatistics ?? [],
     }),
-    filters.creditDateFilter,
-    filters.creditsEarnedFilter,
+    filters.creditDateFilter(),
+    filters.creditsEarnedFilter(),
   ]
 
   if (!group?.tags?.studyProgramme) {

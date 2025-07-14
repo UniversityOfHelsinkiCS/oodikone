@@ -10,7 +10,7 @@ import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { FilterViewContext } from './context'
 import type { FilterContext, FilterViewContextState } from './context'
 
-import type { Filter, FilterFactory } from './filters/createFilter'
+import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 // TODO: Use acual Student type when available
@@ -19,16 +19,14 @@ export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>
 export const FilterView: FC<{
   children: (filteredStudents: Student[], filteredCourses: any[]) => any
   name: string
-  filters: (FilterFactory | Filter)[]
+  filters: Filter[]
   students: Student[]
   courses: CourseStats[]
   displayTray: boolean
   initialOptions: Record<Filter['key'], any>
-}> = ({ children, name, filters: pFilters, students, courses, displayTray, initialOptions }) => {
+}> = ({ children, name, filters, students, courses, displayTray, initialOptions }) => {
   const dispatch = useAppDispatch()
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
-
-  const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
 
   const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
   const filterOptions = useMemo(

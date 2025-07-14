@@ -166,29 +166,29 @@ export const PopulationStatistics = () => {
     useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
   const filters = [
-    !useUserHasRestrictedAccess() ? ageFilter : null,
-    citizenshipFilter,
+    !useUserHasRestrictedAccess() ? ageFilter() : null,
+    citizenshipFilter(),
     courseFilter({ courses: population?.coursestatistics }),
-    creditDateFilter,
-    creditsEarnedFilter,
-    curriculumPeriodFilter,
+    creditDateFilter(),
+    creditsEarnedFilter(),
+    curriculumPeriodFilter(),
     enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
       programme: programmeCode,
     }),
-    genderFilter,
+    genderFilter(),
     graduatedFromProgrammeFilter({
       code: programmeCode,
       combinedProgrammeCode,
       showBachelorAndMaster,
     }),
     hopsFilter({ programmeCode, combinedProgrammeCode }),
-    studentNumberFilter,
-    startYearAtUniFilter,
+    studentNumberFilter(),
+    startYearAtUniFilter(),
     studyTrackFilter({ code: programmeCode }),
     studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
-    tagsFilter,
-    transferredToProgrammeFilter,
+    tagsFilter(),
+    transferredToProgrammeFilter(),
     enableStudyRightTypeFilter ? studyRightTypeFilter({ programme: programmeCode }) : null,
 
     // For combined programme admission type is the same as they started in bachelor programme

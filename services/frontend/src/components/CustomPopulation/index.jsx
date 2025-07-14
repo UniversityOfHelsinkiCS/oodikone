@@ -57,15 +57,15 @@ export const CustomPopulation = () => {
 
   const filters = useMemo(() => {
     const filtersList = [
-      genderFilter,
-      ageFilter,
+      genderFilter(),
+      ageFilter(),
       courseFilter({ courses: population?.coursestatistics ?? [] }),
-      creditsEarnedFilter,
-      transferredToProgrammeFilter,
-      startYearAtUniFilter,
-      tagsFilter,
-      programmeFilter,
-      creditDateFilter,
+      creditsEarnedFilter(),
+      transferredToProgrammeFilter(),
+      startYearAtUniFilter(),
+      tagsFilter(),
+      programmeFilter(),
+      creditDateFilter(),
       enrollmentStatusFilter({
         allSemesters,
         programme: associatedProgramme,
