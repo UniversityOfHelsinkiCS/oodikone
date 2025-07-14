@@ -118,6 +118,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
 
   const opt_actions: NonNullable<FilterOptions['actions']> = Object.assign(options.actions ?? {}, {
     setOptions: (_, value) => value,
+    reset: (..._) => options.defaultOptions,
   })
 
   /**
