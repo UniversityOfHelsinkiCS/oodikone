@@ -110,18 +110,22 @@ export const gradeFilter = createFilter({
   },
 
   actions: {
-    selectGrade(state, grade) {
-      if (state.selected.indexOf(grade) === -1) {
-        state.selected.push(grade)
+    selectGrade(options, grade) {
+      if (options.selected.indexOf(grade) === -1) {
+        options.selected.push(grade)
       }
+
+      return options
     },
 
-    unselectGrade(state, grade) {
-      const index = state.selected.indexOf(grade)
+    unselectGrade(options, grade) {
+      const index = options.selected.indexOf(grade)
 
       if (index !== -1) {
-        state.selected.splice(index, 1)
+        options.selected.splice(index, 1)
       }
+
+      return options
     },
   },
 })

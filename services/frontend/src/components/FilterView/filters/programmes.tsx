@@ -232,6 +232,8 @@ export const programmeFilter = createFilter({
       } else {
         options.selectedProgrammes.splice(index, 1)
       }
+
+      return options
     },
   },
 

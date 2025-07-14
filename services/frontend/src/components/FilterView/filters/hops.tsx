@@ -204,12 +204,16 @@ export const hopsFilter = createFilter({
       options.activeProgramme = !options.activeProgramme
       options.activeCombinedProgramme = false
       options.combinedIsSelected = 'default'
+
+      return options
     },
     toggleCombinedProgramme: (options, combinedProgrammeCode) => {
       options.activeProgramme = false
       options.activeCombinedProgramme = !options.activeCombinedProgramme
       options.combinedIsSelected =
         options.combinedIsSelected === combinedProgrammeCode ? 'default' : combinedProgrammeCode
+
+      return options
     },
   },
 

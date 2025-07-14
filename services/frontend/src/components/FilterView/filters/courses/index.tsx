@@ -112,6 +112,8 @@ export const courseFilter = createFilter({
       } else {
         delete options.courseFilters[code]
       }
+
+      return options
     },
   },
 })

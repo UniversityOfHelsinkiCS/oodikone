@@ -184,21 +184,29 @@ export const studentNumberFilter = createFilter({
     addToAllowlist: (options, students) => {
       const sns = formatToArray(students)
       options.allowlist = union(options.allowlist, sns)
+
+      return options
     },
 
     setAllowlist: (options, students) => {
       const sns = formatToArray(students)
       options.allowlist = sns
+
+      return options
     },
 
     addToBlocklist: (options, students) => {
       const sns = formatToArray(students)
       options.blocklist = union(options.blocklist, sns)
+
+      return options
     },
 
     setBlocklist: (options, students) => {
       const sns = formatToArray(students)
       options.blocklist = sns
+
+      return options
     },
   },
 

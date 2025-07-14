@@ -7,7 +7,7 @@ import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
 type Selector<T, R> = (options: FilterContext['options'], args: T) => R
-type Action<P> = (options: FilterContext['options'], payload: P) => void
+type Action<P> = (options: FilterContext['options'], payload: P) => FilterContext['options']
 
 export type Filter = {
   args?: any
@@ -138,12 +138,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
           view,
           filter: options.key,
           action: `${options.key}/${key}`,
-          options: (() => {
-            const newOpts = structuredClone(ctx.options)
-            action(newOpts, payload)
-
-            return newOpts
-          })(),
+          options: action(structuredClone(ctx.options), payload),
         })
       },
     ]

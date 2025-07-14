@@ -63,6 +63,8 @@ export const transferredToProgrammeFilter = createFilter({
   actions: {
     set: (options, value) => {
       options.transferred = value
+
+      return options
     },
     // Toggle between 'null' -> 'All' and 'false' -> 'Not transferred'
     toggle: options => {
@@ -71,6 +73,8 @@ export const transferredToProgrammeFilter = createFilter({
       } else {
         options.transferred = null
       }
+
+      return options
     },
   },
 
