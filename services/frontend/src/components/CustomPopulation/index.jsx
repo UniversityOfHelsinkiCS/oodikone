@@ -82,6 +82,7 @@ export const CustomPopulation = () => {
       courses={population?.coursestatistics ?? []}
       displayTray={custompop.length > 0}
       filters={filters}
+      initialOptions={[]}
       name="CustomPopulation"
       students={custompop}
     >

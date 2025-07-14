@@ -31,19 +31,20 @@ export const FilterTray = () => {
   const filterSet = filters
     .sort(({ title: a }, { title: b }) => a.localeCompare(b))
     .map(filter => {
-      const { key, render } = filter
+      const { key, isActive, render } = filter
       const ctx = getContextByKey(key)
 
       const props: FilterTrayProps = {
         options: ctx.options,
-        onOptionsChange: options => {
-          setFilterOptions(key, options)
-        },
+        onOptionsChange: options => setFilterOptions(key, options),
         students: allStudents.slice(), // Copy instead of move
       }
 
+      const active = isActive(ctx.options)
+      const onClear = () => resetFilter(key)
+
       return (
-        <FilterCard filter={filter} key={key} onClear={() => resetFilter(key)} options={ctx.options}>
+        <FilterCard active={active} filter={filter} key={key} onClear={onClear}>
           {render(props, ctx)}
         </FilterCard>
       )

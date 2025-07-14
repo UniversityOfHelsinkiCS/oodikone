@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
-import { keyBy } from '@oodikone/shared/util'
 
 import { FilterViewContext } from './context'
 import type { FilterContext, FilterViewContextState } from './context'
@@ -17,15 +16,6 @@ import { FilterTray } from './FilterTray'
 // TODO: Use acual Student type when available
 export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
-const resolveFilterOptions = <T,>(
-  store: Record<Filter['key'], FilterContext>,
-  filters: Filter[],
-  initialOptions?: Record<Filter['key'], T>
-): Record<Filter['key'], any> =>
-  Object.fromEntries(
-    filters.map(({ key, defaultOptions }) => [key, store[key]?.options ?? initialOptions?.[key] ?? defaultOptions])
-  )
-
 export const FilterView: FC<{
   children: (filteredStudents: Student[], filteredCourses: any[]) => any
   name: string
@@ -33,26 +23,36 @@ export const FilterView: FC<{
   students: Student[]
   courses: CourseStats[]
   displayTray: boolean
-  initialOptions?: Record<Filter['key'], any>
+  initialOptions: Record<Filter['key'], any>
 }> = ({ children, name, filters: pFilters, students, courses, displayTray, initialOptions }) => {
+  const dispatch = useAppDispatch()
   const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
+
   const filters: Filter[] = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
-  const filtersByKey = keyBy(filters, 'key')
+
+  const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
   const filterOptions = useMemo(
-    () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
-    [storeFilterOptions, filters, initialOptions]
+    () =>
+      Object.fromEntries(
+        filters.map(({ key, defaultOptions }) => [
+          key,
+          storeFilterOptions[key]?.options ?? initialOptions?.[key] ?? defaultOptions,
+        ])
+      ),
+    [filters, initialOptions, storeFilterOptions]
   )
+
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
         filters
-          .filter(({ precompute }) => precompute)
+          .filter(({ precompute }) => !!precompute)
           .map(({ precompute, key }) => [
             key,
             precompute!({
               students,
               options: filterOptions[key],
-              args: filtersByKey[key].args,
+              args: filterArgs[key],
             }),
           ])
       ),
@@ -63,28 +63,22 @@ export const FilterView: FC<{
     students,
     precomputed: precomputed[key] ?? null,
     options: filterOptions[key] ?? {},
-    args: filtersByKey[key]?.args ?? null,
+    args: filterArgs[key] ?? null,
   })
 
-  const applyFilters = (filters: Filter[]) =>
-    filters
-      .map(filter => ({ filter, ctx: getFilterContext(filter.key) }))
-      .filter(({ filter: { key, isActive } }) => isActive(filterOptions[key]))
-      .reduce((students, { filter: { filter }, ctx }) => {
-        return students
-          .map(student => {
-            const newStudent = structuredClone(student)
-            return filter(newStudent, ctx) ? newStudent : null
-          })
-          .filter(Boolean)
-      }, students)
-
-  const filteredStudents = useMemo(() => applyFilters(filters), [filters])
+  const filteredStudents = useMemo(
+    () =>
+      filters
+        .filter(({ key, isActive }) => isActive(filterOptions[key]))
+        .map(({ key, filter }) => ({ key, filter }))
+        .reduce((students, { key, filter }) => {
+          return students.filter(student => filter(structuredClone(student), getFilterContext(key)))
+        }, students),
+    [filters]
+  )
   const filteredCourses = filterCourses(courses, filteredStudents)
 
-  const dispatch = useAppDispatch()
-
-  const value: FilterViewContextState = {
+  const ctxState: FilterViewContextState = {
     viewName: name,
     allStudents: students,
     filters,
@@ -97,7 +91,7 @@ export const FilterView: FC<{
   }
 
   return (
-    <FilterViewContext.Provider value={value}>
+    <FilterViewContext.Provider value={ctxState}>
       <Stack direction="row" sx={{ alignContent: 'center' }}>
         {displayTray && <FilterTray />}
         {children(filteredStudents, filteredCourses)}
