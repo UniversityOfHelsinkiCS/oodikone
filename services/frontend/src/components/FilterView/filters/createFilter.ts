@@ -1,5 +1,3 @@
-import { produce } from 'immer'
-
 import { ReactNode } from 'react'
 import { setFilterOptions } from '@/redux/filters'
 import { mapValues } from '@oodikone/shared/util'
@@ -120,7 +118,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
 
   const opt_actions: NonNullable<FilterOptions['actions']> = Object.assign(options.actions ?? {}, {
     setOptions: (_, value) => value,
-    reset: (..._) => null,
+    reset: (..._) => options.defaultOptions,
   })
 
   /**
@@ -140,7 +138,12 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
           view,
           filter: options.key,
           action: `${options.key}/${key}`,
-          options: produce(ctx.options, (draft: FilterContext['options']) => action(draft, payload)),
+          options: (() => {
+            const newOpts = structuredClone(ctx.options)
+            action(newOpts, payload)
+
+            return newOpts
+          })(),
         })
       },
     ]

@@ -1,4 +1,3 @@
-import { produce } from 'immer'
 import { keyBy } from 'lodash'
 import { FC } from 'react'
 import { Dropdown, type DropdownProps } from 'semantic-ui-react'
@@ -32,10 +31,13 @@ const CourseFilterCard: FC<{
 
   const setCourseFilter = (code, type) =>
     onOptionsChange(
-      produce(options, draft => {
-        draft.courseFilters[code] = type
-        if (type === null) delete draft.courseFilters[code]
-      })
+      (() => {
+        const newOpts = structuredClone(options)
+        newOpts.courseFilters[code] = type
+        if (type === null) delete newOpts.courseFilters[code]
+
+        return newOpts
+      })()
     )
 
   const onChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {

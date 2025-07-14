@@ -15,7 +15,7 @@ const defaultFilterContext: FilterContext = {
   students: [],
   precomputed: null,
   options: {},
-  args: null,
+  args: undefined,
 }
 
 export type FilterViewContextState = {
