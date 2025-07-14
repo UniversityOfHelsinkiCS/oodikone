@@ -17,10 +17,7 @@ const slice = createSlice({
 
     resetFilter(state, action) {
       const { view, filter } = action.payload
-
-      if (state.views[view]?.[filter]) {
-        delete state.views[view][filter]
-      }
+      delete state.views[view]?.[filter]
     },
 
     resetViewFilters(state, action) {

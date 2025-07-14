@@ -6,12 +6,7 @@ export const useFilters = () => {
   const dispatch = useAppDispatch()
   const { getContextByKey, viewName } = useContext(FilterViewContext)
 
-  const filterDispatch = filterAction => {
-    dispatch({
-      ...filterAction(viewName, getContextByKey),
-      filterAction: filterAction.actionName,
-    })
-  }
+  const filterDispatch = filterAction => dispatch(filterAction(viewName, getContextByKey))
 
   const useFilterSelector = filterSelector => {
     const { options } = getContextByKey(filterSelector.filter)

@@ -137,7 +137,6 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
         return setFilterOptions({
           view,
           filter: options.key,
-          action: `${options.key}/${key}`,
           options: action(structuredClone(ctx.options), payload),
         })
       },
