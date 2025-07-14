@@ -3,7 +3,8 @@ import { Form, Radio } from 'semantic-ui-react'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { createFilter } from './createFilter'
 
-const StudyRightStatusFilterCard = ({ options, onOptionsChange, combinedProgrammeCode, showBachelorAndMaster }) => {
+const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }) => {
+  const { combinedProgrammeCode, showBachelorAndMaster } = args
   const { activeProgramme, activeCombinedProgramme } = options
 
   const toggle = (buttonValue, type) => () =>
@@ -130,11 +131,5 @@ export const studyRightStatusFilter = createFilter({
     return false
   },
 
-  render: (props, { args }) => (
-    <StudyRightStatusFilterCard
-      {...props}
-      combinedProgrammeCode={args.combinedProgrammeCode}
-      showBachelorAndMaster={args.showBachelorAndMaster}
-    />
-  ),
+  render: StudyRightStatusFilterCard,
 })

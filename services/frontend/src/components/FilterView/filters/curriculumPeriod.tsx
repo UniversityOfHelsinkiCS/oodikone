@@ -1,8 +1,9 @@
 import { Form, Dropdown, type DropdownItemProps } from 'semantic-ui-react'
 
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }) => {
+const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const { selected } = options
 
   const dropdownOptions: DropdownItemProps[] = Array.from(

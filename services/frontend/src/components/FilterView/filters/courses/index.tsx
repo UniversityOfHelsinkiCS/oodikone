@@ -1,9 +1,7 @@
 import { keyBy } from 'lodash'
-import { FC } from 'react'
 import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import type { FilterContext } from '../../context'
 import type { FilterTrayProps } from '../../FilterTray'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
@@ -11,11 +9,8 @@ import { FilterType } from './filterType'
 
 type CourseStats = Record<string, any>
 
-const CourseFilterCard: FC<{
-  courseStats: CourseStats
-  options: FilterTrayProps['options']
-  onOptionsChange: FilterContext['precomputed']
-}> = ({ courseStats, options, onOptionsChange }) => {
+const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
+  const courseStats: CourseStats = precomputed
   const { courseFilters } = options ?? {}
   const { getTextIn } = useLanguage()
 
@@ -104,7 +99,7 @@ export const courseFilter = createFilter({
     return true
   },
 
-  render: (props, { precomputed }) => <CourseFilterCard {...props} courseStats={precomputed} />,
+  render: CourseFilterCard,
 
   selectors: {
     isCourseSelected: ({ courseFilters }, course) => !!courseFilters[course],

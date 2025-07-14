@@ -1,9 +1,10 @@
 import { Form, Dropdown } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }) => {
+const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const name = 'startYearAtUni'
   const { selected } = options
 

@@ -69,11 +69,10 @@ export const FilterView: FC<{
     () =>
       filters
         .filter(({ key, isActive }) => isActive(filterOptions[key]))
-        .map(({ key, filter }) => ({ key, filter }))
         .reduce((students, { key, filter }) => {
           return students.filter(student => filter(structuredClone(student), getFilterContext(key)))
         }, students),
-    [filters]
+    [filters, filterOptions]
   )
   const filteredCourses = filterCourses(courses, filteredStudents)
 

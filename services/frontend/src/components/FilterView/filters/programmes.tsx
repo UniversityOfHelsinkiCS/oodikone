@@ -11,7 +11,9 @@ dayjs.extend(isSameOrAfter)
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-const ProgrammeFilterCard = ({ additionalModes, onOptionsChange, options, studentToProgrammeMap, students }) => {
+const ProgrammeFilterCard = ({ args, onOptionsChange, options, precomputed: studentToProgrammeMap, students }) => {
+  const additionalModes = args?.additionalModes ?? []
+
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
 
@@ -233,13 +235,7 @@ export const programmeFilter = createFilter({
     },
   },
 
-  render: (props, { precomputed: studentToProgrammeMap, args }) => (
-    <ProgrammeFilterCard
-      {...props}
-      additionalModes={args?.additionalModes ?? []}
-      studentToProgrammeMap={studentToProgrammeMap}
-    />
-  ),
+  render: ProgrammeFilterCard,
 })
 
 export const { isProgrammeSelected } = programmeFilter.selectors

@@ -1,5 +1,6 @@
 import { Form, Radio } from 'semantic-ui-react'
 
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 const STUDYRIGHT_TYPES = {
@@ -8,7 +9,7 @@ const STUDYRIGHT_TYPES = {
   master: { label: 'Master only', value: 2 },
 }
 
-const StudyRightTypeFilterCard = ({ options, onOptionsChange }) => {
+const StudyRightTypeFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
   const { mode } = options
 
   const modeOptions = Object.entries(STUDYRIGHT_TYPES).map(([key, studyRightType]) => ({

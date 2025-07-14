@@ -10,10 +10,9 @@ import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
 
 export type FilterTrayProps = {
-  options: FilterContext['options']
-  onOptionsChange: (options) => void
   students: Student[]
-}
+  onOptionsChange: (options: FilterContext['options']) => void
+} & FilterContext
 
 export const FilterTray = () => {
   const {
@@ -34,18 +33,18 @@ export const FilterTray = () => {
       const { key, isActive, render } = filter
       const ctx = getContextByKey(key)
 
-      const props: FilterTrayProps = {
-        options: ctx.options,
-        onOptionsChange: options => setFilterOptions(key, options),
-        students: allStudents.slice(), // Copy instead of move
-      }
-
       const active = isActive(ctx.options)
       const onClear = () => resetFilter(key)
 
+      const props: FilterTrayProps = {
+        students: allStudents.slice(), // Copy instead of move
+        onOptionsChange: options => setFilterOptions(key, options),
+        ...ctx,
+      }
+
       return (
         <FilterCard active={active} filter={filter} key={key} onClear={onClear}>
-          {render(props, ctx)}
+          {render(props)}
         </FilterCard>
       )
     })

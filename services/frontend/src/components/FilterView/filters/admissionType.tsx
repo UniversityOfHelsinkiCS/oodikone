@@ -1,4 +1,5 @@
 import { ADMISSION_TYPES } from '@/common'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
@@ -18,7 +19,8 @@ export const filter = code => value => student => {
   )
 }
 
-const AdmissionTypeFilterCard = ({ options, onOptionsChange, students, code }) => {
+const AdmissionTypeFilterCard = ({ args, options, onOptionsChange, students }: FilterTrayProps) => {
+  const code = args.programme
   const { selected } = options
   const count = (admissionType: string | null): number => students.filter(filter(code)(admissionType)).length
 
@@ -66,5 +68,5 @@ export const admissionTypeFilter = createFilter({
     return filter(args.programme)(selected)(student)
   },
 
-  render: (props, { args }) => <AdmissionTypeFilterCard {...props} code={args.programme} />,
+  render: AdmissionTypeFilterCard,
 })

@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
-import { FC } from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
 
 import { useFilters } from '@/components/FilterView/useFilters'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 import { creditDateFilter } from './date'
 
@@ -29,11 +29,7 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
   )
 }
 
-const HopsFilterCard: FC<{
-  options: any
-  onOptionsChange: any
-  combinedProgramme: any
-}> = ({ options, onOptionsChange, combinedProgramme }) => {
+const HopsFilterCard = ({ options, onOptionsChange, precomputed: combinedProgramme }: FilterTrayProps) => {
   const { selectedStartDate } = creditDateFilter.selectors
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
@@ -217,5 +213,5 @@ export const hopsFilter = createFilter({
     },
   },
 
-  render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
+  render: HopsFilterCard,
 })

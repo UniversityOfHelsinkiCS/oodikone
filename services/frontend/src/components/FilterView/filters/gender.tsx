@@ -1,5 +1,6 @@
 import { Form, Dropdown } from 'semantic-ui-react'
 
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 const GENDERS = {
@@ -9,7 +10,7 @@ const GENDERS = {
   unknown: { label: 'Unknown', value: 0 },
 }
 
-const GenderFilterCard = ({ options, onOptionsChange, students }) => {
+const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const { selected } = options
 
   const count = (genderCode: number) => students.filter(student => Number(student.gender_code) === genderCode).length

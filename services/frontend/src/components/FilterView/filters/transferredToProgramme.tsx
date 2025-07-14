@@ -1,9 +1,10 @@
 import { Form, Radio } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
+const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
   const { transferred } = options
 
   const toggle = buttonValue => () =>

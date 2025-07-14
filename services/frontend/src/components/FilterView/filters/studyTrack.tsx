@@ -2,9 +2,11 @@ import { Dropdown, Form } from 'semantic-ui-react'
 import type { DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const StudyTrackFilterCard = ({ code, onOptionsChange, options, students }) => {
+const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: FilterTrayProps) => {
+  const { code } = args
   const { selected } = options
   const { getTextIn } = useLanguage()
 
@@ -73,5 +75,5 @@ export const studyTrackFilter = createFilter({
       .some(element => selected.includes(element.studyTrack.code))
   },
 
-  render: (props, { args }) => <StudyTrackFilterCard {...props} code={args.code} />,
+  render: StudyTrackFilterCard,
 })

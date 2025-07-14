@@ -49,7 +49,7 @@ export type Filter = {
   /**
    * Filter tray render component.
    */
-  render: (props: FilterTrayProps, ctx: FilterContext) => ReactNode
+  render: (props: FilterTrayProps) => ReactNode
 
   isActive: Selector<void, boolean>
 }

@@ -1,8 +1,9 @@
-import { FC } from 'react'
 import { Dropdown, Form } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import type { SemestersData } from '@/redux/semesters'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 const STATUS_OPTIONS = [
@@ -11,11 +12,8 @@ const STATUS_OPTIONS = [
   { key: 'enrl-status-inactive', text: 'Passive', value: 3 },
 ]
 
-const EnrollmentStatusFilterCard: FC<{
-  options: any
-  onOptionsChange: any
-  allSemesters: Record<string, any>
-}> = ({ options, onOptionsChange, allSemesters }) => {
+const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
+  const allSemesters = args.allSemesters as SemestersData['semesters']
   const name = 'enrollmentStatusFilter'
   const { getTextIn } = useLanguage()
 
@@ -119,5 +117,5 @@ export const enrollmentStatusFilter = createFilter({
     })
   },
 
-  render: (props, { args }) => <EnrollmentStatusFilterCard {...props} allSemesters={args.allSemesters} />,
+  render: EnrollmentStatusFilterCard,
 })
