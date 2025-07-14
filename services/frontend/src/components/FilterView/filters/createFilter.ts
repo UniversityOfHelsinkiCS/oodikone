@@ -69,7 +69,7 @@ type FilterOptions = Filter & {
   actions?: Record<string, Action<any>>
 }
 
-export type FilterFactory = {
+type FilterFactory = {
   key: string
   actions: Record<
     string,
