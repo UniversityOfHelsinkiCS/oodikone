@@ -4,18 +4,9 @@ import type { Student } from '.'
 import type { Filter } from './filters/createFilter'
 
 export type FilterContext = {
-  students: Student[]
   precomputed: any // can be null
   options: Record<string, any>
   args: any // can be null
-}
-
-export const getDefaultFilterContext = () => ({ ...defaultFilterContext })
-const defaultFilterContext: FilterContext = {
-  students: [],
-  precomputed: null,
-  options: {},
-  args: undefined,
 }
 
 export type FilterViewContextState = {
@@ -36,7 +27,11 @@ const defaultState: FilterViewContextState = {
   allStudents: [],
   filters: [],
   filteredStudents: [],
-  getContextByKey: () => getDefaultFilterContext(),
+  getContextByKey: () => ({
+    precomputed: null,
+    options: {},
+    args: undefined,
+  }),
   setFilterOptions: () => {},
   resetFilter: () => {},
   resetFilters: () => {},

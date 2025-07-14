@@ -44,7 +44,7 @@ export type Filter = {
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (ctx: Omit<FilterContext, 'precomputed'>) => any
+  precompute?: (ctx: Omit<FilterContext, 'precomputed'> & { students: Student[] }) => any
 
   /**
    * Filter tray render component.

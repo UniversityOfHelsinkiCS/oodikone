@@ -36,7 +36,7 @@ export const FilterView: FC<{
       Object.fromEntries(
         filters.map(({ key, defaultOptions }) => [
           key,
-          storeFilterOptions[key]?.options ?? initialOptions?.[key] ?? defaultOptions,
+          storeFilterOptions[key] ?? initialOptions?.[key] ?? defaultOptions,
         ])
       ),
     [filters, initialOptions, storeFilterOptions]
@@ -50,7 +50,7 @@ export const FilterView: FC<{
           .map(({ precompute, key }) => [
             key,
             precompute!({
-              students,
+              students: students.slice(), // Copy instead of pass
               options: filterOptions[key],
               args: filterArgs[key],
             }),
@@ -60,7 +60,6 @@ export const FilterView: FC<{
   )
 
   const getFilterContext = (key: string): FilterContext => ({
-    students,
     precomputed: precomputed[key] ?? null,
     options: filterOptions[key] ?? {},
     args: filterArgs[key] ?? null,

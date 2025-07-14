@@ -27,7 +27,7 @@ export const FilterTray = () => {
     areOptionsDirty,
   } = useContext(FilterViewContext)
 
-  const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
+  const filterOptionsSet = filters.some(({ key }) => areOptionsDirty(key))
   const filterSet = filters
     .sort(({ title: a }, { title: b }) => a.localeCompare(b))
     .map(filter => {
@@ -69,7 +69,7 @@ export const FilterTray = () => {
         <Typography component="span" fontSize="1.1em">
           Showing {filteredStudents.length} out of {allStudents.length} students
         </Typography>
-        {haveOptionsBeenChanged && (
+        {filterOptionsSet && (
           <Button
             color="inherit"
             data-cy="reset-all-filters"
