@@ -2,6 +2,7 @@ import 'dayjs/locale/fi'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
+import { FilterTrayProps } from '../../FilterTray'
 import { createFilter } from '../createFilter'
 
 /**
@@ -9,7 +10,7 @@ import { createFilter } from '../createFilter'
  * Unlike other filters, this one does not filter out students from the population. Rather it
  * operates on the students' courses, filtering them according to the date range input.
  */
-const CreditDateFilterCard = ({ options, onOptionsChange }) => {
+const CreditDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
   const { startDate, endDate } = options
 
   return (
@@ -34,8 +35,6 @@ export const creditDateFilter = createFilter({
   title: 'Date of course credits',
 
   info: filterToolTips.courseCredits,
-
-  priority: 100,
 
   defaultOptions: {
     startDate: null,

@@ -3,10 +3,11 @@ import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
 import { useDebounce } from '@/hooks/debounce'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterRange } from './common/FilterRange'
 import { createFilter } from './createFilter'
 
-const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
+const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds }: FilterTrayProps) => {
   const { min, max } = bounds
 
   const onChange = ([min, max]) => {
@@ -61,5 +62,5 @@ export const creditsEarnedFilter = createFilter({
     return !(min !== null && credits < min) && !(max !== null && credits > max)
   },
 
-  render: (props, { precomputed }) => <CreditsEarnedFilterCard {...props} bounds={precomputed} />,
+  render: CreditsEarnedFilterCard,
 })

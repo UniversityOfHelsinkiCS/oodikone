@@ -10,10 +10,9 @@ import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
 
 export type FilterTrayProps = {
-  options: FilterContext['options']
-  onOptionsChange: (options) => void
   students: Student[]
-}
+  onOptionsChange: (options: FilterContext['options']) => void
+} & FilterContext
 
 export const FilterTray = () => {
   const {
@@ -27,24 +26,25 @@ export const FilterTray = () => {
     areOptionsDirty,
   } = useContext(FilterViewContext)
 
-  const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
+  const filterOptionsSet = filters.some(({ key }) => areOptionsDirty(key))
   const filterSet = filters
     .sort(({ title: a }, { title: b }) => a.localeCompare(b))
     .map(filter => {
-      const { key, render } = filter
+      const { key, isActive, render } = filter
       const ctx = getContextByKey(key)
 
+      const active = isActive(ctx.options)
+      const onClear = () => resetFilter(key)
+
       const props: FilterTrayProps = {
-        options: ctx.options,
-        onOptionsChange: options => {
-          setFilterOptions(key, options)
-        },
         students: allStudents.slice(), // Copy instead of move
+        onOptionsChange: options => setFilterOptions(key, options),
+        ...ctx,
       }
 
       return (
-        <FilterCard filter={filter} key={key} onClear={() => resetFilter(key)} options={ctx.options}>
-          {render(props, ctx)}
+        <FilterCard active={active} filter={filter} key={key} onClear={onClear}>
+          {render(props)}
         </FilterCard>
       )
     })
@@ -68,7 +68,7 @@ export const FilterTray = () => {
         <Typography component="span" fontSize="1.1em">
           Showing {filteredStudents.length} out of {allStudents.length} students
         </Typography>
-        {haveOptionsBeenChanged && (
+        {filterOptionsSet && (
           <Button
             color="inherit"
             data-cy="reset-all-filters"

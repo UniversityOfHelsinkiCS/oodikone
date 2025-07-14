@@ -2,10 +2,11 @@ import { useCallback, useMemo } from 'react'
 
 import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterRange } from './common/FilterRange'
 import { createFilter } from './createFilter'
 
-const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
+const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: FilterTrayProps) => {
   const { min, max } = bounds
 
   const onChange = useCallback(
@@ -36,6 +37,8 @@ const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
 export const ageFilter = createFilter({
   key: 'Age',
 
+  title: 'Age',
+
   defaultOptions: {
     min: null,
     max: null,
@@ -59,5 +62,5 @@ export const ageFilter = createFilter({
     return !(min !== null && min > age) && !(max !== null && max < age)
   },
 
-  render: (props, { precomputed }) => <AgeFilterCard {...props} bounds={precomputed} />,
+  render: AgeFilterCard,
 })

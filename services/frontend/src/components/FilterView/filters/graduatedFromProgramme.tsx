@@ -1,7 +1,11 @@
 import { Form, Radio } from 'semantic-ui-react'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombinedExtent, isLicentiate }) => {
+const GraduatedFromProgrammeFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
+  const isCombinedExtent = !!args.code && (!!args.combinedProgrammeCode || !!args.showBachelorAndMaster)
+  const isLicentiate = args.combinedProgrammeCode === 'MH90_001'
+
   const { mode } = options
   const typeOfCombined = isLicentiate ? 'Licentiate' : 'Master'
   const modeOptions = isCombinedExtent
@@ -84,11 +88,5 @@ export const graduatedFromProgrammeFilter = createFilter({
     return keepGraduated === hasGraduated
   },
 
-  render: (props, { args }) => (
-    <GraduatedFromProgrammeFilterCard
-      {...props}
-      isCombinedExtent={!!args.code && (!!args.combinedProgrammeCode || !!args.showBachelorAndMaster)}
-      isLicentiate={args.combinedProgrammeCode === 'MH90_001'}
-    />
-  ),
+  render: GraduatedFromProgrammeFilterCard,
 })

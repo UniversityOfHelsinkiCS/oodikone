@@ -4,6 +4,7 @@ import { Button, Icon } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { formatToArray } from '@oodikone/shared/util'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 const IconButton = ({ onClick, ...props }) => (
@@ -104,7 +105,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
   )
 }
 
-const StudentNumberFilterCard = ({ options, onOptionsChange, students }) => {
+const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const swapLists = () => {
     onOptionsChange({
       allowlist: options.blocklist,
@@ -177,27 +178,35 @@ export const studentNumberFilter = createFilter({
     )
   },
 
-  render: props => <StudentNumberFilterCard {...props} />,
+  render: StudentNumberFilterCard,
 
   actions: {
     addToAllowlist: (options, students) => {
       const sns = formatToArray(students)
       options.allowlist = union(options.allowlist, sns)
+
+      return options
     },
 
     setAllowlist: (options, students) => {
       const sns = formatToArray(students)
       options.allowlist = sns
+
+      return options
     },
 
     addToBlocklist: (options, students) => {
       const sns = formatToArray(students)
       options.blocklist = union(options.blocklist, sns)
+
+      return options
     },
 
     setBlocklist: (options, students) => {
       const sns = formatToArray(students)
       options.blocklist = sns
+
+      return options
     },
   },
 

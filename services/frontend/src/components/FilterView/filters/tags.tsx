@@ -1,8 +1,9 @@
 import { Form, Dropdown, Message } from 'semantic-ui-react'
 
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const TagsFilterCard = ({ options, onOptionsChange, students }) => {
+const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
@@ -67,6 +68,8 @@ const TagsFilterCard = ({ options, onOptionsChange, students }) => {
 
 export const tagsFilter = createFilter({
   key: 'Tags',
+
+  title: 'Tags',
 
   defaultOptions: {
     includedTags: [],

@@ -1,10 +1,7 @@
-import { produce } from 'immer'
 import { keyBy } from 'lodash'
-import { FC } from 'react'
 import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import type { FilterContext } from '../../context'
 import type { FilterTrayProps } from '../../FilterTray'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
@@ -12,11 +9,8 @@ import { FilterType } from './filterType'
 
 type CourseStats = Record<string, any>
 
-const CourseFilterCard: FC<{
-  courseStats: CourseStats
-  options: FilterTrayProps['options']
-  onOptionsChange: FilterContext['precomputed']
-}> = ({ courseStats, options, onOptionsChange }) => {
+const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
+  const courseStats: CourseStats = precomputed
   const { courseFilters } = options ?? {}
   const { getTextIn } = useLanguage()
 
@@ -32,10 +26,13 @@ const CourseFilterCard: FC<{
 
   const setCourseFilter = (code, type) =>
     onOptionsChange(
-      produce(options, draft => {
-        draft.courseFilters[code] = type
-        if (type === null) delete draft.courseFilters[code]
-      })
+      (() => {
+        const newOpts = structuredClone(options)
+        newOpts.courseFilters[code] = type
+        if (type === null) delete newOpts.courseFilters[code]
+
+        return newOpts
+      })()
     )
 
   const onChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
@@ -74,6 +71,8 @@ const CourseFilterCard: FC<{
 export const courseFilter = createFilter({
   key: 'Courses',
 
+  title: 'Courses',
+
   defaultOptions: {
     courseFilters: {},
   },
@@ -100,7 +99,7 @@ export const courseFilter = createFilter({
     return true
   },
 
-  render: (props, { precomputed }) => <CourseFilterCard {...props} courseStats={precomputed} />,
+  render: CourseFilterCard,
 
   selectors: {
     isCourseSelected: ({ courseFilters }, course) => !!courseFilters[course],
@@ -113,6 +112,8 @@ export const courseFilter = createFilter({
       } else {
         delete options.courseFilters[code]
       }
+
+      return options
     },
   },
 })

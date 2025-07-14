@@ -1,9 +1,10 @@
 import { Form, Radio } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
-const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
+const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
   const { transferred } = options
 
   const toggle = buttonValue => () =>
@@ -62,6 +63,8 @@ export const transferredToProgrammeFilter = createFilter({
   actions: {
     set: (options, value) => {
       options.transferred = value
+
+      return options
     },
     // Toggle between 'null' -> 'All' and 'false' -> 'Not transferred'
     toggle: options => {
@@ -70,6 +73,8 @@ export const transferredToProgrammeFilter = createFilter({
       } else {
         options.transferred = null
       }
+
+      return options
     },
   },
 

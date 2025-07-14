@@ -2,13 +2,15 @@ import fp from 'lodash/fp'
 import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 /**
  * Grade filter.
  * Only applicable to a single course.
  */
-const GradeFilterCard = ({ options, onOptionsChange, grades, students }) => {
+const GradeFilterCard = ({ options, onOptionsChange, students, precomputed }: FilterTrayProps) => {
+  const { grades } = precomputed
   const { selected } = options
   const name = 'gradeFilter'
 
@@ -61,6 +63,8 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, students }) => {
 export const gradeFilter = createFilter({
   key: 'Grade',
 
+  title: 'Grade',
+
   defaultOptions: {
     selected: [],
   },
@@ -97,7 +101,7 @@ export const gradeFilter = createFilter({
     return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))
   },
 
-  render: (props, { precomputed }) => <GradeFilterCard {...props} grades={precomputed.grades} />,
+  render: GradeFilterCard,
 
   selectors: {
     isGradeSelected: ({ selected }, grade) => {
@@ -106,18 +110,22 @@ export const gradeFilter = createFilter({
   },
 
   actions: {
-    selectGrade(state, grade) {
-      if (state.selected.indexOf(grade) === -1) {
-        state.selected.push(grade)
+    selectGrade(options, grade) {
+      if (options.selected.indexOf(grade) === -1) {
+        options.selected.push(grade)
       }
+
+      return options
     },
 
-    unselectGrade(state, grade) {
-      const index = state.selected.indexOf(grade)
+    unselectGrade(options, grade) {
+      const index = options.selected.indexOf(grade)
 
       if (index !== -1) {
-        state.selected.splice(index, 1)
+        options.selected.splice(index, 1)
       }
+
+      return options
     },
   },
 })

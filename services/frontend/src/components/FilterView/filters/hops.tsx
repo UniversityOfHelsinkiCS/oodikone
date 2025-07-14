@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
-import { FC } from 'react'
 import { Radio, Button, Form } from 'semantic-ui-react'
 
 import { useFilters } from '@/components/FilterView/useFilters'
+import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 import { creditDateFilter } from './date'
 
@@ -29,11 +29,7 @@ const getCutStudyStart = ({ options, filterDispatch }) => {
   )
 }
 
-const HopsFilterCard: FC<{
-  options: any
-  onOptionsChange: any
-  combinedProgramme: any
-}> = ({ options, onOptionsChange, combinedProgramme }) => {
+const HopsFilterCard = ({ options, onOptionsChange, precomputed: combinedProgramme }: FilterTrayProps) => {
   const { selectedStartDate } = creditDateFilter.selectors
   const { filterDispatch, useFilterSelector } = useFilters()
   const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
@@ -154,8 +150,6 @@ export const hopsFilter = createFilter({
 
   title: 'Personal study plan',
 
-  priority: -200,
-
   defaultOptions: {
     activeProgramme: false,
     activeCombinedProgramme: false,
@@ -201,14 +195,8 @@ export const hopsFilter = createFilter({
 
   selectors: {
     isPrimarySelected: ({ activeProgramme }) => !!activeProgramme,
-    isCombinedSelected: ({ combinedIsSelected }, code) => {
-      // TODO: fix args being needlessly cast into array in createFilter
-      return combinedIsSelected === code[0]
-    },
-    isBothSelected: ({ combinedIsSelected, activeProgramme }, code) => {
-      // TODO: fix args being needlessly cast into array in createFilter
-      return combinedIsSelected === code[0] && activeProgramme
-    },
+    isCombinedSelected: ({ combinedIsSelected }, code) => combinedIsSelected === code,
+    isBothSelected: ({ combinedIsSelected, activeProgramme }, code) => combinedIsSelected === code && activeProgramme,
   },
 
   actions: {
@@ -216,14 +204,18 @@ export const hopsFilter = createFilter({
       options.activeProgramme = !options.activeProgramme
       options.activeCombinedProgramme = false
       options.combinedIsSelected = 'default'
+
+      return options
     },
     toggleCombinedProgramme: (options, combinedProgrammeCode) => {
       options.activeProgramme = false
       options.activeCombinedProgramme = !options.activeCombinedProgramme
       options.combinedIsSelected =
         options.combinedIsSelected === combinedProgrammeCode ? 'default' : combinedProgrammeCode
+
+      return options
     },
   },
 
-  render: (props, { precomputed }) => <HopsFilterCard {...props} combinedProgramme={precomputed} />,
+  render: HopsFilterCard,
 })

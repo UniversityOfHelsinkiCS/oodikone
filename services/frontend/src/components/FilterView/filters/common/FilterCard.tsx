@@ -10,19 +10,17 @@ import { FC, useState } from 'react'
 
 import { InfoBox } from '@/components/material/InfoBox'
 
-import { FilterContext, FilterViewContextState } from '../../context'
+import { FilterViewContextState } from '../../context'
 import type { Filter } from '../createFilter'
 
 export const FilterCard: FC<{
+  active: boolean
   filter: Filter
-  options: FilterContext['options']
   children: ReturnType<Filter['render']>
   onClear: () => ReturnType<FilterViewContextState['resetFilter']>
-}> = ({ filter, options, children, onClear }) => {
-  const { info, key, title, isActive } = filter
-  const active = isActive(options)
-
+}> = ({ active, filter, children, onClear }) => {
   const [opened, setOpened] = useState<boolean>(active)
+  const { info, key, title } = filter
 
   return (
     <Stack data-active={active} data-cy={`${key}-filter-card`} spacing={1.2} sx={{ width: '100%' }}>
