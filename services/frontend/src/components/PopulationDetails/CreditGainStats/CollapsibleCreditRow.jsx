@@ -40,11 +40,15 @@ export const CollapsibleCreditRow = ({
 
   return (
     <>
-      <Table.Row onClick={isCollapsible ? collapse : undefined} style={{ cursor: isCollapsible && 'pointer' }}>
+      <Table.Row>
         <Table.Cell collapsing>
           <ExternalCreditFilterToggle helpText={filterHelpText} students={categoryStudents} />
         </Table.Cell>
-        <Table.Cell key={`${min} ≤ credits`}>
+        <Table.Cell
+          key={`${min} ≤ credits`}
+          onClick={isCollapsible ? collapse : undefined}
+          style={{ cursor: isCollapsible && 'pointer' }}
+        >
           {max === 0 ? 0 : `${min} ≤ credits`}
           {max > 0 && ` < ${max}`}
           {isCollapsible && <Icon color="grey" name={isCollapsed ? 'caret down' : 'caret right'} />}

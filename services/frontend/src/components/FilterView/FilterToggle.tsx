@@ -1,16 +1,15 @@
-import { Popup, Button, Icon } from 'semantic-ui-react'
+import FilterAltIcon from '@mui/icons-material/FilterAlt'
+import Button from '@mui/material/Button'
+import Tooltip from '@mui/material/Tooltip'
 
-export const FilterToggle = ({ active, applyFilter, clearFilter, popupContent, disabled }) => {
-  const toggleFilter = () => (active ? clearFilter() : applyFilter())
-  const Toggle = (
-    <Button basic={!active} disabled={disabled} icon onClick={toggleFilter} primary={active} size="mini">
-      <Icon name="filter" />
+export const FilterToggle = ({ active, applyFilter, clearFilter, popupContent, disabled }) => (
+  <Tooltip hidden={disabled} title={popupContent}>
+    <Button
+      disabled={disabled}
+      onClick={active ? clearFilter : applyFilter}
+      variant={active ? 'contained' : 'outlined'}
+    >
+      <FilterAltIcon fontSize="small" />
     </Button>
-  )
-
-  return !disabled && popupContent ? (
-    <Popup content={popupContent} size="mini" trigger={Toggle} />
-  ) : (
-    <div style={{ cursor: disabled ? 'not-allowed' : 'default' }}>{Toggle}</div>
-  )
-}
+  </Tooltip>
+)
