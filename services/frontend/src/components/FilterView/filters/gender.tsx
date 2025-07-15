@@ -1,4 +1,8 @@
-import { Form, Dropdown } from 'semantic-ui-react'
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 
 import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
@@ -22,23 +26,23 @@ const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProp
   }))
 
   return (
-    <div className="card-content">
-      <Form>
-        <Dropdown
-          button
-          className="mini"
-          clearable
+    <Box className="card-content">
+      <FormControl fullWidth>
+        <InputLabel id="genderFilter-select-label">Choose curriculum period</InputLabel>
+        <Select
           data-cy="genderFilter-dropdown"
-          fluid
-          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
-          options={dropdownOptions}
-          placeholder="Choose gender"
-          selectOnBlur={false}
-          selection
+          labelId="genderFilter-select-label"
+          onChange={(event: SelectChangeEvent) => onOptionsChange({ selected: event.target.value })}
           value={selected}
-        />
-      </Form>
-    </div>
+        >
+          {dropdownOptions.map(({ key, value, text }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   )
 }
 
@@ -51,7 +55,7 @@ export const genderFilter = createFilter({
     selected: '',
   },
 
-  isActive: ({ selected }) => selected !== '',
+  isActive: ({ selected }) => !!selected,
 
   filter(student, { options }) {
     const { selected } = options
