@@ -1,47 +1,42 @@
-import { Form, Dropdown, type DropdownItemProps } from 'semantic-ui-react'
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 
+import { useMemo } from 'react'
 import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
 const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const { selected } = options
 
-  const dropdownOptions: DropdownItemProps[] = Array.from(
-    students
-      .map(({ curriculumVersion }) => curriculumVersion)
-      .filter(Boolean)
-      .sort()
-      .reverse()
-      .reduce((versions: Map<string, DropdownItemProps>, curriculumVersion: string) => {
-        versions.set(curriculumVersion, {
-          key: curriculumVersion,
-          text: curriculumVersion,
-          value: curriculumVersion,
-        })
-
-        return versions
-      }, new Map())
-      .values()
+  const dropdownOptions = useMemo(
+    () =>
+      Array.from(new Set(students.map(({ curriculumVersion }) => curriculumVersion).filter(Boolean))).sort((a, b) =>
+        b.localeCompare(a)
+      ),
+    [students]
   )
 
   return (
-    <div className="card-content">
-      <Form>
-        <Dropdown
-          button
-          className="mini"
-          clearable
+    <Box className="card-content">
+      <FormControl fullWidth>
+        <InputLabel id="curriculumPeriodFilter-select-label">Choose curriculum period</InputLabel>
+        <Select
           data-cy="curriculumPeriodFilter-dropdown"
-          fluid
-          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
-          options={dropdownOptions}
-          placeholder="Choose curriculum period"
-          selectOnBlur={false}
-          selection
+          labelId="curriculumPeriodFilter-select-label"
+          onChange={(event: SelectChangeEvent) => onOptionsChange({ selected: event.target.value })}
           value={selected}
-        />
-      </Form>
-    </div>
+        >
+          {dropdownOptions.map(value => (
+            <MenuItem key={value} value={value}>
+              {value}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   )
 }
 
@@ -50,7 +45,9 @@ export const curriculumPeriodFilter = createFilter({
 
   title: 'Curriculum period',
 
-  defaultOptions: { selected: null },
+  defaultOptions: {
+    selected: '',
+  },
 
   isActive: ({ selected }) => !!selected,
 
