@@ -1,12 +1,8 @@
-import Box from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { orderBy } from 'lodash'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
@@ -34,23 +30,13 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
   const sortedDropdownOptions = orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
 
   return (
-    <Box className="card-content">
-      <FormControl fullWidth>
-        <InputLabel id="citizenship-select-label">Choose citizenship</InputLabel>
-        <Select
-          data-cy="citizenshipFilter-dropdown"
-          labelId="citizenship-select-label"
-          onChange={(event: SelectChangeEvent) => onOptionsChange({ selected: event.target.value })}
-          value={selected}
-        >
-          {sortedDropdownOptions.map(({ key, value, text }) => (
-            <MenuItem key={key} value={value}>
-              {text}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
+    <FilterSelect
+      filterKey="citizenshipFilter"
+      label="Choose citizenship"
+      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      options={sortedDropdownOptions}
+      value={selected}
+    />
   )
 }
 
