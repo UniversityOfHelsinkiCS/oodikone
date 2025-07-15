@@ -1,4 +1,7 @@
-import { Form, Radio } from 'semantic-ui-react'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+
 import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
 
@@ -21,30 +24,25 @@ const GraduatedFromProgrammeFilterCard = ({ args, options, onOptionsChange }: Fi
       ]
 
   return (
-    <Form>
-      <div className="card-content">
-        <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
-          <Radio
-            checked={mode === null}
-            data-cy="option-all"
-            label="All"
-            onChange={() => onOptionsChange({ mode: null })}
-            style={{ marginBottom: '0.5rem' }}
-          />
-          {modeOptions.map(option => (
-            <Radio
-              checked={mode === option.value}
-              data-cy={`option-${option.key}`}
-              key={option.key}
-              label={option.text}
-              name="radioGroup"
-              onChange={() => onOptionsChange({ mode: option.value })}
-              style={{ marginBottom: '0.5rem' }}
-            />
-          ))}
-        </Form.Field>
-      </div>
-    </Form>
+    <RadioGroup>
+      <FormControlLabel
+        checked={mode === null}
+        control={<Radio />}
+        data-cy="option-all"
+        label="All"
+        onChange={() => onOptionsChange({ mode: null })}
+      />
+      {modeOptions.map(option => (
+        <FormControlLabel
+          checked={mode === option.value}
+          control={<Radio />}
+          data-cy={`option-${option.key}`}
+          key={option.key}
+          label={option.text}
+          onChange={() => onOptionsChange({ mode: option.value })}
+        />
+      ))}
+    </RadioGroup>
   )
 }
 
