@@ -1,4 +1,9 @@
-import { Dropdown, Form } from 'semantic-ui-react'
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -33,48 +38,50 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
     }))
 
   return (
-    <div className="card-content">
-      <Form>
-        <Form.Field>
-          <Dropdown
-            button
-            className="mini"
-            clearable
-            data-cy={`${name}-status`}
-            fluid
-            onChange={(_, { value }) =>
-              onOptionsChange({
-                ...options,
-                status: value !== '' ? value : null,
-              })
-            }
-            options={STATUS_OPTIONS}
-            placeholder="Choose enrollment status"
-            selection
-            value={status}
-          />
-        </Form.Field>
-        <Form.Field>
-          <Dropdown
-            button
-            className="mini"
-            data-cy={`${name}-semesters`}
-            fluid
-            multiple
-            onChange={(_, { value }) =>
-              onOptionsChange({
-                ...options,
-                semesters: value,
-              })
-            }
-            options={semesterOptions}
-            placeholder="Choose semesters"
-            selection
-            value={semesters}
-          />
-        </Form.Field>
-      </Form>
-    </div>
+    <Box className="card-content">
+      <FormControl fullWidth>
+        <InputLabel id={`${name}-status-select-label`}>Choose enrollment status</InputLabel>
+        <Select
+          data-cy={`${name}-status`}
+          labelId={`${name}-status-select-label`}
+          onChange={(event: SelectChangeEvent) => onOptionsChange({ ...options, status: event.target.value })}
+          value={status}
+        >
+          {STATUS_OPTIONS.map(({ key, value, text }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth>
+        <InputLabel id={`${name}-semesters-select-label`}>Choose semesters</InputLabel>
+        <Select
+          data-cy={`${name}-semesters`}
+          labelId={`${name}-semesters-select-label`}
+          multiple
+          onChange={(event: SelectChangeEvent<number[]>) =>
+            onOptionsChange({ ...options, semesters: event.target.value })
+          }
+          renderValue={semestercodes => (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {semestercodes
+                .map(value => semesterOptions.find(semester => semester.value === value)!)
+                .map(({ key, text }) => {
+                  return <Chip key={key} label={text} sx={{ my: 0.5 }} />
+                })}
+            </Box>
+          )}
+          value={semesters}
+        >
+          {semesterOptions.map(({ key, value, text }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   )
 }
 
@@ -85,11 +92,11 @@ export const enrollmentStatusFilter = createFilter({
 
   info: filterToolTips.enrollmentStatus,
   defaultOptions: {
-    status: null,
+    status: '',
     semesters: [],
   },
 
-  isActive: ({ status }) => status !== null,
+  isActive: ({ status }) => !!status,
 
   filter({ studyRights }, { args, options }) {
     const { status, semesters } = options
