@@ -1,5 +1,8 @@
+import Checkbox from '@mui/material/Checkbox'
+import FormGroup from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Typography from '@mui/material/Typography'
 import fp from 'lodash/fp'
-import { Checkbox, Form } from 'semantic-ui-react'
 
 import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
 import { FilterTrayProps } from '../FilterTray'
@@ -9,7 +12,7 @@ import { createFilter } from './createFilter'
  * Grade filter.
  * Only applicable to a single course.
  */
-const GradeFilterCard = ({ options, onOptionsChange, students, precomputed }: FilterTrayProps) => {
+const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps) => {
   const { grades } = precomputed
   const { selected } = options
   const name = 'gradeFilter'
@@ -34,29 +37,21 @@ const GradeFilterCard = ({ options, onOptionsChange, students, precomputed }: Fi
     }
   }
 
-  const gradesWithoutSelf = fp.mapValues(
-    fp.filter(studentNumber => students.some(student => student.studentNumber === studentNumber))
-  )(grades)
-
   return (
-    <div className="card-content">
-      <Form>
-        {choices.map(grade => (
-          <Form.Field key={`${name}-${grade}`}>
-            <Checkbox
-              checked={checked(grade)}
-              label={
-                <label data-cy={`${name}-${grade}`}>
-                  {grade}
-                  <span className="filter-option-count">{` (${gradesWithoutSelf[grade].length} students)`}</span>
-                </label>
-              }
-              onChange={onChange(grade)}
-            />
-          </Form.Field>
-        ))}
-      </Form>
-    </div>
+    <FormGroup>
+      {choices.map(grade => (
+        <FormControlLabel
+          checked={checked(grade)}
+          control={<Checkbox />}
+          data-cy={`${name}-${grade}`}
+          key={`${name}-${grade}`}
+          label={
+            <Typography component="span" variant="body1">{`${grade} (${grades[grade].length} students)`}</Typography>
+          }
+          onChange={onChange(grade)}
+        />
+      ))}
+    </FormGroup>
   )
 }
 
