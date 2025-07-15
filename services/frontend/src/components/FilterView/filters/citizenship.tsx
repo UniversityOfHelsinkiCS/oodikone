@@ -1,5 +1,9 @@
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { orderBy } from 'lodash'
-import { Form, Dropdown } from 'semantic-ui-react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -30,23 +34,23 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
   const sortedDropdownOptions = orderBy(dropdownOptions, ['count', 'text'], ['desc', 'asc'])
 
   return (
-    <div className="card-content">
-      <Form>
-        <Dropdown
-          button
-          className="mini"
-          clearable
+    <Box className="card-content">
+      <FormControl fullWidth>
+        <InputLabel id="citizenship-select-label">Choose citizenship</InputLabel>
+        <Select
           data-cy="citizenshipFilter-dropdown"
-          fluid
-          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
-          options={sortedDropdownOptions}
-          placeholder="Choose citizenship"
-          selectOnBlur={false}
-          selection
+          labelId="citizenship-select-label"
+          onChange={(event: SelectChangeEvent) => onOptionsChange({ selected: event.target.value })}
           value={selected}
-        />
-      </Form>
-    </div>
+        >
+          {sortedDropdownOptions.map(({ key, value, text }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
   )
 }
 
@@ -61,7 +65,7 @@ export const citizenshipFilter = createFilter({
 
   info: filterToolTips.citizenship,
 
-  isActive: ({ selected }) => selected !== '',
+  isActive: ({ selected }) => !!selected,
 
   filter(student, { options }) {
     const { selected } = options
