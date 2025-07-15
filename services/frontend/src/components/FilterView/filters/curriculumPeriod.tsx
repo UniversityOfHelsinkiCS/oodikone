@@ -1,11 +1,7 @@
-import Box from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-
 import { useMemo } from 'react'
+
 import { FilterTrayProps } from '../FilterTray'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
@@ -13,30 +9,20 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: Filt
 
   const dropdownOptions = useMemo(
     () =>
-      Array.from(new Set(students.map(({ curriculumVersion }) => curriculumVersion).filter(Boolean))).sort((a, b) =>
-        b.localeCompare(a)
-      ),
+      Array.from(new Set(students.map(({ curriculumVersion }) => curriculumVersion).filter(Boolean)))
+        .sort((a, b) => b.localeCompare(a))
+        .map(value => ({ key: value, text: value, value })),
     [students]
   )
 
   return (
-    <Box className="card-content">
-      <FormControl fullWidth>
-        <InputLabel id="curriculumPeriodFilter-select-label">Choose curriculum period</InputLabel>
-        <Select
-          data-cy="curriculumPeriodFilter-dropdown"
-          labelId="curriculumPeriodFilter-select-label"
-          onChange={(event: SelectChangeEvent) => onOptionsChange({ selected: event.target.value })}
-          value={selected}
-        >
-          {dropdownOptions.map(value => (
-            <MenuItem key={value} value={value}>
-              {value}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
+    <FilterSelect
+      filterKey="curriculumPeriodFilter"
+      label="Choose curriculum period"
+      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      options={dropdownOptions}
+      value={selected}
+    />
   )
 }
 
