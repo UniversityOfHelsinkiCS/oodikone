@@ -6,7 +6,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 
 // HACK: This is ripped off of MUI MenuItem error.
 // TODO: Find an actual type to replace this.
-type ValidValueType = string | number | undefined
+type ValidValueType = string | number
 
 type SelectOption<T extends ValidValueType> = {
   key?: string
