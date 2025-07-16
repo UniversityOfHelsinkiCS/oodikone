@@ -1,48 +1,57 @@
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
-
 import { FilterTrayProps } from '../FilterTray'
+import { FilterRadio } from './common/FilterRadio'
 import { createFilter } from './createFilter'
 
-const GraduatedFromProgrammeFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
+const DEFAULT_STATE = '0' as const
+
+const BACHELORS = 'urn:code:degree-program-type:bachelors-degree' as const
+const MASTERS = 'urn:code:degree-program-type:masters-degree' as const
+const GRADUATION_PHASE = {
+  NOT_GRADUATED: '-1',
+  NOT_GRADUATED_BACHELOR: '-1',
+  NOT_GRADUATED_MASTER: '-2',
+
+  GRADUATED: '1',
+  GRADUATED_BACHELOR: '1',
+  GRADUATED_MASTER: '2',
+} as const
+
+const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayProps) => {
   const isCombinedExtent = !!args.code && (!!args.combinedProgrammeCode || !!args.showBachelorAndMaster)
   const isLicentiate = args.combinedProgrammeCode === 'MH90_001'
 
-  const { mode } = options
   const typeOfCombined = isLicentiate ? 'Licentiate' : 'Master'
   const modeOptions = isCombinedExtent
     ? [
-        { key: 'graduated-bachelor', text: "Graduated with Bachelor's", value: 1 },
-        { key: 'graduated-master', text: `Graduated with ${typeOfCombined}'s`, value: 2 },
-        { key: 'not-graduated-bachelor', text: "Not graduated with Bachelor's", value: 0 },
-        { key: 'not-graduated-master', text: `Not graduated with ${typeOfCombined}'s`, value: -1 },
+        { key: 'graduated-bachelor', text: "Graduated with Bachelor's", value: GRADUATION_PHASE.GRADUATED_BACHELOR },
+        {
+          key: 'graduated-master',
+          text: `Graduated with ${typeOfCombined}'s`,
+          value: GRADUATION_PHASE.GRADUATED_MASTER,
+        },
+        {
+          key: 'not-graduated-bachelor',
+          text: "Not graduated with Bachelor's",
+          value: GRADUATION_PHASE.NOT_GRADUATED_BACHELOR,
+        },
+        {
+          key: 'not-graduated-master',
+          text: `Not graduated with ${typeOfCombined}'s`,
+          value: GRADUATION_PHASE.NOT_GRADUATED_MASTER,
+        },
       ]
     : [
-        { key: 'graduated-true', text: 'Graduated', value: 1 },
-        { key: 'graduated-false', text: 'Not graduated', value: 0 },
+        { key: 'graduated-true', text: 'Graduated', value: GRADUATION_PHASE.GRADUATED },
+        { key: 'graduated-false', text: 'Not graduated', value: GRADUATION_PHASE.NOT_GRADUATED },
       ]
 
   return (
-    <RadioGroup>
-      <FormControlLabel
-        checked={mode === null}
-        control={<Radio />}
-        data-cy="option-all"
-        label="All"
-        onChange={() => onOptionsChange({ mode: null })}
-      />
-      {modeOptions.map(option => (
-        <FormControlLabel
-          checked={mode === option.value}
-          control={<Radio />}
-          data-cy={`option-${option.key}`}
-          key={option.key}
-          label={option.text}
-          onChange={() => onOptionsChange({ mode: option.value })}
-        />
-      ))}
-    </RadioGroup>
+    <FilterRadio
+      defaultOption={{ text: 'All', value: DEFAULT_STATE }}
+      filterKey="graduatedFromProgrammeFilter"
+      onChange={({ target }) => onOptionsChange({ mode: target.value })}
+      options={modeOptions}
+    />
   )
 }
 
@@ -52,17 +61,14 @@ export const graduatedFromProgrammeFilter = createFilter({
   title: 'Graduated from programme',
 
   defaultOptions: {
-    mode: null,
+    mode: DEFAULT_STATE,
   },
 
-  isActive: ({ mode }) => mode !== null,
+  isActive: ({ mode }) => mode !== '0',
 
   filter(student, { args, options }) {
     const { mode } = options
-
     const { code, showBachelorAndMaster } = args
-    const BACHELORS = 'urn:code:degree-program-type:bachelors-degree'
-    const MASTERS = 'urn:code:degree-program-type:masters-degree'
 
     const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === code))
     if (!studyRight) return false
@@ -70,18 +76,20 @@ export const graduatedFromProgrammeFilter = createFilter({
     const element = studyRight.studyRightElements.find(el => el.code === code)
 
     const isBachelorOrMaster = [BACHELORS, MASTERS].includes(element?.degreeProgrammeType)
+    const isBachelorMode = [GRADUATION_PHASE.NOT_GRADUATED_BACHELOR, GRADUATION_PHASE.GRADUATED_BACHELOR].includes(mode)
+    const isMastersMode = [GRADUATION_PHASE.NOT_GRADUATED_MASTER, GRADUATION_PHASE.GRADUATED_MASTER].includes(mode)
 
     let hasGraduated = false
 
     if (!isBachelorOrMaster || !showBachelorAndMaster) {
       hasGraduated = !!element?.graduated
-    } else if ([0, 1].includes(mode)) {
+    } else if (isBachelorMode) {
       hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === BACHELORS && el.graduated)
-    } else if ([2, -1].includes(mode)) {
+    } else if (isMastersMode) {
       hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === MASTERS && el.graduated)
     }
 
-    const keepGraduated = mode > 0
+    const keepGraduated = Number(mode) > 0
 
     return keepGraduated === hasGraduated
   },
