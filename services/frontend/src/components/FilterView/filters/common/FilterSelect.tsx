@@ -21,6 +21,7 @@ type FilterSelectProps<T extends ValidValueType> = {
   value: T | T[]
   onChange: (event: SelectChangeEvent<T | T[]>) => void
   filterKey?: string
+  multiple?: true
 }
 
 export const FilterSelect = <T extends ValidValueType = string>({
@@ -29,6 +30,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
   options,
   onChange,
   filterKey,
+  multiple,
 }: FilterSelectProps<T>) => (
   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
     <FormControl sx={{ width: '95%' }} variant="outlined">
@@ -39,6 +41,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
         data-cy={`${filterKey}-selector`}
         label={label}
         labelId={filterKey}
+        multiple={multiple}
         onChange={onChange}
         size="small"
         value={value ?? ''}
