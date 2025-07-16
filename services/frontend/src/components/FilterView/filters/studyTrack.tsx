@@ -1,8 +1,6 @@
-import { Dropdown, Form } from 'semantic-ui-react'
-import type { DropdownProps } from 'semantic-ui-react'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { FilterTrayProps } from '../FilterTray'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: FilterTrayProps) => {
@@ -33,29 +31,14 @@ const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: Filt
       return acc
     }, [])
 
-  const handleChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
-    onOptionsChange({
-      selected: value,
-    })
-  }
-
   return (
-    <Form>
-      <Dropdown
-        button
-        className="mini"
-        clearable
-        data-cy="StudyTrack-filter-dropdown"
-        fluid
-        multiple
-        onChange={handleChange}
-        options={dropdownOptions}
-        placeholder="Choose study track"
-        search
-        selection
-        value={selected}
-      />
-    </Form>
+    <FilterSelect
+      filterKey="studyTrackFilter"
+      label="Choose study track"
+      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      options={dropdownOptions}
+      value={selected}
+    />
   )
 }
 
