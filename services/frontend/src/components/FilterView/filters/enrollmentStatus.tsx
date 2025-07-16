@@ -1,14 +1,10 @@
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { SemestersData } from '@/redux/semesters'
 import { FilterTrayProps } from '../FilterTray'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const STATUS_OPTIONS = [
@@ -19,7 +15,6 @@ const STATUS_OPTIONS = [
 
 const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
   const allSemesters = args.allSemesters as SemestersData['semesters']
-  const name = 'enrollmentStatusFilter'
   const { getTextIn } = useLanguage()
 
   if (!Object.keys(allSemesters).length) {
@@ -33,55 +28,28 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
     .sort((a, b) => b.semestercode - a.semestercode)
     .map(({ semestercode, name }) => ({
       key: `semester-option-${semestercode}`,
-      text: getTextIn(name),
+      text: getTextIn(name) ?? '',
       value: semestercode,
     }))
 
   return (
-    <Box className="card-content">
-      <FormControl fullWidth>
-        <InputLabel id={`${name}-status-select-label`}>Choose enrollment status</InputLabel>
-        <Select
-          data-cy={`${name}-status`}
-          labelId={`${name}-status-select-label`}
-          onChange={(event: SelectChangeEvent) => onOptionsChange({ ...options, status: event.target.value })}
-          value={status}
-        >
-          {STATUS_OPTIONS.map(({ key, value, text }) => (
-            <MenuItem key={key} value={value}>
-              {text}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth>
-        <InputLabel id={`${name}-semesters-select-label`}>Choose semesters</InputLabel>
-        <Select
-          data-cy={`${name}-semesters`}
-          labelId={`${name}-semesters-select-label`}
-          multiple
-          onChange={(event: SelectChangeEvent<number[]>) =>
-            onOptionsChange({ ...options, semesters: event.target.value })
-          }
-          renderValue={semestercodes => (
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              {semestercodes
-                .map(value => semesterOptions.find(semester => semester.value === value)!)
-                .map(({ key, text }) => {
-                  return <Chip key={key} label={text} sx={{ my: 0.5 }} />
-                })}
-            </Box>
-          )}
-          value={semesters}
-        >
-          {semesterOptions.map(({ key, value, text }) => (
-            <MenuItem key={key} value={value}>
-              {text}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Box>
+    <Stack gap={1}>
+      <FilterSelect
+        filterKey="enrollmentStatusFilter-status"
+        label="Choose enrollment status"
+        onChange={({ target }) => onOptionsChange({ ...options, status: target.value })}
+        options={STATUS_OPTIONS}
+        value={status}
+      />
+      <FilterSelect
+        filterKey="enrollmentStatusFilter-semester"
+        label="Choose semesters"
+        multiple
+        onChange={({ target }) => onOptionsChange({ ...options, semesters: target.value })}
+        options={semesterOptions}
+        value={semesters}
+      />
+    </Stack>
   )
 }
 
