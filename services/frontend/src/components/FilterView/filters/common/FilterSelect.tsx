@@ -4,22 +4,32 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 
-type SelectOption = {
+// HACK: This is ripped off of MUI MenuItem error.
+// TODO: Find an actual type to replace this.
+type ValidValueType = string | number | undefined
+
+type SelectOption<T extends ValidValueType> = {
   key?: string
   text: string
-  value: string
+  value: T
   amount?: number
 }
 
-type FilterSelectProps = {
+type FilterSelectProps<T extends ValidValueType> = {
   label?: string
-  options: SelectOption[]
-  value: string | undefined
-  onChange: (event: SelectChangeEvent) => void
+  options: SelectOption<T>[]
+  value: T | T[]
+  onChange: (event: SelectChangeEvent<T | T[]>) => void
   filterKey?: string
 }
 
-export const FilterSelect = ({ label, value, options, onChange, filterKey }: FilterSelectProps) => (
+export const FilterSelect = <T extends ValidValueType = string>({
+  label,
+  value,
+  options,
+  onChange,
+  filterKey,
+}: FilterSelectProps<T>) => (
   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
     <FormControl sx={{ width: '95%' }} variant="outlined">
       <InputLabel id={filterKey} size="small">
