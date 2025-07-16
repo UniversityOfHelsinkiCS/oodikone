@@ -1,8 +1,8 @@
 import { keyBy } from 'lodash'
-import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { FilterTrayProps } from '../../FilterTray'
+import { FilterSelect } from '../common/FilterSelect'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
@@ -11,15 +11,15 @@ type CourseStats = Record<string, any>
 
 const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
   const courseStats: CourseStats = precomputed
-  const { courseFilters } = options ?? {}
+
+  const courseFilters: Record<string, keyof typeof FilterType> = options?.courseFilters
   const { getTextIn } = useLanguage()
 
-  const name = 'course-filter-card'
   const dropdownOptions = Object.values(courseStats)
     .filter(cs => !courseFilters[cs.course.code])
     .sort((a, b) => a.course.code.localeCompare(b.course.code))
     .map(cs => ({
-      key: `course-filter-option-${cs.course.code}`,
+      key: `courseFilter-option-${cs.course.code}`,
       text: `${cs.course.code} - ${getTextIn(cs.course.name)}`,
       value: cs.course.code,
     }))
@@ -35,31 +35,19 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
       })()
     )
 
-  const onChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
-    setCourseFilter(value?.[0], FilterType.ALL)
-  }
-
   return (
     <>
-      <Dropdown
-        button
-        className="mini course-filter-selection"
-        closeOnChange
-        data-cy="courseFilter-course-dropdown"
-        fluid
-        multiple
-        name={name}
-        onChange={onChange}
+      <FilterSelect
+        filterKey="courseFilter"
+        label="Select course"
+        onChange={({ target }) => setCourseFilter(target.value, FilterType.ALL)}
         options={dropdownOptions}
-        placeholder="Select course"
-        search
-        selection
-        value={[]}
+        value={''}
       />
-      {Object.entries(courseFilters).map(([code]) => (
+      {Object.entries(courseFilters).map(([code, type]) => (
         <CourseCard
           course={courseStats[code]}
-          filterType={courseFilters[code]}
+          filterType={type}
           key={`course-filter-selected-course-${code}`}
           onChange={type => setCourseFilter(code, type)}
         />

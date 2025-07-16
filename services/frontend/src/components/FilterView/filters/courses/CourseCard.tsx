@@ -1,8 +1,10 @@
-import { FC } from 'react'
-import { Button, Dropdown, Icon, Label } from 'semantic-ui-react'
-import type { DropdownProps } from 'semantic-ui-react'
+import ClearIcon from '@mui/icons-material/Clear'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterSelect } from '../common/FilterSelect'
 import { FilterType } from './filterType'
 
 const filterTexts = {
@@ -24,56 +26,55 @@ const filterTexts = {
   },
 }
 
-export const CourseCard: FC<{
+export const CourseCard = ({
+  course,
+  filterType,
+  onChange,
+}: {
   course: any
   filterType: keyof typeof FilterType
   onChange: (type) => any
-}> = ({ course, filterType, onChange }) => {
+}) => {
   const { getTextIn } = useLanguage()
-  const name = 'courseFilter'
 
-  const onClick: NonNullable<DropdownProps['Item']['onClick']> = (_, { value }) => onChange(value)
-
-  const clear = () => {
-    onChange(null)
-  }
+  const dropdownOptions = Object.entries(filterTexts).map(([type, { key, label }]) => ({
+    key,
+    text: label,
+    value: type,
+    disabled: !Object.keys(course?.students[key] ?? {}).length,
+  }))
 
   return (
-    <Label style={{ marginTop: '0.5rem' }}>
-      {getTextIn(course?.course?.name)}
-
-      <Dropdown
-        button
-        className="mini"
-        data-cy={`${name}-${course?.course?.code}-dropdown`}
-        fluid
-        style={{ marginTop: '0.5rem' }}
-        text={filterTexts[filterType].label}
+    <Box
+      sx={theme => ({
+        my: 0.5,
+        py: 1,
+        px: 1.5,
+        backgroundColor: theme.palette.grey[200],
+        borderRadius: 1,
+        '& .MuiSelect-select': { backgroundColor: theme.palette.grey[50] },
+      })}
+    >
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+        <Typography sx={{ my: 2 }}>{getTextIn(course.course?.name)}</Typography>
+        <ClearIcon
+          data-cy={`courseFilter-${course.course?.code}-clear`}
+          onClick={() => onChange(null)}
+          sx={{
+            color: theme => theme.palette.error.dark,
+            '&:hover': {
+              color: theme => theme.palette.error.light,
+            },
+          }}
+        />
+      </Stack>
+      <FilterSelect
+        filterKey="courseFilter"
+        label="Select course"
+        onChange={({ target }) => onChange(target.value)}
+        options={dropdownOptions}
         value={filterType}
-      >
-        <Dropdown.Menu>
-          {Object.entries(filterTexts).map(([type, { key, label }]) => (
-            <Dropdown.Item
-              disabled={!Object.keys(course?.students[key] ?? {}).length}
-              key={label}
-              onClick={onClick}
-              text={label}
-              value={type}
-            />
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
-
-      <Button
-        compact
-        data-cy={`${name}-${course?.course?.code}-clear`}
-        icon
-        onClick={clear}
-        size="tiny"
-        style={{ marginTop: '0.5rem' }}
-      >
-        <Icon name="close" />
-      </Button>
-    </Label>
+      />
+    </Box>
   )
 }
