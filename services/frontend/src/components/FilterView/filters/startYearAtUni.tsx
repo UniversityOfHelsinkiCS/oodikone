@@ -1,11 +1,9 @@
-import { Form, Dropdown } from 'semantic-ui-react'
-
 import { filterToolTips } from '@/common/InfoToolTips'
 import { FilterTrayProps } from '../FilterTray'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
-  const name = 'startYearAtUni'
   const { selected } = options
 
   const countsByYear = {}
@@ -23,26 +21,13 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: Filter
   }))
 
   return (
-    <div className="card-content">
-      <Form>
-        <Dropdown
-          button
-          className="mini"
-          data-cy={`${name}-dropdown`}
-          fluid
-          multiple
-          onChange={(_, { value }) =>
-            onOptionsChange({
-              selected: value,
-            })
-          }
-          options={dropdownOptions}
-          placeholder="Choose years to include"
-          selection
-          value={selected}
-        />
-      </Form>
-    </div>
+    <FilterSelect
+      filterKey="startYearAtUniFilter"
+      label="Choose years to include"
+      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      options={dropdownOptions}
+      value={selected}
+    />
   )
 }
 
