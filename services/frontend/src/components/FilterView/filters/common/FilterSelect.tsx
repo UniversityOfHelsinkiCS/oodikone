@@ -13,6 +13,7 @@ type SelectOption<T extends ValidValueType> = {
   text: string
   value: T
   amount?: number
+  disabled?: boolean
 }
 
 type FilterSelectProps<T extends ValidValueType> = {
@@ -47,7 +48,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
         value={value ?? ''}
       >
         {options.map(option => (
-          <MenuItem key={option.key} value={option.value}>
+          <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
             {option.text}
           </MenuItem>
         ))}
