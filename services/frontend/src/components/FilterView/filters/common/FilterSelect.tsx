@@ -45,7 +45,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
         multiple={multiple}
         onChange={onChange}
         size="small"
-        value={value ?? ''}
+        value={value}
       >
         {options.map(option => (
           <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
