@@ -101,21 +101,7 @@ export const PopulationSearchForm = () => {
     setStudyTrack(studyTrack ?? null)
   }
 
-  const buildLegacyQuery = () => {
-    const [primaryProgramme, combinedProgramme] = programme?.code?.split('+') ?? []
-    return {
-      studyRights: JSON.stringify({
-        programme: primaryProgramme,
-        combinedProgramme,
-        studyTrack: studyTrack?.code ?? undefined,
-      }),
-      year,
-      semesters,
-      showBachelorAndMaster,
-    }
-  }
-
-  const buildModernQuery = (): PopulationQuery => {
+  const buildQueryFromState = (): PopulationQuery => {
     const [primaryProgramme, combinedProgramme] = programme?.code?.split('+') ?? []
     return {
       programme: primaryProgramme,
@@ -127,8 +113,8 @@ export const PopulationSearchForm = () => {
     }
   }
 
-  const pushQueryToUrl = () => {
-    const searchString = queryParamsToString(buildModernQuery())
+  const pushQueryToUrl = (params?: PopulationQuery) => {
+    const searchString = queryParamsToString(params ?? buildQueryFromState())
     void navigate({ search: searchString })
   }
 
@@ -146,12 +132,13 @@ export const PopulationSearchForm = () => {
   }
 
   const handleSubmit = () => {
+    const query = buildQueryFromState()
     addItemToSearchHistory({
       text: getSearchHistoryTextFromQuery(),
-      params: buildLegacyQuery(),
+      params: query,
     })
 
-    pushQueryToUrl()
+    pushQueryToUrl(query)
   }
 
   const handleYearSelection = (event: SelectChangeEvent) => {
