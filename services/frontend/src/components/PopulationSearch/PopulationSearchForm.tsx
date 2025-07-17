@@ -1,19 +1,11 @@
-import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router'
 
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SearchHistory } from '@/components/material/SearchHistory'
-
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import type {
   PopulationSearchProgramme,
   PopulationSearchStudyTrack,
@@ -22,13 +14,14 @@ import type {
   StudentStatus,
 } from '@/types/populationSearch'
 import { queryParamsToString } from '@/util/queryparams'
+
 import { DegreeProgrammeSelector } from './DegreeProgrammeSelector'
 import { EnrollmentDateSelector } from './EnrollmentDateSelector'
+import { StudyTrackSelector } from './StudyTrackSelector'
 
 export const PopulationSearchForm = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { getTextIn } = useLanguage()
   const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
 
   const [year, setYear] = useState(2017)
@@ -37,21 +30,12 @@ export const PopulationSearchForm = () => {
   const [semesters, _setSemesters] = useState<Semester[]>(['FALL', 'SPRING'])
   const [studentStatuses, _setStudentStatuses] = useState<StudentStatus[]>([])
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
-  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState<boolean>(fullAccessToStudentData)
-
-  const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery(
-    { id: programme?.code ?? '' },
-    { skip: !programme }
-  )
+  const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
 
   const handleProgrammeChange = (newProgramme: PopulationSearchProgramme | null) => {
     setProgramme(newProgramme ?? null)
     setStudyTrack(null)
-  }
-
-  const handleStudyTrackChange = (_event: unknown, studyTrack: PopulationSearchStudyTrack | null) => {
-    setStudyTrack(studyTrack ?? null)
   }
 
   const buildQueryFromState = (): PopulationQuery => {
@@ -94,47 +78,6 @@ export const PopulationSearchForm = () => {
     pushQueryToUrl(query)
   }
 
-  const StudyTrackSelector = () => {
-    const studyTracksAvailable = Object.values(studyTracks).length > 1 && !studyTracksAreLoading && !!programme
-    const studyTrackOptions: PopulationSearchStudyTrack[] = studyTracksAvailable
-      ? Object.entries(studyTracks)
-          .filter(([code, _]) => code !== programme?.code)
-          .map(([code, name]) => ({
-            code,
-            name: typeof name === 'string' ? name : getTextIn(name),
-          }))
-      : []
-
-    return (
-      <Box data-cy="population-studytrack-selector-parent" sx={{ m: 1 }}>
-        <Typography
-          color={studyTracksAvailable ? 'textPrimary' : 'textDisabled'}
-          fontWeight="bold"
-          sx={{ mb: 1 }}
-          variant="subtitle1"
-        >
-          Study track (optional)
-        </Typography>
-        <Autocomplete
-          autoComplete
-          data-cy="population-studytrack-selector"
-          disablePortal
-          disabled={!studyTracksAvailable}
-          getOptionLabel={opt => `${opt.name} - ${opt.code}`}
-          onChange={handleStudyTrackChange}
-          options={studyTrackOptions}
-          renderInput={params => (
-            <TextField
-              {...params}
-              placeholder={studyTracksAvailable ? 'Select study track' : 'No study tracks available'}
-            />
-          )}
-          value={studyTrack}
-        />
-      </Box>
-    )
-  }
-
   if (location.search !== '') {
     return null
   }
@@ -155,8 +98,7 @@ export const PopulationSearchForm = () => {
         setShowBachelorAndMaster={setShowBachelorAndMaster}
         showBachelorAndMaster={showBachelorAndMaster}
       />
-
-      <StudyTrackSelector />
+      <StudyTrackSelector programme={programme} setStudyTrack={setStudyTrack} studyTrack={studyTrack} />
       <Button disabled={!programme} onClick={handleSubmit} size="large" sx={{ maxWidth: '12rem' }} variant="contained">
         See class
       </Button>
