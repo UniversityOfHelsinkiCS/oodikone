@@ -1,28 +1,19 @@
-import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
-import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router'
 
-import { isNewStudyProgramme } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { InfoBox } from '@/components/material/InfoBox'
 import { SearchHistory } from '@/components/material/SearchHistory'
-import { ToggleablePin } from '@/components/material/ToggleablePin'
 
-import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
-import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import type {
   PopulationSearchProgramme,
   PopulationSearchStudyTrack,
@@ -30,14 +21,9 @@ import type {
   Semester,
   StudentStatus,
 } from '@/types/populationSearch'
-import { createPinnedFirstComparator } from '@/util/comparator'
 import { queryParamsToString } from '@/util/queryparams'
+import { DegreeProgrammeSelector } from './DegreeProgrammeSelector'
 import { EnrollmentDateSelector } from './EnrollmentDateSelector'
-
-const bachelorAndMasterInfoTooltip = `If you choose a Bachelor's programme, toggling 'Show
-    Bachelor + Master' on will also show information about the students' master's studies. If you
-    choose a Master's programme, you can see information about the students' bachelor's studies.
-    #### This feature is experimental and might still change`
 
 export const PopulationSearchForm = () => {
   const navigate = useNavigate()
@@ -53,41 +39,13 @@ export const PopulationSearchForm = () => {
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
   const [filterProgrammes, setFilterProgrammes] = useState<boolean>(fullAccessToStudentData)
-  const { data: programmes = {}, isLoading: programmesAreLoading } = useGetProgrammesQuery()
-
-  const studyProgrammes =
-    (programmes.KH90_001 || programmes.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
-      ? {
-          ...programmes,
-          'KH90_001+MH90_001': {
-            ...programmes.KH90_001,
-            code: 'KH90_001+MH90_001',
-            name: {
-              fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
-              en: "Bachelor's and Degree Programme in Vetenary Medicine",
-              sv: 'Kandidats- och Utbildningsprogrammet i veterinärmedicin',
-            },
-          },
-        }
-      : programmes
 
   const { data: studyTracks = {}, isLoading: studyTracksAreLoading } = useGetStudyTracksQuery(
     { id: programme?.code ?? '' },
     { skip: !programme }
   )
 
-  const { data: studyProgrammePins } = useGetStudyProgrammePinsQuery()
-  const pinnedProgrammes = studyProgrammePins?.studyProgrammes ?? []
-
-  const degreeProgrammeType = useDegreeProgrammeTypes([programme?.code ?? ''])
-
-  const bachelorOrMasterProgrammeIsSelected = programme
-    ? ['urn:code:degree-program-type:bachelors-degree', 'urn:code:degree-program-type:masters-degree'].includes(
-        degreeProgrammeType[programme.code] ?? ''
-      )
-    : false
-
-  const handleProgrammeChange = (_event: unknown, newProgramme: PopulationSearchProgramme | null) => {
+  const handleProgrammeChange = (newProgramme: PopulationSearchProgramme | null) => {
     setProgramme(newProgramme ?? null)
     setStudyTrack(null)
   }
@@ -134,90 +92,6 @@ export const PopulationSearchForm = () => {
     })
 
     pushQueryToUrl(query)
-  }
-
-  const StudyProgrammeSelector = () => {
-    if (Object.values(studyProgrammes).length === 0 && !programmesAreLoading) {
-      return (
-        <Alert severity="warning">
-          You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi
-        </Alert>
-      )
-    }
-
-    const studyProgrammesAvailable = Object.values(studyProgrammes).length > 0 && !programmesAreLoading
-    const pinnedFirstComparator = createPinnedFirstComparator(pinnedProgrammes)
-
-    const programmeOptions: PopulationSearchProgramme[] = studyProgrammesAvailable
-      ? Object.values(studyProgrammes)
-          .filter(programme => !filterProgrammes || isNewStudyProgramme(programme.code))
-          .map(({ code, name }) => ({
-            code,
-            name: getTextIn(name),
-            pinned: pinnedProgrammes.includes(code),
-          }))
-          .sort(pinnedFirstComparator)
-      : []
-
-    const handleBscAndMscToggle = () => {
-      setShowBachelorAndMaster(show => !show)
-    }
-
-    return (
-      <Box sx={{ m: 1 }}>
-        <Typography fontWeight="bold" sx={{ mb: 1 }} variant="subtitle1">
-          Degree programme
-        </Typography>
-        <Stack data-cy="population-programme-selector-parent" direction="row" spacing={2}>
-          <Autocomplete
-            autoComplete
-            autoHighlight
-            clearOnEscape
-            disablePortal
-            fullWidth
-            getOptionLabel={opt => `${opt.name} - ${opt.code}`}
-            onChange={handleProgrammeChange}
-            options={programmeOptions}
-            renderInput={params => (
-              <TextField
-                {...params}
-                data-cy="population-programme-selector"
-                placeholder="Select degree programme"
-                sx={{ p: 0, border: 'none' }}
-              />
-            )}
-            renderOption={(props, option) => {
-              const { key, ...optionProps } = props
-              return (
-                <Stack component="li" direction="row" key={key} spacing={2} sx={{ width: '100%' }} {...optionProps}>
-                  <ToggleablePin programme={option} />
-                  <Typography sx={{ flex: 1, p: 0.4 }}>{option.name}</Typography>
-                  <Typography alignSelf="flex-end" fontWeight="300" sx={{ ml: 2 }} variant="body2">
-                    {option.code}
-                  </Typography>
-                </Stack>
-              )
-            }}
-            value={programme}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showBachelorAndMaster}
-                disabled={!bachelorOrMasterProgrammeIsSelected}
-                onChange={handleBscAndMscToggle}
-              />
-            }
-            label={
-              <Stack direction="row" spacing={1}>
-                <Typography sx={{ whiteSpace: 'nowrap' }}>Show Bachelor & Master</Typography>
-                <InfoBox content={bachelorAndMasterInfoTooltip} mini />
-              </Stack>
-            }
-          />
-        </Stack>
-      </Box>
-    )
   }
 
   const StudyTrackSelector = () => {
@@ -274,7 +148,14 @@ export const PopulationSearchForm = () => {
         setYear={setYear}
         year={year}
       />
-      <StudyProgrammeSelector />
+      <DegreeProgrammeSelector
+        filterProgrammes={filterProgrammes}
+        handleChange={handleProgrammeChange}
+        programme={programme}
+        setShowBachelorAndMaster={setShowBachelorAndMaster}
+        showBachelorAndMaster={showBachelorAndMaster}
+      />
+
       <StudyTrackSelector />
       <Button disabled={!programme} onClick={handleSubmit} size="large" sx={{ maxWidth: '12rem' }} variant="contained">
         See class
