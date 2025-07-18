@@ -1,40 +1,28 @@
-import { Form, Radio } from 'semantic-ui-react'
-
 import { FilterTrayProps } from '../FilterTray'
+import { FilterRadio } from './common/FilterRadio'
 import { createFilter } from './createFilter'
 
-const STUDYRIGHT_TYPES = {
-  all: { label: 'All', value: 0 },
-  bama: { label: 'Bachelor + master', value: 1 },
-  master: { label: 'Master only', value: 2 },
-}
+const DEFAULT_STATE = '0' as const
 
-const StudyRightTypeFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
-  const { mode } = options
+const STUDYRIGHT_TYPES = [
+  { text: 'Bachelor + master', value: '1' },
+  { text: 'Master only', value: '2' },
+]
 
-  const modeOptions = Object.entries(STUDYRIGHT_TYPES).map(([key, studyRightType]) => ({
-    key,
-    text: studyRightType.label,
-    value: studyRightType.value,
+const StudyRightTypeFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
+  const modeOptions = STUDYRIGHT_TYPES.map(({ text, value }) => ({
+    key: text,
+    text,
+    value,
   }))
 
   return (
-    <Form>
-      <div className="card-content">
-        <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
-          {modeOptions.map(option => (
-            <Radio
-              checked={mode === option.value}
-              data-cy={option.key}
-              key={option.key}
-              label={option.text}
-              onChange={() => onOptionsChange({ mode: option.value })}
-              style={{ marginBottom: '0.5rem' }}
-            />
-          ))}
-        </Form.Field>
-      </div>
-    </Form>
+    <FilterRadio
+      defaultOption={{ key: undefined, text: 'All', value: DEFAULT_STATE }}
+      filterKey="studyRightTypeFilter"
+      onChange={({ target }) => onOptionsChange({ mode: target.value })}
+      options={modeOptions}
+    />
   )
 }
 
@@ -44,15 +32,15 @@ export const studyRightTypeFilter = createFilter({
   title: 'Study right type',
 
   defaultOptions: {
-    mode: 0,
+    mode: DEFAULT_STATE,
   },
 
-  isActive: ({ mode }) => mode !== 0,
+  isActive: ({ mode }) => mode !== '0',
 
   filter(student, { args, options }) {
     const { mode } = options
 
-    if (mode === 0) return true
+    if (mode === '0') return true
 
     const studyRight = student.studyRights.find(studyRight =>
       studyRight.studyRightElements.some(el => el.code === args.programme)
@@ -60,7 +48,7 @@ export const studyRightTypeFilter = createFilter({
 
     if (!studyRight) return false
 
-    return mode === 1 ? studyRight.extentCode === 5 : studyRight.extentCode === 2
+    return mode === '1' ? studyRight.extentCode === 5 : studyRight.extentCode === 2
   },
 
   render: StudyRightTypeFilterCard,
