@@ -240,6 +240,7 @@ export const PopulationStatistics = () => {
             <Backdrop
               open={isLoading}
               sx={theme => ({ zIndex: theme.zIndex.drawer + 1, color: theme.palette.grey[300] })}
+              unmountOnExit
             >
               <CircularProgress color="inherit" size="3em" />
             </Backdrop>
