@@ -1,4 +1,3 @@
-import Tooltip from '@mui/material/Tooltip'
 import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
@@ -65,14 +64,14 @@ export const getSemestersPresentFunctions = ({
   }
 
   const getSemesterEnrollmentsContent = (student, studyright) => {
-    if (!student.semesterEnrollmentsMap && !studyright) return null
+    if (!student.semesterEnrollmentsMap && !studyright) return []
 
     const isMasters = isMastersProgramme(programmeCode ?? '')
 
     const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
     const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
 
-    const semesterIcons = Array.from(Array(lastSemester - firstSemester + 1).keys()).map((_, index) => {
+    return Array.from(Array(lastSemester - firstSemester + 1).keys()).map((_, index) => {
       const semester = index + firstSemester
       const key = `${student.studentNumber}-${semester}`
 
@@ -101,14 +100,8 @@ export const getSemestersPresentFunctions = ({
       const springMargin = isFall(semester) ? '' : 'margin-right'
       const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
 
-      return (
-        <Tooltip key={key} placement="top" title={onHoverString}>
-          <span className={`enrollment-label-no-margin ${springMargin} label-${typeLabel} ${graduationCrown}`} />
-        </Tooltip>
-      )
+      return { key, onHoverString, springMargin, typeLabel, graduationCrown }
     })
-
-    return <div style={{ display: 'flex', gap: '4px' }}>{semesterIcons}</div>
   }
 
   const getSemesterEnrollmentsVal = (student, studyright) => {

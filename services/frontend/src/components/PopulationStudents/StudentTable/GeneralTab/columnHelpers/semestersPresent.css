@@ -4,17 +4,13 @@
 
 .graduated::after,
 .graduated-higher::after {
-  content: '';
-  position: relative;
-  top: -15px;
-  left: -4px;
+  content: url('/crown.svg');
   display: inline-block;
-  width: 23px;
-  height: 23px;
-  background-image: url('/crown.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  overflow: visible;
+  position: relative;
+  top: -0.8em;
+  left: -0.125em;
+  width: 1.25em;
+  height: 1.25em;
 }
 
 .graduated-higher::after {

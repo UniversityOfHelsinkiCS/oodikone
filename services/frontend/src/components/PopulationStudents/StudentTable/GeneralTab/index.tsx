@@ -29,7 +29,16 @@ export type FormattedStudentData = {
   studyRightStart: string
   programmeStart: string
   option: string
-  semesterEnrollments: { exportValue: number; content: JSX.Element | null }
+  semesterEnrollments: {
+    exportValue: number
+    content: {
+      key: string
+      onHoverString: string
+      springMargin: string
+      typeLabel: string
+      graduationCrown: string
+    }[]
+  }
   graduationDate: string
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | string
@@ -376,7 +385,7 @@ export const GeneralTabContainer = ({
       option: getTextIn(student.option?.name) ?? '',
       semesterEnrollments: {
         exportValue: getSemesterEnrollmentsVal(student),
-        content: getSemesterEnrollmentsContent(student) ?? null,
+        content: getSemesterEnrollmentsContent(student),
       },
       graduationDate: getGraduationDate(student),
       startYearAtUniversity: getStartingYear(student),

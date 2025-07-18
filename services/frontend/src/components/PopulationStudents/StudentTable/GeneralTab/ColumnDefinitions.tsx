@@ -1,4 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check'
+import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
@@ -111,7 +112,17 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
         header: 'Semesters present',
         Cell: ({ cell }) => {
           const { content } = cell.getValue()
-          return content ?? null
+          if (!content) return null
+
+          return (
+            <Box sx={{ display: 'flex', m: 0.5 }}>
+              {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+                <Tooltip key={key} placement="top" title={onHoverString}>
+                  <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+                </Tooltip>
+              ))}
+            </Box>
+          )
         },
       }),
       columnHelper.accessor('graduationDate', {

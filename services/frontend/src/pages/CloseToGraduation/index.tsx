@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { range } from 'lodash'
@@ -182,7 +183,20 @@ export const CloseToGraduation = () => {
       {
         header: 'Semester enrollments',
         accessorFn: row => getSemesterEnrollmentsVal(row.student, row.studyright),
-        Cell: ({ row }) => getSemesterEnrollmentsContent(row.original.student, row.original.studyright),
+        Cell: ({ row }) => {
+          const content = getSemesterEnrollmentsContent(row.original.student, row.original.studyright)
+          if (!content) return null
+
+          return (
+            <Box sx={{ display: 'flex', m: 0.5 }}>
+              {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+                <Tooltip key={key} placement="top" title={onHoverString}>
+                  <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+                </Tooltip>
+              ))}
+            </Box>
+          )
+        },
         id: 'semesterEnrollments',
       },
       {

@@ -1,15 +1,12 @@
-.enrollment-label-no-margin {
-  border-radius: 0.28rem;
-  box-shadow:
-    0 1px 3px 0 #d4d4d5,
-    0 0 0 1px #d4d4d5;
-  display: inline-block;
-  width: 15px;
-  height: 15px;
+.enrollment-label {
+  width: 1em;
+  height: 1em;
+  margin: 0 1px;
+  border-radius: 0.25em;
 }
 
-.margin-right:not(:last-child) {
-  margin-right: 0.75rem;
+.enrollment-label:nth-of-type(even):not(:last-child) {
+  margin-right: 6px;
 }
 
 .label-present {
