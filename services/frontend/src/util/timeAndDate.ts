@@ -1,11 +1,9 @@
-import dayjs from 'dayjs'
+import dayjs, { type Dayjs } from 'dayjs'
 
 import { DateFormat } from '@/constants/date'
 
-export const getAge = (birthDate: string, integer = true, dateToCompare = new Date()) => {
-  const age = dayjs(dateToCompare).diff(dayjs(birthDate), 'years', true)
-  return integer ? Math.floor(age) : age
-}
+export const getAge = (birthDate: string | Date | Dayjs, integer = true, dateToCompare = new Date()) =>
+  dayjs(dateToCompare).diff(birthDate, 'years', !integer)
 
 export const getTimestamp = () => formatDate(new Date(), DateFormat.ISO_DATE)
 
