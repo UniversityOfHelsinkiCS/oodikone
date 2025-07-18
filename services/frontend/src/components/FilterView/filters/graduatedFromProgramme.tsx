@@ -47,7 +47,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
 
   return (
     <FilterRadio
-      defaultOption={{ text: 'All', value: DEFAULT_STATE }}
+      defaultOption={{ key: undefined, text: 'All', value: DEFAULT_STATE }}
       filterKey="graduatedFromProgrammeFilter"
       onChange={({ target }) => onOptionsChange({ mode: target.value })}
       options={modeOptions}
