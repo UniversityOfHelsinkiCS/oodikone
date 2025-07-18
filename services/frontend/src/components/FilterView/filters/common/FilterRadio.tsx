@@ -14,7 +14,7 @@ type SelectOption<T extends ValidValueType> = {
   amount?: number
 }
 
-type FilterSelectProps<T extends ValidValueType> = {
+type FilterRadioProps<T extends ValidValueType> = {
   defaultOption: SelectOption<T>
   options: SelectOption<T>[]
   filterKey?: string
@@ -26,7 +26,7 @@ export const FilterRadio = <T extends ValidValueType = string>({
   options,
   onChange,
   filterKey,
-}: FilterSelectProps<T>) => {
+}: FilterRadioProps<T>) => {
   const RadioButton = ({ option }: { option: SelectOption<T> }) => {
     const radioGroup = useRadioGroup()
 
@@ -43,7 +43,7 @@ export const FilterRadio = <T extends ValidValueType = string>({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <RadioGroup name="mygroup" onChange={onChange} defaultValue={defaultOption.value}>
+      <RadioGroup defaultValue={defaultOption.value} name="mygroup" onChange={onChange}>
         <RadioButton option={defaultOption} />
         {options.map(option => (
           <RadioButton key={option.key} option={option} />
