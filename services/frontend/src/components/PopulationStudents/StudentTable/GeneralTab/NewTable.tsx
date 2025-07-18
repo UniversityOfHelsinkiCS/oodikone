@@ -8,7 +8,7 @@ import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { FormattedStudentData } from '../GeneralTab'
 
 import { formatStudent } from './formatStudents'
-import { baseColumns } from './baseColumns'
+import { useGetColumnDefinitions } from './baseColumns'
 
 export const NewTable = ({
   variant,
@@ -38,7 +38,7 @@ export const NewTable = ({
   const data = useMemo(() => filteredStudents.map(student => formatStudent(student, { isAdmin, programmeCode, getTextIn })), [filteredStudents])
 
   const columns: ColumnDef<FormattedStudentData, any>[] = [
-    ...baseColumns({
+    ...useGetColumnDefinitions({
       getTextIn,
       combinedProgrammeCode,
       isMastersProgramme,
