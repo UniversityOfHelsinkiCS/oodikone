@@ -12,7 +12,6 @@ type SelectOption<T extends ValidValueType> = {
   key?: string
   text: string
   value: T
-  amount?: number
   disabled?: boolean
 }
 
