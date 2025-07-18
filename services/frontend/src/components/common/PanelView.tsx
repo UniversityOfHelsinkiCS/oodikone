@@ -16,6 +16,7 @@ export const PanelView = ({ panels: initialPanels }) => {
     setActiveIndex([...currentActiveIndex])
   }
 
+  // Remove this after each view is fixed to not include null along other panels
   const availablePanels = useMemo(() => initialPanels.filter(panel => !!panel), [initialPanels])
 
   const panels = useMemo(

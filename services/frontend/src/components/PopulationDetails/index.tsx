@@ -99,15 +99,12 @@ export const PopulationDetails = ({
         </div>
       ),
     },
-    {
-      title: 'Credit statistics',
-      content:
-        query.years.length > 1 ? (
-          <div>This table is omitted when searching population of multiple years</div>
-        ) : (
-          <CreditGainStats filteredStudents={filteredStudents} query={query} year={query.years[0]} />
-        ),
-    },
+    query.years.length <= 1
+      ? {
+          title: 'Credit statistics',
+          content: <CreditGainStats filteredStudents={filteredStudents} query={query} year={query.years[0]} />,
+        }
+      : null,
     {
       title: 'Age distribution',
       content: <AgeStats filteredStudents={filteredStudents} query={query} />,
@@ -157,7 +154,7 @@ export const PopulationDetails = ({
           ),
         }
       : null,
-  ]
+  ].filter(panel => !!panel)
 
   return (
     <Box sx={{ mx: 2 }}>

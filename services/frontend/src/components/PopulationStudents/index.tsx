@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { useRef } from 'react'
 import { Tab } from 'semantic-ui-react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -92,12 +91,11 @@ export const PopulationStudents = ({
   year,
 }: PopulationStudentsProps) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
-  const studentRef = useRef(null)
 
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
-  const availablePanels = {
+  const availableTabs = {
     General: () => (
       <GeneralTab
         combinedProgramme={combinedProgramme}
@@ -144,45 +142,46 @@ export const PopulationStudents = ({
 
   const contentByVariant: {
     [K in PopulationStudentsProps['variant']]: {
-      panesToInclude: (keyof typeof availablePanels)[]
-      infotoolTipContent: string
+      tabs: (keyof typeof availableTabs)[]
+      tooltip: string
     }
   } = {
     population: {
-      panesToInclude:
+      tabs:
         year === 'All' || (programme && !isBachelorOrLicentiateProgramme(programme))
           ? ['General', 'Courses', 'Modules', 'Tags']
           : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
-      infotoolTipContent: populationStatisticsToolTips.studentsClass,
+      tooltip: populationStatisticsToolTips.studentsClass,
     },
     coursePopulation: {
-      panesToInclude: ['General'],
-      infotoolTipContent: coursePopulationToolTips.students,
+      tabs: ['General'],
+      tooltip: coursePopulationToolTips.students,
     },
     customPopulation: {
-      panesToInclude: ['General'],
-      infotoolTipContent: populationStatisticsToolTips.studentsCustom,
+      tabs: ['General'],
+      tooltip: populationStatisticsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {
-      panesToInclude: studyGuidanceGroup?.tags?.studyProgramme
+      tabs: studyGuidanceGroup?.tags?.studyProgramme
         ? isBachelorOrLicentiateProgramme(studyGuidanceGroup?.tags?.studyProgramme)
           ? ['General', 'Courses', 'Modules', 'Progress']
           : ['General', 'Courses', 'Modules']
         : ['General'],
-      infotoolTipContent: populationStatisticsToolTips.studentsGuidanceGroups,
+      tooltip: populationStatisticsToolTips.studentsGuidanceGroups,
     },
   }
 
   const contentToInclude = contentByVariant[variant]
-  const panels = Object.entries(availablePanels)
-    .filter(([key, _]) => contentToInclude.panesToInclude.includes(key as keyof typeof availablePanels))
+  const tabs = Object.entries(availableTabs)
+    .filter(([key, _]) => contentToInclude.tabs.includes(key as keyof typeof availableTabs))
     .map(([key, val]) => ({ menuItem: key, render: val }))
 
   if (filteredStudents.length === 0) return null
+
   return (
     <>
-      <span ref={studentRef} style={{ marginRight: '0.5rem' }}>
-        <InfoBox content={contentToInclude.infotoolTipContent} />
+      <span style={{ marginRight: '0.5rem' }}>
+        <InfoBox content={contentToInclude.tooltip} />
       </span>
       {isAdmin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -197,7 +196,7 @@ export const PopulationStudents = ({
         </div>
         {dataExport}
       </div>
-      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={panels} />
+      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={tabs} />
     </>
   )
 }
