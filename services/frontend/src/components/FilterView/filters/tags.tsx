@@ -1,10 +1,11 @@
-import { Form, Dropdown, Message } from 'semantic-ui-react'
+import Alert from '@mui/material/Alert'
+import Stack from '@mui/material/Stack'
 
 import { FilterTrayProps } from '../FilterTray'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
-  const name = 'tagsFilter'
   const { includedTags, excludedTags } = options
 
   const tagCounts: Record<string, { count: number; name: string }> = {}
@@ -18,6 +19,9 @@ const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps)
     }
   }
 
+  if (!Object.keys(tagCounts).length)
+    return <Alert severity="warning">No tags have been defined for any of the selected students.</Alert>
+
   const dropdownOptions = Object.entries(tagCounts).map(([tagId, { count, name }]) => ({
     key: `tag-${tagId}`,
     text: `${name} (${count})`,
@@ -27,42 +31,25 @@ const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps)
   const includeOptions = dropdownOptions.filter(({ value }) => !excludedTags.includes(value))
   const excludeOptions = dropdownOptions.filter(({ value }) => !includedTags.includes(value))
 
-  if (!Object.keys(tagCounts).length)
-    return (
-      <Message color="orange" size="tiny">
-        No tags have been defined for any of the selected students.
-      </Message>
-    )
-
   return (
-    <Form>
-      <Form.Field>
-        <label>Include students with tags</label>
-        <Dropdown
-          data-cy={`${name}-dropdown-include`}
-          fluid
-          multiple
-          onChange={(_, { value }) => onOptionsChange({ includedTags: value, excludedTags })}
-          options={includeOptions}
-          placeholder="Choose tags to include"
-          selection
-          value={includedTags}
-        />
-      </Form.Field>
-      <Form.Field>
-        <label>Exclude students with tags</label>
-        <Dropdown
-          data-cy={`${name}-dropdown-exclude`}
-          fluid
-          multiple
-          onChange={(_, { value }) => onOptionsChange({ includedTags, excludedTags: value })}
-          options={excludeOptions}
-          placeholder="Choose tags to exclude"
-          selection
-          value={excludedTags}
-        />
-      </Form.Field>
-    </Form>
+    <Stack gap={1}>
+      <FilterSelect
+        filterKey="tagsFilter-include"
+        label="Include students with tags"
+        multiple
+        onChange={({ target }) => onOptionsChange({ ...options, includedTags: target.value })}
+        options={includeOptions}
+        value={includedTags}
+      />
+      <FilterSelect
+        filterKey="tagsFilter-exclude"
+        label="Exclude students with tags"
+        multiple
+        onChange={({ target }) => onOptionsChange({ ...options, excludedTags: target.value })}
+        options={excludeOptions}
+        value={excludedTags}
+      />
+    </Stack>
   )
 }
 
