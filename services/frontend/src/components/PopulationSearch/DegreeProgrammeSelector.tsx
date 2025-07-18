@@ -93,9 +93,6 @@ export const DegreeProgrammeSelector = ({
 
   return (
     <Box sx={{ m: 1 }}>
-      <Typography fontWeight="bold" sx={{ mb: 1 }} variant="subtitle1">
-        Degree programme
-      </Typography>
       <Stack data-cy="population-programme-selector-parent" direction="row" spacing={2}>
         <Autocomplete
           autoComplete

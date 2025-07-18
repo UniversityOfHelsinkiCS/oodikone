@@ -1,11 +1,16 @@
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router'
 
+import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { SearchHistory } from '@/components/material/SearchHistory'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
 import type {
   PopulationSearchProgramme,
   PopulationSearchStudyTrack,
@@ -32,6 +37,13 @@ export const PopulationSearchForm = () => {
   const [showBachelorAndMaster, setShowBachelorAndMaster] = useState(false)
   const [filterProgrammes, setFilterProgrammes] = useState<boolean>(fullAccessToStudentData)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
+
+  const { data: studyTracks = {}, isLoading } = useGetStudyTracksQuery(
+    { id: programme?.code ?? '' },
+    { skip: !programme }
+  )
+
+  const studyTracksAvailable = Object.values(studyTracks).length > 1 && !isLoading && !!programme
 
   const handleProgrammeChange = (newProgramme: PopulationSearchProgramme | null) => {
     setProgramme(newProgramme ?? null)
@@ -82,24 +94,44 @@ export const PopulationSearchForm = () => {
     return null
   }
 
+  const Subtitle = ({ text, disabled = false }) => (
+    <Typography color={disabled ? 'textDisabled' : 'inherit'} fontWeight="bold" sx={{ mb: '1em' }} variant="subtitle1">
+      {text}
+    </Typography>
+  )
+
   return (
     <Stack spacing={3} sx={{ maxWidth: '1200px', width: '100%' }}>
-      <EnrollmentDateSelector
-        filterProgrammes={filterProgrammes}
-        fullAccessToStudentData={fullAccessToStudentData}
-        setFilterProgrammes={setFilterProgrammes}
-        setYear={setYear}
-        year={year}
-      />
-      <DegreeProgrammeSelector
-        filterProgrammes={filterProgrammes}
-        handleChange={handleProgrammeChange}
-        programme={programme}
-        setShowBachelorAndMaster={setShowBachelorAndMaster}
-        showBachelorAndMaster={showBachelorAndMaster}
-      />
-      <StudyTrackSelector programme={programme} setStudyTrack={setStudyTrack} studyTrack={studyTrack} />
-      <Button disabled={!programme} onClick={handleSubmit} size="large" sx={{ maxWidth: '12rem' }} variant="contained">
+      <Box>
+        <Subtitle text="Class of" />
+        <Stack direction="row" spacing={2}>
+          <EnrollmentDateSelector setYear={setYear} year={year} />
+          {fullAccessToStudentData && (
+            <FilterOldProgrammesToggle checked={filterProgrammes} onChange={() => setFilterProgrammes(prev => !prev)} />
+          )}
+        </Stack>
+      </Box>
+      <Box>
+        <Subtitle text="Degree programme" />
+        <DegreeProgrammeSelector
+          filterProgrammes={filterProgrammes}
+          handleChange={handleProgrammeChange}
+          programme={programme}
+          setShowBachelorAndMaster={setShowBachelorAndMaster}
+          showBachelorAndMaster={showBachelorAndMaster}
+        />
+      </Box>
+      <Box data-cy="population-studytrack-selector-parent">
+        <Subtitle disabled={!studyTracksAvailable} text="Study track (optional)" />
+        <StudyTrackSelector
+          programmeCode={programme?.code}
+          setStudyTrack={setStudyTrack}
+          studyTrack={studyTrack}
+          studyTracks={studyTracks}
+          studyTracksAvailable={studyTracksAvailable}
+        />
+      </Box>
+      <Button disabled={!programme} onClick={handleSubmit} size="large" sx={{ maxWidth: '14em' }} variant="contained">
         See class
       </Button>
       <SearchHistory handleSearch={pushQueryToUrl} items={searchHistory} updateItem={updateItemInSearchHistory} />
