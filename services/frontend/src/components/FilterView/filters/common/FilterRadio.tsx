@@ -43,7 +43,7 @@ export const FilterRadio = <T extends ValidValueType = string>({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <RadioGroup name="mygroup" onChange={onChange}>
+      <RadioGroup name="mygroup" onChange={onChange} defaultValue={defaultOption.value}>
         <RadioButton option={defaultOption} />
         {options.map(option => (
           <RadioButton key={option.key} option={option} />
