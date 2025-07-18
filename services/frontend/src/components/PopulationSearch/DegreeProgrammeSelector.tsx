@@ -1,6 +1,5 @@
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
@@ -92,55 +91,53 @@ export const DegreeProgrammeSelector = ({
   }
 
   return (
-    <Box sx={{ m: 1 }}>
-      <Stack data-cy="population-programme-selector-parent" direction="row" spacing={2}>
-        <Autocomplete
-          autoComplete
-          autoHighlight
-          clearOnEscape
-          disablePortal
-          fullWidth
-          getOptionLabel={opt => `${opt.name} - ${opt.code}`}
-          onChange={(_, value) => handleChange(value)}
-          options={programmeOptions}
-          renderInput={params => (
-            <TextField
-              {...params}
-              data-cy="population-programme-selector"
-              placeholder="Select degree programme"
-              sx={{ p: 0, border: 'none' }}
-            />
-          )}
-          renderOption={(props, option) => {
-            const { key, ...optionProps } = props
-            return (
-              <Stack component="li" direction="row" key={key} spacing={2} sx={{ width: '100%' }} {...optionProps}>
-                <ToggleablePin programme={option} />
-                <Typography sx={{ flex: 1, p: 0.4 }}>{option.name}</Typography>
-                <Typography alignSelf="flex-end" fontWeight="300" sx={{ ml: 2 }} variant="body2">
-                  {option.code}
-                </Typography>
-              </Stack>
-            )
-          }}
-          value={programme}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showBachelorAndMaster}
-              disabled={!bachelorOrMasterProgrammeIsSelected}
-              onChange={() => setShowBachelorAndMaster(prev => !prev)}
-            />
-          }
-          label={
-            <Stack direction="row" spacing={1}>
-              <Typography sx={{ whiteSpace: 'nowrap' }}>Show Bachelor & Master</Typography>
-              <InfoBox content={bachelorAndMasterInfoTooltip} mini />
+    <Stack data-cy="population-programme-selector-parent" direction="row" spacing={2}>
+      <Autocomplete
+        autoComplete
+        autoHighlight
+        clearOnEscape
+        disablePortal
+        fullWidth
+        getOptionLabel={opt => `${opt.name} - ${opt.code}`}
+        onChange={(_, value) => handleChange(value)}
+        options={programmeOptions}
+        renderInput={params => (
+          <TextField
+            {...params}
+            data-cy="population-programme-selector"
+            placeholder="Select degree programme"
+            sx={{ p: 0, border: 'none' }}
+          />
+        )}
+        renderOption={(props, option) => {
+          const { key, ...optionProps } = props
+          return (
+            <Stack component="li" direction="row" key={key} spacing={2} sx={{ width: '100%' }} {...optionProps}>
+              <ToggleablePin programme={option} />
+              <Typography sx={{ flex: 1, p: 0.4 }}>{option.name}</Typography>
+              <Typography alignSelf="flex-end" fontWeight="300" sx={{ ml: 2 }} variant="body2">
+                {option.code}
+              </Typography>
             </Stack>
-          }
-        />
-      </Stack>
-    </Box>
+          )
+        }}
+        value={programme}
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={showBachelorAndMaster}
+            disabled={!bachelorOrMasterProgrammeIsSelected}
+            onChange={() => setShowBachelorAndMaster(prev => !prev)}
+          />
+        }
+        label={
+          <Stack direction="row" spacing={1}>
+            <Typography sx={{ whiteSpace: 'nowrap' }}>Show Bachelor & Master</Typography>
+            <InfoBox content={bachelorAndMasterInfoTooltip} mini />
+          </Stack>
+        }
+      />
+    </Stack>
   )
 }
