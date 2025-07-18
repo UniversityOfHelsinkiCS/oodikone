@@ -1,9 +1,12 @@
+import MenuItem from '@mui/material/MenuItem'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import { Dropdown, type DropdownProps } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
 dayjs.extend(isSameOrBefore)
@@ -50,20 +53,6 @@ const ProgrammeFilterCard = ({ args, onOptionsChange, options, precomputed: stud
     }))
     .sort((a, b) => a.text.localeCompare(b.text))
 
-  const handleChange: NonNullable<DropdownProps['onChange']> = (_, { value }) => {
-    onOptionsChange({
-      ...options,
-      selectedProgrammes: value,
-    })
-  }
-
-  const setMode = mode => {
-    onOptionsChange({
-      ...options,
-      mode,
-    })
-  }
-
   const builtInModes = [
     {
       key: 'any',
@@ -79,60 +68,46 @@ const ProgrammeFilterCard = ({ args, onOptionsChange, options, precomputed: stud
     },
   ]
 
+  const modes = [...builtInModes, ...additionalModes]
+  const modeOptions = modes.map(mode => ({
+    key: mode.key,
+    value: mode.key,
+    text: mode.label,
+  }))
+
+  // TODO: Add infobox
   return (
     <>
-      <Dropdown
-        closeOnChange
-        data-cy="Programme-filter-dropdown"
-        fluid
+      <FilterSelect
+        filterKey="programmeFilter"
+        label="Select programme"
         multiple
-        name="programmeFilterCard"
-        onChange={handleChange}
+        onChange={({ target }) => onOptionsChange({ ...options, selectedProgrammes: target.value })}
         options={dropdownOptions}
-        placeholder="Select programme"
-        search
-        selection
         value={selectedProgrammes}
       />
-      <div style={{ marginTop: '0.5em' }}>
-        Mode:{' '}
-        <Dropdown
-          compact
-          data-cy="Programme-filter-mode-selector"
-          inline
-          onChange={(_, { value }) => setMode(value)}
-          options={[...builtInModes, ...additionalModes].map(mode => ({
-            key: mode.key,
-            value: mode.key,
-            text: mode.label,
-            content: (
-              <>
-                {mode.label}
-                {mode.description && (
-                  <>
-                    <br />
-                    <span
-                      style={{
-                        fontWeight: 'normal',
-                        marginTop: '0.4em',
-                        color: '#5b5b5b',
-                        maxWidth: '13em',
-                        whiteSpace: 'normal',
-                        display: 'inline-block',
-                        fontSize: '0.9em',
-                      }}
-                    >
-                      {mode.description}
-                    </span>
-                  </>
-                )}
-              </>
-            ),
-          }))}
-          placeholder="Type"
-          value={options.mode ?? 'active'}
-        />
-      </div>
+      <FilterSelect
+        InputItem={value => (
+          <Typography fontWeight={500} px={0.5}>
+            {modeOptions.find(mode => value === mode.value)!.text}
+          </Typography>
+        )}
+        MenuItem={option => (
+          <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
+            <Stack>
+              <Typography fontWeight={500}>{option.text}</Typography>
+              <Typography sx={{ color: '#5b5b5b', fontSize: '0.9em' }}>
+                {modes.find(mode => option.key === mode.key)?.description}
+              </Typography>
+            </Stack>
+          </MenuItem>
+        )}
+        filterKey="programmeFilter-mode"
+        label="Select Mode"
+        onChange={({ target }) => onOptionsChange({ ...options, mode: target.value })}
+        options={modeOptions}
+        value={options.mode}
+      />
     </>
   )
 }
