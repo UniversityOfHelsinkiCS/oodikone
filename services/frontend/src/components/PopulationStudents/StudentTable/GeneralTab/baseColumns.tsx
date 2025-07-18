@@ -14,7 +14,7 @@ import { FormattedStudentData } from '../GeneralTab'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
-export const baseColumns = ({
+export const useGetColumnDefinitions = ({
   getTextIn,
   combinedProgrammeCode,
   isMastersProgramme,
@@ -165,4 +165,8 @@ export const baseColumns = ({
       return 'Master graduation date'
     }
   }),
-], [])
+], [
+  combinedProgrammeCode,
+  isMastersProgramme,
+  includePrimaryProgramme,
+])
