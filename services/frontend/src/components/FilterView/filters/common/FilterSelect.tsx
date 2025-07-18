@@ -23,7 +23,15 @@ type FilterSelectProps<T extends ValidValueType> = {
   onChange: (event: SelectChangeEvent<T | T[]>) => void
   filterKey?: string
   multiple?: true
+  InputItem?: (value: T | T[]) => JSX.Element
+  MenuItem?: (option: SelectOption<T>) => JSX.Element
 }
+
+const DefaultMenuItem = option => (
+  <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
+    {option.text}
+  </MenuItem>
+)
 
 export const FilterSelect = <T extends ValidValueType = string>({
   label,
@@ -32,6 +40,8 @@ export const FilterSelect = <T extends ValidValueType = string>({
   onChange,
   filterKey,
   multiple,
+  InputItem,
+  MenuItem,
 }: FilterSelectProps<T>) => (
   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
     <FormControl sx={{ width: '95%' }} variant="outlined">
@@ -44,14 +54,11 @@ export const FilterSelect = <T extends ValidValueType = string>({
         labelId={filterKey}
         multiple={multiple}
         onChange={onChange}
+        renderValue={InputItem}
         size="small"
         value={value}
       >
-        {options.map(option => (
-          <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
-            {option.text}
-          </MenuItem>
-        ))}
+        {options.map(MenuItem ?? DefaultMenuItem)}
       </Select>
     </FormControl>
   </Box>
