@@ -1,6 +1,7 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
+import { SxProps, Theme } from '@mui/material/styles'
 import styled from '@mui/material/styles/styled'
 import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -21,10 +22,12 @@ export const InfoBox = ({
   content,
   cypress = '',
   mini = false,
+  sx,
 }: {
   content: string
   cypress?: string
   mini?: boolean
+  sx?: SxProps<Theme>
 }) => {
   return (
     <CustomWidthTooltip
@@ -36,11 +39,17 @@ export const InfoBox = ({
       }
     >
       {mini ? (
-        <IconButton data-cy={`${cypress}-info-box-button`} sx={{ padding: 0 }}>
+        <IconButton data-cy={`${cypress}-info-box-button`} sx={{ padding: 0, ...sx }}>
           <HelpOutlineIcon color="info" fontSize="small" />
         </IconButton>
       ) : (
-        <Button color="info" data-cy={`${cypress}-info-box-button`} startIcon={<HelpOutlineIcon />} variant="contained">
+        <Button
+          color="info"
+          data-cy={`${cypress}-info-box-button`}
+          startIcon={<HelpOutlineIcon />}
+          sx={sx}
+          variant="contained"
+        >
           Info
         </Button>
       )}
