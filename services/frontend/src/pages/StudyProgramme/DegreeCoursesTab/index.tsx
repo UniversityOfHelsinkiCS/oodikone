@@ -68,7 +68,7 @@ export const DegreeCoursesTab = ({
         <DegreeCourseTable
           combinedProgramme=""
           criteria={criteria}
-          curriculumVersion={curriculum.version}
+          curriculumVersion={curriculum.periodIds}
           modules={defaultProgrammeModules}
           studyProgramme={degreeProgramme}
         />
@@ -77,7 +77,7 @@ export const DegreeCoursesTab = ({
         <DegreeCourseTable
           combinedProgramme={combinedProgramme}
           criteria={criteria}
-          curriculumVersion={curriculum.version}
+          curriculumVersion={curriculum.periodIds}
           modules={secondProgrammeModules}
           studyProgramme={degreeProgramme}
         />

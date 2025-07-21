@@ -21,6 +21,7 @@ import {
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationStudents } from '@/components/PopulationStudents'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useCurriculumState } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
@@ -54,26 +55,26 @@ export const PopulationDetails = ({
   const { programme, combinedProgramme, showBachelorAndMaster } = query
 
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
+  const [courseTableMode, setCourseTableMode] = useState<'curriculum' | 'all'>('curriculum')
+  const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
 
   const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected())
   const combinedHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgramme))
   const bothHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgramme))
   const transferredSelected = useFilterSelector(transferredToProgrammeFilter.selectors.getState())
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
+  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
 
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
-  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
-  const [courseTableMode, setCourseTableMode] = useState('curriculum')
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
-
-  const onStudentAmountLimitChange = value => {
-    if (!Number.isNaN(Number(value))) setStudentAmountLimit(+value)
+  const onStudentAmountLimitChange = (value: string) => {
+    if (/^\d*$/.test(value)) {
+      setStudentAmountLimit(value === '' ? 0 : +value)
+    }
   }
 
   if (isLoading || authLoading) return null

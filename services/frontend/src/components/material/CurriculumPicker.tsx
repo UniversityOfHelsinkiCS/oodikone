@@ -1,6 +1,7 @@
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
+import type { Dispatch, SetStateAction } from 'react'
 
 import { CurriculumOption } from '@oodikone/shared/types'
 
@@ -13,7 +14,7 @@ export const CurriculumPicker = ({
   disabled?: boolean
   curriculum: CurriculumOption | null
   curriculumList: CurriculumOption[]
-  setCurriculum: (curriculum?: CurriculumOption) => void
+  setCurriculum: Dispatch<SetStateAction<CurriculumOption | null>>
 }) => {
   if (!curriculumList.length || !curriculum) return null
 
@@ -24,7 +25,7 @@ export const CurriculumPicker = ({
           disablePortal: true,
         }}
         data-cy="curriculum-picker"
-        onChange={event => setCurriculum(curriculumList.find(({ id }) => id === event.target.value))}
+        onChange={event => setCurriculum(curriculumList.find(({ id }) => id === event.target.value)!)}
         value={curriculum.id}
       >
         {curriculumList.map(({ id, name }) => (

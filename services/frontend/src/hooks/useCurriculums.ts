@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState, Dispatch, SetStateAction } from 'react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
 import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
 
-export type ExtendedCurriculumDetails = CurriculumDetails & { id: string; version: string[] }
+export type ExtendedCurriculumDetails = CurriculumDetails & CurriculumOption
 
 export const useCurriculumState = (
   programmeCode: string,
   year: string | number
-): [
-  ExtendedCurriculumDetails | null,
-  CurriculumOption[],
-  React.Dispatch<React.SetStateAction<CurriculumOption | null>>,
-] => {
+): [ExtendedCurriculumDetails | null, CurriculumOption[], Dispatch<SetStateAction<CurriculumOption | null>>] => {
   const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | null>(null)
   const [curriculum, setCurriculum] = useState<ExtendedCurriculumDetails | null>(null)
 
@@ -37,7 +33,7 @@ export const useCurriculumState = (
 
   useEffect(() => {
     if (curriculumData) {
-      setCurriculum({ ...curriculumData, id: chosenCurriculum.id, version: chosenCurriculum.periodIds })
+      setCurriculum({ ...curriculumData, ...chosenCurriculum })
     }
   }, [curriculumData, chosenCurriculum])
 
