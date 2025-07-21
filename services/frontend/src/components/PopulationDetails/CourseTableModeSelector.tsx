@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import RadioMui from '@mui/material/Radio'
+import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
@@ -37,7 +37,7 @@ export const CourseTableModeSelector = ({
     <RadioGroup>
       <Box>
         <FormControlLabel
-          control={<RadioMui checked={courseTableMode === 'curriculum'} onChange={handleRadioChange} size="small" />}
+          control={<Radio checked={courseTableMode === 'curriculum'} onChange={handleRadioChange} size="small" />}
           label={<Typography fontWeight={500}>Choose curriculum</Typography>}
           value={'curriculum'}
         />
@@ -50,7 +50,7 @@ export const CourseTableModeSelector = ({
       </Box>
       <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
         <FormControlLabel
-          control={<RadioMui checked={courseTableMode === 'all'} onChange={handleRadioChange} size="small" />}
+          control={<Radio checked={courseTableMode === 'all'} onChange={handleRadioChange} size="small" />}
           label={<Typography fontWeight={500}>Select all courses with at least</Typography>}
           value={'all'}
         />
