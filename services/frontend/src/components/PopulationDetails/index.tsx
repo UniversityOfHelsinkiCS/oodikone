@@ -31,7 +31,7 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
-import { CreditGainStats } from './CreditGainStats'
+import { CreditStatistics } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
 
@@ -103,7 +103,7 @@ export const PopulationDetails = ({
     query.years.length <= 1
       ? {
           title: 'Credit statistics',
-          content: <CreditGainStats filteredStudents={filteredStudents} query={query} year={query.years[0]} />,
+          content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
         }
       : null,
     {

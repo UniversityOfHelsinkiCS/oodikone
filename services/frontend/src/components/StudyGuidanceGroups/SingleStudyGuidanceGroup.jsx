@@ -14,7 +14,7 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
-import { CreditGainStats } from '@/components/PopulationDetails/CreditGainStats'
+import { CreditStatistics } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
@@ -87,7 +87,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
           title: 'Credit statistics',
           content: !query?.years ? (
             <div>
-              <CreditGainStats filteredStudents={filteredStudents} query={query} year={group.tags.year} />
+              <CreditStatistics filteredStudents={filteredStudents} query={query} sggYear={group.tags.year} />
             </div>
           ) : (
             <div>This table is omitted when searching population of multiple years</div>
