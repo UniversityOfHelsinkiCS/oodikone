@@ -98,11 +98,16 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
         <Table data-cy="age-distribution-table">
           <TableHead>
             <TableRow>
-              <TableCell>Current age</TableCell>
               <TableCell>
-                Number of students <Typography fontWeight="250">(n={total})</Typography>
+                <Typography fontWeight="inherit">Current age</Typography>
               </TableCell>
-              <TableCell>Percentage of population</TableCell>
+              <TableCell>
+                <Typography fontWeight="inherit">Number of students</Typography>
+                <Typography fontWeight="250">(n = {total})</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight="inherit">Percentage of population</Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -115,13 +120,15 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                 >
                   <TableCell>
                     <Box alignItems="center" display="flex" justifyContent="left">
-                      {getAgeCellContent(age)}
+                      <Typography>{getAgeCellContent(age)}</Typography>
                       {isGrouped &&
                         !onlyIamRights &&
                         (expandedGroups.includes(index) ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
                     </Box>
                   </TableCell>
-                  <TableCell>{count}</TableCell>
+                  <TableCell>
+                    <Typography>{count}</Typography>
+                  </TableCell>
                   <TableCell sx={{ width: '20em' }}>
                     <PercentageBar denominator={total} numerator={count} />
                   </TableCell>
@@ -133,8 +140,12 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                     .map(([nonGroupedAge, nonGroupedAgeCount]) => {
                       return (
                         <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
-                          <TableCell>{nonGroupedAge}</TableCell>
-                          <TableCell>{nonGroupedAgeCount}</TableCell>
+                          <TableCell>
+                            <Typography>{nonGroupedAge}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography>{nonGroupedAgeCount}</Typography>
+                          </TableCell>
                           <TableCell>
                             <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
                           </TableCell>
