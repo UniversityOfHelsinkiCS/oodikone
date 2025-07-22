@@ -21,19 +21,6 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
   const admissionTypesAvailable =
     filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme)(null)).length
 
-  const GetCreditsGainedTable = ({ type }: { type: (typeof admissionTypes)[number] }) => {
-    const filteredStudentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
-    return (
-      <CreditsGainedTable
-        filteredStudents={filteredStudentsByAdmissionType}
-        key={`creditsgainedtable-admissiontype-${type}`}
-        programmeGoalTime={programmeGoalTime}
-        type={type ?? 'Ei valintatapaa'}
-        year={year}
-      />
-    )
-  }
-
   return (
     <Stack direction="column" spacing={'2em'}>
       <CreditsGainedTable
@@ -49,9 +36,18 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
               By admission type
             </Typography>
           </Divider>
-          {admissionTypes.map(type => (
-            <GetCreditsGainedTable key={type} type={type} />
-          ))}
+          {admissionTypes.map(type => {
+            const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
+            return (
+              <CreditsGainedTable
+                filteredStudents={studentsByAdmissionType}
+                key={`creditsgainedtable-admissiontype-${type}`}
+                programmeGoalTime={programmeGoalTime}
+                type={type ?? 'Ei valintatapaa'}
+                year={year}
+              />
+            )
+          })}
         </>
       )}
     </Stack>
