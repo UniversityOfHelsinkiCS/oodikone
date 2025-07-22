@@ -14,10 +14,11 @@ export const reformatDate = (date: string | Date | null | undefined, outputForma
 
 // Prefer this to using moment as the library is MEGA slow
 // goal is to get rid of moment completely
-export const formatDate = (dateToFormat: string | Date | null | undefined, outputFormat: DateFormat) => {
+export const formatDate = (dateToFormat: string | Date | Dayjs | null | undefined, outputFormat: DateFormat) => {
   if (!dateToFormat) return 'Unavailable'
 
-  const date = new Date(dateToFormat)
+  const date = dayjs.isDayjs(dateToFormat) ? dateToFormat.toDate() : new Date(dateToFormat)
+
   if (isNaN(date.getTime())) return 'Unavailable'
 
   const year = date.getFullYear()
