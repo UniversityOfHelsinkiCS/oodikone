@@ -1,7 +1,9 @@
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
@@ -62,7 +64,7 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
 
     const startFormatted = formatDate(start, DateFormat.DISPLAY_DATE)
     const endFormatted = formatDate(end, DateFormat.DISPLAY_DATE)
-    return `Credits gained between ${startFormatted} and ${endFormatted}`
+    return `Credits gained between\n${startFormatted} and ${endFormatted}`
   }
 
   if (studyPlanFilterIsActive) {
@@ -95,45 +97,52 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
         flexDirection: 'column',
         alignItems: 'center',
         p: 1,
+        my: '1em',
       }}
     >
-      <Typography component="span" sx={{ mt: '1em' }} variant="h5">
+      <Typography component="span" fontSize="1.5em" variant="h5">
         {type}
       </Typography>
-      <Table>
-        <TableHead>
-          <TableRow key={`credits-gained-table-${type}-MATERIALUI`}>
-            <TableCell></TableCell>
-            <TableCell>
-              <Typography fontWeight="inherit">{getTitle()}</Typography>
-              {!studyPlanFilterIsActive && (
-                <Typography fontWeight="250">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
-              )}
-            </TableCell>
-            <TableCell>
-              <Typography fontWeight="inherit">Number of students</Typography>
-              <Typography fontWeight="250">(n = {filteredStudents.length})</Typography>
-            </TableCell>
-            <TableCell>
-              <Typography fontWeight="inherit">Percentage of population</Typography>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody data-cy="credits-gained-table-body">
-          {limits.map(([min, max]) => (
-            <CollapsibleCreditRow
-              filteredLength={filteredStudents.length}
-              getStudentsInCreditCategory={getStudentsInCreditCategory}
-              key={`credits-table-row-${min}-${max}-${type}`}
-              max={max}
-              min={min}
-              months={monthsForLimits}
-              monthsFromStart={months}
-              studyPlanFilterIsActive={studyPlanFilterIsActive}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <TableContainer component={Paper} sx={{ mt: '1em', maxWidth: 'min(95%, 60em)' }} variant="outlined">
+        <Table>
+          <TableHead>
+            <TableRow key={`credits-gained-table-${type}`}>
+              <TableCell></TableCell>
+              <TableCell>
+                <Typography fontWeight="inherit" sx={{ whiteSpace: 'wrap' }}>
+                  {getTitle()}
+                </Typography>
+                {!studyPlanFilterIsActive && (
+                  <Typography fontWeight="250">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
+                )}
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight="inherit" sx={{ whiteSpace: 'wrap' }}>
+                  Number of students
+                </Typography>
+                <Typography fontWeight="250">(n = {filteredStudents.length})</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight="inherit">Percentage of population</Typography>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody data-cy="credits-gained-table-body">
+            {limits.map(([min, max]) => (
+              <CollapsibleCreditRow
+                filteredLength={filteredStudents.length}
+                getStudentsInCreditCategory={getStudentsInCreditCategory}
+                key={`credits-table-row-${min}-${max}-${type}`}
+                max={max}
+                min={min}
+                months={monthsForLimits}
+                monthsFromStart={months}
+                studyPlanFilterIsActive={studyPlanFilterIsActive}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   )
 }

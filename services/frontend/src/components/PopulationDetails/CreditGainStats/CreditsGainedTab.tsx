@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -22,7 +23,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
     filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme)(null)).length
 
   return (
-    <Stack direction="column" spacing={'2em'}>
+    <Stack direction="column" sx={{ p: 1 }}>
       <CreditsGainedTable
         filteredStudents={filteredStudents}
         programmeGoalTime={programmeGoalTime}
@@ -30,9 +31,9 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
         year={year}
       />
       {admissionTypesAvailable && (
-        <>
-          <Divider sx={{ my: '0em' }}>
-            <Typography fontSize="1em" variant="overline">
+        <Box>
+          <Divider sx={{ my: '1em' }}>
+            <Typography fontSize="1.2em" variant="overline">
               By admission type
             </Typography>
           </Divider>
@@ -48,7 +49,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
               />
             ) : null
           })}
-        </>
+        </Box>
       )}
     </Stack>
   )
