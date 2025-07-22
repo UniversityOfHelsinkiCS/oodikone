@@ -3,44 +3,33 @@ import Stack from '@mui/material/Stack'
 
 import { ADMISSION_TYPES } from '@/common'
 import { filter as admissionTypeFilter } from '@/components/FilterView/filters/admissionType'
-import { CreditsGainedTable } from './CreditsGainedTable'
 import { DividerWithText } from './DividerWithText'
+import { StatisticsTable } from './StatisticsTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 
-type CreditsGainedTabProps = {
+type StatisticsTabProps = {
   filteredStudents: any[] // TODO: type
-  programmeGoalTime: number
   programme: string
-  year: number
 }
 
-export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programme, year }: CreditsGainedTabProps) => {
-  if (!filteredStudents?.length || !programme) return null
-
+export const StatisticsTab = ({ filteredStudents, programme }: StatisticsTabProps) => {
   const admissionTypesAvailable =
     filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme)(null)).length
 
   return (
-    <Stack direction="column" sx={{ p: 1 }}>
-      <CreditsGainedTable
-        filteredStudents={filteredStudents}
-        programmeGoalTime={programmeGoalTime}
-        type="All students of the class"
-        year={year}
-      />
+    <Stack>
+      <StatisticsTable filteredStudents={filteredStudents} type="All students of the population" />
       {admissionTypesAvailable && (
         <Box>
           <DividerWithText text="By admission type" />
           {admissionTypes.map(type => {
             const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
             return studentsByAdmissionType.length ? (
-              <CreditsGainedTable
+              <StatisticsTable
                 filteredStudents={studentsByAdmissionType}
-                key={`creditsgainedtable-admissiontype-${type}`}
-                programmeGoalTime={programmeGoalTime}
+                key={`admissiontype-${type}`}
                 type={type ?? 'Ei valintatapaa'}
-                year={year}
               />
             ) : null
           })}

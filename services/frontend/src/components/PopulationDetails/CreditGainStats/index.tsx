@@ -48,7 +48,7 @@ export const CreditStatistics = ({ filteredStudents, query, sggYear }: CreditSta
           year={year}
         />
       )}
-      {selectedTab === 1 && <StatisticsTab allStudents={filteredStudents} programme={programme} />}
+      {selectedTab === 1 && <StatisticsTab filteredStudents={filteredStudents} programme={programme} />}
       {selectedTab === 2 && (
         <Box>
           <CreditDistributionDevelopment
