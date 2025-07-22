@@ -13,7 +13,7 @@ export const PercentageBar = ({ numerator, denominator }: { numerator: number; d
       <Box mr={1} width="100%">
         <LinearProgress
           color="primary"
-          sx={{ height: '1.2em', borderRadius: '3px' }}
+          sx={{ height: '1.6em', borderRadius: '3px' }}
           value={value}
           variant="determinate"
         />
