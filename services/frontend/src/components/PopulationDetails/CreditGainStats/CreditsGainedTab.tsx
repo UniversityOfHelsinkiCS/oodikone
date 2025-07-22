@@ -38,7 +38,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
           </Divider>
           {admissionTypes.map(type => {
             const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
-            return (
+            return studentsByAdmissionType.length ? (
               <CreditsGainedTable
                 filteredStudents={studentsByAdmissionType}
                 key={`creditsgainedtable-admissiontype-${type}`}
@@ -46,7 +46,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
                 type={type ?? 'Ei valintatapaa'}
                 year={year}
               />
-            )
+            ) : null
           })}
         </>
       )}
