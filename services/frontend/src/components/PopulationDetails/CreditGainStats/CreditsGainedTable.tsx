@@ -78,8 +78,8 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
 
   const monthsForLimits = programmeGoalTime ? Math.min(months, programmeGoalTime) : months
 
-  const limits = [
-    [Math.ceil(monthsForLimits * (60 / 12))],
+  const limits: [number | null, number | null][] = [
+    [Math.ceil(monthsForLimits * (60 / 12)), null],
     [Math.ceil(monthsForLimits * (45 / 12)), Math.ceil(monthsForLimits * (60 / 12))],
     [Math.ceil(monthsForLimits * (30 / 12)), Math.ceil(monthsForLimits * (45 / 12))],
     [Math.ceil(monthsForLimits * (15 / 12)), Math.ceil(monthsForLimits * (30 / 12))],
