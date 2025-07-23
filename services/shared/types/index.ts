@@ -31,7 +31,7 @@ export type {
 } from './graduations'
 export type { EncrypterData } from './encryption'
 export type { Name, NameWithCode } from './name'
-export type { ProgressCriteria } from './progressCriteria'
+export type { CriteriaYear, ProgressCriteria } from './progressCriteria'
 export type { Release } from './release'
 export type { Role } from './role'
 export type {
@@ -48,6 +48,7 @@ export type { NewTag, StudentTag, Tag } from './tag'
 export type { SemesterEnrollment } from './semesterEnrollment'
 export type { StudyTrack } from './studyTrack'
 export type { UnifyStatus } from './unification'
+export type { FormattedStudent } from './studentData'
 
 // ENUMS
 export { CreditTypeCode } from './creditTypeCode'

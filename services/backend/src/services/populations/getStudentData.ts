@@ -83,7 +83,7 @@ type StudentStudyRightElement = Pick<
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
 
-type StudentStudyRight = Pick<
+export type StudentStudyRight = Pick<
   SISStudyRight,
   'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
 > & {

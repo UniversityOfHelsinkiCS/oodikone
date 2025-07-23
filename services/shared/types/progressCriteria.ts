@@ -17,3 +17,11 @@ export type ProgressCriteria = {
     yearSix: number
   }
 }
+
+type CoursesSatisfied = Record<string, string | null>
+
+export type CriteriaYear = {
+  credits: boolean
+  totalSatisfied: number
+  coursesSatisfied: CoursesSatisfied
+}

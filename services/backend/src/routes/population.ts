@@ -24,8 +24,8 @@ import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '..
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTags } from '../services/populations/getStudentData'
-import { optimizedStatisticsOf } from '../services/populations/optimizedStatisticsOf'
 import { parseDateRangeFromParams } from '../services/populations/shared'
+import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
 import { ParsedCourse } from '../types'
@@ -83,7 +83,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     const studyRights = [programme]
     const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
-    const result = await optimizedStatisticsOf(studentNumbers, studyRights, tagList, startDate)
+    const result = await statisticsOf(studentNumbers, studyRights, tagList, startDate)
 
     // Obfuscate if user has only limited study programme rights and there are any students
     if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
@@ -145,7 +145,7 @@ router.get<
   const studyRights = []
   const tagList = await getStudentTags(studyRights, studentNumbers, userId)
 
-  const result: any = await optimizedStatisticsOf(studentNumbers, studyRights, tagList)
+  const result: any = await statisticsOf(studentNumbers, studyRights, tagList)
   let courseProviders: string[] = []
   if (!hasFullAccessToStudentData(roles)) {
     courseProviders = await getCourseProvidersForCourses(JSON.parse(coursecodes))
@@ -213,7 +213,7 @@ router.post<never, PostByStudentNumbersResBody, PostByStudentNumbersReqBody>(
       ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
       : { startDate: undefined }
 
-    const result = await optimizedStatisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
+    const result = await statisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
 
     const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
     const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)

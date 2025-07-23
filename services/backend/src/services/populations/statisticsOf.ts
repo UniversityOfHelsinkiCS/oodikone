@@ -26,7 +26,7 @@ export type AnonymousCredit = Omit<StudentCredit, 'student_studentnumber'>
 export type StudentEnrollmentObject = Map<StudentEnrollment['studentnumber'], AnonymousEnrollment[]>
 export type StudentCreditObject = Map<StudentCredit['student_studentnumber'], AnonymousCredit[]>
 
-export const optimizedStatisticsOf = async (
+export const statisticsOf = async (
   studentNumbers: string[],
   studyRights: string[],
   tagList: Record<string, StudentTags[]>,

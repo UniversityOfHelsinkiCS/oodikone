@@ -1,4 +1,5 @@
 import { Name, EnrollmentState, ProgrammeModuleWithRelevantAttributes, UnifyStatus, Unarray } from '../types'
+import { FormattedStudent } from '../types/studentData'
 
 type Course = {
   code: string
@@ -46,7 +47,7 @@ export type CourseStats = {
 }
 
 // populationstatistics
-export type PopulationstatisticsResBody = { students: any; coursestatistics: CourseStats[] }
+export type PopulationstatisticsResBody = { students: FormattedStudent[]; coursestatistics: CourseStats[] }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
   years: string[]

@@ -1,3 +1,5 @@
+export const dayInMilliseconds = 24 * 60 * 60 * 1000
+
 /**
  * @returns A new date with year incremented by the given amount
  */
@@ -22,7 +24,7 @@ export const dateMonthsFromNow = (date: string, months?: string) => {
 /**
  * @returns A new Date with amount of days added to the start date
  */
-export const dateDaysFromNow = (date: Date, days: number) => new Date(date.getTime() + 24 * 60 * 60 * 1000 * days)
+export const dateDaysFromNow = (date: Date, days: number) => new Date(date.getTime() + dayInMilliseconds * days)
 
 /**
  * @returns Smallest Date object, or undefined if dates is empty
