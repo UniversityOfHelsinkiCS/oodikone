@@ -1,25 +1,19 @@
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
-import { type Programme } from '../util'
 
 export const createMaps = (
-  selectedStudents: string[],
-  students: any,
+  students: any[],
   programme: string | null,
   combinedProgramme: string | null,
   year: string | null | undefined,
   currentSemester: any,
   showBachelorAndMaster: boolean
 ) => {
-  const studentToStudyrightStartMap = new Map<string, Date | null>()
   const studentToStudyrightEndMap = new Map<string, Date | null>()
   const studentToSecondStudyrightEndMap = new Map<string, Date | null>()
-  const studentToProgrammeStartMap = new Map<string, Date | null>()
-  const studentToPrimaryProgrammeMap = new Map<string, Programme | undefined>()
-  const studentToOtherProgrammesMap = new Map<string, Programme[] | undefined>()
 
-  for (const studentNumber of selectedStudents) {
-    const student = students[studentNumber]
+  for (const student of students) {
+    const { studentNumber } = student
 
     const studentProgrammes = getAllProgrammesOfStudent(student?.studyRights ?? [], currentSemester)
 
@@ -44,8 +38,6 @@ export const createMaps = (
       })
       .toSorted(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)[0]
 
-    studentToStudyrightStartMap.set(studentNumber, relevantStudyRight?.startDate ?? null)
-    studentToProgrammeStartMap.set(studentNumber, relevantStudyRightElement?.startDate ?? null)
     studentToStudyrightEndMap.set(
       studentNumber,
       relevantStudyRightElement?.graduated ? relevantStudyRightElement.endDate : null
@@ -54,22 +46,10 @@ export const createMaps = (
       studentNumber,
       secondStudyRightElement?.graduated ? secondStudyRightElement.endDate : null
     )
-    studentToPrimaryProgrammeMap.set(
-      studentNumber,
-      studentProgrammes.find(({ code }) => code === programmeCode)
-    )
-    studentToOtherProgrammesMap.set(
-      studentNumber,
-      studentProgrammes.filter(({ code }) => code !== programmeCode)
-    )
   }
 
   return {
-    studentToStudyrightStartMap,
     studentToStudyrightEndMap,
     studentToSecondStudyrightEndMap,
-    studentToProgrammeStartMap,
-    studentToOtherProgrammesMap,
-    studentToPrimaryProgrammeMap,
   }
 }

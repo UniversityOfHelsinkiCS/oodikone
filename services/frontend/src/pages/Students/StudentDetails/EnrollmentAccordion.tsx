@@ -54,14 +54,12 @@ const getProgrammeEndDateForStudyright = (studyright, phase) => {
   return { endDate, programmeCode }
 }
 
-const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semestersAndYears) =>
+const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn) =>
   studyrights.reduce((acc, studyright) => {
     const studentToStudyrightEndMap = new Map([[student.studentNumber, null]])
     const studentToSecondStudyrightEndMap = new Map([[student.studentNumber, null]])
 
     const baseArguments = {
-      currentSemester: semestersAndYears.currentSemester,
-      allSemesters: semestersAndYears.semesters,
       year: firstDisplayedYear,
       getTextIn,
       programmeCode: null,
@@ -126,7 +124,7 @@ export const EnrollmentAccordion = ({ student }) => {
 
   const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
 
-  const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semesters)
+  const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn)
 
   return (
     <StyledAccordion expanded={active} onChange={() => setActive(!active)}>
