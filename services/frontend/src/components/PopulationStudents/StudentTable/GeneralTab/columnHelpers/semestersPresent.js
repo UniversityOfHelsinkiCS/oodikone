@@ -2,14 +2,13 @@ import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { isFall, isMastersProgramme } from '@/common'
+import { useGetSemestersQuery } from '@/redux/semesters'
 
 import './semestersPresent.css'
 
 dayjs.extend(isBetween)
 
 export const getSemestersPresentFunctions = ({
-  currentSemester,
-  allSemesters,
   getTextIn,
   programmeCode,
   studentToSecondStudyrightEndMap,
@@ -17,25 +16,25 @@ export const getSemestersPresentFunctions = ({
   year,
   semestersToAddToStart,
 }) => {
-  const { semestercode: currentSemesterCode } = currentSemester ?? {}
+  const { data: semesters } = useGetSemestersQuery()
+
+  const allSemesters = semesters?.semesters ?? {}
+  const { semestercode: currentSemesterCode } = semesters?.currentSemester ?? { semestercode: 0 }
 
   const getFirstAndLastSemester = () => {
-    const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
+    const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
 
     const associatedYear = year !== 'All' && year
-    if (associatedYear) {
-      const first = Object.values(allSemesters).find(
-        semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
-      ).semestercode
+    const firstSemester = associatedYear
+      ? (Object.values(allSemesters).find(semester =>
+          new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
+        )?.semestercode ?? lastSemester) - (semestersToAddToStart ?? 0)
+      : lastSemester - 13
 
-      return { first: first - (semestersToAddToStart ?? 0), last }
-    }
-
-    return { first: last - 13, last }
+    return [firstSemester, lastSemester]
   }
 
-  const { first: firstSemester, last: lastSemester } =
-    Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 0, last: 0 }
+  const [firstSemester, lastSemester] = getFirstAndLastSemester()
 
   const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
     switch (enrollmenttype) {
@@ -63,7 +62,7 @@ export const getSemestersPresentFunctions = ({
     }
   }
 
-  const getSemesterEnrollmentsContent = (student, studyright) => {
+  const getSemesterEnrollmentsContent = (student, studyright = undefined) => {
     if (!student.semesterEnrollmentsMap && !studyright) return []
 
     const isMasters = isMastersProgramme(programmeCode ?? '')

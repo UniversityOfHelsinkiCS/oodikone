@@ -99,7 +99,7 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
       columnHelper.accessor('option', {
         header: `${dynamicTitles.option}`,
         Cell: ({ cell }) => {
-          const value = cell.getValue()
+          const value = cell.getValue() ?? ''
           const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
           return (
             <Tooltip arrow title={value}>

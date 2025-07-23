@@ -43,8 +43,6 @@ export const CloseToGraduation = () => {
     () =>
       getSemestersPresentFunctions({
         getTextIn,
-        currentSemester,
-        allSemesters,
         year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
         programmeCode: null,
         studentToSecondStudyrightEndMap: null,
