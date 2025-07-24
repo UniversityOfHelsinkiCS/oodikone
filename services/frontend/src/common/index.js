@@ -233,9 +233,9 @@ export const getStudyRightElementTargetDates = (studyRightElement, absences = []
 }
 
 export const TimeDivision = {
-  ACADEMIC_YEAR: 'academic-year',
-  CALENDAR_YEAR: 'calendar-year',
-  SEMESTER: 'semester',
+  ACADEMIC_YEAR: 'Academic year',
+  CALENDAR_YEAR: 'Calendar year',
+  SEMESTER: 'Semester',
 }
 
 /* Returns an array of credit categories depending on parameters, shows the high limit

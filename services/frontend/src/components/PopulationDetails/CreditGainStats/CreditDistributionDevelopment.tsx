@@ -1,31 +1,38 @@
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormLabel from '@mui/material/FormLabel'
+import Paper from '@mui/material/Paper'
+import RadioMui from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
 import dayjs from 'dayjs'
+import { Options } from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
+
 import { chain, range, sortBy } from 'lodash'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
-import { useLocation } from 'react-router'
-import { Dropdown, Radio, Segment } from 'semantic-ui-react'
 
 import { getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
 import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Toggle } from '@/components/material/Toggle'
+import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useDeepMemo } from '@/hooks/deepMemo'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { generateGradientColors } from '@/util/color'
-import { parseQueryParams } from '@/util/queryparams'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
 
-const StackOrdering = {
-  ASCENDING: 'asc',
-  DESCENDING: 'desc',
-}
-
+/*
+This file is bit of a legacy mess still and imo not worth the effort refactoring unless replacing legacy react-highcharts
+(last publish 6 years ago as of 2025 btw) with the official newer version or something else entirely
+*/
 const splitStudentCredits = (student, timeSlots, cumulative) => {
   if (!timeSlots.length) return {}
 
@@ -69,18 +76,34 @@ const hasGraduatedBeforeDate = (student, programme, date) => {
 
 const GRADUATED = Symbol('GRADUATED')
 
-const getChartData = (students, timeSlots, programme, timeDivision, cumulative, combinedProgramme) => {
+const getChartData = (
+  students: any[],
+  timeSlots: any[],
+  programme: string,
+  timeDivision: string,
+  cumulative: boolean,
+  combinedProgramme?: string
+) => {
   const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
-  const limits = getCreditCategories(cumulative, timeDivision, programmeCredits, timeSlots, 6)
+  const limits: Array<number[] | typeof GRADUATED> = getCreditCategories(
+    cumulative,
+    timeDivision,
+    programmeCredits,
+    timeSlots,
+    6
+  )
   const colors = generateGradientColors(limits.length)
 
   limits.push(GRADUATED)
-  colors.push('#dedede') // grey
+  colors.push('#ddd') // Color for graduated (grey)
 
-  const data = new Array(limits.length)
-    .fill()
-    .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
+  const data: { y: number; custom: { students: number[] } }[][] = limits.map(() =>
+    timeSlots.map(() => ({
+      y: 0,
+      custom: { students: [] },
+    }))
+  )
 
   const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
 
@@ -143,25 +166,39 @@ const getChartData = (students, timeSlots, programme, timeDivision, cumulative, 
   return series
 }
 
-export const CreditDistributionDevelopment = ({ students, programme, combinedProgramme, year }) => {
+type CreditDistributionDevelopmentProps = {
+  filteredStudents: any[] // TODO: type
+  programme: string
+  combinedProgramme?: string
+  year: number
+}
+
+export const CreditDistributionDevelopment = ({
+  filteredStudents,
+  programme,
+  combinedProgramme,
+  year,
+}: CreditDistributionDevelopmentProps) => {
   const [cumulative, setCumulative] = useState(true)
-  const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
-  const [stackOrdering, setStackOrdering] = useState(StackOrdering.DESCENDING)
-  const location = useLocation()
-  const { months } = parseQueryParams(location.search)
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+  const [timeDivision, setTimeDivision] = useState<(typeof TimeDivision)[keyof typeof TimeDivision]>(
+    TimeDivision.SEMESTER
+  ) // TODO: use enum or something else
+  const [isAscending, setIsAscending] = useState(true)
+
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
+
+  const { data: semesters } = useGetSemestersQuery()
+  const { semesters: allSemesters } = semesters ?? { semesters: {} as SemestersData['semesters'] }
+
   const timeSlots = (() => {
-    const startDate = year ? dayjs([year]).endOf('year') : dayjs().subtract({ months }).endOf('year')
+    const startDate = dayjs().year(year).endOf('year')
 
     if (timeDivision === TimeDivision.CALENDAR_YEAR) {
-      const startYear = months === undefined ? year : dayjs().year() - Math.ceil(months / 12)
-      return range(startYear, dayjs().year() + 1).map(year => ({
-        start: dayjs({ year }),
-        end: dayjs({ year }).endOf('year'),
-        label: year,
+      return range(year, dayjs().year() + 1).map(year => ({
+        start: dayjs().year(year),
+        end: dayjs().year(year).endOf('year'),
+        label: year.toString(),
       }))
     }
 
@@ -186,28 +223,29 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
       return Object.values(allSemesters)
         .filter(semester => startDate.isBefore(semester.enddate) && dayjs().isAfter(semester.startdate))
         .map(semester => ({
-          start: semester.startdate,
-          end: semester.enddate,
-          label: getTextIn(semester.name),
+          start: dayjs(semester.startdate),
+          end: dayjs(semester.enddate),
+          label: getTextIn(semester.name) ?? '',
         }))
     }
-
     return []
   })()
 
   const series = useDeepMemo(
-    () => getChartData(students, timeSlots, programme, timeDivision, cumulative, combinedProgramme),
-    [students, timeSlots, programme, timeDivision, cumulative, combinedProgramme]
+    () => getChartData(filteredStudents, timeSlots, programme, timeDivision, cumulative, combinedProgramme),
+    [filteredStudents, timeSlots, programme, timeDivision, cumulative, combinedProgramme]
   )
 
   const labels = timeSlots.map(ts => ts.label)
   const bcMsTitle = combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate' : 'Bachelor + Master'
   const title = combinedProgramme ? bcMsTitle : ''
-  const config = {
-    series: stackOrdering === StackOrdering.ASCENDING ? series.toReversed() : series,
+
+  const config: Options = {
+    series: isAscending ? series : series.toReversed(),
     title: { text: title },
     tooltip: {
       formatter() {
+        // Highcharts formatter only accepts a subset of HTML as a string
         // eslint-disable-next-line react/no-this-in-sfc
         return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`
       },
@@ -218,7 +256,7 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
     yAxis: {
       allowDecimals: false,
       min: 0,
-      max: students.length,
+      max: filteredStudents.length,
       endOnTick: false,
       reversed: false,
       title: { text: 'Students' },
@@ -239,7 +277,8 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
         point: {
           events: {
             click(event) {
-              filterDispatch(studentNumberFilter.actions.addToAllowlist(event.point.custom.students))
+              const point = event.point as Highcharts.Point & { custom: { students: number[] } }
+              filterDispatch(studentNumberFilter.actions.addToAllowlist(point.custom.students))
             },
           },
         },
@@ -248,41 +287,33 @@ export const CreditDistributionDevelopment = ({ students, programme, combinedPro
   }
 
   return (
-    <div>
-      <div style={{ textAlign: 'right' }}>
-        <Segment.Group compact horizontal style={{ display: 'inline-flex', margin: '0 0 2em 0' }}>
-          <Segment>
-            <Radio checked={cumulative} label="Cumulative" onChange={() => setCumulative(!cumulative)} toggle />
-          </Segment>
-          <Segment>
-            <label style={{ marginRight: '0.5em' }}>Divide by:</label>
-            <Dropdown
-              inline
-              label="Divide by"
-              onChange={(_event, { value }) => setTimeDivision(value)}
-              options={[
-                { value: TimeDivision.CALENDAR_YEAR, text: 'Calendar year' },
-                { value: TimeDivision.ACADEMIC_YEAR, text: 'Academic year' },
-                { value: TimeDivision.SEMESTER, text: 'Semester' },
-              ]}
-              value={timeDivision}
-            />
-          </Segment>
-          <Segment>
-            <label style={{ marginRight: '0.5em' }}>Stack ordering:</label>
-            <Dropdown
-              inline
-              onChange={(_event, { value }) => setStackOrdering(value)}
-              options={[
-                { value: StackOrdering.ASCENDING, text: 'Ascending' },
-                { value: StackOrdering.DESCENDING, text: 'Descending' },
-              ]}
-              value={stackOrdering}
-            />
-          </Segment>
-        </Segment.Group>
-      </div>
+    <Paper sx={{ p: 2, my: 2 }} variant="outlined">
+      <Box sx={{ m: 2, width: '100%', display: 'flex', justifyContent: 'center', gap: '5em' }}>
+        <ToggleContainer>
+          <FormLabel sx={{ mb: 1 }}>Chart settings</FormLabel>
+          <Toggle
+            firstLabel="Non-cumulative"
+            secondLabel="Cumulative"
+            setValue={() => setCumulative(prev => !prev)}
+            value={cumulative}
+          />
+          <Toggle
+            firstLabel="Ascending"
+            secondLabel="Descending"
+            setValue={() => setIsAscending(prev => !prev)}
+            value={isAscending}
+          />
+        </ToggleContainer>
+        <FormControl>
+          <FormLabel>Divide by</FormLabel>
+          <RadioGroup onChange={(_, value) => setTimeDivision(value)} value={timeDivision}>
+            {Object.values(TimeDivision).map(value => (
+              <FormControlLabel control={<RadioMui sx={{ py: '0.5em' }} />} key={value} label={value} value={value} />
+            ))}
+          </RadioGroup>
+        </FormControl>
+      </Box>
       <ReactHighcharts config={config} />
-    </div>
+    </Paper>
   )
 }

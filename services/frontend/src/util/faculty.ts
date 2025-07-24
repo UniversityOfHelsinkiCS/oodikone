@@ -1,4 +1,4 @@
-import { getCreditCategories } from '@/common'
+import { getCreditCategories, TimeDivision } from '@/common'
 
 /*
   Order of the programme keys (such as TKT, PSYK) is chosen by "old" code:
@@ -67,7 +67,7 @@ export const calculateStats = (
 
   const limits = getCreditCategories(
     true,
-    'academic-year',
+    TimeDivision.ACADEMIC_YEAR,
     maximumAmountOfCredits,
     Object.keys(creditCounts),
     numberOfCreditCategories - 1,

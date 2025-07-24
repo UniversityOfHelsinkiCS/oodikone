@@ -53,15 +53,15 @@ export const CreditStatistics = ({ filteredStudents, query, sggYear }: CreditSta
         <Box>
           <CreditDistributionDevelopment
             combinedProgramme=""
+            filteredStudents={filteredStudents}
             programme={programme}
-            students={filteredStudents}
             year={year}
           />
           {combinedProgramme && (
             <CreditDistributionDevelopment
               combinedProgramme={combinedProgramme}
+              filteredStudents={filteredStudents}
               programme={combinedProgramme}
-              students={filteredStudents}
               year={year}
             />
           )}
