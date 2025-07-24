@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { images } from '@/common'
+import toskaLogo from '@/assets/toska.svg'
 
 export const ToskaLogo = () => {
   return (
@@ -9,7 +9,7 @@ export const ToskaLogo = () => {
       <a href="https://toska.dev" rel="noopener noreferrer" target="_blank">
         <img
           alt="Toska logo"
-          src={images.toskaLogo}
+          src={toskaLogo}
           style={{
             display: 'block',
             height: 'auto',

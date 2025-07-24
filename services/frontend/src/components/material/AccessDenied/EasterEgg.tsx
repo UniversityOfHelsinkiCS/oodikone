@@ -1,4 +1,4 @@
-import { images } from '@/common'
+import irtomikko from '@/assets/irtomikko.png'
 
 export const EasterEgg = () => {
   return (
@@ -6,7 +6,7 @@ export const EasterEgg = () => {
       <img
         alt="Irtomikko"
         className="easter-egg"
-        src={images.irtomikko}
+        src={irtomikko}
         style={{
           position: 'absolute',
           right: '20px',

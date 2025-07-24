@@ -3,8 +3,6 @@ import isBetween from 'dayjs/plugin/isBetween'
 import { filter, maxBy, orderBy, range } from 'lodash'
 dayjs.extend(isBetween)
 
-import irtomikko from '@/assets/irtomikko.png'
-import toskaLogo from '@/assets/toska.svg'
 import { serviceProvider } from '@/conf'
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
@@ -13,11 +11,6 @@ export const textAndDescriptionSearch = (dropDownOptions, param) =>
       ? option.text.toLowerCase().concat(option.description.toLowerCase()).includes(param.toLowerCase())
       : null
   )
-
-export const images = {
-  toskaLogo,
-  irtomikko,
-}
 
 export const isFall = semester => semester % 2 === 1
 

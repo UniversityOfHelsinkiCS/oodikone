@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import { random } from 'lodash'
 import ReactHighchart from 'react-highcharts'
 
-import { images } from '@/common'
+import toskaLogo from '@/assets/toska.svg'
 import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
 
@@ -85,7 +85,7 @@ export const ErrorBackground = ({ header, content }) => {
         <Stack alignItems="center" gap={3}>
           <img
             alt="Toska logo"
-            src={images.toskaLogo}
+            src={toskaLogo}
             style={{
               display: 'block',
               height: 'auto',
