@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-import type { Student } from '.'
+import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import type { Filter } from './filters/createFilter'
 
 export type FilterContext = {

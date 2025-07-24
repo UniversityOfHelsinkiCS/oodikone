@@ -62,6 +62,7 @@ export type FormattedStudent = {
   started: Date
   studentNumber: string
   credits: number
+  hopsCredits: number
   name: string
   gender_code: string
   email: string

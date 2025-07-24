@@ -3,10 +3,8 @@ import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
-import { useMemo } from 'react'
 import { useLocation, type Location } from 'react-router'
 
-import { getStudentTotalCredits } from '@/common'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -69,24 +67,6 @@ const parseQueryFromUrl = (location: Location): [boolean, PopulationQuery] => {
   return [skipQuery, query as PopulationQuery]
 }
 
-const mapStudentDataToStudents = (programmeCode: string, combinedProgrammeCode?: string, samples: any[] = []) =>
-  samples.map(student => {
-    const hopsCredits = student.studyplans?.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
-    const hopsCombinedProgrammeCredits =
-      student.studyplans?.find(plan => plan.programme_code === combinedProgrammeCode)?.completed_credits ?? 0
-    const studyrightStartDate = new Date(student.studyrightStart)
-    const courses = student.courses.filter(({ date }) => studyrightStartDate <= new Date(date))
-    const credits = getStudentTotalCredits({ courses })
-
-    return {
-      ...student,
-      allCredits: student.credits,
-      hopsCredits,
-      hopsCombinedProgrammeCredits,
-      credits,
-    }
-  })
-
 const useUserHasRestrictedAccess = () => {
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
@@ -143,17 +123,11 @@ export const PopulationStatistics = () => {
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query
 
-  const students = useMemo(
-    () => mapStudentDataToStudents(programmeCode, combinedProgrammeCode, population?.students ?? []),
-    [programmeCode, combinedProgrammeCode, population?.students]
-  )
+  const students = population?.students ?? []
+  const courses = population?.coursestatistics ?? []
 
-  const populationTags = useMemo(
-    () =>
-      new Map<string, string>(
-        population?.students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname])) ?? []
-      ),
-    [population?.students]
+  const populationTags = new Map<string, string>(
+    students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname]))
   )
 
   const showBachelorAndMaster = !!combinedProgrammeCode || !!query.showBachelorAndMaster
@@ -168,7 +142,7 @@ export const PopulationStatistics = () => {
   const filters = [
     !useUserHasRestrictedAccess() ? ageFilter() : null,
     citizenshipFilter(),
-    courseFilter({ courses: population?.coursestatistics }),
+    courseFilter({ courses }),
     creditDateFilter(),
     creditsEarnedFilter(),
     curriculumPeriodFilter(),
@@ -227,7 +201,7 @@ export const PopulationStatistics = () => {
   // else display population from query
   return (
     <FilterView
-      courses={population?.coursestatistics ?? []}
+      courses={courses}
       displayTray={!isLoading}
       filters={filters}
       initialOptions={initialOptions}

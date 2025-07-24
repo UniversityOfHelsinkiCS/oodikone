@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useContext } from 'react'
 
-import { Student } from '.'
+import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { FilterViewContext } from './context'
 import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'

@@ -194,10 +194,6 @@ export const GeneralTabContainer = ({
     const studyRightEnd = studentToStudyrightEndMap.get(studentNumber)
     return studyRightEnd ? formatDate(studyRightEnd, DateFormat.ISO_DATE) : ''
   }
-  const getCreditsFromHops = student => {
-    const code = programmeCode ?? studentToPrimaryProgrammeMap.get(student.studentNumber)?.code
-    return student.hopsCredits ?? student.studyplans?.find(plan => plan.programme_code === code)?.completed_credits ?? 0
-  }
 
   const getStudyRightStatus = ({ studentNumber }) => {
     const primaryProgramme = studentToPrimaryProgrammeMap.get(studentNumber)
@@ -376,8 +372,8 @@ export const GeneralTabContainer = ({
       email: student.email,
       phoneNumber: student.phoneNumber,
       sisuID: student.sis_person_id,
-      creditsTotal: student.allCredits ?? student.credits,
-      creditsHops: getCreditsFromHops(student),
+      creditsTotal: student.credits,
+      creditsHops: student.hopsCredits,
       creditsSince: getCreditsBetween(student),
       studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : null,
       studyRightStart: formatDate(studentToStudyrightStartMap.get(student.studentNumber), DateFormat.ISO_DATE),

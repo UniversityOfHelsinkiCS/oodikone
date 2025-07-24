@@ -1,9 +1,9 @@
 import Stack from '@mui/material/Stack'
 import { FC, useMemo } from 'react'
 
+import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 
@@ -12,9 +12,6 @@ import type { FilterContext, FilterViewContextState } from './context'
 
 import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
-
-// TODO: Use acual Student type when available
-export type Student = ReturnType<typeof useGetPopulationStatisticsByCourseQuery>['data']['students']
 
 export const FilterView: FC<{
   children: (filteredStudents: Student[], filteredCourses: any[]) => any

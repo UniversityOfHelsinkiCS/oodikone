@@ -73,7 +73,7 @@ const getProgressCriteria = (
   startDate: string,
   criteria: ProgressCriteria,
   credits: AnonymousCredit[],
-  hops: StudentStudyPlan[]
+  hops: StudentStudyPlan | undefined
 ) => {
   const startDateFromISO = new Date(startDate)
 
@@ -122,8 +122,8 @@ const getProgressCriteria = (
 
     if (
       startDateFromISO < courseDate &&
-      !!hops[0] &&
-      (hops[0].included_courses.includes(course.course_code) || hops[0].included_courses.includes(correctCode))
+      !!hops &&
+      (hops.included_courses.includes(course.course_code) || hops.included_courses.includes(correctCode))
     )
       Object.keys(academicYears)
         .filter((_, index) => courseDate < dateYearsFromNow(startDateFromISO, index + 1))
@@ -150,7 +150,7 @@ export const formatStudentForAPI = (
 ): FormattedStudent => {
   const { studentnumber, studyRights, studyplans } = student
 
-  const hops = studyplans.filter(plan => plan.programme_code === code)
+  const hops = studyplans.find(plan => plan.programme_code === code)
   const [transferredStudyright, transferSource] = getTransferSource(code, studyRights)
 
   const courses = credits.map(credit => {
@@ -178,6 +178,8 @@ export const formatStudentForAPI = (
     started: student.dateofuniversityenrollment,
     studentNumber: studentnumber,
     credits: student.creditcount ?? 0,
+
+    hopsCredits: hops?.completed_credits ?? 0,
     name: student.abbreviatedname,
     gender_code: student.gender_code,
     email: student.email,
@@ -191,7 +193,7 @@ export const formatStudentForAPI = (
     sis_person_id: student.sis_person_id,
     citizenships: student.citizenships,
     criteriaProgress: getProgressCriteria(startDate, criteria, credits, hops),
-    curriculumVersion: getCurriculumVersion(hops[0]?.curriculum_period_id),
+    curriculumVersion: getCurriculumVersion(hops?.curriculum_period_id),
 
     transferredStudyright,
     transferSource,
