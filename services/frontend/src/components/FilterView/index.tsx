@@ -1,11 +1,11 @@
 import Stack from '@mui/material/Stack'
 import { FC, useMemo } from 'react'
 
-import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
+import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 
 import { FilterViewContext } from './context'
 import type { FilterContext, FilterViewContextState } from './context'

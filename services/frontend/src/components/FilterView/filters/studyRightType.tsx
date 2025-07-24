@@ -1,3 +1,4 @@
+import { ExtentCode } from '@oodikone/shared/types'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
 import { createFilter } from './createFilter'
@@ -48,7 +49,9 @@ export const studyRightTypeFilter = createFilter({
 
     if (!studyRight) return false
 
-    return mode === '1' ? studyRight.extentCode === 5 : studyRight.extentCode === 2
+    return mode === '1'
+      ? studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
+      : studyRight.extentCode === ExtentCode.MASTER
   },
 
   render: StudyRightTypeFilterCard,

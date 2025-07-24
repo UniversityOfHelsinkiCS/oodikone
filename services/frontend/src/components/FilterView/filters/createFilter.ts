@@ -1,8 +1,8 @@
 import { ReactNode } from 'react'
 import { setFilterOptions } from '@/redux/filters'
+import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { mapValues } from '@oodikone/shared/util'
 
-import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import type { FilterContext, FilterViewContextState } from '../context'
 import type { FilterTrayProps } from '../FilterTray'
 
