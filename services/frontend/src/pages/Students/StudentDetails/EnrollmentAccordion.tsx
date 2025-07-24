@@ -1,12 +1,14 @@
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowDropDown'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import Tooltip from '@mui/material/Tooltip'
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -86,7 +88,16 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
       semestersToAddToStart: null,
     })
 
-    acc[studyright.id] = getSemesterEnrollmentsContent(student, studyright)
+    const content = getSemesterEnrollmentsContent(student, studyright)
+    acc[studyright.id] = (
+      <Box sx={{ display: 'flex', m: 0.5 }}>
+        {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+          <Tooltip key={key} placement="top" title={onHoverString}>
+            <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+          </Tooltip>
+        ))}
+      </Box>
+    )
     return acc
   }, {})
 
