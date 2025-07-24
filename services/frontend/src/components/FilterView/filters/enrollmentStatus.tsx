@@ -76,13 +76,15 @@ export const enrollmentStatusFilter = createFilter({
 
       return semesters.every(
         semester =>
-          correctStudyRight.semesterEnrollments.find(
+          correctStudyRight?.semesterEnrollments?.find(
             ({ semester: enrollmentSemester }) => enrollmentSemester === semester
           )?.type === status
       )
     }
 
-    const allEnrollments = studyRights.flatMap(studyRight => studyRight.semesterEnrollments).filter(Boolean)
+    const allEnrollments = studyRights
+      .flatMap(studyRight => studyRight.semesterEnrollments)
+      .filter(enrollment => enrollment !== null)
 
     return semesters.every(semester => {
       // HACK: If enrollment info not found, return false. This may or may not be what we want?

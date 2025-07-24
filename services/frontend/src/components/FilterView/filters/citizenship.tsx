@@ -2,15 +2,19 @@ import { orderBy } from 'lodash'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
-const CitizenshipFilterCard = ({ options, onOptionsChange, students }) => {
+const CitizenshipFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
   const { getTextIn } = useLanguage()
   const { selected } = options
 
   const uniqueContryNames = new Map<string, string>(
-    students.flatMap(({ citizenships }) => citizenships).map(citizenship => [citizenship.en, getTextIn(citizenship)])
+    students
+      .flatMap(({ citizenships }) => citizenships)
+      .filter(citizenship => !!citizenship.en)
+      .map(citizenship => [citizenship.en!, getTextIn(citizenship)!])
   )
 
   const dropdownOptions = [] as any[]

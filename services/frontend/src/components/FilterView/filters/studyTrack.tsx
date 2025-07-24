@@ -1,4 +1,5 @@
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import type { StudyTrack } from '@oodikone/shared/types'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
@@ -8,28 +9,22 @@ const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: Filt
   const { selected } = options
   const { getTextIn } = useLanguage()
 
-  const dropdownOptions = students
+  const validStudyTracks = students
     .flatMap(student => student.studyRights)
     .flatMap(studyRight => studyRight.studyRightElements)
     .filter(element => element.code === code && element.studyTrack !== null)
-    .reduce((acc, element) => {
-      const { studyTrack } = element
-      if (acc.some(option => option.key === studyTrack.code)) {
-        return acc
-      }
-      acc.push({
-        key: studyTrack.code,
-        value: studyTrack.code,
-        text: `${getTextIn(studyTrack.name)} (${studyTrack.code})`,
-        content: (
-          <>
-            {getTextIn(studyTrack.name)}{' '}
-            <span style={{ whiteSpace: 'nowrap', color: '#888', fontSize: '0.8rem' }}>({studyTrack.code})</span>
-          </>
-        ),
-      })
-      return acc
-    }, [])
+    .map(element => element.studyTrack) as StudyTrack[]
+
+  const dropdownOptions = [...new Map(validStudyTracks.map(({ code, name }) => [code, name]))].map(([code, name]) => ({
+    key: code,
+    value: code,
+    text: `${getTextIn(name)} (${code})`,
+    content: (
+      <>
+        {getTextIn(name)} <span style={{ whiteSpace: 'nowrap', color: '#888', fontSize: '0.8rem' }}>({code})</span>
+      </>
+    ),
+  }))
 
   return (
     <FilterSelect
@@ -55,7 +50,7 @@ export const studyTrackFilter = createFilter({
     return student.studyRights
       .flatMap(studyRight => studyRight.studyRightElements)
       .filter(element => element.code === args.code && element.studyTrack !== null)
-      .some(element => selected.includes(element.studyTrack.code))
+      .some(element => selected.includes(element.studyTrack?.code))
   },
 
   render: StudyTrackFilterCard,

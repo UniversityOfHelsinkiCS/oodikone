@@ -1,11 +1,12 @@
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
 import { createFilter } from './createFilter'
 
 const DEFAULT_STATE = '0' as const
 
-const BACHELORS = 'urn:code:degree-program-type:bachelors-degree' as const
-const MASTERS = 'urn:code:degree-program-type:masters-degree' as const
+const BACHELORS = DegreeProgrammeType.BACHELOR
+const MASTERS = DegreeProgrammeType.MASTER
 const GRADUATION_PHASE = {
   NOT_GRADUATED: '-1',
   NOT_GRADUATED_BACHELOR: '-1',
@@ -73,9 +74,9 @@ export const graduatedFromProgrammeFilter = createFilter({
     const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === code))
     if (!studyRight) return false
 
-    const element = studyRight.studyRightElements.find(el => el.code === code)
+    const element = studyRight.studyRightElements.find(el => el.code === code)!
 
-    const isBachelorOrMaster = [BACHELORS, MASTERS].includes(element?.degreeProgrammeType)
+    const isBachelorOrMaster = [BACHELORS, MASTERS].includes(element.degreeProgrammeType)
     const isBachelorMode = [GRADUATION_PHASE.NOT_GRADUATED_BACHELOR, GRADUATION_PHASE.GRADUATED_BACHELOR].includes(mode)
     const isMastersMode = [GRADUATION_PHASE.NOT_GRADUATED_MASTER, GRADUATION_PHASE.GRADUATED_MASTER].includes(mode)
 

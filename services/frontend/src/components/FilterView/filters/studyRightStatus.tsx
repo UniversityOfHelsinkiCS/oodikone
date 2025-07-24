@@ -1,8 +1,10 @@
 import { filterToolTips } from '@/common/InfoToolTips'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
 import { createFilter } from './createFilter'
 
-const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }) => {
+const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
   const { combinedProgrammeCode, showBachelorAndMaster } = args
   const { activeProgramme, activeCombinedProgramme } = options
 
@@ -84,21 +86,20 @@ export const studyRightStatusFilter = createFilter({
     const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === currentSemesterCode)
 
     if (!showBachelorAndMaster) {
-      if (studyRight.studyRightElements.find(element => element.code === code).graduated) {
+      if (studyRight.studyRightElements.find(element => element.code === code)?.graduated) {
         return false
       }
 
       return activeProgramme === isStudyRightActive(enrollment)
     } else {
-      const BACHELOR = 'urn:code:degree-program-type:bachelors-degree'
-      const MASTER = 'urn:code:degree-program-type:masters-degree'
       const hasBachelorsProgramme =
-        studyRight.studyRightElements.find(element => element.degreeProgrammeType === BACHELOR) != null
+        studyRight.studyRightElements.find(element => element.degreeProgrammeType === DegreeProgrammeType.BACHELOR) !=
+        null
       const graduatedBachelor = studyRight.studyRightElements.some(
-        element => element.degreeProgrammeType === BACHELOR && element.graduated
+        element => element.degreeProgrammeType === DegreeProgrammeType.BACHELOR && element.graduated
       )
       const graduatedMaster = studyRight.studyRightElements.some(
-        element => element.degreeProgrammeType === MASTER && element.graduated
+        element => element.degreeProgrammeType === DegreeProgrammeType.MASTER && element.graduated
       )
 
       if (activeProgramme !== null) {

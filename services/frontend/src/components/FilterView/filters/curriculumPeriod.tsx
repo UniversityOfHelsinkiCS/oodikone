@@ -9,7 +9,9 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: Filt
 
   const dropdownOptions = useMemo(
     () =>
-      Array.from(new Set(students.map(({ curriculumVersion }) => curriculumVersion).filter(Boolean)))
+      Array.from(
+        new Set(students.map(({ curriculumVersion }) => curriculumVersion).filter(version => version !== null))
+      )
         .sort((a, b) => b.localeCompare(a))
         .map(value => ({ key: value, text: value, value })),
     [students]

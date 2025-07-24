@@ -6,6 +6,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
@@ -14,7 +15,13 @@ dayjs.extend(isSameOrAfter)
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-const ProgrammeFilterCard = ({ args, onOptionsChange, options, precomputed: studentToProgrammeMap, students }) => {
+const ProgrammeFilterCard = ({
+  args,
+  onOptionsChange,
+  options,
+  precomputed: studentToProgrammeMap,
+  students,
+}: FilterTrayProps) => {
   const additionalModes = args?.additionalModes ?? []
 
   const { getTextIn } = useLanguage()
