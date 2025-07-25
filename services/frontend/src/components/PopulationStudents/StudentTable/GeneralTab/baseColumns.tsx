@@ -11,6 +11,7 @@ import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithToo
 
 import { joinProgrammes } from './util'
 import { FormattedStudentData } from '../GeneralTab'
+import Box from '@mui/material/Box'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
@@ -83,11 +84,11 @@ export const useGetColumnDefinitions = ({
   columnHelper.accessor('option', {
     header: isMastersProgramme ? 'Bachelor' : 'Master',
     cell: cell => {
-      const value = cell.getValue()
-      const formattedValue = value.length > 45 ? `${value.substring(0, 43)}...` : value
+      const value = cell.getValue() ?? ''
+
       return (
         <Tooltip arrow title={value}>
-          <span>{formattedValue}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</span>
         </Tooltip>
       )
     },
@@ -104,15 +105,17 @@ export const useGetColumnDefinitions = ({
       const { programmes } = cell.getValue()
       if (!programmes || programmes.length === 0) return null
 
-      const programmeName = getTextIn(programmes[0].name) ?? ''
-      const formattedProgramme = programmeName.length > 45 ? `${programmeName.substring(0, 43)}...` : programmeName
+      const programmeName = getTextIn(programmes[0]?.name) ?? ''
       const tooltipProgrammeList = joinProgrammes(programmes, getTextIn, '\n')
 
       return (
         <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{tooltipProgrammeList}</div>}>
-          <span>
-            {programmes.length > 1 ? `${formattedProgramme} +${programmes.length - 1}` : `${formattedProgramme}`}
-          </span>
+          <div style={{ display: 'flex', width: '100%' }}>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {programmes.length > 1 ? `${programmeName}...` : programmeName}
+            </span>
+            {programmes.length > 1 ? <span style={{ paddingLeft: '0.25em' }}>+{programmes.length - 1}</span> : null}
+          </div>
         </Tooltip>
       )
     }
@@ -154,7 +157,20 @@ export const useGetColumnDefinitions = ({
 
   columnHelper.accessor('semesterEnrollments', {
     header: 'Semesters present',
-    cell: cell => cell.getValue()?.content ?? null,
+    cell: cell => {
+      const { content } = cell.getValue()
+      if (!content) return null
+
+      return (
+        <Box sx={{ display: 'flex', m: 0.5 }}>
+          {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+            <Tooltip key={key} placement="top" title={onHoverString}>
+              <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+            </Tooltip>
+          ))}
+        </Box>
+      )
+    },
   }),
 
   columnHelper.accessor('graduationDate', { header: combinedProgrammeCode ? 'Bachelor graduation date' : 'Graduation date' }),

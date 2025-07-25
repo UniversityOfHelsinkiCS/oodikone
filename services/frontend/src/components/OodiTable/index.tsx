@@ -48,9 +48,9 @@ export const OodiTable = <TData,>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: { pagination },
     onPaginationChange: setPagination,
     ...config,
+    state: { pagination, ...config.state },
   })
   return <OodiTableContainer table={table} />
 }
