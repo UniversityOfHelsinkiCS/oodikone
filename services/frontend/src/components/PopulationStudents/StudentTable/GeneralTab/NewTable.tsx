@@ -4,10 +4,11 @@ import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
-import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { FormattedStudentData } from '../GeneralTab'
 
 import { useGetColumnDefinitions } from './baseColumns'
+import { useGetProgrammesQuery } from '@/redux/populations'
+import { isMastersProgramme } from '@/common'
 
 export const NewTable = ({
   includePrimaryProgramme,
@@ -18,41 +19,34 @@ export const NewTable = ({
   formattingFunction,
 }: {
   includePrimaryProgramme: boolean
-  programme: string
+  programme: string | undefined
   combinedProgramme: string | undefined
-  filteredStudents: any[]
 
   columnFunction: () => [string[], string[]],
   formattingFunction: () => FormattedStudentData[]
 }) => {
   const { getTextIn } = useLanguage()
+  const { data: degreeProgrammes, isSuccess: degreeProgrammesFound } = useGetProgrammesQuery()
 
-  const data = formattingFunction()
+  if (!degreeProgrammesFound) return null
 
-  const combinedProgrammeCode = combinedProgramme ?? null
-
-  const queryStudyrights = [programme, combinedProgramme].filter(studyright => !!studyright) as string[]
-  const degreeProgrammeTypes = useDegreeProgrammeTypes(queryStudyrights)
-  const isMastersProgramme = degreeProgrammeTypes[programme] === 'urn:code:degree-program-type:masters-degree'    
-
-  const columns: ColumnDef<FormattedStudentData, any>[] = [
-    ...useGetColumnDefinitions({
+  const [columns, accessorKeys]: [ColumnDef<FormattedStudentData, any>[], string[]] = useMemo(() => {
+    const columns = useGetColumnDefinitions({
       getTextIn,
-      combinedProgrammeCode,
-      isMastersProgramme,
+      combinedProgramme,
       includePrimaryProgramme,
+      isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree',
     })
-  ]
 
-  const accessorKeys = useMemo(() => {
     const squashGroups = (column) => {
       if (column.columns) return column.columns.flatMap(squashGroups)
       return [column.accessorKey]
     }
 
-    return columns.flatMap(squashGroups)
-  }, [])
+    return [columns, columns.flatMap(squashGroups)]
+  }, [combinedProgramme, includePrimaryProgramme, isMastersProgramme])
 
+  const data = formattingFunction()
   const [visible, excelVisible] = columnFunction()
 
   const columnVisibility = useMemo(() =>

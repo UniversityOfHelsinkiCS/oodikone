@@ -35,11 +35,14 @@ import { CreditStatistics } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
 
+import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
+import { FormattedStudent as Student } from '@oodikone/shared/types'
+
 type PopulationDetailsProps = {
   isLoading: boolean
   query: PopulationQuery
   populationTags: Map<string, string>
-  filteredStudents: any[]
+  filteredStudents: Student[]
   filteredCourses: any[]
 }
 
@@ -140,7 +143,6 @@ export const PopulationDetails = ({
           title: `Students (${filteredStudents.length})`,
           content: (
             <div>
-              {/* @ts-expect-error leave for later :) TODO */}
               <PopulationStudents
                 combinedProgramme={combinedProgramme}
                 criteria={criteria}
@@ -150,6 +152,15 @@ export const PopulationDetails = ({
                 programme={programme}
                 showBachelorAndMaster={showBachelorAndMaster}
                 variant="population"
+
+                generalTabColumns={() => columnsGeneralTab()}
+                generalTabFormattingFunction={() => formatGeneralTab({
+                  programme,
+                  combinedProgramme,
+                  showBachelorAndMaster,
+
+                  filteredStudents,
+                })}
               />
             </div>
           ),

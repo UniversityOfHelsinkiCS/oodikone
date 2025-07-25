@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import Tooltip from '@mui/material/Tooltip'
 import CheckIcon from '@mui/icons-material/Check'
 
@@ -17,10 +15,10 @@ const columnHelper = createColumnHelper<FormattedStudentData>()
 
 export const useGetColumnDefinitions = ({
   getTextIn,
-  combinedProgrammeCode,
+  combinedProgramme,
   isMastersProgramme,
   includePrimaryProgramme,
-}): ColumnDef<FormattedStudentData, any>[] => useMemo(() => [
+}): ColumnDef<FormattedStudentData, any>[] => ([
   columnHelper.accessor('studentNumber', {
     header: 'Student number',
     cell: cell => {
@@ -71,7 +69,7 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('creditsSince', { header: 'Since' }),
       columnHelper.accessor('creditsCombinedProg', {
         header: () => {
-          if (combinedProgrammeCode === 'MH90_001') return 'Credits in licentiate HOPS'
+          if (combinedProgramme === 'MH90_001') return 'Credits in licentiate HOPS'
           if (isMastersProgramme) return 'Credits in Bachelor HOPS'
           return 'Credits in Master HOPS'
         }
@@ -173,16 +171,12 @@ export const useGetColumnDefinitions = ({
     },
   }),
 
-  columnHelper.accessor('graduationDate', { header: combinedProgrammeCode ? 'Bachelor graduation date' : 'Graduation date' }),
+  columnHelper.accessor('graduationDate', { header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date' }),
   columnHelper.accessor('graduationDateCombinedProg', {
     header: _ => {
-      if (combinedProgrammeCode === 'MH90_001') return 'Licentiate graduation date'
+      if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
       if (isMastersProgramme) return 'Bachelor graduation date'
       return 'Master graduation date'
     }
   }),
-], [
-  combinedProgrammeCode,
-  isMastersProgramme,
-  includePrimaryProgramme,
 ])

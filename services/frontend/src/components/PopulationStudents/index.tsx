@@ -90,6 +90,9 @@ export const PopulationStudents = ({
   to,
   studyGuidanceGroup,
   year,
+
+  generalTabColumns,
+  generalTabFormattingFunction,
 }: PopulationStudentsProps) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
 
@@ -114,10 +117,12 @@ export const PopulationStudents = ({
     // ),
     General: () => (
       <OodiTableTab
-        variant={variant}
+        includePrimaryProgramme={variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)}
         programme={programme}
         combinedProgramme={combinedProgramme}
-        filteredStudents={filteredStudents}
+
+        columnFunction={generalTabColumns}
+        formattingFunction={generalTabFormattingFunction}
       />
     ),
     Courses: () => (
