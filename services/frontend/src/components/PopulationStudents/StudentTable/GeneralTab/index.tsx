@@ -36,7 +36,6 @@ export type FormattedStudentData = {
     content: {
       key: string
       onHoverString: string
-      springMargin: string
       typeLabel: string
       graduationCrown: string
     }[]
@@ -121,7 +120,7 @@ export const GeneralTabContainer = ({
 
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
     getTextIn,
-    programmeCode,
+    programme: programmeCode,
     studentToStudyrightEndMap,
     studentToSecondStudyrightEndMap,
     year,

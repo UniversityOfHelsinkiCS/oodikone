@@ -44,7 +44,7 @@ export const CloseToGraduation = () => {
       getSemestersPresentFunctions({
         getTextIn,
         year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
-        programmeCode: null,
+        programme: null,
         studentToSecondStudyrightEndMap: null,
         studentToStudyrightEndMap: null,
         semestersToAddToStart: null,
@@ -187,9 +187,9 @@ export const CloseToGraduation = () => {
 
           return (
             <Box sx={{ display: 'flex', m: 0.5 }}>
-              {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+              {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
                 <Tooltip key={key} placement="top" title={onHoverString}>
-                  <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+                  <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
                 </Tooltip>
               ))}
             </Box>

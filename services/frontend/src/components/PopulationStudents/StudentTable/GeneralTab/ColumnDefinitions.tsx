@@ -116,9 +116,9 @@ export const useColumnDefinitions = (dynamicTitles: DynamicColumnTitles) => {
 
           return (
             <Box sx={{ display: 'flex', m: 0.5 }}>
-              {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+              {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
                 <Tooltip key={key} placement="top" title={onHoverString}>
-                  <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+                  <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
                 </Tooltip>
               ))}
             </Box>

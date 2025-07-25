@@ -62,7 +62,7 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn)
     const baseArguments = {
       year: firstDisplayedYear,
       getTextIn,
-      programmeCode: null,
+      programme: null,
     }
 
     const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
@@ -89,9 +89,9 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn)
     const content = getSemesterEnrollmentsContent(student, studyright)
     acc[studyright.id] = (
       <Box sx={{ display: 'flex', m: 0.5 }}>
-        {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+        {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
           <Tooltip key={key} placement="top" title={onHoverString}>
-            <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+            <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
           </Tooltip>
         ))}
       </Box>

@@ -153,7 +153,7 @@ export const PopulationDetails = ({
                 showBachelorAndMaster={showBachelorAndMaster}
                 variant="population"
 
-                generalTabColumns={() => columnsGeneralTab()}
+                generalTabColumnFunction={() => columnsGeneralTab()}
                 generalTabFormattingFunction={() => formatGeneralTab({
                   programme,
                   combinedProgramme,

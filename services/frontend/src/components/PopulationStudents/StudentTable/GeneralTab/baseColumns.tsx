@@ -121,7 +121,17 @@ export const useGetColumnDefinitions = ({
   columnHelper.accessor('attainmentDate', { header: 'Attainment date' }),
   columnHelper.accessor('enrollmentDate', { header: 'Enrollment date' }),
   columnHelper.accessor('language', { header: 'Language' }),
-  columnHelper.accessor('transferredFrom', { header: 'Transferred From' }),
+  columnHelper.accessor('transferredFrom', {
+    header: 'Transferred From',
+    cell: cell => {
+      const transferSource = cell.getValue()
+      return (
+        <Tooltip arrow title={transferSource}>
+          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{transferSource}</span>
+        </Tooltip>
+      )
+    }
+  }),
   columnHelper.accessor('admissionType', { header: 'Admission Type' }),
   columnHelper.accessor('gender', { header: 'Gender' }),
   columnHelper.accessor('citizenships', { header: 'Citizenships' }),
@@ -161,9 +171,9 @@ export const useGetColumnDefinitions = ({
 
       return (
         <Box sx={{ display: 'flex', m: 0.5 }}>
-          {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+          {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
             <Tooltip key={key} placement="top" title={onHoverString}>
-              <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+              <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
             </Tooltip>
           ))}
         </Box>

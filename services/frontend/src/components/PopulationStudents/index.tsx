@@ -13,7 +13,7 @@ import { ProgressCriteria } from '@oodikone/shared/types'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
-import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
+import { FormattedStudentData, GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { NewTable as OodiTableTab } from './StudentTable/GeneralTab/NewTable'
@@ -91,9 +91,12 @@ export const PopulationStudents = ({
   studyGuidanceGroup,
   year,
 
-  generalTabColumns,
+  generalTabColumnFunction,
   generalTabFormattingFunction,
-}: PopulationStudentsProps) => {
+}: PopulationStudentsProps & {
+  generalTabColumnFunction: () => [string[], string[]],
+  generalTabFormattingFunction: () => FormattedStudentData[]
+}) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
@@ -121,7 +124,7 @@ export const PopulationStudents = ({
         programme={programme}
         combinedProgramme={combinedProgramme}
 
-        columnFunction={generalTabColumns}
+        columnFunction={generalTabColumnFunction}
         formattingFunction={generalTabFormattingFunction}
       />
     ),

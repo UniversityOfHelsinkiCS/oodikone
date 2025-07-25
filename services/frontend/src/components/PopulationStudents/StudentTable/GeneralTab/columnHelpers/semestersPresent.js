@@ -10,7 +10,7 @@ dayjs.extend(isBetween)
 
 export const getSemestersPresentFunctions = ({
   getTextIn,
-  programmeCode,
+  programme,
   studentToSecondStudyrightEndMap,
   studentToStudyrightEndMap,
   year,
@@ -65,7 +65,7 @@ export const getSemestersPresentFunctions = ({
   const getSemesterEnrollmentsContent = (student, studyright = undefined) => {
     if (!student.semesterEnrollmentsMap && !studyright) return []
 
-    const isMasters = isMastersProgramme(programmeCode ?? '')
+    const isMasters = isMastersProgramme(programme ?? '')
 
     const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
     const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
@@ -81,8 +81,8 @@ export const getSemestersPresentFunctions = ({
         student.semesterEnrollmentsMap?.[semester]?.statutoryAbsence ??
         studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.statutoryAbsence
 
-      const { startdate, enddate, name: semesterName } = allSemesters[semester] ?? {}
-      const graduated = programmeCode
+      const { startdate, enddate, name: semesterName } = allSemesters[semester]
+      const graduated = programme
         ? (() => {
             if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate)) return 1 + 1 * isMasters
             if (secondGraduation && dayjs(secondGraduation).isBetween(startdate, enddate)) return 2 - 1 * isMasters
@@ -96,10 +96,9 @@ export const getSemestersPresentFunctions = ({
       const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
       const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
 
-      const springMargin = isFall(semester) ? '' : 'margin-right'
       const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
 
-      return { key, onHoverString, springMargin, typeLabel, graduationCrown }
+      return { key, onHoverString, typeLabel, graduationCrown }
     })
   }
 

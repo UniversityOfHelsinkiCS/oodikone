@@ -12,6 +12,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
+import { FormattedStudent as Student } from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import { useMemo } from 'react'
 
@@ -77,10 +78,7 @@ export const format = ({
 
   const queryStudyrights = [programme, combinedProgramme].filter(studyright => !!studyright) as string[]
 
-  const programmeCode = programme
-  const combinedProgrammeCode = combinedProgramme ?? null
-
-  const isMastersProgramme = programmes[programmeCode]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
+  const isMastersProgramme = programmes[programme]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
   const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
 
   const semestersToAddToStart = shouldShowBachelorAndMaster && isMastersProgramme ? 6 : 0
@@ -90,8 +88,8 @@ export const format = ({
     studentToSecondStudyrightEndMap,
   } = createMaps(
     filteredStudents,
-    programmeCode,
-    combinedProgrammeCode,
+    programme,
+    combinedProgramme,
     // year,
     null,
     currentSemester?.semestercode,
@@ -100,10 +98,10 @@ export const format = ({
 
   const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
     getTextIn,
-    programmeCode,
+    programme,
     studentToStudyrightEndMap,
     studentToSecondStudyrightEndMap,
-    // year,
+    // year: firstYearOfThisThing,
     year: null,
     semestersToAddToStart,
   })
@@ -114,11 +112,11 @@ export const format = ({
     )
   })
 
-  const formatStudent = (student: any): FormattedStudentData => {
+  const formatStudent = (student: Student): FormattedStudentData => {
     const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester)
 
-    const primaryProgramme = studentProgrammes.find(({ code }) => code === programmeCode) ?? studentProgrammes[0]
-    const otherProgrammes = studentProgrammes.filter(({ code }) => code !== programmeCode)
+    const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
+    const otherProgrammes = studentProgrammes.filter(({ code }) => code !== programme)
 
     const relevantStudyRight = findStudyRightForClass(student.studyRights, primaryProgramme?.code, /*year*/ null)
     const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code }) => code === primaryProgramme?.code)
@@ -169,7 +167,7 @@ export const format = ({
 
     const studentWithEnrollmentMap = {
       studentNumber: student.studentNumber,
-      semesterEnrollmentsMap: programmeCode
+      semesterEnrollmentsMap: programme
         ? relevantStudyRight?.semesterEnrollments?.reduce((enrollments, { type, semester, statutoryAbsence }) => {
             enrollments[semester] = {
               enrollmenttype: type,
@@ -246,10 +244,10 @@ export const format = ({
         : null,
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       programmeStatus: getStudyRightStatus(),
-      transferredFrom: student.transferredStudyRight ?? getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource,
+      transferredFrom: getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? '',
       admissionType: getAdmissiontype(),
       gender: GenderCodeToText[student.gender_code],
-      citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
+      citizenships: student.citizenships?.map(citizenship => getTextIn(citizenship)).sort().join(', ') ?? null,
       curriculumPeriod: student.curriculumVersion,
       mostRecentAttainment: getMostRecentAttainment(student),
       tvex: !!relevantStudyRight?.tvex,
@@ -262,13 +260,13 @@ export const format = ({
         : null,
     }
 
-    if (combinedProgrammeCode || shouldShowBachelorAndMaster) {
+    if (combinedProgramme || shouldShowBachelorAndMaster) {
       const getCombinedProgrammeCredits = student =>
         student.studyplans?.find(plan => {
-          if (combinedProgrammeCode) return plan.programme_code === combinedProgrammeCode
+          if (combinedProgramme) return plan.programme_code === combinedProgramme
 
-          const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programmeCode))
-          return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programmeCode
+          const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programme))
+          return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programme
         })?.completed_credits
 
       result.creditsCombinedProg = getCombinedProgrammeCredits(student) ?? 0
