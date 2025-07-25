@@ -95,7 +95,7 @@ export const PopulationStudents = ({
   generalTabFormattingFunction,
 }: PopulationStudentsProps & {
   generalTabColumnFunction: () => [string[], string[]],
-  generalTabFormattingFunction: () => FormattedStudentData[]
+  generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
 

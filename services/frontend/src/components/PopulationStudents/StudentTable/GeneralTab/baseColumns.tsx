@@ -76,6 +76,7 @@ export const useGetColumnDefinitions = ({
       }),
     ]
   }),
+  columnHelper.accessor('grade', { header: 'Grade' }),
   columnHelper.accessor('studyTrack', { header: 'Study track' }),
   columnHelper.accessor('studyRightStart', { header: 'Start of study right' }),
   columnHelper.accessor('programmeStart', { header: 'Started in programme' }),
@@ -100,7 +101,7 @@ export const useGetColumnDefinitions = ({
       />
     ),
     cell: cell => {
-      const { programmes } = cell.getValue()
+      const { programmes } = cell.getValue() ?? { programmes: '' }
       if (!programmes || programmes.length === 0) return null
 
       const programmeName = getTextIn(programmes[0]?.name) ?? ''
@@ -160,8 +161,6 @@ export const useGetColumnDefinitions = ({
   columnHelper.accessor('tags', { header: 'Tags' }),
   columnHelper.accessor('extent', { header: 'Extent' }),
   columnHelper.accessor('updatedAt', { header: 'Last updated at' }),
-
-  columnHelper.accessor('grade', { header: 'Grade' }),
 
   columnHelper.accessor('semesterEnrollments', {
     header: 'Semesters present',

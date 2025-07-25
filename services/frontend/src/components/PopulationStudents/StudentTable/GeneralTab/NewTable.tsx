@@ -23,7 +23,7 @@ export const NewTable = ({
   combinedProgramme: string | undefined
 
   columnFunction: () => [string[], string[]],
-  formattingFunction: () => FormattedStudentData[]
+  formattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
   const { getTextIn } = useLanguage()
   const { data: degreeProgrammes, isSuccess: degreeProgrammesFound } = useGetProgrammesQuery()
