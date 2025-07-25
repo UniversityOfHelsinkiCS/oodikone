@@ -50,7 +50,7 @@ export type FormattedStudentData = {
   admissionType: string | null
   gender: string
   citizenships: string | null
-  curriculumPeriod: string
+  curriculumPeriod: string | null
   mostRecentAttainment: string | null
   tags: string | null
   extent?: string

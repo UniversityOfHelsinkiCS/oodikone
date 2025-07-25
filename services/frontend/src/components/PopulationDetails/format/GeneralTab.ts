@@ -16,12 +16,19 @@ import { FormattedStudent as Student } from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import { useMemo } from 'react'
 
-export const useColumns = (): [string[], string[]] => {
+export const useColumns = ({
+  showCombinedProgrammeColumns
+}): [string[], string[]] => {
   const { visible: namesVisible } = useStudentNameVisibility()
 
   const nameColumns = namesVisible ? [
     'lastName',
     'givenNames',
+  ] : []
+
+  const combinedProgrammeColumns = showCombinedProgrammeColumns ? [
+    'graduationDateCombinedProg',
+    'creditsCombinedProg'
   ] : []
 
   return [[
@@ -49,6 +56,7 @@ export const useColumns = (): [string[], string[]] => {
     'tags',
     'extent',
     'updatedAt',
+    ...combinedProgrammeColumns,
   ], [
     'email',
     'phoneNumber',
@@ -210,6 +218,14 @@ export const format = ({
       return formatDate(new Date(latestDate), DateFormat.ISO_DATE)
     }
 
+    const getCombinedProgrammeCredits = student =>
+      student.studyplans?.find(plan => {
+        if (combinedProgramme) return plan.programme_code === combinedProgramme
+
+        const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programme))
+        return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programme
+      })?.completed_credits
+
     const getExtent = student =>
       student.studyRights
         .filter(
@@ -220,7 +236,7 @@ export const format = ({
         .map(studyRight => studyRight.extentCode)
         .join(', ')
 
-    const result: FormattedStudentData = {
+    return {
       firstNames: student.firstnames,
       lastName: student.lastname,
       studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
@@ -252,6 +268,12 @@ export const format = ({
       mostRecentAttainment: getMostRecentAttainment(student),
       tvex: !!relevantStudyRight?.tvex,
       tags: student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null,
+      creditsCombinedProg: combinedProgramme || shouldShowBachelorAndMaster
+        ? getCombinedProgrammeCredits(student) ?? 0
+        : null,
+      graduationDateCombinedProg: (combinedProgramme || shouldShowBachelorAndMaster) && secondStudyRightElement?.graduated
+        ? formatDate(secondStudyRightElement.endDate, DateFormat.ISO_DATE)
+        : null,
       extent: isAdmin
         ? getExtent(student)
         : null,
@@ -259,23 +281,6 @@ export const format = ({
         ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV)
         : null,
     }
-
-    if (combinedProgramme || shouldShowBachelorAndMaster) {
-      const getCombinedProgrammeCredits = student =>
-        student.studyplans?.find(plan => {
-          if (combinedProgramme) return plan.programme_code === combinedProgramme
-
-          const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programme))
-          return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programme
-        })?.completed_credits
-
-      result.creditsCombinedProg = getCombinedProgrammeCredits(student) ?? 0
-      result.graduationDateCombinedProg = secondStudyRightElement?.graduated
-        ? formatDate(secondStudyRightElement.endDate, DateFormat.ISO_DATE)
-        : null
-    }
-
-    return result
   }
 
   return useMemo(() => filteredStudents.map(formatStudent), [programme, filteredStudents])
