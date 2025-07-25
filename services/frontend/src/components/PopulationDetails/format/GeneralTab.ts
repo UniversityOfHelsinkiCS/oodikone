@@ -76,10 +76,9 @@ export const format = ({
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { getTextIn } = useLanguage()
 
-  const { data: programmes, isFetching: programmesFetching, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isFetching: semestersFetching, isSuccess: semestersSuccess} = useGetSemestersQuery()
+  const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
+  const { data: semesters, isSuccess: semestersSuccess} = useGetSemestersQuery()
 
-  if (programmesFetching || semestersFetching) return null
   if (!programmesSuccess || !semestersSuccess) return null
 
   const currentSemester = semesters?.currentSemester
