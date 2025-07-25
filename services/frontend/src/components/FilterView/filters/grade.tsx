@@ -2,11 +2,11 @@ import Checkbox from '@mui/material/Checkbox'
 import FormGroup from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Typography from '@mui/material/Typography'
-import fp from 'lodash/fp'
 
-import { getHighestGradeOrEnrollmentOfCourseBetweenRange } from '@/common'
+import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
+import { FormattedStudent } from '@oodikone/shared/types'
 
 /**
  * Grade filter.
@@ -66,29 +66,24 @@ export const gradeFilter = createFilter({
 
   isActive: ({ selected }) => selected.length > 0,
 
-  precompute: ({ students, args }) =>
-    fp.flow(
-      fp.map((student: any) => [
+  precompute: ({ students, args }) => {
+    return {
+      grades: students.map((student) => [
         student.studentNumber,
-        fp.filter((course: any) => args.courseCodes.includes(course.course_code))(student.courses),
-        fp.filter((enrollment: any) => args.courseCodes.includes(enrollment.course_code))(student.enrollments),
-      ]),
-      /* fp.filter(
-      fp.flow(
-        ([, courses]) => courses,
-        fp.map('course_code'),
-        courses => args.courseCodes.some(code => courses.includes(code))
-      )
-    ), */
-      fp.map(([studentNumber, courses, enrollments]) => [
-        studentNumber,
-        getHighestGradeOrEnrollmentOfCourseBetweenRange(courses, enrollments, args.from, args.to),
-      ]),
-      fp.filter(([, grade]) => grade !== undefined),
-      fp.groupBy(([, { grade }]) => grade),
-      fp.mapValues(fp.map(([studentNumber]) => studentNumber)),
-      grades => ({ grades })
-    )(students),
+        student.courses.filter((course: any) => args.courseCodes.includes(course.course_code)),
+      ] as [string, FormattedStudent["courses"]])
+        .map(([studentNumber, courses]) => [
+          studentNumber,
+          getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
+        ])
+        .filter(([_, grade]) => grade !== undefined)
+        .reduce((acc, [studentNumber, { grade }]) => {
+          acc[grade!] ??= []
+          acc[grade!].push(studentNumber)
+          return acc
+        }, {})
+    }
+  },
 
   filter(student, { precomputed, options }) {
     const { selected } = options
