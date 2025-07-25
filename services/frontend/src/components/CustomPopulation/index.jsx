@@ -32,6 +32,8 @@ import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
 import { UnihowDataExport } from './UnihowDataExport'
 
+import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
+
 export const CustomPopulation = () => {
   const [customPopulationState, setCustomPopulationState] = useState({
     selectedSearch: null,
@@ -170,6 +172,12 @@ const CustomPopulationContent = ({
           dataExport={<UnihowDataExport students={filteredStudents} />}
           filteredStudents={filteredStudents}
           variant="customPopulation"
+
+          generalTabColumnFunction={() => columnsGeneralTab()}
+          generalTabFormattingFunction={() => formatGeneralTab({
+            programme: associatedProgramme || null,
+            filteredStudents,
+          })}
         />
       ),
     },
