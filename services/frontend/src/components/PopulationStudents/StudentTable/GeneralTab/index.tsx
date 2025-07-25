@@ -294,10 +294,10 @@ export const GeneralTabContainer = ({
     const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
     if (!highestGrade) return { grade: '-', date: '', language: '' }
     const { date, language } = courses
-      .filter(course => course.grade === highestGrade.grade)
+      .filter(course => course.grade === highestGrade)
       .sort((a, b) => +new Date(b.date) - +new Date(a.date))[0]
     return {
-      grade: highestGrade.grade,
+      grade: highestGrade,
       attainmentDate: date,
       language,
     }

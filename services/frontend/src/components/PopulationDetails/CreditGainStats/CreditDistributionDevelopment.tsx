@@ -80,7 +80,7 @@ const getChartData = (
   students: any[],
   timeSlots: any[],
   programme: string,
-  timeDivision: string,
+  timeDivision: TimeDivision,
   cumulative: boolean,
   combinedProgramme?: string
 ) => {
@@ -90,7 +90,7 @@ const getChartData = (
     cumulative,
     timeDivision,
     programmeCredits,
-    timeSlots,
+    timeSlots.length,
     6
   )
   const colors = generateGradientColors(limits.length)
@@ -180,9 +180,7 @@ export const CreditDistributionDevelopment = ({
   year,
 }: CreditDistributionDevelopmentProps) => {
   const [cumulative, setCumulative] = useState(true)
-  const [timeDivision, setTimeDivision] = useState<(typeof TimeDivision)[keyof typeof TimeDivision]>(
-    TimeDivision.SEMESTER
-  ) // TODO: use enum or something else
+  const [timeDivision, setTimeDivision] = useState<TimeDivision>(TimeDivision.SEMESTER)
   const [isAscending, setIsAscending] = useState(true)
 
   const { getTextIn } = useLanguage()
@@ -306,7 +304,7 @@ export const CreditDistributionDevelopment = ({
         </ToggleContainer>
         <FormControl>
           <FormLabel>Divide by</FormLabel>
-          <RadioGroup onChange={(_, value) => setTimeDivision(value)} value={timeDivision}>
+          <RadioGroup onChange={(_, value) => setTimeDivision(value as TimeDivision)} value={timeDivision}>
             {Object.values(TimeDivision).map(value => (
               <FormControlLabel control={<RadioMui sx={{ py: '0.5em' }} />} key={value} label={value} value={value} />
             ))}

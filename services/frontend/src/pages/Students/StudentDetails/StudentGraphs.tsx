@@ -23,8 +23,8 @@ import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulati
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import type { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
-import { Absence } from '.'
 
 dayjs.extend(isSameOrAfter)
 exporting(ReactHighcharts.Highcharts)

@@ -10,7 +10,8 @@ import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
 import { useTitle } from '@/hooks/title'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
-import { Unarray } from '@oodikone/shared/types'
+
+import type { Absence } from '@/types/students'
 import { BachelorHonours } from './BachelorHonours'
 import { CourseTables } from './CourseTables'
 import { StudentGraphs } from './StudentGraphs'
@@ -18,7 +19,7 @@ import { StudentInfoCard } from './StudentInfoCard'
 import { StudyrightsTable } from './StudyrightsTable'
 import { TagsTable } from './TagsTable'
 
-const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters']) => {
+const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters']): Absence[] => {
   const semesterEnrollments = studyRights.reduce<
     Record<string, { semestercode: number; enrollmenttype: number; statutoryAbsence: boolean }>
   >((acc, { semesterEnrollments }) => {
@@ -54,14 +55,12 @@ const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters'
     .filter(enrollments => enrollments.enrollmenttype !== 1)
     .map(enrollment => ({
       ...enrollment,
-      startdate: new Date(semesters[enrollment.semestercode].startdate).getTime(),
-      enddate: new Date(semesters[enrollment.semestercode].enddate).getTime(),
+      startDate: new Date(semesters[enrollment.semestercode].startdate),
+      endDate: new Date(semesters[enrollment.semestercode].enddate),
     }))
 
   return mergedEnrollments
 }
-
-export type Absence = Unarray<ReturnType<typeof getAbsentYears>>
 
 export const StudentDetails = () => {
   const { studentNumber } = useParams()

@@ -1,41 +1,54 @@
 import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
-import { filter, maxBy, orderBy, range } from 'lodash'
-dayjs.extend(isBetween)
+import { maxBy, orderBy, range } from 'lodash'
 
 import { serviceProvider } from '@/conf'
+import { SemestersData } from '@/redux/semesters'
+import type { Absence } from '@/types/students'
+import type { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import { FormattedStudent, Release, CreditTypeCode, Name, Unarray } from '@oodikone/shared/types'
 
-export const textAndDescriptionSearch = (dropDownOptions, param) =>
-  filter(dropDownOptions, option =>
+dayjs.extend(isBetween)
+
+export const textAndDescriptionSearch = (dropDownOptions: any[], param: string) =>
+  dropDownOptions.filter(option =>
     option.text
       ? option.text.toLowerCase().concat(option.description.toLowerCase()).includes(param.toLowerCase())
       : null
   )
 
-export const isFall = semester => semester % 2 === 1
+export const isFall = (semester: number) => semester % 2 === 1
 
-export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
+export const getStudentTotalCredits = (
+  student: Pick<FormattedStudent, 'courses'>,
+  includeTransferredCredits = true
+) => {
   const passedCourses = includeTransferredCredits
-    ? student.courses.filter(course => [4, 9].includes(course.credittypecode) && !course.isStudyModuleCredit)
-    : student.courses.filter(course => course.credittypecode === 4 && !course.isStudyModuleCredit)
+    ? student.courses.filter(
+        course =>
+          [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(course.credittypecode) &&
+          !course.isStudyModuleCredit
+      )
+    : student.courses.filter(course => course.credittypecode === CreditTypeCode.PASSED && !course.isStudyModuleCredit)
   return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 
-const getGradedCourses = (student, includeTransferredCredits = true) =>
+const getGradedCourses = (student: FormattedStudent, includeTransferredCredits = true) =>
   includeTransferredCredits
     ? student.courses.filter(course => Number(course.grade) && !course.isStudyModuleCredit)
     : student.courses.filter(
-        course => Number(course.grade) && !course.isStudyModuleCredit && course.credittypecode !== 9
+        course =>
+          Number(course.grade) && !course.isStudyModuleCredit && course.credittypecode !== CreditTypeCode.APPROVED
       )
 
-export const getStudentGradeMean = (student, includeTransferredCredits = true) => {
+export const getStudentGradeMean = (student: FormattedStudent, includeTransferredCredits = true) => {
   const courses = getGradedCourses(student, includeTransferredCredits)
   const gradeTotal = courses.reduce((a, b) => a + Number(b.grade), 0)
   const mean = gradeTotal / courses.length || 0
   return mean
 }
 
-export const getStudentGradeMeanWeightedByCredits = (student, includeTransferredCredits = true) => {
+export const getStudentGradeMeanWeightedByCredits = (student: FormattedStudent, includeTransferredCredits = true) => {
   const courses = getGradedCourses(student, includeTransferredCredits)
   const gradeTotal = courses.reduce((a, b) => a + Number(b.grade) * Number(b.credits), 0)
   const sumWeights = courses.reduce((a, b) => a + Number(b.credits), 0)
@@ -43,7 +56,12 @@ export const getStudentGradeMeanWeightedByCredits = (student, includeTransferred
   return mean
 }
 
-export const getTextInWithOpen = (course, getTextIn, isOpenCourse, isStudyModuleCredit) => {
+export const getTextInWithOpen = (
+  course: { code: string; name: Name },
+  getTextIn: any,
+  isOpenCourse: boolean,
+  isStudyModuleCredit: boolean
+) => {
   if (!course) return ''
   const openUniTexts = { fi: 'Avoin yo', en: 'Open uni', sv: 'Öppna uni' }
   let courseName = getTextIn(course.name)
@@ -60,7 +78,7 @@ export const getTextInWithOpen = (course, getTextIn, isOpenCourse, isStudyModule
   return courseName
 }
 
-export const getUnifyTextIn = unifyCourses => {
+export const getUnifyTextIn = (unifyCourses: string) => {
   switch (unifyCourses) {
     case 'regularStats':
       return '(normal)'
@@ -74,18 +92,25 @@ export const getUnifyTextIn = unifyCourses => {
 }
 
 // Gives students course completion date
-export const getStudentToTargetCourseDateMap = (students, codes) => {
+export const getStudentToTargetCourseDateMap = (
+  students: Pick<FormattedStudent, 'studentNumber' | 'courses'>[],
+  codes: string[]
+) => {
   const codeSet = new Set(codes)
   return students.reduce((acc, student) => {
     const targetCourse = student.courses
       .filter(course => codeSet.has(course.course_code))
-      .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+      .sort((a, b) => +new Date(b.date) - +new Date(a.date))[0]
     acc[student.studentNumber] = targetCourse ? targetCourse.date : null
     return acc
   }, {})
 }
 
-const programmeIsActive = (studyRight, hasGraduated, currentSemesterCode) =>
+const programmeIsActive = (
+  studyRight: Unarray<FormattedStudent['studyRights']>,
+  hasGraduated: boolean,
+  currentSemesterCode: number
+) =>
   !studyRight.cancelled &&
   !hasGraduated &&
   (currentSemesterCode == null ||
@@ -93,7 +118,7 @@ const programmeIsActive = (studyRight, hasGraduated, currentSemesterCode) =>
       enrollment => enrollment.semester === currentSemesterCode && [1, 2].includes(enrollment.type)
     ) != null)
 
-export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
+export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRights'], currentSemester: number) =>
   orderBy(
     studyRights?.flatMap(studyRight =>
       studyRight.studyRightElements
@@ -112,50 +137,53 @@ export const getAllProgrammesOfStudent = (studyRights, currentSemester) =>
     ['desc', 'desc']
   )
 
-export const getNewestProgrammeOfStudentAt = (studyRights, currentSemester, date) => {
+export const getNewestProgrammeOfStudentAt = (
+  studyRights: FormattedStudent['studyRights'],
+  currentSemester: number,
+  date: string
+) => {
   const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
   if (!programmes.length) return null
   if (!date) return programmes[0]
+
   return programmes.find(programme => dayjs(date).isSameOrAfter(programme.startDate)) ?? null
 }
 
-export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBound) => {
-  const grades = []
-  courses.forEach(course => {
-    if (
-      new Date(lowerBound).getTime() <= new Date(course.date).getTime() &&
-      new Date(course.date).getTime() <= new Date(upperBound).getTime()
-    ) {
+export const getHighestGradeOfCourseBetweenRange = (
+  courses: FormattedStudent['courses'],
+  lowerBound: string,
+  upperBound: string
+) => {
+  const grades = courses
+    .filter(course => new Date(lowerBound) <= new Date(course.date) && new Date(course.date) <= new Date(upperBound))
+    .map(course => {
       if (course.grade === 'Hyv.') {
-        grades.push({ grade: course.grade, value: 1 })
-      } else if (!Number(course.grade)) {
-        grades.push({ grade: course.grade, value: 0 })
-      } else {
-        grades.push({ grade: course.grade, value: Number(course.grade) })
+        return { grade: course.grade, sortValue: 1 }
       }
-    }
-  })
-  return maxBy(grades, grade => grade.value)
+      if (Number(course.grade)) {
+        return { grade: course.grade, sortValue: 0 }
+      }
+      return { grade: course.grade, sortValue: Number(course.grade) }
+    })
+
+  return maxBy(grades, grade => grade.sortValue)?.grade
 }
 
-export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollments, lowerBound, upperBound) => {
-  const grade = getHighestGradeOfCourseBetweenRange(courses, lowerBound, upperBound)
-  if (!grade) return enrollments.length ? { grade: 'No grade' } : undefined
-  return grade
-}
-
-export const findStudyRightForClass = (studyRights, programmeCode, year) =>
+// the type of year here is courtesy of study guidance groups
+export const findStudyRightForClass = (
+  studyRights: SISStudyRight[],
+  programmeCode: string | undefined,
+  year: string | null | undefined
+) =>
   studyRights.find(studyRight =>
     studyRight.studyRightElements.some(
       element =>
         element.code === programmeCode &&
-        (year == null ||
-          year === 'All' ||
-          dayjs(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
+        (!year || dayjs(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
     )
   )
 
-export const getTargetCreditsForProgramme = code => {
+export const getTargetCreditsForProgramme = (code: string) => {
   if (code === 'MH30_001' || code === 'KH90_001-MH90_001') return 360
   if (code === 'MH30_003') return 330
   if (code === 'MH30_004') return 150
@@ -166,11 +194,12 @@ export const getTargetCreditsForProgramme = code => {
   // Those codes begin with 'LIS' is it 40 credits or something else?
 }
 
-export const isMastersProgramme = programmeCode => programmeCode.startsWith('MH') || programmeCode.endsWith('-ma')
+export const isMastersProgramme = (programmeCode: string) =>
+  programmeCode.startsWith('MH') || programmeCode.endsWith('-ma')
 
-export const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
+export const getMonthsForDegree = (code: string) => getTargetCreditsForProgramme(code) / (60 / 12)
 
-export const calculatePercentage = (numerator, denominator, numberOfDecimals = 2) =>
+export const calculatePercentage = (numerator: number, denominator: number, numberOfDecimals = 2) =>
   new Intl.NumberFormat(undefined, {
     style: 'percent',
     minimumFractionDigits: numberOfDecimals,
@@ -182,63 +211,69 @@ export const calculatePercentage = (numerator, denominator, numberOfDecimals = 2
  * and for masters a 2 year target. Any absences within the study right element extends the end date.
  * If any absence is in the start of study right element the start date is postponed.
  */
-export const getStudyRightElementTargetDates = (studyRightElement, absences = []) => {
+export const getStudyRightElementTargetDates = (
+  studyRightElement: Pick<SISStudyRightElement, 'code' | 'startDate'>,
+  absences: Absence[]
+) => {
   if (!studyRightElement) return []
-  const { code, startDate } = studyRightElement
+  const { code, startDate: sreStartDate } = studyRightElement
   const months = getMonthsForDegree(code)
-  const end =
+  const sreEndDateTarget =
     code.includes('KH') || code.includes('ba') || ['MH30_001', 'MH30_003'].includes(code)
-      ? dayjs(startDate).add(months, 'months').set('month', 6).endOf('month')
-      : dayjs(startDate).add(months, 'months')
+      ? dayjs(sreStartDate).add(months, 'months').set('month', 6).endOf('month').toDate()
+      : dayjs(sreStartDate).add(months, 'months').toDate()
 
-  if (!absences) return [new Date(startDate), new Date(end)]
+  if (!absences) return [new Date(sreStartDate), sreEndDateTarget]
+
   const absencesWithinStudyRightElement = absences.filter(
-    ({ startdate, enddate }) => startdate >= new Date(startDate).getTime() && enddate <= new Date(end).getTime()
+    ({ startDate, endDate }) => startDate >= sreStartDate && endDate <= sreEndDateTarget
   )
 
-  if (!absencesWithinStudyRightElement.length) return [new Date(startDate), new Date(end)]
+  if (!absencesWithinStudyRightElement.length) return [sreStartDate, sreEndDateTarget]
 
-  const absenceInStartOfStudyRight = absencesWithinStudyRightElement.find(
-    ({ startdate }) => new Date(startDate).getTime() === startdate
-  )
+  const absenceInStartOfStudyRight = absencesWithinStudyRightElement.find(({ startDate }) => sreStartDate === startDate)
+
   const absentMonthsDuringStudy = Math.round(
     absencesWithinStudyRightElement
-      .filter(({ startdate, enddate }) => {
+      .filter(({ startDate, endDate }) => {
         if (!absenceInStartOfStudyRight) return true
-        return startdate !== absenceInStartOfStudyRight.startdate && enddate !== absenceInStartOfStudyRight.enddate
+        return startDate !== absenceInStartOfStudyRight.startDate && endDate !== absenceInStartOfStudyRight.endDate
       })
-      .filter(({ startdate }) => startdate < new Date(end).getTime())
-      .reduce((acc, absent) => {
-        const { startdate, enddate } = absent
-        const diff = dayjs(startdate).diff(enddate, 'days') / 30
+      .filter(({ startDate }) => startDate < sreEndDateTarget)
+      .reduce((acc, absence) => {
+        const { startDate, endDate } = absence
+        const diff = dayjs(startDate).diff(endDate, 'days') / 30
         return acc + Math.abs(diff)
       }, 0)
   )
+
   const absentMonthsBeforeStudy = absenceInStartOfStudyRight
     ? Math.round(
-        Math.abs(dayjs(absenceInStartOfStudyRight.startdate).diff(absenceInStartOfStudyRight.enddate, 'days') / 30)
+        Math.abs(dayjs(absenceInStartOfStudyRight.startDate).diff(absenceInStartOfStudyRight.endDate, 'days') / 30)
       )
     : 0
   return [
-    new Date(dayjs(startDate).add(absentMonthsBeforeStudy, 'months')),
-    new Date(end.add(absentMonthsDuringStudy + absentMonthsBeforeStudy, 'months')),
+    dayjs(sreStartDate).add(absentMonthsBeforeStudy, 'months').toDate(),
+    dayjs(sreEndDateTarget)
+      .add(absentMonthsDuringStudy + absentMonthsBeforeStudy, 'months')
+      .toDate(),
   ]
 }
 
-export const TimeDivision = {
-  ACADEMIC_YEAR: 'Academic year',
-  CALENDAR_YEAR: 'Calendar year',
-  SEMESTER: 'Semester',
+export enum TimeDivision {
+  ACADEMIC_YEAR = 'Academic year',
+  CALENDAR_YEAR = 'Calendar year',
+  SEMESTER = 'Semester',
 }
 
 /* Returns an array of credit categories depending on parameters, shows the high limit
   of the category, for example [20, 40, 60, 80, 100, 120] where the first category is 0 - 20 */
 export const getCreditCategories = (
-  cumulative,
-  timeDivision,
-  programmeCredits,
-  timeSlots,
-  creditCategoryAmount,
+  cumulative: boolean,
+  timeDivision: TimeDivision,
+  programmeCredits: number,
+  timeSlotsLength: number,
+  creditCategoryAmount: number,
   minCredits = 0
 ) => {
   // In calendar-year mode, minus 30 from target credits because programmes (usually) start in autumn,
@@ -247,9 +282,9 @@ export const getCreditCategories = (
   const isPastAugust = new Date().getMonth() > 6
   const calendarModifier = 30 + (isPastAugust ? 0 : 30)
   const creditsByTimeslots =
-    timeSlots.length * (timeDivision === TimeDivision.SEMESTER ? 30 : 60) - (isCalendar ? calendarModifier : 0)
+    timeSlotsLength * (timeDivision === TimeDivision.SEMESTER ? 30 : 60) - (isCalendar ? calendarModifier : 0)
   const maxCredits = creditsByTimeslots > programmeCredits ? programmeCredits : creditsByTimeslots
-  const creditCategoryArray = []
+  const creditCategoryArray: number[] = []
   for (let i = 1; i <= creditCategoryAmount; i++) creditCategoryArray.push(i)
 
   const limitBreaks = cumulative
@@ -258,25 +293,25 @@ export const getCreditCategories = (
   return range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 }
 
-export const validateInputLength = (input, minLength) => input?.trim().length >= minLength
+export const validateInputLength = (input: string, minLength: number) => input?.trim().length >= minLength
 
-export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
+export const splitByEmptySpace = (str: string) => str.replace(/\s\s+/g, ' ').split(' ')
 
-export const getCurrentSemester = allSemesters => {
+export const getCurrentSemester = (allSemesters: SemestersData['semesters']) => {
   if (!allSemesters) return null
   return Object.values(allSemesters).find(
     semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
   )
 }
 
-export const isNewStudyProgramme = programmeCode => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
+export const isNewStudyProgramme = (programmeCode: string) => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
 
 /**
  * Extracts items from a string separated by commas, semicolons, spaces, or newlines.
  * @param {string} input - The input string containing items.
  * @returns An array of extracted items.
  */
-export const extractItems = input => {
+export const extractItems = (input: string) => {
   const items = input.match(/[^\s,;]+/g) ?? []
   return [...items]
 }
@@ -339,7 +374,7 @@ export const languageAbbreviations = {
 
 export const showAsUserKey = 'showAsUser'
 
-export const getEnrollmentTypeTextForExcel = (type, statutoryAbsence) => {
+export const getEnrollmentTypeTextForExcel = (type: number, statutoryAbsence?: boolean) => {
   if (type === 1) return 'Present'
   if (type === 2 && statutoryAbsence) return 'Absent (statutory)'
   if (type === 2) return 'Absent'
@@ -354,11 +389,11 @@ export const isDefaultServiceProvider = () => {
   return serviceProvider === 'toska'
 }
 
-export const formatContent = content => content.replace(/\n +/g, '\n')
+export const formatContent = (content: string) => content.replace(/\n +/g, '\n')
 
-export const filterInternalReleases = release => !release.title.startsWith('Internal:')
+export const filterInternalReleases = (release: Release) => !release.title.startsWith('Internal:')
 
-export const getDescription = description => {
+export const getDescription = (description: string) => {
   const lines = description.split('\n')
   const internalIndex = lines.findIndex(line => line.toLowerCase().includes('internal'))
   if (internalIndex === -1 || internalIndex === 0) {

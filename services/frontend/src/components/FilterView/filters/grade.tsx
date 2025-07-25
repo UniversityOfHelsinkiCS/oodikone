@@ -4,9 +4,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Typography from '@mui/material/Typography'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { FilterTrayProps } from '../FilterTray'
 import { createFilter } from './createFilter'
-import { FormattedStudent } from '@oodikone/shared/types'
 
 /**
  * Grade filter.
@@ -68,20 +68,24 @@ export const gradeFilter = createFilter({
 
   precompute: ({ students, args }) => {
     return {
-      grades: students.map((student) => [
-        student.studentNumber,
-        student.courses.filter((course: any) => args.courseCodes.includes(course.course_code)),
-      ] as [string, FormattedStudent["courses"]])
+      grades: students
+        .map(
+          student =>
+            [
+              student.studentNumber,
+              student.courses.filter((course: any) => args.courseCodes.includes(course.course_code)),
+            ] as [string, FormattedStudent['courses']]
+        )
         .map(([studentNumber, courses]) => [
           studentNumber,
           getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
         ])
         .filter(([_, grade]) => grade !== undefined)
-        .reduce((acc, [studentNumber, { grade }]) => {
+        .reduce((acc, [studentNumber, grade]) => {
           acc[grade!] ??= []
           acc[grade!].push(studentNumber)
           return acc
-        }, {})
+        }, {}),
     }
   },
 

@@ -222,8 +222,8 @@ const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
   const absencePoints = absences
     .filter(a =>
       a.enrollmenttype === 3
-        ? absenceIsBetweenGraphDates(a.startdate, a.enddate) && new Date(a.startdate).getTime() <= new Date().getTime()
-        : absenceIsBetweenGraphDates(a.startdate, a.enddate)
+        ? absenceIsBetweenGraphDates(a.startDate, a.endDate) && a.startDate <= new Date()
+        : absenceIsBetweenGraphDates(a.startDate, a.endDate)
     )
     .reduce((res, { startdate, enddate, enrollmenttype, statutoryAbsence }) => {
       const targetCreditsBeforeAbsence =
@@ -468,12 +468,10 @@ export const CreditAccumulationGraphHighCharts = ({
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0],
       absences
     )
-    const ending = selectedStudyRight
-      ? new Date(studyRightTargetEnd).getTime()
-      : new Date(endDate || new Date()).getTime()
-    const starting = new Date(startDate).getTime()
+    const ending = selectedStudyRight ? new Date(studyRightTargetEnd) : new Date(endDate || new Date())
+    const starting = new Date(startDate)
     const filteredAbsences = selectedStudyRight
-      ? absences.filter(({ startdate, enddate }) => startdate >= starting && enddate <= ending)
+      ? absences.filter(({ startDate, endDate }) => startDate >= starting && endDate <= ending)
       : absences
 
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))

@@ -19,10 +19,10 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
         }
         grades['No grade'].push(student.studentNumber)
       } else {
-        if (!grades[highestGrade.grade]) {
-          grades[highestGrade.grade] = []
+        if (!grades[highestGrade]) {
+          grades[highestGrade] = []
         }
-        grades[highestGrade.grade].push(student.studentNumber)
+        grades[highestGrade].push(student.studentNumber)
       }
     })
 

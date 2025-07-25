@@ -69,7 +69,7 @@ export const calculateStats = (
     true,
     TimeDivision.ACADEMIC_YEAR,
     maximumAmountOfCredits,
-    Object.keys(creditCounts),
+    Object.keys(creditCounts).length,
     numberOfCreditCategories - 1,
     minimumAmountOfCredits
   )
