@@ -9,6 +9,7 @@ import { FormattedStudentData } from '../GeneralTab'
 import { useGetColumnDefinitions } from './baseColumns'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { isMastersProgramme } from '@/common'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 
 export const NewTable = ({
   includePrimaryProgramme,
@@ -35,7 +36,7 @@ export const NewTable = ({
       getTextIn,
       combinedProgramme,
       includePrimaryProgramme,
-      isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree',
+      isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
     })
 
     const squashGroups = (column) => {

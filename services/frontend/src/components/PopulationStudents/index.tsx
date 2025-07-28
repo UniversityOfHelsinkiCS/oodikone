@@ -13,19 +13,17 @@ import { ProgressCriteria } from '@oodikone/shared/types'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
-import { FormattedStudentData, GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
-import { NewTable as OodiTableTab } from './StudentTable/GeneralTab/NewTable'
+import { NewTable as GeneralTab } from './StudentTable/GeneralTab/NewTable'
 import { TagsTab } from './StudentTable/TagsTab'
+import type { FormattedStudentData } from './StudentTable/GeneralTab'
 
 type PopulationDetails = {
   variant: 'population'
 
   programme: string
   combinedProgramme?: string
-
-  showBachelorAndMaster: boolean
 
   criteria?: ProgressCriteria
   curriculum: ExtendedCurriculumDetails | null
@@ -37,10 +35,6 @@ type PopulationDetails = {
 type CoursePopulation = {
   variant: 'coursePopulation'
 
-  from: string
-  to: string
-
-  coursecodes: string[]
   filteredStudents: any[]
 }
 
@@ -60,7 +54,6 @@ type StudyGuidanceGroup = {
 type CustomPopulation = {
   variant: 'customPopulation'
 
-  customPopulationProgramme: string | null
   filteredStudents: any[]
   dataExport: JSX.Element
 }
@@ -71,23 +64,13 @@ type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuid
 
 export const PopulationStudents = ({
   variant,
-
   programme,
   combinedProgramme,
-
-  showBachelorAndMaster,
-
   criteria,
   curriculum,
-
   filteredStudents,
   filteredCourses,
-  coursecodes,
-
-  customPopulationProgramme,
   dataExport,
-  from,
-  to,
   studyGuidanceGroup,
   year,
 
@@ -103,23 +86,8 @@ export const PopulationStudents = ({
     throw new Error(`${variant} is not a proper variant!`)
 
   const availableTabs = {
-    // General: () => (
-    //   <GeneralTab
-    //     combinedProgramme={combinedProgramme}
-    //     coursecodes={coursecodes}
-    //     customPopulationProgramme={customPopulationProgramme}
-    //     filteredStudents={filteredStudents}
-    //     from={from}
-    //     group={studyGuidanceGroup}
-    //     programme={programme}
-    //     showBachelorAndMaster={showBachelorAndMaster}
-    //     to={to}
-    //     variant={variant}
-    //     year={year}
-    //   />
-    // ),
     General: () => (
-      <OodiTableTab
+      <GeneralTab
         includePrimaryProgramme={variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)}
         programme={programme}
         combinedProgramme={combinedProgramme}

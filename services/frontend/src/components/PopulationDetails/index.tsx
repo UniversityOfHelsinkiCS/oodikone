@@ -150,7 +150,6 @@ export const PopulationDetails = ({
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
                 programme={programme}
-                showBachelorAndMaster={showBachelorAndMaster}
                 variant="population"
 
                 generalTabColumnFunction={() => columnsGeneralTab({

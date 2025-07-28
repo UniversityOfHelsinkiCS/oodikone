@@ -48,17 +48,17 @@ export const getRelevantSemesterData = (year: string | undefined): {
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-export const getFirstAndLastSemester = (semesters, year: string | undefined): [number, number] => {
+export const getFirstAndLastSemester = (semesters: SemestersData, year: string | undefined): [number, number] => {
   const { semesters: allSemesters, currentSemester } = semesters
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 
   const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
 
-  const associatedYear = year !== 'All' && year
+  const associatedYear = year !== 'All' && Number(year)
   const firstSemester = associatedYear
     ? (Object.values(allSemesters).find(semester =>
         new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
-      )?.semestercode ?? lastSemester) - (semestersToAddToStart ?? 0)
+      )?.semestercode ?? lastSemester)
     : lastSemester - 13
 
   return [firstSemester, lastSemester]

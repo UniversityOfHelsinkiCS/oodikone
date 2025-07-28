@@ -154,11 +154,8 @@ export const CoursePopulation = () => {
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          coursecodes={codes}
           filteredStudents={filteredStudents}
-          from={dateFrom}
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          to={dateTo}
           variant="coursePopulation"
 
           generalTabColumnFunction={() => columnsGeneralTab()}
