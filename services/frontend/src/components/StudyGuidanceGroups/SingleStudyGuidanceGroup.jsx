@@ -25,6 +25,8 @@ import { useCurriculumState } from '../../hooks/useCurriculums'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
+import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
+
 dayjs.extend(isBetween)
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
@@ -126,6 +128,11 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
             year={year}
+
+            generalTabColumnFunction={() => columnsGeneralTab({ group })}
+            generalTabFormattingFunction={() => formatGeneralTab({
+              group, filteredStudents
+            })}
           />
         </div>
       ),

@@ -120,7 +120,7 @@ export const PopulationStudents = ({
     // ),
     General: () => (
       <OodiTableTab
-        includePrimaryProgramme={variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)}
+        includePrimaryProgramme={variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)}
         programme={programme}
         combinedProgramme={combinedProgramme}
 
