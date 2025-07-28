@@ -173,7 +173,9 @@ const CustomPopulationContent = ({
           filteredStudents={filteredStudents}
           variant="customPopulation"
 
-          generalTabColumnFunction={() => columnsGeneralTab()}
+          generalTabColumnFunction={() => columnsGeneralTab({
+            programme: associatedProgramme || null,
+          })}
           generalTabFormattingFunction={() => formatGeneralTab({
             programme: associatedProgramme || null,
             filteredStudents,

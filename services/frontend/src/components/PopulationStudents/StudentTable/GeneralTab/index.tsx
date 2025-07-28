@@ -39,14 +39,14 @@ export type FormattedStudentData = {
       typeLabel: string
       graduationCrown: string
     }[]
-  }
+  } | null
   graduationDate: string | null
   graduationDateCombinedProg?: string | null
   startYearAtUniversity: number | null
-  primaryProgramme?: string
+  primaryProgramme: string | null
   programmes: { exportValue: string | null; programmes: Programme[] }
   programmeStatus: string | null
-  transferredFrom: string
+  transferredFrom: string | null
   admissionType: string | null
   gender: string
   citizenships: string | null

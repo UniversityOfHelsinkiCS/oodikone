@@ -148,13 +148,15 @@ export const getProgrammeDetails = ({
   const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
   const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme.code)
 
+  const relevantProgrammeCode = programme ?? primaryProgramme.code
+
   const yearMatching = (startDate) => !year || dayjs(startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]')
 
   const relevantStudyRight = student.studyRights.find(({ studyRightElements }) =>
-    studyRightElements.some(({ code, startDate }) => code === programme && yearMatching(startDate))
+    studyRightElements.some(({ code, startDate }) => code === relevantProgrammeCode && yearMatching(startDate))
   )
 
-  const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code, startDate }) => code === programme && yearMatching(startDate))
+  const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code, startDate }) => code === relevantProgrammeCode && yearMatching(startDate))
 
   const secondaryStudyplan = student.studyplans?.find(({ sis_study_right_id, programme_code }) => {
     if (combinedProgramme) return programme_code === combinedProgramme
