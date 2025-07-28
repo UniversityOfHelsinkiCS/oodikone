@@ -1,0 +1,183 @@
+import dayjs from "dayjs"
+
+import { useGetSemestersQuery } from "@/redux/semesters"
+
+import { getAllProgrammesOfStudent, isFall } from "@/common"
+import { creditDateFilter } from "@/components/FilterView/filters"
+import { useFilters } from "@/components/FilterView/useFilters"
+
+import { DegreeProgrammeType, type FormattedStudent as Student } from "@oodikone/shared/types"
+
+export const getCreditDateFilterOptions = () => {
+  const { useFilterSelector } = useFilters()
+  return useFilterSelector(creditDateFilter.selectors.selectOptions())
+}
+
+export const getRelevantSemesterData = (year: string | undefined): {
+  isSuccess: false
+  data: null
+} | {
+  isSuccess: true
+  data: NonNullable<any>
+} => {
+  const { isSuccess, data: semesters } = useGetSemestersQuery()
+
+  if (!isSuccess) return { data: null, isSuccess }
+
+  const { currentSemester, semesters: allSemesters } = semesters
+  const [firstSemester, lastSemester] = getFirstAndLastSemester(semesters, year)
+  
+  return {
+    isSuccess,
+    data: {
+      currentSemester,
+      allSemesters,
+
+      firstSemester,
+      lastSemester,
+    },
+  }
+}
+
+/*
+ * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
+ */
+export const getFirstAndLastSemester = (semesters, year: string | undefined) => {
+  const { semesters: allSemesters, currentSemester } = semesters
+  const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
+
+  const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
+
+  const associatedYear = year !== 'All' && year
+  const firstSemester = associatedYear
+    ? (Object.values(allSemesters).find(semester =>
+        new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
+      )?.semestercode ?? lastSemester) - (semestersToAddToStart ?? 0)
+    : lastSemester - 13
+
+  return [firstSemester, lastSemester]
+}
+
+export const getSemesterEnrollmentsContent = ({
+  getTextIn,
+
+  programme,
+  isMastersProgramme,
+  allSemesters,
+  lastSemester,
+  firstSemester,
+}) => (student, studyright) => {
+  if (!studyright) return []
+  const { studentNumber, studyrightEnd, secondStudyrightEnd } = student
+
+  const firstGraduation = studyrightEnd
+  const secondGraduation = secondStudyrightEnd
+
+  return Array.from(Array(lastSemester - firstSemester + 1).keys()).map((_, index) => {
+    const semester = index + firstSemester
+    const key = `${studentNumber}-${semester}`
+
+    const currentSemesterEnrollment = studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)
+
+    const enrollmenttype = currentSemesterEnrollment?.type
+    const statutoryAbsence = currentSemesterEnrollment?.statutoryAbsence
+
+    const { startdate, enddate, name: semesterName } = allSemesters[semester]
+    const graduated = programme
+      ? (() => {
+          const mastersAsNumber = Number(isMastersProgramme)
+
+          if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate)) return 1 + mastersAsNumber
+          if (secondGraduation && dayjs(secondGraduation).isBetween(startdate, enddate)) return 2 - mastersAsNumber
+          return 0
+        })()
+      : 0
+
+    const typeText = (() => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'Enrolled as present'
+        case 2:
+          return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
+        case 3:
+          return 'Not enrolled'
+        default:
+          return 'No study right'
+      }
+    })()
+
+    const typeLabel = (() => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'present'
+        case 2:
+          return statutoryAbsence ? 'absent-statutory' : 'absent'
+        case 3:
+          return 'passive'
+        default:
+          return 'none'
+      }
+    })()
+
+    const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
+    const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
+
+    const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
+
+    return { key, onHoverString, typeLabel, graduationCrown }
+  })
+}
+
+export const getProgrammeDetails = ({
+  programme,
+  isMastersProgramme,
+  combinedProgramme,
+  showBachelorAndMaster,
+
+  currentSemester,
+  year,
+}) => (student: Student) => {
+  const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester)
+
+  const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
+  const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme.code)
+
+  const yearMatching = (startDate) => !year || dayjs(startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]')
+
+  const relevantStudyRight = student.studyRights.find(({ studyRightElements }) =>
+    studyRightElements.some(({ code, startDate }) => code === programme && yearMatching(startDate))
+  )
+
+  const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code, startDate }) => code === programme && yearMatching(startDate))
+
+  const secondaryStudyplan = student.studyplans?.find(({ sis_study_right_id, programme_code }) => {
+    if (combinedProgramme) return programme_code === combinedProgramme
+
+    return sis_study_right_id === relevantStudyRight?.id && programme_code !== primaryStudyplan?.programme_code
+  })
+
+  const degreeProgrammeTypeToCheck = !!relevantStudyRightElement && !isMastersProgramme
+    ? DegreeProgrammeType.MASTER
+    : DegreeProgrammeType.BACHELOR
+
+  const relevantSecondaryStudyRightElement = (relevantStudyRight?.studyRightElements ?? [])
+    .filter(element => {
+      if (combinedProgramme) return element.code === combinedProgramme
+      if (showBachelorAndMaster && !!relevantStudyRightElement)
+        return element.degreeProgrammeType === degreeProgrammeTypeToCheck
+
+      return false
+    })
+    .sort(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)?.[0]
+
+  return {
+    allProgrammes: studentProgrammes,
+    primaryProgramme,
+    primaryStudyplan,
+    secondaryStudyplan,
+
+    relevantStudyRight,
+    relevantStudyRightElement,
+    relevantSecondaryStudyRightElement,
+  }
+}

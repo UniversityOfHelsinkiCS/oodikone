@@ -36,33 +36,33 @@ export const getSemestersPresentFunctions = ({
 
   const [firstSemester, lastSemester] = getFirstAndLastSemester()
 
-  const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
-    switch (enrollmenttype) {
-      case 1:
-        return 'Enrolled as present'
-      case 2:
-        return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-      case 3:
-        return 'Not enrolled'
-      default:
-        return 'No study right'
-    }
-  }
-
-  const enrollmentTypeLabel = (enrollmenttype, statutoryAbsence) => {
-    switch (enrollmenttype) {
-      case 1:
-        return 'present'
-      case 2:
-        return statutoryAbsence ? 'absent-statutory' : 'absent'
-      case 3:
-        return 'passive'
-      default:
-        return 'none'
-    }
-  }
-
   const getSemesterEnrollmentsContent = (student, studyright = undefined) => {
+    const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'Enrolled as present'
+        case 2:
+          return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
+        case 3:
+          return 'Not enrolled'
+        default:
+          return 'No study right'
+      }
+    }
+
+    const enrollmentTypeLabel = (enrollmenttype, statutoryAbsence) => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'present'
+        case 2:
+          return statutoryAbsence ? 'absent-statutory' : 'absent'
+        case 3:
+          return 'passive'
+        default:
+          return 'none'
+      }
+    }
+
     if (!student.semesterEnrollmentsMap && !studyright) return []
 
     const isMasters = isMastersProgramme(programme ?? '')

@@ -26,7 +26,7 @@ export type FormattedStudentData = {
   phoneNumber: string
   creditsTotal: number
   creditsHops: number
-  creditsCombinedProg?: number
+  creditsCombinedProg: number | null
   creditsSince: number
   studyRightStart: string
   programmeStart: string
@@ -53,8 +53,8 @@ export type FormattedStudentData = {
   curriculumPeriod: string | null
   mostRecentAttainment: string | null
   tags: string | null
-  extent?: string
-  studyTrack?: string | null
+  extent: string | null
+  studyTrack: string | null
   updatedAt: string | null
   grade?: string
   attainmentDate?: string

@@ -1,29 +1,28 @@
-import { findStudyRightForClass, getAllProgrammesOfStudent, getStudentTotalCredits } from '@/common'
-import { creditDateFilter } from '@/components/FilterView/filters'
-import { useFilters } from '@/components/FilterView/useFilters'
+import { useMemo } from 'react'
+
+import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
+import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
+
+import { getStudentTotalCredits } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
-import { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
-import { createMaps } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/createMaps'
-import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
+import { getCreditDateFilterOptions, getProgrammeDetails, getRelevantSemesterData, getSemesterEnrollmentsContent } from '@/components/PopulationStudents/format/GeneralTab'
+import type { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
 import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/GeneralTab/util'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
-import { FormattedStudent as Student } from '@oodikone/shared/types'
-import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
-import { useMemo } from 'react'
 
 export const useColumns = ({
   showCombinedProgrammeColumns
 }): [string[], string[]] => {
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const { visible: namesVisible } = useStudentNameVisibility()
 
   const nameColumns = namesVisible ? [
     'lastName',
-    'givenNames',
+    'firstNames',
   ] : []
 
   const combinedProgrammeColumns = showCombinedProgrammeColumns ? [
@@ -31,8 +30,14 @@ export const useColumns = ({
     'creditsCombinedProg'
   ] : []
 
+  const adminColumns = isAdmin ? [
+    'extent',
+    'updatedAt',
+  ] : []
+
+  const excelOnlyColumns = ['email', 'phoneNumber']
+
   return [[
-    ...nameColumns,
     'studentNumber',
     'creditsTotal',
     'creditsHops',
@@ -56,11 +61,10 @@ export const useColumns = ({
     'tags',
     'extent',
     'updatedAt',
+    ...nameColumns,
     ...combinedProgrammeColumns,
-  ], [
-    'email',
-    'phoneNumber',
-  ]]
+    ...adminColumns,
+  ], excelOnlyColumns]
 }
 
 export const format = ({
@@ -69,86 +73,58 @@ export const format = ({
   showBachelorAndMaster,
 
   filteredStudents,
-}) => {
-  const { useFilterSelector } = useFilters()
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
-  const { isAdmin } = useGetAuthorizedUserQuery()
+  includePrimaryProgramme = false
+}) => {
   const { getTextIn } = useLanguage()
 
+  const { isAdmin } = useGetAuthorizedUserQuery()
+  const creditDateFilterOptions = getCreditDateFilterOptions()
+
   const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isSuccess: semestersSuccess} = useGetSemestersQuery()
+  const { data: semesters, isSuccess: semestersSuccess } = getRelevantSemesterData(undefined)
 
-  if (!programmesSuccess || !semestersSuccess) return null
+  if (!semestersSuccess) return []
+  const { currentSemester, allSemesters, firstSemester, lastSemester } = semesters
 
-  const currentSemester = semesters?.currentSemester
+  if (!programmesSuccess) return []
+  const isMastersProgramme = programmes[programme]?.degreeProgrammeType === DegreeProgrammeType.MASTER
 
-  const queryStudyrights = [programme, combinedProgramme].filter(studyright => !!studyright) as string[]
-
-  const isMastersProgramme = programmes[programme]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
-  const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
-
-  const semestersToAddToStart = shouldShowBachelorAndMaster && isMastersProgramme ? 6 : 0
-
-  const {
-    studentToStudyrightEndMap,
-    studentToSecondStudyrightEndMap,
-  } = createMaps(
-    filteredStudents,
-    programme,
-    combinedProgramme,
-    // year,
-    null,
-    currentSemester?.semestercode,
-    shouldShowBachelorAndMaster
-  )
-
-  const { getSemesterEnrollmentsContent, getSemesterEnrollmentsVal } = getSemestersPresentFunctions({
+  const studentSemesterEnrollmentContent = getSemesterEnrollmentsContent({
     getTextIn,
+
     programme,
-    studentToStudyrightEndMap,
-    studentToSecondStudyrightEndMap,
-    // year: firstYearOfThisThing,
+    isMastersProgramme,
+    allSemesters,
+    firstSemester,
+    lastSemester,
+  })
+
+  const studentProgrammeDetails = getProgrammeDetails({
+    programme,
+    isMastersProgramme,
+    combinedProgramme,
+    showBachelorAndMaster,
+    
+    currentSemester,
     year: null,
-    semestersToAddToStart,
   })
 
-  const containsStudyTracks: boolean = filteredStudents.some(({ studyRights }) => {
-    studyRights?.some(({ studyRightElements }) =>
-      studyRightElements.some(element => queryStudyrights.includes(element.code))
-    )
-  })
+  const formatStudent = (student: Student): Partial<FormattedStudentData> => {
+    const {
+      allProgrammes,
+      primaryProgramme,
+      primaryStudyplan,
+      secondaryStudyplan,
 
-  const formatStudent = (student: Student): FormattedStudentData => {
-    const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester)
+      relevantStudyRight,
+      relevantStudyRightElement,
+      relevantSecondaryStudyRightElement,
+    } = studentProgrammeDetails(student)
 
-    const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
-    const otherProgrammes = studentProgrammes.filter(({ code }) => code !== programme)
+    const otherProgrammes = allProgrammes.filter(({ code }) => code !== primaryProgramme.code)
 
-    const relevantStudyRight = findStudyRightForClass(student.studyRights, primaryProgramme?.code, /*year*/ null)
-    const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code }) => code === primaryProgramme?.code)
-
-    const relevantStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
-
-    const degreeProgrammeTypeToCheck = !!relevantStudyRightElement && !isMastersProgramme
-        ? 'urn:code:degree-program-type:masters-degree'
-        : 'urn:code:degree-program-type:bachelors-degree'
-
-    const secondStudyRightElement = (relevantStudyRight?.studyRightElements ?? [])
-      .filter(element => {
-        if (combinedProgramme) return element.code === combinedProgramme
-        if (showBachelorAndMaster && !!relevantStudyRightElement)
-          return element.degreeProgrammeType === degreeProgrammeTypeToCheck
-
-        return false
-      })
-      .toSorted(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)[0]
-
-    /* ***** */ /* ***** */ /* ***** */
-    /* ***** */ /* ***** */ /* ***** */
-    /* ***** */ /* ***** */ /* ***** */
-
-    const getCreditsBetween = student => {
+    const getCreditsBetween = () => {
       const sinceDate = creditDateFilterOptions.startDate ?? new Date(1970, 0, 1)
       const untilDate = creditDateFilterOptions.endDate ?? new Date()
 
@@ -160,37 +136,17 @@ export const format = ({
       return getStudentTotalCredits({ courses: student.courses.filter((course) => sinceDate <= new Date(course.date) && new Date(course.date) <= untilDate) })
     }
 
-    const getStudyTracks = studyRights => {
-      const correctStudyRight = studyRights?.find(studyRight =>
-        queryStudyrights.some(code => studyRight.studyRightElements.some(element => element.code === code))
-      )
+    const getStudyTracks = () => [relevantStudyRightElement, relevantSecondaryStudyRightElement]
+      .filter(element => !!element?.studyTrack)
+      .map(element => getTextIn(element?.studyTrack?.name))
+      .join(', ') ?? null
 
-      if (!correctStudyRight) return []
-      return queryStudyrights
-        .map(code => correctStudyRight.studyRightElements.find(element => element.code === code))
-        .filter(element => element?.studyTrack)
-        .map(element => getTextIn(element.studyTrack.name))
-    }
-
-    const studentWithEnrollmentMap = {
-      studentNumber: student.studentNumber,
-      semesterEnrollmentsMap: programme
-        ? relevantStudyRight?.semesterEnrollments?.reduce((enrollments, { type, semester, statutoryAbsence }) => {
-            enrollments[semester] = {
-              enrollmenttype: type,
-              statutoryAbsence: statutoryAbsence ?? false,
-            }
-            return enrollments
-          }, {}) ?? null
-        : null,
-    }
-
-    const graduationDate = relevantStudyRightElement?.graduated
+    const getGraduationDate = () => relevantStudyRightElement?.graduated
         ? formatDate(relevantStudyRightElement.endDate, DateFormat.ISO_DATE)
         : null
 
     // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.      
-    const programmesList = otherProgrammes
+    const programmesList = includePrimaryProgramme ? allProgrammes : otherProgrammes
 
     const getStudyRightStatus = () => {
       if (!primaryProgramme) return null
@@ -201,39 +157,39 @@ export const format = ({
     }      
 
     const getAdmissiontype = () => {
-      const admissionType = relevantStudyRight?.admissionType ?? 'Ei valintatapaa'
-      return admissionType !== 'Koepisteet' ? admissionType : 'Valintakoe'
+      const admissionType = relevantStudyRight?.admissionType
+
+      if (admissionType === 'Koepisteet') return 'Valintakoe'
+      return admissionType ?? 'Ei valintatapaa'
     }
 
-    const getMostRecentAttainment = student => {
-      if (!relevantStudyplan) return null
+    const getCitizenships = () => student.citizenships?.map(citizenship => getTextIn(citizenship)).sort().join(', ') ?? null
 
-      const dates = student.courses
-        .filter(({ course_code, passed }) => relevantStudyplan.included_courses.includes(course_code) && passed)
-        .map(({ date }) => +new Date(date))
-      if (!dates.length) return null
+    const getMostRecentAttainment = () => {
+      if (!primaryStudyplan) return null
 
-      const latestDate = Math.max(...dates)
-      return formatDate(new Date(latestDate), DateFormat.ISO_DATE)
+      const courses = student.courses
+        .filter(({ course_code, passed }) => primaryStudyplan.included_courses.includes(course_code) && passed)
+
+      if (!courses.length) return null
+
+      const latestDate = courses
+        .map(({ date }) => new Date(date))
+        .sort((a, b) => Number(a) - Number(b))
+        .pop()!
+
+      return formatDate(latestDate, DateFormat.ISO_DATE)
     }
 
-    const getCombinedProgrammeCredits = student =>
-      student.studyplans?.find(plan => {
-        if (combinedProgramme) return plan.programme_code === combinedProgramme
+    const getTags = () => student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null
 
-        const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programme))
-        return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programme
-      })?.completed_credits
+    const getExtent = () => isAdmin
+      ? relevantStudyRight?.extentCode.toString() ?? null
+      : null
 
-    const getExtent = student =>
-      student.studyRights
-        .filter(
-          studyRight =>
-            studyRight.studyRightElements.filter(element => queryStudyrights.includes(element.code)).length >=
-            queryStudyrights.length
-        )
-        .map(studyRight => studyRight.extentCode)
-        .join(', ')
+    const getUpdatedAt = () => isAdmin
+      ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV)
+      : null
 
     return {
       firstNames: student.firstnames,
@@ -244,16 +200,29 @@ export const format = ({
       sisuID: student.sis_person_id,
       creditsTotal: student.credits,
       creditsHops: student.hopsCredits,
-      creditsSince: getCreditsBetween(student),
-      studyTrack: containsStudyTracks ? getStudyTracks(student.studyRights).join(', ') : null,
+      creditsSince: getCreditsBetween(),
+      studyTrack: getStudyTracks(),
       studyRightStart: formatDate(relevantStudyRight?.startDate, DateFormat.ISO_DATE),
       programmeStart: formatDate(relevantStudyRightElement?.startDate, DateFormat.ISO_DATE),
       option: getTextIn(student.option?.name) ?? null,
       semesterEnrollments: {
-        content: getSemesterEnrollmentsContent(studentWithEnrollmentMap),
-        exportValue: getSemesterEnrollmentsVal(studentWithEnrollmentMap),
+        content: studentSemesterEnrollmentContent(
+          {
+            studentNumber: student.studentNumber,
+            studyrightEnd: relevantStudyRightElement?.graduated
+              ? relevantStudyRightElement.endDate
+              : null,
+            secondStudyrightEnd: relevantSecondaryStudyRightElement?.graduated
+              ? relevantSecondaryStudyRightElement.endDate
+              : null,
+          },
+          relevantStudyRight
+        ),
+        exportValue: (relevantStudyRight?.semesterEnrollments ?? []).reduce(
+          (acc, { type, semester }) => acc + Number(type === EnrollmentType.PRESENT && firstSemester <= semester && semester <= lastSemester), 0
+        ),
       },
-      graduationDate,
+      graduationDate: getGraduationDate(),
       startYearAtUniversity: student.started
         ? new Date(student.started).getFullYear()
         : null,
@@ -262,23 +231,19 @@ export const format = ({
       transferredFrom: getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? '',
       admissionType: getAdmissiontype(),
       gender: GenderCodeToText[student.gender_code],
-      citizenships: student.citizenships?.map(citizenship => getTextIn(citizenship)).sort().join(', ') ?? null,
+      citizenships: getCitizenships(),
       curriculumPeriod: student.curriculumVersion,
-      mostRecentAttainment: getMostRecentAttainment(student),
+      mostRecentAttainment: getMostRecentAttainment(),
       tvex: !!relevantStudyRight?.tvex,
-      tags: student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null,
-      creditsCombinedProg: combinedProgramme || shouldShowBachelorAndMaster
-        ? getCombinedProgrammeCredits(student) ?? 0
+      tags: getTags(),
+      creditsCombinedProg: combinedProgramme || showBachelorAndMaster
+        ? secondaryStudyplan?.completed_credits ?? 0
         : null,
-      graduationDateCombinedProg: (combinedProgramme || shouldShowBachelorAndMaster) && secondStudyRightElement?.graduated
-        ? formatDate(secondStudyRightElement.endDate, DateFormat.ISO_DATE)
+      graduationDateCombinedProg: (combinedProgramme || showBachelorAndMaster) && relevantSecondaryStudyRightElement?.graduated
+        ? formatDate(relevantSecondaryStudyRightElement.endDate, DateFormat.ISO_DATE)
         : null,
-      extent: isAdmin
-        ? getExtent(student)
-        : null,
-      updatedAt: isAdmin
-        ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV)
-        : null,
+      extent: getExtent(),
+      updatedAt: getUpdatedAt(),
     }
   }
 
