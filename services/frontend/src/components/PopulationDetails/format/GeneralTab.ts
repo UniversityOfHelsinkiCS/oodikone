@@ -38,19 +38,20 @@ export const useColumns = ({
   const excelOnlyColumns = ['email', 'phoneNumber']
 
   return [[
+    ...nameColumns,
     'studentNumber',
+    'programmes',
     'creditsTotal',
     'creditsHops',
     'creditsSince',
     'studyTrack',
     'studyRightStart',
     'programmeStart',
+    'programmeStatus',
     'option',
     'semesterEnrollments',
     'graduationDate',
     'startYearAtUniversity',
-    'programmes',
-    'programmeStatus',
     'transferredFrom',
     'admissionType',
     'gender',
@@ -59,9 +60,6 @@ export const useColumns = ({
     'mostRecentAttainment',
     'tvex',
     'tags',
-    'extent',
-    'updatedAt',
-    ...nameColumns,
     ...combinedProgrammeColumns,
     ...adminColumns,
   ], excelOnlyColumns]
@@ -192,12 +190,19 @@ export const format = ({
       : null
 
     return {
-      firstNames: student.firstnames,
-      lastName: student.lastname,
-      studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
+      /* EXCEL ONLY */
       email: student.email,
       phoneNumber: student.phoneNumber,
+
+      /* UTIL */
       sisuID: student.sis_person_id,
+
+      /* NAME COLUMNS */
+      firstNames: student.firstnames,
+      lastName: student.lastname,
+
+      /* BASE COLUMNS */
+      studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
       creditsTotal: student.credits,
       creditsHops: student.hopsCredits,
       creditsSince: getCreditsBetween(),
@@ -236,12 +241,16 @@ export const format = ({
       mostRecentAttainment: getMostRecentAttainment(),
       tvex: !!relevantStudyRight?.tvex,
       tags: getTags(),
+
+      /* COMBINED PROGRAMME COLUMNS */
       creditsCombinedProg: combinedProgramme || showBachelorAndMaster
         ? secondaryStudyplan?.completed_credits ?? 0
         : null,
       graduationDateCombinedProg: (combinedProgramme || showBachelorAndMaster) && relevantSecondaryStudyRightElement?.graduated
         ? formatDate(relevantSecondaryStudyRightElement.endDate, DateFormat.ISO_DATE)
         : null,
+
+      /* ADMIN COLUMNS */
       extent: getExtent(),
       updatedAt: getUpdatedAt(),
     }
