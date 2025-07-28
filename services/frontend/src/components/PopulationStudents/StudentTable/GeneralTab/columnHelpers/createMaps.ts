@@ -1,4 +1,5 @@
 import { findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { type Programme } from '../util'
 
 export const createMaps = (
@@ -29,9 +30,9 @@ export const createMaps = (
     const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code }) => code === programmeCode)
 
     const degreeProgrammeTypeToCheck =
-      relevantStudyRightElement?.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree'
-        ? 'urn:code:degree-program-type:masters-degree'
-        : 'urn:code:degree-program-type:bachelors-degree'
+      relevantStudyRightElement?.degreeProgrammeType === DegreeProgrammeType.BACHELOR
+        ? DegreeProgrammeType.MASTER
+        : DegreeProgrammeType.BACHELOR
 
     const secondStudyRightElement = (relevantStudyRight?.studyRightElements ?? [])
       .filter(element => {
