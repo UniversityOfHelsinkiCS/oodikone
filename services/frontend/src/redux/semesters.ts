@@ -1,36 +1,30 @@
 import { RTKApi } from '@/apiConnection'
 import { Name } from '@oodikone/shared/types'
 
+type Semester = {
+  enddate: string
+  name: Name
+  semestercode: number
+  startdate: string
+  yearcode: number
+}
+
+type Year = {
+  enddate: string
+  startdate: string
+  yearcode: number
+  yearname: string
+}
+
 export type SemestersData = {
-  semesters: Record<
-    string,
-    {
-      enddate: string
-      name: Name
-      semestercode: number
-      startdate: string
-      yearcode: number
-    }
-  >
-  years: Record<
-    string,
-    {
-      enddate: string
-      startdate: string
-      yearcode: number
-      yearname: string
-    }
-  >
+  currentSemester: Semester
+  semesters: Record<string, Semester>
+  years: Record<string, Year>
 }
 
 const semestersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getSemesters: builder.query<
-      SemestersData & {
-        currentSemester: SemestersData['semesters'][string]
-      },
-      void
-    >({
+    getSemesters: builder.query<SemestersData, void>({
       query: () => '/semesters/codes',
       providesTags: ['Semester'],
       transformResponse: (semesterData: SemestersData) => {

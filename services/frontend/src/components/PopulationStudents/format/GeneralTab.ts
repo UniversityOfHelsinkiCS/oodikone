@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 
-import { useGetSemestersQuery } from "@/redux/semesters"
+import { SemestersData, useGetSemestersQuery } from "@/redux/semesters"
 
 import { getAllProgrammesOfStudent, isFall } from "@/common"
 import { creditDateFilter } from "@/components/FilterView/filters"
@@ -18,7 +18,13 @@ export const getRelevantSemesterData = (year: string | undefined): {
   data: null
 } | {
   isSuccess: true
-  data: NonNullable<any>
+  data: {
+    currentSemester: SemestersData['currentSemester']
+    allSemesters: SemestersData['semesters']
+
+    firstSemester: number
+    lastSemester: number
+  }
 } => {
   const { isSuccess, data: semesters } = useGetSemestersQuery()
 
@@ -42,7 +48,7 @@ export const getRelevantSemesterData = (year: string | undefined): {
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-export const getFirstAndLastSemester = (semesters, year: string | undefined) => {
+export const getFirstAndLastSemester = (semesters, year: string | undefined): [number, number] => {
   const { semesters: allSemesters, currentSemester } = semesters
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 
