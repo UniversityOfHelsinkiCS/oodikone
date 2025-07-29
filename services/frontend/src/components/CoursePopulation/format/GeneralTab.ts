@@ -5,7 +5,7 @@ import type { FormattedStudent } from '@oodikone/shared/types'
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
-import { getProgrammeDetails, getRelevantSemesterData } from '@/components/PopulationStudents/format/GeneralTab'
+import { getProgrammeDetails, useGetRelevantSemesterData } from '@/components/PopulationStudents/format/GeneralTab'
 import { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
 import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/GeneralTab/util'
 import { DateFormat } from '@/constants/date'
@@ -51,7 +51,7 @@ export const useFormat = ({
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { getTextIn } = useLanguage()
 
-  const { data: semesters, isSuccess: semestersSuccess } = getRelevantSemesterData(undefined)
+  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
 
   if (!semestersSuccess) return []
   const { currentSemester, allSemesters } = semesters

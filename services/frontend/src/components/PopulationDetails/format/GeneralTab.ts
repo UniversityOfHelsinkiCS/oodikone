@@ -7,9 +7,9 @@ import { getStudentTotalCredits } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import {
-  getCreditDateFilterOptions,
+  useGetCreditDateFilterOptions,
   getProgrammeDetails,
-  getRelevantSemesterData,
+  useGetRelevantSemesterData,
   getSemesterEnrollmentsContent,
 } from '@/components/PopulationStudents/format/GeneralTab'
 import type { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
@@ -76,10 +76,10 @@ export const useFormat = ({
   const { getTextIn } = useLanguage()
 
   const { isAdmin } = useGetAuthorizedUserQuery()
-  const creditDateFilterOptions = getCreditDateFilterOptions()
+  const creditDateFilterOptions = useGetCreditDateFilterOptions()
 
   const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isSuccess: semestersSuccess } = getRelevantSemesterData(undefined)
+  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
 
   if (!semestersSuccess) return []
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semesters

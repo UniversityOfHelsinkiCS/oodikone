@@ -7,12 +7,12 @@ import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
 import { DegreeProgrammeType, type FormattedStudent as Student } from '@oodikone/shared/types'
 
-export const getCreditDateFilterOptions = () => {
+export const useGetCreditDateFilterOptions = () => {
   const { useFilterSelector } = useFilters()
   return useFilterSelector(creditDateFilter.selectors.selectOptions())
 }
 
-export const getRelevantSemesterData = (
+export const useGetRelevantSemesterData = (
   year: string | undefined
 ):
   | {
@@ -51,7 +51,7 @@ export const getRelevantSemesterData = (
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-export const getFirstAndLastSemester = (semesters: SemestersData, year: string | undefined): [number, number] => {
+const getFirstAndLastSemester = (semesters: SemestersData, year: string | undefined): [number, number] => {
   const { semesters: allSemesters, currentSemester } = semesters
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 

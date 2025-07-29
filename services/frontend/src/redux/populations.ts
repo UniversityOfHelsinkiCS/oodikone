@@ -1,7 +1,7 @@
 import { RTKApi } from '@/apiConnection'
-import { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
 import type { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
+import type { DegreeProgrammeType } from '@oodikone/shared/types'
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -34,7 +34,7 @@ const populationApi = RTKApi.injectEndpoints({
         params: { courseCodes },
       }),
     }),
-    getProgrammes: builder.query<Record<string, DegreeProgramme>, void>({
+    getProgrammes: builder.query<Record<string, DegreeProgrammeType>, void>({
       query: () => '/v3/populationstatistics/studyprogrammes',
       keepUnusedDataFor: 60 * 60,
     }),
