@@ -57,6 +57,8 @@ export type TaggetStudentData = StudentData & {
 }
 
 export type FormattedStudent = {
+  obfuscated?: true
+
   firstnames: string
   lastname: string
   started: Date
