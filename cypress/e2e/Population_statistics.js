@@ -140,7 +140,6 @@ describe('Population statistics tests', () => {
             if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
           })
         cy.contains('Credits gained').click()
-        cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
         const limits = [1, 45, 90, 135, 180, null]
         const ranges = limits.map((limit, i) => (i === 0 ? [null, 0] : [limits[i - 1], limit])).reverse()
 
@@ -155,8 +154,9 @@ describe('Population statistics tests', () => {
           }))
         }
 
-        cy.get("[data-cy='credits-gained-table-All students of the class'] table thead tr").within(() => {
-          cy.get('th').eq(1).contains('Credits gained between 01.08.2020 and 30.08.2024 (49 months)')
+        cy.cs('credits-gained-table-All students of the class').within(() => {
+          cy.get('th').eq(1).contains('Credits gained between 01.08.2020 and 30.08.2024')
+          cy.get('th').eq(1).contains('(49 months)')
           cy.get('th').eq(2).contains('Number of students')
           cy.get('th').eq(2).contains(`(n = ${totalStudents})`)
           cy.get('th').eq(3).contains('Percentage of population')
@@ -204,7 +204,7 @@ describe('Population statistics tests', () => {
           .then($parentDiv => {
             if (!$parentDiv.hasClass('active')) cy.contains('Credit statistics').click()
           })
-        cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
+        cy.cs('credit-statistics-tab').click()
         const rows = ['Total credits', 'Average', 'Median', 'Standard deviation', 'Minimum', 'Maximum']
         const categories = [
           {
@@ -231,7 +231,7 @@ describe('Population statistics tests', () => {
 
         for (const { selector, data, size } of categories) {
           cy.get(`[data-cy='statistics-table-${selector}']`).within(() => {
-            cy.contains('h3', selector)
+            cy.contains('h5', selector)
             cy.contains("[data-cy='credit-stats-population-size']", `n = ${size}`)
             cy.get('table tbody').within(() => {
               rows.forEach((text, index) => {

@@ -34,9 +34,9 @@ export const CreditStatistics = ({ filteredStudents, query, sggYear }: CreditSta
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: 1, borderColor: 'divider' }}>
         <Tabs data-cy="credit-stats-tab" onChange={(_, value) => setSelectedTab(value)} value={selectedTab}>
-          <Tab label="Credits gained" />
-          <Tab label="Statistics" />
-          <Tab label="Distribution development" />
+          <Tab data-cy="credits-gained-tab" label="Credits gained" />
+          <Tab data-cy="credit-statistics-tab" label="Statistics" />
+          <Tab data-cy="distribution-development-tab" label="Distribution development" />
         </Tabs>
         <InfoBox content={populationStatisticsToolTips.creditStatistics} sx={{ mb: 1, mr: 1 }} />
       </Box>
