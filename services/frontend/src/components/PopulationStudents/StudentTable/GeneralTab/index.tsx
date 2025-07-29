@@ -9,7 +9,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 
-import { useGetColumnDefinitions } from './baseColumns'
+import { useGetColumnDefinitions } from './columnDefinitions'
 import { Programme } from './util'
 
 export type FormattedStudentData = {

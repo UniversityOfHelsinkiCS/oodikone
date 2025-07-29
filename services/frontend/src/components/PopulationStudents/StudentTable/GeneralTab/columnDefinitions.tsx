@@ -11,7 +11,7 @@ import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithToo
 
 import { DateFormat } from '@/constants/date'
 import { formatDate } from '@/util/timeAndDate'
-import { FormattedStudentData } from '../GeneralTab'
+import { FormattedStudentData } from '.'
 import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
