@@ -157,12 +157,9 @@ export const getHighestGradeOfCourseBetweenRange = (
   const grades = courses
     .filter(course => new Date(lowerBound) <= new Date(course.date) && new Date(course.date) <= new Date(upperBound))
     .map(course => {
-      if (course.grade === 'Hyv.' || course.grade === 'HT') {
-        return { grade: course.grade, sortValue: 1 }
-      }
-      if (!Number(course.grade)) {
-        return { grade: course.grade, sortValue: 0 }
-      }
+      if (course.grade === 'HT') return { grade: course.grade, sortValue: 2 }
+      if (course.grade === 'Hyv.' || course.grade === 'TT') return { grade: course.grade, sortValue: 1 }
+      if (!Number(course.grade)) return { grade: course.grade, sortValue: 0 }
       return { grade: course.grade, sortValue: Number(course.grade) }
     })
 

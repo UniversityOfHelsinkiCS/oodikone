@@ -14,14 +14,10 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
       const courses = student.courses.filter(course => courseCodes.includes(course.course_code))
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
       if (!highestGrade) {
-        if (!grades['No grade']) {
-          grades['No grade'] = []
-        }
+        grades['No grade'] ??= []
         grades['No grade'].push(student.studentNumber)
       } else {
-        if (!grades[highestGrade]) {
-          grades[highestGrade] = []
-        }
+        grades[highestGrade] ??= []
         grades[highestGrade].push(student.studentNumber)
       }
     })
