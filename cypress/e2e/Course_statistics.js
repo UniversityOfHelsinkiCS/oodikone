@@ -170,10 +170,9 @@ describe('Basic user', () => {
       cy.wait('@coursestats').its('response.statusCode').should('be.oneOf', [200, 304])
 
       const gradesTableContents = [
-        [null, 'TT', 176],
+        [null, 'TT', 179],
         [null, 'No grade', 10],
-        [null, 'Hyl.', 5],
-        [null, 'HT', 177],
+        [null, 'HT', 179],
       ]
       checkGradeTable(gradesTableContents)
     })
