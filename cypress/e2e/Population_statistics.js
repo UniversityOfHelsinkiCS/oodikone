@@ -277,28 +277,24 @@ describe('Population statistics tests', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
 
-        cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
+        cy.cs('curriculum-picker').scrollIntoView().should('be.visible').click()
         cy.contains('2020–2023').click({ force: true })
         cy.contains('Students (27)')
-        cy.get('[data-cy=toggle-group-module-DIGI-k]')
-          .should('exist')
-          .scrollIntoView()
-          .should('be.visible')
-          .click({ force: true })
+        cy.cs('toggle-group-module-DIGI-k').should('exist').scrollIntoView().should('be.visible').click({ force: true })
         cy.contains('DIGI-100').should('exist')
 
-        cy.get('[data-cy=curriculum-picker]').scrollIntoView().should('be.visible').click()
+        cy.cs('curriculum-picker').scrollIntoView().should('be.visible').click()
         cy.contains('2023–2026').click({ force: true })
-        cy.get('[data-cy=toggle-group-module-DIGI-k]').should('exist')
-        cy.contains('DIGI-100').should('not.be.visible')
+        cy.cs('toggle-group-module-DIGI-k').should('exist')
+        cy.contains('DIGI-100').should('not.exist')
       })
 
       it('Courses data is changed when filtered students change', () => {
         cy.visit(pathToMathBSc2020)
 
-        cy.get('[data-cy=GraduatedFromProgramme-filter-card]').within(() => {
-          cy.get('[data-cy=GraduatedFromProgramme-header]').click()
-          cy.get('[data-cy=option-graduated-true]').click()
+        cy.cs('GraduatedFromProgramme-filter-card').within(() => {
+          cy.cs('GraduatedFromProgramme-header').click()
+          cy.cs('GraduatedFromProgrammeFilter-radio-graduated-true').click()
         })
 
         cy.contains('Students (16)')
