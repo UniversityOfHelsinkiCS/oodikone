@@ -10,6 +10,7 @@ import { useGetColumnDefinitions } from './baseColumns'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { isMastersProgramme } from '@/common'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 
 export const NewTable = ({
   includePrimaryProgramme,
@@ -54,6 +55,10 @@ export const NewTable = ({
     Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key)]))
   , [visible])
 
+  const exportColumns = useMemo(() =>
+    Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key) || excelVisible.includes(key)]))
+  , [visible, excelVisible])
+
   const tableOptions: Partial<TableOptions<FormattedStudentData>> = {
     initialState: {
       columnPinning: { left: ['studentNumber'] },
@@ -64,5 +69,10 @@ export const NewTable = ({
     }
   }
 
-  return <OodiTable data={data} columns={columns} options={tableOptions} />
+  return (
+    <>
+      <OodiTableExcelExport exportData={data} exportColumns={exportColumns} />
+      <OodiTable data={data as FormattedStudentData[]} columns={columns} options={tableOptions} />
+    </>
+  )
 }
