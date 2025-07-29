@@ -30,9 +30,8 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { UnihowDataExport } from './UnihowDataExport'
-
-import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
 
 export const CustomPopulation = () => {
   const [customPopulationState, setCustomPopulationState] = useState({

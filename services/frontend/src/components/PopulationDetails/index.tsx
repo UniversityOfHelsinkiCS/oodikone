@@ -28,15 +28,14 @@ import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
+import { FormattedStudent as Student } from '@oodikone/shared/types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditStatistics } from './CreditGainStats'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
-
-import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
-import { FormattedStudent as Student } from '@oodikone/shared/types'
 
 type PopulationDetailsProps = {
   isLoading: boolean

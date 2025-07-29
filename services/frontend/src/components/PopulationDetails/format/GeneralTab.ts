@@ -64,7 +64,7 @@ export const useColumns = ({ showCombinedProgrammeColumns }): [string[], string[
   ]
 }
 
-export const format = ({
+export const useFormat = ({
   programme,
   combinedProgramme,
   showBachelorAndMaster,

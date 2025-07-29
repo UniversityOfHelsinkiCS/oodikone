@@ -34,7 +34,7 @@ import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTab
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 
-import { useColumns as columnsGeneralTab, format as formatGeneralTab } from './format/GeneralTab'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 
 export const CoursePopulation = () => {
   const location = useLocation()

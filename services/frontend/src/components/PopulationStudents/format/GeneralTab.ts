@@ -1,10 +1,9 @@
 import dayjs from 'dayjs'
 
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
-
 import { getAllProgrammesOfStudent, isFall } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
+import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
 import { DegreeProgrammeType, type FormattedStudent as Student } from '@oodikone/shared/types'
 

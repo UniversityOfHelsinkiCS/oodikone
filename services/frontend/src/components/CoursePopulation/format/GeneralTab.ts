@@ -1,3 +1,7 @@
+import { useMemo } from 'react'
+
+import type { FormattedStudent } from '@oodikone/shared/types'
+
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
@@ -7,8 +11,6 @@ import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/Gen
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { formatDate } from '@/util/timeAndDate'
-import { FormattedStudent } from '@oodikone/shared/types'
-import { useMemo } from 'react'
 
 export const useColumns = (): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -39,7 +41,7 @@ export const useColumns = (): [string[], string[]] => {
   ]
 }
 
-export const format = ({
+export const useFormat = ({
   from,
   to,
   coursecodes,
@@ -139,8 +141,8 @@ export const format = ({
       tags: student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null,
 
       /* COURSE POPULATION SPECIFIC */
-      grade: grade,
-      language: language,
+      grade,
+      language,
       attainmentDate: attainmentDate ? formatDate(attainmentDate, DateFormat.ISO_DATE) : 'No attainment',
       enrollmentDate: enrollmentDate ? formatDate(enrollmentDate, DateFormat.ISO_DATE) : 'No enrollment',
 

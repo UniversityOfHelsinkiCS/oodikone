@@ -28,7 +28,7 @@ export const useColumns = ({ group }): [string[], string[]] => {
 
   const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
 
-  const groupWithProgrammeColumns = !!programme
+  const groupWithProgrammeColumns = programme
     ? [
         'citizenships',
         'programmeStatus',
@@ -70,7 +70,7 @@ export const useColumns = ({ group }): [string[], string[]] => {
   ]
 }
 
-export const format = ({
+export const useFormat = ({
   group,
 
   filteredStudents,

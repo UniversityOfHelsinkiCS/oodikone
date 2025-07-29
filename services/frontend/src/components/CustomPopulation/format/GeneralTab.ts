@@ -25,7 +25,7 @@ export const useColumns = ({ programme }): [string[], string[]] => {
 
   const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
 
-  const populationWithProgrammeColumns = !!programme
+  const populationWithProgrammeColumns = programme
     ? ['option', 'transferredFrom', 'semesterEnrollments', 'curriculumPeriod']
     : ['primaryProgramme']
 
@@ -60,7 +60,7 @@ export const useColumns = ({ programme }): [string[], string[]] => {
   ]
 }
 
-export const format = ({
+export const useFormat = ({
   programme,
   filteredStudents,
 
@@ -221,11 +221,11 @@ export const format = ({
       /* CUSTOM POPULATION WITHOUT PROGRAMME */
       primaryProgramme: !programme ? (getTextIn(primaryProgramme.name) ?? null) : null,
       /* CUSTOM POPULATION WITH PROGRAMME */
-      option: !!programme ? (getTextIn(student.option?.name) ?? null) : null,
-      transferredFrom: !!programme
+      option: programme ? (getTextIn(student.option?.name) ?? null) : null,
+      transferredFrom: programme
         ? (getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? null)
         : null,
-      semesterEnrollments: !!programme
+      semesterEnrollments: programme
         ? {
             content: studentSemesterEnrollmentContent(
               {
@@ -244,7 +244,7 @@ export const format = ({
             ),
           }
         : null,
-      curriculumPeriod: !!programme ? student.curriculumVersion : null,
+      curriculumPeriod: programme ? student.curriculumVersion : null,
 
       /* ADMIN COLUMNS */
       extent: getExtent(),
