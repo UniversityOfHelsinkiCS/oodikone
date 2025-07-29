@@ -5,19 +5,27 @@ import Tooltip from '@mui/material/Tooltip'
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
 
+import { creditDateFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
+
+
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
 import { FormattedStudentData } from '../GeneralTab'
 import { joinProgrammes } from './util'
+import { formatDate } from '@/util/timeAndDate'
+import { DateFormat } from '@/constants/date'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
 export const getColumnDefinitions = ({
   getTextIn,
+  programme,
   combinedProgramme,
   isMastersProgramme,
   includePrimaryProgramme,
+  year,
 }): ColumnDef<FormattedStudentData, any>[] => [
   columnHelper.accessor('studentNumber', {
     header: 'Student number',
@@ -66,7 +74,32 @@ export const getColumnDefinitions = ({
     columns: [
       columnHelper.accessor('creditsTotal', { header: 'Total' }),
       columnHelper.accessor('creditsHops', { header: 'In HOPS' }),
-      columnHelper.accessor('creditsSince', { header: 'Since' }),
+      columnHelper.accessor('creditsSince', {
+        header: _ => {
+          const { useFilterSelector } = useFilters()
+          const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+          if (creditDateFilterOptions) {
+            const { startDate, endDate } = creditDateFilterOptions
+
+            if (startDate && endDate) {
+              return `Credits between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+            } else if (startDate) {
+              return `Credits since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
+            } else if (year) {
+              if (endDate) {
+                return `Credits between 1.8.${year} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+              } else {
+                return `Credits since 1.8.${year}`
+              }
+            } else if (endDate) {
+              return `Credits before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+            }
+          }
+
+          if (programme) return 'Credits since start in programme'
+          return 'Credits since 1.1.1970'
+        },
+      }),
       columnHelper.accessor('creditsCombinedProg', {
         header: () => {
           if (combinedProgramme === 'MH90_001') return 'Credits in licentiate HOPS'

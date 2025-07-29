@@ -94,7 +94,7 @@ export const PopulationStudents = ({
         includePrimaryProgramme={
           variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)
         }
-        programme={programme}
+        programme={programme ?? studyGuidanceGroup?.tags?.studyProgramme}
       />
     ),
     Courses: () => (

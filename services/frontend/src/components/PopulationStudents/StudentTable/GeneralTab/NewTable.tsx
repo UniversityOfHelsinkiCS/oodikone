@@ -15,6 +15,7 @@ export const NewTable = ({
   includePrimaryProgramme,
   programme,
   combinedProgramme,
+  year,
 
   columnFunction,
   formattingFunction,
@@ -22,6 +23,7 @@ export const NewTable = ({
   includePrimaryProgramme: boolean
   programme: string | undefined
   combinedProgramme: string | undefined
+  year?: string
 
   columnFunction: () => [string[], string[]]
   formattingFunction: () => Partial<FormattedStudentData>[]
@@ -34,9 +36,11 @@ export const NewTable = ({
 
     const columns = getColumnDefinitions({
       getTextIn,
+      programme,
       combinedProgramme,
       includePrimaryProgramme,
       isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
+      year,
     })
 
     const squashGroups = column => {
