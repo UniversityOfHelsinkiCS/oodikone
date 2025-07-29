@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/material'
+import type { SxProps } from '@mui/material/styles'
 import type { Column } from '@tanstack/react-table'
 
 export const getCommonPinningStyles = <TData>(column: Column<TData>): SxProps => {

@@ -14,6 +14,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
@@ -102,8 +103,7 @@ export const GeneralTabContainer = ({
   const programmeCode = programme ?? sggProgramme ?? customPopulationProgramme
   const combinedProgrammeCode = combinedProgramme ?? sggCombinedProgramme ?? null
 
-  const isMastersProgramme =
-    programmes[programmeCode]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
+  const isMastersProgramme = programmes[programmeCode]?.degreeProgrammeType === DegreeProgrammeType.MASTER
   const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
 
   const semestersToAddToStart = shouldShowBachelorAndMaster && isMastersProgramme ? 6 : 0

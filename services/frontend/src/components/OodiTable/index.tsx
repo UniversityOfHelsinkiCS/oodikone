@@ -35,7 +35,6 @@ export const OodiTable = <TData,>({
   const config: Partial<TableOptions<TData>> = {
     ...options,
   }
-  console.log(config)
 
   const table = useReactTable<TData>({
     data,

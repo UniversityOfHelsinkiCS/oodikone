@@ -27,7 +27,7 @@ export const OodiTableSortIcons = ({ canSort, isSorted }: { canSort: boolean; is
         asc: <ArrowUpwardIcon fontSize="small" sx={{ color: theme => theme.palette.primary.main }} />,
         desc: <ArrowDownwardIcon fontSize="small" sx={{ color: theme => theme.palette.primary.main }} />,
         false: <SwapVertIcon fontSize="small" sx={{ color: 'grey.300' }} />,
-      }[isSorted as string]) ||
+      }[isSorted as string]) ??
       null}
   </Box>
 )
