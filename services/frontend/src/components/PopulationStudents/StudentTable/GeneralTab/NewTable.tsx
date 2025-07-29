@@ -9,7 +9,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { FormattedStudentData } from '../GeneralTab'
 
-import { useGetColumnDefinitions } from './baseColumns'
+import { getColumnDefinitions } from './baseColumns'
 
 export const NewTable = ({
   includePrimaryProgramme,
@@ -29,10 +29,10 @@ export const NewTable = ({
   const { getTextIn } = useLanguage()
   const { data: degreeProgrammes, isSuccess: degreeProgrammesFound } = useGetProgrammesQuery()
 
-  if (!degreeProgrammesFound) return null
-
   const [columns, accessorKeys]: [ColumnDef<FormattedStudentData, any>[], string[]] = useMemo(() => {
-    const columns = useGetColumnDefinitions({
+    if (!degreeProgrammesFound) return [[], []]
+
+    const columns = getColumnDefinitions({
       getTextIn,
       combinedProgramme,
       includePrimaryProgramme,

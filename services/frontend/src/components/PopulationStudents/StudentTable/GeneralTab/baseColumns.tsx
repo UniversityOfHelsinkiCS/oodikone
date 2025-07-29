@@ -13,7 +13,7 @@ import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
-export const useGetColumnDefinitions = ({
+export const getColumnDefinitions = ({
   getTextIn,
   combinedProgramme,
   isMastersProgramme,

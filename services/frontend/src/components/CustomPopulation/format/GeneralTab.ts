@@ -73,11 +73,13 @@ export const useFormat = ({
   const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
   const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
 
-  if (!semestersSuccess) return []
-  const { currentSemester, allSemesters, firstSemester, lastSemester } = semesters
+  const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
+    ? semesters
+    : { currentSemester: null, allSemesters: [], firstSemester: 0, lastSemester: 0 }
 
-  if (!programmesSuccess) return []
-  const isMastersProgramme = programmes[programme]?.degreeProgrammeType === DegreeProgrammeType.MASTER
+  const isMastersProgramme = programmesSuccess
+    ? programmes[programme]?.degreeProgrammeType === DegreeProgrammeType.MASTER
+    : false
 
   const studentSemesterEnrollmentContent = getSemesterEnrollmentsContent({
     getTextIn,

@@ -52,8 +52,7 @@ export const useFormat = ({
 
   const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
 
-  if (!semestersSuccess) return []
-  const { currentSemester, allSemesters } = semesters
+  const { currentSemester, allSemesters } = semestersSuccess ? semesters : { currentSemester: null, allSemesters: [] }
 
   const studentProgrammeDetails = getProgrammeDetails({
     programme: undefined,
