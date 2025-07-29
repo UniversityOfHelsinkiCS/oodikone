@@ -1,4 +1,3 @@
-/* eslint-disable cypress/unsafe-to-chain-command */
 /// <reference types="cypress" />
 
 const { getEmptyYears } = require('../support/commands')

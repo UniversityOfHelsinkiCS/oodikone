@@ -292,7 +292,7 @@ describe('Basic user', () => {
       cy.contains('Fetch statistics').click()
 
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.url().should('contain', `courseCodes=%5B%22TKT10002%22%2C%22TKT20001%22%5D`)
+      cy.url().should('contain', 'courseCodes=%5B%22TKT10002%22%2C%22TKT20001%22%5D')
 
       openSummaryTab()
       cy.contains('Tietorakenteet ja algoritmit').click()
@@ -337,7 +337,7 @@ describe('Basic user', () => {
     cy.contains('Fetch statistics').click()
 
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.url().should('contain', `courseCodes=%5B%22TKT10002%22%2C%22TKT20001%22%5D`)
+    cy.url().should('contain', 'courseCodes=%5B%22TKT10002%22%2C%22TKT20001%22%5D')
 
     cy.cs('course-population-for-2023-2024').click()
     cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
