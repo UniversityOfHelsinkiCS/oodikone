@@ -69,14 +69,14 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
     const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
     if (masterInfo) {
       const { endDate, programmeCode } = masterInfo
-      baseArguments.programmeCode = programmeCode
+      baseArguments.programme = programmeCode
       studentToSecondStudyrightEndMap[student.studentNumber] = endDate
     }
 
     const bachelorInfo = getProgrammeEndDateForStudyright(studyright, 1)
     if (bachelorInfo) {
       const { endDate, programmeCode } = bachelorInfo
-      baseArguments.programmeCode = programmeCode
+      baseArguments.programme = programmeCode
       studentToStudyrightEndMap[student.studentNumber] = endDate
     }
 

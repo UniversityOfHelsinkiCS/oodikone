@@ -238,7 +238,7 @@ export const useFormat = ({
       startYearAtUniversity: student.started ? new Date(student.started).getFullYear() : null,
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       programmeStatus: getStudyRightStatus(),
-      transferredFrom: getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? '',
+      transferredFrom: getTextIn(programmes?.[student.transferSource!]?.name) ?? student.transferSource ?? '',
       admissionType: getAdmissiontype(),
       gender: GenderCodeToText[student.gender_code],
       citizenships: getCitizenships(),

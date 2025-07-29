@@ -259,7 +259,7 @@ export const useFormat = ({
       studyRightStart: formatDate(relevantStudyRight?.startDate, DateFormat.ISO_DATE),
       programmeStart: formatDate(relevantStudyRightElement?.startDate, DateFormat.ISO_DATE),
       studyTrack: getStudyTracks(),
-      transferredFrom: getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? '',
+      transferredFrom: getTextIn(programmes?.[student.transferSource!]?.name) ?? student.transferSource ?? '',
 
       /* ADMIN COLUMNS */
       extent: getExtent(),

@@ -224,7 +224,7 @@ export const useFormat = ({
       /* CUSTOM POPULATION WITH PROGRAMME */
       option: programme ? (getTextIn(student.option?.name) ?? null) : null,
       transferredFrom: programme
-        ? (getTextIn(programmes[student.transferSource!]?.name) ?? student.transferSource ?? null)
+        ? (getTextIn(programmes?.[student.transferSource!]?.name) ?? student.transferSource ?? null)
         : null,
       semesterEnrollments: programme
         ? {

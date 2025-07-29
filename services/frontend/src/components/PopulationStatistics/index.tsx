@@ -40,6 +40,7 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 
 import { parseQueryParams } from '@/util/queryparams'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
 import { HelpInfoCard } from '../material/InfoCard'
@@ -81,7 +82,7 @@ const useGetProgrammes = (): Record<string, DegreeProgramme> => {
     'KH90_001+MH90_001': {
       code: 'KH90_001+MH90_001',
       curriculumPeriodIds: [],
-      degreeProgrammeType: '',
+      degreeProgrammeType: DegreeProgrammeType.BACHELOR,
       progId: '',
       name: {
         fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',
