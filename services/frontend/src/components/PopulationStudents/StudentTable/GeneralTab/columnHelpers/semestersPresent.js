@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { isFall, isMastersProgramme } from '@/common'
-import { useGetSemestersQuery } from '@/redux/semesters'
 
 import './semestersPresent.css'
 
@@ -15,9 +14,8 @@ export const getSemestersPresentFunctions = ({
   studentToStudyrightEndMap,
   year,
   semestersToAddToStart,
+  semesters,
 }) => {
-  const { data: semesters } = useGetSemestersQuery()
-
   const allSemesters = semesters?.semesters ?? {}
   const { semestercode: currentSemesterCode } = semesters?.currentSemester ?? { semestercode: 0 }
 

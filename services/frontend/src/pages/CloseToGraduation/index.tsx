@@ -48,6 +48,7 @@ export const CloseToGraduation = () => {
         studentToSecondStudyrightEndMap: null,
         studentToStudyrightEndMap: null,
         semestersToAddToStart: null,
+        semesters: semesterData,
       }),
     [allSemesters, getTextIn, students]
   )
