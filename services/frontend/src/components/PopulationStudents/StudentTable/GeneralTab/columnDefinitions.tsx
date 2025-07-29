@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import CheckIcon from '@mui/icons-material/Check'
 import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
@@ -28,7 +30,7 @@ export const useGetColumnDefinitions = ({
 }): ColumnDef<FormattedStudentData, any>[] => {
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
-  return [
+  return useMemo(() => ([
     columnHelper.accessor('studentNumber', {
       header: 'Student number',
       cell: cell => {
@@ -229,5 +231,14 @@ export const useGetColumnDefinitions = ({
         return 'Master graduation date'
       },
     }),
-  ]
+  ]), [
+    getTextIn,
+    useFilterSelector,
+
+    programme,
+    combinedProgramme,
+    isMastersProgramme,
+    includePrimaryProgramme,
+    year,
+  ])
 }

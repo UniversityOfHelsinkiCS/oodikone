@@ -1,4 +1,4 @@
-import type { ColumnDef, TableOptions } from '@tanstack/react-table'
+import type { TableOptions } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { isMastersProgramme } from '@/common'
@@ -77,28 +77,26 @@ export const GeneralTab = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { useFilterSelector } = useFilters()
-  const { data: degreeProgrammes, isSuccess: degreeProgrammesFound } = useGetProgrammesQuery()
+  const { data: degreeProgrammes } = useGetProgrammesQuery()
 
-  const [columns, accessorKeys]: [ColumnDef<FormattedStudentData, any>[], string[]] = useMemo(() => {
-    if (!degreeProgrammesFound) return [[], []]
-
-    const columns = useGetColumnDefinitions({
+  const columns = useGetColumnDefinitions({
       getTextIn,
       useFilterSelector,
 
       programme,
       combinedProgramme,
       includePrimaryProgramme,
-      isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
+      isMastersProgramme: degreeProgrammes?.[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
       year,
     })
 
+  const accessorKeys: string[] = useMemo(() => {
     const squashGroups = column => {
       if (column.columns) return column.columns.flatMap(squashGroups)
       return [column.accessorKey]
     }
 
-    return [columns, columns.flatMap(squashGroups)]
+    return columns.flatMap(squashGroups)
   }, [combinedProgramme, includePrimaryProgramme, isMastersProgramme])
 
   const data = formattingFunction()
