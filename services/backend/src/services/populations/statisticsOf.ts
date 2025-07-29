@@ -58,6 +58,14 @@ export const statisticsOf = async (
     creditsByStudent.get(credit.student_studentnumber)!.push(omitKeys(credit, ['student_studentnumber']))
   )
 
+  const enrollmentsByStudent: StudentEnrollmentObject = new Map<string, AnonymousEnrollment[]>(
+    studentNumbers.map(n => [n, []])
+  )
+  enrollments.forEach(enrollment => {
+    const { studentnumber } = enrollment
+    enrollmentsByStudent[studentnumber].push(omitKeys(enrollment, ['studentnumber']))
+  })
+
   const criteria = await getCriteria(code)
   const optionData = await getOptionsForStudents(studentNumbers, code, await getDegreeProgrammeType(code))
 
@@ -69,6 +77,7 @@ export const statisticsOf = async (
         mockedStartDate,
         { ...student, tags: tagList[student.studentnumber] },
         creditsByStudent.get(student.studentnumber) ?? [],
+        enrollmentsByStudent.get(student.studentnumber) ?? [],
         optionData?.[student.studentnumber],
         criteria
       )

@@ -1,4 +1,4 @@
-import type { SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
+import type { Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
 import type { Tag, TagStudent } from '../models/kone'
 
 import type { CriteriaYear, CreditTypeCode, Name } from '../types'
@@ -93,4 +93,5 @@ export type FormattedStudent = {
     language: string
     studyright_id: string
   }[]
+  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time'>[]
 }

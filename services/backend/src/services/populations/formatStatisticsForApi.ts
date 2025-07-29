@@ -5,7 +5,7 @@ import { CreditModel } from '../../models'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
 import type { StudentStudyPlan, StudentStudyRight, TaggetStudentData } from './getStudentData'
 import { getCurriculumVersion } from './shared'
-import type { AnonymousCredit } from './statisticsOf'
+import type { AnonymousCredit, AnonymousEnrollment } from './statisticsOf'
 
 const yearMap: [string, keyof ProgressCriteria['courses']][] = [
   ['year1', 'yearOne'],
@@ -145,6 +145,7 @@ export const formatStudentForAPI = (
   startDate: string,
   student: TaggetStudentData,
   credits: AnonymousCredit[],
+  enrollments: AnonymousEnrollment[],
   optionData: Name | undefined,
   criteria: ProgressCriteria
 ): FormattedStudent => {
@@ -200,5 +201,6 @@ export const formatStudentForAPI = (
     studyRights,
     studyplans,
     courses,
+    enrollments,
   }
 }
