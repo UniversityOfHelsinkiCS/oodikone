@@ -1,7 +1,7 @@
 // TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
 
 import { GraphStat } from '@/types/graphStat'
-import { Name, NameWithCode } from '@oodikone/shared/types'
+import { DegreeProgrammeType, Name, NameWithCode } from '@oodikone/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
 import { GetAllGraduationStatsResponse } from './university'
 
@@ -123,7 +123,7 @@ export type GetAllProgressStatsResponse = {
 export type DegreeProgramme = {
   code: string
   curriculumPeriodIds: string[]
-  degreeProgrammeType: string
+  degreeProgrammeType: DegreeProgrammeType
   name: Name
   progId: string
 }

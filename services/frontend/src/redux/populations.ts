@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import { DegreeProgramme } from '@/types/api/faculty'
+import type { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
 import type { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
 

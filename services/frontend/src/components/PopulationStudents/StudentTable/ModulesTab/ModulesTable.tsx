@@ -19,7 +19,6 @@ import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
-
 import type { FormattedModules, FormattedStudent } from '.'
 
 const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>

@@ -18,7 +18,7 @@ import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { createLocaleComparator, createPinnedFirstComparator } from '@/util/comparator'
-import { Name } from '@oodikone/shared/types'
+import { DegreeProgrammeType, Name } from '@oodikone/shared/types'
 import { StudyProgrammeFilter } from './StudyProgrammeFilter'
 import { StudyProgrammeTable } from './StudyProgrammeTable'
 
@@ -52,8 +52,8 @@ export const StudyProgrammeSelector = () => {
     .sort(localeComparator)
     .filter(
       programme =>
-        programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
-        getTextIn(programme.name)!.toLowerCase().includes(filter.toLocaleLowerCase()) ||
+        programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ??
+        getTextIn(programme.name)!.toLowerCase().includes(filter.toLocaleLowerCase()) ??
         programme.progId?.toLowerCase().includes(filter.toLocaleLowerCase())
     )
 
@@ -92,11 +92,11 @@ export const StudyProgrammeSelector = () => {
     }
     if (!programme.curriculumPeriodIds.includes(currentCurriculumPeriod.id)) {
       otherProgrammes.push(programme)
-    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:bachelors-degree') {
+    } else if (programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
       bachelorProgrammes.push(programme)
-    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree') {
+    } else if (programme.degreeProgrammeType === DegreeProgrammeType.MASTER) {
       masterProgrammes.push(programme)
-    } else if (programme.degreeProgrammeType === 'urn:code:degree-program-type:doctor') {
+    } else if (programme.degreeProgrammeType === DegreeProgrammeType.DOCTOR) {
       doctoralProgrammes.push(programme)
     } else {
       otherProgrammes.push(programme)

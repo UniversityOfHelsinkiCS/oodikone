@@ -30,6 +30,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { UnihowDataExport } from './UnihowDataExport'
 
 export const CustomPopulation = () => {
@@ -166,9 +167,19 @@ const CustomPopulationContent = ({
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          customPopulationProgramme={associatedProgramme || null}
           dataExport={<UnihowDataExport students={filteredStudents} />}
           filteredStudents={filteredStudents}
+          generalTabColumnFunction={() =>
+            columnsGeneralTab({
+              programme: associatedProgramme || null,
+            })
+          }
+          generalTabFormattingFunction={() =>
+            formatGeneralTab({
+              programme: associatedProgramme || null,
+              filteredStudents,
+            })
+          }
           variant="customPopulation"
         />
       ),

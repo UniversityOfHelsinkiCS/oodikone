@@ -54,30 +54,29 @@ const getProgrammeEndDateForStudyright = (studyright, phase) => {
   return { endDate, programmeCode }
 }
 
-const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semestersAndYears) =>
+const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semesters) =>
   studyrights.reduce((acc, studyright) => {
     const studentToStudyrightEndMap = new Map([[student.studentNumber, null]])
     const studentToSecondStudyrightEndMap = new Map([[student.studentNumber, null]])
 
     const baseArguments = {
-      currentSemester: semestersAndYears.currentSemester,
-      allSemesters: semestersAndYears.semesters,
       year: firstDisplayedYear,
       getTextIn,
-      programmeCode: null,
+      programme: null,
+      semesters,
     }
 
     const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
     if (masterInfo) {
       const { endDate, programmeCode } = masterInfo
-      baseArguments.programmeCode = programmeCode
+      baseArguments.programme = programmeCode
       studentToSecondStudyrightEndMap[student.studentNumber] = endDate
     }
 
     const bachelorInfo = getProgrammeEndDateForStudyright(studyright, 1)
     if (bachelorInfo) {
       const { endDate, programmeCode } = bachelorInfo
-      baseArguments.programmeCode = programmeCode
+      baseArguments.programme = programmeCode
       studentToStudyrightEndMap[student.studentNumber] = endDate
     }
 
@@ -91,9 +90,9 @@ const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn,
     const content = getSemesterEnrollmentsContent(student, studyright)
     acc[studyright.id] = (
       <Box sx={{ display: 'flex', m: 0.5 }}>
-        {content.map(({ key, onHoverString, springMargin, typeLabel, graduationCrown }) => (
+        {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
           <Tooltip key={key} placement="top" title={onHoverString}>
-            <span className={`enrollment-label ${springMargin} label-${typeLabel} ${graduationCrown}`} />
+            <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
           </Tooltip>
         ))}
       </Box>

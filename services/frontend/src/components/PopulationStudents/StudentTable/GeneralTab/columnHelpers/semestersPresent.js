@@ -8,65 +8,62 @@ import './semestersPresent.css'
 dayjs.extend(isBetween)
 
 export const getSemestersPresentFunctions = ({
-  currentSemester,
-  allSemesters,
   getTextIn,
-  programmeCode,
+  programme,
   studentToSecondStudyrightEndMap,
   studentToStudyrightEndMap,
   year,
   semestersToAddToStart,
+  semesters,
 }) => {
-  const { semestercode: currentSemesterCode } = currentSemester ?? {}
+  const allSemesters = semesters?.semesters ?? {}
+  const { semestercode: currentSemesterCode } = semesters?.currentSemester ?? { semestercode: 0 }
 
   const getFirstAndLastSemester = () => {
-    const last = currentSemesterCode + 1 * isFall(currentSemesterCode)
+    const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
 
     const associatedYear = year !== 'All' && year
-    if (associatedYear) {
-      const first = Object.values(allSemesters).find(
-        semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
-      ).semestercode
+    const firstSemester = associatedYear
+      ? (Object.values(allSemesters).find(
+          semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
+        )?.semestercode ?? lastSemester) - (semestersToAddToStart ?? 0)
+      : lastSemester - 13
 
-      return { first: first - (semestersToAddToStart ?? 0), last }
-    }
-
-    return { first: last - 13, last }
+    return [firstSemester, lastSemester]
   }
 
-  const { first: firstSemester, last: lastSemester } =
-    Object.keys(allSemesters).length > 0 ? getFirstAndLastSemester() : { first: 0, last: 0 }
+  const [firstSemester, lastSemester] = getFirstAndLastSemester()
 
-  const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
-    switch (enrollmenttype) {
-      case 1:
-        return 'Enrolled as present'
-      case 2:
-        return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-      case 3:
-        return 'Not enrolled'
-      default:
-        return 'No study right'
+  const getSemesterEnrollmentsContent = (student, studyright = undefined) => {
+    const enrollmentTypeText = (enrollmenttype, statutoryAbsence) => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'Enrolled as present'
+        case 2:
+          return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
+        case 3:
+          return 'Not enrolled'
+        default:
+          return 'No study right'
+      }
     }
-  }
 
-  const enrollmentTypeLabel = (enrollmenttype, statutoryAbsence) => {
-    switch (enrollmenttype) {
-      case 1:
-        return 'present'
-      case 2:
-        return statutoryAbsence ? 'absent-statutory' : 'absent'
-      case 3:
-        return 'passive'
-      default:
-        return 'none'
+    const enrollmentTypeLabel = (enrollmenttype, statutoryAbsence) => {
+      switch (enrollmenttype) {
+        case 1:
+          return 'present'
+        case 2:
+          return statutoryAbsence ? 'absent-statutory' : 'absent'
+        case 3:
+          return 'passive'
+        default:
+          return 'none'
+      }
     }
-  }
 
-  const getSemesterEnrollmentsContent = (student, studyright) => {
     if (!student.semesterEnrollmentsMap && !studyright) return []
 
-    const isMasters = isMastersProgramme(programmeCode ?? '')
+    const isMasters = isMastersProgramme(programme ?? '')
 
     const firstGraduation = studentToStudyrightEndMap.get(student.studentNumber)
     const secondGraduation = studentToSecondStudyrightEndMap.get(student.studentNumber)
@@ -82,8 +79,8 @@ export const getSemestersPresentFunctions = ({
         student.semesterEnrollmentsMap?.[semester]?.statutoryAbsence ??
         studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.statutoryAbsence
 
-      const { startdate, enddate, name: semesterName } = allSemesters[semester] ?? {}
-      const graduated = programmeCode
+      const { startdate, enddate, name: semesterName } = allSemesters[semester]
+      const graduated = programme
         ? (() => {
             if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate)) return 1 + 1 * isMasters
             if (secondGraduation && dayjs(secondGraduation).isBetween(startdate, enddate)) return 2 - 1 * isMasters
@@ -97,10 +94,9 @@ export const getSemestersPresentFunctions = ({
       const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
       const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
 
-      const springMargin = isFall(semester) ? '' : 'margin-right'
       const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
 
-      return { key, onHoverString, springMargin, typeLabel, graduationCrown }
+      return { key, onHoverString, typeLabel, graduationCrown }
     })
   }
 

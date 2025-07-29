@@ -23,6 +23,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { useCurriculumState } from '../../hooks/useCurriculums'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
 dayjs.extend(isBetween)
@@ -123,6 +124,13 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             curriculum={curriculum}
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
+            generalTabColumnFunction={() => columnsGeneralTab({ group })}
+            generalTabFormattingFunction={() =>
+              formatGeneralTab({
+                group,
+                filteredStudents,
+              })
+            }
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
             year={year}

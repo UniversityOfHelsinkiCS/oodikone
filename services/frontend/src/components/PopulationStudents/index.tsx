@@ -13,7 +13,7 @@ import { ProgressCriteria } from '@oodikone/shared/types'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
-import { GeneralTabContainer as GeneralTab } from './StudentTable/GeneralTab'
+import { type FormattedStudentData, GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
@@ -23,8 +23,6 @@ type PopulationDetails = {
 
   programme: string
   combinedProgramme?: string
-
-  showBachelorAndMaster: boolean
 
   criteria?: ProgressCriteria
   curriculum: ExtendedCurriculumDetails | null
@@ -36,10 +34,6 @@ type PopulationDetails = {
 type CoursePopulation = {
   variant: 'coursePopulation'
 
-  from: string
-  to: string
-
-  coursecodes: string[]
   filteredStudents: any[]
 }
 
@@ -59,7 +53,6 @@ type StudyGuidanceGroup = {
 type CustomPopulation = {
   variant: 'customPopulation'
 
-  customPopulationProgramme: string | null
   filteredStudents: any[]
   dataExport: JSX.Element
 }
@@ -70,26 +63,22 @@ type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuid
 
 export const PopulationStudents = ({
   variant,
-
   programme,
   combinedProgramme,
-
-  showBachelorAndMaster,
-
   criteria,
   curriculum,
-
   filteredStudents,
   filteredCourses,
-  coursecodes,
-
-  customPopulationProgramme,
   dataExport,
-  from,
-  to,
   studyGuidanceGroup,
   year,
-}: PopulationStudentsProps) => {
+
+  generalTabColumnFunction,
+  generalTabFormattingFunction,
+}: PopulationStudentsProps & {
+  generalTabColumnFunction: () => [string[], string[]]
+  generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
+}) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
@@ -98,17 +87,13 @@ export const PopulationStudents = ({
   const availableTabs = {
     General: () => (
       <GeneralTab
+        columnFunction={generalTabColumnFunction}
         combinedProgramme={combinedProgramme}
-        coursecodes={coursecodes}
-        customPopulationProgramme={customPopulationProgramme}
-        filteredStudents={filteredStudents}
-        from={from}
-        group={studyGuidanceGroup}
-        programme={programme}
-        showBachelorAndMaster={showBachelorAndMaster}
-        to={to}
-        variant={variant}
-        year={year}
+        formattingFunction={generalTabFormattingFunction}
+        includePrimaryProgramme={
+          variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)
+        }
+        programme={programme ?? studyGuidanceGroup?.tags?.studyProgramme}
       />
     ),
     Courses: () => (

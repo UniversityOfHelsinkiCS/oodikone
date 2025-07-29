@@ -9,7 +9,7 @@ import { DEFAULT_LANG } from '@oodikone/shared/language'
 
 // If defining sx props in a column definition, existing props defined here would be
 // completely overridden. Export and ...spread from here as needed to avoid copy pasting.
-export const muiTableBodyCellPropsDefaultSx = {
+const muiTableBodyCellPropsDefaultSx = {
   borderWidth: '0 1px 0 0',
   borderStyle: 'solid',
   borderColor: 'grey.300',

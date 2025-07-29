@@ -28,10 +28,12 @@ import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
+import { FormattedStudent as Student } from '@oodikone/shared/types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditStatistics } from './CreditGainStats'
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
 
@@ -39,7 +41,7 @@ type PopulationDetailsProps = {
   isLoading: boolean
   query: PopulationQuery
   populationTags: Map<string, string>
-  filteredStudents: any[]
+  filteredStudents: Student[]
   filteredCourses: any[]
 }
 
@@ -147,8 +149,21 @@ export const PopulationDetails = ({
                 curriculum={curriculum}
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}
+                generalTabColumnFunction={() =>
+                  columnsGeneralTab({
+                    showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
+                  })
+                }
+                generalTabFormattingFunction={() =>
+                  formatGeneralTab({
+                    programme,
+                    combinedProgramme,
+                    showBachelorAndMaster,
+
+                    filteredStudents,
+                  })
+                }
                 programme={programme}
-                showBachelorAndMaster={showBachelorAndMaster}
                 variant="population"
               />
             </div>

@@ -34,6 +34,8 @@ import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTab
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 
+import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
+
 export const CoursePopulation = () => {
   const location = useLocation()
   const { getTextIn } = useLanguage()
@@ -152,11 +154,18 @@ export const CoursePopulation = () => {
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          coursecodes={codes}
           filteredStudents={filteredStudents}
-          from={dateFrom}
+          generalTabColumnFunction={() => columnsGeneralTab()}
+          generalTabFormattingFunction={() =>
+            formatGeneralTab({
+              from: dateFrom,
+              to: dateTo,
+              coursecodes: codes,
+
+              filteredStudents,
+            })
+          }
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          to={dateTo}
           variant="coursePopulation"
         />
       ),
