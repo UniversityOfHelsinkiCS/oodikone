@@ -1,9 +1,8 @@
-import type { FC, ReactNode } from 'react'
-
 import TableCell, { type TableCellProps } from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import { flexRender } from '@tanstack/react-table'
 import type { HeaderGroup } from '@tanstack/react-table'
+import type { FC, ReactNode } from 'react'
 
 import { getCommonPinningStyles } from '../styles'
 import { OodiTableSortIcons } from './SortIcons'
@@ -41,10 +40,10 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>) 
 
       return (
         <OodiTableHeader
-          key={header.id}
           colSpan={header.colSpan}
-          rowSpan={rowSpan}
+          key={header.id}
           onClick={header.column.getToggleSortingHandler()}
+          rowSpan={rowSpan}
           sx={{
             ...getCommonPinningStyles(header.column),
             cursor: header.column.getCanSort() ? 'pointer' : 'inherit',

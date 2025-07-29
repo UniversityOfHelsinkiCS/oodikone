@@ -1,23 +1,22 @@
-import { useMemo, useState } from 'react'
-import { utils, writeFile } from 'xlsx'
+import DownloadIcon from '@mui/icons-material/Download'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
+import Dialog from '@mui/material/Dialog'
 
-import { createColumnHelper } from '@tanstack/react-table'
 import type { RowSelectionState, TableOptions } from '@tanstack/react-table'
 
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
-import Checkbox from '@mui/material/Checkbox'
-
-import DownloadIcon from '@mui/icons-material/Download'
+import { createColumnHelper } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
+import { utils, writeFile } from 'xlsx'
 
 import { DateFormat } from '@/constants/date'
 import { getTimestamp, reformatDate } from '@/util/timeAndDate'
@@ -150,7 +149,7 @@ export const OodiTableExcelExport = <TData extends object>({
   }
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
+    <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
       <Button
         disabled={dialogOpen}
         onClick={() => setDialogOpen(true)}
@@ -162,7 +161,7 @@ export const OodiTableExcelExport = <TData extends object>({
       >
         Export to Excel
       </Button>
-      <Dialog fullWidth maxWidth="md" open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog fullWidth maxWidth="md" onClose={() => setDialogOpen(false)} open={dialogOpen}>
         <DialogTitle>Export to Excel</DialogTitle>
         <DialogContent>
           <DialogContentText component="div" sx={{ marginBottom: 2 }}>
@@ -181,11 +180,11 @@ export const OodiTableExcelExport = <TData extends object>({
               </Alert>
             )}
           </DialogContentText>
-          <OodiTable data={pivotedData} columns={extendedColumns} options={tableOptions} />
+          <OodiTable columns={extendedColumns} data={pivotedData} options={tableOptions} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button sx={{ backgroundColor: theme => theme.palette.export }} onClick={handleExport} variant="contained">
+          <Button onClick={handleExport} sx={{ backgroundColor: theme => theme.palette.export }} variant="contained">
             Export
           </Button>
         </DialogActions>

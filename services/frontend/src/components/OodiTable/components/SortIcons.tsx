@@ -1,8 +1,7 @@
-import Box from '@mui/material/Box'
-
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
+import Box from '@mui/material/Box'
 import type { SortDirection } from '@tanstack/react-table'
 
 export const OodiTableSortIcons = ({ canSort, isSorted }: { canSort: boolean; isSorted: SortDirection | false }) => (

@@ -1,5 +1,6 @@
-import Tooltip from '@mui/material/Tooltip'
 import CheckIcon from '@mui/icons-material/Check'
+import Box from '@mui/material/Box'
+import Tooltip from '@mui/material/Tooltip'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -7,9 +8,8 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
-import { joinProgrammes } from './util'
 import { FormattedStudentData } from '../GeneralTab'
-import Box from '@mui/material/Box'
+import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
@@ -25,7 +25,7 @@ export const useGetColumnDefinitions = ({
       const studentNumber = cell.getValue()
       if (studentNumber === 'Hidden') return studentNumber
 
-      const sisuID = cell.row.original.sisuID
+      const { sisuID } = cell.row.original
       return <StudentInfoItem sisPersonId={sisuID} studentNumber={studentNumber} />
     },
     filterFn: 'includesString',

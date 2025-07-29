@@ -1,10 +1,9 @@
-import type { FC, ReactNode } from 'react'
-
-import TableCell, { type TableCellProps } from '@mui/material/TableCell'
 import Box from '@mui/material/Box'
+import TableCell, { type TableCellProps } from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import { flexRender } from '@tanstack/react-table'
 import type { Row } from '@tanstack/react-table'
+import type { FC, ReactNode } from 'react'
 
 import { getCommonPinningStyles } from '../styles'
 

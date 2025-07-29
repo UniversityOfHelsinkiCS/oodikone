@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
 
-import type { FormattedStudent } from '@oodikone/shared/types'
-
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
@@ -11,6 +9,7 @@ import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/Gen
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { formatDate } from '@/util/timeAndDate'
+import type { FormattedStudent } from '@oodikone/shared/types'
 
 export const useColumns = (): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()

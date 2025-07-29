@@ -4,15 +4,14 @@ import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 
-import { OodiTablePagination } from './components/Pagination'
-
 import { type Table as TableType } from '@tanstack/react-table'
-import { OodiTableHeaderGroup } from './components/Header'
 import { OodiTableDataRow } from './components/Cell'
+import { OodiTableHeaderGroup } from './components/Header'
+import { OodiTablePagination } from './components/Pagination'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
+    <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
       <TableContainer
         sx={{
           maxHeight: '75vh',

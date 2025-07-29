@@ -169,7 +169,6 @@ const CustomPopulationContent = ({
         <PopulationStudents
           dataExport={<UnihowDataExport students={filteredStudents} />}
           filteredStudents={filteredStudents}
-          variant="customPopulation"
           generalTabColumnFunction={() =>
             columnsGeneralTab({
               programme: associatedProgramme || null,
@@ -181,6 +180,7 @@ const CustomPopulationContent = ({
               filteredStudents,
             })
           }
+          variant="customPopulation"
         />
       ),
     },

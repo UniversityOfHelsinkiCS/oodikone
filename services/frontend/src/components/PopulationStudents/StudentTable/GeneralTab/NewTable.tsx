@@ -1,16 +1,15 @@
+import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import type { ColumnDef, TableOptions } from '@tanstack/react-table'
-
+import { isMastersProgramme } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useGetProgrammesQuery } from '@/redux/populations'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { FormattedStudentData } from '../GeneralTab'
 
 import { useGetColumnDefinitions } from './baseColumns'
-import { useGetProgrammesQuery } from '@/redux/populations'
-import { isMastersProgramme } from '@/common'
-import { DegreeProgrammeType } from '@oodikone/shared/types'
-import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 
 export const NewTable = ({
   includePrimaryProgramme,
@@ -73,8 +72,8 @@ export const NewTable = ({
 
   return (
     <>
-      <OodiTableExcelExport exportData={data} exportColumns={exportColumns} />
-      <OodiTable data={data as FormattedStudentData[]} columns={columns} options={tableOptions} />
+      <OodiTableExcelExport exportColumns={exportColumns} exportData={data} />
+      <OodiTable columns={columns} data={data as FormattedStudentData[]} options={tableOptions} />
     </>
   )
 }

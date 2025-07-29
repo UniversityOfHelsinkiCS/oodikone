@@ -1,8 +1,5 @@
 import { useMemo } from 'react'
 
-import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
-import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
-
 import { getStudentTotalCredits } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
@@ -18,6 +15,8 @@ import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { formatDate } from '@/util/timeAndDate'
+import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
+import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 
 export const useColumns = ({ showCombinedProgrammeColumns }): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()

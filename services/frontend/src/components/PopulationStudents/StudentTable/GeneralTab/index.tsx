@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
 
-import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
-
 import {
   getStudentTotalCredits,
   getHighestGradeOfCourseBetweenRange,
@@ -16,6 +14,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { formatDate } from '@/util/timeAndDate'
+import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import { createMaps } from './columnHelpers/createMaps'
 import { getSemestersPresentFunctions } from './columnHelpers/semestersPresent'
 

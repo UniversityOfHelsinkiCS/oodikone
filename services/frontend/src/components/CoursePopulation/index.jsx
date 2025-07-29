@@ -155,8 +155,6 @@ export const CoursePopulation = () => {
       content: (
         <PopulationStudents
           filteredStudents={filteredStudents}
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          variant="coursePopulation"
           generalTabColumnFunction={() => columnsGeneralTab()}
           generalTabFormattingFunction={() =>
             formatGeneralTab({
@@ -167,6 +165,8 @@ export const CoursePopulation = () => {
               filteredStudents,
             })
           }
+          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+          variant="coursePopulation"
         />
       ),
     },

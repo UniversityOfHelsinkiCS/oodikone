@@ -124,9 +124,6 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             curriculum={curriculum}
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
-            studyGuidanceGroup={group}
-            variant="studyGuidanceGroupPopulation"
-            year={year}
             generalTabColumnFunction={() => columnsGeneralTab({ group })}
             generalTabFormattingFunction={() =>
               formatGeneralTab({
@@ -134,6 +131,9 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
                 filteredStudents,
               })
             }
+            studyGuidanceGroup={group}
+            variant="studyGuidanceGroupPopulation"
+            year={year}
           />
         </div>
       ),
