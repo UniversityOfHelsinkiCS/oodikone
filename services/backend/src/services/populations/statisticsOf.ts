@@ -61,10 +61,9 @@ export const statisticsOf = async (
   const enrollmentsByStudent: StudentEnrollmentObject = new Map<string, AnonymousEnrollment[]>(
     studentNumbers.map(n => [n, []])
   )
-  enrollments.forEach(enrollment => {
-    const { studentnumber } = enrollment
-    enrollmentsByStudent[studentnumber].push(omitKeys(enrollment, ['studentnumber']))
-  })
+  enrollments.forEach(enrollment =>
+    enrollmentsByStudent.get(enrollment.studentnumber)!.push(omitKeys(enrollment, ['studentnumber']))
+  )
 
   const criteria = await getCriteria(code)
   const optionData = await getOptionsForStudents(studentNumbers, code, await getDegreeProgrammeType(code))
