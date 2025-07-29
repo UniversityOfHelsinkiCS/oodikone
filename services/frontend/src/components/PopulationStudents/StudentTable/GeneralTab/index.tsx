@@ -80,15 +80,15 @@ export const GeneralTab = ({
   const { data: degreeProgrammes } = useGetProgrammesQuery()
 
   const columns = useGetColumnDefinitions({
-      getTextIn,
-      useFilterSelector,
+    getTextIn,
+    useFilterSelector,
 
-      programme,
-      combinedProgramme,
-      includePrimaryProgramme,
-      isMastersProgramme: degreeProgrammes?.[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
-      year,
-    })
+    programme,
+    combinedProgramme,
+    includePrimaryProgramme,
+    isMastersProgramme: degreeProgrammes?.[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
+    year,
+  })
 
   const accessorKeys: string[] = useMemo(() => {
     const squashGroups = column => {

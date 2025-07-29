@@ -5,7 +5,7 @@ import { maxBy, orderBy, range } from 'lodash'
 import { serviceProvider } from '@/conf'
 import { SemestersData } from '@/redux/semesters'
 import type { Absence } from '@/types/students'
-import type { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import type { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent, Release, CreditTypeCode, Name, Unarray } from '@oodikone/shared/types'
 
 dayjs.extend(isBetween)
@@ -165,20 +165,6 @@ export const getHighestGradeOfCourseBetweenRange = (
 
   return maxBy(grades, grade => grade.sortValue)?.grade
 }
-
-// the type of year here is courtesy of study guidance groups
-export const findStudyRightForClass = (
-  studyRights: SISStudyRight[],
-  programmeCode: string | undefined,
-  year: string | null | undefined
-) =>
-  studyRights.find(studyRight =>
-    studyRight.studyRightElements.some(
-      element =>
-        element.code === programmeCode &&
-        (!year || dayjs(element.startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]'))
-    )
-  )
 
 export const getTargetCreditsForProgramme = (code: string) => {
   if (code === 'MH30_001' || code === 'KH90_001-MH90_001') return 360
