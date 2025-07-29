@@ -26,7 +26,6 @@ export const OodiTable = <TData,>({
   columns: ColumnDef<TData, any>[]
   options?: Partial<TableOptions<TData>>
 }) => {
-
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,

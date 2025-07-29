@@ -92,31 +92,33 @@ export const OodiTableExcelExport = <TData extends object>({
       ),
     }),
     columnHelper.accessor('header', {
-      header: 'Column'
+      header: 'Column',
     }),
     columnHelper.accessor('sample', {
       header: 'Sample values',
       cell: cell => {
         const value = cell.getValue<React.ReactNode>()
         return (
-          <Stack flexDirection="row" sx={{ gap: 1 }}>{value}</Stack>
+          <Stack flexDirection="row" sx={{ gap: 1 }}>
+            {value}
+          </Stack>
         )
       },
-    })
+    }),
   ]
 
   const prepData = exportData.slice(0, 10)
-  const pivotedData = useMemo(() =>
-    Object.entries(exportColumns)
-      .filter(([_, value]) => value)
-      .map(([key, _]) => ({
-        header: key,
-        sample: prepData
-          .map(row => row[key])
-          .filter(value => value !== undefined)
-          .map(churnSampleData),
-        })
-      ),
+  const pivotedData = useMemo(
+    () =>
+      Object.entries(exportColumns)
+        .filter(([_, value]) => value)
+        .map(([key, _]) => ({
+          header: key,
+          sample: prepData
+            .map(row => row[key])
+            .filter(value => value !== undefined)
+            .map(churnSampleData),
+        })),
     [exportColumns, exportData]
   )
 
@@ -129,22 +131,26 @@ export const OodiTableExcelExport = <TData extends object>({
       rowSelection,
     },
     defaultColumn: {
-      enableResizing: false
-    }
+      enableResizing: false,
+    },
   }
-  
+
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const handleExport = () => {
     const selectedColumns = Object.keys(rowSelection).map(key => Number(key))
-    const worksheet = utils.json_to_sheet(exportData.map(row => Object.fromEntries(Object.entries(row).filter((_, index) => selectedColumns.includes(index)))))
+    const worksheet = utils.json_to_sheet(
+      exportData.map(row =>
+        Object.fromEntries(Object.entries(row).filter((_, index) => selectedColumns.includes(index)))
+      )
+    )
     const workbook = utils.book_new()
     utils.book_append_sheet(workbook, worksheet)
-    writeFile(workbook, `oodikone_${ "" }_${getTimestamp()}.xlsx`)
+    writeFile(workbook, `oodikone_${''}_${getTimestamp()}.xlsx`)
   }
 
   return (
-    <Paper variant='outlined' sx={{ p: 2, borderRadius: 0 }}>
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
       <Button
         disabled={dialogOpen}
         onClick={() => setDialogOpen(true)}
@@ -160,20 +166,18 @@ export const OodiTableExcelExport = <TData extends object>({
         <DialogTitle>Export to Excel</DialogTitle>
         <DialogContent>
           <DialogContentText component="div" sx={{ marginBottom: 2 }}>
-            Exporting {exportData.length} rows into an Excel (.xlsx) file. Choose which columns you want to include in the
-            generated file from the list below.
+            Exporting {exportData.length} rows into an Excel (.xlsx) file. Choose which columns you want to include in
+            the generated file from the list below.
             {Object.keys(rowSelection).length === 0 ? (
               <Alert severity="warning" sx={{ mt: 2 }}>
                 <Typography variant="body2">
-                  Please select at least one column to export. You can select all columns by clicking the checkbox in the
-                  table header.
+                  Please select at least one column to export. You can select all columns by clicking the checkbox in
+                  the table header.
                 </Typography>
               </Alert>
             ) : (
               <Alert severity="info" sx={{ mt: 2 }}>
-                <Typography variant="body2">
-                  You have selected {Object.keys(rowSelection).length} column(s).
-                </Typography>
+                <Typography variant="body2">You have selected {Object.keys(rowSelection).length} column(s).</Typography>
               </Alert>
             )}
           </DialogContentText>
@@ -181,11 +185,7 @@ export const OodiTableExcelExport = <TData extends object>({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button
-            sx={{ backgroundColor: theme => theme.palette.export }}
-            onClick={handleExport}
-            variant="contained"
-          >
+          <Button sx={{ backgroundColor: theme => theme.palette.export }} onClick={handleExport} variant="contained">
             Export
           </Button>
         </DialogActions>

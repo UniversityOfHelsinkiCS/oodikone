@@ -2,7 +2,12 @@ import { useMemo } from 'react'
 
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 
-import { getStudentTotalCredits, getHighestGradeOfCourseBetweenRange, findStudyRightForClass, getAllProgrammesOfStudent } from '@/common'
+import {
+  getStudentTotalCredits,
+  getHighestGradeOfCourseBetweenRange,
+  findStudyRightForClass,
+  getAllProgrammesOfStudent,
+} from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -83,7 +88,7 @@ export const GeneralTabContainer = ({
   const { getTextIn } = useLanguage()
 
   const { data: programmes, isFetching: programmesFetching, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isFetching: semestersFetching, isSuccess: semestersSuccess} = useGetSemestersQuery()
+  const { data: semesters, isFetching: semestersFetching, isSuccess: semestersSuccess } = useGetSemestersQuery()
 
   if (programmesFetching || semestersFetching) return null
   if (!programmesSuccess || !semestersSuccess) return null
@@ -98,7 +103,8 @@ export const GeneralTabContainer = ({
   const programmeCode = programme ?? sggProgramme ?? customPopulationProgramme
   const combinedProgrammeCode = combinedProgramme ?? sggCombinedProgramme ?? null
 
-  const isMastersProgramme = programmes[programmeCode]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
+  const isMastersProgramme =
+    programmes[programmeCode]?.degreeProgrammeType === 'urn:code:degree-program-type:masters-degree'
   const shouldShowBachelorAndMaster = showBachelorAndMaster === 'true'
 
   const semestersToAddToStart = shouldShowBachelorAndMaster && isMastersProgramme ? 6 : 0
@@ -106,10 +112,7 @@ export const GeneralTabContainer = ({
   const includePrimaryProgramme =
     variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programmeCode)
 
-  const {
-    studentToStudyrightEndMap,
-    studentToSecondStudyrightEndMap,
-  } = createMaps(
+  const { studentToStudyrightEndMap, studentToSecondStudyrightEndMap } = createMaps(
     filteredStudents,
     programmeCode,
     combinedProgrammeCode,
@@ -140,11 +143,16 @@ export const GeneralTabContainer = ({
     const otherProgrammes = studentProgrammes.filter(({ code }) => code !== programmeCode)
 
     const relevantStudyRight = findStudyRightForClass(student.studyRights, primaryProgramme?.code, year)
-    const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(({ code }) => code === primaryProgramme?.code)
+    const relevantStudyRightElement = relevantStudyRight?.studyRightElements.find(
+      ({ code }) => code === primaryProgramme?.code
+    )
 
-    const relevantStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
+    const relevantStudyplan = student.studyplans?.find(
+      ({ programme_code }) => programme_code === primaryProgramme?.code
+    )
 
-    const degreeProgrammeTypeToCheck = !!relevantStudyRightElement && !isMastersProgramme
+    const degreeProgrammeTypeToCheck =
+      !!relevantStudyRightElement && !isMastersProgramme
         ? 'urn:code:degree-program-type:masters-degree'
         : 'urn:code:degree-program-type:bachelors-degree'
 
@@ -166,17 +174,23 @@ export const GeneralTabContainer = ({
       const sinceDate = creditDateFilterOptions.startDate ?? new Date(1970, 0, 1)
       const untilDate = creditDateFilterOptions.endDate ?? new Date()
 
-      if (group?.tags?.year) return getStudentTotalCredits({
-        courses: student.courses
-          .filter((course) => new Date(group?.tags?.year, 7, 1) < new Date(course.date))
-      })
+      if (group?.tags?.year)
+        return getStudentTotalCredits({
+          courses: student.courses.filter(course => new Date(group?.tags?.year, 7, 1) < new Date(course.date)),
+        })
 
-      if (!sinceDate && !untilDate) return getStudentTotalCredits({
-        courses: student.courses
-          .filter((course) => new Date(relevantStudyRightElement?.startDate ?? 0).getTime() <= new Date(course.date).getTime())
-      })
+      if (!sinceDate && !untilDate)
+        return getStudentTotalCredits({
+          courses: student.courses.filter(
+            course => new Date(relevantStudyRightElement?.startDate ?? 0).getTime() <= new Date(course.date).getTime()
+          ),
+        })
 
-      return getStudentTotalCredits({ courses: student.courses.filter((course) => sinceDate <= new Date(course.date) && new Date(course.date) <= untilDate) })
+      return getStudentTotalCredits({
+        courses: student.courses.filter(
+          course => sinceDate <= new Date(course.date) && new Date(course.date) <= untilDate
+        ),
+      })
     }
 
     const getStudyTracks = studyRights => {
@@ -194,22 +208,25 @@ export const GeneralTabContainer = ({
     const studentWithEnrollmentMap = {
       studentNumber: student.studentNumber,
       semesterEnrollmentsMap: programmeCode
-        ? relevantStudyRight?.semesterEnrollments?.reduce((enrollments, { type, semester, statutoryAbsence }) => {
+        ? (relevantStudyRight?.semesterEnrollments?.reduce((enrollments, { type, semester, statutoryAbsence }) => {
             enrollments[semester] = {
               enrollmenttype: type,
               statutoryAbsence: statutoryAbsence ?? false,
             }
             return enrollments
-          }, {}) ?? null
+          }, {}) ?? null)
         : null,
     }
 
     const graduationDate = relevantStudyRightElement?.graduated
-        ? formatDate(relevantStudyRightElement.endDate, DateFormat.ISO_DATE)
-        : null
+      ? formatDate(relevantStudyRightElement.endDate, DateFormat.ISO_DATE)
+      : null
 
-    // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.      
-    const programmesList = [...(includePrimaryProgramme && primaryProgramme ? [primaryProgramme] : []), ...otherProgrammes]
+    // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.
+    const programmesList = [
+      ...(includePrimaryProgramme && primaryProgramme ? [primaryProgramme] : []),
+      ...otherProgrammes,
+    ]
 
     const getStudyRightStatus = () => {
       if (!primaryProgramme) return null
@@ -217,7 +234,7 @@ export const GeneralTabContainer = ({
       if (primaryProgramme.cancelled) return 'Cancelled'
       if (primaryProgramme.active) return 'Active'
       return 'Inactive'
-    }      
+    }
 
     const getAdmissiontype = () => {
       const admissionType = relevantStudyRight?.admissionType ?? 'Ei valintatapaa'
@@ -265,12 +282,11 @@ export const GeneralTabContainer = ({
         exportValue: getSemesterEnrollmentsVal(studentWithEnrollmentMap),
       },
       graduationDate,
-      startYearAtUniversity: student.started
-        ? new Date(student.started).getFullYear()
-        : null,
+      startYearAtUniversity: student.started ? new Date(student.started).getFullYear() : null,
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       programmeStatus: getStudyRightStatus(),
-      transferredFrom: student.transferredStudyRight ?? getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource,
+      transferredFrom:
+        student.transferredStudyRight ?? getTextIn(programmes[student.transferSource]?.name) ?? student.transferSource,
       admissionType: getAdmissiontype(),
       gender: GenderCodeToText[student.gender_code],
       citizenships: student.citizenships?.map(getTextIn).sort().join(', ') ?? null,
@@ -278,12 +294,8 @@ export const GeneralTabContainer = ({
       mostRecentAttainment: getMostRecentAttainment(student),
       tvex: !!relevantStudyRight?.tvex,
       tags: student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null,
-      extent: isAdmin
-        ? getExtent(student)
-        : null,
-      updatedAt: isAdmin
-        ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV)
-        : null,
+      extent: isAdmin ? getExtent(student) : null,
+      updatedAt: isAdmin ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV) : null,
     }
 
     if (combinedProgrammeCode || shouldShowBachelorAndMaster) {
@@ -291,7 +303,9 @@ export const GeneralTabContainer = ({
         student.studyplans?.find(plan => {
           if (combinedProgrammeCode) return plan.programme_code === combinedProgrammeCode
 
-          const studyRightIdOfProgramme = student.studyRights.find(studyRight => studyRight.studyRightElements?.some(element => element.code === programmeCode))
+          const studyRightIdOfProgramme = student.studyRights.find(studyRight =>
+            studyRight.studyRightElements?.some(element => element.code === programmeCode)
+          )
           return plan.sis_study_right_id === studyRightIdOfProgramme?.id && plan.programme_code !== programmeCode
         })?.completed_credits
 
@@ -338,8 +352,9 @@ export const GeneralTabContainer = ({
         const enrollments =
           student.enrollments
             ?.filter(enrollment => coursecodes.includes(enrollment?.course_code))
-            ?.filter(enrollment => fromSemester <= enrollment?.semestercode && enrollment?.semestercode <= toSemester) ??
-          null
+            ?.filter(
+              enrollment => fromSemester <= enrollment?.semestercode && enrollment?.semestercode <= toSemester
+            ) ?? null
         return enrollments ? (enrollments[0].enrollment_date_time ?? null) : null
       }
 

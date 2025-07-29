@@ -151,17 +151,20 @@ export const PopulationDetails = ({
                 filteredStudents={filteredStudents}
                 programme={programme}
                 variant="population"
+                generalTabColumnFunction={() =>
+                  columnsGeneralTab({
+                    showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
+                  })
+                }
+                generalTabFormattingFunction={() =>
+                  formatGeneralTab({
+                    programme,
+                    combinedProgramme,
+                    showBachelorAndMaster,
 
-                generalTabColumnFunction={() => columnsGeneralTab({
-                  showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster
-                })}
-                generalTabFormattingFunction={() => formatGeneralTab({
-                  programme,
-                  combinedProgramme,
-                  showBachelorAndMaster,
-
-                  filteredStudents,
-                })}
+                    filteredStudents,
+                  })
+                }
               />
             </div>
           ),

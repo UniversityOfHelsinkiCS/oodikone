@@ -8,12 +8,10 @@ import type { HeaderGroup } from '@tanstack/react-table'
 import { getCommonPinningStyles } from '../styles'
 import { OodiTableSortIcons } from './SortIcons'
 
-const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({
-  children,
-  ...props
-}) => {
+const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({ children, ...props }) => {
   return (
-    <TableCell {...props}
+    <TableCell
+      {...props}
       sx={{
         position: 'relative',
         padding: '1.5em',
@@ -23,11 +21,11 @@ const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({
         fontWeight: 'bold',
         backgroundColor: 'white',
         ...props.sx,
-      }}>
+      }}
+    >
       {children}
     </TableCell>
   )
-
 }
 
 export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>) => (
@@ -52,17 +50,10 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>) 
             cursor: header.column.getCanSort() ? 'pointer' : 'inherit',
           }}
         >
-          {flexRender(
-            header.column.columnDef.header,
-            header.getContext()
-          )}
-          <OodiTableSortIcons
-            canSort={header.column.getCanSort()}
-            isSorted={header.column.getIsSorted()}
-          />
+          {flexRender(header.column.columnDef.header, header.getContext())}
+          <OodiTableSortIcons canSort={header.column.getCanSort()} isSorted={header.column.getIsSorted()} />
         </OodiTableHeader>
       )
-    }
-    )}
+    })}
   </TableRow>
 )

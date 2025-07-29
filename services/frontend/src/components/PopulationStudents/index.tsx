@@ -77,7 +77,7 @@ export const PopulationStudents = ({
   generalTabColumnFunction,
   generalTabFormattingFunction,
 }: PopulationStudentsProps & {
-  generalTabColumnFunction: () => [string[], string[]],
+  generalTabColumnFunction: () => [string[], string[]]
   generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -88,10 +88,11 @@ export const PopulationStudents = ({
   const availableTabs = {
     General: () => (
       <GeneralTab
-        includePrimaryProgramme={variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)}
+        includePrimaryProgramme={
+          variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)
+        }
         programme={programme}
         combinedProgramme={combinedProgramme}
-
         columnFunction={generalTabColumnFunction}
         formattingFunction={generalTabFormattingFunction}
       />

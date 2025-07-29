@@ -14,32 +14,29 @@ export const useColumns = (): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { visible: namesVisible } = useStudentNameVisibility()
 
-  const nameColumns = namesVisible ? [
-    'lastName',
-    'firstNames',
-  ] : []
+  const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
 
-  const adminColumns = isAdmin ? [
-    'extent',
-    'updatedAt',
-  ] : []
+  const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
 
   const excelOnlyColumns = ['email', 'phoneNumber']
 
-  return [[
-    'studentNumber',
-    'programmes',
-    'creditsTotal',
-    'grade',
-    'language',
-    'attainmentDate',
-    'enrollmentDate',
-    'startYearAtUniversity',
-    'tvex',
-    'tags',
-    ...nameColumns,
-    ...adminColumns,
-  ], excelOnlyColumns]
+  return [
+    [
+      'studentNumber',
+      'programmes',
+      'creditsTotal',
+      'grade',
+      'language',
+      'attainmentDate',
+      'enrollmentDate',
+      'startYearAtUniversity',
+      'tvex',
+      'tags',
+      ...nameColumns,
+      ...adminColumns,
+    ],
+    excelOnlyColumns,
+  ]
 }
 
 export const format = ({
@@ -62,7 +59,7 @@ export const format = ({
     isMastersProgramme: false,
     combinedProgramme: undefined,
     showBachelorAndMaster: false,
-    
+
     currentSemester,
     year: null,
   })
@@ -70,19 +67,17 @@ export const format = ({
   const includePrimaryProgramme = true
 
   const fromSemester = from
-    ? Object.values(allSemesters)
+    ? (Object.values(allSemesters)
         .filter(({ startdate }) => new Date(startdate) <= new Date(from))
         .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))
-        .shift()
-        ?.semestercode ?? null
+        .shift()?.semestercode ?? null)
     : null
 
   const toSemester = to
-    ? Object.values(allSemesters)
+    ? (Object.values(allSemesters)
         .filter(({ enddate }) => new Date(to) <= new Date(enddate))
         .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))
-        .shift()
-        ?.semestercode ?? null
+        .shift()?.semestercode ?? null)
     : null
 
   const formatStudent = (student: FormattedStudent): Partial<FormattedStudentData> => {
@@ -98,8 +93,7 @@ export const format = ({
     const programmesList = includePrimaryProgramme ? allProgrammes : otherProgrammes
 
     const getCourseInformation = () => {
-      const validCourses = student.courses
-        .filter(({ course_code }) => coursecodes.includes(course_code))
+      const validCourses = student.courses.filter(({ course_code }) => coursecodes.includes(course_code))
       const grade = getHighestGradeOfCourseBetweenRange(validCourses, from, to)
       if (!grade) return { grade: '-', date: '', language: '' }
 
@@ -113,11 +107,12 @@ export const format = ({
 
     const getEnrollmentDate = () => {
       if (!fromSemester || !toSemester || !student.enrollments?.length) return null
-      return student.enrollments
-        ?.filter(({ course_code }) => coursecodes.includes(course_code))
-        ?.filter(({ semestercode }) => fromSemester <= semestercode && semestercode <= toSemester)
-        ?.shift()
-        ?.enrollment_date_time ?? null
+      return (
+        student.enrollments
+          ?.filter(({ course_code }) => coursecodes.includes(course_code))
+          ?.filter(({ semestercode }) => fromSemester <= semestercode && semestercode <= toSemester)
+          ?.shift()?.enrollment_date_time ?? null
+      )
     }
 
     const enrollmentDate = getEnrollmentDate()
@@ -138,9 +133,7 @@ export const format = ({
       /* BASE COLUMNS */
       studentNumber: student.obfuscated ? 'Hidden' : student.studentNumber,
       creditsTotal: student.credits,
-      startYearAtUniversity: student.started
-        ? new Date(student.started).getFullYear()
-        : null,
+      startYearAtUniversity: student.started ? new Date(student.started).getFullYear() : null,
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
       tvex: !!relevantStudyRight?.tvex,
       tags: student.tags?.map(({ tag }) => tag.tagname).join(', ') ?? null,
@@ -152,9 +145,7 @@ export const format = ({
       enrollmentDate: enrollmentDate ? formatDate(enrollmentDate, DateFormat.ISO_DATE) : 'No enrollment',
 
       /* ADMIN COLUMNS */
-      updatedAt: isAdmin
-        ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV)
-        : null,
+      updatedAt: isAdmin ? formatDate(student.updatedAt, DateFormat.ISO_DATE_DEV) : null,
     }
   }
 

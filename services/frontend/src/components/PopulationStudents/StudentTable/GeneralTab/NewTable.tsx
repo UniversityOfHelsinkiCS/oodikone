@@ -24,7 +24,7 @@ export const NewTable = ({
   programme: string | undefined
   combinedProgramme: string | undefined
 
-  columnFunction: () => [string[], string[]],
+  columnFunction: () => [string[], string[]]
   formattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
   const { getTextIn } = useLanguage()
@@ -40,7 +40,7 @@ export const NewTable = ({
       isMastersProgramme: degreeProgrammes[programme!]?.degreeProgrammeType === DegreeProgrammeType.MASTER,
     })
 
-    const squashGroups = (column) => {
+    const squashGroups = column => {
       if (column.columns) return column.columns.flatMap(squashGroups)
       return [column.accessorKey]
     }
@@ -51,13 +51,15 @@ export const NewTable = ({
   const data = formattingFunction()
   const [visible, excelVisible] = columnFunction()
 
-  const columnVisibility = useMemo(() =>
-    Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key)]))
-  , [visible])
+  const columnVisibility = useMemo(
+    () => Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key)])),
+    [visible]
+  )
 
-  const exportColumns = useMemo(() =>
-    Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key) || excelVisible.includes(key)]))
-  , [visible, excelVisible])
+  const exportColumns = useMemo(
+    () => Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key) || excelVisible.includes(key)])),
+    [visible, excelVisible]
+  )
 
   const tableOptions: Partial<TableOptions<FormattedStudentData>> = {
     initialState: {
@@ -65,8 +67,8 @@ export const NewTable = ({
     },
     state: { columnVisibility },
     defaultColumn: {
-      enableResizing: false
-    }
+      enableResizing: false,
+    },
   }
 
   return (

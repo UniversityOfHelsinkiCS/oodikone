@@ -12,7 +12,7 @@ import { OodiTableDataRow } from './components/Cell'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
   return (
-    <Paper variant='outlined' sx={{ p: 2, borderRadius: 0 }}>
+    <Paper variant="outlined" sx={{ p: 2, borderRadius: 0 }}>
       <TableContainer
         sx={{
           maxHeight: '75vh',
@@ -27,7 +27,8 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
         <Table
           sx={{
             borderCollapse: 'separate', // Prevents items clipping through borders when scrolling
-          }}>
+          }}
+        >
           <TableHead
             sx={{
               position: 'sticky',
@@ -37,18 +38,20 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
           >
             {table.getHeaderGroups().map(OodiTableHeaderGroup)}
           </TableHead>
-          <TableBody sx={{
-            '& tr:nth-of-type(odd) > td': {
-              backgroundColor: 'grey.100'
-            },
-            '& tr:nth-of-type(even) > td': {
-              backgroundColor: 'white'
-            },
-          }}>
+          <TableBody
+            sx={{
+              '& tr:nth-of-type(odd) > td': {
+                backgroundColor: 'grey.100',
+              },
+              '& tr:nth-of-type(even) > td': {
+                backgroundColor: 'white',
+              },
+            }}
+          >
             {table.getRowModel().rows.map(OodiTableDataRow)}
           </TableBody>
         </Table>
-      </TableContainer >
+      </TableContainer>
       <OodiTablePagination table={table} />
     </Paper>
   )

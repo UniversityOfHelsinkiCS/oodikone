@@ -18,7 +18,7 @@ export const useGetColumnDefinitions = ({
   combinedProgramme,
   isMastersProgramme,
   includePrimaryProgramme,
-}): ColumnDef<FormattedStudentData, any>[] => ([
+}): ColumnDef<FormattedStudentData, any>[] => [
   columnHelper.accessor('studentNumber', {
     header: 'Student number',
     cell: cell => {
@@ -48,7 +48,7 @@ export const useGetColumnDefinitions = ({
           <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
         </Tooltip>
       )
-    }
+    },
   }),
   columnHelper.accessor('programmeStatus', {
     header: _ => (
@@ -56,7 +56,7 @@ export const useGetColumnDefinitions = ({
         header="Status"
         tooltipText="Shows the status of the studyright associated with the corresponding programme. Status is active only if an active semester enrollment for the ongoing semester exists."
       />
-    )
+    ),
   }),
   columnHelper.accessor('email', { header: 'email' }),
   columnHelper.accessor('phoneNumber', { header: 'Phone number' }),
@@ -72,9 +72,9 @@ export const useGetColumnDefinitions = ({
           if (combinedProgramme === 'MH90_001') return 'Credits in licentiate HOPS'
           if (isMastersProgramme) return 'Credits in Bachelor HOPS'
           return 'Credits in Master HOPS'
-        }
+        },
       }),
-    ]
+    ],
   }),
   columnHelper.accessor('grade', { header: 'Grade' }),
   columnHelper.accessor('studyTrack', { header: 'Study track' }),
@@ -117,7 +117,7 @@ export const useGetColumnDefinitions = ({
           </div>
         </Tooltip>
       )
-    }
+    },
   }),
   columnHelper.accessor('attainmentDate', { header: 'Attainment date' }),
   columnHelper.accessor('enrollmentDate', { header: 'Enrollment date' }),
@@ -131,32 +131,38 @@ export const useGetColumnDefinitions = ({
           <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{transferSource}</span>
         </Tooltip>
       )
-    }
+    },
   }),
   columnHelper.accessor('admissionType', { header: 'Admission Type' }),
   columnHelper.accessor('gender', { header: 'Gender' }),
   columnHelper.accessor('citizenships', { header: 'Citizenships' }),
   columnHelper.accessor('curriculumPeriod', { header: 'Curriculum period' }),
   columnHelper.accessor('mostRecentAttainment', {
-    header: _ => <TableHeaderWithTooltip
-      header="Latest attainment date"
-      tooltipText="Date of the most recent course completion that is included in the HOPS"
-    />
+    header: _ => (
+      <TableHeaderWithTooltip
+        header="Latest attainment date"
+        tooltipText="Date of the most recent course completion that is included in the HOPS"
+      />
+    ),
   }),
   columnHelper.accessor('tvex', {
-    header: _ => <TableHeaderWithTooltip
-      header="TVEX"
-      tooltipText="Student is enrolled to a bilingual programme (kaksikielinen tutkinto, tvåspråkig examen)"
-    />,
+    header: _ => (
+      <TableHeaderWithTooltip
+        header="TVEX"
+        tooltipText="Student is enrolled to a bilingual programme (kaksikielinen tutkinto, tvåspråkig examen)"
+      />
+    ),
     cell: cell => {
       const isTVEX = !!cell.getValue()
 
-      return isTVEX && (
-        <span style={{ display: 'flex', justifyContent: 'center' }}>
-          <CheckIcon />
-        </span>
+      return (
+        isTVEX && (
+          <span style={{ display: 'flex', justifyContent: 'center' }}>
+            <CheckIcon />
+          </span>
+        )
       )
-    }
+    },
   }),
   columnHelper.accessor('tags', { header: 'Tags' }),
   columnHelper.accessor('extent', { header: 'Extent' }),
@@ -180,12 +186,14 @@ export const useGetColumnDefinitions = ({
     },
   }),
 
-  columnHelper.accessor('graduationDate', { header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date' }),
+  columnHelper.accessor('graduationDate', {
+    header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
+  }),
   columnHelper.accessor('graduationDateCombinedProg', {
     header: _ => {
       if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
       if (isMastersProgramme) return 'Bachelor graduation date'
       return 'Master graduation date'
-    }
+    },
   }),
-])
+]

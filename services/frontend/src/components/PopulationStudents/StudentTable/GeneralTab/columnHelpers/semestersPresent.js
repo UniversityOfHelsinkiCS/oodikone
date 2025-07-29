@@ -26,8 +26,8 @@ export const getSemestersPresentFunctions = ({
 
     const associatedYear = year !== 'All' && year
     const firstSemester = associatedYear
-      ? (Object.values(allSemesters).find(semester =>
-          new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
+      ? (Object.values(allSemesters).find(
+          semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
         )?.semestercode ?? lastSemester) - (semestersToAddToStart ?? 0)
       : lastSemester - 13
 

@@ -34,7 +34,7 @@ const semestersApi = RTKApi.injectEndpoints({
           ) ?? null
 
         // HACK: currentSemester should never be null
-        if (currentSemester === null) throw Error("No current semester found")
+        if (currentSemester === null) throw Error('No current semester found')
 
         return { ...semesterData, currentSemester }
       },
