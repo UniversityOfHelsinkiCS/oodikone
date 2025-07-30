@@ -89,13 +89,17 @@ class DbConnections extends EventEmitter {
           tableName: 'migrations',
         }),
         migrations: {
-          glob: `${process.cwd()}/src/db/migrations`,
+          glob: 'src/db/migrations/*.cjs',
           resolve: ({ name, path, context }) => {
-            const migration = require(path || '')
+            const getMigration = () => import(path)
             return {
-              name,
-              up: async () => migration.up(context, Sequelize),
-              down: async () => migration.down(context, Sequelize),
+              // Migration names need to end in .js for legacy reasons
+              // modifying this behaviour requires manually altering the db 'migrations' table
+              // else umzug will attempt to reapply all migrations
+              // which will not work for many of them -> would need to rewrite migration files..
+              name: name.replace(/\.cjs$/, '.js'),
+              up: async () => (await getMigration()).up(context, Sequelize),
+              down: async () => (await getMigration()).down(context, Sequelize),
             }
           },
         },
