@@ -4,29 +4,35 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useContext } from 'react'
 
+import { setViewFilterOptions, resetViewFilter, resetAllViewFilters, selectViewFilters } from '@/redux/filters'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { FilterViewContext } from './context'
 import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
+import { Filter } from './filters/createFilter'
 
 export type FilterTrayProps = {
   students: Student[]
   onOptionsChange: (options: FilterContext['options']) => void
 } & FilterContext
 
-export const FilterTray = () => {
-  const {
-    filteredStudents,
-    allStudents,
-    filters,
-    setFilterOptions,
-    resetFilter,
-    resetFilters,
-    getContextByKey,
-    areOptionsDirty,
-  } = useContext(FilterViewContext)
+export const FilterTray = ({
+  allStudents,
+  filters,
+  numberOfFilteredStudents,
+}: {
+  allStudents: Student[]
+  filters: Filter[]
+  numberOfFilteredStudents: number
+}) => {
+  const { viewName, getContextByKey } = useContext(FilterViewContext)
 
-  const filterOptionsSet = filters.some(({ key }) => areOptionsDirty(key))
+  const dispatch = useAppDispatch()
+  const storedOptions = useAppSelector(state => selectViewFilters(state, viewName))
+
+  const resetAllFilters = () => dispatch(resetAllViewFilters({ view: viewName }))
+
   const filterSet = filters
     .sort(({ title: a }, { title: b }) => a.localeCompare(b))
     .map(filter => {
@@ -34,11 +40,11 @@ export const FilterTray = () => {
       const ctx = getContextByKey(key)
 
       const active = isActive(ctx.options)
-      const onClear = () => resetFilter(key)
+      const onClear = () => dispatch(resetViewFilter({ view: viewName, filter: key }))
 
       const props: FilterTrayProps = {
         students: allStudents.slice(), // Copy instead of move
-        onOptionsChange: options => setFilterOptions(key, options),
+        onOptionsChange: options => dispatch(setViewFilterOptions({ view: viewName, filter: key, options })),
         ...ctx,
       }
 
@@ -66,19 +72,18 @@ export const FilterTray = () => {
           Filter students
         </Typography>
         <Typography component="span" fontSize="1.1em">
-          Showing {filteredStudents.length} out of {allStudents.length} students
+          Showing {numberOfFilteredStudents} out of {allStudents.length} students
         </Typography>
-        {filterOptionsSet && (
-          <Button
-            color="inherit"
-            data-cy="reset-all-filters"
-            disableElevation
-            onClick={resetFilters}
-            variant="contained"
-          >
-            Reset All Filters
-          </Button>
-        )}
+        <Button
+          color="inherit"
+          data-cy="reset-all-filters"
+          disableElevation
+          disabled={!filters.some(({ key }) => !!storedOptions[key])}
+          onClick={resetAllFilters}
+          variant="contained"
+        >
+          Reset All Filters
+        </Button>
       </Stack>
       {filterSet}
     </Paper>

@@ -8,19 +8,19 @@ const slice = createSlice({
     views: {},
   },
   reducers: {
-    setFilterOptions(state, action) {
+    setViewFilterOptions(state, action) {
       const { view, filter, options } = action.payload
 
       state.views[view] ??= {}
       state.views[view][filter] = options
     },
 
-    resetFilter(state, action) {
+    resetViewFilter(state, action) {
       const { view, filter } = action.payload
       delete state.views[view]?.[filter]
     },
 
-    resetViewFilters(state, action) {
+    resetAllViewFilters(state, action) {
       const { view } = action.payload
       state.views[view] = {}
     },
@@ -33,5 +33,5 @@ export const selectViewFilters = createSelector(
   (state, view) => state?.[view] ?? {}
 )
 
-export const { setFilterOptions, resetFilter, resetViewFilters } = slice.actions
+export const { setViewFilterOptions, resetViewFilter, resetAllViewFilters } = slice.actions
 export const { reducer } = slice

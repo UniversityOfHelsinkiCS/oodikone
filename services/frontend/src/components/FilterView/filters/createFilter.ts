@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { setFilterOptions } from '@/redux/filters'
+import { setViewFilterOptions } from '@/redux/filters'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { mapValues } from '@oodikone/shared/util'
 
@@ -134,7 +134,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
       payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
         const ctx = getContext(options.key)
 
-        return setFilterOptions({
+        return setViewFilterOptions({
           view,
           filter: options.key,
           options: action(structuredClone(ctx.options), payload),
@@ -185,23 +185,24 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * The filter is evaluated over the student list only when this function returns true.
    * Activity of the filter is also reflected in the user interface.
    */
-  const factory: FilterFactory = (args?: any): Filter => ({
-    args,
+  return Object.assign(
+    (args?: any): Filter => ({
+      args,
 
-    key: options.key,
-    title: options.title,
-    info: options.info,
+      key: options.key,
+      title: options.title,
+      info: options.info,
 
-    defaultOptions: options.defaultOptions,
-    filter: options.filter,
-    precompute: options.precompute,
-    render: options.render,
-    isActive: options.isActive,
-  })
-
-  factory.key = options.key
-  factory.actions = actions
-  factory.selectors = selectors
-
-  return factory
+      defaultOptions: options.defaultOptions,
+      filter: options.filter,
+      precompute: options.precompute,
+      render: options.render,
+      isActive: options.isActive,
+    }),
+    {
+      key: options.key,
+      actions,
+      selectors,
+    }
+  )
 }

@@ -1,8 +1,8 @@
 import Stack from '@mui/material/Stack'
 import { FC, useMemo } from 'react'
 
-import { selectViewFilters, setFilterOptions, resetFilter, resetViewFilters } from '@/redux/filters'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { selectViewFilters } from '@/redux/filters'
+import { useAppSelector } from '@/redux/hooks'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
@@ -14,7 +14,7 @@ import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[], filteredCourses: any[]) => any
+  children: (filteredStudents: Student[], filteredCourses: any[]) => React.ReactNode
   name: string
   filters: Filter[]
   students: Student[]
@@ -22,26 +22,22 @@ export const FilterView: FC<{
   displayTray: boolean
   initialOptions: Record<Filter['key'], any>
 }> = ({ children, name, filters, students, courses, displayTray, initialOptions }) => {
-  const dispatch = useAppDispatch()
-  const storeFilterOptions = useAppSelector(state => selectViewFilters(state, name))
+  const storedOptions = useAppSelector(state => selectViewFilters(state, name))
 
   const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
   const filterOptions = useMemo(
     () =>
       Object.fromEntries(
-        filters.map(({ key, defaultOptions }) => [
-          key,
-          storeFilterOptions[key] ?? initialOptions?.[key] ?? defaultOptions,
-        ])
+        filters.map(({ key, defaultOptions }) => [key, storedOptions[key] ?? initialOptions?.[key] ?? defaultOptions])
       ),
-    [filters, initialOptions, storeFilterOptions]
+    [filters, initialOptions, storedOptions]
   )
 
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
         filters
-          .filter(({ precompute }) => !!precompute)
+          .filter(({ precompute }) => precompute !== undefined)
           .map(({ precompute, key }) => [
             key,
             precompute!({
@@ -56,7 +52,7 @@ export const FilterView: FC<{
 
   const getFilterContext = (key: string): FilterContext => ({
     precomputed: precomputed[key] ?? null,
-    options: filterOptions[key] ?? {},
+    options: filterOptions[key],
     args: filterArgs[key] ?? null,
   })
 
@@ -71,22 +67,14 @@ export const FilterView: FC<{
   )
   const filteredCourses = filterCourses(courses, filteredStudents)
 
-  const ctxState: FilterViewContextState = {
-    viewName: name,
-    allStudents: students,
-    filters,
-    filteredStudents,
-    getContextByKey: getFilterContext,
-    areOptionsDirty: key => !!storeFilterOptions[key],
-    setFilterOptions: (filter, options) => dispatch(setFilterOptions({ view: name, filter, options })),
-    resetFilter: filter => dispatch(resetFilter({ view: name, filter })),
-    resetFilters: () => dispatch(resetViewFilters({ view: name })),
-  }
+  const ctxState: FilterViewContextState = { viewName: name, getContextByKey: getFilterContext }
 
   return (
     <FilterViewContext.Provider value={ctxState}>
       <Stack direction="row" sx={{ alignContent: 'center' }}>
-        {displayTray && <FilterTray />}
+        {displayTray && (
+          <FilterTray allStudents={students} filters={filters} numberOfFilteredStudents={filteredStudents.length} />
+        )}
         {children(filteredStudents, filteredCourses)}
       </Stack>
     </FilterViewContext.Provider>

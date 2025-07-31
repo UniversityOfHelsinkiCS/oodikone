@@ -10,37 +10,41 @@ import { FC, useState } from 'react'
 
 import { InfoBox } from '@/components/material/InfoBox'
 
-import { FilterViewContextState } from '../../context'
 import type { Filter } from '../createFilter'
 
 export const FilterCard: FC<{
   active: boolean
   filter: Filter
-  children: ReturnType<Filter['render']>
-  onClear: () => ReturnType<FilterViewContextState['resetFilter']>
+  children: React.ReactNode
+  onClear: () => void
 }> = ({ active, filter, children, onClear }) => {
   const [opened, setOpened] = useState<boolean>(active)
   const { info, key, title } = filter
+
+  const handleOnClick = () => setOpened(state => !state)
 
   return (
     <Stack data-active={active} data-cy={`${key}-filter-card`} spacing={1.2} sx={{ width: '100%' }}>
       <Box
         data-cy={`${key}-header`}
-        onClick={() => setOpened(state => !state)}
         sx={{ alignItems: 'center', justifyContent: 'center', cursor: 'pointer', display: 'inline-flex' }}
       >
-        <IconButton size="small">{opened ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}</IconButton>
-        <Typography component="span" fontWeight={500} sx={{ mr: 1, flex: 1, whiteSpace: 'wrap' }} variant="subtitle1">
+        <IconButton onClick={handleOnClick} size="small">
+          {opened ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+        </IconButton>
+        <Typography
+          component="span"
+          fontWeight={500}
+          onClick={handleOnClick}
+          sx={{ mr: 1, flex: 1, whiteSpace: 'wrap' }}
+          variant="subtitle1"
+        >
           {title}
         </Typography>
         {active && (
           <ClearIcon
             data-cy={`${key}-clear`}
-            onClick={event => {
-              event.stopPropagation()
-              onClear()
-              setOpened(false)
-            }}
+            onClick={() => onClear()}
             sx={{
               color: theme => theme.palette.error.dark,
               mr: info ? 0.5 : 0,
