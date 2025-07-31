@@ -1,7 +1,9 @@
 import { isEqual } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export const useDebounce = <T>(value: T, timeout: number, onChange: (arg: T) => void) => {
+const TIMEOUT = 1000
+
+export const useDebounce = <T>(value: T, onChange: (arg: T) => void) => {
   const [innerValue, setInnerValue] = useState(value)
   const [dirty, setDirty] = useState(false)
 
@@ -32,9 +34,9 @@ export const useDebounce = <T>(value: T, timeout: number, onChange: (arg: T) => 
       timeoutRef.current = setTimeout(() => {
         onChange(value)
         setDirty(false)
-      }, timeout)
+      }, TIMEOUT)
     },
-    [innerValue, setInnerValue, timeoutRef, onChange, timeout]
+    [innerValue, setInnerValue, timeoutRef, onChange]
   )
 
   const flush = useCallback(() => {

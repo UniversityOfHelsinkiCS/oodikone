@@ -22,7 +22,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds
     [options.min, options.max, intMin, intMax]
   )
 
-  const [range, setRange] = useDebounce(value, 1000, onChange)
+  const [range, setRange] = useDebounce(value, onChange)
 
   return (
     <FilterRange

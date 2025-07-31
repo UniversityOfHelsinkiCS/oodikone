@@ -27,7 +27,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
       payload: { range },
     })
 
-  const [range, setRange, , dirty] = useDebounce(value, 100, onChange)
+  const [range, setRange, _, dirty] = useDebounce(value, onChange)
 
   const handleChange = ([newMin, newMax]) => {
     if (newMin === minValue && newMax === maxValue) {

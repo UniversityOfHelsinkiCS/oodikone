@@ -21,7 +21,7 @@ const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: Filter
     [options.min, options.max, min, max]
   )
 
-  const [range, setRange] = useDebounce(value, 1000, onChange)
+  const [range, setRange] = useDebounce(value, onChange)
 
   return (
     <FilterRange
