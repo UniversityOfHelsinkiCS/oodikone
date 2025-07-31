@@ -48,13 +48,7 @@ const Layout = ({ children }) => (
   <LanguageProvider>
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <ThemeProvider theme={theme}>
-        <StatusNotificationProvider>
-          <CssBaseline />
-          <NavigationBar />
-          <main style={{ flex: 1 }}>{children}</main>
-          <StatusNotification />
-          <Footer />
-        </StatusNotificationProvider>
+        <StatusNotificationProvider>{children}</StatusNotificationProvider>
       </ThemeProvider>
     </LocalizationProvider>
   </LanguageProvider>
@@ -71,7 +65,16 @@ export const App = () => {
     if (isProduction && !isLoading && id && username) Sentry.setUser({ id, username, mockedBy })
   }, [id, username, mockedBy])
 
+  if (isLoading) return <SegmentDimmer isLoading />
   if (error) return <AccessDenied />
 
-  return <Layout>{isLoading ? <SegmentDimmer isLoading={isLoading} /> : <Routes />}</Layout>
+  return (
+    <Layout>
+      <CssBaseline />
+      <NavigationBar />
+      <Routes />
+      <StatusNotification />
+      <Footer />
+    </Layout>
+  )
 }
