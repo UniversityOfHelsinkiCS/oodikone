@@ -155,9 +155,9 @@ export const getProgrammeDetails =
     const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester)
 
     const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
-    const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme.code)
+    const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
 
-    const relevantProgrammeCode = programme ?? primaryProgramme.code
+    const relevantProgrammeCode = programme ?? primaryProgramme?.code
 
     const yearMatching = startDate =>
       !year || dayjs(startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]')
