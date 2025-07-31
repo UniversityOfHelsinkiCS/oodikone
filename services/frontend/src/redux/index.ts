@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
 
 import { handleRequest, RTKApi } from '@/apiConnection'
+import { isDev } from '@/conf'
 import { reducer as actionHistory } from './actionHistory'
 import { reducer as courseSearch } from './courseSearch'
 import { reducer as courseSummaryForm } from './coursesSummaryForm'
@@ -21,6 +22,8 @@ export const store = configureStore({
     settings,
     [RTKApi.reducerPath]: RTKApi.reducer,
   },
+  devTools: isDev,
+  duplicateMiddlewareCheck: isDev,
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
   middleware: getDefaultMiddleware =>
