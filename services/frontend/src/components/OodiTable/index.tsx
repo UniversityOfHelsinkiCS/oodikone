@@ -39,10 +39,6 @@ export const OodiTable = <TData,>({
   const table = useReactTable<TData>({
     data,
     columns,
-    // TODO: remove debug when done
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
