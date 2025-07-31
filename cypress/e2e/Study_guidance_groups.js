@@ -66,12 +66,12 @@ describe('Study guidance group tests', () => {
         cy.cs('Credit accumulation (for 2 students)')
         cy.cs('Age distribution')
         cy.cs('Courses of population')
-        cy.cs('Students (2)')
+        cy.contains('Students (2)')
         cy.cs('Credit statistics').should('not.exist')
       })
 
       it('students table has the correct tabs', () => {
-        cy.cs('Students (2)').click()
+        cy.contains('Students (2)').click()
         cy.get('[data-cy="student-table-tabs"] .ui.attached.tabular.menu').then($menu => {
           const tabNames = Array.from($menu[0].children).map(elem => elem.innerText)
           expect(tabNames).to.deep.equal(['General'])
@@ -87,7 +87,7 @@ describe('Study guidance group tests', () => {
           'Study programmes',
           'Tags',
         ]
-        cy.cs('Students (2)').click()
+        cy.contains('Students (2)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').within(() => {
           colHeaders.every(heading => cy.contains(heading))
         })
@@ -110,7 +110,7 @@ describe('Study guidance group tests', () => {
         cy.cs('Credit statistics')
         cy.cs('Age distribution')
         cy.cs('Courses of population')
-        cy.cs('Students (3)')
+        cy.contains('Students (3)')
       })
 
       it("clicking the 'Show starting from associated year' button activates the 'Date of Course Credits' filter", () => {
@@ -127,7 +127,7 @@ describe('Study guidance group tests', () => {
       })
 
       it('students table has the correct tabs', () => {
-        cy.cs('Students (3)').click()
+        cy.contains('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] .ui.attached.tabular.menu').then($menu => {
           const tabNames = Array.from($menu[0].children).map(elem => elem.innerText)
           expect(tabNames).to.deep.equal(['General', 'Courses', 'Modules', 'Progress'])
@@ -154,7 +154,7 @@ describe('Study guidance group tests', () => {
           'Latest attainment date',
           'Tags',
         ]
-        cy.cs('Students (3)').click()
+        cy.contains('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] table thead tr').within(() => {
           colHeaders.every(heading => cy.contains(heading))
         })
