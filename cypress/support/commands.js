@@ -104,27 +104,21 @@ Cypress.Commands.add('cs', { prevSubject: 'optional' }, (subject, name) => {
 })
 
 /**
- * Select item specified by `index` number from a semantic-ui dropdown with
- * `data-cy` attribute value `name`.
+ * Select item from FilterSelect dropdown.
+ * If the index is a number, select index-th item.
+ * Otherwise select the item containing index text.
  */
-Cypress.Commands.add('selectFromDropdown', { prevSubject: true }, (s, index) => {
-  const subject = cy.wrap(s)
-  const indexes = Array.isArray(index) ? index : [index]
+Cypress.Commands.add('selectFromDropdown', { prevSubject: false }, (label, index) => {
+  cy.cs(`${label}-selector`)
+    .click()
+    .then(() => {
+      cy.get(`[role="listbox"][aria-labelledby="${label}"]`).within(() => {
+        if (typeof index === 'number') cy.get('.MuiMenuItem-root').eq(index).click()
+        else cy.get('.MuiMenuItem-root').contains(index).click()
+      })
+    })
 
-  indexes.forEach(i => {
-    subject.click()
-
-    if (typeof i === 'number') {
-      subject.children('.menu').children().eq(i).click({ force: true })
-    } else {
-      subject.children('.menu').containing(i).eq(0).click({ force: true })
-    }
-  })
-
-  // Close multiple selection so it does not block elements underneath it.
-  if (Array.isArray(index)) {
-    cy.wrap(s).children('.icon').click({ force: true })
-  }
+  cy.get('body').click()
 })
 
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {

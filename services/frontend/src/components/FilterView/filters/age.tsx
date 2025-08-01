@@ -35,7 +35,7 @@ const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: Filter
 }
 
 export const ageFilter = createFilter({
-  key: 'Age',
+  key: 'ageFilter',
 
   title: 'Age',
 

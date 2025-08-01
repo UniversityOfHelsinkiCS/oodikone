@@ -56,7 +56,7 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
 }
 
 export const gradeFilter = createFilter({
-  key: 'Grade',
+  key: 'gradeFilter',
 
   title: 'Grade',
 

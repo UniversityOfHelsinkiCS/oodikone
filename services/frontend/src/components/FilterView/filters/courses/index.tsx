@@ -24,16 +24,13 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
       value: cs.course.code,
     }))
 
-  const setCourseFilter = (code, type) =>
-    onOptionsChange(
-      (() => {
-        const newOpts = structuredClone(options)
-        newOpts.courseFilters[code] = type
-        if (type === null) delete newOpts.courseFilters[code]
+  const setCourseFilter = (code, type) => {
+    const newOpts = structuredClone(options)
+    newOpts.courseFilters[code] = type
+    if (type === null) delete newOpts.courseFilters[code]
 
-        return newOpts
-      })()
-    )
+    onOptionsChange(newOpts)
+  }
 
   return (
     <>
@@ -48,7 +45,7 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
         <CourseCard
           course={courseStats[code]}
           filterType={type}
-          key={`course-filter-selected-course-${code}`}
+          key={`courseFilter-selected-course-${code}`}
           onChange={type => setCourseFilter(code, type)}
         />
       ))}
@@ -57,7 +54,7 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
 }
 
 export const courseFilter = createFilter({
-  key: 'Courses',
+  key: 'courseFilter',
 
   title: 'Courses',
 

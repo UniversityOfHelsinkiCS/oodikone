@@ -49,7 +49,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
   return (
     <FilterRadio
       defaultOption={{ key: undefined, text: 'All', value: DEFAULT_STATE }}
-      filterKey="GraduatedFromProgrammeFilter"
+      filterKey={graduatedFromProgrammeFilter.key}
       onChange={({ target }) => onOptionsChange({ mode: target.value })}
       options={modeOptions}
     />
@@ -57,7 +57,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
 }
 
 export const graduatedFromProgrammeFilter = createFilter({
-  key: 'GraduatedFromProgramme',
+  key: 'graduatedFromProgrammeFilter',
 
   title: 'Graduated from programme',
 
@@ -65,7 +65,7 @@ export const graduatedFromProgrammeFilter = createFilter({
     mode: DEFAULT_STATE,
   },
 
-  isActive: ({ mode }) => mode !== '0',
+  isActive: ({ mode }) => mode !== DEFAULT_STATE,
 
   filter(student, { args, options }) {
     const { mode } = options

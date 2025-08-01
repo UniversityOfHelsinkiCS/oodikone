@@ -158,7 +158,7 @@ const MODE_PREDICATES = {
 }
 
 export const programmeFilter = createFilter({
-  key: 'Programme',
+  key: 'programmeFilter',
 
   title: 'Programme',
 

@@ -32,7 +32,7 @@ const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProp
 }
 
 export const genderFilter = createFilter({
-  key: 'Gender',
+  key: 'genderFilter',
 
   title: 'Gender',
 
@@ -40,7 +40,7 @@ export const genderFilter = createFilter({
     selected: '',
   },
 
-  isActive: ({ selected }) => !!selected,
+  isActive: ({ selected }) => selected !== '',
 
   filter(student, { options }) {
     const { selected } = options

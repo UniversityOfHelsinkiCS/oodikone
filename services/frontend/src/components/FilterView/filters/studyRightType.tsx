@@ -20,7 +20,7 @@ const StudyRightTypeFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
   return (
     <FilterRadio
       defaultOption={{ key: undefined, text: 'All', value: DEFAULT_STATE }}
-      filterKey="studyRightTypeFilter"
+      filterKey={studyRightTypeFilter.key}
       onChange={({ target }) => onOptionsChange({ mode: target.value })}
       options={modeOptions}
     />

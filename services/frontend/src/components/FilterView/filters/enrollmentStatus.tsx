@@ -35,14 +35,14 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
   return (
     <Stack gap={1}>
       <FilterSelect
-        filterKey="enrollmentStatusFilter-status"
+        filterKey={`${enrollmentStatusFilter.key}-status`}
         label="Choose enrollment status"
         onChange={({ target }) => onOptionsChange({ ...options, status: target.value })}
         options={STATUS_OPTIONS}
         value={status}
       />
       <FilterSelect
-        filterKey="enrollmentStatusFilter-semester"
+        filterKey={`${enrollmentStatusFilter.key}-semester`}
         label="Choose semesters"
         multiple
         onChange={({ target }) => onOptionsChange({ ...options, semesters: target.value })}
@@ -54,7 +54,7 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
 }
 
 export const enrollmentStatusFilter = createFilter({
-  key: 'EnrollmentStatus',
+  key: 'enrollmentStatusFilter',
 
   title: 'Enrollment status',
 

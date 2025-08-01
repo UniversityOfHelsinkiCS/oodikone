@@ -32,22 +32,22 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: Filter
 }
 
 export const startYearAtUniFilter = createFilter({
-  key: 'StartYearAtUni',
+  key: 'startYearAtUniFilter',
 
   title: 'Starting year',
 
   defaultOptions: {
-    selected: [],
+    selected: '',
   },
 
   info: filterToolTips.startingYear,
 
-  isActive: ({ selected }) => selected.length > 0,
+  isActive: ({ selected }) => !!selected,
 
   filter: (student, { options }) => {
     const { selected } = options
 
-    return selected.includes(new Date(student.started).getFullYear())
+    return selected === new Date(student.started).getFullYear()
   },
 
   render: StartYearAtUniFilterCard,

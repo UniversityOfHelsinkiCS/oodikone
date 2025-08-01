@@ -36,7 +36,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds
 }
 
 export const creditsEarnedFilter = createFilter({
-  key: 'CreditsEarned',
+  key: 'creditsEarnedFilter',
 
   title: 'Credits earned',
 
@@ -56,8 +56,9 @@ export const creditsEarnedFilter = createFilter({
     }
   },
 
-  filter({ credits }, { options }) {
+  filter(student, { options }) {
     const { min, max } = options
+    const credits = getStudentTotalCredits(student)
 
     return !(min !== null && credits < min) && !(max !== null && credits > max)
   },

@@ -69,7 +69,7 @@ export const CourseCard = ({
         />
       </Stack>
       <FilterSelect
-        filterKey="courseFilter"
+        filterKey={`courseFilter-${course.course?.code}`}
         label="Select course"
         onChange={({ target }) => onChange(target.value)}
         options={dropdownOptions}

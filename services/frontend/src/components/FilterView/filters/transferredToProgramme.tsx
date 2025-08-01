@@ -12,7 +12,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTr
     })
 
   const modeObject = {
-    All: () => toggle(null),
+    All: () => toggle(''),
     Transferred: () => toggle(true),
     'Not transferred': () => toggle(false),
   }
@@ -28,7 +28,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTr
   return (
     <FilterRadio
       defaultOption={defaultOption}
-      filterKey="transferredToProgrammeFilter"
+      filterKey={transferredToProgrammeFilter.key}
       onChange={({ target }) => modeObject[target.value]()}
       options={modeOptions}
     />
@@ -36,17 +36,17 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTr
 }
 
 export const transferredToProgrammeFilter = createFilter({
-  key: 'TransferredToProgramme',
+  key: 'transferredToProgrammeFilter',
 
   title: 'Transferred to programme',
 
   info: filterToolTips.transferred,
 
   defaultOptions: {
-    transferred: null,
+    transferred: '',
   },
 
-  isActive: ({ transferred }) => transferred !== null,
+  isActive: ({ transferred }) => transferred !== '',
 
   filter: (student, { options }) => {
     const { transferred } = options
@@ -65,7 +65,7 @@ export const transferredToProgrammeFilter = createFilter({
       if (options.transferred !== false) {
         options.transferred = false
       } else {
-        options.transferred = null
+        options.transferred = ''
       }
 
       return options

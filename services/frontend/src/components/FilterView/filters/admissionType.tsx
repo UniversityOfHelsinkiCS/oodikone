@@ -52,7 +52,7 @@ const AdmissionTypeFilterCard = ({ args, options, onOptionsChange, students }: F
 }
 
 export const admissionTypeFilter = createFilter({
-  key: 'AdmissionType',
+  key: 'admissionTypeFilter',
 
   title: 'Admission type',
 
