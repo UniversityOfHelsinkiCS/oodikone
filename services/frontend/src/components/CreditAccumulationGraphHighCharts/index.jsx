@@ -550,7 +550,7 @@ export const CreditAccumulationGraphHighCharts = ({
 
         <div>
           {makeGraphSizeButton(400, 'Small')}
-          {makeGraphSizeButton(600, 'Medium')}
+          {makeGraphSizeButton(700, 'Medium')}
           {makeGraphSizeButton(1000, 'Large')}
         </div>
       </div>
