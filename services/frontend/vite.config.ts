@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { defineConfig } from 'vite'
 
-import { inStaging } from './src/conf'
+const inStaging = process.env.REACT_APP_STAGING === 'true'
 
 // https://vitejs.dev/config/
 // eslint-disable-next-line import-x/no-unused-modules, import-x/no-default-export

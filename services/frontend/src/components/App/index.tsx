@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/L
 import * as Sentry from '@sentry/browser'
 import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
-import HighCharts from 'highcharts'
+import HighCharts from 'highcharts' // eslint-disable-line import-x/default
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
