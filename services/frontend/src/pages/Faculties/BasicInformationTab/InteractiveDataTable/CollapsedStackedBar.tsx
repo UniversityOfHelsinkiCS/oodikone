@@ -1,4 +1,5 @@
-/* eslint-disable react/no-this-in-sfc */
+/* eslint-disable react/no-this-in-sfc  */
+/* eslint-disable-next-line import-x/default */
 import HighCharts from 'highcharts'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'

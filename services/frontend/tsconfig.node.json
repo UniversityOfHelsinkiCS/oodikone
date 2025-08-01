@@ -8,5 +8,5 @@
     "strict": false,
     "strictNullChecks": true
   },
-  "include": ["vite.config.ts", "src/conf.ts"]
+  "include": ["vite.config.ts"]
 }
