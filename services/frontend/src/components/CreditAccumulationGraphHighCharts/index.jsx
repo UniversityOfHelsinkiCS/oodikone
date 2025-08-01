@@ -474,7 +474,7 @@ export const CreditAccumulationGraphHighCharts = ({
       ? absences.filter(({ startDate, endDate }) => startDate >= starting && endDate <= ending)
       : absences
 
-    seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
+    seriesData.push(createGoalSeries(starting.getTime(), ending.getTime(), filteredAbsences))
   }
   const getStudyRightStart = () => {
     const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date(null))
