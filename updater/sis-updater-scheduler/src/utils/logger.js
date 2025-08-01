@@ -16,13 +16,13 @@ if (isProduction && !isStaging && !runningInCI && SENTRY_DSN) {
 
 const devFormat = printf(
   ({ timestamp, level, message, error, ...rest }) =>
-    `${timestamp} ${level}: ${message}${error ? ` ${error?.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
+    `${timestamp} ${level}: ${message}${error ? ` ${error.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
 )
 
 const prodFormat = printf(({ timestamp, level, message, error, ...rest }) => {
   const log = { timestamp, level, message, ...rest }
   if (error) {
-    log.error = error?.stack
+    log.error = error.stack
   }
   return JSON.stringify(log)
 })

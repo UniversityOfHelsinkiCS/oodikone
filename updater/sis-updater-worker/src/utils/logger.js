@@ -1,5 +1,5 @@
 import os from 'os'
-import winston from 'winston'
+import { format as winstonFormat, transports as winstonTransports, createLogger } from 'winston'
 import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
 import WinstonSentry from 'winston-transport-sentry-node'
@@ -8,7 +8,7 @@ import { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DS
 
 const Sentry = WinstonSentry.default
 
-const { colorize, combine, timestamp, printf, uncolorize } = winston.format
+const { colorize, combine, timestamp, printf, uncolorize } = winstonFormat
 
 const transports = []
 
@@ -30,7 +30,7 @@ const prodFormat = printf(({ timestamp, level, message, error, ...rest }) => {
 })
 
 transports.push(
-  new winston.transports.Console({
+  new winstonTransports.Console({
     level: isDev ? 'debug' : 'info',
     format: combine(
       isDev ? colorize() : uncolorize(),
@@ -65,7 +65,7 @@ if (isProduction && !isStaging && serviceProvider !== 'fd') {
   )
 }
 
-const logger = winston.createLogger({ transports })
+const logger = createLogger({ transports })
 
 logger.on('error', error => console.error('Logging failed. Reason: ', error)) // eslint-disable-line no-console
 
