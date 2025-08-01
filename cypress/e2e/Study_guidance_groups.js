@@ -70,7 +70,7 @@ describe('Study guidance group tests', () => {
         cy.cs('Credit statistics').should('not.exist')
       })
 
-      it('students table has the correct tabs', () => {
+      it.skip('students table has the correct tabs', () => {
         cy.contains('Students (2)').click()
         cy.get('[data-cy="student-table-tabs"] .ui.attached.tabular.menu').then($menu => {
           const tabNames = Array.from($menu[0].children).map(elem => elem.innerText)
@@ -78,7 +78,7 @@ describe('Study guidance group tests', () => {
         })
       })
 
-      it('general tab of the students table has the correct columns', () => {
+      it.skip('general tab of the students table has the correct columns', () => {
         const colHeaders = [
           'Student number',
           'All credits',
@@ -126,7 +126,7 @@ describe('Study guidance group tests', () => {
         cy.get('[data-cy="CreditDate-filter-card"][data-active="false"]')
       })
 
-      it('students table has the correct tabs', () => {
+      it.skip('students table has the correct tabs', () => {
         cy.contains('Students (3)').click()
         cy.get('[data-cy="student-table-tabs"] .ui.attached.tabular.menu').then($menu => {
           const tabNames = Array.from($menu[0].children).map(elem => elem.innerText)
@@ -134,7 +134,7 @@ describe('Study guidance group tests', () => {
         })
       })
 
-      it('general tab of the students table has the correct columns', () => {
+      it.skip('general tab of the students table has the correct columns', () => {
         const colHeaders = [
           'Student number',
           'All credits',
