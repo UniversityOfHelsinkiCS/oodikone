@@ -292,9 +292,10 @@ describe('Population statistics tests', () => {
       it('Courses data is changed when filtered students change', () => {
         cy.visit(pathToMathBSc2020)
 
-        cy.cs('GraduatedFromProgramme-filter-card').within(() => {
-          cy.cs('GraduatedFromProgramme-header').click()
-          cy.cs('GraduatedFromProgrammeFilter-radio-graduated-true').click()
+        cy.cs('graduatedFromProgrammeFilter-filter-card').within(() => {
+          cy.cs('graduatedFromProgrammeFilter-header').click()
+          cy.get('input[name="graduatedFromProgrammeFilter"][value="1"]').click()
+          cy.get('input[name="graduatedFromProgrammeFilter"][value="1"]').should('be.checked')
         })
 
         cy.contains('Students (16)')
