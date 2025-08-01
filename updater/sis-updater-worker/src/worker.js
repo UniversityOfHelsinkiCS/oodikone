@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-redeclare
 import { Worker } from 'bullmq'
 
 import { REDIS_HOST, REDIS_PORT } from './config.js'

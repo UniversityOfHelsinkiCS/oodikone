@@ -2,7 +2,7 @@
 import Box from '@mui/material/Box'
 import useTheme from '@mui/material/styles/useTheme'
 
-import HighCharts from 'highcharts'
+import HighCharts from 'highcharts' // eslint-disable-line import-x/default
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
