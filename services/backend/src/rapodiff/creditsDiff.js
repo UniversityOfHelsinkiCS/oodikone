@@ -2,7 +2,7 @@ const { orderBy } = require('lodash')
 
 // dbConnections must be imported to avoid Sequelize errors even if it's not used
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line no-unused-vars
 const { dbConnections } = require('../database/connection')
 const { computeCreditsProduced } = require('../services/providerCredits')
 const { parseCsv, printProgressBar } = require('./helpers')
