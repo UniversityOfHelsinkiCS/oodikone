@@ -1,5 +1,6 @@
 {
   "name": "oodikone",
+  "type": "module",
   "description": "An application for analyzing university data.",
   "scripts": {
     "cypress": "cypress",
