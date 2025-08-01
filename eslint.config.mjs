@@ -55,8 +55,12 @@ export default tseslint.config(
       'import-x/no-commonjs': 'error',
       'import-x/no-default-export': 'error',
       'import-x/no-extraneous-dependencies': ['error', { devDependencies: false }],
-      'import-x/no-unused-modules': ['error', { missingExports: true, unusedExports: true, src: ['{services,updater}/**/*.{js,jsx,ts,tsx}'] }],
-      // 'import-x/no-unused-modules': 'off',
+      'import-x/no-unused-modules': ['error',
+        {
+          missingExports: true,
+          unusedExports: true,
+          src: ['{services,updater}/**/*.{js,jsx,ts,tsx}']
+        }],
       'import-x/order': ['error', {
         alphabetize: { order: 'asc', caseInsensitive: true },
         groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
@@ -178,6 +182,14 @@ export default tseslint.config(
       'react/no-unknown-property': 'off', // TODO: Delete this override
       'react/prefer-stateless-function': 'error',
       'react/prop-types': 'off',
+    }
+  },
+
+  // TODO: Remove when ts migration is complete
+  {
+    files: ['services/frontend/src/**/*.{js,jsx}'],
+    rules: {
+      'import-x/no-unused-modules': 'off',
     }
   },
 
