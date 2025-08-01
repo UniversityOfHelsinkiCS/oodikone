@@ -92,12 +92,7 @@ export default tseslint.config(
       'import-x/internal-regex': '^@oodikone/shared/',
       'import-x/resolver-next': [
         createTypeScriptImportResolver({
-          project: [
-            'services/frontend/tsconfig.json',
-            'services/frontend/tsconfig.node.json',
-            'services/backend/tsconfig.json',
-            'services/shared/tsconfig.json',
-          ],
+          project: ['tsconfig.json'],
         }),
         createNodeResolver({
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
