@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable import/no-commonjs */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unused-modules */
-const { defineConfig } = require('cypress')
+/* eslint-disable import-x/no-extraneous-dependencies  */
+/* eslint-disable import-x/no-default-export */
 
-module.exports = defineConfig({
+import { defineConfig } from 'cypress'
+
+export default defineConfig({
   experimentalStudio: process.env.NODE_ENV === 'development',
   projectId: 'c3jsph',
   defaultCommandTimeout: 30000,
