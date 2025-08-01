@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import-x/no-extraneous-dependencies */
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { defineConfig } from 'vite'
@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 import { inStaging } from './src/conf'
 
 // https://vitejs.dev/config/
-// eslint-disable-next-line import/no-unused-modules, import/no-default-export
+// eslint-disable-next-line import-x/no-unused-modules, import-x/no-default-export
 export default defineConfig({
   plugins: [react()],
   base: inStaging ? '/oodikone' : '/',

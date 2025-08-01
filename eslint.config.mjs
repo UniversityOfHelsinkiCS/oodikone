@@ -5,10 +5,12 @@ import tseslint from 'typescript-eslint'
 
 import globals from 'globals'
 import pluginCypress from 'eslint-plugin-cypress'
-import pluginImport from 'eslint-plugin-import'
 import pluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginImportX from 'eslint-plugin-import-x'
+import { createNodeResolver } from 'eslint-plugin-import-x'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 
 export default tseslint.config(
   {
@@ -23,13 +25,12 @@ export default tseslint.config(
   },
 
   // Global options (excl. e2e)
-  // TODO: provide tsconfig files "tsconfigRootDir"
   {
     files: ['**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}'],
     ignores: ['cypress/**'],
     extends: [
       eslint.configs.recommended,
-      pluginImport.flatConfigs.recommended,
+      pluginImportX.flatConfigs.recommended,
     ],
     languageOptions: {
       ecmaVersion: 2021,
@@ -40,7 +41,8 @@ export default tseslint.config(
       },
     },
     plugins: {
-      pluginReact
+      'eslint-react': pluginReact,
+      'import-x': pluginImportX
     },
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
@@ -50,17 +52,18 @@ export default tseslint.config(
       'class-methods-use-this': 'error',
       'consistent-return': 'error',
       'id-denylist': ['error', 'c', 'd', 'e', 'err', 't'],
-      'import/no-commonjs': 'error',
-      'import/no-default-export': 'error',
-      'import/no-extraneous-dependencies': ['error', { devDependencies: false }],
-      'import/no-unused-modules': ['error', { missingExports: true, unusedExports: true }],
-      'no-unused-vars': ['error',
-        { argsIgnorePattern: '^_', caughtErrors: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^_' },
-      ],
-      'import/order': ['error', {
+      'import-x/no-commonjs': 'error',
+      'import-x/no-default-export': 'error',
+      'import-x/no-extraneous-dependencies': ['error', { devDependencies: false }],
+      'import-x/no-unused-modules': ['error', { missingExports: true, unusedExports: true, src: ['{services,updater}/**/*.{js,jsx,ts,tsx}'] }],
+      // 'import-x/no-unused-modules': 'off',
+      'import-x/order': ['error', {
         alphabetize: { order: 'asc', caseInsensitive: true },
         groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
       },
+      ],
+      'no-unused-vars': ['error',
+        { argsIgnorePattern: '^_', caughtErrors: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^_' },
       ],
       'no-alert': 'error',
       'no-async-promise-executor': 'error',
@@ -82,17 +85,20 @@ export default tseslint.config(
       ],
     },
     settings: {
-      'import/internal-regex': '^@oodikone/shared/',
-      'import/resolver': {
-        typescript: {
+      'import-x/internal-regex': '^@oodikone/shared/',
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
           project: [
             'services/frontend/tsconfig.json',
             'services/frontend/tsconfig.node.json',
             'services/backend/tsconfig.json',
             'services/shared/tsconfig.json',
           ],
-        },
-      },
+        }),
+        createNodeResolver({
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        })
+      ],
     },
   },
 
@@ -105,7 +111,7 @@ export default tseslint.config(
     extends: [
       tseslint.configs.recommendedTypeCheckedOnly,
       tseslint.configs.stylisticTypeChecked,
-      pluginImport.flatConfigs.typescript
+      pluginImportX.flatConfigs.typescript,
     ],
     languageOptions: {
       parser: tseslint.parser,
@@ -132,19 +138,6 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
-    },
-    settings: {
-      'import/internal-regex': '^@oodikone/shared/',
-      'import/resolver': {
-        typescript: {
-          project: [
-            'services/frontend/tsconfig.json',
-            'services/frontend/tsconfig.node.json',
-            'services/backend/tsconfig.json',
-            'services/shared/tsconfig.json',
-          ],
-        },
-      },
     },
   },
 
@@ -209,7 +202,7 @@ export default tseslint.config(
       sourceType: 'commonjs',
     },
     rules: {
-      'import/no-commonjs': 'off',
+      'import-x/no-commonjs': 'off',
     },
   },
 
@@ -223,9 +216,13 @@ export default tseslint.config(
 
   // TODO: figure out why this exists
   {
-    files: ['services/**/shared/**/*', 'updater/**/migrations/*.cjs'],
+    files: [
+      'services/**/shared/**/*',
+      'services/frontend/**/.*js',
+      'updater/**/migrations/*.cjs',
+    ],
     rules: {
-      'import/no-unused-modules': 'off',
+      'import-x/no-unused-modules': 'off',
     },
   },
 
@@ -235,8 +232,8 @@ export default tseslint.config(
     rules: {
       // TODO: Most of these overrides should probably be removed
       'consistent-return': 'off',
-      'import/no-default-export': 'off',
-      'import/no-unused-modules': 'off',
+      'import-x/no-default-export': 'off',
+      'import-x/no-unused-modules': 'off',
       'no-await-in-loop': 'off',
       'no-param-reassign': 'off',
       'no-promise-executor-return': 'off',
