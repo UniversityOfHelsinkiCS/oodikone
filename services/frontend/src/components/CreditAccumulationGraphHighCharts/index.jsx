@@ -225,15 +225,15 @@ const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
         ? absenceIsBetweenGraphDates(a.startDate, a.endDate) && a.startDate <= new Date()
         : absenceIsBetweenGraphDates(a.startDate, a.endDate)
     )
-    .reduce((res, { startdate, enddate, enrollmenttype, statutoryAbsence }) => {
+    .reduce((res, { startDate, endDate, enrollmenttype, statutoryAbsence }) => {
       const targetCreditsBeforeAbsence =
-        (dayjs(startdate).diff(dayjs(graphStartDate), 'years', true) - totalAbsenceYears) * 60
+        (dayjs(startDate).diff(dayjs(graphStartDate), 'years', true) - totalAbsenceYears) * 60
 
-      const absenceInYears = dayjs(enddate).diff(dayjs(startdate), 'years', true)
+      const absenceInYears = dayjs(endDate).diff(dayjs(startDate), 'years', true)
       totalAbsenceYears += absenceInYears
 
-      res.push([startdate, targetCreditsBeforeAbsence, null, null])
-      res.push([enddate, targetCreditsBeforeAbsence, enrollmenttype, statutoryAbsence])
+      res.push([startDate.getTime(), targetCreditsBeforeAbsence, null, null])
+      res.push([endDate.getTime(), targetCreditsBeforeAbsence, enrollmenttype, statutoryAbsence])
       return res
     }, [])
 
