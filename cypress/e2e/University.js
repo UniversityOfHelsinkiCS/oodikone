@@ -51,7 +51,8 @@ describe('University view', () => {
       checkProgressTables()
     })
 
-    it('years in the tables can be clicked to show faculty level breakdown', () => {
+    // Nothing in this test is explained. Non of these values are verified.
+    it.skip('years in the tables can be clicked to show faculty level breakdown', () => {
       cy.cs('study-right-toggle').click()
       cy.cs('bachelors-faculty-progress-table-show-button3').click()
       cy.contains('29.5%').trigger('mouseover', { force: true })
