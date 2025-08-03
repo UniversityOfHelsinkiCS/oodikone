@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
-const MOCKED_DATE = new Date('2024-08-30').getTime()
+const MOCKED_DATE = new Date('2024-08-30')
+const setClockToMockedDate = () => cy.clock().then(clock => clock.setSystemTime(MOCKED_DATE))
 
 const checkFilteredStudentCount = studentCount => {
   cy.contains(`Students (${studentCount})`)
@@ -111,7 +112,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
   const transferred = 3
 
   before(() => cy.init(pathToMathBSc2020))
-  beforeEach(() => cy.clock(MOCKED_DATE, ['Date']))
+  beforeEach(() => setClockToMockedDate())
 
   it('Study right type filter is not visible', () => {
     cy.contains('Study right type').should('not.exist')
@@ -351,7 +352,7 @@ describe('Course Statistics', { testIsolation: false }, () => {
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   before(() => cy.init(pathToLimits2021))
-  beforeEach(() => cy.clock(MOCKED_DATE, ['Date']))
+  beforeEach(() => setClockToMockedDate())
 
   it('Grade filter works', () => {
     checkFilteredStudentCount(defaultAmountOfStudents)
@@ -451,7 +452,7 @@ describe('Custom Population Statistics', { testIsolation: false }, () => {
       cy.cs('search-button').click()
     })
   })
-  beforeEach(() => cy.clock(MOCKED_DATE, ['Date']))
+  beforeEach(() => setClockToMockedDate())
 
   it('Age filter works', () => {
     cy.cs('ageFilter-header').click()
