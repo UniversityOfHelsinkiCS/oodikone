@@ -87,8 +87,14 @@ Cypress.Commands.add('init', (path = '', userId = 'basic') => {
     if (!headersToUse) throw Error(`${userId} is not valid user id!`)
     req.headers = headersToUse
   })
+
   const { baseUrl } = Cypress.config()
-  cy.visit(baseUrl.concat(path))
+  const url = baseUrl.concat(path)
+
+  cy.intercept(url).as('initURL')
+  cy.visit(url)
+
+  cy.wait('@initURL').its('response.statusCode').should('be.oneOf', [200, 304])
 })
 
 /**
