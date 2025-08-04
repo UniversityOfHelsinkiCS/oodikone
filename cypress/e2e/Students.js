@@ -20,7 +20,7 @@ const typeStudentNumberAndClick = studentNumber => {
 describe('Students tests', () => {
   describe('When using basic user', () => {
     beforeEach(() => {
-      cy.init()
+      cy.init('')
       cy.contains('Students').click()
       cy.url().should('include', '/students')
       cy.contains('Show student names')
