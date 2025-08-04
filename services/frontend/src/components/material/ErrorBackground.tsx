@@ -1,6 +1,5 @@
 import LogoutIcon from '@mui/icons-material/Logout'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import Backdrop from '@mui/material/Backdrop'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
@@ -13,6 +12,7 @@ import ReactHighchart from 'react-highcharts'
 import toskaLogo from '@/assets/toska.svg'
 import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
+import { Backdrop } from './Backdrop'
 
 const names = [
   'mluukkai',
