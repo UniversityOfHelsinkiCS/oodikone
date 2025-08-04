@@ -1,7 +1,9 @@
 /// <reference types="cypress" />
 
-const MOCKED_DATE = new Date('2024-08-30')
-const setClockToMockedDate = () => cy.clock().then(clock => clock.setSystemTime(MOCKED_DATE))
+const setClockToMockedDate = () => {
+  const MOCKED_DATE = new Date('2024-08-30')
+  cy.clock(MOCKED_DATE, ['Date'])
+}
 
 const checkFilteredStudentCount = studentCount => {
   cy.contains(`Students (${studentCount})`)
