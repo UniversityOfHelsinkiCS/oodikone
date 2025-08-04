@@ -4,11 +4,11 @@ import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 
 import globals from 'globals'
-import pluginCypress from 'eslint-plugin-cypress'
-import pluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
-import pluginReact from 'eslint-plugin-react'
-import pluginReactHooks from 'eslint-plugin-react-hooks'
-import pluginImportX from 'eslint-plugin-import-x'
+import eslintPluginCypress from 'eslint-plugin-cypress'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import eslintPluginReact from 'eslint-plugin-react'
+import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
+import eslintPluginImportX from 'eslint-plugin-import-x'
 import { createNodeResolver } from 'eslint-plugin-import-x'
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 
@@ -26,32 +26,58 @@ export default tseslint.config(
 
   // Global options (excl. e2e)
   {
-    files: ['**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}'],
-    ignores: ['cypress/**'],
+    ignores: ['cypress/**/*.js'],
     extends: [
       eslint.configs.recommended,
-      pluginImportX.flatConfigs.recommended,
+      eslintPluginImportX.flatConfigs.recommended,
+      eslintPluginImportX.flatConfigs.typescript,
+      eslintPluginReact.configs.flat.recommended,
+      eslintPluginReact.configs.flat['jsx-runtime'],
+      eslintPluginReactHooks.configs['recommended-latest'],
+      tseslint.configs.recommendedTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
     ],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        projectService: true,
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
       },
     },
     plugins: {
-      'eslint-react': pluginReact,
-      'import-x': pluginImportX
+      'react': eslintPluginReact,
+      'import-x': eslintPluginImportX
     },
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
     },
     rules: {
-      'camelcase': 'off', // TODO: Enable eventually
-      'class-methods-use-this': 'error',
-      'consistent-return': 'error',
+      'camelcase': 'off', // TODO: Enable. old db/backend logic is still using snake_case every now and then and needs a big refactor
+      'class-methods-use-this': 'off', // Disabled in favor of @typescript-eslint
+      'consistent-return': 'off', // Disabled in favor of @typescript-eslint
       'id-denylist': ['error', 'c', 'd', 'e', 'err', 't'],
+      'no-alert': 'error',
+      'no-await-in-loop': 'error',
+      'no-console': 'error',
+      'no-implied-eval': 'off', // Disabled in favor of @typescript-eslint
+      'no-param-reassign': 'error',
+      'no-promise-executor-return': 'error',
+      'no-return-assign': 'error',
+      'no-unused-vars': 'off', // Disabled in favor of @typescript-eslint
+      'object-shorthand': ['error', 'always'],
+      'prefer-const': 'error',
+      'prefer-destructuring': 'off', // Disabled in favor of @typescript-eslint
+      'dot-notation': 'off', // Disabled in favor of @typescript-eslint
+      'no-restricted-imports': ['error', { 'patterns': [{ 'regex': '^@mui/[^/]+$' }] }],
+      'quotes': ['error', 'single',
+        { avoidEscape: true, allowTemplateLiterals: false }
+      ],
+
       'import-x/no-commonjs': 'error',
       'import-x/no-default-export': 'error',
       'import-x/no-extraneous-dependencies': ['error', { devDependencies: false }],
@@ -64,145 +90,104 @@ export default tseslint.config(
       'import-x/order': ['error', {
         alphabetize: { order: 'asc', caseInsensitive: true },
         groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
-      },
-      ],
-      'no-unused-vars': ['error',
-        { argsIgnorePattern: '^_', caughtErrors: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^_' },
-      ],
-      'no-alert': 'error',
-      'no-async-promise-executor': 'error',
-      'no-await-in-loop': 'error',
-      'no-console': 'error',
-      'no-implied-eval': 'error',
-      'no-param-reassign': ['error', { props: false }],
-      'no-promise-executor-return': 'error',
-      'no-return-assign': 'error',
-      'object-shorthand': ['error', 'always'],
-      'prefer-const': 'error',
-      'prefer-destructuring': ['error',
-        { VariableDeclarator: { object: true } }
-      ],
-      'dot-notation': 'error',
-      'no-restricted-imports': ['error', { 'patterns': [{ 'regex': '^@mui/[^/]+$' }] }],
-      'quotes': ['error', 'single',
-        { avoidEscape: true, allowTemplateLiterals: false }
-      ],
-    },
-    settings: {
-      'import-x/internal-regex': '^@oodikone/shared/',
-      'import-x/resolver-next': [
-        createTypeScriptImportResolver({
-          project: ['tsconfig.json'],
-        }),
-        createNodeResolver({
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        })
-      ],
-    },
-  },
+      }],
 
-  // TypeScript options
-  {
-    files: ['**/*.{ts,cts,mts,tsx}'],
-    plugins: {
-      '@typescript-eslint': tseslint.plugin,
-    },
-    extends: [
-      tseslint.configs.recommendedTypeCheckedOnly,
-      tseslint.configs.stylisticTypeChecked,
-      pluginImportX.flatConfigs.typescript,
-    ],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        projectService: true
-      },
-    },
-    rules: {
-      'no-unused-vars': 'off', // Disable in favor of tseslint
+      // React
+      'react/prop-types': 'off', // Typescript but worse
+      'react/no-unescaped-entities': 'off',
+      'react/function-component-definition': ['error',
+        { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
+      ],
+      'react/no-array-index-key': 'error',
+      'react/no-unstable-nested-components': 'warn', // TODO: turn into error, reduces re-renders
+      'react/no-this-in-sfc': 'error',
+      'react/prefer-stateless-function': 'error',
+      'react/jsx-boolean-value': ['error', 'never'],
+      'react/jsx-filename-extension': ['error',
+        { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }
+      ],
+      'react/jsx-no-leaked-render': 'warn', // TODO: enable, tho not that useful after full ts migration
+      'react/jsx-no-useless-fragment': 'error',
+      'react/jsx-props-no-spreading': 'warn', // TODO: enable, improves readability
+      'react/jsx-sort-props': ['error', { reservedFirst: false }],
+      'react/jsx-tag-spacing': 'warn',
+
+      // TypeScript
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', caughtErrors: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/array-type': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
+      '@typescript-eslint/class-methods-use-this': 'error',
+      // '@typescript-eslint/consistent-indexed-object-style': 'off', // TODO: keep as error/record (default)
+      '@typescript-eslint/consistent-return': 'error', // NOTE: This is weaker than tsconfig.json noImplicitReturns, and should be replaced once ts migration complete
       '@typescript-eslint/consistent-type-definitions': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/dot-notation': 'error',
+      '@typescript-eslint/prefer-destructuring': ['error',
+        { VariableDeclarator: { object: true } }
+      ],
       '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'with-single-extends' }],
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-misused-promises': 'off', // Most of these errors come from Express route handlers that are handled correctly by express-async-errors
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-explicit-any': 'off', // TODO: enable when feeling brave
+      '@typescript-eslint/no-implied-eval': 'error',
+      '@typescript-eslint/no-shadow': 'off', // TODO: enable?
+      '@typescript-eslint/no-unsafe-argument': 'off', // TODO: enable
+      '@typescript-eslint/no-unsafe-assignment': 'off', // TODO: enable
+      '@typescript-eslint/no-unsafe-call': 'off', // TODO: enable
+      '@typescript-eslint/no-unsafe-member-access': 'off', // TODO: enable
+      '@typescript-eslint/no-unsafe-return': 'off', // TODO: enable
       '@typescript-eslint/restrict-template-expressions': 'off',
     },
-  },
-
-  // React options
-  {
-    files: ['services/frontend/src/**/*.{jsx,tsx}'],
-    plugins: { pluginReact },
-    extends: [
-      pluginReact.configs.flat.recommended,
-      pluginReact.configs.flat['jsx-runtime'],
-      pluginReactHooks.configs['recommended-latest'],
-    ],
-    languageOptions: {
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
     settings: {
-      react: {
-        version: '18',
-      },
+      'import-x/internal-regex': '^@oodikone/shared/',
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
+          project: ['tsconfig.eslint.json'],
+        }),
+        createNodeResolver({
+          extensions: ['.js', '.jsx', 'cjs', 'mjs', '.ts', '.tsx'],
+        })
+      ],
+      'react': {
+        'version': 'detect'
+      }
     },
-    rules: {
-      'react/display-name': 'off', // TODO: Delete this override
-      'react/function-component-definition': ['error',
-        { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
-      ],
-      'react/jsx-boolean-value': ['error', 'never'],
-      'react/jsx-filename-extension': ['error',
-        { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }
-      ],
-      'react/jsx-sort-props': ['error', { reservedFirst: false }],
-      'react/no-array-index-key': 'error',
-      'react/no-this-in-sfc': 'error',
-      'react/no-unescaped-entities': 'off',
-      'react/no-unknown-property': 'off', // TODO: Delete this override
-      'react/prefer-stateless-function': 'error',
-      'react/prop-types': 'off',
-    }
   },
 
-  // TODO: Remove when ts migration is complete
   {
-    files: ['services/frontend/src/**/*.{js,jsx}'],
+    files: ['services/backend/src/routes/*.{ts,js}'],
     rules: {
-      'import-x/no-unused-modules': 'off',
+      '@typescript-eslint/no-misused-promises': 'off', // Errors come mainly from Express route handlers that are handled correctly by express-async-errors      
+      '@typescript-eslint/consistent-return': 'off',
     }
   },
 
+  // Disable type-aware linting for javascript files
+  {
+    files: ['updater/**/*.{js,cjs}', '**/*{.js.cjs.mjs,jsx}'],
+    extends: [tseslint.configs.disableTypeChecked]
+  },
+
+  // Frontend camelCase
+  {
+    files: ['services/frontend/**.*{js,jsx,mjs,cjs,ts,tsx}'],
+    rules: {
+      'camelcase': 'warn'
+    }
+  },
 
   // Cypress should only use rules provided by the plugin below
   {
     files: ['cypress/**/*.js'],
     extends: [
-      pluginCypress.configs.recommended
+      eslintPluginCypress.configs.recommended
     ]
   },
 
   // Overrides for CommonJS
   {
     files: [
-      '**/*.cjs',
-      'cypress/**/*.js',
       'services/backend/**/*.js',
+      'updater/sis-updater-worker/src/db/migrations/*.cjs',
       'updater/sis-updater-scheduler/**/*.js'
     ],
     languageOptions: {
@@ -210,6 +195,7 @@ export default tseslint.config(
     },
     rules: {
       'import-x/no-commonjs': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 
@@ -221,30 +207,28 @@ export default tseslint.config(
     },
   },
 
-  // TODO: figure out why this exists
+  // Migration files
   {
     files: [
-      'services/**/shared/**/*',
-      'services/frontend/**/.*js',
-      'updater/**/migrations/*.cjs',
+      'updater/sis-updater-worker/src/db/migrations/*.cjs',
+      'services/backend/src/database/**/*.js'
     ],
     rules: {
       'import-x/no-unused-modules': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/require-await': 'off',
     },
   },
 
-  // TODO: Figure out why this exists
+  // TODO: See if these can be disabled and or fix
   {
     files: ['services/backend/**/*.{js,ts}', 'updater/**/*.js'],
     rules: {
-      // TODO: Most of these overrides should probably be removed
-      'consistent-return': 'off',
       'import-x/no-default-export': 'off',
       'import-x/no-unused-modules': 'off',
       'no-await-in-loop': 'off',
-      'no-param-reassign': 'off',
       'no-promise-executor-return': 'off',
     },
   },
-  pluginPrettierRecommended, // This must be the last plugin so it can override other configs
+  eslintPluginPrettierRecommended, // This must be the last plugin so it can override other configs
 )

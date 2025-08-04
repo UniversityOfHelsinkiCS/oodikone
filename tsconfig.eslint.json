@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [{ "path": "services/frontend" }, { "path": "services/backend" }, { "path": "services/shared" }],
+  "compilerOptions": {
+    "noEmit": true
+  }
+}

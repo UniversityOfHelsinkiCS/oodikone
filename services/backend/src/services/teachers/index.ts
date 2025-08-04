@@ -64,10 +64,8 @@ const parseCreditInfo = (credit: Credit) => ({
 
 type Stats = { credits: number; passed: number; failed: number; transferred: number }
 
-const markCredit = (stats: Stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
-  if (!stats) {
-    stats = { credits: 0, passed: 0, failed: 0, transferred: 0 }
-  }
+const markCredit = (paramStats: Stats, credits: number, passed: boolean, failed: boolean, transferred: boolean) => {
+  const stats = paramStats ?? { credits: 0, passed: 0, failed: 0, transferred: 0 }
   if (passed) {
     stats.credits = transferred ? stats.credits : stats.credits + credits
     stats.passed += 1
