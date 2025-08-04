@@ -164,7 +164,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
   it('Enrollment filter works', () => {
     cy.cs('enrollmentStatusFilter-header').click()
     cy.selectFromDropdown('enrollmentStatusFilter-status', 0)
-    cy.selectFromDropdown('enrollmentStatusFilter-semester', 'Syksy 2023')
+    cy.selectFromDropdown('enrollmentStatusFilter-semester', 'Syksy 2023', true)
     checkFilteredStudentCount(25)
 
     cy.cs('enrollmentStatusFilter-clear').click()
@@ -377,7 +377,7 @@ describe('Course Statistics', { testIsolation: false }, () => {
     checkFilteredStudentCount(defaultAmountOfStudents)
     cy.cs('programmeFilter-header').click()
     cy.cs('programmeFilter-mode-selector').children().eq(0).should('contain', 'Attainment')
-    cy.selectFromDropdown('programmeFilter', 1)
+    cy.selectFromDropdown('programmeFilter', 1, true)
     checkFilteredStudentCount(33)
 
     cy.cs('programmeFilter-clear').click()
@@ -468,7 +468,7 @@ describe('Custom Population Statistics', { testIsolation: false }, () => {
   it('Programme filter works and defaults to "Active Study Right"', () => {
     cy.cs('programmeFilter-header').click()
     cy.cs('programmeFilter-mode-selector').children().eq(0).should('contain', 'Active Study Right')
-    cy.selectFromDropdown('programmeFilter', 1)
+    cy.selectFromDropdown('programmeFilter', 1, true)
     checkFilteredStudentCount(3)
 
     cy.cs('programmeFilter-clear').click()
