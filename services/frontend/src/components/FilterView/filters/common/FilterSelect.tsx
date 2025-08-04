@@ -44,7 +44,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
 }: FilterSelectProps<T>) => (
   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
     <FormControl sx={{ width: '95%' }} variant="outlined">
-      <InputLabel id={filterKey} size="small">
+      <InputLabel id={`${filterKey}-label`} size="small">
         {label}
       </InputLabel>
       <Select
