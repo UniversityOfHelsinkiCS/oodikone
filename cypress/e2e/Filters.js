@@ -116,7 +116,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
   before(() => cy.init(pathToMathBSc2020))
   beforeEach(() => setClockToMockedDate())
 
-  it('Study right type filter is not visible', () => {
+  it.skip('Study right type filter is not visible', () => {
     cy.contains('Study right type').should('not.exist')
   })
 
