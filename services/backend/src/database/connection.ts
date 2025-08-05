@@ -96,7 +96,7 @@ class DbConnection extends EventEmitter {
         message: `Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`,
         meta: error,
       })
-      setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
+      setTimeout(() => void this.connect(attempt + 1), 1000 * attempt)
     }
   }
 }

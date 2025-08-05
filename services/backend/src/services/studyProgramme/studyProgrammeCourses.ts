@@ -67,46 +67,40 @@ const makeYearlyPromises = (
   type: 'passed' | 'notCompleted' | 'ownStudents' | 'withoutStudyRight' | 'otherStudents' | 'transfer',
   programmeCourses: string[],
   studyProgramme?: string
-): Promise<Students[]>[] => {
-  return years.map(
-    year =>
-      // eslint-disable-next-line no-async-promise-executor
-      new Promise(async res => {
-        const from = getFrom(academicYear, year)
-        const to = getTo(academicYear, year)
-        let result: Students[] | null = null
+) => {
+  return years.map(async year => {
+    const from = getFrom(academicYear, year)
+    const to = getTo(academicYear, year)
+    let result: Students[] | null = null
 
-        switch (type) {
-          case 'passed':
-            result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
-            break
-          case 'notCompleted':
-            result = await getNotCompletedForProgrammeCourses(from, to, programmeCourses)
-            break
-          case 'ownStudents':
-            result = await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
-            break
-          case 'withoutStudyRight':
-            result = await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)
-            break
-          case 'otherStudents':
-            result = await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
-            break
-          case 'transfer':
-            result = await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)
-            break
-          default:
-            result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
-        }
+    switch (type) {
+      case 'passed':
+        result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
+        break
+      case 'notCompleted':
+        result = await getNotCompletedForProgrammeCourses(from, to, programmeCourses)
+        break
+      case 'ownStudents':
+        result = await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
+        break
+      case 'withoutStudyRight':
+        result = await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)
+        break
+      case 'otherStudents':
+        result = await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
+        break
+      case 'transfer':
+        result = await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)
+        break
+      default:
+        result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
+    }
 
-        res(
-          result.map(course => {
-            course.year = year
-            return course
-          })
-        )
-      })
-  )
+    return result.map(course => {
+      course.year = year
+      return course
+    })
+  })
 }
 
 type Attempt = {

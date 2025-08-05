@@ -70,6 +70,7 @@ const createCriteria = async (
     return await formatCriteria(createdCriteria)
   } catch (error) {
     logger.error(`Creating criteria failed: ${error}`)
+    return null
   }
 }
 
@@ -100,6 +101,7 @@ export const saveYearlyCreditCriteria = async (studyProgramme: string, credits: 
     return await formatCriteria(updatedCriteria)
   } catch (error) {
     logger.error(`Updating yearly credit criteria failed: ${error}`)
+    return null
   }
 }
 
@@ -143,6 +145,7 @@ export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: 
     return await formatCriteria(updatedCriteria)
   } catch (error) {
     logger.error(`Updating yearly credit criteria failed: ${error}`)
+    return null
   }
 }
 
