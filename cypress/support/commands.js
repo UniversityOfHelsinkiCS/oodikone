@@ -89,12 +89,9 @@ Cypress.Commands.add('init', { prevSubject: false }, (path, userId = 'basic') =>
     req.headers = headersToUse
   })
 
-  const { baseUrl } = Cypress.config()
-  const url = baseUrl.concat(path)
-
   // TODO: Add wait for visit url.
   //       This is block by course population query.
-  cy.visit(url)
+  cy.visit({ method: 'GET', url: path, headers: headersToUse })
 })
 
 /**
