@@ -97,10 +97,9 @@ Cypress.Commands.add('init', { prevSubject: false }, (path, userId = 'basic') =>
   const { baseUrl } = Cypress.config()
   const url = baseUrl.concat(path)
 
-  cy.intercept(url).as('initURL')
+  // TODO: Add wait for visit url.
+  //       This is block by course population query.
   cy.visit(url)
-
-  cy.wait('@initURL').its('response.statusCode').should('be.oneOf', [200, 304])
 })
 
 /**
@@ -120,17 +119,15 @@ Cypress.Commands.add('cs', { prevSubject: 'optional' }, (subject, name) => {
  * If the index is a number, select index-th item.
  * Otherwise select the item containing index text.
  */
-Cypress.Commands.add('selectFromDropdown', { prevSubject: false }, (label, index) => {
-  cy.cs(`${label}-selector`)
-    .click()
-    .then(() => {
-      cy.get(`[role="listbox"][aria-labelledby="${label}"]`).within(() => {
-        if (typeof index === 'number') cy.get('.MuiMenuItem-root').eq(index).click()
-        else cy.get('.MuiMenuItem-root').contains(index).click()
-      })
-    })
+Cypress.Commands.add('selectFromDropdown', { prevSubject: false }, (label, index, isMultiSelect = false) => {
+  cy.cs(`${label}-selector`).click()
 
-  cy.get('body').click()
+  cy.get(`[role="listbox"][aria-labelledby="${label}"]`).within(() => {
+    if (typeof index === 'number') cy.get('li').eq(index).click()
+    else cy.get('li').contains(index).click()
+  })
+
+  if (isMultiSelect) cy.get('#menu- > .MuiModal-backdrop').click()
 })
 
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {

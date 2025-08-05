@@ -1,4 +1,3 @@
-import Backdrop from '@mui/material/Backdrop'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
@@ -43,6 +42,7 @@ import { parseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
+import { Backdrop } from '../material/Backdrop'
 import { HelpInfoCard } from '../material/InfoCard'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
@@ -214,8 +214,7 @@ export const PopulationStatistics = () => {
           <Box sx={{ textAlign: 'center' }}>
             <Backdrop
               open={isLoading}
-              sx={theme => ({ zIndex: theme.zIndex.drawer + 1, color: theme.palette.grey[300] })}
-              unmountOnExit
+              sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
             >
               <CircularProgress color="inherit" size="3em" />
             </Backdrop>
