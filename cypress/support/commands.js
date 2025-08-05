@@ -82,9 +82,10 @@ const userHeaders = [
  * Set up headers to login, set up correct user (admin / basic / etc.) and open given path.
  */
 Cypress.Commands.add('init', { prevSubject: false }, (path, userId = 'basic') => {
+  const headersToUse = userHeaders.find(({ uid }) => uid === userId)
+  if (!headersToUse) throw Error(`${userId} is not valid user id!`)
+
   cy.intercept({ hostname: 'localhost', url: '**', method: '*' }, req => {
-    const headersToUse = userHeaders.find(({ uid }) => uid === userId)
-    if (!headersToUse) throw Error(`${userId} is not valid user id!`)
     req.headers = headersToUse
   })
 
