@@ -26,6 +26,7 @@ type StudentStudyRightElement = Pick<
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type StudentStudyRight = Pick<
   SISStudyRight,
   'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
@@ -33,6 +34,7 @@ export type StudentStudyRight = Pick<
   studyRightElements: Array<StudentStudyRightElement>
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type StudentStudyPlan = Pick<
   Studyplan,
   | 'included_courses'
@@ -43,15 +45,18 @@ export type StudentStudyPlan = Pick<
   | 'sis_study_right_id'
 >
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type StudentData = StudentPersonalData & {
   studyplans: Array<StudentStudyPlan>
   studyRights: Array<StudentStudyRight>
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type TaggetStudentData = StudentData & {
   tags: StudentTags[]
 }
@@ -77,7 +82,7 @@ export type FormattedStudent = {
   birthdate: Date
   sis_person_id: string
   citizenships: Name[]
-  criteriaProgress: { [year: string]: CriteriaYear }
+  criteriaProgress: Record<string, CriteriaYear>
   curriculumVersion: string | null
 
   transferredStudyright: boolean

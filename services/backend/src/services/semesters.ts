@@ -5,23 +5,25 @@ import { dateMinFromList, dateMaxFromList } from '@oodikone/shared/util/datetime
 import { SemesterModel } from '../models'
 
 type SemestersAndYears = {
-  years: {
-    [yearcode: string]: {
+  years: Record<
+    string,
+    {
       yearcode: number
       yearname: string
       startdate: Date
       enddate: Date
     }
-  }
-  semesters: {
-    [semestercode: string]: {
+  >
+  semesters: Record<
+    string,
+    {
       semestercode: number
       name: Name
       yearcode: number
       startdate: Date
       enddate: Date
     }
-  }
+  >
 }
 
 export const getSemesterNames = async (semesterCodes: number[]) => {

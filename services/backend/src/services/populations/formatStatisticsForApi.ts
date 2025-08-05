@@ -47,7 +47,7 @@ const getTransferSource = (code: string, studyRights: StudentStudyRight[]): [boo
   return [false, undefined]
 }
 
-const getCriteriaBase = (criteria: ProgressCriteria): [boolean, { [year: string]: CriteriaYear }] => {
+const getCriteriaBase = (criteria: ProgressCriteria): [boolean, Record<string, CriteriaYear>] => {
   const thereAreCriteriaCourses = !!Object.values(criteria.courses).flatMap(val => val).length
   const thereAreCriteriaCredits = !!Object.values(criteria.credits).reduce((acc, cur) => acc + cur, 0)
 
@@ -57,7 +57,7 @@ const getCriteriaBase = (criteria: ProgressCriteria): [boolean, { [year: string]
     coursesSatisfied: Object.fromEntries(criteria.courses[year].map(course => [course, null])),
   })
 
-  const criteriaChecked: { [year: string]: CriteriaYear } = {
+  const criteriaChecked: Record<string, CriteriaYear> = {
     year1: createEmptyCriteriaYear(criteria, 'yearOne'),
     year2: createEmptyCriteriaYear(criteria, 'yearTwo'),
     year3: createEmptyCriteriaYear(criteria, 'yearThree'),

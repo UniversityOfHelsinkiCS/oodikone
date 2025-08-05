@@ -141,7 +141,7 @@ export default tseslint.config(
 
   // Disable type-aware linting for javascript files
   {
-    files: ['**/*{.js.cjs.mjs,jsx}'],
+    files: ['{updater,services}/**/*.{js,cjs}'],
     extends: [tseslint.configs.disableTypeChecked]
   },
 

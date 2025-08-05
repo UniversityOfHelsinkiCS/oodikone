@@ -16,10 +16,11 @@ export type CourseStats = {
   course: Course
   attempts: number
   enrollments: EnrollmentObject & {
-    semesters: { [semester: string]: EnrollmentObject }
+    semesters: Record<string, EnrollmentObject>
   }
-  grades: {
-    [grade: string]: {
+  grades: Record<
+    string,
+    {
       count: number
       status: {
         passingGrade: boolean
@@ -27,7 +28,7 @@ export type CourseStats = {
         improvedGrade: boolean
       }
     }
-  }
+  >
   /**
    * all: string[]
    * passed: string[]
@@ -36,13 +37,9 @@ export type CourseStats = {
    * markedToSemester: string[]
    * enrolledNoGrade: string[]
    */
-  students: {
-    [key: string]: string[]
-  }
+  students: Record<string, string[]>
   stats: {
-    passingSemesters: {
-      [semester: string]: number
-    }
+    passingSemesters: Record<string, number>
   }
 }
 

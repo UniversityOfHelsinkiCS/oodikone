@@ -60,17 +60,11 @@ export const formatToArray = <T>(param: T | T[]): T[] => {
   return Array.isArray(param) ? param : [param]
 }
 
-export const formatQueryParamsToArrays = (query: Record<string, any>, params: string[]) => {
-  const result = { ...query }
-  params.filter(param => !!result[param]).forEach(param => (result[param] = formatToArray(result[param])))
-
-  return result
-}
-
 export const omitKeys = <T extends object, K extends keyof T>(input: T, toOmit: K[]): Omit<T, K> => {
   return Object.fromEntries(Object.entries(input).filter(([key, _]) => !toOmit.includes(key as K))) as Omit<T, K>
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): Record<K, T> =>
   Object.fromEntries(input.map(item => [item[key], item]))
 

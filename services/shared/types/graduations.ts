@@ -3,14 +3,15 @@ export type FacultyClassSizes = {
   bcMsCombo: Record<string, number>
   master: Record<string, number>
   doctor: Record<string, number>
-  programmes: {
-    [code: string]: {
+  programmes: Record<
+    string,
+    {
       bachelor: Record<string, number>
       bcMsCombo: Record<string, number>
       master: Record<string, number>
       doctor: Record<string, number>
     }
-  }
+  >
 }
 
 export type ProgrammeClassSizes = {

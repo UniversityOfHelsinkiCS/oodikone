@@ -6,9 +6,9 @@ import { FormattedProgramme, OrganizationDetails } from './helpers'
 
 type Programme = {
   name: Name
-  students: { [yearCode: number]: string[] }
-  passed: { [yearCode: number]: string[] }
-  credits: { [yearCode: number]: number }
+  students: Record<number, string[]>
+  passed: Record<number, string[]>
+  credits: Record<number, number>
 }
 
 type Faculty = {
@@ -22,11 +22,11 @@ type FacultyYearStats = {
   year: string
   allStudents: string[]
   allPassed: string[]
-  faculties: { [facultyCode: string]: Faculty }
+  faculties: Record<string, Faculty>
   allCredits: number
 }
 
-type Grades = { [grade: string]: string[] }
+type Grades = Record<string, string[]>
 
 type GroupAttempts = {
   grades: Grades
@@ -37,7 +37,7 @@ type GroupAttempts = {
 }
 
 type GroupStudents = {
-  grades: { [studentNumber: string]: { grade: string; passed: boolean } }
+  grades: Record<string, { grade: string; passed: boolean }>
   studentNumbers: string[]
 }
 
@@ -58,9 +58,9 @@ type Student = {
 }
 
 export class CourseYearlyStatsCounter {
-  private groups: { [groupCode: number]: Group }
-  private programmes: { [code: string]: Programme }
-  private facultyStats: { [yearCode: number]: FacultyYearStats }
+  private groups: Record<number, Group>
+  private programmes: Record<string, Programme>
+  private facultyStats: Record<number, FacultyYearStats>
   private obfuscated: boolean
   private students: Map<string, Student>
 
@@ -215,11 +215,12 @@ export class CourseYearlyStatsCounter {
       enrollment => enrollment.studentNumber === studentNumber
     )
     if (!oldEnrollment) {
-      return this.groups[groupCode].enrollments.push({ studentNumber, enrollmentDateTime })
+      this.groups[groupCode].enrollments.push({ studentNumber, enrollmentDateTime })
+    } else {
+      this.groups[groupCode].enrollments = this.groups[groupCode].enrollments
+        .filter(enrollment => enrollment.studentNumber !== studentNumber)
+        .concat([enrollment])
     }
-    this.groups[groupCode].enrollments = this.groups[groupCode].enrollments
-      .filter(enrollment => enrollment.studentNumber !== studentNumber)
-      .concat([enrollment])
   }
 
   private markCreditToAttempts(studentNumber: string, passed: boolean, grade: string, groupCode: number) {

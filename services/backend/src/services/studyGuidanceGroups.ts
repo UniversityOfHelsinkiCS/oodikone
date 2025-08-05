@@ -68,9 +68,7 @@ const getGroupsFromImporter = async (sisPersonId: string) => {
 
 type Tags = { studyProgramme?: string | null; year?: string | null }
 
-type TagsByGroupId = {
-  [groupId: string]: Tags
-}
+type TagsByGroupId = Record<string, Tags>
 
 type GroupsWithTags = StudyGuidanceGroup & { tags: Tags }
 
