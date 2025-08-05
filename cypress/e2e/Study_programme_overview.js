@@ -1,6 +1,19 @@
 /// <reference types="cypress" />
 
-const { getEmptyYears } = require('../support/commands')
+const getEmptyYears = isAcademicYear => {
+  const today = new Date()
+  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
+
+  const years = []
+  for (let year = latestYear; year >= 2024; year--) {
+    if (isAcademicYear) {
+      years.push(`${year} - ${year + 1}`)
+    } else {
+      years.push(year)
+    }
+  }
+  return years
+}
 
 const tagName = `tag-${new Date().getTime()}`
 

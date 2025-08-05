@@ -180,22 +180,3 @@ Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
     cy.get('tr').filter(':visible').should('have.length', correctStats.length)
   })
 })
-
-const getEmptyYears = isAcademicYear => {
-  const today = new Date()
-  const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
-
-  const years = []
-  for (let year = latestYear; year >= 2024; year--) {
-    if (isAcademicYear) {
-      years.push(`${year} - ${year + 1}`)
-    } else {
-      years.push(year)
-    }
-  }
-  return years
-}
-
-module.exports = {
-  getEmptyYears,
-}
