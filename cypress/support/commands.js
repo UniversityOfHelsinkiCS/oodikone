@@ -124,6 +124,44 @@ Cypress.Commands.add('selectFromDropdown', { prevSubject: false }, (label, index
   if (isMultiSelect) cy.get('#menu- > .MuiModal-backdrop').click()
 })
 
+/**
+ * Set range selector values FilterRange.
+ * If the reset flag is set, the function tries to reset the original values.
+ */
+Cypress.Commands.add('setRangeSelect', { prevSubject: false }, (filter, min, max, expected, reset) => {
+  const minText = min.toString()
+  const maxText = max.toString()
+  const expectedText = expected.toString()
+
+  const parent = `${filter}-filter-card`
+
+  cy.cs(parent)
+    .cs('FilterRangeStart')
+    .find('input')
+    .invoke('val')
+    .then(initialMin => {
+      cy.cs(parent)
+        .cs('FilterRangeEnd')
+        .find('input')
+        .invoke('val')
+        .then(initialMax => {
+          cy.cs(parent).cs('FilterRangeStart').find('input').clear()
+          cy.cs(parent).cs('FilterRangeStart').find('input').type(minText)
+          cy.cs(parent).cs('FilterRangeEnd').find('input').clear()
+          cy.cs(parent).cs('FilterRangeEnd').find('input').type(maxText)
+
+          checkFilteredStudentCount(expectedText)
+
+          if (reset) {
+            cy.cs(parent).cs('FilterRangeStart').find('input').clear()
+            cy.cs(parent).cs('FilterRangeStart').find('input').type(initialMin)
+            cy.cs(parent).cs('FilterRangeEnd').find('input').clear()
+            cy.cs(parent).cs('FilterRangeEnd').find('input')?.type(initialMax)
+          }
+        })
+    })
+})
+
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
   cy.get(`[data-cy=${tableName}-data-table] tbody`).within(() => {
     correctStats.forEach((values, trIndex) => {

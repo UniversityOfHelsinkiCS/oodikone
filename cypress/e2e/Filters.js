@@ -9,40 +9,6 @@ const checkFilteredStudentCount = studentCount => {
   cy.contains(`Students (${studentCount})`)
 }
 
-const testRangeFilter = (filter, min, max, expected, reset) => {
-  const minText = min.toString()
-  const maxText = max.toString()
-  const expectedText = expected.toString()
-
-  const parent = `${filter}-filter-card`
-
-  cy.cs(parent)
-    .cs('FilterRangeStart')
-    .find('input')
-    .invoke('val')
-    .then(initialMin => {
-      cy.cs(parent)
-        .cs('FilterRangeEnd')
-        .find('input')
-        .invoke('val')
-        .then(initialMax => {
-          cy.cs(parent).cs('FilterRangeStart').find('input').clear()
-          cy.cs(parent).cs('FilterRangeStart').find('input').type(minText)
-          cy.cs(parent).cs('FilterRangeEnd').find('input').clear()
-          cy.cs(parent).cs('FilterRangeEnd').find('input').type(maxText)
-
-          checkFilteredStudentCount(expectedText)
-
-          if (reset) {
-            cy.cs(parent).cs('FilterRangeStart').find('input').clear()
-            cy.cs(parent).cs('FilterRangeStart').find('input').type(initialMin)
-            cy.cs(parent).cs('FilterRangeEnd').find('input').clear()
-            cy.cs(parent).cs('FilterRangeEnd').find('input')?.type(initialMax)
-          }
-        })
-    })
-}
-
 describe("Population statistics with a master's programme", { testIsolation: false }, () => {
   const pathToMathMSc2020 = '/populations?years=2020&programme=MH50_001&semesters=FALL&semesters=SPRING'
   const defaultAmountOfStudents = 26
@@ -149,7 +115,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
   it('Credit filter works', () => {
     cy.cs('creditsEarnedFilter-header').click()
     checkFilteredStudentCount(defaultAmountOfStudents)
-    testRangeFilter('creditsEarnedFilter', 50, 150, 12)
+    cy.setRangeSelect('creditsEarnedFilter', 50, 150, 12)
 
     cy.cs('creditsEarnedFilter-clear').click()
     cy.cs('creditsEarnedFilter-header').click()
@@ -159,7 +125,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
   it('Age filter works', () => {
     cy.cs('ageFilter-header').click()
     checkFilteredStudentCount(defaultAmountOfStudents)
-    testRangeFilter('ageFilter', 23, 30, 21)
+    cy.setRangeSelect('ageFilter', 23, 30, 21)
 
     cy.cs('ageFilter-clear').click()
     cy.cs('ageFilter-header').click()
@@ -241,7 +207,7 @@ describe('Population Statistics', { testIsolation: false }, () => {
     checkFilteredStudentCount(graduated)
 
     cy.cs('ageFilter-header').click()
-    testRangeFilter('ageFilter', 23, 30, 12)
+    cy.setRangeSelect('ageFilter', 23, 30, 12)
 
     cy.cs('graduatedFromProgrammeFilter-clear').click()
     cy.cs('graduatedFromProgrammeFilter-header').click()
@@ -361,7 +327,7 @@ describe('Course Statistics', { testIsolation: false }, () => {
   it('Age filter works', () => {
     cy.cs('ageFilter-header').click()
     checkFilteredStudentCount(defaultAmountOfStudents)
-    testRangeFilter('ageFilter', 21, 30, 36)
+    cy.setRangeSelect('ageFilter', 23, 30, 36)
 
     cy.cs('ageFilter-clear').click()
     cy.cs('ageFilter-header').click()
@@ -399,7 +365,7 @@ describe('Course Statistics', { testIsolation: false }, () => {
   it('Filter combinations work', () => {
     cy.cs('ageFilter-header').click()
     checkFilteredStudentCount(defaultAmountOfStudents)
-    testRangeFilter('ageFilter', 21, 30, 36)
+    cy.setRangeSelect('ageFilter', 23, 30, 36)
 
     cy.cs('gradeFilter-header').click()
     cy.cs('gradeFilter-5').click()
@@ -431,7 +397,7 @@ describe('Custom Population Statistics', { testIsolation: false }, () => {
 
   it('Age filter works', () => {
     cy.cs('ageFilter-header').click()
-    testRangeFilter('ageFilter', 24, 28, 5)
+    cy.setRangeSelect('ageFilter', 24, 28, 5)
 
     cy.cs('ageFilter-clear').click()
     cy.cs('ageFilter-header').click()
