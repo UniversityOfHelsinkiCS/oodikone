@@ -12,7 +12,7 @@ export const AccessDenied = () => {
   const header = 'Welcome to Oodikone!'
   const content = (
     <>
-      You're currently not allowed to enter but you will get an email when you're authorized"
+      You're currently not allowed to enter but you will get an email when you're authorized
       {easterEggVisible && <EasterEgg />}
     </>
   )
