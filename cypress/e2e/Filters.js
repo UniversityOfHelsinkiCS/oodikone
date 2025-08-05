@@ -16,6 +16,7 @@ describe("Population statistics with a master's programme", { testIsolation: fal
   const expectedMasterOnlyStudents = 2
 
   before(() => cy.init(pathToMathMSc2020))
+  after(() => cy.visit({ url: 'about:blank' }))
 
   it('Study track filter works', () => {
     cy.cs('studyTrackFilter-header').click()
