@@ -66,8 +66,9 @@ const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunct
   if (!username) missingHeaders.push('uid')
 
   if (missingHeaders.length > 0) {
+    const reqUser = username ?? 'Anonymous user'
     throw new ApplicationError(
-      `Not enough data in request headers, the following headers were missing: ${missingHeaders.join(', ')}`,
+      `${reqUser} requested ${req.url} without valid request headers. Missing: ${missingHeaders.join(', ')}`,
       403,
       { logoutUrl }
     )
