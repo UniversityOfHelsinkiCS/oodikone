@@ -151,7 +151,9 @@ Cypress.Commands.add('setRangeSelect', { prevSubject: false }, (filter, min, max
           cy.cs(parent).cs('FilterRangeEnd').find('input').clear()
           cy.cs(parent).cs('FilterRangeEnd').find('input').type(maxText)
 
-          checkFilteredStudentCount(expectedText)
+          // This should be linked to other checking functions.
+          // Maybe one day.
+          cy.contains(`Students (${expectedText})`)
 
           if (reset) {
             cy.cs(parent).cs('FilterRangeStart').find('input').clear()
