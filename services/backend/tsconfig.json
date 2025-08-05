@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "composite": true,
     "target": "ES2021",
     "lib": ["ES2023"],
     "allowJs": true,

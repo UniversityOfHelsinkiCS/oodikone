@@ -31,9 +31,6 @@ export default tseslint.config(
       eslint.configs.recommended,
       eslintPluginImportX.flatConfigs.recommended,
       eslintPluginImportX.flatConfigs.typescript,
-      eslintPluginReact.configs.flat.recommended,
-      eslintPluginReact.configs.flat['jsx-runtime'],
-      eslintPluginReactHooks.configs['recommended-latest'],
       tseslint.configs.recommendedTypeChecked,
       tseslint.configs.stylisticTypeChecked,
     ],
@@ -50,7 +47,6 @@ export default tseslint.config(
       },
     },
     plugins: {
-      'react': eslintPluginReact,
       'import-x': eslintPluginImportX
     },
     linterOptions: {
@@ -92,26 +88,6 @@ export default tseslint.config(
         groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
       }],
 
-      // React
-      'react/prop-types': 'off', // Typescript but worse
-      'react/no-unescaped-entities': 'off',
-      'react/function-component-definition': ['error',
-        { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
-      ],
-      'react/no-array-index-key': 'error',
-      'react/no-unstable-nested-components': 'warn', // TODO: turn into error, reduces re-renders
-      'react/no-this-in-sfc': 'error',
-      'react/prefer-stateless-function': 'error',
-      'react/jsx-boolean-value': ['error', 'never'],
-      'react/jsx-filename-extension': ['error',
-        { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }
-      ],
-      'react/jsx-no-leaked-render': 'warn', // TODO: enable, tho not that useful after full ts migration
-      'react/jsx-no-useless-fragment': 'error',
-      'react/jsx-props-no-spreading': 'warn', // TODO: enable, improves readability
-      'react/jsx-sort-props': ['error', { reservedFirst: false }],
-      'react/jsx-tag-spacing': 'warn',
-
       // TypeScript
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -141,15 +117,17 @@ export default tseslint.config(
       'import-x/internal-regex': '^@oodikone/shared/',
       'import-x/resolver-next': [
         createTypeScriptImportResolver({
-          project: ['tsconfig.eslint.json'],
+          project: [
+            'services/frontend/tsconfig.json',
+            'services/frontend/tsconfig.node.json',
+            'services/backend/tsconfig.json',
+            'services/shared/tsconfig.json'
+          ],
         }),
         createNodeResolver({
           extensions: ['.js', '.jsx', 'cjs', 'mjs', '.ts', '.tsx'],
         })
       ],
-      'react': {
-        'version': 'detect'
-      }
     },
   },
 
@@ -163,15 +141,46 @@ export default tseslint.config(
 
   // Disable type-aware linting for javascript files
   {
-    files: ['updater/**/*.{js,cjs}', '**/*{.js.cjs.mjs,jsx}'],
+    files: ['**/*{.js.cjs.mjs,jsx}'],
     extends: [tseslint.configs.disableTypeChecked]
   },
 
-  // Frontend camelCase
+  // Frontend camelCase and react
   {
     files: ['services/frontend/**.*{js,jsx,mjs,cjs,ts,tsx}'],
+    extends: [
+      eslintPluginReact.configs.flat.recommended,
+      eslintPluginReact.configs.flat['jsx-runtime'],
+      eslintPluginReactHooks.configs['recommended-latest'],
+    ],
+    plugins: {
+      'react': eslintPluginReact,
+    },
     rules: {
-      'camelcase': 'warn'
+      'camelcase': 'warn',
+      'react/prop-types': 'off', // Typescript but worse
+      'react/no-unescaped-entities': 'off',
+      'react/function-component-definition': ['error',
+        { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
+      ],
+      'react/no-array-index-key': 'error',
+      'react/no-unstable-nested-components': 'warn', // TODO: turn into error, reduces re-renders
+      'react/no-this-in-sfc': 'error',
+      'react/prefer-stateless-function': 'error',
+      'react/jsx-boolean-value': ['error', 'never'],
+      'react/jsx-filename-extension': ['error',
+        { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }
+      ],
+      'react/jsx-no-leaked-render': 'warn', // TODO: enable, tho not that useful after full ts migration
+      'react/jsx-no-useless-fragment': 'error',
+      'react/jsx-props-no-spreading': 'warn', // TODO: enable, improves readability
+      'react/jsx-sort-props': ['error', { reservedFirst: false }],
+      'react/jsx-tag-spacing': 'warn',
+    },
+    settings: {
+      'react': {
+        'version': 'detect'
+      }
     }
   },
 
