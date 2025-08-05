@@ -9,17 +9,6 @@ const checkFilteredStudentCount = studentCount => {
   cy.contains(`Students (${studentCount})`)
 }
 
-// Semantic UI doesn't allow injection of data-cy:s for single multiple dropdown selection.
-// This function tries to click "x" on all selections inside dropdown matching given attribute
-const clearSemanticUIMultipleDropDownSelection = dataCyAttribute => {
-  cy.cs(dataCyAttribute).find('i.delete').click({ force: true })
-  cy.cs(dataCyAttribute).click()
-}
-
-const clearSingleDropdownSelection = dataCyAttribute => {
-  cy.cs(dataCyAttribute).find('i.clear').click({ force: true })
-}
-
 const testRangeFilter = (filter, min, max, expected, reset) => {
   const minText = min.toString()
   const maxText = max.toString()
@@ -52,21 +41,6 @@ const testRangeFilter = (filter, min, max, expected, reset) => {
           }
         })
     })
-}
-
-// Helper tool to create pre and post steps for each filter step. Created to avoid copypasting clicking and checking
-// to every it-function. Reason behind using test function wrapper is that Cypresses internal beforeEach / afterEach
-// functions don't take any parameters and using global object for matching test step name seemed overcomplicated.
-const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
-  return (filterName, testStepFunctionToRun) => {
-    cy.cs(`${filterName}-filter-card`)
-      .click()
-      .then(_ => {
-        checkFilteredStudentCount(amountWithoutFiltering)
-        testStepFunctionToRun()
-        checkFilteredStudentCount(amountWithoutFiltering)
-      })
-  }
 }
 
 describe("Population statistics with a master's programme", { testIsolation: false }, () => {
@@ -351,7 +325,6 @@ describe('Course Statistics', { testIsolation: false }, () => {
   const pathToLimits2021 =
     '/coursepopulation?coursecodes=%5B"MAT11003"%2C"57116"%2C"57016"%2C"AYMAT11003"%5D&from=72&separate=false&to=72&unifyCourses=unifyStats&years=2021-2022'
   const defaultAmountOfStudents = 48
-  const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   before(() => cy.init(pathToLimits2021))
   beforeEach(() => setClockToMockedDate())
