@@ -26,6 +26,7 @@ describe('Students tests', () => {
       cy.contains('Show student names')
     })
 
+    // FIXME: Flaky
     it('Students search form is usable', () => {
       typeToSearch(student.lastName)
       cy.contains('Student number')

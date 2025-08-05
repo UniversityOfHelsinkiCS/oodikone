@@ -74,11 +74,13 @@ describe('When language center is opened', () => {
         })
       })
 
+      // FIXME: Flaky
       it('Faculties tab "exceeding" button works', () => {
         cy.get('[data-cy="difference-button"]').click()
         checkNumbers([...new Array(12).fill(0), 1, 221], 15)
       })
 
+      // FIXME: Flaky
       it('Faculties tab semester selector changes numbers', () => {
         chooseSemester('Syksy 2020', 'from')
         checkNumbers([28, 6, 27, 496, 4, 10, 2, 33, 0, 9, 535, 34, 0, 1184], 15)
@@ -92,10 +94,12 @@ describe('When language center is opened', () => {
         chooseSemester('Kevät 2024', 'to')
       })
 
+      // FIXME: Flaky
       it('Semester tab shows numbers', () => {
         checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17, 'semesters')
       })
 
+      // FIXME: Flaky
       it('Coloring mode works on semester tab', () => {
         cy.contains('Compare to average of course').click()
         const expectedAlphas = [0.04, 0.016, 0.17, 0.03, 0.192, 0.055, 0.247, 0.08, 0.173, 0.05, 0.07, 0.043, 0.004, 0]

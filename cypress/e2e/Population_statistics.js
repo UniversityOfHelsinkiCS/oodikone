@@ -324,6 +324,7 @@ describe('Population statistics tests', () => {
         })
       })
 
+      // FIXME: Flaky
       it("'Courses tab' is usable", () => {
         cy.cs('student-table-tabs').within(() => {
           cy.contains('Courses').click()

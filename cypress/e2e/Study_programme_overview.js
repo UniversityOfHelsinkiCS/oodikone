@@ -668,6 +668,7 @@ describe('Study programme overview', () => {
         cy.cs('by-semester-tab').click()
       })
 
+      // FIXME: Flaky
       it('test', () => {
         // TODO: Implement some real tests for this tab
         cy.contains('From')
