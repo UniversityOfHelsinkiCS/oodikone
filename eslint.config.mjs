@@ -23,7 +23,7 @@ export default tseslint.config(
       '**/instrumented/**',
       '**/coverage/**',
       'nyc-config.cjs',
-      '.lintstagedrc.js',
+      '.lintstagedrc.mjs',
       'cypress.config.js',
     ]
   },

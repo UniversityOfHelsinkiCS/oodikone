@@ -1,12 +1,13 @@
 {
-  "ignorePatterns": ["eslint.config.mjs",
-      "**/build/**",
-      "**/dist/**",
-      "**/node_modules/**",
-      "**/instrumented/**",
-      "**/coverage/**",
-      "nyc-config.cjs",
-      ".lintstagedrc.js",
-      "cypress.config.js"
-]
+  "ignorePatterns": [
+    "eslint.config.mjs",
+    "**/build/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/instrumented/**",
+    "**/coverage/**",
+    "nyc-config.cjs",
+    ".lintstagedrc.mjs",
+    "cypress.config.js"
+  ]
 }

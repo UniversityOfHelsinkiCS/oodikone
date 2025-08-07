@@ -1,12 +1,8 @@
 /* eslint-disable import-x/no-extraneous-dependencies  */
 /* eslint-disable import-x/no-default-export */
+const { defineConfig } = require('cypress')
 
-import { defineConfig } from 'cypress'
-
-import coverage from '@cypress/code-coverage/task'
-import plugin from './cypress/plugins/index.js'
-
-export default defineConfig({
+module.exports = defineConfig({
   experimentalStudio: process.env.NODE_ENV === 'development',
   projectId: 'c3jsph',
   defaultCommandTimeout: 30000,
@@ -18,8 +14,8 @@ export default defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      coverage(on, config)
-      plugin(on, config)
+      require('@cypress/code-coverage/task')(on, config)
+      require('./cypress/plugins/index.js')(on, config)
       return config
     },
     baseUrl: 'http://localhost:3000',
