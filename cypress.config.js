@@ -3,6 +3,9 @@
 
 import { defineConfig } from 'cypress'
 
+import coverage from '@cypress/code-coverage/task'
+import plugin from './cypress/plugins/index.js'
+
 export default defineConfig({
   experimentalStudio: process.env.NODE_ENV === 'development',
   projectId: 'c3jsph',
@@ -15,8 +18,8 @@ export default defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config)
-      require('./cypress/plugins/index.js')(on, config)
+      coverage(on, config)
+      plugin(on, config)
       return config
     },
     baseUrl: 'http://localhost:3000',
