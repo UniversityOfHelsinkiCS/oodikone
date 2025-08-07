@@ -53,7 +53,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
         <div style={{ color: 'black', fontWeight: 'normal', margin: '0.3em 0 0.5em 0', flex: 1 }}>
           Select value range:
         </div>
-        {dirty && <Icon loading name="spinner" />}
+        {dirty ? <Icon loading name="spinner" /> : null}
       </div>
       <RangeSelector max={maxValue} min={minValue} onChange={handleChange} value={range} />
     </div>

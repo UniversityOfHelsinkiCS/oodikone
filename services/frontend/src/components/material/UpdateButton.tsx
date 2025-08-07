@@ -20,9 +20,9 @@ export const UpdateButton = ({
       <Button disabled={stats.isLoading} onClick={onClick} variant="contained">
         Update
       </Button>
-      {stats.isLoading && <CircularProgress size={20} />}
-      {stats.isSuccess && <CheckIcon color="success" />}
-      {stats.isError && <CloseIcon color="error" />}
+      {stats.isLoading ? <CircularProgress size={20} /> : null}
+      {stats.isSuccess ? <CheckIcon color="success" /> : null}
+      {stats.isError ? <CloseIcon color="error" /> : null}
     </Stack>
   )
 }

@@ -71,7 +71,7 @@ export const bulkCreate = async (
       ? { updateOnDuplicate: getColumnsToUpdate(model, properties), transaction }
       : { ignoreDuplicates: true, transaction }
     await model.bulkCreate(entities, options)
-  } catch (error) {
+  } catch (_error) {
     for (const entity of entities) {
       try {
         if (upsertStyle) await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })

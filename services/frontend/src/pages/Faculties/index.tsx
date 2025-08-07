@@ -48,7 +48,7 @@ export const Faculties = () => {
           <Tab label="Basic information" />
           <Tab label="Students by starting year" />
           <Tab label="Graduation times" />
-          {isAdmin && <Tab label="Update statistics" />}
+          {isAdmin ? <Tab label="Update statistics" /> : null}
         </Tabs>
         {tab === 0 && (
           <BasicInformationTab
@@ -76,7 +76,7 @@ export const Faculties = () => {
             studyProgrammes={studyProgrammes}
           />
         )}
-        {tab === 3 && isAdmin && <UpdateStatisticsTab id={faculty?.id} />}
+        {tab === 3 && isAdmin ? <UpdateStatisticsTab id={faculty?.id} /> : null}
       </Stack>
     </Container>
   )

@@ -132,7 +132,7 @@ export const StudentDetails = () => {
         student={student}
       />
       <TagsTable student={student} />
-      {honoursCode && <BachelorHonours absentYears={absences} programmeCode={honoursCode} student={student} />}
+      {honoursCode ? <BachelorHonours absentYears={absences} programmeCode={honoursCode} student={student} /> : null}
       <CourseTables selectedStudyPlanId={selectedStudyPlanId} student={student} />
     </Stack>
   )

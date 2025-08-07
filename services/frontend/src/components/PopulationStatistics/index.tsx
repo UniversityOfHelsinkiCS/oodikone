@@ -227,9 +227,9 @@ export const PopulationStatistics = () => {
             <Typography fontWeight={300} variant="h6">
               Class size {students.length} students
             </Typography>
-            {showNoStudentsMessage && <HelpInfoCard body={helpCardBody} title={helpCardTitle} />}
+            {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           </Box>
-          {isSuccess && (
+          {isSuccess ? (
             <PopulationDetails
               filteredCourses={filteredCourses}
               filteredStudents={filteredStudents}
@@ -237,7 +237,7 @@ export const PopulationStatistics = () => {
               populationTags={populationTags}
               query={query}
             />
-          )}
+          ) : null}
         </Box>
       )}
     </FilterView>

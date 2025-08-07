@@ -22,7 +22,7 @@ export const StatisticsTab = ({ filteredStudents, programme }: StatisticsTabProp
       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
         <StatisticsTable filteredStudents={filteredStudents} type="All students of the population" />
       </Box>
-      {admissionTypesAvailable && (
+      {admissionTypesAvailable ? (
         <>
           <DividerWithText text="By admission type" />
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '2em', justifyContent: 'center', width: '100%' }}>
@@ -38,7 +38,7 @@ export const StatisticsTab = ({ filteredStudents, programme }: StatisticsTabProp
             })}
           </Box>
         </>
-      )}
+      ) : null}
     </Stack>
   )
 }

@@ -248,7 +248,7 @@ export const BasicInformationTab = ({
         isLoading={basicsIsLoading}
         title="Students of the faculty"
       >
-        {basics.isSuccess && basics.data && (
+        {basics.isSuccess && basics.data ? (
           <Stack gap={2}>
             <LineGraph
               cypress="students-of-the-faculty"
@@ -268,7 +268,7 @@ export const BasicInformationTab = ({
               titles={basics.data.studentInfo.titles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
       <Section
         cypress="graduated-of-the-faculty"
@@ -277,7 +277,7 @@ export const BasicInformationTab = ({
         isLoading={basicsIsLoading}
         title="Graduated of the faculty"
       >
-        {basics.isSuccess && basics.data && (
+        {basics.isSuccess && basics.data ? (
           <Stack gap={2}>
             <LineGraph
               cypress="graduated-of-the-faculty"
@@ -296,7 +296,7 @@ export const BasicInformationTab = ({
               titles={basics.data.graduationInfo.titles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
       <Section
         cypress="thesis-writers-of-the-faculty"
@@ -305,7 +305,7 @@ export const BasicInformationTab = ({
         isLoading={thesisWritersIsLoading}
         title="Thesis writers of the faculty"
       >
-        {thesisWriters.isSuccess && thesisWriters.data && (
+        {thesisWriters.isSuccess && thesisWriters.data ? (
           <Stack gap={2}>
             <LineGraph
               cypress="thesis-writers-of-the-faculty"
@@ -324,7 +324,7 @@ export const BasicInformationTab = ({
               titles={thesisWriters.data.titles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
       <Section
         cypress="credits-produced-by-the-faculty"
@@ -340,7 +340,7 @@ export const BasicInformationTab = ({
               <Typography>Show special categories</Typography>
             </Stack>
           </Stack>
-          {credits.isSuccess && credits.data && (
+          {credits.isSuccess && credits.data ? (
             <Stack gap={2}>
               <StackedBarChart
                 cypress="credits-produced-by-the-faculty"
@@ -363,7 +363,7 @@ export const BasicInformationTab = ({
                 titles={tableStats?.titles}
               />
             </Stack>
-          )}
+          ) : null}
         </Stack>
       </Section>
     </Stack>

@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import compression from 'compression'
 import cors from 'cors'
-import express, { Express } from 'express'
+import { Express, json as jsonExpress } from 'express'
 
 import { frontUrl, languageCenterViewEnabled, serviceProvider } from './config'
 import accessLogger from './middleware/accessLogger'
@@ -39,11 +39,11 @@ import usersFd from './routes/usersFd'
 
 const routes = (app: Express, url: string) => {
   app.use(cors({ credentials: true, origin: frontUrl }))
-  app.use(express.json())
+  app.use(jsonExpress())
   app.use(compression())
 
   app.use(headersMiddleware)
-  app.use(currentUserMiddleware)
+  app.use(currentUserMiddleware) // eslint-disable-line @typescript-eslint/no-misused-promises
   app.use(accessLogger)
   app.use(`${url}/login`, login)
   app.use(url, courses)

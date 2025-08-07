@@ -1,6 +1,13 @@
-// ! If we don't have this file, running ESLint will fail because of the import/no-unused-modules rule
-// ! See: https://github.com/import-js/eslint-plugin-import/issues/3079
-// ! When this issue is resolved, this file can be removed
 {
-  "ignorePatterns": ["**/node_modules/", "**/dist/", "**/build/"]
+  "ignorePatterns": [
+    "eslint.config.mjs",
+    "**/build/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/instrumented/**",
+    "**/coverage/**",
+    "nyc-config.cjs",
+    ".lintstagedrc.mjs",
+    "cypress.config.js"
+  ]
 }

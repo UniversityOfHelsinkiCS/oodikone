@@ -87,11 +87,11 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   return (
     <ColorizedCoursesTableContext.Provider value={settingsContext}>
       <div className="colorized-courses-table">
-        {dividerText && (
+        {dividerText ? (
           <Divider horizontal style={{ marginTop: '3em' }}>
             {dividerText}
           </Divider>
-        )}
+        ) : null}
         {infoBox}
         {displayedPanes.length === 1 ? displayedPanes[0].render() : <Tab panes={displayedPanes} />}
       </div>

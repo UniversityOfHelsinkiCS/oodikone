@@ -27,11 +27,11 @@ export const PopulationCourses = ({
           <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
         </div>
       )}
-      {query.programme && !onlyIamRights && (
+      {query.programme && !onlyIamRights ? (
         <div style={{ marginBottom: '20px' }}>
           <FilterDegreeCoursesModal degreeProgramme={query.programme} years={query.years} />
         </div>
-      )}
+      ) : null}
     </div>
     <SegmentDimmer isLoading={isPending} />
     {courseTableMode === 'curriculum' ? (

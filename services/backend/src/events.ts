@@ -106,14 +106,15 @@ const dailyJobs = async () => {
 export const startCron = () => {
   if (isProduction && !runningInCI) {
     logger.info(`Cronjob for refreshing stats started: runs at "${CRON_SCHEDULE}"`)
-    schedule(CRON_SCHEDULE, async () => {
+    schedule(CRON_SCHEDULE, () => {
       logger.info('Running daily jobs from cron')
-      await dailyJobs()
+      void dailyJobs()
     })
-    schedule('0 4 * * 3', async () => {
+    schedule('0 4 * * 3', () => {
       logger.info("Deleting users who haven't logged in for 18 months")
-      const [, result] = (await deleteOutdatedUsers()) as { rowCount: number }[]
-      logger.info(`Deleted ${result.rowCount} users`)
+
+      const deletedOutdatedUsers = deleteOutdatedUsers() as Promise<{ rowCount: number }[]>
+      void deletedOutdatedUsers.then(([_, result]) => logger.info(`Deleted ${result.rowCount} users`))
     })
     schedule('0 19 * * 1', () => {
       logger.info('Updating students whose studyplans have not been updated recently')

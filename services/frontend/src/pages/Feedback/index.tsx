@@ -126,7 +126,7 @@ export const Feedback = () => {
               color="primary"
               disabled={!feedback.trim().length || isLoading}
               endIcon={<SendIcon />}
-              onClick={handleSubmit}
+              onClick={() => void handleSubmit()}
               variant="contained"
             >
               Send

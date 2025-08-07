@@ -6,14 +6,13 @@ const hasLanded = () => {
 }
 
 const chooseSemester = (semester, fromOrTo) => {
-  cy.get(`[data-cy="semester-${fromOrTo}"]`)
-    .click()
-    .within(() => {
-      cy.get('div.visible.menu.transition').within(() => {
-        cy.contains('div.item', semester).click()
-      })
-      cy.get('div.menu.transition').should('not.have.class', 'visible')
+  cy.get(`[data-cy="semester-${fromOrTo}"]`).click()
+  cy.get(`[data-cy="semester-${fromOrTo}"]`).within(() => {
+    cy.get('div.visible.menu.transition').within(() => {
+      cy.contains('div.item', semester).click()
     })
+    cy.get('div.menu.transition').should('not.have.class', 'visible')
+  })
 }
 
 const checkNumbers = (numbers, numberOfColumns, mode) => {

@@ -87,7 +87,7 @@ export const Routes = () => (
 
         {/* Access control inside ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
-          {languageCenterViewEnabled && <Route element={<LanguageCenterView />} path="/languagecenterview" />}
+          {languageCenterViewEnabled ? <Route element={<LanguageCenterView />} path="/languagecenterview" /> : null}
         </Route>
 
         {/* Catch all route */}

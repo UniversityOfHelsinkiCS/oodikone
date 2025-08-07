@@ -64,7 +64,7 @@ export const DegreeCoursesTab = ({
       {isBachelorOrLicentiateProgramme(degreeProgramme) && (
         <CreditCriteriaSection criteria={criteria} degreeProgramme={degreeProgramme} />
       )}
-      {defaultProgrammeModules.length > 1 && curriculum && (
+      {defaultProgrammeModules.length > 1 && curriculum ? (
         <DegreeCourseTable
           combinedProgramme=""
           criteria={criteria}
@@ -72,8 +72,8 @@ export const DegreeCoursesTab = ({
           modules={defaultProgrammeModules}
           studyProgramme={degreeProgramme}
         />
-      )}
-      {secondProgrammeModules.length > 0 && curriculum && (
+      ) : null}
+      {secondProgrammeModules.length > 0 && curriculum ? (
         <DegreeCourseTable
           combinedProgramme={combinedProgramme}
           criteria={criteria}
@@ -81,7 +81,7 @@ export const DegreeCoursesTab = ({
           modules={secondProgrammeModules}
           studyProgramme={degreeProgramme}
         />
-      )}
+      ) : null}
     </Stack>
   )
 }

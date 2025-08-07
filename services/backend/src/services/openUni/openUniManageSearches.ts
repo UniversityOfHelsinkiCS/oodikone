@@ -73,5 +73,6 @@ export const updateSearch = async (userId: string, id: string, courseCodes: stri
     return updated
   } catch (error) {
     logger.error(`Couldn't update open uni search instance: ${error}`)
+    return null
   }
 }

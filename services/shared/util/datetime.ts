@@ -14,6 +14,7 @@ export const dateYearsFromNow = (date: Date, years: number) => {
  * @param months Number of months to add to the start date
  * @returns A new date with months incremented by the given amount
  */
+// eslint-disable-next-line import-x/no-unused-modules
 export const dateMonthsFromNow = (date: string, months?: string) => {
   const initialDate = new Date(date)
   // NOTE: Cast to number, uses "MAGIC_NUMBER" if undefined or NaN

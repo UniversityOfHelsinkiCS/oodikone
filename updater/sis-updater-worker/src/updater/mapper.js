@@ -426,12 +426,10 @@ export const studyplanMapper =
                       // Some cases course_unit_id is not the same in attainment and course in hops. In attainments may be different
                       // course_uni_id between types AssesmentItemAttainment and CourseUnitAttainment.
                       const attainment = getCorrectAttainment(attainments, courseUnitIdToCode, courseUnitId, studyplan)
-                      if (attainment.length > 0) {
-                        courseUnitId = attainment[0].course_unit_id
-                      }
+                      const acualCourseUnitId = attainment.length > 0 ? attainment[0].course_unit_id : courseUnitId
 
-                      return courseUnitIdToAttainment[courseUnitId]
-                        ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
+                      return courseUnitIdToAttainment[acualCourseUnitId]
+                        ? courseUnitIdToAttainment[acualCourseUnitId][studyplan.user_id]
                         : []
                     })
                 )

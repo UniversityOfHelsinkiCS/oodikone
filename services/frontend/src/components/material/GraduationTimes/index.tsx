@@ -62,10 +62,10 @@ export const GraduationTimes = ({
     <Section
       cypress={`${level}-graduation-times`}
       isError={isError}
-      isLoading={isLoading && !dataIsLoaded}
+      isLoading={isLoading ? !dataIsLoaded : false}
       title={title}
     >
-      {showMedian && dataIsLoaded && (
+      {showMedian && dataIsLoaded ? (
         <MedianDisplay
           classSizes={classSizes}
           data={data}
@@ -82,8 +82,8 @@ export const GraduationTimes = ({
           year={year}
           yearLabel={yearLabel}
         />
-      )}
-      {!showMedian && dataIsLoaded && (
+      ) : null}
+      {!showMedian && dataIsLoaded ? (
         <BreakdownDisplay
           data={data}
           handleClick={handleClick}
@@ -95,7 +95,7 @@ export const GraduationTimes = ({
           year={year}
           yearLabel={yearLabel}
         />
-      )}
+      ) : null}
     </Section>
   )
 }

@@ -25,7 +25,7 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
   }
 
   const handleDelete = () => {
-    deleteStudentTags({
+    void deleteStudentTags({
       combinedProgramme,
       tagId: selectedValue,
       studentNumbers: selectedStudents,
@@ -44,7 +44,7 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
       })
     })
     setSelected('')
-    createStudentTags({ combinedProgramme, studyTrack: programme, studentTags: tagList })
+    void createStudentTags({ combinedProgramme, studyTrack: programme, studentTags: tagList })
     setConfirmAdd(false)
   }
 
@@ -55,7 +55,7 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
       content={`Are you sure you want to add tag "${selectedTag ? selectedTag.name : null}" to ${selectedStudents.length} students?`}
       onCancel={() => setConfirmAdd(false)}
       onConfirm={() => handleAdd()}
-      open={confirmAdd && !!selectedTag}
+      open={confirmAdd ? !!selectedTag : null}
     />
   )
 
@@ -66,7 +66,7 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
       content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.name : null}" from ${selectedStudents.length} students?`}
       onCancel={() => setConfirmDelete(false)}
       onConfirm={() => handleDelete()}
-      open={confirmDelete && !!selectedTag}
+      open={confirmDelete ? !!selectedTag : null}
     />
   )
 

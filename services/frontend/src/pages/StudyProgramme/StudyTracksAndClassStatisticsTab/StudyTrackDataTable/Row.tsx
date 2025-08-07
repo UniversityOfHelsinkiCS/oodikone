@@ -99,7 +99,7 @@ export const Row = ({
           return (
             <TableCell align="right" key={getCellKey(year, index)} sx={{ whiteSpace: 'nowrap' }}>
               {title}
-              {populationLinkVisible && (
+              {populationLinkVisible ? (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   cypress={year.split(' - ')[0]}
@@ -107,7 +107,7 @@ export const Row = ({
                   studyTrack={correctStudyTrack}
                   years={year === 'Total' ? calendarYears : [parseInt(year.split(' ')[0], 10)]}
                 />
-              )}
+              ) : null}
             </TableCell>
           )
         }

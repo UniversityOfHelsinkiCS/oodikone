@@ -94,13 +94,9 @@ export const CustomPopulationProgrammeDist = ({ students, coursecode, from, to }
       programme = getNewestProgrammeOfStudentAt(student.studyRights, currentSemester?.semestercode)
     }
 
-    if (!programme) {
-      programme = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
-    }
+    programme ??= { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-    if (!allProgrammes[programme.code]) {
-      allProgrammes[programme.code] = { programme, students: 0 }
-    }
+    allProgrammes[programme.code] ??= { programme, students: 0 }
     allProgrammes[programme.code].students += 1
   }
 

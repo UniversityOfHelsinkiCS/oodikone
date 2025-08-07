@@ -28,7 +28,7 @@ const DateColumnFilterComponent = ({ options, dispatch }) => {
 export const dateColumnFilter = {
   component: DateColumnFilterComponent,
 
-  isActive: options => options?.range?.[0] || options?.range?.[1],
+  isActive: options => options?.range?.[0] ?? options?.range?.[1],
 
   initialOptions: () => ({
     range: [null, null],

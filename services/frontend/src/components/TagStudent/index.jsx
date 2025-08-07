@@ -10,8 +10,8 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
   const { visible: namesVisible } = useStudentNameVisibility()
   const [selectedTags, setSelectedTags] = useState([])
 
-  const handleSave = async () => {
-    await createStudentTags({
+  const handleSave = () => {
+    void createStudentTags({
       combinedProgramme,
       studentTags: selectedTags.map(tag => ({ studentNumber, tagId: tag })),
       studyTrack,
@@ -20,7 +20,7 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
   }
 
   const deleteTag = tag => {
-    deleteStudentTags({
+    void deleteStudentTags({
       combinedProgramme,
       tagId: tag.id,
       studentNumbers: [studentNumber],
@@ -36,7 +36,7 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
 
   return (
     <Table.Row>
-      {namesVisible && <Table.Cell>{studentName}</Table.Cell>}
+      {namesVisible ? <Table.Cell>{studentName}</Table.Cell> : null}
       <Table.Cell>{studentNumber}</Table.Cell>
       <Table.Cell>{studentTagLabels}</Table.Cell>
       <Table.Cell>

@@ -171,12 +171,12 @@ const CustomPopulationContent = ({
           filteredStudents={filteredStudents}
           generalTabColumnFunction={() =>
             columnsGeneralTab({
-              programme: associatedProgramme || null,
+              programme: associatedProgramme ?? null,
             })
           }
           generalTabFormattingFunction={() =>
             formatGeneralTab({
-              programme: associatedProgramme || null,
+              programme: associatedProgramme ?? null,
               filteredStudents,
             })
           }
@@ -211,15 +211,15 @@ const CustomPopulationContent = ({
             <div style={{ margin: 'auto' }}>
               <Header className="segmentTitle" size="large" textAlign="center">
                 Custom population
-                {customPopulationState.selectedSearch && ` "${customPopulationState.selectedSearch.name}"`}
-                {associatedProgramme && (
+                {customPopulationState.selectedSearch ? ` "${customPopulationState.selectedSearch.name}"` : null}
+                {associatedProgramme ? (
                   <Label
                     color="blue"
                     content={studyProgrammes.find(programme => programme.key === associatedProgramme).text}
                     style={{ marginLeft: '2em' }}
                     tag
                   />
-                )}
+                ) : null}
               </Header>
             </div>
             <PanelView panels={panels} viewTitle="custompopulation" />

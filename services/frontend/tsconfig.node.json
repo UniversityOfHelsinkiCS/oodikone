@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "target": "es2021",
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",

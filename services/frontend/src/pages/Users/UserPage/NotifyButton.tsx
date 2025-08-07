@@ -47,7 +47,7 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
       >
         Notify
       </Button>
-      {!previewIsLoading && !previewIsError && email && (
+      {!previewIsLoading && !previewIsError && email ? (
         <Modal onClose={() => setConfirmOpen(false)} open={confirmOpen}>
           <Card
             sx={{
@@ -77,7 +77,7 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
                   disabled={previewIsLoading || previewIsError || sendIsLoading || sendIsSuccess}
                   endIcon={<SendIcon />}
                   loading={sendIsLoading}
-                  onClick={onClick}
+                  onClick={() => void onClick()}
                   variant="contained"
                 >
                   Send
@@ -86,7 +86,7 @@ export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
             </CardContent>
           </Card>
         </Modal>
-      )}
+      ) : null}
     </>
   )
 }

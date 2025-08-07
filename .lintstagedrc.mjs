@@ -1,9 +1,10 @@
-const path = require('path')
+import { relative } from 'path'
+
 const cwd = process.cwd()
 const dockerCmdBase = `docker run --rm --volume ${cwd}:/oodikone --workdir /oodikone`
-const relativeFilePaths = files => [...files.map(file => path.relative(cwd, file))].join(' ')
+const relativeFilePaths = files => [...files.map(file => relative(cwd, file))].join(' ')
 
-module.exports = {
+export default {
   '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
     `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
   'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',

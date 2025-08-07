@@ -34,8 +34,8 @@ export const FacultyProgress = ({
 
   return (
     <Stack spacing={2}>
-      <Section isError={isError} isLoading={isLoading && !bachelorStats} title="Bachelor">
-        {bachelorStats && (
+      <Section isError={isError} isLoading={isLoading ? !bachelorStats : false} title="Bachelor">
+        {bachelorStats ? (
           <Stack gap={2}>
             <ProgressBarChart
               cypress="faculty-bachelors"
@@ -55,16 +55,16 @@ export const FacultyProgress = ({
               titles={bachelorStats?.tableTitles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
       <Section
         cypress="faculty-bachelor-masters-progress"
         infoBoxContent={facultyToolTips.bachelorMasterProgress}
         isError={isError}
-        isLoading={isLoading && !bachelorMasterStats}
+        isLoading={isLoading ? !bachelorMasterStats : false}
         title="Bachelor + Master"
       >
-        {bachelorMasterStats && (
+        {bachelorMasterStats ? (
           <Stack gap={2}>
             <ProgressBarChart
               cypress="faculty-bachelor-masters"
@@ -84,10 +84,10 @@ export const FacultyProgress = ({
               titles={bachelorMasterStats.tableTitles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
-      <Section isError={isError} isLoading={isLoading && !masterStats} title="Master">
-        {masterStats && faculty !== 'H90' && (
+      <Section isError={isError} isLoading={isLoading ? !masterStats : false} title="Master">
+        {masterStats && faculty !== 'H90' ? (
           <Stack gap={2}>
             <ProgressBarChart
               cypress="faculty-masters"
@@ -107,10 +107,10 @@ export const FacultyProgress = ({
               titles={masterStats.tableTitles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
-      <Section isError={isError} isLoading={isLoading && !doctorStats} title="Doctor">
-        {doctorStats && (
+      <Section isError={isError} isLoading={isLoading ? !doctorStats : false} title="Doctor">
+        {doctorStats ? (
           <Stack gap={2}>
             <ProgressBarChart
               cypress="faculty-doctoral"
@@ -129,7 +129,7 @@ export const FacultyProgress = ({
               titles={doctorStats.tableTitles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
     </Stack>
   )

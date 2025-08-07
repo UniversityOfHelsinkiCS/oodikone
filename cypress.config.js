@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable import/no-commonjs */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unused-modules */
+/* eslint-disable import-x/no-extraneous-dependencies  */
+/* eslint-disable import-x/no-default-export */
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({

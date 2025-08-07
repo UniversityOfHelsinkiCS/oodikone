@@ -50,11 +50,16 @@ export const StudentInfoCard = ({ student }) => {
             <Box component="span">Credits: {student.credits ?? 0}</Box>
             <EnrollmentAccordion student={student} />
             Updated at {formattedTimestamp}
-            {isAdmin && (
-              <Button onClick={updateStudent} startIcon={<RefreshIcon />} sx={{ marginTop: 1 }} variant="outlined">
+            {isAdmin ? (
+              <Button
+                onClick={() => void updateStudent()}
+                startIcon={<RefreshIcon />}
+                sx={{ marginTop: 1 }}
+                variant="outlined"
+              >
                 Update student
               </Button>
-            )}
+            ) : null}
           </Stack>
         </Stack>
       </CardContent>

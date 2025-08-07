@@ -11,11 +11,10 @@ type CourseInfo = {
   }
 }
 
-type StudentStats = {
-  [studentNumber: string]: {
-    courseInfo: {
-      [courseCode: string]: CourseInfo
-    }
+type StudentStats = Record<
+  string,
+  {
+    courseInfo: Record<string, CourseInfo>
     email: string
     secondaryEmail: string
     totals: {
@@ -24,7 +23,7 @@ type StudentStats = {
       unfinished: number
     }
   }
-}
+>
 
 const uniq = objects => [...new Set(objects)]
 

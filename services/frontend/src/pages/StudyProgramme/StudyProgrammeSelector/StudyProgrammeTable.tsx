@@ -65,8 +65,8 @@ export const StudyProgrammeTable = ({
               data-cy={`pin-programme-${row.original.code}-button`}
               onClick={
                 isPinned
-                  ? () => removeStudyProgrammePins({ programmeCode: row.original.code })
-                  : () => addStudyProgrammePins({ programmeCode: row.original.code })
+                  ? () => void removeStudyProgrammePins({ programmeCode: row.original.code })
+                  : () => void addStudyProgrammePins({ programmeCode: row.original.code })
               }
               sx={{
                 color: theme =>

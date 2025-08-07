@@ -143,7 +143,7 @@ export const StudyTrackDataTable = ({
             ))}
           </TableRow>
         </TableHead>
-        {(sortedMainStats || sortedTrackStats) && (
+        {sortedMainStats || sortedTrackStats ? (
           <TableBody>
             {singleTrack
               ? sortedTrackStats.map((row, index) => (
@@ -179,7 +179,7 @@ export const StudyTrackDataTable = ({
                   ))
                 )}
           </TableBody>
-        )}
+        ) : null}
       </Table>
     </TableContainer>
   )

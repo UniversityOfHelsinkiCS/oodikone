@@ -1,5 +1,4 @@
-/* eslint-disable class-methods-use-this */
-
+/* eslint-disable @typescript-eslint/class-methods-use-this */
 import { getDataItemType, DataItemType } from '@/components/SortableTable/common'
 
 class DataVisitorContext {

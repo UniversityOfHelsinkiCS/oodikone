@@ -1,4 +1,4 @@
-import dayjs, { type Dayjs } from 'dayjs'
+import dayjs, { type Dayjs, isDayjs } from 'dayjs'
 
 import { DateFormat } from '@/constants/date'
 
@@ -17,7 +17,7 @@ export const reformatDate = (date: string | Date | null | undefined, outputForma
 export const formatDate = (dateToFormat: string | Date | Dayjs | null | undefined, outputFormat: DateFormat) => {
   if (!dateToFormat) return 'Unavailable'
 
-  const date = dayjs.isDayjs(dateToFormat) ? dateToFormat.toDate() : new Date(dateToFormat)
+  const date = isDayjs(dateToFormat) ? dateToFormat.toDate() : new Date(dateToFormat)
 
   if (isNaN(date.getTime())) return 'Unavailable'
 

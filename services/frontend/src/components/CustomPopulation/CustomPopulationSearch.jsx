@@ -44,15 +44,15 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   const onSave = () => {
     const students = extractItems(input)
     if (selectedSearch) {
-      updateSearch({ id: selectedSearch.id, students })
+      void updateSearch({ id: selectedSearch.id, students })
     } else {
-      createSearch({ name, students })
+      void createSearch({ name, students })
     }
   }
 
   const onDelete = () => {
     if (selectedSearch) {
-      deleteSearch({ id: selectedSearch.id })
+      void deleteSearch({ id: selectedSearch.id })
       clearForm()
     }
   }

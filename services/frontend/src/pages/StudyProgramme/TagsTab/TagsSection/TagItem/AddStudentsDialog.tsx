@@ -86,7 +86,7 @@ export const AddStudentsDialog = ({
           color="success"
           data-cy="add-students-confirm-button"
           disabled={isLoading || !parsedStudentNumbers.length}
-          onClick={handleClick}
+          onClick={event => void handleClick(event)}
           variant="contained"
         >
           Confirm

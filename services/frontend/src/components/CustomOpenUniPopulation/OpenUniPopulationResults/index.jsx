@@ -74,13 +74,13 @@ const getColumns = (labelsToCourses, getTextIn) => {
     {
       key: 'email-child',
       title: 'Email',
-      getRowVal: student => (student.email ? student.email : ''),
+      getRowVal: student => student.email ?? '',
       headerProps: { title: 'Email' },
     },
     {
       key: 'secondary_email-child',
       title: 'Secondary email',
-      getRowVal: student => (student.secondaryEmail ? student.secondaryEmail : ''),
+      getRowVal: student => student.secondaryEmail ?? '',
       headerProps: { title: 'Secondary email' },
     },
   ]

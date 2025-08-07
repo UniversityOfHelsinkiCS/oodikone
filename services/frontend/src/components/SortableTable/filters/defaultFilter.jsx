@@ -33,7 +33,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
           search === '' ||
           (typeof value === 'string' &&
             typeof search === 'string' &&
-            `${value.toLowerCase()}`.indexOf(search.toLowerCase()) > -1)
+            value.toLowerCase().includes(search.toLowerCase()))
       )
       .sort((a, b) => {
         if (typeof a === 'string' && typeof b === 'string') {
@@ -96,7 +96,7 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
         onClick={event => event.stopPropagation()}
         onKeyDown={event => {
           if (event.keyCode === 13) {
-            const visibleValues = uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
+            const visibleValues = uniq(values).filter(value => search === '' || value.includes(search))
 
             const visibleTypes = chain(valueFilters)
               .filter(f => includes(visibleValues, f.value))

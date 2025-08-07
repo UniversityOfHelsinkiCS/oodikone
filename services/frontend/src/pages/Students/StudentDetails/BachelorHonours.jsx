@@ -140,14 +140,14 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
           icon={honours ? <DoneIcon /> : <CloseIcon />}
           label={honours ? 'Qualified for Honours' : 'Not qualified for Honours'}
         />
-        {!honours && reason && <Chip color="error" data-cy="honours-chip-error" label={reason} />}
+        {!honours && reason ? <Chip color="error" data-cy="honours-chip-error" label={reason} /> : null}
         {inspection && <Chip color="info" data-cy="honours-chip-inspection" label="Might need further inspection" />}
       </Stack>
       <Stack alignItems="center" direction="row" spacing={1} sx={{ marginTop: 2 }}>
         <span>Select curriculum version used for checking Bachelor Honours eligibility</span>
         <CurriculumPicker curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
       </Stack>
-      {honours && (
+      {honours ? (
         <StyledAccordion expanded={showHonoursModules} onChange={() => setShowHonoursModules(!showHonoursModules)}>
           <AccordionSummary expandIcon={<ArrowDropDownIcon />} sx={{ fontWeight: 'bold' }}>
             Study modules
@@ -173,7 +173,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
             </Stack>
           </AccordionDetails>
         </StyledAccordion>
-      )}
+      ) : null}
     </Section>
   )
 }

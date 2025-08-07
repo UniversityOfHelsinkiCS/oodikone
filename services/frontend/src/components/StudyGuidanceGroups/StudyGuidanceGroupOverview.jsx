@@ -27,7 +27,7 @@ const LinkToGroup = ({ group }) => {
 }
 
 const prettifyCamelCase = string => {
-  const splitted = string.match(/[A-Za-z][a-z]*/g) || []
+  const splitted = string.match(/[A-Za-z][a-z]*/g) ?? []
   return splitted.map(word => word.charAt(0).toLowerCase() + word.substring(1)).join(' ')
 }
 
@@ -64,13 +64,13 @@ const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit }) =>
     setFormErrors(errors)
 
     if (Object.keys(errors).length === 0) {
-      changeStudyGuidanceGroupTags({ groupId: group.id, tags: formValues })
+      void changeStudyGuidanceGroupTags({ groupId: group.id, tags: formValues })
       toggleEdit()
     }
   }
 
   const handleRemove = () => {
-    changeStudyGuidanceGroupTags({ groupId: group.id, tags: { [tagName]: null } })
+    void changeStudyGuidanceGroupTags({ groupId: group.id, tags: { [tagName]: null } })
     toggleEdit()
   }
 
@@ -129,7 +129,7 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
             onChange={(_, { value }) => handleChange(tagName, value)}
             options={selectFieldItems}
             placeholder={
-              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text || 'Select study programme'
+              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text ?? 'Select study programme'
             }
             search={textAndDescriptionSearch}
             value={formValues[tagName]}
@@ -175,7 +175,7 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
         )}
       </div>
     </Form>
-    {formErrors[tagName] && <Message header={`${formErrors[tagName]}`} icon="exclamation circle" negative />}
+    {formErrors[tagName] ? <Message header={`${formErrors[tagName]}`} icon="exclamation circle" negative /> : null}
   </>
 )
 
@@ -229,8 +229,8 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
       key: 'students',
       title: 'Students',
       filterType: 'range',
-      getRowVal: group => group.members?.length || 0,
-      getRowContent: group => group.members?.length || 0,
+      getRowVal: group => group.members?.length ?? 0,
+      getRowContent: group => group.members?.length ?? 0,
     },
     {
       key: 'studyProgramme',

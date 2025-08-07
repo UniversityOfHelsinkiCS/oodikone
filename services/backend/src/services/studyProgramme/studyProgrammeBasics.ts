@@ -15,9 +15,7 @@ import { getStudyRightsInProgramme } from './studyRightFinders'
 
 export const getDateOfFirstSemesterPresent = (
   semesterEnrollments: SemesterEnrollment[] | null,
-  semesters: {
-    [semestercode: string]: { semestercode: number; name: Name; yearcode: number; startdate: Date; enddate: Date }
-  },
+  semesters: Record<string, { semestercode: number; name: Name; yearcode: number; startdate: Date; enddate: Date }>,
   currentSemester: number,
   since: Date
 ) => {

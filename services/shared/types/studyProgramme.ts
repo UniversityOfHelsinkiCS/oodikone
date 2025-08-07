@@ -41,14 +41,13 @@ export type ProgrammeOrStudyTrackGraduationStats = {
   }
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export type Goals = {
   basic: number
   combo: number
 }
 
-export type GraduationTimes = {
-  [programmeOrStudyTrack: string]: ProgrammeOrStudyTrackGraduationStats
-} & {
+export type GraduationTimes = Record<string, ProgrammeOrStudyTrackGraduationStats> & {
   goals: Goals
 }
 

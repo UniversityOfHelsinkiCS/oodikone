@@ -7,6 +7,7 @@ import { Name } from '@oodikone/shared/types'
 
 type LanguageContextType = [Language, React.Dispatch<React.SetStateAction<Language>>]
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const LanguageContext = createContext<LanguageContextType>([DEFAULT_LANG, () => {}])
 LanguageContext.displayName = 'Language'
 

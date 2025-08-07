@@ -18,9 +18,7 @@ export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
         .sort((a, b) => (new Date(a.date) <= new Date(b.date) ? -1 : 1))
 
       if (filteredCourses[0] && filteredCourses[0].language !== null) {
-        if (!languages[filteredCourses[0].language]) {
-          languages[filteredCourses[0].language] = 0
-        }
+        languages[filteredCourses[0].language] ??= 0
         languages[filteredCourses[0].language] += 1
         total++
       }

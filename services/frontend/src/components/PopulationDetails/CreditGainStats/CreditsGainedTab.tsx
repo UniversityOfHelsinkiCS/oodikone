@@ -29,7 +29,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
         type="All students of the class"
         year={year}
       />
-      {admissionTypesAvailable && (
+      {admissionTypesAvailable ? (
         <Box>
           <DividerWithText text="By admission type" />
           {admissionTypes.map(type => {
@@ -45,7 +45,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
             ) : null
           })}
         </Box>
-      )}
+      ) : null}
     </Stack>
   )
 }

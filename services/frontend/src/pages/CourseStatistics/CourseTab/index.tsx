@@ -40,15 +40,15 @@ export const CourseTab = ({
       <Section title={hasSubstitutions ? 'Selected courses' : 'Selected course'}>
         <Stack gap={1}>
           {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-          {hasSubstitutions && (
+          {hasSubstitutions ? (
             <Typography component="h3" variant="h6">
               Course
             </Typography>
-          )}
+          ) : null}
           <Box>
             <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} primary />
           </Box>
-          {hasSubstitutions && (
+          {hasSubstitutions ? (
             <Stack gap={1}>
               <Typography component="h3" variant="h6">
                 Substitutions
@@ -63,7 +63,7 @@ export const CourseTab = ({
                   ))}
               </Grid>
             </Stack>
-          )}
+          ) : null}
         </Stack>
       </Section>
       <SingleCourseStats

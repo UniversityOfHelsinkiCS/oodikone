@@ -48,9 +48,9 @@ export const FoldableRow = ({
         }}
       >
         <TableCell onClick={() => isMainRow && setIsUnfolded(isUnfolded => !isUnfolded)} width={1}>
-          {showFoldIcon && (
+          {showFoldIcon ? (
             <IconButton size="small">{isUnfolded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}</IconButton>
-          )}
+          ) : null}
         </TableCell>
         <TableCell align="left" onClick={() => onClickCourse(id)}>
           <Typography color={obfuscated ? 'text.secondary' : 'text.primary'} sx={{ cursor: 'pointer' }} variant="body2">
@@ -81,12 +81,13 @@ export const FoldableRow = ({
   return (
     <>
       {getRow(id, courseData)}
-      {showCourseRealisations &&
-        realisations.map(row => {
-          const { realisation } = row
-          const realisationId = `${id}-${realisation}`
-          return getRow(realisationId, row, false)
-        })}
+      {showCourseRealisations
+        ? realisations.map(row => {
+            const { realisation } = row
+            const realisationId = `${id}-${realisation}`
+            return getRow(realisationId, row, false)
+          })
+        : null}
     </>
   )
 }

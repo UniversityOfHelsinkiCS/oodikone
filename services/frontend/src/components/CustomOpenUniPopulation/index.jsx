@@ -33,7 +33,7 @@ export const CustomOpenUniPopulation = () => {
       </Message>
       <CustomOpenUniSearch savedSearches={savedSearches.data} setValues={setValues} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
-        {fieldValues && fieldValues.courseList?.length > 0 && (
+        {fieldValues && fieldValues.courseList?.length > 0 ? (
           <p>
             <span style={{ color: '#484848' }}>Beginning of the search for all fields:</span>
             <span style={{ paddingLeft: '10px', fontWeight: '600' }}>
@@ -45,10 +45,12 @@ export const CustomOpenUniPopulation = () => {
               {formatDate(fieldValues.enddate, DateFormat.DISPLAY_DATE)}
             </span>
           </p>
-        )}
+        ) : null}
       </div>
       <div style={{ paddingTop: '25px' }}>
-        {fieldValues && fieldValues.courseList?.length > 0 && <OpenUniPopulationResults fieldValues={fieldValues} />}
+        {fieldValues && fieldValues.courseList?.length > 0 ? (
+          <OpenUniPopulationResults fieldValues={fieldValues} />
+        ) : null}
       </div>
     </div>
   )

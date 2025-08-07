@@ -27,11 +27,7 @@ export const TagsTab = ({ programme, combinedProgramme, students }) => {
             }}
           >
             <h3>
-              No tags defined. You can define them{' '}
-              <Link onClick={() => {}} to={`/study-programme/${correctCode}?tab=4`}>
-                here
-              </Link>
-              .
+              No tags defined. You can define them <Link to={`/study-programme/${correctCode}?tab=4`}>here</Link>.
             </h3>
           </div>
         )}

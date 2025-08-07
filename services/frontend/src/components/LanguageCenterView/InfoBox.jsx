@@ -7,7 +7,7 @@ export const InfoBox = () => {
     <Message style={{ maxWidth: '60em', marginBottom: '4em' }}>
       <p>This view displays amounts of enrollments and completions of courses organized by language center.</p>
       <p>You can view the numbers by faculties or by semesters.</p>
-      {open && (
+      {open ? (
         <div>
           <ul>
             <li>
@@ -50,7 +50,7 @@ export const InfoBox = () => {
             the <a href="https://oodikone.helsinki.fi/feedback">feedback form</a>.
           </p>
         </div>
-      )}
+      ) : null}
       <Button onClick={() => setOpen(!open)} style={{ marginTop: '20px' }}>
         {open ? 'Hide' : 'Show more info'}
       </Button>

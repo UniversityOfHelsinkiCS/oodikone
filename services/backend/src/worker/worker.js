@@ -1,6 +1,5 @@
 const Sentry = require('@sentry/node')
-// eslint-disable-next-line no-redeclare
-const { Worker } = require('bullmq')
+const { Worker: BullMQWorker } = require('bullmq')
 const dayjs = require('dayjs')
 
 const { redis, concurrentWorkers } = require('../config')
@@ -15,7 +14,7 @@ const connection = {
 // https://github.com/taskforcesh/bullmq/issues/2075#issuecomment-1646079335
 process.execArgv = process.execArgv.filter(arg => !arg.includes('--max_old_space_size='))
 
-const worker = new Worker(queueName, `${__dirname}/processor.js`, {
+const worker = new BullMQWorker(queueName, `${__dirname}/processor.js`, {
   connection,
   useWorkerThreads: true,
   concurrency: concurrentWorkers,

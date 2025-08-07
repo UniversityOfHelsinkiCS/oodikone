@@ -57,9 +57,8 @@ type CustomPopulation = {
   dataExport: JSX.Element
 }
 
-type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuidanceGroup | CustomPopulation) & {
-  [key: string]: undefined
-}
+type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuidanceGroup | CustomPopulation) &
+  Record<string, undefined>
 
 export const PopulationStudents = ({
   variant,
@@ -125,12 +124,13 @@ export const PopulationStudents = ({
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
 
-  const contentByVariant: {
-    [K in PopulationStudentsProps['variant']]: {
+  const contentByVariant: Record<
+    PopulationStudentsProps['variant'],
+    {
       tabs: (keyof typeof availableTabs)[]
       tooltip: string
     }
-  } = {
+  > = {
     population: {
       tabs:
         year === 'All' || (programme && !isBachelorOrLicentiateProgramme(programme))
@@ -172,12 +172,12 @@ export const PopulationStudents = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginTop: '5px', marginBottom: '5px' }}>
           <StudentNameVisibilityToggle />
-          {showSubstitutionToggle && (
+          {showSubstitutionToggle ? (
             <IncludeSubstitutionsToggle
               includeSubstitutions={includeSubstitutions}
               toggleIncludeSubstitutions={toggleIncludeSubstitutions}
             />
-          )}
+          ) : null}
         </div>
         {dataExport}
       </div>

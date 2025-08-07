@@ -51,12 +51,12 @@ export const MedianDisplay = ({
           data in Sisu
         </Typography>
       )}
-      {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) && (
+      {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) ? (
         <Typography>
           <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring, but
           the faculty level bar color is based on the typical goal time of {goal} months
         </Typography>
-      )}
+      ) : null}
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
         <MedianBarChart
@@ -70,7 +70,7 @@ export const MedianDisplay = ({
           title={title}
           yearLabel={yearLabel}
         />
-        {programmeDataVisible && year && year in levelProgrammeData && (
+        {programmeDataVisible && year && year in levelProgrammeData ? (
           <MedianBarChart
             classSizes={'programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks}
             cypress={`${level}-median-bar-chart-faculty`}
@@ -86,7 +86,7 @@ export const MedianDisplay = ({
             year={year}
             yearLabel={yearLabel}
           />
-        )}
+        ) : null}
       </Stack>
     </Box>
   )

@@ -190,27 +190,31 @@ export const FacultyStudentDataTable = ({
                     )
                   })}
                 </TableRow>
-                {yearsVisible[yearIndex] &&
-                  sortedKeys.map(programme => {
-                    return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
-                      <TableRow key={`${year}-regular-row-${programme}`}>
-                        <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
-                          <Stack alignItems="center" direction="row" gap={0.5}>
-                            <Tooltip
-                              title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
-                            >
-                              <b>{programmeNames[programme].progId}</b>
-                            </Tooltip>
-                            {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                              (requiredRights.fullAccessToStudentData && (
-                                <PopulationLink programme={programmeNames[programme].code} years={populationLinkYear} />
-                              ))}
-                          </Stack>
-                        </TableCell>
-                        {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
-                      </TableRow>
-                    )
-                  })}
+                {yearsVisible[yearIndex]
+                  ? sortedKeys.map(programme => {
+                      return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
+                        <TableRow key={`${year}-regular-row-${programme}`}>
+                          <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
+                            <Stack alignItems="center" direction="row" gap={0.5}>
+                              <Tooltip
+                                title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
+                              >
+                                <b>{programmeNames[programme].progId}</b>
+                              </Tooltip>
+                              {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
+                                (requiredRights.fullAccessToStudentData && (
+                                  <PopulationLink
+                                    programme={programmeNames[programme].code}
+                                    years={populationLinkYear}
+                                  />
+                                ))}
+                            </Stack>
+                          </TableCell>
+                          {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
+                        </TableRow>
+                      )
+                    })
+                  : null}
               </Fragment>
             )
           })}

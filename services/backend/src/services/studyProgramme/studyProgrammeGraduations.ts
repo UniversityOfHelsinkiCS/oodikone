@@ -235,9 +235,7 @@ type QueryParameters = {
   includeAllSpecials: boolean
 }
 
-type ProgrammeWithYears = {
-  [key: string]: number | string | Name
-} & StudyTrack
+type ProgrammeWithYears = Record<string, number | string | Name> & StudyTrack
 
 const getProgrammesBeforeStarting = async ({
   studyProgramme,

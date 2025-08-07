@@ -23,28 +23,25 @@ dayjs.extend(isSameOrAfter)
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(
-    course =>
-      course.course_code === courseCode ||
-      (criteria?.allCourses[courseCode] && criteria?.allCourses[courseCode].includes(course.course_code))
+    course => course.course_code === courseCode || criteria?.allCourses[courseCode]?.includes(course.course_code)
   )
 }
 
-const hasCreditTransfer = courses => courses && courses.some(course => course.credittypecode === 9)
+const hasCreditTransfer = courses => courses?.some(course => course.credittypecode === 9)
 
 const hasPassedDuringAcademicYear = (courses, start, end) => {
   return (
-    courses &&
-    courses.some(course => course.passed) &&
+    courses?.some(course => course.passed) &&
     courses.some(course => dayjs(course.date).isBetween(dayjs(start), dayjs(end)))
   )
 }
 
-const hasPassedOutsideAcademicYear = courses => courses && courses.some(course => course.passed)
+const hasPassedOutsideAcademicYear = courses => courses?.some(course => course.passed)
 
-const hasFailed = courses => courses && courses.some(course => course.passed === false)
+const hasFailed = courses => courses?.some(course => course.passed === false)
 
 const hasEnrolled = (student, courseCode) => {
-  return student.enrollments && student.enrollments.map(course => course.course_code).includes(courseCode)
+  return student.enrollments?.map(course => course.course_code).includes(courseCode)
 }
 
 const getEnrollment = (student, courseCode) => {
@@ -53,7 +50,7 @@ const getEnrollment = (student, courseCode) => {
 
 const getRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits')) {
-    if (student.criteriaProgress[year] && student.criteriaProgress[year].credits) {
+    if (student.criteriaProgress[year]?.credits) {
       return <Icon color="green" fitted name="check" title="Checked" />
     }
     return null
@@ -86,7 +83,7 @@ const getRowContent = (student, courseCode, year, start, end, criteria) => {
 
 const getExcelText = (courseCode, criteria, student, year) => {
   if (courseCode.includes('Credits')) {
-    return student.criteriaProgress[year] && student.criteriaProgress[year].credits ? 'Passed' : ''
+    return student.criteriaProgress[year]?.credits ? 'Passed' : ''
   }
 
   const courses = getCourses(courseCode, criteria, student)

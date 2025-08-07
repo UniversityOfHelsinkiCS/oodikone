@@ -13,7 +13,7 @@ import { PopulationCourseContext } from './PopulationCourseContext'
 const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.defaultProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
-  ) ||
+  ) ??
   mandatoryCourses.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
@@ -48,11 +48,9 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
         : []
 
     programmeCourses.forEach(course => {
-      if (!modules[course.parent_code]) {
-        modules[course.parent_code] = {
-          module: { code: course.parent_code, name: course.parent_name },
-          courses: [],
-        }
+      modules[course.parent_code] ??= {
+        module: { code: course.parent_code, name: course.parent_name },
+        courses: [],
       }
       modules[course.parent_code].courses.push(course)
     })

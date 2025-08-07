@@ -80,16 +80,16 @@ export const StudentSearch = () => {
         }}
         value={searchString}
       />
-      {!isLoading && students && students.length > 0 && searchString && (
+      {!isLoading && students && students.length > 0 && searchString ? (
         <StyledTable>
           <TableHead>
             <TableRow>
-              {showNames && (
+              {showNames ? (
                 <>
                   <TableCell>Last name</TableCell>
                   <TableCell>First names</TableCell>
                 </>
-              )}
+              ) : null}
               <TableCell>Student number</TableCell>
               <TableCell>Started</TableCell>
               <TableCell align="right">Credits</TableCell>
@@ -100,15 +100,15 @@ export const StudentSearch = () => {
             {students.map(student => (
               <TableRow
                 key={student.studentNumber}
-                onClick={() => navigate(`/students/${student.studentNumber}`)}
+                onClick={() => void navigate(`/students/${student.studentNumber}`)}
                 sx={{ cursor: 'pointer' }}
               >
-                {showNames && (
+                {showNames ? (
                   <>
                     <TableCell>{student.lastName}</TableCell>
                     <TableCell>{student.firstNames}</TableCell>
                   </>
-                )}
+                ) : null}
                 <TableCell>{student.studentNumber}</TableCell>
                 <TableCell>
                   {student.started ? reformatDate(student.started, DateFormat.DISPLAY_DATE) : 'Unavailable'}
@@ -123,17 +123,17 @@ export const StudentSearch = () => {
             ))}
           </TableBody>
         </StyledTable>
-      )}
+      ) : null}
       {[1, 2, 3].includes(searchString.length) && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="info">Search term is not accurate enough</Alert>
         </Box>
       )}
-      {isLoading && (
+      {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', padding: 5 }}>
           <CircularProgress />
         </Box>
-      )}
+      ) : null}
       {!isLoading && students?.length === 0 && searchString.length > 3 && (
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Alert severity="error">No students found</Alert>

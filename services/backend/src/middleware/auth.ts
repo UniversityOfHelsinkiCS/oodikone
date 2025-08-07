@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-return */
 import { NextFunction, Request, Response } from 'express'
 
 import { Role } from '@oodikone/shared/types'
