@@ -141,7 +141,7 @@ export const TeacherStatistics = () => {
             content="Search"
             disabled={invalidQueryParams}
             fluid
-            onClick={() => getTeacherStatistics({ semesterStart, semesterEnd, providers })}
+            onClick={() => void getTeacherStatistics({ semesterStart, semesterEnd, providers })}
           />
         </Form>
       </Segment>
@@ -150,7 +150,9 @@ export const TeacherStatistics = () => {
           <TeacherStatisticsTable statistics={teacherStats} variant="leaderboard" />
         </Segment>
       )}
-      {!isLoading && !isFetching && teacherData && teacherStats.length === 0 && <Message content="No teachers found" />}
+      {!isLoading && !isFetching && teacherData && teacherStats.length === 0 ? (
+        <Message content="No teachers found" />
+      ) : null}
     </div>
   )
 }

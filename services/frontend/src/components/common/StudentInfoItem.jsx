@@ -18,7 +18,7 @@ export const StudentInfoItem = ({ showSisuLink, student }) => {
       <Item as={Link} style={{ marginLeft: '10px', marginRight: '10px' }} to={`/students/${student.studentNumber}`}>
         <Icon name="user outline" />
       </Item>
-      {showSisuLink && <SisuLinkItem id={student.sis_person_id} />}
+      {showSisuLink ? <SisuLinkItem id={student.sis_person_id} /> : null}
     </div>
   )
 }

@@ -38,31 +38,31 @@ export const Updater = () => {
     }
   }
 
-  const updateSISMeta = () => apiCall('/updater/update/v2/meta')
-  const updateSISStudents = () => apiCall('/updater/update/v2/students')
-  const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
+  const updateSISMeta = () => void apiCall('/updater/update/v2/meta')
+  const updateSISStudents = () => void apiCall('/updater/update/v2/students')
+  const updateSISProgrammes = () => void apiCall('/updater/update/v2/programmes')
   const updateSISCustomList = () =>
-    apiCall(`/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
+    void apiCall(`/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
   const refreshTeacherLeaderboardForCurrentAndPreviousYear = () =>
-    apiCall('/updater/refresh-teacher-leaderboard', 'post')
-  const abortSisUpdater = () => apiCall('/updater/abort')
-  const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache')
-  const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
-  const refreshFaculties = () => apiCall('/updater/refresh_faculties_v2', 'post')
-  const refreshStudyProgrammes = () => apiCall('/updater/refresh_study_programmes_v2', 'post')
-  const refreshLanguageCenterData = () => apiCall('/updater/refresh_language_center_data', 'post')
-  const refreshCloseToGraduationData = () => apiCall('/updater/refresh-close-to-graduation', 'post')
-  const getJobs = () => callApi('/updater/jobs')
-  const removeWaitingJobs = () => callApi('/updater/jobs', 'delete')
+    void apiCall('/updater/refresh-teacher-leaderboard', 'post')
+  const abortSisUpdater = () => void apiCall('/updater/abort')
+  const refreshSISRedisCache = () => void apiCall('/updater/refresh_redis_cache')
+  const refreshAllTeacherLeaderboards = () => void apiCall('/teachers/top', 'post')
+  const refreshFaculties = () => void apiCall('/updater/refresh_faculties_v2', 'post')
+  const refreshStudyProgrammes = () => void apiCall('/updater/refresh_study_programmes_v2', 'post')
+  const refreshLanguageCenterData = () => void apiCall('/updater/refresh_language_center_data', 'post')
+  const refreshCloseToGraduationData = () => void apiCall('/updater/refresh-close-to-graduation', 'post')
+  const getJobs = () => void callApi('/updater/jobs')
+  const removeWaitingJobs = () => void callApi('/updater/jobs', 'delete')
 
-  const updateJobs = async () => {
-    const jobs = await getJobs()
+  const updateJobs = () => {
+    const jobs = getJobs()
     setJobs(jobs?.data)
   }
 
   useEffect(() => {
     updateJobs()
-  }, [])
+  }, [updateJobs])
 
   if (error) throw new Error('Admin intentionally caused frontend crash')
 
@@ -105,7 +105,7 @@ export const Updater = () => {
           infoBoxContent={updaterToolTips.refreshDataSection}
           title="Refresh data (calculations done by oodikone-backend and cached in redis)"
         >
-          {jobs && (
+          {jobs ? (
             <Stack alignItems="flex-start" spacing={2}>
               <Button onClick={updateJobs} startIcon={<RefreshIcon />} variant="contained">
                 Update messages
@@ -127,7 +127,7 @@ export const Updater = () => {
                 ))}
               </ul>
             </Stack>
-          )}
+          ) : null}
           <Stack direction="row" spacing={2}>
             <Button
               onClick={() => {
@@ -146,11 +146,11 @@ export const Updater = () => {
             <Button onClick={refreshStudyProgrammes} variant="contained">
               Refresh study programmes
             </Button>
-            {languageCenterViewEnabled && (
+            {languageCenterViewEnabled ? (
               <Button onClick={refreshLanguageCenterData} variant="contained">
                 Refresh language center data
               </Button>
-            )}
+            ) : null}
             <Button onClick={refreshCloseToGraduationData} variant="contained">
               Refresh close to graduation data
             </Button>

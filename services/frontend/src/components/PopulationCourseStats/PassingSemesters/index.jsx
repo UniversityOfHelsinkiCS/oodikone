@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-optional-chain */
 import { chain, range } from 'lodash'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router'

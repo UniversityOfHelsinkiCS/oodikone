@@ -9,7 +9,7 @@ export const NewQueryButton = () => {
     <Button
       data-cy="NewQueryButton"
       endIcon={<SearchIcon />}
-      onClick={() => navigate('/coursestatistics')}
+      onClick={() => void navigate('/coursestatistics')}
       variant="text"
     >
       New query

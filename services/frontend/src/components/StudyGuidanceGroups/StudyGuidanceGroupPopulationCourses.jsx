@@ -22,7 +22,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
   }
   return (
     <Segment basic>
-      {curriculumsAvailable && (
+      {curriculumsAvailable ? (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
           curriculum={curriculum}
@@ -34,7 +34,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
           setStudentAmountLimit={setStudentAmountLimit}
           studentAmountLimit={studentAmountLimit}
         />
-      )}
+      ) : null}
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats curriculum={curriculum} filteredCourses={filteredCourses} />
       ) : (

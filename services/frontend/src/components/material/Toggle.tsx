@@ -56,7 +56,7 @@ export const Toggle = ({
         />
         <ToggleLabel active={value} disabled={disabled} label={secondLabel} />
       </Stack>
-      {infoBoxContent && <InfoBox content={infoBoxContent} mini />}
+      {infoBoxContent ? <InfoBox content={infoBoxContent} mini /> : null}
     </Stack>
   )
 }

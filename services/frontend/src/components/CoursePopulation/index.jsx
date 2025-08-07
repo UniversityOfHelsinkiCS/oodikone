@@ -93,7 +93,7 @@ export const CoursePopulation = () => {
   const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
 
   const header = courseData
-    ? `${getTextIn(courseData[unifyCourses].name)} ${years || years2} ${getUnifyTextIn(unifyCourses)}`
+    ? `${getTextIn(courseData[unifyCourses].name)} ${years ?? years2} ${getUnifyTextIn(unifyCourses)}`
     : null
 
   const subHeader = codes.join(', ')

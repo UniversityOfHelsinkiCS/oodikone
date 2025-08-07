@@ -24,7 +24,7 @@ export const TimeCell = ({
         {name}
         {name === 'Total' && !userHasAccessToAllStats && <strong> *</strong>}
       </Typography>
-      {name !== 'Total' && userHasAccessToAllStats && isDefaultServiceProvider() && (
+      {name !== 'Total' && userHasAccessToAllStats && isDefaultServiceProvider() ? (
         <IconButton
           color="primary"
           component={Link}
@@ -37,7 +37,7 @@ export const TimeCell = ({
         >
           <NorthEastIcon fontSize="small" />
         </IconButton>
-      )}
+      ) : null}
     </Stack>
   )
 }

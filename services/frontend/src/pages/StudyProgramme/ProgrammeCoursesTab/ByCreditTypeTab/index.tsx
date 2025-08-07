@@ -90,7 +90,7 @@ export const ByCreditTypeTab = ({
       isLoading={isLoading || !fromYear || !toYear || !years}
       title="Programme courses by credit type"
     >
-      {data && fromYear && toYear && years && (
+      {data && fromYear && toYear && years ? (
         <Stack gap={2}>
           <CourseYearFilter
             academicYear={academicYear}
@@ -112,7 +112,7 @@ export const ByCreditTypeTab = ({
           </ToggleContainer>
           <OverallStatsTable data={data} fromYear={fromYear} showStudents={showStudents} toYear={toYear} />
         </Stack>
-      )}
+      ) : null}
     </Section>
   )
 }

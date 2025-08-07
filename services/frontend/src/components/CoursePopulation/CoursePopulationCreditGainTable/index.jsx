@@ -80,19 +80,15 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
       code: '00000',
     }
 
-    if (!programmeCredits[programme.code]) {
-      programmeCredits[programme.code] = { name: programme.name, students: [], credits: 0 }
-    }
+    programmeCredits[programme.code] ??= { name: programme.name, students: [], credits: 0 }
 
-    const faculty = faculties?.find(faculty => faculty.code === programme.facultyCode) || {
+    const faculty = faculties?.find(faculty => faculty.code === programme.facultyCode) ?? {
       // in case there isn't a faculty associated with studyright
       code: '0000',
       name: { en: 'No associated faculty', fi: 'Ei tiedekuntaa suorituksen hetkellä' },
     }
 
-    if (!facultyCredits[faculty.code]) {
-      facultyCredits[faculty.code] = { name: faculty.name, students: [], credits: 0 }
-    }
+    facultyCredits[faculty.code] ??= { name: faculty.name, students: [], credits: 0 }
 
     const coursesBetween = []
     courses.forEach(course => {

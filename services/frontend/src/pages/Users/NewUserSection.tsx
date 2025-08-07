@@ -96,22 +96,22 @@ export const NewUserSection = ({ onAddUser }) => {
           </Button>
         </Stack>
       </Section>
-      {isErrorGetUser && (
+      {isErrorGetUser ? (
         <Alert severity="warning" variant="outlined">
           <Typography>Something went wrong, please try a different eppn</Typography>
         </Alert>
-      )}
-      {showAdded && (
+      ) : null}
+      {showAdded ? (
         <Alert severity="success" variant="outlined">
           <Typography>Added user to the Oodikone user database</Typography>
         </Alert>
-      )}
-      {showAddError && (
+      ) : null}
+      {showAddError ? (
         <Alert severity="error" variant="outlined">
           <Typography>The user already exists in Oodikone</Typography>
         </Alert>
-      )}
-      {!isErrorGetUser && user && (
+      ) : null}
+      {!isErrorGetUser && user ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -141,7 +141,7 @@ export const NewUserSection = ({ onAddUser }) => {
             </TableBody>
           </Table>
         </TableContainer>
-      )}
+      ) : null}
     </>
   )
 }

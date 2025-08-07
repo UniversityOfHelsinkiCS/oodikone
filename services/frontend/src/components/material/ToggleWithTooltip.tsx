@@ -23,7 +23,7 @@ export const ToggleWithTooltip = ({
         <Switch checked={checked} data-cy={cypress} onChange={onChange} />
         <Typography color="text.primary">{label}</Typography>
       </Stack>
-      {tooltipText && <InfoBox content={tooltipText} mini />}
+      {tooltipText ? <InfoBox content={tooltipText} mini /> : null}
     </Stack>
   )
 }

@@ -20,7 +20,11 @@ export default tseslint.config(
       '**/build/**',
       '**/dist/**',
       '**/node_modules/**',
-      '**/instrumented/**'
+      '**/instrumented/**',
+      '**/coverage/**',
+      'nyc-config.cjs',
+      '.lintstagedrc.js',
+      'cypress.config.js',
     ]
   },
 
@@ -39,7 +43,9 @@ export default tseslint.config(
       sourceType: 'module',
       parser: tseslint.parser,
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['*.{js,cjs}']
+        }
       },
       globals: {
         ...globals.browser,
@@ -147,14 +153,21 @@ export default tseslint.config(
 
   // Frontend camelCase and react
   {
-    files: ['services/frontend/**.*{js,jsx,mjs,cjs,ts,tsx}'],
+    files: ['services/frontend/**/*.{js,jsx,mjs,cjs,ts,tsx}'],
+    plugins: {
+      'react': eslintPluginReact,
+    },
     extends: [
       eslintPluginReact.configs.flat.recommended,
       eslintPluginReact.configs.flat['jsx-runtime'],
       eslintPluginReactHooks.configs['recommended-latest'],
     ],
-    plugins: {
-      'react': eslintPluginReact,
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        }
+      }
     },
     rules: {
       'camelcase': 'warn',

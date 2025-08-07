@@ -56,13 +56,13 @@ export const UserButton = () => {
           vertical: 'top',
         }}
       >
-        {!isLoading && username && (
+        {!isLoading && username ? (
           <MenuItem sx={{ pointerEvents: 'none' }}>
             <Typography>
               {mockedBy ? 'Mocking' : 'Logged in'} as <b>{username}</b>
             </Typography>
           </MenuItem>
-        )}
+        ) : null}
         <Divider />
         <MenuItem sx={{ pointerEvents: 'none' }}>
           <ListItemIcon>
@@ -71,7 +71,7 @@ export const UserButton = () => {
           <Typography>Language</Typography>
         </MenuItem>
         {languageOptions.map(({ key, text, value }) => (
-          <MenuItem key={key} onClick={() => setLanguage(value)} selected={language === value}>
+          <MenuItem key={key} onClick={() => void setLanguage(value)} selected={language === value}>
             <ListItemIcon>{language === value ? <CheckIcon fontSize="small" /> : null}</ListItemIcon>
             <Typography fontWeight={language === value ? 'bold' : 'normal'}>{text}</Typography>
           </MenuItem>

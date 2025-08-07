@@ -135,7 +135,7 @@ const filterCoursesByStudyPlan = (plan, courses) => {
     if (!course?.code && !course_code) {
       return false
     }
-    return plan.included_courses.includes(course_code || course.code)
+    return plan.included_courses.includes(course_code ?? course.code)
   })
 }
 
@@ -455,8 +455,8 @@ export const CreditAccumulationGraphHighCharts = ({
       ? selectedStudyRight.studyRightElements
           .filter(element => element.phase === correctStudyRightElement.phase)
           .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0].startDate
-      : chain(students[0].studyRights || students[0].courses)
-          .map(element => new Date(element.startDate || element.date))
+      : chain(students[0].studyRights ?? students[0].courses)
+          .map(element => new Date(element.startDate ?? element.date))
           .sortBy()
           .head()
           .defaultTo(new Date())
@@ -468,7 +468,7 @@ export const CreditAccumulationGraphHighCharts = ({
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0],
       absences
     )
-    const ending = selectedStudyRight ? new Date(studyRightTargetEnd) : new Date(endDate || new Date())
+    const ending = selectedStudyRight ? new Date(studyRightTargetEnd) : new Date(endDate ?? new Date())
     const starting = new Date(startDate)
     const filteredAbsences = selectedStudyRight
       ? absences.filter(({ startDate, endDate }) => startDate >= starting && endDate <= ending)
@@ -538,14 +538,14 @@ export const CreditAccumulationGraphHighCharts = ({
     <div style={{ minWidth: '400px', marginBottom: '15px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1rem 0' }}>
         <div>
-          {!singleStudent && studyPlanFilterIsActive && (
+          {!singleStudent && studyPlanFilterIsActive ? (
             <Radio
               checked={cutStudyPlanCredits}
               label="Display credits from study right start"
               onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
               toggle
             />
-          )}
+          ) : null}
         </div>
 
         <div>

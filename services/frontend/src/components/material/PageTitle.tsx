@@ -30,11 +30,11 @@ export const PageTitle = ({ subtitle, title }: { subtitle?: string; title?: stri
           <Skeleton height="100%" variant="text" width="60%" />
         </Box>
       )}
-      {subtitle && (
+      {subtitle ? (
         <Typography color="text.secondary" component="h2" variant="h6">
           {subtitle}
         </Typography>
-      )}
+      ) : null}
     </Stack>
   )
 }

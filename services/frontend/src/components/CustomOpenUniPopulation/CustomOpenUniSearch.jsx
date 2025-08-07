@@ -55,7 +55,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const pushQueryToUrl = query => {
     setTimeout(() => {
       const searchString = queryParamsToString(query)
-      navigate({ search: searchString }, { replace: true })
+      void navigate({ search: searchString }, { replace: true })
     }, 0)
   }
 
@@ -118,7 +118,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   }
 
   const onDelete = () => {
-    deleteOpenUniCourseSearch({ id: selectedSearchId })
+    void deleteOpenUniCourseSearch({ id: selectedSearchId })
     clearForm()
   }
 
@@ -139,9 +139,9 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
   const onSave = () => {
     const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     if (selectedSearchId !== '') {
-      updateOpenUniCourseSearch({ id: selectedSearchId, courseList })
+      void updateOpenUniCourseSearch({ id: selectedSearchId, courseList })
     } else {
-      createOpenUniCourseSearch({ courseList, name })
+      void createOpenUniCourseSearch({ courseList, name })
     }
   }
   return (

@@ -219,16 +219,16 @@ export const SearchForm = ({ progress, isPending }) => {
                 />
               </Grid>
             </Grid>
-            {selectMultipleCourses && (
+            {selectMultipleCourses ? (
               <MultipleCoursesAlert selectedCourses={Object.keys(selectedCourses).length || 0} />
-            )}
+            ) : null}
             {!isInputValid ? (
               <Alert severity="info" variant="outlined">
                 Please enter at least 5 characters for course name or 2 characters for course code.
               </Alert>
             ) : (
-              <Section isLoading={(isFetching || debouncedChanged) && isInputValid}>
-                {selected.length > 0 && selectMultipleCourses && (
+              <Section isLoading={isFetching || debouncedChanged ? isInputValid : null}>
+                {selected.length > 0 && selectMultipleCourses ? (
                   <Stack gap={2}>
                     <CourseTable
                       courses={selected}
@@ -244,20 +244,20 @@ export const SearchForm = ({ progress, isPending }) => {
                       selectedCourses={selected.length}
                     />
                   </Stack>
-                )}
+                ) : null}
                 <CourseTable
                   courses={courses}
                   hidden={isPending ?? (!Object.keys(courses).length && !Object.keys(selectedCourses).length)}
                   onSelectCourse={onSelectCourse}
                   title="Searched courses"
                 />
-                {courses.length > 0 && selectMultipleCourses && (
+                {courses.length > 0 && selectMultipleCourses ? (
                   <Box display="flex" justifyContent="center" mt={2}>
                     <Button onClick={addAllCourses} startIcon={<LibraryAddIcon />} variant="outlined">
                       Select all search results
                     </Button>
                   </Box>
-                )}
+                ) : null}
               </Section>
             )}
           </Stack>

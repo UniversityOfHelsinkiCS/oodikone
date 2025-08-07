@@ -111,7 +111,7 @@ export const SemesterRangeSelector = () => {
       </div>
       <div>
         <b>Until</b>
-        {semesters && (
+        {semesters ? (
           <SemesterSelector
             allSemesters={semesters?.filter(semester => {
               return semesterFilter.start <= semester.semestercode
@@ -122,7 +122,7 @@ export const SemesterRangeSelector = () => {
               setSemesterFilter({ ...semesterFilter, end: semester })
             }}
           />
-        )}
+        ) : null}
       </div>
     </div>
   )

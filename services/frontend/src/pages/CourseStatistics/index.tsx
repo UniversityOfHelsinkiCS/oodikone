@@ -101,7 +101,7 @@ export const CourseStatistics = () => {
             />
           )}
           {tab === 1 && !singleCourseStats && <SummaryTab onClickCourse={switchToCourse} />}
-          {tab === 2 && userHasAccessToAllStats && <FacultyStatisticsTab />}
+          {tab === 2 && userHasAccessToAllStats ? <FacultyStatisticsTab /> : null}
         </>
       )}
     </Container>

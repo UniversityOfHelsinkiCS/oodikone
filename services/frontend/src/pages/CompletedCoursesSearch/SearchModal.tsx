@@ -200,7 +200,7 @@ export const SearchModal = ({ setValues }) => {
                 data-cy="delete-courselist"
                 disabled={!selectedSearchId || isFetching}
                 endIcon={<DeleteIcon />}
-                onClick={onDelete}
+                onClick={() => void onDelete()}
                 variant="contained"
               >
                 Delete
@@ -210,7 +210,7 @@ export const SearchModal = ({ setValues }) => {
                 data-cy="save-courselist"
                 disabled={!name || isFetching}
                 endIcon={<SaveIcon />}
-                onClick={onSave}
+                onClick={() => void onSave()}
                 variant="contained"
               >
                 Save

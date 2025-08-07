@@ -116,126 +116,123 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
   const hasFullAccess = checkUserAccess(['admin', 'fullSisuAccess'], roles)
 
   return (
-    <>
-      <Card sx={{ width: '100%' }} variant="outlined">
-        <CardHeader
-          buttons={<EditButton disabled={hasFullAccess} editing={editing} onClick={handleEditClick} />}
-          title="Study programme rights"
-        />
+    <Card sx={{ width: '100%' }} variant="outlined">
+      <CardHeader
+        buttons={<EditButton disabled={hasFullAccess} editing={editing} onClick={handleEditClick} />}
+        title="Study programme rights"
+      />
 
-        {hasFullAccess ? (
-          <Alert severity="info">This user has full access to all study programmes.</Alert>
-        ) : (
-          <>
-            {editing && (
-              <CardContent>
-                <Typography component="h3" fontWeight="bold" gutterBottom>
-                  Select new study programme access rights
-                </Typography>
-                <Stack direction="column">
-                  <FormControl>
-                    <InputLabel>Select study programmes to add</InputLabel>
-                    <Select
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 300,
-                          },
-                        },
-                      }}
-                      data-cy="StudyProgrammeSelector"
-                      label="Select study programmes to add"
-                      multiple
-                      onChange={event => setAccessRightsToBeAdded(event.target.value as string[])}
-                      renderValue={selected => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {selected.map(value => (
-                            <Chip key={value} label={value} />
-                          ))}
-                        </Box>
-                      )}
-                      value={accessRightsToBeAdded}
-                    >
-                      {options.map(({ key, code, name }) => (
-                        <MenuItem data-cy={`StudyProgrammeSelectorOption${code}`} key={key} value={code}>
-                          <Box display="flex" justifyContent="space-between" width="100%">
-                            <Typography color="text.primary" component="span" variant="body1">
-                              {name}
-                            </Typography>
-                            <Typography color="text.secondary" component="span" variant="body1">
-                              {code}
-                            </Typography>
-                          </Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FilterOldProgrammesToggle
-                    checked={filterOldProgrammes}
-                    onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
-                  />
-                </Stack>
-              </CardContent>
-            )}
-
+      {hasFullAccess ? (
+        <Alert severity="info">This user has full access to all study programmes.</Alert>
+      ) : (
+        <>
+          {editing ? (
             <CardContent>
               <Typography component="h3" fontWeight="bold" gutterBottom>
-                Current study programme access rights
+                Select new study programme access rights
               </Typography>
-
-              <Stack direction="column" gap={1}>
-                {currentRegularAccessRights.length > 0 ? (
-                  currentRegularAccessRights.map(({ code, name }) => (
-                    <Stack alignItems="center" direction="row" justifyContent="space-between" key={code}>
-                      <Typography>{`${name} ${code}`}</Typography>
-                      {editing && (
-                        <Button
-                          color={!accessRightsToBeRemoved.includes(code) ? 'error' : 'primary'}
-                          onClick={
-                            accessRightsToBeRemoved.includes(code)
-                              ? () =>
-                                  setAccessRightsToBeRemoved(accessRightsToBeRemoved.filter(right => right !== code))
-                              : () => setAccessRightsToBeRemoved([...accessRightsToBeRemoved, code])
-                          }
-                          size="small"
-                          variant="outlined"
-                        >
-                          {accessRightsToBeRemoved.includes(code) ? 'Cancel removal' : 'Mark for removal'}
-                        </Button>
-                      )}
-                    </Stack>
-                  ))
-                ) : (
-                  <Typography color="text.secondary">No study programme access rights</Typography>
-                )}
+              <Stack direction="column">
+                <FormControl>
+                  <InputLabel>Select study programmes to add</InputLabel>
+                  <Select
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                    data-cy="StudyProgrammeSelector"
+                    label="Select study programmes to add"
+                    multiple
+                    onChange={event => setAccessRightsToBeAdded(event.target.value as string[])}
+                    renderValue={selected => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map(value => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </Box>
+                    )}
+                    value={accessRightsToBeAdded}
+                  >
+                    {options.map(({ key, code, name }) => (
+                      <MenuItem data-cy={`StudyProgrammeSelectorOption${code}`} key={key} value={code}>
+                        <Box display="flex" justifyContent="space-between" width="100%">
+                          <Typography color="text.primary" component="span" variant="body1">
+                            {name}
+                          </Typography>
+                          <Typography color="text.secondary" component="span" variant="body1">
+                            {code}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FilterOldProgrammesToggle
+                  checked={filterOldProgrammes}
+                  onChange={() => setFilterOldProgrammes(!filterOldProgrammes)}
+                />
               </Stack>
             </CardContent>
+          ) : null}
 
-            {isDefaultServiceProvider() && (
-              <CardContent>
-                <Stack alignItems="center" direction="row" gap={1}>
-                  <Typography component="h3" fontWeight="bold">
-                    Current IAM group based study programme access rights
-                  </Typography>
-                  <InfoBox content={userToolTips.iamGroupBasedAccess} mini />
-                </Stack>
-                {currentIamAccessRights.length > 0 ? (
-                  currentIamAccessRights.map(({ code, name, limited }) => (
-                    <Stack direction="row" justifyContent="space-between" key={code}>
-                      <Typography>{`${name} ${code}`}</Typography>
-                      <Tooltip arrow placement="left" title={limited ? 'Limited rights' : 'Full rights'}>
-                        {limited ? <WarningIcon color="warning" /> : <CheckCircleIcon color="success" />}
-                      </Tooltip>
-                    </Stack>
-                  ))
-                ) : (
-                  <Typography color="text.secondary">No IAM based access rights</Typography>
-                )}
-              </CardContent>
-            )}
-          </>
-        )}
-      </Card>
-    </>
+          <CardContent>
+            <Typography component="h3" fontWeight="bold" gutterBottom>
+              Current study programme access rights
+            </Typography>
+
+            <Stack direction="column" gap={1}>
+              {currentRegularAccessRights.length > 0 ? (
+                currentRegularAccessRights.map(({ code, name }) => (
+                  <Stack alignItems="center" direction="row" justifyContent="space-between" key={code}>
+                    <Typography>{`${name} ${code}`}</Typography>
+                    {editing ? (
+                      <Button
+                        color={!accessRightsToBeRemoved.includes(code) ? 'error' : 'primary'}
+                        onClick={
+                          accessRightsToBeRemoved.includes(code)
+                            ? () => setAccessRightsToBeRemoved(accessRightsToBeRemoved.filter(right => right !== code))
+                            : () => setAccessRightsToBeRemoved([...accessRightsToBeRemoved, code])
+                        }
+                        size="small"
+                        variant="outlined"
+                      >
+                        {accessRightsToBeRemoved.includes(code) ? 'Cancel removal' : 'Mark for removal'}
+                      </Button>
+                    ) : null}
+                  </Stack>
+                ))
+              ) : (
+                <Typography color="text.secondary">No study programme access rights</Typography>
+              )}
+            </Stack>
+          </CardContent>
+
+          {isDefaultServiceProvider() && (
+            <CardContent>
+              <Stack alignItems="center" direction="row" gap={1}>
+                <Typography component="h3" fontWeight="bold">
+                  Current IAM group based study programme access rights
+                </Typography>
+                <InfoBox content={userToolTips.iamGroupBasedAccess} mini />
+              </Stack>
+              {currentIamAccessRights.length > 0 ? (
+                currentIamAccessRights.map(({ code, name, limited }) => (
+                  <Stack direction="row" justifyContent="space-between" key={code}>
+                    <Typography>{`${name} ${code}`}</Typography>
+                    <Tooltip arrow placement="left" title={limited ? 'Limited rights' : 'Full rights'}>
+                      {limited ? <WarningIcon color="warning" /> : <CheckCircleIcon color="success" />}
+                    </Tooltip>
+                  </Stack>
+                ))
+              ) : (
+                <Typography color="text.secondary">No IAM based access rights</Typography>
+              )}
+            </CardContent>
+          )}
+        </>
+      )}
+    </Card>
   )
 }

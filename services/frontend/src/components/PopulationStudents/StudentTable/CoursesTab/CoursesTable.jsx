@@ -95,12 +95,12 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
     })
 
     const courseLabels = []
-    const defaultCourses = curriculum?.defaultProgrammeCourses || []
-    const combinedCourses = curriculum?.secondProgrammeCourses || []
+    const defaultCourses = curriculum?.defaultProgrammeCourses ?? []
+    const combinedCourses = curriculum?.secondProgrammeCourses ?? []
     const courses = [...defaultCourses, ...combinedCourses]
     const labelToCourses = courses.reduce((labels, course) => {
       const label = course.label ? course.label.label : ''
-      labels[label] = labels[label] || []
+      labels[label] = labels[label] ?? []
       if (labels[label].some(label => label.code === course.code)) {
         return labels
       }
@@ -121,7 +121,7 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
 
     const { visibleLabels, visibleCourseCodes } = courses.reduce(
       (total, course) => {
-        if (course.visible && course.visible.visibility) {
+        if (course.visible?.visibility) {
           total.visibleLabels.add(course.parent_code)
           total.visibleCourseCodes.add(course.code)
         }
@@ -173,7 +173,7 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
 
     const getCompletionDate = (student, code) => {
       const course = student.courses.find(course => course.course_code === code && course.passed === true)
-      return course?.date || null
+      return course?.date ?? null
     }
 
     const getEnrollmentDate = (student, code) => {

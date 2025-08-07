@@ -77,7 +77,7 @@ export const ProgressSection = ({
       >
         <Stack gap={2}>
           <AccordionWrapper level="Bachelor">
-            {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) && (
+            {progressStats.isSuccess && progressStats.data && bachelorStats && hasNonZeroStats(bachelorStats) ? (
               <Stack gap={2}>
                 <ProgressBarChart
                   cypress="FacultyBachelorsProgress"
@@ -99,67 +99,67 @@ export const ProgressSection = ({
                   titles={bachelorStats.tableTitles}
                 />
               </Stack>
-            )}
+            ) : null}
           </AccordionWrapper>
           <AccordionWrapper level={faculty.code === 'H90' ? 'Bachelor + Licentiate' : 'Bachelor + Master'}>
             {progressStats.isSuccess &&
-              progressStats.data &&
-              bachelorMasterStats &&
-              hasNonZeroStats(bachelorMasterStats) && (
-                <Stack gap={2}>
-                  <ProgressBarChart
-                    cypress="faculty-bachelor-masters"
-                    data={{
-                      id: faculty.code,
-                      stats: bachelorMasterStats.chartStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                  <FacultyProgressTable
-                    cypress="bachelor-masters"
-                    data={bachelorMasterStats.tableStats}
-                    programmeNames={progressStats.data.programmeNames}
-                    programmeStats={progressStats.data.bcMsProgStats}
-                    progressTitles={progressStats.data.yearlyBcMsTitles}
-                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
-                      listObj => listObj[0]
-                    )}
-                    titles={bachelorMasterStats.tableTitles}
-                  />
-                </Stack>
-              )}
+            progressStats.data &&
+            bachelorMasterStats &&
+            hasNonZeroStats(bachelorMasterStats) ? (
+              <Stack gap={2}>
+                <ProgressBarChart
+                  cypress="faculty-bachelor-masters"
+                  data={{
+                    id: faculty.code,
+                    stats: bachelorMasterStats.chartStats,
+                    years: progressStats?.data.years,
+                  }}
+                />
+                <FacultyProgressTable
+                  cypress="bachelor-masters"
+                  data={bachelorMasterStats.tableStats}
+                  programmeNames={progressStats.data.programmeNames}
+                  programmeStats={progressStats.data.bcMsProgStats}
+                  progressTitles={progressStats.data.yearlyBcMsTitles}
+                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.bcMsProgStats).map(
+                    listObj => listObj[0]
+                  )}
+                  titles={bachelorMasterStats.tableTitles}
+                />
+              </Stack>
+            ) : null}
           </AccordionWrapper>
           <AccordionWrapper level="Master">
             {progressStats.isSuccess &&
-              progressStats.data &&
-              masterStats &&
-              hasNonZeroStats(masterStats) &&
-              !(faculty.code === 'H90') && (
-                <Stack gap={2}>
-                  <ProgressBarChart
-                    cypress="faculty-masters"
-                    data={{
-                      id: faculty.code,
-                      stats: masterStats.chartStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                  <FacultyProgressTable
-                    cypress="masters"
-                    data={masterStats.tableStats}
-                    programmeNames={progressStats?.data.programmeNames}
-                    programmeStats={progressStats?.data.mastersProgStats}
-                    progressTitles={progressStats?.data.yearlyMasterTitles}
-                    sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
-                      listObj => listObj[0]
-                    )}
-                    titles={masterStats.tableTitles}
-                  />
-                </Stack>
-              )}
+            progressStats.data &&
+            masterStats &&
+            hasNonZeroStats(masterStats) &&
+            !(faculty.code === 'H90') ? (
+              <Stack gap={2}>
+                <ProgressBarChart
+                  cypress="faculty-masters"
+                  data={{
+                    id: faculty.code,
+                    stats: masterStats.chartStats,
+                    years: progressStats?.data.years,
+                  }}
+                />
+                <FacultyProgressTable
+                  cypress="masters"
+                  data={masterStats.tableStats}
+                  programmeNames={progressStats?.data.programmeNames}
+                  programmeStats={progressStats?.data.mastersProgStats}
+                  progressTitles={progressStats?.data.yearlyMasterTitles}
+                  sortedKeys={getSortedProgrammeKeysProgress(progressStats?.data.mastersProgStats).map(
+                    listObj => listObj[0]
+                  )}
+                  titles={masterStats.tableTitles}
+                />
+              </Stack>
+            ) : null}
           </AccordionWrapper>
           <AccordionWrapper level="Doctor">
-            {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) && (
+            {progressStats.isSuccess && progressStats.data && doctorStats && hasNonZeroStats(doctorStats) ? (
               <Stack gap={2}>
                 <ProgressBarChart
                   cypress="faculty-doctoral"
@@ -180,7 +180,7 @@ export const ProgressSection = ({
                   titles={doctorStats.tableTitles}
                 />
               </Stack>
-            )}
+            ) : null}
           </AccordionWrapper>
         </Stack>
       </Section>

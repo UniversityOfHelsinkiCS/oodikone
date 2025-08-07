@@ -41,7 +41,7 @@ export const FilterCard: FC<{
         >
           {title}
         </Typography>
-        {active && (
+        {active ? (
           <ClearIcon
             data-cy={`${key}-clear`}
             onClick={() => onClear()}
@@ -53,8 +53,8 @@ export const FilterCard: FC<{
               },
             }}
           />
-        )}
-        {info && <InfoBox content={info} mini />}
+        ) : null}
+        {info ? <InfoBox content={info} mini /> : null}
       </Box>
       <Collapse in={opened}>
         <Box sx={{ px: 1, mb: 1.5 }}>{children}</Box>

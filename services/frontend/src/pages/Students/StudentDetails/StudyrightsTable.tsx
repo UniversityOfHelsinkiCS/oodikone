@@ -174,7 +174,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                     backgroundColor: studyRight.studyPlanId === selectedStudyPlanId ? blue[50] : 'inherit',
                   }}
                 >
-                  {isFirstRow && (
+                  {isFirstRow ? (
                     <TableCell rowSpan={numberOfProgrammes}>
                       <Tooltip
                         arrow
@@ -200,7 +200,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                         </div>
                       </Tooltip>
                     </TableCell>
-                  )}
+                  ) : null}
                   <TableCell>
                     <Stack alignItems="center" direction="row">
                       {`${getTextIn(name)} (${reformatDate(startDate, DateFormat.DISPLAY_DATE)}–${reformatDate(endDate, DateFormat.DISPLAY_DATE)})`}
@@ -217,10 +217,10 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                     </Stack>
                   </TableCell>
                   <TableCell>{getTextIn(studyTrack?.name)}</TableCell>
-                  {isFirstRow && <TableCell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</TableCell>}
-                  {isFirstRow && (
+                  {isFirstRow ? <TableCell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</TableCell> : null}
+                  {isFirstRow ? (
                     <TableCell rowSpan={numberOfProgrammes}>{renderCompletionPercent(studyRight, student)}</TableCell>
-                  )}
+                  ) : null}
                 </TableRow>
               )
             })

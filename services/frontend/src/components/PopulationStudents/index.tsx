@@ -172,12 +172,12 @@ export const PopulationStudents = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginTop: '5px', marginBottom: '5px' }}>
           <StudentNameVisibilityToggle />
-          {showSubstitutionToggle && (
+          {showSubstitutionToggle ? (
             <IncludeSubstitutionsToggle
               includeSubstitutions={includeSubstitutions}
               toggleIncludeSubstitutions={toggleIncludeSubstitutions}
             />
-          )}
+          ) : null}
         </div>
         {dataExport}
       </div>

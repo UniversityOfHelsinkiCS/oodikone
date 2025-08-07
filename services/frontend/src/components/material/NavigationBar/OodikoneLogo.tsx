@@ -25,7 +25,7 @@ export const OodikoneLogo = () => {
       >
         oodikone
       </Typography>
-      {isDev && <Chip color="error" label="dev" size="small" />}
+      {isDev ? <Chip color="error" label="dev" size="small" /> : null}
     </Stack>
   )
 }

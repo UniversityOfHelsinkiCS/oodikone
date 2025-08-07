@@ -121,9 +121,13 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                   <TableCell>
                     <Box alignItems="center" display="flex" justifyContent="left">
                       <Typography>{getAgeCellContent(age)}</Typography>
-                      {isGrouped &&
-                        !onlyIamRights &&
-                        (expandedGroups.includes(index) ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+                      {isGrouped && !onlyIamRights ? (
+                        expandedGroups.includes(index) ? (
+                          <ExpandLessIcon />
+                        ) : (
+                          <ExpandMoreIcon />
+                        )
+                      ) : null}
                     </Box>
                   </TableCell>
                   <TableCell>
@@ -133,25 +137,25 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                     <PercentageBar denominator={total} numerator={count} />
                   </TableCell>
                 </TableRow>
-                {isGrouped &&
-                  expandedGroups.includes(index) &&
-                  getAges(false)
-                    .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
-                    .map(([nonGroupedAge, nonGroupedAgeCount]) => {
-                      return (
-                        <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
-                          <TableCell>
-                            <Typography>{nonGroupedAge}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography>{nonGroupedAgeCount}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                {isGrouped && expandedGroups.includes(index)
+                  ? getAges(false)
+                      .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
+                      .map(([nonGroupedAge, nonGroupedAgeCount]) => {
+                        return (
+                          <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
+                            <TableCell>
+                              <Typography>{nonGroupedAge}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{nonGroupedAgeCount}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })
+                  : null}
               </Fragment>
             ))}
           </TableBody>

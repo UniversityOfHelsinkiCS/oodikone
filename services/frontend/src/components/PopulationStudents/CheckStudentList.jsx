@@ -10,7 +10,7 @@ export const CheckStudentList = ({ students }) => {
   const [notInListRows, setNotInListRows] = useState([])
 
   const checkStudents = input => {
-    const studentnumbers = input.match(/[^\s,]+/g) || []
+    const studentnumbers = input.match(/[^\s,]+/g) ?? []
     const foundStudents = studentnumbers.filter(studentnumber => students.includes(studentnumber))
     const notInSisu = studentnumbers.filter(studentnumber => !students.includes(studentnumber))
     const notInList = students.filter(student => !studentnumbers.includes(student))

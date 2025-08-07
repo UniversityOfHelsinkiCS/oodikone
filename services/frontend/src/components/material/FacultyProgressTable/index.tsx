@@ -70,7 +70,7 @@ export const FacultyProgressTable = ({
                     yearArray={yearArray}
                     yearIndex={yearIndex}
                   />
-                  {visibleYears[yearIndex] && (
+                  {visibleYears[yearIndex] ? (
                     <TableRow>
                       <TableCell colSpan={100}>
                         <Collapse in={visibleYears[yearIndex]} timeout="auto" unmountOnExit>
@@ -83,7 +83,7 @@ export const FacultyProgressTable = ({
                         </Collapse>
                       </TableCell>
                     </TableRow>
-                  )}
+                  ) : null}
                 </>
               ) : (
                 <TableRow>

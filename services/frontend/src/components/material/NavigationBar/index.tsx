@@ -96,7 +96,7 @@ export const NavigationBar = () => {
             }}
           >
             <OodikoneLogo />
-            {!isFetching && location && (
+            {!isFetching && location ? (
               <Tabs
                 sx={{ '& .MuiTabs-indicator': { backgroundColor: 'activeNavigationTab' } }}
                 textColor="inherit"
@@ -121,7 +121,7 @@ export const NavigationBar = () => {
                   />
                 ))}
               </Tabs>
-            )}
+            ) : null}
             <UserButton />
           </Box>
         </Toolbar>

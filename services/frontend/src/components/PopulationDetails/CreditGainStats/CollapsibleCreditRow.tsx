@@ -71,14 +71,14 @@ export const CollapsibleCreditRow = ({
         <TableCell>
           <Box sx={{ display: 'flex' }}>
             <Typography>{getCellText(min, max)}</Typography>
-            {isExpandable && (isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />)}
+            {isExpandable ? isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> : null}
           </Box>
         </TableCell>
         <TableCell>{!isExpanded && <Typography>{categoryStudents.length}</Typography>}</TableCell>
         <TableCell>
-          {filteredLength && !isExpanded && (
+          {filteredLength && !isExpanded ? (
             <PercentageBar denominator={filteredLength} numerator={categoryStudents.length} />
-          )}
+          ) : null}
         </TableCell>
       </TableRow>
       {limits.map(([imin, imax]) => {
@@ -95,7 +95,9 @@ export const CollapsibleCreditRow = ({
               <Typography>{categoryStudents.length}</Typography>
             </TableCell>
             <TableCell>
-              {filteredLength && <PercentageBar denominator={filteredLength} numerator={categoryStudents.length} />}
+              {filteredLength ? (
+                <PercentageBar denominator={filteredLength} numerator={categoryStudents.length} />
+              ) : null}
             </TableCell>
           </TableRow>
         )

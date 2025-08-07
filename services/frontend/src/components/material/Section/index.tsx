@@ -32,8 +32,10 @@ export const Section = ({
           {title}
         </Typography>
         <Stack direction="row" gap={1}>
-          {exportOnClick && <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />}
-          {infoBoxContent && <InfoBox content={infoBoxContent} cypress={cypress} />}
+          {exportOnClick ? (
+            <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
+          ) : null}
+          {infoBoxContent ? <InfoBox content={infoBoxContent} cypress={cypress} /> : null}
         </Stack>
       </Stack>
       <Box sx={{ marginTop: title ? 2 : 0 }}>

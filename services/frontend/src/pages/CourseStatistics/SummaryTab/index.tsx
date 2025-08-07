@@ -79,14 +79,14 @@ export const SummaryTab = ({ onClickCourse }: { onClickCourse: (courseCode: stri
   return (
     <Stack gap={2}>
       <Stack gap={1}>
-        {userHasAccessToAllStats && (
+        {userHasAccessToAllStats ? (
           <ProgrammeDropdown
             label="Select study programmes"
             onChange={handleChange}
             options={options}
             value={form.programmes}
           />
-        )}
+        ) : null}
       </Stack>
       <Section exportOnClick={() => exportToExcel(data)}>
         <AttemptsTable data={data} onClickCourse={onClickCourse} userHasAccessToAllStats={userHasAccessToAllStats} />

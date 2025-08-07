@@ -44,7 +44,7 @@ export const FacultiesTab = () => {
       const facultiesTotal = { ...emptyFields }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
-          if (!course.bySemesters.cellStats[faculty]) course.bySemesters.cellStats[faculty] = { ...emptyFields }
+          course.bySemesters.cellStats[faculty] ??= { ...emptyFields }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
           course.bySemesters.cellStats[faculty].completions += stats.completions

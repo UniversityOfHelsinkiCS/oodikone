@@ -196,7 +196,7 @@ export const PopulationDetails = ({
               }
               sx={{ width: 'fit-content' }}
             />
-            {combinedProgramme && (
+            {combinedProgramme ? (
               <FormControlLabel
                 control={
                   <Switch
@@ -207,7 +207,7 @@ export const PopulationDetails = ({
                 label="Show only credits included in licentiate study plan"
                 sx={{ width: 'fit-content' }}
               />
-            )}
+            ) : null}
             <FormControlLabel
               control={
                 <Switch
@@ -232,7 +232,9 @@ export const PopulationDetails = ({
           </FormGroup>
           <PopulationQueryCard populationTags={populationTags} query={query} />
         </Stack>
-        {showAdvancedSettings && <AdvancedSettings cleanUp={() => setShowAdvancedSettings(false)} query={query} />}
+        {showAdvancedSettings ? (
+          <AdvancedSettings cleanUp={() => setShowAdvancedSettings(false)} query={query} />
+        ) : null}
       </Paper>
       <PanelView panels={panels} />
     </Box>

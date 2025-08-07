@@ -31,7 +31,7 @@ export const BreakdownDisplay = ({
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
         <BreakdownBarChart cypress={`${level}-breakdown-bar-chart`} data={data} handleClick={handleClick} mode={mode} />
-        {programmeDataVisible && year && year in levelProgrammeData && (
+        {programmeDataVisible && year && year in levelProgrammeData ? (
           <BreakdownBarChart
             cypress={`${level}BreakdownBarChartFaculty`}
             data={levelProgrammeData[year].data}
@@ -42,7 +42,7 @@ export const BreakdownDisplay = ({
             year={year}
             yearLabel={yearLabel}
           />
-        )}
+        ) : null}
       </Stack>
     </Box>
   )

@@ -224,9 +224,7 @@ export const tableStateReducer = (...args) =>
         state.expandedGroups = payload.groups
       },
       TOGGLE_COLUMN_SORT: () => {
-        if (!state.columnOptions[payload.column]) {
-          state.columnOptions[payload.column] = getDefaultColumnOptions()
-        }
+        state.columnOptions[payload.column] ??= getDefaultColumnOptions()
 
         if (payload.direction) {
           if (state.columnOptions[payload.column].sort === payload.direction) {
@@ -371,6 +369,7 @@ const ColumnHeader = ({ columnKey, displayColumnKey, column, ...props }) => {
   return <ColumnHeaderContent colSpan={colSpan} column={column} state={state} {...props} />
 }
 
+// eslint-disable-next-line react/display-name
 const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
   const cellSize = useRef()
   const titleSize = useRef()
@@ -419,8 +418,9 @@ const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, s
     })
   }
 
-  const isFilterActive =
-    isActive && isActive(state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions())
+  const isFilterActive = isActive?.(
+    state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()
+  )
   const isSortingActive = !!sort
 
   const evaluateSizes = () => {
@@ -492,7 +492,7 @@ const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, s
       {...column.headerProps}
     >
       <SizeMeasurer onSizeChange={onCellSizeChange} style={{ display: 'flex', alignItems: 'center' }}>
-        {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
+        {toolsMode !== 'fixed' && (isFilterActive ?? isSortingActive) ? (
           <div
             style={{
               borderWidth: '7px',
@@ -503,7 +503,7 @@ const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, s
               right: '-7px',
             }}
           />
-        )}
+        ) : null}
         <Orientable
           orientation={column.vertical ? 'vertical' : 'horizontal'}
           style={{
@@ -518,16 +518,16 @@ const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, s
           </SizeMeasurer>
         </Orientable>
         <div style={{ flexGrow: 1 }} />
-        {(sortable || filterable) && (
+        {sortable || filterable ? (
           <SizeMeasurer className={`column-tools ${toolsMode}`} onSizeChange={onToolsSizeChange}>
             <div style={{ marginRight: column.helpText ? '20px' : 0 }}>
-              {sortable && (!hasChildren || column.mergeHeader) && (
+              {sortable && (!hasChildren || column.mergeHeader) ? (
                 <Icon
                   name={sortIcon}
                   style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
                 />
-              )}
-              {filterable && (!hasChildren || column.mergeHeader) && (
+              ) : null}
+              {filterable && (!hasChildren || column.mergeHeader) ? (
                 <Popup
                   className="filter-menu"
                   hideOnScroll={false}
@@ -591,15 +591,15 @@ const ColumnHeaderContent = memo(({ column, colSpan, state, dispatch, rowSpan, s
                     </div>
                   </div>
                 </Popup>
-              )}
+              ) : null}
             </div>
           </SizeMeasurer>
-        )}
-        {column.helpText && (
+        ) : null}
+        {column.helpText ? (
           <div>
             <Popup content={column.helpText} position="top center" trigger={helpIcon} />
           </div>
-        )}
+        ) : null}
       </SizeMeasurer>
     </th>
   )

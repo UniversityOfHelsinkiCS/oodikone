@@ -34,7 +34,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const { data: criteria } = useGetProgressCriteriaQuery({
-    programmeCode: group?.tags?.studyProgramme ? group?.tags?.studyProgramme : '',
+    programmeCode: group?.tags?.studyProgramme ?? '',
   })
   const year = group?.tags?.year
 
@@ -70,11 +70,11 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
       content: (
         <>
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
-          {group.tags?.year && (
+          {group.tags?.year ? (
             <Button onClick={() => toggleCreditDateFilter()} primary>
               {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
             </Button>
-          )}
+          ) : null}
           <CreditAccumulationGraphHighCharts
             programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
             students={filteredStudents}
@@ -249,7 +249,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
   const { getTextIn } = useLanguage()
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const handleBack = () => {
-    navigate('/studyguidancegroups')
+    void navigate('/studyguidancegroups')
   }
 
   return (
@@ -259,16 +259,16 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
         <Divider />
         <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
           <Header size="medium" style={{ marginRight: 'auto' }}>
-            {group && group.name && getTextIn(group.name)}
+            {getTextIn(group?.name)}
           </Header>
-          {group.tags?.studyProgramme && (
+          {!!group.tags?.studyProgramme && (
             <Label
               color="blue"
               content={studyProgrammes.find(programme => programme.value === group.tags.studyProgramme)?.text}
               tag
             />
           )}
-          {group.tags?.year && <Label color="blue" content={startYearToAcademicYear(group.tags.year)} tag />}
+          {!!group.tags?.year && <Label color="blue" content={startYearToAcademicYear(group.tags.year)} tag />}
         </div>
       </Wrapper>
       {children}
@@ -278,7 +278,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
 
 export const SingleStudyGuidanceGroupContainer = ({ group }) => {
   // Sorting is needed for RTK query cache to work properly
-  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() || []
+  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() ?? []
   const { data: population, isLoading } = useGetCustomPopulationQuery({
     studentNumbers: groupStudentNumbers,
     tags: {

@@ -13,7 +13,7 @@ export const getCourseCodeColumn = getTextIn => ({
   getRowContent: row => (
     <div style={{ display: 'flex', flexDirection: 'column' }} title={getTextIn(row.name)}>
       <b>{row.code}</b>
-      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name && getTextIn(row.name)}</i>
+      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name ? getTextIn(row.name) : null}</i>
     </div>
   ),
 })

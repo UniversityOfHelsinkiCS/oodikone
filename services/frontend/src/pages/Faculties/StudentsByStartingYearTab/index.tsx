@@ -139,7 +139,7 @@ export const StudentsByStartingYearTab = ({
               value={showPercentages}
             />
           </ToggleContainer>
-          {studentStats?.data && (
+          {studentStats?.data ? (
             <FacultyStudentDataTable
               extraTableStats={studentStats?.data.facultyTableStatsExtra}
               programmeNames={studentStats?.data.programmeNames}
@@ -152,7 +152,7 @@ export const StudentsByStartingYearTab = ({
               titles={studentStats?.data.titles}
               years={studentStats?.data.years}
             />
-          )}
+          ) : null}
         </Stack>
       </Section>
       <ProgressSection faculty={faculty} graduatedGroup={graduatedGroup} specialGroups={specialGroups} />

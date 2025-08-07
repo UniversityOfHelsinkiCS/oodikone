@@ -121,7 +121,7 @@ export const BasicInformationTab = ({
         isLoading={basicsIsLoading}
         title="Students of the study programme"
       >
-        {basics.isSuccess && basics.data && (
+        {basics.isSuccess && basics.data ? (
           <Stack gap={2}>
             {!isNewProgramme(studyProgramme) && (
               <Alert severity="info" variant="outlined">
@@ -140,7 +140,7 @@ export const BasicInformationTab = ({
               titles={basics.data.titles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
 
       <Section
@@ -150,7 +150,7 @@ export const BasicInformationTab = ({
         isLoading={creditsIsLoading}
         title="Credits produced by the study programme"
       >
-        {creditGraphStats && tableStats && isDefaultServiceProvider() && (
+        {creditGraphStats && tableStats && isDefaultServiceProvider() ? (
           <Stack gap={2}>
             <Stack alignItems="center">
               <Stack alignItems="center" direction="row">
@@ -169,7 +169,7 @@ export const BasicInformationTab = ({
               data={tableStats.data}
               titles={tableStats.titles}
             />
-            {secondCreditGraphStats && secondTableStats && (
+            {secondCreditGraphStats && secondTableStats ? (
               <Stack gap={2}>
                 <Typography variant="h6">Credits produced by the licentiate programme</Typography>
                 <StackedBarChart
@@ -184,9 +184,9 @@ export const BasicInformationTab = ({
                   titles={secondTableStats.titles}
                 />
               </Stack>
-            )}
+            ) : null}
           </Stack>
-        )}
+        ) : null}
       </Section>
 
       <Section
@@ -196,7 +196,7 @@ export const BasicInformationTab = ({
         isLoading={graduationsIsLoading}
         title={getGraduatedText(studyProgramme)}
       >
-        {graduations.isSuccess && graduations.data && (
+        {graduations.isSuccess && graduations.data ? (
           <Stack gap={2}>
             <BarChart
               graphStats={graduations.data.graphStats}
@@ -209,7 +209,7 @@ export const BasicInformationTab = ({
               titles={graduations?.data?.titles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
 
       <Section
@@ -219,7 +219,7 @@ export const BasicInformationTab = ({
         isLoading={graduationsIsLoading}
         title="Average graduation times"
       >
-        {graduations.isSuccess && graduations.data && (
+        {graduations.isSuccess && graduations.data ? (
           <Stack gap={2}>
             <ToggleContainer>
               <Toggle
@@ -232,14 +232,14 @@ export const BasicInformationTab = ({
             </ToggleContainer>
             {showMedian ? (
               <>
-                {doCombo && (
+                {doCombo ? (
                   <MedianTimeBarChart
                     byStartYear={false}
                     data={graduations?.data?.comboTimes?.medians}
                     goal={graduations?.data?.comboTimes?.goal}
                     title={getGraduationGraphTitle(studyProgramme, doCombo)}
                   />
-                )}
+                ) : null}
                 {studyProgramme !== 'MH90_001' && (
                   <MedianTimeBarChart
                     byStartYear={false}
@@ -248,36 +248,36 @@ export const BasicInformationTab = ({
                     title={getGraduationGraphTitle(studyProgramme)}
                   />
                 )}
-                {combinedProgramme && (
+                {combinedProgramme ? (
                   <MedianTimeBarChart
                     byStartYear={false}
                     data={timesDataSecondProgramme?.medians}
                     goal={graduations?.data.graduationTimesSecondProgramme?.goal}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
                   />
-                )}
+                ) : null}
               </>
             ) : (
               <>
-                {doCombo && (
+                {doCombo ? (
                   <BreakdownBarChart
                     data={graduations?.data?.comboTimes?.medians}
                     title={getGraduationGraphTitle(studyProgramme, doCombo)}
                   />
-                )}
+                ) : null}
                 {studyProgramme !== 'MH90_001' && (
                   <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyProgramme)} />
                 )}
-                {combinedProgramme && (
+                {combinedProgramme ? (
                   <BreakdownBarChart
                     data={timesDataSecondProgramme?.medians}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
                   />
-                )}
+                ) : null}
               </>
             )}
           </Stack>
-        )}
+        ) : null}
       </Section>
 
       <Section
@@ -291,7 +291,7 @@ export const BasicInformationTab = ({
             : 'Primary bachelor programme studies before this programme'
         }
       >
-        {graduations.isSuccess && graduations?.data?.programmesBeforeOrAfterGraphStats?.length && (
+        {graduations.isSuccess && graduations?.data?.programmesBeforeOrAfterGraphStats?.length ? (
           <Stack gap={2}>
             <StackedBarChart
               cypress="programmes-before-or-after"
@@ -310,7 +310,7 @@ export const BasicInformationTab = ({
               titles={graduations?.data?.programmesBeforeOrAfterTitles}
             />
           </Stack>
-        )}
+        ) : null}
       </Section>
     </Stack>
   )

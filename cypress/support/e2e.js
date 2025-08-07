@@ -13,11 +13,9 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 require('@cypress/code-coverage/support')
 require('./commands')
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 Cypress.on('uncaught:exception', error => {
   /* returning false here prevents Cypress from failing the test */
   return true

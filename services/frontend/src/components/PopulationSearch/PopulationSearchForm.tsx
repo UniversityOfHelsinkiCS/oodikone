@@ -106,9 +106,9 @@ export const PopulationSearchForm = () => {
         <Subtitle text="Class of" />
         <Stack direction="row" spacing={2}>
           <EnrollmentDateSelector setYear={setYear} year={year} />
-          {fullAccessToStudentData && (
+          {fullAccessToStudentData ? (
             <FilterOldProgrammesToggle checked={filterProgrammes} onChange={() => setFilterProgrammes(prev => !prev)} />
-          )}
+          ) : null}
         </Stack>
       </Box>
       <Box>

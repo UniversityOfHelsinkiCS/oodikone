@@ -55,19 +55,19 @@ export const TagItem = ({
           primary={
             <Stack direction="row" sx={{ alignItems: 'center' }}>
               {tag.name}
-              {tag.year && (
+              {tag.year ? (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   programme={studyProgramme}
                   tag={tag}
                   years={[parseInt(tag.year, 10)]}
                 />
-              )}
-              {tag.personalUserId && (
+              ) : null}
+              {tag.personalUserId ? (
                 <Tooltip arrow placement="right" title="Only you can see this tag">
                   <VisibilityIcon data-cy={`${tag.name}-visibility-icon`} fontSize="small" />
                 </Tooltip>
-              )}
+              ) : null}
             </Stack>
           }
           secondary={tag.year ? `Associated start year ${tag.year}` : 'No associated start year'}

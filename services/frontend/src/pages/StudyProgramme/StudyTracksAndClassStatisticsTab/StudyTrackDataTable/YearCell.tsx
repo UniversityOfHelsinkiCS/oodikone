@@ -36,14 +36,14 @@ export const YearCell = ({
           </IconButton>
         )}
         {year}
-        {populationLinkVisible && (
+        {populationLinkVisible ? (
           <PopulationLink
             combinedProgramme={combinedProgramme}
             cypress={year.split(' - ')[0]}
             programme={degreeProgramme}
             years={populationYears}
           />
-        )}
+        ) : null}
       </Stack>
     </TableCell>
   )

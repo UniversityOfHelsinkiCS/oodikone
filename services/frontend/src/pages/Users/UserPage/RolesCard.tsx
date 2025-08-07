@@ -57,29 +57,27 @@ export const RolesCard = ({ user }: { user: User }) => {
   }, [result.isSuccess, result.isError, user.roles])
 
   return (
-    <>
-      <Card sx={{ height: '100%', width: '100%' }} variant="outlined">
-        <CardHeader
-          buttons={<EditButton disabled={result.isLoading} editing={editing} onClick={handleEditClick} />}
-          title="Roles"
-        />
-        <CardContent>
-          {roles.map(role => (
-            <Box key={role} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>
-              <RoleChip role={role} />
-              <Stack direction="row" sx={{ alignItems: 'center' }}>
-                {selected.includes(role) && <Chip color="success" label="Active" size="small" variant="outlined" />}
-                <Checkbox
-                  checked={selected.includes(role)}
-                  color="success"
-                  disabled={!editing || (!['admin', 'teachers'].includes(role) && isDefaultServiceProvider())}
-                  onChange={() => toggleRole(role)}
-                />
-              </Stack>
-            </Box>
-          ))}
-        </CardContent>
-      </Card>
-    </>
+    <Card sx={{ height: '100%', width: '100%' }} variant="outlined">
+      <CardHeader
+        buttons={<EditButton disabled={result.isLoading} editing={editing} onClick={handleEditClick} />}
+        title="Roles"
+      />
+      <CardContent>
+        {roles.map(role => (
+          <Box key={role} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>
+            <RoleChip role={role} />
+            <Stack direction="row" sx={{ alignItems: 'center' }}>
+              {selected.includes(role) && <Chip color="success" label="Active" size="small" variant="outlined" />}
+              <Checkbox
+                checked={selected.includes(role)}
+                color="success"
+                disabled={!editing || (!['admin', 'teachers'].includes(role) && isDefaultServiceProvider())}
+                onChange={() => toggleRole(role)}
+              />
+            </Stack>
+          </Box>
+        ))}
+      </CardContent>
+    </Card>
   )
 }

@@ -23,7 +23,7 @@ export const StudyGuidanceGroups = () => {
         <Wrapper isLoading={isLoading}>
           {!isLoading && !groupid && <StudyGuidanceGroupOverview groups={data} />}
         </Wrapper>
-        {!isLoading && groupid && <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} />}
+        {!isLoading && groupid ? <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} /> : null}
       </div>
     </>
   )

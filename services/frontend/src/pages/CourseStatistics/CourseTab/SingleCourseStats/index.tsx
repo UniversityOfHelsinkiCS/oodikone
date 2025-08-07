@@ -485,7 +485,7 @@ export const SingleCourseStats = ({
           )}
         </Stack>
       </Section>
-      {userHasAccessToAllStats && (
+      {userHasAccessToAllStats ? (
         <Section title="Filter statistics by study programme">
           <Stack direction="row" gap={2}>
             <Box width="50%">
@@ -520,7 +520,7 @@ export const SingleCourseStats = ({
             </Box>
           </Stack>
         </Section>
-      )}
+      ) : null}
       <ResultTabs
         availableStats={availableStats}
         comparison={statistics.comparison}

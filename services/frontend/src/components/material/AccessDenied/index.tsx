@@ -13,7 +13,7 @@ export const AccessDenied = () => {
   const content = (
     <>
       You're currently not allowed to enter but you will get an email when you're authorized"
-      {easterEggVisible && <EasterEgg />}
+      {easterEggVisible ? <EasterEgg /> : null}
     </>
   )
 

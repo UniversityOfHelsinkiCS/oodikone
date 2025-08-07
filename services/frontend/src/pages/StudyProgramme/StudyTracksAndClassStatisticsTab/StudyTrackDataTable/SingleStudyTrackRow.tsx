@@ -37,7 +37,7 @@ export const SingleStudyTrackRow = ({
           return (
             <TableCell align="right" key={getCellKey(code, index)} sx={{ whiteSpace: 'nowrap' }}>
               {value}
-              {populationLinkVisible && (
+              {populationLinkVisible ? (
                 <PopulationLink
                   combinedProgramme={combinedProgramme}
                   cypress={year.split(' - ')[0]}
@@ -45,7 +45,7 @@ export const SingleStudyTrackRow = ({
                   studyTrack={code}
                   years={year === 'Total' ? calendarYears : [parseInt(year.slice(0, 4), 10)]}
                 />
-              )}
+              ) : null}
             </TableCell>
           )
         }

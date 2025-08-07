@@ -1,4 +1,3 @@
-/* eslint-disable import-x/no-extraneous-dependencies */
 const { parserPlugins } = require('@istanbuljs/schema').defaults.nyc
 
 module.exports = {

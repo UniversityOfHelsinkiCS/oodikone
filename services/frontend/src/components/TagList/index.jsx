@@ -4,6 +4,7 @@ import { Table } from 'semantic-ui-react'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { TagStudent } from '@/components/TagStudent'
 
+// eslint-disable-next-line react/display-name
 const Row = memo(
   ({ studentTags, studentNumber, studyTrack, tagOptions, name, combinedProgramme }) => (
     <TagStudent
@@ -64,7 +65,7 @@ export const TagList = ({ programme, combinedProgramme, selectedStudents, tags }
     <Table celled>
       <Table.Header>
         <Table.Row>
-          {namesVisible && <Table.HeaderCell>Student name</Table.HeaderCell>}
+          {namesVisible ? <Table.HeaderCell>Student name</Table.HeaderCell> : null}
           <Table.HeaderCell>Student number</Table.HeaderCell>
           <Table.HeaderCell>Tags</Table.HeaderCell>
           <Table.HeaderCell>Add tags</Table.HeaderCell>
