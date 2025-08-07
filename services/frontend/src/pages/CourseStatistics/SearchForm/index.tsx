@@ -227,7 +227,7 @@ export const SearchForm = ({ progress, isPending }) => {
                 Please enter at least 5 characters for course name or 2 characters for course code.
               </Alert>
             ) : (
-              <Section isLoading={isFetching || debouncedChanged ? isInputValid : null}>
+              <Section isLoading={isFetching || debouncedChanged ? isInputValid : false}>
                 {selected.length > 0 && selectMultipleCourses ? (
                   <Stack gap={2}>
                     <CourseTable

@@ -34,7 +34,7 @@ export const FacultyProgress = ({
 
   return (
     <Stack spacing={2}>
-      <Section isError={isError} isLoading={isLoading ? !bachelorStats : null} title="Bachelor">
+      <Section isError={isError} isLoading={isLoading ? !bachelorStats : false} title="Bachelor">
         {bachelorStats ? (
           <Stack gap={2}>
             <ProgressBarChart
@@ -61,7 +61,7 @@ export const FacultyProgress = ({
         cypress="faculty-bachelor-masters-progress"
         infoBoxContent={facultyToolTips.bachelorMasterProgress}
         isError={isError}
-        isLoading={isLoading ? !bachelorMasterStats : null}
+        isLoading={isLoading ? !bachelorMasterStats : false}
         title="Bachelor + Master"
       >
         {bachelorMasterStats ? (
@@ -86,7 +86,7 @@ export const FacultyProgress = ({
           </Stack>
         ) : null}
       </Section>
-      <Section isError={isError} isLoading={isLoading ? !masterStats : null} title="Master">
+      <Section isError={isError} isLoading={isLoading ? !masterStats : false} title="Master">
         {masterStats && faculty !== 'H90' ? (
           <Stack gap={2}>
             <ProgressBarChart
@@ -109,7 +109,7 @@ export const FacultyProgress = ({
           </Stack>
         ) : null}
       </Section>
-      <Section isError={isError} isLoading={isLoading ? !doctorStats : null} title="Doctor">
+      <Section isError={isError} isLoading={isLoading ? !doctorStats : false} title="Doctor">
         {doctorStats ? (
           <Stack gap={2}>
             <ProgressBarChart

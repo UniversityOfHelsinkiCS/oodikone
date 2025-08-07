@@ -62,7 +62,7 @@ export const GraduationTimes = ({
     <Section
       cypress={`${level}-graduation-times`}
       isError={isError}
-      isLoading={isLoading ? !dataIsLoaded : null}
+      isLoading={isLoading ? !dataIsLoaded : false}
       title={title}
     >
       {showMedian && dataIsLoaded ? (
