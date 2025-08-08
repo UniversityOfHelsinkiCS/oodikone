@@ -6,7 +6,16 @@ import { serviceProvider } from '@/conf'
 import { SemestersData } from '@/redux/semesters'
 import type { Absence } from '@/types/students'
 import type { SISStudyRightElement } from '@oodikone/shared/models'
-import { FormattedStudent, Release, CreditTypeCode, Name, Unarray } from '@oodikone/shared/types'
+import {
+  FormattedStudent,
+  Release,
+  CreditTypeCode,
+  Name,
+  Unarray,
+  SemesterEnrollment,
+  EnrollmentType,
+} from '@oodikone/shared/types'
+import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
 dayjs.extend(isBetween)
 
@@ -18,6 +27,31 @@ export const textAndDescriptionSearch = (dropDownOptions: any[], param: string) 
   )
 
 export const isFall = (semester: number) => semester % 2 === 1
+
+/**
+ * @param currentSemester semesterCode for wanted semester
+ * @param semesterEnrollments fetched from within a studyRight
+ * @returns boolean depicting if registration for given semester is "absent"
+ */
+const semesterEnrollmentAbsence = (
+  currentSemester: number,
+  semesterEnrollments: SemesterEnrollment[] | undefined | null
+) => {
+  const relevantSemesterEnrollment = semesterEnrollments?.find(se => se.semester === currentSemester)
+  return relevantSemesterEnrollment?.type === EnrollmentType.ABSENT
+}
+
+// NB: statutory absence is named just "absent"
+export const getStudyRightStatusText = (
+  { active, graduated, cancelled }: { active: boolean; graduated: boolean; cancelled: boolean },
+  studyRight: StudentStudyRight | undefined,
+  semestercode: number | undefined
+) => {
+  if (graduated) return 'Graduated'
+  if (cancelled) return 'Cancelled'
+  if (active) return 'Active'
+  return semesterEnrollmentAbsence(semestercode ?? NaN, studyRight?.semesterEnrollments) ? 'Absent' : 'Inactive'
+}
 
 export const getStudentTotalCredits = (
   student: Pick<FormattedStudent, 'courses'>,

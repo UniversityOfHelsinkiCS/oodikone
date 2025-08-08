@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { getStudentTotalCredits } from '@/common'
+import { getStudentTotalCredits, getStudyRightStatusText } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import {
@@ -152,14 +152,6 @@ export const useFormat = ({
     // This is so that "Study programmes" column is complete in views that have no associated "primary" programme.
     const programmesList = includePrimaryProgramme ? allProgrammes : otherProgrammes
 
-    const getStudyRightStatus = () => {
-      if (!primaryProgramme) return null
-      if (primaryProgramme.graduated) return 'Graduated'
-      if (primaryProgramme.cancelled) return 'Cancelled'
-      if (primaryProgramme.active) return 'Active'
-      return 'Inactive'
-    }
-
     const getAdmissiontype = () => {
       const admissionType = relevantStudyRight?.admissionType
 
@@ -237,7 +229,7 @@ export const useFormat = ({
       graduationDate: getGraduationDate(),
       startYearAtUniversity: student.started ? new Date(student.started).getFullYear() : null,
       programmes: { programmes: programmesList, exportValue: joinProgrammes(programmesList, getTextIn, '; ') },
-      programmeStatus: getStudyRightStatus(),
+      programmeStatus: getStudyRightStatusText(primaryProgramme, relevantStudyRight, currentSemester?.semestercode),
       transferredFrom: getTextIn(programmes?.[student.transferSource!]?.name) ?? student.transferSource ?? '',
       admissionType: getAdmissiontype(),
       gender: GenderCodeToText[student.gender_code],
