@@ -43,13 +43,14 @@ const semesterEnrollmentAbsence = (
 
 // NB: statutory absence is named just "absent"
 export const getStudyRightStatusText = (
-  { active, graduated, cancelled }: { active: boolean; graduated: boolean; cancelled: boolean },
+  programme: { active: boolean; graduated: boolean; cancelled: boolean } | undefined,
   studyRight: StudentStudyRight | undefined,
   semestercode: number | undefined
 ) => {
-  if (graduated) return 'Graduated'
-  if (cancelled) return 'Cancelled'
-  if (active) return 'Active'
+  if (!programme) return null
+  if (programme.graduated) return 'Graduated'
+  if (programme.cancelled) return 'Cancelled'
+  if (programme.active) return 'Active'
   return semesterEnrollmentAbsence(semestercode ?? NaN, studyRight?.semesterEnrollments) ? 'Absent' : 'Inactive'
 }
 

@@ -157,7 +157,9 @@ export const getProgrammeDetails =
     const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
     const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
 
-    const relevantProgrammeCode = programme ?? primaryProgramme?.code
+    // Programme can be an empty string, so direct ?? comparison wont work
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    const relevantProgrammeCode = (programme || primaryProgramme?.code) ?? ''
 
     const yearMatching = startDate =>
       !year || dayjs(startDate).isBetween(`${year}-08-01`, `${Number(year) + 1}-07-31`, 'day', '[]')
