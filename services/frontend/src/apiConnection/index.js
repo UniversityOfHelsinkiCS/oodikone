@@ -35,7 +35,7 @@ const actionSuffixes = {
   success: 'SUCCESS',
 }
 
-export const actionTypes = prefix => ({
+const actionTypes = prefix => ({
   attempt: `${prefix}${actionSuffixes.attempt}`,
   failure: `${prefix}${actionSuffixes.failure}`,
   success: `${prefix}${actionSuffixes.success}`,
@@ -60,20 +60,6 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0, pr
     default:
       return Promise.reject(new Error('Invalid http method'))
   }
-}
-
-export const callController = (route, prefix, data, method = 'get', query, params, onProgress = null) => {
-  const requestSettings = {
-    route,
-    method,
-    data,
-    prefix,
-    query,
-    params,
-    onProgress,
-  }
-  const { attempt } = actionTypes(prefix)
-  return { type: attempt, requestSettings }
 }
 
 const handleError = (error, actionHistory = []) => {
