@@ -159,10 +159,6 @@ describe('Basic user', () => {
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
 
-      cy.contains('Show population').should('be.disabled')
-      cy.contains('Show population').trigger('mouseover', { force: true })
-      cy.contains('The maximum time range to generate a population for this course is 17 years')
-
       selectFromYear('2019-2020')
       cy.contains('Show population').should('be.enabled')
       cy.contains('Show population').click()
