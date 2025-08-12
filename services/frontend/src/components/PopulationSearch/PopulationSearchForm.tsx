@@ -24,12 +24,17 @@ import { DegreeProgrammeSelector } from './DegreeProgrammeSelector'
 import { EnrollmentDateSelector } from './EnrollmentDateSelector'
 import { StudyTrackSelector } from './StudyTrackSelector'
 
+const getDefaultYear = () => {
+  const date = new Date()
+  return date.getMonth() < 7 ? date.getFullYear() - 1 : date.getFullYear()
+}
+
 export const PopulationSearchForm = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { fullAccessToStudentData } = useGetAuthorizedUserQuery()
 
-  const [year, setYear] = useState(2017)
+  const [year, setYear] = useState(getDefaultYear())
   const [programme, setProgramme] = useState<PopulationSearchProgramme | null>(null)
   const [studyTrack, setStudyTrack] = useState<PopulationSearchStudyTrack | null>(null)
   const [semesters, _setSemesters] = useState<Semester[]>(['FALL', 'SPRING'])
