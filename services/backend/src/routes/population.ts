@@ -119,37 +119,32 @@ router.get<
   PopulationstatisticsbycourseReqBody,
   PopulationstatisticsbycourseParams
 >('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { coursecodes, from, to, separate: separateString, unifyCourses } = req.query
   const { id: userId, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
+  const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses } = req.query
 
-  if (!coursecodes || !from || !to) {
+  if (!coursecodeJSON || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
   }
 
-  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(JSON.parse(coursecodes), Unification.REGULAR)
+  const isSeparate = separate === 'true'
+  const coursecodes = JSON.parse(coursecodeJSON)
+
   const toFromDiff = Math.abs(Number(to) - Number(from) + 1)
-  const separate = separateString === 'true'
-  const requestedYearsToCreatePopulationFrom = Math.ceil(separate ? toFromDiff / 2 : toFromDiff) // 2 semesters = 1 year
+  const requestedYearsToCreatePopulationFrom = Math.ceil(isSeparate ? toFromDiff / 2 : toFromDiff) // 2 semesters = 1 year
+
+  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(coursecodes, Unification.REGULAR)
   if (requestedYearsToCreatePopulationFrom > maxYearsForPopulation) {
     return res.status(400).json({ error: `Max years to create population from is ${maxYearsForPopulation}` })
   }
 
-  const studentNumbers = await findByCourseAndSemesters(
-    JSON.parse(coursecodes),
-    Number(from),
-    Number(to),
-    separate,
-    unifyCourses
-  )
+  const studentNumbers = await findByCourseAndSemesters(coursecodes, Number(from), Number(to), isSeparate, unifyCourses)
 
   const studyRights = []
   const tagList = await getStudentTags(studyRights, studentNumbers, userId)
-
   const result: any = await statisticsOf(studentNumbers, studyRights, tagList)
-  let courseProviders: string[] = []
-  if (!hasFullAccessToStudentData(roles)) {
-    courseProviders = await getCourseProvidersForCourses(JSON.parse(coursecodes))
-  }
+  const courseProviders: string[] = !hasFullAccessToStudentData(roles)
+    ? await getCourseProvidersForCourses(coursecodes)
+    : []
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
   const found = courseProviders.some(provider => rightsMappedToProviders.includes(provider))

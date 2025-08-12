@@ -11,10 +11,10 @@ export type FormattedProgramme = {
 }
 
 export const getIsOpen = (unification: Unification) => {
-  const options = {
+  const options: Record<Unification, object> = {
     open: { [Op.eq]: true },
     regular: { [Op.eq]: false },
-    unify: { [Op.in]: [false, true] },
+    unify: { [Op.ne]: null },
   }
   return options[unification]
 }

@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { Op } from 'sequelize'
+import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
@@ -260,59 +260,31 @@ const getYearlyStatsOfNew = async (
 }
 
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
-  const maxAttainmentDate = new Date(
-    Math.max(
-      ...(
-        await CourseModel.findAll({
-          where: {
-            code: {
-              [Op.in]: courseCodes,
-            },
-          },
-          attributes: ['max_attainment_date'],
-        })
-      ).map(course => new Date(course.max_attainment_date).getTime())
-    )
-  )
-
-  const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
-  attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
-
-  const credits = await CreditModel.findAll({
+  const lastAttainmentDate = (await CourseModel.findOne({
+    attributes: [[dbFn('MAX', dbCol('max_attainment_date')), 'date']],
     where: {
-      course_code: {
-        [Op.in]: courseCodes,
-      },
-      attainment_date: {
-        [Op.gt]: attainmentThreshold,
-      },
+      code: { [Op.in]: courseCodes },
+    },
+    raw: true,
+  })) as { date: Date } | null
+
+  if (lastAttainmentDate === null) return 0
+
+  const newestAttainmentDate = lastAttainmentDate?.date.getFullYear()
+  const attainmentDateThreshold = new Date(newestAttainmentDate - 6, 0, 1)
+
+  const attainmentsWithinThreshold = await CreditModel.count({
+    attributes: [[dbFn('COUNT', dbCol('id')), 'numAttainments']],
+    where: {
+      course_code: { [Op.in]: courseCodes },
+      attainment_date: { [Op.gt]: attainmentDateThreshold },
       is_open: getIsOpen(unification),
     },
-    order: [['attainment_date', 'ASC']],
   })
 
-  const yearlyStudents = Object.values(
-    credits.reduce(
-      (res, credit) => {
-        const attainmentYear = new Date(credit.attainment_date).getFullYear()
-        if (!res[attainmentYear]) {
-          res[attainmentYear] = 0
-        }
-        res[attainmentYear]++
-        return res
-      },
-      {} as Record<number, number>
-    )
-  )
-
-  // ? What should this be called?
-  const magicNumber = 1200 // * Lower this value to get a smaller result if necessary
-  const maxYearsToCreatePopulationFrom = Math.max(
-    Math.floor(magicNumber / (yearlyStudents.reduce((acc, curr) => acc + curr, 0) / yearlyStudents.length)),
-    1
-  )
-
-  return maxYearsToCreatePopulationFrom
+  // MAGIC NUMBER
+  const maxAllowedAttainments = 1000000 // * Lower this value to get a smaller result if necessary
+  return Math.max(1, maxAllowedAttainments / attainmentsWithinThreshold)
 }
 
 export const getCourseYearlyStats = async (
