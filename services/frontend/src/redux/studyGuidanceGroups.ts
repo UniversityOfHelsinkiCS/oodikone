@@ -1,14 +1,18 @@
 import { RTKApi } from '@/apiConnection'
 
+import type { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
+
 const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getAllStudyGuidanceGroups: builder.query({
+    getAllStudyGuidanceGroups: builder.query<GroupsWithTags[], void>({
       query: () => '/studyguidancegroups',
-      providesTags: result => [
-        // eslint-disable-next-line no-unsafe-optional-chaining
-        ...result?.map(({ id }) => ({ type: 'StudyGuidanceGroups', id })),
-        { type: 'StudyGuidanceGroups', id: 'LIST' },
-      ],
+      providesTags: result =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: 'StudyGuidanceGroups' as const, id })),
+              { type: 'StudyGuidanceGroups', id: 'LIST' },
+            ]
+          : [{ type: 'StudyGuidanceGroups', id: 'LIST' }],
     }),
     changeStudyGuidanceGroupTags: builder.mutation({
       query: ({ groupId, tags }) => ({

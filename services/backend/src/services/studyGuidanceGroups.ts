@@ -2,43 +2,12 @@ import * as Sentry from '@sentry/node'
 import { AxiosError } from 'axios'
 import { uniq } from 'lodash'
 
-import { Name } from '@oodikone/shared/types'
+import type { StudyGuidanceGroup, Tags, TagsByGroupId, GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StudyGuidanceGroupTagModel } from '../models/kone'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
 
 const importerClient = getImporterClient()
-
-type ValidityPeriod = { startDate?: string; endDate?: string }
-
-type ResponsibilityInfo = {
-  text: string | null
-  roleUrn: string
-  personId: string
-  validityPeriod: ValidityPeriod
-}
-
-type Member = {
-  id: string
-  personGroupId: string
-  personGroupName: Name
-  personId: string
-  personFirstNames: string
-  personLastName: string
-  personStudentNumber: string
-  validityPeriod: ValidityPeriod
-  personPrimaryEmail: string
-}
-
-type StudyGuidanceGroup = {
-  id: string
-  name: Name
-  responsibilityInfos: ResponsibilityInfo[]
-  type: string
-  createdAt: string
-  updatedAt: string
-  members: Member[]
-}
 
 const getGroupsFromImporter = async (sisPersonId: string) => {
   if (!importerClient || !sisPersonId) {
@@ -65,12 +34,6 @@ const getGroupsFromImporter = async (sisPersonId: string) => {
     return []
   }
 }
-
-type Tags = { studyProgramme?: string | null; year?: string | null }
-
-type TagsByGroupId = Record<string, Tags>
-
-type GroupsWithTags = StudyGuidanceGroup & { tags: Tags }
 
 export const getAllGroupsAndStudents = async (sisPersonId: string) => {
   const tags = await StudyGuidanceGroupTagModel.findAll()
