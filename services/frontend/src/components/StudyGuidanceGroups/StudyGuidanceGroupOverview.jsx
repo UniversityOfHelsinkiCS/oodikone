@@ -248,7 +248,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
     },
   ]
 
-  if (groups.length === 0) {
+  if (groups?.length === 0) {
     return <StyledMessage>You do not have access to any study guidance groups.</StyledMessage>
   }
 

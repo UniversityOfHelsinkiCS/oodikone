@@ -1,3 +1,6 @@
+// @ts-check
+// Convert to tsx when migrating to MUI
+
 import { useParams } from 'react-router'
 import { Header } from 'semantic-ui-react'
 
@@ -10,7 +13,7 @@ import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
 export const StudyGuidanceGroups = () => {
   useTitle('Study guidance groups')
   const { groupid } = useParams()
-  const { data, isLoading } = useGetAllStudyGuidanceGroupsQuery()
+  const { data: groups, isLoading } = useGetAllStudyGuidanceGroupsQuery()
 
   return (
     <>
@@ -21,9 +24,11 @@ export const StudyGuidanceGroups = () => {
       </div>
       <div style={{ padding: '0 1rem' }}>
         <Wrapper isLoading={isLoading}>
-          {!isLoading && !groupid && <StudyGuidanceGroupOverview groups={data} />}
+          {!isLoading && !groupid && <StudyGuidanceGroupOverview groups={groups} />}
         </Wrapper>
-        {!isLoading && groupid ? <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} /> : null}
+        {!isLoading && groupid && groups ? (
+          <SingleStudyGuidanceGroup group={groups.find(group => group.id === groupid)} />
+        ) : null}
       </div>
     </>
   )

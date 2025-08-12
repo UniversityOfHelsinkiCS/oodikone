@@ -14,7 +14,7 @@ export const useGetCreditDateFilterOptions = () => {
 }
 
 export const useGetRelevantSemesterData = (
-  year: number | undefined
+  year: number | undefined | null
 ):
   | {
       isSuccess: false
@@ -52,7 +52,7 @@ export const useGetRelevantSemesterData = (
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-const getFirstAndLastSemester = (semesters: SemestersData, year: number | undefined): [number, number] => {
+const getFirstAndLastSemester = (semesters: SemestersData, year: number | undefined | null): [number, number] => {
   const { semesters: allSemesters, currentSemester } = semesters
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 

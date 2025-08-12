@@ -15,15 +15,21 @@ import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { formatDate } from '@/util/timeAndDate'
-import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
+import {
+  DegreeProgrammeType,
+  EnrollmentType,
+  FormattedStudent,
+  type FormattedStudent as Student,
+} from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
+import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
-export const useColumns = ({ group }): [string[], string[]] => {
+export const useColumns = ({ group }: { group: GroupsWithTags }): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { visible: namesVisible } = useStudentNameVisibility()
 
-  const [programme, combinedProgramme] = group?.tags?.studyProgramme?.split('+') ?? []
-  const year = group?.tags?.year
+  const [programme, combinedProgramme] = group.tags.studyProgramme?.split('+') ?? []
+  const { year } = group.tags
 
   const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
 
@@ -74,15 +80,19 @@ export const useFormat = ({
 
   filteredStudents,
   includePrimaryProgramme = true,
+}: {
+  group: GroupsWithTags
+  filteredStudents: FormattedStudent[]
+  includePrimaryProgramme: boolean
 }) => {
-  const [programme, combinedProgramme] = group?.tags?.studyProgramme?.split('+') ?? []
+  const [programme, combinedProgramme] = group.tags.studyProgramme?.split('+') ?? []
   const { getTextIn } = useLanguage()
 
   const { isAdmin } = useGetAuthorizedUserQuery()
   const creditDateFilterOptions = useGetCreditDateFilterOptions()
 
   const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
+  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(Number(group.tags.year))
 
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
     ? semesters
