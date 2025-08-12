@@ -1,4 +1,12 @@
-import { Name, EnrollmentState, ProgrammeModuleWithRelevantAttributes, UnifyStatus, Unarray } from '../types'
+import {
+  Name,
+  EnrollmentState,
+  ProgrammeModuleWithRelevantAttributes,
+  UnifyStatus,
+  Unarray,
+  SemesterEnrollment,
+  DegreeProgrammeType,
+} from '../types'
 import { FormattedStudent } from '../types/studentData'
 
 type Course = {
@@ -10,6 +18,50 @@ type Course = {
 type EnrollmentObject = {
   [EnrollmentState.ENROLLED]: string[]
   [EnrollmentState.REJECTED]: string[]
+}
+
+export type AttainmentDates = {
+  latestTotal?: Date
+  latestHops?: Date
+  earliestHops?: Date
+}
+
+export type CloseToGraduationData = {
+  student: {
+    studentNumber: string
+    name: string
+    sis_person_id: string
+    email: string
+    phoneNumber: string
+    secondaryEmail: string
+    preferredLanguage: string
+  }
+  studyright: {
+    startDate: Date
+    semesterEnrollments: SemesterEnrollment[] | null
+    isBaMa: boolean
+  }
+  thesisInfo: {
+    grade: string
+    attainmentDate: Date
+    courseCode: string
+  } | null
+  programme: {
+    code: string
+    name: Name
+    studyTrack: Name | null
+    startedAt: Date
+    degreeProgrammeType: DegreeProgrammeType
+  }
+  faculty: Name
+  attainmentDates: AttainmentDates
+  numberOfAbsentSemesters: number
+  numberOfUsedSemesters: number
+  curriculumPeriod: string | null
+  credits: {
+    hops: number
+    all: number
+  }
 }
 
 export type CourseStats = {

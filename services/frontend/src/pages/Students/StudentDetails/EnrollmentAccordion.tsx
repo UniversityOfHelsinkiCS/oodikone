@@ -16,7 +16,7 @@ import { StyledAccordion } from '@/components/material/StyledAccordion'
 import { StyledTable } from '@/components/material/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
 const calculateSemesterEnrollmentsByStudyright = (semesters, years, studyrights) => {
   const programmeNames = {}
@@ -54,7 +54,7 @@ const getProgrammeEndDateForStudyright = (studyright, phase) => {
   return { endDate, programmeCode }
 }
 
-const processStudyrights = (studyrights, student, firstDisplayedYear, getTextIn, semesters) =>
+const processStudyrights = (studyrights, student, firstDisplayedYear: number, getTextIn, semesters: SemestersData) =>
   studyrights.reduce((acc, studyright) => {
     const studentToStudyrightEndMap = new Map([[student.studentNumber, null]])
     const studentToSecondStudyrightEndMap = new Map([[student.studentNumber, null]])
@@ -123,7 +123,7 @@ export const EnrollmentAccordion = ({ student }) => {
     studyRights
   )
 
-  const firstDisplayedYear = `${Math.max(new Date().getFullYear() - 10, firstYear)}`
+  const firstDisplayedYear = Math.max(new Date().getFullYear() - 10, firstYear)
 
   const semesterEnrollments = processStudyrights(studyRights, student, firstDisplayedYear, getTextIn, semesters)
 

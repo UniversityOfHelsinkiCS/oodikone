@@ -5,7 +5,8 @@ import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
-import { DegreeProgrammeType, type FormattedStudent as Student } from '@oodikone/shared/types'
+import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
+import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
 export const useGetCreditDateFilterOptions = () => {
   const { useFilterSelector } = useFilters()
@@ -13,7 +14,7 @@ export const useGetCreditDateFilterOptions = () => {
 }
 
 export const useGetRelevantSemesterData = (
-  year: string | undefined
+  year: number | undefined
 ):
   | {
       isSuccess: false
@@ -51,16 +52,15 @@ export const useGetRelevantSemesterData = (
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-const getFirstAndLastSemester = (semesters: SemestersData, year: string | undefined): [number, number] => {
+const getFirstAndLastSemester = (semesters: SemestersData, year: number | undefined): [number, number] => {
   const { semesters: allSemesters, currentSemester } = semesters
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 
   const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
 
-  const associatedYear = year !== 'All' && Number(year)
-  const firstSemester = associatedYear
+  const firstSemester = year
     ? (Object.values(allSemesters).find(
-        semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(associatedYear, 7, 1)).getTime()
+        semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(year, 7, 1)).getTime()
       )?.semestercode ?? lastSemester)
     : lastSemester - 13
 
@@ -76,8 +76,18 @@ export const getSemesterEnrollmentsContent =
     allSemesters,
     lastSemester,
     firstSemester,
+  }: {
+    getTextIn: (arg0: any) => string | undefined | null
+    programme: string
+    isMastersProgramme: boolean
+    allSemesters: SemestersData['semesters']
+    lastSemester: number
+    firstSemester: number
   }) =>
-  (student, studyright) => {
+  (
+    student: { studentNumber: string; studyrightEnd: Date | null; secondStudyrightEnd: Date | null },
+    studyright: StudentStudyRight | undefined
+  ) => {
     if (!studyright) return []
     const { studentNumber, studyrightEnd, secondStudyrightEnd } = student
 
@@ -108,11 +118,11 @@ export const getSemesterEnrollmentsContent =
 
       const typeText = (() => {
         switch (enrollmenttype) {
-          case 1:
+          case EnrollmentType.PRESENT:
             return 'Enrolled as present'
-          case 2:
+          case EnrollmentType.ABSENT:
             return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-          case 3:
+          case EnrollmentType.INACTIVE:
             return 'Not enrolled'
           default:
             return 'No study right'
@@ -121,11 +131,11 @@ export const getSemesterEnrollmentsContent =
 
       const typeLabel = (() => {
         switch (enrollmenttype) {
-          case 1:
+          case EnrollmentType.PRESENT:
             return 'present'
-          case 2:
+          case EnrollmentType.ABSENT:
             return statutoryAbsence ? 'absent-statutory' : 'absent'
-          case 3:
+          case EnrollmentType.INACTIVE:
             return 'passive'
           default:
             return 'none'

@@ -43,7 +43,7 @@ export const CloseToGraduation = () => {
     () =>
       getSemestersPresentFunctions({
         getTextIn,
-        year: `${new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2)}`,
+        year: new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2),
         programme: null,
         studentToSecondStudyrightEndMap: null,
         studentToStudyrightEndMap: null,
@@ -181,7 +181,7 @@ export const CloseToGraduation = () => {
       },
       {
         header: 'Semester enrollments',
-        accessorFn: row => getSemesterEnrollmentsVal(row.student, row.studyright),
+        accessorFn: row => getSemesterEnrollmentsVal(row.studyright),
         Cell: ({ row }) => {
           const content = getSemesterEnrollmentsContent(row.original.student, row.original.studyright)
           if (!content) return null

@@ -14,6 +14,7 @@ import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/Gen
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
+import { PopulationQuery } from '@/types/populationSearch'
 import { formatDate } from '@/util/timeAndDate'
 import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
@@ -64,25 +65,27 @@ export const useColumns = ({ showCombinedProgrammeColumns }): [string[], string[
 }
 
 export const useFormat = ({
-  programme,
-  combinedProgramme,
-  showBachelorAndMaster,
-
+  query,
   filteredStudents,
-
   includePrimaryProgramme = false,
+}: {
+  query: PopulationQuery
+  filteredStudents: Student[]
+  includePrimaryProgramme?: boolean
 }) => {
   const { getTextIn } = useLanguage()
+
+  const { programme, combinedProgramme, showBachelorAndMaster, years } = query
 
   const { isAdmin } = useGetAuthorizedUserQuery()
   const creditDateFilterOptions = useGetCreditDateFilterOptions()
 
   const { data: programmes, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(undefined)
+  const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(years.at(0))
 
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
     ? semesters
-    : { currentSemester: null, allSemesters: [], firstSemester: 0, lastSemester: 0 }
+    : { currentSemester: null, allSemesters: {}, firstSemester: 0, lastSemester: 0 }
 
   const isMastersProgramme = programmesSuccess
     ? programmes[programme]?.degreeProgrammeType === DegreeProgrammeType.MASTER

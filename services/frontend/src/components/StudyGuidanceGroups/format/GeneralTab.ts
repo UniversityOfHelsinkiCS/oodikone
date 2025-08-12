@@ -86,7 +86,7 @@ export const useFormat = ({
 
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
     ? semesters
-    : { currentSemester: null, allSemesters: [], firstSemester: 0, lastSemester: 0 }
+    : { currentSemester: null, allSemesters: {}, firstSemester: 0, lastSemester: 0 }
 
   const isMastersProgramme = programmesSuccess
     ? programmes[programme]?.degreeProgrammeType === DegreeProgrammeType.MASTER

@@ -156,10 +156,7 @@ export const PopulationDetails = ({
                 }
                 generalTabFormattingFunction={() =>
                   formatGeneralTab({
-                    programme,
-                    combinedProgramme,
-                    showBachelorAndMaster,
-
+                    query,
                     filteredStudents,
                   })
                 }

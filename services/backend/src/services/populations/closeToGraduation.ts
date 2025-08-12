@@ -1,14 +1,8 @@
 import { col, Op, where } from 'sequelize'
 
 import { Credit, Student, Studyplan } from '@oodikone/shared/models'
-import {
-  Name,
-  CreditTypeCode,
-  DegreeProgrammeType,
-  EnrollmentType,
-  ExtentCode,
-  SemesterEnrollment,
-} from '@oodikone/shared/types'
+import { CloseToGraduationData, AttainmentDates } from '@oodikone/shared/routes/populations'
+import { Name, CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import {
   CourseModel,
   CreditModel,
@@ -24,50 +18,6 @@ import { getCurrentSemester } from '../semesters'
 import { getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
-
-type AttainmentDates = {
-  latestTotal?: Date
-  latestHops?: Date
-  earliestHops?: Date
-}
-
-type AccumulatorType = {
-  student: {
-    studentNumber: string
-    name: string
-    sis_person_id: string
-    email: string
-    phoneNumber: string
-    secondaryEmail: string
-    preferredLanguage: string
-  }
-  studyright: {
-    startDate: Date
-    semesterEnrollments: SemesterEnrollment[] | null
-    isBaMa: boolean
-  }
-  thesisInfo: {
-    grade: string
-    attainmentDate: Date
-    courseCode: string
-  } | null
-  programme: {
-    code: string
-    name: Name
-    studyTrack: Name | null
-    startedAt: Date
-    degreeProgrammeType: DegreeProgrammeType
-  }
-  faculty: Name
-  attainmentDates: AttainmentDates
-  numberOfAbsentSemesters: number
-  numberOfUsedSemesters: number
-  curriculumPeriod: string | null
-  credits: {
-    hops: number
-    all: number
-  }
-}
 
 const findThesisAndLatestAndEarliestAttainments = (
   studyPlan: Studyplan,
@@ -114,7 +64,7 @@ const formatStudent = (student: Student, facultyMap: Record<string, Name>, curre
     preferredLanguage,
     secondary_email: secondaryEmail,
   } = student
-  return student.studyplans.reduce<AccumulatorType[]>((acc, studyPlan) => {
+  return student.studyplans.reduce<CloseToGraduationData[]>((acc, studyPlan) => {
     const { studyRight } = studyPlan
     const {
       id: studyRightId,
@@ -326,7 +276,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         }
         return acc
       },
-      { bachelor: [] as AccumulatorType[], masterAndLicentiate: [] as AccumulatorType[] }
+      { bachelor: [] as CloseToGraduationData[], masterAndLicentiate: [] as CloseToGraduationData[] }
     )
 }
 
