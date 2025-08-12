@@ -118,7 +118,7 @@ export const getSemestersPresentFunctions = ({
   const getSemesterEnrollmentsVal = (studyright: CloseToGraduationData['studyright']) => {
     const enrollmentsToCount = studyright?.semesterEnrollments ?? []
 
-    /* Enrolled as present or non-statutory absence will add to the count" */
+    /* Enrolled as present or non-statutory absence will add to the count (should inactive count too?) */
     return enrollmentsToCount.reduce(
       (acc, cur) =>
         acc +
