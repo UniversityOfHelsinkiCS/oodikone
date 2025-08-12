@@ -52,8 +52,8 @@ export const StudyProgrammeSelector = () => {
     .sort(localeComparator)
     .filter(
       programme =>
-        programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ??
-        getTextIn(programme.name)!.toLowerCase().includes(filter.toLocaleLowerCase()) ??
+        programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
+        getTextIn(programme.name)!.toLowerCase().includes(filter.toLocaleLowerCase()) ||
         programme.progId?.toLowerCase().includes(filter.toLocaleLowerCase())
     )
 
