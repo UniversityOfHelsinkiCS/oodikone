@@ -12,7 +12,7 @@ import { sortBy } from 'lodash'
 import { memo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { getActiveYears } from '../courseStatisticsUtils'
+import { getActiveYears } from '../util'
 
 const CourseTable = ({
   courses,

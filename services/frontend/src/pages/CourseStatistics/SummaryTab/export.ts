@@ -1,6 +1,6 @@
 import { utils, writeFile } from 'xlsx'
 
-import { formatPassRate } from '@/pages/CourseStatistics/courseStatisticsUtils'
+import { formatPassRate } from '@/pages/CourseStatistics/util'
 import { AttemptData } from '@/types/attemptData'
 import { getTimestamp } from '@/util/timeAndDate'
 

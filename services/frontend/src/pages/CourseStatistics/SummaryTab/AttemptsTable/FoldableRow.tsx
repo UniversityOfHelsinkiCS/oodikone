@@ -6,7 +6,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
-import { formatPassRate } from '@/pages/CourseStatistics/courseStatisticsUtils'
+import { formatPassRate } from '@/pages/CourseStatistics/util'
 import { AttemptData } from '@/types/attemptData'
 
 const ContentCell = ({ content, obfuscated }: { content: string; obfuscated: boolean }) => {

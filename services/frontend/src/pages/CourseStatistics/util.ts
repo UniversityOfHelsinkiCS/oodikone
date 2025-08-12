@@ -2,17 +2,6 @@ import { CourseSearchState } from '@/redux/courseSearch'
 import { CourseStat, Realisation } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
 
-export const ALL = {
-  key: 'ALL',
-  value: 'ALL',
-  text: {
-    fi: 'All',
-    en: 'All',
-    sv: 'All',
-  },
-  description: 'All students combined',
-} as const
-
 export type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
 export type CourseStudyProgramme = {
   key: string
@@ -27,6 +16,50 @@ export type CourseStatisticsSummary = {
   summary: { passed: number; failed: number; passRate: string | null }
   realisations: { passed: number; failed: number; passRate: string | null; obfuscated: boolean | undefined }[]
 }[]
+
+export const ALL = {
+  key: 'ALL',
+  value: 'ALL',
+  text: {
+    fi: 'All',
+    en: 'All',
+    sv: 'All',
+  },
+  description: 'All students combined',
+} as const
+
+const MIN_YEAR = 1899
+const MAX_YEAR = 2112
+
+const isSpring = (date: Date) => date.getMonth() < 9
+const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
+const getYearText = (year: number, spring: boolean) => (spring ? `Spring ${year}` : `Fall ${year}`)
+
+export const getActiveYears = course => {
+  if (!course.min_attainment_date && !course.max_attainment_date) return 'No attainments yet'
+
+  const min_attainment_date = new Date(course.min_attainment_date)
+  const max_attainment_date = new Date(course.max_attainment_date)
+
+  const [startYear, endYear] = [min_attainment_date.getFullYear(), max_attainment_date.getFullYear()]
+
+  const startYearText = getYearText(startYear, isSpring(min_attainment_date))
+  const endYearText = getYearText(endYear, isSpring(max_attainment_date))
+
+  if (endYear === MAX_YEAR && isPre2016Course(course)) return `— ${getYearText(2016, false)}`
+  else if (startYear === MIN_YEAR) return `— ${endYearText}`
+  else if (endYear === MAX_YEAR) return `${startYearText} — `
+  else if (startYearText === endYearText) return startYearText
+
+  return `${startYearText} — ${endYearText}`
+}
+
+export const formatPassRate = (passRate: string | null) => {
+  if (!passRate) {
+    return '-'
+  }
+  return `${passRate} %`
+}
 
 export const getCourseStats = (
   courseStats: CourseStats,
