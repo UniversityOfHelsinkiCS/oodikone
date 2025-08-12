@@ -5,9 +5,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
-import { useAppSelector } from '@/redux/hooks'
-import { getCourseAlternatives } from '@/selectors/courseStats'
-import { FormattedStats } from '@/types/courseStat'
+import { CourseStat, FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { queryParamsToString } from '@/util/queryparams'
 import { ObfuscatedCell } from './ObfuscatedCell'
@@ -33,16 +31,19 @@ export const StudentsTable = ({
   separate,
   showGrades,
   userHasAccessToAllStats,
+
+  openOrRegular,
+  alternatives,
 }: {
   data: { name: string; stats: FormattedStats[] }
   separate: boolean
   showGrades: boolean
   userHasAccessToAllStats: boolean
+
+  openOrRegular
+  alternatives: CourseStat['alternatives']
 }) => {
   const { language } = useLanguage()
-
-  const alternatives = useAppSelector(getCourseAlternatives)
-  const unifyCourses = useAppSelector(state => state.courseSearch.openOrRegular)
 
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
@@ -56,12 +57,12 @@ export const StudentsTable = ({
         coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
         years,
         separate,
-        unifyCourses,
+        unifyCourses: openOrRegular,
       }
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`
     },
-    [alternatives, separate, unifyCourses]
+    [alternatives, separate, openOrRegular]
   )
 
   const data = useMemo(() => getTableData(stats), [stats])

@@ -5,8 +5,9 @@ import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
-import { useAppSelector } from '@/redux/hooks'
-import { getAvailableStats, getCourses, getCourseStats } from '@/selectors/courseStats'
+import { CourseStudyProgramme } from '@/pages/CourseStatistics'
+import { CourseSearchState } from '@/redux/courseSearch'
+import { CourseStat } from '@/types/courseStat'
 import { CourseLabel } from './CourseLabel'
 import { CourseSelector } from './CourseSelector'
 import { SingleCourseStats } from './SingleCourseStats'
@@ -15,23 +16,33 @@ export const CourseTab = ({
   selected,
   setSelected,
   userHasAccessToAllStats,
+
+  loading,
+  openOrRegular,
+  stats,
+  availableStats,
+  alternatives,
+  programmes,
 }: {
-  selected: string
+  selected: string | undefined
   setSelected: (courseCode: string) => void
   userHasAccessToAllStats: boolean
+
+  loading: boolean
+  openOrRegular: CourseSearchState
+  stats: Record<string, CourseStat>
+  availableStats: Record<string, { unify: boolean; open: boolean; university: boolean }>
+  alternatives: CourseStat['alternatives']
+  programmes: CourseStudyProgramme[]
 }) => {
   const { getTextIn } = useLanguage()
-  const stats = useAppSelector(getCourseStats)
-  const availableStats = useAppSelector(getAvailableStats)
-  const courses = useAppSelector(getCourses).map(({ code, name }) => ({
+  const courses = Object.values(stats as object).map(({ name, coursecode: code }) => ({
     key: code,
     code,
     name: getTextIn(name)!,
   }))
 
-  if (!stats[selected]) {
-    return null
-  }
+  if (!selected || !stats[selected]) return null
 
   const hasSubstitutions = stats[selected].alternatives.length > 1
 
@@ -67,7 +78,11 @@ export const CourseTab = ({
         </Stack>
       </Section>
       <SingleCourseStats
+        alternatives={alternatives}
         availableStats={availableStats[selected]}
+        loading={loading}
+        openOrRegular={openOrRegular}
+        programmes={programmes}
         stats={stats[selected]}
         userHasAccessToAllStats={userHasAccessToAllStats}
       />

@@ -5,8 +5,6 @@ import { handleRequest, RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'
 import { reducer as actionHistory } from './actionHistory'
 import { reducer as courseSearch } from './courseSearch'
-import { reducer as courseSummaryForm } from './coursesSummaryForm'
-import { reducer as courseStats } from './courseStats'
 import { reducer as filters } from './filters'
 import { reducer as selectedCourse } from './selectedCourse'
 import { reducer as settings } from './settings'
@@ -15,8 +13,6 @@ export const store = configureStore({
   reducer: {
     actionHistory,
     courseSearch,
-    courseStats,
-    courseSummaryForm,
     filters,
     selectedCourse,
     settings,

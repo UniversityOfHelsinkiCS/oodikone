@@ -6,17 +6,17 @@ import Stack from '@mui/material/Stack'
 
 import { flatten, uniq } from 'lodash'
 import { useState } from 'react'
-import { useAppSelector } from '@/redux/hooks'
-
-import { CourseStat } from '@/types/courseStat'
+import { CourseStats } from '@/pages/CourseStatistics'
+import { CourseSearchState } from '@/redux/courseSearch'
 import { CourseTable } from './CourseTable'
 
-export const FacultyStatisticsTab = () => {
-  const openOrRegular = useAppSelector(state => state.courseSearch.openOrRegular)
-  const courseStats: Record<string, Record<'unifyStats' | 'openStats' | 'regularStats', CourseStat>> = useAppSelector(
-    state => state.courseStats.data
-  )
-
+export const FacultyStatisticsTab = ({
+  courseStats,
+  openOrRegular,
+}: {
+  courseStats: CourseStats
+  openOrRegular: CourseSearchState
+}) => {
   const yearCodes = uniq(
     flatten(Object.values(courseStats).map(course => Object.keys(course[openOrRegular].facultyStats)))
   )

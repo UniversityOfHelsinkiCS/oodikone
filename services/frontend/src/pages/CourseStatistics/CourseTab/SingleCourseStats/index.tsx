@@ -11,11 +11,12 @@ import { useLocation, useNavigate } from 'react-router'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics'
+import { CourseSearchState } from '@/redux/courseSearch'
+import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { ALL, getAllStudyProgrammes } from '@/selectors/courseStats'
 import {
   Attempts,
   AvailableStats,
@@ -52,10 +53,20 @@ export const SingleCourseStats = ({
   availableStats,
   stats,
   userHasAccessToAllStats,
+
+  loading,
+  openOrRegular,
+  alternatives,
+  programmes,
 }: {
   availableStats: AvailableStats
   stats: CourseStat
   userHasAccessToAllStats: boolean
+
+  loading: boolean
+  openOrRegular: CourseSearchState
+  alternatives: CourseStat['alternatives']
+  programmes: CourseStudyProgramme[]
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -66,8 +77,6 @@ export const SingleCourseStats = ({
   const [fromYear, setFromYear] = useState(0)
   const [toYear, setToYear] = useState(0)
   const [separate, setSeparate] = useState<boolean>(false)
-  const programmes = useAppSelector(state => getAllStudyProgrammes(state))
-  const unifyCourses = useAppSelector(state => state.courseSearch.openOrRegular)
   const { coursecode } = stats
 
   const { data: semesters } = useGetSemestersQuery()
@@ -101,7 +110,7 @@ export const SingleCourseStats = ({
 
   let maxYearsToCreatePopulationFrom = 0
   if (maxYears) {
-    switch (unifyCourses) {
+    switch (openOrRegular) {
       case 'openStats':
         maxYearsToCreatePopulationFrom = maxYears.openCourses
         break
@@ -419,7 +428,7 @@ export const SingleCourseStats = ({
       coursecodes: JSON.stringify(stats.alternatives.map(course => course.code)),
       years2,
       separate: false,
-      unifyCourses,
+      unifyCourses: openOrRegular,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate(`/coursepopulation?${searchString}`)
@@ -522,8 +531,11 @@ export const SingleCourseStats = ({
         </Section>
       ) : null}
       <ResultTabs
+        alternatives={alternatives}
         availableStats={availableStats}
         comparison={statistics.comparison}
+        loading={loading}
+        openOrRegular={openOrRegular}
         primary={statistics.primary}
         separate={separate}
       />

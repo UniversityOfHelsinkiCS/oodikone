@@ -3,17 +3,21 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 
-import { toggleOpenAndRegularCourses } from '@/redux/courseSearch'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-
+import { CourseSearchState, toggleOpenAndRegularCourses } from '@/redux/courseSearch'
+import { useAppDispatch } from '@/redux/hooks'
 import { AvailableStats } from '@/types/courseStat'
 
-export const ProviderOrganizationSelect = ({ availableStats }: { availableStats: AvailableStats }) => {
-  const openOrRegular = useAppSelector(state => state.courseSearch.openOrRegular)
+export const ProviderOrganizationSelect = ({
+  openOrRegular,
+  availableStats,
+}: {
+  openOrRegular: CourseSearchState
+  availableStats: AvailableStats
+}) => {
   const dispatch = useAppDispatch()
 
-  const onChange = (event: SelectChangeEvent<'openStats' | 'regularStats' | 'unifyStats'>) => {
-    return dispatch(toggleOpenAndRegularCourses(event.target.value))
+  const onChange = ({ target }: SelectChangeEvent<'openStats' | 'regularStats' | 'unifyStats'>) => {
+    return dispatch(toggleOpenAndRegularCourses(target.value))
   }
 
   return (

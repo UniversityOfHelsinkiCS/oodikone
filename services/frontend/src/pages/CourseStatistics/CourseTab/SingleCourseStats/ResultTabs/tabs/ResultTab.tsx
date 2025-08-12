@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
-import { AvailableStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
+import { CourseSearchState } from '@/redux/courseSearch'
+import { AvailableStats, CourseStat, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
 import { ChartSettings } from './settings/ChartSettings'
@@ -26,6 +27,9 @@ export const ResultTab = ({
   loading,
   updateSeparate,
   userHasAccessToAllStats,
+
+  openOrRegular,
+  alternatives,
 }: {
   availableStats: AvailableStats
   datasets: (ProgrammeStats | undefined)[]
@@ -33,6 +37,9 @@ export const ResultTab = ({
   loading: boolean
   updateSeparate: (separate: boolean) => void
   userHasAccessToAllStats: boolean
+
+  openOrRegular: CourseSearchState
+  alternatives: CourseStat['alternatives']
 }) => {
   const [settings, setSettings] = useState<ResultTabSettings>({
     isRelative: false,
@@ -67,6 +74,7 @@ export const ResultTab = ({
             availableStats={availableStats}
             onSeparateChange={toggleSeparate}
             onShowGradesChange={toggleShowGrades}
+            openOrRegular={openOrRegular}
             separate={settings.separate}
             showGrades={settings.showGrades}
           />
@@ -76,14 +84,18 @@ export const ResultTab = ({
               <div key={data.name}>
                 {settings.viewMode === 'STUDENTS' ? (
                   <StudentsTable
+                    alternatives={alternatives}
                     data={data}
+                    openOrRegular={openOrRegular}
                     separate={settings.separate}
                     showGrades={settings.showGrades}
                     userHasAccessToAllStats={userHasAccessToAllStats}
                   />
                 ) : (
                   <AttemptsTable
+                    alternatives={alternatives}
                     data={data}
+                    openOrRegular={openOrRegular}
                     separate={settings.separate}
                     showGrades={settings.showGrades}
                     userHasAccessToAllStats={userHasAccessToAllStats}

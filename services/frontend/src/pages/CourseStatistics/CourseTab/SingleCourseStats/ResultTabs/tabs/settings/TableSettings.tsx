@@ -11,12 +11,16 @@ export const TableSettings = ({
   onSeparateChange,
   separate,
   showGrades,
+
+  openOrRegular,
 }: {
   availableStats: AvailableStats
   onShowGradesChange: (showGrades: boolean) => void
   onSeparateChange: (separate: boolean) => void
   separate: boolean
   showGrades: boolean
+
+  openOrRegular
 }) => {
   return (
     <Stack direction="row" gap={1}>
@@ -28,7 +32,7 @@ export const TableSettings = ({
         control={<Switch checked={separate} data-cy="separateToggle" onChange={() => onSeparateChange(!separate)} />}
         labelText="Separate by semesters"
       />
-      <ProviderOrganizationSelect availableStats={availableStats} />
+      <ProviderOrganizationSelect availableStats={availableStats} openOrRegular={openOrRegular} />
     </Stack>
   )
 }

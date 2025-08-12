@@ -3,7 +3,6 @@ import SearchIcon from '@mui/icons-material/Search'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid2'
 import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
@@ -15,7 +14,6 @@ import { useNavigate } from 'react-router'
 
 import { validateInputLength } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Backdrop } from '@/components/material/Backdrop'
 import { SearchHistory } from '@/components/material/SearchHistory'
 import { Section } from '@/components/material/Section'
 import { ToggleWithTooltip } from '@/components/material/ToggleWithTooltip'
@@ -33,7 +31,7 @@ import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 // fail if the courses have small populations (this used to be limited to 40)
 const MAX_SELECTED_COURSES = 99999
 
-export const SearchForm = ({ progress, isPending }) => {
+export const SearchForm = () => {
   const { getTextIn } = useLanguage()
   const navigate = useNavigate()
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
@@ -135,7 +133,7 @@ export const SearchForm = ({ progress, isPending }) => {
 
   const selected = Object.values(selectedCourses)
   const noSelectedCourses = !selected.length
-  const disabled = isPending ?? noSelectedCourses ?? selected.length > MAX_SELECTED_COURSES
+  const disabled = noSelectedCourses ?? selected.length > MAX_SELECTED_COURSES
 
   const addAllCourses = () => {
     const newSelectedCourses = courses.reduce((newSelected, course) => {
@@ -151,9 +149,6 @@ export const SearchForm = ({ progress, isPending }) => {
 
   return (
     <Stack gap={2}>
-      <Backdrop open={isPending} sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}>
-        <CircularProgress color="inherit" value={progress} variant="determinate" />
-      </Backdrop>
       <Section title="Search for courses">
         <Box autoComplete="off" component="form" noValidate>
           <Stack gap={2}>
@@ -247,7 +242,7 @@ export const SearchForm = ({ progress, isPending }) => {
                 ) : null}
                 <CourseTable
                   courses={courses}
-                  hidden={isPending ?? (!Object.keys(courses).length && !Object.keys(selectedCourses).length)}
+                  hidden={!Object.keys(courses).length && !Object.keys(selectedCourses).length}
                   onSelectCourse={onSelectCourse}
                   title="Searched courses"
                 />

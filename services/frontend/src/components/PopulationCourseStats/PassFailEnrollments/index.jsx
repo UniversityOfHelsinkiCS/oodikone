@@ -16,8 +16,7 @@ const calculatePassRate = (total, passed) => {
 }
 
 export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
-  const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
-    UsePopulationCourseContext()
+  const { modules, courseStatistics, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
 
   const columns = useMemo(() => {
@@ -56,7 +55,7 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
                         row.code
                       )}"]&separate=false&unifyOpenUniCourses=false`}
                     >
-                      <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                      <Icon name="level up alternate" />
                     </Item>
                   ),
               },
@@ -173,7 +172,7 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
       columns[0].children[0].children.pop()
     }
     return columns
-  }, [onGoToCourseStatisticsClick, courseStatistics])
+  }, [courseStatistics])
 
   const data = useMemo(() => {
     if (flat) {

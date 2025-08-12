@@ -16,7 +16,8 @@ const courseSearchApi = RTKApi.injectEndpoints({
 
 export const { useGetCourseSearchResultQuery } = courseSearchApi
 
-const initialState: { openOrRegular: 'openStats' | 'regularStats' | 'unifyStats' } = { openOrRegular: 'unifyStats' }
+export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
+const initialState: { openOrRegular: CourseSearchState } = { openOrRegular: 'unifyStats' }
 
 const courseSearchSlice = createSlice({
   name: 'courseSearch',

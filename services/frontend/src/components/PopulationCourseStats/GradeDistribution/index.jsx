@@ -31,8 +31,7 @@ const mapCourseData = course => ({
 })
 
 export const GradeDistribution = ({ flat, onlyIamRights }) => {
-  const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
-    UsePopulationCourseContext()
+  const { modules, courseStatistics, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
 
   const columns = useMemo(() => {
@@ -73,7 +72,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
                     row.code
                   )}"]&separate=false&unifyOpenUniCourses=false`}
                 >
-                  <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                  <Icon name="level up alternate" />
                 </Item>
               ),
           },
@@ -117,7 +116,7 @@ export const GradeDistribution = ({ flat, onlyIamRights }) => {
     if (onlyIamRights) columns[0].children.pop()
 
     return columns
-  }, [onGoToCourseStatisticsClick])
+  }, [])
 
   const data = useMemo(() => {
     if (flat) {

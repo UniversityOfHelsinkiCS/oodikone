@@ -1,36 +1,34 @@
-import { callController } from '@/apiConnection/index'
+import { RTKApi } from '@/apiConnection'
 import { CourseStat } from '@/types/courseStat'
-import { actions, listreducer } from './common/listreducer'
 
-const prefix = 'COURSESTATS_'
+const courseStatsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getCourseStats: builder.query({
+      query: ({
+        codes,
+        separate,
+        combineSubstitutions,
+      }: {
+        codes: string[]
+        separate?: boolean
+        combineSubstitutions?: boolean
+      }) => ({
+        url: '/v3/courseyearlystats',
+        params: { codes, separate, combineSubstitutions },
+      }),
+      transformResponse: (
+        courseStats: { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }[]
+      ) => {
+        const data: Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }> = {}
+        courseStats.forEach(stat => {
+          data[stat.unifyStats.coursecode] = stat
+        })
 
-const { reset } = actions(prefix)
+        return data
+      },
+    }),
+  }),
+})
 
-export const clearCourseStats = reset
-
-export const getCourseStats = (
-  {
-    courseCodes,
-    separate = false,
-    combineSubstitutions = true,
-  }: { courseCodes: string[]; separate?: boolean; combineSubstitutions?: boolean },
-  onProgress: any
-) => {
-  const route = '/v3/courseyearlystats'
-  const params = {
-    codes: courseCodes,
-    separate,
-    combineSubstitutions,
-  }
-  return callController(route, prefix, [], 'get', params, params, onProgress)
-}
-
-const responseToObj = (courseStats: Record<string, CourseStat>[]) => {
-  const data: Record<string, Record<string, CourseStat>> = {}
-  courseStats.forEach(stat => {
-    data[stat.unifyStats.coursecode] = stat
-  })
-  return data
-}
-
-export const reducer = listreducer(prefix, responseToObj)
+export const { useGetCourseStatsQuery } = courseStatsApi
+// export const clearCourseStats = () => courseStatsApi.util.resetApiState()

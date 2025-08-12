@@ -37,7 +37,7 @@ const yearColumn = (year, cumulative) => ({
 })
 
 export const PassingSemesters = ({ onlyIamRights }) => {
-  const { modules, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
+  const { modules, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
   const { getTextIn } = useLanguage()
 
@@ -80,7 +80,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
                     row.code
                   )}"]&separate=false&unifyOpenUniCourses=false`}
                 >
-                  <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                  <Icon name="level up alternate" />
                 </Item>
               ),
           },
@@ -126,7 +126,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
     if (onlyIamRights) columns[0].children.pop()
 
     return columns
-  }, [cumulativeStats, onGoToCourseStatisticsClick])
+  }, [cumulativeStats])
 
   const data = useMemo(
     () =>

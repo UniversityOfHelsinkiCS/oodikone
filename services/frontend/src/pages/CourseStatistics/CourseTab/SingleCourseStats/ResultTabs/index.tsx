@@ -6,10 +6,8 @@ import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-import { useProgress } from '@/hooks/progress'
-import { getCourseStats } from '@/redux/courseStats'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
+import { CourseSearchState } from '@/redux/courseSearch'
+import { AvailableStats, CourseStat, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'
 
@@ -18,19 +16,23 @@ export const ResultTabs = ({
   comparison,
   primary,
   separate,
+
+  loading,
+  openOrRegular,
+  alternatives,
 }: {
   availableStats: AvailableStats
   comparison: ProgrammeStats | undefined
   primary: ProgrammeStats | undefined
   separate: boolean
+
+  loading: boolean
+  openOrRegular: CourseSearchState
+  alternatives: CourseStat['alternatives']
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const [tab, setTab] = useState(0)
-  const courseStats = useAppSelector(state => state.courseStats)
-  const { pending: loading } = courseStats
-  const { onProgress } = useProgress(loading)
-  const dispatch = useAppDispatch()
 
   if (!primary) {
     return null
@@ -47,7 +49,6 @@ export const ResultTabs = ({
       courseCodes: JSON.parse(courseCodes as string),
       separate,
     }
-    dispatch(getCourseStats(query, onProgress))
     const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
     void navigate({ search: queryParamsToString(queryToString) }, { replace: true })
   }
@@ -60,20 +61,24 @@ export const ResultTabs = ({
       </Tabs>
       {tab === 0 && (
         <ResultTab
+          alternatives={alternatives}
           availableStats={availableStats}
           datasets={[primary, comparison]}
           initialSettings={{ viewMode: 'STUDENTS', separate }}
           loading={loading}
+          openOrRegular={openOrRegular}
           updateSeparate={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />
       )}
       {tab === 1 && (
         <ResultTab
+          alternatives={alternatives}
           availableStats={availableStats}
           datasets={[primary, comparison]}
           initialSettings={{ viewMode: 'ATTEMPTS', separate }}
           loading={loading}
+          openOrRegular={openOrRegular}
           updateSeparate={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />

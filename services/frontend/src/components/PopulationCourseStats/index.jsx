@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react'
 import { Tab } from 'semantic-ui-react'
 
 import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
-import { clearCourseStats } from '@/redux/courseStats'
-import { useAppDispatch } from '@/redux/hooks'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
@@ -18,7 +16,6 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
 export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, onlyIamRights }) => {
-  const dispatch = useAppDispatch()
   const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const { handleTabChange } = useTabChangeAnalytics()
@@ -72,10 +69,6 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
     )
   }, [filteredCourses, curriculum])
 
-  const onGoToCourseStatisticsClick = () => {
-    dispatch(clearCourseStats())
-  }
-
   const toggleGroupExpansion = (code, close = false, all = null) => {
     if (all) {
       setExpandedGroups(new Set(all))
@@ -95,7 +88,6 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
   const contextValue = {
     modules,
     courseStatistics: filteredCourses,
-    onGoToCourseStatisticsClick,
     toggleGroupExpansion,
     expandedGroups,
   }
