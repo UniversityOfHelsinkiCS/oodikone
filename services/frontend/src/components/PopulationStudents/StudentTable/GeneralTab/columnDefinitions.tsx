@@ -84,29 +84,29 @@ export const useGetColumnDefinitions = ({
                 const { startDate, endDate } = creditDateFilterOptions
 
                 if (startDate && endDate) {
-                  return `Credits between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+                  return `Between ${formatDate(startDate, DateFormat.DISPLAY_DATE)} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
                 } else if (startDate) {
-                  return `Credits since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
+                  return `Since ${formatDate(startDate, DateFormat.DISPLAY_DATE)}`
                 } else if (year) {
                   if (endDate) {
-                    return `Credits between 1.8.${year} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+                    return `Between 1.8.${year} and ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
                   } else {
-                    return `Credits since 1.8.${year}`
+                    return `Since 1.8.${year}`
                   }
                 } else if (endDate) {
-                  return `Credits before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
+                  return `Before ${formatDate(endDate, DateFormat.DISPLAY_DATE)}`
                 }
               }
 
-              if (programme) return 'Credits since start in programme'
-              return 'Credits since 1.1.1970'
+              if (programme) return 'Since start in programme'
+              return 'Since 1.1.1970'
             },
           }),
           columnHelper.accessor('creditsCombinedProg', {
             header: () => {
-              if (combinedProgramme === 'MH90_001') return 'Credits in licentiate HOPS'
-              if (isMastersProgramme) return 'Credits in Bachelor HOPS'
-              return 'Credits in Master HOPS'
+              if (combinedProgramme === 'MH90_001') return 'In licentiate HOPS'
+              if (isMastersProgramme) return 'In Bachelor HOPS'
+              return 'In Master HOPS'
             },
           }),
         ],
