@@ -50,8 +50,9 @@ export const getStudyRightStatusText = (
   if (!programme) return null
   if (programme.graduated) return 'Graduated'
   if (programme.cancelled) return 'Cancelled'
+  if (semesterEnrollmentAbsence(semestercode ?? NaN, studyRight?.semesterEnrollments)) return 'Absent'
   if (programme.active) return 'Active'
-  return semesterEnrollmentAbsence(semestercode ?? NaN, studyRight?.semesterEnrollments) ? 'Absent' : 'Inactive'
+  return 'Inactive'
 }
 
 export const getStudentTotalCredits = (
@@ -144,14 +145,18 @@ export const getStudentToTargetCourseDateMap = (
 const programmeIsActive = (
   studyRight: Unarray<FormattedStudent['studyRights']>,
   hasGraduated: boolean,
-  currentSemesterCode: number
-) =>
-  !studyRight.cancelled &&
-  !hasGraduated &&
-  (currentSemesterCode == null ||
-    studyRight.semesterEnrollments?.find(
-      enrollment => enrollment.semester === currentSemesterCode && [1, 2].includes(enrollment.type)
-    ) != null)
+  currentSemesterCode: number | null
+) => {
+  return (
+    !studyRight.cancelled &&
+    !hasGraduated &&
+    !!studyRight.semesterEnrollments?.some(
+      enrollment =>
+        enrollment.semester === currentSemesterCode &&
+        [EnrollmentType.PRESENT, EnrollmentType.ABSENT].includes(enrollment.type)
+    )
+  )
+}
 
 export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRights'], currentSemester: number) =>
   orderBy(

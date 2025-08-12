@@ -162,7 +162,7 @@ export const getProgrammeDetails =
     year,
   }) =>
   (student: Student) => {
-    const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester)
+    const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester?.semestercode)
 
     const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
     const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
