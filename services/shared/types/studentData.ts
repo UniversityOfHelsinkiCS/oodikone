@@ -26,7 +26,6 @@ type StudentStudyRightElement = Pick<
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
 
-// eslint-disable-next-line import-x/no-unused-modules
 export type StudentStudyRight = Pick<
   SISStudyRight,
   'id' | 'extentCode' | 'facultyCode' | 'admissionType' | 'cancelled' | 'semesterEnrollments' | 'startDate' | 'tvex'
