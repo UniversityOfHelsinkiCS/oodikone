@@ -9,11 +9,14 @@ import Typography from '@mui/material/Typography'
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/ExternalLink'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
-import { sisUrl } from '@/conf'
+import { sisUrl, serviceProvider } from '@/conf'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { reformatDate } from '@/util/timeAndDate'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
+
+//@ts-expect-error since frontendRuntimeConfiguredSisUrl is defined in a separate, possibly mounted js-file
+const usableSisUrl = serviceProvider === 'fd' ? frontendRuntimeConfiguredSisUrl : sisUrl
 
 export const StudentInfoCard = ({ student }) => {
   const { visible: showName } = useStudentNameVisibility()
@@ -40,7 +43,7 @@ export const StudentInfoCard = ({ student }) => {
             </Typography>
             <ExternalLink
               cypress="sisu-link"
-              href={`${sisUrl}/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
+              href={`${usableSisUrl}/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
               text="Sisu"
               variant="h6"
             />
