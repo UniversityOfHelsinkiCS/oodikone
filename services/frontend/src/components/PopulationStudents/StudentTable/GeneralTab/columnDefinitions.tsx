@@ -113,8 +113,40 @@ export const useGetColumnDefinitions = ({
       }),
       columnHelper.accessor('grade', { header: 'Grade' }),
       columnHelper.accessor('studyTrack', { header: 'Study track' }),
-      columnHelper.accessor('studyRightStart', { header: 'Start of study right' }),
+
       columnHelper.accessor('programmeStart', { header: 'Started in programme' }),
+      columnHelper.accessor('studyRightStart', { header: 'Start of study right' }),
+      columnHelper.accessor('startYearAtUniversity', { header: 'Start year at uni' }),
+
+      columnHelper.accessor('semesterEnrollments', {
+        header: 'Semesters present',
+        cell: cell => {
+          const { content } = cell.getValue()
+          if (!content) return null
+
+          return (
+            <Box sx={{ display: 'flex', m: 0.5 }}>
+              {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
+                <Tooltip key={key} placement="top" title={onHoverString}>
+                  <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
+                </Tooltip>
+              ))}
+            </Box>
+          )
+        },
+      }),
+
+      columnHelper.accessor('graduationDate', {
+        header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
+      }),
+      columnHelper.accessor('graduationDateCombinedProg', {
+        header: _ => {
+          if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
+          if (isMastersProgramme) return 'Bachelor graduation date'
+          return 'Master graduation date'
+        },
+      }),
+
       columnHelper.accessor('option', {
         header: isMastersProgramme ? 'Bachelor' : 'Master',
         cell: cell => {
@@ -127,7 +159,6 @@ export const useGetColumnDefinitions = ({
           )
         },
       }),
-      columnHelper.accessor('startYearAtUniversity', { header: 'Start year at uni' }),
       columnHelper.accessor('programmes', {
         header: _ => (
           <TableHeaderWithTooltip
@@ -202,35 +233,6 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('tags', { header: 'Tags' }),
       columnHelper.accessor('extent', { header: 'Extent' }),
       columnHelper.accessor('updatedAt', { header: 'Last updated at' }),
-
-      columnHelper.accessor('semesterEnrollments', {
-        header: 'Semesters present',
-        cell: cell => {
-          const { content } = cell.getValue()
-          if (!content) return null
-
-          return (
-            <Box sx={{ display: 'flex', m: 0.5 }}>
-              {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
-                <Tooltip key={key} placement="top" title={onHoverString}>
-                  <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
-                </Tooltip>
-              ))}
-            </Box>
-          )
-        },
-      }),
-
-      columnHelper.accessor('graduationDate', {
-        header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
-      }),
-      columnHelper.accessor('graduationDateCombinedProg', {
-        header: _ => {
-          if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
-          if (isMastersProgramme) return 'Bachelor graduation date'
-          return 'Master graduation date'
-        },
-      }),
     ],
     [getTextIn, useFilterSelector, programme, combinedProgramme, isMastersProgramme, includePrimaryProgramme, year]
   )
