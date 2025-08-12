@@ -28,7 +28,7 @@ export const OodiTable = <TData,>({
 }) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 50,
+    pageSize: 200,
   })
 
   // should maybe use a deep merging tool or write own

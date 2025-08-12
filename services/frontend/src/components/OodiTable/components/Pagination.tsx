@@ -12,6 +12,6 @@ export const OodiTablePagination = <TData,>({ table }: { table: Table<TData> }) 
     }}
     page={table.getState().pagination.pageIndex}
     rowsPerPage={table.getState().pagination.pageSize}
-    rowsPerPageOptions={[25, 50, 100, 200]}
+    rowsPerPageOptions={[100, 200, 500, 1000, table.getRowCount()]}
   />
 )
