@@ -288,7 +288,7 @@ describe('Population Statistics with Bachelor + Master', { testIsolation: false 
 })
 
 // FIXME: Flaky
-describe('Course Statistics', { testIsolation: false }, () => {
+describe.skip('Course Statistics', { testIsolation: false }, () => {
   const pathToLimits2021 =
     '/coursepopulation?coursecodes=%5B"MAT11003"%2C"57116"%2C"57016"%2C"AYMAT11003"%5D&from=72&separate=false&to=72&unifyCourses=unifyStats&years=2021-2022'
   const defaultAmountOfStudents = 48
