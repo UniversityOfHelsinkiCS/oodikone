@@ -21,7 +21,7 @@ const getTransferSource = (code: string, studyRights: StudentStudyRight[]): [boo
     const correctStudyRight = studyRights.find(({ studyRightElements }) =>
       studyRightElements.some(element => element.code === code)
     )!
-    const correctStudyRightElement = correctStudyRight.studyRightElements.find(element => element.code === code)
+    const correctStudyRightElement = correctStudyRight?.studyRightElements?.find(element => element.code === code)
 
     if (correctStudyRight && correctStudyRightElement) {
       const studyRightStart = new Date(correctStudyRightElement?.startDate ?? 0)
