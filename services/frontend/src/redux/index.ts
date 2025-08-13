@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
+import { configureStore } from '@reduxjs/toolkit/react'
 
 import { handleRequest, RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'

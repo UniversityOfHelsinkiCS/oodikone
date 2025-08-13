@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit/react'
 
 const initialState: { selectedCourse: string | null } = { selectedCourse: null }
 
