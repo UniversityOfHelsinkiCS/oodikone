@@ -24,7 +24,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
-import { Phase } from '@oodikone/shared/types'
+import { EnrollmentType, Phase } from '@oodikone/shared/types'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
 // For the most part we calculate if studyright is active by checking for term registrations
@@ -44,13 +44,22 @@ const isBetweenDays = (startDate: Date | string, endDate: Date | string) => {
   return start <= current && current <= end
 }
 
-const studyRightIsActive = (studyRight, currentSemester) => {
-  return studyRight.expirationRuleUrns?.includes(NON_DEGREE_LEADING_STUDY_RIGHT_URN)
-    ? isBetweenDays(studyRight.startDate, studyRight.endDate)
-    : studyRight.semesterEnrollments?.find(
-        ({ type, semester }) => semester === currentSemester && [1, 2].includes(type)
-      ) != null
+const getEnrollmentStatus = (
+  studyRight: SISStudyRight,
+  currentSemesterCode: number | undefined
+): { present: boolean; absent: boolean } => {
+  if (studyRight.expirationRuleUrns?.includes(NON_DEGREE_LEADING_STUDY_RIGHT_URN)) {
+    const present = isBetweenDays(studyRight.startDate, studyRight.endDate)
+    return { present, absent: false }
+  }
+  const enrollment = studyRight.semesterEnrollments?.find(({ semester }) => semester === currentSemesterCode)
+  if (enrollment) {
+    if (enrollment.type === EnrollmentType.PRESENT) return { present: true, absent: false }
+    if (enrollment.type === EnrollmentType.ABSENT) return { present: false, absent: true }
+  }
+  return { present: false, absent: false }
 }
+
 export const StudyrightsTable = ({
   handleStudyPlanChange,
   student,
@@ -68,17 +77,19 @@ export const StudyrightsTable = ({
   if (!student) return null
 
   // Study right elements are sorted by end date in descending order in the backend so the newest programme is the first one
-  const formatStudyRightRow = (studyRight: SISStudyRight, phase: number, programmes: SISStudyRightElement[]) => {
+  const formatStudyRightRow = (studyRight: SISStudyRight, phase: Phase, programmes: SISStudyRightElement[]) => {
     const studyPlanId = student.studyplans.find(
       plan => plan.sis_study_right_id === studyRight.id && plan.programme_code === programmes[0].code
     )?.id
+    const { present, absent } = getEnrollmentStatus(studyRight, currentSemester?.semestercode)
     return {
       key: `${studyRight.id}-${phase}`,
       studyRightId: studyRight.id,
       graduated: programmes[0].graduated,
       endDate: programmes[0].endDate,
       studyPlanId,
-      active: studyRightIsActive(studyRight, currentSemester?.semestercode),
+      active: present || absent,
+      absent,
       cancelled: studyRight.cancelled,
       programmes,
     }
@@ -90,9 +101,9 @@ export const StudyrightsTable = ({
       const phase1Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === Phase.ANY)
       const phase2Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === Phase.MASTER)
 
-      const result = [formatStudyRightRow(studyRight, 1, phase1Programmes)]
+      const result = [formatStudyRightRow(studyRight, Phase.ANY, phase1Programmes)]
 
-      if (phase2Programmes.length > 0) result.push(formatStudyRightRow(studyRight, 2, phase2Programmes))
+      if (phase2Programmes.length > 0) result.push(formatStudyRightRow(studyRight, Phase.MASTER, phase2Programmes))
       return result
     }),
     ['endDate'],
@@ -101,23 +112,23 @@ export const StudyrightsTable = ({
 
   if (studyRightRows.length === 0) return null
 
-  const renderStatus = programme => {
-    let text = <div style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</div>
-    // let text2 = getStudyRightStatusText(studyright, studyright, )
+  const RenderStatus = ({ studyRight }: { studyRight: (typeof studyRightRows)[number] }) => {
+    let text = <span style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</span>
 
-    if (programme.graduated) {
+    if (studyRight.graduated) {
       text = (
         <>
-          <div style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</div>
-          <div style={{ color: 'grey' }}>{reformatDate(programme.endDate, DateFormat.DISPLAY_DATE)}</div>
+          <span style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</span>
+          <span style={{ color: 'grey' }}>{reformatDate(studyRight.endDate, DateFormat.DISPLAY_DATE)}</span>
         </>
       )
-    } else if (programme.active) {
-      text = <div style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</div>
-    } else if (programme.cancelled) {
-      text = <div style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</div>
+    } else if (studyRight.absent) {
+      text = <span style={{ color: 'orange', fontWeight: 'bolder' }}>ABSENT</span>
+    } else if (studyRight.active) {
+      text = <span style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</span>
+    } else if (studyRight.cancelled) {
+      text = <span style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</span>
     }
-
     return <div style={{ display: 'flex', flexDirection: 'column' }}>{text}</div>
   }
 
@@ -229,7 +240,11 @@ export const StudyrightsTable = ({
                     </Stack>
                   </TableCell>
                   <TableCell>{getTextIn(studyTrack?.name)}</TableCell>
-                  {isFirstRow ? <TableCell rowSpan={numberOfProgrammes}>{renderStatus(studyRight)}</TableCell> : null}
+                  {isFirstRow ? (
+                    <TableCell rowSpan={numberOfProgrammes}>
+                      <RenderStatus studyRight={studyRight} />
+                    </TableCell>
+                  ) : null}
                   {isFirstRow ? (
                     <TableCell rowSpan={numberOfProgrammes}>{renderCompletionPercent(studyRight, student)}</TableCell>
                   ) : null}
