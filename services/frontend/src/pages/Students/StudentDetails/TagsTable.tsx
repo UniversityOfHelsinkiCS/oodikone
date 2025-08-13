@@ -12,32 +12,32 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { Name } from '@oodikone/shared/types'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
 type Tag = {
   programme: {
     code: string
     name: Name
   }
-  tags: Array<{
+  tags: {
     id: string
     tagName: string
     userId: string | null
-  }>
+  }[]
 }
 
-export const TagsTable = ({ student }: { student: any }) => {
+export const TagsTable = ({ student }: { student: StudentPageStudent }) => {
   const { getTextIn } = useLanguage()
-  if (!student) return null
 
   const tagData: Tag[] = []
 
   for (const tag of student.tags) {
-    const tagsForProgramme = tagData.find(({ programme }) => programme.code === tag.programme.code)
-    const parsedTag = { userId: tag.tag.personal_user_id, tagName: tag.tag.tagname, id: tag.tag_id }
+    const tagsForProgramme = tagData.find(({ programme }) => programme.code === tag.programme?.code)
+    const parsedTag = { userId: tag.tag.personal_user_id, tagName: tag.tag.tagname, id: tag.tagId }
 
     if (tagsForProgramme) {
       tagsForProgramme.tags.push(parsedTag)
-    } else {
+    } else if (tag.programme) {
       tagData.push({ programme: tag.programme, tags: [parsedTag] })
     }
   }
