@@ -235,7 +235,7 @@ export const calculatePercentage = (numerator: number, denominator: number, numb
  * If any absence is in the start of study right element the start date is postponed.
  */
 export const getStudyRightElementTargetDates = (
-  studyRightElement: Pick<SISStudyRightElement, 'code' | 'startDate'>,
+  studyRightElement: Pick<SISStudyRightElement, 'code' | 'startDate'> | undefined,
   absences: Absence[]
 ) => {
   if (!studyRightElement) return []

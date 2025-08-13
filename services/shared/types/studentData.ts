@@ -1,7 +1,7 @@
 import type { Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
 import type { Tag, TagStudent } from '../models/kone'
 
-import type { CriteriaYear, CreditTypeCode, Name } from '../types'
+import type { CriteriaYear, CreditTypeCode, Name, ProgrammeModule } from '../types'
 
 type StudentPersonalData = Pick<
   Student,
@@ -58,6 +58,38 @@ export type StudentTags = TagStudent & {
 // eslint-disable-next-line import-x/no-unused-modules
 export type TaggetStudentData = StudentData & {
   tags: StudentTags[]
+}
+
+export type StudentPageStudent = {
+  tags: {
+    programme: Pick<ProgrammeModule, 'code' | 'name'> | undefined
+    tagId: string // numeric
+    tag: Tag
+  }[]
+  firstNames: string
+  lastName: string
+  studyRights: SISStudyRight[]
+  started: Date
+  studentNumber: string
+  credits: number
+  courses: {
+    course: {
+      code: string
+      name: Name
+    }
+    date: Date
+    passed: boolean
+    grade: string
+    credits: number
+    credittypecode: CreditTypeCode
+    isStudyModuleCredit: boolean
+    isOpenCourse: boolean
+  }[]
+  name: string
+  email: string
+  updatedAt: Date
+  studyplans: Studyplan[]
+  sisPersonId: string
 }
 
 export type FormattedStudent = {

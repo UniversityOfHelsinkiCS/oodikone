@@ -2,6 +2,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
 import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { dbConnections } from '../database/connection'
 import {
   StudentModel,
@@ -216,7 +217,7 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: Student) => {
+}: Student): Omit<StudentPageStudent, 'tags'> => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     return {
       course: {
@@ -238,8 +239,8 @@ const formatSharedStudentData = ({
     .map(toCourse)
 
   return {
-    firstnames,
-    lastname,
+    firstNames: firstnames,
+    lastName: lastname,
     studyRights: studyRights || [],
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
@@ -249,18 +250,24 @@ const formatSharedStudentData = ({
     email,
     updatedAt: updatedAt || createdAt,
     studyplans: studyplans || [],
-    sis_person_id,
+    sisPersonId: sis_person_id,
   }
 }
 
-export const withStudentNumber = async (studentNumber: string, userId: string) => {
+export const withStudentNumber = async (studentNumber: string, userId: string): Promise<StudentPageStudent | null> => {
   const student = await byStudentNumber(studentNumber)
   if (student == null) {
     return null
   }
   return {
     ...formatSharedStudentData(student),
-    tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId),
+    tags: student.tags
+      .filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+      .map(tag => ({
+        programme: tag.programme,
+        tagId: tag.tag_id,
+        tag: tag.tag,
+      })),
   }
 }
 

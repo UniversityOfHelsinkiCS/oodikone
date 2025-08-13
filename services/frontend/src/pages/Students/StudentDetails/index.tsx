@@ -12,6 +12,8 @@ import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { useGetStudentQuery } from '@/redux/students'
 
 import type { Absence } from '@/types/students'
+import { SISStudyRight } from '@oodikone/shared/models'
+import { EnrollmentType, Phase } from '@oodikone/shared/types'
 import { BachelorHonours } from './BachelorHonours'
 import { CourseTables } from './CourseTables'
 import { StudentGraphs } from './StudentGraphs'
@@ -19,7 +21,7 @@ import { StudentInfoCard } from './StudentInfoCard'
 import { StudyrightsTable } from './StudyrightsTable'
 import { TagsTable } from './TagsTable'
 
-const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters']): Absence[] => {
+const getAbsentYears = (studyRights: SISStudyRight[], semesters: SemestersData['semesters']): Absence[] => {
   const semesterEnrollments = studyRights.reduce<
     Record<string, { semestercode: number; enrollmenttype: number; statutoryAbsence: boolean }>
   >((acc, { semesterEnrollments }) => {
@@ -34,7 +36,7 @@ const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters'
         }
       } else if (currentEnrollment.enrollmenttype === 1) {
         continue
-      } else if (enrollment.type === 2) {
+      } else if (enrollment.type === EnrollmentType.ABSENT) {
         currentEnrollment.enrollmenttype = enrollment.type
         currentEnrollment.statutoryAbsence = enrollment.statutoryAbsence ?? false
       }
@@ -65,19 +67,19 @@ const getAbsentYears = (studyRights: any[], semesters: SemestersData['semesters'
 export const StudentDetails = () => {
   const { studentNumber } = useParams()
   useTitle(studentNumber ? `${studentNumber} - Student statistics` : 'Student statistics')
-  const [graphYearStart, setGraphYear] = useState(null)
-  const [selectedStudyPlanId, setSelectedStudyPlanId] = useState(null)
+  const [graphYearStart, setGraphYear] = useState<string | null>(null) // numeric
+  const [selectedStudyPlanId, setSelectedStudyPlanId] = useState<string | null>(null)
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters } = semesters ?? { semesters: {} }
 
   const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery({ studentNumber })
-  let honoursCode
+  let honoursCode = ''
 
   if (isLoading) {
     return <CircularProgress />
   }
 
-  if (isError || student.error) {
+  if (isError) {
     return <Alert severity="error">Student not found or no sufficient permissions</Alert>
   }
 
@@ -90,7 +92,7 @@ export const StudentDetails = () => {
       student.studyRights
         .filter(studyRight => [1, 5].includes(studyRight.extentCode))
         .flatMap(studyRight => studyRight.studyRightElements)
-        .filter(element => element.phase === 1),
+        .filter(element => element.phase === Phase.ANY),
       ['startDate'],
       ['desc']
     )
@@ -100,18 +102,18 @@ export const StudentDetails = () => {
     }
   }
 
-  const handleStudyPlanChange = id => {
+  const handleStudyPlanChange = (id: string | null) => {
     if (id === selectedStudyPlanId) {
       setSelectedStudyPlanId(null)
       setGraphYear(null)
     } else {
       setSelectedStudyPlanId(id)
-      const { programme_code: programmeCode, sis_study_right_id: studyRightId } = student.studyplans.find(
-        studyPlan => studyPlan.id === id
-      )
+      const studyPlan = student.studyplans.find(studyPlan => studyPlan.id === id)
+      const programmeCode = studyPlan?.programme_code
+      const studyRightId = studyPlan?.sis_study_right_id
       const studyRight = student.studyRights.find(studyRight => studyRight.id === studyRightId)
-      const programme = studyRight.studyRightElements.find(element => element.code === programmeCode)
-      setGraphYear(programme.startDate)
+      const programme = studyRight?.studyRightElements.find(element => element.code === programmeCode)
+      setGraphYear(programme?.startDate.toString() ?? '')
     }
   }
 

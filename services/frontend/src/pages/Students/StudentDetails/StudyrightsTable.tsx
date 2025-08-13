@@ -23,6 +23,9 @@ import { DateFormat } from '@/constants/date'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
+import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import { Phase } from '@oodikone/shared/types'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
 // For the most part we calculate if studyright is active by checking for term registrations
 // If study right doesn't have term registrations (non degree leading studyright) --
@@ -41,14 +44,22 @@ const isBetweenDays = (startDate: Date | string, endDate: Date | string) => {
   return start <= current && current <= end
 }
 
-const studyRightIsActive = (studyRight, currentSemester) =>
-  studyRight.expirationRuleUrns?.includes(NON_DEGREE_LEADING_STUDY_RIGHT_URN)
+const studyRightIsActive = (studyRight, currentSemester) => {
+  return studyRight.expirationRuleUrns?.includes(NON_DEGREE_LEADING_STUDY_RIGHT_URN)
     ? isBetweenDays(studyRight.startDate, studyRight.endDate)
     : studyRight.semesterEnrollments?.find(
         ({ type, semester }) => semester === currentSemester && [1, 2].includes(type)
       ) != null
-
-export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudyPlanId }) => {
+}
+export const StudyrightsTable = ({
+  handleStudyPlanChange,
+  student,
+  selectedStudyPlanId,
+}: {
+  handleStudyPlanChange: (id: string | null) => void
+  student: StudentPageStudent
+  selectedStudyPlanId: string | null
+}) => {
   const { getTextIn } = useLanguage()
   const { data: studyProgrammes } = useGetProgrammesQuery()
   const { data: semesters } = useGetSemestersQuery()
@@ -57,7 +68,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
   if (!student) return null
 
   // Study right elements are sorted by end date in descending order in the backend so the newest programme is the first one
-  const formatStudyRightRow = (studyRight, phase, programmes) => {
+  const formatStudyRightRow = (studyRight: SISStudyRight, phase: number, programmes: SISStudyRightElement[]) => {
     const studyPlanId = student.studyplans.find(
       plan => plan.sis_study_right_id === studyRight.id && plan.programme_code === programmes[0].code
     )?.id
@@ -76,8 +87,8 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
   const studyRightRows = orderBy(
     student.studyRights.flatMap(studyRight => {
       // Phases 1 and 2 (usually bachelor and master) are still separated as different rows, even though they're now under the same study right
-      const phase1Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === 1)
-      const phase2Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === 2)
+      const phase1Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === Phase.ANY)
+      const phase2Programmes = studyRight.studyRightElements.filter(({ phase }) => phase === Phase.MASTER)
 
       const result = [formatStudyRightRow(studyRight, 1, phase1Programmes)]
 
@@ -90,19 +101,20 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
 
   if (studyRightRows.length === 0) return null
 
-  const renderStatus = studyright => {
+  const renderStatus = programme => {
     let text = <div style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</div>
+    // let text2 = getStudyRightStatusText(studyright, studyright, )
 
-    if (studyright.graduated) {
+    if (programme.graduated) {
       text = (
         <>
           <div style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</div>
-          <div style={{ color: 'grey' }}>{reformatDate(studyright.endDate, DateFormat.DISPLAY_DATE)}</div>
+          <div style={{ color: 'grey' }}>{reformatDate(programme.endDate, DateFormat.DISPLAY_DATE)}</div>
         </>
       )
-    } else if (studyright.active) {
+    } else if (programme.active) {
       text = <div style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</div>
-    } else if (studyright.cancelled) {
+    } else if (programme.cancelled) {
       text = <div style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</div>
     }
 
@@ -167,7 +179,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
               return (
                 <TableRow
                   key={`${studyRight.key}-${code}`}
-                  onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId) : null)}
+                  onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId ?? null) : null)}
                   style={{
                     cursor: rowIsFilterable ? 'pointer' : 'not-allowed',
                     borderWidth: `0 1px ${isLastRow ? '1px' : '0'} 1px`, // Bottom border only for the last programme in the study right
@@ -188,7 +200,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                           <IconButton
                             color={studyRight.studyPlanId === selectedStudyPlanId ? 'primary' : 'default'}
                             disabled={!rowIsFilterable}
-                            onClick={() => handleStudyPlanChange(studyRight.studyPlanId)}
+                            onClick={() => handleStudyPlanChange(studyRight.studyPlanId ?? null)}
                             size="small"
                             sx={{
                               borderRadius: 2,
@@ -209,7 +221,7 @@ export const StudyrightsTable = ({ handleStudyPlanChange, student, selectedStudy
                           color="primary"
                           component={Link}
                           size="small"
-                          to={showPopulationStatistics(code, startDate)}
+                          to={showPopulationStatistics(code, startDate.toString())}
                         >
                           <NorthEastIcon fontSize="small" />
                         </IconButton>

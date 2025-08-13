@@ -25,6 +25,7 @@ import { DateFormat } from '@/constants/date'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import type { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
 dayjs.extend(isSameOrAfter)
 exporting(ReactHighcharts.Highcharts)
@@ -76,12 +77,22 @@ const resolveGraphEndDate = (
   return Math.max(...comparedValues)
 }
 
-const CreditsGraph = ({ graphYearStart, student, absences, selectedStudyPlanId }) => {
+const CreditsGraph = ({
+  graphYearStart,
+  student,
+  absences,
+  selectedStudyPlanId,
+}: {
+  graphYearStart: string | null
+  student: StudentPageStudent
+  absences: Absence[]
+  selectedStudyPlanId: string | null
+}) => {
   const selectedStudyPlan = student.studyplans.find(({ id }) => id === selectedStudyPlanId)
   const studyRightId = selectedStudyPlan?.sis_study_right_id
   const selectedStudyRight = student.studyRights.find(({ id }) => id === studyRightId)
   const selectedStudyRightElement = selectedStudyRight?.studyRightElements.find(
-    ({ code }) => code === selectedStudyPlan.programme_code
+    ({ code }) => code === selectedStudyPlan?.programme_code
   )
   const creditDates = student.courses.map(({ date }) => new Date(date).getTime())
   const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(
@@ -284,7 +295,7 @@ export const StudentGraphs = ({
 }: {
   absences: Absence[]
   graphYearStart: string | null
-  student: any
+  student: StudentPageStudent
   selectedStudyPlanId: string | null
 }) => {
   const [activeTab, setActiveTab] = useState(0)

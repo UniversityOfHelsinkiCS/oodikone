@@ -13,9 +13,10 @@ import { sisUrl } from '@/conf'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { reformatDate } from '@/util/timeAndDate'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
 
-export const StudentInfoCard = ({ student }) => {
+export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) => {
   const { visible: showName } = useStudentNameVisibility()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
@@ -40,7 +41,7 @@ export const StudentInfoCard = ({ student }) => {
             </Typography>
             <ExternalLink
               cypress="sisu-link"
-              href={`${sisUrl}/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
+              href={`${sisUrl}/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`}
               text="Sisu"
               variant="h6"
             />
