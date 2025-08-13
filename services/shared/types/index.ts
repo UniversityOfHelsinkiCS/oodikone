@@ -39,7 +39,7 @@ export type {
   MedianEntry,
   Module,
   ProgrammeCourse,
-  ProgrammeModule, // eslint-disable-line import-x/no-unused-modules
+  ProgrammeModule,
   ProgrammeOrStudyTrackGraduationStats,
   StudyProgrammeCourse,
   StudyTrackStats,
