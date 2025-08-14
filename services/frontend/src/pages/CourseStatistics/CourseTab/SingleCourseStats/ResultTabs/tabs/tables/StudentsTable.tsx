@@ -50,12 +50,11 @@ export const StudentsTable = ({
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
   const showPopulation = useCallback(
-    (yearCode: string, years: string) => {
+    (yearCode: string) => {
       const queryObject = {
         from: yearCode,
         to: yearCode,
         coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
-        years,
         separate,
         unifyCourses: openOrRegular,
       }
@@ -74,7 +73,7 @@ export const StudentsTable = ({
         header: 'Time',
         Cell: ({ cell, row }) => (
           <TimeCell
-            href={showPopulation(row.original.code, row.original.name)}
+            href={showPopulation(row.original.code)}
             isEmptyRow={row.original.totalStudents === 0}
             name={cell.getValue<string>()}
             userHasAccessToAllStats={userHasAccessToAllStats}

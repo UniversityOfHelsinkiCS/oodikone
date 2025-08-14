@@ -42,9 +42,7 @@ export const CoursePopulation = () => {
   const [codes, setCodes] = useState([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, years, years2, combineSubstitutions } = parseQueryParams(
-    location.search
-  )
+  const { coursecodes, from, to, separate, unifyCourses, combineSubstitutions } = parseQueryParams(location.search)
 
   const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
@@ -72,7 +70,7 @@ export const CoursePopulation = () => {
     currentSemester,
   } = semesters ?? { semesters: {}, years: {}, currentSemester: null }
 
-  const { data: [courseData = undefined] = [] } = useGetSingleCourseStatsQuery(
+  const { data: [courseData] = [] } = useGetSingleCourseStatsQuery(
     { courseCodes: codes, separate, combineSubstitutions },
     { skip: codes.length === 0 }
   )
@@ -91,9 +89,10 @@ export const CoursePopulation = () => {
   }
 
   const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
+  const dateRange = `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
   const header = courseData
-    ? `${getTextIn(courseData[unifyCourses].name)} ${years ?? years2} ${getUnifyTextIn(unifyCourses)}`
+    ? `${getTextIn(courseData[unifyCourses].name)} ${dateRange} ${getUnifyTextIn(unifyCourses)}`
     : null
 
   const subHeader = codes.join(', ')
@@ -224,7 +223,7 @@ export const CoursePopulation = () => {
             <Header className="segmentTitle" size="medium" textAlign="center">
               {subHeader}
             </Header>
-            <PanelView panels={createPanels(filteredStudents, filteredCourses)} viewTitle="coursepopulation" />
+            <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
           </Segment>
         </div>
       )}

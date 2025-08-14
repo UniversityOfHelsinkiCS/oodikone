@@ -419,14 +419,10 @@ export const SingleCourseStats = ({
   const showPopulation = () => {
     const from = fromYear
     const to = toYear
-    const years2 = `${semesterYearsReversed.find(year => year.value === from)?.text.split('-')[0]}-${
-      semesterYearsReversed.find(year => year.value === to)?.text.split('-')[1]
-    }`
     const queryObject = {
       from,
       to,
       coursecodes: JSON.stringify(stats.alternatives.map(course => course.code)),
-      years2,
       separate: false,
       unifyCourses: openOrRegular,
     }

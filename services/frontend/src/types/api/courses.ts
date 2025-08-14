@@ -29,7 +29,7 @@ export type GetSingleCourseStatsResponse = {
   openStats: CourseStat
   regularStats: CourseStat
   unifyStats: CourseStat
-}
+}[]
 
 export type GetSingleCourseStatsRequest = {
   courseCodes: string[]
