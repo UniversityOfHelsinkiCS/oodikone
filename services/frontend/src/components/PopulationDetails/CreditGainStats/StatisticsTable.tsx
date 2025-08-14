@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { getStudentTotalCredits } from '@/common'
+import { FormattedStudent } from '@oodikone/shared/types'
 
 const calculateMedian = (sortedArr: number[]) => {
   const mid = Math.floor(sortedArr.length / 2)
@@ -16,10 +17,10 @@ const calculateMedian = (sortedArr: number[]) => {
 
 const calculateMean = (arr: number[]) => arr.reduce((acc, n) => acc + n, 0) / arr.length
 
-export const StatisticsTable = ({ filteredStudents, type }: { filteredStudents: any[]; type: string }) => {
+export const StatisticsTable = ({ filteredStudents, type }: { filteredStudents: FormattedStudent[]; type: string }) => {
   if (!filteredStudents?.length) return null
 
-  const credits: number[] = filteredStudents.map(student => getStudentTotalCredits(student)).sort((a, b) => a - b)
+  const credits = filteredStudents.map(student => getStudentTotalCredits(student)).sort((a, b) => a - b)
 
   const mean = calculateMean(credits)
   const median = calculateMedian(credits)

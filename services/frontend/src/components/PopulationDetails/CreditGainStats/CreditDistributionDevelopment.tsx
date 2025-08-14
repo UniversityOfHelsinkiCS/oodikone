@@ -24,6 +24,7 @@ import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useDeepMemo } from '@/hooks/deepMemo'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { generateGradientColors } from '@/util/color'
+import { FormattedStudent } from '@oodikone/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -167,7 +168,7 @@ const getChartData = (
 }
 
 type CreditDistributionDevelopmentProps = {
-  filteredStudents: any[] // TODO: type
+  filteredStudents: FormattedStudent[]
   programme: string
   combinedProgramme?: string
   year: number

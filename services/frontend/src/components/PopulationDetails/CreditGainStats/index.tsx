@@ -8,12 +8,13 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/material/InfoBox'
 import { PopulationQuery } from '@/types/populationSearch'
 
+import { FormattedStudent } from '@oodikone/shared/types'
 import { CreditDistributionDevelopment } from './CreditDistributionDevelopment'
 import { CreditsGainedTab } from './CreditsGainedTab'
 import { StatisticsTab } from './StatisticsTab'
 
 type CreditStatisticsProps = {
-  filteredStudents: any[]
+  filteredStudents: FormattedStudent[]
   query: PopulationQuery
   sggYear?: number
 }

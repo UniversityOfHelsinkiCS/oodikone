@@ -16,12 +16,13 @@ import { hopsFilter as studyPlanFilter, creditDateFilter } from '@/components/Fi
 import { useFilters } from '@/components/FilterView/useFilters'
 import { DateFormat } from '@/constants/date'
 import { formatDate } from '@/util/timeAndDate'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 dayjs.extend(isBetween)
 
 type CreditsGainedTableProps = {
-  filteredStudents: any[] // TODO: type
+  filteredStudents: FormattedStudent[]
   programmeGoalTime: number
   type: string
   year: number

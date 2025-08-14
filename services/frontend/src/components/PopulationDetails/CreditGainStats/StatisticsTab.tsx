@@ -3,13 +3,14 @@ import Stack from '@mui/material/Stack'
 
 import { ADMISSION_TYPES } from '@/common'
 import { filter as admissionTypeFilter } from '@/components/FilterView/filters/admissionType'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { DividerWithText } from './DividerWithText'
 import { StatisticsTable } from './StatisticsTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 
 type StatisticsTabProps = {
-  filteredStudents: any[] // TODO: type
+  filteredStudents: FormattedStudent[]
   programme: string
 }
 
