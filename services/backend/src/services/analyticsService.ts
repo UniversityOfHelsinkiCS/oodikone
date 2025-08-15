@@ -1,4 +1,4 @@
-import { Graduated, SpecialGroups, YearType } from '@oodikone/shared/types'
+import { Graduated, SpecialGroups, StudyTrackStats, YearType } from '@oodikone/shared/types'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
 import { redisClient } from './redis'
 import { isRelevantProgramme } from './studyProgramme/studyProgrammeHelpers'
@@ -139,10 +139,10 @@ export const getStudyTrackStats = async (
   if (!dataFromRedis) {
     return null
   }
-  return JSON.parse(dataFromRedis)
+  return JSON.parse(dataFromRedis) as StudyTrackStats & { status: string; lastUpdated: string }
 }
 
-export const setStudyTrackStats = async (data, graduated: Graduated, specialGroups: SpecialGroups) => {
+export const setStudyTrackStats = async (data: StudyTrackStats, graduated: Graduated, specialGroups: SpecialGroups) => {
   const { id } = data
   const redisKey = createRedisKeyForStudyTrackStats(id, graduated, specialGroups)
   const dataToRedis = {

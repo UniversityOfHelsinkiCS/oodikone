@@ -193,6 +193,7 @@ router.get(
 
     const { graduated, special_groups: specialGroups } = req.query
 
+    /* Fetch cached data if exists */
     const data = await getFacultyStudentStats(code, specialGroups, graduated)
     if (data) {
       return res.json(data)
@@ -203,9 +204,11 @@ router.get(
       return res.status(422).end()
     }
 
-    let updatedStats: any = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
+    const updatedStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
+
     if (updatedStats) {
-      updatedStats = await setFacultyStudentStats(updatedStats, specialGroups, graduated)
+      const redisResponse = await setFacultyStudentStats(updatedStats, specialGroups, graduated)
+      if (!redisResponse) return res.json(updatedStats)
     }
     return res.json(updatedStats)
   }

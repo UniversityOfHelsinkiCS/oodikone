@@ -13,11 +13,16 @@ import { exportStudentTable } from './exportStudentTable'
 import { FacultyStudentDataTable } from './FacultyStudentDataTable'
 import { ProgressSection } from './ProgressSection'
 
-const getKey = (programmeKeys: string[][], index: number) => {
-  if (programmeKeys[index][1].startsWith('T') || programmeKeys[index][1].startsWith('LIS')) {
+type ProgrammeKeys = {
+  progId: string
+  code: string
+}
+
+const getKey = (programmeKeys: ProgrammeKeys[], index: number) => {
+  if (programmeKeys[index].code.startsWith('T') || programmeKeys[index].code.startsWith('LIS')) {
     return 'T'
   }
-  if (programmeKeys[index][1].includes('KH')) {
+  if (programmeKeys[index].code.includes('KH')) {
     return 'KH'
   }
   return 'MH'
@@ -53,7 +58,7 @@ export const StudentsByStartingYearTab = ({
   const isError = studentStats.isError || (studentStats.isSuccess && !studentStats.data)
 
   // These are for color coding the rows based on the programme; bachelor, master, doctor
-  const getTableLinePlaces = (programmeKeys: string[][]) => {
+  const getTableLinePlaces = (programmeKeys: ProgrammeKeys[]) => {
     if (programmeKeys.length === 0) {
       return []
     }
@@ -61,9 +66,9 @@ export const StudentsByStartingYearTab = ({
     const plotLinePlaces = [['0', key]]
     for (let i = 0; i < programmeKeys.length - 1; i++) {
       if (
-        (programmeKeys[i][1].includes('KH') && programmeKeys[i + 1][1].includes('MH')) ||
-        (programmeKeys[i][1].includes('MH') &&
-          (programmeKeys[i + 1][1].startsWith('T') || programmeKeys[i + 1][1].startsWith('LIS')))
+        (programmeKeys[i].code.includes('KH') && programmeKeys[i + 1].code.includes('MH')) ||
+        (programmeKeys[i].code.includes('MH') &&
+          (programmeKeys[i + 1].code.startsWith('T') || programmeKeys[i + 1].code.startsWith('LIS')))
       ) {
         const key = getKey(programmeKeys, i + 1)
         plotLinePlaces.push([(i + 1).toString(), key])
@@ -72,7 +77,7 @@ export const StudentsByStartingYearTab = ({
     return plotLinePlaces
   }
 
-  const sortedProgrammeKeysStudents = studentStats?.data?.programmeStats
+  const programmeKeys: ProgrammeKeys[] = studentStats?.data?.programmeStats
     ? Object.keys(studentStats?.data?.programmeStats || {})
         .sort((a, b) => {
           const priority = {
@@ -85,7 +90,7 @@ export const StudentsByStartingYearTab = ({
 
           return aPriority - bPriority
         })
-        .map(programme => [studentStats?.data?.programmeNames[programme]?.progId ?? '', programme])
+        .map(programme => ({ progId: studentStats?.data?.programmeNames[programme]?.progId ?? '', code: programme }))
     : []
 
   return (
@@ -119,7 +124,7 @@ export const StudentsByStartingYearTab = ({
             studentStats?.data,
             studentStats?.data?.programmeNames,
             faculty.code,
-            sortedProgrammeKeysStudents.map(listObj => listObj[1]),
+            programmeKeys.map(listObj => listObj.code),
             getTextIn
           )
         }
@@ -146,8 +151,8 @@ export const StudentsByStartingYearTab = ({
               programmeStats={studentStats?.data.programmeStats}
               requiredRights={requiredRights}
               showPercentages={showPercentages}
-              sortedKeys={sortedProgrammeKeysStudents.map(listObj => listObj[1])}
-              tableLinePlaces={getTableLinePlaces(sortedProgrammeKeysStudents)}
+              sortedKeys={programmeKeys.map(listObj => listObj.code)}
+              tableLinePlaces={getTableLinePlaces(programmeKeys)}
               tableStats={studentStats?.data.facultyTableStats}
               titles={studentStats?.data.titles}
               years={studentStats?.data.years}
