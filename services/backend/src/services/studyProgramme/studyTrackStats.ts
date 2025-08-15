@@ -116,12 +116,9 @@ const combineStats = (
   for (const year of Object.keys(yearlyStats)) {
     for (const programmeOrStudyTrack of Object.keys(yearlyStats[year])) {
       const yearStats = yearlyStats[year][programmeOrStudyTrack]
-      if (!mainStatsByYear[year]) {
-        mainStatsByYear[year] = []
-      }
-      if (!mainStatsByTrack[programmeOrStudyTrack]) {
-        mainStatsByTrack[programmeOrStudyTrack] = []
-      }
+
+      mainStatsByYear[year] ??= []
+      mainStatsByTrack[programmeOrStudyTrack] ??= []
 
       const yearArray = [
         yearStats.all,
@@ -197,13 +194,11 @@ const getMainStatsByTrackAndYear = async (
     startedInProgramme: Date,
     studyRightElement: SISStudyRightElement
   ) => {
-    if (!yearlyStats[year]) {
-      yearlyStats[year] = {}
-    }
-    if (!yearlyStats[year][programmeOrStudyTrack]) {
-      yearlyStats[year][programmeOrStudyTrack] = getEmptyYear()
-    }
+    yearlyStats[year] ??= {}
+    yearlyStats[year][programmeOrStudyTrack] ??= getEmptyYear()
     yearlyStats[year][programmeOrStudyTrack].all += 1
+
+    /* Started studying col */
     if (!hasTransferredToProgramme) {
       const firstPresentAt = getDateOfFirstSemesterPresent(
         studyRight.semesterEnrollments,
@@ -218,6 +213,8 @@ const getMainStatsByTrackAndYear = async (
         }
       }
     }
+
+    /* Gender cols */
     if (studyRight.student.gender_code === GenderCode.MALE) {
       yearlyStats[year][programmeOrStudyTrack].male += 1
     } else if (studyRight.student.gender_code === GenderCode.FEMALE) {
@@ -226,6 +223,7 @@ const getMainStatsByTrackAndYear = async (
       yearlyStats[year][programmeOrStudyTrack].otherUnknown += 1
     }
 
+    /* Current status cols */
     const hasGraduated = studyRightElement.graduated
     const hasGraduatedFromCombinedProgramme = combinedProgramme
       ? (studyRight.studyRightElements.find(element => element.code === combinedProgramme)?.graduated ?? false)
@@ -234,6 +232,7 @@ const getMainStatsByTrackAndYear = async (
     if (hasGraduated) {
       yearlyStats[year][programmeOrStudyTrack].graduated += 1
     }
+
     if (hasGraduatedFromCombinedProgramme) {
       yearlyStats[year][programmeOrStudyTrack].graduatedCombinedProgramme += 1
     } else if (combinedProgramme || !hasGraduated) {
@@ -249,6 +248,7 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
+    /* Citizenship cols */
     const studentCitizenships = studyRight.student.citizenships
 
     for (const citizenship of studentCitizenships) {
@@ -265,6 +265,7 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
+    /* Graduation statistics */
     if (!hasGraduated) return
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     const [firstStudyRightElementWithSamePhase] = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
@@ -364,7 +365,7 @@ const getMainStatsByTrackAndYear = async (
       studyRightElement
     )
 
-    const studyTrack = studyRightElement.studyTrack?.code ?? null
+    const studyTrack = studyRightElement.studyTrack?.code
     if (studyTrack) {
       updateCounts(
         startYear,
@@ -375,6 +376,7 @@ const getMainStatsByTrackAndYear = async (
         studyRightElement
       )
     }
+
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
     if (countAsBachelorMaster) {
       const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
@@ -391,12 +393,8 @@ const getMainStatsByTrackAndYear = async (
   for (const year of Object.keys(yearlyStats)) {
     if (year === 'Total') continue
     for (const track of Object.keys(yearlyStats[year])) {
-      if (!yearlyStats.Total) {
-        yearlyStats.Total = {}
-      }
-      if (!yearlyStats.Total[track]) {
-        yearlyStats.Total[track] = getEmptyYear()
-      }
+      yearlyStats.Total ??= {}
+      yearlyStats.Total[track] ??= getEmptyYear()
 
       for (const field of keysOf(yearlyStats[year][track])) {
         if (field !== 'otherCountriesCounts') {
@@ -404,9 +402,7 @@ const getMainStatsByTrackAndYear = async (
           continue
         }
         for (const country of Object.keys(yearlyStats[year][track].otherCountriesCounts)) {
-          if (!yearlyStats.Total[track].otherCountriesCounts[country]) {
-            yearlyStats.Total[track].otherCountriesCounts[country] = 0
-          }
+          yearlyStats.Total[track].otherCountriesCounts[country] ??= 0
           yearlyStats.Total[track].otherCountriesCounts[country] +=
             yearlyStats[year][track].otherCountriesCounts[country]
         }
@@ -458,7 +454,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   studyProgramme: string
   combinedProgramme?: string
   settings: { graduated: boolean; specialGroups: boolean }
-  studyRightsOfProgramme: Array<SISStudyRight>
+  studyRightsOfProgramme: SISStudyRight[]
 }) => {
   const isAcademicYear = true
   const includeYearsCombined = true

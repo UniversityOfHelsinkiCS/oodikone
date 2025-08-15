@@ -207,8 +207,7 @@ router.get(
     const updatedStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
 
     if (updatedStats) {
-      const redisResponse = await setFacultyStudentStats(updatedStats, specialGroups, graduated)
-      if (!redisResponse) return res.json(updatedStats)
+      void setFacultyStudentStats(updatedStats, specialGroups, graduated)
     }
     return res.json(updatedStats)
   }

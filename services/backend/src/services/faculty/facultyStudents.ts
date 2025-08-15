@@ -8,14 +8,18 @@ import type { ProgrammesOfOrganization } from './faculty'
 type StudyTrackStats = Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>
 
 const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats[]) => {
-  const facultyTableStats: Record<string, Array<string | number>> = {}
+  const facultyTableStats: Record<string, (string | number)[]> = {}
   const facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>> = {}
-  const programmeTableStats: Record<string, Record<string, Array<string | number>>> = {}
+  const programmeTableStats: Record<string, Record<string, (string | number)[]>> = {}
 
-  for (const prog of programmeCodes) {
-    const statsForProgramme = stats.find(programmeStats => programmeStats.id === prog)?.mainStatsByTrack?.[prog]
-    const programmeOtherCountriesCount = stats.find(programmeStats => programmeStats.id === prog)
-      ?.otherCountriesCount?.[prog]
+  for (const programmeCode of programmeCodes) {
+    const statsForProgramme = stats.find(programmeStats => programmeStats.id === programmeCode)?.mainStatsByTrack?.[
+      programmeCode
+    ]
+
+    const programmeOtherCountriesCount = stats.find(programmeStats => programmeStats.id === programmeCode)
+      ?.otherCountriesCount?.[programmeCode]
+
     if (!statsForProgramme) continue
 
     for (const yearStats of statsForProgramme) {
@@ -34,11 +38,11 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
         }
       }
 
-      if (!(prog in programmeTableStats)) {
-        programmeTableStats[prog] = {}
+      if (!(programmeCode in programmeTableStats)) {
+        programmeTableStats[programmeCode] = {}
       }
-      if (!(yearStats[0] in programmeTableStats[prog])) {
-        programmeTableStats[prog][yearStats[0]] = yearStats.slice(1)
+      if (!(yearStats[0] in programmeTableStats[programmeCode])) {
+        programmeTableStats[programmeCode][yearStats[0]] = yearStats.slice(1)
       }
     }
 
@@ -47,7 +51,7 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
       if (!(year in facultyTableStatsExtra)) {
         facultyTableStatsExtra[year] = {}
       }
-      facultyTableStatsExtra[year][prog] = countryStats
+      facultyTableStatsExtra[year][programmeCode] = countryStats
     }
   }
 
