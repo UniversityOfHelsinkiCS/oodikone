@@ -138,6 +138,11 @@ export type GetFacultyStudentStatsResponse = {
   id: string
   lastUpdated: string
   programmeNames: Record<string, DegreeProgramme>
+  /**
+   * NOTE: programmeStats order is random (not by the year). Make sure to index properly.
+   *
+   * (Order is based on the order in which studyrights were processed in the backend)
+   */
   programmeStats: Record<string, Record<string, (number | string)[]>>
   status: string
   titles: string[]

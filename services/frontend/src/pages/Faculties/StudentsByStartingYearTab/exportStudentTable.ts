@@ -1,39 +1,43 @@
 import { utils, writeFile } from 'xlsx'
 
 import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
-import { DegreeProgramme, GetFacultyStudentStatsResponse } from '@/types/api/faculty'
+import { GetFacultyStudentStatsResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
+
+/* This is theoretically useless, as js would sort exactly the same way without a function, but w.e */
+const sortByYear = (a: string, b: string) => {
+  if (a === 'Total') return 1
+  if (b === 'Total') return -1
+
+  const yearA = parseInt(a.split(' - ')[0], 10)
+  const yearB = parseInt(b.split(' - ')[0], 10)
+
+  return yearB - yearA
+}
 
 export const exportStudentTable = (
   data: GetFacultyStudentStatsResponse | undefined,
-  programmeNames: Record<string, DegreeProgramme> | undefined,
   faculty: string,
   sortedkeys: string[],
   getTextIn: GetTextIn
 ) => {
-  if (!data || !programmeNames) {
+  if (!data) {
     return
   }
+
+  const { programmeNames, programmeStats } = data
 
   const book = utils.book_new()
   const tableHeaders = data.titles.slice(1)
   const countriesExtra = data.facultyTableStatsExtra
-  const years = Object.keys(data.facultyTableStats).sort((a, b) => {
-    if (a === 'Total') return 1
-    if (b === 'Total') return -1
-
-    const yearA = parseInt(a.split(' - ')[0], 10)
-    const yearB = parseInt(b.split(' - ')[0], 10)
-
-    return yearB - yearA
-  })
+  const years = Object.keys(data.facultyTableStats).sort(sortByYear)
 
   const processTableData = (data: (number | string)[][], tableHeaders: string[]) => {
     let counter = 0
     return data.map(row =>
       row.reduce(
         (result, value) => {
-          let header
+          let header: string
           if (typeof value !== 'string') {
             header = tableHeaders[counter].replace('\n', ' ')
             counter += 1
@@ -56,18 +60,19 @@ export const exportStudentTable = (
   const tableSheet = utils.json_to_sheet(tableStats)
   utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
-  const programmeStats = data?.programmeStats || {}
   const progressStats = sortedkeys.reduce(
     (results, programme) => [
       ...results,
-      ...Object.keys(programmeStats[programme]).map((yearRow, yearIndex) => {
-        return {
-          'Academic Year': years[yearIndex],
-          Programme: programme,
-          Name: getTextIn(programmeNames[programme].name) ?? '',
-          ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
-        }
-      }),
+      ...Object.keys(programmeStats[programme])
+        .sort(sortByYear)
+        .map((yearRow, yearIndex) => {
+          return {
+            'Academic Year': years[yearIndex],
+            Programme: programme,
+            Name: getTextIn(programmeNames[programme].name) ?? '',
+            ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
+          }
+        }),
     ],
     [] as Record<string, string | number>[]
   )

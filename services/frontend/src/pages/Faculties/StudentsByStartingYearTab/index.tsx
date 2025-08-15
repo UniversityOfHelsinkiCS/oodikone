@@ -122,7 +122,6 @@ export const StudentsByStartingYearTab = ({
         exportOnClick={() =>
           exportStudentTable(
             studentStats?.data,
-            studentStats?.data?.programmeNames,
             faculty.code,
             programmeKeys.map(listObj => listObj.code),
             getTextIn
