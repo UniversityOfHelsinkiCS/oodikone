@@ -34,8 +34,8 @@ export const PanelView = ({ panels: initialPanels }) => {
     <Box data-cy="panelview-parent">
       {panels.map(({ key, onChange, title, content }) => (
         <Accordion
-          defaultExpanded={!!content}
           disableGutters
+          expanded={!!content}
           key={key}
           onChange={onChange}
           slotProps={{ transition: { unmountOnExit: true } }}
