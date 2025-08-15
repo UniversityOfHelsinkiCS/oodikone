@@ -22,9 +22,9 @@ export type FormattedStudentData = {
   creditsTotal: number
   creditsHops: number
   creditsCombinedProg: number | null
-  creditsSince: number
-  studyRightStart: string
-  programmeStart: string
+  creditsSince: number | null
+  studyRightStart: string | null
+  programmeStart: string | null
   option: string | null
   semesterEnrollments: {
     exportValue: number
@@ -36,10 +36,10 @@ export type FormattedStudentData = {
     }[]
   } | null
   graduationDate: string | null
-  graduationDateCombinedProg?: string | null
+  graduationDateCombinedProg: string | null
   startYearAtUniversity: number | null
   primaryProgramme: string | null
-  programmes: { exportValue: string | null; programmes: Programme[] }
+  programmes: { exportValue: string | null; programmes: Programme[] } | null
   programmeStatus: string | null
   transferredFrom: string | null
   admissionType: string | null
@@ -51,11 +51,11 @@ export type FormattedStudentData = {
   extent: string | null
   studyTrack: string | null
   updatedAt: string | null
-  grade?: string
-  attainmentDate?: string
-  enrollmentDate?: string
-  language?: string
-  tvex: boolean
+  grade: string | null
+  attainmentDate: string
+  enrollmentDate: string
+  language: string | null
+  tvex: boolean | null
 }
 
 export const GeneralTab = ({

@@ -121,7 +121,7 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('semesterEnrollments', {
         header: 'Semesters present',
         cell: cell => {
-          const { content } = cell.getValue()
+          const content = cell.getValue()?.content
           if (!content) return null
 
           return (

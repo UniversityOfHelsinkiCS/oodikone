@@ -1,0 +1,43 @@
+import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
+
+export const useColumns = ({ programme }): [string[], string[]] => {
+  const { isAdmin } = useGetAuthorizedUserQuery()
+  const { visible: namesVisible } = useStudentNameVisibility()
+
+  const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
+
+  const populationWithProgrammeColumns = programme
+    ? ['option', 'transferredFrom', 'semesterEnrollments', 'curriculumPeriod']
+    : ['primaryProgramme']
+
+  const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
+
+  const excelOnlyColumns = ['email', 'phoneNumber']
+
+  return [
+    [
+      'studentNumber',
+      'programmes',
+      'creditsTotal',
+      'creditsHops',
+      'creditsSince',
+      'admissionType',
+      'startYearAtUniversity',
+      'graduationDate',
+      'studyRightStart',
+      'programmeStart',
+      'programmeStatus',
+      'studyTrack',
+      'gender',
+      'citizenships',
+      'mostRecentAttainment',
+      'tvex',
+      'tags',
+      ...nameColumns,
+      ...populationWithProgrammeColumns,
+      ...adminColumns,
+    ],
+    excelOnlyColumns,
+  ]
+}

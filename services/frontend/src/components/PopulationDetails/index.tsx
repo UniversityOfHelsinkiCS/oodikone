@@ -21,6 +21,7 @@ import {
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationStudents } from '@/components/PopulationStudents'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useCurriculumState } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -33,9 +34,9 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
 import { CreditStatistics } from './CreditGainStats'
-import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
+import { useColumns as columnsGeneralTab } from './studentColumns'
 
 type PopulationDetailsProps = {
   isLoading: boolean
@@ -156,8 +157,20 @@ export const PopulationDetails = ({
                 }
                 generalTabFormattingFunction={() =>
                   formatGeneralTab({
-                    query,
+                    variant: 'population',
                     filteredStudents,
+
+                    years: query.years,
+
+                    programme: query.programme,
+                    combinedProgramme: query.combinedProgramme,
+
+                    showBachelorAndMaster: query.showBachelorAndMaster,
+                    includePrimaryProgramme: false,
+
+                    coursecodes: [],
+                    from: undefined,
+                    to: undefined,
                   })
                 }
                 programme={programme}

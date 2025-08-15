@@ -21,6 +21,7 @@ import {
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useProgress } from '@/hooks/progress'
@@ -30,7 +31,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { CustomPopulationSearch } from './CustomPopulationSearch'
-import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
+import { useColumns as columnsGeneralTab } from './studentColumns'
 import { UnihowDataExport } from './UnihowDataExport'
 
 export const CustomPopulation = () => {
@@ -176,8 +177,20 @@ const CustomPopulationContent = ({
           }
           generalTabFormattingFunction={() =>
             formatGeneralTab({
-              programme: associatedProgramme ?? null,
+              variant: 'customPopulation',
               filteredStudents,
+
+              years: [],
+
+              programme: associatedProgramme ?? undefined,
+              combinedProgramme: undefined,
+
+              showBachelorAndMaster: false,
+              includePrimaryProgramme: false,
+
+              coursecodes: [],
+              from: undefined,
+              to: undefined,
             })
           }
           variant="customPopulation"

@@ -1,17 +1,10 @@
 import dayjs from 'dayjs'
 
 import { getAllProgrammesOfStudent, isFall } from '@/common'
-import { creditDateFilter } from '@/components/FilterView/filters'
-import { useFilters } from '@/components/FilterView/useFilters'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
 import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
-
-export const useGetCreditDateFilterOptions = () => {
-  const { useFilterSelector } = useFilters()
-  return useFilterSelector(creditDateFilter.selectors.selectOptions())
-}
 
 export const useGetRelevantSemesterData = (
   year: number | undefined | null
@@ -164,7 +157,7 @@ export const getProgrammeDetails =
   (student: Student) => {
     const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester?.semestercode)
 
-    const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes[0]
+    const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes.at(0)
     const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
 
     // Programme can be an empty string, so direct ?? comparison wont work
@@ -199,7 +192,8 @@ export const getProgrammeDetails =
 
         return false
       })
-      .sort(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)?.[0]
+      .sort(({ startDate: a }, { startDate: b }) => Number(b < a) * 1 + Number(a < b) * -1)
+      ?.at(0)
 
     return {
       allProgrammes: studentProgrammes,

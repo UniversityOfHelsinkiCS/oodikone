@@ -16,6 +16,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditStatistics } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudents } from '@/components/PopulationStudents'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
@@ -23,7 +24,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { useCurriculumState } from '../../hooks/useCurriculums'
 import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
-import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
+import { useColumns as columnsGeneralTab } from './studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
 dayjs.extend(isBetween)
@@ -127,8 +128,20 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             generalTabColumnFunction={() => columnsGeneralTab({ group })}
             generalTabFormattingFunction={() =>
               formatGeneralTab({
-                group,
+                variant: 'studyGuidanceGroupPopulation',
                 filteredStudents,
+
+                years: [group.tags?.year ?? undefined],
+
+                programme: group.tags?.studyProgramme?.split('+')[0],
+                combinedProgramme: group.tags?.studyProgramme?.split('+')[1],
+
+                showBachelorAndMaster: false,
+                includePrimaryProgramme: true,
+
+                coursecodes: [],
+                from: undefined,
+                to: undefined,
               })
             }
             studyGuidanceGroup={group}

@@ -21,7 +21,7 @@ type StudentPersonalData = Pick<
   | 'sis_person_id'
 >
 
-type StudentStudyRightElement = Pick<
+export type StudentStudyRightElement = Pick<
   SISStudyRightElement,
   'code' | 'name' | 'studyTrack' | 'graduated' | 'startDate' | 'endDate' | 'phase' | 'degreeProgrammeType'
 >
@@ -33,7 +33,6 @@ export type StudentStudyRight = Pick<
   studyRightElements: Array<StudentStudyRightElement>
 }
 
-// eslint-disable-next-line import-x/no-unused-modules
 export type StudentStudyPlan = Pick<
   Studyplan,
   | 'included_courses'

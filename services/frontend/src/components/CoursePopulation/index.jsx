@@ -23,6 +23,7 @@ import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
@@ -34,7 +35,7 @@ import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTab
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 
-import { useColumns as columnsGeneralTab, useFormat as formatGeneralTab } from './format/GeneralTab'
+import { useColumns as columnsGeneralTab } from './studentColumns'
 
 export const CoursePopulation = () => {
   const location = useLocation()
@@ -157,11 +158,20 @@ export const CoursePopulation = () => {
           generalTabColumnFunction={() => columnsGeneralTab()}
           generalTabFormattingFunction={() =>
             formatGeneralTab({
+              variant: 'coursePopulation',
+              filteredStudents,
+
+              years: [],
+
+              programme: undefined,
+              combinedProgramme: undefined,
+
+              showBachelorAndMaster: false,
+              includePrimaryProgramme: true,
+
+              coursecodes: codes,
               from: dateFrom,
               to: dateTo,
-              coursecodes: codes,
-
-              filteredStudents,
             })
           }
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
