@@ -101,7 +101,6 @@ export const FacultyStudentDataTable = ({
   }
   showPercentages: boolean
   sortedKeys: string[]
-  tableLinePlaces: string[][]
   tableStats: Record<string, (number | string)[]>
   titles: string[]
   years: string[]

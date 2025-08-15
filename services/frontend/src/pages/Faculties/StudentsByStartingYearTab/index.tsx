@@ -18,16 +18,6 @@ type ProgrammeKeys = {
   code: string
 }
 
-const getKey = (programmeKeys: ProgrammeKeys[], index: number) => {
-  if (programmeKeys[index].code.startsWith('T') || programmeKeys[index].code.startsWith('LIS')) {
-    return 'T'
-  }
-  if (programmeKeys[index].code.includes('KH')) {
-    return 'KH'
-  }
-  return 'MH'
-}
-
 export const StudentsByStartingYearTab = ({
   faculty,
   graduatedGroup,
@@ -56,26 +46,6 @@ export const StudentsByStartingYearTab = ({
 
   const isLoading = studentStats.isLoading || studentStats.isFetching
   const isError = studentStats.isError || (studentStats.isSuccess && !studentStats.data)
-
-  // These are for color coding the rows based on the programme; bachelor, master, doctor
-  const getTableLinePlaces = (programmeKeys: ProgrammeKeys[]) => {
-    if (programmeKeys.length === 0) {
-      return []
-    }
-    const key = getKey(programmeKeys, 0)
-    const plotLinePlaces = [['0', key]]
-    for (let i = 0; i < programmeKeys.length - 1; i++) {
-      if (
-        (programmeKeys[i].code.includes('KH') && programmeKeys[i + 1].code.includes('MH')) ||
-        (programmeKeys[i].code.includes('MH') &&
-          (programmeKeys[i + 1].code.startsWith('T') || programmeKeys[i + 1].code.startsWith('LIS')))
-      ) {
-        const key = getKey(programmeKeys, i + 1)
-        plotLinePlaces.push([(i + 1).toString(), key])
-      }
-    }
-    return plotLinePlaces
-  }
 
   const programmeKeys: ProgrammeKeys[] = studentStats?.data?.programmeStats
     ? Object.keys(studentStats?.data?.programmeStats || {})
@@ -151,7 +121,6 @@ export const StudentsByStartingYearTab = ({
               requiredRights={requiredRights}
               showPercentages={showPercentages}
               sortedKeys={programmeKeys.map(listObj => listObj.code)}
-              tableLinePlaces={getTableLinePlaces(programmeKeys)}
               tableStats={studentStats?.data.facultyTableStats}
               titles={studentStats?.data.titles}
               years={studentStats?.data.years}
