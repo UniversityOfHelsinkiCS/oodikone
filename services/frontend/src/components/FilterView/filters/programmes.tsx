@@ -15,6 +15,21 @@ dayjsExtend(isSameOrAfter)
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
+const SelectInputItem = ({ text }) => (
+  <Typography fontWeight={500} px={0.5}>
+    {text}
+  </Typography>
+)
+
+const CourseMenuStack = ({ disabled, text, value, description }) => (
+  <MenuItem disabled={disabled} value={value}>
+    <Stack>
+      <Typography fontWeight={500}>{text}</Typography>
+      <Typography sx={{ color: '#5b5b5b', fontSize: '0.9em' }}>{description}</Typography>
+    </Stack>
+  </MenuItem>
+)
+
 const ProgrammeFilterCard = ({
   args,
   onOptionsChange,
@@ -94,20 +109,15 @@ const ProgrammeFilterCard = ({
         value={selectedProgrammes}
       />
       <FilterSelect
-        InputItem={value => (
-          <Typography fontWeight={500} px={0.5}>
-            {modeOptions.find(mode => value === mode.value)!.text}
-          </Typography>
-        )}
+        InputItem={value => <SelectInputItem text={modeOptions.find(mode => value === mode.value)!.text} />}
         MenuItem={option => (
-          <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
-            <Stack>
-              <Typography fontWeight={500}>{option.text}</Typography>
-              <Typography sx={{ color: '#5b5b5b', fontSize: '0.9em' }}>
-                {modes.find(mode => option.key === mode.key)?.description}
-              </Typography>
-            </Stack>
-          </MenuItem>
+          <CourseMenuStack
+            description={modes.find(mode => option.key === mode.key)?.description}
+            disabled={option.disabled}
+            key={option.key}
+            text={option.text}
+            value={option.value}
+          />
         )}
         filterKey="programmeFilter-mode"
         label="Select Mode"
