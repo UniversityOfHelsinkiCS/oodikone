@@ -13,7 +13,7 @@ type EnrollmentDateSelectorProps = {
 export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelectorProps) => {
   const currentYear = new Date().getFullYear()
   const lowestYear = 2017
-  const options = [...Array(currentYear + 1 - lowestYear).keys()].map(value => lowestYear + value)
+  const options = [...Array(currentYear + 1 - lowestYear).keys()].map(value => currentYear - value)
   return (
     <Stack direction="row" spacing={1} sx={{ mt: 0 }}>
       <IconButton
