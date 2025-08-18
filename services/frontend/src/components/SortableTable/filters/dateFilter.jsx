@@ -1,12 +1,12 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
 import { getColumnValue } from '@/components/SortableTable/common'
 
-dayjs.extend(isSameOrBefore)
-dayjs.extend(isSameOrAfter)
+dayjsExtend(isSameOrBefore)
+dayjsExtend(isSameOrAfter)
 
 const DateColumnFilterComponent = ({ options, dispatch }) => {
   return (

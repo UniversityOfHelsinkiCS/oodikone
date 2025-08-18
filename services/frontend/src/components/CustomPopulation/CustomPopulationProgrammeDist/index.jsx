@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
@@ -12,9 +12,9 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 
-dayjs.extend(isBetween)
-dayjs.extend(isSameOrBefore)
-dayjs.extend(isSameOrAfter)
+dayjsExtend(isBetween)
+dayjsExtend(isSameOrBefore)
+dayjsExtend(isSameOrAfter)
 
 export const findCorrectProgramme = (student, coursecodes, semesters, startDate, endDate, currentSemester) => {
   let programme

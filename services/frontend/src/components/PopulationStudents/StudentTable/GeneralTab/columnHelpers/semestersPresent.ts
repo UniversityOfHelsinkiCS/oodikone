@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { isFall, isMastersProgramme } from '@/common'
@@ -8,7 +8,7 @@ import './semestersPresent.css'
 import { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 import { EnrollmentType } from '@oodikone/shared/types'
 
-dayjs.extend(isBetween)
+dayjsExtend(isBetween)
 
 type SemesterPresentFnsProps = {
   getTextIn: (arg0: any) => string | null | undefined

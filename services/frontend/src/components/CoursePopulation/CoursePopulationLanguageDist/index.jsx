@@ -1,10 +1,10 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import { Table, Progress } from 'semantic-ui-react'
 
 import { languageAbbreviations } from '@/common'
 
-dayjs.extend(isBetween)
+dayjsExtend(isBetween)
 
 export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
   let total = 0

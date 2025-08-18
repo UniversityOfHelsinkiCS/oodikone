@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import { useNavigate } from 'react-router'
 import { Button, Divider, Header, Label } from 'semantic-ui-react'
@@ -27,7 +27,7 @@ import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
-dayjs.extend(isBetween)
+dayjsExtend(isBetween)
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 

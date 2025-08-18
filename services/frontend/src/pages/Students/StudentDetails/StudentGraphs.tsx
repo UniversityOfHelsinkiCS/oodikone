@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
@@ -27,7 +27,7 @@ import type { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
-dayjs.extend(isSameOrAfter)
+dayjsExtend(isSameOrAfter)
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)

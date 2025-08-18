@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import dayjs, { type Dayjs } from 'dayjs'
+import dayjs, { type Dayjs, extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { getStudentTotalCredits } from '@/common'
@@ -19,7 +19,7 @@ import { formatDate } from '@/util/timeAndDate'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
-dayjs.extend(isBetween)
+dayjsExtend(isBetween)
 
 type CreditsGainedTableProps = {
   filteredStudents: FormattedStudent[]

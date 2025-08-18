@@ -4,7 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider'
 
 import * as Sentry from '@sentry/browser'
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import HighCharts from 'highcharts' // eslint-disable-line import-x/default
 import { useEffect } from 'react'
@@ -37,7 +37,7 @@ HighCharts.setOptions({
   },
 })
 
-dayjs.extend(updateLocale)
+dayjsExtend(updateLocale)
 dayjs.updateLocale('en', {
   week: {
     dow: 1, // First day of week is Monday

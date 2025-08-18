@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
@@ -17,9 +17,9 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 
-dayjs.extend(isBetween)
-dayjs.extend(isSameOrBefore)
-dayjs.extend(isSameOrAfter)
+dayjsExtend(isBetween)
+dayjsExtend(isSameOrBefore)
+dayjsExtend(isSameOrAfter)
 
 const getCourses = (courseCode, criteria, student) => {
   return student.courses.filter(

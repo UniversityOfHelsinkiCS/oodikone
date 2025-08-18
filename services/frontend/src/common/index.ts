@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import { maxBy, orderBy, range } from 'lodash'
 
@@ -17,7 +17,7 @@ import {
 } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
-dayjs.extend(isBetween)
+dayjsExtend(isBetween)
 
 export const textAndDescriptionSearch = (dropDownOptions: any[], param: string) =>
   dropDownOptions.filter(option =>

@@ -1,7 +1,7 @@
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import dayjs from 'dayjs'
+import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
@@ -10,8 +10,8 @@ import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
-dayjs.extend(isSameOrBefore)
-dayjs.extend(isSameOrAfter)
+dayjsExtend(isSameOrBefore)
+dayjsExtend(isSameOrAfter)
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
