@@ -1,13 +1,14 @@
 import { ADMISSION_TYPES } from '@/common'
+import { FormattedStudent } from '@oodikone/shared/types/studentData'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
-const findAllStudyRightsForProgramme = (student, programme) =>
+const findAllStudyRightsForProgramme = (student: FormattedStudent, programme: string) =>
   student.studyRights.filter(studyRight => studyRight.studyRightElements.some(el => el.code === programme))
 
-export const filter = code => value => student => {
-  const programmeStudyRights = findAllStudyRightsForProgramme(student, code)
+export const filter = (programme: string, value: string | null) => (student: FormattedStudent) => {
+  const programmeStudyRights = findAllStudyRightsForProgramme(student, programme)
   const fixedValue = value !== 'Valintakoe' ? value : 'Koepisteet'
 
   return programmeStudyRights.some(
@@ -22,7 +23,7 @@ export const filter = code => value => student => {
 const AdmissionTypeFilterCard = ({ args, options, onOptionsChange, students }: FilterTrayProps) => {
   const code = args.programme
   const { selected } = options
-  const count = (admissionType: string | null): number => students.filter(filter(code)(admissionType)).length
+  const count = (admissionType: string | null): number => students.filter(filter(code, admissionType)).length
 
   const selectOptions = Object.entries(ADMISSION_TYPES)
     .filter(([_, admissionType]) => !!admissionType)
@@ -57,15 +58,15 @@ export const admissionTypeFilter = createFilter({
   title: 'Admission type',
 
   defaultOptions: {
-    selected: null,
+    selected: '',
   },
 
-  isActive: ({ selected }) => !!selected,
+  isActive: ({ selected }) => !!selected.length,
 
   filter(student, { args, options }) {
     const { selected } = options
 
-    return filter(args.programme)(selected)(student)
+    return filter(args.programme, selected)(student)
   },
 
   render: AdmissionTypeFilterCard,

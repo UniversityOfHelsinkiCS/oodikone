@@ -16,7 +16,7 @@ type StatisticsTabProps = {
 
 export const StatisticsTab = ({ filteredStudents, programme }: StatisticsTabProps) => {
   const admissionTypesAvailable =
-    filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme)(null)).length
+    filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme, null)).length
 
   return (
     <Stack sx={{ alignItems: 'center', p: '2em' }}>
@@ -28,7 +28,7 @@ export const StatisticsTab = ({ filteredStudents, programme }: StatisticsTabProp
           <DividerWithText text="By admission type" />
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '2em', justifyContent: 'center', width: '100%' }}>
             {admissionTypes.map(type => {
-              const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
+              const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme, type))
               return studentsByAdmissionType.length ? (
                 <StatisticsTable
                   filteredStudents={studentsByAdmissionType}

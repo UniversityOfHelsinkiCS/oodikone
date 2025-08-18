@@ -20,7 +20,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
   if (!filteredStudents?.length || !programme) return null
 
   const admissionTypesAvailable =
-    filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme)(null)).length
+    filteredStudents.length !== filteredStudents.filter(admissionTypeFilter(programme, null)).length
 
   return (
     <Stack direction="column" sx={{ p: 1 }}>
@@ -34,7 +34,7 @@ export const CreditsGainedTab = ({ filteredStudents, programmeGoalTime, programm
         <Box>
           <DividerWithText text="By admission type" />
           {admissionTypes.map(type => {
-            const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme)(type))
+            const studentsByAdmissionType = filteredStudents.filter(admissionTypeFilter(programme, type))
             return studentsByAdmissionType.length ? (
               <CreditsGainedTable
                 filteredStudents={studentsByAdmissionType}
