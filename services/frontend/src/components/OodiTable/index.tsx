@@ -23,7 +23,6 @@ declare module '@tanstack/react-table' {
   interface TableState extends VerticalHeaders {}
 }
 
-
 /**
  * In loving memory of SortableTable
  *
