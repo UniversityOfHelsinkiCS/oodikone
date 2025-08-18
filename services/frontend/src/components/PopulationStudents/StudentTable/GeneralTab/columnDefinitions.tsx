@@ -112,7 +112,15 @@ export const useGetColumnDefinitions = ({
         ],
       }),
       columnHelper.accessor('grade', { header: 'Grade' }),
-      columnHelper.accessor('studyTrack', { header: 'Study track' }),
+      columnHelper.accessor('studyTrack', {
+        header: 'Study track',
+        cell: cell => {
+          const studyTrack = cell.getValue()
+          if (!studyTrack) return null
+
+          return <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
+        },
+      }),
 
       columnHelper.accessor('programmeStart', { header: 'Started in programme' }),
       columnHelper.accessor('studyRightStart', { header: 'Start of study right' }),
