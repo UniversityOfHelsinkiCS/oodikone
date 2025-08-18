@@ -49,7 +49,7 @@ export const ModulesTab = ({
         cell: cell => <StudentInfoItem sisPersonId={cell.row.original.sisPersonID} studentNumber={cell.getValue()} />,
         footer: () => <DividedTableCell bottom="Completed" top="Planned" />,
         filterFn: (row, columnId, filterValue) => {
-          const value = row.getValue(columnId)
+          const value: string = row.getValue(columnId)
           if (!filterValue) return true
 
           return value.toLowerCase().startsWith(filterValue.toLowerCase())
