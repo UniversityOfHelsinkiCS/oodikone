@@ -10,6 +10,8 @@ import { OodiTableHeaderGroup } from './components/Header'
 import { OodiTablePagination } from './components/Pagination'
 
 export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
+  const verticalHeaders = table.getState().useVerticalHeaders ?? []
+
   return (
     <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
       <TableContainer
