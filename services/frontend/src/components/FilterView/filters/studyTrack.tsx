@@ -30,6 +30,7 @@ const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: Filt
     <FilterSelect
       filterKey={studyTrackFilter.key}
       label="Choose study track"
+      multiple
       onChange={({ target }) => onOptionsChange({ selected: target.value })}
       options={dropdownOptions}
       value={selected}
