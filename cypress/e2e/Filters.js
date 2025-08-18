@@ -19,7 +19,7 @@ describe("Population statistics with a master's programme", { testIsolation: fal
 
   it('Study track filter works', () => {
     cy.cs('studyTrackFilter-header').click()
-    cy.selectFromDropdown('studyTrackFilter', 0)
+    cy.selectFromDropdown('studyTrackFilter', 0, true)
     checkFilteredStudentCount(15)
 
     cy.cs('studyTrackFilter-clear').click()
