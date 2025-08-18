@@ -1,10 +1,12 @@
+import Box from '@mui/material/Box'
+import { SxProps, Theme } from '@mui/material/styles'
 import TableCell, { type TableCellProps } from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import { flexRender } from '@tanstack/react-table'
 import type { HeaderGroup } from '@tanstack/react-table'
 import type { FC, ReactNode } from 'react'
 
-import { getCommonPinningStyles } from '../styles'
+import { getCommonPinningStyles, getVerticalStyles } from '../styles'
 import { OodiTableSortIcons } from './SortIcons'
 
 const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({ children, ...props }) => {
@@ -27,7 +29,7 @@ const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({ childr
   )
 }
 
-export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>) => (
+export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, verticalHeaders: string[]) => (
   <TableRow key={headerGroup.id}>
     {headerGroup.headers.map(header => {
       if (header.depth - header.column.depth > 1) return null
@@ -38,18 +40,48 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>) 
         rowSpan = leafs[leafs.length - 1].depth - header.depth
       }
 
+      const isVertical = verticalHeaders.includes(header.id)
+
+      const sx = {
+        cursor: header.column.getCanSort() ? 'pointer' : 'inherit',
+        ...(isVertical && getVerticalStyles()),
+        ...getCommonPinningStyles(header.column),
+      }
+
       return (
         <OodiTableHeader
           colSpan={header.colSpan}
           key={header.id}
           onClick={header.column.getToggleSortingHandler()}
           rowSpan={rowSpan}
-          sx={{
-            ...getCommonPinningStyles(header.column),
-            cursor: header.column.getCanSort() ? 'pointer' : 'inherit',
-          }}
+          sx={sx as SxProps<Theme>}
         >
-          {flexRender(header.column.columnDef.header, header.getContext())}
+          {isVertical ? (
+            <Box
+              sx={{
+                display: 'inline-flex',
+                width: '100%',
+              }}
+            >
+              <Box
+                sx={{
+                  writingMode: 'vertical-rl',
+                  textOrientation: 'mixed',
+                  whiteSpace: 'normal',
+                  overflow: 'visible',
+                  height: '100%',
+                  maxWidth: '15em',
+                  minHeight: '160px',
+                  maxHeight: '240px',
+                  margin: '0 auto',
+                }}
+              >
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </Box>
+            </Box>
+          ) : (
+            <Box>{flexRender(header.column.columnDef.header, header.getContext())}</Box>
+          )}
           <OodiTableSortIcons canSort={header.column.getCanSort()} isSorted={header.column.getIsSorted()} />
         </OodiTableHeader>
       )

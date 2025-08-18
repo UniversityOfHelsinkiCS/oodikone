@@ -37,7 +37,7 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
               zIndex: 2,
             }}
           >
-            {table.getHeaderGroups().map(OodiTableHeaderGroup)}
+            {table.getHeaderGroups().map(group => OodiTableHeaderGroup(group, verticalHeaders))}
           </TableHead>
           <TableBody
             sx={{
