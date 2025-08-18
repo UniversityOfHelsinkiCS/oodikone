@@ -11,26 +11,24 @@ type SwitchOption = {
 
 type FilterSwitchProps = {
   options: SwitchOption[]
-  filterKey?: string
+  filterKey: string
 }
 
-export const FilterSwitch = ({ options, filterKey }: FilterSwitchProps) => {
-  const SwitchButton = ({ option }: { option: SwitchOption }) => {
-    return (
-      <FormControlLabel
-        checked={option.checked}
-        control={<Switch />}
-        data-cy={`${filterKey}-radio-${option.key}`}
-        label={option.text}
-        onClick={option.onClick}
-      />
-    )
-  }
+const SwitchButton = ({ filterKey, option }: { filterKey: string; option: SwitchOption }) => (
+  <FormControlLabel
+    checked={!!option.checked}
+    control={<Switch />}
+    data-cy={`${filterKey}-radio-${option.key}`}
+    label={option.text}
+    onClick={option.onClick}
+  />
+)
 
+export const FilterSwitch = ({ options, filterKey }: FilterSwitchProps) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       {options.map(option => (
-        <SwitchButton key={option.key} option={option} />
+        <SwitchButton filterKey={filterKey} key={option.key} option={option} />
       ))}
     </Box>
   )

@@ -16,27 +16,27 @@ type FilterRadioProps = {
   onChange: RadioGroupProps['onChange']
 }
 
+const RadioButton = ({ filterKey, option }: { filterKey: string; option: RadioOption }) => {
+  const radioGroup = useRadioGroup()
+
+  return (
+    <FormControlLabel
+      checked={radioGroup?.value === String(option.value)}
+      control={<Radio />}
+      data-cy={`${filterKey}-radio-${option.key}`}
+      label={option.text}
+      value={option.value}
+    />
+  )
+}
+
 export const FilterRadio = ({ defaultOption, options, onChange, filterKey }: FilterRadioProps) => {
-  const RadioButton = ({ option }: { option: RadioOption }) => {
-    const radioGroup = useRadioGroup()
-
-    return (
-      <FormControlLabel
-        checked={radioGroup?.value === String(option.value)}
-        control={<Radio />}
-        data-cy={`${filterKey}-radio-${option.key}`}
-        label={option.text}
-        value={option.value}
-      />
-    )
-  }
-
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       <RadioGroup defaultValue={defaultOption.value} name={filterKey} onChange={onChange}>
-        <RadioButton option={defaultOption} />
+        <RadioButton filterKey={filterKey} option={defaultOption} />
         {options.map(option => (
-          <RadioButton key={option.key} option={option} />
+          <RadioButton filterKey={filterKey} key={option.key} option={option} />
         ))}
       </RadioGroup>
     </Box>
