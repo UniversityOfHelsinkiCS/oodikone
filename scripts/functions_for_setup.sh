@@ -20,7 +20,7 @@ SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
 USER_DB_NAME="user-db"
 JAMI_DB_NAME="jami-db"
-DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
+DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME" "$JAMI_DB_NAME")
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
 KONE_DB_S3_PATH="oodikone_kone"
