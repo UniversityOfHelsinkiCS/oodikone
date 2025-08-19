@@ -19,6 +19,7 @@ KONE_DB_NAME="kone-db"
 SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
 USER_DB_NAME="user-db"
+JAMI_DB_NAME="jami-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
@@ -26,7 +27,8 @@ KONE_DB_S3_PATH="oodikone_kone"
 SIS_DB_S3_PATH="oodikone_updater"
 SIS_IMPORTER_DB_S3_PATH="sis_importer"
 USER_DB_S3_PATH="oodikone_user"
-S3_PATHS=("$KONE_DB_S3_PATH" "$SIS_DB_S3_PATH" "$SIS_IMPORTER_DB_S3_PATH" "$USER_DB_S3_PATH")
+JAMI_DB_S3_PATH="jami"
+S3_PATHS=("$KONE_DB_S3_PATH" "$SIS_DB_S3_PATH" "$SIS_IMPORTER_DB_S3_PATH" "$USER_DB_S3_PATH" "$JAMI_DB_S3_PATH")
 
 # Source utility functions
 source "$PROJECT_ROOT"/scripts/utils.sh
@@ -58,33 +60,44 @@ download_real_dump() {
   local database=$1
   local dump_destination="$DUMP_DIR/$database.sql.gz"
   local s3_path=$2
-  
+  local selection_flag=$3
+
   rm -f "$dump_destination"
 
-  local backup_files
-  backup_files=$(s3cmd -c $S3_CONFIG_FILE ls $S3_BUCKET"/$s3_path/" | awk '{print $4}')
+  if [ "$selection_flag" = "true" ]; then
+    local backup_files
+    mapfile -t backup_files < <(s3cmd -c "$S3_CONFIG_FILE" ls "$S3_BUCKET/$s3_path/" | sort -rk1,2 | awk '{print $4}')
 
-  if [ -z "$backup_files" ]; then
-    die "No backup files found in $S3_BUCKET bucket $s3_path path!"
-  fi
-
-  infomsg "Available backups:"
-  select chosen_backup in $backup_files; do
-    if [ -n "$chosen_backup" ]; then
-      infomsg "You selected: $chosen_backup"
-      local FILE_NAME
-      FILE_NAME=$(basename "$chosen_backup")
-      infomsg "Fetching the selected dump: $FILE_NAME"
-      s3cmd -c "$S3_CONFIG_FILE" get "$chosen_backup" "$dump_destination"
-      if [ ! -f "$dump_destination" ]; then
-        die "Download failed or file not found: $dump_destination"
-      fi
-      echo "$dump_destination"
-      break
-    else
-      warningmsg "Invalid selection. Please select a valid backup number."
+    if [ ${#backup_files[@]} -eq 0 ]; then
+      die "No backup files found in $S3_BUCKET bucket $s3_path path!"
     fi
-  done
+
+    infomsg "Available backups:"
+    PS3="Select backup (or 0 to go back): "
+    select chosen_backup in "${backup_files[@]}"; do
+      if [ "$REPLY" = "0" ] || [ "$chosen_backup" = "Go back" ]; then
+        infomsg "Going back to previous menu."
+        break
+      elif [ -n "$chosen_backup" ]; then
+        infomsg "You selected: $chosen_backup"
+        local FILE_NAME
+        FILE_NAME=$(basename "$chosen_backup")
+        infomsg "Fetching the selected dump: $FILE_NAME"
+        s3cmd -c "$S3_CONFIG_FILE" get "$chosen_backup" "$dump_destination"
+        if [ ! -f "$dump_destination" ]; then
+          die "Download failed or file not found: $dump_destination"
+        fi
+        echo "$dump_destination"
+        break
+      else
+        warningmsg "Invalid selection. Please select a valid backup number."
+      fi
+    done
+  else
+    local current_date
+    current_date=$(date +"%Y%m%d")
+    s3cmd -c "$S3_CONFIG_FILE" get "s3://psyduck/${s3_path}/${s3_path}_${current_date}.sql.gz" "$dump_destination"
+  fi
 }
 
 check_if_postgres_is_ready() {
@@ -133,34 +146,7 @@ reset_jami_data() {
 
   infomsg "Removing old data"
 
-  rm -f "$dump_destination"
 
-  infomsg "Downloading Jami data"
-
-  local backup_files
-  backup_files=$(s3cmd -c $S3_CONFIG_FILE ls $S3_BUCKET/$s3_path/ | awk '{print $4}')
-
-  if [ -z "$backup_files" ]; then
-    die "No backup files found in $S3_BUCKET bucket $s3_path path!"
-  fi
-
-  infomsg "Available backups:"
-  select chosen_backup in $backup_files; do
-    if [ -n "$chosen_backup" ]; then
-      infomsg "You selected: $chosen_backup"
-      local FILE_NAME
-      FILE_NAME=$(basename "$chosen_backup")
-      infomsg "Fetching the selected dump: $FILE_NAME"
-      s3cmd -c "$S3_CONFIG_FILE" get "$chosen_backup" "$dump_destination"
-      if [ ! -f "$dump_destination" ]; then
-        die "Download failed or file not found: $dump_destination"
-      fi
-      echo "$dump_destination"
-      break
-    else
-      warningmsg "Invalid selection. Please select a valid backup number."
-    fi
-  done
 
   infomsg "Removing database and related volume"
   docker volume rm oodikone_jami-data || warningmsg "This is okay, continuing"
@@ -181,9 +167,8 @@ reset_all_real_data() {
   for i in ${!DATABASES[*]}; do
     local database="${DATABASES[$i]}"
     local url="${S3_PATHS[$i]}"
-    download_real_dump "$database" "$url"
+    download_real_dump "$database" "$url" false
   done
-  reset_jami_data
   reset_databases "${DATABASES[@]}"
 }
 
@@ -207,6 +192,7 @@ reset_single_database() {
 
   local database=""
   local url=""
+  local selection_flag=true
 
   while true; do
     select opt in "${options[@]}"; do
@@ -228,7 +214,8 @@ reset_single_database() {
           local url=$USER_DB_S3_PATH
           break 2;;
         "jami-db")
-          reset_jami_data
+          local database=$JAMI_DB_NAME
+          local url=$JAMI_DB_S3_PATH
           break 2;;
         "Return to main menu.")
           break 2;;
@@ -241,7 +228,7 @@ reset_single_database() {
 
   if [ -n "$database" ]; then
     infomsg "Downloading $database dump"
-    download_real_dump $database $url
+    download_real_dump $database $url $selection_flag
     reset_databases $database
   fi
 }
