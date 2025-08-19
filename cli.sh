@@ -60,7 +60,7 @@ set_custom_select_prompt() {
 # Run scripts and set the prompt
 show_welcome
 init_dirs
-get_username
+get_s3_config
 set_custom_select_prompt
 
 while true; do

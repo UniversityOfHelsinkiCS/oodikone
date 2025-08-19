@@ -9,7 +9,8 @@
 ## Folders
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
-USER_DATA_FILE="$DUMP_DIR/hyuserdata"
+S3_CONFIG_FILE=~/.s3cfg
+S3_BUCKET="s3://psyduck"
 DOCKER_COMPOSE=$PROJECT_ROOT/docker-compose.yml
 
 ## Following the naming convention in docker-compose, these are names for database
@@ -21,11 +22,11 @@ USER_DB_NAME="user-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
-KONE_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-kone-db.sql.gz"
-SIS_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-sis-db.sql.gz"
-SIS_IMPORTER_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz"
-USER_DB_REAL_DUMP_URL="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/oodikone-user-db.sql.gz"
-REAL_DUMP_URLS=("$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
+KONE_DB_S3_PATH="oodikone_kone"
+SIS_DB_S3_PATH="oodikone_updater"
+SIS_IMPORTER_DB_S3_PATH="sis_importer"
+USER_DB_S3_PATH="oodikone_user"
+S3_PATHS=("$KONE_DB_S3_PATH" "$SIS_DB_S3_PATH" "$SIS_IMPORTER_DB_S3_PATH" "$USER_DB_S3_PATH")
 
 # Source utility functions
 source "$PROJECT_ROOT"/scripts/utils.sh
@@ -55,9 +56,35 @@ retry() {
 
 download_real_dump() {
   local database=$1
-  local pannu_url=$2
   local dump_destination="$DUMP_DIR/$database.sql.gz"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
+  local s3_path=$2
+  
+  rm -f "$dump_destination"
+
+  local backup_files
+  backup_files=$(s3cmd -c $S3_CONFIG_FILE ls $S3_BUCKET"/$s3_path/" | awk '{print $4}')
+
+  if [ -z "$backup_files" ]; then
+    die "No backup files found in $S3_BUCKET bucket $s3_path path!"
+  fi
+
+  infomsg "Available backups:"
+  select chosen_backup in $backup_files; do
+    if [ -n "$chosen_backup" ]; then
+      infomsg "You selected: $chosen_backup"
+      local FILE_NAME
+      FILE_NAME=$(basename "$chosen_backup")
+      infomsg "Fetching the selected dump: $FILE_NAME"
+      s3cmd -c "$S3_CONFIG_FILE" get "$chosen_backup" "$dump_destination"
+      if [ ! -f "$dump_destination" ]; then
+        die "Download failed or file not found: $dump_destination"
+      fi
+      echo "$dump_destination"
+      break
+    else
+      warningmsg "Invalid selection. Please select a valid backup number."
+    fi
+  done
 }
 
 check_if_postgres_is_ready() {
@@ -101,11 +128,39 @@ reset_databases() {
 
 reset_jami_data() {
   local database="jami-db"
-  local pannu_url="svm-116.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/jami.sql.gz"
   local dump_destination="$DUMP_DIR/$database.sql.gz"
+  local s3_path="jami"
+
+  infomsg "Removing old data"
+
+  rm -f "$dump_destination"
 
   infomsg "Downloading Jami data"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
+
+  local backup_files
+  backup_files=$(s3cmd -c $S3_CONFIG_FILE ls $S3_BUCKET/$s3_path/ | awk '{print $4}')
+
+  if [ -z "$backup_files" ]; then
+    die "No backup files found in $S3_BUCKET bucket $s3_path path!"
+  fi
+
+  infomsg "Available backups:"
+  select chosen_backup in $backup_files; do
+    if [ -n "$chosen_backup" ]; then
+      infomsg "You selected: $chosen_backup"
+      local FILE_NAME
+      FILE_NAME=$(basename "$chosen_backup")
+      infomsg "Fetching the selected dump: $FILE_NAME"
+      s3cmd -c "$S3_CONFIG_FILE" get "$chosen_backup" "$dump_destination"
+      if [ ! -f "$dump_destination" ]; then
+        die "Download failed or file not found: $dump_destination"
+      fi
+      echo "$dump_destination"
+      break
+    else
+      warningmsg "Invalid selection. Please select a valid backup number."
+    fi
+  done
 
   infomsg "Removing database and related volume"
   docker volume rm oodikone_jami-data || warningmsg "This is okay, continuing"
@@ -122,10 +177,10 @@ reset_jami_data() {
 }
 
 reset_all_real_data() {
-  infomsg "Downloading real data dumps, asking for pannu password when needed"
+  infomsg "Downloading real data dumps"
   for i in ${!DATABASES[*]}; do
     local database="${DATABASES[$i]}"
-    local url="${REAL_DUMP_URLS[$i]}"
+    local url="${S3_PATHS[$i]}"
     download_real_dump "$database" "$url"
   done
   reset_jami_data
@@ -158,19 +213,19 @@ reset_single_database() {
       case $opt in
         "kone-db")
           local database=$KONE_DB_NAME
-          local url=$KONE_DB_REAL_DUMP_URL
+          local url=$KONE_DB_S3_PATH
           break 2;;
         "sis-db")
           local database=$SIS_DB_NAME
-          local url=$SIS_DB_REAL_DUMP_URL
+          local url=$SIS_DB_S3_PATH
           break 2;;
         "sis-importer-db")
           local database=$SIS_IMPORTER_DB_NAME
-          local url=$SIS_IMPORTER_DB_REAL_DUMP_URL
+          local url=$SIS_IMPORTER_DB_S3_PATH
           break 2;;
         "user-db")
           local database=$USER_DB_NAME
-          local url=$USER_DB_REAL_DUMP_URL
+          local url=$USER_DB_S3_PATH
           break 2;;
         "jami-db")
           reset_jami_data
@@ -242,14 +297,11 @@ init_dirs() {
 
 # If username is not set, get username from data file.
 # Ask user to provide username, if username was not found from data file.
-get_username() {
-  if [ ! -f "$USER_DATA_FILE" ]; then
-    warningmsg "University username is needed to get database dumps from toska servers, please enter it now:"
-    read -r username
-    echo "$username" > "$USER_DATA_FILE"
-    successmsg "Succesfully saved username for later usage."
+get_s3_config() {
+  if [ ! -f "$S3_CONFIG_FILE" ]; then
+    warningmsg "You have to set up s3 config for path ~/.s3cfg accessing the database dumps, config is visibe at the toska/dokumentaatio repo"
+    return 0
   fi
-  username=$(head -n 1 < "$USER_DATA_FILE")
 
-  infomsg "Using your university username - $username - for getting database dumps"
+  infomsg "Using your config $S3_CONFIG_FILE - for getting database dumps"
 }
