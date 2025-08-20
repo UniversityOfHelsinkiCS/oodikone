@@ -136,11 +136,14 @@ export const OodiTableExcelExport = <TData extends object>({
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const handleExport = () => {
-    const selectedColumns = Object.keys(rowSelection).map(key => Number(key))
+    const selectedRows = Object.entries(rowSelection)
+      .filter(([_, selected]) => selected)
+      .map(([key, _]) => Number(key))
+
+    const selectedCols = pivotedData.filter((_, index) => selectedRows.includes(index)).map(({ header }) => header)
+
     const worksheet = utils.json_to_sheet(
-      exportData.map(row =>
-        Object.fromEntries(Object.entries(row).filter((_, index) => selectedColumns.includes(index)))
-      )
+      exportData.map(row => Object.fromEntries(Object.entries(row).filter(([key, _]) => selectedCols.includes(key))))
     )
     const workbook = utils.book_new()
     utils.book_append_sheet(workbook, worksheet)
