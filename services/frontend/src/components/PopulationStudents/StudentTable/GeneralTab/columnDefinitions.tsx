@@ -127,13 +127,14 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('startYearAtUniversity', { header: 'Start year at uni' }),
 
       columnHelper.accessor('semesterEnrollments', {
+        maxSize: Number.MAX_SAFE_INTEGER - 1, // MAGIC NUMBER; we want to fit all enrollments without size constraints
         header: 'Semesters present',
         cell: cell => {
           const content = cell.getValue()?.content
           if (!content) return null
 
           return (
-            <Box sx={{ display: 'flex', m: 0.5 }}>
+            <Box sx={{ display: 'inline-flex' }}>
               {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
                 <Tooltip key={key} placement="top" title={onHoverString}>
                   <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
