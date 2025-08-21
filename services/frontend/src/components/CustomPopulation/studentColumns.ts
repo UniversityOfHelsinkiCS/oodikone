@@ -13,7 +13,8 @@ export const useColumns = ({ programme }): [string[], string[]] => {
 
   const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
 
-  const excelOnlyColumns = ['email', 'phoneNumber']
+  /* REQUIRED TO ALWAYS BE VISIBLE */
+  const excelRequired = ['studentNumber', 'lastName', 'firstNames', 'email', 'phoneNumber']
 
   return [
     [
@@ -38,6 +39,6 @@ export const useColumns = ({ programme }): [string[], string[]] => {
       ...populationWithProgrammeColumns,
       ...adminColumns,
     ],
-    excelOnlyColumns,
+    excelRequired,
   ]
 }

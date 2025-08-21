@@ -33,7 +33,8 @@ export const useColumns = ({ group }: { group: GroupsWithTags }): [string[], str
 
   const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
 
-  const excelOnlyColumns = ['email', 'phoneNumber']
+  /* REQUIRED TO ALWAYS BE VISIBLE */
+  const excelRequired = ['studentNumber', 'lastName', 'firstNames', 'email', 'phoneNumber']
 
   return [
     [
@@ -50,6 +51,6 @@ export const useColumns = ({ group }: { group: GroupsWithTags }): [string[], str
       ...groupWithYearColumns,
       ...adminColumns,
     ],
-    excelOnlyColumns,
+    excelRequired,
   ]
 }
