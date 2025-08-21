@@ -6,6 +6,7 @@ import { createFilter } from './createFilter'
 const DEFAULT_STATE = '0' as const
 
 const STUDYRIGHT_TYPES = [
+  { text: 'All', value: DEFAULT_STATE },
   { text: 'Bachelor + master', value: '1' },
   { text: 'Master only', value: '2' },
 ]

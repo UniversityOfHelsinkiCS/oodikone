@@ -24,6 +24,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
   const typeOfCombined = isLicentiate ? 'Licentiate' : 'Master'
   const modeOptions = isCombinedExtent
     ? [
+        { key: undefined, text: 'All', value: DEFAULT_STATE },
         { key: 'graduated-bachelor', text: "Graduated with Bachelor's", value: GRADUATION_PHASE.GRADUATED_BACHELOR },
         {
           key: 'graduated-master',
@@ -42,6 +43,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
         },
       ]
     : [
+        { key: undefined, text: 'All', value: DEFAULT_STATE },
         { key: 'graduated-true', text: 'Graduated', value: GRADUATION_PHASE.GRADUATED },
         { key: 'graduated-false', text: 'Not graduated', value: GRADUATION_PHASE.NOT_GRADUATED },
       ]
