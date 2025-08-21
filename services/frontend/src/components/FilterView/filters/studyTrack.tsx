@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { StudyTrack } from '@oodikone/shared/types'
 import { FilterTrayProps } from '../FilterTray'
@@ -14,6 +15,9 @@ const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: Filt
     .flatMap(studyRight => studyRight.studyRightElements)
     .filter(element => element.code === code && element.studyTrack !== null)
     .map(element => element.studyTrack) as StudyTrack[]
+
+  if (!Object.keys(validStudyTracks).length)
+    return <Alert severity="warning">No study tracks have been defined for the selected students.</Alert>
 
   const dropdownOptions = [...new Map(validStudyTracks.map(({ code, name }) => [code, name]))].map(([code, name]) => ({
     key: code,

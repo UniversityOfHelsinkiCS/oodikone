@@ -20,7 +20,7 @@ const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps)
   }
 
   if (!Object.keys(tagCounts).length)
-    return <Alert severity="warning">No tags have been defined for any of the selected students.</Alert>
+    return <Alert severity="warning">No tags have been defined for the selected students.</Alert>
 
   const dropdownOptions = Object.entries(tagCounts).map(([tagId, { count, name }]) => ({
     key: `tag-${tagId}`,
