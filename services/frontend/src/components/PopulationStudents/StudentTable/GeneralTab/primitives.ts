@@ -31,19 +31,15 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
   const variantIsOneOf = (...options: Variant[]): boolean => options.includes(variant)
 
   const getCreditsBetween = variantIsOneOf('population', 'customPopulation', 'studyGuidanceGroupPopulation')
-    ? ({ relevantStudyRightElement, courses }: StudentBlob, startDate: Date, endDate: Date) => {
-        const sinceDate = startDate ?? new Date(1970, 0, 1)
+    ? ({ relevantStudyRightElement, courses }: StudentBlob, startDate: Date | undefined, endDate: Date | undefined) => {
+        const sinceDate = startDate ?? new Date(relevantStudyRightElement?.startDate ?? 0)
         const untilDate = endDate ?? new Date()
 
-        if (!sinceDate && !untilDate)
-          return getStudentTotalCredits({
-            courses: courses.filter(
-              course => new Date(relevantStudyRightElement?.startDate ?? 0).getTime() <= new Date(course.date).getTime()
-            ),
-          })
-
         return getStudentTotalCredits({
-          courses: courses.filter(course => sinceDate <= new Date(course.date) && new Date(course.date) <= untilDate),
+          courses: courses.filter(course => {
+            const courseDate = new Date(course.date)
+            return sinceDate <= courseDate && courseDate <= untilDate
+          }),
         })
       }
     : nullFunction

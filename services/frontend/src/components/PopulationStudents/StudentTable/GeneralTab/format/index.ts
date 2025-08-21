@@ -60,6 +60,7 @@ export const useFormat = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
+  const creditDateFilterOptions = useGetCreditDateFilterOptions()
 
   // TODO: Use years correctly
   const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(years.at(0))
@@ -118,10 +119,6 @@ export const useFormat = ({
     firstSemester,
     lastSemester,
   })
-
-  const creditDateFilterOptions = useGetCreditDateFilterOptions()
-  const creditsSinceDate = creditDateFilterOptions?.startDate ?? new Date(1970, 0, 1)
-  const creditsUntilDate = creditDateFilterOptions?.endDate ?? new Date()
 
   const fromSemester = from
     ? (Object.values(allSemesters)
@@ -197,7 +194,11 @@ export const useFormat = ({
       creditsHops: student.hopsCredits,
 
       creditsCombinedProg: !!combinedProgramme || showBachelorAndMaster ? getCombinedCredits(studentBlob) : null,
-      creditsSince: getCreditsBetween(studentBlob, creditsSinceDate, creditsUntilDate),
+      creditsSince: getCreditsBetween(
+        studentBlob,
+        creditDateFilterOptions?.startDate,
+        creditDateFilterOptions?.endDate
+      ),
       studyRightStart: getStudyRightStart(studentBlob),
       programmeStart: getProgrammeStart(studentBlob),
       option: getOption(studentBlob),
