@@ -8,6 +8,7 @@ import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { ProgressCriteria } from '@oodikone/shared/types'
 import { CheckStudentList } from './CheckStudentList'
@@ -83,6 +84,13 @@ export const PopulationStudents = ({
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
+  const { years } = parseQueryParams(location.search)
+  const months = years
+    ? dayjs().diff(dayjs(`${Math.min(years)}-08-01`), 'months')
+    : studyGuidanceGroup?.tags?.year
+      ? dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
+      : undefined
+
   const availableTabs = {
     General: () => (
       <GeneralTab
@@ -109,11 +117,7 @@ export const PopulationStudents = ({
       <ProgressTab
         criteria={criteria}
         curriculum={curriculum}
-        months={
-          studyGuidanceGroup?.tags?.year
-            ? dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
-            : undefined
-        }
+        months={months}
         programme={programme}
         students={filteredStudents}
         studyGuidanceGroupProgramme={programme}

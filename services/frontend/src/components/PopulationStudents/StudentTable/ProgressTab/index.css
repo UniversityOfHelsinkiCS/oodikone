@@ -5,6 +5,10 @@
   border-radius: 0.25em;
 }
 
+.enrollment-label-no-margin {
+  margin: 0 !important;
+}
+
 .enrollment-label:nth-of-type(even):not(:last-child) {
   margin-right: 6px;
 }

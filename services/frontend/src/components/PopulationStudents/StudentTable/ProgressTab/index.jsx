@@ -286,8 +286,8 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     const springText = `Spring: ${helpTexts[spring]}`
     return (
       <div style={{ display: 'flex', justifyContent: 'center', gap: '0.2rem' }}>
-        <div className={`enrollment-label-no-margin ${enrollmentTypes[fall]?.className}`} title={fallText} />
-        <div className={`enrollment-label-no-margin ${enrollmentTypes[spring]?.className}`} title={springText} />
+        <div className={`enrollment-label ${enrollmentTypes[fall]?.className}`} title={fallText} />
+        <div className={`enrollment-label ${enrollmentTypes[spring]?.className}`} title={springText} />
       </div>
     )
   }
@@ -347,8 +347,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
       const semesters = Object.values(allSemesters)
         .filter(
           semester =>
-            dayjs(semester.startdate).isSameOrAfter(startYear) &&
-            dayjs(semester.enddate).isSameOrBefore(endYear.add(1, 'day'))
+            dayjs(semester.startdate).isSameOrAfter(startYear) && dayjs(semester.enddate).isSameOrBefore(endYear)
         )
         .map(semester => semester.semestercode)
       return {
@@ -476,9 +475,6 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
 
   const isCriteriaSet =
     criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
-  const studentData = useMemo(() => {
-    return students
-  }, [students])
 
   return (
     <>
@@ -488,22 +484,31 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
           after changes.
         </h5>
       )}
-      <Message style={{ fontSize: '16px', maxWidth: '700px' }}>
-        <p>
-          <Icon color="green" fitted name="check" />: Student has passed the course in the academic year. <br />
-          <Icon color="grey" fitted name="check" />: Student has passed the course outside of the corresponding academic
-          year. <br />
-          <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course. <br />
-          <Icon color="red" fitted name="times" />: Student has failed the course. <br />
-          <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the
-          course. <br />
-          <span className="enrollment-label-no-margin label-present" />: Student has an active semester enrollment.
-          <br />
-          <span className="enrollment-label-no-margin label-absent" />: Student has enrolled as absent. <br />
-          <span className="enrollment-label-no-margin label-passive" />: Inactive: Student did not enroll at all. <br />
-          <span className="enrollment-label-no-margin label-none" />: Student has no enrollment, but also no study right
-          for the semester.
-        </p>
+      <Message>
+        <Icon color="green" fitted name="check" />: Student has passed the course in the academic year. <br />
+        <Icon color="grey" fitted name="check" />: Student has passed the course outside of the corresponding academic
+        year. <br />
+        <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course. <br />
+        <Icon color="red" fitted name="times" />: Student has failed the course. <br />
+        <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the course.{' '}
+        <br />
+        <span
+          className="enrollment-label enrollment-label-no-margin label-present"
+          style={{ display: 'inline-block' }}
+        />
+        : Student has an active semester enrollment. <br />
+        <span
+          className="enrollment-label enrollment-label-no-margin label-absent"
+          style={{ display: 'inline-block' }}
+        />
+        : Student has enrolled as absent. <br />
+        <span
+          className="enrollment-label enrollment-label-no-margin label-passive"
+          style={{ display: 'inline-block' }}
+        />
+        : Inactive: Student did not enroll at all. <br />
+        <span className="enrollment-label enrollment-label-no-margin label-none" style={{ display: 'inline-block' }} />:
+        Student has no enrollment, but also no study right for the semester. <br />
       </Message>
       <Tab.Pane>
         <div style={{ display: 'flex' }}>
@@ -511,7 +516,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
             {isCriteriaSet ? (
               <SortableTable
                 columns={columns}
-                data={studentData}
+                data={students}
                 featureName="progress"
                 style={{ height: '80vh' }}
                 tableId="progress-of-population-students"

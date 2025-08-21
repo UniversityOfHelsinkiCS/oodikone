@@ -131,9 +131,12 @@ const getProgressCriteria = (
   })
 
   yearMap.forEach(([yearToAdd, criteriaYear]) => {
+    criteriaChecked[yearToAdd].totalSatisfied +=
+      Object.values(criteriaChecked[yearToAdd].coursesSatisfied).filter(course => !!course).length ?? 0
     // UPDATE CREDIT CRITERIA
     if (!!criteria.credits[criteriaYear] && criteria.credits[criteriaYear] < academicYears[yearToAdd]) {
       criteriaChecked[yearToAdd].credits = true
+      criteriaChecked[yearToAdd].totalSatisfied += 1
     }
   })
 

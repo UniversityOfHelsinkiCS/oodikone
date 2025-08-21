@@ -8,8 +8,6 @@ import type { FC } from 'react'
 import { getCommonPinningStyles } from '../styles'
 
 const OodiTableCell: FC<TableCellProps> = ({ children, ...props }) => {
-  // console.log(props)
-
   return (
     <TableCell
       {...props}
