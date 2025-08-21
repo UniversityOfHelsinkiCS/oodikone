@@ -3,6 +3,7 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import Tooltip from '@mui/material/Tooltip'
 
 // HACK: This is ripped off of MUI MenuItem error.
 // TODO: Find an actual type to replace this.
@@ -41,24 +42,31 @@ export const FilterSelect = <T extends ValidValueType = string>({
   multiple,
   InputItem,
   MenuItem,
-}: FilterSelectProps<T>) => (
-  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-    <FormControl sx={{ width: '95%' }} variant="outlined">
-      <InputLabel id={`${filterKey}-label`} size="small">
-        {label}
-      </InputLabel>
-      <Select
-        data-cy={`${filterKey}-selector`}
-        label={label}
-        labelId={filterKey}
-        multiple={multiple}
-        onChange={onChange}
-        renderValue={InputItem}
-        size="small"
-        value={value}
-      >
-        {options.map(MenuItem ?? DefaultMenuItem)}
-      </Select>
-    </FormControl>
-  </Box>
-)
+}: FilterSelectProps<T>) => {
+  const disabled = !options.length
+
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <FormControl sx={{ width: '95%' }} variant="outlined">
+        <InputLabel id={`${filterKey}-label`} size="small">
+          {label}
+        </InputLabel>
+        <Tooltip title={disabled ? 'No valid values found' : null}>
+          <Select
+            data-cy={`${filterKey}-selector`}
+            disabled={disabled}
+            label={label}
+            labelId={filterKey}
+            multiple={multiple}
+            onChange={onChange}
+            renderValue={InputItem}
+            size="small"
+            value={value}
+          >
+            {options.map(MenuItem ?? DefaultMenuItem)}
+          </Select>
+        </Tooltip>
+      </FormControl>
+    </Box>
+  )
+}
