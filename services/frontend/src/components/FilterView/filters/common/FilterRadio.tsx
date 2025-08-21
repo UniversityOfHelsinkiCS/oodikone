@@ -3,20 +3,21 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Radio from '@mui/material/Radio'
 import RadioGroup, { type RadioGroupProps, useRadioGroup } from '@mui/material/RadioGroup'
 
-type RadioOption = {
+type RadioOption<T> = {
   key: string | undefined
   text: string
-  value: string
+  value: T
 }
 
-type FilterRadioProps = {
-  defaultOption: RadioOption
-  options: RadioOption[]
+type FilterRadioProps<T> = {
+  defaultValue: RadioOption<T>['value']
+  controlledValue?: RadioOption<T>['value']
+  options: RadioOption<T>[]
   filterKey: string
   onChange: RadioGroupProps['onChange']
 }
 
-const RadioButton = ({ filterKey, option }: { filterKey: string; option: RadioOption }) => {
+const RadioButton = <T,>({ filterKey, option }: { filterKey: string; option: RadioOption<T> }) => {
   const radioGroup = useRadioGroup()
 
   return (
@@ -30,11 +31,16 @@ const RadioButton = ({ filterKey, option }: { filterKey: string; option: RadioOp
   )
 }
 
-export const FilterRadio = ({ defaultOption, options, onChange, filterKey }: FilterRadioProps) => {
+export const FilterRadio = <T,>({
+  defaultValue,
+  controlledValue,
+  options,
+  onChange,
+  filterKey,
+}: FilterRadioProps<T>) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <RadioGroup defaultValue={defaultOption.value} name={filterKey} onChange={onChange}>
-        <RadioButton filterKey={filterKey} option={defaultOption} />
+      <RadioGroup defaultValue={defaultValue} name={filterKey} onChange={onChange} value={controlledValue}>
         {options.map(option => (
           <RadioButton filterKey={filterKey} key={option.key} option={option} />
         ))}

@@ -172,7 +172,7 @@ export const PopulationStatistics = () => {
 
   const initialOptions = {
     [transferredToProgrammeFilter.key]: {
-      transferred: false,
+      transferred: 'false',
     },
     [hopsFilter.key]: {
       studyStart: students.some(student => !!student?.studyrightStart),

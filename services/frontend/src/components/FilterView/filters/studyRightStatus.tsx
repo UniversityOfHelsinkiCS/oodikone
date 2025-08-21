@@ -41,11 +41,11 @@ const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
     value: key,
   }))
 
-  const defaultOption = modeOptions.shift()!
+  const defaultOption = modeOptions.at(0)?.value ?? ''
 
   return (
     <FilterRadio
-      defaultOption={defaultOption}
+      defaultValue={defaultOption}
       filterKey="studyRightStatusFilter"
       onChange={({ target }) => modeObject[target.value]()}
       options={modeOptions}

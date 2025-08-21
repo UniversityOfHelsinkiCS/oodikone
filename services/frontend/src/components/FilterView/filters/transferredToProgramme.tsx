@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { filterToolTips } from '@/common/InfoToolTips'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
@@ -8,28 +10,24 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTr
 
   const toggle = buttonValue =>
     onOptionsChange({
-      transferred: transferred === buttonValue ? null : buttonValue,
+      transferred: String(transferred) === buttonValue ? null : buttonValue,
     })
 
   const modeObject = {
-    All: () => toggle(''),
-    Transferred: () => toggle(true),
-    'Not transferred': () => toggle(false),
+    All: '',
+    Transferred: 'true',
+    'Not transferred': 'false',
   }
 
-  const modeOptions = Object.keys(modeObject).map(key => ({
-    key,
-    text: key,
-    value: key,
-  }))
-
-  const defaultOption = modeOptions.shift()!
+  const defaultOption = useMemo(() => transferred ?? modeOptions.at(0)?.value ?? '', [])
+  const modeOptions = Object.entries(modeObject).map(([key, value]) => ({ key, text: key, value }))
 
   return (
     <FilterRadio
-      defaultOption={defaultOption}
+      controlledValue={transferred}
+      defaultValue={defaultOption}
       filterKey={transferredToProgrammeFilter.key}
-      onChange={({ target }) => modeObject[target.value]()}
+      onChange={({ target }) => toggle(target.value)}
       options={modeOptions}
     />
   )
@@ -51,25 +49,13 @@ export const transferredToProgrammeFilter = createFilter({
   filter: (student, { options }) => {
     const { transferred } = options
 
-    return student.transferredStudyright === transferred
+    return String(student.transferredStudyright) === transferred
   },
 
   actions: {
-    set: (options, value) => {
-      options.transferred = value
-
-      return options
-    },
+    set: (options, value) => Object.assign(options, { transferred: String(value) }),
     // Toggle between 'null' -> 'All' and 'false' -> 'Not transferred'
-    toggle: options => {
-      if (options.transferred !== false) {
-        options.transferred = false
-      } else {
-        options.transferred = ''
-      }
-
-      return options
-    },
+    toggle: options => Object.assign(options, { transferred: options.transferred !== 'false' ? 'false' : '' }),
   },
 
   selectors: {

@@ -44,11 +44,11 @@ const CombinedProgramme = ({ options, onOptionsChange, combinedProgramme }) => {
     value: key,
   }))
 
-  const defaultOption = modeOptions.shift()!
+  const defaultOption = modeOptions.at(0)?.value ?? ''
 
   return (
     <FilterRadio
-      defaultOption={defaultOption}
+      defaultValue={defaultOption}
       filterKey="hopsFilter"
       onChange={({ target }) => modeObject[target.value]()}
       options={modeOptions}

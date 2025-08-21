@@ -221,7 +221,7 @@ export const PopulationDetails = ({
             <FormControlLabel
               control={
                 <Switch
-                  checked={transferredSelected !== false}
+                  checked={transferredSelected !== 'false'}
                   onChange={() => filterDispatch(transferredToProgrammeFilter.actions.toggle(undefined))}
                 />
               }
