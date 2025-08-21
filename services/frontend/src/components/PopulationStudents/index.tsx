@@ -10,7 +10,6 @@ import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
-import { ProgressCriteria } from '@oodikone/shared/types'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
@@ -25,7 +24,6 @@ type PopulationDetails = {
   programme: string
   combinedProgramme?: string
 
-  criteria?: ProgressCriteria
   curriculum: ExtendedCurriculumDetails | null
 
   filteredCourses: any[]
@@ -41,7 +39,6 @@ type CoursePopulation = {
 type StudyGuidanceGroup = {
   variant: 'studyGuidanceGroupPopulation'
 
-  criteria: ProgressCriteria | null
   curriculum: ExtendedCurriculumDetails | null
 
   studyGuidanceGroup: any
@@ -65,7 +62,6 @@ export const PopulationStudents = ({
   variant,
   programme,
   combinedProgramme,
-  criteria,
   curriculum,
   filteredStudents,
   filteredCourses,
@@ -115,7 +111,6 @@ export const PopulationStudents = ({
     Tags: () => <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: () => (
       <ProgressTab
-        criteria={criteria}
         curriculum={curriculum}
         months={months}
         programme={programme}

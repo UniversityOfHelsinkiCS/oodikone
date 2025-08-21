@@ -25,7 +25,6 @@ import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/S
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useCurriculumState } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
@@ -70,7 +69,6 @@ export const PopulationDetails = ({
 
   const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
 
   useEffect(() => setStudentAmountLimit(Math.floor(filteredStudents.length * 0.3)), [filteredStudents.length])
 
@@ -146,7 +144,6 @@ export const PopulationDetails = ({
               {/* @ts-expect-error leave for later :) TODO */}
               <PopulationStudents
                 combinedProgramme={combinedProgramme}
-                criteria={criteria}
                 curriculum={curriculum}
                 filteredCourses={filteredCourses}
                 filteredStudents={filteredStudents}

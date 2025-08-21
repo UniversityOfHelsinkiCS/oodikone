@@ -13,6 +13,7 @@ import './index.css'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { SortableTable } from '@/components/SortableTable'
 import { DateFormat } from '@/constants/date'
+import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
@@ -132,9 +133,10 @@ const getCriteriaHeaders = (months, programme) => {
   return criteriaHeaders
 }
 
-export const ProgressTable = ({ curriculum, criteria, students, months, programme, studyGuidanceGroupProgramme }) => {
+export const ProgressTable = ({ curriculum, students, months, programme, studyGuidanceGroupProgramme }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
+  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const { data } = useGetSemestersQuery()
   const { semesters: allSemesters } = data ?? { semesters: {} }
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
@@ -152,17 +154,17 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
     return ''
   }
 
-  const labelCriteria = Object.keys(criteria.courses).reduce((acc, year, index) => {
+  const labelCriteria = Object.keys(criteria?.courses ?? {}).reduce((acc, year, index) => {
     acc[year] = [
       {
         code: 'Credits',
         name: {
-          fi: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
-          en: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
-          sv: `${creditMonths[index]} mos.: ${criteria.credits[year]}`,
+          fi: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
+          en: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
+          sv: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
         },
       },
-      ...[...criteria.courses[year]]
+      ...[...(criteria?.courses[year] ?? [])]
         .sort((a, b) => a.localeCompare(b))
         .map(courseCode => ({
           code: courseCode,
@@ -293,7 +295,7 @@ export const ProgressTable = ({ curriculum, criteria, students, months, programm
   }
 
   const createContent = (labels, year, start, end, semesters) => {
-    return labels.map(label => ({
+    return labels?.map(label => ({
       key: `${year}-${label.code}-${label.name.fi}`,
       title: (
         <div

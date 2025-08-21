@@ -19,7 +19,6 @@ import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
-import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { useCurriculumState } from '../../hooks/useCurriculums'
@@ -34,9 +33,6 @@ const createAcademicYearStartDate = year => new Date(year, 7, 1)
 const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
 
-  const { data: criteria } = useGetProgressCriteriaQuery({
-    programmeCode: group?.tags?.studyProgramme ?? '',
-  })
   const year = group?.tags?.year
 
   const programmeCodes = group?.tags?.studyProgramme?.split('+') ?? []
@@ -121,7 +117,6 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
       content: (
         <div>
           <PopulationStudents
-            criteria={criteria}
             curriculum={curriculum}
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
@@ -144,6 +139,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
                 to: undefined,
               })
             }
+            programme={group.tags?.studyProgramme?.split('+')[0]}
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
             year={year}
