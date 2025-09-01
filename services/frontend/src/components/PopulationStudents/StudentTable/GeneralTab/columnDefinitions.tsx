@@ -202,9 +202,11 @@ export const useGetColumnDefinitions = ({
         header: 'Transferred From',
         cell: cell => {
           const transferSource = cell.getValue()
+          if (!transferSource) return null
+
           return (
             <Tooltip arrow title={transferSource}>
-              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{transferSource}</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{transferSource}</span>
             </Tooltip>
           )
         },
@@ -230,13 +232,12 @@ export const useGetColumnDefinitions = ({
         ),
         cell: cell => {
           const isTVEX = !!cell.getValue()
+          if (!isTVEX) return null
 
           return (
-            isTVEX && (
-              <span style={{ display: 'flex', justifyContent: 'center' }}>
-                <CheckIcon />
-              </span>
-            )
+            <span style={{ display: 'flex', justifyContent: 'center' }}>
+              <CheckIcon />
+            </span>
           )
         },
       }),
