@@ -286,7 +286,7 @@ init_dirs() {
 # Ask user to provide username, if username was not found from data file.
 get_s3_config() {
   if [ ! -f "$S3_CONFIG_FILE" ]; then
-    warningmsg "You have to set up s3 config for path ~/.s3cfg accessing the database dumps, config is visibe at the toska/dokumentaatio repo"
+    warningmsg "No username provided, config file is required. The \".s3cfg\" config file can be found on toska/dokumentaatio repo."
     return 0
   fi
 
