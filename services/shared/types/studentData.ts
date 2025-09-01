@@ -43,20 +43,13 @@ export type StudentStudyPlan = Pick<
   | 'sis_study_right_id'
 >
 
-// eslint-disable-next-line import-x/no-unused-modules
 export type StudentData = StudentPersonalData & {
   studyplans: Array<StudentStudyPlan>
   studyRights: Array<StudentStudyRight>
 }
 
-// eslint-disable-next-line import-x/no-unused-modules
 export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
-}
-
-// eslint-disable-next-line import-x/no-unused-modules
-export type TaggetStudentData = StudentData & {
-  tags: StudentTags[]
 }
 
 export type StudentPageStudent = {

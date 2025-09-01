@@ -3,7 +3,6 @@ import { Op } from 'sequelize'
 import { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
 import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
-import { serviceProvider } from '../../config'
 import {
   CreditModel,
   EnrollmentModel,
@@ -16,10 +15,6 @@ import { TagModel, TagStudentModel } from '../../models/kone'
 
 export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
-}
-
-export type TaggetStudentData = StudentData & {
-  tags: StudentTags[]
 }
 
 export const getStudentTags = async (studyRights: string[], studentNumbers: string[], userId: string) => {
@@ -190,28 +185,8 @@ export type StudentCredit = Pick<
   | 'studyright_id'
 >
 
-export const getCredits = async (
-  studentNumbers: string[],
-  studyRights: string[],
-  attainmentDateFrom: string
-): Promise<Array<StudentCredit>> => {
-  const includedCoursesInStudyPlans: Array<Pick<Studyplan, 'included_courses'>> = await StudyplanModel.findAll({
-    attributes: ['included_courses'],
-    where: {
-      studentnumber: { [Op.in]: studentNumbers },
-    },
-    raw: true,
-  })
-
-  const uniqueCourses = new Set(includedCoursesInStudyPlans.flatMap(plan => plan.included_courses))
-
-  // takes into account possible progress tests taken earlier than the start date
-  const courseCodes =
-    ['320001', 'MH30_001'].includes(studyRights[0]) && serviceProvider !== 'fd'
-      ? [...uniqueCourses, '375063', '339101']
-      : [...uniqueCourses]
-
-  return CreditModel.findAll({
+export const getCredits = async (studentNumbers: string[]): Promise<Array<StudentCredit>> =>
+  CreditModel.findAll({
     attributes: [
       'grade',
       'credits',
@@ -225,8 +200,6 @@ export const getCredits = async (
     ],
     where: {
       student_studentnumber: { [Op.in]: studentNumbers },
-      [Op.or]: [{ attainment_date: { [Op.gte]: attainmentDateFrom } }, { course_code: courseCodes }],
     },
     raw: true,
   })
-}

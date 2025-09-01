@@ -1,9 +1,10 @@
 import { SISStudyRight } from '@oodikone/shared/models'
 import { FormattedStudent, CriteriaYear, Name, ProgressCriteria } from '@oodikone/shared/types'
+import { StudentData, StudentTags } from '@oodikone/shared/types/studentData'
 import { dateYearsFromNow, dateDaysFromNow, dayInMilliseconds } from '@oodikone/shared/util/datetime'
 import { CreditModel } from '../../models'
 import { hasTransferredFromOrToProgramme } from '../studyProgramme/studyProgrammeHelpers'
-import type { StudentStudyPlan, StudentStudyRight, TaggetStudentData } from './getStudentData'
+import type { StudentStudyPlan, StudentStudyRight } from './getStudentData'
 import { getCurriculumVersion } from './shared'
 import type { AnonymousCredit, AnonymousEnrollment } from './statisticsOf'
 
@@ -146,7 +147,8 @@ const getProgressCriteria = (
 export const formatStudentForAPI = (
   code: string,
   startDate: string,
-  student: TaggetStudentData,
+  student: StudentData,
+  tags: StudentTags[],
   credits: AnonymousCredit[],
   enrollments: AnonymousEnrollment[],
   optionData: Name | undefined,
@@ -190,7 +192,6 @@ export const formatStudentForAPI = (
     secondaryEmail: student.secondary_email,
     phoneNumber: student.phone_number,
     updatedAt: student.updatedAt,
-    tags: student.tags,
     studyrightStart: startDate,
     option: optionData ?? null,
     birthdate: student.birthdate,
@@ -199,6 +200,7 @@ export const formatStudentForAPI = (
     criteriaProgress: getProgressCriteria(startDate, criteria, credits, hops),
     curriculumVersion: getCurriculumVersion(hops?.curriculum_period_id),
 
+    tags,
     transferredStudyright,
     transferSource,
     studyRights,

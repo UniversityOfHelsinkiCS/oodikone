@@ -5,10 +5,10 @@ import { formatStudentForAPI } from './formatStatisticsForApi'
 import {
   type StudentEnrollment,
   type StudentCredit,
+  type StudentTags,
   getStudents,
   getEnrollments,
   getCredits,
-  StudentTags,
 } from './getStudentData'
 import { getOptionsForStudents, parseCourseData } from './shared'
 
@@ -37,7 +37,7 @@ export const statisticsOf = async (
 
   const [enrollments, credits, students] = await Promise.all([
     getEnrollments(studentNumbers, mockedStartDate),
-    getCredits(studentNumbers, studyRights, mockedStartDate),
+    getCredits(studentNumbers),
     getStudents(studentNumbers),
   ])
 
@@ -74,10 +74,11 @@ export const statisticsOf = async (
       formatStudentForAPI(
         code,
         mockedStartDate,
-        { ...student, tags: tagList[student.studentnumber] },
-        creditsByStudent.get(student.studentnumber) ?? [],
-        enrollmentsByStudent.get(student.studentnumber) ?? [],
-        optionData?.[student.studentnumber],
+        student,
+        tagList[student.studentnumber],
+        creditsByStudent.get(student.studentnumber)!,
+        enrollmentsByStudent.get(student.studentnumber)!,
+        optionData[student.studentnumber],
         criteria
       )
     ),
