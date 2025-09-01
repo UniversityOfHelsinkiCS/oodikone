@@ -192,7 +192,7 @@ export const formatStudentForAPI = (
     updatedAt: student.updatedAt,
     tags: student.tags,
     studyrightStart: startDate,
-    option: optionData ? { name: optionData } : null,
+    option: optionData ?? null,
     birthdate: student.birthdate,
     sis_person_id: student.sis_person_id,
     citizenships: student.citizenships,

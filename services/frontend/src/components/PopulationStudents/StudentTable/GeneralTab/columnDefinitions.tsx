@@ -159,7 +159,8 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('option', {
         header: isMastersProgramme ? 'Bachelor' : 'Master',
         cell: cell => {
-          const value = cell.getValue() ?? ''
+          const value = cell.getValue()
+          if (!value) return null
 
           return (
             <Tooltip arrow title={value}>

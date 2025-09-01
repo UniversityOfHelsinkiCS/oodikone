@@ -119,7 +119,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
     : nullFunction
 
   const getOption = variantIsOneOf('population', 'customPopulation')
-    ? ({ option }: StudentBlob) => getTextIn(option?.name) ?? null
+    ? ({ option }: StudentBlob) => getTextIn(option) ?? null
     : nullFunction
 
   const getStartYearAtUniversity = variantIsOneOf(

@@ -108,7 +108,7 @@ export type FormattedStudent = {
   updatedAt: Date
   tags: StudentTags[]
   studyrightStart: string
-  option: { name: Name } | null
+  option: Name | null
   birthdate: Date
   sis_person_id: string
   citizenships: Name[]
