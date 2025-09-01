@@ -8,6 +8,7 @@ import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
+import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
 import { Section } from '@/components/material/Section'
@@ -432,6 +433,9 @@ export const SingleCourseStats = ({
 
   const renderShowPopulation = (disabled = false) => {
     if (!userHasAccessToAllStats) {
+      return null
+    }
+    if (!isDefaultServiceProvider()) {
       return null
     }
     return (
