@@ -1,30 +1,12 @@
-import { useState, useEffect } from 'react'
 import { Icon, Item } from 'semantic-ui-react'
-import { sisUrl, serviceProvider } from '@/conf'
+import { useSisUrl } from '@/hooks/useSisUrl'
 
 interface SisuLinkItemProps {
   id: string
 }
 
 export const SisuLinkItem = ({ id }: SisuLinkItemProps) => {
-  const [runtimeConfiguredSisUrl, setRuntimeConfiguredSisUrl] = useState(sisUrl)
-  useEffect(() => {
-    fetch('/frontend-config.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Json response was not ok')
-        }
-        return response.json()
-      })
-      .then(data => {
-        if (data.sisUrl) setRuntimeConfiguredSisUrl(data.sisUrl)
-      })
-      .catch(error => {
-        throw new Error(error)
-      })
-  }, [])
-
-  const usableSisUrl = serviceProvider === 'fd' ? runtimeConfiguredSisUrl : sisUrl
+  const usableSisUrl = useSisUrl()
 
   return (
     <div data-cy="sisulink">
