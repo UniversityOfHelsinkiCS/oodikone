@@ -120,6 +120,7 @@ services:
       - redis
     environment:
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       SECRET_TOKEN: dev
       SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
       SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
@@ -148,6 +149,7 @@ services:
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       SIS_IMPORTER_HOST: ${SIS_IMPORTER_DB_HOST:-host.docker.internal}
       SIS_IMPORTER_PORT: ${SIS_IMPORTER_DB_PORT:-15234}
       SIS_IMPORTER_DATABASE: importer-db
