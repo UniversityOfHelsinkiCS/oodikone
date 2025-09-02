@@ -6,10 +6,12 @@ import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { useState, useEffect } from 'react'
+
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/material/ExternalLink'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
-import { sisUrl } from '@/conf'
+import { sisUrl, serviceProvider } from '@/conf'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { reformatDate } from '@/util/timeAndDate'
@@ -17,10 +19,29 @@ import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
 
 export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) => {
+  const [runtimeConfiguredSisUrl, setRuntimeConfiguredSisUrl] = useState(sisUrl)
   const { visible: showName } = useStudentNameVisibility()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
+
+  useEffect(() => {
+    fetch('/frontend-config.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Json response was not ok')
+        }
+        return response.json()
+      })
+      .then(data => {
+        if (data.sisUrl) setRuntimeConfiguredSisUrl(data.sisUrl)
+      })
+      .catch(error => {
+        throw new Error(error)
+      })
+  }, [])
+
+  const usableSisUrl = serviceProvider === 'fd' ? runtimeConfiguredSisUrl : sisUrl
 
   const formattedTimestamp = reformatDate(
     student.updatedAt,
@@ -41,7 +62,7 @@ export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) =>
             </Typography>
             <ExternalLink
               cypress="sisu-link"
-              href={`${sisUrl}/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`}
+              href={`${usableSisUrl}/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`}
               text="Sisu"
               variant="h6"
             />
