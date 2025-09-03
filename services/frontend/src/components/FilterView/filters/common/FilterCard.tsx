@@ -38,7 +38,13 @@ export const FilterCard = ({
   }
 
   return (
-    <Stack data-active={active} data-cy={`${key}-filter-card`} padding={0.5} spacing={1.2} sx={{ width: '100%' }}>
+    <Stack
+      data-active={active}
+      data-cy={`${key}-filter-card`}
+      padding={0.5}
+      spacing={Number(opened) * 1.2}
+      sx={{ width: '100%' }}
+    >
       <Box
         data-cy={`${key}-header`}
         sx={{ alignItems: 'center', justifyContent: 'center', cursor: 'pointer', display: 'inline-flex' }}
@@ -70,7 +76,7 @@ export const FilterCard = ({
         ) : null}
         <ConditionalInfoBox info={info} />
       </Box>
-      <Collapse in={opened}>
+      <Collapse in={opened} sx={{ transition: '300ms' }}>
         <Paper sx={{ p: 1.5 }} variant="outlined">
           {children}
         </Paper>
