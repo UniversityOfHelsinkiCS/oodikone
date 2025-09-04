@@ -10,7 +10,7 @@ import { FilterType } from './filterType'
 type CourseStats = Record<string, any>
 
 const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
-  const courseStats: CourseStats = precomputed
+  const courseStats: CourseStats = precomputed.courses
 
   const courseFilters: Record<string, keyof typeof FilterType> = options?.courseFilters
   const { getTextIn } = useLanguage()
@@ -62,7 +62,25 @@ export const courseFilter = createFilter({
     courseFilters: {},
   },
 
-  precompute: ({ args }) => keyBy(args.courses, 'course.code'),
+  precompute: ({ args }) => {
+    const substitutedBy = args.courses.reduce(
+      (acc, { course }) => {
+        const { code, substitutions } = course
+        for (const original of substitutions) {
+          acc[original] ??= []
+          acc[original].push(code)
+        }
+
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
+
+    return {
+      courses: keyBy(args.courses, 'course.code'),
+      substitutedBy,
+    }
+  },
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
@@ -75,10 +93,14 @@ export const courseFilter = createFilter({
     }
 
     for (const [code, filterType] of Object.entries(options.courseFilters)) {
-      const { students = {} } = precomputed[code]
-      const key = filterKeys[filterType as string]
+      const found = [code, ...(precomputed.substitutedBy[code] ?? [])].some(course => {
+        const students = precomputed.courses?.[course]?.students ?? {}
+        const key = filterKeys[filterType as string]
 
-      if (!students?.[key]?.includes(studentNumber)) return false
+        return students?.[key]?.includes(studentNumber)
+      })
+
+      if (!found) return false
     }
 
     return true

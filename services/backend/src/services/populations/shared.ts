@@ -98,9 +98,9 @@ export const getOptionsForStudents = async (
   )
 }
 
-export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, 'code' | 'name'>>> =>
+export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, 'code' | 'name' | 'substitutions'>>> =>
   CourseModel.findAll({
-    attributes: ['code', 'name'],
+    attributes: ['code', 'name', 'substitutions'],
     where: {
       code: { [Op.in]: courses },
     },
@@ -267,13 +267,14 @@ export const parseCourseData = async (
 
   const courses = await getCourses(Array.from(coursestats.keys()))
   const courseMap = new Map(courses.map(({ code, name }) => [code, name]))
+  const substitutionMap = new Map(courses.map(({ code, substitutions }) => [code, substitutions]))
 
   return Array.from(coursestats.entries()).map(([code, { attempts, enrollments, grades, students, stats }]) => {
     return {
       course: {
         code,
         name: courseMap.get(code) ?? { en: code },
-        substitutions: [],
+        substitutions: substitutionMap.get(code) ?? [],
       },
       attempts,
       enrollments: {
