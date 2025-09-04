@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker/DatePicker'
 
@@ -30,56 +31,57 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
     }
   }
 
-  const createDateButton = (date, label) => (
-    <Button
-      key={label}
-      onClick={() => triggerOnChange(date)}
-      size="small"
-      sx={{
-        background: 'primary.light',
-        color: value?.isSame(date, 'day') ? 'primary.light' : 'text.primary',
-      }}
-      variant="outlined"
-    >
-      {label}
-    </Button>
+  const DateButton = ({ date, label }) => (
+    <span>
+      <Button
+        key={label}
+        onClick={() => triggerOnChange(date)}
+        size="small"
+        sx={{
+          background: 'primary.light',
+          color: value?.isSame(date, 'day') ? 'primary.light' : 'text.primary',
+        }}
+        variant="outlined"
+      >
+        {label}
+      </Button>
+    </span>
   )
 
-  const CustomPicker = _ => {
-    return (
-      <Box sx={{ padding: '0 0.5em' }}>
-        <Typography sx={{ paddingLeft: '0.3em', fontWeight: 'bold' }}>Semesters:</Typography>
-        <List
-          sx={{
-            overflowY: 'auto',
-            margin: 0,
-            padding: '0.5em 0',
-            maxHeight: '10em',
-            borderTop: '1px solid #f9f9f9',
-          }}
-        >
-          {Object.values(allSemesters)
-            .filter(({ startdate, enddate }) => {
-              const start = dayjs(startdate)
-              const end = dayjs(enddate)
+  const CustomPicker = _ => (
+    <Box sx={{ padding: '0 0.5em' }}>
+      <Typography sx={{ paddingLeft: '0.3em', fontWeight: 'bold' }}>Semesters:</Typography>
+      <List
+        sx={{
+          overflowY: 'auto',
+          padding: '0.5em 0',
+          maxHeight: '10em',
+          borderTop: '1px solid #f9f9f9',
+        }}
+      >
+        {Object.values(allSemesters)
+          .filter(({ startdate, enddate }) => {
+            const start = dayjs(startdate)
+            const end = dayjs(enddate)
 
-              return start.isBefore() && (!before || start.isBefore(before)) && (!after || end.isAfter(after))
-            })
-            .sort(({ startdate: a }, { startdate: b }) => new Date(b).getTime() - new Date(a).getTime())
-            .map(({ name, startdate, enddate }) => (
-              <ListItem
-                key={`${getTextIn(name)}-${Math.random()}`}
-                sx={{ padding: '0.2em 0.3em 0.2em', display: 'flex', alignItems: 'center' }}
-              >
-                <Typography sx={{ flexGrow: 1 }}>{getTextIn(name)}</Typography>
-                <Typography sx={{ margin: '0 0.25em' }}>{createDateButton(dayjs(startdate), 'Start')}</Typography>
-                <Typography>{createDateButton(dayjs(enddate).subtract(1, 'days'), 'End')}</Typography>
-              </ListItem>
-            ))}
-        </List>
-      </Box>
-    )
-  }
+            return start.isBefore() && (!before || start.isBefore(before)) && (!after || end.isAfter(after))
+          })
+          .sort(({ startdate: a }, { startdate: b }) => new Date(b).getTime() - new Date(a).getTime())
+          .map(({ name, startdate, enddate }) => (
+            <ListItem
+              key={`${getTextIn(name)}-${Math.random()}`}
+              sx={{ padding: '0.2em 0.3em', display: 'flex', alignItems: 'center' }}
+            >
+              <Typography sx={{ flexGrow: 1 }}>{getTextIn(name)}</Typography>
+              <Stack direction="row" spacing={1}>
+                <DateButton date={dayjs(startdate)} label="Start" />
+                <DateButton date={dayjs(enddate).subtract(1, 'days')} label="End" />
+              </Stack>
+            </ListItem>
+          ))}
+      </List>
+    </Box>
+  )
 
   return (
     <DatePicker
@@ -92,8 +94,9 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
       onChange={onChange}
       reduceAnimations
       showDaysOutsideCurrentMonth
+      slotProps={{ popper: { disablePortal: true } }}
       // @ts-expect-error HACK: there should be a custom component that eats the picker
-      slots={{ tabs: showSemesters && CustomPicker }}
+      slots={{ tabs: showSemesters && CustomPicker, desktopTrapFocus: undefined }}
       value={value}
     />
   )
