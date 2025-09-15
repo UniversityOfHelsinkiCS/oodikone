@@ -20,10 +20,10 @@ export const getCommonPinningStyles = <TData>(column: Column<TData>): SxProps<Th
     : {}
 }
 
-export const getVerticalStyles = (): SxProps<Theme> => ({
+export const verticalStyles: SxProps<Theme> = {
   overflow: 'visible',
   borderWidth: '1px 1px 1px 0',
   borderStyle: 'solid',
   borderColor: 'grey.300',
-  padding: '0.1em',
-})
+  padding: '0.5em',
+}

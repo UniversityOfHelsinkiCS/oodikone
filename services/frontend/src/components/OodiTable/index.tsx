@@ -1,27 +1,9 @@
-// 03-07-2025 summer hackathon never forget
-
-import type { ColumnDef, TableFeature, TableOptions } from '@tanstack/react-table'
+import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { useState } from 'react'
 
+import { AggregationRowFeature, VerticalHeaderFeature } from './features'
 import { OodiTableContainer } from './OodiTable'
-
-interface VerticalHeaders {
-  useVerticalHeaders: string[]
-}
-
-const VerticalHeaderFeature: TableFeature<unknown> = {
-  getInitialState: (state): VerticalHeaders => {
-    return {
-      useVerticalHeaders: [],
-      ...state,
-    }
-  },
-}
-
-declare module '@tanstack/react-table' {
-  interface TableState extends VerticalHeaders {}
-}
 
 /**
  * In loving memory of SortableTable
@@ -54,7 +36,7 @@ export const OodiTable = <TData,>({
   }
 
   const table = useReactTable<TData>({
-    _features: [VerticalHeaderFeature],
+    _features: [VerticalHeaderFeature, AggregationRowFeature],
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),

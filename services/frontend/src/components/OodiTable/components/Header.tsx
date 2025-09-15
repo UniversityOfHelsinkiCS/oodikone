@@ -6,7 +6,7 @@ import { flexRender } from '@tanstack/react-table'
 import type { HeaderGroup } from '@tanstack/react-table'
 import type { FC, ReactNode } from 'react'
 
-import { getCommonPinningStyles, getVerticalStyles } from '../styles'
+import { getCommonPinningStyles, verticalStyles } from '../styles'
 import { OodiTableSortIcons } from './SortIcons'
 
 const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({ children, ...props }) => {
@@ -44,7 +44,7 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, 
 
       const sx = {
         cursor: header.column.getCanSort() ? 'pointer' : 'inherit',
-        ...(isVertical && getVerticalStyles()),
+        ...(isVertical && verticalStyles),
         ...getCommonPinningStyles(header.column),
       }
 
