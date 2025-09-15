@@ -56,7 +56,10 @@ export const CourseCard = ({
       })}
     >
       <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-        <Typography sx={{ my: 2 }}>{getTextIn(course.course?.name)}</Typography>
+        <Box sx={{ mb: 2 }}>
+          <Typography>{getTextIn(course.course?.name)}</Typography>
+          <Typography sx={{ color: 'text.secondary' }}>{course.course?.code}</Typography>
+        </Box>
         <ClearIcon
           data-cy={`courseFilter-${course.course?.code}-clear`}
           onClick={() => onChange(null)}
