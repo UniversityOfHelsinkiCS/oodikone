@@ -4,7 +4,7 @@ import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
 import { ModulesTab } from './ModulesTable'
 
-export type FormattedStudent = {
+export type ModuleTabStudent = {
   firstNames: string
   lastName: string
   studentNumber: string
@@ -46,7 +46,7 @@ const getModulesFromRelevantStudyPlan = (student: any, degreeProgrammeCodes: str
   return []
 }
 
-const formatStudent = (student: any, degreeProgrammeCodes: string[]): FormattedStudent => {
+const formatStudent = (student: any, degreeProgrammeCodes: string[]): ModuleTabStudent => {
   return {
     firstNames: student.firstnames,
     lastName: student.lastname,

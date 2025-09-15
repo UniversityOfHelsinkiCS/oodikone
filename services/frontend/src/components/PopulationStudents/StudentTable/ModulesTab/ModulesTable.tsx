@@ -1,7 +1,6 @@
 import CheckIcon from '@mui/icons-material/Check'
 import CropSquareIcon from '@mui/icons-material/CropSquare'
 import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { ColumnDef, createColumnHelper, TableOptions } from '@tanstack/react-table'
@@ -12,48 +11,43 @@ import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
-import type { FormattedModules, FormattedStudent } from '@/components/PopulationStudents/StudentTable/ModulesTab'
+import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationStudents/StudentTable/ModulesTab'
 
-const getModuleIfExists = (student: FormattedStudent, moduleCode: string) =>
+const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
-
-const DividedTableCell = ({ top, bottom }: { top?: string | number; bottom?: string | number }) => (
-  <Box sx={{ alignItems: 'end', display: 'flex', flexDirection: 'column' }}>
-    {top !== undefined && (
-      <Typography sx={{ color: 'text.primary', padding: '8px', fontSize: '0.875rem' }}>{top}</Typography>
-    )}
-    <Divider aria-hidden="true" flexItem sx={{ position: 'absolute', left: 0, right: 0, top: '50%' }} />
-    {bottom !== undefined && (
-      <Typography sx={{ color: 'text.primary', padding: '8px', fontSize: '0.875rem' }}>{bottom}</Typography>
-    )}
-  </Box>
-)
 
 export const ModulesTab = ({
   formattedModules,
   formattedStudents,
 }: {
   formattedModules: FormattedModules
-  formattedStudents: FormattedStudent[]
+  formattedStudents: ModuleTabStudent[]
 }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
-  const ooditableColumnHelper = createColumnHelper<FormattedStudent>()
+  const ooditableColumnHelper = createColumnHelper<ModuleTabStudent>()
 
   const ooditableStaticColumns = useMemo(
     () => [
-      ooditableColumnHelper.accessor('lastName', { header: 'Last name' }),
-      ooditableColumnHelper.accessor('firstNames', { header: 'First names' }),
       ooditableColumnHelper.accessor('studentNumber', {
         header: _ => <Typography fontWeight="bold">Student number</Typography>,
         cell: cell => <StudentInfoItem sisPersonId={cell.row.original.sisPersonID} studentNumber={cell.getValue()} />,
-        footer: () => <DividedTableCell bottom="Completed" top="Planned" />,
         filterFn: (row, columnId, filterValue) => {
           const value: string = row.getValue(columnId)
           if (!filterValue) return true
 
           return value.toLowerCase().startsWith(filterValue.toLowerCase())
         },
+        aggregationRows: [
+          { id: 'planned', value: 'Planned' },
+          { id: 'completed', value: 'Completed' },
+        ],
+      }),
+      ooditableColumnHelper.accessor('lastName', {
+        header: 'Last name',
+      }),
+      ooditableColumnHelper.accessor('firstNames', {
+        header: 'First names',
       }),
     ],
     []
@@ -61,7 +55,7 @@ export const ModulesTab = ({
 
   const ooditableDynamicColumns = useMemo(() => {
     if (!formattedModules) return []
-    return Object.keys(formattedModules).flatMap(code => [
+    return Object.keys(formattedModules).map(code =>
       ooditableColumnHelper.accessor(code as 'studyModulesInHOPS.code', {
         header: _ => (
           <Tooltip title={`${code} – ${getTextIn(formattedModules[code])}`}>
@@ -97,8 +91,8 @@ export const ModulesTab = ({
             </Box>
           )
         },
-        footer: ({ table }) => {
-          const { planned, completed } = table.getFilteredRowModel().rows.reduce(
+        aggregationRows: ({ table }) => {
+          const { completed, planned } = table.getFilteredRowModel().rows.reduce(
             (acc, row) => {
               const studyModule = getModuleIfExists(row.original, code)
               if (studyModule) {
@@ -114,7 +108,10 @@ export const ModulesTab = ({
             { planned: 0, completed: 0 }
           )
 
-          return <DividedTableCell bottom={completed} top={planned} />
+          return [
+            { id: 'planned', value: planned },
+            { id: 'completed', value: completed },
+          ]
         },
         sortingFn: (rowA, rowB, _) => {
           /*
@@ -131,11 +128,11 @@ export const ModulesTab = ({
 
           return valueA - valueB
         },
-      }),
-    ])
+      })
+    )
   }, [formattedModules, getTextIn])
 
-  const ooditableColumns: ColumnDef<FormattedStudent, any>[] = useMemo(
+  const ooditableColumns: ColumnDef<ModuleTabStudent, any>[] = useMemo(
     () => [...ooditableStaticColumns, ...ooditableDynamicColumns],
     [ooditableStaticColumns, ooditableDynamicColumns]
   )
@@ -168,7 +165,7 @@ export const ModulesTab = ({
     ),
   }))
 
-  const ooditableOptions: Partial<TableOptions<FormattedStudent>> = {
+  const ooditableOptions: Partial<TableOptions<ModuleTabStudent>> = {
     initialState: {
       columnPinning: { left: ['studentNumber'] },
     },
