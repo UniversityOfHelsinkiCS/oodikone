@@ -11,9 +11,9 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.4.12",
-    "@mui/material": "^6.4.12",
-    "@mui/x-date-pickers": "^7.29.4",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@mui/x-date-pickers": "^8.11.2",
     "@oodikone/shared": "file:../shared",
     "@reduxjs/toolkit": "^2.8.2",
     "@sentry/browser": "^10.5.0",
