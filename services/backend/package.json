@@ -21,7 +21,7 @@
     "morgan": "^1.10.0",
     "papaparse": "^5.5.3",
     "pg": "^8.16.0",
-    "redis": "^4.7.1",
+    "redis": "^5.8.2",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
