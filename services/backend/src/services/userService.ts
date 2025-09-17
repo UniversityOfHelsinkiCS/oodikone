@@ -155,7 +155,7 @@ const updateAccessGroups = async (
   if (!userFromDb) {
     throw new Error(`User ${username} not found`)
   }
-  const currentAccessGroups = userFromDb.roles
+  const currentAccessGroups = userFromDb?.roles ?? []
 
   const newAccessGroups = [
     ...(currentAccessGroups.includes('studyGuidanceGroups') || (await checkStudyGuidanceGroupsAccess(sisId))
