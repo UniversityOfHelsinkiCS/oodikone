@@ -10,57 +10,54 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
-import type { Name, StudyTrack } from '@oodikone/shared/types'
-import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
-
+import type { SISStudyRightElement } from '@oodikone/shared/models'
 import { SISStudyRightModel } from './SISStudyRight'
 
 @Table({
   underscored: true,
   tableName: 'sis_study_right_elements',
 })
-export class SISStudyRightElementModel extends Model<SISStudyRightElement> implements SISStudyRightElement {
+export class SISStudyRightElementModel extends Model implements SISStudyRightElement {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: SISStudyRightElement['id']
 
   @Column(DataType.DATE)
-  startDate!: Date
+  declare startDate: SISStudyRightElement['startDate']
 
   @Column(DataType.DATE)
-  endDate!: Date
+  declare endDate: SISStudyRightElement['endDate']
 
   @Column(DataType.BOOLEAN)
-  graduated!: boolean
+  declare graduated: SISStudyRightElement['graduated']
 
   @Column(DataType.INTEGER)
-  phase!: Phase
+  declare phase: SISStudyRightElement['phase']
 
   @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
-  studyRightId!: string
+  declare studyRightId: SISStudyRightElement['studyRightId']
 
   @BelongsTo(() => SISStudyRightModel, { foreignKey: 'studyRightId' })
-  studyRight!: SISStudyRight
+  declare studyRight: SISStudyRightElement['studyRight']
 
   @Column(DataType.STRING)
-  code!: string
+  declare code: SISStudyRightElement['code']
 
   @Column(DataType.JSONB)
-  name!: Name
+  declare name: SISStudyRightElement['name']
 
   @Column(DataType.JSONB)
-  studyTrack!: StudyTrack | null
+  declare studyTrack: SISStudyRightElement['studyTrack']
 
   @Column(DataType.STRING)
-  degreeProgrammeType!: DegreeProgrammeType
+  declare degreeProgrammeType: SISStudyRightElement['degreeProgrammeType']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: SISStudyRightElement['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: SISStudyRightElement['updatedAt']
 }

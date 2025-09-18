@@ -10,8 +10,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { Organization, ProgrammeModule, SISStudyRight } from '@oodikone/shared/models'
-import type { Name } from '@oodikone/shared/types'
+import type { Organization } from '@oodikone/shared/models'
 
 import { CourseModel } from './course'
 import { CourseProviderModel } from './courseProvider'
@@ -23,37 +22,37 @@ import { SISStudyRightModel } from './SISStudyRight'
   modelName: 'organization',
   tableName: 'organization',
 })
-export class OrganizationModel extends Model<Organization> implements Organization {
+export class OrganizationModel extends Model implements Organization {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Organization['id']
 
   @Column(DataType.STRING)
-  code!: string
+  declare code: Organization['code']
 
   @Column(DataType.JSONB)
-  name!: Name
+  declare name: Organization['name']
 
   @Column(DataType.STRING)
-  parent_id!: string
+  declare parent_id: Organization['parent_id']
 
   @HasMany(() => OrganizationModel, { foreignKey: 'parent_id', as: 'children' })
-  children!: Organization[]
+  declare children: Organization['children']
 
   @HasMany(() => ProgrammeModuleModel, { foreignKey: 'organization_id' })
-  programmeModules!: ProgrammeModule[]
+  declare programmeModules: Organization['programmeModules']
 
   @HasMany(() => SISStudyRightModel, { foreignKey: 'facultyCode', sourceKey: 'code' })
-  SISStudyRights!: SISStudyRight[]
+  declare SISStudyRights: Organization['SISStudyRights']
 
   @BelongsToMany(() => CourseModel, () => CourseProviderModel, 'organizationcode')
-  courses!: CourseModel[]
+  declare courses: Organization['courses']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Organization['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Organization['updatedAt']
 }

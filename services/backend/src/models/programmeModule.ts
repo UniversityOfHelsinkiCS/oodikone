@@ -12,7 +12,6 @@ import {
 } from 'sequelize-typescript'
 
 import type { Organization, ProgrammeModule } from '@oodikone/shared/models'
-import { DegreeProgrammeType, Name } from '@oodikone/shared/types'
 
 import { OrganizationModel } from './organization'
 import { ProgrammeModuleChildModel } from './programmeModuleChild'
@@ -22,62 +21,62 @@ import { ProgrammeModuleChildModel } from './programmeModuleChild'
   modelName: 'programme_module',
   tableName: 'programme_modules',
 })
-export class ProgrammeModuleModel extends Model<ProgrammeModule> implements ProgrammeModule {
+export class ProgrammeModuleModel extends Model implements ProgrammeModule {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: ProgrammeModule['id']
 
   @BelongsToMany(() => ProgrammeModuleModel, () => ProgrammeModuleChildModel, 'child_id')
-  parents!: ProgrammeModule[]
+  declare parents: ProgrammeModule[]
 
   @BelongsToMany(() => ProgrammeModuleModel, () => ProgrammeModuleChildModel, 'parent_id')
-  children!: ProgrammeModule[]
+  declare children: ProgrammeModule[]
+
+  @BelongsTo(() => OrganizationModel, { foreignKey: 'organization_id' })
+  declare organization: Organization
 
   @Column(DataType.STRING)
-  group_id!: string
+  declare group_id: ProgrammeModule['group_id']
 
   @Column(DataType.STRING)
-  code!: string
+  declare code: ProgrammeModule['code']
 
   @Column(DataType.JSONB)
-  name!: Name
+  declare name: ProgrammeModule['name']
 
   @Column(DataType.STRING)
-  type!: 'course' | 'module'
+  declare type: ProgrammeModule['type']
 
   @Column(DataType.INTEGER)
-  order!: number
+  declare order: ProgrammeModule['order']
 
   @Column(DataType.STRING)
-  studyLevel!: string
+  declare studyLevel: ProgrammeModule['studyLevel']
 
   @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
-  organization_id!: string
-
-  @BelongsTo(() => OrganizationModel, { foreignKey: 'organization_id' })
-  organization!: Organization
+  declare organization_id: ProgrammeModule['organization_id']
 
   @Column(DataType.DATE)
-  valid_from!: Date
+  declare valid_from: ProgrammeModule['valid_from']
 
   @Column(DataType.DATE)
-  valid_to!: Date
+  declare valid_to: ProgrammeModule['valid_to']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  curriculum_period_ids!: string[]
+  declare curriculum_period_ids: ProgrammeModule['curriculum_period_ids']
 
   @Column(DataType.STRING)
-  degreeProgrammeType!: DegreeProgrammeType | null
+  declare degreeProgrammeType: ProgrammeModule['degreeProgrammeType']
 
   @Column(DataType.INTEGER)
-  minimumCredits!: number | null
+  declare minimumCredits: ProgrammeModule['minimumCredits']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: ProgrammeModule['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: ProgrammeModule['updatedAt']
 }

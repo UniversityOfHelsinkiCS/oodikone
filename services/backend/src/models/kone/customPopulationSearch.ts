@@ -1,28 +1,24 @@
-import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
-import type { CustomPopulationSearch, CustomPopulationSearchCreation } from '@oodikone/shared/models/kone'
+import type { CustomPopulationSearch } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: false,
   modelName: 'custom_population_search',
   tableName: 'custom_population_searches',
 })
-export class CustomPopulationSearchModel
-  extends Model<CustomPopulationSearch, CustomPopulationSearchCreation>
-  implements CustomPopulationSearch
-{
+export class CustomPopulationSearchModel extends Model implements CustomPopulationSearch {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: CreationOptional<string>
+  declare id: CustomPopulationSearch['id']
 
   @Column(DataType.BIGINT)
-  userId!: string
+  declare userId: CustomPopulationSearch['userId']
 
   @Column(DataType.STRING)
-  name!: string
+  declare name: CustomPopulationSearch['name']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  students!: string[]
+  declare students: CustomPopulationSearch['students']
 }

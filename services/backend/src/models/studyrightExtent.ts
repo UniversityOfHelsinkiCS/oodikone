@@ -1,26 +1,25 @@
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import type { StudyrightExtent } from '@oodikone/shared/models'
-import { ExtentCode } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'studyright_extent',
   tableName: 'studyright_extents',
 })
-export class StudyrightExtentModel extends Model<StudyrightExtent> implements StudyrightExtent {
+export class StudyrightExtentModel extends Model implements StudyrightExtent {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  extentcode!: ExtentCode
+  declare extentcode: StudyrightExtent['extentcode']
 
   @Column(DataType.STRING)
-  name!: string
+  declare name: StudyrightExtent['name']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: StudyrightExtent['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: StudyrightExtent['updatedAt']
 }

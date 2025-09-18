@@ -1,34 +1,33 @@
 import { Column, CreatedAt, DataType, Model, Table, UpdatedAt } from 'sequelize-typescript'
 
 import type { CurriculumPeriod } from '@oodikone/shared/models'
-import type { Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'curriculum_period',
   tableName: 'curriculum_periods',
 })
-export class CurriculumPeriodModel extends Model<CurriculumPeriod> implements CurriculumPeriod {
+export class CurriculumPeriodModel extends Model implements CurriculumPeriod {
   @Column({ type: DataType.STRING, primaryKey: true })
-  id!: string
+  declare id: CurriculumPeriod['id']
 
   @Column({ type: DataType.JSONB, allowNull: false })
-  name!: Name
+  declare name: CurriculumPeriod['name']
 
   @Column({ type: DataType.STRING, allowNull: false })
-  universityOrgId!: string
+  declare universityOrgId: CurriculumPeriod['universityOrgId']
 
   @Column({ type: DataType.DATE, allowNull: false })
-  startDate!: Date
+  declare startDate: CurriculumPeriod['startDate']
 
   @Column({ type: DataType.DATE, allowNull: false })
-  endDate!: Date
+  declare endDate: CurriculumPeriod['endDate']
 
   @CreatedAt
   @Column({ type: DataType.DATE, allowNull: false })
-  createdAt!: Date
+  declare createdAt: CurriculumPeriod['createdAt']
 
   @UpdatedAt
   @Column({ type: DataType.DATE, allowNull: false })
-  updatedAt!: Date
+  declare updatedAt: CurriculumPeriod['updatedAt']
 }

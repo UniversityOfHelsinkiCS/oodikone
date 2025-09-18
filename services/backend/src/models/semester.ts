@@ -1,50 +1,49 @@
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import type { Semester } from '@oodikone/shared/models'
-import type { Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
   modelName: 'semester',
   tableName: 'semesters',
 })
-export class SemesterModel extends Model<Semester> implements Semester {
+export class SemesterModel extends Model implements Semester {
   @PrimaryKey
   @Column(DataType.STRING)
-  composite!: string
+  declare composite: Semester['composite']
 
   @Column(DataType.INTEGER)
-  semestercode!: number
+  declare semestercode: Semester['semestercode']
 
   @Column(DataType.JSONB)
-  name!: Name
+  declare name: Semester['name']
 
   @Column(DataType.INTEGER)
-  startYear!: number
+  declare startYear: Semester['startYear']
 
   @Column(DataType.DATE)
-  startdate!: Date
+  declare startdate: Semester['startdate']
 
   @Column(DataType.DATE)
-  enddate!: Date
+  declare enddate: Semester['enddate']
 
   @Column(DataType.INTEGER)
-  yearcode!: number
+  declare yearcode: Semester['yearcode']
 
   @Column(DataType.STRING)
-  yearname!: string
+  declare yearname: Semester['yearname']
 
   @Column(DataType.STRING)
-  org!: string
+  declare org: Semester['org']
 
   @Column(DataType.INTEGER)
-  termIndex!: number
+  declare termIndex: Semester['termIndex']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Semester['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Semester['updatedAt']
 }

@@ -10,8 +10,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { Enrollment, Semester, SISStudyRight, Student } from '@oodikone/shared/models'
-import { EnrollmentState } from '@oodikone/shared/types'
+import type { Enrollment } from '@oodikone/shared/models'
 
 import { CourseModel } from './course'
 import { SemesterModel } from './semester'
@@ -23,59 +22,59 @@ import { StudentModel } from './student'
   modelName: 'enrollment',
   tableName: 'enrollment',
 })
-export class EnrollmentModel extends Model<Enrollment> implements Enrollment {
+export class EnrollmentModel extends Model implements Enrollment {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Enrollment['id']
 
   @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
-  studentnumber!: string
+  declare studentnumber: Enrollment['studentnumber']
 
   @BelongsTo(() => StudentModel, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-  student!: Student
+  declare student: Enrollment['student']
 
   @Column(DataType.STRING)
-  course_code!: string
+  declare course_code: Enrollment['course_code']
 
   @Column(DataType.STRING)
-  state!: EnrollmentState
+  declare state: Enrollment['state']
 
   @Column(DataType.DATE)
-  enrollment_date_time!: Date
+  declare enrollment_date_time: Enrollment['enrollment_date_time']
 
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
-  course_id!: string
+  declare course_id: Enrollment['course_id']
 
   @ForeignKey(() => SemesterModel)
   @Column(DataType.STRING)
-  semester_composite!: string
+  declare semester_composite: Enrollment['semester_composite']
 
   @BelongsTo(() => SemesterModel, { foreignKey: 'semester_composite', targetKey: 'composite' })
-  semester!: Semester
+  declare semester: Enrollment['semester']
 
   @Column(DataType.INTEGER)
-  semestercode!: number
+  declare semestercode: Enrollment['semestercode']
 
   @Column(DataType.BOOLEAN)
-  is_open!: boolean
+  declare is_open: Enrollment['is_open']
 
   @ForeignKey(() => SISStudyRightModel)
   @Column({ type: DataType.STRING, allowNull: true })
-  studyright_id!: string
+  declare studyright_id: Enrollment['studyright_id']
 
   @BelongsTo(() => SISStudyRightModel, { foreignKey: 'studyright_id', targetKey: 'id', constraints: false })
-  studyright!: SISStudyRight
+  declare studyright: Enrollment['studyright']
 
   @BelongsTo(() => CourseModel, { foreignKey: 'course_id', targetKey: 'id' })
-  course!: CourseModel
+  declare course: Enrollment['course']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Enrollment['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Enrollment['updatedAt']
 }

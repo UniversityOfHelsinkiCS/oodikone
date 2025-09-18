@@ -1,7 +1,6 @@
-import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
-import type { OpenUniPopulationSearch, OpenUniPopulationSearchCreation } from '@oodikone/shared/models/kone'
+import type { OpenUniPopulationSearch } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
@@ -9,21 +8,18 @@ import type { OpenUniPopulationSearch, OpenUniPopulationSearchCreation } from '@
   modelName: 'open_uni_population_search',
   tableName: 'open_uni_population_searches',
 })
-export class OpenUniPopulationSearchModel
-  extends Model<OpenUniPopulationSearch, OpenUniPopulationSearchCreation>
-  implements OpenUniPopulationSearch
-{
+export class OpenUniPopulationSearchModel extends Model implements OpenUniPopulationSearch {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: CreationOptional<string>
+  declare id: OpenUniPopulationSearch['id']
 
   @Column(DataType.BIGINT)
-  userId!: string
+  declare userId: OpenUniPopulationSearch['userId']
 
   @Column(DataType.STRING)
-  name!: string
+  declare name: OpenUniPopulationSearch['name']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  courseCodes!: string[]
+  declare courseCodes: OpenUniPopulationSearch['courseCodes']
 }

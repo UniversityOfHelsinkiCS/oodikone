@@ -9,23 +9,23 @@ import { ProgrammeModuleModel } from './programmeModule'
   modelName: 'programme_module_child',
   tableName: 'programme_module_children',
 })
-export class ProgrammeModuleChildModel extends Model<ProgrammeModuleChild> implements ProgrammeModuleChild {
+export class ProgrammeModuleChildModel extends Model implements ProgrammeModuleChild {
   @PrimaryKey
   @Column(DataType.STRING)
-  composite!: string
+  declare composite: ProgrammeModuleChild['composite']
 
   @ForeignKey(() => ProgrammeModuleModel)
   @Column(DataType.STRING)
-  parentId!: string
+  declare parentId: ProgrammeModuleChild['parentId']
 
   @Column(DataType.STRING)
-  childId!: string
+  declare childId: ProgrammeModuleChild['childId']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: ProgrammeModuleChild['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: ProgrammeModuleChild['updatedAt']
 }

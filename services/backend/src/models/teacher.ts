@@ -1,6 +1,6 @@
 import { BelongsToMany, Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import type { Teacher, Credit } from '@oodikone/shared/models'
+import type { Teacher } from '@oodikone/shared/models'
 
 import { CreditModel } from './credit'
 import { CreditTeacherModel } from './creditTeacher'
@@ -10,22 +10,22 @@ import { CreditTeacherModel } from './creditTeacher'
   modelName: 'teacher',
   tableName: 'teacher',
 })
-export class TeacherModel extends Model<Teacher> implements Teacher {
+export class TeacherModel extends Model implements Teacher {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Teacher['id']
 
   @Column(DataType.STRING)
-  name!: string
+  declare name: Teacher['name']
 
   @BelongsToMany(() => CreditModel, () => CreditTeacherModel)
-  credits!: Credit[]
+  declare credits: Teacher['credits']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Teacher['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Teacher['updatedAt']
 }

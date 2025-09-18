@@ -8,11 +8,11 @@ import type { StudyProgrammePin } from '@oodikone/shared/models/kone'
   modelName: 'study_programme_pin',
   tableName: 'study_programme_pins',
 })
-export class StudyProgrammePinModel extends Model<StudyProgrammePin> implements StudyProgrammePin {
+export class StudyProgrammePinModel extends Model implements StudyProgrammePin {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  userId!: number
+  declare userId: StudyProgrammePin['userId']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  studyProgrammes!: string[]
+  declare studyProgrammes: StudyProgrammePin['studyProgrammes']
 }

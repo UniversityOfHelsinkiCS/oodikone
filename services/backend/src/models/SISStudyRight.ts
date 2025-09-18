@@ -11,16 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type {
-  Credit,
-  Enrollment,
-  Organization,
-  SISStudyRight,
-  SISStudyRightElement,
-  Student,
-  Studyplan,
-} from '@oodikone/shared/models'
-import { ExtentCode, SemesterEnrollment } from '@oodikone/shared/types'
+import type { SISStudyRight } from '@oodikone/shared/models'
 
 import { CreditModel } from './credit'
 import { EnrollmentModel } from './enrollment'
@@ -34,69 +25,69 @@ import { StudyrightExtentModel } from './studyrightExtent'
   underscored: true,
   tableName: 'sis_study_rights',
 })
-export class SISStudyRightModel extends Model<SISStudyRight> implements SISStudyRight {
+export class SISStudyRightModel extends Model implements SISStudyRight {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: SISStudyRight['id']
 
   @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
-  facultyCode!: string
+  declare facultyCode: SISStudyRight['facultyCode']
 
   @BelongsTo(() => OrganizationModel, { foreignKey: 'facultyCode', targetKey: 'code' })
-  organization!: Organization
+  declare organization: SISStudyRight['organization']
 
   @HasMany(() => StudyplanModel)
-  studyPlans!: Studyplan[]
+  declare studyPlans: SISStudyRight['studyPlans']
 
   @HasMany(() => SISStudyRightElementModel, { foreignKey: 'studyRightId' })
-  studyRightElements!: SISStudyRightElement[]
+  declare studyRightElements: SISStudyRight['studyRightElements']
 
   @Column(DataType.DATE)
-  startDate!: Date
+  declare startDate: SISStudyRight['startDate']
 
   @Column(DataType.DATE)
-  endDate!: Date
+  declare endDate: SISStudyRight['endDate']
 
   @Column(DataType.DATE)
-  studyStartDate!: Date
+  declare studyStartDate: SISStudyRight['studyStartDate']
 
   @Column(DataType.BOOLEAN)
-  cancelled!: boolean
+  declare cancelled: SISStudyRight['cancelled']
 
   @Column(DataType.STRING)
-  studentNumber!: string
+  declare studentNumber: SISStudyRight['studentNumber']
 
   @BelongsTo(() => StudentModel, { foreignKey: 'studentNumber', targetKey: 'studentnumber' })
-  student!: Student
+  declare student: SISStudyRight['student']
 
   @ForeignKey(() => StudyrightExtentModel)
   @Column(DataType.INTEGER)
-  extentCode!: ExtentCode
+  declare extentCode: SISStudyRight['extentCode']
 
   @Column(DataType.STRING)
-  admissionType!: string
+  declare admissionType: SISStudyRight['admissionType']
 
   @Column(DataType.JSONB)
-  semesterEnrollments!: SemesterEnrollment[] | null
+  declare semesterEnrollments: SISStudyRight['semesterEnrollments']
 
   @HasMany(() => CreditModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
-  credits!: Credit[]
+  declare credits: SISStudyRight['credits']
 
   @HasMany(() => EnrollmentModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
-  enrollments!: Enrollment[]
+  declare enrollments: SISStudyRight['enrollments']
 
   @Column(DataType.BOOLEAN)
-  tvex!: boolean
+  declare tvex: SISStudyRight['tvex']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  expirationRuleUrns!: string[]
+  declare expirationRuleUrns: SISStudyRight['expirationRuleUrns']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: SISStudyRight['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: SISStudyRight['updatedAt']
 }

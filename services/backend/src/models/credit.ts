@@ -11,7 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { Credit, Course, CreditType, Semester, SISStudyRight, Student, Teacher } from '@oodikone/shared/models'
+import type { Credit } from '@oodikone/shared/models'
 import { CreditTypeCode } from '@oodikone/shared/types'
 
 import { CourseModel } from './course'
@@ -27,85 +27,85 @@ import { TeacherModel } from './teacher'
   modelName: 'credit',
   tableName: 'credit',
 })
-export class CreditModel extends Model<Credit> implements Credit {
+export class CreditModel extends Model implements Credit {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Credit['id']
 
   @Column(DataType.STRING)
-  grade!: string
+  declare grade: Credit['grade']
 
   @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
-  student_studentnumber!: string
+  declare student_studentnumber: Credit['student_studentnumber']
 
   @BelongsTo(() => StudentModel, { foreignKey: 'student_studentnumber', targetKey: 'studentnumber' })
-  student!: Student
+  declare student: Credit['student']
 
   @BelongsTo(() => SemesterModel, { foreignKey: 'semester_composite' })
-  semester!: Semester
+  declare semester: Credit['semester']
 
   @Column(DataType.DOUBLE)
-  credits!: number
+  declare credits: Credit['credits']
 
   @ForeignKey(() => CreditTypeModel)
   @Column(DataType.INTEGER)
-  credittypecode!: CreditTypeCode
+  declare credittypecode: Credit['credittypecode']
 
   @BelongsTo(() => CreditTypeModel, { foreignKey: 'credittypecode', targetKey: 'credittypecode' })
-  creditType!: CreditType
+  declare creditType: Credit['creditType']
 
   @Column(DataType.DATE)
-  createdate!: Date
+  declare createdate: Credit['createdate']
 
   @Column(DataType.DATE)
-  attainment_date!: Date
+  declare attainment_date: Credit['attainment_date']
 
   @BelongsToMany(() => TeacherModel, () => CreditTeacherModel, 'credit_id')
-  teachers!: Teacher[]
+  declare teachers: Credit['teachers']
 
   @Column(DataType.STRING)
-  course_code!: string
+  declare course_code: Credit['course_code']
 
   @BelongsTo(() => CourseModel, { foreignKey: 'course_id' })
-  course!: Course
+  declare course: Credit['course']
 
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
-  course_id!: string
+  declare course_id: Credit['course_id']
 
   @Column(DataType.STRING)
-  semester_composite!: string
+  declare semester_composite: Credit['semester_composite']
 
   @Column(DataType.INTEGER)
-  semestercode!: number
+  declare semestercode: Credit['semestercode']
 
   @Column(DataType.BOOLEAN)
-  isStudyModule!: boolean
+  declare isStudyModule: Credit['isStudyModule']
 
   @Column(DataType.STRING)
-  org!: string
+  declare org: Credit['org']
 
   @Column(DataType.STRING)
-  language!: string
+  declare language: Credit['language']
 
   @Column(DataType.BOOLEAN)
-  is_open!: boolean
+  declare is_open: Credit['is_open']
 
   @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
-  studyright_id!: string
+  declare studyright_id: Credit['studyright_id']
 
   @BelongsTo(() => SISStudyRightModel)
-  studyright!: SISStudyRight
+  declare studyright: Credit['studyright']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Credit['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Credit['updatedAt']
 
   static passed: ({ credittypecode }: { credittypecode: CreditTypeCode }) => boolean
 

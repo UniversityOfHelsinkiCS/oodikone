@@ -1,7 +1,6 @@
-import { CreationOptional } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
-import type { ProgressCriteria, ProgressCriteriaCreation } from '@oodikone/shared/models/kone'
+import type { ProgressCriteria } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
@@ -9,50 +8,47 @@ import type { ProgressCriteria, ProgressCriteriaCreation } from '@oodikone/share
   modelName: 'progress_criteria',
   tableName: 'progress_criteria',
 })
-export class ProgressCriteriaModel
-  extends Model<ProgressCriteria, ProgressCriteriaCreation>
-  implements ProgressCriteria
-{
+export class ProgressCriteriaModel extends Model implements ProgressCriteria {
   @PrimaryKey
   @Column(DataType.STRING)
-  code!: string
+  declare code: ProgressCriteria['code']
 
   @Column(DataType.STRING)
-  curriculumVersion!: CreationOptional<string>
+  declare curriculumVersion: ProgressCriteria['curriculumVersion']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearOne!: string[]
+  declare coursesYearOne: ProgressCriteria['coursesYearOne']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearTwo!: string[]
+  declare coursesYearTwo: ProgressCriteria['coursesYearTwo']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearThree!: string[]
+  declare coursesYearThree: ProgressCriteria['coursesYearThree']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearFour!: string[]
+  declare coursesYearFour: ProgressCriteria['coursesYearFour']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearFive!: string[]
+  declare coursesYearFive: ProgressCriteria['coursesYearFive']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  coursesYearSix!: string[]
+  declare coursesYearSix: ProgressCriteria['coursesYearSix']
 
   @Column(DataType.INTEGER)
-  creditsYearOne!: number
+  declare creditsYearOne: ProgressCriteria['creditsYearOne']
 
   @Column(DataType.INTEGER)
-  creditsYearTwo!: number
+  declare creditsYearTwo: ProgressCriteria['creditsYearTwo']
 
   @Column(DataType.INTEGER)
-  creditsYearThree!: number
+  declare creditsYearThree: ProgressCriteria['creditsYearThree']
 
   @Column(DataType.INTEGER)
-  creditsYearFour!: number
+  declare creditsYearFour: ProgressCriteria['creditsYearFour']
 
   @Column(DataType.INTEGER)
-  creditsYearFive!: number
+  declare creditsYearFive: ProgressCriteria['creditsYearFive']
 
   @Column(DataType.INTEGER)
-  creditsYearSix!: number
+  declare creditsYearSix: ProgressCriteria['creditsYearSix']
 }

@@ -1,10 +1,6 @@
-import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Default, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-import type { Language } from '@oodikone/shared/language'
 import type { User, UserCreation } from '@oodikone/shared/models/user'
-
-import type { Role } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
@@ -16,33 +12,33 @@ export class UserModel extends Model<User, UserCreation> implements User {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id!: CreationOptional<string>
+  declare id: User['id']
 
   @Column(DataType.STRING)
-  fullName!: string
+  declare fullName: User['fullName']
 
   @Unique
   @Column(DataType.STRING)
-  username!: string
+  declare username: User['username']
 
   @Column(DataType.STRING)
-  email!: string
+  declare email: User['email']
 
   @Default('fi')
   @Column(DataType.STRING)
-  language!: CreationOptional<Language>
+  declare language: User['language']
 
   @Column(DataType.STRING)
-  sisuPersonId!: string
+  declare sisuPersonId: User['sisuPersonId']
 
   @Column(DataType.DATE)
-  lastLogin!: Date
+  declare lastLogin: User['lastLogin']
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
-  roles!: CreationOptional<Role[]>
+  declare roles: User['roles']
 
   @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
-  programmeRights!: CreationOptional<string[]>
+  declare programmeRights: User['programmeRights']
 }

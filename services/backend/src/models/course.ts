@@ -12,8 +12,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { Course, CourseType, Credit, Enrollment, Organization } from '@oodikone/shared/models'
-import type { Name } from '@oodikone/shared/types'
+import type { Course } from '@oodikone/shared/models'
 
 import { CourseProviderModel } from './courseProvider'
 import { CourseTypeModel } from './courseType'
@@ -26,57 +25,57 @@ import { OrganizationModel } from './organization'
   modelName: 'course',
   tableName: 'course',
 })
-export class CourseModel extends Model<Course> implements Course {
+export class CourseModel extends Model implements Course {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Course['id']
 
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
-  code!: string
+  declare code: Course['code']
 
   @ForeignKey(() => CourseTypeModel)
   @Column(DataType.STRING)
-  coursetypecode!: string
+  declare coursetypecode: Course['coursetypecode']
 
   @BelongsTo(() => CourseTypeModel, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
-  courseType!: CourseType
+  declare courseType: Course['courseType']
 
   @HasMany(() => CreditModel, { foreignKey: 'course_id', sourceKey: 'id' })
-  credits!: Credit[]
+  declare credits: Course['credits']
 
   @HasMany(() => EnrollmentModel, { foreignKey: 'course_id' })
-  enrollments!: Enrollment[]
+  declare enrollments: Course['enrollments']
 
   @BelongsToMany(() => OrganizationModel, () => CourseProviderModel, 'coursecode')
-  organizations!: Organization[]
+  declare organizations: Course['organizations']
 
   @Column(DataType.BOOLEAN)
-  is_study_module!: boolean
+  declare is_study_module: Course['is_study_module']
 
   @Column(DataType.JSONB)
-  name!: Name
+  declare name: Course['name']
 
   @Column(DataType.DATE)
-  max_attainment_date!: Date
+  declare max_attainment_date: Course['max_attainment_date']
 
   @Column(DataType.DATE)
-  min_attainment_date!: Date
+  declare min_attainment_date: Course['min_attainment_date']
 
   @CreatedAt
   @Column({ field: 'created_at', type: DataType.DATE })
-  createdAt!: Date
+  declare createdAt: Course['createdAt']
 
   @UpdatedAt
   @Column({ field: 'updated_at', type: DataType.DATE })
-  updatedAt!: Date
+  declare updatedAt: Course['updatedAt']
 
   @Column(DataType.JSONB)
-  substitutions!: string[]
+  declare substitutions: Course['substitutions']
 
   @Column(DataType.STRING)
-  course_unit_type!: string
+  declare course_unit_type: Course['course_unit_type']
 
   @Column({ field: 'main_course_code', type: DataType.STRING })
-  mainCourseCode!: string
+  declare mainCourseCode: Course['mainCourseCode']
 }

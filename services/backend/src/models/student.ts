@@ -1,8 +1,6 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import type { Student, Credit, Enrollment, SISStudyRight, Studyplan } from '@oodikone/shared/models'
-import type { Name } from '@oodikone/shared/types'
-import { GenderCode } from '@oodikone/shared/types'
+import type { Student } from '@oodikone/shared/models'
 
 import { CreditModel } from './credit'
 import { EnrollmentModel } from './enrollment'
@@ -14,73 +12,73 @@ import { StudyplanModel } from './studyplan'
   modelName: 'student',
   tableName: 'student',
 })
-export class StudentModel extends Model<Student> implements Student {
+export class StudentModel extends Model implements Student {
   @PrimaryKey
   @Column(DataType.STRING)
-  studentnumber!: string
+  declare studentnumber: Student['studentnumber']
 
   @Column(DataType.STRING)
-  lastname!: string
+  declare lastname: Student['lastname']
 
   @Column(DataType.STRING)
-  firstnames!: string
+  declare firstnames: Student['firstnames']
 
   @Column(DataType.STRING)
-  abbreviatedname!: string
+  declare abbreviatedname: Student['abbreviatedname']
 
   @HasMany(() => EnrollmentModel, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  enrollments!: Enrollment[]
+  declare enrollments: Student['enrollments']
 
   @HasMany(() => SISStudyRightModel, { foreignKey: 'studentNumber', sourceKey: 'studentnumber' })
-  studyRights!: SISStudyRight[]
+  declare studyRights: Student['studyRights']
 
   @HasMany(() => StudyplanModel, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
-  studyplans!: Studyplan[]
+  declare studyplans: Student['studyplans']
 
   @HasMany(() => CreditModel, { foreignKey: 'student_studentnumber', sourceKey: 'studentnumber' })
-  credits!: Credit[]
+  declare credits: Student['credits']
 
   @Column(DataType.DATE)
-  birthdate!: Date
+  declare birthdate: Student['birthdate']
 
   @Column(DataType.INTEGER)
-  creditcount!: number
+  declare creditcount: Student['creditcount']
 
   @Column(DataType.DATE)
-  dateofuniversityenrollment!: Date
+  declare dateofuniversityenrollment: Student['dateofuniversityenrollment']
 
   @Column(DataType.STRING)
-  email!: string
+  declare email: Student['email']
 
   @Column(DataType.STRING)
-  secondary_email!: string
+  declare secondary_email: Student['secondary_email']
 
   @Column(DataType.STRING)
-  national_student_number!: string
+  declare national_student_number: Student['national_student_number']
 
   @Column(DataType.STRING)
-  phone_number!: string
+  declare phone_number: Student['phone_number']
 
   @Column(DataType.JSONB)
-  citizenships!: Name[]
+  declare citizenships: Student['citizenships']
 
   @Column(DataType.STRING)
-  gender_code!: GenderCode
+  declare gender_code: Student['gender_code']
 
   @Column(DataType.STRING)
-  sis_person_id!: string
+  declare sis_person_id: Student['sis_person_id']
 
   @Column(DataType.BOOLEAN)
-  hasPersonalIdentityCode!: boolean
+  declare hasPersonalIdentityCode: Student['hasPersonalIdentityCode']
 
   @Column(DataType.STRING)
-  preferredLanguage!: string
+  declare preferredLanguage: Student['preferredLanguage']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Student['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Student['updatedAt']
 }

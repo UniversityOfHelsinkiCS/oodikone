@@ -1,7 +1,6 @@
-import { CreationOptional } from 'sequelize'
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table, Unique } from 'sequelize-typescript'
 
-import type { StudyGuidanceGroupTag, StudyGuidanceGroupTagCreation } from '@oodikone/shared/models/kone'
+import type { StudyGuidanceGroupTag } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
@@ -9,22 +8,19 @@ import type { StudyGuidanceGroupTag, StudyGuidanceGroupTagCreation } from '@oodi
   modelName: 'study_guidance_group_tag',
   tableName: 'study_guidance_group_tags',
 })
-export class StudyGuidanceGroupTagModel
-  extends Model<StudyGuidanceGroupTag, StudyGuidanceGroupTagCreation>
-  implements StudyGuidanceGroupTag
-{
+export class StudyGuidanceGroupTagModel extends Model implements StudyGuidanceGroupTag {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.BIGINT)
-  id?: CreationOptional<string>
+  declare id: StudyGuidanceGroupTag['id']
 
   @Unique
   @Column(DataType.STRING)
-  studyGuidanceGroupId!: string
+  declare studyGuidanceGroupId: StudyGuidanceGroupTag['studyGuidanceGroupId']
 
   @Column(DataType.STRING)
-  studyProgramme!: string | null
+  declare studyProgramme: StudyGuidanceGroupTag['studyProgramme']
 
   @Column(DataType.STRING)
-  year!: string | null
+  declare year: StudyGuidanceGroupTag['year']
 }

@@ -1,7 +1,6 @@
 import { Column, CreatedAt, DataType, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
 import type { CreditType } from '@oodikone/shared/models'
-import { CreditTypeCode, Name } from '@oodikone/shared/types'
 
 @Table({
   underscored: true,
@@ -11,16 +10,16 @@ import { CreditTypeCode, Name } from '@oodikone/shared/types'
 export class CreditTypeModel extends Model<CreditType> implements CreditType {
   @PrimaryKey
   @Column(DataType.INTEGER)
-  credittypecode!: CreditTypeCode
+  declare credittypecode: CreditType['credittypecode']
 
   @Column(DataType.JSONB)
-  name!: Required<Name>
+  declare name: CreditType['name']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: CreditType['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: CreditType['updatedAt']
 }

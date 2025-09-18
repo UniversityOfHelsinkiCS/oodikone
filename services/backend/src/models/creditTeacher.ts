@@ -10,20 +10,20 @@ import { TeacherModel } from './teacher'
   modelName: 'credit_teacher',
   tableName: 'credit_teachers',
 })
-export class CreditTeacherModel extends Model<CreditTeacher> implements CreditTeacher {
+export class CreditTeacherModel extends Model implements CreditTeacher {
   @ForeignKey(() => CreditModel)
   @Column(DataType.STRING)
-  credit_id!: string
+  declare credit_id: CreditTeacher['credit_id']
 
   @ForeignKey(() => TeacherModel)
   @Column(DataType.STRING)
-  teacher_id!: string
+  declare teacher_id: CreditTeacher['teacher_id']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: CreditTeacher['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: CreditTeacher['updatedAt']
 }

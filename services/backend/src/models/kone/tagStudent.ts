@@ -1,7 +1,6 @@
-import { CreationOptional } from 'sequelize'
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
-import type { Tag, TagStudent, TagStudentCreation } from '@oodikone/shared/models/kone'
+import type { TagStudent } from '@oodikone/shared/models/kone'
 
 import { StudentModel } from '../student'
 import { TagModel } from './tag'
@@ -10,18 +9,18 @@ import { TagModel } from './tag'
   modelName: 'tag_student',
   tableName: 'tag_student',
 })
-export class TagStudentModel extends Model<TagStudent, TagStudentCreation> implements TagStudent {
+export class TagStudentModel extends Model implements TagStudent {
   @PrimaryKey
   @AutoIncrement
   @ForeignKey(() => TagModel)
   @Column(DataType.BIGINT)
-  tag_id!: string
+  declare tag_id: TagStudent['tag_id']
 
   @PrimaryKey
   @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
-  studentnumber!: string
+  declare studentnumber: TagStudent['studentnumber']
 
   @BelongsTo(() => TagModel)
-  tag!: CreationOptional<Tag>
+  declare tag: TagStudent['tag']
 }

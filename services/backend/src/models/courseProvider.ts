@@ -10,23 +10,23 @@ import { OrganizationModel } from './organization'
   modelName: 'course_provider',
   tableName: 'course_providers',
 })
-export class CourseProviderModel extends Model<CourseProvider> implements CourseProvider {
+export class CourseProviderModel extends Model implements CourseProvider {
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
-  coursecode!: string
+  declare coursecode: CourseProvider['coursecode']
 
   @Column(DataType.JSONB)
-  shares!: Array<{ share: number; startDate?: string; endDate?: string }> | null
+  declare shares: CourseProvider['shares']
 
   @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
-  organizationcode!: string
+  declare organizationcode: CourseProvider['organizationcode']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: CourseProvider['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: CourseProvider['updatedAt']
 }

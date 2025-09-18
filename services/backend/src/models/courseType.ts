@@ -1,8 +1,7 @@
 import { Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript'
 
-import type { Course, CourseType } from '@oodikone/shared/models'
+import type { CourseType } from '@oodikone/shared/models'
 
-import { Name } from '@oodikone/shared/types'
 import { CourseModel } from './course'
 
 @Table({
@@ -10,22 +9,22 @@ import { CourseModel } from './course'
   modelName: 'course_type',
   tableName: 'course_types',
 })
-export class CourseTypeModel extends Model<CourseType> implements CourseType {
+export class CourseTypeModel extends Model implements CourseType {
   @PrimaryKey
   @Column(DataType.STRING)
-  coursetypecode!: string
+  declare coursetypecode: CourseType['coursetypecode']
 
   @HasMany(() => CourseModel)
-  courses!: Course[]
+  declare courses: CourseType['courses']
 
   @Column(DataType.JSONB)
-  name!: Required<Name>
+  declare name: CourseType['name']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: CourseType['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: CourseType['updatedAt']
 }

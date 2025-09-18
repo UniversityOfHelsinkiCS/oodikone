@@ -10,7 +10,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript'
 
-import type { SISStudyRight, Student, Studyplan } from '@oodikone/shared/models'
+import type { Studyplan } from '@oodikone/shared/models'
 
 import { SISStudyRightModel } from './SISStudyRight'
 import { StudentModel } from './student'
@@ -20,48 +20,48 @@ import { StudentModel } from './student'
   modelName: 'studyplan',
   tableName: 'studyplan',
 })
-export class StudyplanModel extends Model<Studyplan> implements Studyplan {
+export class StudyplanModel extends Model implements Studyplan {
   @PrimaryKey
   @Column(DataType.STRING)
-  id!: string
+  declare id: Studyplan['id']
 
   @ForeignKey(() => StudentModel)
   @Column(DataType.STRING)
-  studentnumber!: string
+  declare studentnumber: Studyplan['studentnumber']
 
   @BelongsTo(() => StudentModel, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
-  student!: Student
+  declare student: Studyplan['student']
 
   @ForeignKey(() => SISStudyRightModel)
   @Column(DataType.STRING)
-  sis_study_right_id!: string
+  declare sis_study_right_id: Studyplan['sis_study_right_id']
 
   @BelongsTo(() => SISStudyRightModel, { foreignKey: 'sis_study_right_id', targetKey: 'id', as: 'studyRight' })
-  studyRight!: SISStudyRight
+  declare studyRight: Studyplan['studyRight']
 
   @Column(DataType.STRING)
-  programme_code!: string
+  declare programme_code: Studyplan['programme_code']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  included_courses!: string[]
+  declare included_courses: Studyplan['included_courses']
 
   @Column({ type: DataType.ARRAY(DataType.TEXT), field: 'included_modules' })
-  includedModules!: string[]
+  declare includedModules: Studyplan['includedModules']
 
   @Column(DataType.STRING)
-  sisu_id!: string
+  declare sisu_id: Studyplan['sisu_id']
 
   @Column(DataType.DOUBLE)
-  completed_credits!: number
+  declare completed_credits: Studyplan['completed_credits']
 
   @Column(DataType.STRING)
-  curriculum_period_id!: string
+  declare curriculum_period_id: Studyplan['curriculum_period_id']
 
   @CreatedAt
   @Column(DataType.DATE)
-  createdAt!: Date
+  declare createdAt: Studyplan['createdAt']
 
   @UpdatedAt
   @Column(DataType.DATE)
-  updatedAt!: Date
+  declare updatedAt: Studyplan['updatedAt']
 }

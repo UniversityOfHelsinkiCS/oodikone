@@ -1,33 +1,32 @@
-import { CreationOptional } from 'sequelize'
 import { Column, DataType, Model, PrimaryKey, Table, AutoIncrement, Default } from 'sequelize-typescript'
 
-import type { ExcludedCourse, ExcludedCourseCreation } from '@oodikone/shared/models/kone'
+import type { ExcludedCourse } from '@oodikone/shared/models/kone'
 
 @Table({
   underscored: true,
   modelName: 'excluded_course',
   tableName: 'excluded_courses',
 })
-export class ExcludedCourseModel extends Model<ExcludedCourse, ExcludedCourseCreation> implements ExcludedCourse {
+export class ExcludedCourseModel extends Model implements ExcludedCourse {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  id!: CreationOptional<number>
+  declare id: ExcludedCourse['id']
 
   @Column(DataType.STRING)
-  programme_code!: string
+  declare programme_code: ExcludedCourse['programme_code']
 
   @Column(DataType.STRING)
-  course_code!: string
+  declare course_code: ExcludedCourse['course_code']
 
   @Column(DataType.STRING)
-  curriculum_version!: string
+  declare curriculum_version: ExcludedCourse['curriculum_version']
 
   @Default(DataType.NOW)
   @Column(DataType.DATE)
-  createdAt!: CreationOptional<Date>
+  declare createdAt: ExcludedCourse['createdAt']
 
   @Default(DataType.NOW)
   @Column(DataType.DATE)
-  updatedAt!: CreationOptional<Date>
+  declare updatedAt: ExcludedCourse['updatedAt']
 }
