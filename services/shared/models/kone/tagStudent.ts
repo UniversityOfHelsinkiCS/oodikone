@@ -1,3 +1,4 @@
+/* eslint-disable import-x/no-unused-modules */
 import type { Optional } from '../../types'
 
 import type { Tag } from './tag'
