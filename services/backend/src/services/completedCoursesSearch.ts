@@ -129,7 +129,7 @@ const getEnrollments = async (courses: Courses, fullCourseCodes: string[], stude
   return formattedEnrollments
 }
 
-const getStudents = async (studentNumbers: string[]) => {
+const getStudents = async (studentNumbers: string[]): Promise<StudentWithCourses[]> => {
   const students = await StudentModel.findAll({
     attributes: ['studentnumber', 'firstnames', 'lastname', 'email', 'sis_person_id', 'secondary_email'],
     where: {
@@ -147,9 +147,9 @@ const getStudents = async (studentNumbers: string[]) => {
   })
 
   return students.map(student => {
-    const { studyplans, ...rest } = student.toJSON() as StudentWithStudyplanNested
+    const { studyplans, ...rest }: StudentWithStudyplanNested = student.toJSON()
     const coursesInStudyPlan = studyplans.flatMap(studyplan => studyplan.included_courses)
-    return { ...rest, coursesInStudyPlan } as StudentWithCourses
+    return { ...rest, coursesInStudyPlan }
   })
 }
 
