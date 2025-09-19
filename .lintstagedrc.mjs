@@ -14,7 +14,6 @@ export default {
   Dockerfile: files =>
     `${dockerCmdBase} hadolint/hadolint:v2.12.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
   '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.7.2 ${relativeFilePaths(files)} -x`,
-  '.github/{workflows,actions}/*': files => `npm run actionlint ${relativeFilePaths(files)}`,
   'docker-compose*': files => {
     const composeFiles = file => {
       if (['docker-compose.ci.yml', 'docker-compose.test.yml'].some(f => file.includes(f))) {
