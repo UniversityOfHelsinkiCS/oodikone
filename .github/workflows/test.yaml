@@ -176,7 +176,6 @@ jobs:
 
   # === End-to-end tests ===
   test_end_to_end:
-    runs-on: ubuntu-latest
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
@@ -216,6 +215,10 @@ jobs:
           - name: 'Test university'
             spec: cypress/e2e/University.js
     name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    container:
+      image: cypress/browsers:22.15.0
+      options: --user 1001
     steps:
       - uses: actions/checkout@v5
       - name: 'Run tests'
