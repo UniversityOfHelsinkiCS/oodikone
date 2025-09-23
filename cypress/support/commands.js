@@ -123,6 +123,19 @@ Cypress.Commands.add('selectFromDropdown', { prevSubject: false }, (label, index
 })
 
 /**
+ * Select item from FilterSearchableSelect dropdown.
+ * If the index is a number, select index-th item.
+ * Otherwise select the item containing index text.
+ */
+Cypress.Commands.add('selectFromAutocomplete', { prevSubject: false }, (label, index) => {
+  cy.cs(`${label}-selector`).click()
+  cy.get(`#${label}-popper.MuiAutocomplete-popper [role="listbox"]`).within(() => {
+    if (typeof index === 'number') cy.get('li').eq(index).click()
+    else cy.get('li').contains(index).click()
+  })
+})
+
+/**
  * Set range selector values FilterRange.
  * If the reset flag is set, the function tries to reset the original values.
  */
