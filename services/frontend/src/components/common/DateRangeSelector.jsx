@@ -7,7 +7,7 @@ export const DateRangeSelector = ({ value, onChange, ...rest }) => {
   const start = value ? value[0] : null
   const end = value ? value[1] : null
   return (
-    <Stack>
+    <Stack spacing={1}>
       <Box>
         <label>Beginning:</label>
         <DateSelector before={end} onChange={date => onChange([date, end])} value={start} {...rest} />

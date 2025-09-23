@@ -39,7 +39,7 @@ export const FilterRadio = <T,>({
   filterKey,
 }: FilterRadioProps<T>) => {
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'left', px: 1 }}>
       <RadioGroup defaultValue={defaultValue} name={filterKey} onChange={onChange} value={controlledValue}>
         {options.map(option => (
           <RadioButton filterKey={filterKey} key={option.key} option={option} />

@@ -47,8 +47,8 @@ export const FilterSelect = <T extends ValidValueType = string>({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <FormControl sx={{ width: '95%' }} variant="outlined">
-        <InputLabel id={`${filterKey}-label`} size="small">
+      <FormControl fullWidth variant="outlined">
+        <InputLabel id={`${filterKey}-label`} size="small" sx={{ textOverflow: 'ellipsis', pr: 2.5 }}>
           {label}
         </InputLabel>
         <Tooltip title={disabled ? 'No valid values found' : null}>

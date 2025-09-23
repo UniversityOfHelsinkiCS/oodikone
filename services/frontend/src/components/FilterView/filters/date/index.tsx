@@ -14,7 +14,7 @@ const CreditDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => 
   const { startDate, endDate } = options
 
   return (
-    <div className="card-content" style={{ marginTop: '0.5rem' }}>
+    <div className="card-content">
       <DateRangeSelector
         onChange={([startDate, endDate]) =>
           onOptionsChange({
