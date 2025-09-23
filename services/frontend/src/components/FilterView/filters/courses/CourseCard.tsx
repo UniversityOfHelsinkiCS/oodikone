@@ -1,6 +1,7 @@
 import ClearIcon from '@mui/icons-material/Clear'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -25,7 +26,12 @@ const filterTexts = {
     label: 'Enrolled, No Grade',
   },
 }
-
+const getSubstitutionTooltip = (substitutions: string[]) => (
+  <Typography fontSize="0.9rem" whiteSpace="pre-line">
+    Included course substitutions:
+    {substitutions.map(code => `\n${code}`)}
+  </Typography>
+)
 export const CourseCard = ({
   course,
   filterType,
@@ -58,7 +64,15 @@ export const CourseCard = ({
       <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ mb: 2 }}>
           <Typography>{getTextIn(course.course?.name)}</Typography>
-          <Typography sx={{ color: 'text.secondary' }}>{course.course?.code}</Typography>
+          {course.course?.substitutions?.length ? (
+            <Tooltip title={getSubstitutionTooltip(course.course.substitutions)}>
+              <Typography sx={{ color: 'text.secondary' }}>
+                {course.course?.code}... +{course.course?.substitutions?.length}
+              </Typography>
+            </Tooltip>
+          ) : (
+            <Typography sx={{ color: 'text.secondary' }}>{course.course?.code}</Typography>
+          )}
         </Box>
         <ClearIcon
           data-cy={`courseFilter-${course.course?.code}-clear`}
