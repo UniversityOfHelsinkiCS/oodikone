@@ -21,8 +21,6 @@ type FilterSearchableSelectProps<T extends ValidValueType> = {
   filterKey: string
 }
 
-const CustomWidthPopper = props => <Popper {...props} placement="bottom-start" style={{ width: '40em' }} />
-
 export const FilterSearchableSelect = <T extends ValidValueType = string>({
   label,
   value,
@@ -31,6 +29,10 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
   filterKey,
 }: FilterSearchableSelectProps<T>) => {
   const disabled = !options.length
+
+  const CustomWidthPopper = props => (
+    <Popper {...props} id={`${filterKey}-popper`} placement="bottom-start" style={{ width: '40em' }} />
+  )
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
