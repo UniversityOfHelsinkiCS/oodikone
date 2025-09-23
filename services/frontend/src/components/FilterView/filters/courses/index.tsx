@@ -2,7 +2,7 @@ import { keyBy } from 'lodash'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { FilterTrayProps } from '../../FilterTray'
-import { FilterSelect } from '../common/FilterSelect'
+import { FilterSearchableSelect } from '../common/FilterSearchableSelect'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
@@ -34,12 +34,12 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
 
   return (
     <>
-      <FilterSelect
+      <FilterSearchableSelect
         filterKey="courseFilter"
-        label="Select course"
-        onChange={({ target }) => setCourseFilter(target.value, FilterType.ALL)}
+        label="Select a course"
+        onChange={target => setCourseFilter(target.value, FilterType.ALL)}
         options={dropdownOptions}
-        value={''}
+        value={null}
       />
       {Object.entries(courseFilters).map(([code, type]) => (
         <CourseCard
