@@ -10,7 +10,7 @@ export const filterToolTips = {
   startingYear:
     'Valitse opiskelijoita sen mukaan, minä vuonna heidän ensimmäinen opinto-oikeutensa yliopistolla alkoi (ei siis ainoastaan tarkasteltavan tutkinnon oikeus). Avoimia opinto-oikeuksia ei oteta huomioon.',
   studentNumber:
-    'Rajaa yksittäisiä opiskelijoita pois tilastoista (blocklist) tai näytä vain määritellyt opiskelijat (allowlist). Vain täsmälliset opiskelijanumerot toimivat.',
+    'Rajaa yksittäisiä opiskelijoita pois tilastoista (excluded student numbers) tai näytä **vain** määritellyt opiskelijat (allowed student numbers). Vain täsmälliset tarkasteltavan populaation joukosta löytyvät opiskelijanumerot toimivat. Suodatin tukee useamman opiskelijanumeron syöttämistä kerrallaan.',
   studyRightStatus: `
     Opiskeluoikeus on **aktiivinen** (active), jos opiskelija on ilmoittautunut läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle.
 

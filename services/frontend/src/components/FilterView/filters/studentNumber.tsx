@@ -7,7 +7,7 @@ import { includes, isEqual, union } from 'lodash'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { formatToArray } from '@oodikone/shared/util'
 import { FilterTrayProps } from '../FilterTray'
-import { FilterSelect } from './common/FilterSelect'
+import { FilterSearchableSelect } from './common/FilterSearchableSelect'
 import { createFilter } from './createFilter'
 
 const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
@@ -19,10 +19,11 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterT
 
   return (
     <Stack gap={1}>
-      <FilterSelect
+      <FilterSearchableSelect
         filterKey="studentNumberFilter-allowlist"
+        label="Allowed student numbers"
         multiple
-        onChange={({ target }) => onOptionsChange({ ...options, allowlist: target.value })}
+        onChange={studentNumbers => onOptionsChange({ ...options, allowlist: studentNumbers })}
         options={dropdownOptions}
         value={options.allowlist}
       />
@@ -41,10 +42,11 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterT
           <Typography>Swap lists</Typography>
         </Stack>
       </Button>
-      <FilterSelect
+      <FilterSearchableSelect
         filterKey="studentNumberFilter-blocklist"
+        label="Excluded student numbers"
         multiple
-        onChange={({ target }) => onOptionsChange({ ...options, blocklist: target.value })}
+        onChange={studentNumbers => onOptionsChange({ ...options, blocklist: studentNumbers })}
         options={dropdownOptions}
         value={options.blocklist}
       />
