@@ -1,10 +1,13 @@
 import CheckIcon from '@mui/icons-material/Check'
+import CopyAllIcon from '@mui/icons-material/CopyAll'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
@@ -27,12 +30,36 @@ export const useGetColumnDefinitions = ({
   includePrimaryProgramme,
   year,
 }): ColumnDef<FormattedStudentData, any>[] => {
+  const [showCopyText, setShowCopyText] = useState(false)
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+
+  const handleCopy = async (event, studentNumbers) => {
+    event.stopPropagation()
+    await navigator.clipboard.writeText(studentNumbers)
+    setShowCopyText(true)
+    setTimeout(() => setShowCopyText(false), 1500)
+  }
 
   return useMemo(
     () => [
       columnHelper.accessor('studentNumber', {
-        header: 'Student number',
+        header: ({ table }) => {
+          const allStudentNumbers = table
+            .getFilteredRowModel()
+            .rows.map(row => row.original.studentNumber)
+            .filter(Boolean)
+            .join('; ')
+          return (
+            <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
+              <Box sx={{ alignSelf: 'center' }}>Student number</Box>
+              <Tooltip title={showCopyText ? 'Copied!' : 'Copy all student numbers to system clipboard'}>
+                <IconButton onClick={event => void handleCopy(event, allStudentNumbers)}>
+                  <CopyAllIcon color="action" />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          )
+        },
         cell: cell => {
           const studentNumber = cell.getValue()
           if (studentNumber === 'Hidden') return studentNumber
