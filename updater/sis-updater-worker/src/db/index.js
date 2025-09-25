@@ -4,6 +4,7 @@ import { dbConnections } from './connection.js'
 
 export const selectOneById = async (table, id, col = 'id') => dbConnections.knex(table).where(col, id).first()
 
+export const selectLastById = async (table, id, col = 'id') => (await dbConnections.knex(table).where(col, id)).at(-1)
 export const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
 export const selectFromByIdsOrderBy = async (table, ids, col = 'id', by, order = 'asc') =>

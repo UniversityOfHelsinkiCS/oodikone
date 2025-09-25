@@ -1,4 +1,4 @@
-import { selectAllFrom, bulkCreate, selectOneById } from '../../db/index.js'
+import { selectAllFrom, bulkCreate, selectOneById, selectLastById } from '../../db/index.js'
 import { SISStudyRight, SISStudyRightElement } from '../../db/models/index.js'
 import logger from '../../utils/logger.js'
 import { termRegistrationTypeToEnrollmenttype } from '../mapper.js'
@@ -120,7 +120,7 @@ const studyRightElementMapper =
 
     if (studyTrack) {
       const studyTrackCode = moduleGroupIdToCode[studyTrack]
-      const studyTrackInfo = await selectOneById('modules', studyTrack, 'group_id')
+      const studyTrackInfo = await selectLastById('modules', studyTrack, 'group_id')
       studyTrack = { code: studyTrackCode, name: studyTrackInfo?.name }
     }
 
