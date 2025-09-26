@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { InfoBox } from '@/components/material/InfoBox'
 
 import type { Filter } from '../createFilter'
@@ -28,6 +28,8 @@ export const FilterCard = ({
   onClear: () => void
 }) => {
   const [opened, setOpened] = useState<boolean>(active)
+  useEffect(() => setOpened(active), [active])
+
   const { info, key, title } = filter
 
   const handleOnClick = () => setOpened(state => !state)
