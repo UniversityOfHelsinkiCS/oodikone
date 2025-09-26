@@ -35,7 +35,8 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
     <span>
       <Button
         key={label}
-        onClick={() => triggerOnChange(date)}
+        // HACK: Use onMouseDown as it fires faster than onClick, bypassing the onBlur of whatever would be focused (the calendar) and prevents having to double click
+        onMouseDown={() => triggerOnChange(date)}
         size="small"
         sx={{
           background: 'primary.light',
@@ -92,7 +93,6 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
       maxDate={dayjs(before ?? today)}
       minDate={after ? dayjs(after) : undefined}
       onChange={onChange}
-      reduceAnimations
       showDaysOutsideCurrentMonth
       slotProps={{ popper: { disablePortal: true } }}
       // @ts-expect-error HACK: there should be a custom component that eats the picker
