@@ -126,23 +126,31 @@ export const SearchResults = ({ searchValues }) => {
   )
 
   const dynamicColumns = useMemo(() => {
-    if (!data || data.length === 0) return []
-    return data.courses.map(course => ({
-      accessorFn: student => getCompletion(student, course.code, { icon: false }),
-      id: course.code,
-      header: `${course.code} – ${getTextIn(course.name)}`,
-      Header: () => (
-        <Box>
-          <Box>{course.code}</Box>
-          <Box sx={{ color: 'text.secondary', fontWeight: 'normal' }}>{getTextIn(course.name)}</Box>
-        </Box>
-      ),
-      Cell: ({ cell }) => (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }} title={getCellTitle(cell.row.original, course.code)}>
-          {getCompletion(cell.row.original, course.code, { icon: true })}
-        </Box>
-      ),
-    }))
+    const courseOrder = data?.courses.map(({ code }) => code) ?? []
+
+    return (
+      data?.courses
+        .toSorted(({ code: a }, { code: b }) => courseOrder.indexOf(a) < courseOrder.indexOf(b))
+        .map(course => ({
+          accessorFn: student => getCompletion(student, course.code, { icon: false }),
+          id: course.code,
+          header: `${course.code} – ${getTextIn(course.name)}`,
+          Header: () => (
+            <Box>
+              <Box>{course.code}</Box>
+              <Box sx={{ color: 'text.secondary', fontWeight: 'normal' }}>{getTextIn(course.name)}</Box>
+            </Box>
+          ),
+          Cell: ({ cell }) => (
+            <Box
+              sx={{ display: 'flex', justifyContent: 'center' }}
+              title={getCellTitle(cell.row.original, course.code)}
+            >
+              {getCompletion(cell.row.original, course.code, { icon: true })}
+            </Box>
+          ),
+        })) ?? []
+    )
   }, [data, getTextIn])
 
   const columns = useMemo(() => [...staticColumns, ...dynamicColumns], [staticColumns, dynamicColumns])
