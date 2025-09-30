@@ -291,7 +291,9 @@ export const parseCourseData = async (
         ),
       },
       grades,
-      students: Object.fromEntries(Object.entries(students).map(([key, val]) => [key, Array.from(val)])),
+      students: Object.fromEntries(
+        Object.entries(students).map(([key, val]) => [key, Array.from(val)])
+      ) as CourseStats['students'],
       stats,
     }
   })
