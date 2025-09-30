@@ -26,9 +26,10 @@ const LinkToGroup = ({ group }) => {
   )
 }
 
-const prettifyCamelCase = string => {
-  const splitted = string.match(/[A-Za-z][a-z]*/g) ?? []
-  return splitted.map(word => word.charAt(0).toLowerCase() + word.substring(1)).join(' ')
+const prettifyTagName = string => {
+  if (string === 'studyProgramme') return 'Degree programme'
+
+  return string
 }
 
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
@@ -208,7 +209,7 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
           </div>
         </div>
       ) : (
-        <Button content={`Add ${prettifyCamelCase(tagName)}`} icon="add" onClick={toggleEdit} size="tiny" />
+        <Button content={`Add ${prettifyTagName(tagName)}`} icon="add" onClick={toggleEdit} size="tiny" />
       )}
     </>
   )
