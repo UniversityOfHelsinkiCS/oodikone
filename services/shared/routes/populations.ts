@@ -65,8 +65,8 @@ export type CloseToGraduationData = {
 }
 
 export type CourseStats = {
-  course: Course
   attempts: number
+  course: Course
   enrollments: EnrollmentObject & {
     semesters: Record<string, EnrollmentObject>
   }
@@ -75,23 +75,22 @@ export type CourseStats = {
     {
       count: number
       status: {
-        passingGrade: boolean
         failingGrade: boolean
         improvedGrade: boolean
+        passingGrade: boolean
       }
     }
   >
-  /**
-   * all: string[]
-   * passed: string[]
-   * failed: string[]
-   * improvedPassedGrade: string[]
-   * markedToSemester: string[]
-   * enrolledNoGrade: string[]
-   */
-  students: Record<string, string[]>
   stats: {
-    passingSemesters: Record<string, number>
+    passingSemesters: Record<string, number> // Key can also be BEFORE or LATER
+  }
+  students: {
+    all: string[]
+    enrolledNoGrade: string[]
+    failed: string[]
+    improvedPassedGrade: string[]
+    markedToSemester: string[]
+    passed: string[]
   }
 }
 

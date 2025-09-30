@@ -1,4 +1,5 @@
 import { CourseStats } from '@oodikone/shared/routes/populations'
+import { FormattedCourse } from '@oodikone/shared/types/courseData'
 
 const percentageOf = (num: number, denom: number) => {
   if (denom === 0) {
@@ -8,7 +9,7 @@ const percentageOf = (num: number, denom: number) => {
 }
 
 // courseStatsCounter legacy solution
-const getCumulativePassingSemesters = semesters => {
+const getCumulativePassingSemesters = (semesters: CourseStats['stats']['passingSemesters']) => {
   const attemptStats: Record<string, number> = {}
 
   attemptStats.BEFORE = semesters.BEFORE
@@ -26,8 +27,8 @@ const getCumulativePassingSemesters = semesters => {
 }
 
 // courseStatsCounter legacy solution
-const getFinalStats = (course, populationCount) => {
-  const stats = { ...course.stats }
+const getFinalStats = (course: CourseStats, populationCount: number): FormattedCourse['stats'] => {
+  const stats = { ...course.stats } as FormattedCourse['stats']
   const { students } = course
 
   stats.students = course.students.all.length
@@ -47,17 +48,17 @@ const getFinalStats = (course, populationCount) => {
   return stats
 }
 
-const reconstructCourse = (course: CourseStats, populationCount: number) => ({
+const reconstructCourse = (course: CourseStats, populationCount: number): FormattedCourse => ({
   ...course,
   // courseStatsCounter legacy solution
   students: Object.fromEntries(
     Object.entries(course.students).map(([key, val]) => [key, Object.fromEntries(val.map(n => [n, true]))])
-  ),
+  ) as FormattedCourse['students'],
   stats: getFinalStats(course, populationCount),
 })
 
-export const filterCourses = (courseStatistics: any[], filteredStudents: any[]) => {
-  const courses = courseStatistics.map(course => reconstructCourse(course, filteredStudents.length))
+export const filterCourses = (courseStatistics: CourseStats[], populationCount: number) => {
+  const courses = courseStatistics.map(course => reconstructCourse(course, populationCount))
 
   return courses
 }

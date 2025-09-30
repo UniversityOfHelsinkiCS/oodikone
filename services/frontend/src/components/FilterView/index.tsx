@@ -5,6 +5,7 @@ import { selectViewFilters } from '@/redux/filters'
 import { useAppSelector } from '@/redux/hooks'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
+import type { FormattedCourse as Course } from '@oodikone/shared/types/courseData'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 
 import { FilterViewContext } from './context'
@@ -14,7 +15,7 @@ import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[], filteredCourses: any[]) => React.ReactNode
+  children: (filteredStudents: Student[], filteredCourses: Course[]) => React.ReactNode
   name: string
   filters: Filter[]
   students: Student[]
@@ -65,7 +66,7 @@ export const FilterView: FC<{
         }, students),
     [filters, filterOptions]
   )
-  const filteredCourses = filterCourses(courses, filteredStudents)
+  const filteredCourses = filterCourses(courses, filteredStudents.length)
 
   const ctxState: FilterViewContextState = { viewName: name, getContextByKey: getFilterContext }
 
