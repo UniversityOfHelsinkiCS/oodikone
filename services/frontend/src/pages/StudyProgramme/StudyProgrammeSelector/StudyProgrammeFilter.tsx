@@ -19,9 +19,9 @@ export const StudyProgrammeFilter = ({
     <TextField
       data-cy="study-programme-filter"
       fullWidth
-      label="Filter study programmes"
+      label="Filter degree programmes"
       onChange={event => handleFilterChange(event.target.value)}
-      placeholder="Type here to filter study programmes"
+      placeholder="Type here to filter degree programmes"
       slotProps={{
         input: {
           endAdornment: (

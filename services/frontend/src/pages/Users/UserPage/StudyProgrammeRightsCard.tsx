@@ -119,21 +119,21 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
     <Card sx={{ width: '100%' }} variant="outlined">
       <CardHeader
         buttons={<EditButton disabled={hasFullAccess} editing={editing} onClick={handleEditClick} />}
-        title="Study programme rights"
+        title="Degree programme rights"
       />
 
       {hasFullAccess ? (
-        <Alert severity="info">This user has full access to all study programmes.</Alert>
+        <Alert severity="info">This user has full access to all degree programmes.</Alert>
       ) : (
         <>
           {editing ? (
             <CardContent>
               <Typography component="h3" fontWeight="bold" gutterBottom>
-                Select new study programme access rights
+                Select new degree programme access rights
               </Typography>
               <Stack direction="column">
                 <FormControl>
-                  <InputLabel>Select study programmes to add</InputLabel>
+                  <InputLabel>Select degree programmes to add</InputLabel>
                   <Select
                     MenuProps={{
                       PaperProps: {
@@ -143,7 +143,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
                       },
                     }}
                     data-cy="StudyProgrammeSelector"
-                    label="Select study programmes to add"
+                    label="Select degree programmes to add"
                     multiple
                     onChange={event => setAccessRightsToBeAdded(event.target.value as string[])}
                     renderValue={selected => (
@@ -179,7 +179,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
 
           <CardContent>
             <Typography component="h3" fontWeight="bold" gutterBottom>
-              Current study programme access rights
+              Current degree programme access rights
             </Typography>
 
             <Stack direction="column" gap={1}>
@@ -204,7 +204,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
                   </Stack>
                 ))
               ) : (
-                <Typography color="text.secondary">No study programme access rights</Typography>
+                <Typography color="text.secondary">No degree programme access rights</Typography>
               )}
             </Stack>
           </CardContent>
@@ -213,7 +213,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
             <CardContent>
               <Stack alignItems="center" direction="row" gap={1}>
                 <Typography component="h3" fontWeight="bold">
-                  Current IAM group based study programme access rights
+                  Current IAM group based degree programme access rights
                 </Typography>
                 <InfoBox content={userToolTips.iamGroupBasedAccess} mini />
               </Stack>

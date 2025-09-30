@@ -495,7 +495,7 @@ export const SingleCourseStats = ({
         </Stack>
       </Section>
       {userHasAccessToAllStats ? (
-        <Section title="Filter statistics by study programme">
+        <Section title="Filter statistics by degree programme">
           <Stack direction="row" gap={2}>
             <Box width="50%">
               <ProgrammeDropdown
@@ -503,7 +503,7 @@ export const SingleCourseStats = ({
                 name="primary"
                 onChange={handleSelect}
                 options={options}
-                placeholder="Select study programmes"
+                placeholder="Select degree programmes"
                 value={primary}
               />
             </Box>
@@ -523,7 +523,7 @@ export const SingleCourseStats = ({
                   startIcon={<DoNotDisturbIcon />}
                   variant="outlined"
                 >
-                  Select excluded study programmes
+                  Select excluded degree programmes
                 </Button>
               </Stack>
             </Box>

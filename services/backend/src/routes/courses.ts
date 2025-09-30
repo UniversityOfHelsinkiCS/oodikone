@@ -98,7 +98,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const separate = req.query.separate === 'true'
 
     // Student numbers should be obfuscated to all other users except admins,
-    // fullSisuAccess users, and users with rights to any specific study programmes
+    // fullSisuAccess users, and users with rights to any specific degree programmes
     const anonymize = !userHasFullAccessToStudentData && fullStudyProgrammeRights.length === 0
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
     const results = await getCourseYearlyStats(codes, separate, anonymizationSalt, combineSubstitutions)

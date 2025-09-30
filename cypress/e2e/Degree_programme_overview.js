@@ -30,8 +30,8 @@ const deleteTag = tagName => {
   cy.cs('confirm-delete-tag-button').click()
 }
 
-describe('Study programme overview', () => {
-  describe('Study programme selector', () => {
+describe('Degree programme overview', () => {
+  describe('Degree programme selector', () => {
     beforeEach(() => {
       cy.init('/study-programme', 'admin')
     })
@@ -43,7 +43,7 @@ describe('Study programme overview', () => {
       cy.contains('Doctoral programmes')
     })
 
-    it('Study programme search filter', () => {
+    it('Degree programme search filter', () => {
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
       cy.contains('Matemaattisten tieteiden kandiohjelma').should('exist')
       cy.cs('study-programme-filter').type('Tietojenkäsittelytieteen')
@@ -317,7 +317,7 @@ describe('Study programme overview', () => {
       cy.cs('average-graduation-times-section')
     })
 
-    it('Students of the study programme are shown correctly', () => {
+    it('Students of the degree programme are shown correctly', () => {
       const tableContents = [
         // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 1],
@@ -488,7 +488,7 @@ describe('Study programme overview', () => {
 
       it('Info message about missing progress stats is displayed', () => {
         cy.contains('Progress of students of the study track MAT-MAT by starting year')
-        cy.contains('Progress data is currently only available for all students of the study programme.')
+        cy.contains('Progress data is currently only available for all students of the degree programme.')
       })
 
       it.skip('Average graduation times are displayed correctly', () => {
@@ -739,13 +739,13 @@ describe('Study programme overview', () => {
 
     describe('Adding tags to populations and removing them works', () => {
       beforeEach(() => {
-        cy.contains('This study programme does not have any tags yet')
+        cy.contains('This degree programme does not have any tags yet')
         cy.cs('tag-name-text-field').type(tagName)
       })
 
       afterEach(() => {
         deleteTag(tagName)
-        cy.contains('This study programme does not have any tags yet')
+        cy.contains('This degree programme does not have any tags yet')
       })
 
       it('can create and delete tags without start year', () => {

@@ -88,10 +88,10 @@ router.post('/refresh-teacher-leaderboard', (req: Request, res: Response) => {
   res.status(200).json('Teacher leaderboard for the current and previous academic year refreshed')
 })
 
-router.post('/refresh_study_programmes_v2', async (req: Request, res: Response) => {
-  logger.info(`${req.user.username} requested refresh of study programmes`)
+router.post('/refresh_degree_programmes_v2', async (req: Request, res: Response) => {
+  logger.info(`${req.user.username} requested refresh of degree programmes`)
   await refreshProgrammes()
-  res.status(200).json('Added job for refreshing study programme overviews')
+  res.status(200).json('Added job for refreshing degree programme overviews')
 })
 
 router.post('/refresh_faculties_v2', async (req: Request, res: Response) => {

@@ -25,7 +25,7 @@ import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWr
 import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
 import logger from '../util/logger'
 
-// Faculty uses a lot of tools designed for Study programme.
+// Faculty uses a lot of tools designed for Degree programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
 const router = Router()
@@ -56,7 +56,7 @@ router.get('/:id/basicstats', auth.roles(['facultyStatistics']), async (req: Get
     return res.json(data)
   }
 
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
   if (!programmes.length) {
     return res.status(422).end()
   }
@@ -96,7 +96,7 @@ router.get('/:id/thesisstats', auth.roles(['facultyStatistics']), async (req: Ge
     return res.json(data)
   }
 
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
   if (!programmes.length) {
     return res.status(422).end()
   }
@@ -130,7 +130,7 @@ router.get(
       return res.json(data)
     }
 
-    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_STUDY_PROGRAMMES')
+    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
     if (!programmes) {
       return res.status(422).end()
     }

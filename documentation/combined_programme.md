@@ -6,7 +6,7 @@ The made changes do not have any effects on faculty or trends views. **Needs man
 
 Basic rule of thumb is that for the master/licentiate programme I used names `combinedProgramme` and in some rare cases `secondProgramme` as whole or part of the variable names.
 
-## Study programme
+## Degree programme
 
 **Needs manual work** in the function `getCombinedProgrammeId` in `services/frontend/src/common/index.js` if new programmes is added. For showing the both programme data correctly, the filtering mechanism is changed to add both programmes and it is not caring for which programme user has acual rights or IAMrights. However, the links for the class stats level are hidden in studytrack tables, if the user has no rights for the programme.
 
@@ -15,7 +15,7 @@ Basic rule of thumb is that for the master/licentiate programme I used names `co
 - Overview
   - **Needs manual work**
 
-**Redis nightly study programme update**
+**Redis nightly degree programme update**
 
 - Updates automatically combined programme stats. **Needs manual work** here `services/backend/src/services/studyprogrammeHelpers.js` in the constant `combinedStudyprogrammes`. This might needs refactoring if bachelor programme can have many separate master programmes. Then remember to change function `refreshNewOverview` in `services/backend/src/events.js` accordingly to handle lists.
 
@@ -91,6 +91,6 @@ All things listed below should work automatically, if new combinations are done.
 
 ## Study guidance groups
 
-- Backend: student data is fetched by bachelor study programme code in `/v3/populationstatisticsbystudentnumbers`. Separation from code 'KHxx_xxx+MHxx_xxx' is done in backend.
+- Backend: student data is fetched by bachelor degree programme code in `/v3/populationstatisticsbystudentnumbers`. Separation from code 'KHxx_xxx+MHxx_xxx' is done in backend.
 - Frontend: things are done in the same way as with class stats.
 - **Need manual work**: `./oodikone/services/frontend/src/redux/elementdetails.js` add combined programme codes (both bachelor and master) to `combinedProgrammeCodes` and modify `combinedOptions` list accordingly in `useFilterAndFormattedElementDetails()` function.

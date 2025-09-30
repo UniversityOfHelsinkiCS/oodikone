@@ -17,7 +17,7 @@ import { combineFacultyThesisWriters } from './facultyThesisWriters'
 
 const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR'] as const
 const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
-const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_STUDY_PROGRAMMES'] as const
+const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_DEGREE_PROGRAMMES'] as const
 const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
 
 export const updateFacultyOverview = async (facultyCode: string, statsType: StatsType) => {
@@ -30,7 +30,7 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
         if (statsType === 'ALL' || statsType === 'STUDENT') {
           const updatedStudentInfo = await combineFacultyBasics(
             facultyCode,
-            programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
+            programmeFilter === 'NEW_DEGREE_PROGRAMMES' ? onlyNew : all,
             yearType,
             specialGroups
           )
@@ -43,7 +43,7 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
         if (statsType === 'ALL' || statsType === 'THESIS') {
           const updateThesisWriters = await combineFacultyThesisWriters(
             facultyCode,
-            programmeFilter === 'NEW_STUDY_PROGRAMMES' ? onlyNew : all,
+            programmeFilter === 'NEW_DEGREE_PROGRAMMES' ? onlyNew : all,
             yearType,
             specialGroups
           )
@@ -56,7 +56,7 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
   const updatedTimesAll = await countGraduationTimes(facultyCode, all)
   await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
   const updatedTimesNew = await countGraduationTimes(facultyCode, onlyNew)
-  await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
+  await setGraduationStats(updatedTimesNew, 'NEW_DEGREE_PROGRAMMES')
   return 'OK'
 }
 

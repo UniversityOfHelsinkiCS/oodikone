@@ -2,8 +2,8 @@ import { studyProgrammeToolTips } from './studyProgramme'
 
 export const facultyToolTips: Record<string, string> = {
   programmeToggle: `
-    **New study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.  
-    **All study programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
+    **New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.  
+    **All degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
   `,
   creditsProducedByTheFaculty: `
     Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
@@ -44,7 +44,7 @@ export const facultyToolTips: Record<string, string> = {
 
     Valmistumisajoista on **vähennetty lakisääteiset poissaolot**.
     Luvuissa ei ole mukana opiskelijoita, jotka ovat vaihtaneet koulutuohjelmaa saman opiskeluoikeuden sisällä (pois lukien kandiohjelmasta maisteriohjelmaan siirtyneet).
-    Toisin sanoen luvut vastaavat *Study programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special study rights excluded*.
+    Toisin sanoen luvut vastaavat *Degree programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special study rights excluded*.
 
     - **Breakdown**/**Median study times**:
       - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), 12 kuukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
@@ -83,7 +83,7 @@ facultyToolTips.studentsStatsOfTheFaculty = studyProgrammeToolTips.studyTrackOve
   ''
 )
 facultyToolTips.studentsOfTheFaculty =
-  'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Study programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
+  'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Degree programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
     .concat(studyProgrammeToolTips.studentsOfTheStudyProgramme)
     .replace('Transferred away', 'Transferred out of programme')
     .replace('Transferred to', 'Transferred into programme')

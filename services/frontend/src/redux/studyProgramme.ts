@@ -120,7 +120,7 @@ const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn, la
   ]
 }
 
-/** Returns only newest study programmes and formats them to be used in Semantic UI dropdown menus */
+/** Returns only newest degree programmes and formats them to be used in Semantic UI dropdown menus */
 export const useFilteredAndFormattedStudyProgrammes = () => {
   const { data = {} } = useGetProgrammesQuery()
   const studyProgrammes = Object.values(data)

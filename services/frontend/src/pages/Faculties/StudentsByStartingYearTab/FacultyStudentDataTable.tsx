@@ -113,7 +113,7 @@ export const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
   const infoText =
-    "Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for study programmes."
+    "Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for degree programmes."
 
   return (
     <TableContainer>

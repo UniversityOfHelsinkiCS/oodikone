@@ -115,7 +115,7 @@ export const populationStatisticsToolTips = {
     Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017, joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
 
     - **Class of**: lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
-    - **Study programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
+    - **Degree programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
     - **Study track**: (valinnainen) koulutusohjelman opintosuunta. Valittavissa vain, jos ohjelmalla on opintosuuntia.
   `,
   studentsGuidanceGroups: `
@@ -134,8 +134,8 @@ export const populationStatisticsToolTips = {
       - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
       - **Since** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
     - **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
-    - **Study programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
-    - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Study programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.
+    - **Degree programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
+    - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Degree programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.
     - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
   `,
   studentsClass: `
@@ -186,7 +186,7 @@ export const populationStatisticsToolTips = {
 
     **Tags**
 
-    Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
+    Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Degree Program" > "Overview" > haluttu koulutusohjelma.
 
     **Progress**
 
@@ -202,7 +202,7 @@ export const populationStatisticsToolTips = {
   studentsCustom: `
     **Students**
 
-    Mikäli **"custom population"** -näkymää tarkasteltaessa ei ole erikseen valittu opinto-ohjelmaa, sarakkeissa olevat tiedot näytetään kunkin opiskelijan **Primary study programme**  -sarakkeessa olevan (uusimman aktiivisen) ohjelman pohjalta
+    Mikäli **"custom population"** -näkymää tarkasteltaessa ei ole erikseen valittu opinto-ohjelmaa, sarakkeissa olevat tiedot näytetään kunkin opiskelijan **Primary degree programme**  -sarakkeessa olevan (uusimman aktiivisen) ohjelman pohjalta
 
     Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden muut yhteystiedot
 

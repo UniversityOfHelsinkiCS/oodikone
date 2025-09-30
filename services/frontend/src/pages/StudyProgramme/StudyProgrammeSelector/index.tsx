@@ -109,7 +109,7 @@ export const StudyProgrammeSelector = () => {
 
   return (
     <Container maxWidth="md">
-      <PageTitle title="Study programmes" />
+      <PageTitle title="Degree programmes" />
       <Stack direction="column" gap={2}>
         <Box>
           <StudyProgrammeFilter handleFilterChange={handleFilterChange} studyProgrammes={studyProgrammes} />

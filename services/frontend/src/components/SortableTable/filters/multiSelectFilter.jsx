@@ -47,10 +47,10 @@ const MultiSelectFilterComponent = ({ column, options, dispatch }) => {
 
 /**
  * This filter allows the user to select multiple values from a list of values. This is useful for example
- * if you have a column that contains multiple values (like a list of student's study programmes). This way
- * the user can select multiple study programmes and the table will only show students that have at least one
- * of the selected study programmes. If the default filter was used instead, the values that the user is able
- * to filter by are just strings containing all the study programmes that the student has.
+ * if you have a column that contains multiple values (like a list of student's degree programmes). This way
+ * the user can select multiple degree programmes and the table will only show students that have at least one
+ * of the selected degree programmes. If the default filter was used instead, the values that the user is able
+ * to filter by are just strings containing all the degree programmes that the student has.
  *
  * IMPORTANT: The getRowVal function must return an array of strings for this filter to work.
  */

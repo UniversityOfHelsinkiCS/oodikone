@@ -53,7 +53,7 @@ erDiagram
   open_uni_population_searches
   progress_criteria
   study_guidance_group_tags
-  study_programme_pins
+  degree_programme_pins
   tag ||--o{ tag_student : "belongs to"
   tag
   tag_student

@@ -123,7 +123,7 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
             name="Associated programme"
             onChange={(_, value) => setAssociatedProgramme(value?.value)}
             options={studyProgrammes}
-            placeholder="Select associated study programme for the population"
+            placeholder="Select associated degree programme for the population"
             search={textAndDescriptionSearch}
             value={associatedProgramme}
           />

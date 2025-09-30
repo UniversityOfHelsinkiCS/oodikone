@@ -49,7 +49,7 @@ export const Updater = () => {
   const refreshSISRedisCache = () => void apiCall('/updater/refresh_redis_cache')
   const refreshAllTeacherLeaderboards = () => void apiCall('/teachers/top', 'post')
   const refreshFaculties = () => void apiCall('/updater/refresh_faculties_v2', 'post')
-  const refreshStudyProgrammes = () => void apiCall('/updater/refresh_study_programmes_v2', 'post')
+  const refreshStudyProgrammes = () => void apiCall('/updater/refresh_degree_programmes_v2', 'post')
   const refreshLanguageCenterData = () => void apiCall('/updater/refresh_language_center_data', 'post')
   const refreshCloseToGraduationData = () => void apiCall('/updater/refresh-close-to-graduation', 'post')
   const getJobs = () => void callApi('/updater/jobs')
@@ -144,7 +144,7 @@ export const Updater = () => {
               Refresh faculties
             </Button>
             <Button onClick={refreshStudyProgrammes} variant="contained">
-              Refresh study programmes
+              Refresh degree programmes
             </Button>
             {languageCenterViewEnabled ? (
               <Button onClick={refreshLanguageCenterData} variant="contained">

@@ -273,7 +273,7 @@ describe('Faculty statistics', () => {
       // TODO: Implement
     })
 
-    it.skip('Study programme toggle', () => {
+    it.skip('Degree programme toggle', () => {
       // TODO: Implement
     })
 

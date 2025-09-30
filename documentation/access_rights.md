@@ -21,7 +21,7 @@ The roles `facultyStatistics`, `openUniSearch`, and `studyGuidanceGroups` simply
 
 ### teachers
 
-- By default, the role only allows seeing the statistics of course providers (study programmes) they have full rights to (see [Programmes](#programmes))
+- By default, the role only allows seeing the statistics of course providers (degree programmes) they have full rights to (see [Programmes](#programmes))
 - This role always needs to be given and removed manually
 - If the user is a member of the `hy-dekaanit` or `hy-varadekaanit-opetus` IAM group (or is an admin), they can see leaderboards, information about individual teachers, and statistics of all course providers. They don't need to be given the `teachers` role manually.
 

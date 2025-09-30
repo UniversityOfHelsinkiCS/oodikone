@@ -262,7 +262,7 @@ export const StudyTracksAndClassStatisticsTab = ({
           infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
           isError={hasErrors}
           isLoading={isFetchingOrLoading}
-          title="Progress of students of the study programme by starting year"
+          title="Progress of students of the degree programme by starting year"
         >
           {studyTrackStats ? (
             <ProgressOfStudents
@@ -277,7 +277,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         <Section title={`Progress of students of the study track ${studyTrack} by starting year`}>
           <Alert severity="info" variant="outlined">
             <AlertTitle>Date unavailable</AlertTitle>
-            Progress data is currently only available for all students of the study programme. Please select ”All
+            Progress data is currently only available for all students of the degree programme. Please select ”All
             students of the programme” to view the progress data.
           </Alert>
         </Section>

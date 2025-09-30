@@ -1201,7 +1201,7 @@ describe('Only course statistics', () => {
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
     cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
 
-    cy.contains('Filter statistics by study programmes').should('not.exist')
+    cy.contains('Filter statistics by degree programmes').should('not.exist')
     cy.contains('Show population').should('not.exist')
     cy.contains('Faculty statistics').should('be.disabled')
 

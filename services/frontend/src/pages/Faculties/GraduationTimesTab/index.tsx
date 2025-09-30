@@ -25,7 +25,7 @@ export const GraduationTimesTab = ({
 }) => {
   const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
-  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
+  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_DEGREE_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.id, studyProgrammeFilter })
   const { getTextIn } = useLanguage()
 
@@ -129,9 +129,9 @@ export const GraduationTimesTab = ({
           <Toggle
             cypress="programme-toggle"
             disabled={isError || isLoading}
-            firstLabel="New study programmes"
+            firstLabel="New degree programmes"
             infoBoxContent={facultyToolTips.programmeToggle}
-            secondLabel="All study programmes"
+            secondLabel="All degree programmes"
             setValue={setStudyProgrammes}
             value={studyProgrammes}
           />

@@ -20,10 +20,10 @@ export const TagsSection = ({
   return (
     <Section title="Tags">
       {tags.length === 0 ? (
-        <Typography color="text.secondary">This study programme does not have any tags yet</Typography>
+        <Typography color="text.secondary">This degree programme does not have any tags yet</Typography>
       ) : (
         <Stack gap={1}>
-          <Typography>Tags associated with this study programme</Typography>
+          <Typography>Tags associated with this degree programme</Typography>
           <List>
             {tags.map(tag => (
               <TagItem

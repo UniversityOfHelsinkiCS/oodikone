@@ -180,7 +180,7 @@ router.get('/:id/studytracks', async (req: Request, res: Response) => {
     const data = await getStudyTracksForProgramme(code)
     return res.json(data)
   } catch (error) {
-    logger.error({ message: `Failed to get study tracks for study programme ${code}`, meta: `${error}` })
+    logger.error({ message: `Failed to get study tracks for degree programme ${code}`, meta: `${error}` })
   }
 })
 

@@ -85,7 +85,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
     const result = await statisticsOf(studentNumbers, studyRights, tagList, startDate)
 
-    // Obfuscate if user has only limited study programme rights and there are any students
+    // Obfuscate if user has only limited degree programme rights and there are any students
     if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
       result.students = result.students.map(student => {
         const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)

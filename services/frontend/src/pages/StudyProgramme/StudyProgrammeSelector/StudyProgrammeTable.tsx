@@ -54,7 +54,7 @@ export const StudyProgrammeTable = ({
             header="Pin"
             tooltipText={`
               Click the pin icon to pin/unpin a programme.
-              Pinned programmes are shown first here and in the study programme search in Class statistics.
+              Pinned programmes are shown first here and in the degree programme search in Class statistics.
             `}
           />
         ),

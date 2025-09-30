@@ -134,7 +134,7 @@ export const BasicInformationTab = ({
   const [academicYear, setAcademicYear] = useState(false)
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
+  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_DEGREE_PROGRAMMES'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
 
   const basics = useGetFacultyBasicStatsQuery({
@@ -212,9 +212,9 @@ export const BasicInformationTab = ({
           <Toggle
             cypress="programme-toggle"
             disabled={isFetchingOrLoading || hasErrors}
-            firstLabel="New study programmes"
+            firstLabel="New degree programmes"
             infoBoxContent={facultyToolTips.programmeToggle}
-            secondLabel="All study programmes"
+            secondLabel="All degree programmes"
             setValue={setStudyProgrammes}
             value={studyProgrammes}
           />

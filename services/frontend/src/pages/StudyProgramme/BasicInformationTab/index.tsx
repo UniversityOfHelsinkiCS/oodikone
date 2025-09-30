@@ -119,7 +119,7 @@ export const BasicInformationTab = ({
         infoBoxContent={studyProgrammeToolTips.studentsOfTheStudyProgramme}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
-        title="Students of the study programme"
+        title="Students of the degree programme"
       >
         {basics.isSuccess && basics.data ? (
           <Stack gap={2}>
@@ -148,7 +148,7 @@ export const BasicInformationTab = ({
         infoBoxContent={studyProgrammeToolTips.creditsProducedByTheStudyProgramme}
         isError={creditsIsError}
         isLoading={creditsIsLoading}
-        title="Credits produced by the study programme"
+        title="Credits produced by the degree programme"
       >
         {creditGraphStats && tableStats && isDefaultServiceProvider() ? (
           <Stack gap={2}>

@@ -70,7 +70,7 @@ export const StudyProgramme = () => {
   const secondProgrammeId = studyProgrammeId?.split('+')[1] ?? ''
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
-  useTitle(programmeName ? `${programmeName} - Study programmes` : 'Study programmes')
+  useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
 
   if (!studyProgrammeId || !programmeId) {
     return <StudyProgrammeSelector />

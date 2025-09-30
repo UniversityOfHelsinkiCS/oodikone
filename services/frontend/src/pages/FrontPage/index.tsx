@@ -39,7 +39,7 @@ export const FrontPage = () => {
       title: 'Programmes',
       content: (
         <ul>
-          <li>Class statistics: View details of a specific year of a study programme</li>
+          <li>Class statistics: View details of a specific year of a degree programme</li>
           <li>Overview: View statistics of a programme across all years</li>
         </ul>
       ),

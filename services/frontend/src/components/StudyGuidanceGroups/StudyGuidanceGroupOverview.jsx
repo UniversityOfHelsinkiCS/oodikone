@@ -47,7 +47,7 @@ const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit }) =>
   }, [group, tagName, open])
 
   const validate = values => {
-    const tags = { studyProgramme: 'Study programme', year: 'Starting year' }
+    const tags = { studyProgramme: 'Degree programme', year: 'Starting year' }
     const errors = {}
     if (!values[tagName]) {
       errors[tagName] = `${tags[tagName]} is required!`
@@ -116,7 +116,7 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
   <>
     <p>
       {tagName === 'studyProgramme'
-        ? 'Edit associated study programme for this group:'
+        ? 'Edit associated degree programme for this group:'
         : 'Edit associated starting year for this group:'}
     </p>
     <Form style={{ alignItems: 'center' }}>
@@ -129,7 +129,7 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
             onChange={(_, { value }) => handleChange(tagName, value)}
             options={selectFieldItems}
             placeholder={
-              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text ?? 'Select study programme'
+              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text ?? 'Select degree programme'
             }
             search={textAndDescriptionSearch}
             value={formValues[tagName]}
@@ -234,7 +234,7 @@ export const StudyGuidanceGroupOverview = ({ groups }) => {
     },
     {
       key: 'studyProgramme',
-      title: 'Study programme',
+      title: 'Degree programme',
       getRowVal: group => group.tags?.studyProgramme,
       formatValue: value => studyProgrammes.find(programme => programme.value === value)?.text,
       getRowContent: group => <TagCell group={group} studyProgrammes={studyProgrammes} tagName="studyProgramme" />,

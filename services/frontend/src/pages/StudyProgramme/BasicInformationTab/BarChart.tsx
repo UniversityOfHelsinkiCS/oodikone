@@ -34,7 +34,7 @@ export const BarChart = ({ id, graphStats, years }: { id: string; graphStats: Gr
       height: '450px',
     },
     exporting: {
-      filename: `oodikone_graduations_and_thesis_of_study_programme_${id}`,
+      filename: `oodikone_graduations_and_thesis_of_degree_programme_${id}`,
     },
     plotOptions: {
       column: {

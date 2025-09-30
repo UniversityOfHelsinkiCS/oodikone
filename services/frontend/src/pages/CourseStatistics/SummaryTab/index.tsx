@@ -92,7 +92,7 @@ export const SummaryTab = ({
       <Box gap={1}>
         {userHasAccessToAllStats ? (
           <ProgrammeDropdown
-            label="Select study programmes"
+            label="Select degree programmes"
             onChange={handleChange}
             options={options}
             value={courseSummaryFormProgrammes}

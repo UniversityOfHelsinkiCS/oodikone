@@ -75,8 +75,8 @@ export const useGetColumnDefinitions = ({
         maxSize: 340,
         header: _ => (
           <TableHeaderWithTooltip
-            header="Primary study programme"
-            tooltipText="Programme associated with the most recently acquired active study right. Columns showing study programme specific data (e.g. Started in programme or Credits in HOPS) refer to the programme displayed here."
+            header="Primary degree programme"
+            tooltipText="Programme associated with the most recently acquired active study right. Columns showing degree programme specific data (e.g. Started in programme or Credits in HOPS) refer to the programme displayed here."
           />
         ),
         cell: cell => {
@@ -199,7 +199,7 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('programmes', {
         header: _ => (
           <TableHeaderWithTooltip
-            header={includePrimaryProgramme ? 'Study programmes' : 'Other programmes'}
+            header={includePrimaryProgramme ? 'Degree programmes' : 'Other programmes'}
             tooltipText="If a student has more than one programme, hover your mouse on the cell to view the rest. They are also displayed in the exported Excel file."
           />
         ),

@@ -31,7 +31,7 @@ describe('Study guidance group tests', () => {
 
         const studyGuidanceGroupsTableContent = [
           ['MAT kandit 2020', 3, 'Matemaattisten tieteiden kandiohjelma', '2020 - 2021'],
-          ['Oma ohjausryhmä', 2, 'Add study programme', 'Add year'],
+          ['Oma ohjausryhmä', 2, 'Add degree programme', 'Add year'],
         ]
 
         cy.checkTableStats(studyGuidanceGroupsTableContent, 'study-guidance-group-overview')
@@ -56,7 +56,7 @@ describe('Study guidance group tests', () => {
       cy.url().should('eq', `${Cypress.config().baseUrl}/studyguidancegroups`)
     })
 
-    describe('without associated study programme and year', () => {
+    describe('without associated degree programme and year', () => {
       beforeEach(() => {
         cy.init('/studyguidancegroups/sgg-cypress-2', 'onlystudyguidancegroups')
       })
@@ -84,7 +84,7 @@ describe('Study guidance group tests', () => {
           'All credits',
           'Credits since 1.1.1970',
           'Start year at uni',
-          'Study programmes',
+          'Degree programmes',
           'Tags',
         ]
         cy.contains('Students (2)').click()
@@ -94,7 +94,7 @@ describe('Study guidance group tests', () => {
       })
     })
 
-    describe('with associated study programme and year', () => {
+    describe('with associated degree programme and year', () => {
       beforeEach(() => {
         cy.init('/studyguidancegroups/sgg-cypress-1', 'onlystudyguidancegroups')
       })

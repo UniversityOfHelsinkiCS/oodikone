@@ -71,7 +71,7 @@ export const refreshProgramme = async (code: string) => {
 }
 
 export const refreshProgrammes = async () => {
-  logger.info('Refreshing study programme and study track overview statistics for all programmes')
+  logger.info('Refreshing degree programme and study track overview statistics for all programmes')
   const facultyCodes = (await getFaculties()).map(faculty => faculty.code)
   const programmeCodes: string[] = []
   for (const faculty of facultyCodes) {
