@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 
+import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
+import { Name, ProgrammeCourse, FormattedStudent as Student } from '@oodikone/shared/types'
 import { ModulesTab } from './ModulesTable'
 
 export type ModuleTabStudent = {
@@ -12,29 +14,28 @@ export type ModuleTabStudent = {
   sisPersonID: string
 }
 
-export type FormattedModules = Record<string, Record<string, string>>
+export type FormattedModules = Record<string, Name>
 
 type StudyModuleData = { code: string; completed: boolean; completionDate: string | null }
 
-const getModulesFromRelevantStudyPlan = (student: any, degreeProgrammeCodes: string[]): StudyModuleData[] => {
+const getModulesFromRelevantStudyPlan = (student: Student, degreeProgrammeCodes: string[]): StudyModuleData[] => {
   if (!student.studyRights || !Array.isArray(student.studyRights)) {
     return []
   }
 
   const relevantStudyRight =
-    student.studyRights?.find((studyRight: any) =>
-      studyRight.studyRightElements?.some((element: any) => degreeProgrammeCodes.includes(element.code))
+    student.studyRights?.find(studyRight =>
+      studyRight.studyRightElements?.some(element => degreeProgrammeCodes.includes(element.code))
     ) ?? null
 
   if (relevantStudyRight) {
     const studyModules =
       student.studyplans?.find(
-        (plan: any) =>
-          plan.sis_study_right_id === relevantStudyRight.id && degreeProgrammeCodes.includes(plan.programme_code)
+        plan => plan.sis_study_right_id === relevantStudyRight.id && degreeProgrammeCodes.includes(plan.programme_code)
       )?.includedModules ?? []
 
-    return studyModules.map((studyModule: any) => {
-      const completion = student.courses.find((course: any) => course.course_code === studyModule && course.passed)
+    return studyModules.map(studyModule => {
+      const completion = student.courses.find(course => course.course_code === studyModule && course.passed)
       return {
         code: studyModule,
         completed: !!completion,
@@ -46,7 +47,7 @@ const getModulesFromRelevantStudyPlan = (student: any, degreeProgrammeCodes: str
   return []
 }
 
-const formatStudent = (student: any, degreeProgrammeCodes: string[]): ModuleTabStudent => {
+const formatStudent = (student: Student, degreeProgrammeCodes: string[]): ModuleTabStudent => {
   return {
     firstNames: student.firstnames,
     lastName: student.lastname,
@@ -56,10 +57,10 @@ const formatStudent = (student: any, degreeProgrammeCodes: string[]): ModuleTabS
   }
 }
 
-const getAllModules = (curriculumCourses: any[]) => {
+const getAllModules = (curriculumCourses: ProgrammeCourse[]) => {
   const localeComparator = createLocaleComparator()
   const modulesUnordered = curriculumCourses?.reduce<FormattedModules>((modules, course) => {
-    if (!modules[course.parent_code] && course.visible?.visibility) {
+    if (course.parent_code && !modules[course.parent_code] && course.visible?.visibility) {
       modules[course.parent_code] = course.parent_name
     }
     return modules
@@ -72,7 +73,13 @@ const getDegreeProgrammeCodes = (curriculumModules): string[] => {
   return curriculumModules.filter(mod => !!mod.degree_programme_type).map(mod => mod.code)
 }
 
-export const ModulesTabContainer = ({ curriculum, students }) => {
+export const ModulesTabContainer = ({
+  curriculum,
+  students,
+}: {
+  curriculum: ExtendedCurriculumDetails | null | undefined
+  students: Student[]
+}) => {
   const curriculumModules = useMemo(
     () => (curriculum ? [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules] : []),
     [curriculum]

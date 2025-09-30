@@ -29,6 +29,7 @@ import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
 import { FormattedStudent as Student } from '@oodikone/shared/types'
+import { FormattedCourse as Course } from '@oodikone/shared/types/courseData'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -42,7 +43,7 @@ type PopulationDetailsProps = {
   query: PopulationQuery
   populationTags: Map<string, string>
   filteredStudents: Student[]
-  filteredCourses: any[]
+  filteredCourses: Course[]
 }
 
 export const PopulationDetails = ({

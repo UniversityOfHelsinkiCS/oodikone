@@ -10,6 +10,8 @@ import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
+import { FormattedStudent } from '@oodikone/shared/types'
+import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { CheckStudentList } from './CheckStudentList'
 import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
@@ -26,14 +28,14 @@ type PopulationDetails = {
 
   curriculum: ExtendedCurriculumDetails | null
 
-  filteredCourses: any[]
-  filteredStudents: any[]
+  filteredCourses: FormattedCourse[]
+  filteredStudents: FormattedStudent[]
 }
 
 type CoursePopulation = {
   variant: 'coursePopulation'
 
-  filteredStudents: any[]
+  filteredStudents: FormattedStudent[]
 }
 
 type StudyGuidanceGroup = {
@@ -44,14 +46,14 @@ type StudyGuidanceGroup = {
   studyGuidanceGroup: any
   year: string
 
-  filteredCourses: any[]
-  filteredStudents: any[]
+  filteredCourses: FormattedCourse[]
+  filteredStudents: FormattedStudent[]
 }
 
 type CustomPopulation = {
   variant: 'customPopulation'
 
-  filteredStudents: any[]
+  filteredStudents: FormattedStudent[]
   dataExport: JSX.Element
 }
 
