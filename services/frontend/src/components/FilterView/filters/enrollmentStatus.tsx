@@ -70,8 +70,9 @@ export const enrollmentStatusFilter = createFilter({
     const { status, semesters } = options
 
     if (args.programme) {
-      const correctStudyRight = studyRights.find(({ studyRightElements }) =>
-        studyRightElements.some(({ code }) => code === args.programme)
+      const correctStudyRight = studyRights.find(
+        ({ cancelled, studyRightElements }) =>
+          !cancelled && studyRightElements.some(({ code }) => code === args.programme)
       )
 
       return semesters.every(
