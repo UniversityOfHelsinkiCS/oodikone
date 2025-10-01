@@ -27,7 +27,7 @@ const LinkToGroup = ({ group }) => {
 }
 
 const prettifyTagName = string => {
-  if (string === 'studyProgramme') return 'Degree programme'
+  if (string === 'studyProgramme') return 'degree programme'
 
   return string
 }
