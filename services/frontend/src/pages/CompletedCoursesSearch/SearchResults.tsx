@@ -126,11 +126,11 @@ export const SearchResults = ({ searchValues }) => {
   )
 
   const dynamicColumns = useMemo(() => {
-    const courseOrder = data?.courses.map(({ code }) => code) ?? []
+    const courseOrder = courseList ?? []
 
     return (
       data?.courses
-        .toSorted(({ code: a }, { code: b }) => courseOrder.indexOf(a) < courseOrder.indexOf(b))
+        .toSorted(({ code: a }, { code: b }) => courseOrder.indexOf(b) < courseOrder.indexOf(a))
         .map(course => ({
           accessorFn: student => getCompletion(student, course.code, { icon: false }),
           id: course.code,
