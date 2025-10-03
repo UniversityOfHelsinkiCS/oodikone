@@ -22,6 +22,8 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
 
   if (isFetching) return null
 
+  if (!Object.keys(allSemesters).length) return null
+
   const today = dayjs().startOf('day')
 
   const triggerOnChange = date => {

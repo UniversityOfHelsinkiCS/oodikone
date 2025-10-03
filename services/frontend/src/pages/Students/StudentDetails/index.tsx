@@ -87,6 +87,10 @@ export const StudentDetails = () => {
     return null
   }
 
+  if (!Object.keys(allSemesters).length) {
+    return null
+  }
+
   if (student.studyRights) {
     const bachelorStudyRights = orderBy(
       student.studyRights

@@ -38,6 +38,11 @@ const semestersApi = RTKApi.injectEndpoints({
 
         return { ...semesterData, currentSemester }
       },
+      transformErrorResponse: () => {
+        // NOTE: Intentionally crash the page if this request fails.
+        //       Semestercodes is an integral part of this project and is needed almost everywhere.
+        throw new Error('Semestercodes unavailable.')
+      },
     }),
   }),
 })
