@@ -29,16 +29,10 @@ const getHeaders = () => {
 
 const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
 
-const actionSuffixes = {
-  attempt: 'ATTEMPT',
-  failure: 'FAILURE',
-  success: 'SUCCESS',
-}
-
 const actionTypes = prefix => ({
-  attempt: `${prefix}${actionSuffixes.attempt}`,
-  failure: `${prefix}${actionSuffixes.failure}`,
-  success: `${prefix}${actionSuffixes.success}`,
+  attempt: `${prefix}ATTEMPT`,
+  failure: `${prefix}FAILURE`,
+  success: `${prefix}SUCCESS`,
 })
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
@@ -63,32 +57,36 @@ export const callApi = async (url, method = 'get', data, params, timeout = 0, pr
 }
 
 const handleError = (error, actionHistory = []) => {
-  const { response } = error
+  const { config, request, response } = error
   if (response && response.status) {
     Sentry.withScope(scope => {
-      scope.setExtra('config', error.config)
-      scope.setExtra('request', error.request)
-      scope.setExtra('response', error.response)
+      scope.setExtra('config', config)
+      scope.setExtra('request', request)
+      scope.setExtra('response', response)
       scope.setExtra('actionHistory', JSON.stringify(actionHistory))
+
       Sentry.captureException(error)
     })
   }
 }
 
 export const handleRequest = store => next => async action => {
-  next(action)
-  const { requestSettings } = action
-  if (requestSettings) {
-    const { route, method, data, prefix, query, params, onProgress } = requestSettings
+  if (action.requestSettings) {
     const { success, failure } = actionTypes(prefix)
-    try {
-      const res = await callApi(route, method, data, params, 0, onProgress)
-      store.dispatch({ type: success, response: res.data, query })
-    } catch (error) {
-      store.dispatch({ type: failure, response: error, query })
-      handleError(error, store.getState().actionHistory)
-    }
+    const { route, method, data, prefix, query, params, onProgress } = action.requestSettings
+
+    // Based no the previous config. We don't actually care when this finishes.
+    void callApi(route, method, data, params, 0, onProgress)
+      .then(res => store.dispatch({ type: success, response: res.data, query }))
+      .catch(error => {
+        // Handle error first to avoid redux minified error #3 in production.
+        // We don't need to add the error to the actionHistory as it is already passed to Sentry.
+        handleError(error, store.getState().actionHistory)
+        store.dispatch({ type: failure, response: error, query })
+      })
   }
+
+  next(action)
 }
 
 // Redux-toolkit query based API
