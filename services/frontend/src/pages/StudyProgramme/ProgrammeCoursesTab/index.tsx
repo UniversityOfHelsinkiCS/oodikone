@@ -31,6 +31,7 @@ export const ProgrammeCoursesTab = ({
         <ByCreditTypeTab
           academicYear={academicYear}
           combinedProgramme={combinedProgramme}
+          key="ByCreditTypeTab"
           setAcademicYear={setAcademicYear}
           studyProgramme={studyProgramme}
         />
@@ -41,7 +42,7 @@ export const ProgrammeCoursesTab = ({
       cypress: 'by-semester-tab',
       label: 'By semester',
       icon: <CalendarMonthIcon />,
-      component: <BySemesterTab studyProgramme={studyProgramme} />,
+      component: <BySemesterTab key="BySemesterTab" studyProgramme={studyProgramme} />,
     },
   ]
 
