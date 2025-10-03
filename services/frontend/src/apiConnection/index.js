@@ -6,19 +6,22 @@ import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
 import { formatToArray } from '@oodikone/shared/util'
 
+// Set up dev user for development environment, mimicking production admin user
+const baseHeaders = isDev
+  ? {
+      uid: 'mluukkai',
+      displayName: 'Matti Luukkainen',
+      'shib-session-id': 'mock-session',
+      hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users;grp-toska',
+      mail: 'grp-toska+mockmluukkai@helsinki.fi',
+      hyPersonSisuId: 'hy-hlo-1441871',
+      shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
+      remote_user: 'mluukkai',
+    }
+  : {}
+
 const getHeaders = () => {
-  // Set up dev user for development environment, mimicking production admin user
-  const devUserHeaders = {
-    uid: 'mluukkai',
-    displayName: 'Matti Luukkainen',
-    'shib-session-id': 'mock-session',
-    hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users;grp-toska',
-    mail: 'grp-toska+mockmluukkai@helsinki.fi',
-    hyPersonSisuId: 'hy-hlo-1441871',
-    shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
-    remote_user: 'mluukkai',
-  }
-  const headers = isDev ? { ...devUserHeaders } : {}
+  const headers = structuredClone(baseHeaders)
 
   // Set up possible show as user -headers
   const showAsUser = window.localStorage.getItem(showAsUserKey)
