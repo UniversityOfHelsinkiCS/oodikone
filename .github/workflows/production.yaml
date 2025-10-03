@@ -100,9 +100,9 @@ jobs:
       - name: Create Sentry release
         uses: getsentry/action-release@v3
         env:
-          SENTRY_URL: https://toska.cs.helsinki.fi/
+          SENTRY_URL: https://toska.it.helsinki.fi/
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_TOKEN }}
-          SENTRY_ORG: toska
+          SENTRY_ORG: sentry
           SENTRY_PROJECT: oodikone-frontend
         with:
           environment: production
@@ -134,9 +134,9 @@ jobs:
       - name: Create Sentry release
         uses: getsentry/action-release@v3
         env:
-          SENTRY_URL: https://toska.cs.helsinki.fi/
+          SENTRY_URL: https://toska.it.helsinki.fi/
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_TOKEN }}
-          SENTRY_ORG: toska
+          SENTRY_ORG: sentry
           SENTRY_PROJECT: oodikone-backend
         with:
           environment: production
