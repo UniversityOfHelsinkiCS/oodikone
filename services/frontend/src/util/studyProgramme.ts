@@ -1,3 +1,5 @@
+import { isDefaultServiceProvider } from '@/common'
+
 export const getGraduationGraphTitle = (programmeCode: string, doCombo = false) => {
   if (!programmeCode) return ''
   if (['MH30_001', 'MH30_003'].includes(programmeCode)) return 'Licenciate study right'
@@ -5,6 +7,7 @@ export const getGraduationGraphTitle = (programmeCode: string, doCombo = false) 
   if (doCombo && programmeCode.includes('MH')) return 'Bachelor + master study right'
   if (programmeCode.includes('KH')) return 'Bachelor study right'
   if (programmeCode.includes('MH')) return 'Master study right'
+  if (!isDefaultServiceProvider()) return ''
   return 'Doctoral study right'
 }
 
