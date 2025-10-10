@@ -26,7 +26,7 @@ import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 
 const getProgrammeName = (
   studyProgrammeId: string | undefined,
-  combibedProgrammeId: string,
+  combibedProgrammeId: string | undefined,
   programmes: Record<string, DegreeProgramme> | undefined,
   language: Language,
   getTextIn: GetTextIn
@@ -46,13 +46,14 @@ const getProgrammeName = (
 }
 
 const getSubtitle = (programmeId: string, programmeLetterId?: string, secondProgrammeLetterId?: string) => {
-  if (!programmeLetterId) {
-    return programmeId
+  if (programmeLetterId) {
+    if (secondProgrammeLetterId) {
+      return `${programmeLetterId}+${secondProgrammeLetterId} - ${programmeId}`
+    }
+
+    return `${programmeLetterId} - ${programmeId}`
   }
-  if (secondProgrammeLetterId) {
-    return `${programmeLetterId}+${secondProgrammeLetterId} - ${programmeId}`
-  }
-  return `${programmeLetterId} - ${programmeId}`
+  return programmeId
 }
 
 export const StudyProgramme = () => {
@@ -61,20 +62,17 @@ export const StudyProgramme = () => {
   const { language, getTextIn } = useLanguage()
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const [currentTab, setCurrentTab] = useTabs(isAdmin ? 6 : 5)
+  const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
 
-  const programmeId = studyProgrammeId?.split('+')[0]
-  const secondProgrammeId = studyProgrammeId?.split('+')[1] ?? ''
+  const [programmeId, secondProgrammeId] = studyProgrammeId?.split('+') ?? []
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
   useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
 
-  if (!studyProgrammeId || !programmeId) {
-    return <StudyProgrammeSelector />
-  }
+  if (!studyProgrammeId || !programmeId) return <StudyProgrammeSelector />
 
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
