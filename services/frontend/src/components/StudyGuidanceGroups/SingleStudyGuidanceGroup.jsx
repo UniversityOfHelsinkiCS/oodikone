@@ -35,22 +35,21 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
 
   const year = group?.tags?.year
 
-  const programmeCodes = group?.tags?.studyProgramme?.split('+') ?? []
+  const [programme, combinedProgramme] = group?.tags?.studyProgramme?.split('+') ?? []
   const query = {
-    studyRights: {
-      programme: programmeCodes[0],
-      combinedProgramme: programmeCodes[1],
-    },
+    programme,
+    combinedProgramme,
+    years: year ? [year] : undefined,
   }
 
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programmeCodes[0], query?.year)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, year)
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
 
   const toggleCreditDateFilter = () => {
     if (creditDateFilterActive) {
-      filterDispatch(creditDateFilter.actions.reset())
+      filterDispatch(creditDateFilter.actions.reset(undefined))
     } else {
       filterDispatch(
         creditDateFilter.actions.setOptions({
@@ -73,22 +72,20 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             </Button>
           ) : null}
           <CreditAccumulationGraphHighCharts
-            programmeCodes={group?.tags?.studyProgramme ? programmeCodes : []}
+            programmeCodes={group?.tags?.studyProgramme ? [programme, combinedProgramme] : []}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
           />
         </>
       ),
     },
-    ((programmeCodes?.length && programmeCodes[0]) || group?.tags?.studyProgramme) && year
+    (programme || group?.tags?.studyProgramme) && year
       ? {
           title: 'Credit statistics',
-          content: !query?.years ? (
+          content: (
             <div>
               <CreditStatistics filteredStudents={filteredStudents} query={query} sggYear={group.tags.year} />
             </div>
-          ) : (
-            <div>This table is omitted when searching population of multiple years</div>
           ),
         }
       : null,
@@ -106,7 +103,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             setCurriculum={setCurriculum}
-            studyProgramme={group.tags?.studyProgramme ? programmeCodes[0] : null}
+            studyProgramme={group.tags?.studyProgramme ? programme : null}
             year={year}
           />
         </div>
