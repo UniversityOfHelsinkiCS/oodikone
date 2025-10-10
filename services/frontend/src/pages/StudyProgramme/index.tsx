@@ -57,20 +57,23 @@ const getSubtitle = (programmeId: string, programmeLetterId?: string, secondProg
 }
 
 export const StudyProgramme = () => {
+  const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
+  const { language, getTextIn } = useLanguage()
+
   const { studyProgrammeId } = useParams()
   const { data: programmes } = useGetProgrammesQuery()
-  const { language, getTextIn } = useLanguage()
-  const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
+
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
-  const [academicYear, setAcademicYear] = useState(false)
-  const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
-  const [graduated, setGraduated] = useState(false)
 
   const [programmeId, secondProgrammeId] = studyProgrammeId?.split('+') ?? []
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
   useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
+
+  const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
+  const [academicYear, setAcademicYear] = useState(false)
+  const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
+  const [graduated, setGraduated] = useState(false)
 
   if (!studyProgrammeId || !programmeId) return <StudyProgrammeSelector />
 
