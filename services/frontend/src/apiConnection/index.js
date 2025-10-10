@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
+import { actionHistory } from '@/redux/actionHistory'
 import { formatToArray } from '@oodikone/shared/util'
 
 // Set up dev user for development environment, mimicking production admin user
@@ -84,7 +85,7 @@ export const handleRequest = store => next => async action => {
       .catch(error => {
         // Handle error first to avoid redux minified error #3 in production.
         // We don't need to add the error to the actionHistory as it is already passed to Sentry.
-        handleError(error, store.getState().actionHistory)
+        handleError(error, actionHistory)
         store.dispatch({ type: failure, response: error, query })
       })
   }

@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/browser'
 import { type ReactNode, Component } from 'react'
 
-import { useAppSelector } from '@/redux/hooks'
-import { ErrorBackground } from '../material/ErrorBackground'
+import { ErrorBackground } from '@/components/material/ErrorBackground'
+import { actionHistory } from '@/redux/actionHistory'
 
 let lastErrorSent = null
 
@@ -29,10 +29,11 @@ class CustomErrorBoundary extends Component<{
     return { hasError: true }
   }
 
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
   componentDidCatch(error, errorInfo) {
     if (lastErrorSent === error) return
 
-    const cleanedActionHistory = this.props.actionHistory?.map(({ payload, ...rest }) => rest) ?? []
+    const cleanedActionHistory = actionHistory.map(({ payload, ...rest }) => rest)
 
     lastErrorSent = error
     const encoder = new TextEncoder()
@@ -60,7 +61,4 @@ class CustomErrorBoundary extends Component<{
   }
 }
 
-export const ErrorBoundary = ({ children }) => {
-  const actionHistory = useAppSelector(state => state.actionHistory)
-  return <CustomErrorBoundary actionHistory={actionHistory}>{children}</CustomErrorBoundary>
-}
+export const ErrorBoundary = ({ children }) => <CustomErrorBoundary>{children}</CustomErrorBoundary>

@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit/react'
 
 import { handleRequest, RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'
-import { reducer as actionHistory } from './actionHistory'
+import { actionHistoryMiddleware } from './actionHistory'
 import { reducer as courseSearch } from './courseSearch'
 import { reducer as filters } from './filters'
 import { reducer as selectedCourse } from './selectedCourse'
@@ -11,7 +11,6 @@ import { reducer as settings } from './settings'
 
 export const store = configureStore({
   reducer: {
-    actionHistory,
     courseSearch,
     filters,
     selectedCourse,
@@ -23,7 +22,11 @@ export const store = configureStore({
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(RTKApi.middleware, handleRequest),
+    getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(
+      RTKApi.middleware,
+      handleRequest,
+      actionHistoryMiddleware
+    ),
 })
 setupListeners(store.dispatch)
 
