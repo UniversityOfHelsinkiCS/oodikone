@@ -87,7 +87,6 @@ export const StudyProgramme = () => {
   const tabs = [
     {
       key: 'BasicInformationTab',
-      cypress: 'basic-information-tab',
       label: 'Basic information',
       component: (
         <BasicInformationTab
@@ -103,7 +102,6 @@ export const StudyProgramme = () => {
     },
     {
       key: 'StudyTracksAndClassStatisticsTab',
-      cypress: 'study-tracks-and-class-statistics-tab',
       label: 'Study tracks and class statistics',
       component: (
         <StudyTracksAndClassStatisticsTab
@@ -122,7 +120,6 @@ export const StudyProgramme = () => {
   if (otherTabsVisible && isDefaultServiceProvider()) {
     tabs.push({
       key: 'ProgrammeCoursesTab',
-      cypress: 'programme-courses-tab',
       label: 'Programme courses',
       component: (
         <ProgrammeCoursesTab
@@ -140,7 +137,6 @@ export const StudyProgramme = () => {
     tabs.push(
       {
         key: 'DegreeCoursesTab',
-        cypress: 'degree-courses-tab',
         label: 'Degree courses',
         component: (
           <DegreeCoursesTab
@@ -153,7 +149,6 @@ export const StudyProgramme = () => {
       },
       {
         key: 'TagsTab',
-        cypress: 'tags-tab',
         label: 'Tags',
         component: <TagsTab combinedProgramme={secondProgrammeId} key="TagsTabContent" studyProgramme={programmeId} />,
       }
@@ -163,7 +158,6 @@ export const StudyProgramme = () => {
   if (isAdmin) {
     tabs.push({
       key: 'UpdateStatisticsTab',
-      cypress: 'update-statistics-tab',
       label: 'Update statistics',
       component: (
         <UpdateStatisticsTab
@@ -189,7 +183,7 @@ export const StudyProgramme = () => {
           variant="scrollable"
         >
           {tabs.map(tab => (
-            <Tab data-cy={tab.cypress} key={tab.key} label={tab.label} />
+            <Tab data-cy={tab.key} key={tab.key} label={tab.label} />
           ))}
         </Tabs>
         {tabs.map(tab => currentTab === tabs.indexOf(tab) && tab.component)}

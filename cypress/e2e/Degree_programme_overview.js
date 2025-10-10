@@ -290,7 +290,7 @@ describe('Degree programme overview', () => {
       ).as('stQuery')
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('study-tracks-and-class-statistics-tab').click()
+      cy.cs('StudyTracksAndClassStatisticsTab').click()
     })
 
     describe('Info boxes', () => {
@@ -519,7 +519,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('programme-courses-tab').click()
+      cy.cs('ProgrammeCoursesTab').click()
 
       cy.cs('by-credit-type-section')
       cy.cs('by-credit-type-tab')
@@ -693,7 +693,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('degree-courses-tab').click()
+      cy.cs('DegreeCoursesTab').click()
     })
 
     it('Curriculum section', () => {
@@ -729,7 +729,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
-      cy.cs('tags-tab').click()
+      cy.cs('TagsTab').click()
     })
 
     it('info box', () => {
@@ -856,7 +856,7 @@ describe('Degree programme overview', () => {
     })
 
     it('can access basic information', () => {
-      cy.cs('basic-information-tab').click()
+      cy.cs('BasicInformationTab').click()
 
       cy.cs('students-of-the-study-programme-section')
       cy.cs('credits-produced-by-the-study-programme-section')
@@ -866,7 +866,7 @@ describe('Degree programme overview', () => {
     })
 
     it('can access study tracks', () => {
-      cy.cs('study-tracks-and-class-statistics-tab').click()
+      cy.cs('StudyTracksAndClassStatisticsTab').click()
 
       cy.cs('study-track-overview-section')
       cy.cs('progress-of-students-section')
@@ -874,9 +874,9 @@ describe('Degree programme overview', () => {
     })
 
     it("doesn't see other tabs", () => {
-      cy.cs('degree-courses-tab').should('not.exist')
-      cy.cs('tags-tab').should('not.exist')
-      cy.cs('update-statistics-tab').should('not.exist')
+      cy.cs('DegreeCoursesTab').should('not.exist')
+      cy.cs('TagsTab').should('not.exist')
+      cy.cs('UpdateStatisticsTab').should('not.exist')
     })
   })
 })
