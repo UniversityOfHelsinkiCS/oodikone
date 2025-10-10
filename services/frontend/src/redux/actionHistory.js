@@ -1,6 +1,8 @@
 export const reducer = (state = [], action) => {
   switch (action.type) {
     case '@@INIT':
+    case '__rtkq/focused':
+    case '__rtkq/unfocused':
       return state
     default: {
       const newAction = { ...action, time: new Date().toISOString() }
