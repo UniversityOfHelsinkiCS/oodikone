@@ -1,8 +1,11 @@
 import EyeIcon from '@mui/icons-material/RemoveRedEye'
 import SaveIcon from '@mui/icons-material/Save'
 import Button from '@mui/material/Button'
-import { useState } from 'react'
-import { Modal, Container } from 'semantic-ui-react'
+
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import { useState, Fragment } from 'react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 
@@ -14,19 +17,13 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
   }
 
   return (
-    <Modal
-      onOpen={() => setModalOpenState(true)}
-      open={open}
-      size="large"
-      trigger={
-        <Button startIcon={<EyeIcon />} variant="outlined">
-          Manage Courses Shown
-        </Button>
-      }
-    >
-      <Modal.Header>Hide degree courses</Modal.Header>
-      <Modal.Content image>
-        <Container>
+    <Fragment>
+      <Button onClick={() => setModalOpenState(true)} startIcon={<EyeIcon />} variant="outlined">
+        Manage Courses Shown
+      </Button>
+      <Dialog className="MyDialogThings" maxWidth="md" open={open}>
+        <DialogTitle>Hide degree courses</DialogTitle>
+        <DialogContent className="MyDialogContent">
           <DegreeCoursesTab degreeProgramme={degreeProgramme} years={years} />
 
           <Button
@@ -37,8 +34,8 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
           >
             Save & Close
           </Button>
-        </Container>
-      </Modal.Content>
-    </Modal>
+        </DialogContent>
+      </Dialog>
+    </Fragment>
   )
 }
