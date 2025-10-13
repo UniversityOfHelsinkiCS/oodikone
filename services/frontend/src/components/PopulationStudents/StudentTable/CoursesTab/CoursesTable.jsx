@@ -1,6 +1,8 @@
+import CheckIcon from '@mui/icons-material/Check'
+import SquareIcon from '@mui/icons-material/CropSquare'
+import MinusIcon from '@mui/icons-material/Remove'
 import { isNumber, orderBy, sortBy, sumBy, uniqBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { Icon } from 'semantic-ui-react'
 
 import { hiddenNameAndEmailForExcel } from '@/common/columns'
 
@@ -324,15 +326,17 @@ export const CoursesTable = ({ curriculum, includeSubstitutions, populationCours
                 const passedCourse = hasPassedCourse(student.studentNumber, course.code)
                 const passedSubstitutionCourse = hasPassedSubstitutionCourse(student.studentNumber, course.code)
                 if (bestGrade && passedCourse) {
-                  return <Icon color="green" fitted name="check" />
+                  return <CheckIcon color="success" sx={{ display: 'block', margin: 'auto' }} />
                 } else if (passedSubstitutionCourse) {
-                  return includeSubstitutions && <Icon color="grey" fitted name="check" />
+                  return (
+                    includeSubstitutions && <CheckIcon color="disabled" sx={{ display: 'block', margin: 'auto' }} />
+                  )
                 } else if (hasActiveEnrollments(student, course.code)) {
                   const enrollmentDate = getEnrollmentDate(student, course.code)
-                  const color = isWithinSixMonths(enrollmentDate) ? 'yellow' : 'grey'
-                  return <Icon color={color} fitted name="minus" />
+                  const color = isWithinSixMonths(enrollmentDate) ? 'warning' : 'disabled'
+                  return <MinusIcon color={color} sx={{ display: 'block', margin: 'auto' }} />
                 } else if (hasCourseInStudyplan(student, course.code)) {
-                  return <Icon color="grey" fitted name="square outline" />
+                  return <SquareIcon color="disabled" sx={{ display: 'block', margin: 'auto' }} />
                 }
                 return null
               },
