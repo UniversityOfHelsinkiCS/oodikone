@@ -65,7 +65,7 @@ export const StudyProgramme = () => {
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const [programmeId, secondProgrammeId] = studyProgrammeId?.split('+') ?? []
+  const [programmeId, secondProgrammeId] = [...(studyProgrammeId?.split('+') ?? []), '', '']
   const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
   useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
