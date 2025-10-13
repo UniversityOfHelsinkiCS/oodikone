@@ -1,4 +1,5 @@
-import { Button, Icon } from 'semantic-ui-react'
+import InfoIcon from '@mui/icons-material/Info'
+import Button from '@mui/material/Button'
 
 interface InfoBoxButtonProps {
   cypress?: string
@@ -8,15 +9,12 @@ interface InfoBoxButtonProps {
 export const InfoBoxButton = ({ cypress, toggleOpen }: InfoBoxButtonProps) => {
   return (
     <Button
-      basic
-      className="ok-infobox-collapsed"
-      color="green"
+      color="info"
       data-cy={cypress ? `${cypress}-open-info` : undefined}
-      icon
-      labelPosition="left"
       onClick={toggleOpen}
+      startIcon={<InfoIcon />}
+      variant="outlined"
     >
-      <Icon name="info circle" />
       Show Info
     </Button>
   )

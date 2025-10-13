@@ -12,6 +12,9 @@ import createTheme from '@mui/material/styles/createTheme'
 
 const baseTheme = {
   palette: {
+    success: { main: '#03cc0d' },
+    disabled: { main: '#9e9e9e' },
+
     activeNavigationTab: '#fff',
     export: deepPurple[500],
     graduationTimes: {
