@@ -1,5 +1,8 @@
+import EyeIcon from '@mui/icons-material/RemoveRedEye'
+import SaveIcon from '@mui/icons-material/Save'
+import Button from '@mui/material/Button'
 import { useState } from 'react'
-import { Button, Icon, Modal, Container } from 'semantic-ui-react'
+import { Modal, Container } from 'semantic-ui-react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 
@@ -16,8 +19,7 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
       open={open}
       size="large"
       trigger={
-        <Button basic icon labelPosition="left">
-          <Icon name="eye" />
+        <Button startIcon={<EyeIcon />} variant="outlined">
           Manage Courses Shown
         </Button>
       }
@@ -26,8 +28,13 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
       <Modal.Content image>
         <Container>
           <DegreeCoursesTab degreeProgramme={degreeProgramme} years={years} />
-          <Button icon labelPosition="left" onClick={() => setModalOpenState(false)} style={{ marginTop: '10px' }}>
-            <Icon name="save" />
+
+          <Button
+            onClick={() => setModalOpenState(false)}
+            startIcon={<SaveIcon />}
+            style={{ marginTop: '10px' }}
+            variant="contained"
+          >
             Save & Close
           </Button>
         </Container>
