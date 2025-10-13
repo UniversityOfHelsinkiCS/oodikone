@@ -1,3 +1,8 @@
+import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
+import MinusIcon from '@mui/icons-material/Remove'
+import Typography from '@mui/material/Typography'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
@@ -5,7 +10,8 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { keyBy } from 'lodash'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
-import { Icon, Message, Tab } from 'semantic-ui-react'
+
+import { Message, Tab } from 'semantic-ui-react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -52,31 +58,37 @@ const getEnrollment = (student, courseCode) => {
 const getRowContent = (student, courseCode, year, start, end, criteria) => {
   if (courseCode.includes('Credits')) {
     if (student.criteriaProgress[year]?.credits) {
-      return <Icon color="green" fitted name="check" title="Checked" />
+      return <CheckIcon color="success" />
     }
     return null
   }
 
   const courses = getCourses(courseCode, criteria, student)
 
+  // <CheckIcon color="success" />
+  // <CheckIcon color="disabled" />
+  // <AssignmentCheckedIcon color="success" />
+  // <CloseIcon color="error" />
+  // <MinusIcon color="disabled" />
+
   if (hasCreditTransfer(courses)) {
-    return <Icon color="green" name="clipboard check" />
+    return <AssignmentCheckedIcon color="success" />
   }
 
   if (hasPassedDuringAcademicYear(courses, start, end)) {
-    return <Icon color="green" fitted name="check" />
+    return <CheckIcon color="success" />
   }
 
   if (hasPassedOutsideAcademicYear(courses)) {
-    return <Icon color="grey" fitted name="check" />
+    return <CheckIcon color="disabled" />
   }
 
   if (hasFailed(courses)) {
-    return <Icon color="red" fitted name="times" />
+    return <CloseIcon color="error" />
   }
 
   if (hasEnrolled(student, courseCode)) {
-    return <Icon color="grey" fitted name="minus" />
+    return <MinusIcon color="disabled" />
   }
 
   return null
@@ -487,30 +499,52 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
         </h5>
       )}
       <Message>
-        <Icon color="green" fitted name="check" />: Student has passed the course in the academic year. <br />
-        <Icon color="grey" fitted name="check" />: Student has passed the course outside of the corresponding academic
-        year. <br />
-        <Icon color="green" fitted name="clipboard check" />: Student has credit transfer for the course. <br />
-        <Icon color="red" fitted name="times" />: Student has failed the course. <br />
-        <Icon color="grey" fitted name="minus" />: Student has enrolled, but has not received any grade from the course.{' '}
-        <br />
-        <span
-          className="enrollment-label enrollment-label-no-margin label-present"
-          style={{ display: 'inline-block' }}
-        />
-        : Student has an active semester enrollment. <br />
-        <span
-          className="enrollment-label enrollment-label-no-margin label-absent"
-          style={{ display: 'inline-block' }}
-        />
-        : Student has enrolled as absent. <br />
-        <span
-          className="enrollment-label enrollment-label-no-margin label-passive"
-          style={{ display: 'inline-block' }}
-        />
-        : Inactive: Student did not enroll at all. <br />
-        <span className="enrollment-label enrollment-label-no-margin label-none" style={{ display: 'inline-block' }} />:
-        Student has no enrollment, but also no study right for the semester. <br />
+        <Typography variant="h6">Criteria:</Typography>
+        <Typography>
+          <CheckIcon color="success" />: Student has passed the course in the academic year.
+        </Typography>
+        <Typography>
+          <CheckIcon color="disabled" />: Student has passed the course outside of the corresponding academic year.
+        </Typography>
+        <Typography>
+          <AssignmentCheckedIcon color="success" />: Student has credit transfer for the course.
+        </Typography>
+        <Typography>
+          <CloseIcon color="error" />: Student has failed the course.
+        </Typography>
+        <Typography>
+          <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the course.
+        </Typography>
+
+        <Typography variant="h6">Semester enrollments:</Typography>
+        <Typography>
+          <span
+            className="enrollment-label enrollment-label-no-margin label-present"
+            style={{ display: 'inline-block' }}
+          />
+          : Student has an active semester enrollment.
+        </Typography>
+        <Typography>
+          <span
+            className="enrollment-label enrollment-label-no-margin label-absent"
+            style={{ display: 'inline-block' }}
+          />
+          : Student has enrolled as absent.
+        </Typography>
+        <Typography>
+          <span
+            className="enrollment-label enrollment-label-no-margin label-passive"
+            style={{ display: 'inline-block' }}
+          />
+          : Inactive: Student did not enroll at all.
+        </Typography>
+        <Typography>
+          <span
+            className="enrollment-label enrollment-label-no-margin label-none"
+            style={{ display: 'inline-block' }}
+          />
+          : Student has no enrollment, but also no study right for the semester. <br />
+        </Typography>
       </Message>
       <Tab.Pane>
         <div style={{ display: 'flex' }}>
