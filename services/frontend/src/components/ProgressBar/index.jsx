@@ -1,6 +1,6 @@
+import Progress from '@mui/material/LinearProgress'
 import { number } from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
-import { Progress } from 'semantic-ui-react'
 
 import { useDidMount } from '@/hooks/didMount'
 import './progressBar.css'
@@ -39,7 +39,13 @@ export const ProgressBar = ({ progress, fixed = false }) => {
   if (fixed) classNames.push('fixed')
 
   return hidden ? null : (
-    <Progress className={classNames.join(' ')} color="blue" disabled={progress === 100} percent={progress} />
+    <Progress
+      className={classNames.join(' ')}
+      color="info"
+      sx={{ height: '2em', borderRadius: '0.375em' }}
+      value={progress}
+      variant="determinate"
+    />
   )
 }
 
