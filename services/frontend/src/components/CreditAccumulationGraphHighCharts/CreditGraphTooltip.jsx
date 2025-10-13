@@ -1,8 +1,9 @@
-import { Card, Icon } from 'semantic-ui-react'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 
-const getCardHeader = (title, isStudyModuleCredit) => (
-  <Card.Header content={`${title}${isStudyModuleCredit ? ' [Study Module]' : ''}`} style={{ whiteSpace: 'normal' }} />
-)
+// FIXME: For some reason Semantic UI manages to build a working HTML -string, but MUI doesn't.
+import { Icon } from 'semantic-ui-react'
 
 const getCorrectIcon = (passed, isStudyModuleCredit) => {
   if (isStudyModuleCredit) {
@@ -14,48 +15,35 @@ const getCorrectIcon = (passed, isStudyModuleCredit) => {
   return null
 }
 
-const getCardDescription = (credits, date, grade, passed, isStudyModuleCredit) => {
-  const items = [
-    {
-      title: 'Credits',
-      value: credits,
-    },
-    {
-      title: 'Grade',
-      value: grade,
-    },
-    {
-      title: 'Date',
-      value: date,
-    },
-    {
-      title: isStudyModuleCredit ? 'Module' : 'Passed',
-      value: getCorrectIcon(passed, isStudyModuleCredit),
-    },
-  ]
+const Tile = ({ children }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontWeight: 'bold' }}>{children}</div>
+)
+const TileValue = ({ children }) => <div style={{ fontSize: '1.25em' }}>{children}</div>
+
+export const CreditGraphTooltip = ({ credits, date, grade, passed, isStudyModuleCredit, courseCode, courseName }) => {
+  const title = `${courseName} (${courseCode})`
 
   return (
-    <Card.Description style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridRowGap: '0.25rem' }}>
-      {items.map(({ title, value }) => (
-        <div key={title} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontWeight: 'bold' }}>
-          {title}
-          <div style={{ fontSize: '1rem' }}>{value}</div>
-        </div>
-      ))}
-    </Card.Description>
-  )
-}
-
-export const CreditGraphTooltip = ({ payload = [] }) => {
-  if (payload.length === 0) return null
-
-  const { credits, date, grade, passed, isStudyModuleCredit, courseCode, courseName } = payload[0].payload
-  return (
-    <Card>
-      <Card.Content>
-        {getCardHeader(`${courseName} (${courseCode})`, isStudyModuleCredit)}
-        {getCardDescription(credits, date, grade, passed, isStudyModuleCredit)}
-      </Card.Content>
+    <Card variant="outlined">
+      <CardHeader
+        content={`${title}${isStudyModuleCredit ? ' [Study Module]' : ''}`}
+        style={{ whiteSpace: 'normal' }}
+      />
+      <CardContent style={{ display: 'grid', grid: '1fr 1fr 1fr 1fr', gridRowGap: '0.25rem' }}>
+        <Tile>
+          Credits <TileValue>{credits}</TileValue>
+        </Tile>
+        <Tile>
+          Grade <TileValue>{grade}</TileValue>
+        </Tile>
+        <Tile>
+          Date <TileValue>{date}</TileValue>
+        </Tile>
+        <Tile>
+          {isStudyModuleCredit ? 'Module' : 'Passed'}{' '}
+          <TileValue>{getCorrectIcon(passed, isStudyModuleCredit)}</TileValue>
+        </Tile>
+      </CardContent>
     </Card>
   )
 }

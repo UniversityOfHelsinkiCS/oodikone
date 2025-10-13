@@ -186,26 +186,20 @@ const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
 }
 
 const singleStudentTooltipFormatter = (point, student, getTextIn) => {
-  const targetCourse = sortCoursesByDate(student.courses).find(
+  const targetCourse = student.courses.find(
     ({ course, date }) => point.key === course.code && point.x === new Date(date).getTime()
   )
 
-  if (!targetCourse.course) {
-    return null
+  if (!targetCourse.course) return null
+
+  const payload = {
+    ...targetCourse,
+    courseCode: targetCourse.course.code,
+    courseName: getTextIn(targetCourse.course.name),
+    date: reformatDate(targetCourse.date, DateFormat.DISPLAY_DATE),
   }
 
-  const payload = [
-    {
-      payload: {
-        ...targetCourse,
-        courseCode: targetCourse.course.code,
-        courseName: getTextIn(targetCourse.course.name),
-        date: reformatDate(targetCourse.date, DateFormat.DISPLAY_DATE),
-      },
-    },
-  ]
-
-  return renderToString(<CreditGraphTooltip payload={payload} />)
+  return renderToString(<CreditGraphTooltip {...payload} />)
 }
 
 const createGoalSeries = (graphStartDate, graphEndDate, absences) => {
