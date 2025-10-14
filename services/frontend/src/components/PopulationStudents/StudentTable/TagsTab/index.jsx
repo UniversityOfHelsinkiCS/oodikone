@@ -1,6 +1,6 @@
+import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import { Link } from 'react-router'
-import { Tab } from 'semantic-ui-react'
 
 import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
@@ -13,7 +13,7 @@ export const TagsTab = ({ programme, combinedProgramme, students }) => {
   if (isFetching) return <CircularProgress />
 
   return (
-    <Tab.Pane>
+    <Box>
       <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
         {!tags?.length && (
           <div
@@ -48,6 +48,6 @@ export const TagsTab = ({ programme, combinedProgramme, students }) => {
           </>
         )}
       </div>
-    </Tab.Pane>
+    </Box>
   )
 }

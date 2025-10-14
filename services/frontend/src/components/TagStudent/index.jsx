@@ -1,5 +1,9 @@
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
 import { useState } from 'react'
-import { Button, Dropdown, Icon, Label, Table } from 'semantic-ui-react'
+import { Dropdown } from 'semantic-ui-react'
 
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
@@ -11,12 +15,14 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
   const [selectedTags, setSelectedTags] = useState([])
 
   const handleSave = () => {
-    void createStudentTags({
-      combinedProgramme,
-      studentTags: selectedTags.map(tag => ({ studentNumber, tagId: tag })),
-      studyTrack,
-    })
-    setSelectedTags([])
+    if (selectedTags.length) {
+      void createStudentTags({
+        combinedProgramme,
+        studentTags: selectedTags.map(tag => ({ studentNumber, tagId: tag })),
+        studyTrack,
+      })
+      setSelectedTags([])
+    }
   }
 
   const deleteTag = tag => {
@@ -29,17 +35,21 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
   }
 
   const studentTagLabels = studentTags.map(studentTag => (
-    <Label color={studentTag.tag.personalUserId ? 'purple' : null} key={`${studentNumber}-${studentTag.tag.id}`}>
-      {studentTag.tag.name} <Icon link name="delete" onClick={() => deleteTag(studentTag.tag)} />
-    </Label>
+    <Chip
+      color={studentTag.tag.personalUserId ? 'secondary' : 'disabled'}
+      key={`${studentNumber}-${studentTag.tag.id}`}
+      label={studentTag.tag.name}
+      onDelete={() => deleteTag(studentTag.tag)}
+      variant="outlined"
+    />
   ))
 
   return (
-    <Table.Row>
-      {namesVisible ? <Table.Cell>{studentName}</Table.Cell> : null}
-      <Table.Cell>{studentNumber}</Table.Cell>
-      <Table.Cell>{studentTagLabels}</Table.Cell>
-      <Table.Cell>
+    <TableRow>
+      {namesVisible ? <TableCell>{namesVisible ? studentName : null}</TableCell> : null}
+      <TableCell>{studentNumber}</TableCell>
+      <TableCell>{studentTagLabels}</TableCell>
+      <TableCell>
         <div style={{ display: 'flex', gap: '0.5em' }}>
           <Dropdown
             clearable
@@ -52,11 +62,16 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
             selection
             value={selectedTags}
           />
-          <Button disabled={!selectedTags.length} loading={isLoading} onClick={handleSave} positive>
+          <Button
+            color={!selectedTags.length ? 'primary' : 'success'}
+            loading={isLoading}
+            onClick={handleSave}
+            variant="outlined"
+          >
             Save
           </Button>
         </div>
-      </Table.Cell>
-    </Table.Row>
+      </TableCell>
+    </TableRow>
   )
 }
