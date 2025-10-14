@@ -253,7 +253,7 @@ describe('Population statistics tests', () => {
         cy.contains('Courses of class').click()
         cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
         cy.get('[data-cy=toggle-group-module-MAT110]').click()
-        cy.contains('td', 'MAT11001').siblings().find('i.level.up').click()
+        cy.contains('td', 'MAT11001').siblings().find('[data-testId="NorthEastIcon"]').click()
         cy.wait('@coursePage')
         cy.url().should('include', '/coursestatistics')
         cy.contains('MAT11001 • Johdatus yliopistomatematiikkaan')
