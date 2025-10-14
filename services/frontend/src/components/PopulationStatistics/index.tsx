@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { useLocation, type Location } from 'react-router'
@@ -211,7 +212,7 @@ export const PopulationStatistics = () => {
     >
       {(filteredStudents, filteredCourses) => (
         <Box sx={{ maxWidth: '80vw', flex: 1, pt: 2, mx: 'auto' }}>
-          <Box sx={{ textAlign: 'center' }}>
+          <Stack sx={{ textAlign: 'center', alignItems: 'center' }}>
             <Backdrop
               open={isLoading}
               sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
@@ -228,7 +229,7 @@ export const PopulationStatistics = () => {
               Class size {students.length} students
             </Typography>
             {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
-          </Box>
+          </Stack>
           {isSuccess ? (
             <PopulationDetails
               filteredCourses={filteredCourses}
