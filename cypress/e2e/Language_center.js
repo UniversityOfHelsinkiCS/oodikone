@@ -1,10 +1,5 @@
 /// <reference types="cypress" />
 
-const hasLanded = () => {
-  cy.contains('This view displays amounts')
-  cy.contains('Show number of')
-}
-
 const chooseSemester = (semester, fromOrTo) => {
   cy.get(`[data-cy="semester-${fromOrTo}"]`).click()
   cy.get(`[data-cy="semester-${fromOrTo}"]`).within(() => {
@@ -45,7 +40,6 @@ describe('When language center is opened', () => {
     beforeEach(() => {
       cy.init('/languagecenterview', 'admin')
       cy.get('[data-cy="completions-button"]').click()
-      hasLanded()
     })
 
     describe('Faculties tab', () => {
