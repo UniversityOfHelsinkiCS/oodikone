@@ -3,20 +3,32 @@ import Table from '@mui/material/Table'
 
 export const StyledTable = styled(Table, {
   shouldForwardProp: prop => prop !== 'showCellBorders',
-})<{ showCellBorders?: boolean }>(({ theme, showCellBorders }) => {
+})<{ showCellBorders?: true; zebraStriped?: true }>(({ theme, showCellBorders, zebraStriped }) => {
   return {
-    '& tr': {
+    '&': {
       border: `1px solid ${theme.palette.grey[300]}`,
-      '&:hover': {
-        backgroundColor: theme.palette.grey[50],
-      },
     },
-    '& th': {
-      backgroundColor: theme.palette.grey[50],
+
+    '& .MuiTableHead-root': {
+      backgroundColor: theme.palette.grey[100],
+      border: `1px solid ${theme.palette.grey[300]}`,
+      boxShadow: `1px 1px ${theme.palette.grey[300]}`,
     },
-    '& th, & td': {
-      border: showCellBorders ? `1px solid ${theme.palette.grey[300]}` : 'none',
-      padding: theme.spacing(1.5),
+
+    '& .MuiTableCell-root': showCellBorders
+      ? {
+          border: `1px solid ${theme.palette.grey[300]}`,
+        }
+      : {},
+
+    '& .MuiTableBody-root>.MuiTableRow-root:hover': {
+      backgroundColor: theme.palette.grey[100],
     },
+
+    '& .MuiTableBody-root>.MuiTableRow-root:nth-of-type(even)': zebraStriped
+      ? {
+          backgroundColor: theme.palette.grey[50],
+        }
+      : {},
   }
 })
