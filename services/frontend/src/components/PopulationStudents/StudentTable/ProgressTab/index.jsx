@@ -13,8 +13,8 @@ import { Link } from 'react-router'
 
 import { Message, Tab } from 'semantic-ui-react'
 
-import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import './index.css'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { SortableTable } from '@/components/SortableTable'
@@ -400,7 +400,9 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
             title: 'Student number',
             cellProps: { title: 'student number', className: 'studentNumber' },
             getRowVal: student => student.studentNumber,
-            getRowContent: student => <StudentInfoItem showSisuLink student={student} />,
+            getRowContent: student => (
+              <StudentInfoItem sisPersonId={student.sis_person_id} studentNumber={student.studentNumber} />
+            ),
           },
         ],
       },
