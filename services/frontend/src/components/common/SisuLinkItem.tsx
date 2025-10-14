@@ -1,4 +1,8 @@
-import { Icon, Item } from 'semantic-ui-react'
+import LaunchIcon from '@mui/icons-material/Launch'
+import Box from '@mui/material/Box'
+import Link from '@mui/material/Link'
+import Typography from '@mui/material/Typography'
+
 import { useSisUrl } from '@/hooks/useSisUrl'
 
 interface SisuLinkItemProps {
@@ -9,11 +13,12 @@ export const SisuLinkItem = ({ id }: SisuLinkItemProps) => {
   const usableSisUrl = useSisUrl()
 
   return (
-    <div data-cy="sisulink">
-      <Item as="a" href={`${usableSisUrl}/tutor/role/staff/student/${id}/basic/basic-info`} target="_blank">
-        <Icon name="external alternate" />
-        Sisu
-      </Item>
-    </div>
+    <Box data-cy="sisulink">
+      <Link href={`${usableSisUrl}/tutor/role/staff/student/${id}/basic/basic-info`} target="_blank">
+        <Typography sx={{ display: 'flex' }}>
+          Sisu <LaunchIcon color="primary" />
+        </Typography>
+      </Link>
+    </Box>
   )
 }
