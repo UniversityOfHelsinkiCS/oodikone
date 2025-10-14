@@ -1,4 +1,5 @@
 import ArrowIcon from '@mui/icons-material/NorthEast'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { Button, Form, Message, Modal } from 'semantic-ui-react'
@@ -20,8 +21,10 @@ const LinkToGroup = ({ group }) => {
   const destination = `/studyguidancegroups/${group.id}`
   return (
     <Link data-cy={`study-guidance-group-link-${group.id}`} sx={{ color: 'black' }} to={destination}>
-      {getTextIn(group.name)}
-      <ArrowIcon color="primary" />
+      <Typography sx={{ display: 'flex' }}>
+        {getTextIn(group.name)}
+        <ArrowIcon color="primary" />
+      </Typography>
     </Link>
   )
 }
