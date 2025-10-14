@@ -5,10 +5,10 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { getNewestProgrammeOfStudentAt } from '@/common'
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
-import { ProgressBarWithLabel } from '@/components/common/ProgressBarWithLabel'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PercentageBar } from '@/components/material/PercentageBar'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 
@@ -105,7 +105,7 @@ export const CustomPopulationProgrammeDist = ({ students, coursecode, from, to }
       getTextIn(programme.name),
       code,
       programmeStudents,
-      <ProgressBarWithLabel key={code} total={students.length} value={programmeStudents} />,
+      <PercentageBar denominator={students.length} key={code} numerator={programmeStudents} />,
     ])
     .sort((a, b) => b[2] - a[2])
 
