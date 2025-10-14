@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
 import ArrowIcon from '@mui/icons-material/NorthEast'
+import Button from '@mui/material/Button'
 import { chain, range } from 'lodash'
 import { useMemo, useState } from 'react'
-import { Button } from 'semantic-ui-react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Link } from '@/components/material/Link'
 
@@ -150,7 +150,7 @@ export const PassingSemesters = ({ onlyIamRights }) => {
     <div>
       <SortableTable
         actions={
-          <Button onClick={() => setCumulativeStats(!cumulativeStats)} size="mini" style={{ padding: '.75em .75em' }}>
+          <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
             {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
           </Button>
         }
