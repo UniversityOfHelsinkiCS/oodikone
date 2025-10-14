@@ -12,10 +12,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { Link } from 'react-router'
-
 import { getTextInWithOpen } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DateFormat } from '@/constants/date'

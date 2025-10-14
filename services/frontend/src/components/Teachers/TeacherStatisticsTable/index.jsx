@@ -1,8 +1,9 @@
+import ArrowIcon from '@mui/icons-material/NorthEast'
 import { useMemo } from 'react'
-import { Link } from 'react-router'
-import { Segment, Icon, Item } from 'semantic-ui-react'
+import { Segment } from 'semantic-ui-react'
 
 import { calculatePercentage, isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/material/Link'
 import { SortableTable } from '@/components/SortableTable'
 
 const createColumnWithTitle = title => ({
@@ -40,9 +41,9 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
             {row.name}
             {isDefaultServiceProvider() && (
-              <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
-                <Icon name="level up alternate" />
-              </Item>
+              <Link target="_blank" to={`/teachers/${row.id}`}>
+                <ArrowIcon />
+              </Link>
             )}
           </div>
         ),
@@ -57,13 +58,12 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
         formatValue: code => (
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
             {code}
-            <Item
-              as={Link}
+            <Link
               target="_blank"
               to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${code}"]&separate=false`}
             >
-              <Icon name="level up alternate" />
-            </Item>
+              <ArrowIcon />
+            </Link>
           </div>
         ),
       })

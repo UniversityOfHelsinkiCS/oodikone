@@ -3,9 +3,8 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Link } from 'react-router'
-
 import { isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/material/Link'
 
 export const TimeCell = ({
   href,

@@ -4,9 +4,10 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/material/Link'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'

@@ -11,11 +11,11 @@ import Tooltip from '@mui/material/Tooltip'
 
 import dayjs from 'dayjs'
 import { orderBy } from 'lodash'
-import { Link } from 'react-router'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
 import { studentToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'

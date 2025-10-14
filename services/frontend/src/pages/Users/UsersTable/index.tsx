@@ -4,10 +4,10 @@ import Stack from '@mui/material/Stack'
 
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { MockButton } from '@/components/material/MockButton'
 import { RoleChip } from '@/components/material/RoleChip'
 import { DateFormat } from '@/constants/date'

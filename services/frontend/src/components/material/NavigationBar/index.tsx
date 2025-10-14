@@ -6,9 +6,10 @@ import Tabs from '@mui/material/Tabs'
 import Toolbar from '@mui/material/Toolbar'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Link, useLocation } from 'react-router'
+import { useLocation } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/material/Link'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { formatToArray } from '@oodikone/shared/util'

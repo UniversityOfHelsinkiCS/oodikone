@@ -2,9 +2,8 @@ import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Link } from 'react-router'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 
 export const FacultyCard = ({ faculty }: { faculty: GetFacultiesResponse }) => {
@@ -13,9 +12,9 @@ export const FacultyCard = ({ faculty }: { faculty: GetFacultiesResponse }) => {
   return (
     <Card sx={{ padding: 2 }} variant="outlined">
       <Stack alignItems="center" direction="row" justifyContent="space-between">
-        <Typography component={Link} to={`/faculties/${faculty.id}`} variant="h6">
+        <Link to={`/faculties/${faculty.id}`} variant="h6">
           {getTextIn(faculty.name)}
-        </Typography>
+        </Link>
         <Typography color="text.secondary" component="p" variant="body1">
           {faculty.code}
         </Typography>

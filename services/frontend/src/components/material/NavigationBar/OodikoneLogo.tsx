@@ -2,8 +2,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Link } from 'react-router'
-
+import { Link } from '@/components/material/Link'
 import { isDev } from '@/conf'
 
 export const OodikoneLogo = () => {

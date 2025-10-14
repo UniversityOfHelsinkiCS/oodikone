@@ -1,10 +1,11 @@
+import ArrowIcon from '@mui/icons-material/NorthEast'
 import { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
-import { Link, useNavigate } from 'react-router'
-import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
+import { Button, Form, Message, Modal } from 'semantic-ui-react'
 
 import { textAndDescriptionSearch } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { SortableTable } from '@/components/SortableTable'
 import { DateFormat } from '@/constants/date'
 import { useToggle } from '@/hooks/toggle'
@@ -16,12 +17,11 @@ import './StudyGuidanceGroupOverview.css'
 
 const LinkToGroup = ({ group }) => {
   const { getTextIn } = useLanguage()
-  const navigate = useNavigate()
   const destination = `/studyguidancegroups/${group.id}`
   return (
-    <Link data-cy={`study-guidance-group-link-${group.id}`} style={{ color: 'black' }} to={destination}>
+    <Link data-cy={`study-guidance-group-link-${group.id}`} sx={{ color: 'black' }} to={destination}>
       {getTextIn(group.name)}
-      <Icon color="blue" name="level up alternate" onClick={() => navigate(destination)} />
+      <ArrowIcon color="primary" />
     </Link>
   )
 }

@@ -1,5 +1,5 @@
-import { Link } from 'react-router'
-import { Icon, Item } from 'semantic-ui-react'
+import ArrowIcon from '@mui/icons-material/NorthEast'
+import { Link } from '@/components/material/Link'
 
 import { SisuLinkItem } from './SisuLinkItem'
 
@@ -15,9 +15,9 @@ export const StudentInfoItem = ({ showSisuLink, student }) => {
   return (
     <div style={{ display: 'inline-flex' }}>
       <div>{student.studentNumber}</div>
-      <Item as={Link} style={{ marginLeft: '10px', marginRight: '10px' }} to={`/students/${student.studentNumber}`}>
-        <Icon name="user outline" />
-      </Item>
+      <Link sx={{ marginLeft: '10px', marginRight: '10px' }} to={`/students/${student.studentNumber}`}>
+        <ArrowIcon />
+      </Link>
       {showSisuLink ? <SisuLinkItem id={student.sis_person_id} /> : null}
     </div>
   )

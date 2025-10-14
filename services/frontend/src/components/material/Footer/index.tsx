@@ -6,10 +6,10 @@ import Typography from '@mui/material/Typography'
 
 import { isDefaultServiceProvider } from '@/common'
 import { ExternalLink } from '@/components/material/ExternalLink'
+import { Link } from '@/components/material/Link'
 import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
 import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
-import { InternalLink } from './InternalLink'
 import { ToskaLogo } from './ToskaLogo'
 
 export const Footer = () => {
@@ -40,7 +40,7 @@ export const Footer = () => {
             </Stack>
             <Stack>
               <Typography variant="subtitle1">Build</Typography>
-              <InternalLink href="/changelog" text="Changelog" />
+              <Link to="/changelog">Changelog</Link>
               <Typography color="text.secondary" variant="body2">
                 Updated {reformatDate(builtAt || new Date().toISOString(), DateFormat.DISPLAY_DATETIME)}
               </Typography>

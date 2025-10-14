@@ -1,9 +1,9 @@
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
-import { Link } from 'react-router'
-import { Message, Icon, Item, Search, Segment } from 'semantic-ui-react'
+import { Message, Icon, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'
+import { Link } from '@/components/material/Link'
 import { SortableTable } from '@/components/SortableTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
 import './teacherSearch.css'
@@ -38,9 +38,9 @@ export const TeacherSearchTab = () => {
       title: 'Name',
       getRowVal: s => s.name,
       getRowContent: row => (
-        <Item as={Link} target="_blank" to={`/teachers/${row.id}`}>
+        <Link target="_blank" to={`/teachers/${row.id}`}>
           {row.name}
-        </Item>
+        </Link>
       ),
     },
   ]

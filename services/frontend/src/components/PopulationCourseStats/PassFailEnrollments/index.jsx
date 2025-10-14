@@ -1,8 +1,8 @@
+import ArrowIcon from '@mui/icons-material/NorthEast'
 import { useMemo } from 'react'
-import { Link } from 'react-router'
-import { Item, Icon } from 'semantic-ui-react'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
+
 import { SortableTable, group } from '@/components/SortableTable'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
@@ -49,14 +49,13 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
                 export: false,
                 getRowContent: (row, isGroup) =>
                   !isGroup && (
-                    <Item
-                      as={Link}
+                    <Link
                       to={`/coursestatistics?courseCodes=["${encodeURIComponent(
                         row.code
                       )}"]&separate=false&unifyOpenUniCourses=false`}
                     >
-                      <Icon name="level up alternate" />
-                    </Item>
+                      <ArrowIcon />
+                    </Link>
                   ),
               },
             ],

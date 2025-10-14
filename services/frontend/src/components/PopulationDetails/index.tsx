@@ -8,7 +8,6 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
@@ -20,6 +19,7 @@ import {
 } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
+import { Link } from '@/components/material/Link'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'
@@ -185,7 +185,7 @@ export const PopulationDetails = ({
       <Paper sx={{ p: 2, my: 2 }} variant="outlined">
         <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
           <FormGroup sx={{ gap: 1 }}>
-            <Link style={{ width: 'fit-content' }} to="/populations">
+            <Link sx={{ width: 'fit-content' }} to="/populations">
               <Button startIcon={<KeyboardBackspaceIcon />} sx={{ mb: '10px' }} variant="contained">
                 Search for a new class
               </Button>

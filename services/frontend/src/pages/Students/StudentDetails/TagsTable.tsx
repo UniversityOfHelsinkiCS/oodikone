@@ -6,9 +6,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import { sortBy } from 'lodash'
-import { Link } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
 import { Name } from '@oodikone/shared/types'

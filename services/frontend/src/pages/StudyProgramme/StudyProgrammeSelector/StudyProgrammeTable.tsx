@@ -5,9 +5,9 @@ import Typography from '@mui/material/Typography'
 
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useMemo } from 'react'
-import { Link } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Link } from '@/components/material/Link'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
 import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'

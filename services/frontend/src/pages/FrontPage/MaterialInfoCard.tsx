@@ -2,11 +2,9 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
-import Link from '@mui/material/Link'
-
-import { NavLink } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/material/Link'
 
 /**
  * A temporary notification card about the new UI.
@@ -33,10 +31,7 @@ export const MaterialInfoCard = () => {
       {isDefaultServiceProvider() && (
         <>
           {' '}
-          <Link component={NavLink} to="/feedback">
-            Let us know
-          </Link>{' '}
-          if you have any feedback or suggestions.
+          <Link to="/feedback">Let us know</Link> if you have any feedback or suggestions.
         </>
       )}
     </Alert>
