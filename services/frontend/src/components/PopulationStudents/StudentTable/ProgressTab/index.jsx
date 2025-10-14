@@ -2,6 +2,8 @@ import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import MinusIcon from '@mui/icons-material/Remove'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
@@ -10,8 +12,6 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { keyBy } from 'lodash'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
-
-import { Message, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
@@ -500,57 +500,45 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
           after changes.
         </h5>
       )}
-      <Message>
+      <Alert severity="primary" sx={{ my: 2 }} variant="outlined">
         <Typography variant="h6">Criteria:</Typography>
-        <Typography>
+        <Typography sx={{ display: 'flex' }}>
           <CheckIcon color="success" />: Student has passed the course in the academic year.
         </Typography>
-        <Typography>
+        <Typography sx={{ display: 'flex' }}>
           <CheckIcon color="disabled" />: Student has passed the course outside of the corresponding academic year.
         </Typography>
-        <Typography>
+        <Typography sx={{ display: 'flex' }}>
           <AssignmentCheckedIcon color="success" />: Student has credit transfer for the course.
         </Typography>
-        <Typography>
+        <Typography sx={{ display: 'flex' }}>
           <CloseIcon color="error" />: Student has failed the course.
         </Typography>
-        <Typography>
+        <Typography sx={{ display: 'flex' }}>
           <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the course.
         </Typography>
 
         <Typography variant="h6">Semester enrollments:</Typography>
-        <Typography>
-          <span
-            className="enrollment-label enrollment-label-no-margin label-present"
-            style={{ display: 'inline-block' }}
-          />
-          : Student has an active semester enrollment.
+        <Typography sx={{ display: 'flex' }}>
+          <span className="enrollment-label label-present" style={{ margin: 'auto 0' }} />: Student has an active
+          semester enrollment.
         </Typography>
-        <Typography>
-          <span
-            className="enrollment-label enrollment-label-no-margin label-absent"
-            style={{ display: 'inline-block' }}
-          />
-          : Student has enrolled as absent.
+        <Typography sx={{ display: 'flex' }}>
+          <span className="enrollment-label label-absent" style={{ margin: 'auto 0' }} />: Student has enrolled as
+          absent.
         </Typography>
-        <Typography>
-          <span
-            className="enrollment-label enrollment-label-no-margin label-passive"
-            style={{ display: 'inline-block' }}
-          />
-          : Inactive: Student did not enroll at all.
+        <Typography sx={{ display: 'flex' }}>
+          <span className="enrollment-label label-passive" style={{ margin: 'auto 0' }} />: Inactive: Student did not
+          enroll at all.
         </Typography>
-        <Typography>
-          <span
-            className="enrollment-label enrollment-label-no-margin label-none"
-            style={{ display: 'inline-block' }}
-          />
+        <Typography sx={{ display: 'flex' }}>
+          <span className="enrollment-label label-none" style={{ margin: 'auto 0' }} />
           : Student has no enrollment, but also no study right for the semester. <br />
         </Typography>
-      </Message>
-      <Tab.Pane>
-        <div style={{ display: 'flex' }}>
-          <div style={{ maxHeight: '80vh', width: '100%' }}>
+      </Alert>
+      <Box>
+        <Box style={{ display: 'flex' }}>
+          <Box style={{ maxHeight: '80vh', width: '100%' }}>
             {isCriteriaSet ? (
               <SortableTable
                 columns={columns}
@@ -561,13 +549,13 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
                 title="Progress of population's students after predefined criteria"
               />
             ) : (
-              <div>
+              <Box>
                 <h3>There is no criteria set for this programme.</h3>
-              </div>
+              </Box>
             )}
-          </div>
-        </div>
-      </Tab.Pane>
+          </Box>
+        </Box>
+      </Box>
     </>
   )
 }
