@@ -1,10 +1,14 @@
-import { Tab } from 'semantic-ui-react'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import { useState } from 'react'
 
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PopulationCourseContext } from './PopulationCourseContext'
 
 export const PopulationCourseStatsFlat = ({ filteredCourses, studentAmountLimit }) => {
+  const [tab, setTab] = useState(0)
+
   if (!filteredCourses) return null
 
   const contextValue = {
@@ -14,25 +18,22 @@ export const PopulationCourseStatsFlat = ({ filteredCourses, studentAmountLimit 
   const panes = [
     {
       menuItem: 'Pass/fail',
-      render: () => (
-        <Tab.Pane>
-          <PassFailEnrollments flat />
-        </Tab.Pane>
-      ),
+      render: () => <PassFailEnrollments flat />,
     },
     {
       menuItem: 'Grades',
-      render: () => (
-        <Tab.Pane>
-          <GradeDistribution flat />
-        </Tab.Pane>
-      ),
+      render: () => <GradeDistribution flat />,
     },
   ]
 
   return (
     <PopulationCourseContext.Provider value={contextValue}>
-      <Tab panes={panes} />
+      <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        {panes.map(({ menuItem }) => (
+          <Tab key={menuItem} label={menuItem} />
+        ))}
+      </Tabs>
+      {panes.at(tab).render()}
     </PopulationCourseContext.Provider>
   )
 }
