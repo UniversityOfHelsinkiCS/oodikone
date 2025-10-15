@@ -124,7 +124,7 @@ export const GeneralTab = ({
 
   return (
     <>
-      <OodiTableExcelExport exportColumnKeys={exportColumnKeys} exportData={data} />
+      <OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />
       <OodiTable columns={columns} data={data as FormattedStudentData[]} options={tableOptions} />
     </>
   )

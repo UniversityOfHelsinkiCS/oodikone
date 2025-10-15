@@ -182,7 +182,7 @@ export const ModulesTab = ({
 
   return (
     <>
-      <OodiTableExcelExport exportColumnKeys={accessorKeys} exportData={exportData} />
+      <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
       <OodiTable columns={ooditableColumns} data={formattedStudents ?? []} options={ooditableOptions} />
     </>
   )

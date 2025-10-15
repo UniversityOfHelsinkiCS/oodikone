@@ -66,10 +66,10 @@ const columnHelper = createColumnHelper<ExportData>()
 
 export const OodiTableExcelExport = <TData extends object>({
   exportColumnKeys,
-  exportData,
+  data,
 }: {
   exportColumnKeys: string[]
-  exportData: TData[]
+  data: TData[]
 }) => {
   const extendedColumns = [
     columnHelper.display({
@@ -105,7 +105,16 @@ export const OodiTableExcelExport = <TData extends object>({
     }),
   ]
 
+  const exportData = useMemo(
+    () =>
+      data.map(dataItem =>
+        Object.fromEntries(Object.entries(dataItem).map(([key, value]) => [key, value?.exportValue ?? value]))
+      ),
+    [data]
+  )
+
   const prepData = exportData.slice(0, 10)
+
   const pivotedData = useMemo(
     () =>
       exportColumnKeys.map(accessorKey => ({
