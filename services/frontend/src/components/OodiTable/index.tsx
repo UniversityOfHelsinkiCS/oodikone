@@ -19,10 +19,12 @@ import { OodiTableContainer } from './OodiTable'
 export const OodiTable = <TData,>({
   data,
   columns,
+  isExportView,
   options = {},
 }: {
   data: TData[]
   columns: ColumnDef<TData>[]
+  isExportView?: true
   options?: Partial<TableOptions<TData>>
 }) => {
   const [pagination, setPagination] = useState({
@@ -46,5 +48,5 @@ export const OodiTable = <TData,>({
     ...config,
     state: { pagination, ...config.state },
   })
-  return <OodiTableContainer table={table} />
+  return <OodiTableContainer isExportView={isExportView} table={table} />
 }

@@ -182,7 +182,7 @@ export const OodiTableExcelExport = <TData extends object>({
               </Alert>
             )}
           </DialogContentText>
-          <OodiTable columns={extendedColumns} data={pivotedData} options={tableOptions} />
+          <OodiTable columns={extendedColumns} data={pivotedData} isExportView options={tableOptions} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>

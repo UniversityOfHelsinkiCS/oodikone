@@ -10,7 +10,13 @@ import { OodiTableDataRow } from './components/Cell'
 import { OodiTableHeaderGroup } from './components/Header'
 import { OodiTablePagination } from './components/Pagination'
 
-export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData> }) => {
+export const OodiTableContainer = <OTData,>({
+  table,
+  isExportView,
+}: {
+  table: TableType<OTData>
+  isExportView?: true
+}) => {
   const verticalHeaders = table.getState().useVerticalHeaders ?? []
 
   return (
@@ -19,7 +25,8 @@ export const OodiTableContainer = <OTData,>({ table }: { table: TableType<OTData
         sx={{
           maxHeight: '75vh',
           height: 'auto',
-          overflow: 'scroll',
+          overflowY: 'scroll',
+          overflowX: isExportView ? 'hidden' : 'scroll',
           p: 0,
           borderWidth: '1px 0 0 1px',
           borderStyle: 'solid',
