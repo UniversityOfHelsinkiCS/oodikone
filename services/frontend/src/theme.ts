@@ -22,6 +22,12 @@ const baseTheme = {
       yearOver: '#fee191',
       wayOver: '#fb6962',
     },
+    ooditable: {
+      hops: grey[700],
+      recentEnrollment: orange[500],
+      success: green[700],
+      enrollment: grey[700],
+    },
     grades: {
       all: indigo[300],
       enrolledNoGrade: orange[300],

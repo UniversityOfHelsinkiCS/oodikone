@@ -1,6 +1,7 @@
 import CheckIcon from '@mui/icons-material/Check'
 import CropSquareIcon from '@mui/icons-material/CropSquare'
 import Box from '@mui/material/Box'
+import { useTheme } from '@mui/material/styles'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { ColumnDef, createColumnHelper, TableOptions } from '@tanstack/react-table'
@@ -25,6 +26,8 @@ export const ModulesTab = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
+  const theme = useTheme()
+
   const ooditableColumnHelper = createColumnHelper<ModuleTabStudent>()
 
   const ooditableStaticColumns = useMemo(
@@ -80,14 +83,14 @@ export const ModulesTab = ({
               sx={{ display: 'flex', justifyContent: 'center', m: 'auto' }}
               title={`Completed on ${studyModule.completionDate}`}
             >
-              <CheckIcon color="success" />
+              <CheckIcon sx={{ color: theme.palette.ooditable.success }} />
             </Box>
           ) : (
             <Box
               sx={{ display: 'flex', justifyContent: 'center', m: 'auto' }}
               title="Has the module in their primary study plan"
             >
-              <CropSquareIcon sx={{ color: 'grey.500' }} />
+              <CropSquareIcon sx={{ color: theme.palette.ooditable.hops }} />
             </Box>
           )
         },
