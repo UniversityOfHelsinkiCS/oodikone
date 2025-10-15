@@ -1,5 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check'
-import CopyAllIcon from '@mui/icons-material/CopyAll'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -54,7 +54,7 @@ export const useGetColumnDefinitions = ({
               <Box sx={{ alignSelf: 'center' }}>Student number</Box>
               <Tooltip title={showCopyText ? 'Copied!' : 'Copy all student numbers to system clipboard'}>
                 <IconButton onClick={event => void handleCopy(event, allStudentNumbers)}>
-                  <CopyAllIcon color="action" />
+                  <ContentCopyIcon color="action" />
                 </IconButton>
               </Tooltip>
             </Stack>
