@@ -157,7 +157,6 @@ export const ModulesTab = ({
     [accessorKeys, namesVisible]
   )
 
-  const exportColumns = useMemo(() => Object.fromEntries(accessorKeys.map(key => [key, true])), [accessorKeys])
   const exportData = formattedStudents.map(({ studyModulesInHOPS, ...rest }) => ({
     ...rest,
     ...Object.fromEntries(
@@ -183,7 +182,7 @@ export const ModulesTab = ({
 
   return (
     <>
-      <OodiTableExcelExport exportColumns={exportColumns} exportData={exportData} />
+      <OodiTableExcelExport exportColumnKeys={accessorKeys} exportData={exportData} />
       <OodiTable columns={ooditableColumns} data={formattedStudents ?? []} options={ooditableOptions} />
     </>
   )

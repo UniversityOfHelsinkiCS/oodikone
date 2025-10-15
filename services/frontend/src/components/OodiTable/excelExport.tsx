@@ -65,10 +65,10 @@ type ExportData = {
 const columnHelper = createColumnHelper<ExportData>()
 
 export const OodiTableExcelExport = <TData extends object>({
-  exportColumns,
+  exportColumnKeys,
   exportData,
 }: {
-  exportColumns: Record<string, boolean>
+  exportColumnKeys: string[]
   exportData: TData[]
 }) => {
   const extendedColumns = [
@@ -108,16 +108,14 @@ export const OodiTableExcelExport = <TData extends object>({
   const prepData = exportData.slice(0, 10)
   const pivotedData = useMemo(
     () =>
-      Object.entries(exportColumns)
-        .filter(([_, value]) => value)
-        .map(([key, _]) => ({
-          header: key,
-          sample: prepData
-            .map(row => row[key])
-            .filter(value => value !== undefined)
-            .map(churnSampleData),
-        })),
-    [exportColumns, exportData]
+      exportColumnKeys.map(accessorKey => ({
+        header: accessorKey,
+        sample: prepData
+          .map(row => row[accessorKey])
+          .filter(value => value !== undefined)
+          .map(churnSampleData),
+      })),
+    [exportColumnKeys, exportData]
   )
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})

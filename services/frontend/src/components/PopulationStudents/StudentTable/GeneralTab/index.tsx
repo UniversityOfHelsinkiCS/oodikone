@@ -107,8 +107,8 @@ export const GeneralTab = ({
     [visible]
   )
 
-  const exportColumns = useMemo(
-    () => Object.fromEntries(accessorKeys.map(key => [key, visible.includes(key) || excelVisible.includes(key)])),
+  const exportColumnKeys = useMemo(
+    () => accessorKeys.filter(accessorKey => visible.includes(accessorKey) || excelVisible.includes(accessorKey)),
     [visible, excelVisible]
   )
 
@@ -124,7 +124,7 @@ export const GeneralTab = ({
 
   return (
     <>
-      <OodiTableExcelExport exportColumns={exportColumns} exportData={data} />
+      <OodiTableExcelExport exportColumnKeys={exportColumnKeys} exportData={data} />
       <OodiTable columns={columns} data={data as FormattedStudentData[]} options={tableOptions} />
     </>
   )
