@@ -103,8 +103,8 @@ export const PopulationStudents = ({
     ),
     Courses: () => (
       <CoursesTab
-        courses={filteredCourses}
-        curriculum={curriculum}
+        courses={filteredCourses ?? []}
+        curriculum={curriculum!} // TODO: add guard for missing curriculum (it should never be missing)
         includeSubstitutions={includeSubstitutions}
         students={filteredStudents}
       />
@@ -123,7 +123,7 @@ export const PopulationStudents = ({
   }
 
   const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
-  const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(false)
+  const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
   const contentByVariant: Record<
     PopulationStudentsProps['variant'],

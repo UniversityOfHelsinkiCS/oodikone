@@ -7,7 +7,7 @@ export const getAge = (birthDate: string | Date | Dayjs, integer = true, dateToC
 
 export const getTimestamp = () => formatDate(new Date(), DateFormat.ISO_DATE)
 
-export const isWithinSixMonths = (date: string) => dayjs(date) > dayjs().subtract(6, 'months')
+export const isWithinSixMonths = (date: string | Date) => dayjs(date) > dayjs().subtract(6, 'months')
 
 export const reformatDate = (date: string | Date | null | undefined, outputFormat: string) =>
   formatDate(date, outputFormat as DateFormat)
