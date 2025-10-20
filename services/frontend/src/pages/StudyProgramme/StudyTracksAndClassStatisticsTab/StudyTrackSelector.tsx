@@ -44,7 +44,7 @@ export const StudyTrackSelector = ({
         disabled={options.length < 2}
         label="Select study track"
         onChange={event => setStudyTrack(event.target.value)}
-        value={studyTrack}
+        value={options.length ? studyTrack : ''}
       >
         {options.map(option => (
           <MenuItem key={option.code} value={option.value}>
