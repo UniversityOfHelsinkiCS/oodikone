@@ -1,19 +1,21 @@
-import { Icon } from 'semantic-ui-react'
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAlt'
+import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOff'
+import Button from '@mui/material/Button'
 
-interface FilterToggleIconProps {
+export const FilterToggleIcon = ({
+  isActive,
+  onClick,
+  disabled,
+}: {
   isActive: boolean
+  disabled?: true
   onClick: () => void
-}
+}) => {
+  const Icon = isActive ? FilterAltOffOutlinedIcon : FilterAltOutlinedIcon
 
-export const FilterToggleIcon = ({ isActive, onClick }: FilterToggleIconProps) => (
-  <span style={{ alignItems: 'flex-end', cursor: 'pointer', display: 'inline-flex' }}>
-    <Icon name="filter" onClick={onClick} />
-    <Icon
-      color={isActive ? 'red' : undefined}
-      name={isActive ? 'remove' : 'add'}
-      onClick={onClick}
-      size="tiny"
-      style={{ marginLeft: '-9px' }}
-    />
-  </span>
-)
+  return (
+    <Button disabled={disabled} onClick={onClick} variant={isActive ? 'contained' : 'outlined'}>
+      <Icon fontSize="small" />
+    </Button>
+  )
+}
