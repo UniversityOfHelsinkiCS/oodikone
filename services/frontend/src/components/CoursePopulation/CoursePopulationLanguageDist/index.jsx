@@ -1,57 +1,58 @@
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
-import { Table, Progress } from 'semantic-ui-react'
 
 import { languageAbbreviations } from '@/common'
+import { PercentageBar } from '@/components/material/PercentageBar'
+import { StyledTable } from '@/components/material/StyledTable'
 
 dayjsExtend(isBetween)
 
 export const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
-  let total = 0
   const languages = {}
 
-  if (samples) {
-    samples.forEach(student => {
-      const courses = student.courses.filter(course => codes.includes(course.course_code))
-      const filteredCourses = courses
-        .filter(course => dayjs(course.date).isBetween(dayjs(from), dayjs(to)))
-        .sort((a, b) => (new Date(a.date) <= new Date(b.date) ? -1 : 1))
+  samples?.forEach(student => {
+    const filteredCourse = student.courses
+      .filter(course => codes.includes(course.course_code))
+      .filter(course => dayjs(course.date).isBetween(dayjs(from), dayjs(to)))
+      .sort((a, b) => Number(new Date(b.date) < new Date(a.date)))
+      .find(({ language }) => !!language)
 
-      if (filteredCourses[0] && filteredCourses[0].language !== null) {
-        languages[filteredCourses[0].language] ??= 0
-        languages[filteredCourses[0].language] += 1
-        total++
-      }
-    })
-  }
+    if (filteredCourse) {
+      languages[filteredCourse.language] ??= 0
+      languages[filteredCourse.language] += 1
+    }
+  })
 
-  const getLanguage = lang => (lang in languageAbbreviations ? languageAbbreviations[lang] : lang)
-
+  const total = Object.values(languages).reduce((acc, cur) => acc + cur, 0)
   if (total === 0) return <p>No data available!</p>
 
   return (
-    <Table celled>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Languages</Table.HeaderCell>
-          <Table.HeaderCell>
+    <StyledTable showCellBorders>
+      <TableHead>
+        <TableRow>
+          <TableCell>Languages</TableCell>
+          <TableCell>
             Language distribution
-            <div style={{ fontWeight: 100 }}>(n={total})</div>
-          </Table.HeaderCell>
-          <Table.HeaderCell>Percentage of population</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {Object.entries(languages).map(language => (
-          <Table.Row key={`language-table-row-${language[0]}`}>
-            <Table.Cell>{getLanguage(language[0])}</Table.Cell>
-            <Table.Cell>{language[1]}</Table.Cell>
-            <Table.Cell>
-              <Progress precision={0} progress="percent" style={{ margin: 0 }} total={total} value={language[1]} />
-            </Table.Cell>
-          </Table.Row>
+            <div style={{ fontWeight: 'lighter' }}>(n = {total})</div>
+          </TableCell>
+          <TableCell>Percentage of population</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {Object.entries(languages).map(([language, count]) => (
+          <TableRow key={`language-table-row-${language}`}>
+            <TableCell>{languageAbbreviations[language] ?? language}</TableCell>
+            <TableCell>{count}</TableCell>
+            <TableCell>
+              <PercentageBar denominator={total} numerator={count} />
+            </TableCell>
+          </TableRow>
         ))}
-      </Table.Body>
-    </Table>
+      </TableBody>
+    </StyledTable>
   )
 }
