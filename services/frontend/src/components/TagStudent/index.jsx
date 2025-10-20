@@ -1,9 +1,11 @@
+import Autocomplete from '@mui/material/Autocomplete'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
+import TextField from '@mui/material/TextField'
 import { useState } from 'react'
-import { Dropdown } from 'semantic-ui-react'
 
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
@@ -18,7 +20,7 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
     if (selectedTags.length) {
       void createStudentTags({
         combinedProgramme,
-        studentTags: selectedTags.map(tag => ({ studentNumber, tagId: tag })),
+        studentTags: selectedTags.map(({ id }) => ({ studentNumber, tagId: id })),
         studyTrack,
       })
       setSelectedTags([])
@@ -36,7 +38,7 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
 
   const studentTagLabels = studentTags.map(studentTag => (
     <Chip
-      color={studentTag.tag.personalUserId ? 'secondary' : 'disabled'}
+      color={studentTag.tag.personalUserId ? 'secondary' : 'primary'}
       key={`${studentNumber}-${studentTag.tag.id}`}
       label={studentTag.tag.name}
       onDelete={() => deleteTag(studentTag.tag)}
@@ -46,20 +48,21 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
 
   return (
     <TableRow>
-      {namesVisible ? <TableCell>{namesVisible ? studentName : null}</TableCell> : null}
+      {namesVisible ? <TableCell>{studentName}</TableCell> : null}
       <TableCell>{studentNumber}</TableCell>
       <TableCell>{studentTagLabels}</TableCell>
       <TableCell>
-        <div style={{ display: 'flex', gap: '0.5em' }}>
-          <Dropdown
-            clearable
+        <Stack flexDirection="row" gap={0.5} sx={{ maxWidth: '50%' }}>
+          <Autocomplete
+            clearOnEscape
+            data-cy={'$tagstudent-selector'}
+            getOptionLabel={opt => (typeof opt === 'string' ? opt : opt.name)}
             multiple
-            onChange={(_, { value }) => setSelectedTags(value)}
+            onChange={(_, value) => setSelectedTags(value)}
             options={tagOptions}
-            search
-            selectOnBlur={false}
-            selectOnNavigation={false}
-            selection
+            renderInput={params => <TextField {...params} label="Select new tags" />}
+            size="small"
+            sx={{ width: '300px' }}
             value={selectedTags}
           />
           <Button
@@ -70,7 +73,7 @@ export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions,
           >
             Save
           </Button>
-        </div>
+        </Stack>
       </TableCell>
     </TableRow>
   )

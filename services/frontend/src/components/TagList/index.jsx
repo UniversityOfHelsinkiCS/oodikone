@@ -38,14 +38,10 @@ export const TagList = ({ programme, combinedProgramme, selectedStudents, tags }
         {tags
           ? selectedStudents.map(({ studentNumber, name }) => {
               const studentTags = tagStudents.filter(tag => tag.studentNumber === studentNumber)
-              const tagIds = studentTags.map(tag => tag.tag.id)
+              const studentTagIds = studentTags.map(tag => tag.tag.id)
               const studentTagOptions = tags
-                .filter(tag => !tagIds?.includes(tag.id))
-                .map(tag => ({
-                  key: tag.id,
-                  text: tag.name,
-                  value: tag.id,
-                }))
+                .filter(({ id }) => !studentTagIds.includes(id))
+                .map(({ id, name }) => ({ id, name }))
               return (
                 <TagStudent
                   combinedProgramme={combinedProgramme}
