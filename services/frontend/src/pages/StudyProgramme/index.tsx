@@ -59,27 +59,26 @@ const getSubtitle = (programmeId: string, programmeLetterId?: string, secondProg
 export const StudyProgramme = () => {
   const { isAdmin, fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
   const { language, getTextIn } = useLanguage()
-
   const { studyProgrammeId } = useParams()
-  const { data: programmes } = useGetProgrammesQuery()
-
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-
-  const [programmeId, secondProgrammeId] = [...(studyProgrammeId?.split('+') ?? []), '', '']
-  const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
-
-  useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
 
   const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
   const [graduated, setGraduated] = useState(false)
 
-  if (!studyProgrammeId || !programmeId) return <StudyProgrammeSelector />
+  const { data: programmes } = useGetProgrammesQuery()
+
+  const [programmeId, secondProgrammeId] = [...(studyProgrammeId?.split('+') ?? []), '', '']
 
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
+  const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
 
+  useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
+  if (!studyProgrammeId || !programmeId) return <StudyProgrammeSelector />
+  if (!programmes) return null
+
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const otherTabsVisible: boolean =
     !!fullAccessToStudentData ||
     fullStudyProgrammeRights.includes(programmeId) ||
@@ -179,7 +178,7 @@ export const StudyProgramme = () => {
       <Stack gap={2}>
         <Tabs
           data-cy="study-programme-tabs"
-          onChange={(_event, newTab) => setCurrentTab(newTab)}
+          onChange={(_, newTab) => setCurrentTab(newTab)}
           value={currentTab}
           variant="scrollable"
         >
@@ -187,7 +186,7 @@ export const StudyProgramme = () => {
             <Tab data-cy={tab.key} key={tab.key} label={tab.label} />
           ))}
         </Tabs>
-        {tabs.map(tab => currentTab === tabs.indexOf(tab) && tab.component)}
+        {tabs.at(currentTab)?.component ?? null}
       </Stack>
     </Container>
   )
