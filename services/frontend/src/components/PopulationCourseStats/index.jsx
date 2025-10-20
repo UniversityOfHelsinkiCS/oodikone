@@ -1,8 +1,8 @@
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import { orderBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Tab } from 'semantic-ui-react'
 
-import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
@@ -15,48 +15,41 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   mandatoryCourses.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   )
+
 export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, onlyIamRights }) => {
-  const [modules, setModules] = useState([])
   const [expandedGroups, setExpandedGroups] = useState(new Set())
-  const { handleTabChange } = useTabChangeAnalytics()
+  const [modules, setModules] = useState([])
+
+  const [tab, setTab] = useState(0)
 
   useEffect(() => {
     const modules = {}
 
-    const programmeCourses =
-      filteredCourses && curriculum
-        ? filteredCourses
-            .filter(course => visibleCoursesFilter(course, curriculum))
-            // it needs to be with flatMap and filter and not map and find
-            // because there can be many mandatoryCourses with the same course code
-            // as they can belong to many categories
-            .flatMap(course => {
-              const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
-                mandatoryCourse => mandatoryCourse.code === course.course.code
-              )
-              const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
-                mandatoryCourse => mandatoryCourse.code === course.course.code
-              )
-              return [
-                ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-                ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-              ]
-            })
-        : []
-
-    programmeCourses.forEach(course => {
-      modules[course.parent_code] ??= {
-        module: { code: course.parent_code, name: course.parent_name },
-        courses: [],
-      }
-      modules[course.parent_code].courses.push(course)
-    })
-
-    Object.keys(modules).forEach(module => {
-      if (modules[module].courses.length === 0) {
-        delete modules[module]
-      }
-    })
+    if (filteredCourses && curriculum)
+      filteredCourses
+        .filter(course => visibleCoursesFilter(course, curriculum))
+        // it needs to be with flatMap and filter and not map and find
+        // because there can be many mandatoryCourses with the same course code
+        // as they can belong to many categories
+        .flatMap(course => {
+          const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
+            mandatoryCourse => mandatoryCourse.code === course.course.code
+          )
+          const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
+            mandatoryCourse => mandatoryCourse.code === course.course.code
+          )
+          return [
+            ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
+            ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
+          ]
+        })
+        .forEach(course => {
+          modules[course.parent_code] ??= {
+            module: { code: course.parent_code, name: course.parent_name },
+            courses: [],
+          }
+          modules[course.parent_code].courses.push(course)
+        })
 
     setModules(
       orderBy(
@@ -76,11 +69,8 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
       setExpandedGroups(new Set())
     } else {
       const newExpandedGroups = new Set(expandedGroups)
-      if (newExpandedGroups.has(code)) {
-        newExpandedGroups.delete(code)
-      } else {
-        newExpandedGroups.add(code)
-      }
+      if (!newExpandedGroups.delete(code)) newExpandedGroups.add(code)
+
       setExpandedGroups(newExpandedGroups)
     }
   }
@@ -94,40 +84,31 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
 
   const panes = [
     {
-      menuItem: 'Pass/fail',
-      render: () => (
-        <Tab.Pane>
-          <PassFailEnrollments onlyIamRights={onlyIamRights} />
-        </Tab.Pane>
-      ),
+      label: 'Pass/fail',
+      render: () => <PassFailEnrollments onlyIamRights={onlyIamRights} />,
     },
     {
-      menuItem: 'Grades',
-      render: () => (
-        <Tab.Pane>
-          <GradeDistribution onlyIamRights={onlyIamRights} />
-        </Tab.Pane>
-      ),
+      label: 'Grades',
+      render: () => <GradeDistribution onlyIamRights={onlyIamRights} />,
     },
     {
-      menuItem: 'When passed',
-      render: () => (
-        <Tab.Pane>
-          <PassingSemesters onlyIamRights={onlyIamRights} />
-        </Tab.Pane>
-      ),
+      label: 'When passed',
+      render: () => <PassingSemesters onlyIamRights={onlyIamRights} />,
     },
   ]
 
-  if (!filteredCourses || pending) {
-    return null
-  }
+  if (!filteredCourses || pending) return null
 
   return (
-    <div>
+    <>
+      <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        {panes.map(({ label }) => (
+          <Tab key={label} label={label} />
+        ))}
+      </Tabs>
       <PopulationCourseContext.Provider value={contextValue}>
-        <Tab onTabChange={handleTabChange} panes={panes} />
+        {panes.at(tab)?.render() ?? null}
       </PopulationCourseContext.Provider>
-    </div>
+    </>
   )
 }

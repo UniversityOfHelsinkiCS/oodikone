@@ -147,20 +147,18 @@ export const PassingSemesters = ({ onlyIamRights }) => {
   )
 
   return (
-    <div>
-      <SortableTable
-        actions={
-          <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
-            {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
-          </Button>
-        }
-        columns={columns}
-        data={data}
-        expandedGroups={expandedGroups}
-        featureName="passing_semester"
-        title="Students Passing a Course per Semester"
-        toggleGroupExpansion={toggleGroupExpansion}
-      />
-    </div>
+    <SortableTable
+      actions={
+        <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
+          {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
+        </Button>
+      }
+      columns={columns}
+      data={data}
+      expandedGroups={expandedGroups}
+      featureName="passing_semester"
+      title="Students Passing a Course per Semester"
+      toggleGroupExpansion={toggleGroupExpansion}
+    />
   )
 }
