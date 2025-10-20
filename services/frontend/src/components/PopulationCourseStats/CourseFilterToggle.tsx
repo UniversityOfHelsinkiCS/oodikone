@@ -1,4 +1,4 @@
-import { Popup } from 'semantic-ui-react'
+import Tooltip from '@mui/material/Tooltip'
 
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
 import { isCourseSelected, toggleCourseSelection } from '@/components/FilterView/filters/courses'
@@ -16,26 +16,19 @@ export const CourseFilterToggle = ({ courseCode, courseName }: CourseFilterToggl
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isCourseSelected(courseCode))
+  const courseElement = <b>{getTextIn(courseName)}</b>
+
+  const title = (
+    <span>
+      {isActive ? 'Poista rajaus' : 'Rajaa opiskelijat'} kurssin {courseElement} perusteella
+    </span>
+  )
 
   return (
-    <Popup
-      content={
-        isActive ? (
-          <span>
-            Poista rajaus kurssin <b>{getTextIn(courseName)}</b> perusteella
-          </span>
-        ) : (
-          <span>
-            Rajaa opiskelijat kurssin <b>{getTextIn(courseName)}</b> perusteella
-          </span>
-        )
-      }
-      position="top right"
-      trigger={
-        <div>
-          <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(courseCode))} />
-        </div>
-      }
-    />
+    <Tooltip arrow placement="top" title={title}>
+      <div>
+        <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(courseCode))} />
+      </div>
+    </Tooltip>
   )
 }
