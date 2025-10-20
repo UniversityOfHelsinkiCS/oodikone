@@ -45,36 +45,3 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
 
   return [tab, switchToTab] as const
 }
-
-// ! To be deprecated, use useTabs for MUI components
-export const useSemanticTabs = (id: string, initialTab: number, { location, replace }) => {
-  const [tab, setTab] = useState(-1)
-  const [didMount, setDidMount] = useState(false)
-
-  const pushToUrl = newTab => {
-    replace({
-      pathname: location.pathname,
-      search: queryParamsToString({ ...parseQueryParams(location.search), [id]: newTab }),
-    })
-  }
-
-  useEffect(() => {
-    const params = parseQueryParams(location.search)
-    const queryTab = params[id]
-    setTab(queryTab === undefined ? initialTab : JSON.parse(queryTab as string))
-    setDidMount(true)
-  }, [])
-
-  useEffect(() => {
-    if (tab !== undefined && didMount) {
-      pushToUrl(tab)
-    }
-  }, [tab])
-
-  return [
-    tab,
-    (_, { activeIndex }) => {
-      setTab(activeIndex)
-    },
-  ]
-}
