@@ -1,21 +1,23 @@
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAlt'
-import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOff'
 import Button from '@mui/material/Button'
+import { forwardRef } from 'react'
 
-export const FilterToggleIcon = ({
-  isActive,
-  onClick,
-  disabled,
-}: {
+type FilterToggleIconProps = {
   isActive: boolean
   disabled?: true
   onClick: () => void
-}) => {
-  const Icon = isActive ? FilterAltOffOutlinedIcon : FilterAltOutlinedIcon
-
-  return (
-    <Button disabled={disabled} onClick={onClick} variant={isActive ? 'contained' : 'outlined'}>
-      <Icon fontSize="small" />
-    </Button>
-  )
 }
+
+export const FilterToggleIcon = forwardRef<HTMLButtonElement, FilterToggleIconProps>(
+  (props: FilterToggleIconProps, ref) => {
+    const { isActive, ...rest } = props
+
+    return (
+      <Button {...rest} ref={ref} variant={isActive ? 'contained' : 'outlined'}>
+        <FilterAltOutlinedIcon fontSize="small" />
+      </Button>
+    )
+  }
+)
+
+FilterToggleIcon.displayName = 'OKFilterToggleIcon'
