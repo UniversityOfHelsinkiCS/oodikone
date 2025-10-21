@@ -1,6 +1,10 @@
+import Alert from '@mui/material/Alert'
+import Typography from '@mui/material/Typography'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Message, Segment } from 'semantic-ui-react'
+
+import { LoadingSection } from '@/components/material/Loading'
+import { SegmentDimmer } from '@/components/SegmentDimmer'
 
 import { DateFormat } from '@/constants/date'
 import { useGetTopTeachersCategoriesQuery, useGetTopTeachersQuery } from '@/redux/teachers'
@@ -17,7 +21,7 @@ export const TeacherLeaderBoard = () => {
     { skip: !selectedYear || !selectedCategory }
   )
 
-  if (categoriesAreLoading) return <Segment basic loading />
+  if (categoriesAreLoading) return <SegmentDimmer loading />
 
   const initLeaderboard = (year, category) => {
     setSelectedYear(year)
@@ -49,12 +53,27 @@ export const TeacherLeaderBoard = () => {
     text: name,
   }))
 
+  const statistics = statsAreLoading ? (
+    <LoadingSection />
+  ) : (
+    <>
+      {topTeachers.stats?.length > 0 && (
+        <Alert
+          icon={false}
+          severity="info"
+          variant="outlined"
+        >{`Last updated: ${reformatDate(topTeachers?.updated, DateFormat.LONG_DATE_TIME)}`}</Alert>
+      )}
+      <TeacherStatisticsTable statistics={topTeachers.stats ?? []} variant="leaderboard" />
+    </>
+  )
+
   return (
     <div>
-      <Message>
-        <Message.Header>Teacher leaderboard</Message.Header>
+      <Alert icon={false} severity="info" variant="outlined">
+        <Typography variant="h6">Teacher leaderboard</Typography>
         Teachers who have produced the most credits from all departments.
-      </Message>
+      </Alert>
       <LeaderForm
         categoryoptions={categoryOptions}
         handleCategoryChange={handleCategoryChange}
@@ -64,12 +83,7 @@ export const TeacherLeaderBoard = () => {
         selectedyear={selectedYear}
         yearoptions={yearOptions}
       />
-      <Segment loading={statsAreLoading}>
-        {topTeachers.stats?.length > 0 && (
-          <Message>{`Last updated: ${reformatDate(topTeachers?.updated, DateFormat.LONG_DATE_TIME)}`}</Message>
-        )}
-        <TeacherStatisticsTable statistics={topTeachers.stats ?? []} variant="leaderboard" />
-      </Segment>
+      {statistics}
     </div>
   )
 }
