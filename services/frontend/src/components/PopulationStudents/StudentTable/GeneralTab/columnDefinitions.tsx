@@ -191,7 +191,17 @@ export const useGetColumnDefinitions = ({
 
           return (
             <Tooltip arrow title={value}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</span>
+              <span
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {value}
+              </span>
             </Tooltip>
           )
         },
@@ -211,12 +221,22 @@ export const useGetColumnDefinitions = ({
           const tooltipProgrammeList = joinProgrammes(programmes, getTextIn, '\n')
 
           return (
-            <Tooltip arrow title={<div style={{ whiteSpace: 'pre-line' }}>{tooltipProgrammeList}</div>}>
-              <div style={{ display: 'flex', width: '100%' }}>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {programmes.length > 1 ? `${programmeName}...` : programmeName}
+            <Tooltip arrow title={tooltipProgrammeList}>
+              <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
+                <span
+                  style={{
+                    flex: '1 1 auto',
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {programmes.length > 1 ? programmeName : programmeName}
                 </span>
-                {programmes.length > 1 ? <span style={{ paddingLeft: '0.25em' }}>+{programmes.length - 1}</span> : null}
+                {programmes.length > 1 ? (
+                  <span style={{ flex: '0 0 auto', paddingLeft: '0.25em' }}>+{programmes.length - 1}</span>
+                ) : null}
               </div>
             </Tooltip>
           )
