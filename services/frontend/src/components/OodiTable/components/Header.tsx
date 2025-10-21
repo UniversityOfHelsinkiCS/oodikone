@@ -1,33 +1,33 @@
-import Box from '@mui/material/Box'
-import { SxProps, Theme } from '@mui/material/styles'
-import TableCell, { type TableCellProps } from '@mui/material/TableCell'
+import { styled, SxProps, Theme } from '@mui/material/styles'
+import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
-import { flexRender } from '@tanstack/react-table'
 import type { HeaderGroup } from '@tanstack/react-table'
-import type { FC, ReactNode } from 'react'
 
 import { getCommonPinningStyles, verticalStyles } from '../styles'
 import { OodiTableSortIcons } from './SortIcons'
+import { flexRender } from './util'
 
-const OodiTableHeader: FC<TableCellProps & { children?: ReactNode }> = ({ children, ...props }) => {
-  return (
-    <TableCell
-      {...props}
-      sx={{
-        position: 'relative',
-        padding: '1.5em',
-        borderWidth: '0 1px 1px 0',
-        borderStyle: 'solid',
-        borderColor: 'grey.300',
-        fontWeight: 'bold',
-        backgroundColor: 'white',
-        ...props.sx,
-      }}
-    >
-      {children}
-    </TableCell>
-  )
-}
+const OtHeaderCell = styled(TableCell)(({ theme }) => ({
+  position: 'relative',
+  padding: '1.5em',
+  borderWidth: '0 1px 1px 0',
+  borderStyle: 'solid',
+  borderColor: theme.palette.grey[300],
+  fontWeight: 'bold',
+  backgroundColor: theme.palette.common.white,
+}))
+
+const OtVerticalContentWrapper = styled('div')({
+  writingMode: 'vertical-rl',
+  textOrientation: 'mixed',
+  whiteSpace: 'normal',
+  overflow: 'visible',
+  height: '100%',
+  maxWidth: '15em',
+  minHeight: '160px',
+  maxHeight: '240px',
+  margin: '0 auto',
+})
 
 export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, verticalHeaders: string[]) => (
   <TableRow key={headerGroup.id}>
@@ -41,15 +41,16 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, 
       }
 
       const isVertical = verticalHeaders.includes(header.id)
+      const canSort = header.column.getCanSort()
 
       const sx = {
-        cursor: header.column.getCanSort() ? 'pointer' : 'inherit',
+        cursor: canSort ? 'pointer' : 'inherit',
         ...(isVertical && verticalStyles),
         ...getCommonPinningStyles(header.column),
       }
 
       return (
-        <OodiTableHeader
+        <OtHeaderCell
           colSpan={header.colSpan}
           key={header.id}
           onClick={header.column.getToggleSortingHandler()}
@@ -57,33 +58,14 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, 
           sx={sx as SxProps<Theme>}
         >
           {isVertical ? (
-            <Box
-              sx={{
-                display: 'inline-flex',
-                width: '100%',
-              }}
-            >
-              <Box
-                sx={{
-                  writingMode: 'vertical-rl',
-                  textOrientation: 'mixed',
-                  whiteSpace: 'normal',
-                  overflow: 'visible',
-                  height: '100%',
-                  maxWidth: '15em',
-                  minHeight: '160px',
-                  maxHeight: '240px',
-                  margin: '0 auto',
-                }}
-              >
-                {flexRender(header.column.columnDef.header, header.getContext())}
-              </Box>
-            </Box>
+            <OtVerticalContentWrapper>
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </OtVerticalContentWrapper>
           ) : (
-            <Box>{flexRender(header.column.columnDef.header, header.getContext())}</Box>
+            <>{flexRender(header.column.columnDef.header, header.getContext())}</>
           )}
-          <OodiTableSortIcons canSort={header.column.getCanSort()} isSorted={header.column.getIsSorted()} />
-        </OodiTableHeader>
+          <OodiTableSortIcons canSort={canSort} isSorted={header.column.getIsSorted()} />
+        </OtHeaderCell>
       )
     })}
   </TableRow>

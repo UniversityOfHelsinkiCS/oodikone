@@ -27,6 +27,9 @@ declare module '@tanstack/react-table' {
   }
 
   interface Table<TData> {
+    /**
+     * Aggregation rows are not included in pagination/sorting.
+     */
     getAggregationRowModel: () => AggregationRowModel<TData>
     getAllAggregationRowIds: () => string[]
     hasAggregationRows: () => boolean

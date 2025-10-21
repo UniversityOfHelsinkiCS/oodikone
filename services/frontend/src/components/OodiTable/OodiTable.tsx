@@ -5,7 +5,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 
 import { type Table as TableType } from '@tanstack/react-table'
-import { OodiTableAggregationRow } from './components/AggregationRow'
 import { OodiTableDataRow } from './components/Cell'
 import { OodiTableHeaderGroup } from './components/Header'
 import { OodiTablePagination } from './components/Pagination'
@@ -57,8 +56,8 @@ export const OodiTableContainer = <OTData,>({
               },
             }}
           >
-            {table.getAggregationRowModel().rows.map(OodiTableAggregationRow)}
-            {table.getRowModel().rows.map(OodiTableDataRow)}
+            {table.getAggregationRowModel().rows.map(row => OodiTableDataRow(row, true))}
+            {table.getRowModel().rows.map(row => OodiTableDataRow(row))}
           </TableBody>
         </Table>
       </TableContainer>

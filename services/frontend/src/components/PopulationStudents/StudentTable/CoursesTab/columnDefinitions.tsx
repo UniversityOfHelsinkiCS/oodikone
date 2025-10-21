@@ -162,14 +162,13 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                     substitutePrefix +
                     `Grade: ${correctCourse.grade}\nCompleted on: ${formatDate(correctCourse.completionDate, dateFormat)}`
                   return (
-                    <div style={{ display: 'flex', justifyContent: 'center', margin: 'auto' }} title={title}>
+                    <div title={title}>
                       <CheckIcon sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }} />
                     </div>
                   )
                 } else if (correctCourse.enrollmentDate) {
                   return (
                     <div
-                      style={{ display: 'flex', justifyContent: 'center', margin: 'auto' }}
                       title={
                         substitutePrefix + `Last enrollment ${formatDate(correctCourse.enrollmentDate, dateFormat)}`
                       }
@@ -185,10 +184,7 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                   )
                 } else if (correctCourse.inHops) {
                   return (
-                    <div
-                      style={{ display: 'flex', justifyContent: 'center', margin: 'auto' }}
-                      title={substitutePrefix + 'In primary studyplan'}
-                    >
+                    <div title={substitutePrefix + 'In primary studyplan'}>
                       <CropSquareIcon sx={{ color: theme.palette.ooditable.hops }} />
                     </div>
                   )
