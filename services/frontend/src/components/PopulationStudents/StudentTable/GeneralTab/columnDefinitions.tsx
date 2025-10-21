@@ -14,19 +14,13 @@ import { useStatusNotification } from '@/components/material/StatusNotificationC
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
+import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import { DateFormat } from '@/constants/date'
 import { formatDate } from '@/util/timeAndDate'
 import { FormattedStudentData } from '.'
 import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
-
-const handleCopy = async (event, studentNumbers, setNotification, closeNotification) => {
-  event.stopPropagation()
-  await navigator.clipboard.writeText(studentNumbers.join('\n'))
-  setNotification(`Copied ${studentNumbers.length} student numbers`)
-  setTimeout(() => closeNotification(), 5000)
-}
 
 export const useGetColumnDefinitions = ({
   getTextIn,
@@ -38,20 +32,29 @@ export const useGetColumnDefinitions = ({
   includePrimaryProgramme,
   year,
 }): ColumnDef<FormattedStudentData, any>[] => {
-  const { setStatusNotification, closeNotification } = useStatusNotification()
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+  const { setStatusNotification, closeNotification } = useStatusNotification()
 
   return useMemo(
     () => [
       columnHelper.accessor('studentNumber', {
         header: ({ table }) => {
           const allStudentNumbers = table.getFilteredRowModel().rows.map(row => row.original.studentNumber)
+          const copyText = `Copied ${allStudentNumbers.length} student numbers`
           return (
             <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
               <Box sx={{ alignSelf: 'center' }}>Student number</Box>
               <Tooltip title="Copy all student numbers to clipboard">
                 <IconButton
-                  onClick={event => void handleCopy(event, allStudentNumbers, setStatusNotification, closeNotification)}
+                  onClick={event =>
+                    void handleClipboardCopy(
+                      event,
+                      allStudentNumbers,
+                      copyText,
+                      setStatusNotification,
+                      closeNotification
+                    )
+                  }
                 >
                   <ContentCopyIcon color="action" />
                 </IconButton>

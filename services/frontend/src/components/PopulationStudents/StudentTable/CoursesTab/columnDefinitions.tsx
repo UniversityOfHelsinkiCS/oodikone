@@ -11,10 +11,11 @@ import { useTheme } from '@mui/material/styles'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
+import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import { DateFormat } from '@/constants/date'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { Courses, CourseTabModule, CourseTabStudent } from '.'
@@ -32,17 +33,6 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
   const { getTextIn } = useLanguage()
   const theme = useTheme()
   const { setStatusNotification, closeNotification } = useStatusNotification()
-
-  const handleCopy = useCallback(
-    async (event, studentNumbers: string[]) => {
-      event.stopPropagation()
-      await navigator.clipboard.writeText(studentNumbers.join('\n'))
-      setStatusNotification(`Copied ${studentNumbers.length} student numbers`, 'success')
-      setTimeout(() => closeNotification(), 3000)
-    },
-    [setStatusNotification, closeNotification]
-  )
-
   return useMemo(() => {
     return [
       // Static columns
@@ -52,11 +42,22 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
             .getFilteredRowModel()
             .rows.map(row => row.original.studentNumber)
             .filter(Boolean)
+          const copyText = `Copied ${allStudentNumbers.length} student numbers`
           return (
             <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
               <Box sx={{ alignSelf: 'center' }}>Student number</Box>
               <Tooltip title="Copy all student numbers to system clipboard">
-                <IconButton onClick={event => void handleCopy(event, allStudentNumbers)}>
+                <IconButton
+                  onClick={event =>
+                    void handleClipboardCopy(
+                      event,
+                      allStudentNumbers,
+                      copyText,
+                      setStatusNotification,
+                      closeNotification
+                    )
+                  }
+                >
                   <ContentCopyIcon color="action" />
                 </IconButton>
               </Tooltip>
@@ -226,5 +227,5 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
         })
       ),
     ]
-  }, [modules, theme, getTextIn, handleCopy])
+  }, [modules, theme, getTextIn])
 }
