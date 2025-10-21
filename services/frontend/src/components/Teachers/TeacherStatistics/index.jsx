@@ -1,5 +1,6 @@
+import Alert from '@mui/material/Alert'
+import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
 import { getCurrentSemester } from '@/common'
@@ -77,19 +78,14 @@ export const TeacherStatistics = () => {
 
   return (
     <div>
-      <Message
-        content={
-          <ReactMarkdown>
-            Statistics for teachers who admitted credits during or between the selected semesters for one of the
-            specified course providers. This is determined by the acceptor person(s) of the attainment. While the
-            acceptor person is often the responsible teacher for the course, this is not always the case. If an
-            attainment has multiple acceptors, the full amount of credits is given to each acceptor (i.e., the credits
-            are **not** divided between the acceptors).
-          </ReactMarkdown>
-        }
-        header="Teacher statistics by course providers"
-        info
-      />
+      <Alert icon={false} severity="info" variant="outlined">
+        <Typography variant="h6">Teacher statistics by course providers</Typography>
+        Statistics for teachers who admitted credits during or between the selected semesters for one of the specified
+        course providers. This is determined by the acceptor person(s) of the attainment. While the acceptor person is
+        often the responsible teacher for the course, this is not always the case. If an attainment has multiple
+        acceptors, the full amount of credits is given to each acceptor (i.e., the credits are <b>not</b> divided
+        between the acceptors).
+      </Alert>
       <Segment>
         <Form loading={isLoading || isFetching}>
           <Form.Group widths="equal">

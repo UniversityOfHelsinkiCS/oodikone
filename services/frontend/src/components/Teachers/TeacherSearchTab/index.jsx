@@ -1,6 +1,8 @@
+import Alert from '@mui/material/Alert'
+import Typography from '@mui/material/Typography'
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
-import { Message, Icon, Search, Segment } from 'semantic-ui-react'
+import { Icon, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'
 import { Link } from '@/components/material/Link'
@@ -57,10 +59,10 @@ export const TeacherSearchTab = () => {
 
   return (
     <>
-      <Message
-        content="Search for a teacher and click the search result to view their individual statistics from their entire career. "
-        header="Teacher search"
-      />
+      <Alert icon={false} severity="info" variant="outlined">
+        <Typography variant="h6">Teacher search</Typography>
+        Search for a teacher and click the search result to view their individual statistics from their entire career.
+      </Alert>
       <div className="searchContainer">
         <Search
           className="searchInput"
