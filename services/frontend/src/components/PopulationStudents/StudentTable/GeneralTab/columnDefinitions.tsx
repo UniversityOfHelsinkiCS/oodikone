@@ -7,9 +7,10 @@ import Tooltip from '@mui/material/Tooltip'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { creditDateFilter } from '@/components/FilterView/filters'
+import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
@@ -19,6 +20,13 @@ import { FormattedStudentData } from '.'
 import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
+
+const handleCopy = async (event, studentNumbers, setNotification, closeNotification) => {
+  event.stopPropagation()
+  await navigator.clipboard.writeText(studentNumbers.join('\n'))
+  setNotification(`Copied ${studentNumbers.length} student numbers`)
+  setTimeout(() => closeNotification(), 5000)
+}
 
 export const useGetColumnDefinitions = ({
   getTextIn,
@@ -30,30 +38,21 @@ export const useGetColumnDefinitions = ({
   includePrimaryProgramme,
   year,
 }): ColumnDef<FormattedStudentData, any>[] => {
-  const [showCopyText, setShowCopyText] = useState(false)
+  const { setStatusNotification, closeNotification } = useStatusNotification()
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
-
-  const handleCopy = async (event, studentNumbers) => {
-    event.stopPropagation()
-    await navigator.clipboard.writeText(studentNumbers)
-    setShowCopyText(true)
-    setTimeout(() => setShowCopyText(false), 1500)
-  }
 
   return useMemo(
     () => [
       columnHelper.accessor('studentNumber', {
         header: ({ table }) => {
-          const allStudentNumbers = table
-            .getFilteredRowModel()
-            .rows.map(row => row.original.studentNumber)
-            .filter(Boolean)
-            .join('; ')
+          const allStudentNumbers = table.getFilteredRowModel().rows.map(row => row.original.studentNumber)
           return (
             <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
               <Box sx={{ alignSelf: 'center' }}>Student number</Box>
-              <Tooltip title={showCopyText ? 'Copied!' : 'Copy all student numbers to system clipboard'}>
-                <IconButton onClick={event => void handleCopy(event, allStudentNumbers)}>
+              <Tooltip title="Copy all student numbers to clipboard">
+                <IconButton
+                  onClick={event => void handleCopy(event, allStudentNumbers, setStatusNotification, closeNotification)}
+                >
                   <ContentCopyIcon color="action" />
                 </IconButton>
               </Tooltip>
