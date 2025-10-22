@@ -1,8 +1,12 @@
+import SearchIcon from '@mui/icons-material/Search'
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+import Paper from '@mui/material/Paper'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
-import { Icon, Search, Segment } from 'semantic-ui-react'
 
 import { splitByEmptySpace, validateInputLength } from '@/common'
 import { Link } from '@/components/material/Link'
@@ -50,9 +54,9 @@ export const TeacherSearchTab = () => {
   const getContent = () => {
     if (isUninitialized) return null
 
-    if (isLoading || query !== searchString) return <Icon loading name="spinner" size="huge" />
+    if (isLoading || query !== searchString) return <CircularProgress />
 
-    if (teachers.length === 0) return <div>No teachers matched your search</div>
+    if (!teachers.length) return <div>No teachers matched your search</div>
 
     return <SortableTable columns={columns} data={teachers} defaultSort={['name', 'asc']} hideHeaderBar />
   }
@@ -63,17 +67,18 @@ export const TeacherSearchTab = () => {
         <Typography variant="h6">Teacher search</Typography>
         Search for a teacher and click the search result to view their individual statistics from their entire career.
       </Alert>
-      <div className="searchContainer">
-        <Search
+      <Box className="searchContainer" sx={{ padding: 2, gap: 2 }}>
+        <TextField
           className="searchInput"
-          input={{ fluid: true }}
-          onSearchChange={handleSearchChange}
+          onChange={handleSearchChange}
           placeholder="Search by entering a name or an id"
-          showNoResults={false}
+          slotProps={{
+            input: { endAdornment: <SearchIcon /> },
+          }}
           value={searchString}
         />
-        <Segment className="contentSegment">{getContent()}</Segment>
-      </div>
+        <Paper className="contentSegment">{getContent()}</Paper>
+      </Box>
     </>
   )
 }
