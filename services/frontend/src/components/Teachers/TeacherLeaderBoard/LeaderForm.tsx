@@ -4,7 +4,6 @@ import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
-import { any, arrayOf, func, number, shape, string } from 'prop-types'
 import { useEffect } from 'react'
 
 const currentYear = () => {
@@ -22,6 +21,14 @@ export const LeaderForm = ({
   yearoptions,
   categoryoptions,
   initLeaderboard,
+}: {
+  yearoptions: { key: number; value: number; text: string }[]
+  categoryoptions: { key: string; value: string; text: string }[]
+  initLeaderboard: (year: number, category: string) => void
+  handleCategoryChange: () => void
+  handleYearChange: () => void
+  selectedcategory: string
+  selectedyear: number
 }) => {
   useEffect(() => {
     const year = yearoptions.find(year => Number(year.text.slice(0, 4)) === currentYear())?.value
@@ -61,14 +68,4 @@ export const LeaderForm = ({
       </Stack>
     </Paper>
   )
-}
-
-LeaderForm.propTypes = {
-  yearoptions: arrayOf(shape({})).isRequired,
-  categoryoptions: arrayOf(shape({ key: any, value: any, text: string })).isRequired,
-  initLeaderboard: func.isRequired,
-  handleCategoryChange: func.isRequired,
-  handleYearChange: func.isRequired,
-  selectedcategory: string,
-  selectedyear: number,
 }
