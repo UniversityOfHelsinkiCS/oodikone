@@ -13,8 +13,8 @@ import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
 import { LeaderForm } from './LeaderForm'
 
 export const TeacherLeaderBoard = () => {
-  const [selectedYear, setSelectedYear] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedYear, setSelectedYear] = useState(undefined)
+  const [selectedCategory, setSelectedCategory] = useState(undefined)
   const { data: yearsAndCategories, isFetching: categoriesAreLoading } = useGetTopTeachersCategoriesQuery()
   const { data: topTeachers = {}, isFetching: statsAreLoading } = useGetTopTeachersQuery(
     { yearcode: selectedYear, category: selectedCategory },
@@ -28,12 +28,12 @@ export const TeacherLeaderBoard = () => {
     setSelectedCategory(category)
   }
 
-  const handleYearChange = (_event, { value }) => {
-    setSelectedYear(value)
+  const handleYearChange = event => {
+    setSelectedYear(event.target.value)
   }
 
-  const handleCategoryChange = (_event, { value }) => {
-    setSelectedCategory(value)
+  const handleCategoryChange = event => {
+    setSelectedCategory(event.target.value)
   }
 
   const yearOptions = Object.values(yearsAndCategories.years)
@@ -69,7 +69,7 @@ export const TeacherLeaderBoard = () => {
   )
 
   return (
-    <div>
+    <>
       <Alert icon={false} severity="info" variant="outlined">
         <Typography variant="h6">Teacher leaderboard</Typography>
         Teachers who have produced the most credits from all departments.
@@ -84,6 +84,6 @@ export const TeacherLeaderBoard = () => {
         yearoptions={yearOptions}
       />
       {statistics}
-    </div>
+    </>
   )
 }

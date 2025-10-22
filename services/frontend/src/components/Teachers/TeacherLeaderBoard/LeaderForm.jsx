@@ -1,6 +1,11 @@
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
 import { any, arrayOf, func, number, shape, string } from 'prop-types'
 import { useEffect } from 'react'
-import { Form, Segment } from 'semantic-ui-react'
 
 const currentYear = () => {
   const now = new Date()
@@ -19,48 +24,42 @@ export const LeaderForm = ({
   initLeaderboard,
 }) => {
   useEffect(() => {
-    const [defaultyear = {}] = [yearoptions.find(year => Number(year.text.slice(0, 4)) === currentYear())]
-    const [defaultcategory = {}] = categoryoptions
+    const year = yearoptions.find(year => Number(year.text.slice(0, 4)) === currentYear())?.value
+    const category = categoryoptions.at(0)?.value
 
-    const year = defaultyear.value
-    const category = defaultcategory.value
-
-    if (year && category) {
-      initLeaderboard(year, category)
-    }
+    if (!!year && !!category) initLeaderboard(year, category)
   }, [])
 
   return (
-    <Segment>
-      <Form>
-        <Form.Group widths="equal">
-          <Form.Dropdown
-            label="Academic year"
-            name="selectedyear"
-            onChange={handleYearChange}
-            options={yearoptions}
-            placeholder="Academic year"
-            search
-            selectOnBlur={false}
-            selectOnNavigation={false}
-            selection
-            value={selectedyear}
-          />
-          <Form.Dropdown
-            label="Category"
-            name="selectedcategory"
-            onChange={handleCategoryChange}
-            options={categoryoptions}
-            placeholder="Category"
-            search
-            selectOnBlur={false}
-            selectOnNavigation={false}
-            selection
-            value={selectedcategory}
-          />
-        </Form.Group>
-      </Form>
-    </Segment>
+    <Paper sx={{ padding: 2 }} variant="outlined">
+      <Stack flexDirection="row" gap={1}>
+        <FormControl fullWidth size="small">
+          <InputLabel>Academic year</InputLabel>
+          <Select label="academic-year-label" onChange={handleYearChange} value={selectedyear ?? ''} variant="outlined">
+            {yearoptions.map(option => (
+              <MenuItem key={option.key} value={option.value}>
+                {option.text}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel>Category</InputLabel>
+          <Select
+            label="category-label"
+            onSelect={handleCategoryChange}
+            value={selectedcategory ?? ''}
+            variant="outlined"
+          >
+            {categoryoptions.map(option => (
+              <MenuItem key={option.key} value={option.value}>
+                {option.text}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+    </Paper>
   )
 }
 
