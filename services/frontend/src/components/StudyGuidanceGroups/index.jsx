@@ -1,8 +1,5 @@
-// @ts-check
-// Convert to tsx when migrating to MUI
-
+import Typography from '@mui/material/Typography'
 import { useParams } from 'react-router'
-import { Header } from 'semantic-ui-react'
 
 import { useTitle } from '@/hooks/title'
 import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
@@ -18,11 +15,11 @@ export const StudyGuidanceGroups = () => {
   return (
     <>
       <div className="segmentContainer">
-        <Header className="segmentTitle" size="large">
+        <Typography className="segmentTitle" variant="h4">
           Study guidance groups
-        </Header>
+        </Typography>
       </div>
-      <div style={{ padding: '0 1rem' }}>
+      <div>
         <Wrapper isLoading={isLoading}>
           {!isLoading && !groupid && <StudyGuidanceGroupOverview groups={groups} />}
         </Wrapper>
