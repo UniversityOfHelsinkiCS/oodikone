@@ -3,7 +3,7 @@ import { Cell, CellContext, Column, Row, Table, TableFeature } from '@tanstack/r
 /**
  * This doesn't implement all the features of Row, so be aware of that
  */
-export interface AggregationRow<TData> extends Row<TData> {
+/* eslint-disable-line import-x/no-unused-modules */ export interface AggregationRow<TData> extends Row<TData> {
   getIsAggregationRow: () => true
 }
 
