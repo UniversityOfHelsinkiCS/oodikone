@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
@@ -15,30 +14,27 @@ import { TeacherLeaderBoard } from './TeacherLeaderBoard'
 import { TeacherSearchTab } from './TeacherSearchTab'
 import { TeacherStatistics } from './TeacherStatistics'
 
-const pane = (label, Content, icon) => ({
-  label,
-  icon,
-  render: () => <Content />,
-})
-
 const TeachersTabs = () => {
   const { roles, iamGroups } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs(3, 't')
 
-  const panes = [pane('Statistics', TeacherStatistics, 'table')]
+  const panes = [{ label: 'Statistics', render: () => <TeacherStatistics /> }]
   if (hasFullAccessToTeacherData(roles, iamGroups)) {
-    panes.push(pane('Leaderboard', TeacherLeaderBoard, 'trophy'), pane('Search', TeacherSearchTab, 'user'))
+    panes.push(
+      { label: 'Leaderboard', render: () => <TeacherLeaderBoard /> },
+      { label: 'Search', render: () => <TeacherSearchTab /> }
+    )
   }
 
   return (
-    <Box>
+    <>
       <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
         {panes.map(({ label }) => (
           <Tab key={label} label={label} />
         ))}
       </Tabs>
-      {panes.at(tab)?.render()}
-    </Box>
+      {panes.at(tab)?.render() ?? null}
+    </>
   )
 }
 
