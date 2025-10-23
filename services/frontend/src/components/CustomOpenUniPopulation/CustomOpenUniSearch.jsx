@@ -4,7 +4,7 @@ import Datetime from 'react-datetime'
 import { useLocation, useNavigate } from 'react-router'
 import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
-import { SearchHistory } from '@/components/SearchHistory'
+import { SearchHistory } from '@/components/material/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
   useDeleteOpenUniCourseSearchMutation,
