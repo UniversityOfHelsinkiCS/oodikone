@@ -10,17 +10,19 @@ describe('Teachers page tests', () => {
   const teacher1 = 'Luokkanen Liisa Viljami'
   const teacher2 = 'Perälä Juhani Susanna'
 
+  const statisticsHeaders = ['Name', 'Credits', 'Credits transferred', 'Passed']
+
   it('Check Statistics', () => {
-    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.cs('semester-start').click()
     cy.contains('Syksy 2020').click()
     cy.cs('course-providers').click()
     cy.contains('Matemaattisten tieteiden kandiohjelma').click()
-    cy.cs('course-providers').children('.icon').click()
-    cy.contains('button', 'Search').click()
+    cy.get('body').click(0, 0) // Click outside of the select
+    cy.cs('search-statistics').click()
+
     cy.contains('Teacher')
-    const headers = ['Name', 'Credits', 'Credits transferred', 'Passed']
     cy.get('table thead tr th').should('have.length', 4)
-    headers.forEach((header, index) => {
+    statisticsHeaders.forEach((header, index) => {
       cy.get('table thead tr th').eq(index).should('contain', header)
     })
     cy.contains('td', teacher1).siblings().eq(0).contains('235')
@@ -30,15 +32,15 @@ describe('Teachers page tests', () => {
   })
 
   it('Teacher search works', () => {
-    cy.get('.borderless > :nth-child(3)').click()
-    cy.get('.prompt').type(teacher1.split(' ')[0])
+    cy.cs('Search').click()
+    cy.cs('teacher-search').type(teacher1.split(' ')[0])
     cy.get('table tbody tr').should('have.length', 4)
     cy.get('table tbody tr').eq(2).contains('td', teacher1)
   })
 
   it('Can check teacher page', () => {
-    cy.get('.borderless > :nth-child(3)').click()
-    cy.get('.prompt').type(teacher2)
+    cy.cs('Search').click()
+    cy.cs('teacher-search').type(teacher2)
 
     // Prevent opening in new tab
     cy.contains('a', teacher2).invoke('removeAttr', 'target').click()
@@ -47,7 +49,7 @@ describe('Teachers page tests', () => {
     cy.contains('Syksy 2023').click()
     cy.contains('Kevät 2019').click()
     cy.get('.ok-sortable-table tbody tr')
-      .eq(0)
+      .eq(2)
       .within(() => {
         const rowContent = ['MAT12004', 'Tilastollinen päättely I', '120', '0', '92.31%']
         rowContent.forEach((content, index) => {
@@ -57,8 +59,8 @@ describe('Teachers page tests', () => {
   })
 
   it('Check leaderboad works', () => {
-    cy.get('.borderless > :nth-child(2)').click()
-    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.cs('Leaderboard').click()
+    cy.cs('academic-year').click()
     cy.contains('2020-2021').click()
   })
 })

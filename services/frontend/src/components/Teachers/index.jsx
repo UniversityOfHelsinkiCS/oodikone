@@ -30,7 +30,7 @@ const TeachersTabs = () => {
     <>
       <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
         {panes.map(({ label }) => (
-          <Tab key={label} label={label} />
+          <Tab data-cy={label} key={label} label={label} />
         ))}
       </Tabs>
       {panes.at(tab)?.render() ?? null}

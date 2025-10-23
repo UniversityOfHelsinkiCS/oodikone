@@ -70,6 +70,7 @@ export const TeacherSearchTab = () => {
       <Box className="searchContainer" sx={{ padding: 2, gap: 2 }}>
         <TextField
           className="searchInput"
+          data-cy="teacher-search"
           onChange={handleSearchChange}
           placeholder="Search by entering a name or an id"
           slotProps={{

@@ -105,7 +105,12 @@ export const TeacherStatistics = () => {
           <Stack flexDirection="row" gap={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Start semester</InputLabel>
-              <Select onChange={setStartSemester} value={semesterStart ?? ''} variant="outlined">
+              <Select
+                data-cy="semester-start"
+                onChange={setStartSemester}
+                value={semesterStart ?? ''}
+                variant="outlined"
+              >
                 {semesters
                   .filter(semester => semester.value <= currentSemesterCode)
                   .map(({ key, value, text }) => (
@@ -118,7 +123,13 @@ export const TeacherStatistics = () => {
 
             <FormControl fullWidth size="small">
               <InputLabel>End semester</InputLabel>
-              <Select disabled={!semesterStart} onChange={setEndSemester} value={semesterEnd ?? ''} variant="outlined">
+              <Select
+                data-cy="semester-end"
+                disabled={!semesterStart}
+                onChange={setEndSemester}
+                value={semesterEnd ?? ''}
+                variant="outlined"
+              >
                 {semesters
                   .filter(semester => semester.value <= currentSemesterCode)
                   .map(({ key, value, text }) => (
@@ -132,7 +143,13 @@ export const TeacherStatistics = () => {
 
           <FormControl fullWidth size="small">
             <InputLabel>Course providers</InputLabel>
-            <Select multiple onChange={changeProviders} value={providers ?? ''} variant="outlined">
+            <Select
+              data-cy="course-providers"
+              multiple
+              onChange={changeProviders}
+              value={providers ?? ''}
+              variant="outlined"
+            >
               {localizedProviderOptions.map(({ key, value, text, description }) => (
                 <MenuItem key={key} value={value}>
                   {text} {description}
@@ -142,6 +159,7 @@ export const TeacherStatistics = () => {
           </FormControl>
 
           <Button
+            data-cy="search-statistics"
             disabled={invalidQueryParams}
             fullWidth
             onClick={() => void getTeacherStatistics({ semesterStart, semesterEnd, providers })}

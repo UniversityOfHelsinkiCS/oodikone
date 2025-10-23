@@ -42,7 +42,13 @@ export const LeaderForm = ({
       <Stack flexDirection="row" gap={1}>
         <FormControl fullWidth size="small">
           <InputLabel>Academic year</InputLabel>
-          <Select label="academic-year-label" onChange={handleYearChange} value={selectedyear ?? ''} variant="outlined">
+          <Select
+            data-cy="academic-year"
+            label="academic-year-label"
+            onChange={handleYearChange}
+            value={selectedyear ?? ''}
+            variant="outlined"
+          >
             {yearoptions.map(option => (
               <MenuItem key={option.key} value={option.value}>
                 {option.text}
