@@ -1,4 +1,6 @@
-import { Button, Popup } from 'semantic-ui-react'
+import FileDownload from '@mui/icons-material/FileDownload'
+import Button from '@mui/material/Button'
+import Tooltip from '@mui/material/Tooltip'
 import { utils, writeFile } from 'xlsx'
 
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '@/common'
@@ -23,17 +25,15 @@ export const UnihowDataExport = ({ students }) => {
   const filename = `oodikone_export_${students.length}_students_${getTimestamp()}.xlsx`
 
   return (
-    <Popup
-      content="Click here to download a specialized Excel workbook with UniHow data."
-      position="top center"
-      trigger={
-        <Button
-          content="Excel Workbook (UniHow)"
-          icon="file excel"
-          labelPosition="left"
-          onClick={() => writeFile(getXlsx(), filename)}
-        />
-      }
-    />
+    <Tooltip title="Click here to download a specialized Excel workbook with UniHow data.">
+      <Button
+        color="success"
+        onClick={() => writeFile(getXlsx(), filename)}
+        startIcon={<FileDownload />}
+        variant="outlined"
+      >
+        Excel Workbook (UniHow)
+      </Button>
+    </Tooltip>
   )
 }
