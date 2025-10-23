@@ -1,5 +1,7 @@
+import Alert from '@mui/material/Alert'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-import { Message, Button } from 'semantic-ui-react'
 
 export const RightsNotification = ({ discardedStudentNumbers }) => {
   const [visible, setVisible] = useState(true)
@@ -9,18 +11,20 @@ export const RightsNotification = ({ discardedStudentNumbers }) => {
   }
 
   return (
-    <Message data-cy="rights-notification">
-      <Message.Header>Invalid or forbidden student numbers</Message.Header>
-      <p style={{ maxWidth: '50em' }}>
+    <Alert data-cy="rights-notification" severity="error" variant="outlined">
+      <Typography variant="h6">Invalid or forbidden student numbers</Typography>
+      <Typography>
         The following students information could not be displayed. This could be either because they do not exist, or
         you do not have the right to view their information.
-      </p>
+      </Typography>
       <ul>
         {[...new Set(discardedStudentNumbers)].map(num => (
           <li key={num}>{num}</li>
         ))}
       </ul>
-      <Button onClick={() => setVisible(false)}>Hide notification</Button>
-    </Message>
+      <Button color="error" onClick={() => setVisible(false)} variant="outlined">
+        Hide notification
+      </Button>
+    </Alert>
   )
 }
