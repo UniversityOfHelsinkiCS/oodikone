@@ -48,14 +48,12 @@ describe('Teachers page tests', () => {
     cy.contains(teacher2)
     cy.contains('Syksy 2023').click()
     cy.contains('Kevät 2019').click()
-    cy.get('.ok-sortable-table tbody tr')
-      .eq(2)
-      .within(() => {
-        const rowContent = ['MAT12004', 'Tilastollinen päättely I', '120', '0', '92.31%']
-        rowContent.forEach((content, index) => {
-          cy.get('td').eq(index).contains(content)
-        })
+    cy.contains('tr', 'MAT12004').within(() => {
+      const rowContent = ['MAT12004', 'Tilastollinen päättely I', '120', '0', '92.31%']
+      rowContent.forEach((content, index) => {
+        cy.get('td').eq(index).contains(content)
       })
+    })
   })
 
   it('Check leaderboad works', () => {
