@@ -1,7 +1,15 @@
 import Alert from '@mui/material/Alert'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+
 import { useState } from 'react'
-import { Button, Dropdown, Form, Message, Segment } from 'semantic-ui-react'
 
 import { getCurrentSemester } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -34,18 +42,24 @@ export const TeacherStatistics = () => {
       text: getTextIn(name),
     }))
 
-  const setStartSemester = (_, { value }) => {
+  const setStartSemester = event => {
+    const { value } = event.target
+
     setSemesterStart(value)
     if (semesterEnd <= value) {
       setSemesterEnd(value)
     }
   }
 
-  const setEndSemester = (_, { value }) => {
+  const setEndSemester = event => {
+    const { value } = event.target
+
     setSemesterEnd(value)
   }
 
-  const changeProviders = (_, { value }) => {
+  const changeProviders = event => {
+    const { value } = event.target
+
     setProviders(value)
   }
 
@@ -77,7 +91,7 @@ export const TeacherStatistics = () => {
     .sort(createLocaleComparator('text'))
 
   return (
-    <div>
+    <>
       <Alert icon={false} severity="info" variant="outlined">
         <Typography variant="h6">Teacher statistics by course providers</Typography>
         Statistics for teachers who admitted credits during or between the selected semesters for one of the specified
@@ -86,69 +100,64 @@ export const TeacherStatistics = () => {
         acceptors, the full amount of credits is given to each acceptor (i.e., the credits are <b>not</b> divided
         between the acceptors).
       </Alert>
-      <Segment>
-        <Form loading={isLoading || isFetching}>
-          <Form.Group widths="equal">
-            <Form.Dropdown
-              label="Start semester"
-              name="semesterStart"
-              onChange={setStartSemester}
-              options={semesters.filter(semester => semester.value <= currentSemesterCode)}
-              placeholder="Semester"
-              search
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              selection
-              value={semesterStart}
-            />
-            <Form.Dropdown
-              disabled={!semesterStart}
-              label="End semester"
-              name="semesterEnd"
-              onChange={setEndSemester}
-              options={semesters.filter(
-                semester => semester.value <= currentSemesterCode && semester.value >= semesterStart
-              )}
-              placeholder="Semester"
-              search
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              selection
-              value={semesterEnd}
-            />
-          </Form.Group>
-          <Form.Field>
-            <label>Course providers</label>
-            <Dropdown
-              data-cy="course-providers"
-              multiple
-              name="providers"
-              onChange={changeProviders}
-              options={localizedProviderOptions}
-              placeholder="Providers"
-              search
-              selectOnBlur={false}
-              selectOnNavigation={false}
-              selection
-              value={providers}
-            />
-          </Form.Field>
+      <Paper sx={{ padding: 2 }}>
+        <Stack gap={1}>
+          <Stack flexDirection="row" gap={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Start semester</InputLabel>
+              <Select onChange={setStartSemester} value={semesterStart ?? ''} variant="outlined">
+                {semesters
+                  .filter(semester => semester.value <= currentSemesterCode)
+                  .map(({ key, value, text }) => (
+                    <MenuItem key={key} value={value}>
+                      {text}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small">
+              <InputLabel>End semester</InputLabel>
+              <Select disabled={!semesterStart} onChange={setEndSemester} value={semesterEnd ?? ''} variant="outlined">
+                {semesters
+                  .filter(semester => semester.value <= currentSemesterCode)
+                  .map(({ key, value, text }) => (
+                    <MenuItem key={key} value={value}>
+                      {text}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Stack>
+
+          <FormControl fullWidth size="small">
+            <InputLabel>Course providers</InputLabel>
+            <Select multiple onChange={changeProviders} value={providers ?? ''} variant="outlined">
+              {localizedProviderOptions.map(({ key, value, text, description }) => (
+                <MenuItem key={key} value={value}>
+                  {text} {description}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <Button
-            content="Search"
             disabled={invalidQueryParams}
-            fluid
+            fullWidth
             onClick={() => void getTeacherStatistics({ semesterStart, semesterEnd, providers })}
-          />
-        </Form>
-      </Segment>
-      {teacherStats.length > 0 && (
-        <Segment>
-          <TeacherStatisticsTable statistics={teacherStats} variant="leaderboard" />
-        </Segment>
-      )}
+            variant="outlined"
+          >
+            Search
+          </Button>
+        </Stack>
+      </Paper>
+      {(isLoading || isFetching) && teacherStats.length === 0 ? <CircularProgress /> : null}
       {!isLoading && !isFetching && teacherData && teacherStats.length === 0 ? (
-        <Message content="No teachers found" />
+        <Alert icon={false} severity="info" variant="outlined">
+          No teachers found
+        </Alert>
       ) : null}
-    </div>
+      {teacherStats.length > 0 && <TeacherStatisticsTable statistics={teacherStats} variant="leaderboard" />}
+    </>
   )
 }
