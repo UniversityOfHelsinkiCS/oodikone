@@ -79,7 +79,7 @@ export const PopulationDetails = ({
     }
   }
 
-  if (isLoading || authLoading) return null
+  if (isLoading || authLoading || curriculum === null) return null
 
   const onlyIamRights =
     !fullAccessToStudentData &&
