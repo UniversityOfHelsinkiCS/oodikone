@@ -1,27 +1,32 @@
+import Box from '@mui/material/Box'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import { shape } from 'prop-types'
 import { useEffect, useState } from 'react'
-import { Form, Tab } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 
 const CourseTabDropdown = ({ options, doSelect, selected }) => (
-  <Form>
-    <Form.Dropdown
-      onChange={(_, { value }) => doSelect(value)}
-      options={options}
-      placeholder="Select..."
-      search
-      selectOnBlur={false}
-      selectOnNavigation={false}
-      selection
-      value={selected}
-    />
-  </Form>
+  <FormControl fullWidth size="small">
+    <InputLabel>Semester</InputLabel>
+    <Select onChange={event => doSelect(event.target.value)} value={selected ?? ''} variant="outlined">
+      {options.map(({ key, value, text }) => (
+        <MenuItem key={key} value={value}>
+          {text}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
 )
 
 export const CoursesTab = ({ courses, semesters }) => {
   const { getTextIn } = useLanguage()
+  const [tab, setTab] = useState(0)
   const [selectedSemester, setSelectedSemester] = useState(null)
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [semesterOptions, setSemesterOptions] = useState([])
@@ -29,12 +34,12 @@ export const CoursesTab = ({ courses, semesters }) => {
 
   const initialSemesterOptions = () => {
     return Object.values(semesters)
+      .sort((s1, s2) => s2.id - s1.id)
       .map(({ name, id }) => ({
         key: id,
         value: id,
         text: getTextIn(name),
       }))
-      .sort((s1, s2) => s2.value - s1.value)
   }
 
   const initialCourseOptions = () => {
@@ -88,30 +93,36 @@ export const CoursesTab = ({ courses, semesters }) => {
       }))
   }
 
+  const panes = [
+    {
+      label: 'Semester',
+      render: () => (
+        <>
+          <CourseTabDropdown doSelect={setSemester} options={semesterOptions} selected={selectedSemester} />
+          <TeacherStatisticsTable statistics={getSemesterStats(selectedSemester)} variant="course" />
+        </>
+      ),
+    },
+    {
+      label: 'Course',
+      render: () => (
+        <>
+          <CourseTabDropdown doSelect={setCourse} options={courseOptions} selected={selectedCourse} />
+          <TeacherStatisticsTable statistics={getCourseStats(selectedCourse)} variant="semester" />
+        </>
+      ),
+    },
+  ]
+
   return (
-    <Tab
-      menu={{ secondary: true, pointing: true }}
-      panes={[
-        {
-          menuItem: 'Semester',
-          render: () => (
-            <>
-              <CourseTabDropdown doSelect={setSemester} options={semesterOptions} selected={selectedSemester} />
-              <TeacherStatisticsTable statistics={getSemesterStats(selectedSemester)} variant="course" />
-            </>
-          ),
-        },
-        {
-          menuItem: 'Course',
-          render: () => (
-            <>
-              <CourseTabDropdown doSelect={setCourse} options={courseOptions} selected={selectedCourse} />
-              <TeacherStatisticsTable statistics={getCourseStats(selectedCourse)} variant="semester" />
-            </>
-          ),
-        },
-      ]}
-    />
+    <>
+      <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        {panes.map(({ label }) => (
+          <Tab key={label} label={label} />
+        ))}
+      </Tabs>
+      <Box sx={{ padding: 2 }}>{panes.at(tab)?.render() ?? null}</Box>
+    </>
   )
 }
 
