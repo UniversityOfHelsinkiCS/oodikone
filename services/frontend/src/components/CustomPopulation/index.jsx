@@ -1,5 +1,10 @@
+import Alert from '@mui/material/Alert'
+import Chip from '@mui/material/Chip'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
-import { Form, Header, Input, Label, Message, Segment } from 'semantic-ui-react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
@@ -146,16 +151,20 @@ const CustomPopulationContent = ({
       content: (
         <>
           <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-          <Form style={{ padding: '4px 4px 4px 8px' }}>
-            <Form.Field inline>
-              <label>Limit to courses where student number is at least</label>
-              <Input
-                onChange={event => onStudentAmountLimitChange(event.target.value)}
-                style={{ width: '70px' }}
-                value={studentAmountLimit}
-              />
-            </Form.Field>
-          </Form>
+          {/* FIXME:TODO: This is ripped off from CourseTableModeSelector */}
+          <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
+            <Typography fontWeight={500}>Select all courses with at least</Typography>
+            <TextField
+              onChange={({ target }) => onStudentAmountLimitChange(target.value)}
+              size="small"
+              sx={{ maxWidth: '6em' }}
+              type="number"
+              value={studentAmountLimit}
+            />
+            <Typography fontWeight={500} sx={{ ml: '1em' }}>
+              total students
+            </Typography>
+          </Stack>
           <PopulationCourseStatsFlat
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
@@ -201,8 +210,8 @@ const CustomPopulationContent = ({
 
   return (
     <div className="segmentContainer">
-      <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
-        <Message.Header>Custom population</Message.Header>
+      <Alert icon={false} severity="info" sx={{ maxWidth: '800px' }} variant="outlined">
+        <Typography variant="h6">Custom population</Typography>
         <p>
           Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
           button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
@@ -210,38 +219,42 @@ const CustomPopulationContent = ({
           list. These populations are personal meaning that they will only show to you. You can only search
           studentnumbers you have access rights to i.e. you have rights to the programme they are in.
         </p>
-      </Message>
+      </Alert>
       {discardedStudentNumbers?.length > 0 && !isFetchingPopulation && (
         <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
       )}
       {discardedStudentNumbers?.length === 0 && filteredStudents?.length === 0 && (
-        <Message>No students found. Please re-check the student number list</Message>
+        <Alert icon={false} severity="info" variant="outlined">
+          No students found. Please re-check the student number list
+        </Alert>
       )}
       <CustomPopulationSearch setCustomPopulationState={setCustomPopulationState} />
       {!isFetchingPopulation && allStudents.length ? (
-        <Segment className="contentSegment">
+        <Paper className="contentSegment">
           <div>
             <div style={{ margin: 'auto' }}>
-              <Header className="segmentTitle" size="large" textAlign="center">
-                Custom population
-                {customPopulationState.selectedSearch ? ` "${customPopulationState.selectedSearch.name}"` : null}
+              <Stack sx={{ alignItems: 'center', padding: 2 }}>
+                <Typography variant="h4">Custom population</Typography>
+                <Typography fontWeight="lighter" variant="h6">
+                  {customPopulationState.selectedSearch?.name ?? null}
+                </Typography>
                 {associatedProgramme ? (
-                  <Label
-                    color="blue"
-                    content={studyProgrammes.find(programme => programme.key === associatedProgramme).text}
-                    style={{ marginLeft: '2em' }}
-                    tag
+                  <Chip
+                    color="primary"
+                    label={studyProgrammes.find(programme => programme.key === associatedProgramme).text}
+                    sx={{ width: 'fit-content' }}
+                    variant="filled"
                   />
                 ) : null}
-              </Header>
+              </Stack>
             </div>
             <PanelView panels={panels} viewTitle="custompopulation" />
           </div>
-        </Segment>
+        </Paper>
       ) : (
-        <Segment className="contentSegment">
+        <Paper className="contentSegment">
           <ProgressBar progress={progress} />
-        </Segment>
+        </Paper>
       )}
     </div>
   )
