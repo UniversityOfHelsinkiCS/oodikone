@@ -1,5 +1,8 @@
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-import { Form, Input, Segment } from 'semantic-ui-react'
 
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -21,7 +24,7 @@ export const StudyGuidanceGroupPopulationCourses = ({
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
   return (
-    <Segment basic>
+    <Paper sx={{ padding: 2 }}>
       {curriculumsAvailable ? (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
@@ -34,26 +37,27 @@ export const StudyGuidanceGroupPopulationCourses = ({
           setStudentAmountLimit={setStudentAmountLimit}
           studentAmountLimit={studentAmountLimit}
         />
-      ) : null}
+      ) : (
+        // FIXME:TODO: This is ripped off from CourseTableModeSelector
+        <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
+          <Typography fontWeight={500}>Select all courses with at least</Typography>
+          <TextField
+            onChange={({ target }) => onStudentAmountLimitChange(target.value)}
+            size="small"
+            sx={{ maxWidth: '6em' }}
+            type="number"
+            value={studentAmountLimit}
+          />
+          <Typography fontWeight={500} sx={{ ml: '1em' }}>
+            total students
+          </Typography>
+        </Stack>
+      )}
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats curriculum={curriculum} filteredCourses={filteredCourses} />
       ) : (
-        <>
-          {!curriculumsAvailable && (
-            <Form style={{ padding: '4px 4px 4px 8px' }}>
-              <Form.Field inline>
-                <label>Limit to courses where student number is at least</label>
-                <Input
-                  onChange={event => onStudentAmountLimitChange(event.target.value)}
-                  style={{ width: '70px' }}
-                  value={studentAmountLimit}
-                />
-              </Form.Field>
-            </Form>
-          )}
-          <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
-        </>
+        <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
       )}
-    </Segment>
+    </Paper>
   )
 }

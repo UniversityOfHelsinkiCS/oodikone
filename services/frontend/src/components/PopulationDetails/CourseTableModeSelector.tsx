@@ -55,12 +55,12 @@ export const CourseTableModeSelector = ({
           value={'all'}
         />
         <TextField
-          defaultValue={studentAmountLimit}
           disabled={courseTableMode !== 'all'}
           onChange={({ target }) => onStudentAmountLimitChange(target.value)}
           size="small"
           sx={{ maxWidth: '6em' }}
           type="number"
+          value={studentAmountLimit}
         />
         <Typography fontWeight={500} sx={{ ml: '1em' }}>
           total students
