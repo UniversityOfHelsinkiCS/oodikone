@@ -16,9 +16,7 @@ export const Wrapper = ({ isLoading, children }) => {
   const content = isLoading ? (
     <LoadingSection className="contentSegment" />
   ) : (
-    <Paper className="contentSegment" loading={isLoading}>
-      {children}
-    </Paper>
+    <Paper className="contentSegment">{children}</Paper>
   )
 
   return <div className="segmentContainer">{content}</div>
