@@ -1,5 +1,3 @@
-import { Segment } from 'semantic-ui-react'
-
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
@@ -16,7 +14,7 @@ export const PopulationCourses = ({
   courseTableMode,
   studentAmountLimit,
 }) => (
-  <Segment basic>
+  <>
     <div style={{ display: 'flex' }}>
       {courseTableMode === 'curriculum' ? (
         <div style={{ marginBottom: '20px', marginRight: '10px' }}>
@@ -44,5 +42,5 @@ export const PopulationCourses = ({
     ) : (
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     )}
-  </Segment>
+  </>
 )
