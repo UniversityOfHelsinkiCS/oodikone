@@ -1,6 +1,6 @@
 import ArrowIcon from '@mui/icons-material/NorthEast'
+import Typography from '@mui/material/Typography'
 import { useMemo } from 'react'
-import { Segment } from 'semantic-ui-react'
 
 import { calculatePercentage, isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/material/Link'
@@ -87,9 +87,9 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
     [statistics]
   )
 
-  return statistics.length === 0 ? (
-    <Segment basic content="No statistics found for the given query." />
-  ) : (
+  if (!statistics.length) return <Typography>No statistics found for the given query.</Typography>
+
+  return (
     <SortableTable
       columns={columns}
       data={data}
