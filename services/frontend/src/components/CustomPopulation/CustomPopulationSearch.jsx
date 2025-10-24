@@ -1,7 +1,15 @@
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
-import { extractItems, textAndDescriptionSearch } from '@/common'
+import { extractItems } from '@/common'
 import { SearchHistory } from '@/components/material/SearchHistory'
 import { useTitle } from '@/hooks/title'
 import {
@@ -81,80 +89,103 @@ export const CustomPopulationSearch = ({ setCustomPopulationState }) => {
   if (!searches) return null
 
   return (
-    <Modal
-      onClose={handleClose}
-      open={modal}
-      size="small"
-      trigger={
-        <Button color="blue" data-cy="custom-pop-search-button" onClick={() => setModal(true)} size="small">
-          Custom population
-        </Button>
-      }
-    >
-      <Modal.Content>
-        <Form>
+    <>
+      <Button
+        color="primary"
+        data-cy="custom-pop-search-button"
+        onClick={() => setModal(true)}
+        size="small"
+        variant="outlined"
+      >
+        Custom population
+      </Button>
+      <Dialog fullWidth onClose={handleClose} open={modal} size="small">
+        <Paper sx={{ padding: 2 }}>
           <h2>New custom population</h2>
-          <Form.Field>
-            <label>Insert name for this custom population if you wish to save it</label>
-            <Form.Input
-              data-cy="custom-population-name-input"
-              disabled={!!selectedSearch}
-              onChange={handleNameChange}
-              placeholder="name"
-              value={name}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>
-              Insert student numbers you wish to use for population. Separate each number with a comma, semicolon,
-              space, or newline.
-            </label>
-            <TextArea
-              data-cy="student-number-input"
-              onChange={(_, { value }) => setInput(value)}
-              placeholder="011111111"
-              rows={10}
-              value={input}
-            />
-          </Form.Field>
-          <Form.Select
-            clearable
-            closeOnChange
-            name="Associated programme"
-            onChange={(_, value) => setAssociatedProgramme(value?.value)}
-            options={studyProgrammes}
-            placeholder="Select associated degree programme for the population"
-            search={textAndDescriptionSearch}
-            value={associatedProgramme}
+
+          <Typography>Insert name for this custom population if you wish to save it</Typography>
+          <TextField
+            data-cy="custom-population-name-input"
+            disabled={!!selectedSearch}
+            fullWidth
+            onChange={handleNameChange}
+            placeholder="name"
+            value={name}
           />
-        </Form>
-        <SearchHistory
-          handleSearch={selected => onSelectSearch(selected?.id)}
-          header="Saved populations"
-          items={searches.map(search => ({
-            ...search,
-            text: search.name,
-            timestamp: new Date(search.updatedAt),
-            params: { id: search.id },
-          }))}
-          updateItem={() => null}
-        />
-      </Modal.Content>
-      <Modal.Actions>
-        <Button
-          content="Save"
-          disabled={!name || isFetching}
-          floated="left"
-          icon="save"
-          loading={isFetching}
-          onClick={onSave}
-        />
-        <Button content="Delete" disabled={!selectedSearch} floated="left" icon="trash" negative onClick={onDelete} />
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button data-cy="search-button" onClick={event => onClicker(event)} positive>
-          Search population
-        </Button>
-      </Modal.Actions>
-    </Modal>
+
+          <Typography>
+            Insert student numbers you wish to use for population. Separate each number with a comma, semicolon, space,
+            or newline.
+          </Typography>
+          <TextField
+            data-cy="student-number-input"
+            fullWidth
+            multiline
+            onChange={event => setInput(event.target.value)}
+            placeholder={'012345678\n012345679'}
+            rows={10}
+            value={input}
+          />
+
+          <Stack flexDirection="row">
+            <Select
+              fullWidth
+              label="Associated programme"
+              onChange={event => setAssociatedProgramme(event.target.value)}
+              placeholder="Select associated degree programme for the population"
+              value={associatedProgramme ?? ''}
+            >
+              {studyProgrammes.map(({ key, value, description, text }) => (
+                <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
+                  <Typography>{text}</Typography>
+                  <Typography fontWeight="lighter">{description}</Typography>
+                </MenuItem>
+              ))}
+            </Select>
+            <Button
+              color="error"
+              disabled={!associatedProgramme}
+              onClick={() => setAssociatedProgramme('')}
+              variant="outlined"
+            >
+              Clear
+            </Button>
+          </Stack>
+
+          <SearchHistory
+            handleSearch={selected => onSelectSearch(selected?.id)}
+            header="Saved populations"
+            items={searches.map(search => ({
+              ...search,
+              text: search.name,
+              timestamp: new Date(search.updatedAt),
+              params: { id: search.id },
+            }))}
+            updateItem={() => null}
+          />
+
+          <Box sx={{ py: 2 }}>
+            <Stack flexDirection="row" sx={{ justifyContent: 'space-between' }}>
+              <Box>
+                <Button disabled={!name || isFetching} loading={isFetching} onClick={onSave} variant="outlined">
+                  Save
+                </Button>
+                <Button color="error" disabled={!selectedSearch} onClick={onDelete} sx={{ ml: 0.5 }} variant="outlined">
+                  Delete
+                </Button>
+              </Box>
+              <Box>
+                <Button color="error" onClick={handleClose} variant="outlined">
+                  Cancel
+                </Button>
+                <Button data-cy="search-button" onClick={event => onClicker(event)} sx={{ ml: 0.5 }} variant="outlined">
+                  Search population
+                </Button>
+              </Box>
+            </Stack>
+          </Box>
+        </Paper>
+      </Dialog>
+    </>
   )
 }
