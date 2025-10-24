@@ -49,6 +49,7 @@ export type { SemesterEnrollment } from './semesterEnrollment'
 export type { StudyTrack } from './studyTrack'
 export type { UnifyStatus } from './unification'
 export type { FormattedStudent } from './studentData'
+export type { FormattedCourse } from './courseData'
 
 // ENUMS
 export { CreditTypeCode } from './creditTypeCode'
