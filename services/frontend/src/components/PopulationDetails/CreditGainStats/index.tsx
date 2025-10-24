@@ -15,13 +15,12 @@ import { StatisticsTab } from './StatisticsTab'
 
 type CreditStatisticsProps = {
   filteredStudents: FormattedStudent[]
-  query: PopulationQuery
-  sggYear?: number
+  query: Pick<PopulationQuery, "programme" | "years" | "combinedProgramme">
 }
 
-export const CreditStatistics = ({ filteredStudents, query, sggYear }: CreditStatisticsProps) => {
+export const CreditStatistics = ({ filteredStudents, query }: CreditStatisticsProps) => {
   const { programme, years, combinedProgramme } = query
-  const year = sggYear ?? years[0]
+  const year = years[0]
 
   const [selectedTab, setSelectedTab] = useState(0)
 
