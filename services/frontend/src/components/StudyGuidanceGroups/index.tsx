@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { useParams } from 'react-router'
 
@@ -15,8 +14,8 @@ export const StudyGuidanceGroups = () => {
   const { groupid } = useParams()
   const { data: groups, isLoading } = useGetAllStudyGuidanceGroupsQuery()
 
-  return (
-    <>
+  if (!groupid)
+    return (
       <SegmentContainer>
         <Box>
           <Typography sx={{ mt: '20px', mb: '20px', textAlign: 'center' }} variant="h4">
@@ -26,14 +25,11 @@ export const StudyGuidanceGroups = () => {
 
         {!!isLoading && <PageLoading isLoading={isLoading} />}
 
-        {!isLoading && !groupid && (
-          <Paper className="contentSegment">
-            <StudyGuidanceGroupOverview groups={groups} />
-          </Paper>
-        )}
+        {!isLoading && <StudyGuidanceGroupOverview groups={groups} />}
       </SegmentContainer>
+    )
 
-      {!!groupid && !!groups && <SingleStudyGuidanceGroup group={groups.find(group => group.id === groupid)} />}
-    </>
-  )
+  if (groupid && groups) return <SingleStudyGuidanceGroup group={groups.find(group => group.id === groupid)} />
+
+  return null
 }
