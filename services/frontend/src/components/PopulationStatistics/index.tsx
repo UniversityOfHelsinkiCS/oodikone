@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box'
-import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -43,8 +42,8 @@ import { parseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
-import { Backdrop } from '../material/Backdrop'
 import { HelpInfoCard } from '../material/InfoCard'
+import { PageLoading } from '../material/Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 
@@ -213,12 +212,7 @@ export const PopulationStatistics = () => {
       {(filteredStudents, filteredCourses) => (
         <Box sx={{ maxWidth: '80vw', flex: 1, pt: 2, mx: 'auto' }}>
           <Stack sx={{ textAlign: 'center', alignItems: 'center' }}>
-            <Backdrop
-              open={isLoading}
-              sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
-            >
-              <CircularProgress color="inherit" size="3em" />
-            </Backdrop>
+            <PageLoading isLoading={isLoading} />
             <Typography variant="h4">{title}</Typography>
             {!!studyTrack && (
               <Typography fontWeight={300} variant="h6">
