@@ -25,7 +25,8 @@ import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
-import { startYearToAcademicYear, StyledMessage } from './common'
+import { startYearToAcademicYear } from './common'
+import { StyledMessage } from '../common/StyledMessage'
 import './StudyGuidanceGroupOverview.css'
 
 const LinkToGroup = ({ group }) => {
