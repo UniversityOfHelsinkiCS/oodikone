@@ -1,7 +1,10 @@
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
+import MinusIcon from '@mui/icons-material/Remove'
 import { useEffect, useState } from 'react'
-import { Icon, Loader } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Loading } from '@/components/material/Loading'
 import { SortableTable } from '@/components/SortableTable'
 import { DateFormat } from '@/constants/date'
 import { useGetOpenUniCourseStudentsQuery } from '@/redux/openUniPopulations'
@@ -87,9 +90,9 @@ const getColumns = (labelsToCourses, getTextIn) => {
 
   const findRowContent = (student, courseCode) => {
     if (student.courseInfo[courseCode] === undefined) return null
-    if (student.courseInfo[courseCode].status.passed) return <Icon color="green" fitted name="check" />
-    if (student.courseInfo[courseCode].status.failed) return <Icon color="red" fitted name="times" />
-    if (student.courseInfo[courseCode].status.unfinished) return <Icon color="grey" fitted name="minus" />
+    if (student.courseInfo[courseCode].status.passed) return <CheckIcon color="success" />
+    if (student.courseInfo[courseCode].status.failed) return <CloseIcon color="error" />
+    if (student.courseInfo[courseCode].status.unfinished) return <MinusIcon color="disabled" />
     return null
   }
 
@@ -232,7 +235,7 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
   }, [openUniStudentStats, language])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
+  if (isFetchingOrLoading) return <Loading active style={{ marginTop: '15em' }} />
 
   return (
     <div style={{ paddingBottom: '50px' }}>
