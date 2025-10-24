@@ -1,5 +1,12 @@
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
-import { Button, Confirm, Dropdown, List } from 'semantic-ui-react'
 
 import { useCreateStudentTagsMutation, useDeleteStudentTagsMutation } from '@/redux/tags'
 
@@ -17,8 +24,9 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
     setOptions(createdOptions)
   }, [])
 
-  const handleChange = (event, { value }) => {
-    event.preventDefault()
+  const handleChange = event => {
+    const { value } = event.target
+
     setSelected(value)
     const foundTag = tags.find(tag => tag.id === value)
     setSelectedTag(foundTag)
@@ -49,55 +57,69 @@ export const TagPopulation = ({ programme, combinedProgramme, selectedStudents, 
   }
 
   const addConfirm = (
-    <Confirm
-      cancelButton="Cancel"
-      confirmButton="Confirm"
-      content={`Are you sure you want to add tag "${selectedTag ? selectedTag.name : null}" to ${selectedStudents.length} students?`}
-      onCancel={() => setConfirmAdd(false)}
-      onConfirm={() => handleAdd()}
-      open={confirmAdd ? !!selectedTag : null}
-    />
+    <Dialog onClose={() => setConfirmAdd(false)} open={confirmAdd ? !!selectedTag : false}>
+      <Paper sx={{ padding: 2 }}>
+        <Typography variant="h6">
+          Are you sure you want to add tag "{selectedTag ? selectedTag.name : null}" to {selectedStudents.length}{' '}
+          students?
+        </Typography>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button color="error" onClick={() => setConfirmAdd(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button color="primary" onClick={() => handleAdd()} sx={{ ml: 0.5 }} variant="outlined">
+            Confirm
+          </Button>
+        </Box>
+      </Paper>
+    </Dialog>
   )
 
   const deleteConfirm = (
-    <Confirm
-      cancelButton="Cancel"
-      confirmButton="Confirm"
-      content={`Are you sure you want to delete tag "${selectedTag ? selectedTag.name : null}" from ${selectedStudents.length} students?`}
-      onCancel={() => setConfirmDelete(false)}
-      onConfirm={() => handleDelete()}
-      open={confirmDelete ? !!selectedTag : null}
-    />
+    <Dialog onClose={() => setConfirmDelete(false)} open={confirmDelete ? !!selectedTag : false}>
+      <Paper sx={{ padding: 2 }}>
+        <Typography variant="h6">
+          Are you sure you want to delete tag "{selectedTag ? selectedTag.name : null}" from {selectedStudents.length}{' '}
+          students?
+        </Typography>
+        <Box sx={{ textAlign: 'right' }}>
+          <Button color="primary" onClick={() => setConfirmDelete(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button color="error" onClick={() => handleDelete()} sx={{ ml: 0.5 }} variant="outlined">
+            Delete
+          </Button>
+        </Box>
+      </Paper>
+    </Dialog>
   )
 
   return (
-    <List horizontal>
-      <List.Item>
-        <Dropdown
+    <Paper sx={{ padding: 2 }} variant="outlined">
+      <Stack flexDirection="row" sx={{ gap: 1 }}>
+        <Select
+          data-cy="course-providers"
           onChange={handleChange}
-          options={options}
-          placeholder="Tag"
-          search
-          selectOnBlur={false}
-          selectOnNavigation={false}
-          selection
-          value={selectedValue}
-        />
-      </List.Item>
-      <Button
-        content={`Add tag to ${selectedStudents.length} students`}
-        disabled={selectedValue === ''}
-        onClick={() => setConfirmAdd(true)}
-        style={{ marginLeft: '10px' }}
-      />
-      <Button
-        content={`Delete tag from ${selectedStudents.length} students`}
-        disabled={selectedValue === ''}
-        onClick={() => setConfirmDelete(true)}
-        style={{ marginLeft: '10px' }}
-      />
+          size="small"
+          sx={{ minWidth: '32em' }}
+          value={selectedValue ?? ''}
+          variant="outlined"
+        >
+          {options.map(({ key, value, text }) => (
+            <MenuItem key={key} value={value}>
+              {text}
+            </MenuItem>
+          ))}
+        </Select>
+        <Button color="primary" disabled={selectedValue === ''} onClick={() => setConfirmAdd(true)} variant="outlined">
+          Add tag to {selectedStudents.length} students
+        </Button>
+        <Button color="error" disabled={selectedValue === ''} onClick={() => setConfirmDelete(true)} variant="outlined">
+          Delete tag from {selectedStudents.length} students
+        </Button>
+      </Stack>
       {deleteConfirm}
       {addConfirm}
-    </List>
+    </Paper>
   )
 }
