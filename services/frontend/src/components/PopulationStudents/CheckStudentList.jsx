@@ -1,95 +1,164 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Accordion from '@mui/material/Accordion'
+
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { arrayOf, string } from 'prop-types'
 import { useState } from 'react'
-import { Accordion, Button, Form, Header, List, Modal, TextArea } from 'semantic-ui-react'
 
 export const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)
+  const [resultModalOpen, setResultModalOpen] = useState(false)
+
   const [input, setInput] = useState('')
   const [foundStudents, setFoundStudents] = useState([])
   const [notInSisuRows, setNotInSisuRows] = useState([])
   const [notInListRows, setNotInListRows] = useState([])
+
+  const closeDialog = () => {
+    setResultModalOpen(false)
+    setModalOpen(false)
+  }
 
   const checkStudents = input => {
     const studentnumbers = input.match(/[^\s,]+/g) ?? []
     const foundStudents = studentnumbers.filter(studentnumber => students.includes(studentnumber))
     const notInSisu = studentnumbers.filter(studentnumber => !students.includes(studentnumber))
     const notInList = students.filter(student => !studentnumbers.includes(student))
+
     setFoundStudents(foundStudents)
     setNotInSisuRows(notInSisu)
     setNotInListRows(notInList)
+
+    setResultModalOpen(true)
   }
 
   const panels = [
     {
       key: 'found',
       title: 'Student numbers in list and in Sisu',
-      content: {
-        content: foundStudents.length === 0 ? 'No numbers in list and Sisu' : <List id="found" items={foundStudents} />,
-      },
+      content:
+        foundStudents.length === 0 ? (
+          'No numbers in list and Sisu'
+        ) : (
+          <>
+            {foundStudents.map(studentNumber => (
+              <div key={studentNumber}>{studentNumber}</div>
+            ))}
+          </>
+        ),
     },
     {
       key: 'not found',
       title: 'Student numbers in list but not in Sisu',
-      content: {
-        content: notInSisuRows.length === 0 ? 'All numbers in Sisu' : <List id="notfound" items={notInSisuRows} />,
-      },
+      content:
+        notInSisuRows.length === 0 ? (
+          'All numbers in Sisu'
+        ) : (
+          <>
+            {notInSisuRows.map(studentNumber => (
+              <div key={studentNumber}>{studentNumber}</div>
+            ))}
+          </>
+        ),
     },
     {
       key: 'not searched',
       title: 'Student numbers in Sisu but not in list',
-      content: {
-        content: notInListRows.length === 0 ? 'All numbers in list' : <List id="notsearched" items={notInListRows} />,
-      },
+      content:
+        notInListRows.length === 0 ? (
+          'All numbers in list'
+        ) : (
+          <>
+            {notInListRows.map(studentNumber => (
+              <div key={studentNumber}>{studentNumber}</div>
+            ))}
+          </>
+        ),
     },
   ]
 
-  const renderResults = () => (
-    <Modal
-      trigger={
-        <Button color="green" disabled={input.length === 0} onClick={() => checkStudents(input)}>
-          Check students
-        </Button>
-      }
-    >
-      <Modal.Content id="checkstudentsresults">
-        <Header content="Results" />
-        <Accordion exclusive={false} fluid panels={panels} styled />
-      </Modal.Content>
-      <Modal.Actions>
-        <Button color="green" inverted onClick={() => setModalOpen(false)}>
-          Close
-        </Button>
-      </Modal.Actions>
-    </Modal>
-  )
-
   return (
-    <Modal
-      onClose={() => setModalOpen(false)}
-      open={modalOpen}
-      size="small"
-      trigger={
-        <Button onClick={() => setModalOpen(true)} size="small">
-          Check student numbers
-        </Button>
-      }
-    >
-      <Modal.Content>
-        <Form>
-          <h2>Check for student numbers</h2>
-          <Form.Field>
-            <em>Insert student numbers you wish to check here</em>
-            <TextArea onChange={element => setInput(element.target.value)} placeholder="011111111" />
-          </Form.Field>
-        </Form>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button negative onClick={() => setModalOpen(false)}>
-          Cancel
-        </Button>
-        {renderResults()}
-      </Modal.Actions>
-    </Modal>
+    <>
+      <Button onClick={() => setModalOpen(true)} variant="outlined">
+        Check student numbers
+      </Button>
+      <Dialog onClose={() => closeDialog()} open={modalOpen}>
+        {!resultModalOpen ? (
+          <Paper sx={{ padding: 2 }}>
+            <h2>Check for student numbers</h2>
+            <Stack>
+              <em>Insert student numbers you wish to check here</em>
+              <TextField
+                minRows={2}
+                multiline
+                onChange={element => setInput(element.target.value)}
+                placeholder={'012345678\n012345679'}
+              />
+            </Stack>
+            <Box sx={{ gap: 0.5, textAlign: 'right' }}>
+              <Button
+                color="primary"
+                disabled={input.length === 0}
+                onClick={() => checkStudents(input)}
+                variant="outlined"
+              >
+                Check students
+              </Button>
+              <Button color="error" onClick={() => closeDialog()} variant="outlined">
+                Cancel
+              </Button>
+            </Box>
+          </Paper>
+        ) : (
+          <Paper sx={{ padding: 2 }}>
+            <div id="checkstudentsresults">
+              <Typography content="Results" variant="h6" />
+              {/*<Accordion exclusive={false} fluid panels={panels} styled />*/}
+              {panels.map(({ key, title, content }) => (
+                <Accordion
+                  disableGutters
+                  key={key}
+                  slotProps={{ transition: { unmountOnExit: true } }}
+                  sx={{
+                    backgroundColor: 'background.paper',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    boxShadow: 'none',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography
+                      component="span"
+                      data-cy={title}
+                      sx={{ fontSize: 'large', fontWeight: 'bold' }}
+                      variant="h6"
+                    >
+                      {title}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails data-cy={`${title}-data`}>{content}</AccordionDetails>
+                </Accordion>
+              ))}
+            </div>
+            <Box sx={{ gap: 0.5, textAlign: 'right' }}>
+              <Button color="error" onClick={() => setResultModalOpen(false)} variant="outlined">
+                Close
+              </Button>
+            </Box>
+          </Paper>
+        )}
+      </Dialog>
+    </>
   )
 }
 
