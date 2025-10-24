@@ -20,10 +20,11 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getAge } from '@/util/timeAndDate'
+import { FormattedStudent } from '@oodikone/shared/types'
 
 type AgeStatsProps = {
-  filteredStudents: any[] // TODO: type
-  query: PopulationQuery
+  filteredStudents: FormattedStudent[]
+  query: Pick<PopulationQuery, "programme">
 }
 export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
   const [isGrouped, setIsGrouped] = useState(true)
@@ -32,10 +33,10 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const onlyIamRights = !fullAccessToStudentData && fullStudyProgrammeRights.length === 0
 
-  const currentAges: number[] = filteredStudents.reduce((ages, student) => {
+  const currentAges = filteredStudents.reduce((ages, student) => {
     ages.push(getAge(student.birthdate, false))
     return ages
-  }, [])
+  }, [] as number[])
 
   const getAges = (grouped: boolean) =>
     Object.entries(groupBy(currentAges, age => (grouped ? Math.floor(age / 5) * 5 : Math.floor(age))))
@@ -60,11 +61,12 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
     filteredStudents.reduce((ages, student) => {
       const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === query.programme))
       if (studyRight) {
-        const startDateInProgramme = studyRight.studyRightElements.find(el => el.code === query.programme).startDate
-        ages.push(getAge(student.birthdate, false, new Date(startDateInProgramme)))
+        const startDateInProgramme = studyRight.studyRightElements.find(el => el.code === query.programme)?.startDate
+        if (startDateInProgramme)
+          ages.push(getAge(student.birthdate, false, new Date(startDateInProgramme)))
       }
       return ages
-    }, [])
+    }, [] as number[])
   ).toFixed(1)
 
   const currentAverageAge = mean(currentAges).toFixed(1)
@@ -139,22 +141,22 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                 </TableRow>
                 {isGrouped && expandedGroups.includes(index)
                   ? getAges(false)
-                      .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
-                      .map(([nonGroupedAge, nonGroupedAgeCount]) => {
-                        return (
-                          <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
-                            <TableCell>
-                              <Typography>{nonGroupedAge}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography>{nonGroupedAgeCount}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })
+                    .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
+                    .map(([nonGroupedAge, nonGroupedAgeCount]) => {
+                      return (
+                        <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
+                          <TableCell>
+                            <Typography>{nonGroupedAge}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography>{nonGroupedAgeCount}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
                   : null}
               </Fragment>
             ))}
