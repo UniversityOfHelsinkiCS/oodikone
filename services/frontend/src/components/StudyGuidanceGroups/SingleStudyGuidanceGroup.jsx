@@ -1,7 +1,11 @@
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import { useNavigate } from 'react-router'
-import { Button, Divider, Header, Label } from 'semantic-ui-react'
 
 import { isMastersProgramme } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -67,7 +71,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
         <>
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           {group.tags?.year ? (
-            <Button onClick={() => toggleCreditDateFilter()} primary>
+            <Button color="primary" onClick={() => toggleCreditDateFilter()} variant="outlined">
               {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
             </Button>
           ) : null}
@@ -261,20 +265,28 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
   return (
     <>
       <Wrapper isLoading={isLoading}>
-        <Button content="Back" icon="arrow circle left" onClick={handleBack} />
-        <Divider />
+        <Button onClick={handleBack} startIcon={<KeyboardBackspaceIcon />} variant="outlined">
+          Back
+        </Button>
+        <Divider sx={{ margin: 2 }} />
         <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-          <Header size="medium" style={{ marginRight: 'auto' }}>
-            {getTextIn(group?.name)}
-          </Header>
+          <Typography variant="h4">{getTextIn(group?.name)}</Typography>
           {!!group.tags?.studyProgramme && (
-            <Label
-              color="blue"
-              content={studyProgrammes.find(programme => programme.value === group.tags.studyProgramme)?.text}
-              tag
+            <Chip
+              color="primary"
+              label={studyProgrammes.find(programme => programme.value === group.tags.studyProgramme)?.text}
+              sx={{ width: 'fit-content' }}
+              variant="filled"
             />
           )}
-          {!!group.tags?.year && <Label color="blue" content={startYearToAcademicYear(group.tags.year)} tag />}
+          {!!group.tags?.year && (
+            <Chip
+              color="primary"
+              label={startYearToAcademicYear(group.tags.year)}
+              sx={{ width: 'fit-content' }}
+              variant="filled"
+            />
+          )}
         </div>
       </Wrapper>
       {children}
