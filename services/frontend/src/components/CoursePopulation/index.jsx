@@ -1,9 +1,13 @@
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
-import { Form, Header, Input, Segment } from 'semantic-ui-react'
+
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
+import { SegmentContainer } from '@/components/common/SegmentContainer'
 import {
   CustomPopulationProgrammeDist,
   findCorrectProgramme,
@@ -21,11 +25,10 @@ import {
 } from '@/components/FilterView/filters'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PageLoading } from '@/components/material/Loading'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
-import { ProgressBar } from '@/components/ProgressBar'
-import { useProgress } from '@/hooks/progress'
 import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
@@ -58,7 +61,6 @@ export const CoursePopulation = () => {
     setCodes(parsedCourseCodes)
   }, [coursecodes])
 
-  const { progress } = useProgress(isFetching)
   const studentToTargetCourseDateMap = useMemo(
     () => getStudentToTargetCourseDateMap(population?.students ?? [], codes),
     [population?.students, codes]
@@ -98,13 +100,7 @@ export const CoursePopulation = () => {
 
   const subHeader = codes.join(', ')
 
-  if (!population || !semesters) {
-    return (
-      <Segment className="contentSegment">
-        <ProgressBar progress={progress} />
-      </Segment>
-    )
-  }
+  if (!population || !semesters) return <PageLoading isLoading />
 
   const createPanels = (filteredStudents, filteredCourses) => [
     {
@@ -225,17 +221,16 @@ export const CoursePopulation = () => {
       students={population?.students ?? []}
     >
       {(filteredStudents, filteredCourses) => (
-        <div className="segmentContainer">
-          <Segment className="contentSegment">
-            <Header className="segmentTitle" size="large" textAlign="center">
-              Population of course {header}
-            </Header>
-            <Header className="segmentTitle" size="medium" textAlign="center">
-              {subHeader}
-            </Header>
-            <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
-          </Segment>
-        </div>
+        <SegmentContainer>
+          <Typography className="segmentTitle" textAlign="center" variant="h4">
+            Population of course {header}
+          </Typography>
+
+          <Typography className="segmentTitle" textAlign="center" variant="h6">
+            {subHeader}
+          </Typography>
+          <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
+        </SegmentContainer>
       )}
     </FilterView>
   )
@@ -253,16 +248,20 @@ const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) =
   return (
     <>
       <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-      <Form style={{ padding: '4px 4px 4px 8px' }}>
-        <Form.Field inline>
-          <label>Limit to courses where student number is at least</label>
-          <Input
-            onChange={event => onStudentAmountLimitChange(event.target.value)}
-            style={{ width: '70px' }}
-            value={studentAmountLimit}
-          />
-        </Form.Field>
-      </Form>
+      {/* FIXME:TODO: This is ripped off from CourseTableModeSelector */}
+      <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
+        <Typography fontWeight={500}>Select all courses with at least</Typography>
+        <TextField
+          onChange={({ target }) => onStudentAmountLimitChange(target.value)}
+          size="small"
+          sx={{ maxWidth: '6em' }}
+          type="number"
+          value={studentAmountLimit}
+        />
+        <Typography fontWeight={500} sx={{ ml: '1em' }}>
+          total students
+        </Typography>
+      </Stack>
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
