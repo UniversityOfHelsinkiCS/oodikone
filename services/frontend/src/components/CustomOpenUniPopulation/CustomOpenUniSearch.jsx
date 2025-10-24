@@ -1,9 +1,15 @@
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import Datetime from 'react-datetime'
 import { useLocation, useNavigate } from 'react-router'
-import { Button, Form, Modal, TextArea } from 'semantic-ui-react'
 
+import { DateRangeSelector } from '@/components/common/DateRangeSelector'
 import { SearchHistory } from '@/components/material/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
@@ -145,32 +151,36 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     }
   }
   return (
-    <Modal
-      onClose={handleClose}
-      open={modal}
-      size="small"
-      trigger={
-        <Button color="blue" data-cy="open-uni-search-button" onClick={() => setModal(true)} size="small">
-          Fetch Open Uni Students
-        </Button>
-      }
-    >
-      <Modal.Content>
-        <Form>
-          <h2> Fetch open uni course population</h2>
-          <Form.Field>
-            <Form.Field data-cy="search-name">
-              <em> Insert name for this population if you wish to save it </em>
-              <Form.Input
-                disabled={selectedSearchId !== ''}
-                onChange={event => setName(event.target.value)}
-                placeholder="name"
-                value={name}
-              />
-            </Form.Field>
-            <em>Insert course code(s)</em>
-            <TextArea onChange={event => setInput(event.target.value)} placeholder="TKT12345, PSYK-123" value={input} />
-          </Form.Field>
+    <>
+      <Button color="primary" data-cy="open-uni-search-button" onClick={() => setModal(true)} variant="outlined">
+        Fetch Open Uni Students
+      </Button>
+      <Dialog fullWidth onClose={handleClose} open={modal}>
+        <Paper sx={{ padding: 2 }}>
+          <h2>Fetch open uni course population</h2>
+
+          <Stack>
+            <em>Insert name for this population if you wish to save it:</em>
+            <TextField
+              data-cy="search-name"
+              disabled={selectedSearchId !== ''}
+              onChange={event => setName(event.target.value)}
+              placeholder="name"
+              value={name}
+            />
+          </Stack>
+
+          <Stack>
+            <em>Insert course code(s):</em>
+            <TextField
+              minRows={2}
+              multiline
+              onChange={event => setInput(event.target.value)}
+              placeholder="TKT12345, PSYK-123"
+              value={input}
+            />
+          </Stack>
+
           <SearchHistory
             handleSearch={onSelectSearch}
             header="Saved populations"
@@ -182,55 +192,56 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
             }))}
             updateItem={() => null}
           />
-          <Form.Field data-cy="begin-of-search">
-            <em>Select beginning</em>
-            <Datetime
-              closeOnSelect
-              isValidDate={date => date.isBefore(enddate)}
-              locale="fi"
-              onChange={value => setStartdate(value)}
-              timeFormat={false}
-              value={startdate}
-            />
-          </Form.Field>
-          <Form.Field data-cy="end-of-search">
-            <em>Select ending for enrollments:</em>
-            <br />
-            <em>Attainments are fetched until today.</em>
-            <Datetime
-              closeOnSelect
-              isValidDate={date => date.isAfter(startdate)}
-              locale="fi"
-              onChange={value => setEnddate(value)}
-              timeFormat={false}
-              value={enddate}
-            />
-          </Form.Field>
-        </Form>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button
-          content="Save"
-          data-cy="save-search"
-          disabled={!name || updateIsLoading || createIsLoading}
-          floated="left"
-          icon="save"
-          loading={updateIsLoading || createIsLoading}
-          onClick={onSave}
-        />
-        <Button
-          content="Delete"
-          disabled={!selectedSearchId || deleteIsLoading}
-          floated="left"
-          icon="trash"
-          negative
-          onClick={onDelete}
-        />
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button data-cy="search-button" onClick={event => onClicker(event)} positive>
-          Search population
-        </Button>
-      </Modal.Actions>
-    </Modal>
+
+          <Typography>Select beginnings and ending dates for enrollemnts:</Typography>
+          <DateRangeSelector
+            onChange={([startDate, endDate]) => {
+              setStartdate(startDate)
+              setEnddate(endDate)
+            }}
+            value={[startdate, enddate]}
+          />
+          <Box sx={{ py: 2 }}>
+            <Stack flexDirection="row" sx={{ justifyContent: 'space-between' }}>
+              <Box>
+                <Button
+                  color="primary"
+                  data-cy="save-search"
+                  disabled={!name || updateIsLoading || createIsLoading}
+                  loading={updateIsLoading || createIsLoading}
+                  onClick={onSave}
+                  variant="outlined"
+                >
+                  Save
+                </Button>
+                <Button
+                  color="error"
+                  disabled={!selectedSearchId || deleteIsLoading}
+                  onClick={onDelete}
+                  sx={{ ml: 0.5 }}
+                  variant="outlined"
+                >
+                  Delete
+                </Button>
+              </Box>
+              <Box>
+                <Button color="error" onClick={handleClose} variant="outlined">
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  data-cy="search-button"
+                  onClick={event => onClicker(event)}
+                  sx={{ ml: 0.5 }}
+                  variant="outlined"
+                >
+                  Search population
+                </Button>
+              </Box>
+            </Stack>
+          </Box>
+        </Paper>
+      </Dialog>
+    </>
   )
 }
