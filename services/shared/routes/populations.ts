@@ -107,7 +107,7 @@ export type PopulationstatisticsQuery = {
 }
 
 // populationstatisticsbycourse
-export type PopulationstatisticsbycourseResBody = { students: any; coursestatistics: CourseStats[] }
+export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody
 export type PopulationstatisticsbycourseReqBody = never
 export type PopulationstatisticsbycourseParams = {
   coursecodes: string
@@ -118,13 +118,12 @@ export type PopulationstatisticsbycourseParams = {
 }
 
 // populationstatisticsbystudentnumbers
-export type PostByStudentNumbersResBody = {
-  students: any
+export type GetCustomPopulationResBody = PopulationstatisticsResBody & {
   studyProgramme?: string | null
   discardedStudentNumbers: string[]
 }
-export type PostByStudentNumbersReqBody = {
-  studentnumberlist: string[]
+export type CustomPopulationQuery = {
+  studentNumbers: string[]
   tags?: {
     studyProgramme: string | null
     year: string | null

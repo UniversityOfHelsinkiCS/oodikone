@@ -10,8 +10,8 @@ import {
   type PopulationstatisticsbycourseResBody,
   type PopulationstatisticsbycourseReqBody,
   type PopulationstatisticsbycourseParams,
-  type PostByStudentNumbersResBody,
-  type PostByStudentNumbersReqBody,
+  type GetCustomPopulationResBody,
+  type CustomPopulationQuery,
   type PopulationstatisticsStudyprogrammesResBody,
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
@@ -190,14 +190,15 @@ router.get<
   res.json(result)
 })
 
-router.post<never, PostByStudentNumbersResBody, PostByStudentNumbersReqBody>(
+// Used in custom population and single study guidance groups
+router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
   '/v3/populationstatisticsbystudentnumbers',
   async (req, res) => {
-    const { studentnumberlist, tags } = req.body
+    const { studentNumbers, tags } = req.body
     const { id: userId, roles, studentsUserCanAccess } = req.user
     const filteredStudentNumbers = hasFullAccessToStudentData(roles)
-      ? studentnumberlist
-      : intersection(studentnumberlist, studentsUserCanAccess)
+      ? studentNumbers
+      : intersection(studentNumbers, studentsUserCanAccess)
 
     const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
@@ -211,7 +212,7 @@ router.post<never, PostByStudentNumbersResBody, PostByStudentNumbersReqBody>(
     const result = await statisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
 
     const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
-    const discardedStudentNumbers = difference(studentnumberlist, filteredStudentNumbers)
+    const discardedStudentNumbers = difference(studentNumbers, filteredStudentNumbers)
 
     res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
   }

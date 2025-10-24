@@ -1,7 +1,7 @@
 import { RTKApi } from '@/apiConnection'
 import type { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
-import type { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
+import type { PopulationstatisticsResBody, CustomPopulationQuery, GetCustomPopulationResBody } from '@oodikone/shared/routes/populations'
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -12,12 +12,12 @@ const populationApi = RTKApi.injectEndpoints({
         params,
       }),
     }),
-    getCustomPopulation: builder.query({
+    getCustomPopulation: builder.query<GetCustomPopulationResBody, CustomPopulationQuery>({
       query: ({ studentNumbers, tags }) => ({
         url: '/v3/populationstatisticsbystudentnumbers',
         method: 'POST',
         body: {
-          studentnumberlist: studentNumbers,
+          studentNumbers,
           tags,
         },
       }),
