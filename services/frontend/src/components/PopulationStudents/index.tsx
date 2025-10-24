@@ -1,10 +1,11 @@
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
-import { Tab } from 'semantic-ui-react'
+import { useState } from 'react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox'
 import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVisibilityToggle'
-import { useTabChangeAnalytics } from '@/hooks/tabChangeAnalytics'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -77,6 +78,7 @@ export const PopulationStudents = ({
   generalTabColumnFunction: () => [string[], string[]]
   generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
+  const [tab, setTab] = useState(0)
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
@@ -122,7 +124,6 @@ export const PopulationStudents = ({
     ),
   }
 
-  const { handleTabChange, showSubstitutionToggle } = useTabChangeAnalytics()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
   const contentByVariant: Record<
@@ -160,7 +161,7 @@ export const PopulationStudents = ({
   const contentToInclude = contentByVariant[variant]
   const tabs = Object.entries(availableTabs)
     .filter(([key, _]) => contentToInclude.tabs.includes(key as keyof typeof availableTabs))
-    .map(([key, val]) => ({ menuItem: key, render: val }))
+    .map(([key, val]) => ({ label: key, render: val }))
 
   if (filteredStudents.length === 0) return null
 
@@ -173,7 +174,7 @@ export const PopulationStudents = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginTop: '5px', marginBottom: '5px' }}>
           <StudentNameVisibilityToggle />
-          {showSubstitutionToggle ? (
+          {tabs.at(tab)?.label === 'Courses' ? (
             <IncludeSubstitutionsToggle
               includeSubstitutions={includeSubstitutions}
               toggleIncludeSubstitutions={toggleIncludeSubstitutions}
@@ -182,7 +183,12 @@ export const PopulationStudents = ({
         </div>
         {dataExport}
       </div>
-      <Tab data-cy="student-table-tabs" onTabChange={handleTabChange} panes={tabs} />
+      <Tabs data-cy="student-table-tabs" onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        {tabs.map(({ label }) => (
+          <Tab key={label} label={label} />
+        ))}
+      </Tabs>
+      {tabs.at(tab)?.render() ?? null}
     </>
   )
 }
