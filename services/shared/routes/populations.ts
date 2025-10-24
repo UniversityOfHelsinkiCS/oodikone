@@ -125,8 +125,8 @@ export type GetCustomPopulationResBody = PopulationstatisticsResBody & {
 export type CustomPopulationQuery = {
   studentNumbers: string[]
   tags?: {
-    studyProgramme: string | null
-    year: string | null
+    studyProgramme?: string | null
+    year?: string | null
   }
 }
 
