@@ -1,10 +1,20 @@
+import AddIcon from '@mui/icons-material/Add'
+import CheckIcon from '@mui/icons-material/Check'
+import ClearIcon from '@mui/icons-material/Clear'
+import DeleteIcon from '@mui/icons-material/Delete'
+import ModeIcon from '@mui/icons-material/Mode'
 import ArrowIcon from '@mui/icons-material/NorthEast'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
-import Datetime from 'react-datetime'
-import { Button, Form, Message, Modal } from 'semantic-ui-react'
 
-import { textAndDescriptionSearch } from '@/common'
+import { useEffect, useState } from 'react'
+
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Link } from '@/components/material/Link'
 import { SortableTable } from '@/components/SortableTable'
@@ -13,6 +23,8 @@ import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
+
+import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
 import { startYearToAcademicYear, StyledMessage } from './common'
 import './StudyGuidanceGroupOverview.css'
 
@@ -35,18 +47,14 @@ const prettifyTagName = string => {
   return string
 }
 
-const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
-const cellContent = { flexGrow: 1 }
-
-const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit }) => {
+const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit, initialState }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
   const { getTextIn } = useLanguage()
-  const initialState = { [tagName]: '' }
-  const [formValues, setFormValues] = useState(initialState)
+  const [formValues, setFormValues] = useState({ [tagName]: initialState ?? '' })
   const [formErrors, setFormErrors] = useState({})
 
   useEffect(() => {
-    setFormValues(initialState)
+    setFormValues({ [tagName]: initialState ?? '' })
     setFormErrors({})
   }, [group, tagName, open])
 
@@ -79,40 +87,38 @@ const EditTagModal = ({ group, open, selectFieldItems, tagName, toggleEdit }) =>
   }
 
   return (
-    <Modal onClose={toggleEdit} open={open}>
-      <Modal.Header>{getTextIn(group.name)}</Modal.Header>
-      <Modal.Content>
-        <AssociateTagForm
-          formErrors={formErrors}
-          formValues={formValues}
-          group={group}
-          handleChange={handleChange}
-          selectFieldItems={selectFieldItems}
-          tagName={tagName}
-        />
-      </Modal.Content>
-      <Modal.Actions>
-        <Button content="Cancel" icon="cancel" labelPosition="right" onClick={toggleEdit} />
-        <Button
-          content="Remove"
-          disabled={isLoading || !group.tags?.[tagName]}
-          icon="trash"
-          labelPosition="right"
-          negative
-          onClick={handleRemove}
-          type="submit"
-        />
-        <Button
-          content="Save"
-          disabled={isLoading}
-          icon="checkmark"
-          labelPosition="right"
-          onClick={handleSave}
-          positive
-          type="submit"
-        />
-      </Modal.Actions>
-    </Modal>
+    <Dialog fullWidth onClose={toggleEdit} open={open}>
+      <Paper sx={{ padding: 2 }}>
+        <Typography variant="h6">{getTextIn(group.name)}</Typography>
+        <Paper sx={{ padding: 2 }} variant="outlined">
+          <AssociateTagForm
+            formErrors={formErrors}
+            formValues={formValues}
+            group={group}
+            handleChange={handleChange}
+            selectFieldItems={selectFieldItems}
+            tagName={tagName}
+          />
+        </Paper>
+        <Box flexDirection="row" sx={{ gap: 0.5, margin: 1, textAlign: 'right' }}>
+          <Button color="primary" endIcon={<ClearIcon />} onClick={toggleEdit} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            color="error"
+            disabled={isLoading || !group.tags?.[tagName]}
+            endIcon={<DeleteIcon />}
+            onClick={handleRemove}
+            variant="outlined"
+          >
+            Remove
+          </Button>
+          <Button color="success" disabled={isLoading} endIcon={<CheckIcon />} onClick={handleSave} variant="outlined">
+            Save
+          </Button>
+        </Box>
+      </Paper>
+    </Dialog>
   )
 }
 
@@ -123,63 +129,36 @@ const AssociateTagForm = ({ formErrors, formValues, group, handleChange, selectF
         ? 'Edit associated degree programme for this group:'
         : 'Edit associated starting year for this group:'}
     </p>
-    <Form style={{ alignItems: 'center' }}>
-      <div>
-        {tagName === 'studyProgramme' ? (
-          <Form.Select
-            closeOnChange
-            fluid
-            name={tagName}
-            onChange={(_, { value }) => handleChange(tagName, value)}
-            options={selectFieldItems}
-            placeholder={
-              selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text ?? 'Select degree programme'
-            }
-            search={textAndDescriptionSearch}
-            value={formValues[tagName]}
-          />
-        ) : (
-          <Datetime
-            className="guidance-group-overview-year-tag-selector"
-            closeOnSelect
-            dateFormat={DateFormat.YEAR_DATE}
-            initialValue={group.tags?.[tagName]}
-            inputProps={{ readOnly: true }}
-            name={tagName}
-            onChange={value => handleChange(tagName, formatDate(value, DateFormat.YEAR_DATE))}
-            renderInput={({ value, ...rest }) => {
-              return (
-                <div>
-                  <input
-                    placeholder="Select year"
-                    style={{ maxWidth: 400 }}
-                    value={startYearToAcademicYear(value)}
-                    {...rest}
-                  />
-                </div>
-              )
-            }}
-            renderYear={(props, year) => {
-              const shiftBy = 2 // fix to start from 2017 instead of 2019
-              const formattedAndShiftedYear = startYearToAcademicYear(year - shiftBy)
-              const shiftedProps = {
-                ...props,
-                key: props.key - shiftBy,
-                className:
-                  `${formValues[tagName]}` === formattedAndShiftedYear.substring(0, 4)
-                    ? 'rdtYear rdtActive'
-                    : 'rdtYear',
-                'data-value': props['data-value'] - shiftBy,
-              }
-              return <td {...shiftedProps}> {formattedAndShiftedYear}</td>
-            }}
-            timeFormat={false}
-            value={formValues[tagName]}
-          />
-        )}
-      </div>
-    </Form>
-    {formErrors[tagName] ? <Message header={`${formErrors[tagName]}`} icon="exclamation circle" negative /> : null}
+    <div>
+      {tagName === 'studyProgramme' ? (
+        <Select
+          fullWidth
+          name={tagName}
+          onChange={event => handleChange(tagName, event.target.value)}
+          placeholder={
+            selectFieldItems.find(item => item.value === group.tags?.[tagName])?.text ?? 'Select degree programme'
+          }
+          value={formValues[tagName] ?? '2017'}
+        >
+          {selectFieldItems.map(({ key, value, description, text }) => (
+            <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
+              <Typography>{text}</Typography>
+              <Typography fontWeight="lighter">{description}</Typography>
+            </MenuItem>
+          ))}
+        </Select>
+      ) : (
+        <EnrollmentDateSelector
+          setYear={value => handleChange(tagName, formatDate(new String(value), DateFormat.YEAR_DATE))}
+          year={Number(formValues[tagName] ?? 0)}
+        />
+      )}
+    </div>
+    {formErrors[tagName] ? (
+      <Alert severity="error" variant="outlined">
+        {formErrors[tagName]}
+      </Alert>
+    ) : null}
   </>
 )
 
@@ -199,20 +178,21 @@ const TagCell = ({ group, studyProgrammes, tagName }) => {
     <>
       <EditTagModal
         group={group}
+        initialState={group.tags?.[tagName]}
         open={showEdit}
         selectFieldItems={studyProgrammes}
         tagName={tagName}
         toggleEdit={toggleEdit}
       />
       {group.tags?.[tagName] ? (
-        <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
-          <p style={{ ...cellContent, textAlign: 'left' }}>{getText()}</p>
-          <div style={{ ...cellContent, flexGrow: 0 }}>
-            <Button icon="pencil" onClick={toggleEdit} size="tiny" />
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <p style={{ margin: 'auto 1em' }}>{getText()}</p>
+          <Button onClick={toggleEdit} size="small" startIcon={<ModeIcon />} variant="outlined" />
         </div>
       ) : (
-        <Button content={`Add ${prettifyTagName(tagName)}`} icon="add" onClick={toggleEdit} size="tiny" />
+        <Button onClick={toggleEdit} size="small" startIcon={<AddIcon />} variant="outlined">
+          Add {prettifyTagName(tagName)}
+        </Button>
       )}
     </>
   )
