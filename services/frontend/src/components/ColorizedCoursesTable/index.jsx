@@ -1,6 +1,10 @@
+import Divider from '@mui/material/Divider'
+import Paper from '@mui/material/Paper'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import { useEffect, useMemo, useState } from 'react'
-import { Divider, Loader, Tab } from 'semantic-ui-react'
 
+import { LoadingSection } from '@/components/material/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ColorizedCoursesTableContext } from './common'
@@ -19,6 +23,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
 
   const { data, isFetching, isLoading, isError } = fetchDataHook({ id: studyProgramme })
 
+  const [tab, setTab] = useState(0)
   const [numberMode, setNumberMode] = useState('completions')
   const [colorMode, setColorMode] = useState('none')
   const [semesterFilter, setSemesterFilter] = useState(null)
@@ -50,12 +55,12 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   const possiblePanes = [
     {
       name: 'Faculties',
-      menuItem: 'By faculties',
+      label: 'By faculties',
       render: () => <FacultiesTab />,
     },
     {
       name: 'Semesters',
-      menuItem: 'By semesters',
+      label: 'By semesters',
       render: () => <SemestersTab />,
     },
   ]
@@ -67,7 +72,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   }
 
   if (!data || isFetching || isLoading || !semesterFilter || !semesters?.length) {
-    return <Loader active style={{ marginTop: '15em' }} />
+    return <LoadingSection sx={{ padding: 16 }} />
   }
 
   const settingsContext = {
@@ -87,13 +92,14 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   return (
     <ColorizedCoursesTableContext.Provider value={settingsContext}>
       <div className="colorized-courses-table">
-        {dividerText ? (
-          <Divider horizontal style={{ marginTop: '3em' }}>
-            {dividerText}
-          </Divider>
-        ) : null}
+        {dividerText ? <Divider sx={{ marginTop: '3em' }}>{dividerText}</Divider> : null}
         {infoBox}
-        {displayedPanes.length === 1 ? displayedPanes[0].render() : <Tab panes={displayedPanes} />}
+        <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+          {displayedPanes.map(({ label }) => (
+            <Tab key={label} label={label} />
+          ))}
+        </Tabs>
+        <Paper variant="outlined">{displayedPanes.at(tab)?.render() ?? null}</Paper>
       </div>
     </ColorizedCoursesTableContext.Provider>
   )
