@@ -4,7 +4,6 @@ import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router'
 
 import 'semantic-ui-css/semantic.min.css'
-import 'react-datetime/css/react-datetime.css'
 import './styles/custom.css'
 import { App } from './components/App'
 import { ErrorBoundary } from './components/ErrorBoundary'
