@@ -1,3 +1,6 @@
+import Button from '@mui/material/Button'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 import dayjs from 'dayjs'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
@@ -5,7 +8,6 @@ import { chain, flatten, flow } from 'lodash'
 import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
-import { Button, Radio } from 'semantic-ui-react'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -525,7 +527,13 @@ export const CreditAccumulationGraphHighCharts = ({
   })
 
   const makeGraphSizeButton = (height, label) => (
-    <Button active={graphHeight === height} content={label} onClick={() => setGraphHeight(height)} />
+    <Button
+      color="primary"
+      onClick={() => setGraphHeight(height)}
+      variant={graphHeight === height ? 'contained' : 'outlined'}
+    >
+      {label}
+    </Button>
   )
 
   return (
@@ -533,11 +541,10 @@ export const CreditAccumulationGraphHighCharts = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1rem 0' }}>
         <div>
           {!singleStudent && studyPlanFilterIsActive ? (
-            <Radio
-              checked={cutStudyPlanCredits}
+            <FormControlLabel
+              control={<Switch />}
               label="Display credits from study right start"
-              onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
-              toggle
+              onClick={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
             />
           ) : null}
         </div>
