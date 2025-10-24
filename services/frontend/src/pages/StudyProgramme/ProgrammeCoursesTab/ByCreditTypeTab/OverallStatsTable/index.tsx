@@ -209,16 +209,22 @@ export const OverallStatsTable = ({
     [getCommonColumns, showStudents]
   )
 
+  const paginationChoices = [50, 100, 250, 500, filteredData.length].filter(num => num <= filteredData.length)
+  const pageSize = Math.min(100, filteredData.length)
+
   const table = useMaterialReactTable({
     columns,
     data: filteredData,
     defaultColumn: { size: 0 },
     enableDensityToggle: false,
     enableHiding: false,
+    muiPaginationProps: {
+      rowsPerPageOptions: paginationChoices,
+    },
     initialState: {
       density: 'compact',
       pagination: {
-        pageSize: 20,
+        pageSize,
         pageIndex: 0,
       },
       sorting: [
