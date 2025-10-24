@@ -19,7 +19,7 @@ export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelector
       <IconButton
         data-cy="population-year-decrement"
         disabled={year <= lowestYear}
-        onClick={() => setYear(year => (year > lowestYear ? year - 1 : year))}
+        onClick={() => setYear(year > lowestYear ? year - 1 : year)}
       >
         <RemoveIcon />
       </IconButton>
@@ -44,11 +44,7 @@ export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelector
           >{`${option} - ${option + 1}`}</MenuItem>
         ))}
       </Select>
-      <IconButton
-        data-cy="population-year-increment"
-        disabled={year >= currentYear}
-        onClick={() => setYear(year => year + 1)}
-      >
+      <IconButton data-cy="population-year-increment" disabled={year >= currentYear} onClick={() => setYear(year + 1)}>
         <AddIcon />
       </IconButton>
     </Stack>
