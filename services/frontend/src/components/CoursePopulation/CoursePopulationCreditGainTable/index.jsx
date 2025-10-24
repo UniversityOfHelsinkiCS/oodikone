@@ -1,11 +1,19 @@
+import Tab from '@mui/material/Tab'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
 import { maxBy } from 'lodash'
-import { Loader, Tab, Table } from 'semantic-ui-react'
+import { useState } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { Loading } from '@/components/material/Loading'
+import { StyledTable } from '@/components/material/StyledTable'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useGetSemestersQuery } from '@/redux/semesters'
 
@@ -13,13 +21,13 @@ const CreditGainTableRow = ({ statistics, code }) => {
   const { getTextIn } = useLanguage()
 
   return (
-    <Table.Row key={code} value={statistics.students.length}>
-      <Table.Cell>
+    <TableRow key={code} value={statistics.students.length}>
+      <TableCell>
         {code}, {getTextIn(statistics.name)}
-      </Table.Cell>
-      <Table.Cell>{statistics.students.length}</Table.Cell>
-      <Table.Cell>{statistics.credits}</Table.Cell>
-    </Table.Row>
+      </TableCell>
+      <TableCell>{statistics.students.length}</TableCell>
+      <TableCell>{statistics.credits}</TableCell>
+    </TableRow>
   )
 }
 
@@ -37,27 +45,29 @@ const CreditGainTable = ({ data, totalCredits, headerText }) => {
   }, 0)
 
   return (
-    <Table>
-      <Table.Header style={{ backgroundColor: 'whitesmoke' }}>
-        <Table.Row>
-          <Table.HeaderCell>{headerText}</Table.HeaderCell>
-          <Table.HeaderCell>Students</Table.HeaderCell>
-          <Table.HeaderCell>Credits</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
+    <StyledTable>
+      <TableHead>
+        <TableRow>
+          <TableCell>{headerText}</TableCell>
+          <TableCell>Students</TableCell>
+          <TableCell>Credits</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {tableRows}
-        <Table.Row style={{ backgroundColor: 'ghostwhite' }}>
-          <Table.Cell style={{ fontWeight: '700' }}>Total</Table.Cell>
-          <Table.Cell style={{ fontWeight: '700' }}>{totalStudents}</Table.Cell>
-          <Table.Cell style={{ fontWeight: '700' }}>{totalCredits}</Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>
+        <TableRow>
+          <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
+          <TableCell sx={{ fontWeight: 'bold' }}>{totalStudents}</TableCell>
+          <TableCell sx={{ fontWeight: 'bold' }}>{totalCredits}</TableCell>
+        </TableRow>
+      </TableBody>
+    </StyledTable>
   )
 }
 
 export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) => {
+  const [tab, setTab] = useState(0)
+
   const { data: faculties } = useGetFacultiesQuery()
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
@@ -65,11 +75,7 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
   const facultyCredits = {}
 
   if (!faculties || !currentSemester) {
-    return (
-      <Loader active inline="centered">
-        Loading
-      </Loader>
-    )
+    return <Loading />
   }
 
   let totalCredits = 0
@@ -113,20 +119,12 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
 
   const panes = [
     {
-      menuItem: 'Faculty',
-      render: () => (
-        <Tab.Pane>
-          <CreditGainTable data={facultyCredits} headerText="Faculty" totalCredits={totalCredits} />
-        </Tab.Pane>
-      ),
+      label: 'Faculty',
+      render: () => <CreditGainTable data={facultyCredits} headerText="Faculty" totalCredits={totalCredits} />,
     },
     {
-      menuItem: 'Programme',
-      render: () => (
-        <Tab.Pane>
-          <CreditGainTable data={programmeCredits} headerText="Programme" totalCredits={totalCredits} />
-        </Tab.Pane>
-      ),
+      label: 'Programme',
+      render: () => <CreditGainTable data={programmeCredits} headerText="Programme" totalCredits={totalCredits} />,
     },
   ]
 
@@ -135,7 +133,12 @@ export const CoursePopulationCreditGainTable = ({ students, codes, from, to }) =
       <div style={{ marginBottom: '20px' }}>
         <InfoBox content={populationStatisticsToolTips.creditDistributionCoursePopulation} />
       </div>
-      <Tab panes={panes} />
+      <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        {panes.map(({ label }) => (
+          <Tab key={label} label={label} />
+        ))}
+      </Tabs>
+      {panes.at(tab)?.render() ?? null}
     </>
   )
 }
