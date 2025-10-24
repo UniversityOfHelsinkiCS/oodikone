@@ -25,8 +25,11 @@ import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { FormattedStudent, FormattedCourse } from '@oodikone/shared/types'
+import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { useCurriculumState } from '../../hooks/useCurriculums'
-import { startYearToAcademicYear, StyledMessage, Wrapper } from './common'
+import { StyledMessage } from '../common/StyledMessage'
+import { startYearToAcademicYear, Wrapper } from './common'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 
@@ -34,7 +37,15 @@ dayjsExtend(isBetween)
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
-const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) => {
+const SingleStudyGroupContent = ({
+  filteredStudents,
+  filteredCourses,
+  group,
+}: {
+  filteredStudents: FormattedStudent[]
+  filteredCourses: FormattedCourse[]
+  group: GroupsWithTags
+}) => {
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const year = group?.tags?.year
@@ -43,10 +54,10 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
   const query = {
     programme,
     combinedProgramme,
-    years: year ? [year] : undefined,
+    years: year ? [Number(year)] : [],
   }
 
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, year)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, year!) // TODO: fix year
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
@@ -76,9 +87,16 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
             </Button>
           ) : null}
           <CreditAccumulationGraphHighCharts
+            absences={null}
+            endDate={null}
             programmeCodes={group?.tags?.studyProgramme ? [programme, combinedProgramme] : []}
+            selectedStudyPlan={null}
+            showBachelorAndMaster={null}
+            singleStudent={false}
+            startDate={null}
             students={filteredStudents}
             studyPlanFilterIsActive={studyPlanFilterIsActive}
+            studyRightId={null}
           />
         </>
       ),
@@ -88,7 +106,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
           title: 'Credit statistics',
           content: (
             <div>
-              <CreditStatistics filteredStudents={filteredStudents} query={query} sggYear={group.tags.year} />
+              <CreditStatistics filteredStudents={filteredStudents} query={query} />
             </div>
           ),
         }
@@ -117,6 +135,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
       title: `Students (${filteredStudents.length})`,
       content: (
         <div>
+          {/* @ts-expect-error FIX typing */}
           <PopulationStudents
             curriculum={curriculum}
             filteredCourses={filteredCourses}
@@ -127,7 +146,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
                 variant: 'studyGuidanceGroupPopulation',
                 filteredStudents,
 
-                years: [group.tags?.year ?? undefined],
+                years: year ? [Number(year)] : [],
 
                 programme: group.tags?.studyProgramme?.split('+')[0],
                 combinedProgramme: group.tags?.studyProgramme?.split('+')[1],
@@ -140,10 +159,10 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
                 to: undefined,
               })
             }
-            programme={group.tags?.studyProgramme?.split('+')[0]}
+            programme={group.tags?.studyProgramme?.split('+').at(0)}
             studyGuidanceGroup={group}
             variant="studyGuidanceGroupPopulation"
-            year={year}
+            year={year ?? undefined}
           />
         </div>
       ),
@@ -152,7 +171,7 @@ const SingleStudyGroupContent = ({ filteredStudents, filteredCourses, group }) =
 
   return (
     <div style={{ overflowX: 'auto', flexGrow: 1, padding: '1px' }}>
-      <PanelView panels={panels} viewTitle="studyguidancegroup" />
+      <PanelView panels={panels} />
     </div>
   )
 }
@@ -294,7 +313,7 @@ const SingleStudyGroupViewWrapper = ({ group, isLoading, children }) => {
   )
 }
 
-export const SingleStudyGuidanceGroupContainer = ({ group }) => {
+export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWithTags | undefined }) => {
   // Sorting is needed for RTK query cache to work properly
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() ?? []
   const { data: population, isLoading } = useGetCustomPopulationQuery({
