@@ -71,8 +71,8 @@ export const ModulesTab = ({
           return value.toLowerCase().startsWith(filterValue.toLowerCase())
         },
         aggregationRows: [
-          { id: 'planned', value: 'Planned' },
-          { id: 'completed', value: 'Completed' },
+          { id: 'planned', value: 'Total planned' },
+          { id: 'completed', value: 'Total passed' },
         ],
       }),
       ooditableColumnHelper.accessor('lastName', {
