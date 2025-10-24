@@ -1,5 +1,10 @@
+import FormControlLabel from '@mui/material/FormControlLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+
+import Select from '@mui/material/Select'
 import { useMemo } from 'react'
-import { Dropdown, Radio } from 'semantic-ui-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useColorizedCoursesTableContext } from './common'
@@ -17,17 +22,19 @@ export const NumberModeSelector = () => {
   return (
     <div className="selector-container">
       <b>Show number of</b>
-      {modes.map(mode => (
-        <Radio
-          checked={numberMode === mode.value}
-          data-cy={`${mode.value}-button`}
-          key={mode.value}
-          label={mode.label}
-          name="modeRadioGroup"
-          onChange={() => setNumberMode(mode.value)}
-          value={mode.value}
-        />
-      ))}
+      <RadioGroup>
+        {modes.map(mode => (
+          <FormControlLabel
+            checked={numberMode === mode.value}
+            control={<Radio />}
+            data-cy={`${mode.value}-button`}
+            key={mode.value}
+            label={mode.label}
+            onChange={() => setNumberMode(mode.value)}
+            value={mode.value}
+          />
+        ))}
+      </RadioGroup>
     </div>
   )
 }
@@ -38,27 +45,29 @@ export const ColorModeSelector = () => {
   return (
     <div className="selector-container">
       <b>Coloring mode</b>
-      <Radio
-        checked={colorMode === 'course'}
-        label="Compare to average of course"
-        name="colorModeGroup"
-        onChange={() => setColorMode('course')}
-        value="course"
-      />
-      <Radio
-        checked={colorMode === 'total'}
-        label="Compare to other courses"
-        name="colorModeGroup"
-        onChange={() => setColorMode('total')}
-        value="total"
-      />
-      <Radio
-        checked={colorMode === 'none'}
-        label="No colors"
-        name="colorModeGroup"
-        onChange={() => setColorMode('none')}
-        value="none"
-      />
+      <RadioGroup>
+        <FormControlLabel
+          checked={colorMode === 'course'}
+          control={<Radio />}
+          label="Compare to average of course"
+          onChange={() => setColorMode('course')}
+          value="course"
+        />
+        <FormControlLabel
+          checked={colorMode === 'total'}
+          control={<Radio />}
+          label="Compare to other courses"
+          onChange={() => setColorMode('total')}
+          value="total"
+        />
+        <FormControlLabel
+          checked={colorMode === 'none'}
+          control={<Radio />}
+          label="No colors"
+          onChange={() => setColorMode('none')}
+          value="none"
+        />
+      </RadioGroup>
     </div>
   )
 }
@@ -78,14 +87,19 @@ const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
 
   return (
     <div className="selector-container">
-      <Dropdown
+      <Select
         data-cy={dataCy}
-        onChange={(_, { value }) =>
-          setSemester(allSemesters.find(({ semestercode }) => semestercode === value).semestercode)
+        onChange={event =>
+          setSemester(allSemesters.find(({ semestercode }) => semestercode === event.target.value).semestercode)
         }
-        options={options}
         value={currentValue.semestercode}
-      />
+      >
+        {options.map(({ key, text, value }) => (
+          <MenuItem key={key} value={value}>
+            {text}
+          </MenuItem>
+        ))}
+      </Select>
     </div>
   )
 }
