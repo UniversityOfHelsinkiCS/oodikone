@@ -45,7 +45,7 @@ jobs:
         env:
           DOCKER_BUILD_SUMMARY: false
       - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: updater-worker-image
           path: /tmp/worker.tar
@@ -66,7 +66,7 @@ jobs:
         env:
           DOCKER_BUILD_SUMMARY: false
       - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: updater-scheduler-image
           path: /tmp/scheduler.tar
@@ -87,7 +87,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: 'Download built images'
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: 'updater-{worker,scheduler}-image'
           merge-multiple: true
