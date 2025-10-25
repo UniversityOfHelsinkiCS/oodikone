@@ -59,7 +59,7 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
       <TableBody>
         {sortedCourseGrades.map(grade => (
           <TableRow key={`grade-table-row-${grade.grade}`}>
-            <TableCell collapsing>
+            <TableCell>
               <ExternalGradeFilterToggle grade={grade.grade} />
             </TableCell>
             <TableCell>{grade.grade}</TableCell>
