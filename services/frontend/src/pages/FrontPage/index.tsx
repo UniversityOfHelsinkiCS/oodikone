@@ -1,4 +1,3 @@
-import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
@@ -77,10 +76,6 @@ export const FrontPage = () => {
   return (
     <Container maxWidth="lg">
       <PageTitle subtitle="Exploratory Research on Study Data" title="Oodikone" />
-      <Alert severity="warning" sx={{ justifyContent: 'center' }}>
-        Our team is currently updating data tables across various views. If you notice any discrepancies or anomalies,
-        please reach out to <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
-      </Alert>
       <Stack direction={{ sm: 'column', md: 'row' }} divider={<Divider flexItem orientation="vertical" />} gap={3}>
         <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
           <SectionTitle title="Features" />
