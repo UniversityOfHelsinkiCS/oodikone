@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 
+import { StyledMessage } from '@/components/common/StyledMessage'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Link } from '@/components/material/Link'
 import { SortableTable } from '@/components/SortableTable'
@@ -26,7 +27,7 @@ import { formatDate } from '@/util/timeAndDate'
 
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
 import { startYearToAcademicYear } from './common'
-import { StyledMessage } from '../common/StyledMessage'
+
 import './StudyGuidanceGroupOverview.css'
 
 const LinkToGroup = ({ group }) => {

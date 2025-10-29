@@ -1,7 +1,11 @@
 import { RTKApi } from '@/apiConnection'
 import type { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
-import type { PopulationstatisticsResBody, CustomPopulationQuery, GetCustomPopulationResBody } from '@oodikone/shared/routes/populations'
+import type {
+  PopulationstatisticsResBody,
+  CustomPopulationQuery,
+  GetCustomPopulationResBody,
+} from '@oodikone/shared/routes/populations'
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

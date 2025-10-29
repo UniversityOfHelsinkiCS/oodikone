@@ -15,7 +15,7 @@ import { StatisticsTab } from './StatisticsTab'
 
 type CreditStatisticsProps = {
   filteredStudents: FormattedStudent[]
-  query: Pick<PopulationQuery, "programme" | "years" | "combinedProgramme">
+  query: Pick<PopulationQuery, 'programme' | 'years' | 'combinedProgramme'>
 }
 
 export const CreditStatistics = ({ filteredStudents, query }: CreditStatisticsProps) => {

@@ -19,13 +19,6 @@ import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
 dayjsExtend(isBetween)
 
-export const textAndDescriptionSearch = (dropDownOptions: any[], param: string) =>
-  dropDownOptions.filter(option =>
-    option.text
-      ? option.text.toLowerCase().concat(option.description.toLowerCase()).includes(param.toLowerCase())
-      : null
-  )
-
 export const isFall = (semester: number) => semester % 2 === 1
 
 /**

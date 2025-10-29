@@ -24,7 +24,7 @@ import { FormattedStudent } from '@oodikone/shared/types'
 
 type AgeStatsProps = {
   filteredStudents: FormattedStudent[]
-  query: Pick<PopulationQuery, "programme">
+  query: Pick<PopulationQuery, 'programme'>
 }
 export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
   const [isGrouped, setIsGrouped] = useState(true)
@@ -62,8 +62,9 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
       const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === query.programme))
       if (studyRight) {
         const startDateInProgramme = studyRight.studyRightElements.find(el => el.code === query.programme)?.startDate
-        if (startDateInProgramme)
+        if (startDateInProgramme) {
           ages.push(getAge(student.birthdate, false, new Date(startDateInProgramme)))
+        }
       }
       return ages
     }, [] as number[])
@@ -141,22 +142,22 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                 </TableRow>
                 {isGrouped && expandedGroups.includes(index)
                   ? getAges(false)
-                    .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
-                    .map(([nonGroupedAge, nonGroupedAgeCount]) => {
-                      return (
-                        <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
-                          <TableCell>
-                            <Typography>{nonGroupedAge}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography>{nonGroupedAgeCount}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })
+                      .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
+                      .map(([nonGroupedAge, nonGroupedAgeCount]) => {
+                        return (
+                          <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
+                            <TableCell>
+                              <Typography>{nonGroupedAge}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>{nonGroupedAgeCount}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <PercentageBar denominator={total} numerator={nonGroupedAgeCount} />
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })
                   : null}
               </Fragment>
             ))}
