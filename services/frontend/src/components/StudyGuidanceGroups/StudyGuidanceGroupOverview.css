@@ -1,4 +1,0 @@
-/* Hide year header from datetime picker in overview */
-.guidance-group-overview-year-tag-selector .rdtSwitch {
-  display: none;
-}
