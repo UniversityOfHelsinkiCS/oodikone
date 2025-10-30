@@ -26,7 +26,7 @@ import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
-import { startYearToAcademicYear } from './common'
+import { startYearToAcademicYear } from './utils'
 
 import './StudyGuidanceGroupOverview.css'
 

@@ -19,9 +19,8 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StyledMessage } from '../common/StyledMessage'
-import { startYearToAcademicYear } from './common'
 import { SingleStudyGuidanceGroupPanels } from './SingleStudyGuidanceGroupPanels'
-import { useGetFilters } from './utils'
+import { startYearToAcademicYear, useGetFilters } from './utils'
 
 export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWithTags | undefined }) => {
   // Sorting is needed for RTK query cache to work properly
