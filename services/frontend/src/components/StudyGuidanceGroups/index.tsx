@@ -25,11 +25,12 @@ export const StudyGuidanceGroups = () => {
 
         {!!isLoading && <PageLoading isLoading={isLoading} />}
 
-        {!isLoading && <StudyGuidanceGroupOverview groups={groups} />}
+        {!isLoading && groups !== undefined && <StudyGuidanceGroupOverview groups={groups} />}
       </SegmentContainer>
     )
 
-  if (groupid && groups) return <SingleStudyGuidanceGroup group={groups.find(group => group.id === groupid)} />
+  if (!!groupid && Array.isArray(groups))
+    return <SingleStudyGuidanceGroup group={groups.find(group => group.id === groupid)} />
 
   return null
 }
