@@ -135,12 +135,12 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
               </Grid>
               <Grid size={2} /> {/* for alignment */}
             </Grid>
-            <SingleStudyGuidanceGroupPanels
-              filteredCourses={filteredCourses}
-              filteredStudents={filteredStudents}
-              group={group}
-            />
           </Stack>
+          <SingleStudyGuidanceGroupPanels
+            filteredCourses={filteredCourses}
+            filteredStudents={filteredStudents}
+            group={group}
+          />
         </Box>
       )}
     </FilterView>
