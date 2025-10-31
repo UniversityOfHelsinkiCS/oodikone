@@ -8,8 +8,8 @@ import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
 export const createAcademicYearStartDate = (year: number) => new Date(year, 7, 1)
 
-export const startYearToAcademicYear = (year: string) =>
-  year === '' || Number.isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
+export const startYearToAcademicYear = (year: string | null | undefined) =>
+  !year ? '' : `${year} - ${parseInt(year, 10) + 1}`
 
 export const useGetFilters = (
   group: GroupsWithTags | undefined,

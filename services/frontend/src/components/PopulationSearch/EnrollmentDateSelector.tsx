@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack'
 
 type EnrollmentDateSelectorProps = {
   year: number
-  setYear: React.Dispatch<React.SetStateAction<number>>
+  setYear: React.Dispatch<React.SetStateAction<number>> | (() => void)
 }
 
 export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelectorProps) => {
