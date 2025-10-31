@@ -35,4 +35,4 @@ export type StudyGuidanceGroup = {
   members: Member[]
 }
 
-export type GroupsWithTags = StudyGuidanceGroup & { tags: Tags }
+export type GroupsWithTags = StudyGuidanceGroup & { tags?: Tags }
