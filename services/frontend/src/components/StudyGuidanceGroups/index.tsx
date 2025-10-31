@@ -23,8 +23,7 @@ export const StudyGuidanceGroups = () => {
           </Typography>
         </Box>
 
-        {!!isLoading && <PageLoading isLoading={isLoading} />}
-
+        <PageLoading isLoading={isLoading} />
         {!isLoading && groups !== undefined && <StudyGuidanceGroupOverview groups={groups} />}
       </SegmentContainer>
     )
