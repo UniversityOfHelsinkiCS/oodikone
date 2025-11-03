@@ -11,7 +11,6 @@ Properties are optional unless they are in **bold**.
 | featureName          | Describes the feature in the Excel filename: "oodikone*{featureName}*{timeStamp}.xlsx". Defaults to "export"  |
 | **data**             | Array of data items                                                                                           |
 | **columns**          | Array of columns, see fields of columns below                                                                 |
-| actions              | JSX to add in the top right corner of the table, for example buttons                                          |
 | hideHeaderBar        | Hides the header bar that has a table icon, title, fullscreen button and menu/buttons                         |
 | striped              | The style where every other row is grey. Boolean, default is true.                                            |
 | firstColumnSticky    | Boolean, default is false. If true, the first column is sticky                                                |
