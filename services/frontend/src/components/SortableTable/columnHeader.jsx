@@ -10,7 +10,6 @@ import { dateColumnFilter } from './filters/dateFilter'
 import { defaultColumnFilter } from './filters/defaultFilter'
 import { multiSelectColumnFilter } from './filters/multiSelectFilter'
 import { rangeColumnFilter } from './filters/rangeFilter'
-import './style.css'
 
 const getDefaultColumnOptions = () => ({
   valueFilters: [],

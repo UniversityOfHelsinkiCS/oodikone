@@ -6,7 +6,6 @@ import { Link } from '@/components/material/Link'
 import { SortableTable, group } from '@/components/SortableTable'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import './passFailEnrollments.css'
 
 const calculatePassRate = (total, passed) => {
   if (total === 0) {
@@ -197,7 +196,6 @@ export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
       defaultSort={['total', 'desc']}
       expandedGroups={expandedGroups}
       featureName="pass_and_fail"
-      tableId="pass-and-fail-statistics-of-courses"
       title="Pass and fail statistics of courses with course enrollment details"
       toggleGroupExpansion={toggleGroupExpansion}
     />

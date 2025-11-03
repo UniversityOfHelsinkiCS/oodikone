@@ -83,7 +83,6 @@ export const FacultiesTab = () => {
           totalRow.bySemesters[numberMode]
         )}
         data={tableData}
-        stretch
         striped={colorMode === 'none'}
       />
     </div>

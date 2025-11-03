@@ -537,15 +537,13 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
         </Typography>
       </Alert>
       <Box>
-        <Box style={{ display: 'flex' }}>
-          <Box style={{ maxHeight: '80vh', width: '100%' }}>
+        <Box sx={{ display: 'flex' }}>
+          <Box sx={{ width: '100%' }}>
             {isCriteriaSet ? (
               <SortableTable
                 columns={columns}
                 data={students}
                 featureName="progress"
-                style={{ height: '80vh' }}
-                tableId="progress-of-population-students"
                 title="Progress of population's students after predefined criteria"
               />
             ) : (

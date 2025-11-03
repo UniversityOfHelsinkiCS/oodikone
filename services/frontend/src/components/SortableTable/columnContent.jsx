@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { useContext, useContextSelector } from 'use-context-selector'
 
 import { cloneColumns, DataItemType, getDataItemType, SortableTableContext, thickBorderStyles } from './common'
-import './style.css'
 
 export const getKey = data => {
   const columnsToCheck = ['studentNumber', 'studentnumber', 'id']

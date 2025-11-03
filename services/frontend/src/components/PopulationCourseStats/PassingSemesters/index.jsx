@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
 import ArrowIcon from '@mui/icons-material/NorthEast'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import { chain, range } from 'lodash'
 import { useMemo, useState } from 'react'
@@ -147,18 +148,20 @@ export const PassingSemesters = ({ onlyIamRights }) => {
   )
 
   return (
-    <SortableTable
-      actions={
+    <>
+      <Box pt={2}>
         <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
           {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
         </Button>
-      }
-      columns={columns}
-      data={data}
-      expandedGroups={expandedGroups}
-      featureName="passing_semester"
-      title="Students Passing a Course per Semester"
-      toggleGroupExpansion={toggleGroupExpansion}
-    />
+      </Box>
+      <SortableTable
+        columns={columns}
+        data={data}
+        expandedGroups={expandedGroups}
+        featureName="passing_semester"
+        title="Students Passing a Course per Semester"
+        toggleGroupExpansion={toggleGroupExpansion}
+      />
+    </>
   )
 }

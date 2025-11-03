@@ -4,27 +4,20 @@ Properties are optional unless they are in **bold**.
 
 ### Table settings (as props to component)
 
-| Property                  | Explanation                                                                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| tableId                   | id-property of the `<table>` tag                                                                                            |
-| title                     | Table title                                                                                                                 |
-| featureName               | Describes the feature in the Excel filename: "oodikone*{featureName}*{timeStamp}.xlsx". Defaults to "export"                |
-| **data**                  | Array of data items                                                                                                         |
-| **columns**               | Array of columns, see fields of columns below                                                                               |
-| onlyExportColumns         | Array of columns, never shown but always added to export as the first columns                                               |
-| singleLine                | default true, set to false to allow line wrapping (may make lines different size)                                           |
-| stretch                   | sets table's css width to 100%                                                                                              |
-| actions                   | JSX to add in the top right corner of the table, for example buttons                                                        |
-| hideHeaderBar             | Hides the header bar that has a table icon, title, fullscreen button and menu/buttons                                       |
-| style                     | css style object of the whole table                                                                                         |
-| striped                   | The style where every other row is grey. Boolean, default is true.                                                          |
-| firstColumnSticky         | Boolean, default is false. If true, the first column is sticky                                                              |
-| defaultSort               | [columnkey, order] of default sort column and order. For example ['name', 'desc']                                           |
-| toggleGroupExpansion      | Function which is called when group of rows is collapsed or expanded                                                        |
-| expandedGroups            | Array (or set?) of keys of rows are supposed to be expanded. These two are used only in population of courses               |
-| maxHeight                 | Overwrite the maximum height. Defaults to 80vh if not set.                                                                  |
-| useFilteredDataOnExport   | If true, uses filtered data (the data that's shown after applying all the selected filters) on exports. Defaults to true.   |
-| handleDisplayedDataChange | A function that is called with the displayed data when it changes. Can be used to update the state in the parent component. |
+| Property             | Explanation                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- |
+| tableId              | id-property of the `<table>` tag                                                                              |
+| title                | Table title                                                                                                   |
+| featureName          | Describes the feature in the Excel filename: "oodikone*{featureName}*{timeStamp}.xlsx". Defaults to "export"  |
+| **data**             | Array of data items                                                                                           |
+| **columns**          | Array of columns, see fields of columns below                                                                 |
+| actions              | JSX to add in the top right corner of the table, for example buttons                                          |
+| hideHeaderBar        | Hides the header bar that has a table icon, title, fullscreen button and menu/buttons                         |
+| striped              | The style where every other row is grey. Boolean, default is true.                                            |
+| firstColumnSticky    | Boolean, default is false. If true, the first column is sticky                                                |
+| defaultSort          | [columnkey, order] of default sort column and order. For example ['name', 'desc']                             |
+| toggleGroupExpansion | Function which is called when group of rows is collapsed or expanded                                          |
+| expandedGroups       | Array (or set?) of keys of rows are supposed to be expanded. These two are used only in population of courses |
 
 ### Column/header settings
 

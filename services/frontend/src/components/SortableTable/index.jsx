@@ -1,6 +1,6 @@
 import { mapValues } from 'lodash'
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
-import { Icon } from 'semantic-ui-react'
+import { useCallback, useMemo, useReducer, useState } from 'react'
+import { Button, Card, Icon, Popup } from 'semantic-ui-react'
 
 import { computeColumnSpans, DataItem, getKey } from './columnContent'
 import {
@@ -29,26 +29,17 @@ Future uusihenkilö's will thank you.
 */
 
 export const SortableTable = ({
-  actions,
   columns: pColumns,
   data,
   defaultSort,
   expandedGroups,
   featureName = 'export',
   firstColumnSticky = false,
-  handleDisplayedDataChange,
-  hideHeaderBar,
-  maxHeight = '80vh',
-  onlyExportColumns = [],
-  singleLine = true,
-  stretch,
   striped = true,
-  style,
-  tableId,
   title,
   toggleGroupExpansion,
-  useFilteredDataOnExport = true,
 }) => {
+  const [isFullscreen, setFullscreen] = useState(false)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(
     tableStateReducer(defaultSort),
@@ -98,58 +89,14 @@ export const SortableTable = ({
     [data, columnsByKey, state]
   )
 
-  useEffect(() => {
-    if (handleDisplayedDataChange) handleDisplayedDataChange(sortedData)
-  }, [sortedData])
-
-  const tableStyles = {
-    position: 'relative',
-  }
-
-  if (stretch) {
-    tableStyles.width = '100%'
-  }
-
-  const figureStyles = { ...style }
-
-  if (!hideHeaderBar) {
-    Object.assign(tableStyles, {
-      borderRadius: 0,
-      borderLeft: 'none',
-      borderTop: 'none',
-      background: 'white',
-    })
-  }
-
-  const classNames = ['ui', 'table', 'collapsing', 'celled', 'ok-sortable-table']
+  const classNames = ['ui', 'table', 'basic', 'collapsing', 'celled', 'ok-sortable-table', 'single', 'line']
 
   if (striped) {
     classNames.push('striped')
   }
 
-  if (singleLine) {
-    classNames.push('single', 'line')
-  }
-
-  if (!hideHeaderBar) {
-    classNames.push('basic')
-  }
-
   if (firstColumnSticky) {
     classNames.push('first-column-sticky')
-  }
-
-  const content = () => {
-    return (
-      <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
-        <thead>{headers}</thead>
-        <tbody>
-          {sortedData.map(item => (
-            <DataItem item={item} key={`dataItem-${getKey(item)}`} />
-          ))}
-        </tbody>
-      </table>
-    )
   }
 
   const context = {
@@ -162,30 +109,77 @@ export const SortableTable = ({
     columnDepth,
   }
 
-  if (hideHeaderBar) {
-    return <SortableTableContext.Provider value={context}>{content()}</SortableTableContext.Provider>
-  }
-
   return (
     <>
       <ExportModal
-        columns={[...onlyExportColumns, ...columns]}
-        data={useFilteredDataOnExport ? sortedData : data}
+        columns={columns}
+        data={sortedData}
         featureName={featureName}
         onClose={() => setExportModalOpen(false)}
         open={exportModalOpen}
       />
-      <SortableTableContext.Provider value={context}>
-        <FigureContainer style={figureStyles}>
-          <FigureContainer.Header actions={actions} onClickExport={() => setExportModalOpen(true)}>
-            <Icon name="table" style={{ color: '#c2c2c2', marginRight: '0.5em', position: 'relative', top: '1px' }} />{' '}
-            {title}
-          </FigureContainer.Header>
-          <FigureContainer.Content style={{ backgroundColor: '#e8e8e91c', maxHeight, overflow: 'auto', padding: 0 }}>
-            {content()}
-          </FigureContainer.Content>
-        </FigureContainer>
-      </SortableTableContext.Provider>
+      <FigureContainer isFullscreen={isFullscreen}>
+        <Card fluid style={{ height: '100%' }}>
+          <Card.Content
+            style={{ alignItems: 'center', display: 'flex', flexGrow: 0, height: '3.25em', padding: '1em' }}
+          >
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>
+              <Icon name="table" style={{ color: '#c2c2c2', marginRight: '0.5em' }} />
+              {title}
+            </div>
+            <div style={{ flexGrow: 1 }} />
+            <Button
+              onClick={() => setExportModalOpen(true)}
+              size="tiny"
+              style={{ marginRight: '1em', padding: '0.75em 1em' }}
+            >
+              <Icon name="save" />
+              Export to Excel
+            </Button>
+            <Popup
+              on="hover"
+              position="left center"
+              trigger={
+                <Icon
+                  name={isFullscreen ? 'compress' : 'expand'}
+                  onClick={() => setFullscreen(!isFullscreen)}
+                  style={{ cursor: 'pointer', height: 'auto' }}
+                />
+              }
+            >
+              Toggle fullscreen
+            </Popup>
+          </Card.Content>
+          <Card.Content
+            style={{
+              backgroundColor: '#e8e8e91c',
+              padding: 0,
+              overflow: 'auto',
+              height: '100%',
+            }}
+          >
+            <SortableTableContext.Provider value={context}>
+              <table
+                className={classNames.join(' ')}
+                style={{
+                  position: 'relative',
+                  borderRadius: 0,
+                  borderLeft: 'none',
+                  borderTop: 'none',
+                  background: 'white',
+                }}
+              >
+                <thead>{headers}</thead>
+                <tbody>
+                  {sortedData.map(item => (
+                    <DataItem item={item} key={`dataItem-${getKey(item)}`} />
+                  ))}
+                </tbody>
+              </table>
+            </SortableTableContext.Provider>
+          </Card.Content>
+        </Card>
+      </FigureContainer>
     </>
   )
 }
