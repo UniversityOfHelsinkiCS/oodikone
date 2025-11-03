@@ -94,11 +94,13 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
       <div className="colorized-courses-table">
         {dividerText ? <Divider sx={{ marginTop: '3em' }}>{dividerText}</Divider> : null}
         {infoBox}
-        <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
-          {displayedPanes.map(({ label }) => (
-            <Tab key={label} label={label} />
-          ))}
-        </Tabs>
+        {displayedPanes.length > 1 ? (
+          <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+            {displayedPanes.map(({ label }) => (
+              <Tab key={label} label={label} />
+            ))}
+          </Tabs>
+        ) : null}
         <Paper variant="outlined">{displayedPanes.at(tab)?.render() ?? null}</Paper>
       </div>
     </ColorizedCoursesTableContext.Provider>
