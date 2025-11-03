@@ -17,6 +17,7 @@ import { validateInputLength } from '@/common'
 import { Link } from '@/components/material/Link'
 import { StyledTable } from '@/components/material/StyledTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
+import { splitByEmptySpace } from '@oodikone/shared/util'
 import './teacherSearch.css'
 
 export const TeacherSearchTab = () => {
@@ -24,17 +25,14 @@ export const TeacherSearchTab = () => {
   const [query, setQuery] = useState('')
 
   const trimmedQuery = query.trim()
-  const stringSearchTermIsInvalid = !validateInputLength(trimmedQuery, 4)
-  const numericSearchTermIsInvalid = !Number.isNaN(Number(trimmedQuery)) && !validateInputLength(trimmedQuery, 6)
+  const searchTermIsInvalid =
+    !validateInputLength(trimmedQuery, 4) && !splitByEmptySpace(trimmedQuery).find(searchTerm => searchTerm.length >= 4)
 
   const {
     data: teachers = [],
     isLoading,
     isUninitialized,
-  } = useFindTeachersQuery(
-    { searchString: trimmedQuery },
-    { skip: stringSearchTermIsInvalid || numericSearchTermIsInvalid }
-  )
+  } = useFindTeachersQuery({ searchString: trimmedQuery }, { skip: searchTermIsInvalid })
 
   const debouncedSetQuery = useCallback(
     debounce(value => {

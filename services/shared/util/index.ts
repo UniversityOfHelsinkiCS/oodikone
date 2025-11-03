@@ -71,3 +71,5 @@ export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): 
 export const mapValues = <T extends object, K extends keyof T, R>(input: T, f: (value: [K, T[K]]) => [K, R]) => {
   return Object.fromEntries(Object.entries(input).map(entry => f(entry as [K, T[K]])))
 }
+
+export const splitByEmptySpace = (str: string) => str.split(/\s+/g)

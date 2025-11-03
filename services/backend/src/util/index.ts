@@ -59,8 +59,6 @@ export const keysOf = <T extends object>(obj: T) => {
   return Object.keys(obj) as Array<keyof T>
 }
 
-export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
-
 export const validateParamLength = (param: any, minLength: number) => {
   return typeof param === 'string' && param.trim().length >= minLength
 }

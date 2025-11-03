@@ -2,32 +2,24 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { Credit } from '@oodikone/shared/models'
 import { Name, CreditTypeCode } from '@oodikone/shared/types'
+import { splitByEmptySpace } from '@oodikone/shared/util'
 import { dbConnections } from '../../database/connection'
 import { CreditModel, CourseModel, SemesterModel, TeacherModel } from '../../models'
-import { splitByEmptySpace } from '../../util'
 import { isRegularCourse, TeacherStats } from './helpers'
-
-const likefy = (term: string) => `%${term}%`
-
-const nameLike = (terms: string[]) => ({
-  name: {
-    [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) })),
-  },
-})
-
-const matchesId = (searchTerm: string) => ({ id: { [Op.eq]: searchTerm } })
 
 export const getTeachersBySearchTerm = async (searchTerm: string) => {
   if (!searchTerm) {
     return []
   }
-  const searchTerms = splitByEmptySpace(searchTerm)
+  const searchTerms = splitByEmptySpace(searchTerm).filter(term => !!term.length)
   return TeacherModel.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt'],
     },
     where: {
-      [Op.or]: [nameLike(searchTerms), matchesId(searchTerm)],
+      name: {
+        [Op.and]: searchTerms.map(term => ({ [Op.iLike]: `%${term}%` })),
+      },
     },
   })
 }

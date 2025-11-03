@@ -1,7 +1,8 @@
 import { Request, Response, Router } from 'express'
 
+import { splitByEmptySpace } from '@oodikone/shared/util'
 import { bySearchTermAndStudentNumbers, withStudentNumber } from '../services/students'
-import { hasFullAccessToStudentData, splitByEmptySpace } from '../util'
+import { hasFullAccessToStudentData } from '../util'
 import { ApplicationError } from '../util/customErrors'
 
 const router = Router()

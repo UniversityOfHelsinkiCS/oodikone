@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express'
 
-import { mapToProviders } from '@oodikone/shared/util'
+import { mapToProviders, splitByEmptySpace } from '@oodikone/shared/util'
 import { serviceProvider } from '../config'
 import * as auth from '../middleware/auth'
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
 import { CategoryID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } from '../services/teachers/top'
-import { getFullStudyProgrammeRights, splitByEmptySpace } from '../util'
+import { getFullStudyProgrammeRights, validateParamLength } from '../util'
 
 const router = Router()
 
@@ -28,9 +28,10 @@ router.get('/', fullAccessAuth(), async (req: GetTeachersRequest, res: Response)
   }
 
   const trimmedSearchTerm = searchTerm.trim()
-  const stringSearchTermIsInvalid = !splitByEmptySpace(trimmedSearchTerm).find(searchTerm => searchTerm.length >= 4)
-  const numericSearchTermIsInvalid = !Number.isNaN(Number(trimmedSearchTerm)) && trimmedSearchTerm.length < 6
-  if (stringSearchTermIsInvalid || numericSearchTermIsInvalid) {
+  const searchTermIsInvalid =
+    !validateParamLength(trimmedSearchTerm, 4) &&
+    !splitByEmptySpace(trimmedSearchTerm).find(searchTerm => searchTerm.length >= 4)
+  if (searchTermIsInvalid) {
     return res.status(400).json({ error: 'Invalid search term' })
   }
 
