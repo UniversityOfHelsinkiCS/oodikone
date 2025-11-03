@@ -311,8 +311,6 @@ export const getCreditCategories = (
 
 export const validateInputLength = (input: string, minLength: number) => input?.trim().length >= minLength
 
-export const splitByEmptySpace = (str: string) => str.replace(/\s\s+/g, ' ').split(' ')
-
 export const getCurrentSemester = (allSemesters: SemestersData['semesters']) => {
   if (!allSemesters) return null
   return Object.values(allSemesters).find(
