@@ -3,27 +3,37 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Paper from '@mui/material/Paper'
+
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { debounce } from 'lodash'
 import { useState, useCallback } from 'react'
 
-import { splitByEmptySpace, validateInputLength } from '@/common'
+import { validateInputLength } from '@/common'
 import { Link } from '@/components/material/Link'
-import { SortableTable } from '@/components/SortableTable'
+import { StyledTable } from '@/components/material/StyledTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
 import './teacherSearch.css'
 
 export const TeacherSearchTab = () => {
   const [searchString, setSearchString] = useState('')
   const [query, setQuery] = useState('')
+
+  const trimmedQuery = query.trim()
+  const stringSearchTermIsInvalid = !validateInputLength(trimmedQuery, 4)
+  const numericSearchTermIsInvalid = !Number.isNaN(Number(trimmedQuery)) && !validateInputLength(trimmedQuery, 6)
+
   const {
     data: teachers = [],
     isLoading,
     isUninitialized,
   } = useFindTeachersQuery(
-    { searchString: splitByEmptySpace(query.trim()).find(text => validateInputLength(text, 4)) },
-    { skip: !splitByEmptySpace(query.trim()).find(text => validateInputLength(text, 4)) }
+    { searchString: trimmedQuery },
+    { skip: stringSearchTermIsInvalid || numericSearchTermIsInvalid }
   )
 
   const debouncedSetQuery = useCallback(
@@ -38,19 +48,6 @@ export const TeacherSearchTab = () => {
     setSearchString(event.target.value)
   }
 
-  const columns = [
-    {
-      key: 'name',
-      title: 'Name',
-      getRowVal: s => s.name,
-      getRowContent: row => (
-        <Link target="_blank" to={`/teachers/${row.id}`}>
-          {row.name}
-        </Link>
-      ),
-    },
-  ]
-
   const getContent = () => {
     if (isUninitialized) return null
 
@@ -58,7 +55,26 @@ export const TeacherSearchTab = () => {
 
     if (!teachers.length) return <div>No teachers matched your search</div>
 
-    return <SortableTable columns={columns} data={teachers} defaultSort={['name', 'asc']} hideHeaderBar />
+    return (
+      <StyledTable>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {teachers.map(({ id, name }) => (
+            <TableRow key={id}>
+              <TableCell>
+                <Link target="_blank" to={`/teachers/${id}`}>
+                  {name}
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </StyledTable>
+    )
   }
 
   return (
@@ -78,7 +94,9 @@ export const TeacherSearchTab = () => {
           }}
           value={searchString}
         />
-        <Paper className="contentSegment">{getContent()}</Paper>
+        <Paper className="contentSegment" sx={{ maxWidth: 'sm' }}>
+          {getContent()}
+        </Paper>
       </Box>
     </>
   )
