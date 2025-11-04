@@ -221,16 +221,18 @@ export const CoursePopulation = () => {
       students={population?.students ?? []}
     >
       {(filteredStudents, filteredCourses) => (
-        <SegmentContainer>
-          <Typography className="segmentTitle" textAlign="center" variant="h4">
-            Population of course {header}
-          </Typography>
+        <>
+          <SegmentContainer>
+            <Typography className="segmentTitle" textAlign="center" variant="h4">
+              Population of course {header}
+            </Typography>
 
-          <Typography className="segmentTitle" textAlign="center" variant="h6">
-            {subHeader}
-          </Typography>
+            <Typography className="segmentTitle" textAlign="center" variant="h6">
+              {subHeader}
+            </Typography>
+          </SegmentContainer>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
-        </SegmentContainer>
+        </>
       )}
     </FilterView>
   )
