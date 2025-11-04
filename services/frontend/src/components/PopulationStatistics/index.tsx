@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -210,9 +209,9 @@ export const PopulationStatistics = () => {
       students={students}
     >
       {(filteredStudents, filteredCourses) => (
-        <Box sx={{ maxWidth: '80vw', flex: 1, pt: 2, mx: 'auto' }}>
-          <Stack sx={{ textAlign: 'center', alignItems: 'center' }}>
-            <PageLoading isLoading={isLoading} />
+        <>
+          <PageLoading isLoading={isLoading} />
+          <Stack textAlign="center">
             <Typography variant="h4">{title}</Typography>
             {!!studyTrack && (
               <Typography fontWeight={300} variant="h6">
@@ -222,8 +221,8 @@ export const PopulationStatistics = () => {
             <Typography fontWeight={300} variant="h6">
               Class size {students.length} students
             </Typography>
-            {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           </Stack>
+          {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           {isSuccess ? (
             <PopulationDetails
               filteredCourses={filteredCourses}
@@ -233,7 +232,7 @@ export const PopulationStatistics = () => {
               query={query}
             />
           ) : null}
-        </Box>
+        </>
       )}
     </FilterView>
   )

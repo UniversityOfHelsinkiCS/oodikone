@@ -6,7 +6,6 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid2'
-import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router'
@@ -70,78 +69,66 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
       students={population.students}
     >
       {(filteredStudents, filteredCourses) => (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            p: 2,
-            flex: 1,
-            mx: 'auto',
-            maxWidth: '82vw',
-          }}
-        >
-          <Stack spacing={2} textAlign="center">
-            <Grid alignItems="center" container spacing={2}>
-              <Grid size={2}>
-                <Button
-                  onClick={handleBack}
-                  startIcon={<KeyboardBackspaceIcon />}
-                  sx={{ gridColumn: '1' }}
-                  variant="outlined"
-                >
-                  Back to groups
-                </Button>
-              </Grid>
-              <Grid size={8}>
-                <Typography
-                  sx={{
-                    gridColumn: 2,
-                    justifySelf: 'center',
-                  }}
-                  variant="h4"
-                >
-                  Study guidance group: {getTextIn(group.name)}
-                </Typography>
-                <Box display="flex" gap={2} justifyContent="center" my="1rem">
-                  {!groupProgramme && !groupYear && (
-                    <Typography fontStyle="italic">
-                      No associated degree programme or starting year set. Some features are disabled.
-                    </Typography>
-                  )}
-                  {!!groupProgramme && (
-                    <Tooltip arrow title="Associated degree programme set for the study guidance group">
-                      <Chip
-                        color="primary"
-                        icon={<LabelIcon fontSize="small" />}
-                        label={studyProgrammes.find(programme => programme.value === groupProgramme)?.text}
-                        sx={{ p: 1 }}
-                        variant="filled"
-                      />
-                    </Tooltip>
-                  )}
-                  {!!groupYear && (
-                    <Tooltip arrow title="Associated starting academic year set for the study guidance group">
-                      <Chip
-                        color="primary"
-                        icon={<CalendarMonthIcon fontSize="small" />}
-                        label={startYearToAcademicYear(groupYear)}
-                        sx={{ p: 1 }}
-                        variant="filled"
-                      />
-                    </Tooltip>
-                  )}
-                </Box>
-              </Grid>
-              <Grid size={2} /> {/* for alignment */}
+        <>
+          <Grid alignItems="center" container mb={2} spacing={2} textAlign="center">
+            <Grid size={2}>
+              <Button
+                onClick={handleBack}
+                startIcon={<KeyboardBackspaceIcon />}
+                sx={{ gridColumn: '1' }}
+                variant="outlined"
+              >
+                Back to groups
+              </Button>
             </Grid>
-          </Stack>
+            <Grid size={8}>
+              <Typography
+                sx={{
+                  gridColumn: 2,
+                  justifySelf: 'center',
+                }}
+                variant="h4"
+              >
+                Study guidance group: {getTextIn(group.name)}
+              </Typography>
+              <Box display="flex" gap={2} justifyContent="center" my="1rem">
+                {!groupProgramme && !groupYear && (
+                  <Typography fontStyle="italic">
+                    No associated degree programme or starting year set. Some features are disabled.
+                  </Typography>
+                )}
+                {!!groupProgramme && (
+                  <Tooltip arrow title="Associated degree programme set for the study guidance group">
+                    <Chip
+                      color="primary"
+                      icon={<LabelIcon fontSize="small" />}
+                      label={studyProgrammes.find(programme => programme.value === groupProgramme)?.text}
+                      sx={{ p: 1 }}
+                      variant="filled"
+                    />
+                  </Tooltip>
+                )}
+                {!!groupYear && (
+                  <Tooltip arrow title="Associated starting academic year set for the study guidance group">
+                    <Chip
+                      color="primary"
+                      icon={<CalendarMonthIcon fontSize="small" />}
+                      label={startYearToAcademicYear(groupYear)}
+                      sx={{ p: 1 }}
+                      variant="filled"
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+            </Grid>
+            <Grid size={2} /> {/* for alignment */}
+          </Grid>
           <SingleStudyGuidanceGroupPanels
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             group={group}
           />
-        </Box>
+        </>
       )}
     </FilterView>
   )

@@ -72,11 +72,13 @@ export const FilterView: FC<{
 
   return (
     <FilterViewContext.Provider value={ctxState}>
-      <Stack direction="row" sx={{ alignContent: 'center' }}>
+      <Stack direction="row" id="filterview-stack">
         {displayTray ? (
           <FilterTray allStudents={students} filters={filters} numberOfFilteredStudents={filteredStudents.length} />
         ) : null}
-        {children(filteredStudents, filteredCourses)}
+        <Stack direction="column" sx={{ maxWidth: '80vw', flex: 1, p: 2, mx: 'auto' }}>
+          {children(filteredStudents, filteredCourses)}
+        </Stack>
       </Stack>
     </FilterViewContext.Provider>
   )

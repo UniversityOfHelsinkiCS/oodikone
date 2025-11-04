@@ -181,7 +181,7 @@ export const PopulationDetails = ({
   ].filter(panel => !!panel)
 
   return (
-    <Box sx={{ mx: 2 }}>
+    <Box>
       <Paper sx={{ p: 2, my: 2 }} variant="outlined">
         <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
           <FormGroup sx={{ gap: 1 }}>
