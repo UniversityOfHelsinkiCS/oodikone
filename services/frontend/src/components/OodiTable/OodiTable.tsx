@@ -17,6 +17,7 @@ export const OodiTableContainer = <OTData,>({
   isExportView?: true
 }) => {
   const verticalHeaders = table.getState().useVerticalHeaders ?? []
+  const zebraStriped = table.getState().useZebrastripes
 
   return (
     <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
@@ -48,12 +49,15 @@ export const OodiTableContainer = <OTData,>({
           </TableHead>
           <TableBody
             sx={{
-              '& tr:nth-of-type(odd) > td': {
-                backgroundColor: 'grey.100',
-              },
-              '& tr:nth-of-type(even) > td': {
+              '& tr > td': {
                 backgroundColor: 'white',
               },
+
+              '& tr:nth-of-type(odd) > td': zebraStriped
+                ? {
+                    backgroundColor: 'grey.100',
+                  }
+                : {},
             }}
           >
             {table.getAggregationRowModel().rows.map(row => OodiTableDataRow(row, true))}
