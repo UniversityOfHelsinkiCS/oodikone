@@ -2,7 +2,7 @@ import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { useState } from 'react'
 
-import { AggregationRowFeature, VerticalHeaderFeature } from './features'
+import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from './features'
 import { OodiTableContainer } from './OodiTable'
 
 /**
@@ -38,7 +38,7 @@ export const OodiTable = <TData,>({
   }
 
   const table = useReactTable<TData>({
-    _features: [VerticalHeaderFeature, AggregationRowFeature],
+    _features: [VerticalHeaderFeature, AggregationRowFeature, ZebrastripesFeature],
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
