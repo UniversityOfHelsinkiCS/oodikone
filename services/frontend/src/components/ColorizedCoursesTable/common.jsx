@@ -86,21 +86,19 @@ export const calculateNewTotalColumnValues = (data, selectedSemesters) =>
   })
 
 export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal, allTotal) => {
-  if (colorMode === 'none' || allTotal === 0) return {}
-  if (!stats) return {}
+  if (!stats || colorMode === 'none') return {}
+
   const value = stats[numberMode]
   const totalValue = colorMode === 'course' ? courseTotal : allTotal
-  if (value === 0) return {}
+  if (totalValue === 0 || value === 0) return {}
 
-  const relativeValue = (() => {
-    if (totalValue === 0) return 0
-    if (colorMode === 'course') return value / ((totalValue / columnAmount) * 2)
-    return value / (totalValue / columnAmount / 8)
-  })()
-  const divisor = colorMode === 'course' ? 6 : 2
-  const color = ['completions', 'enrollments'].includes(numberMode) ? '0,170,0' : '220,60,60'
-  const modifier = ['completions', 'enrollments'].includes(numberMode) ? 0 : 0.3
+  const color = ['completions', 'enrollments'].includes(numberMode) ? '0,170,0' : '255,70,70'
+
+  const relativeAlphaValue = colorMode === 'course'
+    ? (value * columnAmount) / (12 * totalValue)
+    : (4 * value * columnAmount) / totalValue
+
   return {
-    backgroundColor: `rgba(${color},${relativeValue / divisor + modifier})`,
+    backgroundColor: `rgba(${color},${Math.min(1.0, relativeAlphaValue)}) !important`,
   }
 }
