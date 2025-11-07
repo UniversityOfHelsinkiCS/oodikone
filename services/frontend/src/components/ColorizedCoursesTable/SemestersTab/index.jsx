@@ -12,46 +12,59 @@ import {
 } from '@/components/ColorizedCoursesTable/selectorComponents'
 import '@/components/ColorizedCoursesTable/index.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { SortableTable, row } from '@/components/SortableTable'
-import { getColumns } from './logic'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useColumns } from './logic'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
-  const { setSemesterFilter, semesterFilter, semesters, numberMode, colorMode, selectedSemesters, data } =
-    useColorizedCoursesTableContext()
+  const { semesters, numberMode, colorMode, selectedSemesters, data } = useColorizedCoursesTableContext()
 
   const totalRow = useMemo(() => {
-    if (!data) return null
-    const totals = calculateTotals(data.tableData, selectedSemesters)
-    return row(totals, { ignoreSorting: true, ignoreFilters: true })
+    if (!data) return {}
+    return calculateTotals(data.tableData, selectedSemesters)
   }, [data, selectedSemesters])
 
-  const updatedTableData = useMemo(() => {
-    if (!data) return null
-    return calculateNewTotalColumnValues(data.tableData, selectedSemesters.map(String))
+  const [tableData, excelData] = useMemo(() => {
+    if (!data) return []
+    const tableData = calculateNewTotalColumnValues(data.tableData, selectedSemesters.map(String))
+    const excelData = tableData.map(({ code, bySemesters }) => ({
+      Course: code,
+      ...Object.fromEntries(
+        semesters
+          .filter(({ semestercode }) => selectedSemesters.includes(semestercode))
+          .map(({ name, semestercode }) => [`${getTextIn(name)}`, bySemesters[semestercode]?.[numberMode] ?? 0])
+      ),
+      Total: bySemesters[numberMode],
+    }))
+
+    return [tableData, excelData]
   }, [data, selectedSemesters])
 
-  const tableData = [totalRow, ...updatedTableData]
+  const cols = useColumns(
+    getTextIn,
+    semesters.filter(({ semestercode }) => selectedSemesters.includes(semestercode)),
+    numberMode,
+    colorMode,
+    totalRow.bySemesters[numberMode]
+  )
+
+  const tableOptions = {
+    initialState: { columnPinning: { left: ['code'] } },
+    state: {
+      useZebrastripes: colorMode === 'none',
+    },
+  }
 
   return (
     <div>
       <div className="options-container">
-        <SemesterRangeSelector semesterFilter={semesterFilter} setSemesterFilter={setSemesterFilter} />
+        <SemesterRangeSelector />
         <NumberModeSelector />
         <ColorModeSelector />
       </div>
-      <SortableTable
-        columns={getColumns(
-          getTextIn,
-          semesters.filter(({ semestercode }) => selectedSemesters.includes(semestercode)),
-          numberMode,
-          colorMode,
-          totalRow.bySemesters[numberMode]
-        )}
-        data={tableData}
-        firstColumnSticky
-        striped={colorMode === 'none'}
-      />
+      <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />
+      <OodiTable columns={cols} data={tableData} options={tableOptions} />
     </div>
   )
 }

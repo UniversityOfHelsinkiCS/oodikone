@@ -18,13 +18,6 @@ export const getCourseCodeColumn = getTextIn => ({
   ),
 })
 
-export const getCourseNameColumn = getTextIn => ({
-  key: 'course-name',
-  title: 'Name',
-  getRowVal: row => getTextIn(row.name),
-  displayColumn: false,
-})
-
 export const calculateTotals = (courses, semesters, faculties) => {
   const facultiesTotal = { ...emptyFields }
   const totalRow = { ...emptyFields, cellStats: {} }
@@ -94,9 +87,8 @@ export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal
 
   const color = ['completions', 'enrollments'].includes(numberMode) ? '0,170,0' : '255,70,70'
 
-  const relativeAlphaValue = colorMode === 'course'
-    ? (value * columnAmount) / (12 * totalValue)
-    : (4 * value * columnAmount) / totalValue
+  const relativeAlphaValue =
+    colorMode === 'course' ? (value * columnAmount) / (12 * totalValue) : (4 * value * columnAmount) / totalValue
 
   return {
     backgroundColor: `rgba(${color},${Math.min(1.0, relativeAlphaValue)}) !important`,
