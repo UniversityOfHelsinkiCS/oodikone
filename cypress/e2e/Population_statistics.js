@@ -252,8 +252,8 @@ describe('Population statistics tests', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
         cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
-        cy.get('[data-cy=toggle-group-module-MAT110]').click()
-        cy.contains('td', 'MAT11001').siblings().find('[data-testId="NorthEastIcon"]').click()
+        cy.cs('toggle-group-module-MAT110').click()
+        cy.contains('td', 'MAT11001').siblings().find('[data-testid="NorthEastIcon"]').click()
         cy.wait('@coursePage')
         cy.url().should('include', '/coursestatistics')
         cy.contains('MAT11001 • Johdatus yliopistomatematiikkaan')
@@ -319,7 +319,7 @@ describe('Population statistics tests', () => {
       })
 
       it("'General tab' is usable", () => {
-        cy.cs('student-table-tabs').within(() => {
+        cy.cs('ooditable-general').within(() => {
           cy.contains('522142')
           cy.contains('Tilastotiede')
           cy.contains('Matematiikka')
@@ -330,18 +330,19 @@ describe('Population statistics tests', () => {
         })
       })
 
-      // FIXME: Flaky
       it("'Courses tab' is usable", () => {
         cy.cs('student-table-tabs').within(() => {
           cy.contains('Courses').click()
+        })
+        cy.cs('ooditable-courses').within(() => {
           cy.contains('MAT12001')
           cy.contains('MAT21001')
         })
       })
 
       it("'Modules tab' Displays correct modules based on the selected programme", () => {
-        cy.cs('student-table-tabs').within(() => {
-          cy.contains('Modules').click()
+        cy.cs('student-table-tabs').contains('Modules').click()
+        cy.cs('ooditable-modules').within(() => {
           cy.contains('MAT011')
           cy.contains('MAT110')
         })
@@ -349,18 +350,17 @@ describe('Population statistics tests', () => {
         cy.cs('curriculum-picker').click()
         cy.contains('2023–2026').click()
         cy.contains('Courses of class').click()
-        cy.cs('student-table-tabs').within(() => {
+        cy.cs('ooditable-modules').within(() => {
           cy.contains('MAT011').should('not.exist')
           cy.contains('MAT110')
         })
       })
 
-      it.skip("Empty 'tags' tab has a link to the page where tags can be created", () => {
-        // TODO: This fails in the pipeline, but works locally. Investigate.
+      it("Empty 'tags' tab has a link to the page where tags can be created", () => {
         cy.cs('student-table-tabs').within(() => {
           cy.contains('Tags').click()
-          cy.contains('No tags defined. You can define them here.').find('a').click()
         })
+        cy.contains('No tags defined. You can define them here.').find('a').click()
         cy.url().should('include', '/study-programme/KH50_001?tab=4')
         cy.contains('Matemaattisten tieteiden kandiohjelma')
         cy.contains('Create new tag')
@@ -383,17 +383,15 @@ describe('Population statistics tests', () => {
       cy.contains(nonExisting).should('not.exist')
       cy.contains('button', 'Check student numbers').click()
       cy.contains('Check for student numbers')
-      cy.get('textarea').type(existing)
-      cy.get('textarea').type('{enter}')
-      cy.get('textarea').type(nonExisting)
+      cy.cs('check-student-numbers').click().type(`${existing}{enter}${nonExisting}`)
       cy.contains('button', 'Check students').click()
-      cy.contains('#checkstudentsresults', 'Results').within(() => {
-        cy.contains('Student numbers in list and in Sisu').click()
-        cy.contains('#found', existing)
-        cy.contains('Student numbers in list but not in Sisu').click()
-        cy.contains('#notfound', nonExisting)
-        cy.contains('Student numbers in Sisu but not in list').click()
-        cy.contains('#notsearched', '457144')
+      cy.get('#checkstudentsresults').within(() => {
+        cy.cs('found-title').click()
+        cy.cs('found-data').contains(existing)
+        cy.cs('not-found-title').click()
+        cy.cs('not-found-data').contains(nonExisting)
+        cy.cs('not-searched-title').click()
+        cy.cs('not-searched-data').contains('457144')
       })
       cy.contains('button', 'Close').click()
       cy.contains('Student numbers in list and in Sisu').should('not.exist')

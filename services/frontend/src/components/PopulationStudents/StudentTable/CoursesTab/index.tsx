@@ -268,7 +268,7 @@ export const CoursesTabContainer = ({
   return (
     <>
       <OodiTableExcelExport data={formattedStudents} exportColumnKeys={keysForExport} />
-      <OodiTable columns={columns} data={formattedStudents} options={tableOptions} />
+      <OodiTable columns={columns} cy="ooditable-courses" data={formattedStudents} options={tableOptions} />
     </>
   )
 }

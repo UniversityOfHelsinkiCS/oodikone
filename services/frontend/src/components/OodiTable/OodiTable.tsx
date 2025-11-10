@@ -12,15 +12,17 @@ import { OodiTablePagination } from './components/Pagination'
 export const OodiTableContainer = <OTData,>({
   table,
   isExportView,
+  cy,
 }: {
   table: TableType<OTData>
   isExportView?: true
+  cy?: string
 }) => {
   const verticalHeaders = table.getState().useVerticalHeaders ?? []
   const zebraStriped = table.getState().useZebrastripes
 
   return (
-    <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
+    <Paper data-cy={cy} sx={{ p: 2, borderRadius: 0 }} variant="outlined">
       <TableContainer
         sx={{
           maxHeight: '75vh',

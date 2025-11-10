@@ -56,7 +56,7 @@ export const CheckStudentList = ({ students }) => {
         ),
     },
     {
-      key: 'not found',
+      key: 'not-found',
       title: 'Student numbers in list but not in Sisu',
       content:
         notInSisuRows.length === 0 ? (
@@ -70,7 +70,7 @@ export const CheckStudentList = ({ students }) => {
         ),
     },
     {
-      key: 'not searched',
+      key: 'not-searched',
       title: 'Student numbers in Sisu but not in list',
       content:
         notInListRows.length === 0 ? (
@@ -97,6 +97,7 @@ export const CheckStudentList = ({ students }) => {
             <Stack>
               <em>Insert student numbers you wish to check here</em>
               <TextField
+                data-cy="check-student-numbers"
                 minRows={2}
                 multiline
                 onChange={element => setInput(element.target.value)}
@@ -121,7 +122,6 @@ export const CheckStudentList = ({ students }) => {
           <Paper sx={{ padding: 2 }}>
             <div id="checkstudentsresults">
               <Typography content="Results" variant="h6" />
-              {/*<Accordion exclusive={false} fluid panels={panels} styled />*/}
               {panels.map(({ key, title, content }) => (
                 <Accordion
                   disableGutters
@@ -139,14 +139,14 @@ export const CheckStudentList = ({ students }) => {
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography
                       component="span"
-                      data-cy={title}
+                      data-cy={`${key}-title`}
                       sx={{ fontSize: 'large', fontWeight: 'bold' }}
                       variant="h6"
                     >
                       {title}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails data-cy={`${title}-data`}>{content}</AccordionDetails>
+                  <AccordionDetails data-cy={`${key}-data`}>{content}</AccordionDetails>
                 </Accordion>
               ))}
             </div>
