@@ -3,9 +3,11 @@ import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
 import { filterInternalReleases, isDefaultServiceProvider } from '@/common'
+import { StyledMessage } from '@/components/common/StyledMessage'
 import { Link } from '@/components/material/Link'
 import { PageTitle } from '@/components/material/PageTitle'
 import { useTitle } from '@/hooks/title'
@@ -76,6 +78,12 @@ export const FrontPage = () => {
   return (
     <Container maxWidth="lg">
       <PageTitle subtitle="Exploratory Research on Study Data" title="Oodikone" />
+      <StyledMessage sx={{ mb: 2 }}>
+        <Typography fontWeight={550}>Service break 18th november, between 7.00 - 9.00</Typography>
+        <Typography>
+          Network maintenance performed during the period might cause oodikone to become temporarily unavailable
+        </Typography>
+      </StyledMessage>
       <Stack direction={{ sm: 'column', md: 'row' }} divider={<Divider flexItem orientation="vertical" />} gap={3}>
         <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
           <SectionTitle title="Features" />
