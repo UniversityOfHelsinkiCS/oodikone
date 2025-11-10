@@ -7,4 +7,6 @@ export type CustomPopulationSearch = {
   userId: string
   name: string
   students: string[]
+  createdAt?: string // Both are dates
+  updatedAt?: string
 }

@@ -21,46 +21,44 @@ import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
 import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
 import { TagsTab } from './StudentTable/TagsTab'
 
-type PopulationDetails = {
-  variant: 'population'
+type CommonProps = {
+  filteredStudents: FormattedStudent[]
+  generalTabColumnFunction: () => [string[], string[]]
+  generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
+}
 
+type PopulationDetails = CommonProps & {
+  variant: 'population'
   programme: string
   combinedProgramme?: string
-
   curriculum: ExtendedCurriculumDetails | null
-
   filteredCourses: FormattedCourse[]
-  filteredStudents: FormattedStudent[]
 }
 
-type CoursePopulation = {
+type CoursePopulation = CommonProps & {
   variant: 'coursePopulation'
-
-  filteredStudents: FormattedStudent[]
 }
 
-type StudyGuidanceGroup = {
+type StudyGuidanceGroup = CommonProps & {
   variant: 'studyGuidanceGroupPopulation'
-
   curriculum: ExtendedCurriculumDetails | null
-
   studyGuidanceGroup: any
   year: string
-
   filteredCourses: FormattedCourse[]
-  filteredStudents: FormattedStudent[]
 }
 
-type CustomPopulation = {
+type CustomPopulation = CommonProps & {
   variant: 'customPopulation'
-
-  filteredStudents: FormattedStudent[]
   dataExport: JSX.Element
 }
 
 type PopulationStudentsProps = (PopulationDetails | CoursePopulation | StudyGuidanceGroup | CustomPopulation) &
-  Record<string, undefined>
+  Record<string, any>
 
+/**
+ * TODO: FIXME: do not lose typing
+ * Ensure the props at call site are what expected, as the types are lost here and need to be asserted
+ */
 export const PopulationStudents = ({
   variant,
   programme,
@@ -71,13 +69,9 @@ export const PopulationStudents = ({
   dataExport,
   studyGuidanceGroup,
   year,
-
   generalTabColumnFunction,
   generalTabFormattingFunction,
-}: PopulationStudentsProps & {
-  generalTabColumnFunction: () => [string[], string[]]
-  generalTabFormattingFunction: () => Partial<FormattedStudentData>[]
-}) => {
+}: PopulationStudentsProps) => {
   const [tab, setTab] = useState(0)
   const { isAdmin } = useGetAuthorizedUserQuery()
 
@@ -106,7 +100,7 @@ export const PopulationStudents = ({
     Courses: () => (
       <CoursesTab
         courses={filteredCourses ?? []}
-        curriculum={curriculum!} // TODO: add guard for missing curriculum (it should never be missing)
+        curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
         includeSubstitutions={includeSubstitutions}
         students={filteredStudents}
       />
