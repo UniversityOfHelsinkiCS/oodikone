@@ -94,6 +94,6 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
         })
       ),
     ],
-    [numberMode, colorMode, allTotal]
+    [numberMode, colorMode, allTotal, semesters.length]
   )
 }
