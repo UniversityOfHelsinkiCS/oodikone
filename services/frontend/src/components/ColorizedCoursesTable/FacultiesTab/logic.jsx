@@ -114,6 +114,12 @@ export const useColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
                 ),
               0
             ),
+        sortingFn: (rowA, rowB) => {
+          const a = rowA.original.bySemesters.facultiesTotal[numberMode] ?? 0
+          const b = rowB.original.bySemesters.facultiesTotal[numberMode] ?? 0
+
+          return a - b
+        },
       }),
     ],
     [numberMode, colorMode, allTotal, facultyMap === undefined]
