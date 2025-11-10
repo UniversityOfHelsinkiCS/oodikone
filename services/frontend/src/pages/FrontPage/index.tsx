@@ -81,7 +81,7 @@ export const FrontPage = () => {
       <StyledMessage sx={{ mb: 2 }}>
         <Typography fontWeight={550}>Service break 18th november, between 7.00 - 9.00</Typography>
         <Typography>
-          Network maintenance performed during the period might cause oodikone to become temporarily unavailable
+          Network maintenance performed during the period might cause Oodikone to become temporarily unavailable
         </Typography>
       </StyledMessage>
       <Stack direction={{ sm: 'column', md: 'row' }} divider={<Divider flexItem orientation="vertical" />} gap={3}>
