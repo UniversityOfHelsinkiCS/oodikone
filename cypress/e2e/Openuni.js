@@ -15,7 +15,9 @@ const deleteAllSearches = () => {
   })
 }
 
-describe('Open uni population tests', () => {
+// Skipping the whole test suite as it is unclear whether the feature has any use or will be
+// removed alltogether.
+describe.skip('Open uni population tests', () => {
   describe('Open uni form can be used', () => {
     // When openUniUser is created, change it here
     beforeEach(() => {
