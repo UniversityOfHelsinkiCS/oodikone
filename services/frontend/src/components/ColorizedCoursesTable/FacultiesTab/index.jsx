@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash'
 import { useMemo } from 'react'
 
 import {
@@ -13,9 +12,10 @@ import {
   SemesterRangeSelector,
 } from '@/components/ColorizedCoursesTable/selectorComponents'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { SortableTable, row } from '@/components/SortableTable'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { getColumns } from './logic'
+import { useColumns } from './logic'
 
 export const FacultiesTab = () => {
   const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data } =
@@ -34,12 +34,13 @@ export const FacultiesTab = () => {
   )
 
   const totalRow = useMemo(() => {
-    const totals = calculateTotals(data.tableData, selectedSemesters, data.faculties)
-    return row(totals, { ignoreFilters: true, ignoreSorting: true })
+    if (!data) return {}
+    return calculateTotals(data.tableData, selectedSemesters, data.faculties)
   }, [data, facultyMap])
 
-  const tableData = useMemo(() => {
-    const tableData = [cloneDeep(totalRow), ...cloneDeep(data.tableData)]
+  const [tableData, excelData] = useMemo(() => {
+    if (!data) return []
+    const tableData = structuredClone(data.tableData)
     tableData.forEach(course => {
       const facultiesTotal = { ...emptyFields }
       selectedSemesters.forEach(semestercode => {
@@ -61,10 +62,37 @@ export const FacultiesTab = () => {
       course.bySemesters.facultiesTotal = facultiesTotal
       course.bySemesters = { ...course.bySemesters, facultiesTotal }
     })
-    return tableData
+
+    const excelData = tableData.map(({ code, bySemesters }) => ({
+      Course: code,
+      ...Object.fromEntries(
+        data.faculties
+          .toSorted()
+          .map(facultyCode => [facultyCode, bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0])
+      ),
+      Total: bySemesters.facultiesTotal[numberMode],
+    }))
+
+    return [tableData, excelData]
   }, [selectedSemesters, data])
 
+  const cols = useColumns(
+    getTextIn,
+    [...data.faculties].sort(),
+    numberMode,
+    colorMode,
+    facultyMap,
+    totalRow.bySemesters[numberMode]
+  )
+
   if (!facultyMap) return null
+
+  const tableOptions = {
+    initialState: { columnPinning: { left: ['code'] } },
+    state: {
+      useZebrastripes: colorMode === 'none',
+    },
+  }
 
   return (
     <div>
@@ -73,18 +101,8 @@ export const FacultiesTab = () => {
         <NumberModeSelector />
         <ColorModeSelector />
       </div>
-      <SortableTable
-        columns={getColumns(
-          getTextIn,
-          [...data.faculties].sort(),
-          numberMode,
-          colorMode,
-          facultyMap,
-          totalRow.bySemesters[numberMode]
-        )}
-        data={tableData}
-        striped={colorMode === 'none'}
-      />
+      <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ id }) => id)} />
+      <OodiTable columns={cols} data={tableData} options={tableOptions} />
     </div>
   )
 }

@@ -6,18 +6,6 @@ export const useColorizedCoursesTableContext = () => useContext(ColorizedCourses
 
 export const emptyFields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
 
-export const getCourseCodeColumn = getTextIn => ({
-  key: 'course-code',
-  title: 'Course',
-  getRowVal: row => row.code,
-  getRowContent: row => (
-    <div style={{ display: 'flex', flexDirection: 'column' }} title={getTextIn(row.name)}>
-      <b>{row.code}</b>
-      <i style={{ color: 'gray', fontWeight: 'normal' }}>{row.name ? getTextIn(row.name) : null}</i>
-    </div>
-  ),
-})
-
 export const calculateTotals = (courses, semesters, faculties) => {
   const facultiesTotal = { ...emptyFields }
   const totalRow = { ...emptyFields, cellStats: {} }
@@ -42,7 +30,7 @@ export const calculateTotals = (courses, semesters, faculties) => {
     })
     if (faculties) {
       faculties.forEach(faculty => {
-        totalRow[semester][faculty] = { ...emptyFields }
+        totalRow[semester][faculty] = structuredClone(emptyFields)
         courses.forEach(course => {
           const stats = course.bySemesters[semester]?.[faculty]
           if (!stats) return
