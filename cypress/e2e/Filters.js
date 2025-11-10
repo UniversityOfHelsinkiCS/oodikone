@@ -385,7 +385,6 @@ describe('Custom Population Statistics', { testIsolation: false }, () => {
 
   before(() => {
     cy.init('/custompopulation')
-    cy.cs('custom-pop-search-button').click()
     cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2 }) => {
       const students = [...studentNumbersForCSStudentsSet1, ...studentNumbersForCSStudentsSet2]
       defaultAmountOfStudents = students.length
