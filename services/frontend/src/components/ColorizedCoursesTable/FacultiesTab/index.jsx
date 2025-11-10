@@ -88,7 +88,7 @@ export const FacultiesTab = () => {
   if (!facultyMap) return null
 
   const tableOptions = {
-    initialState: { columnPinning: { left: ['code'] } },
+    initialState: { columnPinning: { left: ['Course'] } },
     state: {
       useZebrastripes: colorMode === 'none',
     },
