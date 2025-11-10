@@ -31,7 +31,7 @@ describe('Study guidance group tests', () => {
 
         const studyGuidanceGroupsTableContent = [
           ['MAT kandit 2020', 3, 'Matemaattisten tieteiden kandiohjelma', '2020 - 2021'],
-          ['Oma ohjausryhmä', 2, 'Add degree programme', 'Add year'],
+          ['Oma ohjausryhmä', 2, 'Add degree programme', 'Add starting year'],
         ]
 
         cy.checkTableStats(studyGuidanceGroupsTableContent, 'study-guidance-group-overview')
@@ -52,7 +52,7 @@ describe('Study guidance group tests', () => {
     it('has a working back button', () => {
       cy.init('/studyguidancegroups/sgg-cypress-1', 'onlystudyguidancegroups')
 
-      cy.get('button.ui.button').contains('Back').click()
+      cy.get('button').contains('Back to groups').click()
       cy.url().should('eq', `${Cypress.config().baseUrl}/studyguidancegroups`)
     })
 
@@ -100,9 +100,9 @@ describe('Study guidance group tests', () => {
       })
 
       it('shows the correct labels', () => {
-        cy.get('.ui.medium.header').contains('MAT kandit 2020')
-        cy.get('.ui.blue.tag.label:first').contains('Matemaattisten tieteiden kandiohjelma')
-        cy.get('.ui.blue.tag.label:last').contains('2020 - 2021')
+        cy.get('h4').contains('MAT kandit 2020')
+        cy.get('.MuiChip-root:first').contains('Matemaattisten tieteiden kandiohjelma')
+        cy.get('.MuiChip-root:last').contains('2020 - 2021')
       })
 
       it('shows the correct panes', () => {
@@ -116,13 +116,13 @@ describe('Study guidance group tests', () => {
       it("clicking the 'Show starting from associated year' button activates the 'Date of Course Credits' filter", () => {
         cy.get('[data-cy="CreditDate-filter-card"][data-active="false"]')
         cy.cs('Credit accumulation (for 3 students)').click()
-        cy.get('.ui.primary.button').contains('Show starting from associated year').click()
+        cy.get('button').contains('Show starting from associated year').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-active="true"]')
         cy.get('.date-picker')
           .eq(0)
           .within(() => cy.get('input').should('have.value', '01.08.2020'))
         cy.contains('Reset All Filters')
-        cy.get('.ui.primary.button').contains('Show all credits').click()
+        cy.get('button').contains('Show all credits').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-active="false"]')
       })
 
