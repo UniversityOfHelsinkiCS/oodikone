@@ -35,7 +35,7 @@ describe('Teachers page tests', () => {
     cy.cs('Search').click()
     cy.cs('teacher-search').type(teacher1.split(' ')[0])
     cy.get('table tbody tr').should('have.length', 4)
-    cy.get('table tbody tr').eq(2).contains('td', teacher1)
+    cy.get('table tbody tr').eq(3).contains('td', teacher1)
   })
 
   it('Can check teacher page', () => {
