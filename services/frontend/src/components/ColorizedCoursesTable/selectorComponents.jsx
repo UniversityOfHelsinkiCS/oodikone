@@ -95,7 +95,7 @@ const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
         value={currentValue.semestercode}
       >
         {options.map(({ key, text, value }) => (
-          <MenuItem key={key} value={value}>
+          <MenuItem data-cy={`select-opt-${text}`} key={key} value={value}>
             {text}
           </MenuItem>
         ))}

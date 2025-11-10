@@ -102,7 +102,7 @@ export const FacultiesTab = () => {
         <ColorModeSelector />
       </div>
       <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ id }) => id)} />
-      <OodiTable columns={cols} data={tableData} options={tableOptions} />
+      <OodiTable columns={cols} cy="ooditable-faculties" data={tableData} options={tableOptions} />
     </div>
   )
 }
