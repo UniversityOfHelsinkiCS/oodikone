@@ -17,32 +17,32 @@ const openSearch = () => {
 }
 
 const selectSavedCourselist = name => {
-  cy.get('[data-cy=history-search]').click()
-  cy.get('[data-cy=history-search]').type(name)
-  cy.get('[data-cy=history-search]').type('{downarrow}')
-  cy.get('[data-cy=history-search]').type('{enter}')
+  cy.cs('history-search').click()
+  cy.cs('history-search').type(name)
+  cy.cs('history-search').type('{downarrow}')
+  cy.cs('history-search').type('{enter}')
 }
 
 const createCourseList = (courseCodes, courseListName) => {
   openSearch()
   openCompletedCoursesModal()
-  cy.get('[data-cy=course-list-input]').type(courseCodes.join('\n'))
-  cy.get('[data-cy=search-name]').type(courseListName)
-  cy.get('[data-cy=save-courselist]').click()
+  cy.cs('course-list-input').type(courseCodes.join('\n'))
+  cy.cs('search-name').type(courseListName)
+  cy.cs('save-courselist').click()
 }
 
 const generateCourseListName = () => `TEST-course-list-${new Date().getTime()}`
 
 const deleteAllPreviousSearches = () => {
-  cy.get('[data-cy=history-search]').click()
+  cy.cs('history-search').click()
 
   cy.get('.MuiAutocomplete-popper li').then($options => {
     if ($options.length > 0) {
       cy.wrap($options).each(($option, index, $list) => {
         cy.wrap($option).click()
-        cy.get('[data-cy=delete-courselist]').click()
+        cy.cs('delete-courselist').click()
         if (index < $list.length - 1) {
-          cy.get('[data-cy=history-search]').click()
+          cy.cs('history-search').click()
         }
       })
     } else {
@@ -57,7 +57,7 @@ describe('When search modal is opened', () => {
     hasLanded()
     cy.url().should('include', '/completedcoursessearch')
     cy.contains('Search completed courses of students')
-    cy.get('[data-cy=open-completed-courses-modal-button]').click()
+    cy.cs('open-completed-courses-modal-button').click()
   })
 
   it('Modal opens correctly', () => {
@@ -74,8 +74,8 @@ describe('When search modal is opened', () => {
     cy.init('/completedcoursessearch?courseList=TKT10001&courseList=TKT10002&studentList=433237&studentList=457144')
     hasLanded()
     openCompletedCoursesModal()
-    cy.contains('[data-cy=student-no-input]', '433237, 457144')
-    cy.contains('[data-cy=course-list-input]', 'TKT10001, TKT10002')
+    cy.cs('student-no-input').contains('433237, 457144')
+    cy.cs('course-list-input').contains('TKT10001, TKT10002')
   })
 
   describe('When a search is executed with invalid input', () => {
@@ -83,16 +83,16 @@ describe('When search modal is opened', () => {
       cy.init('/completedcoursessearch')
       hasLanded()
       openCompletedCoursesModal()
-      cy.get('[data-cy=student-no-input]').type('1')
-      cy.get('[data-cy=course-list-input]').type('1')
-      cy.get('[data-cy=completed-courses-search-button]').click()
-      cy.get('[data-cy=rights-notification]').should(
+      cy.cs('student-no-input').type('1')
+      cy.cs('course-list-input').type('1')
+      cy.cs('completed-courses-search-button').click()
+      cy.cs('rights-notification').should(
         'contain.text',
         'The information for the following students could not be displayed'
       )
-      cy.contains('[data-cy=rights-notification]', '1')
-      cy.contains('[data-cy=completed-courses-table-div]', 'Student number')
-      cy.contains('[data-cy=completed-courses-table-div]', '1').should('not.exist')
+      cy.cs('rights-notification').contains('1')
+      cy.cs('completed-courses-table-div').contains('Student number')
+      cy.cs('completed-courses-table-div').contains('1').should('not.exist')
     })
   })
 
@@ -102,9 +102,9 @@ describe('When search modal is opened', () => {
       hasLanded()
       openCompletedCoursesModal()
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
-        cy.get('[data-cy=student-no-input]').type(studentSet1.join('\n'))
-        cy.get('[data-cy=course-list-input]').type(coursesSet1.join('\n'))
-        cy.get('[data-cy=completed-courses-search-button]').click()
+        cy.cs('student-no-input').type(studentSet1.join('\n'))
+        cy.cs('course-list-input').type(coursesSet1.join('\n'))
+        cy.cs('completed-courses-search-button').click()
       })
     })
 
@@ -120,10 +120,10 @@ describe('When search modal is opened', () => {
     it('Finds correct students and courses', () => {
       cy.fixture('completedCoursesData').then(({ studentSet1, coursesSet1 }) => {
         for (const studentNumber of studentSet1) {
-          cy.contains('[data-cy=completed-courses-table-div]', studentNumber)
+          cy.cs('completed-courses-table-div').contains(studentNumber)
         }
         for (const courseCode of coursesSet1) {
-          cy.contains('[data-cy=completed-courses-table-div]', courseCode)
+          cy.cs('completed-courses-table-div').contains(courseCode)
         }
       })
     })
@@ -150,7 +150,7 @@ describe('Courselist saving-related functions work', () => {
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseList)
-    cy.contains('[data-cy=course-list-input]', courses.join(', '))
+    cy.cs('course-list-input').contains(courses.join(', '))
   })
 
   it('Course list can be deleted', () => {
@@ -159,7 +159,7 @@ describe('Courselist saving-related functions work', () => {
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseList)
-    cy.get('[data-cy=delete-courselist]').click()
+    cy.cs('delete-courselist').click()
     cy.contains('You have no previous searches.')
   })
 
@@ -169,11 +169,11 @@ describe('Courselist saving-related functions work', () => {
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseList)
-    cy.get('[data-cy=course-list-input]').type(',TKT10001')
-    cy.get('[data-cy=save-courselist]').click()
+    cy.cs('course-list-input').type(',TKT10001')
+    cy.cs('save-courselist').click()
     openSearch()
     openCompletedCoursesModal()
     selectSavedCourselist(courseList)
-    cy.contains('[data-cy=course-list-input]', 'CSM14204, TKT10004, TKT10001')
+    cy.cs('course-list-input').contains('CSM14204, TKT10004, TKT10001')
   })
 })
