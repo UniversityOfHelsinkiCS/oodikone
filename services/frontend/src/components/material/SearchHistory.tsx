@@ -61,6 +61,7 @@ export const SearchHistory = ({
         </Stack>
         {sortedItems.length > 0 ? (
           <Autocomplete
+            autoHighlight
             getOptionLabel={option => option.text}
             onChange={handleChange}
             options={sortedItems}

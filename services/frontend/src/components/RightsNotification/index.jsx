@@ -11,7 +11,7 @@ export const RightsNotification = ({ discardedStudentNumbers }) => {
   }
 
   return (
-    <Alert data-cy="rights-notification" severity="error" variant="outlined">
+    <Alert data-cy="rights-notification" severity="error" sx={{ my: 2 }} variant="outlined">
       <Typography variant="h6">Invalid or forbidden student numbers</Typography>
       <Typography>
         The following students information could not be displayed. This could be either because they do not exist, or

@@ -163,7 +163,7 @@ export const CustomPopulationContent = ({
             <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
           )}
 
-          {discardedStudentNumbers?.length === 0 && unfilteredPopulationLength === 0 && (
+          {unfilteredPopulationLength === 0 && (
             <StyledMessage sx={{ my: 2, justifyContent: 'center', width: 'fit-content' }}>
               <Typography>No students found! Please re-check the student number list.</Typography>
             </StyledMessage>
@@ -187,9 +187,11 @@ export const CustomPopulationContent = ({
             </Box>
             <Box sx={{ width: '220px' }} />
           </Box>
-          <Box sx={{ mt: 2 }}>
-            <PanelView panels={panels} />
-          </Box>
+          {unfilteredPopulationLength > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <PanelView panels={panels} />
+            </Box>
+          )}
         </>
       )}
     </Box>
