@@ -13,7 +13,7 @@ import {
   insertGroupColumns,
   tableStateReducer,
 } from './columnHeader'
-import { cloneColumns, group, row, SortableTableContext } from './common'
+import { cloneColumns, group, SortableTableContext } from './common'
 import { ExportModal } from './ExportModal'
 import { FigureContainer } from './FigureContainer'
 import { SortingFilteringVisitor } from './visitors/SortingFilteringVisitor'
@@ -34,8 +34,6 @@ export const SortableTable = ({
   defaultSort,
   expandedGroups,
   featureName = 'export',
-  firstColumnSticky = false,
-  striped = true,
   title,
   toggleGroupExpansion,
 }) => {
@@ -89,15 +87,7 @@ export const SortableTable = ({
     [data, columnsByKey, state]
   )
 
-  const classNames = ['ui', 'table', 'basic', 'collapsing', 'celled', 'ok-sortable-table', 'single', 'line']
-
-  if (striped) {
-    classNames.push('striped')
-  }
-
-  if (firstColumnSticky) {
-    classNames.push('first-column-sticky')
-  }
+  const classNames = ['ui', 'table', 'basic', 'collapsing', 'celled', 'ok-sortable-table', 'single', 'line', 'striped']
 
   const context = {
     state,
@@ -184,4 +174,4 @@ export const SortableTable = ({
   )
 }
 
-export { group, row }
+export { group }

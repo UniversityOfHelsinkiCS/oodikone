@@ -31,13 +31,6 @@ export const group = (definition, children) => {
   }
 }
 
-export const row = (data, options = {}) => {
-  return {
-    ...data,
-    [RowOptionsKey]: options,
-  }
-}
-
 export const getRowOptions = data => {
   return data[RowOptionsKey] ?? {}
 }
