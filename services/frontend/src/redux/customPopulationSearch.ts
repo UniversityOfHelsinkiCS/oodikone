@@ -1,8 +1,9 @@
 import { RTKApi } from '@/apiConnection'
+import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
 
 const customPopulationSearchApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getCustomPopulationSearches: builder.query({
+    getCustomPopulationSearches: builder.query<CustomPopulationSearch[], unknown>({
       query: () => '/custom-population-search',
       providesTags: [{ type: 'CustomPopulationSearches', id: 'LIST' }],
     }),
