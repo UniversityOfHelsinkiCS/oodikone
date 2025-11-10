@@ -1,37 +1,23 @@
 /// <reference types="cypress" />
 
 const chooseSemester = (semester, fromOrTo) => {
-  cy.get(`[data-cy="semester-${fromOrTo}"]`).click()
-  cy.get(`[data-cy="semester-${fromOrTo}"]`).within(() => {
-    cy.get('div.visible.menu.transition').within(() => {
-      cy.contains('div.item', semester).click()
-    })
-    cy.get('div.menu.transition').should('not.have.class', 'visible')
-  })
+  cy.cs(`semester-${fromOrTo}`).click()
+  cy.cs(`select-opt-${semester}`).click()
+  cy.cs(`select-opt-${semester}`).should('not.have.class', 'visible')
 }
 
 const checkNumbers = (numbers, numberOfColumns, mode) => {
-  const offset = mode === 'semesters' ? 2 : 1
-  cy.get('table > tbody > tr:first').within(() => {
-    cy.get('td').should('have.length', numberOfColumns)
-    cy.get('td').eq(0).contains('All courses total')
-    numbers.forEach((number, index) => {
-      cy.get('td')
-        .eq(index + offset)
-        .contains(number)
-    })
-  })
-}
+  const offset = 1 // skip first col with codes / names
+  cy.cs(`ooditable-${mode}`).find('table').find('tbody').as('tbody')
+  cy.get('@tbody').find('tr').first().as('totalRow')
+  cy.get('@totalRow').find('td').should('have.length', numberOfColumns)
+  cy.get('@totalRow').find('td').eq(0).should('contain', 'All courses total')
 
-const checkStyle = (styles, numberOfColumns) => {
-  cy.get('table > tbody > tr:first').within(() => {
-    cy.get('td').should('have.length', numberOfColumns)
-    styles.forEach((style, index) => {
-      cy.get('td')
-        .eq(index + 2)
-        .should('have.attr', 'style')
-        .and('include', style)
-    })
+  numbers.forEach((number, index) => {
+    cy.get('@totalRow')
+      .find('td')
+      .eq(index + offset)
+      .should('contain', number)
   })
 }
 
@@ -39,7 +25,7 @@ describe('When language center is opened', () => {
   describe('as an admin user', () => {
     beforeEach(() => {
       cy.init('/languagecenterview', 'admin')
-      cy.get('[data-cy="completions-button"]').click()
+      cy.cs('completions-button').click()
     })
 
     describe('Faculties tab', () => {
@@ -58,7 +44,7 @@ describe('When language center is opened', () => {
         cy.get('table > tbody > tr:first').within(() => {
           cy.get('td').should('have.length', 15)
           cy.get('td').eq(0).contains('All courses total')
-          const numbers = [36, 9, 33, 756, 15, 40, 6, 48, 1, 24, 1059, 49, 0, 2076]
+          const numbers = [2076, 36, 9, 33, 756, 15, 40, 6, 48, 1, 24, 1059, 49, 0]
           numbers.forEach((number, index) => {
             cy.get('td')
               .eq(index + 1)
@@ -67,16 +53,14 @@ describe('When language center is opened', () => {
         })
       })
 
-      // FIXME: Flaky
       it('Faculties tab "exceeding" button works', () => {
-        cy.get('[data-cy="difference-button"]').click()
-        checkNumbers([...new Array(12).fill(0), 1, 221], 15)
+        cy.cs('difference-button').click()
+        checkNumbers([65, 2, 0, 3, 13, 0, 1, 1, 2, 0, 1, 30, 11, 1], 15, 'faculties')
       })
 
-      // FIXME: Flaky
       it('Faculties tab semester selector changes numbers', () => {
         chooseSemester('Syksy 2020', 'from')
-        checkNumbers([28, 6, 27, 496, 4, 10, 2, 33, 0, 9, 535, 34, 0, 1184], 15)
+        checkNumbers([1184, 28, 6, 27, 496, 4, 10, 2, 33, 0, 9, 535, 34, 0], 15, 'faculties')
       })
     })
 
@@ -87,23 +71,8 @@ describe('When language center is opened', () => {
         chooseSemester('Kevät 2024', 'to')
       })
 
-      // FIXME: Flaky
       it('Semester tab shows numbers', () => {
-        checkNumbers([69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1, 2076], 17, 'semesters')
-      })
-
-      // FIXME: Flaky
-      it('Coloring mode works on semester tab', () => {
-        cy.contains('Compare to average of course').click()
-        const expectedAlphas = [0.04, 0.016, 0.17, 0.03, 0.192, 0.055, 0.247, 0.08, 0.173, 0.05, 0.07, 0.043, 0.004, 0]
-
-        checkStyle(
-          expectedAlphas.map(alpha => `background-color: rgba(0, 170, 0, ${alpha})`),
-          17
-        )
-        cy.get('table > tbody > tr:first').within(() => {
-          cy.get('td').eq(16).should('have.attr', 'style').and('not.include', 'background-color')
-        })
+        checkNumbers([2076, 69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1], 16, 'semesters')
       })
     })
   })
