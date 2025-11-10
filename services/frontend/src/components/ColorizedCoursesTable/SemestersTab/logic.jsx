@@ -28,6 +28,37 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
         aggregationRows: () => [{ id: 'total', value: undefined }],
         aggregatedCell: () => <CourseContainer code="Total" getTextIn={getTextIn} name={{ en: 'All courses total' }} />,
       }),
+      columnHelper.accessor('all', {
+        header: 'Total',
+        cell: ({ row }) => {
+          return (
+            <Box
+              sx={{
+                'td:has(> &)':
+                  colorMode !== 'course'
+                    ? getColor(row.original[numberMode], semesters.length, colorMode, numberMode, null, allTotal)
+                    : {},
+              }}
+            >
+              {row.original[numberMode] ?? 0}
+            </Box>
+          )
+        },
+        enableSorting: true,
+        aggregatedCell: ({ table }) =>
+          table
+            .getFilteredRowModel()
+            .rows.reduce(
+              (acc, row) =>
+                acc +
+                semesters.reduce(
+                  (semester_acc, semester) =>
+                    semester_acc + (row.original.bySemesters[semester.semestercode]?.[numberMode] ?? 0),
+                  0
+                ),
+              0
+            ),
+      }),
       ...semesters.map(({ name, semestercode }) =>
         columnHelper.accessor(() => undefined, {
           id: `${semestercode}`,
@@ -62,37 +93,6 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
           },
         })
       ),
-      columnHelper.accessor('all', {
-        header: 'Total',
-        cell: ({ row }) => {
-          return (
-            <Box
-              sx={{
-                'td:has(> &)':
-                  colorMode !== 'course'
-                    ? getColor(row.original[numberMode], semesters.length, colorMode, numberMode, null, allTotal)
-                    : {},
-              }}
-            >
-              {row.original[numberMode] ?? 0}
-            </Box>
-          )
-        },
-        enableSorting: true,
-        aggregatedCell: ({ table }) =>
-          table
-            .getFilteredRowModel()
-            .rows.reduce(
-              (acc, row) =>
-                acc +
-                semesters.reduce(
-                  (semester_acc, semester) =>
-                    semester_acc + (row.original.bySemesters[semester.semestercode]?.[numberMode] ?? 0),
-                  0
-                ),
-              0
-            ),
-      }),
     ],
     [numberMode, colorMode, allTotal]
   )
