@@ -38,44 +38,6 @@ export const useColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
         aggregationRows: () => [{ id: 'total', value: undefined }],
         aggregatedCell: () => <CourseContainer code="Total" getTextIn={getTextIn} name={{ en: 'All courses total' }} />,
       }),
-      ...faculties.map(facultyCode =>
-        columnHelper.accessor(() => undefined, {
-          id: facultyCode,
-          header: () => (
-            <Tooltip title={getTextIn(facultyMap?.[facultyCode]) ?? getFacultyTitle(facultyCode)}>
-              <Typography variant="subtitle2">{getFacultyTitle(facultyCode)}</Typography>
-            </Tooltip>
-          ),
-          cell: ({ row }) => {
-            return (
-              <Box
-                sx={{
-                  'td:has(> &)': getColor(
-                    row.original.bySemesters.cellStats[facultyCode],
-                    faculties.length,
-                    colorMode,
-                    numberMode,
-                    row.original.bySemesters.facultiesTotal[numberMode],
-                    allTotal
-                  ),
-                }}
-              >
-                {row.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0}
-              </Box>
-            )
-          },
-          aggregatedCell: ({ table }) =>
-            table
-              .getFilteredRowModel()
-              .rows.reduce((acc, row) => acc + (row.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0), 0),
-          sortingFn: (rowA, rowB) => {
-            const a = rowA.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0
-            const b = rowB.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0
-
-            return a - b
-          },
-        })
-      ),
       columnHelper.accessor('total-column', {
         id: 'Total',
         header: 'Total',
@@ -121,6 +83,44 @@ export const useColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
           return a - b
         },
       }),
+      ...faculties.map(facultyCode =>
+        columnHelper.accessor(() => undefined, {
+          id: facultyCode,
+          header: () => (
+            <Tooltip title={getTextIn(facultyMap?.[facultyCode]) ?? getFacultyTitle(facultyCode)}>
+              <Typography variant="subtitle2">{getFacultyTitle(facultyCode)}</Typography>
+            </Tooltip>
+          ),
+          cell: ({ row }) => {
+            return (
+              <Box
+                sx={{
+                  'td:has(> &)': getColor(
+                    row.original.bySemesters.cellStats[facultyCode],
+                    faculties.length,
+                    colorMode,
+                    numberMode,
+                    row.original.bySemesters.facultiesTotal[numberMode],
+                    allTotal
+                  ),
+                }}
+              >
+                {row.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0}
+              </Box>
+            )
+          },
+          aggregatedCell: ({ table }) =>
+            table
+              .getFilteredRowModel()
+              .rows.reduce((acc, row) => acc + (row.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0), 0),
+          sortingFn: (rowA, rowB) => {
+            const a = rowA.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0
+            const b = rowB.original.bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0
+
+            return a - b
+          },
+        })
+      ),
     ],
     [numberMode, colorMode, allTotal, facultyMap === undefined]
   )
