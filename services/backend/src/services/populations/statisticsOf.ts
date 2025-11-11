@@ -1,4 +1,3 @@
-import { omitKeys } from '@oodikone/shared/util'
 import { getDegreeProgrammeType } from '../../util'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { formatStudentForAPI } from './formatStatisticsForApi'
@@ -9,6 +8,7 @@ import {
   getStudents,
   getEnrollments,
   getCredits,
+  getStudyRightElementsForStudyRight,
 } from './getStudentData'
 import { getOptionsForStudents, parseCourseData } from './shared'
 
@@ -35,11 +35,15 @@ export const statisticsOf = async (
   const code = studyRights[0] ?? ''
   const mockedStartDate = startDate ?? new Date(1900).toISOString()
 
-  const [enrollments, credits, students] = await Promise.all([
-    getEnrollments(studentNumbers, mockedStartDate),
-    getCredits(studentNumbers),
-    getStudents(studentNumbers),
-  ])
+  const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
+    await Promise.all([
+      getStudents(studentNumbers),
+      getEnrollments(studentNumbers, mockedStartDate),
+      getCredits(studentNumbers),
+      getDegreeProgrammeType(code),
+      getCriteria(code),
+      getStudyRightElementsForStudyRight(studentNumbers, code),
+    ])
 
   const studentStartingYears = new Map(
     students.map(({ studentnumber, studyRights }) => [
@@ -51,36 +55,38 @@ export const statisticsOf = async (
     ])
   )
 
+  const creditsAndEnrollmentsByStudent = new Map<string, [AnonymousCredit[], AnonymousEnrollment[]]>(
+    studentNumbers.map(n => [n, [[], []]])
+  )
+
+  for (const credit of credits) {
+    const { student_studentnumber, ...rest } = credit
+    creditsAndEnrollmentsByStudent.get(student_studentnumber)![0].push(rest)
+  }
+
+  for (const enrollment of enrollments) {
+    const { studentnumber, ...rest } = enrollment
+    creditsAndEnrollmentsByStudent.get(studentnumber)![1].push(rest)
+  }
+
   const formattedCoursestats = await parseCourseData(studentStartingYears, enrollments, credits)
-
-  const creditsByStudent: StudentCreditObject = new Map<string, AnonymousCredit[]>(studentNumbers.map(n => [n, []]))
-  credits.forEach(credit =>
-    creditsByStudent.get(credit.student_studentnumber)!.push(omitKeys(credit, ['student_studentnumber']))
-  )
-
-  const enrollmentsByStudent: StudentEnrollmentObject = new Map<string, AnonymousEnrollment[]>(
-    studentNumbers.map(n => [n, []])
-  )
-  enrollments.forEach(enrollment =>
-    enrollmentsByStudent.get(enrollment.studentnumber)!.push(omitKeys(enrollment, ['studentnumber']))
-  )
-
-  const criteria = await getCriteria(code)
-  const optionData = await getOptionsForStudents(studentNumbers, code, await getDegreeProgrammeType(code))
+  const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
 
   return {
     coursestatistics: formattedCoursestats,
-    students: students.map(student =>
-      formatStudentForAPI(
+    students: students.map(student => {
+      const [credits, enrollments] = creditsAndEnrollmentsByStudent.get(student.studentnumber)!
+
+      return formatStudentForAPI(
         code,
         mockedStartDate,
         student,
         tagList[student.studentnumber],
-        creditsByStudent.get(student.studentnumber)!,
-        enrollmentsByStudent.get(student.studentnumber)!,
+        credits,
+        enrollments,
         optionData[student.studentnumber],
         criteria
       )
-    ),
+    }),
   }
 }

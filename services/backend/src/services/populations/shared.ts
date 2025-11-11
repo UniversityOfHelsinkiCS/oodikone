@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 import { Name, DegreeProgrammeType, EnrollmentState } from '@oodikone/shared/types'
-import { SISStudyRightModel, SISStudyRightElementModel, CreditModel, CourseModel } from '../../models'
+import { SISStudyRightElementModel, CreditModel, CourseModel } from '../../models'
 import { getPassingSemester, SemesterStart } from '../../util/semester'
 import { StudentCredit, StudentEnrollment } from './getStudentData'
 
@@ -47,45 +47,24 @@ export const getCurriculumVersion = (curriculumPeriodId: string | undefined) => 
   return curriculumVersion
 }
 
-export const getOptionsForStudents = async (
-  studentNumbers: string[],
-  code: string,
+export const getOptionsForStudents = (
+  studyRightElementsForStudyRight: SISStudyRightElementModel[],
   degreeProgrammeType: DegreeProgrammeType | null
-): Promise<Record<string, Name>> => {
-  if (!code || !studentNumbers.length) {
-    return {}
-  } else if (
+): Record<string, Name> => {
+  if (
     degreeProgrammeType &&
     ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(degreeProgrammeType)
   ) {
     return {}
   }
 
-  const studyRightElementsForStudyRight = await SISStudyRightElementModel.findAll({
-    attributes: [],
-    where: { code },
-    include: {
-      model: SISStudyRightModel,
-      attributes: ['studentNumber'],
-      where: {
-        studentNumber: { [Op.in]: studentNumbers },
-      },
-      include: [
-        {
-          model: SISStudyRightElementModel,
-          attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
-        },
-      ],
-    },
-  })
+  const levelIsMasters = degreeProgrammeType === DegreeProgrammeType.MASTER
+  const filter = levelIsMasters ? DegreeProgrammeType.BACHELOR : DegreeProgrammeType.MASTER
 
   return Object.fromEntries(
     studyRightElementsForStudyRight
       .map(({ studyRight }) => {
-        const levelIsMasters = degreeProgrammeType === DegreeProgrammeType.MASTER
-        const filter = levelIsMasters ? DegreeProgrammeType.BACHELOR : DegreeProgrammeType.MASTER
-
-        // NOTE: If in masters, then select latest finished bachlor studyRight otherwise select first started masters studyRight
+        // NOTE: If in masters, then select latest finished bachelor studyRight otherwise select first started masters studyRight
         const [latestProgramme] = orderBy(
           studyRight.studyRightElements.filter(element => element.degreeProgrammeType === filter),
           [levelIsMasters ? 'endDate' : 'startDate'],
@@ -266,15 +245,15 @@ export const parseCourseData = async (
   }
 
   const courses = await getCourses(Array.from(coursestats.keys()))
-  const courseMap = new Map(courses.map(({ code, name }) => [code, name]))
-  const substitutionMap = new Map(courses.map(({ code, substitutions }) => [code, substitutions]))
+  const courseSubMap = new Map(courses.map(({ code, name, substitutions }) => [code, { name, substitutions }]))
 
   return Array.from(coursestats.entries()).map(([code, { attempts, enrollments, grades, students, stats }]) => {
+    const courseMapObj = courseSubMap.get(code)
     return {
       course: {
         code,
-        name: courseMap.get(code) ?? { en: code },
-        substitutions: substitutionMap.get(code) ?? [],
+        name: courseMapObj?.name ?? { en: code },
+        substitutions: courseMapObj?.substitutions ?? [],
       },
       attempts,
       enrollments: {
