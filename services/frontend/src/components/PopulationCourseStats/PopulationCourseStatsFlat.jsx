@@ -22,7 +22,7 @@ export const PopulationCourseStatsFlat = ({ filteredCourses, studentAmountLimit 
     },
     {
       menuItem: 'Grades',
-      render: () => <GradeDistribution flat />,
+      render: () => <GradeDistribution />,
     },
   ]
 
