@@ -203,3 +203,22 @@ export const getCredits = async (studentNumbers: string[]): Promise<Array<Studen
     },
     raw: true,
   })
+
+export const getStudyRightElementsForStudyRight = async (studentNumbers: string[], code: string) =>
+  SISStudyRightElementModel.findAll({
+    attributes: [],
+    where: { code },
+    include: {
+      model: SISStudyRightModel,
+      attributes: ['studentNumber'],
+      where: {
+        studentNumber: { [Op.in]: studentNumbers },
+      },
+      include: [
+        {
+          model: SISStudyRightElementModel,
+          attributes: ['code', 'name', 'degreeProgrammeType', 'startDate', 'endDate'],
+        },
+      ],
+    },
+  })
