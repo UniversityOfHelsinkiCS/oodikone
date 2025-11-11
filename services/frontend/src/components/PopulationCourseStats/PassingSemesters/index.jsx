@@ -186,12 +186,20 @@ export const PassingSemesters = ({ onlyIamRights, useModules }) => {
 
   return (
     <>
-      <Box pt={2}>
-        <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          '& >:first-child': {
+            width: '100%',
+          },
+        }}
+      >
+        <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+        <Button onClick={() => setCumulativeStats(!cumulativeStats)} sx={{ my: 'auto', mx: 1 }} variant="outlined">
           {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
         </Button>
       </Box>
-      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
       <OodiTable columns={columns} data={data} options={tableOptions} />
     </>
   )
