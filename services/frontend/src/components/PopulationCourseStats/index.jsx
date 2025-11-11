@@ -85,15 +85,15 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
   const panes = [
     {
       label: 'Pass/fail',
-      render: () => <PassFailEnrollments onlyIamRights={onlyIamRights} />,
+      render: <PassFailEnrollments onlyIamRights={onlyIamRights} useModules />,
     },
     {
       label: 'Grades',
-      render: () => <GradeDistribution onlyIamRights={onlyIamRights} useModules />,
+      render: <GradeDistribution onlyIamRights={onlyIamRights} useModules />,
     },
     {
       label: 'When passed',
-      render: () => <PassingSemesters onlyIamRights={onlyIamRights} />,
+      render: <PassingSemesters onlyIamRights={onlyIamRights} />,
     },
   ]
 
@@ -107,7 +107,7 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
         ))}
       </Tabs>
       <PopulationCourseContext.Provider value={contextValue}>
-        {panes.at(tab)?.render() ?? null}
+        {panes.at(tab)?.render ?? null}
       </PopulationCourseContext.Provider>
     </>
   )
