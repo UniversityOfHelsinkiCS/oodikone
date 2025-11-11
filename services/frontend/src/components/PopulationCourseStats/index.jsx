@@ -93,7 +93,7 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
     },
     {
       label: 'When passed',
-      render: <PassingSemesters onlyIamRights={onlyIamRights} />,
+      render: <PassingSemesters onlyIamRights={onlyIamRights} useModules />,
     },
   ]
 

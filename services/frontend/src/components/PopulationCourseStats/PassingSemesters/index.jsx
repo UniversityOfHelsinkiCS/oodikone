@@ -1,151 +1,188 @@
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import ArrowIcon from '@mui/icons-material/NorthEast'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import { chain, range } from 'lodash'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { createColumnHelper, getExpandedRowModel } from '@tanstack/react-table'
+import { range } from 'lodash'
 import { useMemo, useState } from 'react'
+
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Link } from '@/components/material/Link'
-
-import { SortableTable, group } from '@/components/SortableTable'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
-const semesterColumn = (year, semester, cumulative) => ({
-  key: `semester-${year}-${semester}`,
-  cellProps: { style: { textAlign: 'right' } },
-  filterType: 'range',
-  title: semester,
-  getRowVal: row =>
-    ((cumulative ? row?.stats?.passingSemestersCumulative : row?.stats?.passingSemesters) ?? {})[
-      `${year}-${semester.toUpperCase()}`
-    ],
-  getRowContent: row => {
-    const value = ((cumulative ? row?.stats?.passingSemestersCumulative : row?.stats?.passingSemesters) ?? {})[
-      `${year}-${semester.toUpperCase()}`
-    ]
+const columnHelper = createColumnHelper()
 
-    if (value === 0) {
-      return null
-    }
-    return value
-  },
-})
+const semesterColumn = (year, semester, cumulative) =>
+  columnHelper.accessor(() => undefined, {
+    id: `semester-${year}-${semester}`,
+    header: semester,
+    cell: ({ row }) =>
+      /* eslint-disable-next-line @typescript-eslint/prefer-optional-chain */
+      ((cumulative ? row.original.stats?.passingSemestersCumulative : row.original.stats?.passingSemesters) ?? {})[
+        `${year}-${semester.toUpperCase()}`
+      ],
+  })
 
-const yearColumn = (year, cumulative) => ({
-  key: `year-${year}`,
-  title: `${year + 1}${['st', 'nd', 'rd'][year] ?? 'th'} year`,
-  children: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
-})
+const yearColumn = (year, cumulative) =>
+  columnHelper.group({
+    header: `${year + 1}${['st', 'nd', 'rd'][year] ?? 'th'} year`,
+    columns: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
+  })
 
-export const PassingSemesters = ({ onlyIamRights }) => {
-  const { modules, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
-  const [cumulativeStats, setCumulativeStats] = useState(false)
+export const PassingSemesters = ({ onlyIamRights, useModules }) => {
+  const { modules, courseStatistics } = UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
 
-  const columns = useMemo(() => {
-    const columns = [
-      {
-        key: 'course-name',
-        mergeHeader: true,
-        merge: true,
-        children: [
-          {
-            key: 'name',
-            title: 'Name',
-            getRowVal: (row, isGroup, parents) => getTextIn(isGroup ? parents[0].module.name : row.name),
-            cellProps: {
-              style: {
-                maxWidth: '20em',
-                whiteSpace: 'normal',
-                overflow: 'hidden',
-              },
-            },
-          },
-          {
-            key: 'filter-toggle',
-            export: false,
-            getRowContent: (row, isGroup) => {
-              if (isGroup) return null
+  const [expanded, setExpanded] = useState({})
+  const [cumulativeStats, setCumulativeStats] = useState(false)
 
-              return <CourseFilterToggle courseCode={row.code} courseName={row.name} />
-            },
-          },
-          {
-            key: 'go-to-course',
-            export: false,
-            getRowContent: (row, isGroup) =>
-              !isGroup && (
-                <Link
-                  to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                    row.code
-                  )}"]&separate=false&unifyOpenUniCourses=false`}
-                >
-                  <ArrowIcon />
-                </Link>
-              ),
-          },
-        ],
-      },
-      {
-        key: 'code',
-        title: 'Code',
-        getRowVal: (row, isGroup, parents) => (isGroup ? parents[0].module.code : row.code),
-      },
-      {
-        key: 'stats',
-        noHeader: true,
-        getRowVal: (__, isGroup) => (isGroup ? ' ' : null),
-        children: [
-          {
-            key: 'students',
-            title: 'Students',
-            filterType: 'range',
-            getRowVal: row => row.stats?.students,
-            cellProps: { style: { textAlign: 'right' } },
-          },
-          {
-            key: 'passed',
-            title: 'Passed',
-            filterType: 'range',
-            getRowVal: row => row.stats?.passed,
-            cellProps: { style: { textAlign: 'right' } },
-          },
-          {
-            key: 'passed-before',
-            title: 'Before 1st year',
-            filterType: 'range',
-            getRowVal: row =>
-              (cumulativeStats ? row.stats?.passingSemesters : row.stats?.passingSemestersCumulative)?.BEFORE,
-            cellProps: { style: { textAlign: 'right' } },
-          },
+  const [data, excelData] = useMemo(() => {
+    const data = useModules
+      ? modules.map(({ module, courses }) => ({
+          name: module.name,
+          code: module.code,
+          courses,
+        }))
+      : courseStatistics
+
+    const excelData = data
+      // Export only the courses, not the modules
+      .flatMap(row => row?.courses ?? [row])
+      .map(({ name, code, stats }) => ({
+        Name: getTextIn(name),
+        Code: code,
+        Students: stats.students,
+        Passed: stats.passed,
+        'Before 1st year': (cumulativeStats ? stats.passingSemesters : stats.passingSemestersCumulative)?.BEFORE,
+        ...Object.fromEntries(
+          range(0, 6).flatMap(i => {
+            const year = `${i + 1}${['st', 'nd', 'rd'][i] ?? 'th'}`
+            return [
+              [
+                `${year} Fall`,
+                (cumulativeStats ? stats.passingSemestersCumulative : stats.passingSemesters)?.[`${i}-FALL`],
+              ],
+              [
+                `${year} Spring`,
+                (cumulativeStats ? stats.passingSemestersCumulative : stats.passingSemesters)?.[`${i}-SPRING`],
+              ],
+            ]
+          })
+        ),
+      }))
+
+    return [data, excelData]
+  }, [modules, cumulativeStats])
+
+  const accessorKeys = useMemo(
+    () => [
+      'Name',
+      'Code',
+      'Students',
+      'Passed',
+      'Before 1st year',
+      ...range(0, 6).flatMap(i => {
+        const year = `${i + 1}${['st', 'nd', 'rd'][i] ?? 'th'}`
+        return [`${year} Fall`, `${year} Spring`]
+      }),
+    ],
+    []
+  )
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('name', {
+        maxSize: '32em', // Hand picked magic number
+        header: 'Name',
+        cell: ({ row }) => {
+          const name = getTextIn(row.original.name)
+          const { code } = row.original
+
+          const expansionStyle = row.getIsExpanded() ? { transform: 'rotate(90deg)' } : {}
+          const expansionArrow = row.getCanExpand() ? (
+            <Box sx={{ p: 1, pl: 0, my: 'auto' }}>
+              <KeyboardArrowRightIcon
+                onClick={row.getToggleExpandedHandler()}
+                sx={{
+                  cursor: 'pointer',
+                  ...expansionStyle,
+                }}
+              />
+            </Box>
+          ) : null
+
+          const linkComponent =
+            row.originalSubRows === undefined ? (
+              <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
+                <CourseFilterToggle courseCode={code} courseName={name} />
+                {!onlyIamRights ? (
+                  <Link
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
+                  >
+                    <ArrowIcon sx={{ ml: 1 }} />
+                  </Link>
+                ) : null}
+              </Stack>
+            ) : null
+
+          return (
+            <Stack
+              flexDirection="row"
+              sx={{
+                '.ot-data-cell:has(> &)': {
+                  width: '100%',
+                  whiteSpace: 'normal',
+                },
+              }}
+            >
+              {expansionArrow}
+              <Typography sx={{ minWidth: '20em', my: 'auto' }} variant="body2">
+                {name}
+              </Typography>
+              {linkComponent}
+            </Stack>
+          )
+        },
+        sortingFn: (rowA, rowB) => getTextIn(rowA.original.name)?.localeCompare(getTextIn(rowB.original.name)) ?? 0,
+      }),
+      columnHelper.accessor('code', { header: 'Code' }),
+      columnHelper.group({
+        id: 'stats',
+        header: 'Enrollment statistics',
+        columns: [
+          columnHelper.accessor(() => undefined, {
+            header: 'Students',
+            cell: ({ row }) => row.original.stats?.students,
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Passed',
+            cell: ({ row }) => row.original.stats?.passed,
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Before 1st year',
+            cell: ({ row }) =>
+              (cumulativeStats ? row.original.stats?.passingSemesters : row.original.stats?.passingSemestersCumulative)
+                ?.BEFORE,
+          }),
           ...range(0, 6).map(i => yearColumn(i, cumulativeStats)),
         ],
-      },
-    ]
-
-    if (onlyIamRights) columns[0].children.pop()
-
-    return columns
-  }, [cumulativeStats])
-
-  const data = useMemo(
-    () =>
-      chain(modules)
-        .map(({ module, courses }) =>
-          group(
-            {
-              key: `module-${module.code}`,
-              module,
-              headerRowData: {},
-              columnOverrides: {},
-            },
-            courses
-          )
-        )
-        .value(),
-    [modules]
+      }),
+    ],
+    [modules, cumulativeStats]
   )
+
+  const tableOptions = {
+    getExpandedRowModel: getExpandedRowModel(),
+    getSubRows: row => row.courses,
+    paginateExpandedRows: false,
+    onExpandedChange: setExpanded,
+    state: { expanded },
+  }
 
   return (
     <>
@@ -154,14 +191,8 @@ export const PassingSemesters = ({ onlyIamRights }) => {
           {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
         </Button>
       </Box>
-      <SortableTable
-        columns={columns}
-        data={data}
-        expandedGroups={expandedGroups}
-        featureName="passing_semester"
-        title="Students Passing a Course per Semester"
-        toggleGroupExpansion={toggleGroupExpansion}
-      />
+      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+      <OodiTable columns={columns} data={data} options={tableOptions} />
     </>
   )
 }
