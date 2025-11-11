@@ -1,203 +1,227 @@
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import ArrowIcon from '@mui/icons-material/NorthEast'
-import { useMemo } from 'react'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { createColumnHelper, getExpandedRowModel } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
+
+import { calculatePercentage } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Link } from '@/components/material/Link'
-
-import { SortableTable, group } from '@/components/SortableTable'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
-const calculatePassRate = (total, passed) => {
-  if (total === 0) {
-    return 0
-  }
-  return (100 * passed) / total
-}
+const columnHelper = createColumnHelper()
 
-export const PassFailEnrollments = ({ flat, onlyIamRights }) => {
-  const { modules, courseStatistics, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
+export const PassFailEnrollments = ({ onlyIamRights, useModules }) => {
+  const { modules, courseStatistics } = UsePopulationCourseContext()
   const { getTextIn } = useLanguage()
 
-  const columns = useMemo(() => {
-    const columns = [
-      {
-        key: 'course',
-        title: 'Course',
-        children: [
-          {
-            key: 'course-name-parent',
-            mergeHeader: true,
-            merge: true,
-            children: [
-              {
-                key: 'course-name',
-                title: 'Name',
-                getRowVal: row => getTextIn(row.name ?? row.course.name),
-                cellProps: {
-                  style: { maxWidth: '20em', whiteSpace: 'normal' },
+  const [expanded, setExpanded] = useState({})
+
+  const [data, excelData] = useMemo(() => {
+    const data = useModules
+      ? modules.map(({ module, courses }) => ({
+          name: module.name,
+          code: module.code,
+          courses,
+        }))
+      : courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
+
+    const excelData = data
+      // Export only the courses, not the modules
+      .flatMap(row => row?.courses ?? [row])
+      .map(({ name, code, stats }) => ({
+        Name: getTextIn(name),
+        Code: code,
+        'Total students': stats.totalStudents,
+        Passed: stats.passed,
+        Failed: stats.failed,
+        'Enrolled, no grade': stats.totalEnrolledNoGrade,
+        'Pass rate': calculatePercentage(stats.passed, stats.totalStudents),
+        'Attempts total': stats.attempts,
+        'Attempts per student': stats.perStudent,
+        'Passed%': calculatePercentage(stats.passedOfPopulation, 100),
+        'Attempted%': calculatePercentage(stats.triedOfPopulation, 100),
+      }))
+
+    return [data, excelData]
+  }, [useModules, modules, courseStatistics, getTextIn, calculatePercentage])
+
+  const accessorKeys = useMemo(
+    () => [
+      'Name',
+      'Code',
+      'Total students',
+      'Passed',
+      'Failed',
+      'Enrolled, no grade',
+      'Pass rate',
+      'Attempts total',
+      'Attempts per student',
+      'Passed%',
+      'Attempted%',
+    ],
+    []
+  )
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('name', {
+        maxSize: '32em', // Hand picked magic number
+        header: 'Name',
+        cell: ({ row }) => {
+          const name = getTextIn(row.original.name)
+          const { code } = row.original
+
+          const expansionStyle = row.getIsExpanded() ? { transform: 'rotate(90deg)' } : {}
+          const expansionArrow = row.getCanExpand() ? (
+            <Box sx={{ p: 1, pl: 0, my: 'auto' }}>
+              <KeyboardArrowRightIcon
+                onClick={row.getToggleExpandedHandler()}
+                sx={{
+                  cursor: 'pointer',
+                  ...expansionStyle,
+                }}
+              />
+            </Box>
+          ) : null
+
+          const linkComponent =
+            row.originalSubRows === undefined ? (
+              <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
+                <CourseFilterToggle courseCode={code} courseName={name} />
+                {!onlyIamRights ? (
+                  <Link
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
+                  >
+                    <ArrowIcon sx={{ ml: 1 }} />
+                  </Link>
+                ) : null}
+              </Stack>
+            ) : null
+
+          return (
+            <Stack
+              flexDirection="row"
+              sx={{
+                '.ot-data-cell:has(> &)': {
+                  width: '100%',
+                  whiteSpace: 'normal',
                 },
-              },
-              {
-                key: 'filter-toggle',
-                export: false,
-                getRowContent: (row, isGroup) =>
-                  !isGroup && <CourseFilterToggle courseCode={row.code} courseName={row.name} />,
-              },
-              {
-                key: 'go-to-course',
-                export: false,
-                getRowContent: (row, isGroup) =>
-                  !isGroup && (
-                    <Link
-                      to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                        row.code
-                      )}"]&separate=false&unifyOpenUniCourses=false`}
-                    >
-                      <ArrowIcon />
-                    </Link>
-                  ),
-              },
-            ],
-          },
-          {
-            key: 'course-code',
-            title: 'Code',
-            getRowVal: row => row.code ?? row.course.code,
-            cellProps: { style: { textAlign: 'left' } },
-          },
-        ],
-      },
-      {
-        key: 'statistics',
-        noHeader: true,
-        getRowVal: (_, isGroup) => (isGroup ? ' ' : undefined),
-        children: [
-          {
-            key: 'total',
-            title: 'Total\nstudents',
-            filterType: 'range',
-            getRowVal: row => row.stats?.totalStudents ?? 0,
-          },
-          {
-            key: 'passed-total',
-            title: 'Passed',
-            filterType: 'range',
-            getRowVal: row => row.stats?.passed ?? 0,
-          },
-          {
-            key: 'failed-total',
-            title: 'Failed',
-            filterType: 'range',
-            getRowVal: row => row.stats?.failed ?? 0,
-          },
-          {
-            key: 'totalEnrolledNoGrade',
-            title: 'Enrolled, \nno grade',
-            filterType: 'range',
-            getRowVal: row => row.stats?.totalEnrolledNoGrade ?? 0,
-          },
-          {
-            key: 'pass-rate',
-            title: 'Pass rate',
-            cellStyle: { textAlign: 'right' },
-            filterType: 'range',
-            getRowVal: row => calculatePassRate(row.stats?.totalStudents, row.stats?.passed),
-            formatValue: value =>
-              value &&
-              new Intl.NumberFormat('fi-FI', {
-                style: 'percent',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(value / 100),
-          },
-          {
-            key: 'attempts',
-            title: 'Attempts',
-            children: [
-              {
-                key: 'attempts-n',
-                title: 'Total',
-                filterType: 'range',
-                getRowVal: row => row.stats?.attempts,
-              },
-              {
-                key: 'attempts-per-student',
-                title: 'Per student',
-                cellStyle: { textAlign: 'right' },
-                filterType: 'range',
-                getRowVal: row => row.stats?.perStudent,
-                formatValue: value =>
-                  new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value),
-              },
-            ],
-          },
-          {
-            key: 'of-population',
-            title: 'Percentage of population',
-            children: [
-              {
-                key: 'passed-of-population',
-                title: 'Passed',
-                cellStyle: { textAlign: 'right' },
-                filterType: 'range',
-                getRowVal: row => row.stats?.passedOfPopulation,
-                formatValue: value =>
-                  new Intl.NumberFormat('fi-FI', {
-                    style: 'percent',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(value / 100),
-              },
-              {
-                key: 'attempted-of-population',
-                title: 'Attempted',
-                cellStyle: { textAlign: 'right' },
-                filterType: 'range',
-                getRowVal: row => row.stats?.triedOfPopulation,
-                formatValue: value =>
-                  new Intl.NumberFormat('fi-FI', {
-                    style: 'percent',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(value / 100),
-              },
-            ],
-          },
-        ],
-      },
-    ]
-    if (onlyIamRights) {
-      columns[0].children[0].children.pop()
-    }
-    return columns
-  }, [courseStatistics])
-
-  const data = useMemo(() => {
-    if (flat) {
-      return courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
-    }
-
-    return modules.map(({ module, courses }) =>
-      group(
-        {
-          key: `module-${module.code}`,
-          module,
-          headerRowData: { code: module.code, name: module.name },
+              }}
+            >
+              {expansionArrow}
+              <Typography sx={{ minWidth: '20em', my: 'auto' }} variant="body2">
+                {name}
+              </Typography>
+              {linkComponent}
+            </Stack>
+          )
         },
-        courses
-      )
-    )
-  }, [modules, courseStatistics])
+        sortingFn: (rowA, rowB) => getTextIn(rowA.original.name)?.localeCompare(getTextIn(rowB.original.name)) ?? 0,
+      }),
+      columnHelper.accessor('code', { header: 'Code' }),
+      columnHelper.group({
+        id: 'stats',
+        header: 'Enrollment statistics',
+        columns: [
+          columnHelper.accessor(() => undefined, {
+            header: 'Total students',
+            cell: ({ row }) => row.original.stats?.totalStudents,
+            sortingFn: (rowA, rowB) =>
+              (rowA.original.stats?.totalStudents ?? 0) - (rowB.original.stats?.totalStudents ?? 0),
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Passed',
+            cell: ({ row }) => row.original.stats?.passed,
+            sortingFn: (rowA, rowB) => (rowA.original.stats?.passed ?? 0) - (rowB.original.stats?.passed ?? 0),
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Failed',
+            cell: ({ row }) => row.original.stats?.failed,
+            sortingFn: (rowA, rowB) => (rowA.original.stats?.failed ?? 0) - (rowB.original.stats?.failed ?? 0),
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Enrolled, no grade',
+            cell: ({ row }) => row.original.stats?.totalEnrolledNoGrade,
+            sortingFn: (rowA, rowB) =>
+              (rowA.original.stats?.totalEnrolledNoGrade ?? 0) - (rowB.original.stats?.totalEnrolledNoGrade ?? 0),
+          }),
+          columnHelper.accessor(() => undefined, {
+            header: 'Pass rate',
+            cell: ({ row }) =>
+              row.original.stats
+                ? calculatePercentage(row.original.stats?.passed, row.original.stats?.totalStudents)
+                : null,
+            sortingFn: (rowA, rowB) => {
+              const a = rowA.original.stats ? rowA.original.stats.passed / rowA.original.stats.totalStudents : 0
+              const b = rowB.original.stats ? rowB.original.stats.passed / rowB.original.stats.totalStudents : 0
+
+              return a - b
+            },
+          }),
+          columnHelper.group({
+            id: 'attempts',
+            header: 'Attempts',
+            columns: [
+              columnHelper.accessor(() => undefined, {
+                header: 'Total',
+                cell: ({ row }) => row.original.stats?.attempts,
+                sortingFn: (rowA, rowB) => (rowA.original.stats?.attempts ?? 0) - (rowB.original.stats?.attempts ?? 0),
+              }),
+              columnHelper.accessor(() => undefined, {
+                header: 'Per student',
+                cell: ({ row }) => row.original.stats?.perStudent,
+                sortingFn: (rowA, rowB) =>
+                  (rowA.original.stats?.perStudent ?? 0) - (rowB.original.stats?.perStudent ?? 0),
+              }),
+            ],
+          }),
+          columnHelper.group({
+            id: 'ofPopulation',
+            header: 'Percentage of population',
+            columns: [
+              columnHelper.accessor(() => undefined, {
+                id: 'passedPercentage',
+                header: 'Passed',
+                cell: ({ row }) =>
+                  row.original.stats ? calculatePercentage(row.original.stats?.passedOfPopulation, 100) : null,
+                sortingFn: (rowA, rowB) =>
+                  (rowA.original.stats?.passedOfPopulation ?? 0) - (rowB.original.stats?.passedOfPopulation ?? 0),
+              }),
+              columnHelper.accessor(() => undefined, {
+                header: 'Attempted',
+                cell: ({ row }) =>
+                  row.original.stats ? calculatePercentage(row.original.stats?.triedOfPopulation, 100) : null,
+                sortingFn: (rowA, rowB) =>
+                  (rowA.original.stats?.triedOfPopulation ?? 0) - (rowB.original.stats?.triedOfPopulation ?? 0),
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+    []
+  )
+
+  const tableOptions = {
+    getExpandedRowModel: getExpandedRowModel(),
+    getSubRows: row => row.courses,
+    paginateExpandedRows: false,
+    onExpandedChange: setExpanded,
+    state: { expanded },
+  }
+
+  if (!data.length) return null
 
   return (
-    <SortableTable
-      columns={columns}
-      data={data}
-      defaultSort={['total', 'desc']}
-      expandedGroups={expandedGroups}
-      featureName="pass_and_fail"
-      title="Pass and fail statistics of courses with course enrollment details"
-      toggleGroupExpansion={toggleGroupExpansion}
-    />
+    <>
+      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+      <OodiTable columns={columns} data={data} options={tableOptions} />
+    </>
   )
 }

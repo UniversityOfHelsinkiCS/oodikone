@@ -18,7 +18,7 @@ export const PopulationCourseStatsFlat = ({ filteredCourses, studentAmountLimit 
   const panes = [
     {
       menuItem: 'Pass/fail',
-      render: () => <PassFailEnrollments flat />,
+      render: () => <PassFailEnrollments />,
     },
     {
       menuItem: 'Grades',
