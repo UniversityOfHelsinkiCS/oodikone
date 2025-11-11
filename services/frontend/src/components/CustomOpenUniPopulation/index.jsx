@@ -26,21 +26,19 @@ export const CustomOpenUniPopulation = () => {
     <div className="segmentContainer">
       <Alert icon={false} severity="info" style={{ maxWidth: '800px' }} variant="outlined">
         <Typography variant="h6">Open uni student population</Typography>
-        <p>
-          Here you can create custom population using a list of courses. Clicking the blue button will open a modal
-          where you can enter a list of courses. <br />
-          <Typography sx={{ display: 'flex' }}>
-            <CheckIcon color="success" />: Student has passed the course. <br />
-          </Typography>
-          <Typography sx={{ display: 'flex' }}>
-            <CloseIcon color="error" />: Student has failed the course. <br />
-          </Typography>
-          <Typography sx={{ display: 'flex' }}>
-            <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the
-          </Typography>
-          course. <br />
-          <b>Empty cell</b>: Student has no enrollments for the course. <br />
-        </p>
+        Here you can create custom population using a list of courses. Clicking the blue button will open a modal where
+        you can enter a list of courses. <br />
+        <Typography sx={{ display: 'flex' }}>
+          <CheckIcon color="success" />: Student has passed the course. <br />
+        </Typography>
+        <Typography sx={{ display: 'flex' }}>
+          <CloseIcon color="error" />: Student has failed the course. <br />
+        </Typography>
+        <Typography sx={{ display: 'flex' }}>
+          <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the
+        </Typography>
+        course. <br />
+        <b>Empty cell</b>: Student has no enrollments for the course. <br />
       </Alert>
       <CustomOpenUniSearch savedSearches={savedSearches.data} setValues={setValues} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
@@ -58,7 +56,7 @@ export const CustomOpenUniPopulation = () => {
           </p>
         ) : null}
       </div>
-      <div style={{ paddingTop: '25px' }}>
+      <div data-cy="open-uni-table-div" style={{ width: '100%' }}>
         {fieldValues && fieldValues.courseList?.length > 0 ? (
           <OpenUniPopulationResults fieldValues={fieldValues} />
         ) : null}

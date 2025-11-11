@@ -1,14 +1,20 @@
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import MinusIcon from '@mui/icons-material/Remove'
-import { useEffect, useState } from 'react'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { createColumnHelper } from '@tanstack/react-table'
+import { useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/material/Loading'
-import { SortableTable } from '@/components/SortableTable'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
 import { useGetOpenUniCourseStudentsQuery } from '@/redux/openUniPopulations'
 import { formatDate } from '@/util/timeAndDate'
+
+const columnHelper = createColumnHelper()
 
 const getTableData = studentsData => {
   return Object.keys(studentsData).reduce(
@@ -26,229 +32,155 @@ const getTableData = studentsData => {
   )
 }
 
-const getColumns = (labelsToCourses, getTextIn) => {
-  const style = {
-    verticalAlign: 'middle',
-    textAlign: 'center',
-  }
-
-  const studentNumberColumn = [
-    {
-      key: 'studentnumber-parent',
-      mergeHeader: true,
-      title: 'Student number',
-      children: [
-        {
-          key: 'studentnumber-child',
-          title: 'Student number',
-          cellProps: { style },
-          getRowVal: student => student.studentnumber,
-          getRowContent: student => student.studentnumber,
-        },
-      ],
-    },
-  ]
-
-  const statisticColumns = [
-    {
-      key: 'passed',
-      title: 'Passed',
-      cellProps: { style },
-      headerProps: { title: 'Passed' },
-      getRowVal: student => student.totals.passed,
-    },
-    {
-      key: 'failed',
-      title: 'Failed',
-      headerProps: { title: 'Failed' },
-      getRowVal: student => student.totals.failed,
-      cellProps: { style },
-    },
-    {
-      key: 'unfinished',
-      title: 'Unfinished',
-      headerProps: { title: 'Unfinished' },
-      getRowVal: student => student.totals.unfinished,
-      cellProps: { style },
-    },
-  ]
-
-  const informationColumns = [
-    {
-      key: 'email-child',
-      title: 'Email',
-      getRowVal: student => student.email ?? '',
-      headerProps: { title: 'Email' },
-    },
-    {
-      key: 'secondary_email-child',
-      title: 'Secondary email',
-      getRowVal: student => student.secondaryEmail ?? '',
-      headerProps: { title: 'Secondary email' },
-    },
-  ]
-
-  const findRowContent = (student, courseCode) => {
-    if (student.courseInfo[courseCode] === undefined) return null
-    if (student.courseInfo[courseCode].status.passed) return <CheckIcon color="success" />
-    if (student.courseInfo[courseCode].status.failed) return <CloseIcon color="error" />
-    if (student.courseInfo[courseCode].status.unfinished) return <MinusIcon color="disabled" />
-    return null
-  }
-
-  const findRowValue = (student, courseCode, hidden = false) => {
-    if (student.courseInfo[courseCode] === undefined) return ''
-    if (student.courseInfo[courseCode].status.passed && hidden) {
-      return `Passed: ${formatDate(student.courseInfo[courseCode].status.passed, DateFormat.ISO_DATE)}`
-    }
-    if (student.courseInfo[courseCode].status.failed && hidden) {
-      return `Failed: ${formatDate(student.courseInfo[courseCode].status.failed, DateFormat.ISO_DATE)}`
-    }
-    if (student.courseInfo[courseCode].status.unfinished && hidden) {
-      return `Enrollment: ${formatDate(student.courseInfo[courseCode].status.unfinished, DateFormat.ISO_DATE)}`
-    }
-    if (student.courseInfo[courseCode].status.passed) return 'Passed'
-    if (student.courseInfo[courseCode].status.failed) return 'Failed'
-    if (student.courseInfo[courseCode].status.unfinished) return 'Unfinished'
-    return ''
-  }
-  const findProp = (student, courseCode) => {
-    const propObj = {
-      title: '',
-      style,
-    }
-    if (student.courseInfo[courseCode] === undefined) return propObj
-    if (student.courseInfo[courseCode].status.passed)
-      return {
-        ...propObj,
-        title: `Passed: ${formatDate(student.courseInfo[courseCode].status.passed, DateFormat.ISO_DATE)}`,
-      }
-    if (student.courseInfo[courseCode].status.failed)
-      return {
-        ...propObj,
-        title: `Failed: ${formatDate(student.courseInfo[courseCode].status.failed, DateFormat.ISO_DATE)}`,
-      }
-    if (student.courseInfo[courseCode].status.unfinished)
-      return {
-        ...propObj,
-        title: `Enrollment: ${formatDate(student.courseInfo[courseCode].status.unfinished, DateFormat.ISO_DATE)}`,
-      }
-    return propObj
-  }
-
-  const columnsToShow = labelsToCourses.map(course => ({
-    key: `${course.label}-${getTextIn(course.name)}`,
-    title: (
-      <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
-        <div>{course.label}</div>
-      </div>
-    ),
-    textTitle: `${course.label}-${getTextIn(course.name)}`,
-    vertical: false,
-    forceToolsMode: 'dangling',
-    cellProps: student => findProp(student, course.label),
-    headerProps: { title: `${course.label}-${getTextIn(course.name)}` },
-    getRowVal: student => {
-      return findRowValue(student, course.label)
-    },
-    getRowContent: student => {
-      return findRowContent(student, course.label)
-    },
-    code: course.label,
-  }))
-
-  const columnsToHide = labelsToCourses.map(course => ({
-    key: `hidden-${course.label}-${getTextIn(course.name)}`,
-    export: true,
-    displayColumn: false,
-    textTitle: `Dates-${course.label}-${getTextIn(course.name)}`,
-    headerProps: {
-      title: `Dates-${course.label}-${getTextIn(course.name)}`,
-    },
-    getRowVal: student => {
-      return findRowValue(student, course.label, true)
-    },
-    code: `hidden ${course.label}`,
-  }))
-
-  const columns = []
-  columns.push(
-    {
-      key: 'general',
-      title: <b>Labels</b>,
-      textTitle: null,
-      children: studentNumberColumn,
-    },
-    {
-      key: 'courses',
-      title: <b>Courses</b>,
-      textTitle: null,
-      children: columnsToShow,
-    },
-    {
-      key: 'statistics',
-      title: <b>Total of</b>,
-      textTitle: null,
-      children: statisticColumns,
-    },
-    {
-      key: 'information',
-      title: <b>Information</b>,
-      textTitle: null,
-      children: informationColumns,
-    }
-  )
-  if (labelsToCourses.length > 0) {
-    columns.push({
-      key: 'hiddencourses',
-      title: '',
-      mergeHeader: true,
-      textTitle: null,
-      children: columnsToHide,
-    })
-  }
-  return columns
+const findRowContent = (student, courseCode) => {
+  if (student.courseInfo[courseCode] === undefined) return null
+  if (student.courseInfo[courseCode].status.passed) return <CheckIcon color="success" />
+  if (student.courseInfo[courseCode].status.failed) return <CloseIcon color="error" />
+  if (student.courseInfo[courseCode].status.unfinished) return <MinusIcon color="disabled" />
+  return null
 }
+
+const findRowValue = (student, courseCode) => {
+  if (student.courseInfo[courseCode]?.status.passed) {
+    return `Passed: ${formatDate(student.courseInfo[courseCode].status.passed, DateFormat.ISO_DATE)}`
+  }
+  if (student.courseInfo[courseCode]?.status.failed) {
+    return `Failed: ${formatDate(student.courseInfo[courseCode].status.failed, DateFormat.ISO_DATE)}`
+  }
+  if (student.courseInfo[courseCode]?.status.unfinished) {
+    return `Enrollment: ${formatDate(student.courseInfo[courseCode].status.unfinished, DateFormat.ISO_DATE)}`
+  }
+
+  return ''
+}
+
+const getColumns = (labelsToCourses, getTextIn) => [
+  columnHelper.group({
+    key: 'general',
+    header: 'Labels',
+    columns: [
+      columnHelper.accessor('studentnumber', {
+        key: 'studentnumber-child',
+        header: 'Student number',
+        cell: ({ row }) => row.original.studentnumber,
+      }),
+    ],
+  }),
+  columnHelper.group({
+    key: 'information',
+    header: 'Information',
+    columns: [
+      columnHelper.accessor('email', {
+        key: 'email-child',
+        header: 'Email',
+        cell: ({ row }) => row.original.email ?? '',
+      }),
+      columnHelper.accessor('secondaryEmail', {
+        key: 'secondary_email-child',
+        header: 'Secondary email',
+        cell: ({ row }) => row.original.secondaryEmail ?? '',
+      }),
+    ],
+  }),
+  columnHelper.group({
+    key: 'courses',
+    header: 'Courses',
+    columns: labelsToCourses.map(course =>
+      columnHelper.display({
+        key: `${course.label}-${getTextIn(course.name)}`,
+        header: course.label,
+        // cellProps: student => findProp(student, course.label),
+        cell: ({ row }) => (
+          <Tooltip title={findRowValue(row.original, course.label)}>
+            <Typography component="div" sx={{ m: 'auto', width: 'fit-content' }}>
+              {findRowContent(row.original, course.label)}
+            </Typography>
+          </Tooltip>
+        ),
+      })
+    ),
+  }),
+  columnHelper.group({
+    key: 'statistics',
+    header: 'Total of',
+    columns: [
+      columnHelper.display({
+        key: 'passed',
+        header: 'Passed',
+        cell: ({ row }) => row.original.totals.passed,
+      }),
+      columnHelper.display({
+        key: 'failed',
+        header: 'Failed',
+        cell: ({ row }) => row.original.totals.failed,
+      }),
+      columnHelper.display({
+        key: 'unfinished',
+        header: 'Unfinished',
+        cell: ({ row }) => row.original.totals.unfinished,
+      }),
+    ],
+  }),
+]
 
 export const OpenUniPopulationResults = ({ fieldValues }) => {
   const { courseList, startdate, enddate } = fieldValues
-  const [tableData, setData] = useState({ data: [], columns: [] })
-  const { getTextIn, language } = useLanguage()
-  const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
-  const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
-  const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
+  const { getTextIn } = useLanguage()
+  const { data, isLoading, isFetching, isSuccess, isError } = useGetOpenUniCourseStudentsQuery(
+    { courseList, startdate, enddate },
+    { skip: !courseList.length }
+  )
+  const isFetchingOrLoading = isLoading || isFetching
+  const hasFailed = isError || (isSuccess && !data)
 
-  useEffect(() => {
-    if (!isError && !isFetchingOrLoading) {
-      const unOrderedLabels = openUniStudentStats?.data.courses
-      const labelsToCourses = [...unOrderedLabels].sort((a, b) => a.label.localeCompare(b.label))
+  const [columns, tableData, excelData] = useMemo(() => {
+    if (isFetchingOrLoading || hasFailed) return []
 
-      const timer = setTimeout(() => {
-        const data = getTableData(openUniStudentStats?.data.students)
-        const columns = getColumns(labelsToCourses, getTextIn)
-        setData({ data, columns })
-      }, 0)
+    const labelsToCourses = data.courses
+    const columns = getColumns(
+      data.courses.toSorted((a, b) => a.label.localeCompare(b.label)),
+      getTextIn
+    )
 
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [openUniStudentStats, language])
+    const tableData = getTableData(data.students)
+    const excelData = tableData.map(student => ({
+      'Student number': student.studentnumber,
+      Email: student.email,
+      'Secondary email': student.secondaryEmail,
+      ...Object.fromEntries(labelsToCourses.map(course => [course.label, findRowValue(student, course.label)])),
+      Passed: student.totals.passed,
+      Failed: student.totals.failed,
+      Unfinished: student.totals.unfinished,
+    }))
 
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading) return <Loading active style={{ marginTop: '15em' }} />
+    return [columns, tableData, excelData]
+  }, [data])
+
+  const accessorKeys = useMemo(
+    () => [
+      'Student number',
+      'Email',
+      'Secondary email',
+      ...(data?.courses.map(course => course.label).toSorted((a, b) => a.localeCompare(b)) ?? []),
+      'Passed',
+      'Failed',
+      'Unfinished',
+    ],
+    [data?.courses]
+  )
+
+  if (!courseList.length) return <h3>No courses selected.</h3>
+
+  if (isFetchingOrLoading) return <Loading />
+  if (hasFailed) return <h3>Something went wrong, please try refreshing the page.</h3>
+
+  const tableOptions = {}
 
   return (
-    <div style={{ paddingBottom: '50px' }}>
-      <div data-cy="open-uni-table-div" style={{ maxHeight: '80vh', width: '100%' }}>
-        {courseList.length > 0 && (
-          <SortableTable
-            columns={tableData.columns}
-            data={tableData.data}
-            featureName="open_uni"
-            title={`Open uni student population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
-          />
-        )}
-      </div>
-    </div>
+    <>
+      {`Open uni student population (${Object.keys(data.students).length} students)`}
+      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+      <OodiTable columns={columns} data={tableData} options={tableOptions} />
+    </>
   )
 }
