@@ -10,11 +10,11 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { creditDateFilter } from '@/components/FilterView/filters'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { formatDate } from '@/util/timeAndDate'
 import { FormattedStudentData } from '.'

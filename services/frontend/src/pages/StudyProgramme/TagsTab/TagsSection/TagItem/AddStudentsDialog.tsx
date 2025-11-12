@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
 
 import { extractItems } from '@/common'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useCreateStudentTagsMutation } from '@/redux/tags'
 import { Tag } from '@oodikone/shared/types'
 

@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 
 import { useEffect } from 'react'
 
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useDeleteTagMutation } from '@/redux/tags'
 import { Tag } from '@oodikone/shared/types'
 

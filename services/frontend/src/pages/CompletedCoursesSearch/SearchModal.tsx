@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
 import { SearchHistory } from '@/components/material/SearchHistory'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import {
   useCreateCourseListMutation,
   useDeleteCourseListMutation,

@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/material/Section'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { ProgressCriteria } from '@oodikone/shared/types'

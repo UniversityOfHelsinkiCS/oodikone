@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
 import { PageTitle } from '@/components/material/PageTitle'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useSendFeedbackMutation } from '@/redux/feedback'

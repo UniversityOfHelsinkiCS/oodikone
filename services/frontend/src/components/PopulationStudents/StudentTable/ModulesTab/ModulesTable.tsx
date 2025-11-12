@@ -11,13 +11,13 @@ import { ColumnDef, createColumnHelper, TableOptions } from '@tanstack/react-tab
 import { useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
 import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationStudents/StudentTable/ModulesTab'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 
 const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null

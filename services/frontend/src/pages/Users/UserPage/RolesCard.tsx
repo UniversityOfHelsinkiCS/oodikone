@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { RoleChip } from '@/components/material/RoleChip'
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { User } from '@/types/api/users'
 import { Role } from '@oodikone/shared/types'

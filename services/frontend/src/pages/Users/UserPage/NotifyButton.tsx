@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack'
 
 import { useEffect, useState } from 'react'
 
-import { useStatusNotification } from '@/components/material/StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailPreview } from './EmailPreview'
 

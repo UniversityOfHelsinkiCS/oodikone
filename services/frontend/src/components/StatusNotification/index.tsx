@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 
-import { useStatusNotification } from './StatusNotificationContext'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
 
 export const StatusNotification = () => {
   const { message, severity, open, closeNotification } = useStatusNotification()
