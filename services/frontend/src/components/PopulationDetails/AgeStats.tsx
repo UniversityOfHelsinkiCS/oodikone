@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography'
 import { mean, groupBy } from 'lodash'
 import { Fragment, useState } from 'react'
 
-import { PercentageBar } from '@/components/material/PercentageBar'
+import { PercentageBar } from '@/components/common/PercentageBar'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'

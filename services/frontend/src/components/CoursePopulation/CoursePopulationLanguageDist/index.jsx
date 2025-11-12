@@ -6,8 +6,8 @@ import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { languageAbbreviations } from '@/common'
+import { PercentageBar } from '@/components/common/PercentageBar'
 import { StyledTable } from '@/components/common/StyledTable'
-import { PercentageBar } from '@/components/material/PercentageBar'
 
 dayjsExtend(isBetween)
 

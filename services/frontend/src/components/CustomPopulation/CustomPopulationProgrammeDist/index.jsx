@@ -5,10 +5,10 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { getNewestProgrammeOfStudentAt } from '@/common'
 import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
+import { PercentageBar } from '@/components/common/PercentageBar'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PercentageBar } from '@/components/material/PercentageBar'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { SearchResultTable } from './SearchResultTable'
 

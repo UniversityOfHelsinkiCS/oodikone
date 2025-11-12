@@ -6,7 +6,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
-import { PercentageBar } from '@/components/material/PercentageBar'
+import { PercentageBar } from '@/components/common/PercentageBar'
 import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'
 
 type CollapsibleCreditRowProps = {
