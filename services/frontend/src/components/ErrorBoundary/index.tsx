@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/browser'
 import { type ReactNode, Component } from 'react'
 
-import { ErrorBackground } from '@/components/material/ErrorBackground'
+import { ErrorBackground } from '@/components/ErrorBoundary/ErrorBackground'
 import { actionHistory } from '@/redux/actionHistory'
 
 let lastErrorSent = null

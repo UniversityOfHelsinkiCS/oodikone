@@ -10,8 +10,8 @@ import HighCharts from 'highcharts' // eslint-disable-line import-x/default
 import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
+import { AccessDenied } from '@/components/AccessDenied'
 import { LanguageProvider } from '@/components/LanguagePicker/useLanguage'
-import { AccessDenied } from '@/components/material/AccessDenied'
 import { Footer } from '@/components/material/Footer'
 import { NavigationBar } from '@/components/material/NavigationBar'
 import { StatusNotification } from '@/components/material/StatusNotification'

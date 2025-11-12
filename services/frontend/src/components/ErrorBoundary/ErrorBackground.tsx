@@ -10,9 +10,9 @@ import { random } from 'lodash'
 import ReactHighchart from 'react-highcharts'
 
 import toskaLogo from '@/assets/toska.svg'
+import { Backdrop } from '@/components/common/Backdrop'
 import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
-import { Backdrop } from './Backdrop'
 
 const names = [
   'mluukkai',

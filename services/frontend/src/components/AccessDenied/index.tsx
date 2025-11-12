@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import { ErrorBackground } from '../ErrorBackground'
+import { ErrorBackground } from '../ErrorBoundary/ErrorBackground'
 import { EasterEgg } from './EasterEgg'
 
 export const AccessDenied = () => {
