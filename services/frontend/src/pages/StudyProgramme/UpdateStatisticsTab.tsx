@@ -3,8 +3,8 @@ import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
 
-import { Section } from '@/components/material/Section'
 import { UpdateButton } from '@/components/material/UpdateButton'
+import { Section } from '@/components/Section'
 import { useUpdateBasicViewQuery, useUpdateStudyTrackViewQuery } from '@/redux/studyProgramme'
 
 export const UpdateStatisticsTab = ({

@@ -9,8 +9,8 @@ import { sortBy } from 'lodash'
 
 import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Section } from '@/components/material/Section'
 import { StyledTable } from '@/components/material/StyledTable'
+import { Section } from '@/components/Section'
 import { Name } from '@oodikone/shared/types'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 

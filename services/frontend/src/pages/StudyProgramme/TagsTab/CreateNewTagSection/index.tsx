@@ -10,7 +10,7 @@ import type { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

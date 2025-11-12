@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 import { Loading } from '@/components/material/Loading'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 
 export const NewUserSection = ({ onAddUser }) => {

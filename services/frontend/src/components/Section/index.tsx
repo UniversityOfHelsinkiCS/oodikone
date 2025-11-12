@@ -4,9 +4,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { InfoBox } from '@/components/material/InfoBox'
-import { ErrorMessage } from './ErrorMessage'
-import { ExportButton } from './ExportButton'
-import { LoadingSkeleton } from './LoadingSkeleton'
+import { ErrorMessage } from '@/components/Section/ErrorMessage'
+import { ExportButton } from '@/components/Section/ExportButton'
+import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
 
 export const Section = ({
   children,

@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { CourseSearchState } from '@/redux/courseSearch'
 import { AvailableStats, CourseStat, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'

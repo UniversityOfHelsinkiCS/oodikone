@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import {
   FacultyClassSizes,
   GraduationStats,

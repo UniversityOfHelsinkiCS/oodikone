@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField'
 import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
 import { isMedicalProgramme } from '@/util/studyProgramme'

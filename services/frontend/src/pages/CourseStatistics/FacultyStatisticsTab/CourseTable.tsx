@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { CourseStat, FacultyStat } from '@/types/courseStat'
 
 export const CourseTable = ({ course, courseInstance }: { course: CourseStat; courseInstance: FacultyStat }) => {

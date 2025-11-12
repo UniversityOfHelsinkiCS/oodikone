@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { CourseSearchState } from '@/redux/courseSearch'
 import { CourseStat } from '@/types/courseStat'

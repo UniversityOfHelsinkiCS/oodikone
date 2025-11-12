@@ -2,7 +2,7 @@ import List from '@mui/material/List'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { Tag } from '@oodikone/shared/types'
 import { TagItem } from './TagItem'
 

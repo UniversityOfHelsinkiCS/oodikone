@@ -6,7 +6,7 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { FacultyProgress } from '@/components/material/FacultyProgress'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyProgressTab = () => {

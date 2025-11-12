@@ -16,7 +16,7 @@ import { isDefaultServiceProvider } from '@/common'
 import { updaterToolTips } from '@/common/InfoToolTips'
 import { ExternalLink } from '@/components/common/ExternalLink'
 import { PageTitle } from '@/components/material/PageTitle'
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 import { languageCenterViewEnabled } from '@/conf'
 import { useTitle } from '@/hooks/title'
 

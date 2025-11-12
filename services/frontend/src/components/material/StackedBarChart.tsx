@@ -5,7 +5,7 @@ import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
-import { Section } from '@/components/material/Section'
+import { Section } from '@/components/Section'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { Section } from '../material/Section'
+import { Section } from '../Section'
 import { PopulationSearchForm } from './PopulationSearchForm'
 
 export const PopulationSearch = () => (
