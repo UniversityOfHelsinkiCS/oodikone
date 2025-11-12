@@ -18,7 +18,6 @@ import { Link } from '@/components/material/Link'
 import { StyledTable } from '@/components/material/StyledTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
 import { splitByEmptySpace } from '@oodikone/shared/util'
-import './teacherSearch.css'
 
 export const TeacherSearchTab = () => {
   const [searchString, setSearchString] = useState('')
@@ -90,11 +89,10 @@ export const TeacherSearchTab = () => {
           slotProps={{
             input: { endAdornment: <SearchIcon /> },
           }}
+          sx={{ width: '100%', maxWidth: '600px', py: '1rem' }}
           value={searchString}
         />
-        <Paper className="contentSegment" sx={{ maxWidth: 'sm' }}>
-          {getContent()}
-        </Paper>
+        <Paper sx={{ maxWidth: 'sm' }}>{getContent()}</Paper>
       </Box>
     </>
   )

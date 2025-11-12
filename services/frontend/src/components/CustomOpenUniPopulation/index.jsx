@@ -2,6 +2,7 @@ import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import MinusIcon from '@mui/icons-material/Remove'
 import Alert from '@mui/material/Alert'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
@@ -23,7 +24,15 @@ export const CustomOpenUniPopulation = () => {
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loading active style={{ marginTop: '15em' }} />
   return (
-    <div className="segmentContainer">
+    <Stack
+      sx={{
+        display: 'flex',
+        mx: 'auto',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: 'md',
+      }}
+    >
       <Alert icon={false} severity="info" style={{ maxWidth: '800px' }} variant="outlined">
         <Typography variant="h6">Open uni student population</Typography>
         Here you can create custom population using a list of courses. Clicking the blue button will open a modal where
@@ -61,6 +70,6 @@ export const CustomOpenUniPopulation = () => {
           <OpenUniPopulationResults fieldValues={fieldValues} />
         ) : null}
       </div>
-    </div>
+    </Stack>
   )
 }

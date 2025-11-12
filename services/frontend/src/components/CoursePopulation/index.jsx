@@ -26,6 +26,7 @@ import {
 import { InfoBox } from '@/components/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/material/Loading'
+import { PageTitle } from '@/components/material/PageTitle'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
@@ -223,13 +224,7 @@ export const CoursePopulation = () => {
       {(filteredStudents, filteredCourses) => (
         <>
           <SegmentContainer>
-            <Typography className="segmentTitle" textAlign="center" variant="h4">
-              Population of course {header}
-            </Typography>
-
-            <Typography className="segmentTitle" textAlign="center" variant="h6">
-              {subHeader}
-            </Typography>
+            <PageTitle subtitle={subHeader} title={`Population of course ${header}`} />
           </SegmentContainer>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>

@@ -1,9 +1,10 @@
+import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import Typography from '@mui/material/Typography'
 import { useParams } from 'react-router'
 
+import { PageTitle } from '@/components/material/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 
 import { useTitle } from '@/hooks/title'
@@ -43,13 +44,9 @@ export const Teachers = () => {
   const { teacherid } = useParams()
 
   return (
-    <div className="segmentContainer">
-      <Typography className="segmentTitle" variant="h4">
-        Teacher statistics
-      </Typography>
-      <Paper className="contentSegment">
-        {teacherid ? <TeacherDetails teacherId={teacherid} /> : <TeachersTabs />}
-      </Paper>
-    </div>
+    <Box maxWidth="md" mx="auto">
+      <PageTitle title="Teacher statistics" />
+      <Paper elevation={0}>{teacherid ? <TeacherDetails teacherId={teacherid} /> : <TeachersTabs />}</Paper>
+    </Box>
   )
 }
