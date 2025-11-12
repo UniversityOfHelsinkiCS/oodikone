@@ -7,10 +7,10 @@ import Typography from '@mui/material/Typography'
 import { isDefaultServiceProvider } from '@/common'
 import { ExternalLink } from '@/components/common/ExternalLink'
 import { Link } from '@/components/common/Link'
+import { ToskaLogo } from '@/components/Footer/ToskaLogo'
 import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
 import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
-import { ToskaLogo } from './ToskaLogo'
 
 export const Footer = () => {
   return (
