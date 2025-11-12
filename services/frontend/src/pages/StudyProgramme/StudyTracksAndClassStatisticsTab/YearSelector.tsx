@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 
-import { PopulationLink } from '@/components/material/PopulationLink'
+import { PopulationLink } from '@/components/common/PopulationLink'
 
 export const YearSelector = ({
   studyProgramme,

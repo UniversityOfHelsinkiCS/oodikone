@@ -7,8 +7,8 @@ import { createColumnHelper, getExpandedRowModel } from '@tanstack/react-table'
 import { chain, range } from 'lodash'
 import { useMemo, useState } from 'react'
 
+import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Link } from '@/components/material/Link'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 

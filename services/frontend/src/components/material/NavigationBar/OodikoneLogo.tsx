@@ -2,7 +2,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { isDev } from '@/conf'
 
 export const OodikoneLogo = () => {

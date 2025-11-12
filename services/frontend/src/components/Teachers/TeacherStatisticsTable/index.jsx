@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { calculatePercentage, isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 

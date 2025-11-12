@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'

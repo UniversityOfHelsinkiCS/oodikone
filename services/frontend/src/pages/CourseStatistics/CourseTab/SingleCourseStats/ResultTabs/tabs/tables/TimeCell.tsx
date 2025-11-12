@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 
 export const TimeCell = ({
   href,

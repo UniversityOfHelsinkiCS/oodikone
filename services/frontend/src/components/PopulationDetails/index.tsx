@@ -10,6 +10,7 @@ import Switch from '@mui/material/Switch'
 import { useEffect, useState } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { Link } from '@/components/common/Link'
 import { PanelView } from '@/components/common/PanelView'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import {
@@ -19,7 +20,6 @@ import {
 } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox'
-import { Link } from '@/components/material/Link'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'

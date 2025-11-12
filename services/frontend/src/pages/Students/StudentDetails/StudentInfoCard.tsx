@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { callApi } from '@/apiConnection'
-import { ExternalLink } from '@/components/material/ExternalLink'
+import { ExternalLink } from '@/components/common/ExternalLink'
 import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { DateFormat } from '@/constants/date'
 import { useSisUrl } from '@/hooks/useSisUrl'

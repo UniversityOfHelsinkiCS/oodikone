@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { MockButton } from '@/components/material/MockButton'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

@@ -21,9 +21,9 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 
+import { Link } from '@/components/common/Link'
 import { StyledMessage } from '@/components/common/StyledMessage'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Link } from '@/components/material/Link'
 
 import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'

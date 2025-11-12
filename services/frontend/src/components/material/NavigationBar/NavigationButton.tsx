@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useLocation } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'

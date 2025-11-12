@@ -2,8 +2,8 @@ import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Link } from '@/components/material/Link'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 
 export const FacultyCard = ({ faculty }: { faculty: GetFacultiesResponse }) => {

@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import TableCell from '@mui/material/TableCell'
 
-import { PopulationLink } from '@/components/material/PopulationLink'
+import { PopulationLink } from '@/components/common/PopulationLink'
 
 export const YearCell = ({
   calendarYears,

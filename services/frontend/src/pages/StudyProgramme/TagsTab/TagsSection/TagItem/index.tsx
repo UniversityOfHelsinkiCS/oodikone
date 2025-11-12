@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip'
 
 import { useState } from 'react'
 
-import { PopulationLink } from '@/components/material/PopulationLink'
+import { PopulationLink } from '@/components/common/PopulationLink'
 import { Tag } from '@oodikone/shared/types'
 import { AddStudentsDialog } from './AddStudentsDialog'
 import { DeleteTagDialog } from './DeleteTagDialog'

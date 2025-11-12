@@ -3,9 +3,9 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { useSisUrl } from '@/hooks/useSisUrl'
-import { ExternalLink } from './ExternalLink'
+import { ExternalLink } from '../common/ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => {
   const usableSisUrl = useSisUrl()

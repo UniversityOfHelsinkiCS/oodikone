@@ -4,7 +4,7 @@ import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 
 /**
  * A temporary notification card about the new UI.

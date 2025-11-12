@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Link } from '@/components/material/Link'
+import { Link } from '@/components/common/Link'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { formatToArray } from '@oodikone/shared/util'

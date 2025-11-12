@@ -1,8 +1,8 @@
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 
+import { PopulationLink } from '@/components/common/PopulationLink'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PopulationLink } from '@/components/material/PopulationLink'
 import { Name } from '@oodikone/shared/types'
 import { BasicCell } from './BasicCell'
 import { OtherCountriesCell } from './OtherCountriesCell'

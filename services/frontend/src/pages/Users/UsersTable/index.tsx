@@ -6,8 +6,8 @@ import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'materi
 import { useCallback, useMemo } from 'react'
 
 import { isDefaultServiceProvider } from '@/common'
+import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Link } from '@/components/material/Link'
 import { MockButton } from '@/components/material/MockButton'
 import { RoleChip } from '@/components/material/RoleChip'
 import { DateFormat } from '@/constants/date'
