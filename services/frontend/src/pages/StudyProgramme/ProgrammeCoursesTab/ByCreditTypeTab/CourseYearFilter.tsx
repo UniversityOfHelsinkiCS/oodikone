@@ -6,8 +6,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { Toggle } from '@/components/material/Toggle'
-import { ToggleContainer } from '@/components/material/ToggleContainer'
+import { Toggle } from '@/components/common/toggle/Toggle'
+import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 
 export const CourseYearFilter = ({
   academicYear,

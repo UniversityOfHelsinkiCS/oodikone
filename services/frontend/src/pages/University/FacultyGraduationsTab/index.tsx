@@ -3,10 +3,10 @@ import Stack from '@mui/material/Stack'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { Toggle } from '@/components/common/toggle/Toggle'
+import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { FacultyGraduations } from '@/components/material/FacultyGraduations'
 import { Section } from '@/components/material/Section'
-import { Toggle } from '@/components/material/Toggle'
-import { ToggleContainer } from '@/components/material/ToggleContainer'
 import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyGraduationsTab = () => {

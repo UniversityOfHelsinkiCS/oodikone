@@ -6,11 +6,11 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { Toggle } from '@/components/common/toggle/Toggle'
+import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { LineGraph } from '@/components/material/LineGraph'
 import { Section } from '@/components/material/Section'
 import { StackedBarChart } from '@/components/material/StackedBarChart'
-import { Toggle } from '@/components/material/Toggle'
-import { ToggleContainer } from '@/components/material/ToggleContainer'
 import {
   useGetFacultyBasicStatsQuery,
   useGetFacultyCreditStatsQuery,
