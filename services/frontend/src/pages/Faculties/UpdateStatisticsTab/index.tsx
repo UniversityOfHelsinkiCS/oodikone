@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
 
-import { UpdateButton } from '@/components/material/UpdateButton'
+import { UpdateButton } from '@/components/common/UpdateButton'
 import { Section } from '@/components/Section'
 import { useUpdateFacultyBasicTabQuery, useUpdateFacultyProgressTabQuery } from '@/redux/facultyStats'
 
