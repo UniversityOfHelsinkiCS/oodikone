@@ -13,7 +13,7 @@ export const FilterToggleIcon = forwardRef<HTMLButtonElement, FilterToggleIconPr
     const { isActive, ...rest } = props
 
     return (
-      <Button {...rest} ref={ref} variant={isActive ? 'contained' : 'outlined'}>
+      <Button {...rest} ref={ref} size="small" variant={isActive ? 'contained' : 'outlined'}>
         <FilterAltOutlinedIcon fontSize="small" />
       </Button>
     )
