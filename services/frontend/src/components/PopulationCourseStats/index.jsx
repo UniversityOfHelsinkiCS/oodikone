@@ -17,10 +17,8 @@ const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
   )
 
 export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, onlyIamRights }) => {
-  const [expandedGroups, setExpandedGroups] = useState(new Set())
-  const [modules, setModules] = useState([])
-
   const [tab, setTab] = useState(0)
+  const [modules, setModules] = useState([])
 
   useEffect(() => {
     const modules = {}
@@ -62,24 +60,9 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
     )
   }, [filteredCourses, curriculum])
 
-  const toggleGroupExpansion = (code, close = false, all = null) => {
-    if (all) {
-      setExpandedGroups(new Set(all))
-    } else if (close) {
-      setExpandedGroups(new Set())
-    } else {
-      const newExpandedGroups = new Set(expandedGroups)
-      if (!newExpandedGroups.delete(code)) newExpandedGroups.add(code)
-
-      setExpandedGroups(newExpandedGroups)
-    }
-  }
-
   const contextValue = {
     modules,
     courseStatistics: filteredCourses,
-    toggleGroupExpansion,
-    expandedGroups,
   }
 
   const panes = [
