@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router'
 
-import 'semantic-ui-css/semantic.min.css'
 import './styles/custom.css'
 import { App } from './components/App'
 import { ErrorBoundary } from './components/ErrorBoundary'
