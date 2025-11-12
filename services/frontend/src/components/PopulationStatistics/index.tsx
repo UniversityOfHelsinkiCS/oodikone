@@ -42,7 +42,7 @@ import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
 import { HelpInfoCard } from '../material/InfoCard'
-import { PageLoading } from '../material/Loading'
+import { PageLoading } from '../Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 

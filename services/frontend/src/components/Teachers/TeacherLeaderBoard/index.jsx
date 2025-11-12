@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import { LoadingSection } from '@/components/material/Loading'
+import { LoadingSection } from '@/components/Loading'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 
 import { DateFormat } from '@/constants/date'

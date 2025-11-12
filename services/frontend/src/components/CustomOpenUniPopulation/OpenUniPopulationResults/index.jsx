@@ -7,7 +7,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Loading } from '@/components/material/Loading'
+import { Loading } from '@/components/Loading'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'

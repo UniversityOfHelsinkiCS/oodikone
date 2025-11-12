@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
-import { Loading } from '@/components/material/Loading'
+import { Loading } from '@/components/Loading'
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useGetSavedSearchesQuery } from '@/redux/openUniPopulations'

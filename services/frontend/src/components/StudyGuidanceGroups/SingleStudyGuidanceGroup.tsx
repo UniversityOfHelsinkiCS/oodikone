@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router'
 
 import { FilterView } from '@/components/FilterView'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PageLoading } from '@/components/material/Loading'
+import { PageLoading } from '@/components/Loading'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'

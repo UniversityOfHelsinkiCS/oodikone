@@ -5,7 +5,7 @@ import { useParams } from 'react-router'
 import { useTitle } from '@/hooks/title'
 import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
 import { SegmentContainer } from '../common/SegmentContainer'
-import { PageLoading } from '../material/Loading'
+import { PageLoading } from '../Loading'
 import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
 import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
 

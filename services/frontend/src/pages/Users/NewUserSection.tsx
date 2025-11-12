@@ -14,7 +14,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
-import { Loading } from '@/components/material/Loading'
+import { Loading } from '@/components/Loading'
 import { Section } from '@/components/Section'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
 

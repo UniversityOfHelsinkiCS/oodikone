@@ -25,7 +25,7 @@ import {
 } from '@/components/FilterView/filters'
 import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { PageLoading } from '@/components/material/Loading'
+import { PageLoading } from '@/components/Loading'
 import { PageTitle } from '@/components/material/PageTitle'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'

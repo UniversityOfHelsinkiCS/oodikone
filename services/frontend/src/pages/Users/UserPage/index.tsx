@@ -4,7 +4,7 @@ import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 
 import { isDefaultServiceProvider } from '@/common'
-import { Loading } from '@/components/material/Loading'
+import { Loading } from '@/components/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
 import { IamGroupsCard } from './IamGroupsCard'

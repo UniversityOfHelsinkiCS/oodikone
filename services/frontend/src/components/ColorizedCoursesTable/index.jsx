@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useEffect, useMemo, useState } from 'react'
 
-import { LoadingSection } from '@/components/material/Loading'
+import { LoadingSection } from '@/components/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ColorizedCoursesTableContext } from './common'
