@@ -23,7 +23,7 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
 } from '@/components/FilterView/filters'
-import { InfoBox } from '@/components/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/material/Loading'
 import { PageTitle } from '@/components/material/PageTitle'

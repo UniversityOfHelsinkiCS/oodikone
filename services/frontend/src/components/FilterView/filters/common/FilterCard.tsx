@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
-import { InfoBox } from '@/components/material/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 
 import type { Filter } from '../createFilter'
 

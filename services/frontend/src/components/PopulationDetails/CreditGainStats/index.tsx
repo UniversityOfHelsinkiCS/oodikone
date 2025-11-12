@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { getMonthsForDegree } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/material/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { PopulationQuery } from '@/types/populationSearch'
 
 import { FormattedStudent } from '@oodikone/shared/types'

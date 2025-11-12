@@ -19,7 +19,7 @@ import {
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { InfoBox } from '@/components/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'

@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { InfoBox } from '@/components/material/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ErrorMessage } from '@/components/Section/ErrorMessage'
 import { ExportButton } from '@/components/Section/ExportButton'
 import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'

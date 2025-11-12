@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { InfoBox } from './InfoBox'
+import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 
 export const TableHeaderWithTooltip = ({ header, tooltipText }: { header: string; tooltipText: string }) => (
   <Stack direction="row" spacing={1}>

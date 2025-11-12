@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography'
 
 import { isNewStudyProgramme } from '@/common'
 import { ToggleablePin } from '@/components/common/toggle/ToggleablePin'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { InfoBox } from '@/components/material/InfoBox'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 
 import { useGetProgrammesQuery } from '@/redux/populations'

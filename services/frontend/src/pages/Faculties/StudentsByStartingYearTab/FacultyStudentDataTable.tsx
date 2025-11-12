@@ -14,8 +14,8 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { InfoBox } from '@/components/material/InfoBox'
 import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
 

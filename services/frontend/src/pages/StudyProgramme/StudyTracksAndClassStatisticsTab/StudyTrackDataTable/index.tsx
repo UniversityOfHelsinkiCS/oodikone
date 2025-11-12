@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow'
 
 import { useState } from 'react'
 
-import { InfoBox } from '@/components/material/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
 import { Row } from './Row'

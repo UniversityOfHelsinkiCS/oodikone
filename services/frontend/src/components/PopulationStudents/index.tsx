@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVisibilityToggle'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'

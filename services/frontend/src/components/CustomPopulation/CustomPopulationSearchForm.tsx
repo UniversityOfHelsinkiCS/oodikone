@@ -21,7 +21,7 @@ import {
 } from '@/redux/customPopulationSearch'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
-import { InfoBox } from '../material/InfoBox'
+import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 import { CustomPopulationState } from '.'
 
 const customPopulationInfo = `

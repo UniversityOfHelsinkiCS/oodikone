@@ -13,7 +13,7 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PopulationQuery } from '@/types/populationSearch'
 import { queryParamsToString } from '@/util/queryparams'
 import { formatToArray } from '@oodikone/shared/util'
-import { InfoBox } from '../material/InfoBox'
+import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 
 type AdvancedSettingsProps = {
   query: PopulationQuery
