@@ -9,9 +9,9 @@ import TableSortLabel from '@mui/material/TableSortLabel'
 import { Fragment, useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
-import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@oodikone/shared/types'
 import { CollapsedStackedBar } from './CollapsedStackedBar'
 

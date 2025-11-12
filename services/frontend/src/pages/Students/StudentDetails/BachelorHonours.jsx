@@ -18,10 +18,10 @@ import {
   bachelorHonoursBasicModules as basicHonoursModules,
   bachelorHonoursIntermediateModules as intermediateHonoursModules,
 } from '@/common'
+import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CurriculumPicker } from '@/components/material/CurriculumPicker'
 import { StyledAccordion } from '@/components/material/StyledAccordion'
-import { StyledTable } from '@/components/material/StyledTable'
 import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'

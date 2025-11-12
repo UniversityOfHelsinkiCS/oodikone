@@ -7,8 +7,8 @@ import TableRow from '@mui/material/TableRow'
 
 import { Fragment, useState } from 'react'
 
+import { StyledTable } from '@/components/common/StyledTable'
 import { ExpandableRow } from '@/components/material/ExpandableRow'
-import { StyledTable } from '@/components/material/StyledTable'
 import { NameWithCode } from '@oodikone/shared/types'
 import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 

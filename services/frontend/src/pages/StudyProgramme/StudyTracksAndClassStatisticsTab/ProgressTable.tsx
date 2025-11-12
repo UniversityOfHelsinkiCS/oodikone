@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
-import { StyledTable } from '@/components/material/StyledTable'
+import { StyledTable } from '@/components/common/StyledTable'
 import { getCellKey, getRowKey } from './StudyTrackDataTable/util'
 
 export const ProgressTable = ({ data, titles }: { data: (string | number)[][]; titles: string[] }) => {

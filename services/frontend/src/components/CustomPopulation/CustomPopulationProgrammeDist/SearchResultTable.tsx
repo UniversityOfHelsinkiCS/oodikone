@@ -2,7 +2,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import { StyledTable } from '@/components/material/StyledTable'
+import { StyledTable } from '@/components/common/StyledTable'
 
 export const SearchResultTable = ({ actionTrigger, headers, rows, noResultText, selectable }) => {
   if (!rows.length) return <div>{noResultText}</div>

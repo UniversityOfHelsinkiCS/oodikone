@@ -5,8 +5,8 @@ import TableRow from '@mui/material/TableRow'
 import { intersection, orderBy } from 'lodash'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
+import { StyledTable } from '@/components/common/StyledTable'
 import { PercentageBar } from '@/components/material/PercentageBar'
-import { StyledTable } from '@/components/material/StyledTable'
 import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseCodes, from, to }) => {

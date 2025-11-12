@@ -30,7 +30,7 @@ import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGr
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
-import { StyledTable } from '../material/StyledTable'
+import { StyledTable } from '../common/StyledTable'
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
 import { startYearToAcademicYear } from './utils'
 

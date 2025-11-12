@@ -14,9 +14,9 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
+import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { StyledTable } from '@/components/material/StyledTable'
 import { DegreeProgramme } from '@/types/api/faculty'
 
 const getTableCell = (year: string, programme: string, value: number | string) => {

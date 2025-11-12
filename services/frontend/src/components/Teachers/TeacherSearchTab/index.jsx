@@ -15,7 +15,7 @@ import { useState, useCallback } from 'react'
 
 import { validateInputLength } from '@/common'
 import { Link } from '@/components/common/Link'
-import { StyledTable } from '@/components/material/StyledTable'
+import { StyledTable } from '@/components/common/StyledTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
 import { splitByEmptySpace } from '@oodikone/shared/util'
 
