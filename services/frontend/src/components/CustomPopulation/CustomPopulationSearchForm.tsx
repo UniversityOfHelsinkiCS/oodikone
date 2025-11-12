@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { extractItems } from '@/common'
-import { SearchHistory } from '@/components/material/SearchHistory'
+import { SearchHistory } from '@/components/common/SearchHistory'
 
 import {
   useCreateCustomPopulationSearchMutation,

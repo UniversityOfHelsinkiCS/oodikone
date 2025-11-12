@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router'
 
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
-import { SearchHistory } from '@/components/material/SearchHistory'
+import { SearchHistory } from '@/components/common/SearchHistory'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'

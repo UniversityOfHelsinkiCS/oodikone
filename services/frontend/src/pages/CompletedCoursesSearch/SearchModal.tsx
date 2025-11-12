@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 
-import { SearchHistory } from '@/components/material/SearchHistory'
+import { SearchHistory } from '@/components/common/SearchHistory'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import {
   useCreateCourseListMutation,

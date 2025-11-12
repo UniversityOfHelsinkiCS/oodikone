@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
-import { SearchHistory } from '@/components/material/SearchHistory'
+import { SearchHistory } from '@/components/common/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
   useDeleteOpenUniCourseSearchMutation,
