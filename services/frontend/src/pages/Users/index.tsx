@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useLazyGetAllUsersQuery } from '@/redux/users'
 import { NewUserSection } from './NewUserSection'

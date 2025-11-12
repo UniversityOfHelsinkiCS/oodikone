@@ -2,7 +2,7 @@ import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { FacultyGraduationsTab } from './FacultyGraduationsTab'

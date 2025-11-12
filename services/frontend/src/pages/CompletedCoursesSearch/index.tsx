@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack'
 
 import { useState } from 'react'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { SearchModal } from './SearchModal'
 import { SearchResults } from './SearchResults'

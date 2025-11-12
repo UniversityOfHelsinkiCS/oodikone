@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
 import { filterInternalReleases } from '@/common'
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { Release } from '@oodikone/shared/types'

@@ -9,7 +9,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

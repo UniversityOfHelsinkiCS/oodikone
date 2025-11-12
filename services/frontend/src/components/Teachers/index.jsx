@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useParams } from 'react-router'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 
 import { useTitle } from '@/hooks/title'

@@ -2,7 +2,7 @@ import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import { Outlet } from 'react-router'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVisibilityToggle'
 import { useTitle } from '@/hooks/title'
 

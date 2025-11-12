@@ -6,6 +6,7 @@ import { useLocation } from 'react-router'
 
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
 import { SegmentContainer } from '@/components/common/SegmentContainer'
 import {
@@ -26,7 +27,6 @@ import {
 import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
-import { PageTitle } from '@/components/material/PageTitle'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'

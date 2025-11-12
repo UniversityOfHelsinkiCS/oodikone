@@ -8,7 +8,7 @@ import Tabs from '@mui/material/Tabs'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 
-import { PageTitle } from '@/components/material/PageTitle'
+import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
