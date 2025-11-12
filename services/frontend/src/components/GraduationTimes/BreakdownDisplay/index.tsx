@@ -2,8 +2,8 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChart'
 import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@oodikone/shared/types'
-import { BreakdownBarChart } from './BreakdownBarChart'
 
 export const BreakdownDisplay = ({
   data,

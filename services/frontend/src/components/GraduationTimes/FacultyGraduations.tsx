@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 
+import { GraduationTimes } from '@/components/GraduationTimes'
 import { GetAllGraduationStatsResponse } from '@/types/api/university'
-import { GraduationTimes } from './GraduationTimes'
 
 export const FacultyGraduations = ({
   data,

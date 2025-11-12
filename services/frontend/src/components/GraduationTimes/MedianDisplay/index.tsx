@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { MedianBarChart } from '@/components/GraduationTimes/MedianDisplay/MedianBarChart'
 import {
   FacultyClassSizes,
   GraduationStats,
@@ -10,7 +11,6 @@ import {
   ProgrammeClassSizes,
   ProgrammeMedians,
 } from '@oodikone/shared/types'
-import { MedianBarChart } from './MedianBarChart'
 
 export const MedianDisplay = ({
   classSizes,

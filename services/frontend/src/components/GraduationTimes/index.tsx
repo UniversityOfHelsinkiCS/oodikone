@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { BreakdownDisplay } from '@/components/GraduationTimes/BreakdownDisplay'
+import { MedianDisplay } from '@/components/GraduationTimes/MedianDisplay'
 import { Section } from '@/components/Section'
 import {
   FacultyClassSizes,
@@ -9,8 +11,6 @@ import {
   ProgrammeClassSizes,
   ProgrammeMedians,
 } from '@oodikone/shared/types'
-import { BreakdownDisplay } from './BreakdownDisplay'
-import { MedianDisplay } from './MedianDisplay'
 
 export const GraduationTimes = ({
   classSizes,

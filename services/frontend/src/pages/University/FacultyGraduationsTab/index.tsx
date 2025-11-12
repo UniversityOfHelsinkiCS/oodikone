@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { FacultyGraduations } from '@/components/material/FacultyGraduations'
+import { FacultyGraduations } from '@/components/GraduationTimes/FacultyGraduations'
 import { Section } from '@/components/Section'
 import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
