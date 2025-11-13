@@ -13,8 +13,8 @@ import { useState } from 'react'
 
 import { StyledAccordion } from '@/components/common/StyledAccordion'
 import { StyledTable } from '@/components/common/StyledTable'
+import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 

@@ -10,8 +10,8 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { creditDateFilter } from '@/components/FilterView/filters'
-import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import { useStatusNotification } from '@/components/StatusNotification/Context'

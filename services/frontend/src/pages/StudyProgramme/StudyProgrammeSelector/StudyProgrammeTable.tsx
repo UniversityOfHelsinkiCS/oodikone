@@ -7,8 +7,8 @@ import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'materi
 import { useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
+import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
 import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
 
