@@ -6,9 +6,9 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { LineGraph } from '@/components/common/LineGraph'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { LineGraph } from '@/components/material/LineGraph'
 import { StackedBarChart } from '@/components/material/StackedBarChart'
 import { Section } from '@/components/Section'
 import {
