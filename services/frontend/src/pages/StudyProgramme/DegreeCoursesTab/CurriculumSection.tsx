@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { CurriculumPicker } from '@/components/material/CurriculumPicker'
+import { CurriculumPicker } from '@/components/common/CurriculumPicker'
 import { Section } from '@/components/Section'
 
 export const CurriculumSection = ({ curriculum, curriculumList, setCurriculum }) => {

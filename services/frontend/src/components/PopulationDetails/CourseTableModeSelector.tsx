@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Dispatch, SetStateAction } from 'react'
 
-import { CurriculumPicker } from '@/components/material/CurriculumPicker'
+import { CurriculumPicker } from '@/components/common/CurriculumPicker'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { CurriculumOption } from '@oodikone/shared/types'
 
