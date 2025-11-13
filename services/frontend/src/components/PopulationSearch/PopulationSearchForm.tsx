@@ -106,7 +106,7 @@ export const PopulationSearchForm = () => {
   )
 
   return (
-    <Stack spacing={3} sx={{ maxWidth: '1200px', width: '100%' }}>
+    <Stack spacing={3}>
       <Box>
         <Subtitle text="Class of" />
         <Stack direction="row" spacing={2}>

@@ -1,10 +1,9 @@
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import { useParams } from 'react-router'
 
 import { useTitle } from '@/hooks/title'
 import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
-import { SegmentContainer } from '../common/SegmentContainer'
+import { PageLayout } from '../common/PageLayout'
+import { PageTitle } from '../common/PageTitle'
 import { PageLoading } from '../Loading'
 import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
 import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
@@ -16,16 +15,11 @@ export const StudyGuidanceGroups = () => {
 
   if (!groupid)
     return (
-      <SegmentContainer>
-        <Box>
-          <Typography sx={{ mt: '20px', mb: '20px', textAlign: 'center' }} variant="h4">
-            Study guidance groups
-          </Typography>
-        </Box>
-
+      <PageLayout>
+        <PageTitle title="Study guidance groups" />
         <PageLoading isLoading={isLoading} />
         {!isLoading && groups !== undefined && <StudyGuidanceGroupOverview groups={groups} />}
-      </SegmentContainer>
+      </PageLayout>
     )
 
   if (!!groupid && Array.isArray(groups))

@@ -24,7 +24,7 @@ export const Faculties = () => {
   const { data: faculties = [] } = useGetFacultiesQuery()
   const faculty = facultyId && faculties.length > 0 ? faculties.find(faculty => faculty.id === facultyId) : undefined
   const facultyCode = faculty?.code
-  const facultyName = faculty && getTextIn(faculty.name)
+  const facultyName = getTextIn(faculty?.name) ?? undefined
 
   useTitle(facultyName ? `${facultyName} - Faculties` : 'Faculties')
 

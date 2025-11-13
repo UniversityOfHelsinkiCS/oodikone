@@ -45,6 +45,7 @@ import { parseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
+import { PageTitle } from '../common/PageTitle'
 import { PageLoading } from '../Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
@@ -232,15 +233,11 @@ export const PopulationStatistics = () => {
         <>
           <PageLoading isLoading={isLoading} />
           <Stack textAlign="center">
-            <Typography variant="h4">{title}</Typography>
-            {!!studyTrack && (
+            <PageTitle subtitle={studyTrack ? `Studytrack ${studyTrack}` : undefined} title={title}>
               <Typography fontWeight="light" variant="h6">
-                Studytrack {studyTrack}
+                Class size {students.length} students
               </Typography>
-            )}
-            <Typography fontWeight="light" variant="h6">
-              Class size {students.length} students
-            </Typography>
+            </PageTitle>
           </Stack>
           {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           {isSuccess ? (

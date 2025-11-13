@@ -24,6 +24,7 @@ import { useProgress } from '@/hooks/progress'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
 
+import { PageTitle } from '../common/PageTitle'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -149,44 +150,44 @@ export const CustomPopulationContent = ({
 
   return (
     <Box>
-      <Box textAlign="center">
-        <Typography variant="h4">
-          {populationName ? `Custom population: ${populationName}` : 'Custom population'}
-        </Typography>
-      </Box>
-
       {isFetchingPopulation ? (
         <ProgressBar progress={progress} />
       ) : (
         <>
+          <PageTitle title={populationName ? `Custom population: ${populationName}` : 'Custom population'}>
+            <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
+              <Button onClick={resetState} startIcon={<KeyboardBackspaceIcon />} variant="outlined">
+                Back to search form
+              </Button>
+              <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                {associatedProgramme ? (
+                  <Tooltip title="Degree programme associated with the custom population">
+                    <Chip
+                      color="primary"
+                      icon={<LabelIcon fontSize="small" />}
+                      label={studyProgrammes.find(programme => programme.key === associatedProgramme)?.text}
+                      sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
+                      variant="filled"
+                    />
+                  </Tooltip>
+                ) : (
+                  <Typography fontStyle="italic">
+                    No associated degree programme. Defaults to the latest active degree programme for each student.
+                  </Typography>
+                )}
+              </Box>
+              <Box sx={{ width: '220px' }} />
+            </Box>
+          </PageTitle>
           {(discardedStudentNumbers?.length ?? 0) > 0 && !isFetchingPopulation && (
             <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
           )}
 
           {unfilteredPopulationLength === 0 && (
-            <StyledMessage sx={{ my: 2, justifyContent: 'center', width: 'fit-content' }}>
+            <StyledMessage sx={{ justifyContent: 'center', width: 'fit-content' }}>
               <Typography>No students found! Please re-check the student number list.</Typography>
             </StyledMessage>
           )}
-          <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
-            <Button onClick={resetState} startIcon={<KeyboardBackspaceIcon />} variant="outlined">
-              Back to search form
-            </Button>
-            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              {associatedProgramme ? (
-                <Tooltip title="Degree programme associated with the custom population">
-                  <Chip
-                    color="primary"
-                    icon={<LabelIcon fontSize="small" />}
-                    label={studyProgrammes.find(programme => programme.key === associatedProgramme)?.text}
-                    sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
-                    variant="filled"
-                  />
-                </Tooltip>
-              ) : null}
-            </Box>
-            <Box sx={{ width: '220px' }} />
-          </Box>
           {unfilteredPopulationLength > 0 && (
             <Box sx={{ mt: 2 }}>
               <PanelView panels={panels} />

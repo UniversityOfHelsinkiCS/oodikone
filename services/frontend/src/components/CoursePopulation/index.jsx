@@ -6,9 +6,9 @@ import { useLocation } from 'react-router'
 
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
-import { SegmentContainer } from '@/components/common/SegmentContainer'
 import {
   CustomPopulationProgrammeDist,
   findCorrectProgramme,
@@ -223,9 +223,9 @@ export const CoursePopulation = () => {
     >
       {(filteredStudents, filteredCourses) => (
         <>
-          <SegmentContainer>
+          <PageLayout>
             <PageTitle subtitle={subHeader} title={`Population of course ${header}`} />
-          </SegmentContainer>
+          </PageLayout>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>
       )}

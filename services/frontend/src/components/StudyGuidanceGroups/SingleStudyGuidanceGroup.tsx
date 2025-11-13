@@ -5,7 +5,6 @@ import LabelIcon from '@mui/icons-material/Label'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
-import Grid from '@mui/material/Grid2'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from 'react-router'
@@ -17,6 +16,7 @@ import { useGetCustomPopulationQuery } from '@/redux/populations'
 
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
+import { PageTitle } from '../common/PageTitle'
 import { StyledMessage } from '../common/StyledMessage'
 import { SingleStudyGuidanceGroupPanels } from './SingleStudyGuidanceGroupPanels'
 import { startYearToAcademicYear, useGetFilters } from './utils'
@@ -70,8 +70,8 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
     >
       {(filteredStudents, filteredCourses) => (
         <>
-          <Grid alignItems="center" container mb={2} spacing={2} textAlign="center">
-            <Grid size={2}>
+          <PageTitle title={`Study guidance group: ${getTextIn(group.name)}`}>
+            <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
               <Button
                 onClick={handleBack}
                 startIcon={<KeyboardBackspaceIcon />}
@@ -80,23 +80,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
               >
                 Back to groups
               </Button>
-            </Grid>
-            <Grid size={8}>
-              <Typography
-                sx={{
-                  gridColumn: 2,
-                  justifySelf: 'center',
-                }}
-                variant="h4"
-              >
-                Study guidance group: {getTextIn(group.name)}
-              </Typography>
-              <Box display="flex" gap={2} justifyContent="center" my="1rem">
-                {!groupProgramme && !groupYear && (
-                  <Typography fontStyle="italic">
-                    No associated degree programme or starting year set. Some features are disabled.
-                  </Typography>
-                )}
+              <Box gap={1} sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                 {!!groupProgramme && (
                   <Tooltip arrow title="Associated degree programme set for the study guidance group">
                     <Chip
@@ -119,10 +103,15 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
                     />
                   </Tooltip>
                 )}
+                {!groupProgramme && !groupYear && (
+                  <Typography fontStyle="italic">
+                    No associated degree programme or starting year set. Some features are disabled.
+                  </Typography>
+                )}
               </Box>
-            </Grid>
-            <Grid size={2} /> {/* for alignment */}
-          </Grid>
+              <Box sx={{ width: '176px' }} />
+            </Box>
+          </PageTitle>
           <SingleStudyGuidanceGroupPanels
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}

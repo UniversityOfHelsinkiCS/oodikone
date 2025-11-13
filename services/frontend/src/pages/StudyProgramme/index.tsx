@@ -72,7 +72,7 @@ export const StudyProgramme = () => {
 
   const programmeLetterId = programmes?.[programmeId]?.progId
   const secondProgrammeLetterId = programmes?.[secondProgrammeId]?.progId
-  const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn)
+  const programmeName = getProgrammeName(programmeId, secondProgrammeId, programmes, language, getTextIn) ?? undefined
 
   useTitle(programmeName ? `${programmeName} - Degree programmes` : 'Degree programmes')
   if (!studyProgrammeId || !programmeId) return <StudyProgrammeSelector />

@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
+import type { SxProps, Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
@@ -16,6 +17,7 @@ export const Section = ({
   isLoading = false,
   isError = false,
   title,
+  contentSx = {},
 }: {
   children: React.ReactNode
   cypress?: string
@@ -24,6 +26,7 @@ export const Section = ({
   isLoading?: boolean
   isError?: boolean
   title?: string
+  contentSx?: SxProps<Theme>
 }) => {
   return (
     <Paper data-cy={`${cypress}-section`} sx={{ padding: 2 }} variant="outlined">
@@ -38,7 +41,7 @@ export const Section = ({
           {infoBoxContent ? <InfoBox content={infoBoxContent} cypress={cypress} /> : null}
         </Stack>
       </Stack>
-      <Box sx={{ marginTop: title ? 2 : 0 }}>
+      <Box sx={{ marginTop: title ? 2 : 0, ...contentSx }}>
         {isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}
       </Box>
     </Paper>

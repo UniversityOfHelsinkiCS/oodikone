@@ -4,7 +4,6 @@ import SendIcon from '@mui/icons-material/Send'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -21,7 +20,8 @@ import {
 } from '@/redux/customPopulationSearch'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
-import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
+import { PageTitle } from '../common/PageTitle'
+import { Section } from '../Section'
 import { CustomPopulationState } from '.'
 
 const customPopulationInfo = `
@@ -103,19 +103,13 @@ export const CustomPopulationSearchForm = ({
   if (!searches) return null
 
   return (
-    <>
-      <Box my={2} textAlign="center">
-        <Typography variant="h4">Custom population</Typography>
-      </Box>
-      <Paper
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2, m: 2, p: 2, maxWidth: '1000px', mx: 'auto' }}
-        variant="outlined"
+    <Box maxWidth="md" mx="auto" width="100%">
+      <PageTitle title="Custom population" />
+      <Section
+        contentSx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        infoBoxContent={customPopulationInfo}
+        title="New custom population"
       >
-        <Stack direction="row" justifyContent="space-between">
-          <Typography variant="h5">New custom population</Typography>
-          <InfoBox content={customPopulationInfo} />
-        </Stack>
-
         <Box>
           <Typography>Insert a name for this custom population if you wish to save it</Typography>
           <TextField
@@ -225,7 +219,7 @@ export const CustomPopulationSearchForm = ({
             </Box>
           </Stack>
         </Box>
-      </Paper>
-    </>
+      </Section>
+    </Box>
   )
 }

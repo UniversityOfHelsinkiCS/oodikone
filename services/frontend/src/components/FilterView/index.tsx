@@ -8,6 +8,7 @@ import type { CourseStats } from '@oodikone/shared/routes/populations'
 import type { FormattedCourse as Course } from '@oodikone/shared/types/courseData'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 
+import { PageLayout } from '../common/PageLayout'
 import { FilterViewContext } from './context'
 import type { FilterContext, FilterViewContextState } from './context'
 
@@ -76,9 +77,7 @@ export const FilterView: FC<{
         {displayTray ? (
           <FilterTray allStudents={students} filters={filters} numberOfFilteredStudents={filteredStudents.length} />
         ) : null}
-        <Stack direction="column" sx={{ maxWidth: '80vw', flex: 1, p: 2, mx: 'auto' }}>
-          {children(filteredStudents, filteredCourses)}
-        </Stack>
+        <PageLayout>{children(filteredStudents, filteredCourses)}</PageLayout>
       </Stack>
     </FilterViewContext.Provider>
   )
