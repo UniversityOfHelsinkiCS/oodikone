@@ -11,8 +11,8 @@ import { ColumnDef, createColumnHelper, TableOptions } from '@tanstack/react-tab
 import { useMemo } from 'react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'

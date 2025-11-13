@@ -1,4 +1,4 @@
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
 export const useColumns = ({ showCombinedProgrammeColumns }): [string[], string[]] => {

@@ -1,6 +1,6 @@
 import { TableOptions, VisibilityState } from '@tanstack/react-table'
 import { useMemo } from 'react'
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'

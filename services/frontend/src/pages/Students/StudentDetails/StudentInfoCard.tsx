@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography'
 
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/common/ExternalLink'
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { DateFormat } from '@/constants/date'
 import { useSisUrl } from '@/hooks/useSisUrl'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'

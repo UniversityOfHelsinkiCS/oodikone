@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import { useState } from 'react'
 
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useDeleteStudentTagsMutation, useCreateStudentTagsMutation } from '@/redux/tags'
 
 export const TagStudent = ({ studentNumber, studentTags, studyTrack, tagOptions, studentName, combinedProgramme }) => {

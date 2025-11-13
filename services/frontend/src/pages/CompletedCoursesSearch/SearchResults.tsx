@@ -10,13 +10,10 @@ import Stack from '@mui/material/Stack'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { RightsNotification } from '@/components/material/RightsNotification'
-import {
-  StudentNameVisibilityToggle,
-  useStudentNameVisibility,
-} from '@/components/material/StudentNameVisibilityToggle'
 import { DateFormat } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'

@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack'
 import { Outlet } from 'react-router'
 
 import { PageTitle } from '@/components/common/PageTitle'
-import { StudentNameVisibilityToggle } from '@/components/material/StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
 import { useTitle } from '@/hooks/title'
 
 export const Students = () => {

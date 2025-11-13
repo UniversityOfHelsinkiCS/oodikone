@@ -3,8 +3,8 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { StyledTable } from '@/components/common/StyledTable'
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 
 import { TagStudent } from '@/components/TagStudent'
 

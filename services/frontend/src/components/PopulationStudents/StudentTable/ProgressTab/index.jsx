@@ -15,9 +15,8 @@ import { useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
+import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import './index.css'
-import { useStudentNameVisibility } from '@/components/material/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
@@ -26,6 +25,7 @@ import { useGetSemestersQuery } from '@/redux/semesters'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 import { TableInfo } from './info'
+import './index.css'
 
 dayjsExtend(isBetween)
 dayjsExtend(isSameOrBefore)
