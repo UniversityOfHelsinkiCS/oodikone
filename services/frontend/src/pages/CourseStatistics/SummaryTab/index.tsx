@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
+import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ProgrammeDropdown } from '@/components/material/ProgrammeDropdown'
-import { TotalsDisclaimer } from '@/components/material/TotalsDisclaimer'
 import { Section } from '@/components/Section'
 import { ALL, CourseStatisticsSummary, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
