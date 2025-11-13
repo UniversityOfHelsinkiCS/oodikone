@@ -49,7 +49,7 @@ export const StatisticsTable = ({ filteredStudents, type }: { filteredStudents: 
                 <Typography fontSize="1.6em" variant="h5">
                   {type}
                 </Typography>
-                <Typography data-cy="credit-stats-population-size" fontSize="1.2em" fontWeight="250">
+                <Typography data-cy="credit-stats-population-size" fontSize="1.2em" fontWeight="light">
                   (n = {credits.length})
                 </Typography>
               </Box>

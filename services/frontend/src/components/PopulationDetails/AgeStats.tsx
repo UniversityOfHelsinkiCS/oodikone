@@ -106,7 +106,7 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
               </TableCell>
               <TableCell>
                 <Typography fontWeight="inherit">Number of students</Typography>
-                <Typography fontWeight="250">(n = {total})</Typography>
+                <Typography fontWeight="light">(n = {total})</Typography>
               </TableCell>
               <TableCell>
                 <Typography fontWeight="inherit">Percentage of population</Typography>

@@ -13,7 +13,7 @@ export const OodikoneLogo = () => {
         noWrap
         sx={{
           color: 'inherit',
-          fontWeight: 700,
+          fontWeight: 'bold',
           letterSpacing: '.1rem',
           '&:hover': {
             color: 'inherit',

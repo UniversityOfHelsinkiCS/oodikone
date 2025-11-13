@@ -54,12 +54,12 @@ export const CustomOpenUniPopulation = () => {
         {fieldValues && fieldValues.courseList?.length > 0 ? (
           <p>
             <span style={{ color: '#484848' }}>Beginning of the search for all fields:</span>
-            <span style={{ paddingLeft: '10px', fontWeight: '600' }}>
+            <span style={{ paddingLeft: '10px', fontWeight: 'bold' }}>
               {formatDate(fieldValues.startdate, DateFormat.DISPLAY_DATE)}
             </span>
             <br />
             <span style={{ color: '#484848' }}>End of the search for enrollments:</span>
-            <span style={{ paddingLeft: '30px', fontWeight: '600' }}>
+            <span style={{ paddingLeft: '30px', fontWeight: 'bold' }}>
               {formatDate(fieldValues.enddate, DateFormat.DISPLAY_DATE)}
             </span>
           </p>

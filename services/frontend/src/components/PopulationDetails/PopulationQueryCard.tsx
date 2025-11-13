@@ -17,7 +17,7 @@ export const PopulationQueryCard = ({ query, populationTags }: PopulationQueryCa
     <Box data-cy="PopulationQueryCard" sx={{ my: '2em', mx: '1em' }}>
       <Card sx={{ height: 'fit-content', p: '0.2em' }} variant="outlined">
         <CardContent>
-          <Typography sx={{ fontWeight: '600' }} variant="subtitle1">
+          <Typography sx={{ fontWeight: 'bold' }} variant="subtitle1">
             Result details
           </Typography>
           {!!tag && (

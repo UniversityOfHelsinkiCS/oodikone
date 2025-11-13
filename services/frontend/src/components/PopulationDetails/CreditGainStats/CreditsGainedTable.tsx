@@ -114,14 +114,14 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
                   {getTitle()}
                 </Typography>
                 {!studyPlanFilterIsActive && (
-                  <Typography fontWeight="250">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
+                  <Typography fontWeight="ligth">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
                 )}
               </TableCell>
               <TableCell>
                 <Typography fontWeight="inherit" sx={{ whiteSpace: 'wrap' }}>
                   Number of students
                 </Typography>
-                <Typography fontWeight="250">(n = {filteredStudents.length})</Typography>
+                <Typography fontWeight="light">(n = {filteredStudents.length})</Typography>
               </TableCell>
               <TableCell>
                 <Typography fontWeight="inherit">Percentage of population</Typography>

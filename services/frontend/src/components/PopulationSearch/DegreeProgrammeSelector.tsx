@@ -115,7 +115,7 @@ export const DegreeProgrammeSelector = ({
             <Stack component="li" direction="row" key={key} spacing={2} sx={{ width: '100%' }} {...optionProps}>
               <ToggleablePin programme={option} />
               <Typography sx={{ flex: 1, p: 0.4 }}>{option.name}</Typography>
-              <Typography alignSelf="flex-end" fontWeight="300" sx={{ ml: 2 }} variant="body2">
+              <Typography alignSelf="flex-end" fontWeight="ligth" sx={{ ml: 2 }} variant="body2">
                 {option.code}
               </Typography>
             </Stack>

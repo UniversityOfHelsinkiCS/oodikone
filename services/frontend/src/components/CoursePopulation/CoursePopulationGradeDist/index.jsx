@@ -50,7 +50,7 @@ export const CoursePopulationGradeDist = ({ singleCourseStats, students, courseC
           <TableCell>Grades</TableCell>
           <TableCell>
             Number of students
-            <div style={{ fontWeight: 100 }}>(n={students.length})</div>
+            <div style={{ fontWeight: 'light' }}>(n={students.length})</div>
           </TableCell>
           <TableCell>Percentage of population</TableCell>
         </TableRow>

@@ -78,7 +78,7 @@ export const FrontPage = () => {
     <Container maxWidth="lg">
       <PageTitle subtitle="Exploratory Research on Study Data" title="Oodikone" />
       <StyledMessage sx={{ mb: 2 }}>
-        <Typography fontWeight={550}>Service break 18th november, between 7.00 - 9.00</Typography>
+        <Typography fontWeight="bold">Service break 18th november, between 7.00 - 9.00</Typography>
         <Typography>
           Network maintenance performed during the period might cause Oodikone to become temporarily unavailable
         </Typography>

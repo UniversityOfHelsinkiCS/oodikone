@@ -234,11 +234,11 @@ export const PopulationStatistics = () => {
           <Stack textAlign="center">
             <Typography variant="h4">{title}</Typography>
             {!!studyTrack && (
-              <Typography fontWeight={300} variant="h6">
+              <Typography fontWeight="light" variant="h6">
                 Studytrack {studyTrack}
               </Typography>
             )}
-            <Typography fontWeight={300} variant="h6">
+            <Typography fontWeight="light" variant="h6">
               Class size {students.length} students
             </Typography>
           </Stack>
