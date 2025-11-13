@@ -9,10 +9,10 @@ import Stack from '@mui/material/Stack'
 
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
+import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
 import { RightsNotification } from '@/components/material/RightsNotification'
-import { StudentInfoItem } from '@/components/material/StudentInfoItem'
 import {
   StudentNameVisibilityToggle,
   useStudentNameVisibility,

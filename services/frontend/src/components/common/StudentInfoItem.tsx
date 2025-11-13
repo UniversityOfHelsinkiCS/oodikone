@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 
 import { Link } from '@/components/common/Link'
 import { useSisUrl } from '@/hooks/useSisUrl'
-import { ExternalLink } from '../common/ExternalLink'
+import { ExternalLink } from './ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => {
   const usableSisUrl = useSisUrl()
