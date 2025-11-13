@@ -81,6 +81,7 @@ export const PassFailEnrollments = ({ onlyIamRights, useModules }) => {
           const expansionArrow = row.getCanExpand() ? (
             <Box sx={{ p: 1, pl: 0, my: 'auto' }}>
               <KeyboardArrowRightIcon
+                data-cy={`toggle-group-module-${code}`}
                 onClick={row.getToggleExpandedHandler()}
                 sx={{
                   cursor: 'pointer',
