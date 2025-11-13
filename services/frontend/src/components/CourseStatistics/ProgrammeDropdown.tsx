@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField'
 import { orderBy } from 'lodash'
 
 import { DropdownOption } from '@/types/dropdownOption'
-import { DropdownItem } from './DropdownItem'
+import { DropdownItem } from './ProgrammeDropdownItem'
 
 export const ProgrammeDropdown = ({
   label,
