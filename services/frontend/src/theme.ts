@@ -9,8 +9,12 @@ import purple from '@mui/material/colors/purple'
 import red from '@mui/material/colors/red'
 
 import createTheme from '@mui/material/styles/createTheme'
+import '@fontsource/roboto'
 
 const baseTheme = {
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
   palette: {
     success: { main: '#03cc0d' },
     disabled: { main: '#9e9e9e' },
