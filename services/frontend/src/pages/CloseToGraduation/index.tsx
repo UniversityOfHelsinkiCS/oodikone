@@ -1,3 +1,4 @@
+import CheckIcon from '@mui/icons-material/Check'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
@@ -16,7 +17,6 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { CheckIconWithTitle } from '@/components/material/CheckIconWithTitle'
 import { TableHeaderWithTooltip } from '@/components/material/TableHeaderWithTooltip'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { DateFormat } from '@/constants/date'
@@ -28,6 +28,12 @@ import { reformatDate } from '@/util/timeAndDate'
 import { getFullLanguage } from '@oodikone/shared/language'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
+
+const CheckIconWithTitle = ({ visible, title }: { visible: boolean; title?: string }) => (
+  <Box sx={{ display: 'flex', justifyContent: 'center' }} title={title}>
+    {visible ? <CheckIcon color="success" fontSize="small" /> : <Box sx={{ width: '20px', height: '20px' }} />}
+  </Box>
+)
 
 export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
