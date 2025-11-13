@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { ProgressBarChart } from '@/components/material/ProgressBarChart'
+import { ProgressBarChart } from '@/components/common/ProgressBarChart'
 import { ProgressTable } from './ProgressTable'
 
 type ProgressStats = {

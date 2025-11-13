@@ -1,8 +1,8 @@
 import Stack from '@mui/material/Stack'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
+import { ProgressBarChart } from '@/components/common/ProgressBarChart'
 import { FacultyProgressTable } from '@/components/material/FacultyProgressTable'
-import { ProgressBarChart } from '@/components/material/ProgressBarChart'
 import { Section } from '@/components/Section'
 import { GetAllProgressStatsResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
