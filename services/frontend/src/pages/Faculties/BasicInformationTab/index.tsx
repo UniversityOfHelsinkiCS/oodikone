@@ -7,9 +7,9 @@ import { useState } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { LineGraph } from '@/components/common/LineGraph'
+import { StackedBarChart } from '@/components/common/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { StackedBarChart } from '@/components/material/StackedBarChart'
 import { Section } from '@/components/Section'
 import {
   useGetFacultyBasicStatsQuery,
