@@ -1,6 +1,8 @@
 import CropSquareIcon from '@mui/icons-material/CropSquare'
 import DoneIcon from '@mui/icons-material/Done'
 import RemoveIcon from '@mui/icons-material/Remove'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import green from '@mui/material/colors/green'
 import grey from '@mui/material/colors/grey'
@@ -13,7 +15,6 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ExportToExcelDialog } from '@/components/material/ExportToExcelDialog'
-import { RightsNotification } from '@/components/material/RightsNotification'
 import { DateFormat } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
@@ -66,6 +67,27 @@ const getCellTitle = (student, courseCode) => {
         enrollment.substitution ?? enrollment.courseCode
       }`
   return title
+}
+
+const RightsNotification = ({ discardedStudentNumbers }: { discardedStudentNumbers: string[] }) => {
+  const [visible, setVisible] = useState(true)
+
+  if (!visible) {
+    return null
+  }
+
+  return (
+    <Alert data-cy="rights-notification" onClose={() => setVisible(false)} severity="error">
+      <AlertTitle>Invalid or forbidden student numbers</AlertTitle>
+      The information for the following students could not be displayed. This may be because the students do not exist
+      or you do not have the necessary permissions to view their information:
+      <ul>
+        {[...new Set(discardedStudentNumbers)].sort().map(num => (
+          <li key={num}>{num}</li>
+        ))}
+      </ul>
+    </Alert>
+  )
 }
 
 export const SearchResults = ({ searchValues }) => {
