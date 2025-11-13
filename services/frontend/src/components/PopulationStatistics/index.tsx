@@ -1,3 +1,7 @@
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -41,7 +45,6 @@ import { parseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
-import { HelpInfoCard } from '../material/InfoCard'
 import { PageLoading } from '../Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
@@ -105,6 +108,23 @@ const useGetProgrammeText = (programmeCode: string, combinedProgrammeCode?: stri
 
   return programmeName
 }
+
+const HelpInfoCard = ({ title, body }: { title: string; body: string }) => (
+  <Box sx={{ maxWidth: '80%', mx: 'auto', my: 1 }}>
+    <Alert
+      icon={<HelpOutlineIcon sx={{ fontSize: '2.5em', alignSelf: 'center', mx: 1.5 }} />}
+      severity="info"
+      sx={{ fontSize: '1.2em', p: 2 }}
+    >
+      <AlertTitle>
+        <Typography component="span" variant="h6">
+          {title}
+        </Typography>
+      </AlertTitle>
+      {body}
+    </Alert>
+  </Box>
+)
 
 export const PopulationStatistics = () => {
   useTitle('Class statistics')
