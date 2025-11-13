@@ -46,7 +46,6 @@ A collection of useful tools, documentation and other resources.
   - [Material Icons](https://mui.com/material-ui/material-icons/)
   - [MUI X Date pickers](https://mui.com/x/react-date-pickers/)
 - [Material React Table documentation](https://www.material-react-table.com/docs)
-- [Semantic UI React documentation](https://react.semantic-ui.com)
 
 <!--
 
