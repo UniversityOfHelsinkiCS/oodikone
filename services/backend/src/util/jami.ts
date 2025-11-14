@@ -22,25 +22,24 @@ export const getUserIamAccess = async (
   iamGroups: string[],
   attempt = 1
 ): Promise<UserIamAccess> => {
-  if (iamGroups.length === 0) {
-    return {}
-  }
+  if (iamGroups.length === 0) return {}
+
   try {
-    const getSisuAccess = !isStaging && sisPersonId != null && sisPersonId !== ''
-    const { data: iamAccess } = await jamiClient.post('/', {
+    const { data } = await jamiClient.post('/', {
       userId: sisPersonId,
+      getSisuAccess: !isStaging && !!sisPersonId,
       iamGroups,
-      getSisuAccess,
     })
-    const { specialGroup } = iamAccess as { specialGroup: Record<string, boolean> }
-    delete iamAccess.specialGroup
-    return { iamAccess, specialGroup }
+
+    const { specialGroup, ...resetOfIamAccess } = data
+    return { iamAccess: resetOfIamAccess, specialGroup }
   } catch (error) {
     if (attempt > 3) {
       logger.error('[Jami] error: ', error)
       Sentry.captureException(error)
       return {}
     }
+
     return getUserIamAccess(sisPersonId, iamGroups, attempt + 1)
   }
 }

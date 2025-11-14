@@ -103,20 +103,16 @@ const getStudyProgrammeRights = (
 }
 
 const formatUser = async (user: ExpandedUser, getStudentAccess = true) => {
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
-  const shouldFetchStudentAccess = getStudentAccess && !hasFullAccessToStudentData(user.roles)
-
   let studentsUserCanAccess: string[] = []
-  if (shouldFetchStudentAccess) {
-    const promises = [
+  if (getStudentAccess && !hasFullAccessToStudentData(user.roles)) {
+    const fullStudyProgrammeRights = getFullStudyProgrammeRights(user.detailedProgrammeRights)
+
+    const studentLists = await Promise.all([
       getStudentnumbersByElementdetails(fullStudyProgrammeRights),
       getAllStudentsUserHasInGroups(user.sisuPersonId),
-    ]
+    ])
 
-    const studentLists = await Promise.all(promises)
-    const flatStudentNumbers = studentLists.flat()
-
-    studentsUserCanAccess = uniq(flatStudentNumbers)
+    studentsUserCanAccess = Array.from(new Set(studentLists.flat()))
   }
 
   const formattedUser: FormattedUser = {
@@ -145,16 +141,13 @@ const formatUserForFrontend = async (user: ExpandedUser) => {
 }
 
 const updateAccessGroups = async (
-  username: string,
   iamGroups: string[],
   specialGroup: Record<string, boolean>,
-  sisId: string
+  sisId: string,
+
+  userFromDb: UserModel
 ) => {
   const { jory, superAdmin, openUni, fullSisuAccess } = specialGroup
-  const userFromDb = await UserModel.findOne({ where: { username } })
-  if (!userFromDb) {
-    throw new Error(`User ${username} not found`)
-  }
   const currentAccessGroups = userFromDb?.roles ?? []
 
   const newAccessGroups = [
@@ -269,17 +262,24 @@ export const getUserToska = async ({
     return userDataCache.get(username) as FormattedUser
   }
 
-  const isNewUser = !(await UserModel.findOne({ where: { username } }))
-  await UserModel.upsert({ fullName: name, username, email, sisuPersonId: sisId, lastLogin: new Date() })
-  await updateAccessGroups(username, iamGroups, specialGroup, sisId)
-  const userFromDb = (await UserModel.findOne({ where: { username } }))!.toJSON()
+  const isNewUser = !(await UserModel.findOne({ attributes: ['id'], where: { username }, raw: true }))
+  if (isNewUser) void (await sendNotificationAboutNewUser({ userId: username, userFullName: name }))
 
-  const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, userFromDb.programmeRights)
-  const user = await formatUser({ ...userFromDb, iamGroups, detailedProgrammeRights })
-  if (isNewUser) {
-    await sendNotificationAboutNewUser({ userId: username, userFullName: name })
-  }
+  const [upsertResult] = await UserModel.upsert({
+    fullName: name,
+    username,
+    email,
+    sisuPersonId: sisId,
+    lastLogin: new Date(),
+  })
+  await updateAccessGroups(iamGroups, specialGroup, sisId, upsertResult)
+
+  const userJSON = upsertResult.toJSON()
+
+  const detailedProgrammeRights = getStudyProgrammeRights(iamAccess, specialGroup, userJSON.programmeRights)
+  const user = await formatUser({ ...userJSON, iamGroups, detailedProgrammeRights })
   userDataCache.set(username, user)
+
   return user
 }
 

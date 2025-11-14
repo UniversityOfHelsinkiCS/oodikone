@@ -4,7 +4,7 @@ import { intersection } from 'lodash'
 
 import { configLogoutUrl, isDev, requiredGroup, serviceProvider } from '../config'
 import { getMockedUser, getMockedUserFd, getOrganizationAccess, getUserFd, getUserToska } from '../services/userService'
-import { FormattedUser, IamAccess } from '../types'
+import { FormattedUser } from '../types'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
@@ -12,30 +12,6 @@ const parseIamGroups = (iamGroups: string) => iamGroups?.split(';') ?? []
 
 const hasRequiredIamGroup = (iamGroups: string[], iamRights: string[]) => {
   return intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
-}
-
-const getUser = async (
-  showAsUser: string | undefined,
-  username: string,
-  name: string,
-  email: string,
-  iamGroups: string[],
-  specialGroup: Record<string, boolean>,
-  sisId: string,
-  iamAccess: IamAccess
-) => {
-  if (showAsUser && specialGroup?.superAdmin) {
-    return await getMockedUser({ userToMock: showAsUser, mockedBy: username })
-  }
-  return await getUserToska({
-    username,
-    name,
-    email,
-    iamGroups,
-    specialGroup,
-    sisId,
-    iamAccess,
-  })
 }
 
 type Headers = {
@@ -49,7 +25,7 @@ type Headers = {
   'x-show-as-user'?: string
 }
 
-const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
+const toskaUserMiddleware = async (req: Request, _: Response, next: NextFunction) => {
   const {
     'shib-session-id': sessionId,
     'x-show-as-user': showAsUser,
@@ -61,20 +37,15 @@ const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunct
     uid: username,
   } = req.headers as Headers
 
-  const missingHeaders: string[] = []
-  if (!sessionId) missingHeaders.push('shib-session-id')
-  if (!username) missingHeaders.push('uid')
-
-  if (missingHeaders.length > 0) {
-    const reqUser = username ?? 'Anonymous user'
+  if (!username || !sessionId)
     throw new ApplicationError(
-      `${reqUser} requested ${req.url} without valid request headers. Missing: ${missingHeaders.join(', ')}`,
+      `${username ?? 'Anonymous user'} requested ${req.url} without authorization headers.`,
       403,
       { logoutUrl }
     )
-  }
 
   const iamGroups = parseIamGroups(hygroupcn!)
+
   const { iamAccess = {}, specialGroup = {} } = await getOrganizationAccess(sisId!, iamGroups)
   const iamRights = Object.keys(iamAccess)
 
@@ -83,15 +54,26 @@ const toskaUserMiddleware = async (req: Request, _res: Response, next: NextFunct
       message: 'User does not have required iam group',
       meta: { username, name, email, iamGroups, iamRights },
     })
+
     throw new ApplicationError(`User '${username}' does not have required iam group`, 403, { logoutUrl })
   }
 
-  const user = await getUser(showAsUser, username!, name!, email!, iamGroups, specialGroup, sisId!, iamAccess)
-  if (!user) {
-    throw new ApplicationError(`Username ${username} not found.`, 403, { logoutUrl })
-  }
+  const user =
+    showAsUser && specialGroup?.superAdmin
+      ? await getMockedUser({ userToMock: showAsUser, mockedBy: username })
+      : await getUserToska({
+          username,
+          name: name!,
+          email: email!,
+          iamGroups,
+          specialGroup,
+          sisId: sisId!,
+          iamAccess,
+        })
 
-  Sentry.setUser({ username: user.mockedBy ?? username! })
+  // Set username just-in-case there is error for invalid user
+  Sentry.setUser({ username: user?.mockedBy ?? username })
+  if (!user) throw new ApplicationError(`Username ${username} not found.`, 403, { logoutUrl })
 
   req.user = user
   req.logoutUrl = logoutUrl!
