@@ -76,17 +76,19 @@ const getProgressCriteria = (
   credits: AnonymousCredit[],
   hops: StudentStudyPlan | undefined
 ) => {
-  const startDateFromISO = new Date(startDate)
-
-  const criteriaCoursesBySubstitutions: Record<string, string> = Object.fromEntries(
-    Object.entries(criteria.allCourses).flatMap(([courseCode, substitutionCodes]) => [
-      [courseCode, courseCode],
-      ...substitutionCodes.map(code => [code, courseCode]),
-    ])
-  )
-
   const [thereAreCriteria, criteriaChecked] = getCriteriaBase(criteria)
   if (!thereAreCriteria) return criteriaChecked
+
+  const startDateFromISO = new Date(startDate)
+
+  const criteriaCoursesBySubstitutionMap = new Map<string, string>()
+  for (const [courseCode, substitutionCodes] of Object.entries(criteria.allCourses)) {
+    criteriaCoursesBySubstitutionMap.set(courseCode, courseCode)
+
+    for (const substitutionCode of substitutionCodes) {
+      criteriaCoursesBySubstitutionMap.set(substitutionCode, courseCode)
+    }
+  }
 
   const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
@@ -101,11 +103,11 @@ const getProgressCriteria = (
   }))
 
   courses
-    .filter(({ course_code }) => !!criteriaCoursesBySubstitutions[course_code])
+    .filter(({ course_code }) => !!criteriaCoursesBySubstitutionMap.get(course_code))
     .filter(({ credittypecode }) => CreditModel.passed({ credittypecode }) || CreditModel.improved({ credittypecode }))
     .forEach(course => {
       const courseDate = new Date(course.date)
-      const correctCode = criteriaCoursesBySubstitutions[course.course_code]
+      const correctCode = criteriaCoursesBySubstitutionMap.get(course.course_code)!
 
       yearMap.forEach(([yearToAdd, criteriaYear]) => {
         if (criteria.courses[criteriaYear].includes(correctCode)) {
@@ -119,7 +121,7 @@ const getProgressCriteria = (
 
   courses.forEach(course => {
     const courseDate = new Date(course.date)
-    const correctCode = criteriaCoursesBySubstitutions[course.course_code]
+    const correctCode = criteriaCoursesBySubstitutionMap.get(course.course_code)!
 
     if (
       startDateFromISO < courseDate &&

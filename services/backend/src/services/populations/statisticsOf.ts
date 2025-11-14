@@ -29,7 +29,7 @@ export type StudentCreditObject = Map<StudentCredit['student_studentnumber'], An
 export const statisticsOf = async (
   studentNumbers: string[],
   studyRights: string[],
-  tagList: Record<string, StudentTags[]>,
+  tagMap: Map<string, StudentTags[]>,
   startDate?: string
 ) => {
   const code = studyRights[0] ?? ''
@@ -47,9 +47,6 @@ export const statisticsOf = async (
     ])
 
   const t1 = performance.now()
-  console.log('DB calls for students, credits, enrollments duration: ', t1 - t0, 'ms') // eslint-disable-line no-console
-
-  const t2 = performance.now()
 
   const studentStartingYears = new Map(
     students.map(({ studentnumber, studyRights }) => [
@@ -76,25 +73,22 @@ export const statisticsOf = async (
   }
 
   const formattedCoursestats = await parseCourseData(studentStartingYears, enrollments, credits)
-  const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
 
-  const t3 = performance.now()
-  console.log('Rest of statisticsOf: ', t3 - t2, 'ms') // eslint-disable-line no-console
+  const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
+  const formattedStudents = students.map(student => {
+    const tags = tagMap.get(student.studentnumber) ?? []
+    const options = optionData.get(student.studentnumber)
+    const [credits, enrollments] = creditsAndEnrollmentsByStudent.get(student.studentnumber)!
+
+    return formatStudentForAPI(code, mockedStartDate, student, tags, credits, enrollments, options, criteria)
+  })
+
+  const t2 = performance.now()
+  console.log('DB calls for students, credits, enrollments duration: ', t1 - t0, 'ms') // eslint-disable-line no-console
+  console.log('Rest of statisticsOf:', t2 - t1, 'ms') // eslint-disable-line no-console
+
   return {
     coursestatistics: formattedCoursestats,
-    students: students.map(student => {
-      const [credits, enrollments] = creditsAndEnrollmentsByStudent.get(student.studentnumber)!
-
-      return formatStudentForAPI(
-        code,
-        mockedStartDate,
-        student,
-        tagList[student.studentnumber],
-        credits,
-        enrollments,
-        optionData[student.studentnumber],
-        criteria
-      )
-    }),
+    students: formattedStudents,
   }
 }

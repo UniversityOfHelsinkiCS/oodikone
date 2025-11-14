@@ -17,7 +17,7 @@ export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
-export const getStudentTags = async (studyRights: string[], studentNumbers: string[], userId: string) => {
+export const getStudentTagMap = async (studyRights: string[], studentNumbers: string[], userId: string) => {
   const studentTags = await TagStudentModel.findAll({
     attributes: ['tag_id', 'studentnumber'],
     include: {
@@ -33,10 +33,15 @@ export const getStudentTags = async (studyRights: string[], studentNumbers: stri
     },
   })
 
-  const studentTagList: Record<string, StudentTags[]> = Object.fromEntries(studentNumbers.map(n => [n, []]))
-  studentTags.forEach(studentTag => studentTagList[studentTag.studentnumber].push(studentTag))
+  const studentTagMap = new Map<string, StudentTags[]>()
+  for (const studentTag of studentTags) {
+    const data = studentTagMap.get(studentTag.studentnumber) ?? []
 
-  return studentTagList
+    data.push(studentTag)
+    studentTagMap.set(studentTag.studentnumber, data)
+  }
+
+  return studentTagMap
 }
 
 export type StudentEnrollment = Pick<

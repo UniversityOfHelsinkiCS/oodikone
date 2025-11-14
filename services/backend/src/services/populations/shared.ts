@@ -50,31 +50,31 @@ export const getCurriculumVersion = (curriculumPeriodId: string | undefined) => 
 export const getOptionsForStudents = (
   studyRightElementsForStudyRight: SISStudyRightElementModel[],
   degreeProgrammeType: DegreeProgrammeType | null
-): Record<string, Name> => {
+): Map<string, Name> => {
   if (
     degreeProgrammeType &&
     ![DegreeProgrammeType.BACHELOR, DegreeProgrammeType.MASTER].includes(degreeProgrammeType)
   ) {
-    return {}
+    return new Map()
   }
 
   const levelIsMasters = degreeProgrammeType === DegreeProgrammeType.MASTER
   const filter = levelIsMasters ? DegreeProgrammeType.BACHELOR : DegreeProgrammeType.MASTER
 
-  return Object.fromEntries(
-    studyRightElementsForStudyRight
-      .map(({ studyRight }) => {
-        // NOTE: If in masters, then select latest finished bachelor studyRight otherwise select first started masters studyRight
-        const [latestProgramme] = orderBy(
-          studyRight.studyRightElements.filter(element => element.degreeProgrammeType === filter),
-          [levelIsMasters ? 'endDate' : 'startDate'],
-          [levelIsMasters ? 'desc' : 'asc']
-        )
+  const optionMap = new Map()
+  for (const { studyRight } of studyRightElementsForStudyRight) {
+    const [latestProgramme] = orderBy(
+      studyRight.studyRightElements.filter(element => element.degreeProgrammeType === filter),
+      [levelIsMasters ? 'endDate' : 'startDate'],
+      [levelIsMasters ? 'desc' : 'asc']
+    )
 
-        return [studyRight.studentNumber, latestProgramme?.name]
-      })
-      .filter(([_, name]) => !!name)
-  )
+    if (latestProgramme?.name === undefined) continue
+
+    optionMap.set(studyRight.studentNumber, latestProgramme.name)
+  }
+
+  return optionMap
 }
 
 export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, 'code' | 'name' | 'substitutions'>>> =>

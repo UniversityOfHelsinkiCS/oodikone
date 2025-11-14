@@ -23,7 +23,7 @@ import { SISStudyRightModel } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
-import { getStudentTags } from '../services/populations/getStudentData'
+import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
@@ -81,9 +81,9 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     })
 
     const studyRights = [programme]
-    const tagList = await getStudentTags(studyRights, studentNumbers, userId)
+    const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
 
-    const result = await statisticsOf(studentNumbers, studyRights, tagList, startDate)
+    const result = await statisticsOf(studentNumbers, studyRights, tagMap, startDate)
 
     // Obfuscate if user has only limited degree programme rights and there are any students
     if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
@@ -140,8 +140,8 @@ router.get<
   const studentNumbers = await findByCourseAndSemesters(coursecodes, Number(from), Number(to), isSeparate, unifyCourses)
 
   const studyRights = []
-  const tagList = await getStudentTags(studyRights, studentNumbers, userId)
-  const result: any = await statisticsOf(studentNumbers, studyRights, tagList)
+  const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
+  const result: any = await statisticsOf(studentNumbers, studyRights, tagMap)
   const courseProviders: string[] = !hasFullAccessToStudentData(roles)
     ? await getCourseProvidersForCourses(coursecodes)
     : []
@@ -203,13 +203,13 @@ router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
     const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
     const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
-    const tagList = await getStudentTags(studyRights, filteredStudentNumbers, userId)
+    const tagMap = await getStudentTagMap(studyRights, filteredStudentNumbers, userId)
 
     const { startDate } = tags?.year
       ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
       : { startDate: undefined }
 
-    const result = await statisticsOf(filteredStudentNumbers, studyRights, tagList, startDate)
+    const result = await statisticsOf(filteredStudentNumbers, studyRights, tagMap, startDate)
 
     const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
     const discardedStudentNumbers = difference(studentNumbers, filteredStudentNumbers)
