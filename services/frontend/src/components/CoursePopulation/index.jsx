@@ -224,7 +224,7 @@ export const CoursePopulation = () => {
       {(filteredStudents, filteredCourses) => (
         <>
           <PageLayout>
-            <PageTitle subtitle={subHeader} title={`Population of course ${header}`} />
+            <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
           </PageLayout>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>
