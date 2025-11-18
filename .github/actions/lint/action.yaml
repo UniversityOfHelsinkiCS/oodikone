@@ -6,7 +6,7 @@ runs:
   steps:
     - uses: actions/setup-node@v6
       with:
-        node-version: 22
+        node-version: 24
     - name: 'Install dependencies'
       shell: bash
       run: npm ci && npm ci --prefix services/shared && npm ci --prefix services/frontend && npm ci --prefix services/backend
