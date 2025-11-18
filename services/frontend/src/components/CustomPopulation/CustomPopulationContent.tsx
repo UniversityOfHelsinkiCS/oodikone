@@ -4,11 +4,9 @@ import Box from '@mui/material/Box'
 
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
-import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
@@ -20,11 +18,12 @@ import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useProgress } from '@/hooks/progress'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
-
 import { PageTitle } from '../common/PageTitle'
+import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -49,7 +48,7 @@ export const CustomPopulationContent = ({
   resetState: () => void
 }) => {
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
-  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+  const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
 
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
@@ -95,20 +94,10 @@ export const CustomPopulationContent = ({
       content: (
         <>
           <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-          {/* FIXME:TODO: This is ripped off from CourseTableModeSelector */}
-          <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
-            <Typography fontWeight={500}>Select all courses with at least</Typography>
-            <TextField
-              onChange={({ target }) => onStudentAmountLimitChange(target.value)}
-              size="small"
-              sx={{ maxWidth: '6em' }}
-              type="number"
-              value={studentAmountLimit}
-            />
-            <Typography fontWeight={500} sx={{ ml: '1em' }}>
-              total students
-            </Typography>
-          </Stack>
+          <StudentAmountLimiter
+            onStudentAmountLimitChange={onStudentAmountLimitChange}
+            studentAmountLimit={studentAmountLimit}
+          />
           <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
         </>
       ),

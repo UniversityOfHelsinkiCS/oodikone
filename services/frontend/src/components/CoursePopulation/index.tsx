@@ -1,6 +1,3 @@
-import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 
@@ -30,15 +27,16 @@ import { PageLoading } from '@/components/Loading'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { parseQueryParams } from '@/util/queryparams'
+import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
-
 import { useColumns as columnsGeneralTab } from './studentColumns'
 
 export const CoursePopulation = () => {
@@ -234,7 +232,7 @@ export const CoursePopulation = () => {
 }
 
 const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) => {
-  const [studentAmountLimit, setStudentAmountLimit] = useState(0)
+  const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
 
   useEffect(() => setStudentAmountLimit(Math.round(filteredStudents.length * 0.3)), [filteredStudents.length])
 
@@ -245,20 +243,10 @@ const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) =
   return (
     <>
       <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-      {/* FIXME:TODO: This is ripped off from CourseTableModeSelector */}
-      <Stack direction="row" sx={{ alignItems: 'center', mt: '0.5em' }}>
-        <Typography fontWeight={500}>Select all courses with at least</Typography>
-        <TextField
-          onChange={({ target }) => onStudentAmountLimitChange(target.value)}
-          size="small"
-          sx={{ maxWidth: '6em' }}
-          type="number"
-          value={studentAmountLimit}
-        />
-        <Typography fontWeight={500} sx={{ ml: '1em' }}>
-          total students
-        </Typography>
-      </Stack>
+      <StudentAmountLimiter
+        onStudentAmountLimitChange={onStudentAmountLimitChange}
+        studentAmountLimit={studentAmountLimit}
+      />
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
