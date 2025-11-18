@@ -12,10 +12,10 @@ import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { DegreeProgramme } from '@/types/api/faculty'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { Language } from '@oodikone/shared/language'
+import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { BasicInformationTab } from './BasicInformationTab'
 import { DegreeCoursesTab } from './DegreeCoursesTab'
 import { ProgrammeCoursesTab } from './ProgrammeCoursesTab'
@@ -27,7 +27,7 @@ import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 const getProgrammeName = (
   studyProgrammeId: string | undefined,
   combibedProgrammeId: string | undefined,
-  programmes: Record<string, DegreeProgramme> | undefined,
+  programmes: Record<string, ProgrammeModuleWithRelevantAttributes> | undefined,
   language: Language,
   getTextIn: GetTextIn
 ) => {

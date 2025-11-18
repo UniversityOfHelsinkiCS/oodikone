@@ -1,10 +1,11 @@
+// @ts-check
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import dayjs from 'dayjs'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import { chain, flatten, flow } from 'lodash'
+import { chain, flatten } from 'lodash'
 import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
@@ -125,10 +126,6 @@ const createGraphOptions = ({
   }
 }
 
-const sortCoursesByDate = courses => {
-  return [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-}
-
 const filterCoursesByStudyPlan = (plan, courses) => {
   if (!plan) {
     return courses
@@ -163,28 +160,6 @@ const filterCourses = (student, singleStudent, byStudyPlanOfCode, cutStudyPlanCr
     )
   if (singleStudent) return student.courses
   return filterCoursesByDate(student.courses, startDate)
-}
-
-const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
-  // Only include passed and transferred courses
-  if (![4, 9].includes(course.credittypecode)) return { points, credits, singleStudent }
-
-  const gainedCredits = !course.isStudyModuleCredit ? course.credits : 0
-
-  const point = {
-    x: new Date(course.date).getTime(),
-    y: credits + gainedCredits,
-  }
-
-  if (singleStudent) point.name = course.course.code
-
-  points.push(point)
-
-  return {
-    points,
-    credits: credits + gainedCredits,
-    singleStudent,
-  }
 }
 
 const singleStudentTooltipFormatter = (point, student, getTextIn) => {
@@ -349,12 +324,39 @@ const createStudentCreditLines = (
       ? code
       : studyPlanFilterIsActive && programmeCodes?.length > 0 && programmeCodes[0]
 
-    const { points } = flow(
-      () => filterCourses(student, singleStudent, studyPlanProgrammeCode, cutStudyPlanCredits, startDate, studyRightId),
-      courses => [...courses].filter(({ date }) => new Date(date) <= new Date()),
-      sortCoursesByDate,
-      courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
-    )(student.courses)
+    const { points } = filterCourses(
+      student,
+      singleStudent,
+      studyPlanProgrammeCode,
+      cutStudyPlanCredits,
+      startDate,
+      studyRightId
+    )
+      .filter(({ date }) => new Date(date) <= new Date())
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .reduce(
+        (acc, course) => {
+          // Only include passed and transferred courses
+          if (![4, 9].includes(course.credittypecode)) return acc
+
+          const gainedCredits = !course.isStudyModuleCredit ? course.credits : 0
+
+          const point = {
+            x: new Date(course.date).getTime(),
+            y: acc.credits + gainedCredits,
+          }
+
+          if (singleStudent) point.name = course.course.code
+
+          acc.points.push(point)
+
+          return {
+            ...acc,
+            credits: acc.credits + gainedCredits,
+          }
+        },
+        { credits: 0, points: [] }
+      )
 
     const graduationDates = programmeCodes ? findGraduationsByCodes(student, programmeCodes, showBachelorAndMaster) : []
 
@@ -362,7 +364,7 @@ const createStudentCreditLines = (
       if (!singleStudent && points[0].y !== 0 && students.length < 100) {
         const xMinusTwoMonths = dayjs(new Date(points[0].x)).subtract(2, 'months').toDate().getTime()
         points.unshift({
-          x: studyPlanFilterIsActive ? xMinusTwoMonths : Math.max(new Date(studyrightStart), xMinusTwoMonths),
+          x: studyPlanFilterIsActive ? xMinusTwoMonths : Math.max(new Date(studyrightStart).getTime(), xMinusTwoMonths),
           y: 0,
         })
       }
@@ -450,7 +452,8 @@ export const CreditAccumulationGraphHighCharts = ({
     const startDate = selectedStudyRight
       ? selectedStudyRight.studyRightElements
           .filter(element => element.phase === correctStudyRightElement.phase)
-          .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0].startDate
+          .sort(({ startDate: a }, { startDate: b }) => new Date(a).getTime() - new Date(b).getTime())
+          .at(0)?.startDate
       : chain(students[0].studyRights ?? students[0].courses)
           .map(element => new Date(element.startDate ?? element.date))
           .sortBy()
@@ -461,7 +464,8 @@ export const CreditAccumulationGraphHighCharts = ({
     const [, studyRightTargetEnd] = getStudyRightElementTargetDates(
       selectedStudyRight?.studyRightElements
         .filter(element => element.phase === correctStudyRightElement.phase)
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))[0],
+        .sort(({ startDate: a }, { startDate: b }) => new Date(a).getTime() - new Date(b).getTime())
+        .at(0),
       absences
     )
     const ending = selectedStudyRight ? new Date(studyRightTargetEnd) : new Date(endDate ?? new Date())
@@ -473,7 +477,7 @@ export const CreditAccumulationGraphHighCharts = ({
     seriesData.push(createGoalSeries(starting.getTime(), ending.getTime(), filteredAbsences))
   }
   const getStudyRightStart = () => {
-    const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date(null))
+    const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date())
     if (studyRightStartFromStudent.getFullYear() < 2000)
       return Math.min(...flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
     return studyRightStartFromStudent.getTime()

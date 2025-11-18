@@ -17,10 +17,10 @@ import {
   useGetFacultyThesisStatsQuery,
 } from '@/redux/facultyStats'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { DegreeProgramme, GetFacultiesResponse } from '@/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getTimestamp } from '@/util/timeAndDate'
-import { NameWithCode } from '@oodikone/shared/types'
+import { NameWithCode, ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { InteractiveDataTable } from './InteractiveDataTable'
 
 const calculateTotals = stats => {
@@ -44,7 +44,7 @@ const calculateTotals = stats => {
 
 const getSortedProgrammeIdsAndPlotLinePlaces = (
   data?: Record<string, NameWithCode>,
-  degreeProgrammes?: Record<string, DegreeProgramme>,
+  degreeProgrammes?: Record<string, ProgrammeModuleWithRelevantAttributes>,
   faculty?: string
 ) => {
   if (!data || !degreeProgrammes) {

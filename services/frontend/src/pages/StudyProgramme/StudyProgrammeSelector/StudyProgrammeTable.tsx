@@ -10,7 +10,8 @@ import { Link } from '@/components/common/Link'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
-import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
+import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
+import { CombinedDegreeProgramme } from './'
 
 export const StudyProgrammeTable = ({
   header,
@@ -20,7 +21,7 @@ export const StudyProgrammeTable = ({
 }: {
   header: string
   pinnedProgrammes: string[]
-  programmes: (DegreeProgramme | CombinedDegreeProgramme)[]
+  programmes: (ProgrammeModuleWithRelevantAttributes | CombinedDegreeProgramme)[]
   visible?: boolean
 }) => {
   const { getTextIn } = useLanguage()

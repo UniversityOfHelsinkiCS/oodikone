@@ -1,8 +1,12 @@
 import { RTKApi } from '@/apiConnection'
-import type { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
 import type {
   PopulationstatisticsResBody,
+  PopulationstatisticsbycourseResBody,
+  PopulationstatisticsbycourseParams,
+  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
+  PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
+  PopulationstatisticsStudyprogrammesResBody,
   CustomPopulationQuery,
   GetCustomPopulationResBody,
 } from '@oodikone/shared/routes/populations'
@@ -26,19 +30,25 @@ const populationApi = RTKApi.injectEndpoints({
         },
       }),
     }),
-    getPopulationStatisticsByCourse: builder.query({
+    getPopulationStatisticsByCourse: builder.query<
+      PopulationstatisticsbycourseResBody,
+      PopulationstatisticsbycourseParams
+    >({
       query: ({ coursecodes, from, to, separate, unifyCourses }) => ({
         url: '/v3/populationstatisticsbycourse',
         params: { coursecodes, from, to, separate, unifyCourses },
       }),
     }),
-    getMaxYearsToCreatePopulationFrom: builder.query({
+    getMaxYearsToCreatePopulationFrom: builder.query<
+      PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
+      PopulationstatisticsMaxYearsToCreatePopulationFormQuery
+    >({
       query: ({ courseCodes }) => ({
         url: '/v3/populationstatistics/maxYearsToCreatePopulationFrom',
         params: { courseCodes },
       }),
     }),
-    getProgrammes: builder.query<Record<string, DegreeProgramme>, void>({
+    getProgrammes: builder.query<PopulationstatisticsStudyprogrammesResBody, void>({
       query: () => '/v3/populationstatistics/studyprogrammes',
       keepUnusedDataFor: 60 * 60,
     }),

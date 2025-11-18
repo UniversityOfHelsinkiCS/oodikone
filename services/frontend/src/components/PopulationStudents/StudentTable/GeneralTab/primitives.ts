@@ -1,11 +1,14 @@
 import { getAllProgrammesOfStudent, getStudentTotalCredits, getStudyRightStatusText } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { DegreeProgramme } from '@/types/api/faculty'
 import { formatDate } from '@/util/timeAndDate'
 
 import { EnrollmentType } from '@oodikone/shared/types'
-import type { FormattedStudent as Student, Unarray } from '@oodikone/shared/types'
+import type {
+  ProgrammeModuleWithRelevantAttributes,
+  FormattedStudent as Student,
+  Unarray,
+} from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import type { StudentStudyPlan, StudentStudyRight, StudentStudyRightElement } from '@oodikone/shared/types/studentData'
 import { joinProgrammes } from './util'
@@ -105,8 +108,10 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
     : nullFunction
 
   const getTransferredFrom = variantIsOneOf('population', 'customPopulation', 'studyGuidanceGroupPopulation')
-    ? ({ transferSource }: StudentBlob, programmes: Record<string, DegreeProgramme> | undefined) =>
-        getTextIn(programmes?.[transferSource!]?.name) ?? transferSource ?? null
+    ? (
+        { transferSource }: StudentBlob,
+        programmes: Record<string, ProgrammeModuleWithRelevantAttributes> | undefined
+      ) => getTextIn(programmes?.[transferSource!]?.name) ?? transferSource ?? null
     : nullFunction
 
   const getStudyRightStart = variantIsOneOf('population', 'customPopulation', 'studyGuidanceGroupPopulation')

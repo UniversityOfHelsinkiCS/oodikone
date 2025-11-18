@@ -15,12 +15,18 @@ import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useCurrentCurriculumPeriod } from '@/hooks/currentCurriculumPeriod'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
-import { CombinedDegreeProgramme, DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { createLocaleComparator, createPinnedFirstComparator } from '@/util/comparator'
-import { DegreeProgrammeType, Name } from '@oodikone/shared/types'
+import { DegreeProgrammeType, Name, ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { StudyProgrammeFilter } from './StudyProgrammeFilter'
 import { StudyProgrammeTable } from './StudyProgrammeTable'
+
+export type CombinedDegreeProgramme = Omit<
+  ProgrammeModuleWithRelevantAttributes,
+  'curriculumPeriodIds' | 'degreeProgrammeType'
+> & {
+  combinedCode: string
+}
 
 export const StudyProgrammeSelector = () => {
   const { getTextIn } = useLanguage()
@@ -32,10 +38,10 @@ export const StudyProgrammeSelector = () => {
   const handleFilterChange = debounce(value => {
     setFilter(value)
   }, 500)
-  const bachelorProgrammes: DegreeProgramme[] = []
-  const masterProgrammes: DegreeProgramme[] = []
-  const doctoralProgrammes: DegreeProgramme[] = []
-  const otherProgrammes: DegreeProgramme[] = []
+  const bachelorProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
+  const masterProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
+  const doctoralProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
+  const otherProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
   const combinedProgrammes: CombinedDegreeProgramme[] = []
   const localeComparator = createLocaleComparator('code')
 

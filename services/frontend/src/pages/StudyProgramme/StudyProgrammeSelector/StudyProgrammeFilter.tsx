@@ -2,14 +2,14 @@ import SearchIcon from '@mui/icons-material/Search'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
-import { DegreeProgramme } from '@/types/api/faculty'
+import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 
 export const StudyProgrammeFilter = ({
   handleFilterChange,
   studyProgrammes,
 }: {
   handleFilterChange: (value: string) => void
-  studyProgrammes: DegreeProgramme[]
+  studyProgrammes: ProgrammeModuleWithRelevantAttributes[]
 }) => {
   if (studyProgrammes.length <= 10) {
     return null

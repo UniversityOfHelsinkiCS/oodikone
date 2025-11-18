@@ -1,9 +1,16 @@
 import { RTKApi } from '@/apiConnection'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DegreeProgramme } from '@/types/api/faculty'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { Language } from '@oodikone/shared/language'
-import { Graduated, Name, SpecialGroups, StudyProgrammeCourse, StudyTrackStats, YearType } from '@oodikone/shared/types'
+import {
+  Graduated,
+  Name,
+  ProgrammeModuleWithRelevantAttributes,
+  SpecialGroups,
+  StudyProgrammeCourse,
+  StudyTrackStats,
+  YearType,
+} from '@oodikone/shared/types'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
@@ -84,7 +91,10 @@ export const {
   useUpdateStudyTrackViewQuery,
 } = studyProgrammeApi
 
-const getFilteredAndFormattedStudyProgrammes = (getTextIn: GetTextIn, studyProgrammes: DegreeProgramme[]) => {
+const getFilteredAndFormattedStudyProgrammes = (
+  getTextIn: GetTextIn,
+  studyProgrammes: ProgrammeModuleWithRelevantAttributes[]
+) => {
   return studyProgrammes
     .filter(studyProgramme => studyProgramme.code.startsWith('KH') || studyProgramme.code.startsWith('MH'))
     .map(studyProgramme => ({
@@ -95,7 +105,7 @@ const getFilteredAndFormattedStudyProgrammes = (getTextIn: GetTextIn, studyProgr
     }))
 }
 
-const getDataForCombined = (studyProgrammes: DegreeProgramme[]) => {
+const getDataForCombined = (studyProgrammes: ProgrammeModuleWithRelevantAttributes[]) => {
   const combinedProgrammeCodes = ['KH90_001', 'MH90_001']
   return studyProgrammes
     .filter(studyProgramme => combinedProgrammeCodes.includes(studyProgramme.code))
