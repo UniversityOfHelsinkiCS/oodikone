@@ -12,7 +12,9 @@ import { OodiTableContainer } from './OodiTable'
  *
  * @param data - Array of data objects of type TData
  * @param columns - Array of column definitions for type TData
+ * @param isExportView (default false) Is table used in an export modal to provide preview
  * @param options - Optional: Additional TableOptions
+ * @param cy - Optional: data-cy tag provided to the wrapper around the TableContainer
  * @returns Table instance
  */
 
