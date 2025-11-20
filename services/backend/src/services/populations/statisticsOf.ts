@@ -35,7 +35,6 @@ export const statisticsOf = async (
   const code = studyRights[0] ?? ''
   const mockedStartDate = startDate ?? new Date(1900).toISOString()
 
-  const t0 = performance.now()
   const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
     await Promise.all([
       getStudents(studentNumbers),
@@ -45,8 +44,6 @@ export const statisticsOf = async (
       getCriteria(code),
       getStudyRightElementsForStudyRight(studentNumbers, code),
     ])
-
-  const t1 = performance.now()
 
   const studentStartingYears = new Map(
     students.map(({ studentnumber, studyRights }) => [
@@ -82,10 +79,6 @@ export const statisticsOf = async (
 
     return formatStudentForAPI(code, mockedStartDate, student, tags, credits, enrollments, options, criteria)
   })
-
-  const t2 = performance.now()
-  console.log('DB calls for students, credits, enrollments duration: ', t1 - t0, 'ms') // eslint-disable-line no-console
-  console.log('Rest of statisticsOf:', t2 - t1, 'ms') // eslint-disable-line no-console
 
   return {
     coursestatistics: formattedCoursestats,
