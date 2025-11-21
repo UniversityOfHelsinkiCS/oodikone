@@ -15,7 +15,7 @@ import { useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
-import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
@@ -440,7 +440,12 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
               columns={columns}
               data={students}
               options={tableOptions}
-              toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />}
+              toolbarContent={
+                <>
+                  <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+                  <StudentNameVisibilityToggle />
+                </>
+              }
             />
           ) : (
             <Typography variant="h6">There is no criteria set for this programme.</Typography>
