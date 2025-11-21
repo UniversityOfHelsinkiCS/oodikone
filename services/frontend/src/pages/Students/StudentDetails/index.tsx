@@ -72,7 +72,11 @@ export const StudentDetails = () => {
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters } = semesters ?? { semesters: {} }
 
-  const { data: student, isLoading: isLoading, isError: isError } = useGetStudentQuery({ studentNumber })
+  const {
+    data: student,
+    isLoading: isLoading,
+    isError: isError,
+  } = useGetStudentQuery({ studentNumber: studentNumber! }, { skip: !!studentNumber })
   let honoursCode = ''
 
   if (isLoading) {

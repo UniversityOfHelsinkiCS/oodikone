@@ -52,6 +52,22 @@ export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
+type ActiveStudyRight = {
+  id: string
+  studyRightElements: {
+    name: Name
+  }[]
+}
+
+export type FormattedStudentForSearch = {
+  activeStudyRights: ActiveStudyRight[]
+  credits: number
+  firstNames: string
+  lastName: string
+  started: string | null
+  studentNumber: string
+}
+
 export type StudentPageStudent = {
   tags: {
     programme: Pick<ProgrammeModule, 'code' | 'name'> | undefined

@@ -2,7 +2,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
 import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
-import { StudentPageStudent } from '@oodikone/shared/types/studentData'
+import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { splitByEmptySpace } from '@oodikone/shared/util'
 import { dbConnections } from '../database/connection'
 import {
@@ -307,16 +307,14 @@ const formatStudentForSearch = ({
   lastname,
   studentnumber,
   studyRights,
-}: Student) => {
-  return {
-    activeStudyRights: studyRights || [],
-    credits: creditcount || 0,
-    firstNames: firstnames,
-    lastName: lastname,
-    studentNumber: studentnumber,
-    started: dateofuniversityenrollment,
-  }
-}
+}: Student): FormattedStudentForSearch => ({
+  activeStudyRights: studyRights || [],
+  credits: creditcount || 0,
+  firstNames: firstnames,
+  lastName: lastname,
+  studentNumber: studentnumber,
+  started: dateofuniversityenrollment.toString(),
+})
 
 export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentNumbers?: string[]) => {
   const terms = splitByEmptySpace(searchTerm)

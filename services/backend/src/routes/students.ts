@@ -1,66 +1,58 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
+import type { CanError } from '@oodikone/shared/routes'
+import type {
+  GetStudentRequestResBody,
+  GetStudentRequestReqBody,
+  GetStudentRequestQuery,
+  GetStudentDetailParams,
+  GetStudentDetailResBody,
+  GetStudentDetailReqBody,
+} from '@oodikone/shared/routes/students'
 import { splitByEmptySpace } from '@oodikone/shared/util'
 import { bySearchTermAndStudentNumbers, withStudentNumber } from '../services/students'
 import { hasFullAccessToStudentData } from '../util'
-import { ApplicationError } from '../util/customErrors'
 
 const router = Router()
 
-interface GetStudentsRequest extends Request {
-  query: {
-    searchTerm: string
+router.get<never, CanError<GetStudentRequestResBody>, GetStudentRequestReqBody, GetStudentRequestQuery>(
+  '/',
+  async (req, res) => {
+    const { searchTerm } = req.query
+    const trimmedSearchTerm = searchTerm?.trim()
+    const validSearchTerm =
+      trimmedSearchTerm &&
+      !splitByEmptySpace(trimmedSearchTerm)
+        .slice(0, 2)
+        .find(term => term.length > 2)
+
+    if (!trimmedSearchTerm || validSearchTerm) {
+      return res.status(400).json({ error: 'at least one search term must be longer than 2 characters' })
+    }
+
+    const { roles, studentsUserCanAccess } = req.user
+    const results: ReturnType<typeof bySearchTermAndStudentNumbers> = hasFullAccessToStudentData(roles)
+      ? bySearchTermAndStudentNumbers(trimmedSearchTerm)
+      : bySearchTermAndStudentNumbers(trimmedSearchTerm, studentsUserCanAccess)
+
+    return res.json(await results)
   }
-}
+)
 
-router.get('/', async (req: GetStudentsRequest, res: Response) => {
-  const {
-    user: { roles, studentsUserCanAccess },
-    query: { searchTerm },
-  } = req
+router.get<GetStudentDetailParams, CanError<GetStudentDetailResBody>, GetStudentDetailReqBody>(
+  '/:studentNumber',
+  async (req, res) => {
+    const { studentNumber } = req.params
+    const { id, roles, studentsUserCanAccess } = req.user
 
-  const trimmedSearchTerm = searchTerm ? searchTerm.trim() : undefined
+    if (!hasFullAccessToStudentData(roles) && !studentsUserCanAccess.includes(studentNumber))
+      return res.status(403).json({ error: 'User does not have permission to view current student.' })
 
-  if (
-    trimmedSearchTerm &&
-    !splitByEmptySpace(trimmedSearchTerm)
-      .slice(0, 2)
-      .find(term => term.length > 2)
-  ) {
-    throw new ApplicationError('at least one search term must be longer than 2 characters', 400)
+    const student = await withStudentNumber(studentNumber, id)
+    if (!student) return res.status(404).json({ error: 'Student not found' })
+
+    res.json(student)
   }
-
-  let results: Awaited<ReturnType<typeof bySearchTermAndStudentNumbers>> = []
-  if (trimmedSearchTerm) {
-    results = hasFullAccessToStudentData(roles)
-      ? await bySearchTermAndStudentNumbers(trimmedSearchTerm)
-      : await bySearchTermAndStudentNumbers(trimmedSearchTerm, studentsUserCanAccess)
-  }
-  res.json(results)
-})
-
-interface GetStudentRequest extends Request {
-  params: {
-    studentNumber: string
-  }
-}
-
-router.get('/:studentNumber', async (req: GetStudentRequest, res: Response) => {
-  const { studentNumber } = req.params
-  const {
-    user: { id, roles, studentsUserCanAccess },
-  } = req
-
-  if (!hasFullAccessToStudentData(roles) && !studentsUserCanAccess.includes(studentNumber)) {
-    return res
-      .status(403)
-      .json({ error: `User does not have permission to view data for student number ${studentNumber}.` })
-  }
-  const student = await withStudentNumber(studentNumber, id)
-  if (!student) {
-    return res.status(404).json({ error: `Student not found with student number ${studentNumber}.` })
-  }
-  res.json(student)
-})
+)
 
 export default router
