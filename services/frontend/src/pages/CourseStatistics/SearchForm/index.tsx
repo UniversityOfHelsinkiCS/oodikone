@@ -38,8 +38,8 @@ export const SearchForm = () => {
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
-  const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState(courseName)
-  const [debouncedCourseCode, setDebouncedCourseCode] = useDebouncedState(courseCode)
+  const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState('')
+  const [debouncedCourseCode, setDebouncedCourseCode] = useDebouncedState('')
   const [selectedCourses, setSelectedCourses] = useState({})
 
   const isInputValid = validateInputLength(courseName, 5) || validateInputLength(courseCode, 2)

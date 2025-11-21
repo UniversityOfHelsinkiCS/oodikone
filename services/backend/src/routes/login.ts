@@ -17,7 +17,7 @@ router.get<never, CanError<LoginResBody>, LoginReqBody>('/', (req, res) => {
   const { user, logoutUrl } = req
 
   if (!user) {
-    throw new ApplicationError('User not found', 404)
+    throw new ApplicationError('User not found', 401)
   }
 
   res.send({
