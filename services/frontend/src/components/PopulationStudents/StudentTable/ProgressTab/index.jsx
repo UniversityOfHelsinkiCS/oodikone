@@ -436,10 +436,12 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
       <Box sx={{ display: 'flex' }}>
         <Box sx={{ width: '100%' }}>
           {isCriteriaSet ? (
-            <>
-              <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-              <OodiTable columns={columns} data={students} options={tableOptions} />
-            </>
+            <OodiTable
+              columns={columns}
+              data={students}
+              options={tableOptions}
+              toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />}
+            />
           ) : (
             <Typography variant="h6">There is no criteria set for this programme.</Typography>
           )}

@@ -162,12 +162,16 @@ export const GradeDistribution = ({ onlyIamRights, useModules }) => {
   }
 
   return (
-    <>
-      <OodiTableExcelExport
-        data={excelData}
-        exportColumnKeys={columns.flatMap(column => column.columns ?? [column]).map(({ header }) => header)}
-      />
-      <OodiTable columns={columns} data={data} options={tableOptions} />
-    </>
+    <OodiTable
+      columns={columns}
+      data={data}
+      options={tableOptions}
+      toolbarContent={
+        <OodiTableExcelExport
+          data={excelData}
+          exportColumnKeys={columns.flatMap(column => column.columns ?? [column]).map(({ header }) => header)}
+        />
+      }
+    />
   )
 }

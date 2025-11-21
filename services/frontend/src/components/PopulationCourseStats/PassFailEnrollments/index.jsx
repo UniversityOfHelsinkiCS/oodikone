@@ -220,9 +220,11 @@ export const PassFailEnrollments = ({ onlyIamRights, useModules }) => {
   if (!data.length) return null
 
   return (
-    <>
-      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-      <OodiTable columns={columns} data={data} options={tableOptions} />
-    </>
+    <OodiTable
+      columns={columns}
+      data={data}
+      options={tableOptions}
+      toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />}
+    />
   )
 }

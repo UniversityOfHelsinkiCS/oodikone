@@ -185,16 +185,18 @@ export const PassingSemesters = ({ onlyIamRights, useModules }) => {
   }
 
   return (
-    <>
-      <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-        <Box sx={{ width: '100%' }}>
+    <OodiTable
+      columns={columns}
+      data={data}
+      options={tableOptions}
+      toolbarContent={
+        <>
           <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-        </Box>
-        <Button onClick={() => setCumulativeStats(!cumulativeStats)} sx={{ my: 'auto', mx: 1 }} variant="outlined">
-          {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
-        </Button>
-      </Box>
-      <OodiTable columns={columns} data={data} options={tableOptions} />
-    </>
+          <Button onClick={() => setCumulativeStats(!cumulativeStats)} sx={{ my: 'auto', mx: 1 }} variant="outlined">
+            {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
+          </Button>
+        </>
+      }
+    />
   )
 }

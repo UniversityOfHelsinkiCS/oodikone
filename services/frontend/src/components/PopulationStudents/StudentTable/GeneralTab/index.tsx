@@ -123,14 +123,12 @@ export const GeneralTab = ({
   }
 
   return (
-    <>
-      <OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />
-      <OodiTable
-        columns={columns}
-        cy="ooditable-general"
-        data={data as FormattedStudentData[]}
-        options={tableOptions}
-      />
-    </>
+    <OodiTable
+      columns={columns}
+      cy="ooditable-general"
+      data={data as FormattedStudentData[]}
+      options={tableOptions}
+      toolbarContent={<OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />}
+    />
   )
 }

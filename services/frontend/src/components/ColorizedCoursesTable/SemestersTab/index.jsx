@@ -63,8 +63,13 @@ export const SemestersTab = () => {
         <NumberModeSelector />
         <ColorModeSelector />
       </div>
-      <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />
-      <OodiTable columns={cols} cy="ooditable-semesters" data={tableData} options={tableOptions} />
+      <OodiTable
+        columns={cols}
+        cy="ooditable-semesters"
+        data={tableData}
+        options={tableOptions}
+        toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />}
+      />
     </div>
   )
 }

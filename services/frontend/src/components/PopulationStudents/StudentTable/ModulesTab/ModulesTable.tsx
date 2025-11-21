@@ -210,14 +210,12 @@ export const ModulesTab = ({
   }
 
   return (
-    <>
-      <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
-      <OodiTable
-        columns={ooditableColumns}
-        cy="ooditable-modules"
-        data={formattedStudents ?? []}
-        options={ooditableOptions}
-      />
-    </>
+    <OodiTable
+      columns={ooditableColumns}
+      cy="ooditable-modules"
+      data={formattedStudents ?? []}
+      options={ooditableOptions}
+      toolbarContent={<OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />}
+    />
   )
 }

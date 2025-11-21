@@ -1,5 +1,5 @@
-import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
@@ -28,15 +28,9 @@ export const OodiTableContainer = <OTData,>({
   return (
     <Paper data-cy={cy} sx={{ my: 1, borderRadius: 0 }} variant="outlined">
       {!!toolbarContent && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            p: 1,
-          }}
-        >
+        <Stack direction="row" spacing={2} sx={{ p: 1 }}>
           {toolbarContent}
-        </Box>
+        </Stack>
       )}
       <TableContainer
         sx={{

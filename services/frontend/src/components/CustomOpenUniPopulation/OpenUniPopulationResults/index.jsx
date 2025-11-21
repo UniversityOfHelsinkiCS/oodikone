@@ -179,8 +179,12 @@ export const OpenUniPopulationResults = ({ fieldValues }) => {
   return (
     <>
       {`Open uni student population (${Object.keys(data.students).length} students)`}
-      <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-      <OodiTable columns={columns} data={tableData} options={tableOptions} />
+      <OodiTable
+        columns={columns}
+        data={tableData}
+        options={tableOptions}
+        toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />}
+      />
     </>
   )
 }
