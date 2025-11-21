@@ -73,3 +73,5 @@ export const mapValues = <T extends object, K extends keyof T, R>(input: T, f: (
 }
 
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
+
+export const uniq = <T>(data: T[]): T[] => [...new Set(data)]
