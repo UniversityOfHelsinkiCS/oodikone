@@ -44,11 +44,15 @@ dayjs.updateLocale('en', {
   },
 })
 
-const Layout = ({ children }) => (
+export const Layout = ({ children }) => (
   <LanguageProvider>
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <ThemeProvider theme={theme}>
-        <StatusNotificationProvider>{children}</StatusNotificationProvider>
+        <StatusNotificationProvider>
+          <CssBaseline />
+          {children}
+          <StatusNotification />
+        </StatusNotificationProvider>
       </ThemeProvider>
     </LocalizationProvider>
   </LanguageProvider>
@@ -69,12 +73,10 @@ export const App = () => {
   if (error) return <AccessDenied />
 
   return (
-    <Layout>
-      <CssBaseline />
+    <>
       <NavigationBar />
       <Routes />
-      <StatusNotification />
       <Footer />
-    </Layout>
+    </>
   )
 }
