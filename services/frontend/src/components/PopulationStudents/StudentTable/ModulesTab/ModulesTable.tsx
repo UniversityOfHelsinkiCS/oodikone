@@ -11,7 +11,7 @@ import { ColumnDef, createColumnHelper, TableOptions } from '@tanstack/react-tab
 import { useMemo } from 'react'
 
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
-import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
@@ -215,7 +215,12 @@ export const ModulesTab = ({
       cy="ooditable-modules"
       data={formattedStudents ?? []}
       options={ooditableOptions}
-      toolbarContent={<OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />}
+      toolbarContent={
+        <>
+          <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
+          <StudentNameVisibilityToggle />
+        </>
+      }
     />
   )
 }

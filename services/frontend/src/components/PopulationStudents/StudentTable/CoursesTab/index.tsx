@@ -1,17 +1,18 @@
 import { TableOptions, VisibilityState } from '@tanstack/react-table'
 import { useMemo } from 'react'
-import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
+import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
+import { IncludeSubstitutionsToggle } from '../../IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from './columnDefinitions'
 
 type CoursesTabContainerProps = {
   curriculum: ExtendedCurriculumDetails
-  includeSubstitutions: boolean
   students: FormattedStudent[]
   courses: FormattedCourse[]
 }
@@ -163,13 +164,9 @@ const gradeOrdering = ['0', 'Hyl.', 'TT', 'HT', '1', '2', '3', '4', '5', 'Hyv.']
 const compareCourseGrades = (previous, current) =>
   gradeOrdering.indexOf(previous.grade) <= gradeOrdering.indexOf(current.grade)
 
-export const CoursesTabContainer = ({
-  curriculum,
-  includeSubstitutions,
-  students,
-  courses,
-}: CoursesTabContainerProps) => {
+export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTabContainerProps) => {
   const { visible: namesVisible } = useStudentNameVisibility()
+  const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
   const columnVisibility: VisibilityState | undefined = useMemo(
     () => (!namesVisible ? { firstNames: false, lastName: false } : undefined),
@@ -271,7 +268,16 @@ export const CoursesTabContainer = ({
       cy="ooditable-courses"
       data={formattedStudents}
       options={tableOptions}
-      toolbarContent={<OodiTableExcelExport data={formattedStudents} exportColumnKeys={keysForExport} />}
+      toolbarContent={
+        <>
+          <OodiTableExcelExport data={formattedStudents} exportColumnKeys={keysForExport} />
+          <StudentNameVisibilityToggle />
+          <IncludeSubstitutionsToggle
+            includeSubstitutions={includeSubstitutions}
+            toggleIncludeSubstitutions={toggleIncludeSubstitutions}
+          />
+        </>
+      }
     />
   )
 }

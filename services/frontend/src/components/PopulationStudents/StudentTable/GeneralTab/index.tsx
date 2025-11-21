@@ -1,14 +1,18 @@
+import Box from '@mui/material/Box'
 import type { TableOptions } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { isMastersProgramme } from '@/common'
+import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 
+import { CheckStudentList } from '../../CheckStudentList'
 import { useGetColumnDefinitions } from './columnDefinitions'
 import { Programme } from './util'
 
@@ -78,6 +82,7 @@ export const GeneralTab = ({
   const { getTextIn } = useLanguage()
   const { useFilterSelector } = useFilters()
   const { data: degreeProgrammes } = useGetProgrammesQuery()
+  const { isAdmin } = useGetAuthorizedUserQuery()
 
   const columns = useGetColumnDefinitions({
     getTextIn,
@@ -128,7 +133,14 @@ export const GeneralTab = ({
       cy="ooditable-general"
       data={data as FormattedStudentData[]}
       options={tableOptions}
-      toolbarContent={<OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />}
+      toolbarContent={
+        <>
+          <OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />
+          <StudentNameVisibilityToggle />
+          <Box sx={{ flexGrow: 1 }} />
+          {isAdmin ? <CheckStudentList students={data.map(student => student.studentNumber)} /> : null}
+        </>
+      }
     />
   )
 }

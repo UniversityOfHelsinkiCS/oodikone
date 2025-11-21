@@ -26,9 +26,9 @@ export const OodiTableContainer = <OTData,>({
   const zebraStriped = table.getState().useZebrastripes
 
   return (
-    <Paper data-cy={cy} sx={{ my: 1, borderRadius: 0 }} variant="outlined">
+    <Paper data-cy={cy} sx={{ my: 2, borderRadius: 0 }} variant="outlined">
       {!!toolbarContent && (
-        <Stack direction="row" spacing={2} sx={{ p: 1 }}>
+        <Stack direction="row" spacing={3} sx={{ p: 2, justifyContent: 'flex-start' }}>
           {toolbarContent}
         </Stack>
       )}

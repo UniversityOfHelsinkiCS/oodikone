@@ -28,7 +28,6 @@ export const StudentNameVisibilityToggle = () => {
     <FormControlLabel
       control={<Switch checked={visible} data-cy="toggleStudentNames" onChange={handleChange} />}
       label="Show student names"
-      sx={{ margin: 0 }}
     />
   )
 }

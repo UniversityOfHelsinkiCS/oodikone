@@ -1,20 +1,17 @@
+import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
 import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
-import { useToggle } from '@/hooks/toggle'
+
+import { InfoBox as NewInfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
-import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { FormattedCourse } from '@oodikone/shared/types/courseData'
-import { CheckStudentList } from './CheckStudentList'
-import { IncludeSubstitutionsToggle } from './IncludeSubstitutionsToggle'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { type FormattedStudentData, GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
@@ -73,7 +70,6 @@ export const PopulationStudents = ({
   generalTabFormattingFunction,
 }: PopulationStudentsProps) => {
   const [tab, setTab] = useState(0)
-  const { isAdmin } = useGetAuthorizedUserQuery()
 
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
@@ -86,7 +82,7 @@ export const PopulationStudents = ({
       : undefined
 
   const availableTabs = {
-    General: () => (
+    General: (
       <GeneralTab
         columnFunction={generalTabColumnFunction}
         combinedProgramme={combinedProgramme}
@@ -97,17 +93,16 @@ export const PopulationStudents = ({
         programme={programme ?? studyGuidanceGroup?.tags?.studyProgramme}
       />
     ),
-    Courses: () => (
+    Courses: (
       <CoursesTab
         courses={filteredCourses ?? []}
         curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
-        includeSubstitutions={includeSubstitutions}
         students={filteredStudents}
       />
     ),
-    Modules: () => <ModulesTab curriculum={curriculum} students={filteredStudents} />,
-    Tags: () => <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
-    Progress: () => (
+    Modules: <ModulesTab curriculum={curriculum} students={filteredStudents} />,
+    Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
+    Progress: (
       <ProgressTab
         curriculum={curriculum}
         months={months}
@@ -117,8 +112,6 @@ export const PopulationStudents = ({
       />
     ),
   }
-
-  const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
   const contentByVariant: Record<
     PopulationStudentsProps['variant'],
@@ -161,28 +154,16 @@ export const PopulationStudents = ({
 
   return (
     <>
-      <span style={{ marginRight: '0.5rem' }}>
-        <InfoBox content={contentToInclude.tooltip} />
-      </span>
-      {isAdmin ? <CheckStudentList students={filteredStudents.map(student => student.studentNumber)} /> : null}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', marginTop: '5px', marginBottom: '5px' }}>
-          <StudentNameVisibilityToggle />
-          {tabs.at(tab)?.label === 'Courses' ? (
-            <IncludeSubstitutionsToggle
-              includeSubstitutions={includeSubstitutions}
-              toggleIncludeSubstitutions={toggleIncludeSubstitutions}
-            />
-          ) : null}
-        </div>
-        {dataExport}
-      </div>
-      <Tabs data-cy="student-table-tabs" onChange={(_, newTab) => setTab(newTab)} value={tab}>
-        {tabs.map(({ label }) => (
-          <Tab key={label} label={label} />
-        ))}
-      </Tabs>
-      {tabs.at(tab)?.render() ?? null}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>{dataExport}</div>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Tabs data-cy="student-table-tabs" onChange={(_, newTab) => setTab(newTab)} value={tab}>
+          {tabs.map(({ label }) => (
+            <Tab key={label} label={label} />
+          ))}
+        </Tabs>
+        <NewInfoBox content={contentToInclude.tooltip} sx={{ mb: 1, mr: 1 }} />
+      </Box>
+      {tabs[tab].render}
     </>
   )
 }
