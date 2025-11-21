@@ -1,6 +1,6 @@
 import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from './features'
 import { OodiTableContainer } from './OodiTable'
@@ -13,6 +13,7 @@ import { OodiTableContainer } from './OodiTable'
  * @param data - Array of data objects of type TData
  * @param columns - Array of column definitions for type TData
  * @param isExportView (default false) Is table used in an export modal to provide preview
+ * @param toolbarContent - Shown above the table
  * @param options - Optional: Additional TableOptions
  * @param cy - Optional: data-cy tag provided to the wrapper around the TableContainer
  * @returns Table instance
@@ -22,6 +23,7 @@ export const OodiTable = <TData,>({
   data,
   columns,
   isExportView,
+  toolbarContent,
   options = {},
   cy,
 }: {
@@ -29,6 +31,7 @@ export const OodiTable = <TData,>({
   columns: ColumnDef<TData>[]
   isExportView?: true
   options?: Partial<TableOptions<TData>>
+  toolbarContent?: ReactNode
   cy?: string
 }) => {
   const [pagination, setPagination] = useState({
@@ -52,5 +55,5 @@ export const OodiTable = <TData,>({
     ...config,
     state: { pagination, ...config.state },
   })
-  return <OodiTableContainer cy={cy} isExportView={isExportView} table={table} />
+  return <OodiTableContainer cy={cy} isExportView={isExportView} table={table} toolbarContent={toolbarContent} />
 }

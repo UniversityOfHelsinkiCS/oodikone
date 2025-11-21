@@ -9,7 +9,6 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { RowSelectionState, TableOptions } from '@tanstack/react-table'
@@ -158,18 +157,19 @@ export const OodiTableExcelExport = <TData extends object>({
   }
 
   return (
-    <Paper sx={{ p: 2, borderRadius: 0 }} variant="outlined">
+    <>
       <Button
         disabled={dialogOpen}
         onClick={() => setDialogOpen(true)}
         startIcon={<DownloadIcon />}
         sx={{
-          backgroundColor: 'export',
+          bgcolor: 'export',
         }}
         variant="contained"
       >
         Export to Excel
       </Button>
+
       <Dialog fullWidth maxWidth="md" onClose={() => setDialogOpen(false)} open={dialogOpen}>
         <DialogTitle>Export to Excel</DialogTitle>
         <DialogContent>
@@ -198,6 +198,6 @@ export const OodiTableExcelExport = <TData extends object>({
           </Button>
         </DialogActions>
       </Dialog>
-    </Paper>
+    </>
   )
 }

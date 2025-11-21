@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -5,16 +6,19 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 
 import { type Table as TableType } from '@tanstack/react-table'
+import { ReactNode } from 'react'
 import { OodiTableDataRow } from './components/Cell'
 import { OodiTableHeaderGroup } from './components/Header'
 import { OodiTablePagination } from './components/Pagination'
 
 export const OodiTableContainer = <OTData,>({
   table,
+  toolbarContent,
   isExportView,
   cy,
 }: {
   table: TableType<OTData>
+  toolbarContent?: ReactNode
   isExportView?: true
   cy?: string
 }) => {
@@ -22,17 +26,26 @@ export const OodiTableContainer = <OTData,>({
   const zebraStriped = table.getState().useZebrastripes
 
   return (
-    <Paper data-cy={cy} sx={{ p: 2, borderRadius: 0 }} variant="outlined">
+    <Paper data-cy={cy} sx={{ my: 1, borderRadius: 0 }} variant="outlined">
+      {!!toolbarContent && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            p: 1,
+          }}
+        >
+          {toolbarContent}
+        </Box>
+      )}
       <TableContainer
         sx={{
-          maxHeight: '75vh',
-          height: 'auto',
-          overflowY: 'scroll',
-          overflowX: isExportView ? 'hidden' : 'scroll',
-          p: 0,
-          borderWidth: '1px 0 0 1px',
+          borderWidth: '1px 0 1px 0',
           borderStyle: 'solid',
           borderColor: 'grey.300',
+          maxHeight: '75vh',
+          overflowY: 'scroll',
+          overflowX: isExportView ? 'hidden' : 'scroll',
         }}
       >
         <Table
@@ -54,7 +67,6 @@ export const OodiTableContainer = <OTData,>({
               '& tr > td': {
                 backgroundColor: 'white',
               },
-
               '& tr:nth-of-type(odd) > td': zebraStriped
                 ? {
                     backgroundColor: 'grey.100',
