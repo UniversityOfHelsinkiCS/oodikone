@@ -22,10 +22,10 @@ input[type='radio'] {
 
 .selector-container {
   display: flex;
-  gap: 0.4em;
+  gap: 1em;
   margin: auto;
   flex-direction: column;
-  max-width: 12em;
+  max-width: 25vw;
 }
 
 table tr th,

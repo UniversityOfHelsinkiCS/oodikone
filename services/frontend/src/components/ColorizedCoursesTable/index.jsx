@@ -2,6 +2,7 @@ import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingSection } from '@/components/Loading'
@@ -12,7 +13,7 @@ import { FacultiesTab } from './FacultiesTab'
 import { SemestersTab } from './SemestersTab'
 import './index.css'
 
-export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, panes, infoBox, dividerText }) => {
+export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, panes, dividerText }) => {
   useTitle(title)
   const { data: semesterData } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
@@ -92,8 +93,14 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   return (
     <ColorizedCoursesTableContext.Provider value={settingsContext}>
       <div className="colorized-courses-table">
-        {dividerText ? <Divider sx={{ marginTop: '3em' }}>{dividerText}</Divider> : null}
-        {infoBox}
+        {dividerText ? (
+          <Divider sx={{ width: '100%', mt: 3, mb: 1 }}>
+            <Typography fontSize="1.3rem" variant="overline">
+              {dividerText}
+            </Typography>
+          </Divider>
+        ) : null}
+
         {displayedPanes.length > 1 ? (
           <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
             {displayedPanes.map(({ label }) => (
