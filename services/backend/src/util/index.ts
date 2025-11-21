@@ -5,7 +5,7 @@ import { tryCatch } from '@oodikone/shared/util'
 import { ProgrammeModuleModel } from '../models'
 
 const isObjectWithKey = (obj: unknown, key: string): obj is Record<string, unknown> => {
-  return typeof obj === 'object' && obj !== null && key in obj
+  return !!obj && typeof obj === 'object' && key in obj
 }
 
 /**
@@ -40,16 +40,16 @@ export const createLocaleComparator = (key?: string, desc = false) => {
   }
 }
 
-export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedProgrammeRights[]) => {
+export const getFullStudyProgrammeRights = (detailedProgrammeRights: DetailedProgrammeRights[]): string[] => {
   return detailedProgrammeRights.filter(({ limited }) => !limited).map(({ code }) => code)
 }
 
-export const hasFullAccessToStudentData = (roles?: Role[]) => {
+export const hasFullAccessToStudentData = (roles?: Role[]): boolean => {
   const rolesWithFullAccess: Role[] = ['admin', 'fullSisuAccess']
   return !!roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
-export const isOpenUniCourseCode = (code: string) => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
+export const isOpenUniCourseCode = (code: string): boolean => !!/^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
 
 /**
  * Returns the keys of the given object as an array of strings, typed as the keys of the object.
