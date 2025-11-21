@@ -1,6 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Tooltip from '@mui/material/Tooltip'
@@ -13,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { getEnrollmentTypeTextForExcel, isFall } from '@/common'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
 import { ExportToExcelDialog } from '@/components/common/MRTExcelExport'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
@@ -349,7 +349,7 @@ export const CloseToGraduation = () => {
   })
 
   return (
-    <Container maxWidth="xl">
+    <PageLayout maxWidth="lg">
       <ExportToExcelDialog
         exportColumns={columns}
         exportData={exportData}
@@ -373,6 +373,6 @@ export const CloseToGraduation = () => {
         ) : null}
       </Box>
       <MaterialReactTable key={selectedTab} table={table} />
-    </Container>
+    </PageLayout>
   )
 }

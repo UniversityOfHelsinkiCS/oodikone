@@ -1,9 +1,9 @@
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 
 import { isDefaultServiceProvider } from '@/common'
+import { PageLayout } from '@/components/common/PageLayout'
 import { Loading } from '@/components/Loading'
 import { useTitle } from '@/hooks/title'
 import { useGetUserQuery } from '@/redux/users'
@@ -24,16 +24,16 @@ export const UserPage = ({ userId }: { userId: string }) => {
 
   if (!user || isError) {
     return (
-      <Container maxWidth="sm">
+      <PageLayout maxWidth="lg">
         <Alert severity="error" variant="outlined">
           User not found
         </Alert>
-      </Container>
+      </PageLayout>
     )
   }
 
   return (
-    <Container maxWidth="md">
+    <PageLayout maxWidth="lg">
       <Stack direction="column" gap={2}>
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
@@ -49,6 +49,6 @@ export const UserPage = ({ userId }: { userId: string }) => {
         </Box>
         <StudyProgrammeRightsCard user={user} />
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

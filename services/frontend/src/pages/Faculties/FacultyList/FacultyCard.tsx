@@ -10,8 +10,8 @@ export const FacultyCard = ({ faculty }: { faculty: GetFacultiesResponse }) => {
   const { getTextIn } = useLanguage()
 
   return (
-    <Card sx={{ padding: 2 }} variant="outlined">
-      <Stack alignItems="center" direction="row" justifyContent="space-between">
+    <Card variant="outlined">
+      <Stack alignItems="center" direction="row" justifyContent="space-between" p={2}>
         <Link to={`/faculties/${faculty.id}`} variant="h6">
           {getTextIn(faculty.name)}
         </Link>

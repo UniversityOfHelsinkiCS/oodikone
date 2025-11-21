@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
 import { filterInternalReleases, isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -73,7 +73,7 @@ export const FrontPage = () => {
   }, [releaseData])
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <PageTitle subtitle="Exploratory Research on Study Data" title="Oodikone" />
       <Stack direction={{ sm: 'column', md: 'row' }} divider={<Divider flexItem orientation="vertical" />} gap={3}>
         <Stack direction="column" gap={2} sx={{ width: { sm: '100%', md: '50%' } }}>
@@ -98,6 +98,6 @@ export const FrontPage = () => {
           </Box>
         </Stack>
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

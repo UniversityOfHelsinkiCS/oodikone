@@ -1,7 +1,7 @@
-import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
@@ -14,7 +14,7 @@ export const University = () => {
   const [tab, setTab] = useTabs(2)
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <PageTitle title="University" />
       <Tabs onChange={(_event, newTab) => setTab(newTab)} sx={{ marginBottom: 2 }} value={tab}>
         <Tab data-cy="faculty-progress-tab" label="Faculty progress" />
@@ -22,6 +22,6 @@ export const University = () => {
       </Tabs>
       {tab === 0 && <FacultyProgressTab />}
       {tab === 1 && <FacultyGraduationsTab />}
-    </Container>
+    </PageLayout>
   )
 }

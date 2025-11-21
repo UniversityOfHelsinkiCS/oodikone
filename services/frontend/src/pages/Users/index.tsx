@@ -1,9 +1,9 @@
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useLazyGetAllUsersQuery } from '@/redux/users'
@@ -27,7 +27,7 @@ export const Users = () => {
   }, [userid, getAllUsersQuery])
 
   return (
-    <Container maxWidth="xl">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Users" />
       <Stack gap={2}>
         {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
@@ -37,6 +37,6 @@ export const Users = () => {
           <UsersTable getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
         )}
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

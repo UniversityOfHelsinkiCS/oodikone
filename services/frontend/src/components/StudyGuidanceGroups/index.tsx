@@ -15,7 +15,7 @@ export const StudyGuidanceGroups = () => {
 
   if (!groupid)
     return (
-      <PageLayout>
+      <PageLayout maxWidth="lg">
         <PageTitle title="Study guidance groups" />
         <PageLoading isLoading={isLoading} />
         {!isLoading && groups !== undefined && <StudyGuidanceGroupOverview groups={groups} />}

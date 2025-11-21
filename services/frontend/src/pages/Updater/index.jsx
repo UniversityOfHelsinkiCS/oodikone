@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import RefreshIcon from '@mui/icons-material/Refresh'
 import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Radio from '@mui/material/Radio'
@@ -15,6 +14,7 @@ import { callApi } from '@/apiConnection'
 import { isDefaultServiceProvider } from '@/common'
 import { updaterToolTips } from '@/common/InfoToolTips'
 import { ExternalLink } from '@/components/common/ExternalLink'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { Section } from '@/components/Section'
 import { languageCenterViewEnabled } from '@/conf'
@@ -67,7 +67,7 @@ export const Updater = () => {
   if (error) throw new Error('Admin intentionally caused frontend crash')
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Updater" />
       <Stack spacing={2}>
         {isDefaultServiceProvider() && (
@@ -211,6 +211,6 @@ export const Updater = () => {
           </Stack>
         </Section>
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

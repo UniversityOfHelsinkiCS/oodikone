@@ -2,9 +2,9 @@ import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import Link from '@mui/material/Link'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 
@@ -12,7 +12,7 @@ export const AccessDeniedMessage = () => {
   useTitle('Access denied')
 
   return (
-    <Container maxWidth="md">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Access denied" />
       <Alert
         icon={
@@ -35,6 +35,6 @@ export const AccessDeniedMessage = () => {
         </Link>
         .
       </Alert>
-    </Container>
+    </PageLayout>
   )
 }

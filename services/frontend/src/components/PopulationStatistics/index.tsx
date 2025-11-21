@@ -2,7 +2,6 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
-import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { useLocation, type Location } from 'react-router'
@@ -232,13 +231,11 @@ export const PopulationStatistics = () => {
       {(filteredStudents, filteredCourses) => (
         <>
           <PageLoading isLoading={isLoading} />
-          <Stack textAlign="center">
-            <PageTitle subtitle={studyTrack ? `Studytrack ${studyTrack}` : undefined} title={title}>
-              <Typography fontWeight="light" variant="h6">
-                Class size {students.length} students
-              </Typography>
-            </PageTitle>
-          </Stack>
+          <PageTitle subtitle={studyTrack ? `Studytrack ${studyTrack}` : undefined} title={title}>
+            <Typography fontWeight="light" variant="h6">
+              Class size {students.length} students
+            </Typography>
+          </PageTitle>
           {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           {isSuccess ? (
             <PopulationDetails

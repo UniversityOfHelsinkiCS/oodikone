@@ -1,8 +1,6 @@
 import LogoutIcon from '@mui/icons-material/Logout'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -11,6 +9,7 @@ import ReactHighchart from 'react-highcharts'
 
 import toskaLogo from '@/assets/toska.svg'
 import { Backdrop } from '@/components/common/Backdrop'
+import { PageLayout } from '@/components/common/PageLayout'
 import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
 
@@ -49,32 +48,30 @@ export const ErrorBackground = ({ header, content }) => {
   const [logout] = useLogoutMutation()
 
   return (
-    <Box>
-      <Container maxWidth="lg">
-        <Stack sx={{ alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
-          <ReactHighchart
-            config={{
-              plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
-              series: dummyData,
-              title: { text: 'Students of Computer Science 2018-2020' },
-              yAxis: { title: { text: 'Cumulative credits' } },
-            }}
-          />
-          <ReactHighchart
-            config={{
-              chart: { type: 'column' },
-              series: dummyData.map(element => ({
-                name: element.name,
-                data: [Math.max(...element.data)],
-                type: 'column',
-              })),
-              title: { text: "Your students' future" },
-              xAxis: { categories: ['2018'] },
-              yAxis: { title: { text: 'Cumulative credits' } },
-            }}
-          />
-        </Stack>
-      </Container>
+    <PageLayout maxWidth="lg">
+      <Stack sx={{ alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
+        <ReactHighchart
+          config={{
+            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
+            series: dummyData,
+            title: { text: 'Students of Computer Science 2018-2020' },
+            yAxis: { title: { text: 'Cumulative credits' } },
+          }}
+        />
+        <ReactHighchart
+          config={{
+            chart: { type: 'column' },
+            series: dummyData.map(element => ({
+              name: element.name,
+              data: [Math.max(...element.data)],
+              type: 'column',
+            })),
+            title: { text: "Your students' future" },
+            xAxis: { categories: ['2018'] },
+            yAxis: { title: { text: 'Cumulative credits' } },
+          }}
+        />
+      </Stack>
       <Backdrop
         open
         sx={{
@@ -119,6 +116,6 @@ export const ErrorBackground = ({ header, content }) => {
           </Stack>
         </Stack>
       </Backdrop>
-    </Box>
+    </PageLayout>
   )
 }

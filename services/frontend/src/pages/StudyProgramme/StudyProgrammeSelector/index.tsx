@@ -1,6 +1,5 @@
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 
 import { debounce } from 'lodash'
@@ -8,6 +7,7 @@ import { useState } from 'react'
 
 import { isDefaultServiceProvider } from '@/common'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/Loading'
@@ -114,7 +114,7 @@ export const StudyProgrammeSelector = () => {
   }
 
   return (
-    <Container maxWidth="md">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Degree programmes" />
       <Stack direction="column" gap={2}>
         <Box>
@@ -156,6 +156,6 @@ export const StudyProgrammeSelector = () => {
           visible={otherProgrammesVisible}
         />
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

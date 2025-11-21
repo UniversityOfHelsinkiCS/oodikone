@@ -77,7 +77,7 @@ export const FilterView: FC<{
         {displayTray ? (
           <FilterTray allStudents={students} filters={filters} numberOfFilteredStudents={filteredStudents.length} />
         ) : null}
-        <PageLayout>{children(filteredStudents, filteredCourses)}</PageLayout>
+        <PageLayout maxWidth="80vw">{children(filteredStudents, filteredCourses)}</PageLayout>
       </Stack>
     </FilterViewContext.Provider>
   )

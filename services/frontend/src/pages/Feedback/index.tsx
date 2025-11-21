@@ -1,7 +1,6 @@
 import SendIcon from '@mui/icons-material/Send'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
 import Link from '@mui/material/Link'
 import Modal from '@mui/material/Modal'
 import TextField from '@mui/material/TextField'
@@ -9,6 +8,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useTitle } from '@/hooks/title'
@@ -54,7 +54,7 @@ export const Feedback = () => {
   }
 
   return (
-    <Container maxWidth="md">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Feedback" />
       <Box textAlign="center">
         <Typography>
@@ -134,6 +134,6 @@ export const Feedback = () => {
           </Box>
         </Box>
       </Modal>
-    </Container>
+    </PageLayout>
   )
 }

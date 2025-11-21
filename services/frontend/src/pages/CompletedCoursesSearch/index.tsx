@@ -6,11 +6,11 @@ import Box from '@mui/material/Box'
 import green from '@mui/material/colors/green'
 import grey from '@mui/material/colors/grey'
 import yellow from '@mui/material/colors/yellow'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 
 import { useState } from 'react'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { SearchModal } from './SearchModal'
@@ -21,7 +21,7 @@ export const CompletedCourses = () => {
   const [searchValues, setValues] = useState({ courseList: [], studentList: [] })
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Completed courses of students" />
       <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
         <Alert severity="info">
@@ -54,6 +54,6 @@ export const CompletedCourses = () => {
           <SearchResults searchValues={searchValues} />
         )}
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

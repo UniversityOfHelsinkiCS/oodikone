@@ -1,4 +1,3 @@
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
@@ -6,6 +5,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router'
 
 import { isDefaultServiceProvider } from '@/common'
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useTabs } from '@/hooks/tabs'
@@ -170,7 +170,7 @@ export const StudyProgramme = () => {
   }
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <PageTitle
         subtitle={getSubtitle(studyProgrammeId, programmeLetterId, secondProgrammeLetterId)}
         title={programmeName}
@@ -188,6 +188,6 @@ export const StudyProgramme = () => {
         </Tabs>
         {tabs.at(currentTab)?.component ?? null}
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

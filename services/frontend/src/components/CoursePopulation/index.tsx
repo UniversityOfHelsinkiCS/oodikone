@@ -3,7 +3,6 @@ import { useLocation } from 'react-router'
 
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
 import {
@@ -221,9 +220,7 @@ export const CoursePopulation = () => {
     >
       {(filteredStudents, filteredCourses) => (
         <>
-          <PageLayout>
-            <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
-          </PageLayout>
+          <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>
       )}

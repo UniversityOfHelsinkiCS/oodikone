@@ -1,6 +1,6 @@
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { GetFacultiesResponse } from '@/types/api/faculty'
@@ -12,13 +12,13 @@ export const FacultyList = ({ faculties }: { faculties: GetFacultiesResponse[] }
   }
 
   return (
-    <Container maxWidth="sm">
+    <PageLayout maxWidth="lg">
       <PageTitle title="Faculties" />
       <Stack gap={2}>
         {faculties.map(faculty => (
           <FacultyCard faculty={faculty} key={faculty.id} />
         ))}
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

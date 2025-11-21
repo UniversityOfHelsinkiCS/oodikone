@@ -1,10 +1,10 @@
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useTabs } from '@/hooks/tabs'
@@ -41,7 +41,7 @@ export const Faculties = () => {
   }
 
   return (
-    <Container data-cy="FacultySegmentContainer" maxWidth="lg">
+    <PageLayout data-cy="FacultySegmentContainer" maxWidth="lg">
       <PageTitle subtitle={facultyCode} title={facultyName} />
       <Stack gap={2}>
         <Tabs data-cy="faculty-tabs" onChange={(_event, newTab) => setTab(newTab)} value={tab}>
@@ -78,6 +78,6 @@ export const Faculties = () => {
         )}
         {tab === 3 && isAdmin ? <UpdateStatisticsTab id={faculty?.id} /> : null}
       </Stack>
-    </Container>
+    </PageLayout>
   )
 }

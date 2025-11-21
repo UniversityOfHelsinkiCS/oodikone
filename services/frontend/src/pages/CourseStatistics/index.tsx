@@ -1,13 +1,13 @@
 import Backdrop from '@mui/material/Backdrop'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
-import Container from '@mui/material/Container'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 
+import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useTabs } from '@/hooks/tabs'
@@ -80,10 +80,10 @@ export const CourseStatistics = () => {
 
   if (skipQuery)
     return (
-      <Container maxWidth="lg">
+      <PageLayout maxWidth="lg">
         <PageTitle title="Course statistics" />
         <SearchForm />
-      </Container>
+      </PageLayout>
     )
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
@@ -93,7 +93,7 @@ export const CourseStatistics = () => {
   const statistics = getSummaryStatistics(stats, programmes, courseSummaryFormProgrammes, userHasAccessToAllStats)
 
   return (
-    <Container maxWidth="lg">
+    <PageLayout maxWidth="lg">
       <Backdrop
         open={loading}
         sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
@@ -134,6 +134,6 @@ export const CourseStatistics = () => {
       {tab === 2 && userHasAccessToAllStats ? (
         <FacultyStatisticsTab courseStats={courseStatsData} openOrRegular={openOrRegular} />
       ) : null}
-    </Container>
+    </PageLayout>
   )
 }
