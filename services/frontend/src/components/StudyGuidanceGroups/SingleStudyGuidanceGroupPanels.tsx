@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
@@ -67,7 +66,7 @@ export const SingleStudyGuidanceGroupPanels = ({
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
-        <Box>
+        <div>
           <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
           {group.tags?.year ? (
             <Button color="primary" onClick={() => toggleCreditDateFilter()} variant="outlined">
@@ -86,17 +85,13 @@ export const SingleStudyGuidanceGroupPanels = ({
             studyPlanFilterIsActive={studyPlanFilterIsActive}
             studyRightId={null}
           />
-        </Box>
+        </div>
       ),
     },
     (programme || group?.tags?.studyProgramme) && groupYear
       ? {
           title: 'Credit statistics',
-          content: (
-            <div>
-              <CreditStatistics filteredStudents={filteredStudents} query={query} />
-            </div>
-          ),
+          content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
         }
       : null,
     {
@@ -106,53 +101,49 @@ export const SingleStudyGuidanceGroupPanels = ({
     {
       title: 'Courses of population',
       content: (
-        <div>
-          <StudyGuidanceGroupPopulationCourses
-            curriculum={curriculum}
-            curriculumList={curriculumList}
-            filteredCourses={filteredCourses}
-            filteredStudents={filteredStudents}
-            setCurriculum={setCurriculum}
-            studyProgramme={group.tags?.studyProgramme ? programme : null}
-            year={groupYear}
-          />
-        </div>
+        <StudyGuidanceGroupPopulationCourses
+          curriculum={curriculum}
+          curriculumList={curriculumList}
+          filteredCourses={filteredCourses}
+          filteredStudents={filteredStudents}
+          setCurriculum={setCurriculum}
+          studyProgramme={group.tags?.studyProgramme ? programme : null}
+          year={groupYear}
+        />
       ),
     },
     {
       title: `Students (${filteredStudents.length})`,
       content: (
-        <div>
-          {/* @ts-expect-error FIX typing */}
-          <PopulationStudents
-            curriculum={curriculum}
-            filteredCourses={filteredCourses}
-            filteredStudents={filteredStudents}
-            generalTabColumnFunction={() => columnsGeneralTab({ group })}
-            generalTabFormattingFunction={() =>
-              formatGeneralTab({
-                variant: 'studyGuidanceGroupPopulation',
-                filteredStudents,
+        // @ts-expect-error FIX typing
+        <PopulationStudents
+          curriculum={curriculum}
+          filteredCourses={filteredCourses}
+          filteredStudents={filteredStudents}
+          generalTabColumnFunction={() => columnsGeneralTab({ group })}
+          generalTabFormattingFunction={() =>
+            formatGeneralTab({
+              variant: 'studyGuidanceGroupPopulation',
+              filteredStudents,
 
-                years: groupYear ? [Number(groupYear)] : [],
+              years: groupYear ? [Number(groupYear)] : [],
 
-                programme: group.tags?.studyProgramme?.split('+')[0],
-                combinedProgramme: group.tags?.studyProgramme?.split('+')[1],
+              programme: group.tags?.studyProgramme?.split('+')[0],
+              combinedProgramme: group.tags?.studyProgramme?.split('+')[1],
 
-                showBachelorAndMaster: false,
-                includePrimaryProgramme: true,
+              showBachelorAndMaster: false,
+              includePrimaryProgramme: true,
 
-                coursecodes: [],
-                from: undefined,
-                to: undefined,
-              })
-            }
-            programme={group.tags?.studyProgramme?.split('+').at(0)}
-            studyGuidanceGroup={group}
-            variant="studyGuidanceGroupPopulation"
-            year={groupYear ?? undefined}
-          />
-        </div>
+              coursecodes: [],
+              from: undefined,
+              to: undefined,
+            })
+          }
+          programme={group.tags?.studyProgramme?.split('+').at(0)}
+          studyGuidanceGroup={group}
+          variant="studyGuidanceGroupPopulation"
+          year={groupYear ?? undefined}
+        />
       ),
     },
   ]

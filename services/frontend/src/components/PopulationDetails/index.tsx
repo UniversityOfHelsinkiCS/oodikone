@@ -1,5 +1,4 @@
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -141,46 +140,44 @@ export const PopulationDetails = ({
       ? {
           title: `Students (${filteredStudents.length})`,
           content: (
-            <div>
-              <PopulationStudents
-                combinedProgramme={combinedProgramme}
-                curriculum={curriculum}
-                filteredCourses={filteredCourses}
-                filteredStudents={filteredStudents}
-                generalTabColumnFunction={() =>
-                  columnsGeneralTab({
-                    showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
-                  })
-                }
-                generalTabFormattingFunction={() =>
-                  formatGeneralTab({
-                    variant: 'population',
-                    filteredStudents,
+            <PopulationStudents
+              combinedProgramme={combinedProgramme}
+              curriculum={curriculum}
+              filteredCourses={filteredCourses}
+              filteredStudents={filteredStudents}
+              generalTabColumnFunction={() =>
+                columnsGeneralTab({
+                  showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
+                })
+              }
+              generalTabFormattingFunction={() =>
+                formatGeneralTab({
+                  variant: 'population',
+                  filteredStudents,
 
-                    years: query.years,
+                  years: query.years,
 
-                    programme: query.programme,
-                    combinedProgramme: query.combinedProgramme,
+                  programme: query.programme,
+                  combinedProgramme: query.combinedProgramme,
 
-                    showBachelorAndMaster: query.showBachelorAndMaster,
-                    includePrimaryProgramme: false,
+                  showBachelorAndMaster: query.showBachelorAndMaster,
+                  includePrimaryProgramme: false,
 
-                    coursecodes: [],
-                    from: undefined,
-                    to: undefined,
-                  })
-                }
-                programme={programme}
-                variant="population"
-              />
-            </div>
+                  coursecodes: [],
+                  from: undefined,
+                  to: undefined,
+                })
+              }
+              programme={programme}
+              variant="population"
+            />
           ),
         }
       : null,
   ].filter(panel => !!panel)
 
   return (
-    <Box>
+    <>
       <Paper sx={{ p: 2, my: 2 }} variant="outlined">
         <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
           <FormGroup sx={{ gap: 1 }}>
@@ -244,6 +241,6 @@ export const PopulationDetails = ({
         ) : null}
       </Paper>
       <PanelView panels={panels} />
-    </Box>
+    </>
   )
 }
