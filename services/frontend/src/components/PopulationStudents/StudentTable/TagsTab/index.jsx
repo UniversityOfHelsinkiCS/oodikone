@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 
 import { Link } from '@/components/common/Link'
+import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
 import { TagList } from '@/components/TagList'
 import { TagPopulation } from '@/components/TagPopulation'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
@@ -10,7 +11,12 @@ export const TagsTab = ({ programme, combinedProgramme, students }) => {
   const correctCode = combinedProgramme ? `${programme}+${combinedProgramme}` : programme
   const { data: tags, isFetching } = useGetTagsByStudyTrackQuery(correctCode, { skip: !correctCode })
 
-  if (isFetching) return <CircularProgress />
+  if (isFetching)
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20em' }}>
+        <CircularProgress />
+      </Box>
+    )
 
   return (
     <Box>
@@ -33,6 +39,9 @@ export const TagsTab = ({ programme, combinedProgramme, students }) => {
         )}
         {tags?.length > 0 && (
           <>
+            <span style={{ marginLeft: '1em' }}>
+              <StudentNameVisibilityToggle />
+            </span>
             <TagPopulation
               combinedProgramme={combinedProgramme}
               programme={programme}
