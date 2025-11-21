@@ -16,6 +16,7 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
 const baseTheme = {
+  cssVariables: true,
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
