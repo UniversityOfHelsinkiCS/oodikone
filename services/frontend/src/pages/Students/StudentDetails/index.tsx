@@ -76,7 +76,7 @@ export const StudentDetails = () => {
     data: student,
     isLoading: isLoading,
     isError: isError,
-  } = useGetStudentQuery({ studentNumber: studentNumber! }, { skip: !!studentNumber })
+  } = useGetStudentQuery({ studentNumber: studentNumber! }, { skip: !studentNumber })
   let honoursCode = ''
 
   if (isLoading) {
