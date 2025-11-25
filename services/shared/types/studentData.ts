@@ -139,5 +139,5 @@ export type FormattedStudent = {
     language: string
     studyright_id: string
   }[]
-  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode'>[]
+  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studyright_id'>[]
 }

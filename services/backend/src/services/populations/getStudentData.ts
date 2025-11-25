@@ -46,11 +46,11 @@ export const getStudentTagMap = async (studyRights: string[], studentNumbers: st
 
 export type StudentEnrollment = Pick<
   Enrollment,
-  'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber'
+  'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
 >
 export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> =>
   EnrollmentModel.findAll({
-    attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber'],
+    attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
