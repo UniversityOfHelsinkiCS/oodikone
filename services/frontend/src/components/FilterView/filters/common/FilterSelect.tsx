@@ -3,6 +3,7 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { SxProps, Theme } from '@mui/material/styles'
 import Tooltip from '@mui/material/Tooltip'
 
 // HACK: This is ripped off of MUI MenuItem error.
@@ -25,6 +26,7 @@ type FilterSelectProps<T extends ValidValueType> = {
   multiple?: true
   InputItem?: (value: T | T[]) => JSX.Element
   MenuItem?: (option: SelectOption<T>) => JSX.Element
+  sx?: SxProps<Theme>
 }
 
 const DefaultMenuItem = option => (
@@ -42,12 +44,13 @@ export const FilterSelect = <T extends ValidValueType = string>({
   multiple,
   InputItem,
   MenuItem,
+  sx,
 }: FilterSelectProps<T>) => {
   const disabled = !options.length
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <FormControl fullWidth variant="outlined">
+      <FormControl sx={{ ...sx }} fullWidth variant="outlined">
         <InputLabel id={`${filterKey}-label`} size="small" sx={{ textOverflow: 'ellipsis', pr: 2.5 }}>
           {label}
         </InputLabel>
