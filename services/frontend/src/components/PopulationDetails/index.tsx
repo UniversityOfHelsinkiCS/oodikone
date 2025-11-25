@@ -26,8 +26,8 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
-import { FormattedStudent as Student } from '@oodikone/shared/types'
-import { FormattedCourse as Course } from '@oodikone/shared/types/courseData'
+import { FormattedStudent } from '@oodikone/shared/types'
+import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -40,8 +40,8 @@ type PopulationDetailsProps = {
   isLoading: boolean
   query: PopulationQuery
   populationTags: Map<string, string>
-  filteredStudents: Student[]
-  filteredCourses: Course[]
+  filteredStudents: FormattedStudent[]
+  filteredCourses: FormattedCourse[]
 }
 
 export const PopulationDetails = ({
@@ -116,7 +116,7 @@ export const PopulationDetails = ({
     {
       title: 'Courses of class',
       content: (
-        <div>
+        <>
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
             curriculum={curriculum}
@@ -130,12 +130,12 @@ export const PopulationDetails = ({
             courseTableMode={courseTableMode}
             curriculum={curriculum}
             filteredCourses={filteredCourses}
-            isPending={isLoading}
+            isLoading={isLoading}
             onlyIamRights={onlyIamRights}
             query={query}
             studentAmountLimit={studentAmountLimit}
           />
-        </div>
+        </>
       ),
     },
     !onlyIamRights

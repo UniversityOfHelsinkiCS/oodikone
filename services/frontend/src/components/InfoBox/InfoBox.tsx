@@ -13,6 +13,10 @@ interface InfoBoxProps {
   cypress?: string
 }
 
+/**
+ * Click to open InfoBox.
+ * For the hover variant, refer to ./InfoBoxWithTooltip.tsx.
+ */
 export const InfoBox = ({ content, cypress = '' }: InfoBoxProps) => {
   const [open, setOpen] = useState(false)
   const toggleOpen = () => setOpen(prev => !prev)

@@ -1,46 +1,55 @@
+import Stack from '@mui/material/Stack'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { PopulationQuery } from '@/types/populationSearch'
+import { FormattedCourse } from '@oodikone/shared/types'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
 export const PopulationCourses = ({
-  isPending,
+  isLoading,
   query,
   filteredCourses,
   onlyIamRights,
   curriculum,
   courseTableMode,
   studentAmountLimit,
-}) => (
-  <>
-    <div style={{ display: 'flex' }}>
-      {courseTableMode === 'curriculum' ? (
-        <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-          <InfoBox content={populationStatisticsToolTips.coursesOfClass} />
-        </div>
-      ) : (
-        <div style={{ marginBottom: '20px', marginRight: '10px' }}>
-          <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-        </div>
-      )}
-      {query.programme && !onlyIamRights ? (
-        <div style={{ marginBottom: '20px' }}>
+}: {
+  isLoading: boolean
+  query: Pick<PopulationQuery, 'programme' | 'years'>
+  filteredCourses: FormattedCourse[]
+  onlyIamRights: boolean
+  curriculum: ExtendedCurriculumDetails
+  courseTableMode: 'curriculum' | 'all'
+  studentAmountLimit: number
+}) => {
+  const tooltipText =
+    courseTableMode === 'curriculum'
+      ? populationStatisticsToolTips.coursesOfClass
+      : populationStatisticsToolTips.coursesOfPopulation
+
+  return (
+    <>
+      <Stack direction="row" spacing={2} sx={{ my: 1, justifyContent: 'space-between' }}>
+        {query.programme && !onlyIamRights ? (
           <FilterDegreeCoursesModal degreeProgramme={query.programme} years={query.years} />
-        </div>
-      ) : null}
-    </div>
-    <SegmentDimmer isLoading={isPending} />
-    {courseTableMode === 'curriculum' ? (
-      <PopulationCourseStats
-        curriculum={curriculum}
-        filteredCourses={filteredCourses}
-        onlyIamRights={onlyIamRights}
-        pending={isPending}
-      />
-    ) : (
-      <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
-    )}
-  </>
-)
+        ) : null}
+        <InfoBox content={tooltipText} />
+      </Stack>
+      <SegmentDimmer isLoading={isLoading} />
+      {courseTableMode === 'curriculum' ? (
+        <PopulationCourseStats
+          curriculum={curriculum}
+          filteredCourses={filteredCourses}
+          onlyIamRights={onlyIamRights}
+          pending={isLoading}
+        />
+      ) : (
+        <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
+      )}
+    </>
+  )
+}
