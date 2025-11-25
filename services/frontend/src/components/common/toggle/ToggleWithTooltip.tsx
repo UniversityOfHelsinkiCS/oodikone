@@ -1,9 +1,13 @@
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
-import Typography from '@mui/material/Typography'
 
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 
+/**
+ * Single switch element with label to the right and an optional tooltip.
+ * For toggle with labels on both sides, use ./Toggle.tsx.
+ */
 export const ToggleWithTooltip = ({
   checked,
   cypress,
@@ -12,18 +16,13 @@ export const ToggleWithTooltip = ({
   tooltipText,
 }: {
   checked: boolean
-  cypress: string
+  cypress?: string
   label: string
   onChange: () => void
   tooltipText?: string | null
-}) => {
-  return (
-    <Stack alignItems="center" direction="row" gap={1}>
-      <Stack alignItems="center" direction="row">
-        <Switch checked={checked} data-cy={cypress} onChange={onChange} />
-        <Typography color="text.primary">{label}</Typography>
-      </Stack>
-      {tooltipText ? <InfoBox content={tooltipText} mini /> : null}
-    </Stack>
-  )
-}
+}) => (
+  <Stack direction="row" spacing={1}>
+    <FormControlLabel control={<Switch checked={checked} data-cy={cypress} onChange={onChange} />} label={label} />
+    {!!tooltipText && <InfoBox content={tooltipText} mini />}
+  </Stack>
+)
