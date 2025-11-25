@@ -1,10 +1,36 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Accordion from '@mui/material/Accordion'
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import Accordion, { AccordionProps } from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionSummary, { AccordionSummaryProps, accordionSummaryClasses } from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
+import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useMemo, useState } from 'react'
+
+const PanelViewAccordion = styled((props: AccordionProps) => <Accordion disableGutters elevation={0} {...props} />)(
+  ({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    '&:not(:last-child)': {
+      borderBottom: 0,
+    },
+    '&::before': {
+      display: 'none',
+    },
+  })
+)
+
+const PanelSummary = styled((props: AccordionSummaryProps) => (
+  <AccordionSummary expandIcon={<KeyboardArrowRightIcon />} {...props} />
+))(({ theme }) => ({
+  flexDirection: 'row-reverse',
+  [`& .${accordionSummaryClasses.expandIconWrapper}.${accordionSummaryClasses.expanded}`]: {
+    transform: 'rotate(90deg)',
+  },
+  [`& .${accordionSummaryClasses.content}`]: {
+    marginLeft: theme.spacing(1),
+  },
+}))
 
 export const PanelView = ({ panels: initialPanels }) => {
   const [activeIndex, setActiveIndex] = useState<number[]>([])
@@ -33,28 +59,19 @@ export const PanelView = ({ panels: initialPanels }) => {
   return (
     <Box data-cy="panelview-parent">
       {panels.map(({ key, onChange, title, content }) => (
-        <Accordion
-          disableGutters
+        <PanelViewAccordion
           expanded={!!content}
           key={key}
           onChange={onChange}
           slotProps={{ transition: { unmountOnExit: true } }}
-          sx={{
-            backgroundColor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 1,
-            boxShadow: 'none',
-            overflow: 'hidden',
-          }}
         >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography component="span" data-cy={title} sx={{ fontSize: 'large', fontWeight: 'bold' }} variant="h6">
+          <PanelSummary>
+            <Typography data-cy={title} sx={{ fontSize: 'large', fontWeight: 'bold' }} variant="subtitle1">
               {title}
             </Typography>
-          </AccordionSummary>
+          </PanelSummary>
           <AccordionDetails data-cy={`${title}-data`}>{content}</AccordionDetails>
-        </Accordion>
+        </PanelViewAccordion>
       ))}
     </Box>
   )
