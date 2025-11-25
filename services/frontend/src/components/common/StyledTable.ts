@@ -1,8 +1,12 @@
 import styled from '@mui/material/styles/styled'
 import Table from '@mui/material/Table'
 
+/**
+ * @description Oodikone specific styles for Material UI Table
+ * To be paired with StyledCell
+ */
 export const StyledTable = styled(Table, {
-  shouldForwardProp: prop => prop !== 'showCellBorders',
+  shouldForwardProp: prop => prop !== 'showCellBorders' && prop !== 'zebraStriped',
 })<{ showCellBorders?: true; zebraStriped?: true }>(({ theme, showCellBorders, zebraStriped }) => {
   return {
     '&': {

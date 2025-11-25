@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
@@ -9,6 +8,7 @@ import { intersection, orderBy } from 'lodash'
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PercentageBar } from '@/components/common/PercentageBar'
+import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { GetSingleCourseStatsResponse } from '@/types/api/courses'
@@ -64,40 +64,34 @@ export const CoursePopulationGradeDist = ({
     <StyledTable showCellBorders>
       <TableHead>
         <TableRow>
-          <TableCell width={1} /* width: 1, forces the cell to collapse */ />
-          <TableCell>
+          <StyledCell width={1} /* width: 1, forces the cell to collapse */ />
+          <StyledCell>
             <Box sx={{ display: 'flex' }}>
               <Typography fontWeight="bold" mr={1}>
                 Grades
               </Typography>
               <InfoBox content={populationStatisticsToolTips.gradeDistributionCoursePopulation} mini />
             </Box>
-          </TableCell>
-          <TableCell>
+          </StyledCell>
+          <StyledCell>
             <Typography fontWeight="bold">Number of students</Typography>
             <Typography>(n={students.length})</Typography>
-          </TableCell>
-          <TableCell>
-            <Typography fontWeight="bold">Percentage of population</Typography>
-          </TableCell>
+          </StyledCell>
+          <StyledCell bold>Percentage of population</StyledCell>
         </TableRow>
       </TableHead>
 
       <TableBody>
         {sortedCourseGrades.map(grade => (
           <TableRow key={`grade-table-row-${grade.grade}`}>
-            <TableCell>
+            <StyledCell>
               <ExternalGradeFilterToggle grade={grade.grade} />
-            </TableCell>
-            <TableCell>
-              <Typography>{grade.grade}</Typography>
-            </TableCell>
-            <TableCell>
-              <Typography>{grade.amount}</Typography>
-            </TableCell>
-            <TableCell>
+            </StyledCell>
+            <StyledCell text>{grade.grade}</StyledCell>
+            <StyledCell text>{grade.amount}</StyledCell>
+            <StyledCell>
               <PercentageBar denominator={students.length} numerator={grade.amount} />
-            </TableCell>
+            </StyledCell>
           </TableRow>
         ))}
       </TableBody>
