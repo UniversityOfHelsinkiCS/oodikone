@@ -116,12 +116,7 @@ export const CoursePopulation = () => {
     },
     {
       title: 'Language distribution',
-      content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.languageDistributionCoursePopulation} />
-          <CoursePopulationLanguageDist codes={codes} from={dateFrom} samples={filteredStudents} to={dateTo} />
-        </div>
-      ),
+      content: <CoursePopulationLanguageDist codes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />,
     },
     {
       title: 'Programme distribution',
