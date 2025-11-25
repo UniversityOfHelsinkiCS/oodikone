@@ -1,13 +1,12 @@
-import Button from '@mui/material/Button'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
+import { ToggleWithTooltip } from '@/components/common/toggle/ToggleWithTooltip'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditStatistics } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudents } from '@/components/PopulationStudents'
@@ -61,21 +60,22 @@ export const SingleStudyGuidanceGroupPanels = ({
       )
     }
   }
-
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
-          {group.tags?.year ? (
-            <Button color="primary" onClick={() => toggleCreditDateFilter()} variant="outlined">
-              {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
-            </Button>
-          ) : null}
+        <>
+          {!!group.tags?.year && (
+            <ToggleWithTooltip
+              checked={creditDateFilterActive}
+              label="Show credits starting from the associated academic year"
+              onChange={toggleCreditDateFilter}
+            />
+          )}
           <CreditAccumulationGraphHighCharts
             absences={null}
             endDate={null}
+            infoBoxContent={populationStatisticsToolTips.creditAccumulation}
             programmeCodes={group?.tags?.studyProgramme ? [programme, combinedProgramme] : []}
             selectedStudyPlan={null}
             showBachelorAndMaster={null}
@@ -85,7 +85,7 @@ export const SingleStudyGuidanceGroupPanels = ({
             studyPlanFilterIsActive={studyPlanFilterIsActive}
             studyRightId={null}
           />
-        </div>
+        </>
       ),
     },
     (programme || group?.tags?.studyProgramme) && groupYear
