@@ -223,7 +223,7 @@ export const populationStatisticsToolTips = {
   programmeDistributionCustomPopulation: `
     Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.
   `,
-  gradeDistributionCoursePopulation: 'Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.',
+  gradeDistributionCoursePopulation: 'Näyttää opiskelijan korkeimman arvosanan annetulta aikaväliltä.',
   creditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
   languageDistributionCoursePopulation: 'Näyttää kielijakauman kurssin suorituskielistä.',
 }
