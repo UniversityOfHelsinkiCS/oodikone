@@ -33,7 +33,7 @@ export const statisticsOf = async (
   startDate?: string
 ) => {
   const code = studyRights[0] ?? ''
-  const mockedStartDate = startDate ?? new Date(1900).toISOString()
+  const mockedStartDate = startDate ?? new Date(1900, 0, 1).toISOString()
 
   const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
     await Promise.all([
