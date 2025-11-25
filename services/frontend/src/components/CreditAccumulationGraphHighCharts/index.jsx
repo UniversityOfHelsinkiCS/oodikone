@@ -11,6 +11,7 @@ import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 
 import { getStudyRightElementTargetDates } from '@/common'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { useDeepMemo } from '@/hooks/deepMemo'
@@ -410,6 +411,7 @@ export const CreditAccumulationGraphHighCharts = ({
   studyPlanFilterIsActive,
   selectedStudyPlan,
   showBachelorAndMaster,
+  infoBoxContent = '',
 }) => {
   const chartRef = useRef()
   const { getTextIn } = useLanguage()
@@ -542,7 +544,16 @@ export const CreditAccumulationGraphHighCharts = ({
 
   return (
     <div style={{ minWidth: '400px', marginBottom: '15px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '1rem 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexDirection: 'row-reverse',
+          alignItems: 'center',
+          margin: '1rem 0',
+        }}
+      >
+        {!!infoBoxContent && <InfoBox content={infoBoxContent} />}
         <div>
           {!singleStudent && studyPlanFilterIsActive ? (
             <FormControlLabel

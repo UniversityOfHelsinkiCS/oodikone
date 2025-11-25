@@ -18,7 +18,6 @@ import {
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'
@@ -89,16 +88,19 @@ export const PopulationDetails = ({
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
-          {/* @ts-expect-error leave for later :) TODO */}
-          <CreditAccumulationGraphHighCharts
-            programmeCodes={[programme, combinedProgramme].filter(Boolean)}
-            showBachelorAndMaster={!!showBachelorAndMaster}
-            students={filteredStudents}
-            studyPlanFilterIsActive={studyPlanFilterIsActive}
-          />
-        </div>
+        <CreditAccumulationGraphHighCharts
+          absences={null}
+          endDate={null}
+          infoBoxContent={populationStatisticsToolTips.creditAccumulation}
+          programmeCodes={[programme, combinedProgramme].filter(Boolean)}
+          selectedStudyPlan={null}
+          showBachelorAndMaster={!!showBachelorAndMaster}
+          singleStudent={false}
+          startDate={null}
+          students={filteredStudents}
+          studyPlanFilterIsActive={studyPlanFilterIsActive}
+          studyRightId={null}
+        />
       ),
     },
     query.years.length <= 1
