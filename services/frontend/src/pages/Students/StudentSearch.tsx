@@ -19,8 +19,8 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
-import { ActiveStudyRight } from '@/types/api/students'
 import { reformatDate } from '@/util/timeAndDate'
+import { ActiveStudyRight } from '@oodikone/shared/types/studentData'
 
 const getProgrammes = (studyRights: ActiveStudyRight[], getTextIn) =>
   [

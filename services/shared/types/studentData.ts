@@ -52,7 +52,7 @@ export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
 }
 
-type ActiveStudyRight = {
+export type ActiveStudyRight = {
   id: string
   studyRightElements: {
     name: Name
