@@ -20,7 +20,7 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
 } from '@/components/FilterView/filters'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -32,6 +32,7 @@ import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { parseQueryParams } from '@/util/queryparams'
+import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
@@ -41,7 +42,7 @@ import { useColumns as columnsGeneralTab } from './studentColumns'
 export const CoursePopulation = () => {
   const location = useLocation()
   const { getTextIn } = useLanguage()
-  const [codes, setCodes] = useState([])
+  const [codes, setCodes] = useState<string[]>([])
   useTitle('Course population')
 
   const { coursecodes, from, to, separate, unifyCourses, combineSubstitutions } = parseQueryParams(location.search)
@@ -100,20 +101,17 @@ export const CoursePopulation = () => {
 
   if (!population || !semesters) return <PageLoading isLoading />
 
-  const createPanels = (filteredStudents, filteredCourses) => [
+  const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FormattedCourse[]) => [
     {
       title: 'Grade distribution',
       content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.gradeDistributionCoursePopulation} />
-          <CoursePopulationGradeDist
-            courseCodes={codes}
-            from={dateFrom}
-            singleCourseStats={courseData}
-            students={filteredStudents}
-            to={dateTo}
-          />
-        </div>
+        <CoursePopulationGradeDist
+          courseCodes={codes}
+          from={dateFrom}
+          singleCourseStats={courseData}
+          students={filteredStudents}
+          to={dateTo}
+        />
       ),
     },
     {
