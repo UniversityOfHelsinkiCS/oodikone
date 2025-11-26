@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'
 import { InfoBoxButton } from './InfoBoxButton'
-import './infoBox.css'
 
 interface InfoBoxProps {
   content: string
