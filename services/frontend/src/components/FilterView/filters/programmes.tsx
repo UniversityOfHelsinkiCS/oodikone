@@ -106,8 +106,8 @@ const ProgrammeFilterCard = ({
         multiple
         onChange={({ target }) => onOptionsChange({ ...options, selectedProgrammes: target.value })}
         options={dropdownOptions}
-        value={selectedProgrammes}
         sx={{ mb: 2 }}
+        value={selectedProgrammes}
       />
       <FilterSelect
         InputItem={value => <SelectInputItem text={modeOptions.find(mode => value === mode.value)!.text} />}

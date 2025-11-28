@@ -50,7 +50,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <FormControl sx={{ ...sx }} fullWidth variant="outlined">
+      <FormControl fullWidth sx={{ ...sx }} variant="outlined">
         <InputLabel id={`${filterKey}-label`} size="small" sx={{ textOverflow: 'ellipsis', pr: 2.5 }}>
           {label}
         </InputLabel>
