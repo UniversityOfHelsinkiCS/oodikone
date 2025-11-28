@@ -12,7 +12,8 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { StyledMessage } from '@/components/common/StyledMessage'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
-import { InfoBox } from '@/components/InfoBox/InfoBox'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
@@ -50,6 +51,8 @@ export const CustomPopulationContent = ({
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
 
+  const { getTextIn } = useLanguage()
+
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
   }, [filteredStudents.length])
@@ -82,10 +85,15 @@ export const CustomPopulationContent = ({
     {
       title: 'Programme distribution',
       content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.programmeDistributionCustomPopulation} />
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+            <InfoBox
+              content={getTextIn(populationStatisticsToolTips.programmeDistributionCustomPopulation) ?? ''}
+              sx={{ mb: 2 }}
+            />
+          </Box>
           <CustomPopulationProgrammeDist students={filteredStudents} />
-        </div>
+        </>
       ),
     },
     {

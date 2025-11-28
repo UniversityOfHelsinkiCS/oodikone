@@ -236,9 +236,11 @@ export const populationStatisticsToolTips = {
 
     If none of the conditions apply, "No degree programme" is shown.`,
   },
-  programmeDistributionCustomPopulation: `
-    Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.
+  programmeDistributionCustomPopulation: {
+    fi: `Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin aktiivinen koulutusohjelma. Jos opiskelijalla ei ole voimassa olevaa opinto-oikeutta, näytetään *Ei koulutusohjelmaa*.
   `,
+    en: `Table shows how the students are distributed across degree programmes. Degree programme is obtained from each student's most recent active study right. If the student has no active study right, *No degree programme* is shown.`,
+  },
   gradeDistributionCoursePopulation: 'Näyttää opiskelijan korkeimman arvosanan annetulta aikaväliltä.',
   creditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
   languageDistributionCoursePopulation: 'Näyttää kielijakauman kurssin suorituskielistä.',
