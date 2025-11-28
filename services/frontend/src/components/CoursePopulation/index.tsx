@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 
@@ -5,10 +6,7 @@ import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
-import {
-  CustomPopulationProgrammeDist,
-  findCorrectProgramme,
-} from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
+import { CustomPopulationProgrammeDist } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
 import { FilterView } from '@/components/FilterView'
 import {
   ageFilter,
@@ -34,6 +32,7 @@ import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { parseQueryParams } from '@/util/queryparams'
 import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
+import { findCorrectProgramme } from '../CustomPopulation/CustomPopulationProgrammeDist/util'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
@@ -121,10 +120,15 @@ export const CoursePopulation = () => {
     {
       title: 'Programme distribution',
       content: (
-        <div>
-          <InfoBox content={populationStatisticsToolTips.programmeDistributionCoursePopulation} />
-          <CustomPopulationProgrammeDist coursecode={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
-        </div>
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+            <InfoBox
+              content={getTextIn(populationStatisticsToolTips.programmeDistributionCoursePopulation) ?? ''}
+              sx={{ mb: 2 }}
+            />
+          </Box>
+          <CustomPopulationProgrammeDist coursecodes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+        </>
       ),
     },
     {

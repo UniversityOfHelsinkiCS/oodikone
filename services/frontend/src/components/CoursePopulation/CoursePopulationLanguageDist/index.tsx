@@ -1,5 +1,4 @@
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
@@ -8,8 +7,9 @@ import isBetween from 'dayjs/plugin/isBetween'
 
 import { languageAbbreviations } from '@/common'
 import { PercentageBar } from '@/components/common/PercentageBar'
+import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
-import { FormattedStudent } from '@oodikone/shared/types'
+import type { FormattedStudent } from '@oodikone/shared/types'
 
 dayjsExtend(isBetween)
 
@@ -46,30 +46,22 @@ export const CoursePopulationLanguageDist = ({
     <StyledTable showCellBorders>
       <TableHead>
         <TableRow>
-          <TableCell>
-            <Typography fontWeight="bold">Languages</Typography>
-          </TableCell>
-          <TableCell>
+          <StyledCell bold>Languages</StyledCell>
+          <StyledCell>
             <Typography fontWeight="bold">Language distribution</Typography>
             <Typography fontWeight="light">(n = {total})</Typography>
-          </TableCell>
-          <TableCell>
-            <Typography fontWeight="bold">Percentage of population</Typography>
-          </TableCell>
+          </StyledCell>
+          <StyledCell bold>Percentage of population</StyledCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {Object.entries(languages).map(([language, count]) => (
           <TableRow key={`language-table-row-${language}`}>
-            <TableCell>
-              <Typography>{languageAbbreviations[language] ?? language}</Typography>
-            </TableCell>
-            <TableCell>
-              <Typography>{count}</Typography>
-            </TableCell>
-            <TableCell>
+            <StyledCell text>{languageAbbreviations[language] ?? language}</StyledCell>
+            <StyledCell text>{count}</StyledCell>
+            <StyledCell>
               <PercentageBar denominator={total} numerator={count} />
-            </TableCell>
+            </StyledCell>
           </TableRow>
         ))}
       </TableBody>

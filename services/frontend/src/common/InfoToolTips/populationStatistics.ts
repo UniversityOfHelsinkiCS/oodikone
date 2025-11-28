@@ -214,12 +214,28 @@ export const populationStatisticsToolTips = {
 
     **Credits since start** listaa kuinka paljon opintopisteitä on kertynyt valitussa opinto-ohjelmassa aloittamisen jälkeen
   `,
-  programmeDistributionCoursePopulation: `
-    Koulutusohjelma määritetään seuraavasti:
-    1. Jos suoritukseen tai ilmoittautumiseen liittyy opiskeluoikeus, käytetään kyseiseen opiskeluoikeuteen liittyvää koulutusohjelmaa, joka oli aktiivinen suorituksen tai ilmoittautumisen hetkellä
-    2. Jos kurssi on sijoitettu opintosuunnitelmaan (HOPS), käytetään sitä koulutusohjelmaa, jonka opintosuunnitelma on kyseessä
-    3. Jos suoritukseen tai ilmoittautumiseen ei liity opiskeluoikeutta eikä kurssia ole sijoitettu opintosuunnitelmaan, käytetään viimeisintä koulutusohjelmaa suorituksen tai ilmoittautumisen hetkellä
-  `,
+  programmeDistributionCoursePopulation: {
+    fi: `**Koulutusohjelma määritetään seuraavasti**:
+    1. Jos suoritukseen tai ilmoittautumiseen liittyy opiskeluoikeus, käytetään kyseiseen opiskeluoikeuteen liittyvää koulutusohjelmaa.
+    2. Jos kurssi on sijoitettu opintosuunnitelmaan (HOPS), käytetään sitä koulutusohjelmaa, jonka opintosuunnitelma on kyseessä.
+    3. Jos kumpikaan ei toteutunut, käytetään viimeisintä koulutusohjelmaa suorituksen tai ilmoittautumisen hetkellä.
+
+    **Avoin yliopisto**: Jos ilmoittautuminen tai suoritus on kirjattu avoimen yliopiston kautta, ja:
+    1. kurssi on sijoitettu opintosunnitelmaan, joka kuuluu tutkintoon johtavaan opinto-oikeuteen, käytetään tähän opinto-oikeuteen liittyvää koulutusohjelmaa.
+    2. opiskelijalla on ollut kyseisellä aikavälillä jokin aktiivinen opinto-oikeus, käytetään tähän opinto-oikeuteen liittyvää koulutusohjelmaa.
+
+    Jos mikään ehto ei toteudu, näytetään "Ei koulutusohjelmaa".`,
+    en: `**Degree programme is calculated as follows**:
+    1. If the enrollment or attainment has an associated study right, use the degree programme associated with that study right.
+    2. If the course is placed in a personal study plan (HOPS), use the degree programme associated with that study plan.
+    3. If neither are true, use the latest active degree programme at the time of enrollment and/or attainment.
+
+    **Open university**: If the enrollment of the attainment is registered through open university, and:
+    1. the course is placed in a study plan belonging to a study right leading to a degree programme, use this degree programme.
+    2. the student had an active study right to some degree programme at the time, use that degree programme.
+
+    If none of the conditions apply, "No degree programme" is shown.`,
+  },
   programmeDistributionCustomPopulation: `
     Taulukossa näytetään opiskelijoiden jakauma koulutusohjelmittain. Käytettävä koulutusohjelma on opiskelijan uusin koulutusohjelma.
   `,

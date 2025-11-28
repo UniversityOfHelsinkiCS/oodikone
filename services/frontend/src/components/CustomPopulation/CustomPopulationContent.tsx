@@ -84,7 +84,6 @@ export const CustomPopulationContent = ({
       content: (
         <div>
           <InfoBox content={populationStatisticsToolTips.programmeDistributionCustomPopulation} />
-          {/* @ts-expect-error FIX later */}
           <CustomPopulationProgrammeDist students={filteredStudents} />
         </div>
       ),

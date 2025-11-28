@@ -10,7 +10,7 @@ import { useState } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { StyledTable } from '@/components/common/StyledTable'
-import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist'
+import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist/util'
 import { InfoBox } from '@/components/InfoBox/InfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/Loading'

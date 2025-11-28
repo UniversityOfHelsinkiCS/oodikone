@@ -135,23 +135,24 @@ export const getStudentToTargetCourseDateMap = (
   }, {})
 }
 
-const programmeIsActive = (
-  studyRight: Unarray<FormattedStudent['studyRights']>,
-  hasGraduated: boolean,
-  currentSemesterCode: number | null
-) => {
-  return (
-    !studyRight.cancelled &&
-    !hasGraduated &&
-    !!studyRight.semesterEnrollments?.some(
-      enrollment =>
-        enrollment.semester === currentSemesterCode &&
-        [EnrollmentType.PRESENT, EnrollmentType.ABSENT].includes(enrollment.type)
-    )
+/**
+ * Only accounts for semester enrollments
+ * Cancelled study right or graduation not accounted for
+ */
+const programmeIsActive = (studyRight: Unarray<FormattedStudent['studyRights']>, currentSemesterCode: number) =>
+  !!studyRight.semesterEnrollments?.some(
+    enrollment =>
+      enrollment.semester === currentSemesterCode &&
+      [EnrollmentType.PRESENT, EnrollmentType.ABSENT].includes(enrollment.type)
   )
-}
 
-export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRights'], currentSemester: number) =>
+/**
+* @param semester "active" is according to the provided semester
+
+* NB: Will show graduated/canceled even if semester is in the past, and student
+* had not graduated / been cancelled at the time.
+*/
+export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRights'], targetSemester: number) =>
   orderBy(
     studyRights?.flatMap(studyRight =>
       studyRight.studyRightElements
@@ -162,7 +163,7 @@ export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRi
           graduated: element.graduated,
           startDate: element.startDate,
           cancelled: studyRight.cancelled,
-          active: programmeIsActive(studyRight, element.graduated, currentSemester),
+          active: programmeIsActive(studyRight, targetSemester),
           facultyCode: studyRight.facultyCode,
         }))
     ),
@@ -170,14 +171,23 @@ export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRi
     ['desc', 'desc']
   )
 
+/**
+ * @param targetSemester used for checking if study right was active at the time
+ * @param filterInactive filters out programmes associated with inactive study rights
+ * @param date only consider programmes that the student had started in prior to the date
+ */
 export const getNewestProgrammeOfStudentAt = (
   studyRights: FormattedStudent['studyRights'],
-  currentSemester: number,
-  date: string
+  targetSemester: number | undefined,
+  filterInactive?: boolean,
+  date?: string
 ) => {
-  const programmes = getAllProgrammesOfStudent(studyRights, currentSemester)
-  if (!programmes.length) return null
-  if (!date) return programmes[0]
+  if (!targetSemester) return null
+
+  const allProgrammes = getAllProgrammesOfStudent(studyRights, targetSemester)
+  const programmes = filterInactive ? allProgrammes.filter(prog => prog.active) : allProgrammes
+
+  if (!date) return programmes.at(0) ?? null
 
   return programmes.find(programme => dayjs(date).isSameOrAfter(programme.startDate)) ?? null
 }
@@ -316,6 +326,18 @@ export const getCurrentSemester = (allSemesters: SemestersData['semesters']) => 
   return Object.values(allSemesters).find(
     semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
   )
+}
+
+/**
+ * @returns semestercode that was active during the targetDate
+ */
+export const getSemesterCodeAt = (allSemesters?: SemestersData['semesters'], targetDate?: Date | string) => {
+  if (!targetDate) return undefined
+
+  return Object.values(allSemesters ?? {}).find(
+    semester =>
+      new Date(semester.startdate) <= new Date(targetDate) && new Date(semester.enddate) >= new Date(targetDate)
+  )?.semestercode
 }
 
 export const isNewStudyProgramme = (programmeCode: string) => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
