@@ -179,6 +179,7 @@ export const useFormat = ({
     return {
       /* EXCEL ONLY */
       email: student.email,
+      secondaryEmail: student.secondaryEmail,
       phoneNumber: student.phoneNumber,
 
       /* UTIL */

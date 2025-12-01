@@ -22,6 +22,7 @@ export type FormattedStudentData = {
   studentNumber: string
   sisuID: string
   email: string
+  secondaryEmail: string
   phoneNumber: string
   creditsTotal: number
   creditsHops: number

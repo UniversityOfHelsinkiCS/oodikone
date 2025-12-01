@@ -100,6 +100,7 @@ export const useGetColumnDefinitions = ({
         ),
       }),
       columnHelper.accessor('email', { header: 'email' }),
+      columnHelper.accessor('secondaryEmail', { header: 'secondary email' }),
       columnHelper.accessor('phoneNumber', { header: 'Phone number' }),
       columnHelper.group({
         header: 'Credits',
