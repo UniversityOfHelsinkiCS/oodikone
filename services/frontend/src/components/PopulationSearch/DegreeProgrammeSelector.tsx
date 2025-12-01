@@ -6,7 +6,6 @@ import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-import { isNewStudyProgramme } from '@/common'
 import { ToggleablePin } from '@/components/common/toggle/ToggleablePin'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -16,6 +15,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { PopulationSearchProgramme } from '@/types/populationSearch'
 import { createPinnedFirstComparator } from '@/util/comparator'
+import { isNewProgramme } from '@/util/studyProgramme'
 
 type StudyProgrammeSelectorProps = {
   programme: PopulationSearchProgramme | null
@@ -68,7 +68,7 @@ export const DegreeProgrammeSelector = ({
 
   const programmeOptions: PopulationSearchProgramme[] = studyProgrammesAvailable
     ? Object.values(degreeProgrammes)
-        .filter(programme => !filterProgrammes || isNewStudyProgramme(programme.code))
+        .filter(programme => !filterProgrammes || isNewProgramme(programme.code))
         .map(({ code, name }) => ({
           code,
           name: getTextIn(name),

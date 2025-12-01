@@ -340,8 +340,6 @@ export const getSemesterCodeAt = (allSemesters?: SemestersData['semesters'], tar
   )?.semestercode
 }
 
-export const isNewStudyProgramme = (programmeCode: string) => ['MH', 'KH', 'T9'].includes(programmeCode.slice(0, 2))
-
 /**
  * Extracts items from a string separated by commas, semicolons, spaces, or newlines.
  * @param {string} input - The input string containing items.

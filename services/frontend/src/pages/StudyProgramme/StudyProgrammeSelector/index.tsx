@@ -17,6 +17,7 @@ import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { createLocaleComparator, createPinnedFirstComparator } from '@/util/comparator'
+import { isNewProgramme } from '@/util/studyProgramme'
 import { DegreeProgrammeType, Name, ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { StudyProgrammeFilter } from './StudyProgrammeFilter'
 import { StudyProgrammeTable } from './StudyProgrammeTable'
@@ -96,7 +97,8 @@ export const StudyProgrammeSelector = () => {
     if (isDefaultServiceProvider() && programme.code.startsWith('2_')) {
       continue
     }
-    if (!programme.curriculumPeriodIds.includes(currentCurriculumPeriod.id)) {
+
+    if (!isNewProgramme(programme.code)) {
       otherProgrammes.push(programme)
     } else if (programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
       bachelorProgrammes.push(programme)

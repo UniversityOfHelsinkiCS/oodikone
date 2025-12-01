@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 
-import { isDefaultServiceProvider, isNewStudyProgramme } from '@/common'
+import { isDefaultServiceProvider } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
@@ -27,6 +27,7 @@ import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/use
 import { User } from '@/types/api/users'
 import { checkUserAccess } from '@/util/access'
 import { createLocaleComparator } from '@/util/comparator'
+import { isNewProgramme } from '@/util/studyProgramme'
 import { DetailedProgrammeRights } from '@oodikone/shared/types'
 import { CardHeader } from './CardHeader'
 import { EditButton } from './EditButton'
@@ -76,7 +77,7 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
     .sort(createLocaleComparator('text'))
 
   if (filterOldProgrammes) {
-    options = options.filter(({ code }) => isNewStudyProgramme(code))
+    options = options.filter(({ code }) => isNewProgramme(code))
   }
 
   const currentRegularAccessRights = mapAndSortProgrammes(
