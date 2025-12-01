@@ -14,7 +14,7 @@ export const useColumns = ({ programme }): [string[], string[]] => {
   const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
 
   /* REQUIRED TO ALWAYS BE VISIBLE */
-  const excelRequired = ['studentNumber', 'lastName', 'firstNames', 'email', 'phoneNumber']
+  const excelRequired = ['studentNumber', 'lastName', 'firstNames', 'email', 'secondaryEmail', 'phoneNumber']
 
   return [
     [
