@@ -113,7 +113,7 @@ export const findCorrectProgramme = (
 
   // If course is in studyplan without a studyright associated with the attainment or the enrollment
   // Unclear if this is ever reached
-  const correctStudyplan = student.studyplans?.find(studyplan =>
+  const correctStudyplan = student.studyplans.find(studyplan =>
     studyplan.included_courses.some(course => coursecodes.includes(course))
   )
   if (correctStudyplan) {

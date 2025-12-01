@@ -141,6 +141,7 @@ router.get<
 
   const studyRights = []
   const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
+  // FIXME no any type
   const result: any = await statisticsOf(studentNumbers, studyRights, tagMap)
   const courseProviders: string[] = !hasFullAccessToStudentData(roles)
     ? await getCourseProvidersForCourses(coursecodes)
@@ -179,6 +180,8 @@ router.get<
     credits: '',
     tags: [],
     obfuscated: true,
+
+    studyplans: [],
   })
 
   if ('students' in result) {
