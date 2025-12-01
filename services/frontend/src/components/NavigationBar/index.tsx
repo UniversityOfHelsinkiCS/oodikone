@@ -84,6 +84,7 @@ export const NavigationBar = () => {
   return (
     <AppBar elevation={0} position="static">
       <Toolbar
+        data-cy="nav-bar"
         disableGutters
         sx={{
           mx: 'auto',
