@@ -4,7 +4,7 @@ import { Op } from 'sequelize'
 import { Name, StudyProgrammeCourse, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
 import { CreditModel, EnrollmentModel } from '../../models'
-import { isOpenUniCourseCode } from '../../util'
+import { getOpenUniCourseCode } from '../../util'
 import { createArrayOfCourses } from '../languageCenterData'
 import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 import {
@@ -343,7 +343,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     'totalTransferStudents',
   ]
   ayCourses.forEach(ayCourse => {
-    const openUniCourseCode = isOpenUniCourseCode(ayCourse)
+    const openUniCourseCode = getOpenUniCourseCode(ayCourse)
     if (!openUniCourseCode) {
       return
     }

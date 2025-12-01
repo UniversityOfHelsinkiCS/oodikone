@@ -49,7 +49,7 @@ export const hasFullAccessToStudentData = (roles?: Role[]): boolean => {
   return !!roles?.some(role => rolesWithFullAccess.includes(role))
 }
 
-export const isOpenUniCourseCode = (code: string): boolean => !!/^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
+export const getOpenUniCourseCode = (code: string): string[] | null => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
 
 /**
  * Returns the keys of the given object as an array of strings, typed as the keys of the object.

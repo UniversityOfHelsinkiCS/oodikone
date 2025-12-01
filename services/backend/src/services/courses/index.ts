@@ -4,7 +4,7 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
-import { isOpenUniCourseCode } from '../../util'
+import { getOpenUniCourseCode } from '../../util'
 import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
@@ -166,7 +166,7 @@ const getYearlyStatsOfNew = async (
       : [courseCode]
 
   if (unification === Unification.REGULAR) {
-    codes = codes.filter(course => !isOpenUniCourseCode(course))
+    codes = codes.filter(course => !getOpenUniCourseCode(course))
   }
 
   const [credits, enrollments, course] = await Promise.all([
