@@ -122,7 +122,7 @@ describe('Study guidance group tests', () => {
           .eq(0)
           .within(() => cy.get('input').should('have.value', '01.08.2020'))
         cy.contains('Reset All Filters')
-        cy.get('button').contains('Show all credits').click()
+        cy.get('label').contains('Show credits starting from the associated academic year').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-active="false"]')
       })
 
