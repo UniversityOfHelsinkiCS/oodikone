@@ -113,10 +113,10 @@ describe('Study guidance group tests', () => {
         cy.contains('Students (3)')
       })
 
-      it("clicking the 'Show starting from associated year' button activates the 'Date of Course Credits' filter", () => {
+      it("clicking the 'Show credits starting from the associated academic year' filter", () => {
         cy.get('[data-cy="CreditDate-filter-card"][data-active="false"]')
         cy.cs('Credit accumulation (for 3 students)').click()
-        cy.get('button').contains('Show starting from associated year').click()
+        cy.get('label').contains('Show credits starting from the associated academic year').click()
         cy.get('[data-cy="CreditDate-filter-card"][data-active="true"]')
         cy.get('.date-picker')
           .eq(0)
