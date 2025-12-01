@@ -313,7 +313,7 @@ const formatStudentForSearch = ({
   firstNames: firstnames,
   lastName: lastname,
   studentNumber: studentnumber,
-  started: dateofuniversityenrollment.toString(),
+  started: dateofuniversityenrollment?.toString(),
 })
 
 export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentNumbers?: string[]) => {
