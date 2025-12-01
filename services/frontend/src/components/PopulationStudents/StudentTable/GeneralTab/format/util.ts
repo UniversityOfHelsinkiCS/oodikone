@@ -153,11 +153,20 @@ export const getProgrammeDetails =
 
     currentSemester,
     year,
+  }: {
+    programme: string | undefined
+    isMastersProgramme: boolean
+    combinedProgramme?: string
+    showBachelorAndMaster?: boolean
+    currentSemester: SemestersData['currentSemester'] | null
+    year: number | null
   }) =>
   (student: Student) => {
-    const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester?.semestercode)
+    const studentProgrammes = getAllProgrammesOfStudent(student.studyRights ?? [], currentSemester?.semestercode ?? 0)
 
-    const primaryProgramme = studentProgrammes.find(({ code }) => code === programme) ?? studentProgrammes.at(0)
+    const primaryProgramme = programme
+      ? studentProgrammes.find(sp => sp.code === programme)
+      : studentProgrammes.find(({ active }) => !!active)
     const primaryStudyplan = student.studyplans?.find(({ programme_code }) => programme_code === primaryProgramme?.code)
 
     // Programme can be an empty string, so direct ?? comparison wont work
