@@ -225,13 +225,20 @@ export const CoursePopulation = () => {
   )
 }
 
-const CustomPopulationCoursesWrapper = ({ filteredCourses, filteredStudents }) => {
-  const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
+const CustomPopulationCoursesWrapper = ({
+  filteredCourses,
+  filteredStudents,
+}: {
+  filteredCourses: FormattedCourse[]
+  filteredStudents: FormattedStudent[]
+}) => {
+  const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(Math.round(filteredStudents.length * 0.3))
 
-  useEffect(() => setStudentAmountLimit(Math.round(filteredStudents.length * 0.3)), [filteredStudents.length])
-
-  const onStudentAmountLimitChange = value => {
-    setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
+  const onStudentAmountLimitChange = (value: string | number) => {
+    const num = Number(value)
+    if (!Number.isNaN(num)) {
+      setStudentAmountLimit(num)
+    }
   }
 
   return (
