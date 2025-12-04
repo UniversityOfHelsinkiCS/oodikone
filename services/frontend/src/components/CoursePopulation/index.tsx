@@ -133,7 +133,7 @@ export const CoursePopulation = () => {
     },
     {
       title: 'Courses of population',
-      content: <CustomPopulationCoursesWrapper filteredCourses={filteredCourses} filteredStudents={filteredStudents} />,
+      content: <CoursePopulationCoursesWrapper filteredCourses={filteredCourses} filteredStudents={filteredStudents} />,
     },
     {
       title: 'Credit gains',
@@ -225,7 +225,7 @@ export const CoursePopulation = () => {
   )
 }
 
-const CustomPopulationCoursesWrapper = ({
+const CoursePopulationCoursesWrapper = ({
   filteredCourses,
   filteredStudents,
 }: {
@@ -243,11 +243,15 @@ const CustomPopulationCoursesWrapper = ({
 
   return (
     <>
-      <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
-      <StudentAmountLimiter
-        onStudentAmountLimitChange={onStudentAmountLimitChange}
-        studentAmountLimit={studentAmountLimit}
-      />
+      <Box sx={{ display: 'flex' }}>
+        <Box sx={{ flex: 1 }}>
+          <StudentAmountLimiter
+            onStudentAmountLimitChange={onStudentAmountLimitChange}
+            studentAmountLimit={studentAmountLimit}
+          />
+        </Box>
+        <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
+      </Box>
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
   )
