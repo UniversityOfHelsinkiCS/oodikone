@@ -18,6 +18,7 @@ export const NO_PROGRAMME = {
     fi: 'Ei koulutusohjelmaa',
     sv: 'Inget utbildningsprogram',
   },
+  facultyCode: '00000',
 } as const
 
 /**
