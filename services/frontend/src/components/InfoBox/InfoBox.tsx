@@ -16,6 +16,7 @@ interface InfoBoxProps {
  * Click to open InfoBox.
  * For the hover variant, refer to ./InfoBoxWithTooltip.tsx.
  */
+// eslint-disable-next-line import-x/no-unused-modules
 export const InfoBox = ({ content, cypress = '' }: InfoBoxProps) => {
   const [open, setOpen] = useState(false)
   const toggleOpen = () => setOpen(prev => !prev)
