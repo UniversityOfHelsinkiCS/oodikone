@@ -25,8 +25,8 @@ export const CoursePopulationGradeDist = ({
   singleCourseStats: GetSingleCourseStatsResponse[number]
   students: FormattedStudent[]
   courseCodes: string[]
-  from: any
-  to: any
+  from: string
+  to: string
 }) => {
   const courseGrades: { grade: string; amount: number }[] = []
 

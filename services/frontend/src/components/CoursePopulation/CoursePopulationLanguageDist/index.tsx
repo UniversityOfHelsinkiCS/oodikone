@@ -21,8 +21,8 @@ export const CoursePopulationLanguageDist = ({
 }: {
   students: FormattedStudent[]
   codes: string[]
-  from: Date
-  to: Date
+  from: string
+  to: string
 }) => {
   const languages: Record<string, number> = {}
 

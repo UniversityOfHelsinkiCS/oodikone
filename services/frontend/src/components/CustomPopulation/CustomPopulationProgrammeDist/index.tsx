@@ -23,8 +23,8 @@ export const CustomPopulationProgrammeDist = ({
 }: {
   students: FormattedStudent[]
   coursecodes?: string[]
-  from?: Date
-  to?: Date
+  from?: string
+  to?: string
 }) => {
   const { getTextIn } = useLanguage()
   const { data: semesters } = useGetSemestersQuery()
@@ -36,7 +36,14 @@ export const CustomPopulationProgrammeDist = ({
     let programme: { code: string; name: Name } | null
     if (coursecodes) {
       // If coursecodes is provided, from/to need to be as well
-      programme = findCorrectProgramme(student, coursecodes, allSemesters, from!, to!, currentSemester.semestercode)
+      programme = findCorrectProgramme(
+        student,
+        coursecodes,
+        allSemesters,
+        new Date(from!),
+        new Date(to!),
+        currentSemester.semestercode
+      )
     } else {
       programme = getNewestProgrammeOfStudentAt(student.studyRights, currentSemester.semestercode, true)
     }

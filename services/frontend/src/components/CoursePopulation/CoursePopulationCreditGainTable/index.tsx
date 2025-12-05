@@ -70,8 +70,8 @@ export const CoursePopulationCreditGainTable = ({
 }: {
   students: FormattedStudent[]
   codes: string[]
-  from: Date
-  to: Date
+  from: string
+  to: string
 }) => {
   const [tab, setTab] = useState(0)
 
@@ -92,7 +92,14 @@ export const CoursePopulationCreditGainTable = ({
   students.forEach(student => {
     const courses = student.courses.filter(course => codes.includes(course.course_code))
 
-    const programme = findCorrectProgramme(student, codes, allSemesters, from, to, currentSemester.semestercode)
+    const programme = findCorrectProgramme(
+      student,
+      codes,
+      allSemesters,
+      new Date(from),
+      new Date(to),
+      currentSemester.semestercode
+    )
     const faculty = faculties.find(faculty => faculty.code === programme.facultyCode) ?? {
       code: '00000',
       name: { en: 'No associated faculty', fi: 'Ei tiedekuntaa' },

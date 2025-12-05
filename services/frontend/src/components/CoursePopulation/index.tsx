@@ -30,6 +30,7 @@ import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { parseQueryParams } from '@/util/queryparams'
+import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { findCorrectProgramme } from '../CustomPopulation/CustomPopulationProgrammeDist/util'
@@ -76,20 +77,26 @@ export const CoursePopulation = () => {
     { skip: codes.length === 0 }
   )
 
-  const getFromToDates = (from, to, separate) => {
+  const getFromToDates = (from: number, to: number, separate: boolean) => {
     if (semestersFetching) return {}
-    const targetProp = separate ? 'semestercode' : 'yearcode'
-    const data = separate ? allSemesters : semesterYears
-    const dataValues = Object.values(data)
-    const findDateByCode = code => dataValues.find(data => data[targetProp] === code)
+
+    const dataValues = separate ? Object.values(allSemesters) : Object.values(semesterYears)
+
+    const key = separate ? 'semestercode' : 'yearcode'
+
+    const findDateByCode = (code: number) => dataValues.find(item => item[key] === code)
 
     return {
-      dateFrom: findDateByCode(Number(from)).startdate,
-      dateTo: findDateByCode(Number(to)).enddate,
+      dateFrom: findDateByCode(Number(from))?.startdate,
+      dateTo: findDateByCode(Number(to))?.enddate,
     }
   }
 
   const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
+
+  // Dates must be set
+  if (!dateFrom || !dateTo) return null
+
   const dateRange = `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
   const header = courseData
@@ -188,13 +195,13 @@ export const CoursePopulation = () => {
             {
               key: 'attainment',
               label: 'Attainment',
-              predicate: (student, studyRightElement) => {
+              predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
                 const correctProgramme = findCorrectProgramme(
                   student,
                   codes,
                   allSemesters,
-                  dateFrom,
-                  dateTo,
+                  new Date(dateFrom),
+                  new Date(dateTo),
                   currentSemester?.semestercode
                 )
                 return correctProgramme?.code === studyRightElement.code
