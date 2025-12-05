@@ -242,6 +242,4 @@ export const populationStatisticsToolTips = {
     en: `Table shows how the students are distributed across degree programmes. Degree programme is obtained from each student's most recent active study right. If the student has no active study right, *No degree programme* is shown.`,
   },
   gradeDistributionCoursePopulation: 'Näyttää opiskelijan korkeimman arvosanan annetulta aikaväliltä.',
-  creditDistributionCoursePopulation: 'Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.',
-  languageDistributionCoursePopulation: 'Näyttää kielijakauman kurssin suorituskielistä.',
 }
