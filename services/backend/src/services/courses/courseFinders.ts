@@ -2,7 +2,7 @@ import { orderBy } from 'lodash'
 import { Op } from 'sequelize'
 
 import { CourseWithSubsId } from '@oodikone/shared/types/course'
-import { getSortRank } from 'src/util/sortRank'
+import { getSortRank } from '../../../src/util/sortRank'
 import { CourseModel } from '../../models'
 
 const nameLikeTerm = (name: string) => {
