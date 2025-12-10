@@ -8,6 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 
+import dayjs from 'dayjs'
 import { omit, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -129,7 +130,19 @@ export const SearchForm = () => {
     clearSelectedCourses()
   }, [selectMultipleCourses])
 
-  const courses = matchingCourses.filter(course => !selectedCourses[course.code])
+  const courses = matchingCourses
+    .filter(course => !selectedCourses[course.code])
+    .sort((a, b) => {
+      const yearA = dayjs(a.max_attainment_date).year()
+      const yearB = dayjs(b.max_attainment_date).year()
+      if (yearA !== yearB) return yearB - yearA
+
+      const isFallA = dayjs(a.max_attainment_date).month() >= 7 ? 1 : 0
+      const isFallB = dayjs(b.max_attainment_date).month() >= 7 ? 1 : 0
+      if (isFallA !== isFallB) return isFallB - isFallA
+
+      return a.code.localeCompare(b.code)
+    })
 
   const selected = Object.values(selectedCourses)
   const noSelectedCourses = !selected.length

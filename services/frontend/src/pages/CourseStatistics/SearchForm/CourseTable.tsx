@@ -8,7 +8,6 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { sortBy } from 'lodash'
 import { memo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -27,7 +26,6 @@ const CourseTable = ({
 }) => {
   const { getTextIn } = useLanguage()
   const noContent = courses.length === 0
-  const sortCourses = courses => sortBy(courses, course => getTextIn(course.name))
 
   const getEmptyListRow = () => (
     <TableRow>
@@ -75,7 +73,7 @@ const CourseTable = ({
             {title === 'Selected courses' && <TableCell />}
           </TableRow>
         </TableHead>
-        <TableBody>{noContent ? getEmptyListRow() : sortCourses(courses).map(toCourseRow)}</TableBody>
+        <TableBody>{noContent ? getEmptyListRow() : courses.map(toCourseRow)}</TableBody>
       </Table>
     </TableContainer>
   )
