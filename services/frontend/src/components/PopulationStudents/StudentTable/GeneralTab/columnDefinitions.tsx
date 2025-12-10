@@ -148,7 +148,7 @@ export const useGetColumnDefinitions = ({
           const studyTrack = cell.getValue()
           if (!studyTrack) return null
 
-          return <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
+          return <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
         },
       }),
 
