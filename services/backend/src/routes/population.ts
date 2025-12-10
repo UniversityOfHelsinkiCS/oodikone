@@ -16,22 +16,91 @@ import {
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
 } from '@oodikone/shared/routes/populations'
 import { Unification, Unarray } from '@oodikone/shared/types'
+import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
-import { maxYearsToCreatePopulationFrom } from '../services/courses'
+import { getCourseProvidersForCourses, maxYearsToCreatePopulationFrom } from '../services/courses'
+import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
-import { hasFullAccessToStudentData } from '../util'
+import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 
 const router = Router()
+
+const obfuscateStuff = ({
+  result,
+
+  programme,
+  combinedProgramme,
+
+  userRoles,
+  userProgrammeRights,
+  studentsUserCanAccess,
+}: {
+  result: Awaited<ReturnType<typeof statisticsOf>>
+  [key: string]: any
+}): Awaited<ReturnType<typeof statisticsOf>> => {
+  const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
+  const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
+  const hasFullRightsToProgramme = userFullProgrammeRights.includes(programme)
+  const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(combinedProgramme)
+
+  if (hasFullAccessToStudents || hasFullRightsToProgramme || hasFullRightsToCombinedProgramme) {
+    return result
+  }
+
+  const { criteria, students, coursestatistics } = result
+  const encryptionMap = new Map<string, string>()
+
+  return {
+    criteria,
+    students: students.map(student => {
+      if (studentsUserCanAccess.has(student.studentNumber)) return student
+
+      // correct year for age distribution calculation but the date is always January 1st
+      const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0))
+      const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
+
+      encryptionMap.set(student.studentNumber, studentNumber)
+
+      return {
+        ...student,
+
+        obfuscated: true,
+        iv,
+        studentNumber,
+        firstnames: '',
+        lastname: '',
+        phoneNumber: '',
+        name: '',
+        email: '',
+        secondaryEmail: '',
+        sis_person_id: '',
+        tags: [],
+        birthdate: obfuscatedBirthDate,
+      }
+    }),
+    coursestatistics: {
+      courses: coursestatistics.courses,
+      enrollments: coursestatistics.enrollments.map(enrollment => ({
+        ...enrollment,
+        studentnumber: encryptionMap.get(enrollment.studentnumber) ?? enrollment.studentnumber,
+      })),
+      credits: coursestatistics.credits.map(credit => ({
+        ...credit,
+        student_studentnumber: encryptionMap.get(credit.student_studentnumber) ?? credit.student_studentnumber,
+      })),
+    },
+  }
+}
 
 router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
   '/v3/populationstatistics',
   async (req, res) => {
-    const { id: userId, roles: userRoles, programmeRights: userProgrammeRights } = req.user
+    const { id: userId, roles: userRoles, programmeRights: userProgrammeRights, studentsUserCanAccess } = req.user
     const { years, semesters, programme, combinedProgramme, studentStatuses } = req.query
 
     const requiredFields = [years, semesters, programme]
@@ -75,8 +144,18 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
 
     const result = await statisticsOf(studentNumbers, studyRights, tagMap, startDate)
+    const processed = obfuscateStuff({
+      result,
 
-    return res.json(result)
+      programme,
+      combinedProgramme,
+
+      userRoles,
+      userProgrammeRights,
+      studentsUserCanAccess,
+    })
+
+    return res.json(processed)
   }
 )
 
@@ -86,7 +165,12 @@ router.get<
   PopulationstatisticsbycourseReqBody,
   PopulationstatisticsbycourseParams
 >('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { id: userId } = req.user
+  const {
+    id: userId,
+    roles: userRoles,
+    programmeRights: userProgrammeRights,
+    studentsUserCanAccess: allStudentsUserCanAccess,
+  } = req.user
   const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses } = req.query
 
   if (!coursecodeJSON || !from || !to) {
@@ -106,11 +190,26 @@ router.get<
 
   const studentNumbers = await findByCourseAndSemesters(coursecodes, Number(from), Number(to), isSeparate, unifyCourses)
 
+  const courseProviders: string[] = await getCourseProvidersForCourses(coursecodes)
+  const fullStudyProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
+  const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
+
+  const studentsUserCanAccess = courseProviders.some(provider => rightsMappedToProviders.includes(provider))
+    ? new Set(studentNumbers)
+    : new Set(allStudentsUserCanAccess)
+
   const studyRights = []
   const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
-  // FIXME no any type
-  const result: any = await statisticsOf(studentNumbers, studyRights, tagMap)
-  res.json(result)
+  const result = await statisticsOf(studentNumbers, studyRights, tagMap)
+  const processed = obfuscateStuff({
+    result,
+
+    userRoles,
+    userProgrammeRights,
+    studentsUserCanAccess,
+  })
+
+  return res.json(processed)
 })
 
 // Used in custom population and single study guidance groups
