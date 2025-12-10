@@ -47,7 +47,6 @@ export const CourseCard = ({
     key,
     text: label,
     value: type,
-    disabled: !course?.students[key]?.size,
   }))
 
   return (
