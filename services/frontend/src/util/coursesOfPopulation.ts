@@ -86,14 +86,14 @@ const getFinalStats = (course, populationCount: number): FilteredCourse['stats']
   stats.failed = students.failed.size
   stats.attempts = course.attempts
   stats.improvedPassedGrade = students.improvedPassedGrade.size
-  stats.percentage = percentageOf(stats.passed, stats.students)
-  stats.passedOfPopulation = percentageOf(stats.passed, populationCount)
-  stats.triedOfPopulation = percentageOf(stats.students, populationCount)
-  stats.perStudent = percentageOf(course.attempts, stats.passed + stats.failed) / 100
+  stats.percentage = percentageOf(stats.passed, stats.students).toFixed(2)
+  stats.passedOfPopulation = percentageOf(stats.passed, populationCount).toFixed(2)
+  stats.triedOfPopulation = percentageOf(stats.students, populationCount).toFixed(2)
+  stats.perStudent = (percentageOf(course.attempts, stats.passed + stats.failed) / 100).toFixed(2)
   stats.passingSemestersCumulative = getCumulativePassingSemesters(stats.passingSemesters)
   stats.totalStudents = stats.students
   stats.totalEnrolledNoGrade = students.enrolledNoGrade.size
-  stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
+  stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents).toFixed(2)
 
   return stats
 }
