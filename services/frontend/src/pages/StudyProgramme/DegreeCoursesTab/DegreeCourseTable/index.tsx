@@ -116,7 +116,7 @@ export const DegreeCourseTable = ({
 
   const removeOne = (course: ProgrammeCourse) => {
     void removeExclusion({
-      courseCodes: course.visible.id ? [course.visible.id] : [],
+      courseCodes: [course.code],
       curriculumVersion: version,
       programmeCode: studyProgramme,
     })
