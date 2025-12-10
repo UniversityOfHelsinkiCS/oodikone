@@ -26,8 +26,8 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -41,7 +41,7 @@ type PopulationDetailsProps = {
   query: PopulationQuery
   populationTags: Map<string, string>
   filteredStudents: FormattedStudent[]
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
 }
 
 export const PopulationDetails = ({

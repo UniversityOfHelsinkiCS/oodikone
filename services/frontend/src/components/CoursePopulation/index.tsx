@@ -29,9 +29,10 @@ import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
-import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { findCorrectProgramme } from '../CustomPopulation/CustomPopulationProgrammeDist/util'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
@@ -107,7 +108,7 @@ export const CoursePopulation = () => {
 
   if (!population || !semesters) return <PageLoading isLoading />
 
-  const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FormattedCourse[]) => [
+  const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FilteredCourse[]) => [
     {
       title: 'Grade distribution',
       content: (
@@ -181,13 +182,13 @@ export const CoursePopulation = () => {
 
   return (
     <FilterView
-      courses={population?.coursestatistics ?? []}
+      coursestatistics={population?.coursestatistics}
       displayTray={!isFetching}
       filters={[
         genderFilter(),
         studentNumberFilter(),
         ageFilter(),
-        courseFilter({ courses: population?.coursestatistics }),
+        courseFilter({ courses: population?.coursestatistics.courses }),
         creditsEarnedFilter(),
         startYearAtUniFilter(),
         programmeFilter({
@@ -236,7 +237,7 @@ const CoursePopulationCoursesWrapper = ({
   filteredCourses,
   filteredStudents,
 }: {
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
   filteredStudents: FormattedStudent[]
 }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(Math.round(filteredStudents.length * 0.3))

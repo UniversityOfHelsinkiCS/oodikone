@@ -47,7 +47,7 @@ export const CourseCard = ({
     key,
     text: label,
     value: type,
-    disabled: !Object.keys(course?.students[key] ?? {}).length,
+    disabled: !course?.students[key]?.size,
   }))
 
   return (
@@ -63,19 +63,19 @@ export const CourseCard = ({
     >
       <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ mb: 2 }}>
-          <Typography>{getTextIn(course.course?.name)}</Typography>
-          {course.course?.substitutions?.length ? (
-            <Tooltip title={getSubstitutionTooltip(course.course.substitutions)}>
+          <Typography>{getTextIn(course?.name)}</Typography>
+          {course?.substitutions?.length ? (
+            <Tooltip title={getSubstitutionTooltip(course.substitutions)}>
               <Typography sx={{ color: 'text.secondary' }}>
-                {course.course?.code}... +{course.course?.substitutions?.length}
+                {course?.code}... +{course?.substitutions?.length}
               </Typography>
             </Tooltip>
           ) : (
-            <Typography sx={{ color: 'text.secondary' }}>{course.course?.code}</Typography>
+            <Typography sx={{ color: 'text.secondary' }}>{course?.code}</Typography>
           )}
         </Box>
         <ClearIcon
-          data-cy={`courseFilter-${course.course?.code}-clear`}
+          data-cy={`courseFilter-${course?.code}-clear`}
           onClick={() => onChange(null)}
           sx={{
             color: theme => theme.palette.error.dark,
@@ -86,7 +86,7 @@ export const CourseCard = ({
         />
       </Stack>
       <FilterSelect
-        filterKey={`courseFilter-${course.course?.code}`}
+        filterKey={`courseFilter-${course?.code}`}
         label="Select course"
         onChange={({ target }) => onChange(target.value)}
         options={dropdownOptions}

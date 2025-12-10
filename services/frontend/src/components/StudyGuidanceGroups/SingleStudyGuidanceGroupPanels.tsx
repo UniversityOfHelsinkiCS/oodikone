@@ -11,7 +11,8 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditStatistics } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
-import { FormattedStudent, FormattedCourse } from '@oodikone/shared/types'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
 import { useCurriculumState } from '../../hooks/useCurriculums'
@@ -27,7 +28,7 @@ export const SingleStudyGuidanceGroupPanels = ({
   group,
 }: {
   filteredStudents: FormattedStudent[]
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
   group: GroupsWithTags
 }) => {
   const { useFilterSelector, filterDispatch } = useFilters()

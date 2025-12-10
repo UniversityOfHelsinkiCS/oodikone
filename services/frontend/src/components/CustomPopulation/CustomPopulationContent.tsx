@@ -22,7 +22,8 @@ import { RightsNotification } from '@/components/RightsNotification'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useProgress } from '@/hooks/progress'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { FormattedCourse, FormattedStudent } from '@oodikone/shared/types'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
+import { FormattedStudent } from '@oodikone/shared/types'
 import { PageTitle } from '../common/PageTitle'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
@@ -40,7 +41,7 @@ export const CustomPopulationContent = ({
   resetState,
 }: {
   filteredStudents: FormattedStudent[]
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
   populationName?: string
   discardedStudentNumbers: string[]
   unfilteredPopulationLength: number

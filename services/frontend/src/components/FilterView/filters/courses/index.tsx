@@ -1,5 +1,3 @@
-import { keyBy } from 'lodash'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { FilterTrayProps } from '../../FilterTray'
 import { FilterSearchableSelect } from '../common/FilterSearchableSelect'
@@ -16,12 +14,12 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
-    .filter(cs => !courseFilters[cs.course.code])
-    .sort((a, b) => a.course.code.localeCompare(b.course.code))
+    .filter(cs => !courseFilters[cs.code])
+    .sort((a, b) => a.code.localeCompare(b.code))
     .map(cs => ({
-      key: `courseFilter-option-${cs.course.code}`,
-      text: `${cs.course.code} - ${getTextIn(cs.course.name)}`,
-      value: cs.course.code,
+      key: `courseFilter-option-${cs.code}`,
+      text: `${cs.code} - ${getTextIn(cs.name)}`,
+      value: cs.code,
     }))
 
   const setCourseFilter = (code, type) => {
@@ -64,7 +62,7 @@ export const courseFilter = createFilter({
 
   precompute: ({ args }) => {
     const substitutedBy = args.courses.reduce(
-      (acc, { course }) => {
+      (acc, course) => {
         const { code, substitutions } = course
         for (const original of substitutions) {
           acc[original] ??= []
@@ -77,27 +75,34 @@ export const courseFilter = createFilter({
     )
 
     return {
-      courses: keyBy(args.courses, 'course.code'),
+      courses: Object.fromEntries(args.courses.map(course => [course.code, course])),
       substitutedBy,
     }
   },
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter({ studentNumber }, { precomputed, options }) {
-    const filterKeys = {
-      [FilterType.ALL]: 'all',
-      [FilterType.PASSED]: 'passed',
-      [FilterType.FAILED]: 'failed',
-      [FilterType.ENROLLED_NO_GRADE]: 'enrolledNoGrade',
-    }
+  filter(student, { precomputed, options }) {
+    const { courses, enrollments } = student
 
     for (const [code, filterType] of Object.entries(options.courseFilters)) {
       const found = [code, ...(precomputed.substitutedBy[code] ?? [])].some(course => {
-        const students = precomputed.courses?.[course]?.students ?? {}
-        const key = filterKeys[filterType as string]
+        const enrolled = enrollments.some(({ course_code }) => course_code === course)
+        const attainment = courses.some(({ course_code }) => course_code === code)
+        const passed = courses.some(({ course_code, passed }) => course_code === code && passed)
 
-        return students?.[key]?.includes(studentNumber)
+        switch (filterType) {
+          case FilterType.ALL:
+            return enrolled || attainment
+          case FilterType.PASSED:
+            return passed
+          case FilterType.FAILED:
+            return attainment && !passed
+          case FilterType.ENROLLED_NO_GRADE:
+            return enrolled && !attainment
+          default:
+            return false
+        }
       })
 
       if (!found) return false

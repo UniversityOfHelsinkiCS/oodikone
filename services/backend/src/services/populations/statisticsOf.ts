@@ -10,7 +10,7 @@ import {
   getCredits,
   getStudyRightElementsForStudyRight,
 } from './getStudentData'
-import { getOptionsForStudents, parseCourseData } from './shared'
+import { getCourses, getOptionsForStudents } from './shared'
 
 export type OptimizedStatisticsQuery = {
   userId: string
@@ -45,43 +45,22 @@ export const statisticsOf = async (
       getStudyRightElementsForStudyRight(studentNumbers, code),
     ])
 
-  const studentStartingYears = new Map(
-    students.map(({ studentnumber, studyRights }) => [
-      studentnumber,
-      studyRights
-        ?.flatMap(({ studyRightElements }) => studyRightElements)
-        .find(element => element.code === code)
-        ?.startDate.getFullYear() ?? +mockedStartDate,
-    ])
-  )
-
-  const creditsAndEnrollmentsByStudent = new Map<string, [AnonymousCredit[], AnonymousEnrollment[]]>(
-    studentNumbers.map(n => [n, [[], []]])
-  )
-
-  for (const credit of credits) {
-    const { student_studentnumber, ...rest } = credit
-    creditsAndEnrollmentsByStudent.get(student_studentnumber)![0].push(rest)
-  }
-
-  for (const enrollment of enrollments) {
-    const { studentnumber, ...rest } = enrollment
-    creditsAndEnrollmentsByStudent.get(studentnumber)![1].push(rest)
-  }
-
-  const formattedCoursestats = await parseCourseData(studentStartingYears, enrollments, credits)
+  const courseCodes = new Set<string>()
+  for (const { course_code } of credits) courseCodes.add(course_code)
+  for (const { course_code } of enrollments) courseCodes.add(course_code)
+  const courses = await getCourses(Array.from(courseCodes))
 
   const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
   const formattedStudents = students.map(student => {
     const tags = tagMap.get(student.studentnumber) ?? []
     const options = optionData.get(student.studentnumber)
-    const [credits, enrollments] = creditsAndEnrollmentsByStudent.get(student.studentnumber)!
 
-    return formatStudentForAPI(code, mockedStartDate, student, tags, credits, enrollments, options, criteria)
+    return formatStudentForAPI(code, mockedStartDate, student, tags, options)
   })
 
   return {
-    coursestatistics: formattedCoursestats,
     students: formattedStudents,
+    criteria,
+    coursestatistics: { courses, enrollments, credits },
   }
 }

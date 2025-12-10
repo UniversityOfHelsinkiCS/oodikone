@@ -5,8 +5,8 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { Name, ProgrammeCourse } from '@oodikone/shared/types'
-import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 import { IncludeSubstitutionsToggle } from '../../IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from './columnDefinitions'
@@ -14,7 +14,7 @@ import { useGetColumnDefinitions } from './columnDefinitions'
 type CoursesTabContainerProps = {
   curriculum: ExtendedCurriculumDetails
   students: FormattedStudent[]
-  courses: FormattedCourse[]
+  courses: FilteredCourse[]
 }
 
 export type Courses = Record<

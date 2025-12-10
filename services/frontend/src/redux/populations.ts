@@ -1,4 +1,5 @@
 import { RTKApi } from '@/apiConnection'
+import { formatPopulationData, type Output } from '@/redux/populations/util'
 import type { PopulationQuery } from '@/types/populationSearch'
 import type {
   PopulationstatisticsResBody,
@@ -13,14 +14,15 @@ import type {
 
 const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getPopulationStatistics: builder.query<PopulationstatisticsResBody, PopulationQuery>({
+    getPopulationStatistics: builder.query<Output<PopulationstatisticsResBody>, PopulationQuery>({
       query: params => ({
         url: '/v3/populationstatistics/',
         method: 'GET',
         params,
       }),
+      transformResponse: formatPopulationData<PopulationstatisticsResBody>,
     }),
-    getCustomPopulation: builder.query<GetCustomPopulationResBody, CustomPopulationQuery>({
+    getCustomPopulation: builder.query<Output<GetCustomPopulationResBody>, CustomPopulationQuery>({
       query: ({ studentNumbers, tags }) => ({
         url: '/v3/populationstatisticsbystudentnumbers',
         method: 'POST',
@@ -29,15 +31,17 @@ const populationApi = RTKApi.injectEndpoints({
           tags,
         },
       }),
+      transformResponse: formatPopulationData<GetCustomPopulationResBody>,
     }),
     getPopulationStatisticsByCourse: builder.query<
-      PopulationstatisticsbycourseResBody,
+      Output<PopulationstatisticsbycourseResBody>,
       PopulationstatisticsbycourseParams
     >({
       query: ({ coursecodes, from, to, separate, unifyCourses }) => ({
         url: '/v3/populationstatisticsbycourse',
         params: { coursecodes, from, to, separate, unifyCourses },
       }),
+      transformResponse: formatPopulationData<PopulationstatisticsbycourseResBody>,
     }),
     getMaxYearsToCreatePopulationFrom: builder.query<
       PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
