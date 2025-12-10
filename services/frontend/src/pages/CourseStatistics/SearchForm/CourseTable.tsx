@@ -37,6 +37,7 @@ const CourseTable = ({
 
   const toCourseRow = course => (
     <TableRow
+      data-cy={`course-${course.code}`}
       hover
       key={course.id}
       onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}

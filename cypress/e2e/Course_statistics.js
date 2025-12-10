@@ -117,7 +117,7 @@ describe('Basic user', () => {
 
     searchByCourseCode(coursecode1)
     cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.contains('td', coursecode1).click()
+    cy.cs(`course-${coursecode1}`).click()
 
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
     cy.url().should('contain', `courseCodes=%5B%22${coursecode1}%22%5D`)
@@ -135,7 +135,7 @@ describe('Basic user', () => {
 
     searchByCourseCode(coursecode2)
     cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.contains('td', coursecode2).click()
+    cy.cs(`course-${coursecode2}`).click()
 
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
     cy.url().should('contain', `courseCodes=%5B%22${coursecode2}%22%5D`)
@@ -154,7 +154,7 @@ describe('Basic user', () => {
 
       searchByCourseCode(coursecode)
       cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains('td', `${coursecode},`).click()
+      cy.cs(`course-${coursecode}`).click()
 
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
@@ -179,7 +179,7 @@ describe('Basic user', () => {
 
       searchByCourseCode(coursecode)
       cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains('td', coursecode).click()
+      cy.cs(`course-${coursecode}`).click()
 
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
@@ -208,7 +208,7 @@ describe('Basic user', () => {
 
       searchByCourseCode(coursecode)
       cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains('td', coursecode).click()
+      cy.cs(`course-${coursecode}`).click()
 
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
@@ -241,7 +241,7 @@ describe('Basic user', () => {
 
       searchByCourseCode(coursecode)
       cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains('td', coursecode).click()
+      cy.cs(`course-${coursecode}`).click()
 
       cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
@@ -281,8 +281,8 @@ describe('Basic user', () => {
 
       searchByCourseCode('TKT')
       cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains('td', /^TKT20001/).click()
-      cy.contains('td', /^TKT10002/).click()
+      cy.cs(`course-TKT20001`).click()
+      cy.cs(`course-TKT10002`).click()
 
       cy.contains('Fetch statistics').should('be.enabled')
       cy.contains('Fetch statistics').click()
@@ -326,8 +326,8 @@ describe('Basic user', () => {
 
     searchByCourseCode('TKT')
     cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.contains('td', /^TKT20001/).click()
-    cy.contains('td', /^TKT10002/).click()
+    cy.cs(`course-TKT20001`).click()
+    cy.cs(`course-TKT10002`).click()
 
     cy.contains('Fetch statistics').should('be.enabled')
     cy.contains('Fetch statistics').click()
@@ -353,7 +353,7 @@ describe('Basic user', () => {
     searchByCourseName('tietokantojen perusteet')
 
     cy.contains('Tietokantojen perusteet')
-    cy.contains('td', 'TKT10004, BSCS2001, 581328, A581328, AYTKT10004').click()
+    cy.cs(`course-TKT10004`).click()
 
     cy.contains('Search for courses').should('not.exist')
 
@@ -370,7 +370,7 @@ describe('Basic user', () => {
     cy.contains('Search for courses')
     searchByCourseName('tietorakenteet ja algoritmit')
     cy.contains('Tietorakenteet ja algoritmit')
-    cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
+    cy.cs(`course-TKT20001`).click()
     cy.contains('Search for courses').should('not.exist')
 
     cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
@@ -380,7 +380,7 @@ describe('Basic user', () => {
     clickNewQueryButton()
     cy.contains('Please enter at least 5 characters for course name or 2 characters for course code.')
     searchByCourseName('tietorakenteet ja algoritmit')
-    cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
+    cy.cs(`course-TKT20001`).click()
 
     cy.contains('Search for courses').should('not.exist')
     cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
@@ -404,7 +404,7 @@ describe('Basic user', () => {
     cy.contains('Search for courses')
     searchByCourseName('tietokantojen perusteet')
 
-    cy.contains('td', /^TKT10004/).click()
+    cy.cs(`course-TKT10004`).click()
     cy.contains('Search for courses').should('not.exist')
 
     cy.contains('TKT10004 • Tietokantojen perusteet')
@@ -448,7 +448,7 @@ describe('Basic user', () => {
 
     it('Population of course shows grades for each student', () => {
       searchByCourseCode('TKT20001')
-      cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
+      cy.cs(`course-TKT20001`).click()
       cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
       cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
       cy.contains('BSCS1003 • Data Structures and Algorithms')
@@ -462,7 +462,7 @@ describe('Basic user', () => {
 
     it("In 'Course population' view, student numbers of students that the user isn't allowed to see are hidden", () => {
       searchByCourseCode('TKT20001')
-      cy.contains('td', 'TKT20001, BSCS1003, 58131, AYTKT20001').click()
+      cy.cs(`course-TKT20001`).click()
       cy.contains('TKT20001 • Tietorakenteet ja algoritmit')
       cy.contains('AYTKT20001 • Avoin yo: Tietorakenteet ja algoritmit')
       cy.contains('BSCS1003 • Data Structures and Algorithms')
@@ -476,7 +476,7 @@ describe('Basic user', () => {
 
   it('Language distribution is correct', () => {
     searchByCourseCode('TKT20003')
-    cy.contains('td', 'TKT20003, 582219').click()
+    cy.cs(`course-TKT20003`).click()
     cy.contains('TKT20003 • Käyttöjärjestelmät')
     cy.contains('582219 • Käyttöjärjestelmät')
     cy.cs('course-population-for-2021-2022').click()
@@ -494,7 +494,7 @@ describe('Basic user', () => {
         cy.cs('combine-substitutions-toggle').should('have.class', 'Mui-checked').click()
         cy.cs('combine-substitutions-toggle').should('not.have.class', 'Mui-checked')
         searchByCourseCode('TKT10002')
-        cy.contains('td', /^TKT10002$/).click()
+        cy.cs(`course-TKT10002`).click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('TKT10002 • Ohjelmoinnin perusteet')
       })
@@ -727,7 +727,7 @@ describe('Basic user', () => {
         cy.url().should('include', '/coursestatistics')
         cy.contains('Search for courses')
         searchByCourseCode('TKT10002')
-        cy.contains('td', /^TKT10002, BSCS1001, 581325, A581325, AYTKT10002$/).click()
+        cy.cs(`course-TKT10002`).click()
         cy.contains('Search for courses').should('not.exist')
         cy.contains('TKT10002 • Ohjelmoinnin perusteet')
         cy.contains('AYTKT10002 • Avoin yo: Ohjelmoinnin perusteet')
