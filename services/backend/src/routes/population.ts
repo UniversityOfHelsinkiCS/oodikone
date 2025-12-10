@@ -21,7 +21,6 @@ import { mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { SISStudyRightModel } from '../models'
 import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
-import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
@@ -56,10 +55,6 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
     const hasFullAccessToStudents = hasFullAccessToStudentData(userRoles)
 
-    const userFullProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
-    const hasFullRightsToProgramme = userFullProgrammeRights.includes(programme)
-    const hasFullRightsToCombinedProgramme = userFullProgrammeRights.includes(combinedProgramme!)
-
     const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
     const hasAccessToProgramme = userProgrammeRightsCodes.includes(programme)
     const hasAccessToCombinedProgramme = userProgrammeRightsCodes.includes(combinedProgramme!)
@@ -84,30 +79,6 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
 
     const result = await statisticsOf(studentNumbers, studyRights, tagMap, startDate)
-
-    // Obfuscate if user has only limited degree programme rights and there are any students
-    if (!hasFullAccessToStudents && !hasFullRightsToProgramme && !hasFullRightsToCombinedProgramme) {
-      result.students = result.students.map(student => {
-        const { iv, encryptedData: studentNumber } = encrypt(student.studentNumber)
-        // correct year for age distribution calculation but the date is always January 1st
-        const obfuscatedBirthDate = new Date(Date.UTC(new Date(student.birthdate).getUTCFullYear(), 0))
-        return {
-          ...student,
-          firstnames: '',
-          lastname: '',
-          phoneNumber: '',
-          iv,
-          studentNumber,
-          name: '',
-          email: '',
-          secondaryEmail: '',
-          sis_person_id: '',
-          tags: [],
-          birthdate: obfuscatedBirthDate,
-          obfuscated: true,
-        }
-      })
-    }
 
     return res.json(result)
   }
