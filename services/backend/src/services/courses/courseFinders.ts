@@ -69,31 +69,20 @@ const getCourses = async (name: string, code: string, includeSpecial: boolean) =
 export const getCoursesByNameAndOrCode = async (name: string, code: string, includeSpecial: boolean) => {
   const courses = await getCourses(name, code, includeSpecial)
 
-  let substitutionGroupIndex = 0
   const visitedCourses = new Set<string>()
 
-  const assignSubstitutionGroup = (course: CourseWithSubsId) => {
-    if (visitedCourses.has(course.code)) {
-      return
-    }
-
+  const assignSubstitutionGroup = (course: CourseWithSubsId, index: number) => {
     const relatedCourses = courses.filter(currentCourse => course.substitutions.includes(currentCourse.code))
     relatedCourses.unshift(course)
     relatedCourses.forEach(relatedCourse => {
-      if (visitedCourses.has(relatedCourse.id)) {
-        return
-      }
       visitedCourses.add(relatedCourse.id)
-      relatedCourse.subsId = substitutionGroupIndex
+      relatedCourse.subsId = index
     })
   }
 
-  courses.forEach(course => {
-    if (!visitedCourses.has(course.id)) {
-      substitutionGroupIndex++
-      assignSubstitutionGroup(course)
-    }
-  })
+  courses
+    .filter(course => !visitedCourses.has(course.id) && !visitedCourses.has(course.code))
+    .forEach((course, index) => assignSubstitutionGroup(course, index))
 
   return courses
 }
