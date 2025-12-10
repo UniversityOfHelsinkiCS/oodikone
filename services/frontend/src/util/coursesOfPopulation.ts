@@ -25,7 +25,20 @@ export type FilteredCourse = {
     }
   >
   stats: {
+    attempts: number
+    failed: number
+    improvedPassedGrade: number
+    passed: number
+    passedOfPopulation: number
     passingSemesters: Record<string, number> // Key can also be BEFORE or LATER
+    passingSemestersCumulative: Record<string, number>
+    perStudent: number
+    percentage: number
+    percentageWithEnrollments: number
+    students: number
+    totalEnrolledNoGrade: number
+    totalStudents: number
+    triedOfPopulation: number
   }
   students: {
     all: string[]
