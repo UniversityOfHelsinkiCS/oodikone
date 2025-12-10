@@ -185,7 +185,7 @@ export const PopulationStatistics = () => {
     transferredToProgrammeFilter(),
     enableStudyRightTypeFilter ? studyRightTypeFilter({ programme: programmeCode }) : null,
 
-    // For combined programme admission type is the same as they started in bachelor programme
+    // For combined programme admission type is the same as for those starting in bachelor programme
     isSingleYear ? (query.years[0] >= 2020 ? admissionTypeFilter({ programme: programmeCode }) : null) : null,
   ].filter(item => !!item)
 
