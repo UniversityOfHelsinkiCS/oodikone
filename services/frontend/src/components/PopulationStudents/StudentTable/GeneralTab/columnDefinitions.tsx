@@ -86,7 +86,7 @@ export const useGetColumnDefinitions = ({
           if (!programmeName) return null
           return (
             <Tooltip arrow title={programmeName}>
-              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
+              <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
             </Tooltip>
           )
         },
@@ -197,10 +197,8 @@ export const useGetColumnDefinitions = ({
               <span
                 style={{
                   display: 'block',
-                  width: '100%',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
                 }}
               >
                 {value}
@@ -225,20 +223,19 @@ export const useGetColumnDefinitions = ({
 
           return (
             <Tooltip arrow title={tooltipProgrammeList}>
-              <div style={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                 <span
                   style={{
-                    flex: '1 1 auto',
-                    minWidth: 0,
+                    display: 'block',
+                    flexGrow: '1',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                   }}
                 >
                   {programmes.length > 1 ? programmeName : programmeName}
                 </span>
                 {programmes.length > 1 ? (
-                  <span style={{ flex: '0 0 auto', paddingLeft: '0.25em' }}>+{programmes.length - 1}</span>
+                  <span style={{ flexGrow: '0', paddingLeft: '0.25em' }}>+{programmes.length - 1}</span>
                 ) : null}
               </div>
             </Tooltip>
