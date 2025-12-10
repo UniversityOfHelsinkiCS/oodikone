@@ -6,7 +6,7 @@ import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/Po
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { PopulationQuery } from '@/types/populationSearch'
-import { FormattedCourse } from '@oodikone/shared/types'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
 export const PopulationCourses = ({
@@ -20,7 +20,7 @@ export const PopulationCourses = ({
 }: {
   isLoading: boolean
   query: Pick<PopulationQuery, 'programme' | 'years'>
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
   onlyIamRights: boolean
   curriculum: ExtendedCurriculumDetails
   courseTableMode: 'curriculum' | 'all'

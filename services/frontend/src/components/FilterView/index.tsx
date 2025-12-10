@@ -3,9 +3,8 @@ import { FC, useMemo } from 'react'
 
 import { selectViewFilters } from '@/redux/filters'
 import { useAppSelector } from '@/redux/hooks'
-import { filterCourses } from '@/util/coursesOfPopulation'
-import type { CourseStats } from '@oodikone/shared/routes/populations'
-import type { FormattedCourse as Course } from '@oodikone/shared/types/courseData'
+import type { ExpandedCourseStats } from '@/redux/populations/util'
+import { filterCourses, type FilteredCourse } from '@/util/coursesOfPopulation'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 
 import { PageLayout } from '../common/PageLayout'
@@ -16,14 +15,14 @@ import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[], filteredCourses: Course[]) => React.ReactNode
+  children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => React.ReactNode
   name: string
   filters: Filter[]
   students: Student[]
-  courses: CourseStats[]
+  coursestatistics: ExpandedCourseStats | undefined
   displayTray: boolean
   initialOptions: Record<Filter['key'], any>
-}> = ({ children, name, filters, students, courses, displayTray, initialOptions }) => {
+}> = ({ children, name, filters, students, coursestatistics, displayTray, initialOptions }) => {
   const storedOptions = useAppSelector(state => selectViewFilters(state, name))
 
   const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
@@ -67,7 +66,8 @@ export const FilterView: FC<{
         }, students),
     [filters, filterOptions]
   )
-  const filteredCourses = filterCourses(courses, filteredStudents.length)
+
+  const filteredCourses = useMemo(() => filterCourses(coursestatistics, filteredStudents), [filters, filterOptions])
 
   const ctxState: FilterViewContextState = { viewName: name, getContextByKey: getFilterContext }
 

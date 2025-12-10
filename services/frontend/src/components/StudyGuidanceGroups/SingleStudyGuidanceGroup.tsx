@@ -61,7 +61,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
 
   return (
     <FilterView
-      courses={population.coursestatistics}
+      coursestatistics={population?.coursestatistics}
       displayTray={!!population.coursestatistics}
       filters={viewFilters}
       initialOptions={initialOptions}

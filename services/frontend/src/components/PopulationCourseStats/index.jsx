@@ -8,13 +8,14 @@ import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
 import { PopulationCourseContext } from './PopulationCourseContext'
 
-const visibleCoursesFilter = ({ course }, mandatoryCourses) =>
-  mandatoryCourses.defaultProgrammeCourses?.some(
+const visibleCoursesFilter = (course, mandatoryCourses) =>
+  mandatoryCourses?.defaultProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
   ) ??
-  mandatoryCourses.secondProgrammeCourses?.some(
+  mandatoryCourses?.secondProgrammeCourses?.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
-  )
+  ) ??
+  false
 
 export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, onlyIamRights }) => {
   const [tab, setTab] = useState(0)
@@ -23,31 +24,30 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
   useEffect(() => {
     const modules = {}
 
-    if (filteredCourses && curriculum)
-      filteredCourses
-        .filter(course => visibleCoursesFilter(course, curriculum))
-        // it needs to be with flatMap and filter and not map and find
-        // because there can be many mandatoryCourses with the same course code
-        // as they can belong to many categories
-        .flatMap(course => {
-          const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
-            mandatoryCourse => mandatoryCourse.code === course.course.code
-          )
-          const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
-            mandatoryCourse => mandatoryCourse.code === course.course.code
-          )
-          return [
-            ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-            ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-          ]
-        })
-        .forEach(course => {
-          modules[course.parent_code] ??= {
-            module: { code: course.parent_code, name: course.parent_name },
-            courses: [],
-          }
-          modules[course.parent_code].courses.push(course)
-        })
+    filteredCourses
+      ?.filter(({ course }) => visibleCoursesFilter(course, curriculum))
+      // it needs to be with flatMap and filter and not map and find
+      // because there can be many mandatoryCourses with the same course code
+      // as they can belong to many categories
+      .flatMap(course => {
+        const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
+          mandatoryCourse => mandatoryCourse.code === course.course.code
+        )
+        const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
+          mandatoryCourse => mandatoryCourse.code === course.course.code
+        )
+        return [
+          ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
+          ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
+        ]
+      })
+      .forEach(course => {
+        modules[course.parent_code] ??= {
+          module: { code: course.parent_code, name: course.parent_name },
+          courses: [],
+        }
+        modules[course.parent_code].courses.push(course)
+      })
 
     setModules(
       orderBy(

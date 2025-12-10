@@ -144,7 +144,7 @@ export const PopulationStatistics = () => {
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query
 
   const students = population?.students ?? []
-  const courses = population?.coursestatistics ?? []
+  const courses = population?.coursestatistics.courses ?? []
 
   const populationTags = new Map<string, string>(
     students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname]))
@@ -221,7 +221,7 @@ export const PopulationStatistics = () => {
   // else display population from query
   return (
     <FilterView
-      courses={courses}
+      coursestatistics={population?.coursestatistics}
       displayTray={!isLoading}
       filters={filters}
       initialOptions={initialOptions}

@@ -1,23 +1,19 @@
+import { Credit, Enrollment } from '../models'
 import {
   Name,
-  EnrollmentState,
   ProgrammeModuleWithRelevantAttributes,
   UnifyStatus,
   Unarray,
   SemesterEnrollment,
   DegreeProgrammeType,
+  ProgressCriteria,
 } from '../types'
 import { FormattedStudent } from '../types/studentData'
 
-type Course = {
+export type CourseStats = {
   code: string
   name: Name
   substitutions: string[]
-}
-
-type EnrollmentObject = {
-  [EnrollmentState.ENROLLED]: string[]
-  [EnrollmentState.REJECTED]: string[]
 }
 
 export type AttainmentDates = {
@@ -64,38 +60,29 @@ export type CloseToGraduationData = {
   }
 }
 
-export type CourseStats = {
-  attempts: number
-  course: Course
-  enrollments: EnrollmentObject & {
-    semesters: Record<string, EnrollmentObject>
-  }
-  grades: Record<
-    string,
-    {
-      count: number
-      status: {
-        failingGrade: boolean
-        improvedGrade: boolean
-        passingGrade: boolean
-      }
-    }
-  >
-  stats: {
-    passingSemesters: Record<string, number> // Key can also be BEFORE or LATER
-  }
-  students: {
-    all: string[]
-    enrolledNoGrade: string[]
-    failed: string[]
-    improvedPassedGrade: string[]
-    markedToSemester: string[]
-    passed: string[]
-  }
+export type PopulationCourseStats = {
+  courses: Pick<CourseStats, 'code' | 'name' | 'substitutions'>[]
+  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber'>[]
+  credits: Pick<
+    Credit,
+    | 'grade'
+    | 'credits'
+    | 'credittypecode'
+    | 'attainment_date'
+    | 'isStudyModule'
+    | 'student_studentnumber'
+    | 'course_code'
+    | 'language'
+    | 'studyright_id'
+  >[]
 }
 
 // populationstatistics
-export type PopulationstatisticsResBody = { students: FormattedStudent[]; coursestatistics: CourseStats[] }
+export type PopulationstatisticsResBody = {
+  students: Omit<FormattedStudent, 'criteriaProgress' | 'courses' | 'enrollments'>[]
+  criteria: ProgressCriteria
+  coursestatistics: PopulationCourseStats
+}
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
   years: string[]

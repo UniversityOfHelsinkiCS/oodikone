@@ -1,6 +1,6 @@
-export const FilterType = {
-  ALL: 'ALL',
-  PASSED: 'PASSED',
-  FAILED: 'FAILED',
-  ENROLLED_NO_GRADE: 'ENROLLED_NO_GRADE',
-} as const
+export enum FilterType {
+  ALL,
+  PASSED,
+  FAILED,
+  ENROLLED_NO_GRADE,
+}

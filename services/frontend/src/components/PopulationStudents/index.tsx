@@ -8,10 +8,10 @@ import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common
 
 import { InfoBox as NewInfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { FormattedCourse } from '@oodikone/shared/types/courseData'
 import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
 import { type FormattedStudentData, GeneralTab } from './StudentTable/GeneralTab'
 import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
@@ -29,7 +29,7 @@ type PopulationDetails = CommonProps & {
   programme: string
   combinedProgramme?: string
   curriculum: ExtendedCurriculumDetails | null
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
 }
 
 type CoursePopulation = CommonProps & {
@@ -41,7 +41,7 @@ type StudyGuidanceGroup = CommonProps & {
   curriculum: ExtendedCurriculumDetails | null
   studyGuidanceGroup: any
   year: string
-  filteredCourses: FormattedCourse[]
+  filteredCourses: FilteredCourse[]
 }
 
 type CustomPopulation = CommonProps & {

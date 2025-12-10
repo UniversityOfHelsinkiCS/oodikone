@@ -36,7 +36,7 @@ export const useGetFilters = (
     filters.startYearAtUniFilter(),
     filters.tagsFilter(),
     filters.courseFilter({
-      courses: population?.coursestatistics ?? [],
+      courses: population?.coursestatistics.courses ?? [],
     }),
     filters.creditDateFilter(),
     filters.creditsEarnedFilter(),

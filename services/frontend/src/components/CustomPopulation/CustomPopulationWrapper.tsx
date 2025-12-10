@@ -46,7 +46,7 @@ export const CustomPopulationWrapper = ({
     const filtersList = [
       genderFilter(),
       ageFilter(),
-      courseFilter({ courses: population?.coursestatistics ?? [] }),
+      courseFilter({ courses: population?.coursestatistics.courses ?? [] }),
       creditsEarnedFilter(),
       transferredToProgrammeFilter(),
       startYearAtUniFilter(),
@@ -66,7 +66,7 @@ export const CustomPopulationWrapper = ({
 
   return (
     <FilterView
-      courses={population?.coursestatistics ?? []}
+      coursestatistics={population?.coursestatistics}
       displayTray={populationStudents.length > 0}
       filters={filters}
       initialOptions={[]}
