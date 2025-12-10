@@ -37,6 +37,7 @@ export const SearchForm = () => {
   const navigate = useNavigate()
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
+  const [includeSpecialCourses, setIncludeSpecialCourses] = useToggle(false)
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
   const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState('')
@@ -50,7 +51,12 @@ export const SearchForm = () => {
 
   const [searchHistory, addItemToSearchHistory] = useSearchHistory('courseSearch', 6)
   const { data, isFetching } = useGetCourseSearchResultQuery(
-    { name: debouncedCourseName, code: debouncedCourseCode, combineSubstitutions },
+    {
+      name: debouncedCourseName,
+      code: debouncedCourseCode,
+      combineSubstitutions,
+      includeSpecial: includeSpecialCourses,
+    },
     { skip: !isDebouncedInputValid }
   )
   const matchingCourses = data?.courses ?? []
@@ -206,6 +212,12 @@ export const SearchForm = () => {
               </Grid>
               <Grid size={4}>
                 <ToggleWithTooltip
+                  checked={selectMultipleCourses}
+                  cypress="select-multiple-courses-toggle"
+                  label="Allow selecting multiple courses"
+                  onChange={toggleSelectMultipleCourses}
+                />
+                <ToggleWithTooltip
                   checked={combineSubstitutions}
                   cypress="combine-substitutions-toggle"
                   label="Combine substitutions"
@@ -216,13 +228,13 @@ export const SearchForm = () => {
                   })}
                 />
                 <ToggleWithTooltip
-                  checked={selectMultipleCourses}
-                  cypress="select-multiple-courses-toggle"
-                  label="Select multiple courses"
-                  onChange={toggleSelectMultipleCourses}
+                  checked={includeSpecialCourses}
+                  cypress="show-special-courses-toggle"
+                  label="Show special courses"
+                  onChange={setIncludeSpecialCourses}
                   tooltipText={getTextIn({
-                    fi: 'Jos "Select multiple courses" on valittuna, voit valita tarkasteltavaksi useita kursseja.',
-                    en: 'If "Select multiple courses" is on, you can select multiple courses to view statistics for.',
+                    fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
+                    en: 'Includes course instances formed by transferred credits and other special courses',
                   })}
                 />
               </Grid>

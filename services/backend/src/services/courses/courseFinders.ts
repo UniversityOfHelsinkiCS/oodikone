@@ -39,7 +39,7 @@ const codeLikeTerm = (code: string) => {
   }
 }
 
-const getRawCourses = async (name: string, code: string, includeSpecial = false) =>
+const getRawCourses = async (name: string, code: string, includeSpecial: boolean) =>
   await CourseModel.findAll({
     where: {
       ...(includeSpecial ? {} : { mainCourseCode: { [Op.ne]: null } }),
@@ -48,8 +48,8 @@ const getRawCourses = async (name: string, code: string, includeSpecial = false)
     },
   })
 
-const getCourses = async (name: string, code: string) => {
-  const rawCourses = await getRawCourses(name, code)
+const getCourses = async (name: string, code: string, includeSpecial: boolean) => {
+  const rawCourses = await getRawCourses(name, code, includeSpecial)
   return rawCourses.map(course => ({
     ...course.toJSON(),
     substitutions: orderBy(course.substitutions, [
@@ -63,8 +63,8 @@ const getCourses = async (name: string, code: string) => {
   })) as CourseWithSubsId[]
 }
 
-export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
-  const courses = await getCourses(name, code)
+export const getCoursesByNameAndOrCode = async (name: string, code: string, includeSpecial: boolean) => {
+  const courses = await getCourses(name, code, includeSpecial)
 
   let substitutionGroupIndex = 0
   const visitedCourses = new Set<string>()

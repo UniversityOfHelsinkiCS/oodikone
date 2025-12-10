@@ -6,6 +6,7 @@ export type CoursesMultiQuery = {
   name: string
   code: string
   combineSubstitutions: string
+  includeSpecial: string
 }
 
 export type CourseYearlyStatsReqBody = never
