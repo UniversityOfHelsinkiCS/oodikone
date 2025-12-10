@@ -1,4 +1,3 @@
-import crypto from 'crypto'
 import { Router } from 'express'
 import { difference, intersection, uniq } from 'lodash'
 
@@ -16,19 +15,16 @@ import {
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
 } from '@oodikone/shared/routes/populations'
-import { GenderCode, Unification, Unarray } from '@oodikone/shared/types'
-import { mapToProviders } from '@oodikone/shared/util'
+import { Unification, Unarray } from '@oodikone/shared/types'
 import { rootOrgId } from '../config'
-import { SISStudyRightModel } from '../models'
-import { maxYearsToCreatePopulationFrom, getCourseProvidersForCourses } from '../services/courses'
+import { maxYearsToCreatePopulationFrom } from '../services/courses'
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
-import { ParsedCourse } from '../types'
-import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
+import { hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
@@ -90,7 +86,7 @@ router.get<
   PopulationstatisticsbycourseReqBody,
   PopulationstatisticsbycourseParams
 >('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { id: userId, roles, studentsUserCanAccess: allStudentsUserCanAccess, programmeRights } = req.user
+  const { id: userId } = req.user
   const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses } = req.query
 
   if (!coursecodeJSON || !from || !to) {
@@ -114,53 +110,6 @@ router.get<
   const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
   // FIXME no any type
   const result: any = await statisticsOf(studentNumbers, studyRights, tagMap)
-  const courseProviders: string[] = !hasFullAccessToStudentData(roles)
-    ? await getCourseProvidersForCourses(coursecodes)
-    : []
-  const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
-  const found = courseProviders.some(provider => rightsMappedToProviders.includes(provider))
-
-  const studentsUserCanAccess =
-    hasFullAccessToStudentData(roles) || found
-      ? new Set(studentNumbers)
-      : new Set(intersection(studentNumbers, allStudentsUserCanAccess))
-
-  const randomHash = crypto.randomBytes(12).toString('hex')
-  const obfuscateStudent = ({
-    studyRights,
-    studentNumber,
-    courses,
-    gender_code,
-  }: {
-    studyRights: SISStudyRightModel[]
-    studentNumber: string
-    courses: ParsedCourse[]
-    gender_code: GenderCode
-  }) => ({
-    courses,
-    studyRights,
-    gender_code,
-    studentNumber: crypto.createHash('md5').update(`${studentNumber}${randomHash}`).digest('hex'),
-    firstnames: '',
-    lastname: '',
-    phone_number: '',
-    name: '',
-    email: '',
-    started: null,
-    credits: '',
-    tags: [],
-    obfuscated: true,
-
-    studyplans: [],
-  })
-
-  if ('students' in result) {
-    result.students = result.students.map(student =>
-      studentsUserCanAccess.has(student.studentNumber) ? student : obfuscateStudent(student)
-    )
-  }
-
   res.json(result)
 })
 
