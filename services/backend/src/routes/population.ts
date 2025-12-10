@@ -152,7 +152,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
       userRoles,
       userProgrammeRights,
-      studentsUserCanAccess,
+      studentsUserCanAccess: new Set(studentsUserCanAccess),
     })
 
     return res.json(processed)
