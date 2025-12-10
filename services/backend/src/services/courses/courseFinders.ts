@@ -3,7 +3,6 @@ import { Op } from 'sequelize'
 
 import { CourseWithSubsId } from '@oodikone/shared/types/course'
 import { CourseModel } from '../../models'
-import { getSortRank } from '../../util/sortRank'
 
 const nameLikeTerm = (name: string) => {
   if (!name) {
@@ -40,59 +39,54 @@ const codeLikeTerm = (code: string) => {
   }
 }
 
-const getRawCourses = async (name: string, code: string) => {
-  return await CourseModel.findAll({
+const getRawCourses = async (name: string, code: string, includeSpecial = false) =>
+  await CourseModel.findAll({
     where: {
+      ...(includeSpecial ? {} : { mainCourseCode: { [Op.ne]: null } }),
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
-    order: [['id', 'desc']],
   })
-}
 
 const getCourses = async (name: string, code: string) => {
   const rawCourses = await getRawCourses(name, code)
-  const courses: CourseWithSubsId[] = rawCourses
-    .map(course => ({
-      ...course.toJSON(),
-      substitutions: orderBy(course.substitutions, [
-        substitution => {
-          if (/^A/.exec(substitution)) return 4 // open university codes come last
-          if (/^\d/.exec(substitution)) return 2 // old numeric codes come second
-          if (/^[A-Za-z]/.exec(substitution)) return 1 // new letter based codes come first
-          return 3 // unknown, comes before open uni?
-        },
-      ]),
-    }))
-    .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
-  return courses
+  return rawCourses.map(course => ({
+    ...course.toJSON(),
+    substitutions: orderBy(course.substitutions, [
+      substitution => {
+        if (/^A/.exec(substitution)) return 4 // open university codes come last
+        if (/^\d/.exec(substitution)) return 2 // old numeric codes come second
+        if (/^[A-Za-z]/.exec(substitution)) return 1 // new letter based codes come first
+        return 3 // unknown, comes before open uni?
+      },
+    ]),
+  })) as CourseWithSubsId[]
 }
 
 export const getCoursesByNameAndOrCode = async (name: string, code: string) => {
   const courses = await getCourses(name, code)
+
   let substitutionGroupIndex = 0
-  const visitedCourses: string[] = []
+  const visitedCourses = new Set<string>()
 
   const assignSubstitutionGroup = (course: CourseWithSubsId) => {
-    if (visitedCourses.includes(course.code)) {
+    if (visitedCourses.has(course.code)) {
       return
     }
-    let relatedCourses: CourseWithSubsId[] = []
-    if (course.substitutions !== null) {
-      relatedCourses = courses.filter(currentCourse => course.substitutions.includes(currentCourse.code))
-    }
+
+    const relatedCourses = courses.filter(currentCourse => course.substitutions.includes(currentCourse.code))
     relatedCourses.unshift(course)
     relatedCourses.forEach(relatedCourse => {
-      if (visitedCourses.includes(relatedCourse.id)) {
+      if (visitedCourses.has(relatedCourse.id)) {
         return
       }
-      visitedCourses.push(relatedCourse.id)
+      visitedCourses.add(relatedCourse.id)
       relatedCourse.subsId = substitutionGroupIndex
     })
   }
 
   courses.forEach(course => {
-    if (!visitedCourses.includes(course.id)) {
+    if (!visitedCourses.has(course.id)) {
       substitutionGroupIndex++
       assignSubstitutionGroup(course)
     }

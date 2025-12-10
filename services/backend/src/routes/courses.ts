@@ -25,7 +25,7 @@ router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMul
       return res.status(400).json({ error: 'Query parameter name or code is invalid' })
     }
 
-    const courses: CourseWithSubsId[] = await getCoursesByNameAndOrCode(name, code)
+    const courses = await getCoursesByNameAndOrCode(name, code)
 
     if (combineSubstitutions === 'false') {
       const courseCodes = courses.map(course => course.code)
