@@ -38,8 +38,8 @@ export const CourseCard = ({
   onChange,
 }: {
   course: any
-  filterType: keyof typeof FilterType
-  onChange: (type) => any
+  filterType: number
+  onChange: (type: number | null) => any
 }) => {
   const { getTextIn } = useLanguage()
 
@@ -87,9 +87,9 @@ export const CourseCard = ({
       <FilterSelect
         filterKey={`courseFilter-${course?.code}`}
         label="Select course"
-        onChange={({ target }) => onChange(target.value)}
+        onChange={({ target }) => onChange(Number(target.value))}
         options={dropdownOptions}
-        value={filterType}
+        value={String(filterType)}
       />
     </Box>
   )

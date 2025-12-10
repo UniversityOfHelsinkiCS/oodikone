@@ -10,7 +10,7 @@ type CourseStats = Record<string, any>
 const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
   const courseStats: CourseStats = precomputed.courses
 
-  const courseFilters: Record<string, keyof typeof FilterType> = options?.courseFilters
+  const courseFilters: Record<string, number> = options?.courseFilters
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
@@ -22,7 +22,7 @@ const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayP
       value: cs.code,
     }))
 
-  const setCourseFilter = (code, type) => {
+  const setCourseFilter = (code: string, type: number | null) => {
     const newOpts = structuredClone(options)
     newOpts.courseFilters[code] = type
     if (type === null) delete newOpts.courseFilters[code]
