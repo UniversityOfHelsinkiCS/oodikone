@@ -74,8 +74,8 @@ export const formatPopulationData = <T extends RequiredFields>(
   return {
     students: formattedStudents,
     coursestatistics: {
-      dataByStudent: creditsAndEnrollmentsByStudent,
       ...coursestatistics,
+      dataByStudent: creditsAndEnrollmentsByStudent,
     },
     ...otherParams,
   }

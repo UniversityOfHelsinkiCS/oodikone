@@ -57,17 +57,19 @@ export const FilterView: FC<{
     args: filterArgs[key] ?? null,
   })
 
-  const filteredStudents = useMemo(
-    () =>
-      filters
-        .filter(({ key, isActive }) => isActive(filterOptions[key]))
-        .reduce((students, { key, filter }) => {
-          return students.filter(student => filter(structuredClone(student), getFilterContext(key)))
-        }, students),
-    [filters, filterOptions]
-  )
+  const [filteredStudents, filteredCourses] = useMemo(() => {
+    const fstudents = filters
+      .slice()
+      .filter(({ key, isActive }) => isActive(filterOptions[key]))
+      .reduce((students, { key, filter, mutate }) => {
+        const ctx = getFilterContext(key)
+        return students.filter(student => filter(student, ctx)).map(student => mutate?.(student, ctx) ?? student)
+      }, students)
 
-  const filteredCourses = useMemo(() => filterCourses(coursestatistics, filteredStudents), [filters, filterOptions])
+    const fcourses = filterCourses(coursestatistics, fstudents)
+
+    return [fstudents, fcourses]
+  }, [filters, filterOptions])
 
   const ctxState: FilterViewContextState = { viewName: name, getContextByKey: getFilterContext }
 

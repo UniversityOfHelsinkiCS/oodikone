@@ -230,67 +230,71 @@ export const filterCourses = (
   filteredStudents: FormattedStudent[]
 ): FilteredCourse[] => {
   if (!courseStatistics) return []
-  const { courses, credits, enrollments } = courseStatistics
+
+  const coursestats = new Map(
+    courseStatistics.courses.map(course => [course.code, { course, ...structuredClone(courseBaseStats) }])
+  )
 
   const fstudents = new Set(filteredStudents.map(({ studentNumber }) => studentNumber))
   const startingYear = new Map(
     filteredStudents.map(({ studentNumber, studyrightStart }) => [studentNumber, studyrightStart])
   )
-  const coursestats = new Map(courses.map(course => [course.code, { course, ...structuredClone(courseBaseStats) }]))
 
-  for (const enrollment of enrollments) {
-    const { course_code, studentnumber, state, enrollment_date_time } = enrollment
-    if (!fstudents.has(studentnumber)) continue
+  for (const student of filteredStudents) {
+    const studentnumber = student.studentNumber
+    for (const credit of student.courses) {
+      const { course_code, grade, date } = credit
 
-    // We cannot display these
-    if (course_code === null) continue
-    const course = coursestats.get(course_code)
-    if (!course) continue
+      // We cannot display these
+      if (course_code === null) continue
+      const course = coursestats.get(course_code)
+      if (!course) continue
 
-    const initialDate = new Date(enrollment_date_time)
-    const semester = getPassingSemester(new Date(startingYear.get(studentnumber)!).getFullYear(), initialDate)
+      const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
+      const failingGrade = credit.credittypecode === CreditTypeCode.FAILED
+      const improvedGrade = credit.credittypecode === CreditTypeCode.IMPROVED
 
-    course.students.all.add(studentnumber)
-    course.students.enrolledNoGrade.add(studentnumber)
-    course.enrollments[state].add(studentnumber)
-    course.enrollments.semesters[semester][state].add(studentnumber)
-  }
+      course.attempts += 1
+      const gradeCount = course.grades[grade]?.count ?? 0
+      course.grades[grade] = { count: gradeCount + 1, status: { passingGrade, failingGrade, improvedGrade } }
 
-  for (const credit of credits) {
-    const { course_code, student_studentnumber: studentnumber, grade, attainment_date: date } = credit
-    if (!fstudents.has(studentnumber)) continue
+      course.students.all.add(studentnumber)
+      course.students.enrolledNoGrade.delete(studentnumber)
+      if (passingGrade) {
+        if (!course.students.markedToSemester.has(studentnumber)) {
+          course.students.markedToSemester.add(studentnumber)
 
-    // We cannot display these
-    if (course_code === null) continue
-    const course = coursestats.get(course_code)
-    if (!course) continue
+          const semester = getPassingSemester(new Date(startingYear.get(studentnumber)!).getFullYear(), new Date(date))
+          course.stats.passingSemesters[semester]++
+        }
 
-    const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
-    const failingGrade = credit.credittypecode === CreditTypeCode.FAILED
-    const improvedGrade = credit.credittypecode === CreditTypeCode.IMPROVED
-
-    course.attempts += 1
-    const gradeCount = course.grades[grade]?.count ?? 0
-    course.grades[grade] = { count: gradeCount + 1, status: { passingGrade, failingGrade, improvedGrade } }
-
-    course.students.all.add(studentnumber)
-    course.students.enrolledNoGrade.delete(studentnumber)
-    if (passingGrade) {
-      if (!course.students.markedToSemester.has(studentnumber)) {
-        course.students.markedToSemester.add(studentnumber)
-
-        const semester = getPassingSemester(2017, new Date(date))
-        course.stats.passingSemesters[semester]++
+        course.students.passed.add(studentnumber)
+        course.students.failed.delete(studentnumber)
+      } else if (improvedGrade) {
+        course.students.improvedPassedGrade.add(studentnumber)
+        course.students.passed.add(studentnumber)
+        course.students.failed.delete(studentnumber)
+      } else if (failingGrade && !course.students.passed.has(studentnumber)) {
+        course.students.failed.add(studentnumber)
       }
+    }
 
-      course.students.passed.add(studentnumber)
-      course.students.failed.delete(studentnumber)
-    } else if (improvedGrade) {
-      course.students.improvedPassedGrade.add(studentnumber)
-      course.students.passed.add(studentnumber)
-      course.students.failed.delete(studentnumber)
-    } else if (failingGrade && !course.students.passed.has(studentnumber)) {
-      course.students.failed.add(studentnumber)
+    for (const enrollment of student.enrollments) {
+      const { course_code, state, enrollment_date_time } = enrollment
+      if (!fstudents.has(studentnumber)) continue
+
+      // We cannot display these
+      if (course_code === null) continue
+      const course = coursestats.get(course_code)
+      if (!course) continue
+
+      const initialDate = new Date(enrollment_date_time)
+      const semester = getPassingSemester(new Date(startingYear.get(studentnumber)!).getFullYear(), initialDate)
+
+      course.students.all.add(studentnumber)
+      course.students.enrolledNoGrade.add(studentnumber)
+      course.enrollments[state].add(studentnumber)
+      course.enrollments.semesters[semester][state].add(studentnumber)
     }
   }
 

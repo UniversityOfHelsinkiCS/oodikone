@@ -43,7 +43,7 @@ export const FilterTray = ({
       const onClear = () => dispatch(resetViewFilter({ view: viewName, filter: key }))
 
       const props: FilterTrayProps = {
-        students: allStudents.slice(), // Copy instead of move
+        students: allStudents,
         onOptionsChange: options => dispatch(setViewFilterOptions({ view: viewName, filter: key, options })),
         ...ctx,
       }

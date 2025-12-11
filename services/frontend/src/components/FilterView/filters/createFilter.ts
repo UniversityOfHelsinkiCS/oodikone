@@ -41,6 +41,11 @@ export type Filter = {
   filter: (students: Student, ctx: FilterContext) => boolean
 
   /**
+   * (Optional) Function used to mutate the students.
+   */
+  mutate?: (students: Student, ctx: FilterContext) => Student
+
+  /**
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
@@ -154,6 +159,10 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    *   3. precomputed - Value returned by the precomputetion function of
    *                    this filter, if one was defined.
    *
+   * `mutate`
+   * Mutate students in-place before passing the data.
+   * Parameters are the same as for `filter`.
+   *
    * ---
    *
    * `render`
@@ -195,6 +204,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
 
       defaultOptions: options.defaultOptions,
       filter: options.filter,
+      mutate: options.mutate,
       precompute: options.precompute,
       render: options.render,
       isActive: options.isActive,

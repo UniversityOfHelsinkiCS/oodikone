@@ -46,14 +46,19 @@ export const creditDateFilter = createFilter({
   /**
    * startDate and endDate are both dayjs.Dayjs
    */
-  filter(student, { options }) {
+  filter() {
+    return true
+  },
+
+  mutate(student, { options }) {
     const { startDate, endDate } = options
 
-    student.courses = student.courses.filter(
-      course => !startDate?.isAfter(course.date, 'day') && !endDate?.isBefore(course.date, 'day')
-    )
-
-    return true
+    return {
+      ...student,
+      courses: student.courses.filter(
+        course => !startDate?.isAfter(course.date, 'day') && !endDate?.isBefore(course.date, 'day')
+      ),
+    }
   },
 
   selectors: {
