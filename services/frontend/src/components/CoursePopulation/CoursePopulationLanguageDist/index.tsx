@@ -40,7 +40,7 @@ export const CoursePopulationLanguageDist = ({
   })
 
   const total = Object.values(languages).reduce((acc, cur) => acc + cur, 0)
-  if (total === 0) return <p>No data available!</p>
+  if (total === 0) return <Typography sx={{ m: 1 }}>No data available</Typography>
 
   return (
     <StyledTable showCellBorders>
