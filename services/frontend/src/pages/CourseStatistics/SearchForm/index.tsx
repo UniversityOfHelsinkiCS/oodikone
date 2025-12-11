@@ -261,7 +261,7 @@ export const SearchForm = () => {
                 ) : null}
                 <CourseTable
                   courses={courses}
-                  hidden={!Object.keys(courses).length && !Object.keys(selectedCourses).length}
+                  hidden={false}
                   onSelectCourse={onSelectCourse}
                   title="Searched courses"
                 />
