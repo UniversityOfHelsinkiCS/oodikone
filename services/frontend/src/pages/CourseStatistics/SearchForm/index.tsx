@@ -28,10 +28,6 @@ import { MemoizedCourseTable as CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 
-// For now, let's allow more courses because it's necessary and doesn't necessarily
-// fail if the courses have small populations (this used to be limited to 40)
-const MAX_SELECTED_COURSES = 99999
-
 export const SearchForm = () => {
   const { getTextIn } = useLanguage()
   const navigate = useNavigate()
@@ -152,7 +148,6 @@ export const SearchForm = () => {
 
   const selected = Object.values(selectedCourses)
   const noSelectedCourses = !selected.length
-  const disabled = noSelectedCourses ?? selected.length > MAX_SELECTED_COURSES
 
   const addAllCourses = () => {
     const newSelectedCourses = courses.reduce((newSelected, course) => {
@@ -258,8 +253,7 @@ export const SearchForm = () => {
                     />
 
                     <FetchStatisticsButton
-                      disabled={disabled}
-                      maxSelectedCourses={MAX_SELECTED_COURSES}
+                      disabled={noSelectedCourses}
                       onClick={onSubmitFormClick}
                       selectedCourses={selected.length}
                     />
