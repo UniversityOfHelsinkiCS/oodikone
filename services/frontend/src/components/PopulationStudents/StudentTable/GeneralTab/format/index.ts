@@ -41,6 +41,7 @@ export const useFormat = ({
   from,
   to,
   coursecodes,
+  relatedProgrammeMap,
 }: {
   variant: Variant
   filteredStudents: Student[]
@@ -57,6 +58,7 @@ export const useFormat = ({
   coursecodes: string[]
   from: string | undefined // Date string
   to: string | undefined // Date string
+  relatedProgrammeMap?: Map<string, string> // Programme based on time of course attainment/enrollment etc.
 }) => {
   const { getTextIn } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
@@ -213,6 +215,7 @@ export const useFormat = ({
       graduationDateCombinedProg:
         !!combinedProgramme || showBachelorAndMaster ? getCombinedGraduationDate(studentBlob) : null,
       startYearAtUniversity: getStartYearAtUniversity(studentBlob),
+      associatedProgramme: relatedProgrammeMap?.get(student.studentNumber),
       primaryProgramme: getPrimaryProgramme(studentBlob),
       programmes: getProgrammes(studentBlob, includePrimaryProgramme),
       programmeStatus: getProgrammeStatus(studentBlob, currentSemester?.semestercode),

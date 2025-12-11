@@ -108,6 +108,21 @@ export const CoursePopulation = () => {
 
   if (!population || !semesters) return <PageLoading isLoading />
 
+  const getStudentRelevantProgrammes = (students: FormattedStudent[]) =>
+    students.reduce<Map<string, string>>((programmes, student) => {
+      const programme = findCorrectProgramme(
+        student,
+        coursecodes,
+        allSemesters,
+        new Date(dateFrom),
+        new Date(dateTo),
+        currentSemester?.semestercode
+      )
+
+      programmes.set(student.studentNumber, getTextIn(programme.name) ?? '')
+      return programmes
+    }, new Map())
+
   const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FilteredCourse[]) => [
     {
       title: 'Grade distribution',
@@ -154,7 +169,7 @@ export const CoursePopulation = () => {
       content: (
         <PopulationStudents
           filteredStudents={filteredStudents}
-          generalTabColumnFunction={() => columnsGeneralTab()}
+          generalTabColumnFunction={columnsGeneralTab}
           generalTabFormattingFunction={() =>
             formatGeneralTab({
               variant: 'coursePopulation',
@@ -171,6 +186,7 @@ export const CoursePopulation = () => {
               coursecodes: codes,
               from: dateFrom,
               to: dateTo,
+              relatedProgrammeMap: getStudentRelevantProgrammes(filteredStudents),
             })
           }
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}

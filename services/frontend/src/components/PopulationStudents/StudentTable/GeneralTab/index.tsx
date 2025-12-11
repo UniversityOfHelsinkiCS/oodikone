@@ -43,6 +43,7 @@ export type FormattedStudentData = {
   graduationDate: string | null
   graduationDateCombinedProg: string | null
   startYearAtUniversity: number | null
+  associatedProgramme: string | undefined
   primaryProgramme: string | null
   programmes: { exportValue: string | null; programmes: Programme[] } | null
   programmeStatus: string | null

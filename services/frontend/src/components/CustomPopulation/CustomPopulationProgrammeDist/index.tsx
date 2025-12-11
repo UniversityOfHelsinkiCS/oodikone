@@ -51,7 +51,7 @@ export const CustomPopulationProgrammeDist = ({
     programme ??= NO_PROGRAMME
 
     allProgrammes[programme.code] ??= { name: programme.name, programmeStudents: 0 }
-    allProgrammes[programme.code].programmeStudents += 1
+    allProgrammes[programme.code].programmeStudents++
   }
 
   const tableRows = Object.entries(allProgrammes)

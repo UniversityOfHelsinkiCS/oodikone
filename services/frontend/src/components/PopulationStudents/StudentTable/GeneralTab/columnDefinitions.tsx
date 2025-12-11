@@ -73,6 +73,24 @@ export const useGetColumnDefinitions = ({
       }),
       columnHelper.accessor('firstNames', { header: 'First names' }),
       columnHelper.accessor('lastName', { header: 'Last name' }),
+      columnHelper.accessor('associatedProgramme', {
+        maxSize: 340,
+        header: _ => (
+          <TableHeaderWithTooltip
+            header="Associated programme"
+            tooltipText="Programme associated with the attainment or enrollment. View **programme distribution** above for more details."
+          />
+        ),
+        cell: cell => {
+          const programmeName = cell.getValue()
+          if (!programmeName) return null
+          return (
+            <Tooltip arrow title={programmeName}>
+              <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
+            </Tooltip>
+          )
+        },
+      }),
       columnHelper.accessor('primaryProgramme', {
         maxSize: 340,
         header: _ => (

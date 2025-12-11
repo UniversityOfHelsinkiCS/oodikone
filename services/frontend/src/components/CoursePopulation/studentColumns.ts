@@ -15,6 +15,7 @@ export const useColumns = (): [string[], string[]] => {
   return [
     [
       'studentNumber',
+      'associatedProgramme',
       'programmes',
       'creditsTotal',
       'grade',
