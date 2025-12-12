@@ -11,9 +11,11 @@ import { useCallback, useState } from 'react'
 export const NumericTextField = ({
   initialValue,
   onChange,
+  disabled,
 }: {
   initialValue: number
   onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>
+  disabled: boolean
 }) => {
   const [value, setValue] = useState(initialValue)
 
@@ -58,6 +60,7 @@ export const NumericTextField = ({
 
   return (
     <TextField
+      disabled={disabled}
       inputMode="numeric"
       onChange={handleInputChange}
       size="small"
@@ -76,10 +79,10 @@ export const NumericTextField = ({
                 },
               }}
             >
-              <IconButton onClick={handleIncrement} size="small">
+              <IconButton disabled={disabled} onClick={handleIncrement} size="small">
                 <KeyboardArrowUpIcon fontSize="small" sx={{ transform: 'translateY(2px)' }} />
               </IconButton>
-              <IconButton onClick={handleDecrement} size="small">
+              <IconButton disabled={disabled} onClick={handleDecrement} size="small">
                 <KeyboardArrowDownIcon fontSize="small" sx={{ transform: 'translateY(-2px)' }} />
               </IconButton>
             </InputAdornment>
