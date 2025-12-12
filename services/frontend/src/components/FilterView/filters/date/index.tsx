@@ -64,9 +64,5 @@ export const creditDateFilter = createFilter({
     }
   },
 
-  selectors: {
-    selectedStartDate: ({ startDate }, _) => startDate,
-  },
-
   render: CreditDateFilterCard,
 })

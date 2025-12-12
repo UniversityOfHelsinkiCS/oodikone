@@ -303,7 +303,6 @@ const findGraduationsByCodes = (student, programmeCodes, showBachelorAndMaster) 
 const createStudentCreditLines = (
   students,
   singleStudent,
-  selectedStartDate,
   studyRightId,
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
@@ -313,13 +312,6 @@ const createStudentCreditLines = (
 ) =>
   students.map(student => {
     const { studyrightStart } = student
-    let startDate = singleStudent ? selectedStartDate : studyrightStart
-    if (showBachelorAndMaster) {
-      startDate =
-        student.studyRights.find(studyRight =>
-          studyRight.studyRightElements.some(element => element.code === programmeCodes[0])
-        )?.startDate ?? studyrightStart
-    }
     const code = selectedStudyPlan?.programme_code
     const studyPlanProgrammeCode = singleStudent
       ? code
@@ -330,7 +322,7 @@ const createStudentCreditLines = (
       singleStudent,
       studyPlanProgrammeCode,
       cutStudyPlanCredits,
-      startDate,
+      studyrightStart,
       studyRightId
     )
       .filter(({ date }) => new Date(date) <= new Date())
@@ -425,7 +417,6 @@ export const CreditAccumulationGraphHighCharts = ({
       createStudentCreditLines(
         students,
         singleStudent,
-        startDate,
         studyRightId,
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
@@ -436,7 +427,6 @@ export const CreditAccumulationGraphHighCharts = ({
     [
       students,
       singleStudent,
-      startDate,
       studyRightId,
       studyPlanFilterIsActive,
       cutStudyPlanCredits,
