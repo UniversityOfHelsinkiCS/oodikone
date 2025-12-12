@@ -55,9 +55,12 @@ export const creditDateFilter = createFilter({
 
     return {
       ...student,
-      courses: student.courses.filter(
-        course => !startDate?.isAfter(course.date, 'day') && !endDate?.isBefore(course.date, 'day')
-      ),
+      courses: student.courses.filter(course => {
+        const afterStart = startDate?.isBefore(course.date, 'day') ?? true
+        const beforeEnd = endDate?.isAfter(course.date, 'day') ?? true
+
+        return afterStart && beforeEnd
+      }),
     }
   },
 
