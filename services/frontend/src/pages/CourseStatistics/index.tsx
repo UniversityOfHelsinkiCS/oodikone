@@ -33,41 +33,35 @@ import {
 } from './util'
 
 export const CourseStatistics = () => {
+  const location = useLocation()
+  const { courseCodes, ...params } = parseQueryParams(location.search)
+
+  const codes = JSON.parse(courseCodes ?? '[]')
+  const [initialCourseCode] = codes
+  const singleCourseStats = codes.length === 1
+
+  const [selected, setSelected] = useState(initialCourseCode)
+  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
+
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
-
-  const location = useLocation()
-  const { tab: _, courseCodes, ...params } = parseQueryParams(location.search)
-  const skipQuery = !courseCodes
-
-  const { data: courseStatsData = {}, isFetching: loading } = useGetCourseStatsQuery(
-    {
-      ...params,
-      codes: JSON.parse(courseCodes ?? '[]'),
-    },
-    {
-      skip: skipQuery,
-    }
-  )
-
-  const courses = Object.keys(courseStatsData)
-  const statsIsEmpty = courses.length === 0
-  const singleCourseStats = courses.length === 1
-  const initialCourseCode = courses.at(0)
 
   const openOrRegular = useAppSelector((state: RootState) => state.courseSearch.openOrRegular)
 
   const [courseSummaryFormProgrammes, setCourseSummaryFormProgrammes] = useState<string[]>([ALL.value])
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
-  const [selected, setSelected] = useState(initialCourseCode)
-  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
+  const skipQuery = !courseCodes
+  const { data: courseStatsData = {}, isFetching: isLoading } = useGetCourseStatsQuery(
+    { ...params, codes },
+    { skip: skipQuery }
+  )
 
   useEffect(() => {
     setSelected(initialCourseCode)
-    if (statsIsEmpty) setTab(0)
-  }, [initialCourseCode])
+    if (!Object.keys(courseStatsData).length) setTab(0)
+  }, [isLoading])
 
   const switchToCourse = (courseCode: string) => {
     setSelected(courseCode)
@@ -90,12 +84,18 @@ export const CourseStatistics = () => {
   const availableStats = getAvailableStats(courseStatsData)
   const alternatives = getCourseAlternatives(courseStatsData, openOrRegular, selected)
   const programmes = getAllStudyProgrammes(stats, selected)
-  const statistics = getSummaryStatistics(stats, programmes, courseSummaryFormProgrammes, userHasAccessToAllStats)
+  const allProgrammes = getAllStudyProgrammes(stats, undefined)
+  const summaryStatistics = getSummaryStatistics(
+    stats,
+    allProgrammes,
+    courseSummaryFormProgrammes,
+    userHasAccessToAllStats
+  )
 
   return (
     <PageLayout maxWidth="lg">
       <Backdrop
-        open={loading}
+        open={isLoading}
         sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
       >
         <CircularProgress color="inherit" size="3em" />
@@ -113,7 +113,7 @@ export const CourseStatistics = () => {
         <CourseTab
           alternatives={alternatives}
           availableStats={availableStats}
-          loading={loading}
+          loading={isLoading}
           openOrRegular={openOrRegular}
           programmes={programmes}
           selected={selected}
@@ -128,7 +128,7 @@ export const CourseStatistics = () => {
           onClickCourse={switchToCourse}
           programmes={programmes}
           setCourseSummaryFormProgrammes={setCourseSummaryFormProgrammes}
-          statistics={statistics}
+          statistics={summaryStatistics}
         />
       )}
       {tab === 2 && userHasAccessToAllStats ? (

@@ -13,22 +13,6 @@ import { getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/a
 import { AttemptsTable } from './AttemptsTable'
 import { exportToExcel } from './export'
 
-// Certified JavaScript moment but basically this was crashing
-// since sometimes object like {en: ..., fi: ...., sv: ....}
-// was being passed to React which is not legal but then again
-// it works sometimes? so doing this to make sure while fixing
-// the crash the realisations that worked will keep working
-const unObjectifyProperty = ({ obj, property }: { obj: object; property: string }) => {
-  const suspectField = obj[property]
-  if (typeof suspectField === 'object' && suspectField !== null) {
-    if (suspectField.en) {
-      return { ...obj, [property]: suspectField.en }
-    }
-    throw Error(`Invalid object being tried to pass to React: ${JSON.stringify(suspectField)}`)
-  }
-  return { ...obj, [property]: suspectField }
-}
-
 export const SummaryTab = ({
   onClickCourse,
 
@@ -64,28 +48,21 @@ export const SummaryTab = ({
   const data: AttemptData[] = statistics.map(stat => {
     const { coursecode, name, realisations, summary } = stat
     const { passed, failed, passRate } = summary
+
     return {
       id: coursecode,
       category: getTextIn(name)!,
       passed,
       failed,
       passRate,
-      realisations: realisations.map(obj => {
-        return unObjectifyProperty({ obj, property: 'realisation' }) as {
-          failed: number
-          obfuscated?: boolean
-          passed: number
-          passRate: string | null
-          realisation: string
-        }
-      }),
+      realisations,
     }
   })
 
   const options: DropdownOption[] = programmes
-    .map(programme => ({ ...programme, size: new Set(Object.values(programme.students).flat()).size }))
-    .filter(programme => programme.size > 0)
-    .map(({ text, ...rest }) => ({ text: getTextIn(text)!, ...rest }))
+    .map(programme => ({ ...programme, size: Object.values(programme.students).flat().length }))
+    .filter(programme => programme.size)
+    .map(({ text, ...rest }) => ({ ...rest, text: getTextIn(text)! }))
 
   return (
     <Stack gap={2}>

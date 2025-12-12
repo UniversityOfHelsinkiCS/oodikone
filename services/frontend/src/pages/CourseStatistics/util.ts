@@ -14,7 +14,7 @@ export type CourseStatisticsSummary = {
   coursecode: string
   name: Name
   summary: { passed: number; failed: number; passRate: string | null }
-  realisations: { passed: number; failed: number; passRate: string | null; obfuscated: boolean | undefined }[]
+  realisations: { realisation: string; passed: number; failed: number; passRate: string | null; obfuscated?: boolean }[]
 }[]
 
 export const ALL = {
@@ -163,19 +163,17 @@ const parseSummaryStats = (
   filterStudentFn: (studentNumber: string) => boolean,
   userHasAccessToAllStats: boolean
 ) => {
-  const summary = statistics.reduce<{ passed: number; failed: number; passRate: string | null }>(
+  const summary = statistics.reduce<{ passed: number; failed: number }>(
     (acc, cur) => {
       const { passed, failed } = cur.attempts.categories
       acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
       acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
       return acc
     },
-    { passed: 0, failed: 0, passRate: null }
+    { passed: 0, failed: 0 }
   )
 
-  summary.passRate = calculatePassRate(summary.passed, summary.failed)
-
-  return summary
+  return { ...summary, passRate: calculatePassRate(summary.passed, summary.failed) }
 }
 
 export const getSummaryStatistics = (
@@ -183,25 +181,20 @@ export const getSummaryStatistics = (
   programmes: CourseStudyProgramme[],
   programmeCodes: string[],
   userHasAccessToAllStats: boolean
-) => {
+): CourseStatisticsSummary => {
   const filteredProgrammes = programmes.filter(programme => programmeCodes.includes(programme.key))
   const students = new Set(filteredProgrammes.flatMap(programme => Object.values(programme.students).flat()))
 
   const filterStudentFn = (studentNumber: string) => students.has(studentNumber)
 
-  return Object.entries(courseStats).map(([coursecode, { statistics, name }]) => {
+  return Object.entries(courseStats).map(([coursecode, { statistics, name }]) => ({
+    coursecode,
+    name,
+    summary: parseSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats),
     // No filters based on programmes can be applied, if the
     // programme and student number data has been obfuscated
-    const realisations = statistics.map(realisation =>
+    realisations: statistics.map(realisation =>
       getRealisationStats(realisation, filterStudentFn, userHasAccessToAllStats)
-    )
-    const summary = parseSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats)
-
-    return {
-      coursecode,
-      name,
-      summary,
-      realisations,
-    }
-  })
+    ),
+  }))
 }
