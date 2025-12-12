@@ -1,3 +1,4 @@
+import SaveIcon from '@mui/icons-material/Save'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid2'
@@ -139,8 +140,14 @@ export const CreditCriteriaSection = ({
             <Button disabled={disabled} onClick={clearLimits} variant="outlined">
               Clear
             </Button>
-            <Button disabled={disabled} onClick={setCreditsLimitCriteria} variant="contained">
-              Save changes
+            <Button
+              color="success"
+              disabled={disabled}
+              onClick={setCreditsLimitCriteria}
+              startIcon={<SaveIcon />}
+              variant="contained"
+            >
+              Save
             </Button>
           </Stack>
         </Box>

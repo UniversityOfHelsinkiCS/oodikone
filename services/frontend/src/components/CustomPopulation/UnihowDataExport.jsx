@@ -27,12 +27,12 @@ export const UnihowDataExport = ({ students }) => {
   return (
     <Tooltip title="Click here to download a specialized Excel workbook with UniHow data.">
       <Button
-        color="success"
+        color="primary"
         onClick={() => writeFile(getXlsx(), filename)}
         startIcon={<FileDownload />}
-        variant="outlined"
+        variant="contained"
       >
-        Excel Workbook (UniHow)
+        Export (UniHow)
       </Button>
     </Tooltip>
   )

@@ -182,7 +182,7 @@ export const CustomPopulationSearchForm = ({
           <Stack flexDirection="row" sx={{ justifyContent: 'space-between' }}>
             <Box>
               <Button
-                color="primary"
+                color="success"
                 disabled={!nameInput || isFetching || !studentNumberInput}
                 endIcon={<SaveIcon />}
                 loading={isFetching}

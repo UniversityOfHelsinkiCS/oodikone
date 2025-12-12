@@ -367,7 +367,7 @@ export const CloseToGraduation = () => {
       </Tabs>
       <Box sx={{ minHeight: '1.25rem' }}>
         {students?.lastUpdated ? (
-          <Typography color="textSecondary" variant="body2">
+          <Typography color="text.secondary" variant="body2">
             Last updated: {reformatDate(students.lastUpdated, DateFormat.LONG_DATE_TIME)}
           </Typography>
         ) : null}

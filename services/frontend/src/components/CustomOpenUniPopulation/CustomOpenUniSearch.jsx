@@ -205,7 +205,7 @@ export const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
             <Stack flexDirection="row" sx={{ justifyContent: 'space-between' }}>
               <Box>
                 <Button
-                  color="primary"
+                  color="success"
                   data-cy="save-search"
                   disabled={!name || updateIsLoading || createIsLoading}
                   loading={updateIsLoading || createIsLoading}

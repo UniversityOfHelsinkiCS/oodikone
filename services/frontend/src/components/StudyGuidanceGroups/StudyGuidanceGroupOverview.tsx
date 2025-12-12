@@ -179,7 +179,7 @@ const EditTagModal = ({
               Clear
             </Button>
             <Button
-              color="primary"
+              color="success"
               disabled={isLoading}
               endIcon={<SaveIcon />}
               onClick={handleSave}

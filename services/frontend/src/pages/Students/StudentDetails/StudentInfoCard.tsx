@@ -46,7 +46,7 @@ export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) =>
               text="Sisu"
               variant="h6"
             />
-            <Typography color="textSecondary">{email}</Typography>
+            <Typography color="text.secondary">{email}</Typography>
           </Stack>
           <Stack alignItems="flex-start" direction="column" spacing={1}>
             <Box component="span">Credits: {student.credits ?? 0}</Box>

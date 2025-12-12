@@ -91,6 +91,7 @@ export const PopulationStudents = ({
           variant === 'coursePopulation' || (variant === 'studyGuidanceGroupPopulation' && !programme)
         }
         programme={programme ?? studyGuidanceGroup?.tags?.studyProgramme}
+        unihowExport={dataExport}
       />
     ),
     Courses: (
@@ -154,7 +155,6 @@ export const PopulationStudents = ({
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>{dataExport}</div>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Tabs data-cy="student-table-tabs" onChange={(_, newTab) => setTab(newTab)} value={tab}>
           {tabs.map(({ label }) => (

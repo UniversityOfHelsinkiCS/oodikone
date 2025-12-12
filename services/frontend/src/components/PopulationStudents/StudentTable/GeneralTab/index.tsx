@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 import type { TableOptions } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 import { isMastersProgramme } from '@/common'
 import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
@@ -69,6 +69,7 @@ export const GeneralTab = ({
   programme,
   combinedProgramme,
   year,
+  unihowExport,
 
   columnFunction,
   formattingFunction,
@@ -77,6 +78,7 @@ export const GeneralTab = ({
   programme: string | undefined
   combinedProgramme: string | undefined
   year?: string
+  unihowExport?: ReactNode
 
   columnFunction: () => [string[], string[]]
   formattingFunction: () => Partial<FormattedStudentData>[]
@@ -138,6 +140,7 @@ export const GeneralTab = ({
       toolbarContent={
         <>
           <OodiTableExcelExport data={data} exportColumnKeys={exportColumnKeys} />
+          {unihowExport}
           <StudentNameVisibilityToggle />
           <Box sx={{ flexGrow: 1 }} />
           {isAdmin ? <CheckStudentList students={data.map(student => student.studentNumber)} /> : null}

@@ -27,6 +27,7 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
           <DegreeCoursesTab degreeProgramme={degreeProgramme} years={years} />
 
           <Button
+            color="success"
             onClick={() => setModalOpenState(false)}
             startIcon={<SaveIcon />}
             style={{ marginTop: '10px' }}

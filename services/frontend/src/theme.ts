@@ -1,5 +1,4 @@
 import blue from '@mui/material/colors/blue'
-import blueGrey from '@mui/material/colors/blueGrey'
 import deepPurple from '@mui/material/colors/deepPurple'
 import green from '@mui/material/colors/green'
 import grey from '@mui/material/colors/grey'
@@ -21,11 +20,15 @@ const baseTheme = {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
   palette: {
-    success: { main: '#03cc0d' },
-    disabled: { main: '#9e9e9e' },
+    primary: { main: indigo[500], light: indigo[100], dark: indigo[700], contrastText: '#fff' },
+    secondary: { main: deepPurple[500], light: deepPurple[300], dark: deepPurple[700] },
+    text: { primary: grey[900], secondary: grey[600] },
+    info: { main: blue[700], light: blue[500], dark: blue[900] },
+
+    success: { main: green[600] },
+    disabled: { main: grey[500] },
 
     activeNavigationTab: '#fff',
-    export: deepPurple[500],
     graduationTimes: {
       onTime: '#90a959',
       yearOver: '#fee191',
@@ -34,7 +37,7 @@ const baseTheme = {
     ooditable: {
       hops: grey[700],
       recentEnrollment: orange[500],
-      success: green[700],
+      success: green[600],
       enrollment: grey[700],
     },
     grades: {
@@ -59,8 +62,8 @@ const baseTheme = {
       l: purple[800],
     },
     studyProgrammePin: {
-      pinned: blueGrey[900],
-      unpinned: blueGrey[100],
+      pinned: grey[900],
+      unpinned: grey[300],
     },
     roles: {
       admin: red[300],

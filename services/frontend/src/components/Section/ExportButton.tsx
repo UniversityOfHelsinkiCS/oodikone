@@ -12,11 +12,11 @@ export const ExportButton = ({
 }) => {
   return (
     <Button
+      color="primary"
       data-cy={`${cypress}-export-button`}
       disabled={disabled}
       onClick={onClick}
       startIcon={<DownloadIcon />}
-      sx={{ backgroundColor: theme => theme.palette.export }}
       variant="contained"
     >
       Export

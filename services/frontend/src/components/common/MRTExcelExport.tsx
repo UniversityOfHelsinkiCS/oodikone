@@ -158,12 +158,7 @@ export const ExportToExcelDialog = <T extends MRT_RowData>({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button
-          disabled={selectedColumns.length === 0}
-          onClick={handleExport}
-          sx={{ backgroundColor: theme => theme.palette.export }}
-          variant="contained"
-        >
+        <Button color="primary" disabled={selectedColumns.length === 0} onClick={handleExport} variant="contained">
           Export
         </Button>
       </DialogActions>

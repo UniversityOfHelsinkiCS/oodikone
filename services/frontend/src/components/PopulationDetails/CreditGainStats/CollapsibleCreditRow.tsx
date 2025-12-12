@@ -84,7 +84,7 @@ export const CollapsibleCreditRow = ({
       {limits.map(([imin, imax]) => {
         const categoryStudents = getStudentsInCreditCategory(imin, imax)
         return (
-          <TableRow key={`table-row-${imin}-${imax}`} sx={{ backgroundColor: 'grey.300' }}>
+          <TableRow key={`table-row-${imin}-${imax}`} sx={{ bgcolor: 'grey.100' }}>
             <TableCell>
               <ExternalCreditFilterToggle helpText={filterHelpText} students={categoryStudents} />
             </TableCell>

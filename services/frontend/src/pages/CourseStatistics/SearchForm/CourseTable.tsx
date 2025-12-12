@@ -45,7 +45,7 @@ const CourseTable = ({
     >
       <TableCell>
         <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
-        <Typography color="textSecondary" variant="body2">
+        <Typography color="text.secondary" variant="body2">
           {getActiveYears(course)}
         </Typography>
       </TableCell>

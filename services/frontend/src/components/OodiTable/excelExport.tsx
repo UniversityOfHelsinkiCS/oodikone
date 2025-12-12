@@ -159,12 +159,10 @@ export const OodiTableExcelExport = <TData extends object>({
   return (
     <>
       <Button
+        color="primary"
         disabled={dialogOpen}
         onClick={() => setDialogOpen(true)}
         startIcon={<DownloadIcon />}
-        sx={{
-          bgcolor: 'export',
-        }}
         variant="contained"
       >
         Export to Excel
@@ -193,7 +191,7 @@ export const OodiTableExcelExport = <TData extends object>({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleExport} sx={{ backgroundColor: theme => theme.palette.export }} variant="contained">
+          <Button color="primary" onClick={handleExport} variant="contained">
             Export
           </Button>
         </DialogActions>

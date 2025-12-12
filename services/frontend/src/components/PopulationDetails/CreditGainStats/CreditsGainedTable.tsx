@@ -114,7 +114,7 @@ export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, 
                   {getTitle()}
                 </Typography>
                 {!studyPlanFilterIsActive && (
-                  <Typography fontWeight="ligth">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
+                  <Typography fontWeight="light">{`(${months} ${months === 1 ? 'month' : 'months'})`}</Typography>
                 )}
               </TableCell>
               <TableCell>

@@ -145,7 +145,7 @@ export const AgeStats = ({ filteredStudents, query }: AgeStatsProps) => {
                       .filter(([nonGroupedAge]) => Math.floor(nonGroupedAge / 5) * 5 === Number(age))
                       .map(([nonGroupedAge, nonGroupedAgeCount]) => {
                         return (
-                          <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.300' }}>
+                          <TableRow key={nonGroupedAge} sx={{ backgroundColor: 'grey.100' }}>
                             <TableCell>
                               <Typography>{nonGroupedAge}</Typography>
                             </TableCell>
