@@ -1,4 +1,4 @@
-import { CourseSearchState } from '@/redux/courseSearch'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStat, Realisation } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
 

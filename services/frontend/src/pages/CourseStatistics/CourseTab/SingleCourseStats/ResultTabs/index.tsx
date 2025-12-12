@@ -6,7 +6,7 @@ import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-import { CourseSearchState } from '@/redux/courseSearch'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { AvailableStats, CourseStat, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'
@@ -18,6 +18,7 @@ export const ResultTabs = ({
   separate,
 
   loading,
+  toggleOpenAndRegularCourses,
   openOrRegular,
   alternatives,
 }: {
@@ -27,6 +28,7 @@ export const ResultTabs = ({
   separate: boolean
 
   loading: boolean
+  toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   alternatives: CourseStat['alternatives']
 }) => {
@@ -67,6 +69,7 @@ export const ResultTabs = ({
           initialSettings={{ viewMode: 'STUDENTS', separate }}
           loading={loading}
           openOrRegular={openOrRegular}
+          toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
           updateSeparate={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />
@@ -79,6 +82,7 @@ export const ResultTabs = ({
           initialSettings={{ viewMode: 'ATTEMPTS', separate }}
           loading={loading}
           openOrRegular={openOrRegular}
+          toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
           updateSeparate={updateSeparate}
           userHasAccessToAllStats={primary.userHasAccessToAllStats}
         />

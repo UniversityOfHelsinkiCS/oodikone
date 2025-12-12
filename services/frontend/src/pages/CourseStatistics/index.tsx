@@ -12,10 +12,8 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
-import { RootState } from '@/redux'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetCourseStatsQuery } from '@/redux/courseStats'
-import { useAppSelector } from '@/redux/hooks'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { parseQueryParams } from '@/util/queryparams'
 import { CourseTab } from './CourseTab'
@@ -32,6 +30,8 @@ import {
   getSummaryStatistics,
 } from './util'
 
+export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
+
 export const CourseStatistics = () => {
   const location = useLocation()
   const { courseCodes, ...params } = parseQueryParams(location.search)
@@ -47,9 +47,8 @@ export const CourseStatistics = () => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
-  const openOrRegular = useAppSelector((state: RootState) => state.courseSearch.openOrRegular)
-
   const [courseSummaryFormProgrammes, setCourseSummaryFormProgrammes] = useState<string[]>([ALL.value])
+  const [openOrRegular, toggleOpenAndRegularCourses] = useState<CourseSearchState>('unifyStats')
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
   const skipQuery = !courseCodes
@@ -119,6 +118,7 @@ export const CourseStatistics = () => {
           selected={selected}
           setSelected={setSelected}
           stats={stats}
+          toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
           userHasAccessToAllStats={userHasAccessToAllStats}
         />
       )}

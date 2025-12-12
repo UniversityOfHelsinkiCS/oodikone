@@ -12,8 +12,8 @@ import { isDefaultServiceProvider } from '@/common'
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { CourseSearchState } from '@/redux/courseSearch'
 import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
@@ -56,6 +56,7 @@ export const SingleCourseStats = ({
   userHasAccessToAllStats,
 
   loading,
+  toggleOpenAndRegularCourses,
   openOrRegular,
   alternatives,
   programmes,
@@ -65,6 +66,7 @@ export const SingleCourseStats = ({
   userHasAccessToAllStats: boolean
 
   loading: boolean
+  toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   alternatives: CourseStat['alternatives']
   programmes: CourseStudyProgramme[]
@@ -538,6 +540,7 @@ export const SingleCourseStats = ({
         openOrRegular={openOrRegular}
         primary={statistics.primary}
         separate={separate}
+        toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
       />
     </Stack>
   )

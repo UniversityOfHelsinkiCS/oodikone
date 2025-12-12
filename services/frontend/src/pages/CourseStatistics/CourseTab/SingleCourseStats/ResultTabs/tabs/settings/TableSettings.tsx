@@ -1,6 +1,7 @@
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 
+import { CourseSearchState } from '@/pages/CourseStatistics'
 import { AvailableStats } from '@/types/courseStat'
 import { ProviderOrganizationSelect } from './ProviderOrganizationSelect'
 import { Setting } from './Setting'
@@ -12,6 +13,7 @@ export const TableSettings = ({
   separate,
   showGrades,
 
+  toggleOpenAndRegularCourses,
   openOrRegular,
 }: {
   availableStats: AvailableStats
@@ -20,7 +22,8 @@ export const TableSettings = ({
   separate: boolean
   showGrades: boolean
 
-  openOrRegular
+  toggleOpenAndRegularCourses: (state: CourseSearchState) => void
+  openOrRegular: CourseSearchState
 }) => {
   return (
     <Stack direction="row" gap={1}>
@@ -32,7 +35,11 @@ export const TableSettings = ({
         control={<Switch checked={separate} data-cy="separateToggle" onChange={() => onSeparateChange(!separate)} />}
         labelText="Separate by semesters"
       />
-      <ProviderOrganizationSelect availableStats={availableStats} openOrRegular={openOrRegular} />
+      <ProviderOrganizationSelect
+        availableStats={availableStats}
+        openOrRegular={openOrRegular}
+        toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
+      />
     </Stack>
   )
 }

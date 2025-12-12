@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/Section'
-import { CourseSearchState } from '@/redux/courseSearch'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { AvailableStats, CourseStat, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
@@ -28,6 +28,7 @@ export const ResultTab = ({
   updateSeparate,
   userHasAccessToAllStats,
 
+  toggleOpenAndRegularCourses,
   openOrRegular,
   alternatives,
 }: {
@@ -38,6 +39,7 @@ export const ResultTab = ({
   updateSeparate: (separate: boolean) => void
   userHasAccessToAllStats: boolean
 
+  toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   alternatives: CourseStat['alternatives']
 }) => {
@@ -77,6 +79,7 @@ export const ResultTab = ({
             openOrRegular={openOrRegular}
             separate={settings.separate}
             showGrades={settings.showGrades}
+            toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
           />
           {datasets
             .filter(data => data !== undefined)

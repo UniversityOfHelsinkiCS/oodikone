@@ -5,8 +5,8 @@ import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { CourseSearchState } from '@/redux/courseSearch'
 import { CourseStat } from '@/types/courseStat'
 import { CourseLabel } from './CourseLabel'
 import { CourseSelector } from './CourseSelector'
@@ -18,6 +18,7 @@ export const CourseTab = ({
   userHasAccessToAllStats,
 
   loading,
+  toggleOpenAndRegularCourses,
   openOrRegular,
   stats,
   availableStats,
@@ -29,6 +30,7 @@ export const CourseTab = ({
   userHasAccessToAllStats: boolean
 
   loading: boolean
+  toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: Record<string, { unify: boolean; open: boolean; university: boolean }>
@@ -84,6 +86,7 @@ export const CourseTab = ({
         openOrRegular={openOrRegular}
         programmes={programmes}
         stats={stats[selected]}
+        toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
         userHasAccessToAllStats={userHasAccessToAllStats}
       />
     </Stack>

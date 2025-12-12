@@ -6,8 +6,8 @@ import Stack from '@mui/material/Stack'
 
 import { flatten, uniq } from 'lodash'
 import { useState } from 'react'
+import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStats } from '@/pages/CourseStatistics/util'
-import { CourseSearchState } from '@/redux/courseSearch'
 import { CourseTable } from './CourseTable'
 
 export const FacultyStatisticsTab = ({
