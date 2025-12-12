@@ -205,7 +205,9 @@ export const DegreeCourseTable = ({
                       <TableCell>{getTextIn(course.name)}</TableCell>
                       <TableCell>{course.code}</TableCell>
                       <TableCell>
-                        <VisibilityChip visibility={getVisibility(moduleCode)} />
+                        <VisibilityChip
+                          visibility={course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN}
+                        />
                       </TableCell>
                       {isBachelorOrLicentiateProgramme(studyProgramme) && (
                         <TableCell>
