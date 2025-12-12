@@ -1,9 +1,12 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import Alert from '@mui/material/Alert'
+import Alert, { type AlertProps } from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 
+import type { ReactNode } from 'react'
 import { useLocation, type Location } from 'react-router'
 
 import { FilterView } from '@/components/FilterView'
@@ -109,11 +112,19 @@ const useGetProgrammeText = (programmeCode: string, combinedProgrammeCode?: stri
   return programmeName
 }
 
-const HelpInfoCard = ({ title, body }: { title: string; body: string }) => (
+const HelpInfoCard = ({
+  title,
+  body,
+  severity = 'info',
+}: {
+  title: string
+  body: ReactNode
+  severity?: AlertProps['severity']
+}) => (
   <Box sx={{ maxWidth: '80%', mx: 'auto', my: 1 }}>
     <Alert
-      icon={<HelpOutlineIcon sx={{ fontSize: '2.5em', alignSelf: 'center', mx: 1.5 }} />}
-      severity="info"
+      icon={severity === 'info' ? <HelpOutlineIcon sx={{ fontSize: '2.5em', alignSelf: 'center', mx: 1.5 }} /> : false}
+      severity={severity}
       sx={{ fontSize: '1.2em', p: 2 }}
     >
       <AlertTitle>
@@ -137,9 +148,13 @@ export const PopulationStatistics = () => {
     data: population,
     isFetching: isLoading,
     isSuccess,
+    isError,
+    refetch,
   } = useGetPopulationStatisticsQuery(query, {
     skip: skipQuery,
   })
+
+  const dataIsReady = isSuccess && !isLoading
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query
 
@@ -205,7 +220,19 @@ export const PopulationStatistics = () => {
     },
   }
 
-  const showNoStudentsMessage = !students.length && !isLoading
+  const errorCardTitle = 'Error occured while fetching data!'
+  const errorCardBody = (
+    <Box sx={{ display: 'flex', flexDirection: 'column', pt: 1, gap: 1 }}>
+      <Typography>
+        If the error persists contact <Link href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</Link>.
+      </Typography>
+      <Box sx={{ width: 'fit-content', mx: 'auto' }}>
+        <Button color="error" onClick={() => void refetch()} variant="contained">
+          Retry
+        </Button>
+      </Box>
+    </Box>
+  )
 
   const helpCardTitle = 'Not seeing any students?'
   const helpCardBody = `
@@ -236,7 +263,8 @@ export const PopulationStatistics = () => {
               Class size {students.length} students
             </Typography>
           </PageTitle>
-          {showNoStudentsMessage ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
+          {isError ? <HelpInfoCard body={errorCardBody} severity="error" title={errorCardTitle} /> : null}
+          {dataIsReady && !students.length ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
           {isSuccess ? (
             <PopulationDetails
               filteredCourses={filteredCourses}
