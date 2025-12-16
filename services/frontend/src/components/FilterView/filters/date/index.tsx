@@ -32,7 +32,7 @@ const ParticipationDateFilterCard = ({ options, onOptionsChange }: FilterTrayPro
 export const creditDateFilter = createFilter({
   key: 'ParticipationDate',
 
-  title: 'Date of course credits',
+  title: 'Date of course participation',
 
   info: filterToolTips.courseCredits,
 
