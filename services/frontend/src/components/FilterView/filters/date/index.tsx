@@ -10,7 +10,7 @@ import { createFilter } from '../createFilter'
  * Unlike other filters, this one does not filter out students from the population. Rather it
  * operates on the students' courses, filtering them according to the date range input.
  */
-const CreditDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
+const ParticipationDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
   const { startDate, endDate } = options
 
   return (
@@ -30,7 +30,7 @@ const CreditDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => 
 }
 
 export const creditDateFilter = createFilter({
-  key: 'CreditDate',
+  key: 'ParticipationDate',
 
   title: 'Date of course credits',
 
@@ -61,8 +61,14 @@ export const creditDateFilter = createFilter({
 
         return afterStart && beforeEnd
       }),
+      enrollments: student.enrollments.filter(enrollment => {
+        const afterStart = startDate?.isBefore(enrollment.enrollment_date_time, 'day') ?? true
+        const beforeEnd = endDate?.isAfter(enrollment.enrollment_date_time, 'day') ?? true
+
+        return afterStart && beforeEnd
+      }),
     }
   },
 
-  render: CreditDateFilterCard,
+  render: ParticipationDateFilterCard,
 })
