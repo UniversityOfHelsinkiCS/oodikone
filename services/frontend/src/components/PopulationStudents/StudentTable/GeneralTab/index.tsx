@@ -32,7 +32,7 @@ export type FormattedStudentData = {
   programmeStart: string | null
   option: string | null
   semesterEnrollments: {
-    exportValue: number
+    exportValue: string
     content: {
       key: string
       onHoverString: string

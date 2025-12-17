@@ -87,11 +87,28 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
           },
           relevantStudyRight
         ),
-        exportValue: (relevantStudyRight?.semesterEnrollments ?? []).reduce(
-          (acc, { type, semester }) =>
-            acc + Number(type === EnrollmentType.PRESENT && firstSemester <= semester && semester <= lastSemester),
-          0
-        ),
+        exportValue: relevantStudyRight?.startDate
+          ? formatDate(relevantStudyRight?.startDate, DateFormat.DISPLAY_DATE) +
+            ': ' +
+            (() => {
+              const enrollments = (relevantStudyRight?.semesterEnrollments ?? []).filter(
+                ({ semester }) => firstSemester <= semester && semester <= lastSemester
+              )
+
+              return [...enrollments]
+                .map(({ type }) => {
+                  switch (type) {
+                    case EnrollmentType.PRESENT:
+                      return '+'
+                    case EnrollmentType.ABSENT:
+                      return 'o'
+                  }
+
+                  return '_'
+                })
+                .join(' ')
+            })()
+          : '',
       })
     : nullFunction
 
