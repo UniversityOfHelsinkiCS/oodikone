@@ -1,5 +1,5 @@
 import type { CourseSearchState } from '@/pages/CourseStatistics'
-import { CourseStat, Realisation } from '@/types/courseStat'
+import { AvailableStats, CourseStat, Realisation } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
 
 export type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
@@ -68,33 +68,28 @@ export const getCourseStats = (
   Object.fromEntries(Object.entries(courseStats).map(([courseCode, value]) => [courseCode, value[openOrRegular]]))
 
 export const getCourseAlternativeCodes = (
-  courseStats: CourseStats,
-  openOrRegular: CourseSearchState,
+  courseStats: Record<string, CourseStat>,
   selectedCourse: string | undefined
-): string[] => courseStats[selectedCourse!]?.[openOrRegular].alternatives?.map(({ code }) => code) ?? []
+): string[] => courseStats[selectedCourse!]?.alternatives?.map(({ code }) => code) ?? []
 
-export const getAvailableStats = (
-  courseStats: CourseStats
-): Record<string, { unify: boolean; open: boolean; university: boolean }> =>
+export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
   Object.fromEntries(
-    Object.entries(courseStats).map(([courseCode, value]) => [
+    Object.entries(courseStats).map(([courseCode, { unifyStats, openStats, regularStats }]) => [
       courseCode,
       {
-        unify: !!value.unifyStats.statistics.length,
-        open: !!value.openStats.statistics.length,
-        university: !!value.regularStats.statistics.length,
+        unify: !!unifyStats.statistics.length,
+        open: !!openStats.statistics.length,
+        university: !!regularStats.statistics.length,
       },
     ])
   )
 
 const mergeStudents = (students1: Record<string, string[]>, students2: Record<string, string[]>) => {
   Object.keys(students2).forEach(yearCode => {
-    if (students1[yearCode]) {
-      students1[yearCode] = [...students1[yearCode], ...students2[yearCode]]
-    } else {
-      students1[yearCode] = students2[yearCode]
-    }
+    students1[yearCode] ??= []
+    students1[yearCode] = [...students1[yearCode], ...students2[yearCode]]
   })
+
   return students1
 }
 

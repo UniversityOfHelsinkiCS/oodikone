@@ -33,16 +33,6 @@ import {
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 
 export const CourseStatistics = () => {
-  const location = useLocation()
-  const { courseCodes, ...params } = parseQueryParams(location.search)
-
-  const codes = JSON.parse(courseCodes ?? '[]')
-  const [initialCourseCode] = codes
-  const singleCourseStats = codes.length === 1
-
-  const [selected, setSelected] = useState(initialCourseCode)
-  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
-
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
@@ -51,21 +41,26 @@ export const CourseStatistics = () => {
   const [openOrRegular, toggleOpenAndRegularCourses] = useState<CourseSearchState>('unifyStats')
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
-  const skipQuery = !courseCodes
-  const { data: courseStatsData = {}, isFetching: isLoading } = useGetCourseStatsQuery(
-    { ...params, codes },
-    { skip: skipQuery }
-  )
+  const location = useLocation()
+  const { courseCodes, ...params } = parseQueryParams(location.search)
+
+  const codes = JSON.parse(courseCodes ?? '[]')
+  const [initialCourseCode] = codes
+  const singleCourseStats = codes.length === 1
+
+  const [selected, setSelected] = useState<string>('')
+  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
+
+  const skipQuery = !initialCourseCode
+  const {
+    data: courseStatsData = {},
+    isFetching: isLoading,
+    isSuccess,
+  } = useGetCourseStatsQuery({ ...params, codes }, { skip: skipQuery })
 
   useEffect(() => {
     setSelected(initialCourseCode)
-    if (!Object.keys(courseStatsData).length) setTab(0)
-  }, [isLoading])
-
-  const switchToCourse = (courseCode: string) => {
-    setSelected(courseCode)
-    setTab(0)
-  }
+  }, [initialCourseCode])
 
   if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && !fullStudyProgrammeRights.length) {
     return <AccessDeniedMessage />
@@ -80,16 +75,22 @@ export const CourseStatistics = () => {
     )
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
-  const availableStats = getAvailableStats(courseStatsData)
-  const alternatives = getCourseAlternativeCodes(courseStatsData, openOrRegular, selected)
-  const programmes = getAllStudyProgrammes(stats, selected)
+  const alternatives = getCourseAlternativeCodes(stats, selected)
   const allProgrammes = getAllStudyProgrammes(stats, undefined)
+  const programmes = getAllStudyProgrammes(stats, selected)
   const summaryStatistics = getSummaryStatistics(
     stats,
     allProgrammes,
     courseSummaryFormProgrammes,
     userHasAccessToAllStats
   )
+
+  const availableStats = getAvailableStats(courseStatsData)
+
+  const switchToCourse = (courseCode: string) => {
+    setSelected(courseCode)
+    setTab(0)
+  }
 
   return (
     <PageLayout maxWidth="lg">
@@ -111,8 +112,8 @@ export const CourseStatistics = () => {
       {tab === 0 && (
         <CourseTab
           alternatives={alternatives}
-          availableStats={availableStats}
-          loading={isLoading}
+          availableStats={availableStats[selected]}
+          loading={isLoading || !isSuccess}
           openOrRegular={openOrRegular}
           programmes={programmes}
           selected={selected}

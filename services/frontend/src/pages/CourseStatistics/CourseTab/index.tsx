@@ -7,8 +7,8 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { CourseStat } from '@/types/courseStat'
-import { CourseLabel } from './CourseLabel'
+import { AvailableStats, CourseStat } from '@/types/courseStat'
+import { PrimaryCourseLabel, SecondaryCourseLabel } from './CourseLabel'
 import { CourseSelector } from './CourseSelector'
 import { SingleCourseStats } from './SingleCourseStats'
 
@@ -33,55 +33,49 @@ export const CourseTab = ({
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
-  availableStats: Record<string, { unify: boolean; open: boolean; university: boolean }>
+  availableStats: AvailableStats
   alternatives: string[]
   programmes: CourseStudyProgramme[]
 }) => {
   const { getTextIn } = useLanguage()
-  const courses = Object.values(stats as object).map(({ name, coursecode: code }) => ({
+  if (!selected || !stats[selected]) return null
+
+  const courses = Object.values(stats).map(({ name, coursecode: code }) => ({
     key: code,
     code,
     name: getTextIn(name)!,
   }))
 
-  if (!selected || !stats[selected]) return null
-
-  const hasSubstitutions = stats[selected].alternatives.length > 1
+  const multipleCourses = courses.length > 1
+  const alternativeCourses = stats[selected].alternatives.filter(course => course.code !== selected)
 
   return (
-    <Stack gap={2}>
-      <Section title={hasSubstitutions ? 'Selected courses' : 'Selected course'}>
-        <Stack gap={1}>
-          {courses.length > 1 && <CourseSelector courses={courses} selected={selected} setSelected={setSelected} />}
-          {hasSubstitutions ? (
-            <Typography component="h3" variant="h6">
-              Course
-            </Typography>
-          ) : null}
-          <Box>
-            <CourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} primary />
-          </Box>
-          {hasSubstitutions ? (
-            <Stack gap={1}>
-              <Typography component="h3" variant="h6">
-                Substitutions
-              </Typography>
-              <Grid container spacing={1}>
-                {stats[selected].alternatives
-                  .filter(course => course.code !== selected)
-                  .map(course => (
-                    <Grid key={course.code}>
-                      <CourseLabel code={course.code} key={course.code} name={getTextIn(course.name)!} />
-                    </Grid>
+    <Stack>
+      <Section title={multipleCourses ? 'Selected courses' : 'Selected course'}>
+        <Stack gap={2}>
+          {multipleCourses ? <CourseSelector courses={courses} selected={selected} setSelected={setSelected} /> : null}
+          <Stack gap={1}>
+            <Box>
+              <PrimaryCourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} />
+            </Box>
+            {alternativeCourses.length ? (
+              <>
+                <Typography component="h6" variant="subtitle2">
+                  Substitutions
+                </Typography>
+                <Grid container spacing={1}>
+                  {alternativeCourses.map(course => (
+                    <SecondaryCourseLabel code={course.code} key={course.code} name={getTextIn(course.name)!} />
                   ))}
-              </Grid>
-            </Stack>
-          ) : null}
+                </Grid>
+              </>
+            ) : null}
+          </Stack>
         </Stack>
       </Section>
       <SingleCourseStats
         alternatives={alternatives}
-        availableStats={availableStats[selected]}
+        availableStats={availableStats}
         loading={loading}
         openOrRegular={openOrRegular}
         programmes={programmes}

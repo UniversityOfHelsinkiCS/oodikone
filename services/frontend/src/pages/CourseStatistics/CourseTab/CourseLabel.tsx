@@ -1,13 +1,11 @@
-import LoopIcon from '@mui/icons-material/Loop'
 import StarIcon from '@mui/icons-material/Star'
+import SwapIcon from '@mui/icons-material/SwapHoriz'
 import Chip from '@mui/material/Chip'
 
-export const CourseLabel = ({ code, name, primary }: { code: string; name: string; primary?: boolean }) => {
-  return (
-    <Chip
-      color={primary ? 'primary' : undefined}
-      icon={primary ? <StarIcon fontSize="small" /> : <LoopIcon fontSize="small" />}
-      label={`${code} • ${name}`}
-    />
-  )
-}
+export const PrimaryCourseLabel = ({ code, name }: { code: string; name: string }) => (
+  <Chip color={'primary'} icon={<StarIcon fontSize="small" />} label={`${code} • ${name}`} />
+)
+
+export const SecondaryCourseLabel = ({ code, name }: { code: string; name: string }) => (
+  <Chip icon={<SwapIcon fontSize="small" />} label={`${code} • ${name}`} />
+)
