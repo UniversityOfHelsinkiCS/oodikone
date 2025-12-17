@@ -4,11 +4,11 @@ import { LANGUAGE_CODES, Language } from '@oodikone/shared/language'
 import { CanError } from '@oodikone/shared/routes'
 import { Role } from '@oodikone/shared/types'
 import { tryCatch } from '@oodikone/shared/util'
-import { FormattedUser } from 'src/types'
 import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
+import { FormattedUser } from '../types'
 import logger from '../util/logger'
 
 const router = Router()
