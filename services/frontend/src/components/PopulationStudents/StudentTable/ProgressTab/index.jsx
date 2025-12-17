@@ -248,7 +248,7 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
       labels?.map(label =>
         columnHelper.accessor(() => undefined, {
           key: `${year}-${label.code}-${label.name.fi}`,
-          header: getTextIn(label.name),
+          header: getTextIn(label.name) ?? label.code,
           cell: ({ row: { original: student } }) => {
             const title = label.code.includes('Criteria')
               ? `${student.criteriaProgress[year]?.totalSatisfied ?? 0} criteria fullfilled`
