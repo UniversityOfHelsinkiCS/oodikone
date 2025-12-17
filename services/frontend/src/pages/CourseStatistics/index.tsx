@@ -25,7 +25,7 @@ import {
   ALL,
   getAllStudyProgrammes,
   getAvailableStats,
-  getCourseAlternatives,
+  getCourseAlternativeCodes,
   getCourseStats,
   getSummaryStatistics,
 } from './util'
@@ -81,7 +81,7 @@ export const CourseStatistics = () => {
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
   const availableStats = getAvailableStats(courseStatsData)
-  const alternatives = getCourseAlternatives(courseStatsData, openOrRegular, selected)
+  const alternatives = getCourseAlternativeCodes(courseStatsData, openOrRegular, selected)
   const programmes = getAllStudyProgrammes(stats, selected)
   const allProgrammes = getAllStudyProgrammes(stats, undefined)
   const summaryStatistics = getSummaryStatistics(

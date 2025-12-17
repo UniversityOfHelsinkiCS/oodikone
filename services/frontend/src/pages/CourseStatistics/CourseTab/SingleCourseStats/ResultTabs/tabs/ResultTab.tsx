@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { courseStatisticsToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/Section'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
-import { AvailableStats, CourseStat, ProgrammeStats, ViewMode } from '@/types/courseStat'
+import { AvailableStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { GradeDistributionChart } from './charts/GradeDistributionChart'
 import { PassRateChart } from './charts/PassRateChart'
 import { ChartSettings } from './settings/ChartSettings'
@@ -41,7 +41,7 @@ export const ResultTab = ({
 
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: CourseStat['alternatives']
+  alternatives: string[]
 }) => {
   const [settings, setSettings] = useState<ResultTabSettings>({
     isRelative: false,

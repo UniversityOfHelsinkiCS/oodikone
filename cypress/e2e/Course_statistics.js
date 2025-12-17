@@ -344,6 +344,8 @@ describe('Basic user', () => {
     cy.go('back')
     cy.cs('CourseSelector').click()
     cy.cs('CourseSelectorOptionTKT20001').click()
+    // Check the link has updated correctly
+    cy.cs('course-population-for-2022-2023').invoke('attr', 'href').should('include', 'TKT20001')
     cy.cs('course-population-for-2022-2023').click()
     cy.contains('Population of course Tietorakenteet ja algoritmit')
   })

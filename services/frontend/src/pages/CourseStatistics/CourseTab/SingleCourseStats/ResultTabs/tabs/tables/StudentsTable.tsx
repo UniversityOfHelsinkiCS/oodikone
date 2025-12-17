@@ -1,11 +1,11 @@
-import { uniq } from 'lodash'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ExportToExcelDialog } from '@/components/common/MRTExcelExport'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { CourseStat, FormattedStats } from '@/types/courseStat'
+import { CourseSearchState } from '@/pages/CourseStatistics'
+import { FormattedStats } from '@/types/courseStat'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { queryParamsToString } from '@/util/queryparams'
 import { ObfuscatedCell } from './ObfuscatedCell'
@@ -40,8 +40,8 @@ export const StudentsTable = ({
   showGrades: boolean
   userHasAccessToAllStats: boolean
 
-  openOrRegular
-  alternatives: CourseStat['alternatives']
+  openOrRegular: CourseSearchState
+  alternatives: string[]
 }) => {
   const { language } = useLanguage()
 
@@ -54,7 +54,7 @@ export const StudentsTable = ({
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(uniq(alternatives.map(course => course.code))),
+        coursecodes: JSON.stringify(alternatives),
         separate,
         unifyCourses: openOrRegular,
       }

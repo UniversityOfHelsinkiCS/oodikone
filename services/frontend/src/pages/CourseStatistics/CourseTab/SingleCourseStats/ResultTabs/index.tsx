@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
-import { AvailableStats, CourseStat, ProgrammeStats } from '@/types/courseStat'
+import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'
 
@@ -30,7 +30,7 @@ export const ResultTabs = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: CourseStat['alternatives']
+  alternatives: string[]
 }) => {
   const navigate = useNavigate()
   const location = useLocation()

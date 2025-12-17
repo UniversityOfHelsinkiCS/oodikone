@@ -68,7 +68,7 @@ export const SingleCourseStats = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: CourseStat['alternatives']
+  alternatives: string[]
   programmes: CourseStudyProgramme[]
 }) => {
   const navigate = useNavigate()

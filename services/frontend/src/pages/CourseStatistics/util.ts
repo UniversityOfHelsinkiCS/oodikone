@@ -67,11 +67,11 @@ export const getCourseStats = (
 ): Record<string, CourseStat> =>
   Object.fromEntries(Object.entries(courseStats).map(([courseCode, value]) => [courseCode, value[openOrRegular]]))
 
-export const getCourseAlternatives = (
+export const getCourseAlternativeCodes = (
   courseStats: CourseStats,
   openOrRegular: CourseSearchState,
   selectedCourse: string | undefined
-) => courseStats[selectedCourse!]?.[openOrRegular].alternatives ?? []
+): string[] => courseStats[selectedCourse!]?.[openOrRegular].alternatives?.map(({ code }) => code) ?? []
 
 export const getAvailableStats = (
   courseStats: CourseStats

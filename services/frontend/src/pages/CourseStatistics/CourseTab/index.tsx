@@ -34,7 +34,7 @@ export const CourseTab = ({
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: Record<string, { unify: boolean; open: boolean; university: boolean }>
-  alternatives: CourseStat['alternatives']
+  alternatives: string[]
   programmes: CourseStudyProgramme[]
 }) => {
   const { getTextIn } = useLanguage()
