@@ -2,7 +2,7 @@ import { flatten, sortBy, uniqBy } from 'lodash-es'
 import { Op } from 'sequelize'
 import { rootOrgId, serviceProvider } from '../../config.js'
 import { dbConnections } from '../../db/connection.js'
-import { selectFromByIds, bulkCreate, getCourseUnitsByCodes, selectOneById } from '../../db/index.js'
+import { selectFromByIds, bulkCreate, selectOneById } from '../../db/index.js'
 import { Course, Teacher, Credit, CreditTeacher, CourseProvider } from '../../db/models/index.js'
 import {
   mapTeacher,
@@ -262,7 +262,7 @@ export const updateAttainments = async (
 
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
-    const courses = await getCourseUnitsByCodes(missingCodes)
+    const courses = await selectFromByIds('course_units', missingCodes, 'code')
     return await Promise.all(
       attainments.map(
         addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)

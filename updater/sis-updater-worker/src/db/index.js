@@ -164,5 +164,3 @@ export const bulkCreate = async (
     }
   }
 }
-
-export const getCourseUnitsByCodes = codes => dbConnections.knex('course_units').whereIn('code', codes).select('*')
