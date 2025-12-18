@@ -1,4 +1,4 @@
-import { uniqBy, flatten, groupBy, memoize } from 'lodash-es'
+import { uniqBy, groupBy, memoize } from 'lodash-es'
 import { Op } from 'sequelize'
 import { rootOrgId } from '../config.js'
 import { bulkCreate, selectFromByIdsOrderBy } from '../db/index.js'
@@ -54,19 +54,17 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const [groupId, courses] = groupedCourse
 
     // Take substitutions from all course units
-    const substitutions = new Set()
-    for (const course of courses) {
-      for (const sub of flatten(course.substitutions)) {
-        substitutions.add(sub.courseUnitGroupId)
-      }
-    }
+    const substitutionArrays = courses.flatMap(course =>
+      course.substitutions.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId))
+    )
+    const uniqueSubstitutionArrays = uniqBy(substitutionArrays, a => [...a].sort().join('|'))
 
     const organisationsById = {}
 
-    for (const { organisations: courseUnitOrganisations, validity_period: courseUnitValidityPeriod } of courses) {
-      if (!courseUnitOrganisations) continue
-      for (const { share, organisationId, roleUrn, validityPeriod } of courseUnitOrganisations) {
-        const { startDate, endDate } = validityPeriod ?? courseUnitValidityPeriod ?? {}
+    for (const { organisations, validity_period: courseValidityPeriod } of courses) {
+      if (!organisations) continue
+      for (const { share, organisationId, roleUrn, validityPeriod } of organisations) {
+        const { startDate, endDate } = validityPeriod ?? courseValidityPeriod ?? {}
 
         organisationsById[organisationId] ??= { organisationId, roleUrn, shares: [] }
         organisationsById[organisationId].shares.push({
@@ -84,21 +82,28 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
     courseProviders.push(...organisations)
 
-    const mapCourse = courseMapper(courseIdToAttainments)
-    return mapCourse(groupedCourse, Array.from(substitutions))
+    return courseMapper(courseIdToAttainments)(groupedCourse, uniqueSubstitutionArrays)
   })
 
   // change substitutions ids to course codes and update
   for (const course of courses) {
-    course.substitutions = (
+    const subtitutionSet = new Set()
+    for (const subGroup of course.substitutions) {
+      for (const sub of subGroup) subtitutionSet.add(sub)
+    }
+
+    const idToCodePairs = (
       await Course.findAll({
-        attributes: ['code'],
+        attributes: ['id', 'code'],
         where: {
-          id: { [Op.in]: course.substitutions },
+          id: { [Op.in]: Array.from(subtitutionSet) },
         },
         raw: true,
       })
-    ).map(({ code }) => code)
+    ).map(({ id, code }) => [id, code])
+    const idToCodeMap = new Map(idToCodePairs)
+
+    course.substitutions = course.substitutions.map(subGroup => subGroup.map(id => idToCodeMap.get(id)))
 
     course.mainCourseCode = [course.code, ...course.substitutions]
       .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))
