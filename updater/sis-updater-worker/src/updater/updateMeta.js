@@ -1,4 +1,5 @@
 import { uniqBy, flatten, groupBy, memoize } from 'lodash-es'
+import { Op } from 'sequelize'
 import { rootOrgId } from '../config.js'
 import { bulkCreate, selectFromByIdsOrderBy } from '../db/index.js'
 import {
@@ -10,7 +11,6 @@ import {
   Organization,
   StudyrightExtent,
 } from '../db/models/index.js'
-import logger from '../utils/logger.js'
 import {
   courseMapper,
   courseProviderMapper,
@@ -50,80 +50,59 @@ const getSubstitutionPriority = memoize(code => {
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
-  const mapCourse = courseMapper(courseIdToAttainments)
-
   const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
     const [groupId, courses] = groupedCourse
 
     // Take substitutions from all course units
-    const substitutions = [
-      ...new Set(
-        courses.reduce((acc, curr) => {
-          return [...acc, ...flatten(curr.substitutions).map(({ courseUnitGroupId }) => courseUnitGroupId)]
-        }, [])
-      ),
-    ]
+    const substitutions = new Set()
+    for (const course of courses) {
+      for (const sub of flatten(course.substitutions)) {
+        substitutions.add(sub.courseUnitGroupId)
+      }
+    }
 
     const organisationsById = {}
 
     for (const { organisations: courseUnitOrganisations, validity_period: courseUnitValidityPeriod } of courses) {
-      if (!courseUnitOrganisations) {
-        continue
-      }
+      if (!courseUnitOrganisations) continue
+      for (const { share, organisationId, roleUrn, validityPeriod } of courseUnitOrganisations) {
+        const { startDate, endDate } = validityPeriod ?? courseUnitValidityPeriod ?? {}
 
-      for (const { share, organisationId, roleUrn, validityPeriod = {} } of courseUnitOrganisations) {
-        try {
-          const effectiveValidityPeriod = Object.keys(validityPeriod).length ? validityPeriod : courseUnitValidityPeriod
-          const shareObj = {
-            share,
-            ...(effectiveValidityPeriod?.startDate && { startDate: effectiveValidityPeriod.startDate }),
-            ...(effectiveValidityPeriod?.endDate && { endDate: effectiveValidityPeriod.endDate }),
-          }
-
-          if (!organisationsById[organisationId]) {
-            organisationsById[organisationId] = { organisationId, roleUrn, shares: [shareObj] }
-          } else {
-            organisationsById[organisationId].shares.push(shareObj)
-          }
-        } catch (error) {
-          // This try-catch-clause added because of a lot of failed updates due to these lines of code.
-          // If the null check for effectiveValidityPeriod fixes this, this try-clause might be removed
-          logger.error(`Error in course unit organisation handling for orgId ${organisationId} with error`, error)
-        }
+        organisationsById[organisationId] ??= { organisationId, roleUrn, shares: [] }
+        organisationsById[organisationId].shares.push({
+          share,
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+        })
       }
     }
 
-    const organisations = Object.values(organisationsById)
-
     const mapCourseProvider = courseProviderMapper(groupId)
-    courseProviders.push(
-      ...organisations
-        .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-        .map(mapCourseProvider)
-    )
-    return mapCourse(groupedCourse, substitutions)
+    const organisations = Object.values(organisationsById)
+      .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+      .map(mapCourseProvider)
+
+    courseProviders.push(...organisations)
+
+    const mapCourse = courseMapper(courseIdToAttainments)
+    return mapCourse(groupedCourse, Array.from(substitutions))
   })
 
   // change substitutions ids to course codes and update
-
   for (const course of courses) {
-    const newSubstitutions = []
-    for (const sub of course.substitutions) {
-      const subs = await Course.findOne({
+    course.substitutions = (
+      await Course.findAll({
         attributes: ['code'],
-        where: { id: sub },
+        where: {
+          id: { [Op.in]: course.substitutions },
+        },
+        raw: true,
       })
+    ).map(({ code }) => code)
 
-      if (subs) newSubstitutions.push(subs.dataValues.code)
-    }
-
-    course.substitutions = newSubstitutions
-
-    const sortedSubstitutions = [course.code, ...course.substitutions]
-      .map(code => [code, getSubstitutionPriority(code)])
-      .sort((a, b) => b[1] - a[1])
-
-    course.mainCourseCode = sortedSubstitutions[0][0]
+    course.mainCourseCode = [course.code, ...course.substitutions]
+      .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))
+      .at(0)
   }
 
   await bulkCreate(Course, courses)
