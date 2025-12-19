@@ -20,53 +20,9 @@ jobs:
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
-  # === Build database images ===
-  build_backend:
-    name: 'Build backend'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: docker/setup-buildx-action@v3
-      - name: 'Build image and export it'
-        uses: docker/build-push-action@v6
-        with:
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
-          context: services
-          file: services/backend/Dockerfile
-          push: false
-          tags: oodikone-backend:staging
-          outputs: type=docker,dest=/tmp/backend.tar
-        env:
-          DOCKER_BUILD_SUMMARY: false
-      - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v5
-        with:
-          name: backend-image
-          path: /tmp/backend.tar
-
-  build_frontend:
-    name: 'Build frontend'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Get current time
-        id: get_current_time
-        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
-      - name: Build frontend image
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: oodikone-frontend
-          tags: staging ${{ github.sha }}
-          context: services
-          containerfiles: |
-            services/frontend/Dockerfile
-          build-args: |
-            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-            BASE_PATH=/oodikone
-            STAGING=true
+  build:
+    name: 'Build images'
+    uses: .github/workflows/build.yaml
 
   check_migration_files:
     name: Check if new migrations have been added
@@ -114,8 +70,7 @@ jobs:
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
     needs:
-      - build_backend
-      - build_frontend
+      - build
       - check_migration_files
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
@@ -142,8 +97,7 @@ jobs:
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
     needs:
-      - build_backend
-      - build_frontend
+      - build
       - check_migration_files
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.user_db_migrations == 'true'
@@ -220,6 +174,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Download frontend image
+        uses: actions/download-artifact@v6
+        with:
+          name: frontend-image
+      - name: Load frontend image
+        run: docker load --input frontend.tar
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
