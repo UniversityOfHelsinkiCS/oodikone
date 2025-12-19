@@ -267,7 +267,9 @@ const getProgrammesBeforeStarting = async ({
     if (!includeAllSpecials && hasTransferred.some(fromOrTo => fromOrTo === true)) return acc
 
     const startDateInProgramme = phase2Programmes.find(elem => elem.code === studyProgramme)?.startDate
-    if (!startDateInProgramme) return acc
+    if (!startDateInProgramme) {
+      return acc
+    }
     ;(acc[latestPhase1Programme.code][defineYear(startDateInProgramme, isAcademicYear)] as number) += 1
     return acc
   }, {})
@@ -355,7 +357,7 @@ export const getGraduationStatsForStudyTrack = async ({
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles =
-    studyProgramme.includes('LIS') || studyProgramme.includes('T')
+    studyProgramme.startsWith('LIS') || studyProgramme.startsWith('T')
       ? ['', 'Graduated']
       : ['', 'Graduated', 'Wrote thesis']
   const combinedTitles = [
@@ -376,10 +378,9 @@ export const getGraduationStatsForStudyTrack = async ({
       ])
     : reversedYears.map(year => [year, graduated.tableStats[year], graduationTimeStats.thesisTableStats[year]])
 
-  const tableStats =
-    studyProgramme.includes('LIS') || studyProgramme.includes('T')
-      ? reversedYears.map(year => [year, graduated.tableStats[year]])
-      : tableStatsDefault
+  const tableStats = studyProgramme.startsWith('LIS')
+    ? reversedYears.map(year => [year, graduated.tableStats[year]])
+    : tableStatsDefault
 
   const graphStats = combinedProgramme
     ? [
@@ -399,7 +400,7 @@ export const getGraduationStatsForStudyTrack = async ({
     tableStats,
     titles: combinedProgramme ? combinedTitles : titles,
     graphStats:
-      studyProgramme.includes('LIS') || studyProgramme.includes('T')
+      studyProgramme.startsWith('LIS') || studyProgramme.startsWith('T')
         ? [{ name: 'Graduated students', data: graduated.graphStats }]
         : graphStats,
     graduationTimes: graduationTimeStats.times,
