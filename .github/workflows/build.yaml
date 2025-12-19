@@ -15,7 +15,7 @@ jobs:
           context: services
           file: services/backend/Dockerfile
           push: false
-          tags: backend:${{ github.sha }}
+          tags: backend:latest
           outputs: type=docker,dest=/tmp/backend.tar
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
@@ -35,7 +35,7 @@ jobs:
           context: services
           file: services/frontend/Dockerfile
           push: false
-          tags: frontend:${{ github.sha }}
+          tags: frontend:latest
           outputs: type=docker,dest=/tmp/frontend.tar
           build-args: |
             BUILT_AT=${{ github.event.head_commit.timestamp }}
