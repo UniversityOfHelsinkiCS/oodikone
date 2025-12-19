@@ -192,7 +192,10 @@ jobs:
         with:
           name: backend-image
       - name: Load frontend image
-        run: docker load --input backend.tar
+        run: |
+          docker load --input backend.tar
+          echo "Images after load:"
+          docker images --format '{{.Repository}}:{{.Tag}}' | sort
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
