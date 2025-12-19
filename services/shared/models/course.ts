@@ -19,7 +19,7 @@ export type Course = {
   min_attainment_date: Date
   createdAt: Date
   updatedAt: Date
-  substitutions: string[]
+  substitutions: string[][]
   course_unit_type: string
   mainCourseCode: string
 }
