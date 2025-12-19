@@ -31,6 +31,9 @@ services:
     <<: *defaults
     container_name: frontend
     image: oodikone-frontend:latest
+    environment:
+      BASE_PATH: /oodikone
+      STAGING: true
     # build:
     # context: services
     # dockerfile: frontend/Dockerfile
