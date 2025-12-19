@@ -11,15 +11,11 @@ jobs:
       username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
       password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
-  build_frontend:
-    uses: ./.github/workflows/build_frontend.yaml
-
   release_frontend:
     name: 'Release frontend'
     runs-on: ubuntu-latest
     needs:
-      # - test
-      - build_frontend
+      - test
 
     steps:
       - uses: actions/checkout@v5
