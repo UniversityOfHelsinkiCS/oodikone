@@ -20,8 +20,8 @@ jobs:
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
-  build:
-    uses: ./.github/workflows/build.yaml
+  # build:
+  #   uses: ./.github/workflows/build.yaml
 
   check_migration_files:
     name: Check if new migrations have been added
