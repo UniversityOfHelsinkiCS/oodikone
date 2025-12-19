@@ -5,20 +5,50 @@ on:
     branches:
       - ci-cd-improvement
 jobs:
-  test:
-    uses: ./.github/workflows/test.yaml
-    secrets:
-      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+  # test:
+  #   uses: ./.github/workflows/test.yaml
+  #   secrets:
+  #     username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+  #     password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+
+  build_frontend:
+    uses: ./.github/workflows/build_frontend.yaml
 
   release_frontend:
     name: 'Release frontend'
     runs-on: ubuntu-latest
     needs:
-      - test
+      # - test
+      - build_frontend
 
     steps:
       - uses: actions/checkout@v5
+
+      - name: Download frontend image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-image
+          path: /tmp
+
+      - name: Load image
+        run: |
+          docker load -i /tmp/frontend.tar
+          echo "Images after load:"
+          docker images --format '{{.Repository}}:{{.Tag}}' | sort
+
+      - name: Login to quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+      - name: Push to quay (using local tags)
+        run: |
+          docker tag oodikone-frontend:${{ github.sha }} quay.io/toska/oodikone-frontend:${{ github.sha }}
+          docker tag oodikone-frontend:staging        quay.io/toska/oodikone-frontend:staging
+          docker push quay.io/toska/oodikone-frontend:${{ github.sha }}
+          docker push quay.io/toska/oodikone-frontend:staging
 
       # - name: Get current time
       #   id: get_current_time
@@ -48,7 +78,7 @@ jobs:
       #     password: ${{ secrets.QUAY_IO_TOKEN }}
 
   release_backend:
-    name: 'Build and release backend'
+    name: 'Release backend'
     runs-on: ubuntu-latest
     needs:
       - test

@@ -8,29 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
-
-      - name: Build backend image and export
-        uses: docker/build-push-action@v6
-        with:
-          context: services
-          file: services/backend/Dockerfile
-          push: false
-          tags: |
-            oodikone-backend:latest
-            oodikone-backend:${{ github.sha }}
-          outputs: type=docker,dest=/tmp/backend.tar
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
-        env:
-          DOCKER_BUILD_SUMMARY: false
-
-      - name: Upload backend artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: backend-image
-          path: /tmp/backend.tar
-
       - name: Build frontend image and export
         uses: docker/build-push-action@v6
         with:
