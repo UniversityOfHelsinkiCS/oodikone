@@ -22,16 +22,18 @@ services:
       IMPORTER_DB_API_URL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
       JAMI_URL: 'http://jami:3003/'
       CRYPT_KEY: 'e16730fce263d5270ba8dcf84d068a32556542455e71331880d6c1c5e4db9b4e'
-    build:
-      context: services
-      dockerfile: backend/Dockerfile
+    image: oodikone-backend:latest
+    # build:
+    # context: services
+    # dockerfile: backend/Dockerfile
 
   frontend:
     <<: *defaults
     container_name: frontend
-    build:
-      context: services
-      dockerfile: frontend/Dockerfile
+    image: oodikone-frontend:latest
+    # build:
+    # context: services
+    # dockerfile: frontend/Dockerfile
 
   kone-db:
     <<: *defaults
