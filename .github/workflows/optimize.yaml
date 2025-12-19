@@ -4,18 +4,6 @@ on:
   push:
     branches:
       - ci-cd-improvement
-    paths:
-      - '.github/actions/**'
-      - '.github/workflows/staging.yaml'
-      - '.github/workflows/test.yaml'
-      - 'cypress/**'
-      - 'cypress.config.json'
-      - 'services/**'
-      - '!services/backend/src/rapodiff/**'
-      - 'updater/sis-updater-worker/src/db/migrations/**'
-      - 'docker-compose.ci.yml'
-      - 'package*.json'
-
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
