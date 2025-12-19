@@ -15,7 +15,9 @@ jobs:
           context: services
           file: services/backend/Dockerfile
           push: false
-          tags: backend:latest
+          tags: |
+            oodikone-backend:latest
+            oodikone-backend:${{ github.sha }}
           outputs: type=docker,dest=/tmp/backend.tar
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
@@ -35,7 +37,9 @@ jobs:
           context: services
           file: services/frontend/Dockerfile
           push: false
-          tags: frontend:latest
+          tags: |
+            oodikone-frontend:latest
+            oodikone-frontend:${{ github.sha }}
           outputs: type=docker,dest=/tmp/frontend.tar
           build-args: |
             BUILT_AT=${{ github.event.head_commit.timestamp }}

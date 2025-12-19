@@ -51,7 +51,7 @@ jobs:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
     needs: check_migration_files
     runs-on: ubuntu-latest
-    if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
+    if: needs.check_migration_files.outputs.sis_db_migrations == 'false'
     steps:
       - uses: actions/checkout@v5
       - name: 'Login to toska docker registry'
@@ -72,7 +72,7 @@ jobs:
       - build
       - check_migration_files
     runs-on: ubuntu-latest
-    if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
+    if: needs.check_migration_files.outputs.kone_db_migrations == 'false'
     steps:
       - uses: actions/checkout@v5
       - name: 'Download backend image'
@@ -100,7 +100,7 @@ jobs:
       - build
       - check_migration_files
     runs-on: ubuntu-latest
-    if: needs.check_migration_files.outputs.user_db_migrations == 'true'
+    if: needs.check_migration_files.outputs.user_db_migrations == 'false'
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
