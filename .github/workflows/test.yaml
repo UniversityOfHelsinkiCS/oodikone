@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/lint
 
   build:
-    uses: .github/workflows/build.yaml
+    uses: ./.github/workflows/build.yaml
 
   check_migration_files:
     name: Check if new migrations have been added

@@ -23,7 +23,7 @@ jobs:
       username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
       password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
   build:
-    uses: .github/workflows/build.yaml
+    uses: ./.github/workflows/build.yaml
 
   release_frontend:
     name: 'Release frontend'
