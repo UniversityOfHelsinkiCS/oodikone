@@ -21,7 +21,6 @@ jobs:
         uses: ./.github/actions/lint
 
   build:
-    name: 'Build images'
     uses: .github/workflows/build.yaml
 
   check_migration_files:
