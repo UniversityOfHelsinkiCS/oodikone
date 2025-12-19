@@ -35,7 +35,7 @@ export const Faculties = () => {
   const [graduatedGroup, setGraduatedGroup] = useState(false)
   const requiredRights = { fullAccessToStudentData, programmeRights }
 
-  if (!facultyCode) {
+  if (!faculty) {
     const sortedFaculties = faculties.toSorted((a, b) => a.code.localeCompare(b.code))
     return <FacultyList faculties={sortedFaculties} />
   }
@@ -76,7 +76,7 @@ export const Faculties = () => {
             studyProgrammes={studyProgrammes}
           />
         )}
-        {tab === 3 && isAdmin ? <UpdateStatisticsTab id={faculty?.id} /> : null}
+        {tab === 3 && isAdmin ? <UpdateStatisticsTab id={faculty.id} /> : null}
       </Stack>
     </PageLayout>
   )

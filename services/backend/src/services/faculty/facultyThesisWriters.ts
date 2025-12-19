@@ -90,6 +90,7 @@ const calculateCombinedStats = async (
       isBachelor ? wroteThesis : 0,
       isMaster ? wroteThesis : 0,
     ])
+
     programmeTableStats[progId] = tableStatsForProgramme
 
     if (!combinedTableStats.length) {

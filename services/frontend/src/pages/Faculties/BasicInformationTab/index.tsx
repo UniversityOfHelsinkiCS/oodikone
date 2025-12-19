@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
-import { useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { LineGraph } from '@/components/common/LineGraph'
@@ -125,8 +125,8 @@ export const BasicInformationTab = ({
   studyProgrammes,
 }: {
   faculty: GetFacultiesResponse
-  setSpecialGroups: (value: boolean) => void
-  setStudyProgrammes: (value: boolean) => void
+  setSpecialGroups: Dispatch<SetStateAction<boolean>>
+  setStudyProgrammes: Dispatch<SetStateAction<boolean>>
   specialGroups: boolean
   studyProgrammes: boolean
 }) => {
@@ -138,21 +138,21 @@ export const BasicInformationTab = ({
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
 
   const basics = useGetFacultyBasicStatsQuery({
-    id: faculty?.id,
+    id: faculty.id,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
 
   const thesisWriters = useGetFacultyThesisStatsQuery({
-    id: faculty?.id,
+    id: faculty.id,
     yearType,
     studyProgrammeFilter,
     specialGroups: special,
   })
 
   const credits = useGetFacultyCreditStatsQuery({
-    id: faculty?.id,
+    id: faculty.id,
     yearType,
   })
 
@@ -252,7 +252,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <LineGraph
               cypress="students-of-the-faculty"
-              exportFileName={`oodikone_students-of-the-faculty_${faculty?.code}_${getTimestamp()}`}
+              exportFileName={`oodikone_students-of-the-faculty_${faculty.code}_${getTimestamp()}`}
               graphStats={basics.data.studentInfo.graphStats}
               years={basics.data.years}
             />
@@ -281,7 +281,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <LineGraph
               cypress="graduated-of-the-faculty"
-              exportFileName={`oodikon"graduated-of-the-faculty"_${faculty?.code}_${getTimestamp()}`}
+              exportFileName={`oodikon"graduated-of-the-faculty"_${faculty.code}_${getTimestamp()}`}
               graphStats={basics.data.graduationInfo.graphStats}
               years={basics.data.years}
             />
@@ -309,7 +309,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <LineGraph
               cypress="thesis-writers-of-the-faculty"
-              exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty?.code}_${getTimestamp()}`}
+              exportFileName={`oodikone_ThesisWritersOfTheFaculty_${faculty.code}_${getTimestamp()}`}
               graphStats={thesisWriters.data.graphStats}
               years={thesisWriters.data.years}
             />
@@ -345,7 +345,7 @@ export const BasicInformationTab = ({
               <StackedBarChart
                 cypress="credits-produced-by-the-faculty"
                 data={graphStats?.data}
-                exportFileName={`oodikone_credits-produced-by-the-faculty_${faculty?.code}_${getTimestamp()}`}
+                exportFileName={`oodikone_credits-produced-by-the-faculty_${faculty.code}_${getTimestamp()}`}
                 labels={graphStats?.years}
               />
               <InteractiveDataTable
