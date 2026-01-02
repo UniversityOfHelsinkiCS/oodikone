@@ -89,7 +89,6 @@ export const CourseStatistics = () => {
 
   const switchToCourse = (courseCode: string) => {
     setSelected(courseCode)
-    setTab(0)
   }
 
   return (

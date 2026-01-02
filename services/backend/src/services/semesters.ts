@@ -26,7 +26,7 @@ type SemestersAndYears = {
   >
 }
 
-export const getSemesterNames = async (semesterCodes: number[]) => {
+export const getSemesterNamesByCode = async (semesterCodes: number[]): Promise<Record<number, Name>> => {
   const semesters = await SemesterModel.findAll({
     attributes: ['name', 'semestercode'],
     where: {
@@ -35,7 +35,7 @@ export const getSemesterNames = async (semesterCodes: number[]) => {
     raw: true,
   })
 
-  return Object.fromEntries(semesters?.map(({ name, semestercode }) => [semestercode, name]) ?? [])
+  return Object.fromEntries(semesters.map(({ name, semestercode }) => [semestercode, name]))
 }
 
 export const getCurrentSemester = async () => {

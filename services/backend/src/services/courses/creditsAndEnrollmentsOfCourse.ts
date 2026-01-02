@@ -3,7 +3,6 @@ import { Op } from 'sequelize'
 import { EnrollmentState, Unification } from '@oodikone/shared/types'
 import {
   CreditModel,
-  StudentModel,
   SemesterModel,
   OrganizationModel,
   EnrollmentModel,
@@ -12,13 +11,10 @@ import {
 } from '../../models'
 import { getIsOpen } from './helpers'
 
-export const getCreditsForCourses = async (codes: string[], unification: Unification) => {
-  return await CreditModel.findAll({
+export const getCreditsForCourses = async (codes: string[], unification: Unification) =>
+  CreditModel.findAll({
+    attributes: ['grade', 'course_code', 'credits', 'attainment_date', 'student_studentnumber', 'studyright_id'],
     include: [
-      {
-        model: StudentModel,
-        attributes: ['studentnumber'],
-      },
       {
         model: SemesterModel,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
@@ -37,7 +33,6 @@ export const getCreditsForCourses = async (codes: string[], unification: Unifica
     },
     order: [['attainment_date', 'ASC']],
   })
-}
 
 export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
   const studyRights = await SISStudyRightModel.findAll({
@@ -53,39 +48,37 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
     },
   })
 
-  const studyRightMap = studyRights.reduce((obj, cur) => {
-    obj[cur.id] = cur.toJSON()
-    return obj
-  }, {})
-
-  const studyRightIds = Object.keys(studyRightMap)
+  const studyRightIds = studyRights.map(({ id }) => id)
+  const studyRightMap = new Map<
+    string,
+    {
+      studentNumber: string
+      facultyCode: string
+      organization: Pick<OrganizationModel, 'name' | 'code'>
+    }
+  >(studyRights.map(sr => [sr.id, sr.toJSON()]))
 
   const studyRightElements = await SISStudyRightElementModel.findAll({
     attributes: ['code', 'name', 'startDate', 'endDate', 'studyRightId'],
     where: {
-      studyRightId: {
-        [Op.in]: studyRightIds,
-      },
+      studyRightId: { [Op.in]: studyRightIds },
     },
+    raw: true,
   })
 
-  const studentNumberToSrElementsMap = studyRightElements.reduce((obj, cur) => {
-    const studyRight = studyRightMap[cur.studyRightId]
-    const { studentNumber } = studyRight
+  return studyRightElements.reduce((obj, cur) => {
+    const { studentNumber, ...studyRight } = studyRightMap.get(cur.studyRightId)!
     obj[studentNumber] ??= []
-    obj[studentNumber].push({ ...cur.toJSON(), studyRight })
+    obj[studentNumber].push({ ...cur, studyRight })
+
     return obj
   }, {})
-  return studentNumberToSrElementsMap
 }
 
-export const getEnrollmentsForCourses = async (codes: string[], unification: Unification) => {
-  return await EnrollmentModel.findAll({
+export const getEnrollmentsForCourses = async (codes: string[], unification: Unification) =>
+  EnrollmentModel.findAll({
+    attributes: ['studentnumber', 'enrollment_date_time', 'course_code'],
     include: [
-      {
-        model: StudentModel,
-        attributes: ['studentnumber'],
-      },
       {
         model: SemesterModel,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
@@ -105,4 +98,3 @@ export const getEnrollmentsForCourses = async (codes: string[], unification: Uni
       is_open: getIsOpen(unification),
     },
   })
-}
