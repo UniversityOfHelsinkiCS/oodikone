@@ -25,13 +25,8 @@ const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): 
   code: studyRightElement.code,
   name: studyRightElement.name,
   startDate: studyRightElement.startDate,
-  facultyCode: studyRightElement.studyRight.facultyCode || null,
-  organization: studyRightElement.studyRight.organization
-    ? {
-        name: studyRightElement.studyRight.organization.name,
-        code: studyRightElement.studyRight.organization.code,
-      }
-    : null,
+  facultyCode: studyRightElement.studyRight.facultyCode,
+  organization: studyRightElement.studyRight.organization,
 })
 
 const anonymizeStudentNumber = (studentNumber: string, anonymizationSalt: string) => {
@@ -48,16 +43,15 @@ type FormattedCredit = {
   grade: string
   passed: boolean
   studentNumber: string
-  programmes: FormattedProgramme[]
+  programme: FormattedProgramme
   credits: number
-  obfuscated?: boolean
 }
 
 const parseCredit = (
   credit: CreditModel,
   anonymizationSalt: string | null,
-  studentNumberToSrElementsMap: Record<string, Array<SISStudyRightElementModel>>
-) => {
+  studyRightElements: Array<SISStudyRightElementModel>
+): FormattedCredit => {
   const {
     semester,
     grade,
@@ -69,18 +63,23 @@ const parseCredit = (
   } = credit
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
-  const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
   const programmeOfCredit: SISStudyRightElementModel | undefined =
     studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
     studyRightElements
-      .filter(studyRightElement =>
-        dateIsBetween(attainmentDate, studyRightElement.startDate, studyRightElement.endDate)
-      )
-      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())[0] // The newest studyRightElement
+      .filter(({ startDate, endDate }) => dateIsBetween(attainmentDate, startDate, endDate))
+      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+      .at(0) // The newest studyRightElement
 
-  const programmes = programmeOfCredit ? [programmeOfCredit].map(formatStudyRightElement) : []
+  const programme = programmeOfCredit
+    ? formatStudyRightElement(programmeOfCredit)
+    : {
+        code: 'OTHER',
+        name: { en: 'Other', fi: 'Muu', sv: 'Andra' },
+        facultyCode: 'OTHER',
+        organization: { name: { en: 'Other', fi: 'Muu', sv: 'Andra' } },
+      }
 
-  const formattedCredit: FormattedCredit = {
+  return {
     yearCode,
     yearName,
     semesterCode,
@@ -89,17 +88,10 @@ const parseCredit = (
     courseCode,
     grade,
     passed: !CreditModel.failed(credit) || CreditModel.passed(credit) || CreditModel.improved(credit),
-    studentNumber,
-    programmes,
+    studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
+    programme,
     credits,
   }
-
-  if (anonymizationSalt) {
-    formattedCredit.obfuscated = true
-    formattedCredit.studentNumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
-  }
-
-  return formattedCredit
 }
 
 type FormattedEnrollment = {
@@ -110,15 +102,9 @@ type FormattedEnrollment = {
   courseCode: string
   enrollmentDateTime: Date
   studentNumber: string
-  programmes: Array<Record<string, any>>
-  obfuscated?: boolean
 }
 
-const parseEnrollment = (
-  enrollment: EnrollmentModel,
-  anonymizationSalt: string | null,
-  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
-) => {
+const parseEnrollment = (enrollment: EnrollmentModel, anonymizationSalt: string | null): FormattedEnrollment => {
   const {
     studentnumber: studentNumber,
     semester,
@@ -127,25 +113,15 @@ const parseEnrollment = (
   } = enrollment
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
-  const studyRightElements = studentNumberToSrElementsMap[studentNumber] || []
-
-  const formattedEnrollment: FormattedEnrollment = {
+  return {
     yearCode,
     yearName,
     semesterCode,
     semesterName,
     courseCode,
     enrollmentDateTime,
-    studentNumber,
-    programmes: studyRightElements.map(formatStudyRightElement),
+    studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
   }
-
-  if (anonymizationSalt) {
-    formattedEnrollment.obfuscated = true
-    formattedEnrollment.studentNumber = anonymizeStudentNumber(studentNumber, anonymizationSalt)
-  }
-
-  return formattedEnrollment
 }
 
 const getYearlyStatsOfNew = async (
@@ -156,27 +132,22 @@ const getYearlyStatsOfNew = async (
   combineSubstitutions: boolean,
   studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
 ) => {
-  const courseForSubs = await CourseModel.findOne({
+  const course: Pick<CourseModel, 'code' | 'name' | 'substitutions'> | null = await CourseModel.findOne({
+    attributes: ['code', 'name', 'substitutions'],
     where: { code: courseCode },
   })
 
-  let codes =
-    combineSubstitutions && courseForSubs?.substitutions
-      ? sortMainCode([...courseForSubs.substitutions, courseCode])
-      : [courseCode]
+  const substitutedCodes =
+    combineSubstitutions && course?.substitutions ? sortMainCode([...course.substitutions, courseCode]) : [courseCode]
 
-  if (unification === Unification.REGULAR) {
-    codes = codes.filter(course => !getOpenUniCourseCode(course))
-  }
+  const codes =
+    unification === Unification.REGULAR
+      ? substitutedCodes.filter(course => !getOpenUniCourseCode(course))
+      : substitutedCodes
 
-  const [credits, enrollments, course] = await Promise.all([
+  const [credits, enrollments] = await Promise.all([
     getCreditsForCourses(codes, unification),
     getEnrollmentsForCourses(codes, unification),
-    CourseModel.findOne({
-      where: {
-        code: courseCode,
-      },
-    }),
   ])
 
   const counter = new CourseYearlyStatsCounter()
@@ -191,70 +162,54 @@ const getYearlyStatsOfNew = async (
       yearCode,
       yearName,
       attainmentDate,
-      programmes,
+      programme,
       courseCode,
       credits,
-    } = parseCredit(credit, anonymizationSalt, studentNumberToSrElementsMap)
+    } = parseCredit(credit, anonymizationSalt, studentNumberToSrElementsMap[credit.student_studentnumber] ?? [])
+
+    counter.markStudyProgramme(
+      studentNumber,
+      yearCode,
+      passed,
+      credits,
+      programme.code,
+      programme.name,
+      programme.facultyCode,
+      programme.organization
+    )
 
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
-    const unknownProgramme: FormattedProgramme[] = [
-      {
-        code: 'OTHER',
-        name: {
-          en: 'Other',
-          fi: 'Muu',
-          sv: 'Andra',
-        },
-        facultyCode: 'OTHER',
-        organization: {
-          name: {
-            en: 'Other',
-            fi: 'Muu',
-            sv: 'Andra',
-          },
-        },
-      },
-    ]
-    counter.markStudyProgrammes(
-      studentNumber,
-      programmes.length === 0 ? unknownProgramme : programmes,
-      yearCode,
-      passed,
-      credits
-    )
     counter.markCreditToGroup(studentNumber, passed, grade, groupCode, groupName, courseCode, yearCode)
     counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
   }
 
-  enrollments.forEach(enrollment => {
+  for (const enrollment of enrollments) {
     const { studentNumber, semesterCode, semesterName, yearCode, yearName, courseCode, enrollmentDateTime } =
-      parseEnrollment(enrollment, anonymizationSalt, studentNumberToSrElementsMap)
+      parseEnrollment(enrollment, anonymizationSalt)
 
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
 
     counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
-  })
+  }
 
   const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
-  let substitutionCourses: CourseModel[] | undefined
-  if (combineSubstitutions && courseForSubs?.substitutions && courseForSubs.substitutions.length > 0) {
-    substitutionCourses = await CourseModel.findAll({
-      where: {
-        code: {
-          [Op.in]: codes,
-        },
-      },
-      attributes: ['code', 'name'],
-    })
-  }
+  const substitutionCourses: Pick<CourseModel, 'code' | 'name'>[] =
+    combineSubstitutions && course?.substitutions?.length
+      ? await CourseModel.findAll({
+          where: {
+            code: { [Op.in]: codes },
+          },
+          attributes: ['code', 'name'],
+        })
+      : [{ code: course!.code, name: course!.name }]
 
   return {
     ...statistics,
     coursecode: courseCode,
-    alternatives: substitutionCourses ?? [{ code: courseForSubs!.code, name: courseForSubs!.name }],
+    alternatives: substitutionCourses,
     name: course?.name,
   }
 }
@@ -274,7 +229,6 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
   const attainmentDateThreshold = new Date(newestAttainmentDate - 6, 0, 1)
 
   const attainmentsWithinThreshold = await CreditModel.count({
-    attributes: [[dbFn('COUNT', dbCol('id')), 'numAttainments']],
     where: {
       course_code: { [Op.in]: courseCodes },
       attainment_date: { [Op.gt]: attainmentDateThreshold },
@@ -293,57 +247,62 @@ export const getCourseYearlyStats = async (
   anonymizationSalt: string | null,
   combineSubstitutions: boolean
 ) => {
-  const credits = await CreditModel.findAll({
-    attributes: ['student_studentnumber'],
-    where: { course_code: { [Op.in]: courseCodes } },
-  })
-  const enrollments = await EnrollmentModel.findAll({
-    attributes: ['studentnumber'],
-    where: {
-      course_code: {
-        [Op.in]: courseCodes,
+  const [credits, enrollments] = await Promise.all([
+    CreditModel.findAll({
+      attributes: ['student_studentnumber'],
+      where: { course_code: { [Op.in]: courseCodes } },
+    }),
+    EnrollmentModel.findAll({
+      attributes: ['studentnumber'],
+      where: {
+        course_code: {
+          [Op.in]: courseCodes,
+        },
+        state: EnrollmentState.ENROLLED,
       },
-      state: EnrollmentState.ENROLLED,
-    },
-  })
+    }),
+  ])
 
-  const studentNumbers = {}
+  const studentNumbers = new Set<string>()
 
   credits.forEach(credit => {
-    studentNumbers[credit.student_studentnumber] = true
-  })
-  enrollments.forEach(enrollment => {
-    studentNumbers[enrollment.studentnumber] = true
+    studentNumbers.add(credit.student_studentnumber)
   })
 
-  const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap(Object.keys(studentNumbers))
+  enrollments.forEach(enrollment => {
+    studentNumbers.add(enrollment.studentnumber)
+  })
+
+  const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap([...studentNumbers])
 
   const statsRegular = await Promise.all(
     courseCodes.map(async courseCode => {
-      const unifyStats = await getYearlyStatsOfNew(
-        courseCode,
-        separate,
-        Unification.UNIFY,
-        anonymizationSalt,
-        combineSubstitutions,
-        studentNumberToSrElementsMap
-      )
-      const regularStats = await getYearlyStatsOfNew(
-        courseCode,
-        separate,
-        Unification.REGULAR,
-        anonymizationSalt,
-        combineSubstitutions,
-        studentNumberToSrElementsMap
-      )
-      const openStats = await getYearlyStatsOfNew(
-        courseCode,
-        separate,
-        Unification.OPEN,
-        anonymizationSalt,
-        combineSubstitutions,
-        studentNumberToSrElementsMap
-      )
+      const [openStats, regularStats, unifyStats] = await Promise.all([
+        getYearlyStatsOfNew(
+          courseCode,
+          separate,
+          Unification.OPEN,
+          anonymizationSalt,
+          combineSubstitutions,
+          studentNumberToSrElementsMap
+        ),
+        getYearlyStatsOfNew(
+          courseCode,
+          separate,
+          Unification.REGULAR,
+          anonymizationSalt,
+          combineSubstitutions,
+          studentNumberToSrElementsMap
+        ),
+        getYearlyStatsOfNew(
+          courseCode,
+          separate,
+          Unification.UNIFY,
+          anonymizationSalt,
+          combineSubstitutions,
+          studentNumberToSrElementsMap
+        ),
+      ])
 
       return { unifyStats, regularStats, openStats }
     })

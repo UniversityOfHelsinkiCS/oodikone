@@ -6,8 +6,8 @@ export type FormattedProgramme = {
   code: string
   name: Name
   startDate?: Date
-  facultyCode: string | null
-  organization: OrganizationDetails | null
+  facultyCode: string
+  organization: OrganizationDetails
 }
 
 export const getIsOpen = (unification: Unification) => {

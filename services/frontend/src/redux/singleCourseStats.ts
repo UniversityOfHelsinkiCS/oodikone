@@ -4,10 +4,10 @@ import { GetSingleCourseStatsRequest, GetSingleCourseStatsResponse } from '@/typ
 const singleCourseStatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getSingleCourseStats: builder.query<GetSingleCourseStatsResponse, GetSingleCourseStatsRequest>({
-      query: ({ courseCodes, separate, combineSubstitutions }) =>
-        `/v3/courseyearlystats?${courseCodes
-          .map(code => `codes[]=${code}`)
-          .join('&')}&separate=${separate}&combineSubstitutions=${combineSubstitutions}`,
+      query: ({ courseCodes, separate, combineSubstitutions }) => ({
+        url: '/v3/courseyearlystats',
+        params: { codes: courseCodes, separate, combineSubstitutions },
+      }),
     }),
   }),
   overrideExisting: false,
