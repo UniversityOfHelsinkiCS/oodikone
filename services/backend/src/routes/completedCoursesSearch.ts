@@ -42,18 +42,11 @@ router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, re
     return res.status(400).json({ error: 'Courses must be of type array' })
   }
 
-  const answerTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 6000))
-
   // Teachers can also get rights to students via Importer if
   // the students have enrolled to their courses in last 8 months
   // (acual logic a bit different, see Importer)
   const { data: teacherRightsToStudents, error } = importerClient
-    ? await tryCatch<{ data: string[] }>(
-        Promise.race([
-          importerClient.post('/teacher-rights/', { teacherId, studentNumbers }),
-          answerTimeout as Promise<never>, // This will always reject with an Error
-        ])
-      )
+    ? await tryCatch<{ data: string[] }>(importerClient.post('/teacher-rights/', { teacherId, studentNumbers }))
     : { data: null, error: null }
 
   if (error) {
