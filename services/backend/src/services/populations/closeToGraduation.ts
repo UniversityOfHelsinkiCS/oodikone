@@ -286,9 +286,14 @@ export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
     if (dataOnRedis) {
       return JSON.parse(dataOnRedis)
     }
-    const freshData = { ...(await findStudentsCloseToGraduation()), lastUpdated: new Date().toISOString() }
+
+    const students = await findStudentsCloseToGraduation()
+
+    const freshData = { ...students, lastUpdated: new Date().toISOString() }
     await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
+
     return freshData
   }
+
   return findStudentsCloseToGraduation(studentNumbers)
 }

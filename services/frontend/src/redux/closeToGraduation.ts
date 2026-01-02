@@ -1,15 +1,9 @@
 import { RTKApi } from '@/apiConnection'
-import { CloseToGraduationData } from '@oodikone/shared/routes/populations'
-
-type CloseToGraduationResponse = {
-  bachelor: CloseToGraduationData[]
-  lastUpdated: string
-  masterAndLicentiate: CloseToGraduationData[]
-}
+import type { CloseToGraduationResBody } from '@oodikone/shared/routes/closeToGraduation'
 
 const closeToGraduationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getStudentsCloseToGraduation: builder.query<CloseToGraduationResponse, void>({
+    getStudentsCloseToGraduation: builder.query<CloseToGraduationResBody, void>({
       query: () => 'close-to-graduation',
     }),
   }),

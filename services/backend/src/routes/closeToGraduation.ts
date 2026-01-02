@@ -1,22 +1,24 @@
 import { Router } from 'express'
 
-import { findStudentsCloseToGraduation, getCloseToGraduationData } from '../services/populations/closeToGraduation'
+import type { CloseToGraduationResBody } from '@oodikone/shared/routes/closeToGraduation'
+import { getCloseToGraduationData } from '../services/populations/closeToGraduation'
 import { getAllStudentsUserHasInGroups } from '../services/studyGuidanceGroups'
 import { hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
-type CloseToGraduationResBody = Awaited<ReturnType<typeof findStudentsCloseToGraduation>>
-
 router.get<never, CloseToGraduationResBody>('/', async (req, res) => {
   const { user } = req
-  if (hasFullAccessToStudentData(user.roles)) {
-    const result = await getCloseToGraduationData()
-    return res.json(result)
+
+  if (!hasFullAccessToStudentData(user.roles)) {
+    const studentNumbers = await getAllStudentsUserHasInGroups(user.sisPersonId)
+    const result = await getCloseToGraduationData(studentNumbers)
+
+    res.json(result)
   }
-  const studentsInUsersGuidanceGroups = await getAllStudentsUserHasInGroups(user.sisPersonId)
-  const result = await getCloseToGraduationData(studentsInUsersGuidanceGroups)
-  res.json(result)
+
+  const result = await getCloseToGraduationData()
+  return res.json(result)
 })
 
 export default router
