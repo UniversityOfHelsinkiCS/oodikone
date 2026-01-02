@@ -1,4 +1,3 @@
-import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
@@ -7,26 +6,24 @@ import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useGetChangelogQuery } from '@/redux/changelog'
-import { Release } from '@oodikone/shared/types'
+import type { Release } from '@oodikone/shared/types'
 import { ReleaseCard } from './ReleaseCard'
 
 export const Changelog = () => {
   useTitle('Changelog')
-
-  const { data: releaseData, isLoading } = useGetChangelogQuery()
   const [visibleReleases, setVisibleReleases] = useState<Release[]>([])
 
+  const { data: releaseData, isSuccess, isFetching: isLoading } = useGetChangelogQuery()
+
   useEffect(() => {
-    if (!releaseData) {
-      return
-    }
-    setVisibleReleases([...releaseData.filter(filterInternalReleases).slice(0, 20)])
-  }, [releaseData])
+    if (!releaseData) return
+    setVisibleReleases(releaseData.filter(filterInternalReleases).slice(0, 20))
+  }, [isSuccess])
 
   return (
     <PageLayout maxWidth="lg">
       <PageTitle subtitle="What's new in Oodikone" title="Changelog" />
-      <Stack direction="column" divider={<Divider flexItem orientation="vertical" />} gap={1}>
+      <Stack direction="column" gap={2}>
         {visibleReleases.map(release => (
           <ReleaseCard isLoading={isLoading} key={release.title} release={release} />
         ))}
