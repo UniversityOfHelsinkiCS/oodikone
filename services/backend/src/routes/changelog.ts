@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
 import { Release } from '@oodikone/shared/types'
 import { isDev } from '../config'
@@ -8,12 +8,11 @@ const router = Router()
 
 const changelog: { data?: Release[] } = {}
 
-export type ChangelogResBody = Release[]
-
-router.get<never, ChangelogResBody>('/', async (_req: Request, res: Response) => {
+router.get<never, Release[]>('/', async (_, res) => {
   if (changelog.data) {
     return res.status(200).send(changelog.data)
   }
+
   if (isDev) {
     const fakeRelease: Release[] = [
       {
@@ -35,8 +34,11 @@ router.get<never, ChangelogResBody>('/', async (_req: Request, res: Response) =>
         version: '0.0.1',
       },
     ]
+
+    changelog.data = fakeRelease
     return res.status(200).json(fakeRelease)
   }
+
   const response = await axios.get('https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases')
   const releasesFromAPI: Release[] = response.data.map((release: Record<string, any>) => ({
     description: release.body,
@@ -44,6 +46,7 @@ router.get<never, ChangelogResBody>('/', async (_req: Request, res: Response) =>
     title: release.name,
     version: release.tag_name,
   }))
+
   changelog.data = releasesFromAPI
   res.status(200).json(releasesFromAPI)
 })
