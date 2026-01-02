@@ -42,7 +42,7 @@ export const CourseStatistics = () => {
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
   const location = useLocation()
-  const { courseCodes, ...params } = parseQueryParams(location.search)
+  const { courseCodes, separate, combineSubstitutions } = parseQueryParams(location.search)
 
   const codes = JSON.parse(courseCodes ?? '[]')
   const [initialCourseCode] = codes
@@ -56,7 +56,7 @@ export const CourseStatistics = () => {
     data: courseStatsData = {},
     isFetching: isLoading,
     isSuccess,
-  } = useGetCourseStatsQuery({ ...params, codes }, { skip: skipQuery })
+  } = useGetCourseStatsQuery({ codes, separate, combineSubstitutions }, { skip: skipQuery })
 
   useEffect(() => {
     setSelected(initialCourseCode)
