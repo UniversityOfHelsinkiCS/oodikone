@@ -9,30 +9,25 @@ import logger from '../util/logger'
 
 const importerClient = getImporterClient()
 
-const getGroupsFromImporter = async (sisPersonId: string) => {
-  if (!importerClient || !sisPersonId) {
-    return []
-  }
-  const answerTimeout = new Promise(resolve => setTimeout(resolve, 2000))
+const getGroupsFromImporter = async (sisPersonId: string): Promise<StudyGuidanceGroup[]> => {
+  if (!importerClient || !sisPersonId) return []
+
   try {
-    const response = (await Promise.race([
-      importerClient.get(`/person-groups/person/${sisPersonId}`),
-      answerTimeout,
-    ])) as { data: Record<string, StudyGuidanceGroup> }
-    if (!response) {
-      return []
-    }
-    const studyGuidanceGroups: StudyGuidanceGroup[] = Object.values(response.data)
-    return studyGuidanceGroups
+    const response: { data: Record<string, StudyGuidanceGroup> } = await importerClient.get(
+      `/person-groups/person/${sisPersonId}`
+    )
+
+    return response?.data ? Object.values(response.data) : []
   } catch (error) {
-    logger.error("Couldn't fetch users study guidance groups")
+    logger.error('Could not fetch study guidance groups!')
     if (error instanceof AxiosError) {
       logger.error(error.stack)
       logger.error(JSON.stringify(error.response?.data))
       Sentry.captureException(error)
     }
-    return []
   }
+
+  return []
 }
 
 export const getAllGroupsAndStudents = async (sisPersonId: string) => {

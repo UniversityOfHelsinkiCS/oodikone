@@ -14,6 +14,7 @@ const createBasicAuthHeader = () => {
 const toskaImporterClient = axios.create({
   headers: { token: importerToken },
   baseURL: importerUrl,
+  timeout: 10000,
 })
 
 const fdImporterClient = axios.create({
