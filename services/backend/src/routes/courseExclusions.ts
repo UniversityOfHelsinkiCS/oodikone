@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
 import type { ExcludedCoursesResBody, ExcludedCoursesReqBody } from '@oodikone/shared/routes/courseExclusions'
-import { hasFullAccessToStudentData } from 'src/util'
 import { addExcludedCourses, removeExcludedCourses } from '../services/excludedCourses'
+import { hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
