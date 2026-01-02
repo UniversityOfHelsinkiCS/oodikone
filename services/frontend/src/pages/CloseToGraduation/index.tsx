@@ -18,6 +18,7 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { LoadingSection } from '@/components/Loading'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
@@ -37,7 +38,7 @@ const CheckIconWithTitle = ({ visible, title }: { visible: boolean; title?: stri
 
 export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
-  const { data: students } = useGetStudentsCloseToGraduationQuery()
+  const { data: students, isFetching } = useGetStudentsCloseToGraduationQuery()
   const { data: semesterData } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
 
@@ -350,14 +351,17 @@ export const CloseToGraduation = () => {
 
   return (
     <PageLayout maxWidth="lg">
-      <ExportToExcelDialog
-        exportColumns={columns}
-        exportData={exportData}
-        featureName="students_close_to_graduation"
-        onClose={() => setExportModalOpen(false)}
-        open={exportModalOpen}
-      />
       <PageTitle title="Students close to graduation" />
+      {!isFetching && (
+        <ExportToExcelDialog
+          exportColumns={columns}
+          exportData={exportData}
+          featureName="students_close_to_graduation"
+          onClose={() => setExportModalOpen(false)}
+          open={exportModalOpen}
+        />
+      )}
+
       <Box sx={{ my: 3, textAlign: 'center' }}>
         <InfoBox content={closeToGraduationToolTips} />
       </Box>
@@ -372,7 +376,8 @@ export const CloseToGraduation = () => {
           </Typography>
         ) : null}
       </Box>
-      <MaterialReactTable key={selectedTab} table={table} />
+
+      {isFetching ? <LoadingSection /> : <MaterialReactTable key={selectedTab} table={table} />}
     </PageLayout>
   )
 }
