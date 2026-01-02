@@ -1,21 +1,21 @@
 import { RTKApi } from '@/apiConnection'
 
-type CourseExclusionRequestParams = { courseCodes: string[]; curriculumVersion: string; programmeCode: string }
+import type { ExcludedCoursesResBody, ExcludedCoursesReqBody } from '@oodikone/shared/routes/courseExclusions'
 
 const courseExclusionsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    setCourseExclusion: builder.mutation<void, CourseExclusionRequestParams>({
+    setCourseExclusion: builder.mutation<ExcludedCoursesResBody, ExcludedCoursesReqBody>({
       query: ({ courseCodes, curriculumVersion, programmeCode }) => ({
-        url: `/v3/course-exclusions/${programmeCode}`,
+        url: `/v3/course-exclusions/`,
         method: 'POST',
-        body: { courseCodes, curriculumVersion },
+        body: { courseCodes, curriculumVersion, programmeCode },
       }),
     }),
-    removeCourseExclusion: builder.mutation<void, CourseExclusionRequestParams>({
+    removeCourseExclusion: builder.mutation<ExcludedCoursesResBody, ExcludedCoursesReqBody>({
       query: ({ courseCodes, curriculumVersion, programmeCode }) => ({
-        url: `/v3/course-exclusions/${programmeCode}`,
+        url: `/v3/course-exclusions/`,
         method: 'DELETE',
-        body: { courseCodes, curriculumVersion },
+        body: { courseCodes, curriculumVersion, programmeCode },
       }),
     }),
   }),
