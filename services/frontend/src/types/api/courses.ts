@@ -1,4 +1,3 @@
-import { CourseStat } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
 
 export type GetCourseSearchResultResponse = {
@@ -24,16 +23,4 @@ export type GetCourseSearchResultRequest = {
   code?: string
   combineSubstitutions?: boolean
   includeSpecial?: boolean
-}
-
-export type GetSingleCourseStatsResponse = {
-  openStats: CourseStat
-  regularStats: CourseStat
-  unifyStats: CourseStat
-}[]
-
-export type GetSingleCourseStatsRequest = {
-  courseCodes: string[]
-  separate: boolean
-  combineSubstitutions: boolean
 }
