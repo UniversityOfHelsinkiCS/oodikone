@@ -70,7 +70,10 @@ export const getCourseStats = (
 export const getCourseAlternativeCodes = (
   courseStats: Record<string, CourseStat>,
   selectedCourse: string | undefined
-): string[] => courseStats[selectedCourse!]?.alternatives?.map(({ code }) => code) ?? []
+): string[] =>
+  [selectedCourse!].concat(
+    courseStats[selectedCourse!]?.alternatives?.map(({ code }) => code).filter(code => code !== selectedCourse)
+  )
 
 export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
   Object.fromEntries(
