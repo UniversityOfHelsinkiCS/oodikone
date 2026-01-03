@@ -13,7 +13,15 @@ import { getIsOpen } from './helpers'
 
 export const getCreditsForCourses = async (codes: string[], unification: Unification) =>
   CreditModel.findAll({
-    attributes: ['grade', 'course_code', 'credits', 'attainment_date', 'student_studentnumber', 'studyright_id'],
+    attributes: [
+      'grade',
+      'course_code',
+      'credits',
+      'attainment_date',
+      'student_studentnumber',
+      'studyright_id',
+      'credittypecode',
+    ],
     include: [
       {
         model: SemesterModel,
