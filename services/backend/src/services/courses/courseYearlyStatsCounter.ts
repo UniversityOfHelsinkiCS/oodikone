@@ -232,7 +232,7 @@ export class CourseYearlyStatsCounter {
         students: {
           ...group.students,
           grades: Object.entries(group.students.grades)
-            .map(([_, { grade, passed }]) => (passed ? grade : '0'))
+            .map(([studentNumber, { grade, passed }]) => [studentNumber, passed ? grade : '0'])
             .reduce<Grades>((grades, [studentNumber, grade]) => {
               grades[grade] ??= []
               grades[grade].push(studentNumber)
