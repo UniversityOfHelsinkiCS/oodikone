@@ -222,7 +222,7 @@ describe('Basic user', () => {
 
       cy.wait('@coursestats').its('response.statusCode').should('be.oneOf', [200, 304])
       cy.contains(
-        'Population of course Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
+        'Population of course Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
       )
       cy.contains('Showing 4 out of 4 students')
 
