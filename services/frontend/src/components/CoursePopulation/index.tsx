@@ -28,7 +28,6 @@ import { useDebouncedState } from '@/hooks/debouncedState'
 import { useTitle } from '@/hooks/title'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { useGetSemestersQuery } from '@/redux/semesters'
-import { useGetSingleCourseStatsQuery } from '@/redux/singleCourseStats'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
@@ -41,12 +40,14 @@ import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 
 export const CoursePopulation = () => {
-  const location = useLocation()
-  const { getTextIn } = useLanguage()
-  const [codes, setCodes] = useState<string[]>([])
   useTitle('Course population')
 
-  const { coursecodes, from, to, separate, unifyCourses, combineSubstitutions } = parseQueryParams(location.search)
+  const location = useLocation()
+  const { getTextIn } = useLanguage()
+
+  const [codes, setCodes] = useState<string[]>([])
+
+  const { coursecodes, from, to, separate, unifyCourses } = parseQueryParams(location.search)
 
   const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
@@ -56,9 +57,12 @@ export const CoursePopulation = () => {
     unifyCourses,
   })
 
+  // HACK: There should be a way to infer this but at least we don't fetch the whole database now...
+  const courseName = population?.coursestatistics.courses.find(course => course.code === codes[0])?.name ?? null
+
   useEffect(() => {
     const parsedCourseCodes = JSON.parse(coursecodes)
-    setCodes(parsedCourseCodes)
+    if (parsedCourseCodes.length) setCodes(parsedCourseCodes)
   }, [coursecodes])
 
   const studentToTargetCourseDateMap = useMemo(
@@ -72,11 +76,6 @@ export const CoursePopulation = () => {
     years: semesterYears,
     currentSemester,
   } = semesters ?? { semesters: {}, years: {}, currentSemester: null }
-
-  const { data: [courseData] = [] } = useGetSingleCourseStatsQuery(
-    { courseCodes: codes, separate, combineSubstitutions },
-    { skip: codes.length === 0 }
-  )
 
   const getFromToDates = (from: number, to: number, separate: boolean) => {
     if (semestersFetching) return {}
@@ -100,9 +99,7 @@ export const CoursePopulation = () => {
 
   const dateRange = `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
-  const header = courseData
-    ? `${getTextIn(courseData[unifyCourses].name)} ${dateRange} ${getUnifyTextIn(unifyCourses)}`
-    : null
+  const header = courseName ? `${getTextIn(courseName)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
 
   const subHeader = codes.join(', ')
 
@@ -127,13 +124,7 @@ export const CoursePopulation = () => {
     {
       title: 'Grade distribution',
       content: (
-        <CoursePopulationGradeDist
-          courseCodes={codes}
-          from={dateFrom}
-          singleCourseStats={courseData}
-          students={filteredStudents}
-          to={dateTo}
-        />
+        <CoursePopulationGradeDist courseCodes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
       ),
     },
     {

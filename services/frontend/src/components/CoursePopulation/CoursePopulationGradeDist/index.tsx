@@ -11,18 +11,15 @@ import { PercentageBar } from '@/components/common/PercentageBar'
 import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
-import { GetSingleCourseStatsResponse } from '@/types/api/courses'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({
-  singleCourseStats,
   students,
   courseCodes,
   from,
   to,
 }: {
-  singleCourseStats: GetSingleCourseStatsResponse[number]
   students: FormattedStudent[]
   courseCodes: string[]
   from: string
@@ -30,7 +27,7 @@ export const CoursePopulationGradeDist = ({
 }) => {
   const courseGrades: { grade: string; amount: number }[] = []
 
-  if (students && singleCourseStats?.unifyStats?.alternatives) {
+  if (students) {
     const grades = {}
 
     students.forEach(student => {
