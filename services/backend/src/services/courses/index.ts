@@ -87,7 +87,7 @@ const parseCredit = (
     attainmentDate,
     courseCode,
     grade,
-    passed: !CreditModel.failed(credit) || CreditModel.passed(credit) || CreditModel.improved(credit),
+    passed: !CreditModel.failed(credit),
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
     programme,
     credits,
