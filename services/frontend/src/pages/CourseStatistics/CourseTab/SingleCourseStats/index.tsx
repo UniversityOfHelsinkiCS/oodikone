@@ -420,13 +420,11 @@ export const SingleCourseStats = ({
   }
 
   const showPopulation = () => {
-    const from = fromYear
-    const to = toYear
     const queryObject = {
-      from,
-      to,
-      coursecodes: JSON.stringify(stats.alternatives.map(course => course.code)),
-      separate: false,
+      from: fromYear,
+      to: toYear,
+      coursecodes: JSON.stringify(alternatives),
+      separate,
       unifyCourses: openOrRegular,
     }
     const searchString = queryParamsToString(queryObject)
