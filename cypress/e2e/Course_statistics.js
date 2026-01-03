@@ -308,12 +308,12 @@ describe('Basic user', () => {
   it('On searches with multiple courses, has correct links on the Course tab', () => {
     cy.intercept({
       pathname: '/api/v2/coursesmulti',
-      query: { code: 'TKT' },
+      query: { code: 'BSCS' },
     }).as('courses')
 
     cy.intercept({
       pathname: '/api/v3/courseyearlystats',
-      query: { 'codes[]': 'TKT20001', 'codes[]': 'TKT10002' },
+      query: { 'codes[]': 'BSCS1003', 'codes[]': 'BSCS1001' },
     }).as('yearlystats')
 
     cy.intercept({
@@ -324,16 +324,16 @@ describe('Basic user', () => {
     cy.cs('select-multiple-courses-toggle').click()
     cy.cs('select-multiple-courses-toggle').should('have.class', 'Mui-checked')
 
-    searchByCourseCode('TKT')
+    searchByCourseCode('BSCS')
     cy.wait('@courses').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.cs(`course-TKT20001`).click()
-    cy.cs(`course-TKT10002`).click()
+    cy.cs(`course-BSCS1003`).click()
+    cy.cs(`course-BSCS1001`).click()
 
     cy.contains('Fetch statistics').should('be.enabled')
     cy.contains('Fetch statistics').click()
 
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.url().should('contain', 'courseCodes=%5B%22TKT10002%22%2C%22TKT20001%22%5D')
+    cy.url().should('contain', 'courseCodes=%5B%22BSCS1001%22%2C%22BSCS1003%22%5D')
 
     cy.cs('course-population-for-2023-2024').click()
     cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
@@ -343,11 +343,11 @@ describe('Basic user', () => {
     //       necessary if the test is flaky.
     cy.go('back')
     cy.cs('CourseSelector').click()
-    cy.cs('CourseSelectorOptionTKT20001').click()
+    cy.cs('CourseSelectorOptionBSCS1003').click()
     // Check the link has updated correctly
-    cy.cs('course-population-for-2022-2023').invoke('attr', 'href').should('include', 'TKT20001')
+    cy.cs('course-population-for-2022-2023').invoke('attr', 'href').should('include', 'BSCS1003')
     cy.cs('course-population-for-2022-2023').click()
-    cy.contains('Population of course Tietorakenteet ja algoritmit')
+    cy.contains('Population of course Data Structures and Algorithms 2022-2023 (open and normal)')
   })
 
   it('Searching course by name displays right courses', () => {
