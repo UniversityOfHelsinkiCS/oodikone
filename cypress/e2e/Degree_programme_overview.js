@@ -319,7 +319,7 @@ describe('Degree programme overview', () => {
 
     it('Students of the degree programme are shown correctly', () => {
       const tableContents = [
-        // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
+        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 1],
         ['2022 - 2023', 26, 25, 0, 0, 24, 2, 19, 7, 0, 25, 1],
         ['2021 - 2022', 38, 29, 0, 0, 33, 5, 29, 9, 0, 36, 4],
@@ -465,7 +465,7 @@ describe('Degree programme overview', () => {
       it('Students of the study track are shown correctly', () => {
         cy.cs('study-track-overview-section').contains('Students of the study track MAT-MAT by starting year')
         const tableContents = [
-          // [Year, All, Started studying, Present, Absent, Inactive, Graduated, Men, Women, Other/Unknown, Finland, Other]
+          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
           ['2022 - 2023', 3, 3, 0, 0, 1, 2, 2, 1, 0, 3, 0],
           ['2021 - 2022', 5, 1, 0, 0, 1, 4, 3, 2, 0, 5, 0],
           ['2020 - 2021', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],

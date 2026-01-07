@@ -115,7 +115,7 @@ export const getSemesterEnrollmentsContent =
             return 'Enrolled as present'
           case EnrollmentType.ABSENT:
             return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-          case EnrollmentType.INACTIVE:
+          case EnrollmentType.PASSIVE:
             return 'Not enrolled'
           default:
             return 'No study right'
@@ -128,7 +128,7 @@ export const getSemesterEnrollmentsContent =
             return 'present'
           case EnrollmentType.ABSENT:
             return statutoryAbsence ? 'absent-statutory' : 'absent'
-          case EnrollmentType.INACTIVE:
+          case EnrollmentType.PASSIVE:
             return 'passive'
           default:
             return 'none'

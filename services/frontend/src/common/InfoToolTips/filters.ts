@@ -15,7 +15,7 @@ export const filterToolTips = {
   studyRightStatus: `
     Opiskeluoikeus on **aktiivinen** (active), jos opiskelija on ilmoittautunut läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle.
 
-    Opiskeluoikeus on **passiivinen** (inactive), jos opiskelija ei ole ilmoittautunut läsnä- eikä poissaolevaksi käynnissä olevalle lukukaudelle.
+    Opiskeluoikeus on **passiivinen** (passive), jos opiskelija ei ole ilmoittautunut läsnä- eikä poissaolevaksi käynnissä olevalle lukukaudelle.
 
     Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Valmistuneet opiskelijat on **suodatettu pois** molemmista kategorioista.
   `,

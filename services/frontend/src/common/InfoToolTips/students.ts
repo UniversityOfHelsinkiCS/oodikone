@@ -4,7 +4,7 @@ export const studentToolTips = {
 
     **Active:** Student has a semester enrollment to the corresponding programme as present.  
     **Absent:** Student has a semester enrollment to the corresponding programme as absent.  
-    **Inactive:** Student has not enrolled to the corresponding programme this semester.  
+    **Passive:** Student has not enrolled to the corresponding programme this semester.  
     **Cancelled:** Study right for the corresponding programme is cancelled.  
     **Graduated:** Student has graduated from the corresponding programme.
   `,

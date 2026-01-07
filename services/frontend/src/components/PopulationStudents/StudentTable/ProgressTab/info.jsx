@@ -34,7 +34,7 @@ export const TableInfo = () => (
       <span className="enrollment-label label-absent" style={{ margin: 'auto 0' }} />: Student has enrolled as absent.
     </Typography>
     <Typography sx={{ display: 'flex' }}>
-      <span className="enrollment-label label-passive" style={{ margin: 'auto 0' }} />: Inactive: Student did not enroll
+      <span className="enrollment-label label-passive" style={{ margin: 'auto 0' }} />: Passive: Student did not enroll
       at all.
     </Typography>
     <Typography sx={{ display: 'flex' }}>

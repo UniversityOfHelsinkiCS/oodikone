@@ -21,7 +21,7 @@ export const joinProgrammes = (
       const name = getTextIn(programme.name)
       if (includeMeta) {
         if (programme.graduated) return `${name} (graduated)`
-        if (!programme.active) return `${name} (inactive)`
+        if (!programme.active) return `${name} (passive)`
       }
       return name
     })

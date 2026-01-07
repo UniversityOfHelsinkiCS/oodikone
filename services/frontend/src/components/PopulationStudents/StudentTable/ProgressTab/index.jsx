@@ -201,7 +201,7 @@ export const ProgressTable = ({ curriculum, students, months, programme, studyGu
     0: 'No information',
     1: 'Active',
     2: 'Absent',
-    3: 'Inactive',
+    3: 'Passive',
   }
 
   const getSemesterEnrollmentVal = (student, semesters) => {

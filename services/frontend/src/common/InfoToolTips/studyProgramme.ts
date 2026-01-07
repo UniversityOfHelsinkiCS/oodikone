@@ -113,9 +113,9 @@ export const studyProgrammeToolTips: Record<string, string> = {
     - **Present**: Käynnissä olevalle lukukaudelle **läsnäolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
     - **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
     - **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
-    - **Inactive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
+    - **Passive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
 
-    Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Inactive”.
+    Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
 
     Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon. **Citizenships**-kategoriat (**Finland** ja **Other**) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
 

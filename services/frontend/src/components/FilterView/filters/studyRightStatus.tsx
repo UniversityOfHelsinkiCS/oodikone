@@ -27,14 +27,14 @@ const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
     ? {
         All: () => toggle(null, false),
         [`Active ${restOfTitle}`]: () => toggle(true, false),
-        [`Inactive ${restOfTitle}`]: () => toggle(false, false),
+        [`Passive ${restOfTitle}`]: () => toggle(false, false),
         [`Active ${typeOfCombined} study right`]: () => toggle(true, true),
-        [`Inactive ${typeOfCombined} study right`]: () => toggle(false, true),
+        [`Passive ${typeOfCombined} study right`]: () => toggle(false, true),
       }
     : {
         All: () => toggle(null, false),
         [`Active ${restOfTitle}`]: () => toggle(true, false),
-        [`Inactive ${restOfTitle}`]: () => toggle(false, false),
+        [`Passive ${restOfTitle}`]: () => toggle(false, false),
       }
 
   const modeOptions = Object.keys(modeObject).map(key => ({
@@ -81,7 +81,7 @@ export const studyRightStatusFilter = createFilter({
     const currentSemesterCode = currentSemester.semestercode
     const enrollment = studyRight.semesterEnrollments?.find(enrollment => enrollment.semester === currentSemesterCode)
     const isActiveStudyRight = [EnrollmentType.PRESENT, EnrollmentType.ABSENT].includes(
-      enrollment?.type ?? EnrollmentType.INACTIVE
+      enrollment?.type ?? EnrollmentType.PASSIVE
     )
 
     if (!showBachelorAndMaster) {
