@@ -113,7 +113,7 @@ export const StudyrightsTable = ({
   if (studyRightRows.length === 0) return null
 
   const RenderStatus = ({ studyRight }: { studyRight: (typeof studyRightRows)[number] }) => {
-    let text = <span style={{ color: 'red', fontWeight: 'bolder' }}>INACTIVE</span>
+    let text = <span style={{ color: 'red', fontWeight: 'bolder' }}>PASSIVE</span>
 
     if (studyRight.graduated) {
       text = (

@@ -55,11 +55,11 @@ The `semester_enrollments` column is an array of JSON objects. Each object conta
 
 The `type` field represents one of the following enrollment types. The `semester` field refers to a semester code, defined as `semestercode` in the model Semester.
 
-| value | meaning  | notes                            |
-| ----: | :------- | :------------------------------- |
-|     1 | Present  |                                  |
-|     2 | Absent   |                                  |
-|     3 | Inactive | neither 1 or 2 has been declared |
+| value | meaning | notes                            |
+| ----: | :------ | :------------------------------- |
+|     1 | Present |                                  |
+|     2 | Absent  |                                  |
+|     3 | Passive | neither 1 or 2 has been declared |
 
 ## Credit type code
 

@@ -58,7 +58,7 @@ export const getSemestersPresentFunctions = ({
           return 'Enrolled as present'
         case EnrollmentType.ABSENT:
           return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-        case EnrollmentType.INACTIVE:
+        case EnrollmentType.PASSIVE:
           return 'Not enrolled'
         default:
           return 'No study right'
@@ -71,7 +71,7 @@ export const getSemestersPresentFunctions = ({
           return 'present'
         case EnrollmentType.ABSENT:
           return statutoryAbsence ? 'absent-statutory' : 'absent'
-        case EnrollmentType.INACTIVE:
+        case EnrollmentType.PASSIVE:
           return 'passive'
         default:
           return 'none'
@@ -118,7 +118,7 @@ export const getSemestersPresentFunctions = ({
   const getSemesterEnrollmentsVal = (studyright: CloseToGraduationData['studyright']) => {
     const enrollmentsToCount = studyright?.semesterEnrollments ?? []
 
-    /* Enrolled as present or non-statutory absence will add to the count (should inactive count too?) */
+    /* Enrolled as present or non-statutory absence will add to the count (should passive count too?) */
     return enrollmentsToCount.reduce(
       (acc, cur) =>
         acc +

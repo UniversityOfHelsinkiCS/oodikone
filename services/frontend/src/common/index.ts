@@ -45,7 +45,7 @@ export const getStudyRightStatusText = (
   if (programme.cancelled) return 'Cancelled'
   if (semesterEnrollmentAbsence(semestercode ?? NaN, studyRight?.semesterEnrollments)) return 'Absent'
   if (programme.active) return 'Active'
-  return 'Inactive'
+  return 'Passive'
 }
 
 export const getStudentTotalCredits = (
@@ -173,19 +173,19 @@ export const getAllProgrammesOfStudent = (studyRights: FormattedStudent['studyRi
 
 /**
  * @param targetSemester used for checking if study right was active at the time
- * @param filterInactive filters out programmes associated with inactive study rights
+ * @param filterPassive filters out programmes associated with passive study rights
  * @param date only consider programmes that the student had started in prior to the date
  */
 export const getNewestProgrammeOfStudentAt = (
   studyRights: FormattedStudent['studyRights'],
   targetSemester: number | undefined,
-  filterInactive?: boolean,
+  filterPassive?: boolean,
   date?: string
 ) => {
   if (!targetSemester) return null
 
   const allProgrammes = getAllProgrammesOfStudent(studyRights, targetSemester)
-  const programmes = filterInactive ? allProgrammes.filter(prog => prog.active) : allProgrammes
+  const programmes = filterPassive ? allProgrammes.filter(prog => prog.active) : allProgrammes
 
   if (!date) return programmes.at(0) ?? null
 

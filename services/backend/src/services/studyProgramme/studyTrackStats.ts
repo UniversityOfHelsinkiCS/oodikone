@@ -82,7 +82,7 @@ const getEmptyYear = () => ({
   started: 0,
   present: 0,
   absent: 0,
-  inactive: 0,
+  passive: 0,
   graduated: 0,
   graduatedCombinedProgramme: 0,
   male: 0,
@@ -128,8 +128,8 @@ const combineStats = (
         getPercentage(yearStats.present, yearStats.all),
         yearStats.absent,
         getPercentage(yearStats.absent, yearStats.all),
-        yearStats.inactive,
-        getPercentage(yearStats.inactive, yearStats.all),
+        yearStats.passive,
+        getPercentage(yearStats.passive, yearStats.all),
         yearStats.graduated,
         getPercentage(yearStats.graduated, yearStats.all),
         yearStats.male,
@@ -244,7 +244,7 @@ const getMainStatsByTrackAndYear = async (
       } else if (currentSemesterStatus === EnrollmentType.ABSENT) {
         yearlyStats[year][programmeOrStudyTrack].absent += 1
       } else {
-        yearlyStats[year][programmeOrStudyTrack].inactive += 1
+        yearlyStats[year][programmeOrStudyTrack].passive += 1
       }
     }
 

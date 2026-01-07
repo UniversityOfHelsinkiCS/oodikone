@@ -36,7 +36,7 @@ All things listed below should work automatically, if new combinations are done.
 
 - _Students of the studyprogramme by starting year_
   - Graduated field separated for both programmes
-  - All = currently enrolled + absent + inactive + graduated licentiate
+  - All = currently enrolled + absent + passive + graduated licentiate
 - _Progress of students of the studyprogramme by starting year_
   - computed for whole bachelor + master/licentiate studyright period
 - _Average graduation times_
@@ -85,7 +85,7 @@ All things listed below should work automatically, if new combinations are done.
 
 - **Graduated from programme** - possibility to filter out students based on graduation either in bachelor's or master's.
 
-- **Studyright status** - active or inactive based on the chosen degree
+- **Studyright status** - active or passive based on the chosen degree
 
 - **Studytrack filter** (needs programme code) is not touched at the moment, thus **may need future manual work**.
 

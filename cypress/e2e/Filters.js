@@ -273,12 +273,12 @@ describe('Population Statistics with Bachelor + Master', { testIsolation: false 
     checkFilteredStudentCount(0)
 
     // Non-Bachelor
-    cy.get('input[name="studyRightStatusFilter"][value="Inactive Bachelor study right"]').click()
-    cy.get('input[name="studyRightStatusFilter"][value="Inactive Bachelor study right"]').should('be.checked')
+    cy.get('input[name="studyRightStatusFilter"][value="Passive Bachelor study right"]').click()
+    cy.get('input[name="studyRightStatusFilter"][value="Passive Bachelor study right"]').should('be.checked')
     checkFilteredStudentCount(5)
     // Non-Master (combined)
-    cy.get('input[name="studyRightStatusFilter"][value="Inactive Master study right"]').click()
-    cy.get('input[name="studyRightStatusFilter"][value="Inactive Master study right"]').should('be.checked')
+    cy.get('input[name="studyRightStatusFilter"][value="Passive Master study right"]').click()
+    cy.get('input[name="studyRightStatusFilter"][value="Passive Master study right"]').should('be.checked')
     checkFilteredStudentCount(24)
 
     cy.cs('studyRightStatusFilter-clear').click()
