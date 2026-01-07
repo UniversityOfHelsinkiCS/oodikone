@@ -15,7 +15,7 @@ export const FacultyGraduationsTab = () => {
   const [medianMode, setMedianMode] = useState(false)
 
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Section
         cypress="average-graduation-times"
         infoBoxContent={facultyToolTips.averageGraduationTimes}

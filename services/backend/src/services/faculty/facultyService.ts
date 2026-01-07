@@ -78,16 +78,9 @@ export const setBasicStats = async (
 ) => {
   const { id } = data
   const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: new Date().toISOString(),
-  }
-  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') {
-    return null
-  }
-  return dataToRedis
+  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(data))
+
+  return setOperationStatus === 'OK'
 }
 
 export const getBasicStats = async (
@@ -98,10 +91,8 @@ export const getBasicStats = async (
 ) => {
   const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
-  if (!dataFromRedis) {
-    return null
-  }
-  return JSON.parse(dataFromRedis) as BasicData & { status: string; lastUpdated: string }
+
+  return dataFromRedis ? (JSON.parse(dataFromRedis) as BasicData) : null
 }
 
 type ProgrammeNames = Record<string, Name & { code: string }>
@@ -117,8 +108,6 @@ type ThesisWriterData = {
   programmeTableStats: Record<string, (string | number)[][]>
   titles: string[]
   programmeNames: ProgrammeNames
-  status: string
-  lastUpdated: string
 }
 
 export const setThesisWritersStats = async (
@@ -129,14 +118,7 @@ export const setThesisWritersStats = async (
 ) => {
   const { id } = data
   const redisKey = createRedisKeyForThesiswriters(id, yearType, programmeFilter, specialGroups)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: new Date().toISOString(),
-  }
-  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') return null
-  return dataToRedis
+  await redisClient.set(redisKey, JSON.stringify(data))
 }
 
 export const getThesisWritersStats = async (
@@ -150,7 +132,7 @@ export const getThesisWritersStats = async (
   if (!dataFromRedis) {
     return null
   }
-  return JSON.parse(dataFromRedis) as ThesisWriterData & { status: string; lastUpdated: string }
+  return JSON.parse(dataFromRedis) as ThesisWriterData
 }
 
 type MediansAndProgrammes = {
@@ -178,16 +160,7 @@ type GraduationData = {
 export const setGraduationStats = async (data: GraduationData, programmeFilter: ProgrammeFilter) => {
   const { id } = data
   const redisKey = createRedisKeyForGraduationTimeStats(id, programmeFilter)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: new Date().toISOString(),
-  }
-  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') {
-    return null
-  }
-  return dataToRedis
+  await redisClient.set(redisKey, JSON.stringify(data))
 }
 
 export const getGraduationStats = async (id: string, programmeFilter: ProgrammeFilter, keepGraduationTimes = false) => {
@@ -196,7 +169,7 @@ export const getGraduationStats = async (id: string, programmeFilter: ProgrammeF
   if (!dataFromRedis) {
     return null
   }
-  const data = JSON.parse(dataFromRedis) as GraduationData & { status: string; lastUpdated: string }
+  const data = JSON.parse(dataFromRedis) as GraduationData
   if (!keepGraduationTimes) {
     removeGraduationTimes(data)
   }
@@ -210,25 +183,14 @@ export const setFacultyProgressStats = async (
 ) => {
   const { id } = data
   const redisKey = createRedisKeyForFacultyProgress(id, specialGroups, graduated)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: new Date().toISOString(),
-  }
-  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') {
-    return null
-  }
-  return dataToRedis
+  await redisClient.set(redisKey, JSON.stringify(data))
 }
 
 export const getFacultyProgressStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
   const redisKey = createRedisKeyForFacultyProgress(id, specialGroups, graduated)
   const dataFromRedis = await redisClient.get(redisKey)
-  if (!dataFromRedis) {
-    return null
-  }
-  return JSON.parse(dataFromRedis) as FacultyProgressData & { status: string; lastUpdated: string }
+
+  return dataFromRedis ? (JSON.parse(dataFromRedis) as FacultyProgressData) : null
 }
 
 type FacultyStudentsData = {
@@ -251,23 +213,12 @@ export const setFacultyStudentStats = async (
 ) => {
   const { id } = data
   const redisKey = createRedisKeyForFacultyStudents(id, specialGroups, graduated)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: new Date().toISOString(),
-  }
-  const setOperationStatus = await redisClient.set(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') {
-    return null
-  }
-  return dataToRedis
+  await redisClient.set(redisKey, JSON.stringify(data))
 }
 
 export const getFacultyStudentStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
   const redisKey = createRedisKeyForFacultyStudents(id, specialGroups, graduated)
   const dataFromRedis = await redisClient.get(redisKey)
-  if (!dataFromRedis) {
-    return null
-  }
-  return JSON.parse(dataFromRedis) as FacultyStudentsData & { status: string; lastUpdated: string }
+
+  return dataFromRedis ? (JSON.parse(dataFromRedis) as FacultyStudentsData) : null
 }

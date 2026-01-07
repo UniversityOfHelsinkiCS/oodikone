@@ -136,7 +136,5 @@ export const combineFacultyThesisWriters = async (
     programmeTableStats,
     titles: ['Code', 'All', 'Bachelors', 'Masters'],
     programmeNames,
-    status: 'Done',
-    lastUpdated: '',
   }
 }

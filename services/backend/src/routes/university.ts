@@ -45,7 +45,7 @@ router.get('/allprogressstats', async (req: GetProgressStatsRequest, res: Respon
   const codeToData: Record<string, FacultyProgressData> = {}
 
   for (const facultyCode of facultyCodes) {
-    let data: any = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
+    let data = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
     if (!data) {
       logger.info(`Data missing from server: Refreshing progress faculty data for faculty ${facultyCode}`)
       const programmes = await getDegreeProgrammesOfFaculty(facultyCode, true)

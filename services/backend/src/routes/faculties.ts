@@ -46,12 +46,14 @@ interface GetStatsRequest extends Request {
 router.get('/:id/basicstats', auth.roles(['facultyStatistics']), async (req: GetStatsRequest, res: Response) => {
   const facultyId = req.params.id
   const code = await getFacultyCodeById(facultyId)
+
   if (!code) {
     return res.status(422).end()
   }
 
   const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
   const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
+
   if (data) {
     return res.json(data)
   }
@@ -61,12 +63,12 @@ router.get('/:id/basicstats', auth.roles(['facultyStatistics']), async (req: Get
     return res.status(422).end()
   }
 
-  // TODO: The types could be handled better. Possible null value is causing issues with TS.
-  let updatedStats: any = await combineFacultyBasics(code, programmes, yearType, specialGroups)
+  const updatedStats = await combineFacultyBasics(code, programmes, yearType, specialGroups)
   if (updatedStats) {
-    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
+    await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
-  return res.json(updatedStats)
+
+  return res.json(updatedStats ?? null)
 })
 
 interface GetCreditStatsRequest extends Request {
@@ -101,11 +103,11 @@ router.get('/:id/thesisstats', auth.roles(['facultyStatistics']), async (req: Ge
     return res.status(422).end()
   }
 
-  let updatedStats: any = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
+  const updatedStats = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
   if (updatedStats) {
-    updatedStats = await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
+    await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
-  return res.json(updatedStats)
+  return res.json(updatedStats ?? null)
 })
 
 interface GetGraduationStatsRequest extends Request {
@@ -135,10 +137,11 @@ router.get(
       return res.status(422).end()
     }
 
-    let updatedStats: any = await countGraduationTimes(code, programmes)
+    const updatedStats = await countGraduationTimes(code, programmes)
     if (updatedStats) {
-      updatedStats = await setGraduationStats(updatedStats, programmeFilter)
+      await setGraduationStats(updatedStats, programmeFilter)
     }
+
     return res.json(updatedStats)
   }
 )
@@ -171,9 +174,9 @@ router.get(
       return res.json(data)
     }
 
-    let updatedStats: any = await combineFacultyStudentProgress(code, programmes, specialGroups, graduated)
+    const updatedStats = await combineFacultyStudentProgress(code, programmes, specialGroups, graduated)
     if (updatedStats) {
-      updatedStats = await setFacultyProgressStats(updatedStats, specialGroups, graduated)
+      await setFacultyProgressStats(updatedStats, specialGroups, graduated)
     }
     return res.json(updatedStats)
   }
@@ -207,7 +210,7 @@ router.get(
     const updatedStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
 
     if (updatedStats) {
-      void setFacultyStudentStats(updatedStats, specialGroups, graduated)
+      await setFacultyStudentStats(updatedStats, specialGroups, graduated)
     }
     return res.json(updatedStats)
   }
