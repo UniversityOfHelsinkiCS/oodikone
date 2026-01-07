@@ -5,21 +5,14 @@ import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'
 
-const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: FilterTrayProps) => {
-  const { code } = args
-  const { selected } = options
+const StudyTrackFilterCard = ({ onOptionsChange, options }: FilterTrayProps) => {
+  const { selected, studyTracks } = options as { selected: string[]; studyTracks: StudyTrack[] }
   const { getTextIn } = useLanguage()
 
-  const validStudyTracks = students
-    .flatMap(student => student.studyRights)
-    .flatMap(studyRight => studyRight.studyRightElements)
-    .filter(element => element.code === code && element.studyTrack !== null)
-    .map(element => element.studyTrack) as StudyTrack[]
-
-  if (!Object.keys(validStudyTracks).length)
+  if (!Object.keys(studyTracks).length)
     return <Alert severity="warning">No study tracks have been defined for the selected students.</Alert>
 
-  const dropdownOptions = [...new Map(validStudyTracks.map(({ code, name }) => [code, name]))].map(([code, name]) => ({
+  const dropdownOptions = [...new Map(studyTracks.map(({ code, name }) => [code, name]))].map(([code, name]) => ({
     key: code,
     value: code,
     text: `${getTextIn(name)} (${code})`,
@@ -35,7 +28,7 @@ const StudyTrackFilterCard = ({ args, onOptionsChange, options, students }: Filt
       filterKey={studyTrackFilter.key}
       label="Choose study track"
       multiple
-      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      onChange={({ target }) => onOptionsChange({ ...options, selected: target.value })}
       options={dropdownOptions}
       value={selected}
     />
@@ -47,7 +40,17 @@ export const studyTrackFilter = createFilter({
   title: 'Study track',
   defaultOptions: {
     selected: [],
+    studyTracks: [],
   },
+
+  precompute: ({ args, students, options }) => {
+    options.studyTracks = students
+      .flatMap(student => student.studyRights)
+      .flatMap(studyRight => studyRight.studyRightElements)
+      .filter(element => element.code === args?.code && element.studyTrack !== null)
+      .map(element => element.studyTrack!)
+  },
+
   isActive: ({ selected }) => (selected !== undefined ? selected.length > 0 : false),
   filter: (student, { args, options }) => {
     const { selected } = options
@@ -56,6 +59,11 @@ export const studyTrackFilter = createFilter({
       .flatMap(studyRight => studyRight.studyRightElements)
       .filter(element => element.code === args.code && element.studyTrack !== null)
       .some(element => selected.includes(element.studyTrack?.code))
+  },
+
+  selectors: {
+    selectedStudyTracks: ({ selected, studyTracks }) =>
+      selected.map(selectedCode => studyTracks.find(({ code }) => selectedCode === code)).filter(Boolean),
   },
 
   render: StudyTrackFilterCard,
