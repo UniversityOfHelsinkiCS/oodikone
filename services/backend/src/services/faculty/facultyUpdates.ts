@@ -21,19 +21,13 @@ const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_DEGREE_PROGRAMMES'] as co
 const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
 
 export const updateFacultyOverview = async (facultyCode: string, statsType: StatsType) => {
-  const all = await getDegreeProgrammesOfFaculty(facultyCode, false)
-  const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
+  for (const programmeFilter of programmeFilterOptions) {
+    const programmes = await getDegreeProgrammesOfFaculty(facultyCode, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
 
-  for (const yearType of yearOptions) {
-    for (const specialGroups of specialGroupOptions) {
-      for (const programmeFilter of programmeFilterOptions) {
+    for (const yearType of yearOptions) {
+      for (const specialGroups of specialGroupOptions) {
         if (statsType === 'ALL' || statsType === 'STUDENT') {
-          const updatedStudentInfo = await combineFacultyBasics(
-            facultyCode,
-            programmeFilter === 'NEW_DEGREE_PROGRAMMES' ? onlyNew : all,
-            yearType,
-            specialGroups
-          )
+          const updatedStudentInfo = await combineFacultyBasics(facultyCode, programmes, yearType, specialGroups)
           await setBasicStats(updatedStudentInfo, yearType, programmeFilter, specialGroups)
         }
         if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
@@ -43,7 +37,7 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
         if (statsType === 'ALL' || statsType === 'THESIS') {
           const updateThesisWriters = await combineFacultyThesisWriters(
             facultyCode,
-            programmeFilter === 'NEW_DEGREE_PROGRAMMES' ? onlyNew : all,
+            programmes,
             yearType,
             specialGroups
           )
@@ -51,12 +45,11 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
         }
       }
     }
+
+    const updatedTimes = await countGraduationTimes(facultyCode, programmes)
+    await setGraduationStats(updatedTimes, programmeFilter)
   }
 
-  const updatedTimesAll = await countGraduationTimes(facultyCode, all)
-  await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
-  const updatedTimesNew = await countGraduationTimes(facultyCode, onlyNew)
-  await setGraduationStats(updatedTimesNew, 'NEW_DEGREE_PROGRAMMES')
   return 'OK'
 }
 

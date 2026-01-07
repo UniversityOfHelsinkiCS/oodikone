@@ -1,4 +1,5 @@
-import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType, DegreeProgrammeType } from '@oodikone/shared/types'
+import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
+import { DegreeProgramme } from 'src/routes/faculties'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
 
@@ -62,7 +63,7 @@ type StudentInfo = {
   titles: string[]
 }
 
-type BasicData = {
+export type BasicData = {
   graduationInfo: GraduationInfo
   id: string
   programmeNames: ProgrammeNames
@@ -97,7 +98,7 @@ export const getBasicStats = async (
 
 type ProgrammeNames = Record<string, Name & { code: string }>
 
-type ThesisWriterData = {
+export type ThesisWriterData = {
   id: string
   years: (string | number)[]
   tableStats: (string | number)[][]
@@ -142,7 +143,7 @@ type MediansAndProgrammes = {
   }
 }
 
-type GraduationData = {
+export type GraduationData = {
   id: string
   goals: {
     bachelor: number
@@ -200,10 +201,7 @@ type FacultyStudentsData = {
   facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
   programmeStats: Record<string, Record<string, (string | number)[]>>
   titles: string[]
-  programmeNames: Record<
-    string,
-    { name: Name; code: string; degreeProgrammeType: DegreeProgrammeType | null; progId: string }
-  >
+  programmeNames: Record<string, DegreeProgramme>
 }
 
 export const setFacultyStudentStats = async (

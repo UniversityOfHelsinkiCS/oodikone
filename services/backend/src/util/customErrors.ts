@@ -1,9 +1,10 @@
+import type { GenericApplicationError } from '@oodikone/shared/routes'
+
 export class ApplicationError extends Error {
   status: number
-
   extra: Record<string, unknown>
 
-  constructor(message = 'Something went wrong. Please try again.', status = 500, extra = {}) {
+  constructor(message, status = 500, extra = {}) {
     super(message)
 
     Error.captureStackTrace(this, this.constructor)
@@ -13,9 +14,9 @@ export class ApplicationError extends Error {
     this.extra = extra
   }
 
-  toJSON() {
+  toJSON(): GenericApplicationError {
     return {
-      message: this.message,
+      error: this.message,
       ...this.extra,
     }
   }

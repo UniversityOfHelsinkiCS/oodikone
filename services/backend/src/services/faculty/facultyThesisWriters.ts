@@ -1,16 +1,9 @@
 import { cloneDeep } from 'lodash'
 
-import { DegreeProgrammeType } from '@oodikone/shared/types'
+import { DegreeProgrammeType, type NameWithCode } from '@oodikone/shared/types'
 import { getGraduationStats, setGraduationStats } from '../analyticsService'
 import { getGraduationStatsForStudyTrack } from '../studyProgramme/studyProgrammeGraduations'
 import { getDegreeProgrammesOfFaculty, ProgrammesOfOrganization } from './faculty'
-
-type ProgrammeName = {
-  code: string
-  en?: string
-  fi?: string
-  sv?: string
-}
 
 const calculateCombinedStats = async (
   isAcademicYear: boolean,
@@ -28,7 +21,7 @@ const calculateCombinedStats = async (
   const newStats: Array<Awaited<ReturnType<typeof getGraduationStatsForStudyTrack>>> = []
   const combinedTableStats: Array<Array<string | number>> = []
   let years: Array<string | number> = []
-  const programmeNames: Record<string, ProgrammeName> = {}
+  const programmeNames: Record<string, NameWithCode> = {}
 
   for (const programme of facultyProgrammes) {
     if (
