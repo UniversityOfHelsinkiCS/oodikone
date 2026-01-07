@@ -1,8 +1,18 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
-import { Graduated, ProgrammeFilter, SpecialGroups, StatsType, YearType } from '@oodikone/shared/types'
+import type { CanError, GenericApplicationError } from '@oodikone/shared/routes'
+import type {
+  Graduated,
+  Name,
+  NameWithCode,
+  ProgrammeFilter,
+  SpecialGroups,
+  StatsType,
+  Unarray,
+  YearType,
+} from '@oodikone/shared/types'
 import * as auth from '../middleware/auth'
-import { getDegreeProgrammesOfFaculty, getFacultyCodeById } from '../services/faculty/faculty'
+import { getDegreeProgrammesOfFaculty, getFacultyCodeById, ProgrammesOfOrganization } from '../services/faculty/faculty'
 import { combineFacultyBasics } from '../services/faculty/facultyBasics'
 import { getFacultyCredits } from '../services/faculty/facultyCredits'
 import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
@@ -18,245 +28,270 @@ import {
   setFacultyStudentStats,
   getFacultyProgressStats,
   setFacultyProgressStats,
+  type BasicData,
+  type ThesisWriterData,
+  GraduationData,
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress } from '../services/faculty/facultyStudentProgress'
 import { combineFacultyStudents } from '../services/faculty/facultyStudents'
 import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWriters'
 import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
-import logger from '../util/logger'
+import { ApplicationError } from '../util/customErrors'
 
 // Faculty uses a lot of tools designed for Degree programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
 const router = Router()
 
-router.get('/', async (_req: Request, res: Response) => {
-  const faculties = await getFacultiesForFacultyList()
-  res.json(faculties)
-})
+type GetFacultyListResBody = {
+  id: string
+  code: string
+  name: Name
+}[]
 
-interface GetStatsRequest extends Request {
-  query: {
-    programme_filter: ProgrammeFilter
-    special_groups: SpecialGroups
-    year_type: YearType
-  }
+router.get<never, GetFacultyListResBody>('/', async (_req, res) => res.json(await getFacultiesForFacultyList()))
+
+type GetStatsParams = { id: string }
+type GetStatsReqBody = never
+type GetStatsResBody = BasicData
+type GetStatsQuery = {
+  programme_filter: ProgrammeFilter
+  special_groups: SpecialGroups
+  year_type: YearType
 }
 
-router.get('/:id/basicstats', auth.roles(['facultyStatistics']), async (req: GetStatsRequest, res: Response) => {
-  const facultyId = req.params.id
-  const code = await getFacultyCodeById(facultyId)
+router.get<GetStatsParams, CanError<GetStatsResBody, GenericApplicationError>, GetStatsReqBody, GetStatsQuery>(
+  '/:id/basicstats',
+  auth.roles(['facultyStatistics']),
+  async (req, res) => {
+    const { id: facultyId } = req.params
+    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
 
-  if (!code) {
-    return res.status(422).end()
+    const faculty = await getFacultyCodeById(facultyId)
+    if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
+    const data = await getBasicStats(faculty.code, yearType, programmeFilter, specialGroups)
+    if (data) return res.json(data)
+
+    const programmes = await getDegreeProgrammesOfFaculty(faculty.code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
+    if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
+
+    const updatedStats = await combineFacultyBasics(faculty.code, programmes, yearType, specialGroups)
+
+    if (updatedStats) await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
+    else throw new ApplicationError('No data', 204)
+
+    return res.json(updatedStats)
   }
+)
 
-  const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
-  const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
+type GetFacultyStatsResBody = ThesisWriterData
 
-  if (data) {
-    return res.json(data)
+router.get<GetStatsParams, CanError<GetFacultyStatsResBody, GenericApplicationError>, GetStatsReqBody, GetStatsQuery>(
+  '/:id/thesisstats',
+  auth.roles(['facultyStatistics']),
+  async (req, res) => {
+    const { id: facultyId } = req.params
+    const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
+
+    const faculty = await getFacultyCodeById(facultyId)
+    if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
+    const data = await getThesisWritersStats(faculty.code, yearType, programmeFilter, specialGroups)
+    if (data) return res.json(data)
+
+    const programmes = await getDegreeProgrammesOfFaculty(faculty.code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
+    if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
+
+    const updatedStats = await combineFacultyThesisWriters(faculty.code, programmes, yearType, specialGroups)
+    if (updatedStats) await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
+    else throw new ApplicationError('No data', 204)
+
+    return res.json(updatedStats)
   }
+)
 
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
-  if (!programmes.length) {
-    return res.status(422).end()
-  }
-
-  const updatedStats = await combineFacultyBasics(code, programmes, yearType, specialGroups)
-  if (updatedStats) {
-    await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
-  }
-
-  return res.json(updatedStats ?? null)
-})
-
-interface GetCreditStatsRequest extends Request {
-  query: {
-    year_type: YearType
-  }
+type GetCreditStatsResBody = {
+  codes: string[]
+  ids: string[]
+  programmeNames: Record<string, NameWithCode>
+}
+type GetCreditStatsQuery = {
+  year_type: YearType
 }
 
-router.get('/:id/creditstats', auth.roles(['facultyStatistics']), async (req: GetCreditStatsRequest, res: Response) => {
-  const facultyId = req.params.id
-  const code = await getFacultyCodeById(facultyId)
+router.get<
+  GetStatsParams,
+  CanError<GetCreditStatsResBody, GenericApplicationError>,
+  GetStatsReqBody,
+  GetCreditStatsQuery
+>('/:id/creditstats', auth.roles(['facultyStatistics']), async (req, res) => {
+  const { id: facultyId } = req.params
   const { year_type: yearType } = req.query
-  const stats = await getFacultyCredits(code, yearType === 'ACADEMIC_YEAR')
-  return res.json(stats)
+
+  const faculty = await getFacultyCodeById(facultyId)
+  if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
+  return res.json(await getFacultyCredits(faculty.code, yearType === 'ACADEMIC_YEAR'))
 })
 
-router.get('/:id/thesisstats', auth.roles(['facultyStatistics']), async (req: GetStatsRequest, res: Response) => {
-  const facultyId = req.params.id
-  const code = await getFacultyCodeById(facultyId)
-  if (!code) {
-    return res.status(422).end()
-  }
+type GetGraduationStatsResBody = GraduationData
+type GetGraduationStatsQuery = {
+  programme_filter: ProgrammeFilter
+}
 
-  const { year_type: yearType, programme_filter: programmeFilter, special_groups: specialGroups } = req.query
-  const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
-  if (data) {
-    return res.json(data)
-  }
+router.get<
+  GetStatsParams,
+  CanError<GetGraduationStatsResBody, GenericApplicationError>,
+  GetStatsReqBody,
+  GetGraduationStatsQuery
+>('/:id/graduationtimes', auth.roles(['facultyStatistics']), async (req, res) => {
+  const { id: facultyId } = req.params
+  const { programme_filter: programmeFilter } = req.query
 
-  const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
-  if (!programmes.length) {
-    return res.status(422).end()
-  }
+  const faculty = await getFacultyCodeById(facultyId)
+  if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
 
-  const updatedStats = await combineFacultyThesisWriters(code, programmes, yearType, specialGroups)
-  if (updatedStats) {
-    await setThesisWritersStats(updatedStats, yearType, programmeFilter, specialGroups)
-  }
-  return res.json(updatedStats ?? null)
+  const data = await getGraduationStats(faculty.code, programmeFilter)
+  if (data) return res.json(data)
+
+  const programmes = await getDegreeProgrammesOfFaculty(faculty.code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
+  if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
+
+  const updatedStats = await countGraduationTimes(faculty.code, programmes)
+  if (updatedStats) await setGraduationStats(updatedStats, programmeFilter)
+
+  return res.json(updatedStats)
 })
 
-interface GetGraduationStatsRequest extends Request {
-  query: {
-    programme_filter: ProgrammeFilter
-  }
+type GetProgressStatsResBody = {
+  bachelorsProgStats: Record<string, number[][]>
+  bcMsProgStats: Record<string, number[][]>
+  creditCounts: Record<string, Record<string, number[]>>
+  doctoralProgStats: Record<string, number[][]>
+  id: string
+  mastersProgStats: Record<string, number[][]>
+  programmeNames: Record<string, NameWithCode>
+  yearlyBachelorTitles: string[][]
+  yearlyBcMsTitles: string[][]
+  yearlyMasterTitles: string[][]
+  years: string[]
 }
 
-router.get(
-  '/:id/graduationtimes',
-  auth.roles(['facultyStatistics']),
-  async (req: GetGraduationStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
-
-    const { programme_filter: programmeFilter } = req.query
-    const data = await getGraduationStats(code, programmeFilter)
-    if (data) {
-      return res.json(data)
-    }
-
-    const programmes = await getDegreeProgrammesOfFaculty(code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
-    if (!programmes) {
-      return res.status(422).end()
-    }
-
-    const updatedStats = await countGraduationTimes(code, programmes)
-    if (updatedStats) {
-      await setGraduationStats(updatedStats, programmeFilter)
-    }
-
-    return res.json(updatedStats)
-  }
-)
-
-interface GetProgressStatsRequest extends Request {
-  query: {
-    graduated: Graduated
-    special_groups: SpecialGroups
-  }
+type GetProgressStatsQuery = {
+  graduated: Graduated
+  special_groups: SpecialGroups
 }
 
-router.get(
-  '/:id/progressstats',
-  auth.roles(['facultyStatistics']),
-  async (req: GetProgressStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
+router.get<
+  GetStatsParams,
+  CanError<GetProgressStatsResBody, GenericApplicationError>,
+  GetStatsReqBody,
+  GetProgressStatsQuery
+>('/:id/progressstats', auth.roles(['facultyStatistics']), async (req, res) => {
+  const { id: facultyId } = req.params
+  const { graduated, special_groups: specialGroups } = req.query
 
-    const programmes = await getDegreeProgrammesOfFaculty(code, true)
-    if (!programmes) {
-      return res.status(422).end()
-    }
+  const faculty = await getFacultyCodeById(facultyId)
+  if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
 
-    const { graduated, special_groups: specialGroups } = req.query
-    const data = await getFacultyProgressStats(code, specialGroups, graduated)
-    if (data) {
-      return res.json(data)
-    }
+  const programmes = await getDegreeProgrammesOfFaculty(faculty.code, true)
+  if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
 
-    const updatedStats = await combineFacultyStudentProgress(code, programmes, specialGroups, graduated)
-    if (updatedStats) {
-      await setFacultyProgressStats(updatedStats, specialGroups, graduated)
-    }
-    return res.json(updatedStats)
-  }
-)
+  const data = await getFacultyProgressStats(faculty.code, specialGroups, graduated)
+  if (data) return res.json(data)
 
-interface GetStudentStatsRequest extends GetProgressStatsRequest {}
+  const updatedStats = await combineFacultyStudentProgress(faculty.code, programmes, specialGroups, graduated)
+  if (updatedStats) await setFacultyProgressStats(updatedStats, specialGroups, graduated)
 
-router.get(
-  '/:id/studentstats',
-  auth.roles(['facultyStatistics']),
-  async (req: GetStudentStatsRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
+  return res.json(updatedStats)
+})
 
-    const { graduated, special_groups: specialGroups } = req.query
+export type DegreeProgramme = Pick<
+  Unarray<ProgrammesOfOrganization>,
+  'code' | 'name' | 'degreeProgrammeType' | 'progId'
+>
 
-    /* Fetch cached data if exists */
-    const data = await getFacultyStudentStats(code, specialGroups, graduated)
-    if (data) {
-      return res.json(data)
-    }
-
-    const newProgrammes = await getDegreeProgrammesOfFaculty(code, true)
-    if (!newProgrammes.length) {
-      return res.status(422).end()
-    }
-
-    const updatedStats = await combineFacultyStudents(code, newProgrammes, specialGroups, graduated)
-
-    if (updatedStats) {
-      await setFacultyStudentStats(updatedStats, specialGroups, graduated)
-    }
-    return res.json(updatedStats)
-  }
-)
-
-interface GetUpdateBasicViewRequest extends Request {
-  query: {
-    stats_type: StatsType
-  }
+type GetStudetStatsResBody = {
+  id: string
+  years: string[]
+  facultyTableStats: Record<string, (number | string)[]>
+  facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
+  /**
+   * NOTE: programmeStats order is random (not by the year). Make sure to index properly.
+   *
+   * (Order is based on the order in which studyrights were processed in the backend)
+   */
+  programmeStats: Record<string, Record<string, (string | number)[]>>
+  titles: string[]
+  programmeNames: Record<string, DegreeProgramme>
 }
 
-router.get(
-  '/:id/update_basicview',
-  auth.roles(['facultyStatistics']),
-  async (req: GetUpdateBasicViewRequest, res: Response) => {
-    const facultyId = req.params.id
-    const code = await getFacultyCodeById(facultyId)
-    if (!code) {
-      return res.status(422).end()
-    }
-    const { stats_type: statsType } = req.query
-    try {
-      const result = await updateFacultyOverview(code, statsType)
-      return res.json(result)
-    } catch (error) {
-      const message = `Failed to update basic stats for faculty ${code}`
-      logger.error(message, { error })
-      return res.status(500).json({ error: message })
-    }
-  }
-)
+router.get<
+  GetStatsParams,
+  CanError<GetStudetStatsResBody, GenericApplicationError>,
+  GetStatsReqBody,
+  GetProgressStatsQuery
+>('/:id/studentstats', auth.roles(['facultyStatistics']), async (req, res) => {
+  const { id: facultyId } = req.params
+  const { graduated, special_groups: specialGroups } = req.query
 
-router.get('/:id/update_progressview', auth.roles(['facultyStatistics']), async (req: Request, res: Response) => {
-  const facultyId = req.params.id
-  const code = await getFacultyCodeById(facultyId)
-  if (!code) {
-    return res.status(422).end()
-  }
+  const faculty = await getFacultyCodeById(facultyId)
+  if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
+  const data = await getFacultyStudentStats(faculty.code, specialGroups, graduated)
+  if (data) return res.json(data)
+
+  const programmes = await getDegreeProgrammesOfFaculty(faculty.code, true)
+  if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
+
+  const updatedStats = await combineFacultyStudents(faculty.code, programmes, specialGroups, graduated)
+  if (updatedStats) await setFacultyStudentStats(updatedStats, specialGroups, graduated)
+
+  return res.json(updatedStats)
+})
+
+type GetUpdateBasicViewResBody = never
+type GetUpdateBasicViewQuery = {
+  stats_type: StatsType
+}
+
+router.get<
+  GetStatsParams,
+  CanError<GetUpdateBasicViewResBody, GenericApplicationError>,
+  GetStatsReqBody,
+  GetUpdateBasicViewQuery
+>('/:id/update_basicview', auth.roles(['facultyStatistics']), async (req, res) => {
+  const { id: facultyId } = req.params
+  const { stats_type: statsType } = req.query
+
+  const faculty = await getFacultyCodeById(facultyId)
+  if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
   try {
-    const result = await updateFacultyProgressOverview(code)
-    return res.json(result)
+    await updateFacultyOverview(faculty.code, statsType)
+    return res.json()
   } catch (error) {
-    const message = `Failed to update progress tab stats for faculty ${code}`
-    logger.error(message, { error })
-    return res.status(500).json({ error: message })
+    throw new ApplicationError(`Failed to update basic stats for faculty ${faculty.code}`, 500)
   }
 })
+
+router.get<GetStatsParams, CanError<never, GenericApplicationError>, GetStatsReqBody, GetStatsQuery>(
+  '/:id/update_progressview',
+  auth.roles(['facultyStatistics']),
+  async (req, res) => {
+    const { id: facultyId } = req.params
+
+    const faculty = await getFacultyCodeById(facultyId)
+    if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
+
+    try {
+      await updateFacultyProgressOverview(faculty.code)
+      return res.json()
+    } catch (error) {
+      throw new ApplicationError(`Failed to update progress tab stats for faculty ${faculty.code}`, 500)
+    }
+  }
+)
 
 export default router

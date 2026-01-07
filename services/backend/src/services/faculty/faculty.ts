@@ -1,11 +1,13 @@
 import { groupBy, orderBy } from 'lodash'
 import { QueryTypes } from 'sequelize'
 
+import { Organization } from '@oodikone/shared/models'
 import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import { OrganizationModel } from '../../models'
+import { ApplicationError } from '../../util/customErrors'
 import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
@@ -106,20 +108,15 @@ export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurr
     },
   })
   if (!organization) {
-    throw new Error(`The organization with the code ${facultyCode} was not found.`)
+    throw new ApplicationError(`The organization with the code ${facultyCode} was not found.`)
   }
   return getDegreeProgrammesOfOrganization(organization.id, onlyCurrentProgrammes)
 }
 
-export const getFacultyCodeById = async (facultyId: string) => {
-  const organization = await OrganizationModel.findOne({
+export const getFacultyCodeById = async (facultyId: string): Promise<Pick<Organization, 'code'> | null> =>
+  OrganizationModel.findOne({
     attributes: ['code'],
     where: {
       id: facultyId,
     },
   })
-  if (!organization) {
-    throw new Error(`The organization with the id ${facultyId} was not found.`)
-  }
-  return organization.code
-}
