@@ -30,6 +30,7 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
@@ -137,6 +138,22 @@ const HelpInfoCard = ({
   </Box>
 )
 
+const StudyTrackNames = () => {
+  const { useFilterSelector } = useFilters()
+  const { getTextIn } = useLanguage()
+
+  const selectedStudyTracks = useFilterSelector(studyTrackFilter.selectors.selectedStudyTracks())
+  const studyTrackString = selectedStudyTracks.map(elem => `${elem.code} - ${getTextIn(elem.name)}`)
+
+  if (selectedStudyTracks.length === 0) return null
+
+  return (
+    <Typography color="text.secondary" fontWeight="standard" variant="h6">
+      Studytrack {studyTrackString.join(' | ')}
+    </Typography>
+  )
+}
+
 export const PopulationStatistics = () => {
   useTitle('Class statistics')
   const location = useLocation()
@@ -240,7 +257,7 @@ export const PopulationStatistics = () => {
         in the class. For example, if you are looking for students of a specialist training in
         medicine or dentistry, you must choose “Students with non-degree study right”.`
 
-  const title = `${programmeText} ${getYearText(query.years)}${showBachelorAndMaster ? ' (Bachelor & Master view)' : ''}`
+  const title = `${programmeText} ${getYearText(query.years)}${showBachelorAndMaster ? ' (Bachelor & Master view)' : ''} ${programmeCode}`
 
   // Show search form if URL contains no query
   if (skipQuery) return <PopulationSearch />
@@ -258,8 +275,9 @@ export const PopulationStatistics = () => {
       {(filteredStudents, filteredCourses) => (
         <>
           <PageLoading isLoading={isLoading} />
-          <PageTitle subtitle={studyTrack ? `Studytrack ${studyTrack}` : undefined} title={title}>
-            <Typography fontWeight="light" variant="h6">
+          <PageTitle title={title}>
+            <StudyTrackNames />
+            <Typography color="text.secondary" fontWeight="standard" variant="h6">
               Class size {students.length} students
             </Typography>
           </PageTitle>
