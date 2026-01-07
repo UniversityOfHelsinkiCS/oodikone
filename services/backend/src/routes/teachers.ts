@@ -58,7 +58,7 @@ router.get('/top', fullAccessAuth(), async (req: GetTopTeachersRequest, res: Res
   }
   await findAndSaveTeachers(Number(yearcode), Number(yearcode))
   const updatedStats = await getTeacherStats(category, Number(yearcode))
-  res.json(updatedStats)
+  return res.json(updatedStats)
 })
 
 interface PostTopTeachersRequest extends Request {

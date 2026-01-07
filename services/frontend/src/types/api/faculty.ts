@@ -1,5 +1,3 @@
-// TODO: Remove 'status', 'lastUpdated' and any other redundant fields from responses
-
 import { GraphStat } from '@/types/graphStat'
 import { DegreeProgrammeType, Name, NameWithCode } from '@oodikone/shared/types'
 import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
@@ -15,9 +13,7 @@ type Info = {
 type FacultyStats = {
   graduationInfo: Info
   id: string
-  lastUpdated: string
   programmeNames: Record<string, NameWithCode>
-  status: string
   studentInfo: Info
   years: number[]
 }
@@ -45,10 +41,8 @@ export type GetFacultyCreditStatsRequest = {
 export type GetFacultyThesisStatsResponse = {
   graphStats: GraphStat[]
   id: string
-  lastUpdated: string
   programmeNames: Record<string, NameWithCode>
   programmeTableStats: Record<string, number[][]>
-  status: string
   tableStats: number[][]
   titles: string[]
   years: number[]
@@ -65,8 +59,6 @@ export type GetFacultyGraduationTimesResponse = GetAllGraduationStatsResponse & 
   // NOTE: This is NameWithCode in GetAllGraduationStatsResponse
   programmeNames: Record<string, Name>
   id: string
-  lastUpdated: string
-  status: string
 }
 
 export type GetFacultyGraduationTimesRequest = {
@@ -86,10 +78,8 @@ export type GetFacultyProgressStatsResponse = {
   creditCounts: Record<string, Record<string, number[]>>
   doctoralProgStats: Record<string, number[][]>
   id: string
-  lastUpdated: string
   mastersProgStats: Record<string, number[][]>
   programmeNames: Record<string, NameWithCode>
-  status: string
   yearlyBachelorTitles: string[][]
   yearlyBcMsTitles: string[][]
   yearlyMasterTitles: string[][]
@@ -136,7 +126,6 @@ export type GetFacultyStudentStatsResponse = {
   facultyTableStats: Record<string, (number | string)[]>
   facultyTableStatsExtra: Record<string, Record<string, Record<string, number>>>
   id: string
-  lastUpdated: string
   programmeNames: Record<string, DegreeProgramme>
   /**
    * NOTE: programmeStats order is random (not by the year). Make sure to index properly.
@@ -144,7 +133,6 @@ export type GetFacultyStudentStatsResponse = {
    * (Order is based on the order in which studyrights were processed in the backend)
    */
   programmeStats: Record<string, Record<string, (number | string)[]>>
-  status: string
   titles: string[]
   years: string[]
 }
