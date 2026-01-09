@@ -57,6 +57,8 @@ export type CreditStats = {
   stats: Record<string, Record<string, number>>
 }
 
+export type CreditStatsPayload = Record<string, CreditStats>
+
 export type BasicStats = {
   id: string
   years: number[]

@@ -67,11 +67,11 @@ export const BasicInformationTab = ({
     yearType,
   })
 
-  const creditStats = credits?.data?.stats?.[studyProgramme]?.stats
+  const creditStats = credits.data?.[studyProgramme]?.stats
   const tableStats = makeTableStats(creditStats, showAll, academicYear)
   const creditGraphStats = makeGraphData(creditStats, showAll, academicYear)
 
-  const secondStats = credits?.data?.stats?.[combinedProgramme]?.stats
+  const secondStats = credits.data?.[combinedProgramme]?.stats
   const secondTableStats = secondStats ? makeTableStats(secondStats, showAll, academicYear) : null
   const secondCreditGraphStats = secondStats ? makeGraphData(secondStats, showAll, academicYear) : null
 
