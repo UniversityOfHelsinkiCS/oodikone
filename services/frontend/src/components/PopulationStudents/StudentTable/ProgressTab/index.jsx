@@ -1,7 +1,7 @@
-import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import MinusIcon from '@mui/icons-material/Remove'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -71,7 +71,7 @@ const getRowContent = (student, courseCode, year, start, end, criteria) => {
   const courses = getCourses(courseCode, criteria, student)
 
   if (hasCreditTransfer(courses)) {
-    return <AssignmentCheckedIcon color="success" />
+    return <SwapHorizIcon color="success" />
   }
 
   if (hasPassedDuringAcademicYear(courses, start, end)) {
