@@ -1,5 +1,6 @@
 import { SISStudyRight } from '@oodikone/shared/models'
 import { EnrollmentType, ExtentCode } from '@oodikone/shared/types'
+import { CreditStats } from '@oodikone/shared/types/studyProgramme'
 import { mapToProviders } from '@oodikone/shared/util'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
@@ -81,8 +82,14 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
   }
 }
 
-const getBasicDegreeStudyRight = (studyRights: Array<SISStudyRight> | undefined, date: Date, semestercode: number) => {
-  return studyRights?.find(studyRight => {
+const getBasicDegreeStudyRight = (
+  studyRights:
+    | Pick<SISStudyRight, 'id' | 'studentNumber' | 'extentCode' | 'semesterEnrollments' | 'startDate' | 'endDate'>[]
+    | undefined,
+  date: Date,
+  semestercode: number
+) =>
+  studyRights?.find(studyRight => {
     const rightDates =
       new Date(studyRight.startDate).getTime() <= new Date(date).getTime() &&
       new Date(date).getTime() <= new Date(studyRight.endDate).getTime()
@@ -91,10 +98,9 @@ const getBasicDegreeStudyRight = (studyRights: Array<SISStudyRight> | undefined,
     )
     return basicDegreeExtentCodes.includes(studyRight.extentCode) && rightDates && enrolledAsPresent
   })
-}
 
 /* Calculates credits produced by provider (programme or faculty) */
-export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean) => {
+export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean): Promise<CreditStats> => {
   const since = new Date('2017-01-01')
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
   const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
@@ -118,15 +124,13 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   const studyRights = await getSISStudyRightsOfStudents(students)
 
-  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, SISStudyRight>>((obj, cur) => {
+  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, (typeof studyRights)[number]>>((obj, cur) => {
     obj[cur.id] = cur
     return obj
   }, {})
 
-  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, Array<SISStudyRight>>>((obj, cur) => {
-    if (!obj[cur.studentNumber]) {
-      obj[cur.studentNumber] = []
-    }
+  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, typeof studyRights>>((obj, cur) => {
+    obj[cur.studentNumber] ??= []
     obj[cur.studentNumber].push(cur)
     return obj
   }, {})
@@ -168,11 +172,11 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 }
 
 export const getCreditsProduced = async (providerCode: string, isAcademicYear: boolean, specialIncluded = true) => {
-  let data = await getCreditStats(providerCode, isAcademicYear, specialIncluded)
+  const data = await getCreditStats(providerCode, isAcademicYear, specialIncluded)
   if (data) {
     return data
   }
-  data = await computeCreditsProduced(providerCode, isAcademicYear)
-  await setCreditStats(data, isAcademicYear, specialIncluded)
-  return data
+  const newData = await computeCreditsProduced(providerCode, isAcademicYear)
+  await setCreditStats(newData, isAcademicYear, specialIncluded)
+  return newData
 }
