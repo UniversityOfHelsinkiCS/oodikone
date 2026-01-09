@@ -11,7 +11,7 @@ import {
   StudyTrackStats,
   YearType,
 } from '@oodikone/shared/types'
-import { BasicStats } from '@oodikone/shared/types/studyProgramme'
+import { BasicStats, CreditStatsPayload } from '@oodikone/shared/types/studyProgramme'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
@@ -30,7 +30,7 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
     }),
     getCreditStats: builder.query<
-      any, // TODO: Type
+      CreditStatsPayload,
       { codes: string[]; specialGroups: SpecialGroups; yearType: YearType }
     >({
       query: ({ codes, specialGroups, yearType }) =>

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express'
 
 import { Graduated, SpecialGroups, YearType } from '@oodikone/shared/types'
+import { CreditStatsPayload } from '@oodikone/shared/types/studyProgramme'
 import {
   getBasicStats,
   setBasicStats,
@@ -34,11 +35,11 @@ interface GetCreditStatsRequest extends Request {
 
 router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => {
   const { codes, specialGroups, yearType } = req.query
-  const stats = {}
+  const stats: CreditStatsPayload = {}
   for (const code of JSON.parse(codes)) {
     stats[code] = await getCreditsProduced(code, yearType === 'ACADEMIC_YEAR', specialGroups === 'SPECIAL_INCLUDED')
   }
-  return res.json({ stats })
+  return res.json(stats)
 })
 
 interface GetStatsRequest extends Request {
