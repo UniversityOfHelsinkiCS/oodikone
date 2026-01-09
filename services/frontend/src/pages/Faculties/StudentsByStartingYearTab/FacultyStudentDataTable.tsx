@@ -3,6 +3,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import { alpha } from '@mui/material/styles'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
@@ -18,6 +19,7 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DegreeProgramme } from '@/types/api/faculty'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 
 const getTableCell = (year: string, programme: string, value: number | string) => {
   return (
@@ -191,8 +193,26 @@ export const FacultyStudentDataTable = ({
                 </TableRow>
                 {yearsVisible[yearIndex]
                   ? sortedKeys.map(programme => {
+                      const degreeToIndex = {
+                        [DegreeProgrammeType.BACHELOR]: 'bachelor',
+                        [DegreeProgrammeType.MASTER]: 'master',
+                        [DegreeProgrammeType.LICENTIATE]: 'licentiate',
+                        [DegreeProgrammeType.DOCTOR]: 'doctor',
+                        [DegreeProgrammeType.POSTGRADUATE_PROFESSIONAL]: 'postgrad',
+                      } as const
+
                       return !programmeStats[programme][year] || programmeStats[programme][year].length === 0 ? null : (
-                        <TableRow key={`${year}-regular-row-${programme}`}>
+                        <TableRow
+                          key={`${year}-regular-row-${programme}`}
+                          sx={theme => ({
+                            backgroundColor: alpha(
+                              theme.palette.degreeProgrammeType[
+                                degreeToIndex[programmeNames[programme].degreeProgrammeType]
+                              ],
+                              0.15
+                            ),
+                          })}
+                        >
                           <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
                             <Stack alignItems="center" direction="row" gap={0.5}>
                               <Tooltip
