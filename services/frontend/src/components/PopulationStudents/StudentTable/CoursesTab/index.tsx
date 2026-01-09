@@ -6,7 +6,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { Name, ProgrammeCourse } from '@oodikone/shared/types'
+import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 import { IncludeSubstitutionsToggle } from '../../IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from './columnDefinitions'
@@ -26,6 +26,7 @@ export type Courses = Record<
     inHops?: boolean
     enrollmentDate?: Date
     passed?: boolean
+    credittypecode?: CreditTypeCode
   }
 >
 
@@ -78,6 +79,7 @@ const studentMapper = (
             completionDate: course.date,
             passed: course.passed,
             substitutedBy: substitutions ? course.course_code : undefined,
+            credittypecode: course.credittypecode,
             exportValue: course.grade,
           }
         }
