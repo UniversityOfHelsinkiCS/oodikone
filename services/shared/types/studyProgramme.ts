@@ -51,6 +51,12 @@ export type GraduationTimes = Record<string, ProgrammeOrStudyTrackGraduationStat
   goals: Goals
 }
 
+// Used in faculty as well
+export type CreditStats = {
+  id: string
+  stats: Record<string, Record<string, number>>
+}
+
 export type BasicStats = {
   id: string
   years: number[]

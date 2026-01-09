@@ -1,5 +1,6 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
+import { SISStudyRight } from '@oodikone/shared/models'
 import { Name, CreditTypeCode } from '@oodikone/shared/types'
 import { StudentModel, SISStudyRightModel, SISStudyRightElementModel, CreditModel } from '../../models'
 
@@ -85,8 +86,12 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
     )
 }
 
-export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) => {
-  return (
+export const getSISStudyRightsOfStudents = async (
+  studentNumbers: string[]
+): Promise<
+  Pick<SISStudyRight, 'id' | 'studentNumber' | 'extentCode' | 'semesterEnrollments' | 'startDate' | 'endDate'>[]
+> =>
+  (
     await SISStudyRightModel.findAll({
       where: {
         studentNumber: {
@@ -96,4 +101,3 @@ export const getSISStudyRightsOfStudents = async (studentNumbers: string[]) => {
       attributes: ['id', 'studentNumber', 'extentCode', 'semesterEnrollments', 'startDate', 'endDate'],
     })
   ).map(studyRight => studyRight.toJSON())
-}
