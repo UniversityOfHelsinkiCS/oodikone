@@ -1,4 +1,5 @@
 import blue from '@mui/material/colors/blue'
+import blueGrey from '@mui/material/colors/blueGrey'
 import deepPurple from '@mui/material/colors/deepPurple'
 import green from '@mui/material/colors/green'
 import grey from '@mui/material/colors/grey'
@@ -74,6 +75,13 @@ const baseTheme = {
       hidden: red[800],
       partial: orange[800],
       visible: green[800],
+    },
+    degreeProgrammeType: {
+      bachelor: blueGrey[50],
+      master: blueGrey[100],
+      licentiate: blueGrey[200],
+      doctor: blueGrey[200],
+      postgrad: blueGrey[300],
     },
   },
 } as const
