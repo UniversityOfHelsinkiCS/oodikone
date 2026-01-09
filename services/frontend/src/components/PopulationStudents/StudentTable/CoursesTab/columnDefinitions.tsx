@@ -1,9 +1,9 @@
-import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
 import CheckIcon from '@mui/icons-material/Check'
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CropSquareIcon from '@mui/icons-material/CropSquare'
 import RemoveIcon from '@mui/icons-material/HorizontalRule'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -170,7 +170,7 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                   return (
                     <div title={title}>
                       {isTransferred ? (
-                        <AssignmentCheckedIcon
+                        <SwapHorizIcon
                           sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }}
                         />
                       ) : (

@@ -1,7 +1,7 @@
-import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import MinusIcon from '@mui/icons-material/Remove'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
@@ -16,7 +16,7 @@ export const TableInfo = () => (
       <CheckIcon color="disabled" />: Student has passed the course outside of the corresponding academic year.
     </Typography>
     <Typography sx={{ display: 'flex' }}>
-      <AssignmentCheckedIcon color="success" />: Student has credit transfer for the course.
+      <SwapHorizIcon color="success" />: Student has credit transfer for the course.
     </Typography>
     <Typography sx={{ display: 'flex' }}>
       <CloseIcon color="error" />: Student has failed the course.
