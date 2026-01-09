@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash'
 
-import { Graduated, SpecialGroups, Unarray } from '@oodikone/shared/types'
+import { Graduated, SpecialGroups } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
@@ -10,35 +10,38 @@ import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrac
 import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from './faculty'
 import { programmeTypes } from './facultyGraduationTimes'
 
+type CreditLimits = Array<[number | null, number | null]>
+
 const createLimits = (
   months: number,
-  creditsToAdd: number,
+  startingCredits: number,
   level: 'bachelor' | 'master' | 'doctor'
-): Array<[number, number | null]> => {
+): CreditLimits => {
   if (level === 'doctor') {
     return [
       [40, null],
       [30, 40],
       [20, 30],
       [10, 20],
-      [0, null],
+      [null, 0],
     ]
   }
+
   return [
-    [Math.ceil(months * (60 / 12)) + creditsToAdd, null],
-    [Math.ceil(months * (45 / 12)) + creditsToAdd, Math.ceil(months * (60 / 12)) + creditsToAdd],
-    [Math.ceil(months * (30 / 12)) + creditsToAdd, Math.ceil(months * (45 / 12)) + creditsToAdd],
-    [Math.ceil(months * (15 / 12)) + creditsToAdd, Math.ceil(months * (30 / 12)) + creditsToAdd],
-    [creditsToAdd + 1, Math.ceil(months * (15 / 12)) + creditsToAdd],
-    [creditsToAdd, null],
+    [Math.ceil(months * (60 / 12)), null],
+    [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
+    [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
+    [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
+    [startingCredits + 1, Math.ceil(months * (15 / 12))],
+    [null, startingCredits],
   ]
 }
 
-const createYearlyTitles = (limitList: ReturnType<typeof createLimits>) => {
+const createYearlyTitles = (limitList: CreditLimits) => {
   const titles: string[] = []
   for (let i = limitList.length - 1; i >= 0; i--) {
-    if (limitList[i][0] === 0) {
-      titles.push('0 Credits')
+    if (limitList[i][0] === null) {
+      titles.push(`${limitList[i][1]} Credits`)
     } else if (limitList[i][1] === null) {
       titles.push(`${limitList[0][0]} ≤ Credits`)
     } else {
@@ -53,18 +56,24 @@ const calculateProgressStats = (
   creditCounts: Record<string, number[]>,
   yearlyTitles: Record<string, string[][]>,
   progressStats: Record<string, Record<string, number[][]>>,
-  programmeInfo: Unarray<ProgrammesOfOrganization>
+  progId: string
 ) => {
   const goalMonthsForLevels = { bachelor: 36, master: 24, bcMs: 60, doctor: 48 } as const
 
   const allYears = Object.keys(creditCounts)
-  const limitsForYears = allYears.reduce<Record<string, ReturnType<typeof createLimits>>>((acc, year) => {
+  const limitsForYears = allYears.reduce<Record<string, CreditLimits>>((acc, year) => {
     const startDate = new Date(`${year.slice(0, 4)}-08-01`)
     const lastDayOfMonth = dayjs().endOf('month')
-    const months = Math.round(dayjs(lastDayOfMonth).diff(startDate, 'months', true))
+    const months =
+      Math.round(dayjs(lastDayOfMonth).diff(startDate, 'months', true)) +
+      Number(level === 'bcMs') * goalMonthsForLevels.bachelor
     const goalMonths = goalMonthsForLevels[level]
 
-    acc[year] = createLimits(Math.min(months, goalMonths), 0, level === 'bcMs' ? 'master' : level)
+    acc[year] = createLimits(
+      Math.min(months, goalMonths),
+      Number(level === 'bcMs') * 180,
+      level === 'bcMs' ? 'master' : level
+    )
     return acc
   }, {})
 
@@ -79,16 +88,16 @@ const calculateProgressStats = (
     progressStats[level] = {}
   }
 
-  progressStats[level][programmeInfo.progId] = []
+  progressStats[level][progId] = []
 
   for (const year of Object.keys(creditCounts)) {
     const limit = limitsForYears[year]
     const statsForYear: number[] = new Array(limit.length).fill(0)
     for (const credits of creditCounts[year]) {
-      const correctIndex = limit.length - 1 - limit.findIndex(element => credits >= element[0])
+      const correctIndex = limit.length - 1 - limit.findIndex(element => credits >= (element[0] ?? 0))
       statsForYear[correctIndex] += 1
     }
-    progressStats[level][programmeInfo.progId].unshift(statsForYear)
+    progressStats[level][progId].unshift(statsForYear)
   }
 }
 
@@ -151,22 +160,19 @@ export const combineFacultyStudentProgress = async (
 
   for (const stats of statsOfProgrammes) {
     const programmeInfo = allDegreeProgrammes.find(programme => programme.code === stats.id)
-    if (
-      !programmeInfo ||
-      programmeInfo.degreeProgrammeType == null ||
-      !(programmeInfo.degreeProgrammeType in programmeTypes)
-    ) {
+    if (!programmeInfo?.degreeProgrammeType || !(programmeInfo.degreeProgrammeType in programmeTypes)) {
       continue
     }
 
-    const level = programmeTypes[programmeInfo.degreeProgrammeType as keyof typeof programmeTypes]
+    const { degreeProgrammeType, progId } = programmeInfo
+    const level = programmeTypes[degreeProgrammeType]
 
     updateCreditCounts(level, stats.creditCounts)
-    calculateProgressStats(level, stats.creditCounts, yearlyTitles, progressStats, programmeInfo)
+    calculateProgressStats(level, stats.creditCounts, yearlyTitles, progressStats, progId)
 
     if (level === 'master' && Object.keys(stats.creditCountsCombo).length > 0) {
       updateCreditCounts('bcMs', stats.creditCountsCombo)
-      calculateProgressStats('bcMs', stats.creditCountsCombo, yearlyTitles, progressStats, programmeInfo)
+      calculateProgressStats('bcMs', stats.creditCountsCombo, yearlyTitles, progressStats, progId)
     }
   }
 
