@@ -1,6 +1,7 @@
 import { indexOf } from 'lodash'
 
 import { Name, EnrollmentType, SemesterEnrollment } from '@oodikone/shared/types'
+import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { getSemestersAndYears } from '../semesters'
 import {
   defineYear,
@@ -278,7 +279,7 @@ export const getBasicStatsForStudytrack = async ({
     isAcademicYear: boolean
     includeAllSpecials: boolean
   }
-}) => {
+}): Promise<BasicStats> => {
   const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]

@@ -51,6 +51,17 @@ export type GraduationTimes = Record<string, ProgrammeOrStudyTrackGraduationStat
   goals: Goals
 }
 
+export type BasicStats = {
+  id: string
+  years: number[]
+  graphStats: {
+    name: string
+    data: number[]
+  }[]
+  tableStats: number[][]
+  titles: string[]
+}
+
 export type StudyTrackStats = {
   creditCounts: Record<string, number[]>
   creditCountsCombo: Record<string, number[]>

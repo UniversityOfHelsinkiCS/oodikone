@@ -1,22 +1,21 @@
 import { cloneDeep } from 'lodash'
 
 import { NameWithCode, DegreeProgrammeType } from '@oodikone/shared/types'
+import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'
 import type { ProgrammesOfOrganization } from './faculty'
-
-type StudyTrackBasicStats = Awaited<ReturnType<typeof getBasicStatsForStudytrack>>
 
 const calculateCombinedStats = async (
   facultyProgrammes: ProgrammesOfOrganization,
   isAcademicYear: boolean,
   includeAllSpecials: boolean
 ) => {
-  const statsFromAllProgrammes: StudyTrackBasicStats[] = []
+  const statsFromAllProgrammes: BasicStats[] = []
   const studentInfo = {
-    graphStats: [] as StudyTrackBasicStats['graphStats'],
-    programmeTableStats: {} as Record<string, StudyTrackBasicStats['tableStats']>,
-    tableStats: [] as StudyTrackBasicStats['tableStats'],
+    graphStats: [] as BasicStats['graphStats'],
+    programmeTableStats: {} as Record<string, BasicStats['tableStats']>,
+    tableStats: [] as BasicStats['tableStats'],
     titles: ['Code', 'Started\nstudying', 'Accepted', 'Graduated'],
   }
   if (includeAllSpecials) {
