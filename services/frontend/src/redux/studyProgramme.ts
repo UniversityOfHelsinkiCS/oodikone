@@ -11,12 +11,13 @@ import {
   StudyTrackStats,
   YearType,
 } from '@oodikone/shared/types'
+import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getBasicStats: builder.query<
-      any, // TODO: Type
+      BasicStats,
       { id: string; yearType: YearType; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>

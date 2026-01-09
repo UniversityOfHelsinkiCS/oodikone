@@ -1,4 +1,5 @@
 import { Graduated, SpecialGroups, StudyTrackStats, YearType } from '@oodikone/shared/types'
+import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
 import { redisClient } from './redis'
 import { isRelevantProgramme } from './studyProgramme/studyProgrammeHelpers'
@@ -19,7 +20,8 @@ const createRedisKeyForStudyTrackStats = (id: string, graduated: Graduated, spec
   return `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 }
 
-const shouldSaveToRedis = (id: unknown) => {
+// *Should* always be a string (previously unknown)
+const shouldSaveToRedis = (id: string) => {
   if (typeof id !== 'string') return false
   if (isRelevantProgramme(id)) return true
   const splitId = id.split('-')
@@ -31,7 +33,7 @@ export const getBasicStats = async (
   combinedProgramme: string | null,
   yearType: YearType,
   specialGroups: SpecialGroups
-) => {
+): Promise<BasicStats | null> => {
   const searchKey = combinedProgramme ? `${id}-${combinedProgramme}` : id
   const redisKey = createRedisKeyForBasicStats(searchKey, yearType, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
@@ -41,7 +43,7 @@ export const getBasicStats = async (
   return JSON.parse(dataFromRedis)
 }
 
-export const setBasicStats = async (data, yearType: YearType, specialGroups: SpecialGroups) => {
+export const setBasicStats = async (data: BasicStats, yearType: YearType, specialGroups: SpecialGroups) => {
   const { id } = data
   if (!shouldSaveToRedis(id)) {
     return
