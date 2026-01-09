@@ -1,3 +1,4 @@
+import AssignmentCheckedIcon from '@mui/icons-material/AssignmentTurnedIn'
 import CheckIcon from '@mui/icons-material/Check'
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
@@ -18,6 +19,7 @@ import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
+import { CreditTypeCode } from '@oodikone/shared/types'
 import { Courses, CourseTabModule, CourseTabStudent } from '.'
 
 const columnHelper = createColumnHelper<CourseTabStudent>()
@@ -159,12 +161,23 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                 const substitutePrefix = sub ? `Substituting course: ${sub}\n` : ''
 
                 if (correctCourse.grade) {
+                  const isTransferred = correctCourse.credittypecode === CreditTypeCode.APPROVED
                   const title =
                     substitutePrefix +
-                    `Grade: ${correctCourse.grade}\nCompleted on: ${formatDate(correctCourse.completionDate, dateFormat)}`
+                    (isTransferred
+                      ? `Grade: ${correctCourse.grade}\nTransferred on: ${formatDate(correctCourse.completionDate, dateFormat)}`
+                      : `Grade: ${correctCourse.grade}\nCompleted on: ${formatDate(correctCourse.completionDate, dateFormat)}`)
                   return (
                     <div title={title}>
-                      <CheckIcon sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }} />
+                      {isTransferred ? (
+                        <AssignmentCheckedIcon
+                          sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }}
+                        />
+                      ) : (
+                        <CheckIcon
+                          sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }}
+                        />
+                      )}
                     </div>
                   )
                 } else if (correctCourse.enrollmentDate) {
