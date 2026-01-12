@@ -82,11 +82,11 @@ export const courseFilter = createFilter({
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter(student, { precomputed, options }) {
+  filter(student, { options }) {
     const { courses, enrollments } = student
 
     for (const [code, filterType] of Object.entries(options.courseFilters)) {
-      const found = [code, ...(precomputed.substitutedBy[code] ?? [])].some(course => {
+      const found = [code, ...(options.substitutedBy[code] ?? [])].some(course => {
         const enrolled = enrollments.some(({ course_code }) => course_code === course)
         const attainment = courses.some(({ course_code }) => course_code === code)
         const passed = courses.some(({ course_code, passed }) => course_code === code && passed)
