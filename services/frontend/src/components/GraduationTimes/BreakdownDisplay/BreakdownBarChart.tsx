@@ -47,9 +47,9 @@ export const BreakdownBarChart = ({
   const codeMap = {}
 
   for (const item of data) {
-    ;(statData[0].data as number[]).push(item.statistics.onTime)
-    ;(statData[1].data as number[]).push(item.statistics.yearOver)
-    ;(statData[2].data as number[]).push(item.statistics.wayOver)
+    statData[0].data?.push(item.statistics.onTime)
+    statData[1].data?.push(item.statistics.yearOver)
+    statData[2].data?.push(item.statistics.wayOver)
     categories = [...categories, item.name]
     if (!facultyGraph) {
       codeMap[item.name || item.code!] = item.code

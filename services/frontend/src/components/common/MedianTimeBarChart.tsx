@@ -6,7 +6,8 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { Section } from '@/components/Section'
-import type { MedianEntry, GraduationStatistics } from '@oodikone/shared/types'
+import type { GraduationStatistics } from '@oodikone/shared/types'
+import { ChartGraduationTimes } from '@oodikone/shared/types/graduations'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
@@ -19,8 +20,8 @@ export const MedianTimeBarChart = ({
   title,
 }: {
   byStartYear: boolean
-  data: Array<MedianEntry>
-  goal: number
+  data: ChartGraduationTimes['medians'] | undefined
+  goal: ChartGraduationTimes['goal']
   title: string
 }) => {
   if (!data) {

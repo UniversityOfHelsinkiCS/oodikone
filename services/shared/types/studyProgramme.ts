@@ -1,4 +1,4 @@
-import { GraduationStatistics } from './graduations'
+import { ChartGraduationTimes, GraduationStatistics } from './graduations'
 import { Name } from './name'
 
 export type StudyProgrammeCourse = {
@@ -27,7 +27,7 @@ export type StudyProgrammeCourse = {
 
 export type MedianEntry = {
   amount: number
-  classSize: number
+  classSize?: number
   name: string
   statistics: GraduationStatistics
   times: number[]
@@ -68,6 +68,21 @@ export type BasicStats = {
   }[]
   tableStats: number[][]
   titles: string[]
+}
+
+export type ProgrammeGraduationStats = {
+  id: string
+  years: number[]
+  tableStats: (string | number)[][]
+  titles: string[]
+  graphStats: { name: string; data: number[] }[]
+  graduationTimes: ChartGraduationTimes
+  doCombo: boolean
+  comboTimes: ChartGraduationTimes
+  graduationTimesSecondProgramme: ChartGraduationTimes
+  programmesBeforeOrAfterTableStats: (string | number | Name)[][] | undefined
+  programmesBeforeOrAfterGraphStats: { name: Name; code: string; data: number[] }[] | undefined
+  programmesBeforeOrAfterTitles: (string | number)[]
 }
 
 export type StudyTrackStats = {

@@ -1,3 +1,5 @@
+import { MedianEntry } from './studyProgramme'
+
 export type FacultyClassSizes = {
   bachelor: Record<string, number>
   bcMsCombo: Record<string, number>
@@ -23,6 +25,11 @@ export type GraduationStatistics = {
   onTime: number
   yearOver: number
   wayOver: number
+}
+
+export type ChartGraduationTimes = {
+  medians: MedianEntry[]
+  goal: number
 }
 
 export type GraduationStats = {
