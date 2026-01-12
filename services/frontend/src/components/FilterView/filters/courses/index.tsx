@@ -7,8 +7,8 @@ import { FilterType } from './filterType'
 
 type CourseStats = Record<string, any>
 
-const CourseFilterCard = ({ precomputed, options, onOptionsChange }: FilterTrayProps) => {
-  const courseStats: CourseStats = precomputed.courses
+const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
+  const courseStats: CourseStats = options.courses
 
   const courseFilters: Record<string, number> = options?.courseFilters
   const { getTextIn } = useLanguage()
@@ -58,9 +58,11 @@ export const courseFilter = createFilter({
 
   defaultOptions: {
     courseFilters: {},
+    courses: {},
+    substitutedBy: [],
   },
 
-  precompute: ({ args }) => {
+  precompute: ({ args, options }) => {
     const substitutedBy = args.courses.reduce(
       (acc, course) => {
         const { code, substitutions } = course
@@ -74,10 +76,8 @@ export const courseFilter = createFilter({
       {} as Record<string, string[]>
     )
 
-    return {
-      courses: Object.fromEntries(args.courses.map(course => [course.code, course])),
-      substitutedBy,
-    }
+    options.courses = Object.fromEntries(args.courses.map(course => [course.code, course]))
+    options.substitutedBy = substitutedBy
   },
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
@@ -115,6 +115,7 @@ export const courseFilter = createFilter({
 
   selectors: {
     isCourseSelected: ({ courseFilters }, course) => !!courseFilters[course],
+    selectedCourseName: ({ courses }, courseCodes) => courses[courseCodes[0]]?.name,
   },
 
   actions: {

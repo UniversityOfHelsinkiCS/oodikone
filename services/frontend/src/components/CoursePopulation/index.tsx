@@ -18,6 +18,7 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
 } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
@@ -39,6 +40,18 @@ import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 
+const CourseTitle = ({ codes, dateRange, unifyCourses }) => {
+  const { useFilterSelector } = useFilters()
+  const { getTextIn } = useLanguage()
+
+  const courseName = useFilterSelector(courseFilter.selectors.selectedCourseName(codes))
+  const header = courseName ? `${getTextIn(courseName)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
+
+  const subHeader = codes.join(', ')
+
+  return <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
+}
+
 export const CoursePopulation = () => {
   useTitle('Course population')
 
@@ -56,9 +69,6 @@ export const CoursePopulation = () => {
     separate,
     unifyCourses,
   })
-
-  // HACK: There should be a way to infer this but at least we don't fetch the whole database now...
-  const courseName = population?.coursestatistics.courses.find(course => course.code === codes[0])?.name ?? null
 
   useEffect(() => {
     const parsedCourseCodes = JSON.parse(coursecodes)
@@ -98,10 +108,6 @@ export const CoursePopulation = () => {
   if (!dateFrom || !dateTo) return null
 
   const dateRange = `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
-
-  const header = courseName ? `${getTextIn(courseName)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
-
-  const subHeader = codes.join(', ')
 
   if (!population || !semesters) return <PageLoading isLoading />
 
@@ -232,7 +238,7 @@ export const CoursePopulation = () => {
     >
       {(filteredStudents, filteredCourses) => (
         <>
-          <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
+          <CourseTitle codes={codes} dateRange={dateRange} unifyCourses={unifyCourses} />
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>
       )}
