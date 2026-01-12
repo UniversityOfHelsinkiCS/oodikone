@@ -92,7 +92,7 @@ export const gradeFilter = createFilter({
   filter(student, { precomputed, options }) {
     const { selected } = options
 
-    return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))
+    return selected.some(selectedGrade => precomputed.grades[selectedGrade]?.includes(student.studentNumber) ?? false)
   },
 
   render: GradeFilterCard,
