@@ -63,7 +63,8 @@ const calculateAbsenceInMonths = (
 /**
  * Absence rules:
  * 1. Student can have any number of statutory absences (lakisääteinen poissaolo)
- * 2. Student can have 2 non-statutory absences
+ * 2a. Student can have 2 non-statutory absences
+ * 2b. If study right started before 1.8.2015, student can have 4 non-statutory absences instead of 2
  *
  * Additional _non-statutory_ absences will consume semesters
  */
@@ -73,6 +74,8 @@ export const calculateDurationOfStudies = (
   semesterEnrollments: SemesterEnrollment[],
   semesters: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters']
 ) => {
+  const allowedNonStatutoryAbsences = dayjs(startDate).isBefore(dayjs('2015-08-01'), 'day') ? 4 : 2
+
   const semestersWithStatutoryAbsence = semesterEnrollments
     .filter(enrollment => enrollment.statutoryAbsence)
     .map(enrollment => enrollment.semester)
@@ -80,7 +83,7 @@ export const calculateDurationOfStudies = (
   const semestersWithNonStatutoryAbsence = semesterEnrollments
     .filter(enrollment => enrollment.type === EnrollmentType.ABSENT && !enrollment.statutoryAbsence)
     .map(enrollment => enrollment.semester)
-    .slice(0, 2) // Max 2 non statutory absences
+    .slice(0, allowedNonStatutoryAbsences)
 
   const monthsToSubtract = [...semestersWithStatutoryAbsence, ...semestersWithNonStatutoryAbsence].reduce(
     (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
