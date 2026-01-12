@@ -20,6 +20,7 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
+import { Name } from '@oodikone/shared/types'
 import { BarChart } from './BarChart'
 
 const getGraduatedText = (code: string) => {
@@ -297,16 +298,18 @@ export const BasicInformationTab = ({
               cypress="programmes-before-or-after"
               data={graduations?.data?.programmesBeforeOrAfterGraphStats.map(programme => ({
                 ...programme,
-                name: getTextIn(programme.name),
+                name: getTextIn(programme.name) ?? '',
               }))}
               exportFileName={`oodikone_graduations_${studyProgramme}_${getTimestamp()}`}
-              labels={graduations?.data?.years}
+              labels={graduations?.data?.years?.map(toString)}
             />
             <DataTable
               cypress="programmes-before-or-after"
-              data={graduations?.data?.programmesBeforeOrAfterTableStats.map(programme =>
-                programme.with(2, getTextIn(programme[2]))
-              )}
+              data={
+                graduations?.data?.programmesBeforeOrAfterTableStats?.map(programme =>
+                  programme.with(2, getTextIn(programme[2] as Name) ?? '')
+                ) as (string | number)[][]
+              } // Only Name-type is in the index 2, which is converted to string here
               titles={graduations?.data?.programmesBeforeOrAfterTitles}
             />
           </Stack>

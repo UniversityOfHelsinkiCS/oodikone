@@ -10,6 +10,8 @@ import {
   ExtentCode,
   Phase,
 } from '@oodikone/shared/types'
+import { ChartGraduationTimes } from '@oodikone/shared/types/graduations'
+import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
 import { mapToProviders } from '@oodikone/shared/util'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
 import { countTimeCategories } from '../graduationHelpers'
@@ -184,8 +186,8 @@ const getGraduationTimeAndThesisWriterStats = async ({
   }
 
   const goal = await getGoal(studyProgramme)
-  const times: GraduationTimes = { medians: [], goal }
-  const comboTimes: GraduationTimes = { medians: [], goal: goal + 36 }
+  const times: ChartGraduationTimes = { medians: [], goal }
+  const comboTimes: ChartGraduationTimes = { medians: [], goal: goal + 36 }
 
   for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])
@@ -193,7 +195,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
     times.medians.push({
       y: median,
       amount: graduationTimes[year].length,
-      name: year,
+      name: year.toString(),
       statistics,
       times: [...graduationTimes[year]],
     })
@@ -204,7 +206,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
       comboTimes.medians.push({
         y: median,
         amount: graduationTimesCombo[year].length,
-        name: year,
+        name: year.toString(),
         statistics,
         times: [...graduationTimesCombo[year]],
       })
@@ -217,12 +219,16 @@ const formatStats = (stats: Record<string, ProgrammeWithYears>, years: Array<str
   const tableStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
     .map(p => [p.code, getId(p.code), p.name, ...years.map(year => p[year])])
-    .sort((a, b) => sortByProgrammeCode(a[0] as string, b[0] as string))
+    .sort((a, b) =>
+      sortByProgrammeCode(a[0] as string, b[0] as string)
+    ) as ProgrammeGraduationStats['programmesBeforeOrAfterTableStats']
 
   const graphStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
     .map(p => ({ name: p.name, code: p.code, data: years.map(year => p[year]) }))
-    .sort((a, b) => sortByProgrammeCode(a.code, b.code))
+    .sort((a, b) =>
+      sortByProgrammeCode(a.code, b.code)
+    ) as ProgrammeGraduationStats['programmesBeforeOrAfterGraphStats']
 
   return { tableStats, graphStats }
 }
@@ -333,7 +339,7 @@ export const getGraduationStatsForStudyTrack = async ({
   studyProgramme: string
   combinedProgramme?: string
   settings: { isAcademicYear: boolean; includeAllSpecials: boolean }
-}) => {
+}): Promise<ProgrammeGraduationStats> => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]
@@ -367,6 +373,7 @@ export const getGraduationStatsForStudyTrack = async ({
     'Graduated licentiate',
     'Wrote thesis licentiate',
   ]
+
   const programmesBeforeOrAfterTitles = ['Code', 'Id', 'Programme', ...years]
   const tableStatsDefault = combinedProgramme
     ? reversedYears.map(year => [

@@ -145,7 +145,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         studyTrackStats.graduationTimes[studyProgramme].medians[combo ? 'combo' : 'basic']
       ).reduce(
         (acc, { name, classSize }) => {
-          acc[name] = classSize
+          acc[name] = classSize!
           return acc
         },
         {} as Record<string, number>
@@ -154,7 +154,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         (acc, [programme, { medians }]) => {
           acc[programme] = {}
           for (const { name, classSize } of Object.values(combo ? medians.combo : medians.basic)) {
-            acc[programme][name] = classSize
+            acc[programme][name] = classSize!
           }
           return acc
         },
