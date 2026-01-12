@@ -301,7 +301,7 @@ export const BasicInformationTab = ({
                 name: getTextIn(programme.name) ?? '',
               }))}
               exportFileName={`oodikone_graduations_${studyProgramme}_${getTimestamp()}`}
-              labels={graduations?.data?.years?.map(toString)}
+              labels={graduations?.data?.years?.map(year => year.toString())}
             />
             <DataTable
               cypress="programmes-before-or-after"
