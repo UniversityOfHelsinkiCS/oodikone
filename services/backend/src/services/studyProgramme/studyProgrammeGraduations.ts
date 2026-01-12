@@ -9,6 +9,7 @@ import {
   DegreeProgrammeType,
   ExtentCode,
   Phase,
+  EnrollmentType,
 } from '@oodikone/shared/types'
 import { ChartGraduationTimes } from '@oodikone/shared/types/graduations'
 import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
@@ -59,6 +60,13 @@ const calculateAbsenceInMonths = (
   return Math.round(dayjs(absence.enddate).diff(absence.startdate, 'months', true))
 }
 
+/**
+ * Absence rules:
+ * 1. Student can have any number of statutory absences (lakisääteinen poissaolo)
+ * 2. Student can have 2 non-statutory absences
+ *
+ * Additional _non-statutory_ absences will consume semesters
+ */
 export const calculateDurationOfStudies = (
   startDate: Date,
   graduationDate: Date,
@@ -68,7 +76,13 @@ export const calculateDurationOfStudies = (
   const semestersWithStatutoryAbsence = semesterEnrollments
     .filter(enrollment => enrollment.statutoryAbsence)
     .map(enrollment => enrollment.semester)
-  const monthsToSubtract = semestersWithStatutoryAbsence.reduce(
+
+  const semestersWithNonStatutoryAbsence = semesterEnrollments
+    .filter(enrollment => enrollment.type === EnrollmentType.ABSENT && !enrollment.statutoryAbsence)
+    .map(enrollment => enrollment.semester)
+    .slice(0, 2) // Max 2 non statutory absences
+
+  const monthsToSubtract = [...semestersWithStatutoryAbsence, ...semestersWithNonStatutoryAbsence].reduce(
     (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
     0
   )
