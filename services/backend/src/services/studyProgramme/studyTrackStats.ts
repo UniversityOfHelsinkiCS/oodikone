@@ -410,6 +410,15 @@ const getMainStatsByTrackAndYear = async (
     }
   }
 
+  const graduatedCount: Record<string, number> = {}
+  years.forEach(year => {
+    if (!yearlyStats[year]) {
+      graduatedCount[year] = 0
+    } else {
+      graduatedCount[year] = yearlyStats[year][studyProgramme].graduated
+    }
+  })
+
   const { mainStatsByYear, mainStatsByTrack, otherCountriesCount } = combineStats(
     years,
     yearlyStats,
@@ -438,6 +447,7 @@ const getMainStatsByTrackAndYear = async (
     otherCountriesCount,
     creditCounts,
     creditCountsCombo,
+    graduatedCount,
     graduationTimes: finalGraduationTimes,
     graduationTimesSecondProg: finalCombinedGraduationTimes,
   }
@@ -484,6 +494,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     creditCounts: stats.creditCounts,
     creditCountsCombo: stats.creditCountsCombo,
     doCombo,
+    graduatedCount: stats.graduatedCount,
     graduationTimes: stats.graduationTimes,
     graduationTimesSecondProg: stats.graduationTimesSecondProg,
     id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,

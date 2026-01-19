@@ -29,7 +29,8 @@ export const ProgressBarChart = ({
     return null
   }
 
-  const colors = generateGradientColors(Object.keys(data.stats).length)
+  const colors = generateGradientColors(Object.keys(data.stats).length - 1)
+  colors.push("#ddd") // For graduated students
   const dataWithColors: SeriesColumnOptions[] = Object.values(data.stats).map((series, index) => ({
     ...series,
     color: colors[index],

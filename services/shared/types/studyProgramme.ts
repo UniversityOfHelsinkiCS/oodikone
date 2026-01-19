@@ -89,6 +89,7 @@ export type StudyTrackStats = {
   creditCounts: Record<string, number[]>
   creditCountsCombo: Record<string, number[]>
   doCombo: boolean
+  graduatedCount: Record<string, number>
   graduationTimes: GraduationTimes
   graduationTimesSecondProg: GraduationTimes
   id: string
