@@ -316,8 +316,11 @@ export const getCreditCategories = (
   const limitBreaks = cumulative
     ? creditCategoryArray.map(num => Math.round(minCredits + (num * (maxCredits - minCredits)) / creditCategoryAmount))
     : [15, 30, 45, 60].map(limit => limit * (timeDivision === TimeDivision.SEMESTER ? 0.5 : 1))
-  const limits: (number[] | "Graduated")[] = range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
-  limits.push("Graduated")
+  const limits: (number[] | 'Graduated')[] = range(0, limitBreaks.length + 1).map(i => [
+    limitBreaks[i - 1],
+    limitBreaks[i],
+  ])
+  limits.push('Graduated')
   return limits
 }
 

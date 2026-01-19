@@ -55,7 +55,7 @@ export const calculateStats = (
   graduatedCount: Record<string, number> | undefined,
   maximumAmountOfCredits: number,
   minimumAmountOfCredits = 0,
-  numberOfCreditCategories = 7,
+  numberOfCreditCategories = 7
 ) => {
   const tableStats: Array<Array<number | string>> = []
   if (creditCounts === undefined) {
@@ -76,7 +76,7 @@ export const calculateStats = (
   )
   const tableTitles = ['', 'All']
   for (const limit of limits) {
-    if (limit == "Graduated") tableTitles.push("Graduated")
+    if (limit == 'Graduated') tableTitles.push('Graduated')
     else if (limit[0] === undefined) tableTitles.push(`< ${limit[1]} credits`)
     else if (limit[1] === undefined) tableTitles.push(`≥ ${limit[0]} credits`)
     else tableTitles.push(`${limit[0]}–${limit[1]} credits`)
@@ -87,7 +87,7 @@ export const calculateStats = (
     const yearCounts = [year, yearCreditCount.length]
 
     for (const limit of limits) {
-      if (limit == "Graduated") {
+      if (limit == 'Graduated') {
         yearCounts.push(graduatedCount ? graduatedCount[year] : 0)
       } else {
         yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limit[0], limit[1])).length)

@@ -85,7 +85,7 @@ const getChartData = (
 ) => {
   const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
-  const limits: Array<number[] | "Graduated"> = getCreditCategories(
+  const limits: Array<number[] | 'Graduated'> = getCreditCategories(
     cumulative,
     timeDivision,
     programmeCredits,
@@ -94,7 +94,6 @@ const getChartData = (
   )
   const colors = generateGradientColors(limits.length - 1)
   colors.push('#ddd') // Color for graduated (grey)
-
 
   const data: { y: number; custom: { students: number[] } }[][] = limits.map(() =>
     timeSlots.map(() => ({
@@ -113,22 +112,22 @@ const getChartData = (
         const credits = studentCredits[studentIndex][timeSlotIndex]
 
         const rangeIndex = hasGraduated
-          ? limits.indexOf("Graduated")
+          ? limits.indexOf('Graduated')
           : limits.findIndex(limit => {
-            if (limit === "Graduated") {
-              return false
-            }
+              if (limit === 'Graduated') {
+                return false
+              }
 
-            const [min, max] = limit
+              const [min, max] = limit
 
-            if (min == null) {
-              return credits < max
-            }
-            if (max == null) {
-              return credits >= min
-            }
-            return credits >= min && credits < max
-          })
+              if (min == null) {
+                return credits < max
+              }
+              if (max == null) {
+                return credits >= min
+              }
+              return credits >= min && credits < max
+            })
 
         data[rangeIndex][timeSlotIndex].y += 1
         data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
@@ -141,7 +140,7 @@ const getChartData = (
     const limit = limits[limitN]
     let name
 
-    if (limit === "Graduated") {
+    if (limit === 'Graduated') {
       name = 'Graduated'
     } else {
       const [min, max] = limit
