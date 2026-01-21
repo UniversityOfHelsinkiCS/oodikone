@@ -28,7 +28,9 @@ runs:
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: |
-        docker pull redis:7.2.6 quay.io/toska/jami:production postgres:15.10
+        for img in redis:7.2.6 quay.io/toska/jami:production postgres:15.10; do
+          docker pull "$img"
+        done
         docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
 
     - name: 'Run cypress'
