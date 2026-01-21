@@ -191,7 +191,7 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: backend-image
-      - name: Load frontend image
+      - name: Load backend image
         run: |
           docker load --input backend.tar
           echo "Images after load:"
