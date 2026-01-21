@@ -22,8 +22,12 @@ jobs:
         uses: ./.github/actions/lint
 
   build_frontend:
+    permissions:
+      contents: read
     uses: ./.github/workflows/build_frontend.yaml
   build_backend:
+    permissions:
+      contents: read
     uses: ./.github/workflows/build_backend.yaml
 
   test_end_to_end:
