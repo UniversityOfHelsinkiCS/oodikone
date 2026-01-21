@@ -28,7 +28,7 @@ runs:
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: |
-        for img in redis:7.2.6 quay.io/toska/jami:production postgres:15.10; do
+        for img in redis:7.2.6 quay.io/toska/jami:production postgres:15.10 registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db ; do
           docker pull "$img"
         done
         docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
