@@ -21,14 +21,13 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download frontend image artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: frontend-image
-          path: /tmp
 
       - name: Load image
         run: |
-          docker load -i /tmp/frontend.tar
+          docker load -i frontend.tar
           echo "Images after load:"
           docker images --format '{{.Repository}}:{{.Tag}}' | sort
 
