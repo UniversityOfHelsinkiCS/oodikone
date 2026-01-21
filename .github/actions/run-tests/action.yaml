@@ -27,7 +27,9 @@ runs:
 
     - name: 'Run services, pull rest of the needed images'
       shell: bash
-      run: docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
+      run: |
+        docker pull redis:7.2.6
+        docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v6
