@@ -418,7 +418,7 @@ describe('Degree programme overview', () => {
         .should('contain', 'Less than 30 credits')
         .should('contain', '30–60 credits')
         .should('contain', 'At least 180 credits')
-        .should('contain', '49.8%') // The percentage for total, at least 180 credits, to check that the graph renders
+        .should('contain', '58.5%') // The percentage for total graduated, to check that the graph renders
 
       cy.cs('programme-progress-bar-chart-section').contains('49.8%').trigger('mouseover', { force: true })
       cy.contains('At least 180 credits: 114')
