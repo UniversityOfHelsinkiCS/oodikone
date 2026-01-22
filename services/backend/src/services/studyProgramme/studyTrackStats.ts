@@ -387,8 +387,6 @@ const getMainStatsByTrackAndYear = async (
       } else {
         creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
       }
-    } else {
-      creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
     }
   }
 
