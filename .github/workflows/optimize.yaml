@@ -1,0 +1,144 @@
+name: 'Optimize ci cd build count'
+
+on:
+  push:
+    branches:
+      - ci-cd-improvement
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+      password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+
+  release_frontend:
+    name: 'Release frontend'
+    runs-on: ubuntu-latest
+    needs:
+      - test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download frontend image artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: frontend-image
+
+      - name: Load image
+        run: |
+          docker load -i frontend.tar
+          docker images --format '{{.Repository}}:{{.Tag}}' | sort
+
+          docker tag oodikone-frontend:staging oodikone-frontend:staging
+          docker tag oodikone-frontend:${{ github.sha }} oodikone-frontend:${{ github.sha }}
+
+      - name: Login to quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+      - name: Push to quay (using local tags)
+        run: |
+          docker tag oodikone-frontend:${{ github.sha }} quay.io/toska/oodikone-frontend:${{ github.sha }}
+          docker tag oodikone-frontend:staging        quay.io/toska/oodikone-frontend:staging
+          docker push quay.io/toska/oodikone-frontend:${{ github.sha }}
+          docker push quay.io/toska/oodikone-frontend:staging
+
+      # - name: Get current time
+      #   id: get_current_time
+      #   run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
+
+      # - name: Build frontend image
+      #   id: build-image
+      #   uses: redhat-actions/buildah-build@v2
+      #   with:
+      #     image: oodikone-frontend
+      #     tags: staging ${{ github.sha }}
+      #     context: services
+      #     containerfiles: |
+      #       services/frontend/Dockerfile
+      #     build-args: |
+      #       BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
+      #       BASE_PATH=/oodikone
+      #       STAGING=true
+
+      # - name: Push to quay.io
+      #   uses: redhat-actions/push-to-registry@v2
+      #   with:
+      #     image: ${{ steps.build-image.outputs.image }}
+      #     tags: ${{ steps.build-image.outputs.tags }}
+      #     registry: quay.io/toska
+      #     username: toska+github
+      #     password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_backend:
+    name: 'Release backend'
+    runs-on: ubuntu-latest
+    needs:
+      - test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # - name: Build backend image
+      #   id: build-image
+      #   uses: redhat-actions/buildah-build@v2
+      #   with:
+      #     image: oodikone-backend
+      #     tags: staging ${{ github.sha }}
+      #     context: services
+      #     containerfiles: |
+      #       services/backend/Dockerfile
+      #     build-args: |
+      #       BASE_PATH=/oodikone
+      #       GIT_SHA=${{ github.sha }}
+      #       STAGING=true
+
+      # - name: Push to quay.io
+      #   uses: redhat-actions/push-to-registry@v2
+      #   with:
+      #     image: ${{ steps.build-image.outputs.image }}
+      #     tags: ${{ steps.build-image.outputs.tags }}
+      #     registry: quay.io/toska
+      #     username: toska+github
+      #     password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  report_success:
+    name: 'Report deployment success to the "oodikone_notifications" channel'
+    runs-on: ubuntu-latest
+    needs:
+      - release_frontend
+      - release_backend
+
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: 'Send notification to Slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment
+          softa-url: https://toska-staging.cs.helsinki.fi/oodikone
+          deployment-target: staging
+
+  report_failure:
+    name: 'Report deployment failure to the "oodikone_notifications" channel'
+    runs-on: ubuntu-latest
+    needs:
+      - release_frontend
+      - release_backend
+
+    if: failure()
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: 'Send notification to Slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: staging

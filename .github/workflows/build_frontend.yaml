@@ -1,0 +1,32 @@
+name: 'Build images and upload as artifacts'
+on:
+  workflow_call: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - name: Build frontend image and export
+        uses: docker/build-push-action@v6
+        with:
+          context: services
+          file: services/frontend/Dockerfile
+          push: false
+          tags: |
+            oodikone-frontend:latest
+            oodikone-frontend:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/frontend.tar
+          build-args: |
+            BUILT_AT=${{ github.event.head_commit.timestamp }}
+            BASE_PATH=/oodikone
+            STAGING=true
+        env:
+          DOCKER_BUILD_SUMMARY: false
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: frontend-image
+          path: /tmp/frontend.tar
