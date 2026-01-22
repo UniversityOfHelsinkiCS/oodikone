@@ -30,8 +30,6 @@ runs:
       run: |
         docker compose --file docker-compose.ci.yml pull --quiet redis jami jami-db nginx kone-db sis-db user-db sis-importer-db
         docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
-        sleep 10
-        docker ps | grep "frontend|backend"
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v6
