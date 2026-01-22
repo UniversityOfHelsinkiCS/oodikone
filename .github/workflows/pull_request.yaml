@@ -76,6 +76,10 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: frontend-image
+      - name: Verify frontend artifact downloaded
+        run: |
+          ls -lah frontend.tar || echo "ERROR: frontend.tar not found!"
+          file frontend.tar || echo "ERROR: Could not identify frontend.tar file type"
       - name: Load frontend image
         run: docker load --input frontend.tar
 
@@ -83,11 +87,17 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: backend-image
+      - name: Verify backend artifact downloaded
+        run: |
+          ls -lah backend.tar || echo "ERROR: backend.tar not found!"
+          file backend.tar || echo "ERROR: Could not identify backend.tar file type"
       - name: Load backend image
         run: |
           docker load --input backend.tar
           echo "Images after load:"
           docker images --format '{{.Repository}}:{{.Tag}}' | sort
+          echo "Verifying required images exist:"
+          docker images | grep -E "oodikone-(frontend|backend)" || echo "WARNING: Required images not found!"
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests

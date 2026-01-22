@@ -30,6 +30,11 @@ runs:
       run: |
         docker compose --file docker-compose.ci.yml pull --quiet redis jami jami-db nginx kone-db sis-db user-db sis-importer-db
         docker compose --file docker-compose.ci.yml up --detach --no-build --pull never
+        echo "Waiting for services to be healthy..."
+        sleep 10
+        docker compose --file docker-compose.ci.yml ps
+        echo "Checking if frontend and backend containers are running:"
+        docker ps | grep -E "frontend|backend" || echo "WARNING: frontend or backend not running!"
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v6
