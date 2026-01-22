@@ -111,6 +111,7 @@ export const combineFacultyStudentProgress = async (
   const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
   const allDegreeProgrammes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
   const creditCounts: Record<string, Record<string, number[]>> = {}
+  const graduatedCount: Record<string, Record<string, number>> = {}
   const progressStats: Record<string, Record<string, number[][]>> = {}
   const yearlyTitles: Record<string, string[][]> = {}
 
@@ -141,12 +142,14 @@ export const combineFacultyStudentProgress = async (
     }
   }
 
-  const updateCreditCounts = (
+  const updateCreditAndGraduatedCount = (
     level: 'bachelor' | 'bcMs' | 'master' | 'doctor',
-    creditCountsOfProgramme: Record<string, number[]>
+    creditCountsOfProgramme: Record<string, number[]>,
+    graduatedCountOfProgramme: Record<string, number>
   ) => {
     if (!(level in creditCounts)) {
       creditCounts[level] = cloneDeep(creditCountsOfProgramme)
+      graduatedCount[level] = cloneDeep(graduatedCountOfProgramme)
     } else {
       for (const year of Object.keys(creditCountsOfProgramme)) {
         if (!(year in creditCounts[level])) {
@@ -154,6 +157,10 @@ export const combineFacultyStudentProgress = async (
         } else {
           creditCounts[level][year].push(...creditCountsOfProgramme[year])
         }
+      }
+
+      for (const year of Object.keys(graduatedCountOfProgramme)) {
+        graduatedCount[level][year] = cloneDeep(graduatedCountOfProgramme[year])
       }
     }
   }
@@ -167,11 +174,11 @@ export const combineFacultyStudentProgress = async (
     const { degreeProgrammeType, progId } = programmeInfo
     const level = programmeTypes[degreeProgrammeType]
 
-    updateCreditCounts(level, stats.creditCounts)
+    updateCreditAndGraduatedCount(level, stats.creditCounts, stats.graduatedCount)
     calculateProgressStats(level, stats.creditCounts, yearlyTitles, progressStats, progId)
 
     if (level === 'master' && Object.keys(stats.creditCountsCombo).length > 0) {
-      updateCreditCounts('bcMs', stats.creditCountsCombo)
+      updateCreditAndGraduatedCount('bcMs', stats.creditCountsCombo, stats.graduatedCount)
       calculateProgressStats('bcMs', stats.creditCountsCombo, yearlyTitles, progressStats, progId)
     }
   }
@@ -184,6 +191,7 @@ export const combineFacultyStudentProgress = async (
     bcMsProgStats: progressStats.bcMs,
     doctoralProgStats: progressStats.doctor,
     creditCounts: {} as Record<string, Record<string, number[]>>,
+    graduatedCount: {} as Record<string, Record<string, number>>,
     yearlyBachelorTitles: yearlyTitles.bachelor,
     yearlyBcMsTitles: yearlyTitles.bcMs,
     yearlyMasterTitles: yearlyTitles.master,
@@ -205,6 +213,14 @@ export const combineFacultyStudentProgress = async (
         result.creditCounts[levelName] = {}
       }
       result.creditCounts[levelName][year] = creditCounts[level][year]
+    }
+
+    for (const year of Object.keys(graduatedCount[level]).toSorted(sortByYear)) {
+      const levelName = level === 'bcMs' ? 'bachelorMaster' : level
+      if (!(levelName in result.graduatedCount)) {
+        result.graduatedCount[levelName] = {}
+      }
+      result.graduatedCount[levelName][year] = graduatedCount[level][year]
     }
   }
 

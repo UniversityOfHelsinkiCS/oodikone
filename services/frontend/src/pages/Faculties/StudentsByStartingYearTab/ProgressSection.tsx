@@ -39,15 +39,30 @@ export const ProgressSection = ({
     )
   }
 
-  const bachelorStats = calculateStats(progressStats?.data?.creditCounts?.bachelor, 180)
+  const bachelorStats = calculateStats(
+    progressStats?.data?.creditCounts?.bachelor,
+    progressStats?.data?.graduatedCount?.bachelor,
+    180
+  )
   const bachelorMasterStats = calculateStats(
     progressStats?.data?.creditCounts?.bachelorMaster,
+    progressStats?.data?.graduatedCount?.bachelorMaster,
     faculty.code === 'H90' ? 360 : 300,
     180,
     7
   )
-  const masterStats = calculateStats(progressStats?.data?.creditCounts?.master, 120)
-  const doctorStats = calculateStats(progressStats?.data?.creditCounts?.doctor, 40, 0, 5)
+  const masterStats = calculateStats(
+    progressStats?.data?.creditCounts?.master,
+    progressStats?.data?.graduatedCount?.master,
+    120
+  )
+  const doctorStats = calculateStats(
+    progressStats?.data?.creditCounts?.doctor,
+    progressStats?.data?.graduatedCount?.doctor,
+    40,
+    0,
+    5
+  )
 
   const hasNonZeroStats = stats => {
     const allValuesZero = values => values.every(value => parseFloat(value) === 0)
