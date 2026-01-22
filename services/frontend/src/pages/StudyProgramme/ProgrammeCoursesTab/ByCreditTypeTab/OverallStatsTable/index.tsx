@@ -45,23 +45,23 @@ export const OverallStatsTable = ({
         header: 'Name',
         Cell: ({ cell }) => getTextIn(cell.getValue<Name>()),
       },
-      {
-        accessorKey: 'totalAllStudents',
-        header: showStudents ? 'Total' : 'Total credits',
-        Header: <HeaderCell value={showStudents ? 'Total' : 'Total credits'} />,
-        Cell: ({ cell }) => cell.getValue<number>(),
-        muiTableHeadCellProps: {
-          align: 'right',
-        },
-        muiTableBodyCellProps: {
-          align: 'right',
-        },
-      },
     ],
     [getTextIn, showStudents]
   )
 
   const getCreditColumns = (): MRT_ColumnDef<any>[] => [
+    {
+      accessorKey: 'totalAllCredits',
+      header: 'Total credits',
+      Header: <HeaderCell value="Total credits" />,
+      Cell: ({ cell }) => cell.getValue<number>(),
+      muiTableHeadCellProps: {
+        align: 'right',
+      },
+      muiTableBodyCellProps: {
+        align: 'right',
+      },
+    },
     {
       accessorKey: 'totalProgrammeCredits',
       header: 'Major credits',
@@ -113,6 +113,18 @@ export const OverallStatsTable = ({
   ]
 
   const getStudentColumns = (): MRT_ColumnDef<any>[] => [
+    {
+      accessorKey: 'totalAllStudents',
+      header: 'Total',
+      Header: <HeaderCell value="Total" />,
+      Cell: ({ cell }) => cell.getValue<number>(),
+      muiTableHeadCellProps: {
+        align: 'right',
+      },
+      muiTableBodyCellProps: {
+        align: 'right',
+      },
+    },
     {
       id: 'breakdown',
       header: 'Breakdown of total',
@@ -227,12 +239,6 @@ export const OverallStatsTable = ({
         pageSize,
         pageIndex: 0,
       },
-      sorting: [
-        {
-          id: 'totalAllStudents',
-          desc: true,
-        },
-      ],
     },
   })
 
