@@ -414,6 +414,8 @@ describe('Degree programme overview', () => {
     })
 
     it('Progress section', () => {
+      cy.cs('programme-progress-bar-chart-section').scrollIntoView()
+
       cy.cs('programme-progress-bar-chart-section')
         .should('contain', 'Less than 30 credits')
         .should('contain', '30–60 credits')
