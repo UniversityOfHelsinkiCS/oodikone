@@ -338,9 +338,6 @@ const getMainStatsByTrackAndYear = async (
     if (!studyRightElement) {
       continue
     }
-    if (!includeGraduated && studyRightElement.graduated) {
-      continue
-    }
 
     const [hasTransferredFromProgramme, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
       studyRight,
@@ -378,12 +375,17 @@ const getMainStatsByTrackAndYear = async (
     }
 
     const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
-    if (countAsBachelorMaster) {
-      const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
-      if (startedInBachelor && years.includes(defineYear(startedInBachelor, true))) {
-        creditCountsCombo[defineYear(startedInBachelor, true)].push(
-          getCreditCount(studyRight.student.credits, startedInBachelor)
-        )
+    // TODO: FIXME: This could be written better
+    if (!studyRightElement.graduated) {
+      if (countAsBachelorMaster) {
+        const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
+        if (startedInBachelor && years.includes(defineYear(startedInBachelor, true))) {
+          creditCountsCombo[defineYear(startedInBachelor, true)].push(
+            getCreditCount(studyRight.student.credits, startedInBachelor)
+          )
+        }
+      } else {
+        creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
       }
     } else {
       creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
