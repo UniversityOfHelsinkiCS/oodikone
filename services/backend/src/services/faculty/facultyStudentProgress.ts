@@ -15,7 +15,7 @@ type CreditLimits = Array<[number | null, number | null]>
 const createLimits = (
   months: number,
   startingCredits: number,
-  level: 'bachelor' | 'master' | 'doctor'
+  level: 'bachelor' | 'master' | 'bcMs' | 'doctor'
 ): CreditLimits => {
   if (level === 'doctor') {
     return [
@@ -28,11 +28,11 @@ const createLimits = (
   }
 
   return [
-    [Math.ceil(months * (60 / 12)), null],
-    [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
-    [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
-    [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
-    [startingCredits + 1, Math.ceil(months * (15 / 12))],
+    [startingCredits + Math.ceil(months * (60 / 12)), null],
+    [startingCredits + Math.ceil(months * (45 / 12)), startingCredits + Math.ceil(months * (60 / 12))],
+    [startingCredits + Math.ceil(months * (30 / 12)), startingCredits + Math.ceil(months * (45 / 12))],
+    [startingCredits + Math.ceil(months * (15 / 12)), startingCredits + Math.ceil(months * (30 / 12))],
+    [startingCredits + 1, startingCredits + Math.ceil(months * (15 / 12))],
     [null, startingCredits],
   ]
 }
@@ -58,22 +58,18 @@ const calculateProgressStats = (
   progressStats: Record<string, Record<string, number[][]>>,
   progId: string
 ) => {
-  const goalMonthsForLevels = { bachelor: 36, master: 24, bcMs: 60, doctor: 48 } as const
+  // "bcMs" is the same as masters, as the students have graduated from bachelors.
+  // We need to add the 180cr to the starting point for compensation.
+  const goalMonthsForLevels = { bachelor: 36, master: 24, bcMs: 24, doctor: 48 } as const
 
   const allYears = Object.keys(creditCounts)
   const limitsForYears = allYears.reduce<Record<string, CreditLimits>>((acc, year) => {
     const startDate = new Date(`${year.slice(0, 4)}-08-01`)
     const lastDayOfMonth = dayjs().endOf('month')
-    const months =
-      Math.round(dayjs(lastDayOfMonth).diff(startDate, 'months', true)) +
-      Number(level === 'bcMs') * goalMonthsForLevels.bachelor
+    const months = Math.round(dayjs(lastDayOfMonth).diff(startDate, 'months', true))
     const goalMonths = goalMonthsForLevels[level]
 
-    acc[year] = createLimits(
-      Math.min(months, goalMonths),
-      Number(level === 'bcMs') * 180,
-      level === 'bcMs' ? 'master' : level
-    )
+    acc[year] = createLimits(Math.min(months, goalMonths), Number(level === 'bcMs') * 180, level)
     return acc
   }, {})
 
