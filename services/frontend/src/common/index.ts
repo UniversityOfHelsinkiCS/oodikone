@@ -52,14 +52,13 @@ export const getStudentTotalCredits = (
   student: Pick<FormattedStudent, 'courses'>,
   includeTransferredCredits = true
 ) => {
-  const passedCourses = includeTransferredCredits
-    ? student.courses.filter(
-        course =>
-          [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(course.credittypecode) &&
-          !course.isStudyModuleCredit
-      )
-    : student.courses.filter(course => course.credittypecode === CreditTypeCode.PASSED && !course.isStudyModuleCredit)
-  return passedCourses.reduce((a, b) => a + b.credits, 0)
+  const validCreditTypes = includeTransferredCredits
+    ? [CreditTypeCode.PASSED, CreditTypeCode.APPROVED]
+    : [CreditTypeCode.PASSED]
+
+  return student.courses
+    .filter(course => !course.isStudyModuleCredit && validCreditTypes.includes(course.credittypecode))
+    .reduce((a, b) => a + b.credits, 0)
 }
 
 const getGradedCourses = (student: FormattedStudent, includeTransferredCredits = true) =>
