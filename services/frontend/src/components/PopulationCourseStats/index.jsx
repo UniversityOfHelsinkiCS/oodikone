@@ -22,42 +22,30 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
   const [modules, setModules] = useState([])
 
   useEffect(() => {
-    const modules = {}
-
-    filteredCourses
-      ?.filter(({ course }) => visibleCoursesFilter(course, curriculum))
+    const modules = (filteredCourses ?? [])
+      .filter(({ course }) => visibleCoursesFilter(course, curriculum))
       // it needs to be with flatMap and filter and not map and find
       // because there can be many mandatoryCourses with the same course code
       // as they can belong to many categories
       .flatMap(course => {
-        const defaultProgrammeCourses = curriculum.defaultProgrammeCourses.filter(
-          mandatoryCourse => mandatoryCourse.code === course.course.code
-        )
-        const secondProgrammeCourses = curriculum.secondProgrammeCourses.filter(
-          mandatoryCourse => mandatoryCourse.code === course.course.code
-        )
-        return [
-          ...defaultProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-          ...secondProgrammeCourses.map(programmeCourse => ({ ...course, ...programmeCourse })),
-        ]
-      })
-      .forEach(course => {
-        modules[course.parent_code] ??= {
-          module: { code: course.parent_code, name: course.parent_name },
-          courses: [],
-        }
-        modules[course.parent_code].courses.push(course)
-      })
+        const defaultProgrammeCourses = curriculum.defaultProgrammeCourses
+          .filter(pg => pg.code === course.course.code)
+          .map(programmeCourse => ({ ...course, ...programmeCourse }))
 
-    setModules(
-      orderBy(
-        Object.entries(modules).map(([, { module, courses }]) => ({
-          module,
-          courses,
-        })),
-        item => item.module.code
-      )
-    )
+        const secondProgrammeCourses = curriculum.secondProgrammeCourses
+          .filter(pg => pg.code === course.course.code)
+          .map(programmeCourse => ({ ...course, ...programmeCourse }))
+
+        return [defaultProgrammeCourses, secondProgrammeCourses].flat()
+      })
+      .reduce((modules, course) => {
+        modules[course.parent_code] ??= { module: { code: course.parent_code, name: course.parent_name }, courses: [] }
+        modules[course.parent_code].courses.push(course)
+
+        return modules
+      }, {})
+
+    setModules(orderBy(Object.values(modules), item => item.module.code))
   }, [filteredCourses, curriculum])
 
   const contextValue = {
