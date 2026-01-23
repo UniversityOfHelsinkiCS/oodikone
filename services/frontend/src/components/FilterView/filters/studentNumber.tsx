@@ -2,7 +2,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { includes, isEqual, union } from 'lodash'
+import { isEqual, union } from 'lodash'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { formatToArray } from '@oodikone/shared/util'
@@ -71,45 +71,34 @@ export const studentNumberFilter = createFilter({
   filter(student, { options }) {
     const { allowlist, blocklist } = options
 
-    return (
-      (allowlist.length === 0 || includes(allowlist, student.studentNumber)) &&
-      (blocklist.length === 0 || !includes(blocklist, student.studentNumber))
-    )
+    return allowlist.includes(student.studentNumber) && !blocklist.includes(student.studentNumber)
   },
 
   render: StudentNumberFilterCard,
 
   actions: {
-    addToAllowlist: (options, students) => {
-      const sns = formatToArray(students)
-      options.allowlist = union(options.allowlist, sns)
+    addToAllowlist: (options, students) => ({
+      allowlist: union(options.allowlist, formatToArray(students)),
+      blocklist: options.blocklist,
+    }),
 
-      return options
-    },
+    setAllowlist: (options, students) => ({
+      allowlist: formatToArray(students),
+      blocklist: options.blocklist,
+    }),
 
-    setAllowlist: (options, students) => {
-      const sns = formatToArray(students)
-      options.allowlist = sns
+    addToBlocklist: (options, students) => ({
+      allowlist: options.allowlist,
+      blocklist: union(options.blocklist, formatToArray(students)),
+    }),
 
-      return options
-    },
-
-    addToBlocklist: (options, students) => {
-      const sns = formatToArray(students)
-      options.blocklist = union(options.blocklist, sns)
-
-      return options
-    },
-
-    setBlocklist: (options, students) => {
-      const sns = formatToArray(students)
-      options.blocklist = sns
-
-      return options
-    },
+    setBlocklist: (options, students) => ({
+      allowlist: options.allowlist,
+      blocklist: formatToArray(students),
+    }),
   },
 
   selectors: {
-    studentListIsEqualToAllowlist: ({ allowlist }, students) => students.length > 0 && isEqual(allowlist, students),
+    studentListIsEqualToAllowlist: ({ allowlist }, students) => isEqual(allowlist, students),
   },
 })
