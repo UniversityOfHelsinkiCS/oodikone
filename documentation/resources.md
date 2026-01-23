@@ -2,26 +2,19 @@
 
 A collection of useful tools, documentation and other resources.
 
-## AI tools
-
-- [ChatGPT](https://chatgpt.com)
-- [CurreChat](https://curre.helsinki.fi/chat)
-- [GitHub Copilot](https://github.com/features/copilot)
-  - Free for students!
-- [Microsoft Copilot](https://copilot.microsoft.com)
-
 ## Code style and maintainability
 
-- [CodeClimate documentation](https://docs.codeclimate.com/docs)
-  - [Advanced configuration](https://docs.codeclimate.com/docs/advanced-configuration)
 - [ESLint documentation](https://eslint.org/docs/v8.x)
 - [Prettier documentation](https://prettier.io/docs/en)
+- [qlty.sh](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone)
+  - Qlty.sh replaced Code climate which was introduced by Riku
+  - The usefulness of qlty.sh is sometimes questionable
 
 ## Database
 
 - [pgcli](https://www.pgcli.com)
   - A useful commandline tool to interact with the database
-  - Install: `$ pip install pgcli`
+  - Can be installed from some package managers or optionally via `$ pip install pgcli`
 - [Postgres documentation](https://www.postgresql.org/docs/15/index.html)
 - [Sequelize documentation](https://sequelize.org/docs/v6/)
 
@@ -29,8 +22,6 @@ A collection of useful tools, documentation and other resources.
 
 - [GitHub documentation](https://docs.github.com/en)
   - [GitHub Actions](https://docs.github.com/en/actions)
-- [GitHub Education](https://github.com/education/students)
-  - Free benefits for students!
 - [Mermaid.js documentation](https://mermaid.js.org/intro/syntax-reference.html)
 
 ## TypeScript
