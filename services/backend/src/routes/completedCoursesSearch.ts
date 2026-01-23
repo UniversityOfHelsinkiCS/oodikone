@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { difference, intersection } from 'lodash'
+import { difference, intersection } from 'lodash-es'
 
 import { CanError } from '@oodikone/shared/routes'
 import { tryCatch } from '@oodikone/shared/util'

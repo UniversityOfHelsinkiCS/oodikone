@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { omit } from 'lodash'
+import { omit } from 'lodash-es'
 import morgan from 'morgan'
 
 import { FormattedUser } from '../types'

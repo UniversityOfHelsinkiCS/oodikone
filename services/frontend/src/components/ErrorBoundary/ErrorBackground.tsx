@@ -4,7 +4,7 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { random } from 'lodash'
+import { random } from 'lodash-es'
 import ReactHighchart from 'react-highcharts'
 
 import toskaLogo from '@/assets/toska.svg'

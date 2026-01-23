@@ -1,4 +1,4 @@
-import { memoize } from 'lodash'
+import { memoize } from 'lodash-es'
 import { Op, QueryTypes } from 'sequelize'
 
 import { Name, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'

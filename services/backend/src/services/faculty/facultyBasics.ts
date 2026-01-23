@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 import { NameWithCode, DegreeProgrammeType } from '@oodikone/shared/types'
 import { BasicStats } from '@oodikone/shared/types/studyProgramme'

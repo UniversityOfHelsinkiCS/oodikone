@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-import { sortBy } from 'lodash'
+import { sortBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 import { DateFormat } from '@/constants/date'

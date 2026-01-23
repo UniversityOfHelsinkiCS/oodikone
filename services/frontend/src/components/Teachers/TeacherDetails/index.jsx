@@ -2,7 +2,7 @@ import Paper from '@mui/material/Paper'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
-import { isString } from 'lodash'
+import { isString } from 'lodash-es'
 import { useState } from 'react'
 import { Navigate } from 'react-router'
 

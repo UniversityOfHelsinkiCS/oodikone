@@ -12,7 +12,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { mean, groupBy } from 'lodash'
+import { mean, groupBy } from 'lodash-es'
 import { Fragment, useState } from 'react'
 
 import { PercentageBar } from '@/components/common/PercentageBar'

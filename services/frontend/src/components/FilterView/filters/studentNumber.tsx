@@ -2,7 +2,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { isEqual, union } from 'lodash'
+import { isEqual, union } from 'lodash-es'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { formatToArray } from '@oodikone/shared/util'

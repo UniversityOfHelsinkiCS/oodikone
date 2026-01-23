@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
 import { AxiosError } from 'axios'
-import { uniq } from 'lodash'
+import { uniq } from 'lodash-es'
 
 import type { StudyGuidanceGroup, Tags, TagsByGroupId, GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StudyGuidanceGroupTagModel } from '../models/kone'

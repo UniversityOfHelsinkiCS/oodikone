@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 import { DegreeProgrammeType, type NameWithCode } from '@oodikone/shared/types'
 import { getGraduationStats, setGraduationStats } from '../analyticsService'

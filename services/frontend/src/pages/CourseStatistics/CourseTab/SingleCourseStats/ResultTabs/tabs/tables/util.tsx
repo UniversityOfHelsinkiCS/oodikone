@@ -1,4 +1,4 @@
-import { flatten } from 'lodash'
+import { flatten } from 'lodash-es'
 
 import { FAILED_GRADES, NUMERIC_GRADES, OTHER_PASSED_GRADES } from '@/constants/grades'
 import { FormattedStats } from '@/types/courseStat'

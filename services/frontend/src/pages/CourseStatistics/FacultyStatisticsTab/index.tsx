@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 
-import { flatten, uniq } from 'lodash'
+import { flatten, uniq } from 'lodash-es'
 import { useState } from 'react'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStats } from '@/pages/CourseStatistics/util'

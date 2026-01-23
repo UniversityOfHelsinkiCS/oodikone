@@ -1,6 +1,6 @@
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
-import { maxBy, orderBy, range } from 'lodash'
+import { maxBy, orderBy, range } from 'lodash-es'
 
 import { serviceProvider } from '@/conf'
 import { SemestersData } from '@/redux/semesters'

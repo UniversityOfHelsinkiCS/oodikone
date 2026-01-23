@@ -14,7 +14,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import { chunk, flattenDeep, groupBy } from 'lodash'
+import { chunk, flattenDeep, groupBy } from 'lodash-es'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 

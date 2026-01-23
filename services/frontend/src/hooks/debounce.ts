@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const TIMEOUT = 1000

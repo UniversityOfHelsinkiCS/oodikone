@@ -1,6 +1,6 @@
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 import { GradeDistribution } from './GradeDistribution'

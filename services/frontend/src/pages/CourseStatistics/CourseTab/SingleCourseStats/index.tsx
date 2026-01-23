@@ -4,7 +4,7 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 
-import { difference, flatten, max, min, pickBy, uniq } from 'lodash'
+import { difference, flatten, max, min, pickBy, uniq } from 'lodash-es'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 

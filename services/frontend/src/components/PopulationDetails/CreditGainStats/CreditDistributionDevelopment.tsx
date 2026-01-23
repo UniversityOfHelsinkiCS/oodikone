@@ -11,7 +11,7 @@ import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 
-import { chain, range, sortBy } from 'lodash'
+import { chain, range, sortBy } from 'lodash-es'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 

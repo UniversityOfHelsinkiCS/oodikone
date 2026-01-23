@@ -1,4 +1,4 @@
-const { orderBy } = require('lodash')
+const { orderBy } = require('lodash-es')
 const { Op } = require('sequelize')
 
 const { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } = require('../models')

@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Typography from '@mui/material/Typography'
 
-import { pick, sampleSize } from 'lodash'
+import { pick, sampleSize } from 'lodash-es'
 import { MaterialReactTable, MRT_ColumnDef, MRT_RowData, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useMemo } from 'react'
 import { utils, writeFile } from 'xlsx'

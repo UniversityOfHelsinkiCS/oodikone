@@ -3,7 +3,7 @@ import TableBody from '@mui/material/TableBody'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { intersection, orderBy } from 'lodash'
+import { intersection, orderBy } from 'lodash-es'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'

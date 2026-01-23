@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { max, min } from 'lodash'
+import { max, min } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'

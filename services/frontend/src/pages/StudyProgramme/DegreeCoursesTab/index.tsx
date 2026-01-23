@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'

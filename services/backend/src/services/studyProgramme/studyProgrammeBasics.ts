@@ -1,4 +1,4 @@
-import { indexOf } from 'lodash'
+import { indexOf } from 'lodash-es'
 
 import { Name, EnrollmentType, SemesterEnrollment } from '@oodikone/shared/types'
 import { BasicStats } from '@oodikone/shared/types/studyProgramme'

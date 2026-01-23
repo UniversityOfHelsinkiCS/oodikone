@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { useState, useCallback } from 'react'
 
 import { validateInputLength } from '@/common'

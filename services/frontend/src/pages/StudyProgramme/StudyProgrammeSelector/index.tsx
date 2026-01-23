@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { useState } from 'react'
 
 import { isDefaultServiceProvider } from '@/common'

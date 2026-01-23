@@ -1,4 +1,4 @@
-import { isEqual, keyBy, omit, uniq } from 'lodash'
+import { isEqual, keyBy, omit, uniq } from 'lodash-es'
 import { LRUCache } from 'lru-cache'
 
 import { User } from '@oodikone/shared/models/user'

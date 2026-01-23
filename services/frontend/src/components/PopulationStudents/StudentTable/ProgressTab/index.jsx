@@ -10,7 +10,7 @@ import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import { range, keyBy } from 'lodash'
+import { range, keyBy } from 'lodash-es'
 import { useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'

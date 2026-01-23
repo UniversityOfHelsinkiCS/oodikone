@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
 import { NextFunction, Request, Response } from 'express'
-import { intersection } from 'lodash'
+import { intersection } from 'lodash-es'
 
 import { configLogoutUrl, isDev, requiredGroup, serviceProvider } from '../config'
 import { getMockedUser, getMockedUserFd, getOrganizationAccess, getUserFd, getUserToska } from '../services/userService'

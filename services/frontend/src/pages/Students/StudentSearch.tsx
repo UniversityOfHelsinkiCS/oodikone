@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 

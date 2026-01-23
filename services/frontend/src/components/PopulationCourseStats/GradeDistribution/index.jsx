@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { createColumnHelper, getExpandedRowModel } from '@tanstack/react-table'
-import { chain, range } from 'lodash'
+import { chain, range } from 'lodash-es'
 import { useMemo, useState } from 'react'
 
 import { Link } from '@/components/common/Link'

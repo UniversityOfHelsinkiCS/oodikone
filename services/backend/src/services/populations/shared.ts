@@ -1,4 +1,4 @@
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
 import { Name, DegreeProgrammeType } from '@oodikone/shared/types'

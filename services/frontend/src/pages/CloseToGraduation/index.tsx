@@ -5,7 +5,7 @@ import Tabs from '@mui/material/Tabs'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { range } from 'lodash'
+import { range } from 'lodash-es'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 

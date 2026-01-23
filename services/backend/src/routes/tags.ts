@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { difference } from 'lodash'
+import { difference } from 'lodash-es'
 
 import { CanError } from '@oodikone/shared/routes'
 import { NewTag, Role, StudentTag, Tag } from '@oodikone/shared/types'

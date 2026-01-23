@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 
 import dayjs from 'dayjs'
-import { omit, sortBy } from 'lodash'
+import { omit, sortBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 

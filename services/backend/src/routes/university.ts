@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 import { Graduated, NameWithCode } from '@oodikone/shared/types'
 import { serviceProvider } from '../config'

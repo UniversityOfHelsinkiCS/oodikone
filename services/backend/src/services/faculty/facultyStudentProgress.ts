@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
 import { SpecialGroups } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'

@@ -1,4 +1,4 @@
-import { max, min } from 'lodash'
+import { max, min } from 'lodash-es'
 import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'

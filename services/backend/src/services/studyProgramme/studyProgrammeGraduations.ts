@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { indexOf, orderBy } from 'lodash'
+import { indexOf, orderBy } from 'lodash-es'
 
 import {
   GraduationStatistics,

@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 
 import dayjs from 'dayjs'
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 
 import { calculatePercentage, getTargetCreditsForProgramme } from '@/common'
 import { studentToolTips } from '@/common/InfoToolTips'

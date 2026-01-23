@@ -1,4 +1,4 @@
-import { orderBy, range } from 'lodash'
+import { orderBy, range } from 'lodash-es'
 import { Op } from 'sequelize'
 
 import { Name, StudyProgrammeCourse, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'

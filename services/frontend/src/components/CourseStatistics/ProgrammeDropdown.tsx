@@ -2,7 +2,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Chip from '@mui/material/Chip'
 import TextField from '@mui/material/TextField'
 
-import { orderBy } from 'lodash'
+import { orderBy } from 'lodash-es'
 
 import { DropdownOption } from '@/types/dropdownOption'
 import { DropdownItem } from './ProgrammeDropdownItem'

@@ -1,4 +1,4 @@
-const { orderBy } = require('lodash')
+const { orderBy } = require('lodash-es')
 
 // dbConnections must be imported to avoid Sequelize errors even if it's not used
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

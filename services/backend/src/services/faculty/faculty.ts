@@ -1,4 +1,4 @@
-import { groupBy, orderBy } from 'lodash'
+import { groupBy, orderBy } from 'lodash-es'
 import { QueryTypes } from 'sequelize'
 
 import { Organization } from '@oodikone/shared/models'

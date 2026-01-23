@@ -4,7 +4,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
-import { maxBy } from 'lodash'
+import { maxBy } from 'lodash-es'
 import { useState } from 'react'
 
 import { StyledCell } from '@/components/common/StyledCell'

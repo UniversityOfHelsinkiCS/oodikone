@@ -1,4 +1,4 @@
-const { chunk } = require('lodash')
+const { chunk } = require('lodash-es')
 
 const {
   CHUNK_SIZE,

@@ -5,7 +5,7 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
-import { sortBy } from 'lodash'
+import { sortBy } from 'lodash-es'
 
 import { Link } from '@/components/common/Link'
 import { StyledTable } from '@/components/common/StyledTable'
