@@ -286,7 +286,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.intercept(
         'GET',
-        'api/v2/studyprogrammes/KH50_001/studytrackstats?graduated=GRADUATED_INCLUDED&special_groups=SPECIAL_INCLUDED&combined_programme='
+        'api/v2/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
       ).as('stQuery')
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
@@ -530,14 +530,21 @@ describe('Degree programme overview', () => {
 
     describe('By credit type tab', () => {
       beforeEach(() => {
-        cy.get('tbody').within(() => {
+        cy.get('thead').within(() => {
           cy.get('tr')
             .eq(0)
+            .within(() => {
+              cy.get('th').eq(3).click()
+            })
+        })
+        cy.get('tbody').within(() => {
+          cy.get('tr')
+            .eq(9)
             .within(() => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT21001')
               cy.get('td').eq(2).contains('Lineaarialgebra ja matriisilaskenta II')
-              cy.get('td').eq(3).contains('341')
+              cy.get('td').eq(3).contains('1220')
             })
         })
       })
@@ -550,12 +557,12 @@ describe('Degree programme overview', () => {
 
         cy.get('tbody').within(() => {
           cy.get('tr')
-            .eq(0)
+            .eq(9)
             .within(() => {
               cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT21001')
-              cy.get('td').eq(2).contains('Lineaarialgebra ja matriisilaskenta II')
-              cy.get('td').eq(3).contains('121')
+              cy.get('td').eq(1).contains('MAT21009')
+              cy.get('td').eq(2).contains('Kandidaatintutkielma')
+              cy.get('td').eq(3).contains('414')
             })
         })
       })
@@ -570,12 +577,12 @@ describe('Degree programme overview', () => {
 
         cy.get('tbody').within(() => {
           cy.get('tr')
-            .eq(0)
+            .eq(5)
             .within(() => {
               cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT21001')
-              cy.get('td').eq(2).contains('Lineaarialgebra ja matriisilaskenta II')
-              cy.get('td').eq(3).contains('311')
+              cy.get('td').eq(1).contains('MAT11001')
+              cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
+              cy.get('td').eq(3).contains('1330')
             })
         })
       })
@@ -645,20 +652,33 @@ describe('Degree programme overview', () => {
         cy.cs('show-credits-students-toggle').click()
 
         cy.get('thead tr')
-          .eq(1)
+          .eq(0)
           .within(() => {
-            cy.get('th').should('have.length', 10)
+            cy.get('th').should('have.length', 7)
             const headers = [
               'Type',
               'Code',
               'Name',
               'Total',
+              'Breakdown of total',
+              'Breakdown of passed students',
+              'Not included in total or passed',
+            ]
+            headers.forEach((header, index) => {
+              cy.get('th').eq(index).contains(header)
+            })
+          })
+        cy.get('thead tr')
+          .eq(1)
+          .within(() => {
+            cy.get('th').should('have.length', 6)
+            const headers = [
               'Passed',
-              'Not',
-              'Major',
-              'Non-major',
-              'Non-degree',
-              'Transferred',
+              'Not completed',
+              'Major students',
+              'Non-major students',
+              'Non-degree students',
+              'Transferred students',
             ]
             headers.forEach((header, index) => {
               cy.get('th').eq(index).contains(header)
@@ -667,12 +687,12 @@ describe('Degree programme overview', () => {
 
         cy.get('tbody').within(() => {
           cy.get('tr')
-            .eq(0)
+            .eq(5)
             .within(() => {
               cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT21001')
-              cy.get('td').eq(2).contains('Lineaarialgebra ja matriisilaskenta II')
-              cy.get('td').eq(3).contains('341')
+              cy.get('td').eq(1).contains('MAT11001')
+              cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
+              cy.get('td').eq(3).contains('309')
             })
         })
       })
