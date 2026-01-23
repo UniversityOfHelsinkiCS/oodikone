@@ -97,7 +97,7 @@ export const hopsFilter = createFilter({
 
   isActive: arg => !!arg?.activeProgramme || !!arg?.activeCombinedProgramme,
 
-  filter: (student, { args, options }) => {
+  mutate: (student, { args, options }) => {
     const { activeProgramme, activeCombinedProgramme } = options
 
     const studyRights = student.studyRights.filter(({ cancelled }) => !cancelled).map(({ id }) => id)
@@ -111,21 +111,29 @@ export const hopsFilter = createFilter({
     )
 
     if (activeProgramme || activeCombinedProgramme) {
-      if (!hops && !secondHops) {
-        student.courses = []
-        return true
-      }
+      if (!hops && !secondHops)
+        return {
+          ...student,
+          courses: [],
+        }
+
       const courses = new Set(hops && activeProgramme ? hops.included_courses : [])
       const secondProgrammeCourses = new Set(secondHops && activeCombinedProgramme ? secondHops.included_courses : [])
       const hopsCourses = student.courses.filter(
         ({ course_code }) => courses.has(course_code) || secondProgrammeCourses.has(course_code)
       )
-      student.courses = [...new Set(hopsCourses)]
-      return true
+
+      return {
+        ...student,
+        courses: [...new Set(hopsCourses)],
+      }
     }
 
-    return true
+    // Fallback
+    return student
   },
+
+  filter: () => true,
 
   selectors: {
     isPrimarySelected: ({ activeProgramme }) => !!activeProgramme,
