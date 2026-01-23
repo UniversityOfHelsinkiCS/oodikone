@@ -71,6 +71,12 @@ router.get('/allprogressstats', async (req: GetProgressStatsRequest, res: Respon
       master: {} as Record<string, number[]>,
       doctor: {} as Record<string, number[]>,
     },
+    graduatedCount: {
+      bachelor: {} as Record<string, number>,
+      bachelorMaster: {} as Record<string, number>,
+      master: {} as Record<string, number>,
+      doctor: {} as Record<string, number>,
+    },
   }
 
   const unifyProgressStats = (progStats: number[][][]) => {
@@ -96,6 +102,14 @@ router.get('/allprogressstats', async (req: GetProgressStatsRequest, res: Respon
         if (!universityData.creditCounts[fieldName][year]) universityData.creditCounts[fieldName][year] = []
         universityData.creditCounts[fieldName][year].push(...facultyData.creditCounts[fieldName][year])
       }
+
+      for (const fieldName of degreeNames) {
+        if (!facultyData.graduatedCount[fieldName] || Object.keys(facultyData.graduatedCount[fieldName]).length === 0)
+          continue
+        if (!universityData.graduatedCount[fieldName][year]) universityData.graduatedCount[fieldName][year] = 0
+        universityData.graduatedCount[fieldName][year] += facultyData.graduatedCount[fieldName][year]
+      }
+
       const progStats = ['bachelorsProgStats', 'bcMsProgStats', 'mastersProgStats', 'doctoralProgStats'] as const
       for (const fieldName of progStats) {
         if (Object.keys(facultyData[fieldName] || {}).length === 0) continue

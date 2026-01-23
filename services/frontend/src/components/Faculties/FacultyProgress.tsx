@@ -19,11 +19,18 @@ export const FacultyProgress = ({
   progressStats: GetAllProgressStatsResponse | undefined
 }) => {
   const creditCounts = progressStats?.creditCounts
+  const graduatedCount = progressStats?.graduatedCount
 
-  const bachelorStats = calculateStats(creditCounts?.bachelor, 180)
-  const bachelorMasterStats = calculateStats(creditCounts?.bachelorMaster, faculty === 'H90' ? 360 : 300, 180, 7)
-  const masterStats = calculateStats(creditCounts?.master, 120)
-  const doctorStats = calculateStats(creditCounts?.doctor, 40, 0, 5)
+  const bachelorStats = calculateStats(creditCounts?.bachelor, graduatedCount?.bachelor, 180)
+  const bachelorMasterStats = calculateStats(
+    creditCounts?.bachelorMaster,
+    graduatedCount?.bachelorMaster,
+    faculty === 'H90' ? 360 : 300,
+    180,
+    7
+  )
+  const masterStats = calculateStats(creditCounts?.master, graduatedCount?.master, 120)
+  const doctorStats = calculateStats(creditCounts?.doctor, graduatedCount?.doctor, 40, 0, 5)
 
   const sortKeys = (stats: Record<string, number[][]>) => {
     return sortProgrammeKeys(

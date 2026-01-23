@@ -85,7 +85,11 @@ export const StudyTracksAndClassStatisticsTab = ({
 
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
 
-  const progressStats = calculateStats(studyTrackStats?.creditCounts, getTargetCreditsForProgramme(programmeCode))
+  const progressStats = calculateStats(
+    studyTrackStats?.creditCounts,
+    studyTrackStats?.graduatedCount,
+    getTargetCreditsForProgramme(programmeCode)
+  )
   if (progressStats?.chartStats) {
     progressStats.chartStats.forEach(creditCategory => {
       const [total, ...years] = creditCategory.data
@@ -95,7 +99,11 @@ export const StudyTracksAndClassStatisticsTab = ({
 
   const progressComboStats =
     Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0
-      ? calculateStats(studyTrackStats?.creditCountsCombo, getTargetCreditsForProgramme(programmeCode) + 180)
+      ? calculateStats(
+          studyTrackStats?.creditCountsCombo,
+          studyTrackStats?.graduatedCount,
+          getTargetCreditsForProgramme(programmeCode) + 180
+        )
       : null
 
   if (progressComboStats?.chartStats) {

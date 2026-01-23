@@ -75,8 +75,6 @@ const hasGraduatedBeforeDate = (student, programme, date) => {
   return studyRightElement.graduated && date.isAfter(studyRightElement.endDate, 'day')
 }
 
-const GRADUATED = Symbol('GRADUATED')
-
 const getChartData = (
   students: any[],
   timeSlots: any[],
@@ -87,16 +85,14 @@ const getChartData = (
 ) => {
   const programmeCredits = getTargetCreditsForProgramme(programme) + (combinedProgramme ? 180 : 0)
 
-  const limits: Array<number[] | typeof GRADUATED> = getCreditCategories(
+  const limits: Array<number[] | 'Graduated'> = getCreditCategories(
     cumulative,
     timeDivision,
     programmeCredits,
     timeSlots.length,
     6
   )
-  const colors = generateGradientColors(limits.length)
-
-  limits.push(GRADUATED)
+  const colors = generateGradientColors(limits.length - 1)
   colors.push('#ddd') // Color for graduated (grey)
 
   const data: { y: number; custom: { students: number[] } }[][] = limits.map(() =>
@@ -116,9 +112,9 @@ const getChartData = (
         const credits = studentCredits[studentIndex][timeSlotIndex]
 
         const rangeIndex = hasGraduated
-          ? limits.indexOf(GRADUATED)
+          ? limits.indexOf('Graduated')
           : limits.findIndex(limit => {
-              if (limit === GRADUATED) {
+              if (limit === 'Graduated') {
                 return false
               }
 
@@ -144,7 +140,7 @@ const getChartData = (
     const limit = limits[limitN]
     let name
 
-    if (limit === GRADUATED) {
+    if (limit === 'Graduated') {
       name = 'Graduated'
     } else {
       const [min, max] = limit

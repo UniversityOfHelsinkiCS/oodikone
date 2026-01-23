@@ -76,6 +76,7 @@ export type GetFacultyProgressStatsResponse = {
   bachelorsProgStats: Record<string, number[][]>
   bcMsProgStats: Record<string, number[][]>
   creditCounts: Record<string, Record<string, number[]>>
+  graduatedCount: Record<string, Record<string, number>>
   doctoralProgStats: Record<string, number[][]>
   id: string
   mastersProgStats: Record<string, number[][]>
@@ -101,6 +102,7 @@ export type GetAllProgressStatsResponse = {
   bachelorsProgStats: Record<string, number[][]>
   bcMsProgStats: Record<string, number[][]>
   creditCounts: Record<string, Record<string, number[]>>
+  graduatedCount: Record<string, Record<string, number>>
   doctoralProgStats: Record<string, number[][]>
   mastersProgStats: Record<string, number[][]>
   programmeNames: Record<string, NameWithCode>
