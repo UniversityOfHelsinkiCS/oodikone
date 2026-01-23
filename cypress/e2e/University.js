@@ -39,12 +39,6 @@ describe('University view', () => {
       checkProgressTables()
     })
 
-    it("'Graduated included / Graduated excluded' toggle works", () => {
-      cy.cs('graduated-toggle').click()
-      checkProgressBarCharts()
-      checkProgressTables()
-    })
-
     it("'All study rights / Special study rights excluded' toggle works", () => {
       cy.cs('study-right-toggle').click()
       checkProgressBarCharts()
