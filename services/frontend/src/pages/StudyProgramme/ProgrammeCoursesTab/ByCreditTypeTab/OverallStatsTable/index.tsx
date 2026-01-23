@@ -117,6 +117,14 @@ export const OverallStatsTable = ({
     state: {
       useZebrastripes: false,
     },
+    initialState: {
+      sorting: [
+        {
+          id: 'totalAllCredits',
+          desc: true,
+        },
+      ],
+    },
   }
 
   return <OodiTable columns={columns} cy="overall-stats-table" data={filteredData} options={options} />
