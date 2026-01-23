@@ -32,7 +32,6 @@ export const Faculties = () => {
   const [tab, setTab] = useTabs(isAdmin ? 4 : 3)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
-  const [graduatedGroup, setGraduatedGroup] = useState(false)
   const requiredRights = { fullAccessToStudentData, programmeRights }
 
   if (!faculty) {
@@ -62,9 +61,7 @@ export const Faculties = () => {
         {tab === 1 && (
           <StudentsByStartingYearTab
             faculty={faculty}
-            graduatedGroup={graduatedGroup}
             requiredRights={requiredRights}
-            setGraduatedGroup={setGraduatedGroup}
             setSpecialGroups={setSpecialGroups}
             specialGroups={specialGroups}
           />

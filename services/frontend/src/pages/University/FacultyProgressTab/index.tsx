@@ -10,11 +10,9 @@ import { Section } from '@/components/Section'
 import { useGetAllFacultiesProgressStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyProgressTab = () => {
-  const [excludeGraduated, setExcludeGraduated] = useState(false)
   const [excludeSpecials, setIncludeSpecials] = useState(false)
 
   const progressStats = useGetAllFacultiesProgressStatsQuery({
-    graduated: excludeGraduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED',
     includeSpecials: !excludeSpecials,
   })
 
@@ -26,15 +24,6 @@ export const FacultyProgressTab = () => {
         title="Progress of students of the university"
       >
         <ToggleContainer>
-          <Toggle
-            cypress="graduated-toggle"
-            disabled={progressStats.isLoading || progressStats.isError}
-            firstLabel="Graduated included"
-            infoBoxContent={facultyToolTips.graduatedToggle}
-            secondLabel="Graduated excluded"
-            setValue={setExcludeGraduated}
-            value={excludeGraduated}
-          />
           <Toggle
             cypress="study-right-toggle"
             disabled={progressStats.isLoading || progressStats.isError}

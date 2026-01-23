@@ -64,7 +64,6 @@ export const StudyProgramme = () => {
   const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
-  const [graduated, setGraduated] = useState(false)
 
   const { data: programmes } = useGetProgrammesQuery()
 
@@ -106,9 +105,7 @@ export const StudyProgramme = () => {
       component: (
         <StudyTracksAndClassStatisticsTab
           combinedProgramme={secondProgrammeId}
-          graduated={graduated}
           key="StudyTracksAndClassStatisticsTabContent"
-          setGraduated={setGraduated}
           setSpecialGroupsExcluded={setSpecialGroupsExcluded}
           specialGroupsExcluded={specialGroupsExcluded}
           studyProgramme={programmeId}

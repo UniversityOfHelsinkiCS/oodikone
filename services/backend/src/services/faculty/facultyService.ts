@@ -1,4 +1,4 @@
-import { Graduated, Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
+import { Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
 import { DegreeProgramme } from 'src/routes/faculties'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
@@ -22,11 +22,11 @@ const createRedisKeyForThesiswriters = (
 const createRedisKeyForGraduationTimeStats = (id: string, programmeFilter: ProgrammeFilter) => {
   return `FACULTY_GRADUATION_TIME_STATS_${id}_${programmeFilter}`
 }
-const createRedisKeyForFacultyProgress = (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
-  return `FACULTY_PROGRESS_STATS_${id}_${specialGroups}_${graduated}`
+const createRedisKeyForFacultyProgress = (id: string, specialGroups: SpecialGroups) => {
+  return `FACULTY_PROGRESS_STATS_${id}_${specialGroups}`
 }
-const createRedisKeyForFacultyStudents = (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
-  return `FACULTY_STUDENTS_STATS_${id}_${specialGroups}_${graduated}`
+const createRedisKeyForFacultyStudents = (id: string, specialGroups: SpecialGroups) => {
+  return `FACULTY_STUDENTS_STATS_${id}_${specialGroups}`
 }
 
 /*
@@ -177,18 +177,14 @@ export const getGraduationStats = async (id: string, programmeFilter: ProgrammeF
   return data
 }
 
-export const setFacultyProgressStats = async (
-  data: FacultyProgressData,
-  specialGroups: SpecialGroups,
-  graduated: Graduated
-) => {
+export const setFacultyProgressStats = async (data: FacultyProgressData, specialGroups: SpecialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForFacultyProgress(id, specialGroups, graduated)
+  const redisKey = createRedisKeyForFacultyProgress(id, specialGroups)
   await redisClient.set(redisKey, JSON.stringify(data))
 }
 
-export const getFacultyProgressStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
-  const redisKey = createRedisKeyForFacultyProgress(id, specialGroups, graduated)
+export const getFacultyProgressStats = async (id: string, specialGroups: SpecialGroups) => {
+  const redisKey = createRedisKeyForFacultyProgress(id, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
 
   return dataFromRedis ? (JSON.parse(dataFromRedis) as FacultyProgressData) : null
@@ -204,18 +200,14 @@ type FacultyStudentsData = {
   programmeNames: Record<string, DegreeProgramme>
 }
 
-export const setFacultyStudentStats = async (
-  data: FacultyStudentsData,
-  specialGroups: SpecialGroups,
-  graduated: Graduated
-) => {
+export const setFacultyStudentStats = async (data: FacultyStudentsData, specialGroups: SpecialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForFacultyStudents(id, specialGroups, graduated)
+  const redisKey = createRedisKeyForFacultyStudents(id, specialGroups)
   await redisClient.set(redisKey, JSON.stringify(data))
 }
 
-export const getFacultyStudentStats = async (id: string, specialGroups: SpecialGroups, graduated: Graduated) => {
-  const redisKey = createRedisKeyForFacultyStudents(id, specialGroups, graduated)
+export const getFacultyStudentStats = async (id: string, specialGroups: SpecialGroups) => {
+  const redisKey = createRedisKeyForFacultyStudents(id, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
 
   return dataFromRedis ? (JSON.parse(dataFromRedis) as FacultyStudentsData) : null

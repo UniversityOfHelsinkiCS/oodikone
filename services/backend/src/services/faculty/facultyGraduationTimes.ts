@@ -134,7 +134,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
-    const statsFromRedis = await getStudyTrackStats(programme.code, '', 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    const statsFromRedis = await getStudyTrackStats(programme.code, '', 'SPECIAL_EXCLUDED')
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       continue
@@ -145,12 +145,11 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
       studyProgramme: programme.code,
       combinedProgramme: '',
       settings: {
-        graduated: true,
         specialGroups: false,
       },
       studyRightsOfProgramme,
     })
-    await setStudyTrackStats(updatedStats, 'GRADUATED_INCLUDED', 'SPECIAL_EXCLUDED')
+    await setStudyTrackStats(updatedStats, 'SPECIAL_EXCLUDED')
     newStats.push(updatedStats)
   }
 

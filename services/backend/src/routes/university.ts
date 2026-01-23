@@ -39,18 +39,17 @@ interface GetProgressStatsRequest extends Request {
 
 router.get('/allprogressstats', async (req: GetProgressStatsRequest, res: Response) => {
   const specialGroups = req.query?.specialsIncluded === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
-  const graduated = req.query?.graduated
   const allFaculties = await getSortedFaculties()
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const codeToData: Record<string, FacultyProgressData> = {}
 
   for (const facultyCode of facultyCodes) {
-    let data = await getFacultyProgressStats(facultyCode, specialGroups, graduated)
+    let data = await getFacultyProgressStats(facultyCode, specialGroups)
     if (!data) {
       logger.info(`Data missing from server: Refreshing progress faculty data for faculty ${facultyCode}`)
       const programmes = await getDegreeProgrammesOfFaculty(facultyCode, true)
-      data = await combineFacultyStudentProgress(facultyCode, programmes, specialGroups, graduated)
-      await setFacultyProgressStats(data, specialGroups, graduated)
+      data = await combineFacultyStudentProgress(facultyCode, programmes, specialGroups)
+      await setFacultyProgressStats(data, specialGroups)
     }
     codeToData[facultyCode] = data
   }

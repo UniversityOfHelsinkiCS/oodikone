@@ -20,28 +20,22 @@ type ProgrammeKeys = {
 
 export const StudentsByStartingYearTab = ({
   faculty,
-  graduatedGroup,
   requiredRights,
-  setGraduatedGroup,
   setSpecialGroups,
   specialGroups,
 }: {
   faculty: GetFacultiesResponse
-  graduatedGroup: boolean
   requiredRights: { fullAccessToStudentData: boolean; programmeRights: string[] }
-  setGraduatedGroup: (value: boolean) => void
   setSpecialGroups: (value: boolean) => void
   specialGroups: boolean
 }) => {
   const [showPercentages, setShowPercentages] = useState(false)
 
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const { getTextIn } = useLanguage()
   const studentStats = useGetFacultyStudentStatsQuery({
     id: faculty.id,
     specialGroups: specials,
-    graduated,
   })
 
   const isLoading = studentStats.isLoading || studentStats.isFetching
@@ -75,15 +69,6 @@ export const StudentsByStartingYearTab = ({
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroups}
             value={specialGroups}
-          />
-          <Toggle
-            cypress="graduated-toggle"
-            disabled={isError || isLoading}
-            firstLabel="Graduated included"
-            infoBoxContent={facultyToolTips.graduatedToggle}
-            secondLabel="Graduated excluded"
-            setValue={setGraduatedGroup}
-            value={graduatedGroup}
           />
         </ToggleContainer>
       </Section>
@@ -128,7 +113,7 @@ export const StudentsByStartingYearTab = ({
           ) : null}
         </Stack>
       </Section>
-      <ProgressSection faculty={faculty} graduatedGroup={graduatedGroup} specialGroups={specialGroups} />
+      <ProgressSection faculty={faculty} specialGroups={specialGroups} />
     </Stack>
   )
 }

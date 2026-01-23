@@ -26,15 +26,11 @@ import { YearSelector } from './YearSelector'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
-  graduated,
-  setGraduated,
   setSpecialGroupsExcluded,
   specialGroupsExcluded,
   studyProgramme,
 }: {
   combinedProgramme: string
-  graduated: boolean
-  setGraduated: (graduated: boolean) => void
   setSpecialGroupsExcluded: (specialGroupsExcluded: boolean) => void
   specialGroupsExcluded: boolean
   studyProgramme: string
@@ -62,7 +58,6 @@ export const StudyTracksAndClassStatisticsTab = ({
     id: studyProgramme,
     combinedProgramme,
     specialGroups: specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED',
-    graduated: graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED',
   })
 
   useEffect(() => {
@@ -199,15 +194,6 @@ export const StudyTracksAndClassStatisticsTab = ({
               setValue={setSpecialGroupsExcluded}
               value={specialGroupsExcluded}
             />
-            <Toggle
-              cypress="graduated-toggle"
-              disabled={hasErrors || isFetchingOrLoading}
-              firstLabel="Graduated included"
-              infoBoxContent={studyProgrammeToolTips.graduatedToggle}
-              secondLabel="Graduated excluded"
-              setValue={setGraduated}
-              value={graduated}
-            />
           </ToggleContainer>
         </Stack>
       </Section>
@@ -291,7 +277,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         </Section>
       )}
 
-      {isSuccess && studyTrackStats?.includeGraduated && studyTrackStats?.graduationTimes[studyTrack] ? (
+      {isSuccess && studyTrackStats?.graduationTimes[studyTrack] ? (
         <Section
           cypress="average-graduation-times"
           infoBoxContent={

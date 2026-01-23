@@ -42,23 +42,19 @@ export const updateBasicView = async (code: string, combinedProgramme: string) =
 }
 
 export const updateStudyTrackView = async (code: string, combinedProgramme: string) => {
-  const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
   const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
   const studyRightsOfProgramme = await getStudyRightsInProgramme(code, false, true)
 
-  for (const graduated of graduatedOptions) {
-    for (const specialGroup of specialGroupOptions) {
-      const stats = await getStudyTrackStatsForStudyProgramme({
-        studyProgramme: code,
-        combinedProgramme,
-        settings: {
-          specialGroups: specialGroup === 'SPECIAL_INCLUDED',
-          graduated: graduated === 'GRADUATED_INCLUDED',
-        },
-        studyRightsOfProgramme,
-      })
-      await setStudyTrackStats(stats, graduated, specialGroup)
-    }
+  for (const specialGroup of specialGroupOptions) {
+    const stats = await getStudyTrackStatsForStudyProgramme({
+      studyProgramme: code,
+      combinedProgramme,
+      settings: {
+        specialGroups: specialGroup === 'SPECIAL_INCLUDED',
+      },
+      studyRightsOfProgramme,
+    })
+    await setStudyTrackStats(stats, specialGroup)
   }
 
   return 'OK'

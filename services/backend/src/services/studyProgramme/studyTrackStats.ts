@@ -171,7 +171,6 @@ const combineStats = (
 const getMainStatsByTrackAndYear = async (
   years: string[],
   studyProgramme: string,
-  includeGraduated: boolean,
   includeAllSpecials: boolean,
   doCombo: boolean,
   studyRightsOfProgramme: Array<SISStudyRight>,
@@ -463,7 +462,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
 }: {
   studyProgramme: string
   combinedProgramme?: string
-  settings: { graduated: boolean; specialGroups: boolean }
+  settings: { specialGroups: boolean }
   studyRightsOfProgramme: SISStudyRight[]
 }) => {
   const isAcademicYear = true
@@ -477,7 +476,6 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   const stats = await getMainStatsByTrackAndYear(
     years,
     studyProgramme,
-    settings.graduated,
     settings.specialGroups,
     doCombo,
     studyRightsOfProgramme,
@@ -498,7 +496,6 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     graduationTimes: stats.graduationTimes,
     graduationTimesSecondProg: stats.graduationTimesSecondProg,
     id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,
-    includeGraduated: settings.graduated,
     mainStatsByTrack: stats.mainStatsByTrack,
     mainStatsByYear: stats.mainStatsByYear,
     otherCountriesCount: stats.otherCountriesCount,

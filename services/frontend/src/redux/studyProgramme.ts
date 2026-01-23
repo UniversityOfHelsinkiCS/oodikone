@@ -3,7 +3,6 @@ import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { Language } from '@oodikone/shared/language'
 import {
-  Graduated,
   Name,
   ProgrammeModuleWithRelevantAttributes,
   SpecialGroups,
@@ -47,10 +46,10 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
     }),
     getStudyTrackStats: builder.query<
       StudyTrackStats,
-      { id: string; graduated: Graduated; specialGroups: SpecialGroups; combinedProgramme: string }
+      { id: string; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
-      query: ({ id, graduated, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/studytrackstats?graduated=${graduated}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+      query: ({ id, specialGroups, combinedProgramme }) =>
+        `/v2/studyprogrammes/${id}/studytrackstats?&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getProgrammeCoursesStats: builder.query<
       StudyProgrammeCourse[],

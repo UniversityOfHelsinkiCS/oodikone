@@ -61,15 +61,14 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
 export const combineFacultyStudents = async (
   code: string,
   programmes: ProgrammesOfOrganization,
-  specialGroups: 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED',
-  graduated: 'GRADUATED_INCLUDED' | 'GRADUATED_EXCLUDED'
+  specialGroups: 'SPECIAL_INCLUDED' | 'SPECIAL_EXCLUDED'
 ) => {
   let years: string[] = []
   const programmeCodes = programmes.map(programme => programme.code)
   const newStats: StudyTrackStats[] = []
 
   for (const studyProgrammeCode of programmeCodes) {
-    const statsFromRedis = await getStudyTrackStats(studyProgrammeCode, null, graduated, specialGroups)
+    const statsFromRedis = await getStudyTrackStats(studyProgrammeCode, null, specialGroups)
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       if (!years.length) {
@@ -81,12 +80,11 @@ export const combineFacultyStudents = async (
     const updatedStats = await getStudyTrackStatsForStudyProgramme({
       studyProgramme: studyProgrammeCode,
       settings: {
-        graduated: graduated === 'GRADUATED_INCLUDED',
         specialGroups: specialGroups === 'SPECIAL_INCLUDED',
       },
       studyRightsOfProgramme,
     })
-    await setStudyTrackStats(updatedStats, graduated, specialGroups)
+    await setStudyTrackStats(updatedStats, specialGroups)
     if (!years.length) {
       years = updatedStats.years
     }

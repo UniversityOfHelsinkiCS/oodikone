@@ -18,7 +18,6 @@ import { combineFacultyThesisWriters } from './facultyThesisWriters'
 const yearOptions = ['CALENDAR_YEAR', 'ACADEMIC_YEAR'] as const
 const specialGroupOptions = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED'] as const
 const programmeFilterOptions = ['ALL_PROGRAMMES', 'NEW_DEGREE_PROGRAMMES'] as const
-const graduatedOptions = ['GRADUATED_INCLUDED', 'GRADUATED_EXCLUDED'] as const
 
 export const updateFacultyOverview = async (facultyCode: string, statsType: StatsType) => {
   for (const programmeFilter of programmeFilterOptions) {
@@ -56,18 +55,11 @@ export const updateFacultyOverview = async (facultyCode: string, statsType: Stat
 export const updateFacultyProgressOverview = async (facultyCode: string) => {
   const onlyNew = await getDegreeProgrammesOfFaculty(facultyCode, true)
 
-  for (const graduated of graduatedOptions) {
-    for (const specialGroups of specialGroupOptions) {
-      const updateFacultyStudentStats = await combineFacultyStudents(facultyCode, onlyNew, specialGroups, graduated)
-      await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
-      const updateFacultyProgressStats = await combineFacultyStudentProgress(
-        facultyCode,
-        onlyNew,
-        specialGroups,
-        graduated
-      )
-      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
-    }
+  for (const specialGroups of specialGroupOptions) {
+    const updateFacultyStudentStats = await combineFacultyStudents(facultyCode, onlyNew, specialGroups)
+    await setFacultyStudentStats(updateFacultyStudentStats, specialGroups)
+    const updateFacultyProgressStats = await combineFacultyStudentProgress(facultyCode, onlyNew, specialGroups)
+    await setFacultyProgressStats(updateFacultyProgressStats, specialGroups)
   }
 
   return 'OK'

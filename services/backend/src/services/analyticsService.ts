@@ -1,4 +1,4 @@
-import { Graduated, SpecialGroups, StudyTrackStats, YearType } from '@oodikone/shared/types'
+import { SpecialGroups, StudyTrackStats, YearType } from '@oodikone/shared/types'
 import { BasicStats, CreditStats, ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
 import { facultyCodes, ignoredFacultyCodes } from '../config/organizationConstants'
 import { redisClient } from './redis'
@@ -16,8 +16,8 @@ const createRedisKeyForCreditStats = (id: string, yearType: YearType, specialGro
 const createRedisKeyForGraduationStats = (id: string, yearType: YearType, specialGroups: SpecialGroups) => {
   return `GRADUATION_STATS_${id}_${yearType}_${specialGroups}`
 }
-const createRedisKeyForStudyTrackStats = (id: string, graduated: Graduated, specialGroups: SpecialGroups) => {
-  return `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
+const createRedisKeyForStudyTrackStats = (id: string, specialGroups: SpecialGroups) => {
+  return `STUDYTRACK_STATS_${id}_${specialGroups}`
 }
 
 // *Should* always be a string (previously unknown)
@@ -105,11 +105,10 @@ export const setGraduationStats = async (data, yearType: YearType, specialGroups
 export const getStudyTrackStats = async (
   id: string,
   combinedProgramme: string | null,
-  graduated: Graduated,
   specialGroups: SpecialGroups
 ) => {
   const searchKey = combinedProgramme ? `${id}-${combinedProgramme}` : id
-  const redisKey = createRedisKeyForStudyTrackStats(searchKey, graduated, specialGroups)
+  const redisKey = createRedisKeyForStudyTrackStats(searchKey, specialGroups)
   const dataFromRedis = await redisClient.get(redisKey)
   if (!dataFromRedis) {
     return null
@@ -117,11 +116,11 @@ export const getStudyTrackStats = async (
   return JSON.parse(dataFromRedis) as StudyTrackStats
 }
 
-export const setStudyTrackStats = async (data: StudyTrackStats, graduated: Graduated, specialGroups: SpecialGroups) => {
+export const setStudyTrackStats = async (data: StudyTrackStats, specialGroups: SpecialGroups) => {
   const { id } = data
   if (!shouldSaveToRedis(id)) {
     return
   }
-  const redisKey = createRedisKeyForStudyTrackStats(id, graduated, specialGroups)
+  const redisKey = createRedisKeyForStudyTrackStats(id, specialGroups)
   await redisClient.set(redisKey, JSON.stringify(data))
 }

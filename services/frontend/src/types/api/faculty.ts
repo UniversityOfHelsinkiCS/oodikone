@@ -1,6 +1,6 @@
 import { GraphStat } from '@/types/graphStat'
 import { DegreeProgrammeType, Name, NameWithCode } from '@oodikone/shared/types'
-import { Graduated, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
+import { ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
 import { GetAllGraduationStatsResponse } from './university'
 
 type Info = {
@@ -90,11 +90,9 @@ export type GetFacultyProgressStatsResponse = {
 export type GetFacultyProgressStatsRequest = {
   id: string
   specialGroups: SpecialGroups
-  graduated: Graduated
 }
 
 export type GetAllProgressStatsRequest = {
-  graduated: Graduated
   includeSpecials: boolean
 }
 
@@ -142,7 +140,6 @@ export type GetFacultyStudentStatsResponse = {
 export type GetFacultyStudentStatsRequest = {
   id: string
   specialGroups: SpecialGroups
-  graduated: Graduated
 }
 
 export type UpdateFacultyBasicTabResponse = undefined

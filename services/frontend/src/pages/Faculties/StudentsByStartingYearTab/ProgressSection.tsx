@@ -13,20 +13,16 @@ import { exportProgressTable } from './exportProgressTable'
 
 export const ProgressSection = ({
   faculty,
-  graduatedGroup,
   specialGroups,
 }: {
   faculty: GetFacultiesResponse
-  graduatedGroup: boolean
   specialGroups: boolean
 }) => {
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
   const { getTextIn } = useLanguage()
   const progressStats = useGetFacultyProgressStatsQuery({
     id: faculty?.id,
     specialGroups: specials,
-    graduated,
   })
 
   const getSortedProgrammeKeysProgress = (studyLevelStats: Record<string, number[][]>) => {

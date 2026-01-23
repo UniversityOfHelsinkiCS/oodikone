@@ -93,7 +93,6 @@ export type StudyTrackStats = {
   graduationTimes: GraduationTimes
   graduationTimesSecondProg: GraduationTimes
   id: string
-  includeGraduated: boolean
   mainStatsByTrack: Record<string, (number | string)[][]>
   mainStatsByYear: Record<string, (number | string)[][]>
   otherCountriesCount: Record<string, Record<string, Record<string, number>>>

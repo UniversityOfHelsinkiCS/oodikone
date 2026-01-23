@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash'
 
-import { Graduated, SpecialGroups } from '@oodikone/shared/types'
+import { SpecialGroups } from '@oodikone/shared/types'
 import { rootOrgId } from '../../config'
 import { getStudyTrackStats, setStudyTrackStats } from '../analyticsService'
 import { getYearsArray } from '../studyProgramme/studyProgrammeHelpers'
@@ -100,8 +100,7 @@ const calculateProgressStats = (
 export const combineFacultyStudentProgress = async (
   faculty: string,
   programmes: ProgrammesOfOrganization,
-  specialGroups: SpecialGroups,
-  graduated: Graduated
+  specialGroups: SpecialGroups
 ) => {
   const since = new Date('2017-08-01')
   const statsOfProgrammes: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
@@ -120,7 +119,7 @@ export const combineFacultyStudentProgress = async (
     ) {
       continue
     }
-    const statsFromRedis = await getStudyTrackStats(studyProgramme, null, graduated, specialGroups)
+    const statsFromRedis = await getStudyTrackStats(studyProgramme, null, specialGroups)
     if (statsFromRedis) {
       statsOfProgrammes.push(statsFromRedis)
     } else {
@@ -128,13 +127,12 @@ export const combineFacultyStudentProgress = async (
       const updatedStats = await getStudyTrackStatsForStudyProgramme({
         studyProgramme,
         settings: {
-          graduated: graduated === 'GRADUATED_INCLUDED',
           specialGroups: specialGroups === 'SPECIAL_INCLUDED',
         },
         studyRightsOfProgramme,
       })
       statsOfProgrammes.push(updatedStats)
-      await setStudyTrackStats(updatedStats, graduated, specialGroups)
+      await setStudyTrackStats(updatedStats, specialGroups)
     }
   }
 

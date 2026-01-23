@@ -135,13 +135,13 @@ interface GetStudyTrackStatsRequest extends Request {
 
 router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: Response) => {
   const code = req.params.id
-  const { graduated, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
+  const { special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
     return res.status(422).end()
   }
 
   void logInfoForGrafana(code, combinedProgramme)
-  const data = await getStudyTrackStats(code, combinedProgramme, graduated, specialGroups)
+  const data = await getStudyTrackStats(code, combinedProgramme, specialGroups)
   if (data) {
     return res.json(data)
   }
@@ -151,13 +151,12 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
     studyProgramme: code,
     combinedProgramme,
     settings: {
-      graduated: graduated === 'GRADUATED_INCLUDED',
       specialGroups: specialGroups === 'SPECIAL_INCLUDED',
     },
     studyRightsOfProgramme,
   })
   if (updated) {
-    await setStudyTrackStats(updated, graduated, specialGroups)
+    await setStudyTrackStats(updated, specialGroups)
   }
   return res.json(updated)
 })

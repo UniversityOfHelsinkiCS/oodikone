@@ -44,19 +44,16 @@ const facultystatsApi = RTKApi.injectEndpoints({
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),
     getFacultyProgressStats: builder.query<GetFacultyProgressStatsResponse, GetFacultyProgressStatsRequest>({
-      query: ({ id, specialGroups, graduated }) =>
-        `/faculties/${id}/progressstats?special_groups=${specialGroups}&graduated=${graduated}`,
+      query: ({ id, specialGroups }) => `/faculties/${id}/progressstats?special_groups=${specialGroups}`,
     }),
     getAllFacultiesProgressStats: builder.query<GetAllProgressStatsResponse, GetAllProgressStatsRequest>({
-      query: ({ graduated, includeSpecials }) =>
-        `/university/allprogressstats?graduated=${graduated}&specialsIncluded=${includeSpecials}`,
+      query: ({ includeSpecials }) => `/university/allprogressstats?&specialsIncluded=${includeSpecials}`,
     }),
     getAllFacultiesGraduationStats: builder.query<GetAllGraduationStatsResponse, void>({
       query: () => '/university/allgraduationstats',
     }),
     getFacultyStudentStats: builder.query<GetFacultyStudentStatsResponse, GetFacultyStudentStatsRequest>({
-      query: ({ id, specialGroups, graduated }) =>
-        `/faculties/${id}/studentstats?special_groups=${specialGroups}&graduated=${graduated}`,
+      query: ({ id, specialGroups }) => `/faculties/${id}/studentstats?special_groups=${specialGroups}`,
     }),
     updateFacultyBasicTab: builder.query<UpdateFacultyBasicTabResponse, UpdateFacultyBasicTabRequest>({
       query: ({ id, statsType }) => `/faculties/${id}/update_basicview?stats_type=${statsType}`,

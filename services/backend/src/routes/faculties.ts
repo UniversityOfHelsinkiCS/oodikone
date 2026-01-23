@@ -190,7 +190,7 @@ router.get<
   GetProgressStatsQuery
 >('/:id/progressstats', auth.roles(['facultyStatistics']), async (req, res) => {
   const { id: facultyId } = req.params
-  const { graduated, special_groups: specialGroups } = req.query
+  const { special_groups: specialGroups } = req.query
 
   const faculty = await getFacultyCodeById(facultyId)
   if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
@@ -198,11 +198,11 @@ router.get<
   const programmes = await getDegreeProgrammesOfFaculty(faculty.code, true)
   if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
 
-  const data = await getFacultyProgressStats(faculty.code, specialGroups, graduated)
+  const data = await getFacultyProgressStats(faculty.code, specialGroups)
   if (data) return res.json(data)
 
-  const updatedStats = await combineFacultyStudentProgress(faculty.code, programmes, specialGroups, graduated)
-  if (updatedStats) await setFacultyProgressStats(updatedStats, specialGroups, graduated)
+  const updatedStats = await combineFacultyStudentProgress(faculty.code, programmes, specialGroups)
+  if (updatedStats) await setFacultyProgressStats(updatedStats, specialGroups)
 
   return res.json(updatedStats)
 })
@@ -234,19 +234,19 @@ router.get<
   GetProgressStatsQuery
 >('/:id/studentstats', auth.roles(['facultyStatistics']), async (req, res) => {
   const { id: facultyId } = req.params
-  const { graduated, special_groups: specialGroups } = req.query
+  const { special_groups: specialGroups } = req.query
 
   const faculty = await getFacultyCodeById(facultyId)
   if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
 
-  const data = await getFacultyStudentStats(faculty.code, specialGroups, graduated)
+  const data = await getFacultyStudentStats(faculty.code, specialGroups)
   if (data) return res.json(data)
 
   const programmes = await getDegreeProgrammesOfFaculty(faculty.code, true)
   if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
 
-  const updatedStats = await combineFacultyStudents(faculty.code, programmes, specialGroups, graduated)
-  if (updatedStats) await setFacultyStudentStats(updatedStats, specialGroups, graduated)
+  const updatedStats = await combineFacultyStudents(faculty.code, programmes, specialGroups)
+  if (updatedStats) await setFacultyStudentStats(updatedStats, specialGroups)
 
   return res.json(updatedStats)
 })
