@@ -1,11 +1,13 @@
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useCallback, useMemo } from 'react'
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
+import { OodiTable } from '@/components/OodiTable'
+import { StudyProgrammeCourse } from '@oodikone/shared/types'
 import { CodeCell } from './CodeCell'
-import { HeaderCell } from './HeaderCell'
 import { filterDataByYear } from './util'
+
+type FilteredColumnData = ReturnType<typeof filterDataByYear>[number]
 
 export const OverallStatsTable = ({
   data,
@@ -19,228 +21,95 @@ export const OverallStatsTable = ({
   toYear: number
 }) => {
   const { getTextIn } = useLanguage()
-
   const filteredData = useMemo(() => filterDataByYear(data, fromYear, toYear), [data, fromYear, toYear])
 
-  // TODO: Filters don't work for most of the columns
-  const getCommonColumns = useCallback(
-    (): MRT_ColumnDef<any>[] => [
-      {
-        accessorKey: 'isStudyModule',
-        header: 'Type',
-        Cell: ({ cell }) => (cell.getValue<boolean>() ? 'Module' : 'Course'),
-        filterVariant: 'select',
-        filterSelectOptions: [
-          { label: 'Module', value: true },
-          { label: 'Course', value: false },
-        ],
-      },
-      {
-        accessorKey: 'code',
-        header: 'Code',
-        Cell: ({ cell }) => <CodeCell code={cell.getValue<string>()} />,
-      },
-      {
-        accessorKey: 'name',
-        header: 'Name',
-        Cell: ({ cell }) => getTextIn(cell.getValue<Name>()),
-      },
-    ],
-    [getTextIn, showStudents]
-  )
+  const columnHelper = createColumnHelper<FilteredColumnData>()
 
-  const getCreditColumns = (): MRT_ColumnDef<any>[] => [
-    {
-      accessorKey: 'totalAllCredits',
-      header: 'Total credits',
-      Header: <HeaderCell value="Total credits" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
-    {
-      accessorKey: 'totalProgrammeCredits',
-      header: 'Major credits',
-      Header: <HeaderCell value="Major credits" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
-    {
-      accessorKey: 'totalOtherProgrammeCredits',
-      header: 'Non-major credits',
-      Header: <HeaderCell value="Non-major credits" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
-    {
-      accessorKey: 'totalWithoutStudyRightCredits',
-      header: 'Non-degree credits',
-      Header: <HeaderCell value="Non-degree credits" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
-    {
-      accessorKey: 'totalTransferCredits',
-      header: 'Transferred credits',
-      Header: <HeaderCell value="Transferred credits" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
+  const commonColumns = [
+    columnHelper.accessor('isStudyModule', {
+      header: 'Type',
+      cell: ({ row }) => (row.original.isStudyModule ? 'Module' : 'Course'),
+    }),
+    columnHelper.accessor('code', {
+      header: 'Code',
+      cell: ({ row }) => <CodeCell code={row.original.code} />,
+    }),
+    columnHelper.accessor('name', {
+      header: 'Name',
+      cell: ({ row }) => getTextIn(row.original.name),
+    }),
   ]
 
-  const getStudentColumns = (): MRT_ColumnDef<any>[] => [
-    {
-      accessorKey: 'totalAllStudents',
+  const creditColumns = [
+    columnHelper.accessor(`totalAllCredits`, {
+      header: 'Total credits',
+    }),
+    columnHelper.accessor('totalProgrammeCredits', {
+      header: 'Major credits',
+    }),
+    columnHelper.accessor('totalOtherProgrammeCredits', {
+      header: 'Non-major credits',
+    }),
+    columnHelper.accessor('totalWithoutStudyRightCredits', {
+      header: 'Non-degree credits',
+    }),
+    columnHelper.accessor('totalTransferCredits', {
+      header: 'Transferred credits',
+    }),
+  ]
+
+  const studentColumns = [
+    columnHelper.accessor('totalAllStudents', {
       header: 'Total',
-      Header: <HeaderCell value="Total" />,
-      Cell: ({ cell }) => cell.getValue<number>(),
-      muiTableHeadCellProps: {
-        align: 'right',
-      },
-      muiTableBodyCellProps: {
-        align: 'right',
-      },
-    },
-    {
+    }),
+    columnHelper.group({
       id: 'breakdown',
       header: 'Breakdown of total',
       columns: [
-        {
-          accessorKey: 'totalAllPassed',
+        columnHelper.accessor('totalAllPassed', {
           header: 'Passed',
-          Header: <HeaderCell value="Passed" />,
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
-        {
-          accessorKey: 'totalAllNotCompleted',
+        }),
+        columnHelper.accessor('totalAllNotCompleted', {
           header: 'Not completed',
-          Header: <HeaderCell value="Not completed" />,
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
+        }),
       ],
-    },
-    {
+    }),
+    columnHelper.group({
       id: 'breakdown-passed',
       header: 'Breakdown of passed students',
       columns: [
-        {
-          accessorKey: 'totalProgrammeStudents',
+        columnHelper.accessor('totalProgrammeStudents', {
           header: 'Major students',
-          Header: <HeaderCell value="Major students" />,
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
-        {
-          accessorKey: 'totalOtherProgrammeStudents',
+        }),
+        columnHelper.accessor('totalOtherProgrammeStudents', {
           header: 'Non-major students',
-          Header: <HeaderCell value="Non-major students" />,
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
-        {
-          accessorKey: 'totalWithoutStudyRightStudents',
+        }),
+        columnHelper.accessor('totalWithoutStudyRightStudents', {
           header: 'Non-degree students',
-          Header: <HeaderCell value="Non-degree students" />,
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
+        }),
       ],
-    },
-    {
+    }),
+    columnHelper.group({
       id: 'excluded',
       header: 'Not included in total or passed',
       columns: [
-        {
-          accessorKey: 'totalTransferStudents',
-          header: 'Transferred\nstudents',
-          Cell: ({ cell }) => cell.getValue<number>(),
-          muiTableHeadCellProps: {
-            align: 'right',
-          },
-          muiTableBodyCellProps: {
-            align: 'right',
-          },
-        },
+        columnHelper.accessor('totalTransferStudents', {
+          header: 'Transferred students',
+        }),
       ],
-    },
+    }),
   ]
 
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
-    () => [...getCommonColumns(), ...(showStudents ? getStudentColumns() : getCreditColumns())],
-    [getCommonColumns, showStudents]
-  )
+  const columns = useMemo(
+    () => [...commonColumns, ...(showStudents ? studentColumns : creditColumns)],
+    [showStudents]
+  ) as ColumnDef<FilteredColumnData>[]
 
-  const paginationChoices = [50, 100, 250, 500, filteredData.length].filter(num => num <= filteredData.length)
-  const pageSize = Math.min(100, filteredData.length)
-
-  const table = useMaterialReactTable({
-    columns,
-    data: filteredData,
-    defaultColumn: { size: 0 },
-    enableDensityToggle: false,
-    enableHiding: false,
-    muiPaginationProps: {
-      rowsPerPageOptions: paginationChoices,
+  const options = {
+    state: {
+      useZebrastripes: false,
     },
-    initialState: {
-      density: 'compact',
-      pagination: {
-        pageSize,
-        pageIndex: 0,
-      },
-    },
-  })
+  }
 
-  return <MaterialReactTable data-cy="overall-stats-table" table={table} />
+  return <OodiTable columns={columns} cy="overall-stats-table" data={filteredData} options={options} />
 }
