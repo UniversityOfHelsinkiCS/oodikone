@@ -1,3 +1,4 @@
+import Tooltip from '@mui/material/Tooltip'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
@@ -36,7 +37,14 @@ export const OverallStatsTable = ({
     }),
     columnHelper.accessor('name', {
       header: 'Name',
-      cell: ({ row }) => getTextIn(row.original.name),
+      cell: ({ row }) => {
+        const text = getTextIn(row.original.name)
+        return (
+          <Tooltip arrow title={text}>
+            <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{text}</span>
+          </Tooltip>
+        )
+      },
     }),
   ]
 
