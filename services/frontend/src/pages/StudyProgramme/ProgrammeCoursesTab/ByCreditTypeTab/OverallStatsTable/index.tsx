@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { StudyProgrammeCourse } from '@oodikone/shared/types'
 import { CodeCell } from './CodeCell'
 import { filterDataByYear } from './util'
@@ -22,7 +23,11 @@ export const OverallStatsTable = ({
   toYear: number
 }) => {
   const { getTextIn } = useLanguage()
-  const filteredData = useMemo(() => filterDataByYear(data, fromYear, toYear), [data, fromYear, toYear])
+
+  const filteredData = useMemo(
+    () => filterDataByYear(data, fromYear, toYear, getTextIn),
+    [data, fromYear, toYear, getTextIn]
+  )
 
   const columnHelper = createColumnHelper<FilteredColumnData>()
 
@@ -38,7 +43,7 @@ export const OverallStatsTable = ({
     columnHelper.accessor('name', {
       header: 'Name',
       cell: ({ row }) => {
-        const text = getTextIn(row.original.name)
+        const text = row.original.name
         return (
           <Tooltip arrow title={text}>
             <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{text}</span>
@@ -127,5 +132,21 @@ export const OverallStatsTable = ({
     },
   }
 
-  return <OodiTable columns={columns} cy="overall-stats-table" data={filteredData} options={options} />
+  const columnKeys = useMemo(() => {
+    const squashGroups = column => {
+      if (column.columns) return column.columns.flatMap(squashGroups)
+      return [column.accessorKey]
+    }
+    return columns.flatMap(squashGroups)
+  }, [columns])
+
+  return (
+    <OodiTable
+      columns={columns}
+      cy="overall-stats-table"
+      data={filteredData}
+      options={options}
+      toolbarContent={<OodiTableExcelExport data={filteredData} exportColumnKeys={columnKeys} />}
+    />
+  )
 }

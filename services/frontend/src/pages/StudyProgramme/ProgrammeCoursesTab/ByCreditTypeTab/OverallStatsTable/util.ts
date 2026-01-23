@@ -1,8 +1,13 @@
 import { range } from 'lodash'
 
-import { StudyProgrammeCourse } from '@oodikone/shared/types'
+import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
 
-export const filterDataByYear = (data: StudyProgrammeCourse[], fromYear: number, toYear: number) => {
+export const filterDataByYear = (
+  data: StudyProgrammeCourse[],
+  fromYear: number,
+  toYear: number,
+  getTextIn: (arg0: Name) => string | null | undefined
+) => {
   const yearRange = range(fromYear, Number(toYear) + 1)
   const filteredAndMergedCourses = data
     .filter(course => {
@@ -47,7 +52,7 @@ export const filterDataByYear = (data: StudyProgrammeCourse[], fromYear: number,
       return {
         ...values,
         code: course.code,
-        name: course.name,
+        name: getTextIn(course.name),
         isStudyModule: course.isStudyModule,
       }
     })
