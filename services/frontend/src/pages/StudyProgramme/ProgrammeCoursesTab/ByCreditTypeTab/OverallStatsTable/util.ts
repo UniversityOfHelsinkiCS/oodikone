@@ -53,7 +53,7 @@ export const filterDataByYear = (
         ...values,
         code: course.code,
         name: getTextIn(course.name),
-        isStudyModule: course.isStudyModule,
+        isStudyModule: !!course.isStudyModule,
       }
     })
 

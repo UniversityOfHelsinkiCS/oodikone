@@ -30,10 +30,10 @@ export const OverallStatsTable = ({
   )
 
   const columnHelper = createColumnHelper<FilteredColumnData>()
-
   const commonColumns = [
     columnHelper.accessor('isStudyModule', {
       header: 'Type',
+      invertSorting: true,
       cell: ({ row }) => (row.original.isStudyModule ? 'Module' : 'Course'),
     }),
     columnHelper.accessor('code', {
