@@ -50,9 +50,14 @@ export const studyRightTypeFilter = createFilter({
 
     if (!studyRight) return false
 
-    return mode === '1'
-      ? studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
-      : studyRight.extentCode === ExtentCode.MASTER
+    switch (mode) {
+      case '1':
+        return studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
+      case '2':
+        return studyRight.extentCode === ExtentCode.MASTER
+    }
+
+    return true
   },
 
   render: StudyRightTypeFilterCard,
