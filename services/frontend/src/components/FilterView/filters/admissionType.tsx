@@ -20,16 +20,14 @@ export const filter = (programme: string, value: string | null) => (student: For
   )
 }
 
-const AdmissionTypeFilterCard = ({ args, options, onOptionsChange, students }: FilterTrayProps) => {
-  const code = args.programme
+const AdmissionTypeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps) => {
   const { selected } = options
-  const count = (admissionType: string | null): number => students.filter(filter(code, admissionType)).length
 
   const selectOptions = Object.entries(ADMISSION_TYPES)
     .filter(([_, admissionType]) => !!admissionType)
     .map(([key, admissionType]) => {
       const value = admissionType ?? 'Ei valintatapaa'
-      const amount = count(admissionType)
+      const amount = precomputed[admissionType!] ?? 0
 
       return {
         key,
@@ -63,11 +61,21 @@ export const admissionTypeFilter = createFilter({
 
   isActive: ({ selected }) => !!selected.length,
 
-  filter(student, { args, options }) {
-    const { selected } = options
+  precompute: ({ args, students }) =>
+    students
+      .flatMap(student =>
+        findAllStudyRightsForProgramme(student, args.programme)
+          .filter(studyRight => !studyRight.cancelled && !!studyRight.admissionType)
+          .map(studyRight => studyRight.admissionType)
+      )
+      .reduce((acc, cur) => {
+        acc[cur] ??= 0
+        acc[cur] += 1
 
-    return filter(args.programme, selected)(student)
-  },
+        return acc
+      }, {}),
+
+  filter: (student, { args, options }) => filter(args.programme, options.selected)(student),
 
   render: AdmissionTypeFilterCard,
 })
