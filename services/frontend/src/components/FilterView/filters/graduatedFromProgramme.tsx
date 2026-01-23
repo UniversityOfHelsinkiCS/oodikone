@@ -70,30 +70,34 @@ export const graduatedFromProgrammeFilter = createFilter({
   isActive: ({ mode }) => mode !== DEFAULT_STATE,
 
   filter(student, { args, options }) {
-    const { mode } = options
-    const { code, showBachelorAndMaster } = args
-
+    const { code } = args
     const studyRight = student.studyRights.find(sr => sr.studyRightElements.some(el => el.code === code))
+
+    // Cannot determine if student has or has not graduated
     if (!studyRight) return false
 
     const element = studyRight.studyRightElements.find(el => el.code === code)!
 
+    const { mode } = options
     const isBachelorOrMaster = [BACHELORS, MASTERS].includes(element.degreeProgrammeType)
     const isBachelorMode = [GRADUATION_PHASE.NOT_GRADUATED_BACHELOR, GRADUATION_PHASE.GRADUATED_BACHELOR].includes(mode)
     const isMastersMode = [GRADUATION_PHASE.NOT_GRADUATED_MASTER, GRADUATION_PHASE.GRADUATED_MASTER].includes(mode)
 
-    let hasGraduated = false
-
-    if (!isBachelorOrMaster || !showBachelorAndMaster) {
-      hasGraduated = !!element?.graduated
-    } else if (isBachelorMode) {
-      hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === BACHELORS && el.graduated)
-    } else if (isMastersMode) {
-      hasGraduated = studyRight.studyRightElements.some(el => el.degreeProgrammeType === MASTERS && el.graduated)
-    }
-
     const keepGraduated = Number(mode) > 0
 
+    if (!isBachelorOrMaster || !args.showBachelorAndMaster) {
+      return keepGraduated === !!element?.graduated
+    } else if (isBachelorMode) {
+      return (
+        keepGraduated === studyRight.studyRightElements.some(el => el.graduated && el.degreeProgrammeType === BACHELORS)
+      )
+    } else if (isMastersMode) {
+      return (
+        keepGraduated === studyRight.studyRightElements.some(el => el.graduated && el.degreeProgrammeType === MASTERS)
+      )
+    }
+
+    const hasGraduated = false
     return keepGraduated === hasGraduated
   },
 
