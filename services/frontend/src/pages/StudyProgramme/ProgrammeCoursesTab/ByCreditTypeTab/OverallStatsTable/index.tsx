@@ -122,14 +122,6 @@ export const OverallStatsTable = ({
     state: {
       useZebrastripes: false,
     },
-    initialState: {
-      sorting: [
-        {
-          id: 'totalAllCredits',
-          desc: true,
-        },
-      ],
-    },
   }
 
   const columnKeys = useMemo(() => {
