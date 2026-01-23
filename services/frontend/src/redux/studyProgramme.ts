@@ -49,7 +49,7 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       { id: string; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
       query: ({ id, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/studytrackstats?&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+        `/v2/studyprogrammes/${id}/studytrackstats?special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getProgrammeCoursesStats: builder.query<
       StudyProgrammeCourse[],
