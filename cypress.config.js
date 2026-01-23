@@ -3,7 +3,6 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
-  experimentalStudio: process.env.NODE_ENV === 'development',
   projectId: 'c3jsph',
   defaultCommandTimeout: 30000,
   requestTimeout: 30000,
