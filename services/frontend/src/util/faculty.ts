@@ -83,12 +83,13 @@ export const calculateStats = (
   }
 
   Object.keys(creditCounts).forEach(year => {
+    const yearGraduatedCount = graduatedCount ? graduatedCount[year] : 0
     const yearCreditCount = creditCounts[year]
-    const yearCounts = [year, yearCreditCount.length]
+    const yearCounts = [year, yearCreditCount.length + yearGraduatedCount]
 
     for (const limit of limits) {
-      if (limit == 'Graduated') {
-        yearCounts.push(graduatedCount ? graduatedCount[year] : 0)
+      if (limit === 'Graduated') {
+        yearCounts.push(yearGraduatedCount)
       } else {
         yearCounts.push(yearCreditCount.filter(credits => isBetween(credits, limit[0], limit[1])).length)
       }

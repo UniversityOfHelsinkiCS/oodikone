@@ -398,16 +398,16 @@ describe('Degree programme overview', () => {
     it('Student progress data is shown correctly', () => {
       const years = getEmptyYears(true)
       const tableContents = [
-        // [Year, All, < 30 credits, 30–60 credits, 60–90 credits, 90–120 credits, 120–150 credits, 150–180 credits, ≥ 180 credits]
-        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
-        ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0],
-        ['2022 - 2023', 26, 9, 9, 4, 3, 0, 1, 0],
-        ['2021 - 2022', 38, 8, 6, 11, 8, 5, 0, 0],
-        ['2020 - 2021', 30, 2, 1, 3, 7, 4, 4, 9],
-        ['2019 - 2020', 35, 1, 0, 2, 1, 0, 4, 27],
-        ['2018 - 2019', 45, 0, 1, 1, 2, 0, 3, 38],
-        ['2017 - 2018', 47, 0, 1, 3, 0, 1, 2, 40],
-        ['Total', 229, 28, 18, 24, 21, 10, 14, 114],
+        // [Year, All, < 30 credits, 30–60 credits, 60–90 credits, 90–120 credits, 120–150 credits, 150–180 credits, ≥ 180 credits, Graduated]
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0, 0],
+        ['2022 - 2023', 26, 9, 8, 4, 3, 0, 0, 0, 2],
+        ['2021 - 2022', 38, 8, 4, 9, 8, 4, 0, 0, 5],
+        ['2020 - 2021', 30, 2, 1, 2, 5, 0, 0, 1, 19],
+        ['2019 - 2020', 35, 1, 0, 2, 1, 0, 0, 4, 27],
+        ['2018 - 2019', 45, 0, 1, 1, 2, 0, 0, 2, 39],
+        ['2017 - 2018', 47, 0, 1, 3, 0, 0, 1, 0, 42],
+        ['Total', 229, 28, 15, 21, 19, 4, 1, 7, 134],
       ]
 
       cy.checkTableStats(tableContents, 'study-programme-progress')
@@ -423,7 +423,7 @@ describe('Degree programme overview', () => {
         .should('contain', '58.5%') // The percentage for total graduated, to check that the graph renders
 
       cy.cs('programme-progress-bar-chart-section').contains('58.5%').trigger('mouseover', { force: true })
-      cy.contains('At least 180 credits: 7')
+      cy.contains('Graduated: 134')
     })
 
     it('Average graduation times section', () => {
