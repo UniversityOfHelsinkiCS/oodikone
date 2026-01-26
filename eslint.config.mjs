@@ -62,7 +62,7 @@ export default tseslint.config(
       'camelcase': 'off', // TODO: Enable. old db/backend logic is still using snake_case every now and then and needs a big refactor
       'class-methods-use-this': 'off', // Disabled in favor of @typescript-eslint
       'consistent-return': 'off', // Disabled in favor of @typescript-eslint
-      'id-denylist': ['error', 'c', 'd', 'e', 'err', 't'],
+      'id-denylist': ['error', 'err'],
       'no-alert': 'error',
       'no-await-in-loop': 'error',
       'no-console': 'error',
