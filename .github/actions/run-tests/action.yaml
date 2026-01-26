@@ -30,7 +30,7 @@ runs:
       run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull
 
     - name: 'Run cypress'
-      uses: cypress-io/github-action@v6
+      uses: cypress-io/github-action@v7
       with:
         browser: chrome
         spec: ${{ inputs.spec }}
