@@ -1,10 +1,10 @@
-const { orderBy } = require('lodash-es')
-const { Op } = require('sequelize')
+import { orderBy } from 'lodash-es'
+import { Op } from 'sequelize'
 
-const { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } = require('../models')
-const { redisClient } = require('./redis')
+import { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } from '../models'
+import { redisClient } from './redis'
 
-const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
+export const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
 const isBetween = (start, date, end) => {
   return new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
@@ -33,7 +33,7 @@ const getLanguageCenterCourses = async () => {
   return courses
 }
 
-const createArrayOfCourses = async (attempts, courses) => {
+export const createArrayOfCourses = async (attempts, courses) => {
   const fields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
   const semesters = {}
   const faculties = {}
@@ -88,7 +88,7 @@ const createArrayOfCourses = async (attempts, courses) => {
   return courseList
 }
 
-const computeLanguageCenterData = async () => {
+export const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
   const autumnSemester2017 = 135
 
@@ -218,17 +218,10 @@ const computeLanguageCenterData = async () => {
   return { tableData, faculties }
 }
 
-const getLanguageCenterData = async () => {
+export const getLanguageCenterData = async () => {
   const dataOnRedis = await redisClient.get(LANGUAGE_CENTER_REDIS_KEY)
   if (dataOnRedis) return JSON.parse(dataOnRedis)
   const freshData = await computeLanguageCenterData()
   await redisClient.set(LANGUAGE_CENTER_REDIS_KEY, JSON.stringify(freshData))
   return freshData
-}
-
-module.exports = {
-  computeLanguageCenterData,
-  createArrayOfCourses,
-  getLanguageCenterData,
-  LANGUAGE_CENTER_REDIS_KEY,
 }
