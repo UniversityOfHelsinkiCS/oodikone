@@ -23,7 +23,6 @@
     "axios": "^1.9.0",
     "dayjs": "^1.11.13",
     "highcharts": "^11.4.8",
-    "immer": "^10.1.1",
     "lodash-es": "^4.17.23",
     "material-react-table": "^3.2.1",
     "prop-types": "^15.8.1",
