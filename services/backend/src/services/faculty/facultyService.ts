@@ -1,5 +1,5 @@
 import { Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
-import { DegreeProgramme } from 'src/routes/faculties'
+import { DegreeProgramme } from '../../routes/faculties'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
 
