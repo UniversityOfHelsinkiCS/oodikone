@@ -4,7 +4,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { createColumnHelper, getExpandedRowModel } from '@tanstack/react-table'
-import { chain, range } from 'lodash-es'
+import { range } from 'lodash-es'
 import { useMemo, useState } from 'react'
 
 import { Link } from '@/components/common/Link'
@@ -25,21 +25,22 @@ const mapCourseData = course =>
     : {
         name: course.course.name,
         code: course.course.code,
-        attempts: chain(course.grades).values().map('count').sum().value(),
-        otherPassed: chain(course.grades)
-          .omit(range(0, 6))
-          .filter(grade => grade.status.passingGrade ?? grade.status.improvedGrade)
-          .map('count')
-          .sum()
-          .value(),
+        attempts: Object.values(course.grades)
+          .map(grade => grade.count ?? 0)
+          .reduce((prev, acc) => prev + acc, 0),
+        otherPassed: Object.entries(course.grades)
+          .filter(
+            ([key, grade]) =>
+              !['1', '2', '3', '4', '5'].includes(key) && (grade.status.passingGrade ?? grade.status.improvedGrade)
+          )
+          .map(([, grade]) => grade.count ?? 0)
+          .reduce((a, b) => a + b, 0),
         grades: {
           ...course.grades,
           0: {
-            count: chain(course.grades)
-              .filter(grade => grade.status.failingGrade)
-              .map('count')
-              .sum()
-              .value(),
+            count: Object.values(course.grades)
+              .filter(g => g.status.failingGrade)
+              .reduce((sum, g) => sum + (g.count ?? 0), 0),
           },
         },
       }

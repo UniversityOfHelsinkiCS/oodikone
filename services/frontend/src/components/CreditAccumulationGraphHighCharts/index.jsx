@@ -5,7 +5,7 @@ import Switch from '@mui/material/Switch'
 import dayjs from 'dayjs'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
-import { chain, flatten } from 'lodash-es'
+import { flatten } from 'lodash-es'
 import { useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
@@ -441,18 +441,20 @@ export const CreditAccumulationGraphHighCharts = ({
     const correctStudyRightElement = selectedStudyRight?.studyRightElements.find(
       element => element.code === studyPlanProgrammeCode
     )
-    const startDate = selectedStudyRight
+
+    const startDates = selectedStudyRight
       ? selectedStudyRight.studyRightElements
-          .filter(element => element.phase === correctStudyRightElement.phase)
-          .sort(({ startDate: a }, { startDate: b }) => new Date(a).getTime() - new Date(b).getTime())
-          .at(0)?.startDate
-      : chain(students[0].studyRights ?? students[0].courses)
-          .map(element => new Date(element.startDate ?? element.date))
-          .sortBy()
-          .head()
-          .defaultTo(new Date())
-          .value()
-          .getTime()
+          .filter(e => e.phase === correctStudyRightElement.phase)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+          .map(e => e.startDate)
+      : (students[0].studyRights ?? students[0].courses ?? []).map(e => e.startDate ?? e.date)
+
+    const firstDate = startDates.length
+      ? startDates.map(date => new Date(date)).sort((a, b) => a.getTime() - b.getTime())[0]
+      : new Date()
+
+    const startDate = firstDate.getTime()
+
     const [, studyRightTargetEnd] = getStudyRightElementTargetDates(
       selectedStudyRight?.studyRightElements
         .filter(element => element.phase === correctStudyRightElement.phase)
