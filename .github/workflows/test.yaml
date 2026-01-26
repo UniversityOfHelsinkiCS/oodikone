@@ -221,6 +221,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Install node-24 for cypress
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
