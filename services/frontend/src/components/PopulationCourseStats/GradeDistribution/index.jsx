@@ -13,47 +13,46 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 
 import { CourseFilterToggle } from '../CourseFilterToggle'
-import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
-const mapCourseData = course => ({
-  name: course.course.name,
-  code: course.course.code,
-  attempts: chain(course.grades).values().map('count').sum().value(),
-  otherPassed: chain(course.grades)
-    .omit(range(0, 6))
-    .filter(grade => grade.status.passingGrade ?? grade.status.improvedGrade)
-    .map('count')
-    .sum()
-    .value(),
-  grades: {
-    ...course.grades,
-    0: {
-      count: chain(course.grades)
-        .filter(grade => grade.status.failingGrade)
-        .map('count')
-        .sum()
-        .value(),
-    },
-  },
-})
+const mapCourseData = course =>
+  course.courses
+    ? {
+        name: course.name,
+        code: course.code,
+        // We do not need the data for modules currently
+        courses: course.courses?.map(mapCourseData),
+      }
+    : {
+        name: course.course.name,
+        code: course.course.code,
+        attempts: chain(course.grades).values().map('count').sum().value(),
+        otherPassed: chain(course.grades)
+          .omit(range(0, 6))
+          .filter(grade => grade.status.passingGrade ?? grade.status.improvedGrade)
+          .map('count')
+          .sum()
+          .value(),
+        grades: {
+          ...course.grades,
+          0: {
+            count: chain(course.grades)
+              .filter(grade => grade.status.failingGrade)
+              .map('count')
+              .sum()
+              .value(),
+          },
+        },
+      }
 
 const columnHelper = createColumnHelper()
 
-export const GradeDistribution = ({ onlyIamRights, useModules }) => {
-  const { modules, courseStatistics } = UsePopulationCourseContext()
+export const GradeDistribution = ({ onlyIamRights, courseStatistics }) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
 
   const [data, excelData] = useMemo(() => {
-    const data = useModules
-      ? modules.map(({ module, courses }) => ({
-          name: module.name,
-          code: module.code,
-          courses: courses.map(mapCourseData),
-        }))
-      : courseStatistics.map(mapCourseData)
-
+    const data = courseStatistics.map(mapCourseData)
     const excelData = data
       // Export only the courses, not the modules
       .flatMap(row => row?.courses ?? [row])
@@ -66,7 +65,7 @@ export const GradeDistribution = ({ onlyIamRights, useModules }) => {
       }))
 
     return [data, excelData]
-  }, [modules])
+  }, [courseStatistics])
 
   const columns = useMemo(() => {
     return [

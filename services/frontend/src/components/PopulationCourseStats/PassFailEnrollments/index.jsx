@@ -12,26 +12,16 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseFilterToggle } from '../CourseFilterToggle'
-import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const columnHelper = createColumnHelper()
 
-export const PassFailEnrollments = ({ onlyIamRights, useModules }) => {
-  const { modules, courseStatistics } = UsePopulationCourseContext()
+export const PassFailEnrollments = ({ onlyIamRights, courseStatistics }) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
 
   const [data, excelData] = useMemo(() => {
-    const data = useModules
-      ? modules.map(({ module, courses }) => ({
-          name: module.name,
-          code: module.code,
-          courses,
-        }))
-      : courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
-
-    const excelData = data
+    const excelData = courseStatistics
       // Export only the courses, not the modules
       .flatMap(row => row?.courses ?? [row])
       .map(({ name, code, stats }) => ({
@@ -48,8 +38,8 @@ export const PassFailEnrollments = ({ onlyIamRights, useModules }) => {
         'Attempted%': calculatePercentage(stats.triedOfPopulation, 100),
       }))
 
-    return [data, excelData]
-  }, [useModules, modules, courseStatistics, getTextIn, calculatePercentage])
+    return [courseStatistics, excelData]
+  }, [courseStatistics, getTextIn, calculatePercentage])
 
   const accessorKeys = useMemo(
     () => [

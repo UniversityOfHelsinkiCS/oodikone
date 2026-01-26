@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
-import { PopulationCourseContext } from './PopulationCourseContext'
 
 const visibleCoursesFilter = (course, mandatoryCourses) =>
   mandatoryCourses?.defaultProgrammeCourses?.some(
@@ -45,26 +44,30 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
         return modules
       }, {})
 
-    setModules(orderBy(Object.values(modules), item => item.module.code))
+    setModules(
+      orderBy(
+        Object.values(modules).map(({ module, courses }) => ({
+          name: module.name,
+          code: module.code,
+          courses,
+        })),
+        item => item.code
+      )
+    )
   }, [filteredCourses, curriculum])
-
-  const contextValue = {
-    modules,
-    courseStatistics: filteredCourses,
-  }
 
   const panes = [
     {
       label: 'Pass/fail',
-      render: <PassFailEnrollments onlyIamRights={onlyIamRights} useModules />,
+      render: <PassFailEnrollments courseStatistics={modules} onlyIamRights={onlyIamRights} />,
     },
     {
       label: 'Grades',
-      render: <GradeDistribution onlyIamRights={onlyIamRights} useModules />,
+      render: <GradeDistribution courseStatistics={modules} onlyIamRights={onlyIamRights} />,
     },
     {
       label: 'When passed',
-      render: <PassingSemesters onlyIamRights={onlyIamRights} useModules />,
+      render: <PassingSemesters courseStatistics={modules} onlyIamRights={onlyIamRights} />,
     },
   ]
 
@@ -77,9 +80,7 @@ export const PopulationCourseStats = ({ curriculum, filteredCourses, pending, on
           <Tab key={label} label={label} />
         ))}
       </Tabs>
-      <PopulationCourseContext.Provider value={contextValue}>
-        {panes.at(tab)?.render ?? null}
-      </PopulationCourseContext.Provider>
+      {panes.at(tab)?.render ?? null}
     </>
   )
 }

@@ -13,7 +13,6 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseFilterToggle } from '../CourseFilterToggle'
-import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const columnHelper = createColumnHelper()
 
@@ -34,23 +33,14 @@ const yearColumn = (year, cumulative) =>
     columns: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
   })
 
-export const PassingSemesters = ({ onlyIamRights, useModules }) => {
-  const { modules, courseStatistics } = UsePopulationCourseContext()
+export const PassingSemesters = ({ onlyIamRights, courseStatistics }) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   const [data, excelData] = useMemo(() => {
-    const data = useModules
-      ? modules.map(({ module, courses }) => ({
-          name: module.name,
-          code: module.code,
-          courses,
-        }))
-      : courseStatistics
-
-    const excelData = data
+    const excelData = courseStatistics
       // Export only the courses, not the modules
       .flatMap(row => row?.courses ?? [row])
       .map(({ name, code, stats }) => ({
@@ -76,8 +66,8 @@ export const PassingSemesters = ({ onlyIamRights, useModules }) => {
         ),
       }))
 
-    return [data, excelData]
-  }, [modules, cumulativeStats])
+    return [courseStatistics, excelData]
+  }, [courseStatistics, cumulativeStats])
 
   const accessorKeys = useMemo(
     () => [
@@ -173,7 +163,7 @@ export const PassingSemesters = ({ onlyIamRights, useModules }) => {
         ],
       }),
     ],
-    [modules, cumulativeStats]
+    [cumulativeStats]
   )
 
   const tableOptions = {
