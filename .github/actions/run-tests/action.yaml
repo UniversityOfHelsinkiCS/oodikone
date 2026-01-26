@@ -25,10 +25,12 @@ runs:
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 
+    - uses: actions/setup-node@v6
+      with:
+        node-version: 24
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull
-
     - name: 'Run cypress'
       uses: cypress-io/github-action@v7
       with:
