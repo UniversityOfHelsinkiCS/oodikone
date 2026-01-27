@@ -35,33 +35,25 @@ This file is bit of a legacy mess still and imo not worth the effort refactoring
 (last publish 6 years ago as of 2025 btw) with the official newer version or something else entirely
 */
 const splitStudentCredits = (student, timeSlots, cumulative) => {
-  if (!timeSlots.length) return {}
+  if (!timeSlots.length) return []
 
   let timeSlotN = 0
-
   const results = new Array(timeSlots.length).fill(0)
 
-  chain(student.courses)
+  student.courses
     .filter(course => course.passed && !course.isStudyModuleCredit && dayjs(course.date).isAfter(timeSlots[0].start))
-    .orderBy(course => dayjs(course.date), ['asc'])
+    .sort((a, b) => dayjs(a.date) > dayjs(b.date))
     .forEach(course => {
-      while (timeSlotN < timeSlots.length && dayjs(course.date).isAfter(timeSlots[timeSlotN].end)) {
-        timeSlotN++
-      }
-
-      if (timeSlotN >= timeSlots.length) {
-        return
-      }
+      while (timeSlotN < timeSlots.length && dayjs(course.date).isAfter(timeSlots[timeSlotN].end)) timeSlotN++
+      if (timeSlots.length <= timeSlotN) return
 
       results[timeSlotN] += course.credits
-
-      if (cumulative) {
-        for (let i = timeSlotN + 1; i < timeSlots.length; i++) {
-          results[i] += course.credits
-        }
-      }
     })
-    .value()
+
+  if (cumulative)
+    for (let i = 1; i < timeSlots.length; i++) {
+      results[i] += results[i - 1]
+    }
 
   return results
 }
