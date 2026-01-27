@@ -158,18 +158,10 @@ export const InteractiveDataTable = ({
                     data={
                       columnIndex === 0
                         ? sortedKeys
-                            ?.map(programme =>
-                              dataProgrammeStats[programme]
-                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                                : null
-                            )
+                            ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
                             .filter(programme => !!programme)
                         : keyOrder[yearIndex]
-                            ?.map(programme =>
-                              dataProgrammeStats[programme]
-                                ? dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                                : null
-                            )
+                            ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
                             .filter(programme => !!programme)
                     }
                     differenceData={Object.keys(differenceToPrevYears)?.reduce(
