@@ -11,7 +11,7 @@ import accessibility from 'highcharts/modules/accessibility'
 import exportData from 'highcharts/modules/export-data'
 import exporting from 'highcharts/modules/exporting'
 
-import { chain, range, sortBy } from 'lodash-es'
+import { groupBy, range } from 'lodash-es'
 import { useState } from 'react'
 import ReactHighcharts from 'react-highcharts'
 
@@ -190,20 +190,14 @@ export const CreditDistributionDevelopment = ({
     }
 
     if (timeDivision === TimeDivision.ACADEMIC_YEAR) {
-      return chain(allSemesters)
-        .groupBy('yearcode')
-        .values()
-        .map(([a, b]) => {
-          const s = sortBy([dayjs(a.startdate), dayjs(a.enddate), dayjs(b.startdate), dayjs(b.enddate)])
-          return [s[0], s[s.length - 1]]
-        })
+      return Object.values(groupBy(allSemesters, 'yearcode'))
+        .map(([a, b]) => [dayjs(a.startdate), dayjs(b.enddate)])
         .filter(([a, b]) => startDate.isBefore(b) && dayjs().isAfter(a))
         .map(([start, end]) => ({
           start,
           end,
           label: `${start.year()}-${end.year()}`,
         }))
-        .value()
     }
 
     if (timeDivision === TimeDivision.SEMESTER) {
