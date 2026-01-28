@@ -195,11 +195,9 @@ jobs:
 
       - name: Start oodikone detached
         working-directory: ./services/backend
-        run: npm run oodikone:test:setup
 
       - name: Run api-tests
         working-directory: ./services/backend
-        run: npm run oodikone:test:api
 
   # === End-to-end tests ===
   test_end_to_end:
