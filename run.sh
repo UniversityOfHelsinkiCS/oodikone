@@ -71,7 +71,7 @@ parse_env() {
     env="--file docker-compose.yml --file docker-compose.real.yml"
   fi
   if [[ "$version" == "api" ]]; then
-    env="--file docker-compose.yml"
+    env="--file docker-compose.ci.yml"
   fi
   return 0
 }
