@@ -85,9 +85,9 @@ parse_params "$@"
 parse_profiles
 parse_env
 if [[ "$compose_command" == "" ]]; then
-  final_command="docker-compose ${env}"
+  final_command="docker compose ${env}"
 else
-  final_command="docker-compose ${env} ${profiles} ${compose_command}"
+  final_command="docker compose ${env} ${profiles} ${compose_command}"
 fi
 
 msg "${BLUE}Running: ${final_command}${NOFORMAT}"
