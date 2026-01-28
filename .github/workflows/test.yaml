@@ -174,13 +174,46 @@ jobs:
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
+  # === Other tests ===
+  test_service_exit_statuses:
+    name: 'Check services run correctly'
+    needs:
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v3
+        with:
+          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+
+      - name: 'Run services, pull rest of the needed images'
+        run: docker compose --file docker-compose.ci.yml up --profile oodikone --detach --quiet-pull
+
+      - name: 'Check that exit statuses are not errors'
+        run: |
+          docker ps -a
+          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+            echo 'Some process had nonzero exit code';
+            exit 1;
+          fi
+
+      - name: 'Print logs on failure'
+        if: failure()
+        run: docker compose --file docker-compose.ci.yml --profile oodikone logs
+
   # === Backend api-tests ===
   test_api:
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
-    if: always()
+      - test_service_exit_statuses
     strategy:
       fail-fast: false
     runs-on: ubuntu-24.04
@@ -206,6 +239,7 @@ jobs:
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - test_api
+      - test_service_exit_statuses
     strategy:
       fail-fast: false
       matrix:
@@ -257,36 +291,3 @@ jobs:
           password: ${{ secrets.password }}
           spec: ${{ matrix.spec }}
           test_name: ${{ matrix.name }}
-
-  # === Other tests ===
-  test_service_exit_statuses:
-    name: 'Check services run correctly'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-
-      - name: 'Run services, pull rest of the needed images'
-        run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull
-
-      - name: 'Check that exit statuses are not errors'
-        run: |
-          docker ps -a
-          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
-            echo 'Some process had nonzero exit code';
-            exit 1;
-          fi
-
-      - name: 'Print logs on failure'
-        if: failure()
-        run: docker compose --file docker-compose.ci.yml logs
