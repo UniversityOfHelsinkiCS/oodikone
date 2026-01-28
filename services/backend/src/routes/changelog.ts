@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Router } from 'express'
 
 import { Release } from '@oodikone/shared/types'
-import { isDev } from '../config'
+import { isDev, isTest } from '../config'
 
 const router = Router()
 
@@ -13,7 +13,7 @@ router.get<never, Release[]>('/', async (_, res) => {
     return res.status(200).send(changelog.data)
   }
 
-  if (isDev) {
+  if (isDev || isTest) {
     const fakeRelease: Release[] = [
       {
         description: '**Feature 1**\n- Added a fancy new feature \n\n**Feature 2**\n- Fixed a bug\n- Fixed another bug',

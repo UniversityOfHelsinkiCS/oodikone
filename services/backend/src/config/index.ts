@@ -1,5 +1,6 @@
 // Node env to use
 export const isDev = process.env.NODE_ENV === 'development'
+export const isTest = process.env.NODE_ENV === 'test'
 export const isStaging = process.env.REACT_APP_STAGING === 'true'
 export const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 
