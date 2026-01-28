@@ -80,7 +80,6 @@ export const ByCreditTypeTab = ({
   return (
     <Section
       cypress="by-credit-type"
-      // TODO: exportOnClick={}
       infoBoxContent={
         showStudents
           ? studyProgrammeToolTips.studentsOfProgrammeCourses
