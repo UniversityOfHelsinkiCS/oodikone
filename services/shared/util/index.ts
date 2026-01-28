@@ -75,3 +75,24 @@ export const mapValues = <T extends object, K extends keyof T, R>(input: T, f: (
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
 
 export const uniq = <T>(data: T[]): T[] => [...new Set(data)]
+
+/**
+ * Cleanup IIFE switch statements.
+ *
+ * USAGE:
+ * ```typescript
+ * const fallback = "Some default value"
+ * const cases = [
+ *   ["vanilla", () => {}],
+ *   ["chocolate", () => {}],
+ *   [["strawberry", "blueberry"], () => {}]
+ * ]
+ *
+ * const res = match(value, cases, fallback)
+ * ```
+ */
+export function match<T, R>(input: T, cases: [T | T[], R][]): R | undefined
+export function match<T, R>(input: T, cases: [T | T[], R][], fallback: R): R
+export function match<T, R>(input: T, cases: [T | T[], R][], fallback?: R) {
+  return cases.find(([matches, _]) => formatToArray(matches).includes(input))?.[1] ?? fallback
+}

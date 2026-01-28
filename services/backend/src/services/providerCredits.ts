@@ -1,15 +1,14 @@
 import { SISStudyRight } from '@oodikone/shared/models'
 import { EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import { CreditStats } from '@oodikone/shared/types/studyProgramme'
-import { mapToProviders } from '@oodikone/shared/util'
+import { mapToProviders, match } from '@oodikone/shared/util'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
 import { defineYear } from './studyProgramme/studyProgrammeHelpers'
 import { getSISStudyRightsOfStudents } from './studyProgramme/studyRightFinders'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const assertUnreachable = (x: never) => {
+const assertUnreachable = () => {
   throw new Error("Didn't expect to get here")
 }
 
@@ -52,34 +51,37 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
   if (degreeStudyRightExtentCode && basicDegreeExtentCodes.includes(degreeStudyRightExtentCode)) {
     return 'basic'
   }
-  switch (extentCode) {
-    case ExtentCode.OPEN_UNIVERSITY_STUDIES:
-    case ExtentCode.SUMMER_AND_WINTER_SCHOOL:
-      return 'open-uni'
-    case ExtentCode.MASTER:
-    case ExtentCode.BACHELOR_AND_MASTER:
-    case ExtentCode.BACHELOR:
-      return 'basic'
-    case ExtentCode.NON_DEGREE_STUDIES:
-    case ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS:
-    case ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS:
-      return 'separate'
-    case ExtentCode.EXCHANGE_STUDIES:
-    case ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE:
-      return 'incoming-exchange'
-    case ExtentCode.CONTRACT_TRAINING:
-      return 'agreement'
-    case ExtentCode.DOCTOR:
-    case ExtentCode.LICENTIATE:
-    case ExtentCode.CONTINUING_EDUCATION:
-    case ExtentCode.SPECIALIZATION_STUDIES:
-    case ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY:
-    case ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS:
-    case undefined:
-      return 'other'
-    default:
-      return assertUnreachable(extentCode)
-  }
+
+  return match(
+    extentCode,
+    [
+      [[ExtentCode.OPEN_UNIVERSITY_STUDIES, ExtentCode.SUMMER_AND_WINTER_SCHOOL], 'open-uni'],
+      [[ExtentCode.MASTER, ExtentCode.BACHELOR_AND_MASTER, ExtentCode.BACHELOR], 'basic'],
+      [
+        [
+          ExtentCode.NON_DEGREE_STUDIES,
+          ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS,
+          ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS,
+        ],
+        'separate',
+      ],
+      [[ExtentCode.EXCHANGE_STUDIES, ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE], 'incoming-exchange'],
+      [[ExtentCode.CONTRACT_TRAINING], 'agreement'],
+      [
+        [
+          ExtentCode.DOCTOR,
+          ExtentCode.LICENTIATE,
+          ExtentCode.CONTINUING_EDUCATION,
+          ExtentCode.SPECIALIZATION_STUDIES,
+          ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY,
+          ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS,
+          undefined,
+        ],
+        'other',
+      ],
+    ],
+    assertUnreachable()
+  )
 }
 
 const getBasicDegreeStudyRight = (
