@@ -1,11 +1,8 @@
-import { orderBy, range } from 'lodash-es'
-import { Op } from 'sequelize'
+import { range } from 'lodash-es'
 
-import { Name, StudyProgrammeCourse, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
+import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { CreditModel, EnrollmentModel } from '../../models'
 import { getOpenUniCourseCode } from '../../util'
-import { createArrayOfCourses } from '../languageCenterData'
 import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
 import {
   getOtherStudentsForProgrammeCourses,
@@ -15,9 +12,6 @@ import {
   getTransferStudentsForProgrammeCourses,
 } from './studentGetters'
 
-const getCurrentYearStartDate = () => {
-  return new Date(new Date().getFullYear(), 0, 1)
-}
 
 const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   const providerCode = mapToProviders([studyProgramme])[0]
@@ -31,164 +25,74 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   }, [] as string[])
 }
 
-const getFrom = (academicYear: string, year: number) => {
-  return academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
-}
+const getCurrentYearStartDate = () => new Date(new Date().getFullYear(), 0, 1)
 
-const getTo = (academicYear: string, year: number) => {
-  return academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
-}
+const getFrom = (academicYear: string, year: number) => academicYear === 'ACADEMIC_YEAR'
+  ? new Date(year, 7, 1, 0, 0, 0)
+  : new Date(year, 0, 1, 0, 0, 0)
 
-// * Combined return type, should be split into smaller types
-type Students = {
-  code: string
-  name: Name
-  type: string
+const getTo = (academicYear: string, year: number) => academicYear === 'ACADEMIC_YEAR'
+  ? new Date(year + 1, 6, 31, 23, 59, 59)
+  : new Date(year, 11, 31, 23, 59, 59)
+
+const promiseKeys = ['passed', 'notCompleted', 'ownStudents', 'withoutStudyRight', 'otherStudents', 'transfer'] as const
+
+
+type CommonFields = {
+  code: string,
+  name: Name,
+  year: number,
+  type: string,
   isStudyModule?: boolean
-  year?: number
-  totalPassed?: number
-  totalAllCredits?: number
-  totalNotCompleted?: number
-  totalProgrammeStudents?: number
-  totalProgrammeCredits?: number
-  totalWithoutStudyRightStudents?: number
-  totalWithoutStudyRightCredits?: number
-  totalOtherProgrammeStudents?: number
-  totalOtherProgrammeCredits?: number
-  totalTransferStudents?: number
-  totalTransferCredits?: number
 }
+type YearlyFields = StudyProgrammeCourse["years"][number]
+type CombinedPromises = Promise<(CommonFields & Partial<YearlyFields>)[]>[]
 
-// TODO: It would be a good idea to split this into smaller functions
-// The amount of different return types makes this very messy
 const makeYearlyPromises = (
   years: number[],
   academicYear: string,
-  type: 'passed' | 'notCompleted' | 'ownStudents' | 'withoutStudyRight' | 'otherStudents' | 'transfer',
+  type: typeof promiseKeys[number],
   programmeCourses: string[],
-  studyProgramme?: string
-) => {
-  return years.map(async year => {
-    const from = getFrom(academicYear, year)
-    const to = getTo(academicYear, year)
-    let result: Students[] | null = null
+  studyProgramme: string
+): CombinedPromises => years.map(async year => {
+  const from = getFrom(academicYear, year)
+  const to = getTo(academicYear, year)
 
-    switch (type) {
-      case 'passed':
-        result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
-        break
-      case 'notCompleted':
-        result = await getNotCompletedForProgrammeCourses(from, to, programmeCourses)
-        break
-      case 'ownStudents':
-        result = await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
-        break
-      case 'withoutStudyRight':
-        result = await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)
-        break
-      case 'otherStudents':
-        result = await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)
-        break
-      case 'transfer':
-        result = await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)
-        break
-      default:
-        result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
-    }
+  const addYear = <T extends object>(course: T) => {
+    course["year"] = year
+    return course as T & { year: number }
+  }
 
-    return result.map(course => {
-      course.year = year
-      return course
-    })
-  })
-}
+  switch (type) {
+    case 'passed':
+      return (await getStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+    case 'notCompleted':
+      return (await getNotCompletedForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+    case 'ownStudents':
+      return (await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
+    case 'withoutStudyRight':
+      return (await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+    case 'otherStudents':
+      return (await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
+    case 'transfer':
+      return (await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+  }
+})
 
-type Attempt = {
-  studentNumber: string
-  courseCode: string
-  completed: boolean
-  date: Date
-  semestercode: number
-  enrolled?: boolean
-}
-
-export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgramme: string) => {
-  const courses = await getAllProgrammeCourses(mapToProviders([studyProgramme])[0])
-  const autumnSemester2017 = 135
-  const courseCodes = courses.map(course => course.code)
-
-  const credits = await CreditModel.findAll({
-    attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date'],
-    where: {
-      course_code: { [Op.in]: courseCodes },
-      semestercode: { [Op.gte]: autumnSemester2017 },
-      credittypecode: CreditTypeCode.PASSED,
-    },
-    raw: true,
-  })
-
-  const enrollments = await EnrollmentModel.findAll({
-    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
-    where: {
-      course_code: { [Op.in]: courseCodes },
-      semestercode: { [Op.gte]: autumnSemester2017 },
-      state: { [Op.in]: [EnrollmentState.ENROLLED, EnrollmentState.REJECTED] },
-    },
-    raw: true,
-  })
-
-  const studentList = new Set<string>()
-  const attemptsByStudents = {} as Record<string, Attempt[]>
-
-  credits.forEach(credit => {
-    const studentNumber = credit.student_studentnumber
-    studentList.add(studentNumber)
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
-    attemptsByStudents[studentNumber].push({
-      studentNumber,
-      courseCode: credit.course_code,
-      completed: true,
-      date: credit.attainment_date,
-      semestercode: credit.semestercode,
-    })
-  })
-
-  enrollments.forEach(enrollment => {
-    const studentNumber = enrollment.studentnumber
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
-    studentList.add(studentNumber)
-    if (
-      attemptsByStudents[studentNumber].find(
-        attempt =>
-          !attempt.completed &&
-          attempt.semestercode === enrollment.semestercode &&
-          attempt.courseCode === enrollment.course_code
-      )
-    ) {
-      return
-    }
-    attemptsByStudents[studentNumber].push({
-      studentNumber,
-      courseCode: enrollment.course_code,
-      completed: false,
-      date: enrollment.enrollment_date_time,
-      semestercode: enrollment.semestercode,
-      enrolled: enrollment.state === EnrollmentState.ENROLLED,
-    })
-  })
-
-  const attemptsArray = [] as Attempt[]
-  studentList.forEach(studentNumber => attemptsArray.push(...attemptsByStudents[studentNumber]))
-
-  const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
-  const tableData = orderBy(unorderedTableData, 'code')
-
-  return { tableData }
-}
+const emptyStats = {
+  totalAllStudents: 0,
+  totalPassed: 0,
+  totalNotCompleted: 0,
+  totalAllCredits: 0,
+  totalProgrammeStudents: 0,
+  totalProgrammeCredits: 0,
+  totalOtherProgrammeStudents: 0,
+  totalOtherProgrammeCredits: 0,
+  totalWithoutStudyRightStudents: 0,
+  totalWithoutStudyRightCredits: 0,
+  totalTransferCredits: 0,
+  totalTransferStudents: 0,
+} as const
 
 export const getStudyProgrammeCoursesForStudyTrack = async (
   unixMillis: number,
@@ -204,149 +108,68 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
   const secondProgrammeCourses = combinedProgramme ? await getAllStudyProgrammeCourses(combinedProgramme) : []
   const programmeCourses = [...mainProgrammeCourses, ...secondProgrammeCourses]
 
-  const yearlyPassedStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'passed', programmeCourses)
-  const yearlyNotCompletedStudentByCoursePromises = makeYearlyPromises(
-    yearRange,
-    academicYear,
-    'notCompleted',
-    programmeCourses
-  )
-  const yearlyProgrammeStudentsPromises = makeYearlyPromises(
-    yearRange,
-    academicYear,
-    'ownStudents',
-    programmeCourses,
-    studyProgramme
-  )
-  const yearlyStudentsWithoutStudyRightPromises = makeYearlyPromises(
-    yearRange,
-    academicYear,
-    'withoutStudyRight',
-    programmeCourses
-  )
-  const yearlyOtherProgrammeStudentsPromises = makeYearlyPromises(
-    yearRange,
-    academicYear,
-    'otherStudents',
-    programmeCourses,
-    studyProgramme
-  )
-  const yearlyTransferStudentsPromises = makeYearlyPromises(
-    yearRange,
-    academicYear,
-    'transfer',
-    programmeCourses,
-    studyProgramme
-  )
-
-  const [
-    yearlyPassedStudentByCourse,
-    yearlyNotCompletedStudentByCourse,
-    yearlyProgrammeStudents,
-    yearlyStudentsWithoutStudyRight,
-    yearlyOtherProgrammeStudents,
-    yearlyTransferStudents,
-  ] = await Promise.all([
-    Promise.all(yearlyPassedStudentByCoursePromises),
-    Promise.all(yearlyNotCompletedStudentByCoursePromises),
-    Promise.all(yearlyProgrammeStudentsPromises),
-    Promise.all(yearlyStudentsWithoutStudyRightPromises),
-    Promise.all(yearlyOtherProgrammeStudentsPromises),
-    Promise.all(yearlyTransferStudentsPromises),
-  ])
+  const courses = (await Promise.all(promiseKeys.flatMap(key => makeYearlyPromises(yearRange, academicYear, key, programmeCourses, studyProgramme)))).flat()
 
   let maxYear = 0
-  const allCourses = [
-    ...yearlyPassedStudentByCourse.flat(),
-    ...yearlyNotCompletedStudentByCourse.flat(),
-    ...yearlyProgrammeStudents.flat(),
-    ...yearlyStudentsWithoutStudyRight.flat(),
-    ...yearlyOtherProgrammeStudents.flat(),
-    ...yearlyTransferStudents.flat(),
-  ].reduce(
-    (acc, curr) => {
-      if (curr.year! > maxYear) {
-        maxYear = curr.year!
-      }
-      if (!acc[curr.code]) {
-        acc[curr.code] = {
-          code: curr.code,
-          name: curr.name,
-          isStudyModule: curr.isStudyModule ?? false,
-          years: {},
-        }
+  const allCourses = courses.reduce(
+    (acc, currentCourseStats) => {
+      if (currentCourseStats.year! > maxYear) {
+        maxYear = currentCourseStats.year!
       }
 
-      if (!acc[curr.code].years[curr.year!]) {
-        acc[curr.code].years[curr.year!] = {
-          isStudyModule: curr.isStudyModule ?? false,
-          totalAllStudents: 0,
-          totalPassed: 0,
-          totalNotCompleted: 0,
-          totalAllCredits: 0,
-          totalProgrammeStudents: 0,
-          totalProgrammeCredits: 0,
-          totalOtherProgrammeStudents: 0,
-          totalOtherProgrammeCredits: 0,
-          totalWithoutStudyRightStudents: 0,
-          totalWithoutStudyRightCredits: 0,
-          totalTransferStudents: 0,
-          totalTransferCredits: 0,
-        }
+      acc[currentCourseStats.code] ??= {
+        code: currentCourseStats.code,
+        name: currentCourseStats.name,
+        isStudyModule: !!currentCourseStats.isStudyModule,
+        years: {},
       }
-      switch (curr.type) {
+
+      acc[currentCourseStats.code].years[currentCourseStats.year!] ??= {
+        ...emptyStats,
+        isStudyModule: !!currentCourseStats.isStudyModule,
+      }
+
+      const currentYear = acc[currentCourseStats.code].years[currentCourseStats.year!]
+
+      switch (currentCourseStats.type) {
         case 'passed':
-          acc[curr.code].years[curr.year!].totalPassed += curr.totalPassed ?? 0
-          acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalPassed
-          acc[curr.code].years[curr.year!].totalAllCredits += curr.totalAllCredits ?? 0
+          currentYear.totalPassed += currentCourseStats.totalPassed ?? 0
+          currentYear.totalAllStudents += currentYear.totalPassed
+          currentYear.totalAllCredits += currentCourseStats.totalAllCredits ?? 0
           break
         case 'notCompleted':
-          acc[curr.code].years[curr.year!].totalNotCompleted += curr.totalNotCompleted ?? 0
-          acc[curr.code].years[curr.year!].totalAllStudents += acc[curr.code].years[curr.year!].totalNotCompleted
+          currentYear.totalNotCompleted += currentCourseStats.totalNotCompleted ?? 0
+          currentYear.totalAllStudents += currentYear.totalNotCompleted
           break
         case 'ownProgramme':
-          acc[curr.code].years[curr.year!].totalProgrammeStudents += curr.totalProgrammeStudents ?? 0
-          acc[curr.code].years[curr.year!].totalProgrammeCredits += curr.totalProgrammeCredits ?? 0
+          currentYear.totalProgrammeStudents += currentCourseStats.totalProgrammeStudents ?? 0
+          currentYear.totalProgrammeCredits += currentCourseStats.totalProgrammeCredits ?? 0
           break
         case 'otherProgramme':
-          acc[curr.code].years[curr.year!].totalOtherProgrammeStudents += curr.totalOtherProgrammeStudents ?? 0
-          acc[curr.code].years[curr.year!].totalOtherProgrammeCredits += curr.totalOtherProgrammeCredits ?? 0
+          currentYear.totalOtherProgrammeStudents += currentCourseStats.totalOtherProgrammeStudents ?? 0
+          currentYear.totalOtherProgrammeCredits += currentCourseStats.totalOtherProgrammeCredits ?? 0
           break
         case 'noStudyright':
-          acc[curr.code].years[curr.year!].totalWithoutStudyRightStudents += curr.totalWithoutStudyRightStudents ?? 0
-          acc[curr.code].years[curr.year!].totalWithoutStudyRightCredits += curr.totalWithoutStudyRightCredits ?? 0
+          currentYear.totalWithoutStudyRightStudents += currentCourseStats.totalWithoutStudyRightStudents ?? 0
+          currentYear.totalWithoutStudyRightCredits += currentCourseStats.totalWithoutStudyRightCredits ?? 0
           break
         case 'transfer':
-          acc[curr.code].years[curr.year!].totalTransferStudents += curr.totalTransferStudents ?? 0
-          acc[curr.code].years[curr.year!].totalTransferCredits += curr.totalTransferCredits ?? 0
-          break
-        default:
+          currentYear.totalTransferStudents += currentCourseStats.totalTransferStudents ?? 0
+          currentYear.totalTransferCredits += currentCourseStats.totalTransferCredits ?? 0
           break
       }
       return acc
     },
     {} as Record<string, StudyProgrammeCourse>
   )
+
   const ayCourses = Object.keys(allCourses).filter(courseCode => courseCode.startsWith('AY'))
-  const properties = [
-    'totalAllStudents',
-    'totalPassed',
-    'totalNotCompleted',
-    'totalAllCredits',
-    'totalProgrammeStudents',
-    'totalProgrammeCredits',
-    'totalOtherProgrammeStudents',
-    'totalOtherProgrammeCredits',
-    'totalWithoutStudyrightStudents',
-    'totalWithoutStudyrightCredits',
-    'totalTransferCredits',
-    'totalTransferStudents',
-  ]
+  const properties = Object.keys(emptyStats)
+
   ayCourses.forEach(ayCourse => {
     const openUniCourseCode = getOpenUniCourseCode(ayCourse)
-    if (!openUniCourseCode) {
-      return
-    }
+    if (!openUniCourseCode) return
+
     const normCode = openUniCourseCode[1]
 
     if (allCourses[normCode]) {
@@ -359,20 +182,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
         .filter(year => year <= maxYear)
         .forEach(year => {
           if (!allCourses[normCode].years[year]) {
-            mergedCourse.years[year] = {
-              totalAllStudents: 0,
-              totalPassed: 0,
-              totalNotCompleted: 0,
-              totalAllCredits: 0,
-              totalProgrammeStudents: 0,
-              totalProgrammeCredits: 0,
-              totalOtherProgrammeStudents: 0,
-              totalOtherProgrammeCredits: 0,
-              totalWithoutStudyRightStudents: 0,
-              totalWithoutStudyRightCredits: 0,
-              totalTransferCredits: 0,
-              totalTransferStudents: 0,
-            }
+            mergedCourse.years[year] = emptyStats
           } else {
             mergedCourse.years[year] = { ...allCourses[normCode].years[year] }
           }

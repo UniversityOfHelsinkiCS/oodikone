@@ -12,10 +12,8 @@ import {
 } from '../services/analyticsService'
 import { getCreditsProduced } from '../services/providerCredits'
 import { getBasicStatsForStudytrack } from '../services/studyProgramme/studyProgrammeBasics'
-import {
-  getStudyProgrammeCoursesForStudyTrack,
-  getStudyProgrammeStatsForColorizedCoursesTable,
-} from '../services/studyProgramme/studyProgrammeCourses'
+import { getStudyProgrammeCoursesForStudyTrack } from '../services/studyProgramme/studyProgrammeCourses'
+import { getStudyProgrammeStatsForColorizedCoursesTable } from '../services/studyProgramme/studyProgrammeCoursesBySemester'
 import { getGraduationStatsForStudyTrack } from '../services/studyProgramme/studyProgrammeGraduations'
 import { updateBasicView, updateStudyTrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme, getStudyTracksForProgramme } from '../services/studyProgramme/studyRightFinders'
