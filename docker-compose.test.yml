@@ -1,5 +1,26 @@
 services:
-  frontend:
+  api-tests:
     volumes:
-      - frontend-nodemod:/opt/app-root/frontend/node_modules
-      - ./services/frontend/instrumented:/opt/app-root/frontend/src
+      - backend-tests-nodemod:/opt/app-root/backend/node_modules
+      - ./services/backend/:/opt/app-root/backend
+      - ./services/shared/:/opt/app-root/shared
+    environment:
+      CI: 'true'
+      NODE_ENV: 'test'
+      DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
+      DB_URL_USER: postgres://postgres@user-db:5432/user-db
+      FRONT_URL: http://localhost:3000
+      REDIS: redis
+      SECRET_TOKEN: test
+      SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
+      SIS_UPDATER_URL: http://sis-updater-scheduler:8082
+      JAMI_URL: 'http://jami:3003/'
+      IMPORTER_DB_API_URL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
+      CRYPT_KEY: 'e16730fce263d5270ba8dcf84d068a32556542455e71331880d6c1c5e4db9b4e'
+    build:
+      context: services/backend
+      dockerfile: dev.Dockerfile
+    command: npm run test
+
+volumes:
+  backend-tests-nodemod:
