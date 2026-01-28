@@ -25,6 +25,8 @@ services:
     build:
       context: services
       dockerfile: backend/Dockerfile
+    profiles:
+      - oodikone
 
   frontend:
     <<: *defaults
@@ -32,6 +34,8 @@ services:
     build:
       context: services
       dockerfile: frontend/Dockerfile
+    profiles:
+      - oodikone
 
   kone-db:
     <<: *defaults
@@ -101,6 +105,8 @@ services:
       - 1337:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+    profiles:
+      - oodikone
 
   # Following services are used to run sis-updater-worker when anon sis-db needs to be updated. Could probably also use production version, but this certainly works.
   sis-importer-db:

@@ -226,11 +226,11 @@ jobs:
         with:
           node-version: 24
 
-      - name: Start oodikone detached
-        run: npm run oodikone:test:setup
+      - name: Start oodikone (without frontend and backend)
+        run: npm run oodikone:ci:setup
 
       - name: Run api-tests
-        run: npm run oodikone:test:api
+        run: npm run oodikone:ci:api
 
   # === End-to-end tests ===
   test_end_to_end:
