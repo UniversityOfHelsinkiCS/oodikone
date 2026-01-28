@@ -66,7 +66,7 @@ jobs:
           build-args: |
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
-            STAGING=true
+            STGING=true
 
   check_migration_files:
     name: Check if new migrations have been added
@@ -187,6 +187,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Install node-24 for cypress
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
 
       - name: Start oodikone detached
         working-directory: ./services/backend
