@@ -1,17 +1,10 @@
 name: 'Test (and release) Updater'
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [published]
     paths:
       - '.github/workflows/updater.yaml'
-      - 'updater/sis-updater-worker/**'
-      - 'updater/sis-updater-scheduler/**'
-  pull_request:
-    branches:
-      - master
-    paths:
       - 'updater/sis-updater-worker/**'
       - 'updater/sis-updater-scheduler/**'
 
