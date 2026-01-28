@@ -69,6 +69,7 @@ services:
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
     profiles:
       - oodikone
+      - tests
     volumes:
       - kone-db-data:/data
 
@@ -156,6 +157,7 @@ services:
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
     profiles:
       - oodikone
+      - tests
     volumes:
       - user-db-data:/data
 

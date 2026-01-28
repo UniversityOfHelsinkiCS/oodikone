@@ -35,7 +35,7 @@ parse_params() {
   option=${args[0]}
 
   #  parse arguments
-  [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both") ]] && \
+  [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both" && "$option" != "tests") ]] && \
     usage && die "Wrong option: $option"
 
   [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
@@ -47,7 +47,7 @@ parse_params() {
     compose_command=${args[*]:1}
   else
     version=${args[1]}
-    [[ "$version" != "anon" && "$version" != "real" && "$version" != "test" ]] && usage && \
+    [[ "$version" != "anon" && "$version" != "real" && "$version" != "api" ]] && usage && \
       die "Wrong version $version"
     compose_command=${args[*]:2}
   fi
@@ -70,8 +70,8 @@ parse_env() {
   if [[ "$version" == "real" ]]; then
     env="--file docker-compose.yml --file docker-compose.real.yml"
   fi
-  if [[ "$version" == "test" ]]; then
-    env="--file docker-compose.yml --file docker-compose.test.yml"
+  if [[ "$version" == "api" ]]; then
+    env="--file docker-compose.yml"
   fi
   return 0
 }
