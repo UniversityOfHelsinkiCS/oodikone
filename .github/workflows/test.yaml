@@ -66,7 +66,7 @@ jobs:
           build-args: |
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
-            STGING=true
+            STAGING=true
 
   check_migration_files:
     name: Check if new migrations have been added
