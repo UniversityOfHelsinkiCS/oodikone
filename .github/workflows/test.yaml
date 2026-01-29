@@ -236,7 +236,7 @@ jobs:
     needs:
       - test_service_exit_statuses
       - test_api
-    if: steps.test_api.outcome == 'success'
+    if: needs.test_api.outcome == 'success'
     strategy:
       fail-fast: false
       matrix:
