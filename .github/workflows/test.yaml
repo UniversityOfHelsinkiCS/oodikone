@@ -182,7 +182,7 @@ jobs:
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - lint_packages
-    if: always()
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -212,6 +212,7 @@ jobs:
   test_api:
     needs:
       - test_service_exit_statuses
+    if: steps.test_service_exit_statuses.outcome == 'success'
     strategy:
       fail-fast: false
     runs-on: ubuntu-24.04
@@ -235,6 +236,7 @@ jobs:
     needs:
       - test_service_exit_statuses
       - test_api
+    if: steps.test_api.outcome == 'success'
     strategy:
       fail-fast: false
       matrix:
