@@ -212,7 +212,7 @@ jobs:
   test_api:
     needs:
       - test_service_exit_statuses
-    if: needs.test_service_exit_statuses.outcome == 'success'
+    if: needs.test_service_exit_statuses.result == 'success'
     strategy:
       fail-fast: false
     runs-on: ubuntu-24.04
@@ -236,7 +236,7 @@ jobs:
     needs:
       - test_service_exit_statuses
       - test_api
-    if: needs.test_api.outcome == 'success'
+    if: needs.test_api.result == 'success'
     strategy:
       fail-fast: false
       matrix:
