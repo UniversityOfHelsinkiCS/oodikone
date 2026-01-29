@@ -1,5 +1,0 @@
-{
-  "all": true,
-  "include": ["services/frontend/src/**/*.js", "services/frontend/src/**/*.jsx"],
-  "extends": "./nyc-config.js"
-}
