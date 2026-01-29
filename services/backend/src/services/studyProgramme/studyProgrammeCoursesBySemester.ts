@@ -1,10 +1,11 @@
-import { getAllProgrammeCourses } from "."
+import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
+
+import { CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
+import { mapToProviders } from '@oodikone/shared/util'
 import { CreditModel, EnrollmentModel } from '../../models'
 import { createArrayOfCourses } from '../languageCenterData'
-import { CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
-import { mapToProviders } from "@oodikone/shared/util"
-import { orderBy } from "lodash-es"
+import { getAllProgrammeCourses } from '.'
 
 type Attempt = {
   studentNumber: string
@@ -92,4 +93,3 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
 
   return { tableData }
 }
-
