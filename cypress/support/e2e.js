@@ -13,7 +13,6 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-require('@cypress/code-coverage/support')
 require('./commands')
 
 Cypress.on('uncaught:exception', error => {
