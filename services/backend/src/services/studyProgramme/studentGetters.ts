@@ -59,7 +59,7 @@ export const getStudentsForProgrammeCourses = async (from: Date, to: Date, progr
     return result.map(course => ({
       code: course.code,
       name: course.courseName,
-      type: 'passed',
+      type: 'passed' as const,
       isStudyModule: course.isStudyModule,
       totalPassed: parseInt(course.totalStudents, 10),
       totalAllCredits: course.totalCredits,
@@ -130,7 +130,7 @@ export const getOwnStudentsForProgrammeCourses = async (
     return result.map(course => ({
       code: course.code,
       name: course.courseName,
-      type: 'ownProgramme',
+      type: 'ownProgramme' as const,
       totalProgrammeStudents: parseInt(course.totalStudents, 10),
       totalProgrammeCredits: course.totalCredits,
     }))
@@ -203,7 +203,7 @@ export const getOtherStudentsForProgrammeCourses = async (
     return result.map(course => ({
       code: course.code,
       name: course.courseName,
-      type: 'otherProgramme',
+      type: 'otherProgramme' as const,
       isStudyModule: course.isStudyModule,
       totalOtherProgrammeStudents: parseInt(course.totalStudents, 10),
       totalOtherProgrammeCredits: course.totalCredits,
@@ -259,7 +259,7 @@ export const getTransferStudentsForProgrammeCourses = async (from: Date, to: Dat
     return result.map(course => ({
       code: course.code,
       name: course.courseName,
-      type: 'transfer',
+      type: 'transfer' as const,
       isStudyModule: course.isStudyModule,
       totalTransferStudents: parseInt(course.totalStudents, 10),
       totalTransferCredits: course.totalCredits,
@@ -337,7 +337,7 @@ export const getStudentsWithoutStudyRightForProgrammeCourses = async (
     return result.map(course => ({
       code: course.code,
       name: course.courseName,
-      type: 'noStudyright',
+      type: 'noStudyright' as const,
       totalWithoutStudyRightStudents: parseInt(course.totalStudents, 10),
       totalWithoutStudyRightCredits: course.totalCredits,
     }))

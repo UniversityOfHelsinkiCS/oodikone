@@ -12,7 +12,6 @@ import {
   getTransferStudentsForProgrammeCourses,
 } from './studentGetters'
 
-
 const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
   const providerCode = mapToProviders([studyProgramme])[0]
   const normalCourses = await getAllProgrammeCourses(providerCode)
@@ -27,57 +26,55 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
 
 const getCurrentYearStartDate = () => new Date(new Date().getFullYear(), 0, 1)
 
-const getFrom = (academicYear: string, year: number) => academicYear === 'ACADEMIC_YEAR'
-  ? new Date(year, 7, 1, 0, 0, 0)
-  : new Date(year, 0, 1, 0, 0, 0)
+const getFrom = (academicYear: string, year: number) =>
+  academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
 
-const getTo = (academicYear: string, year: number) => academicYear === 'ACADEMIC_YEAR'
-  ? new Date(year + 1, 6, 31, 23, 59, 59)
-  : new Date(year, 11, 31, 23, 59, 59)
+const getTo = (academicYear: string, year: number) =>
+  academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
 
-const promiseKeys = ['passed', 'notCompleted', 'ownStudents', 'withoutStudyRight', 'otherStudents', 'transfer'] as const
-
+const promiseKeys = ['passed', 'notCompleted', 'ownProgramme', 'noStudyright', 'otherProgramme', 'transfer'] as const
 
 type CommonFields = {
-  code: string,
-  name: Name,
-  year: number,
-  type: string,
+  code: string
+  name: Name
+  year: number
+  type: (typeof promiseKeys)[number]
   isStudyModule?: boolean
 }
-type YearlyFields = StudyProgrammeCourse["years"][number]
+type YearlyFields = StudyProgrammeCourse['years'][number]
 type CombinedPromises = Promise<(CommonFields & Partial<YearlyFields>)[]>[]
 
 const makeYearlyPromises = (
   years: number[],
   academicYear: string,
-  type: typeof promiseKeys[number],
+  type: (typeof promiseKeys)[number],
   programmeCourses: string[],
   studyProgramme: string
-): CombinedPromises => years.map(async year => {
-  const from = getFrom(academicYear, year)
-  const to = getTo(academicYear, year)
+): CombinedPromises =>
+  years.map(async year => {
+    const from = getFrom(academicYear, year)
+    const to = getTo(academicYear, year)
 
-  const addYear = <T extends object>(course: T) => {
-    course["year"] = year
-    return course as T & { year: number }
-  }
+    const addYear = <T extends object>(course: T) => Object.assign(course, { year })
 
-  switch (type) {
-    case 'passed':
-      return (await getStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-    case 'notCompleted':
-      return (await getNotCompletedForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-    case 'ownStudents':
-      return (await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
-    case 'withoutStudyRight':
-      return (await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-    case 'otherStudents':
-      return (await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
-    case 'transfer':
-      return (await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-  }
-})
+    switch (type) {
+      case 'passed':
+        return (await getStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+      case 'notCompleted':
+        return (await getNotCompletedForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+      case 'ownProgramme':
+        return (await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
+      case 'noStudyright':
+        return (await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+      case 'otherProgramme':
+        return (await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
+      case 'transfer':
+        return (await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
+      default:
+        // This is to satisfy ts-eslint, never acually reached
+        throw new Error('Invalid arg in studyProgrammeCourses')
+    }
+  })
 
 const emptyStats = {
   totalAllStudents: 0,
@@ -108,13 +105,17 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
   const secondProgrammeCourses = combinedProgramme ? await getAllStudyProgrammeCourses(combinedProgramme) : []
   const programmeCourses = [...mainProgrammeCourses, ...secondProgrammeCourses]
 
-  const courses = (await Promise.all(promiseKeys.flatMap(key => makeYearlyPromises(yearRange, academicYear, key, programmeCourses, studyProgramme)))).flat()
+  const courses = (
+    await Promise.all(
+      promiseKeys.flatMap(key => makeYearlyPromises(yearRange, academicYear, key, programmeCourses, studyProgramme))
+    )
+  ).flat()
 
   let maxYear = 0
   const allCourses = courses.reduce(
     (acc, currentCourseStats) => {
-      if (currentCourseStats.year! > maxYear) {
-        maxYear = currentCourseStats.year!
+      if (currentCourseStats.year > maxYear) {
+        maxYear = currentCourseStats.year
       }
 
       acc[currentCourseStats.code] ??= {
@@ -124,12 +125,12 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
         years: {},
       }
 
-      acc[currentCourseStats.code].years[currentCourseStats.year!] ??= {
+      acc[currentCourseStats.code].years[currentCourseStats.year] ??= {
         ...emptyStats,
         isStudyModule: !!currentCourseStats.isStudyModule,
       }
 
-      const currentYear = acc[currentCourseStats.code].years[currentCourseStats.year!]
+      const currentYear = acc[currentCourseStats.code].years[currentCourseStats.year]
 
       switch (currentCourseStats.type) {
         case 'passed':
