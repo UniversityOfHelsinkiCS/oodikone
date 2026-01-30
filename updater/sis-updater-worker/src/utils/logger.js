@@ -4,7 +4,7 @@ import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
 import WinstonSentry from 'winston-transport-sentry-node'
 
-import { isDev, isStaging, isProduction, runningInCI, serviceProvider, SENTRY_DSN } from '../config.js'
+import { isDev, isStaging, isProduction, runningInCI, SENTRY_DSN } from '../config.js'
 
 const Sentry = WinstonSentry.default
 
@@ -40,16 +40,14 @@ transports.push(
   })
 )
 
-if (serviceProvider !== 'fd') {
-  transports.push(
-    new LokiTransport({
-      host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
-      labels: { app: 'updater-worker', environment: process.env.NODE_ENV ?? 'production' },
-    })
-  )
-}
+transports.push(
+  new LokiTransport({
+    host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+    labels: { app: 'updater-worker', environment: process.env.NODE_ENV ?? 'production' },
+  })
+)
 
-if (isProduction && !isStaging && serviceProvider !== 'fd') {
+if (isProduction && !isStaging) {
   transports.push(
     new WinstonGelfTransporter({
       handleExceptions: true,

@@ -3,7 +3,7 @@ import compression from 'compression'
 import cors from 'cors'
 import { Express, json as jsonExpress } from 'express'
 
-import { frontUrl, languageCenterViewEnabled, serviceProvider } from './config'
+import { frontUrl, languageCenterViewEnabled } from './config'
 import accessLogger from './middleware/accessLogger'
 import * as auth from './middleware/auth'
 import currentUserMiddleware from './middleware/currentUser'
@@ -34,8 +34,7 @@ import tags from './routes/tags'
 import teachers from './routes/teachers'
 import university from './routes/university'
 import updater from './routes/updater'
-import usersToska from './routes/users'
-import usersFd from './routes/usersFd'
+import users from './routes/users'
 
 const routes = (app: Express, url: string) => {
   app.use(cors({ credentials: true, origin: frontUrl }))
@@ -66,12 +65,7 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/university`, university)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, teachers)
-  if (serviceProvider === 'toska') {
-    app.use(`${url}/users`, usersToska)
-  } else {
-    app.use(`${url}/users`, usersToska)
-    app.use(`${url}/users`, usersFd)
-  }
+  app.use(`${url}/users`, users)
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
