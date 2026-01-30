@@ -4,7 +4,7 @@ import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
-import { filterInternalReleases, isDefaultServiceProvider } from '@/common'
+import { filterInternalReleases } from '@/common'
 import { Link } from '@/components/common/Link'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
@@ -53,7 +53,7 @@ export const FrontPage = () => {
       content: 'View detailed information for a given student',
     },
     {
-      show: isDefaultServiceProvider(),
+      show: true,
       title: 'Feedback',
       content: (
         <p>

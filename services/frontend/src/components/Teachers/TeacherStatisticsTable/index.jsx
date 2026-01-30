@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { calculatePercentage, isDefaultServiceProvider } from '@/common'
+import { calculatePercentage } from '@/common'
 import { Link } from '@/components/common/Link'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
@@ -42,11 +42,9 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
           cell: ({ row }) => (
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5em' }}>
               {row.original.name}
-              {isDefaultServiceProvider() && (
-                <Link target="_blank" to={`/teachers/${row.original.id}`}>
-                  <NorthEastIcon />
-                </Link>
-              )}
+              <Link target="_blank" to={`/teachers/${row.original.id}`}>
+                <NorthEastIcon />
+              </Link>
             </div>
           ),
         })

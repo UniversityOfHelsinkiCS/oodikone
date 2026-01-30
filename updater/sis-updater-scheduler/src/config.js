@@ -21,6 +21,5 @@ module.exports.SIS_IMPORTER_DATABASE = process.env.SIS_IMPORTER_DATABASE
 module.exports.EXIT_AFTER_IMMEDIATES = process.env.EXIT_AFTER_IMMEDIATES === 'yes'
 module.exports.SCHEDULE_IMMEDIATE = process.env.SCHEDULE_IMMEDIATE ? process.env.SCHEDULE_IMMEDIATE.split(',') : []
 module.exports.SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
-module.exports.serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : ''
 module.exports.runningInCI = process.env.CI === 'true'
 module.exports.SENTRY_DSN = process.env.SENTRY_DSN

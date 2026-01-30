@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import { useLocation } from 'react-router'
 
-import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -26,11 +25,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
       return true
     }
 
-    if (
-      checkUserAccess(['admin', 'openUniSearch'], roles) &&
-      subItemKey === 'openUniSearch' &&
-      isDefaultServiceProvider()
-    ) {
+    if (checkUserAccess(['admin', 'openUniSearch'], roles) && subItemKey === 'openUniSearch') {
       return true
     }
 

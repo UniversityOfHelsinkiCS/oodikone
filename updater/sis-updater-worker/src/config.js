@@ -6,7 +6,6 @@ export const PURGE_LOCK = 'PURGE_LOCK'
 export const REDIS_HOST = process.env.REDIS_HOST || 'redis-updater'
 export const REDIS_PORT = process.env.REDIS_PORT || 6379
 export const rootOrgId = process.env.ROOT_ORG_ID || 'hy-university-root-id'
-export const serviceProvider = process.env.SERVICE_PROVIDER ? process.env.SERVICE_PROVIDER.toLowerCase() : ''
 export const runningInCI = process.env.CI === 'true'
 export const { SENTRY_DSN } = process.env
 

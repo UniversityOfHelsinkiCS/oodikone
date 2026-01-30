@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
 import { callApi } from '@/apiConnection'
-import { isDefaultServiceProvider } from '@/common'
 import { updaterToolTips } from '@/common/InfoToolTips'
 import { ExternalLink } from '@/components/common/ExternalLink'
 import { PageLayout } from '@/components/common/PageLayout'
@@ -70,11 +69,9 @@ export const Updater = () => {
     <PageLayout maxWidth="lg">
       <PageTitle title="Updater" />
       <Stack spacing={2}>
-        {isDefaultServiceProvider() && (
-          <Button color="error" onClick={() => setError(true)} variant="contained">
-            Cause frontend crash
-          </Button>
-        )}
+        <Button color="error" onClick={() => setError(true)} variant="contained">
+          Cause frontend crash
+        </Button>
         <Section
           infoBoxContent={updaterToolTips.updaterSection}
           title="Updater (data pulled from sis-importer-db and brought to sis-db)"

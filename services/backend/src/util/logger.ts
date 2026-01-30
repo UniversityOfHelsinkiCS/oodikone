@@ -3,29 +3,27 @@ import * as winston from 'winston'
 import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
 
-import { isProduction, serviceProvider } from '../config'
+import { isProduction } from '../config'
 
 const transports: winston.transport[] = [new winston.transports.Console()]
 
-if (serviceProvider !== 'fd') {
-  transports.push(
-    new LokiTransport({
-      host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
-      labels: { app: 'oodikone', environment: process.env.NODE_ENV ?? 'production' },
-    }),
-    new WinstonGelfTransporter({
-      handleExceptions: true,
-      host: 'svm-116.cs.helsinki.fi',
-      port: 9503,
-      protocol: 'udp',
-      hostName: os.hostname(),
-      additional: {
-        app: 'oodikone',
-        environment: 'production',
-      },
-    }) as winston.transport
-  )
-}
+transports.push(
+  new LokiTransport({
+    host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+    labels: { app: 'oodikone', environment: process.env.NODE_ENV ?? 'production' },
+  }),
+  new WinstonGelfTransporter({
+    handleExceptions: true,
+    host: 'svm-116.cs.helsinki.fi',
+    port: 9503,
+    protocol: 'udp',
+    hostName: os.hostname(),
+    additional: {
+      app: 'oodikone',
+      environment: 'production',
+    },
+  }) as winston.transport
+)
 
 const { colorize, combine, timestamp, printf } = winston.format
 const logger = winston.createLogger({

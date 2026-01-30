@@ -22,9 +22,6 @@ export const sourceCodeUrl = 'https://github.com/UniversityOfHelsinkiCS/oodikone
 export const licenseUrl = `${sourceCodeUrl}/blob/master/LICENSE`
 export const dataProtectionUrl = `${sourceCodeUrl}/blob/master/documentation/tietosuoja.md`
 
-// Service provider depending this hiding some not needed features default value toska
-export const serviceProvider = process.env.REACT_APP_SERVICE_PROVIDER?.toLowerCase() ?? 'toska'
-
 // Variable that can be used to disable the language center view, by default the view is enabled
 export const languageCenterViewEnabled = !process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED
   ? true

@@ -6,7 +6,6 @@ import Toolbar from '@mui/material/Toolbar'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router'
 
-import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
@@ -47,8 +46,6 @@ export const NavigationBar = () => {
 
           if (key === 'faculty' && !checkUserAccess(['admin', 'fullSisuAccess', 'facultyStatistics'], roles))
             return false
-
-          if (key === 'feedback' && !isDefaultServiceProvider()) return false
 
           if (key === 'admin' && !isAdmin) return false
 

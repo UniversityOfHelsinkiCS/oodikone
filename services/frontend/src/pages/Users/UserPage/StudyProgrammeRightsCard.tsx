@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography'
 
 import { useEffect, useState } from 'react'
 
-import { isDefaultServiceProvider } from '@/common'
 import { userToolTips } from '@/common/InfoToolTips'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
@@ -209,28 +208,26 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
             </Stack>
           </CardContent>
 
-          {isDefaultServiceProvider() && (
-            <CardContent>
-              <Stack alignItems="center" direction="row" gap={1}>
-                <Typography component="h3" fontWeight="bold">
-                  Current IAM group based degree programme access rights
-                </Typography>
-                <InfoBox content={userToolTips.iamGroupBasedAccess} mini />
-              </Stack>
-              {currentIamAccessRights.length > 0 ? (
-                currentIamAccessRights.map(({ code, name, limited }) => (
-                  <Stack direction="row" justifyContent="space-between" key={code}>
-                    <Typography>{`${name} ${code}`}</Typography>
-                    <Tooltip arrow placement="left" title={limited ? 'Limited rights' : 'Full rights'}>
-                      {limited ? <WarningIcon color="warning" /> : <CheckCircleIcon color="success" />}
-                    </Tooltip>
-                  </Stack>
-                ))
-              ) : (
-                <Typography color="text.secondary">No IAM based access rights</Typography>
-              )}
-            </CardContent>
-          )}
+          <CardContent>
+            <Stack alignItems="center" direction="row" gap={1}>
+              <Typography component="h3" fontWeight="bold">
+                Current IAM group based degree programme access rights
+              </Typography>
+              <InfoBox content={userToolTips.iamGroupBasedAccess} mini />
+            </Stack>
+            {currentIamAccessRights.length > 0 ? (
+              currentIamAccessRights.map(({ code, name, limited }) => (
+                <Stack direction="row" justifyContent="space-between" key={code}>
+                  <Typography>{`${name} ${code}`}</Typography>
+                  <Tooltip arrow placement="left" title={limited ? 'Limited rights' : 'Full rights'}>
+                    {limited ? <WarningIcon color="warning" /> : <CheckCircleIcon color="success" />}
+                  </Tooltip>
+                </Stack>
+              ))
+            ) : (
+              <Typography color="text.secondary">No IAM based access rights</Typography>
+            )}
+          </CardContent>
         </>
       )}
     </Card>

@@ -1,6 +1,6 @@
 import { flatten, sortBy, uniqBy } from 'lodash-es'
 import { Op } from 'sequelize'
-import { rootOrgId, serviceProvider } from '../../config.js'
+import { rootOrgId } from '../../config.js'
 import { dbConnections } from '../../db/connection.js'
 import { selectFromByIds, bulkCreate, selectOneById } from '../../db/index.js'
 import { Course, Teacher, Credit, CreditTeacher, CourseProvider } from '../../db/models/index.js'
@@ -133,28 +133,24 @@ export const updateAttainments = async (
 
       if (!customAttainmentTypes.includes(att.type)) return att
       let courseUnit
-      if (serviceProvider === 'fd') {
-        courseUnit = courses.find(course => course.id === att.course_unit_id)
-      } else {
-        const courseUnits = courses.filter(course => course.code === attIdToCourseCode[att.id])
+      const courseUnits = courses.filter(course => course.code === attIdToCourseCode[att.id])
 
-        const isAfterStartAndBeforeEnd = (startDate, endDate, date) => {
-          const dateToCompare = new Date(date)
-          return new Date(startDate) <= dateToCompare && (!endDate || dateToCompare < new Date(endDate))
-        }
+      const isAfterStartAndBeforeEnd = (startDate, endDate, date) => {
+        const dateToCompare = new Date(date)
+        return new Date(startDate) <= dateToCompare && (!endDate || dateToCompare < new Date(endDate))
+      }
 
+      courseUnit = courseUnits.find(({ validity_period }) =>
+        isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.attainment_date)
+      )
+
+      // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
+      // The attainmentdate is outside of all courses, yet should be mapped.
+      // Try to catch suitable courseUnit for this purpose
+      if (!courseUnit) {
         courseUnit = courseUnits.find(({ validity_period }) =>
-          isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.attainment_date)
+          isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.registration_date)
         )
-
-        // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
-        // The attainmentdate is outside of all courses, yet should be mapped.
-        // Try to catch suitable courseUnit for this purpose
-        if (!courseUnit) {
-          courseUnit = courseUnits.find(({ validity_period }) =>
-            isAfterStartAndBeforeEnd(validity_period.startDate, validity_period.endDate, att.registration_date)
-          )
-        }
       }
 
       let courseProvider
@@ -163,11 +159,17 @@ export const updateAttainments = async (
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
-        if (serviceProvider === 'fd') {
+        const parsedCourseCode = attIdToCourseCode[att.id]
+
+        // see if course exists
+        course = await Course.findOne({ where: { code: parsedCourseCode, id: parsedCourseCode } })
+
+        // If course doesn't exist, create it
+        if (!course) {
           courseUnit = {
-            id: att.id,
+            id: parsedCourseCode,
             name: att.name,
-            code: att.code,
+            code: parsedCourseCode,
             is_study_module: isModule(att.type),
             coursetypecode: att.study_level_urn,
             max_attainment_date: att.attainment_date,
@@ -175,42 +177,16 @@ export const updateAttainments = async (
             substitutions: [],
             course_unit_type: att.course_unit_type_urn,
           }
-          coursesToBeCreated.set(att.id, courseUnit)
+
+          coursesToBeCreated.set(parsedCourseCode, courseUnit)
           courseProvider = await CourseProvider.findOne({
             where: {
-              coursecode: att.id,
+              coursecode: parsedCourseCode,
             },
           })
-        } else {
-          const parsedCourseCode = attIdToCourseCode[att.id]
-
-          // see if course exists
-          course = await Course.findOne({ where: { code: parsedCourseCode, id: parsedCourseCode } })
-
-          // If course doesn't exist, create it
-          if (!course) {
-            courseUnit = {
-              id: parsedCourseCode,
-              name: att.name,
-              code: parsedCourseCode,
-              is_study_module: isModule(att.type),
-              coursetypecode: att.study_level_urn,
-              max_attainment_date: att.attainment_date,
-              min_attainment_date: att.attainment_date,
-              substitutions: [],
-              course_unit_type: att.course_unit_type_urn,
-            }
-
-            coursesToBeCreated.set(parsedCourseCode, courseUnit)
-            courseProvider = await CourseProvider.findOne({
-              where: {
-                coursecode: parsedCourseCode,
-              },
-            })
-          }
         }
 
-        const courseIdToUse = serviceProvider === 'fd' ? att.id : attIdToCourseCode[att.id]
+        const courseIdToUse = attIdToCourseCode[att.id]
 
         // If there's no courseprovider, try to create course provider
         if (!courseProvider) {
@@ -227,9 +203,7 @@ export const updateAttainments = async (
           }
         }
 
-        if (serviceProvider !== 'fd') {
-          courseUnit = course || { id: courseIdToUse, code: courseIdToUse }
-        }
+        courseUnit = course || { id: courseIdToUse, code: courseIdToUse }
         courseUnit.group_id = courseUnit.id
       }
 

@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import axios from 'axios'
 
-import { importerToken, isStaging, jamiUrl, serviceProvider } from '../config'
+import { importerToken, isStaging, jamiUrl } from '../config'
 import { IamAccess } from '../types'
 import logger from './logger'
 
@@ -69,14 +69,12 @@ export const getAllUserAccess = async (userIds: string[]) => {
   return data as Access[]
 }
 
-if (serviceProvider === 'toska') {
-  jamiClient
-    .get('/ping', { timeout: 4000 })
-    .then(() => {
-      logger.info('JAMI connected')
-    })
-    .catch(error => {
-      logger.error('JAMI not responding :(', { error })
-      logger.info('Are you sure you are using the latest JAMI image?')
-    })
-}
+jamiClient
+  .get('/ping', { timeout: 4000 })
+  .then(() => {
+    logger.info('JAMI connected')
+  })
+  .catch(error => {
+    logger.error('JAMI not responding :(', { error })
+    logger.info('Are you sure you are using the latest JAMI image?')
+  })

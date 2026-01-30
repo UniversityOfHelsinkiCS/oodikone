@@ -2,7 +2,6 @@ import { Request, Response, Router } from 'express'
 import { cloneDeep } from 'lodash-es'
 
 import { Graduated, NameWithCode } from '@oodikone/shared/types'
-import { serviceProvider } from '../config'
 import { magicFacultyCode } from '../config/organizationConstants'
 import { OrganizationModel } from '../models'
 import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
@@ -125,7 +124,7 @@ router.get('/allgraduationstats', async (_req: Request, res: Response) => {
   const allFaculties = await getSortedFaculties()
   const facultyCodes = allFaculties.map(faculty => faculty.code)
   const facultyData: Record<string, Awaited<ReturnType<typeof countGraduationTimes>>> = {}
-  const programmeFilter = serviceProvider === 'toska' ? 'NEW_DEGREE_PROGRAMMES' : 'ALL_PROGRAMMES'
+  const programmeFilter = 'NEW_DEGREE_PROGRAMMES'
   for (const facultyCode of facultyCodes) {
     let data: any = await getGraduationStats(facultyCode, programmeFilter, true)
     if (!data) {
