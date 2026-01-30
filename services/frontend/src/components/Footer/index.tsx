@@ -3,7 +3,6 @@ import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { isDefaultServiceProvider } from '@/common'
 import { ExternalLink } from '@/components/common/ExternalLink'
 import { ToskaLogo } from '@/components/Footer/ToskaLogo'
 import { builtAt, dataProtectionUrl, licenseUrl, sentryRelease, sourceCodeUrl } from '@/conf'
@@ -36,7 +35,7 @@ export const Footer = () => {
         <Stack direction="row" gap={3}>
           <Stack>
             <Typography variant="subtitle1">Oodikone</Typography>
-            {isDefaultServiceProvider() && <ExternalLink href={dataProtectionUrl} text="Data protection" />}
+            <ExternalLink href={dataProtectionUrl} text="Data protection" />
             <ExternalLink href={sourceCodeUrl} text="Source code" />
             <ExternalLink href={licenseUrl} text="License" />
           </Stack>

@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography'
 import { callApi } from '@/apiConnection'
 import { ExternalLink } from '@/components/common/ExternalLink'
 import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
+import { sisUrl } from '@/conf'
 import { DateFormat } from '@/constants/date'
-import { useSisUrl } from '@/hooks/useSisUrl'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { RefreshIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
@@ -17,7 +17,6 @@ import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { EnrollmentAccordion } from './EnrollmentAccordion'
 
 export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) => {
-  const usableSisUrl = useSisUrl()
   const { visible: showName } = useStudentNameVisibility()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
@@ -42,7 +41,7 @@ export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) =>
             </Typography>
             <ExternalLink
               cypress="sisu-link"
-              href={`${usableSisUrl}/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`}
+              href={`${sisUrl}/tutor/role/staff/student/${student.sisPersonId}/basic/basic-info`}
               text="Sisu"
               variant="h6"
             />

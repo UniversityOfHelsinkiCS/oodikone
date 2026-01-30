@@ -4,7 +4,6 @@ import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 
-import { isDefaultServiceProvider } from '@/common'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -114,7 +113,7 @@ export const StudyProgramme = () => {
     },
   ]
 
-  if (otherTabsVisible && isDefaultServiceProvider()) {
+  if (otherTabsVisible) {
     tabs.push({
       key: 'ProgrammeCoursesTab',
       label: 'Programme courses',

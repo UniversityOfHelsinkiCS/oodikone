@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack'
 
 import { useEffect, useState } from 'react'
 
-import { isDefaultServiceProvider } from '@/common'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { RoleChip } from '@/components/Users/RoleChip'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
@@ -71,7 +70,7 @@ export const RolesCard = ({ user }: { user: User }) => {
               <Checkbox
                 checked={selected.includes(role)}
                 color="success"
-                disabled={!editing || (!['admin', 'teachers'].includes(role) && isDefaultServiceProvider())}
+                disabled={!editing || !['admin', 'teachers'].includes(role)}
                 onChange={() => toggleRole(role)}
               />
             </Stack>

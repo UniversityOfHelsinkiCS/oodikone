@@ -33,12 +33,6 @@ export const baseUrl = isDev ? '/api' : ''
 export const frontUrl = process.env.FRONT_URL
 export const backendPort = 8080
 
-// System run in whose environment
-export const serviceProvider = process.env.SERVICE_PROVIDER?.toLowerCase() ?? 'toska'
-
-// Optional logout-url configuration
-export const configLogoutUrl = serviceProvider === 'toska' ? undefined : process.env.LOGOUT_URL
-
 // Other stuff
 export const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_URL, CRYPT_KEY } = process.env
 
