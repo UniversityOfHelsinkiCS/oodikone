@@ -3,7 +3,6 @@ import { Op } from 'sequelize'
 
 import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
-import { serviceProvider } from '../../config'
 import { programmeCodes } from '../../config/programmeCodes'
 import { ProgrammeModuleModel } from '../../models'
 import { getDegreeProgrammeType } from '../../util'
@@ -97,17 +96,11 @@ export const getThesisType = async (studyProgramme: string) => {
   const degreeProgrammeType = await getDegreeProgrammeType(studyProgramme)
   if (degreeProgrammeType === DegreeProgrammeType.MASTER) {
     const mastersThesisTypes = ['urn:code:course-unit-type:masters-thesis']
-    if (serviceProvider !== 'toska') {
-      mastersThesisTypes.push('urn:code:course-unit-type:amk-masters-thesis')
-    }
     return mastersThesisTypes
   }
 
   if (degreeProgrammeType === DegreeProgrammeType.BACHELOR) {
     const bachelorsThesisTypes = ['urn:code:course-unit-type:bachelors-thesis']
-    if (serviceProvider !== 'toska') {
-      bachelorsThesisTypes.push('urn:code:course-unit-type:amk-bachelors-thesis')
-    }
     return bachelorsThesisTypes
   }
 
@@ -167,8 +160,7 @@ export const tableTitles = {
 } as const
 
 export const getId = (code: string) => {
-  if (serviceProvider !== 'fd') return code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''
-  return code
+  return code in programmeCodes ? programmeCodes[code as keyof typeof programmeCodes] : ''
 }
 
 export const getGoal = async (programme?: string) => {

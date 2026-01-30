@@ -1,5 +1,3 @@
-import { serviceProvider } from '../../config.js'
-
 const anyModule = rule => ({ id: rule.localId, name: 'Any module' })
 const anyCourse = rule => ({ id: rule.localId, name: 'Any course' })
 const unknownRule = rule => ({ type: rule.type, fact: 'Unhandled rule' })
@@ -75,7 +73,7 @@ export class ModuleResolver {
     const children = []
 
     for (const mod of modules) {
-      if (serviceProvider !== 'fd' && mod.code?.startsWith('KK-')) continue
+      if (mod.code?.startsWith('KK-')) continue
       let result = this.moduleCache[mod.id]
       if (!result) {
         result = await this.resolveSingleModule(mod)

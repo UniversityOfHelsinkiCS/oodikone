@@ -4,7 +4,6 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { maxBy, orderBy, range } from 'lodash-es'
 
-import { serviceProvider } from '@/conf'
 import { SemestersData } from '@/redux/semesters'
 import type { Absence } from '@/types/students'
 import type { SISStudyRightElement } from '@oodikone/shared/models'
@@ -435,13 +434,6 @@ export const getEnrollmentTypeTextForExcel = (type: number, statutoryAbsence?: b
   if (type === 2) return 'Absent'
   if (type === 3) return 'Not enrolled'
   return 'No study right'
-}
-
-export const isDefaultServiceProvider = () => {
-  if (!serviceProvider) {
-    return false
-  }
-  return serviceProvider === 'toska'
 }
 
 export const formatContent = (content: string) => content.replace(/\n +/g, '\n')

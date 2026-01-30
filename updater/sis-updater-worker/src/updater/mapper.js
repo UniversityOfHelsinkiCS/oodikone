@@ -1,6 +1,5 @@
 import { sortBy, flatten, uniqBy } from 'lodash-es'
 
-import { serviceProvider } from '../config.js'
 import logger from '../utils/logger.js'
 import {
   educationTypeToExtentcode,
@@ -177,24 +176,21 @@ export const creditMapper =
       let is_open = false
 
       // check if ay code or ay study right or ay responsible organisation
-      // if fd is not service provider
-      if (serviceProvider !== 'fd') {
-        if (course_code && !isModule(type)) {
-          if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
+      if (course_code && !isModule(type)) {
+        if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
+          is_open = true
+        } else if (study_right_id !== null) {
+          if (
+            studyRightIdToEducationType[study_right_id] ===
+            'urn:code:education-type:non-degree-education:open-university-studies'
+          )
             is_open = true
-          } else if (study_right_id !== null) {
-            if (
-              studyRightIdToEducationType[study_right_id] ===
-              'urn:code:education-type:non-degree-education:open-university-studies'
-            )
-              is_open = true
-          } else if (
-            organisations
-              .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-              .some(org => org.organisationid === 'hy-org-48645785')
-          ) {
-            is_open = true
-          }
+        } else if (
+          organisations
+            .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+            .some(org => org.organisationid === 'hy-org-48645785')
+        ) {
+          is_open = true
         }
       }
 

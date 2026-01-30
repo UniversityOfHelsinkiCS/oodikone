@@ -2,7 +2,6 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { NorthEastIcon } from '@/theme'
 
@@ -23,7 +22,7 @@ export const TimeCell = ({
         {name}
         {name === 'Total' && !userHasAccessToAllStats && <strong> *</strong>}
       </Typography>
-      {name !== 'Total' && userHasAccessToAllStats && isDefaultServiceProvider() ? (
+      {name !== 'Total' && userHasAccessToAllStats ? (
         <IconButton
           color="primary"
           component={Link}

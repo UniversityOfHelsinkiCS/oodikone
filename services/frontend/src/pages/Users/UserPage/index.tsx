@@ -2,7 +2,6 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
-import { isDefaultServiceProvider } from '@/common'
 import { PageLayout } from '@/components/common/PageLayout'
 import { Loading } from '@/components/Loading'
 import { useTitle } from '@/hooks/title'
@@ -38,11 +37,9 @@ export const UserPage = ({ userId }: { userId: string }) => {
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
         <Box gap={2} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
-          {isDefaultServiceProvider() && (
-            <Box flex={1}>
-              <IamGroupsCard user={user} />
-            </Box>
-          )}
+          <Box flex={1}>
+            <IamGroupsCard user={user} />
+          </Box>
           <Box flex={2}>
             <RolesCard user={user} />
           </Box>

@@ -1,7 +1,6 @@
 import { Request, Response, Router } from 'express'
 
 import { mapToProviders, splitByEmptySpace } from '@oodikone/shared/util'
-import { serviceProvider } from '../config'
 import * as auth from '../middleware/auth'
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
@@ -12,8 +11,7 @@ const router = Router()
 
 const iamGroupsGivingFullAccess = ['hy-dekaanit', 'hy-varadekaanit-opetus']
 
-const fullAccessAuth = () =>
-  serviceProvider === 'toska' ? auth.roles([], iamGroupsGivingFullAccess) : auth.roles(['teachers'])
+const fullAccessAuth = () => auth.roles([], iamGroupsGivingFullAccess)
 
 interface GetTeachersRequest extends Request {
   query: {

@@ -65,9 +65,6 @@ instrumented/
 .vscode/launch.json
 .vscode/terminals.json
 
-# Funidata specific
-environments/
-
 # Target of shared symlink
 services/**/src/shared
 

@@ -4,7 +4,6 @@ import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
 
-import { isDefaultServiceProvider } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { LineGraph } from '@/components/common/LineGraph'
 import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
@@ -149,7 +148,7 @@ export const BasicInformationTab = ({
         isLoading={creditsIsLoading}
         title="Credits produced by the degree programme"
       >
-        {creditGraphStats && tableStats && isDefaultServiceProvider() ? (
+        {creditGraphStats && tableStats ? (
           <Stack gap={2}>
             <StackedBarChart
               cypress="credits-produced-by-the-study-programme"

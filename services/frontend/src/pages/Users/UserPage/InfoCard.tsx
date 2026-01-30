@@ -7,7 +7,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
-import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { MockButton } from '@/components/Users/MockButton'
 import { DateFormat } from '@/constants/date'
@@ -27,7 +26,7 @@ export const InfoCard = ({ user }: { user: User }) => {
         buttons={
           <>
             {user.username !== currentUserName && <MockButton username={user.username} />}
-            {isDefaultServiceProvider() && <NotifyButton userEmail={user.email} />}
+            {<NotifyButton userEmail={user.email} />}
           </>
         }
         title={user.name}

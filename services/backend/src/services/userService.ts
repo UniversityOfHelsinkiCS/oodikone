@@ -3,7 +3,6 @@ import { LRUCache } from 'lru-cache'
 
 import { User } from '@oodikone/shared/models/user'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
-import { serviceProvider } from '../config'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { UserModel } from '../models/user'
@@ -11,13 +10,12 @@ import { ExpandedUser, FormattedUser, IamAccess } from '../types'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import * as jami from '../util/jami'
-import mami from '../util/mami'
 import { sendNotificationAboutNewUser } from './mailService'
 import { getSisuAuthData, personSearchQuery, getGraphqlData } from './oriProvider'
 import { getStudentnumbersByElementdetails } from './students'
 import { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } from './studyGuidanceGroups'
 
-const userAccessUtils = serviceProvider === 'toska' ? jami : mami
+const userAccessUtils = jami
 const { getAllUserAccess, getUserIams, getUserIamAccess } = userAccessUtils
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
@@ -68,7 +66,7 @@ export const updateUser = async (username: string, fields: Partial<User>) => {
   userDataCache.delete(username)
 }
 
-const getIamBasedRights = (iamAccess: IamAccess): DetailedProgrammeRights[] => {
+const getIamBasedRights = (iamAccess: IamAccess | undefined): DetailedProgrammeRights[] => {
   if (!iamAccess) {
     return []
   }
@@ -89,8 +87,8 @@ const getUserProgrammesRights = (userProgrammes: string[]): DetailedProgrammeRig
 }
 
 const getStudyProgrammeRights = (
-  iamAccess: IamAccess,
-  specialGroup: Record<string, boolean>,
+  iamAccess: IamAccess | undefined,
+  specialGroup: Record<string, boolean> | undefined,
   userProgrammes: string[]
 ): DetailedProgrammeRights[] => {
   const hasFullSisuAccess = specialGroup?.fullSisuAccess
@@ -233,14 +231,6 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
   return mockedUser
 }
 
-export const getMockedUserFd = async ({ userToMock, mockedBy }: { userToMock: string; mockedBy: string }) => {
-  const mockedByFromDb = (await UserModel.findOne({ where: { username: mockedBy } }))?.toJSON()
-  if (!mockedByFromDb) {
-    return null
-  }
-  return await getMockedUser({ userToMock, mockedBy })
-}
-
 export const getUserToska = async ({
   username,
   name,
@@ -280,28 +270,6 @@ export const getUserToska = async ({
   const user = await formatUser({ ...userJSON, iamGroups, detailedProgrammeRights })
   userDataCache.set(username, user)
 
-  return user
-}
-
-export const getUserFd = async ({ username }: { username: string }) => {
-  if (userDataCache.has(username)) {
-    return userDataCache.get(username) as FormattedUser
-  }
-
-  const userFromDbOrm = await UserModel.findOne({ where: { username } })
-  if (!userFromDbOrm) {
-    return null
-  }
-
-  userFromDbOrm.lastLogin = new Date()
-  await userFromDbOrm.save()
-
-  const userFromDb = userFromDbOrm.toJSON()
-
-  const detailedProgrammeRights = getStudyProgrammeRights({}, {}, userFromDb.programmeRights)
-  const user = await formatUser({ ...userFromDb, iamGroups: [], detailedProgrammeRights })
-
-  userDataCache.set(username, user)
   return user
 }
 
