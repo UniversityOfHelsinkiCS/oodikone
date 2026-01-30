@@ -2,12 +2,10 @@ import Stack from '@mui/material/Stack'
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
-import { isDefaultServiceProvider } from '@/common'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { useLazyGetAllUsersQuery } from '@/redux/users'
-import { NewUserSection } from './NewUserSection'
 import { UserPage } from './UserPage'
 import { UsersTable } from './UsersTable'
 
@@ -15,10 +13,6 @@ export const Users = () => {
   useTitle('Users')
   const { userid } = useParams()
   const [getAllUsersQuery, { data: users = [], isLoading, isError }] = useLazyGetAllUsersQuery()
-
-  const onAddUser = () => {
-    void getAllUsersQuery()
-  }
 
   useEffect(() => {
     if (!userid) {
@@ -30,7 +24,6 @@ export const Users = () => {
     <PageLayout maxWidth="lg">
       <PageTitle title="Users" />
       <Stack gap={2}>
-        {!userid && !isDefaultServiceProvider() && <NewUserSection onAddUser={onAddUser} />}
         {userid ? (
           <UserPage userId={userid} />
         ) : (

@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import { Navigate, Route, Routes as RouterRoutes } from 'react-router'
 
-import { isDefaultServiceProvider } from '@/common'
 import { CoursePopulation } from '@/components/CoursePopulation'
 import { CustomOpenUniPopulation } from '@/components/CustomOpenUniPopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
@@ -36,12 +35,12 @@ export const Routes = () => (
         <Route element={<Changelog />} path="/changelog" />
         <Route element={<CompletedCourses />} path="/completedcoursessearch" />
         <Route element={<University />} path="/university" />
-        {isDefaultServiceProvider() && <Route element={<Feedback />} path="/feedback" />}
+        <Route element={<Feedback />} path="/feedback" />
 
         <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['fullSisuAccess']} />}>
           <Route element={<PopulationStatistics />} path="/populations" />
           <Route element={<StudyProgramme />} path="/study-programme/:studyProgrammeId?" />
-          {isDefaultServiceProvider() && <Route element={<CoursePopulation />} path="/coursepopulation" />}
+          <Route element={<CoursePopulation />} path="/coursepopulation" />
         </Route>
 
         <Route element={<ProtectedRoute requiredRoles={['admin']} />}>
@@ -79,11 +78,9 @@ export const Routes = () => (
           <Route element={<CloseToGraduation />} path="/close-to-graduation" />
         </Route>
 
-        {isDefaultServiceProvider() && (
-          <Route element={<ProtectedRoute requiredRoles={['openUniSearch']} />}>
-            <Route element={<CustomOpenUniPopulation />} path="/openunipopulation" />
-          </Route>
-        )}
+        <Route element={<ProtectedRoute requiredRoles={['openUniSearch']} />}>
+          <Route element={<CustomOpenUniPopulation />} path="/openunipopulation" />
+        </Route>
 
         {/* Access control inside ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
