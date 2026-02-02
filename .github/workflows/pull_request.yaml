@@ -40,8 +40,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
       - name: Start oodikone detached
         run: npm run oodikone:ci:setup
