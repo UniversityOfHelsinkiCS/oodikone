@@ -10,4 +10,4 @@ COPY . .
 RUN npm ci
 
 EXPOSE 8080
-CMD ["node_modules/.bin/tsx", "watch", "--clear-screen=false", "index.js"]
+CMD ["node_modules/.bin/tsx", "watch", "--clear-screen=false", "index.ts"]
