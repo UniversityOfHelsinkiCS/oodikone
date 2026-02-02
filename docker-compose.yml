@@ -21,6 +21,7 @@ services:
     build:
       <<: *build_defaults
       context: services/backend
+    container_name: backend
     depends_on:
       - kone-db
       - redis
@@ -132,6 +133,7 @@ services:
     build:
       <<: *build_defaults
       context: updater/sis-updater-worker
+    container_name: sis-updater-worker
     depends_on:
       - redis
       - sis-db
