@@ -47,18 +47,19 @@ const getRawCourses = async (name: string, code: string, includeSpecial: boolean
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
+    raw: true,
   })
 
 const getCourses = async (name: string, code: string, includeSpecial: boolean) => {
   const rawCourses = await getRawCourses(name, code, includeSpecial)
   return rawCourses
     .map(course => ({
-      ...course.toJSON(),
+      ...course,
       substitutions: orderBy(course.substitutions, [
         substitution => {
-          if (/^A/.exec(substitution)) return 4 // open university codes come last
-          if (/^\d/.exec(substitution)) return 2 // old numeric codes come second
-          if (/^[A-Za-z]/.exec(substitution)) return 1 // new letter based codes come first
+          if (/^A/.exec(substitution.at(0) ?? '')) return 4 // open university codes come last
+          if (/^\d/.exec(substitution.at(0) ?? '')) return 2 // old numeric codes come second
+          if (/^[A-Za-z]/.exec(substitution.at(0) ?? '')) return 1 // new letter based codes come first
           return 3 // unknown, comes before open uni?
         },
       ]),
