@@ -50,12 +50,11 @@ const getSubstitutionPriority = memoize(code => {
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
-  const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
-    const [groupId, courses] = groupedCourse
-
+  const courses = Object.entries(groupIdToCourse).map(([groupId, courses]) => {
     // Take substitutions from all course units
-    const substitutionArrays = courses.flatMap(course =>
-      course.substitutions.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId))
+    // NOTE: Modules DO NOT have substitutions fields.
+    const substitutionArrays = courses.flatMap(
+      course => course.substitutions?.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId)) ?? []
     )
     const uniqueSubstitutionArrays = uniqBy(substitutionArrays, a => [...a].sort().join('|'))
 
@@ -82,7 +81,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
     courseProviders.push(...organisations)
 
-    return courseMapper(courseIdToAttainments)(groupedCourse, uniqueSubstitutionArrays)
+    return courseMapper(courseIdToAttainments)([groupId, courses], uniqueSubstitutionArrays)
   })
 
   // change substitutions ids to course codes and update
