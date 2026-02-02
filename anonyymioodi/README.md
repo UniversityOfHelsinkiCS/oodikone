@@ -6,14 +6,14 @@ The quick guide should be enough for most purposes: updating schema, data, or th
 
 ## Quick guide to updating a test database
 
-1. Ensure you have the latest test-db. Just pulling images might not replace your existing volume, so you may need to remove it manually. This command might work: `docker volume rm oodikone_sis-db-data` (replace `oodikone_sis-db-data` with the correct volume name). The new image, including data, should be pulled the next time you launch Oodikone normally.
+1. Ensure you have the latest test-db. Just pulling images might not replace your existing volume, so you may need to remove it manually. This command might work: `docker volume rm oodikone-sis-db-data` (replace `oodikone-sis-db-data` with the correct volume name). The new image, including data, should be pulled the next time you launch Oodikone normally.
 
 2. Do your dev work as usual with the test database, for example, using `npm run both`. Edit data as needed, (for example, run the updater via the frontend), and then run tests to see if they pass (follow the instructions in the [README](../README.md) to run the tests more quickly).
 
 3. If you're updating `sis-db`:
 
    - Modify the scheduler limit in [config.js](../updater/sis-updater-scheduler/src/config.js) by setting `module.exports.DEV_SCHEDULE_COUNT = null`.
-   - Follow the `sis-updater-worker` logs to ensure everything is running smoothly (`docker logs --follow oodikone_sis-updater-worker_1`).
+   - Follow the `sis-updater-worker` logs to ensure everything is running smoothly (`docker logs --follow oodikone-sis-updater-worker`).
 
 4. When you're satisfied with the database, create a dump:
 
@@ -67,6 +67,6 @@ The quick guide should be enough for most purposes: updating schema, data, or th
 
 5. Navigate to <http://localhost:3000/updater> and click the three buttons (Update meta, Update students, Update curriculums) one by one. This will populate `sis-db` with data from the new `sis-importer-db`. You might want to do each update a couple of times, as the database tables affect each other, and not all necessary data might be generated on the first try.
 
-6. Follow the `sis-updater-worker` logs to ensure everything is running smoothly (`docker logs --follow oodikone_sis-updater-worker_1`). If you see any errors, try clicking the buttons again.
+6. Follow the `sis-updater-worker` logs to ensure everything is running smoothly (`docker logs --follow oodikone-sis-updater-worker`). If you see any errors, try clicking the buttons again.
 
 7. Run all the tests to ensure everything is working as expected (follow the instructions in the [README](../README.md) to run the tests more quickly). If any tests fail, update the test files accordingly.

@@ -51,6 +51,7 @@ services:
     command: >
       sh -c 'redis-server --appendonly yes && redis-cli flushall'
     image: redis:7.2.6
+    container_name: redis
     ports:
       - 6379:6379
 
@@ -120,6 +121,7 @@ services:
     <<: *defaults
     build:
       context: updater/sis-updater-worker
+    container_name: sis-updater-worker
     depends_on:
       - redis
       - sis-db

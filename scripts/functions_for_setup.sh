@@ -149,7 +149,7 @@ reset_jami_data() {
 
 
   infomsg "Removing database and related volume"
-  docker volume rm oodikone_jami-data || warningmsg "This is okay, continuing"
+  docker volume rm oodikone-jami-data || warningmsg "This is okay, continuing"
   docker-compose -f "$DOCKER_COMPOSE" down "$database" || warningmsg "This is okay, continuing"
 
   infomsg "Starting postgres in the background"
