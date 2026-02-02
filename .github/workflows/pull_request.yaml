@@ -31,6 +31,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Install node-24 for cypress
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v3
+        with:
+          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+
       - name: Start oodikone detached
         run: npm run oodikone:ci:setup
 
