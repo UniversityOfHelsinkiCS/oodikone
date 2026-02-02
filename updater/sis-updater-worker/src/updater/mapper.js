@@ -238,40 +238,41 @@ export const courseProviderMapper =
 
 const timify = date => new Date(date).getTime()
 
-export const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
-  const [groupId, courses] = groupedCourse
-  const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
+export const courseMapper =
+  courseIdToAttainments =>
+  ([groupId, courses], substitutions) => {
+    const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
 
-  const { min_attainment_date, max_attainment_date } = courses.reduce(
-    (res, curr) => {
-      const courseAttainments = courseIdToAttainments[curr.id]
-      if (!courseAttainments || courseAttainments.length === 0) return res
-      let { min_attainment_date, max_attainment_date } = res
-      if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
-        min_attainment_date = courseAttainments[0].attainment_date
-      if (
-        !max_attainment_date ||
-        timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date)
-      )
-        max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
+    const { min_attainment_date, max_attainment_date } = courses.reduce(
+      (res, curr) => {
+        const courseAttainments = courseIdToAttainments[curr.id]
+        if (!courseAttainments || courseAttainments.length === 0) return res
+        let { min_attainment_date, max_attainment_date } = res
+        if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
+          min_attainment_date = courseAttainments[0].attainment_date
+        if (
+          !max_attainment_date ||
+          timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date)
+        )
+          max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
 
-      return { min_attainment_date, max_attainment_date }
-    },
-    { min_attainment_date: null, max_attainment_date: null }
-  )
+        return { min_attainment_date, max_attainment_date }
+      },
+      { min_attainment_date: null, max_attainment_date: null }
+    )
 
-  return {
-    id: groupId,
-    name,
-    code,
-    coursetypecode,
-    min_attainment_date,
-    max_attainment_date,
-    is_study_module: course_unit_type == null, // Only course units have a course_unit_type so if it's null, it must be a study module
-    substitutions,
-    course_unit_type,
+    return {
+      id: groupId,
+      name,
+      code,
+      coursetypecode,
+      min_attainment_date,
+      max_attainment_date,
+      is_study_module: course_unit_type == null, // Only course units have a course_unit_type so if it's null, it must be a study module
+      substitutions,
+      course_unit_type,
+    }
   }
-}
 
 export const mapCourseType = studyLevel => ({
   coursetypecode: studyLevel.id,
