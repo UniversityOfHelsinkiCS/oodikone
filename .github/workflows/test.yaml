@@ -67,8 +67,7 @@ jobs:
             BASE_PATH=/oodikone
             STAGING=true
           context: services
-          containerfiles: |
-            services/frontend/Dockerfile
+          file: services/frontend/Dockerfile
           push: false
           tags: oodikone-frontend:staging
           outputs: type=docker,dest=/tmp/frontend.tar
