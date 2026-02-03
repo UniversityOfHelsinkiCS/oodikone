@@ -205,6 +205,20 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
 
+      - name: 'Download backend image'
+        uses: actions/download-artifact@v7
+        with:
+          name: backend-image
+      - name: 'Load built backend image'
+        run: docker load --input backend.tar
+
+      - name: 'Download frontend image'
+        uses: actions/download-artifact@v7
+        with:
+          name: frontend-image
+      - name: 'Load built frontend image'
+        run: docker load --input frontend.tar
+
       - name: 'Run services, pull rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
 

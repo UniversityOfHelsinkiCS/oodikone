@@ -32,7 +32,7 @@ runs:
     - name: 'Load built backend image'
       run: docker load --input backend.tar
 
-    - name: 'Download backend image'
+    - name: 'Download frontend image'
       uses: actions/download-artifact@v7
       with:
         name: frontend-image
