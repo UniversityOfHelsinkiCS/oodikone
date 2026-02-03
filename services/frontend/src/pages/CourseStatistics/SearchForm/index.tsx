@@ -23,7 +23,7 @@ import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { AddIcon, SearchIcon } from '@/theme'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { queryParamsToString } from '@/util/queryparams'
-import { MemoizedCourseTable as CourseTable } from './CourseTable'
+import { CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 
@@ -49,7 +49,6 @@ export const SearchForm = () => {
     {
       name: debouncedCourseName,
       code: debouncedCourseCode,
-      combineSubstitutions,
       includeSpecial: includeSpecialCourses,
     },
     { skip: !isDebouncedInputValid }
@@ -245,6 +244,7 @@ export const SearchForm = () => {
                 {selected.length > 0 && selectMultipleCourses ? (
                   <Stack gap={2}>
                     <CourseTable
+                      combineSubstitutions={combineSubstitutions}
                       courses={selected}
                       hidden={noSelectedCourses}
                       onSelectCourse={onSelectCourse}
@@ -259,6 +259,7 @@ export const SearchForm = () => {
                   </Stack>
                 ) : null}
                 <CourseTable
+                  combineSubstitutions={combineSubstitutions}
                   courses={courses}
                   hidden={false}
                   onSelectCourse={onSelectCourse}
