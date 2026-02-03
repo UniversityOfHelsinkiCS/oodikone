@@ -53,22 +53,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+
       - name: Get current time
         id: get_current_time
         run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
       - name: Build frontend image and export it
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
+        uses: docker/build-push-action@v6
         with:
-          image: oodikone-frontend
-          context: services
-          containerfiles: |
-            services/frontend/Dockerfile
           build-args: |
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
             STAGING=true
+          context: services
+          containerfiles: |
+            services/frontend/Dockerfile
+          push: false
           tags: oodikone-frontend:staging
           outputs: type=docker,dest=/tmp/frontend.tar
         env:
