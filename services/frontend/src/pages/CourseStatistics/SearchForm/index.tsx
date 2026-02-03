@@ -20,7 +20,7 @@ import { useDebouncedState } from '@/hooks/debouncedState'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
-import { SearchIcon, LibraryAddIcon } from '@/theme'
+import { AddIcon, SearchIcon } from '@/theme'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { queryParamsToString } from '@/util/queryparams'
 import { MemoizedCourseTable as CourseTable } from './CourseTable'
@@ -266,7 +266,7 @@ export const SearchForm = () => {
                 />
                 {courses.length > 0 && selectMultipleCourses ? (
                   <Box display="flex" justifyContent="center" mt={2}>
-                    <Button onClick={addAllCourses} startIcon={<LibraryAddIcon />} variant="outlined">
+                    <Button onClick={addAllCourses} startIcon={<AddIcon />} variant="outlined">
                       Select all search results
                     </Button>
                   </Box>

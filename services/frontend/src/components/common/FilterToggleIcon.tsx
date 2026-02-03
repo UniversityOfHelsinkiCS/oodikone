@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button'
 import { forwardRef } from 'react'
 
-import { FilterAltOutlinedIcon } from '@/theme'
+import { FilterAltIcon } from '@/theme'
 
 type FilterToggleIconProps = {
   isActive: boolean
@@ -15,7 +15,7 @@ export const FilterToggleIcon = forwardRef<HTMLButtonElement, FilterToggleIconPr
 
     return (
       <Button {...rest} ref={ref} size="small" variant={isActive ? 'contained' : 'outlined'}>
-        <FilterAltOutlinedIcon fontSize="small" />
+        <FilterAltIcon fontSize="small" />
       </Button>
     )
   }

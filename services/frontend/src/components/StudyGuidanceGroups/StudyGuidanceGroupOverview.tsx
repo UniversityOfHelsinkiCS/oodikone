@@ -22,7 +22,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { AddIcon, DeleteIcon, ModeIcon, NorthEastIcon, SaveIcon } from '@/theme'
+import { AddIcon, DeleteIcon, EditIcon, NorthEastIcon, SaveIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StyledTable } from '../common/StyledTable'
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
@@ -224,7 +224,14 @@ const TagCell = ({
       {group.tags?.[tagName] ? (
         <Stack alignItems="center" direction="row" justifyContent="space-between">
           <Typography pr={2}>{getText()}</Typography>
-          <Button endIcon={<ModeIcon />} onClick={toggleEdit} size="small" sx={{ height: '2.4em' }} variant="outlined">
+          <Button
+            endIcon={<EditIcon />}
+            id="asd"
+            onClick={toggleEdit}
+            size="small"
+            sx={{ height: '2.4em' }}
+            variant="outlined"
+          >
             Edit
           </Button>
         </Stack>
