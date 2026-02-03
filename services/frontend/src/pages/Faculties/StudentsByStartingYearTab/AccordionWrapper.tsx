@@ -1,9 +1,10 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+
+import { ExpandMoreIcon } from '@/theme'
 
 export const AccordionWrapper = ({ children, level }: { children: React.ReactNode; level: string }) => {
   return (

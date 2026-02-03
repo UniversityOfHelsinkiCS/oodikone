@@ -1,5 +1,5 @@
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Link, { LinkOwnProps } from '@mui/material/Link'
+import { OpenInNewIcon } from '@/theme'
 
 /**
  * Link that opens an external website in a new tab

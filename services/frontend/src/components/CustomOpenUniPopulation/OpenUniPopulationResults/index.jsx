@@ -1,6 +1,3 @@
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import MinusIcon from '@mui/icons-material/Remove'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -12,6 +9,7 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
 import { useGetOpenUniCourseStudentsQuery } from '@/redux/openUniPopulations'
+import { CheckIcon, CloseIcon, RemoveIcon } from '@/theme'
 import { formatDate } from '@/util/timeAndDate'
 
 const columnHelper = createColumnHelper()
@@ -36,7 +34,7 @@ const findRowContent = (student, courseCode) => {
   if (student.courseInfo[courseCode] === undefined) return null
   if (student.courseInfo[courseCode].status.passed) return <CheckIcon color="success" />
   if (student.courseInfo[courseCode].status.failed) return <CloseIcon color="error" />
-  if (student.courseInfo[courseCode].status.unfinished) return <MinusIcon color="disabled" />
+  if (student.courseInfo[courseCode].status.unfinished) return <RemoveIcon color="disabled" />
   return null
 }
 

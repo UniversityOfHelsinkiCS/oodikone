@@ -1,10 +1,10 @@
-import PersonIcon from '@mui/icons-material/Person'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { Link } from '@/components/common/Link'
 import { useSisUrl } from '@/hooks/useSisUrl'
+import { PersonIcon } from '@/theme'
 import { ExternalLink } from './ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => {

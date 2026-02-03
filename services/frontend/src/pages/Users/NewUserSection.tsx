@@ -1,5 +1,3 @@
-import AddIcon from '@mui/icons-material/Add'
-import SendIcon from '@mui/icons-material/Send'
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
@@ -17,6 +15,7 @@ import { useEffect, useState } from 'react'
 import { Loading } from '@/components/Loading'
 import { Section } from '@/components/Section'
 import { useLazyGetUserFromSisuByEppnQuery, useAddUserMutation } from '@/redux/users'
+import { AddIcon, SendIcon } from '@/theme'
 
 export const NewUserSection = ({ onAddUser }) => {
   const [eppn, setEppn] = useState('')

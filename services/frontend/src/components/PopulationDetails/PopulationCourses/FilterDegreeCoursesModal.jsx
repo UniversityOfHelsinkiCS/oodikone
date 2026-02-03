@@ -1,5 +1,3 @@
-import EyeIcon from '@mui/icons-material/RemoveRedEye'
-import SaveIcon from '@mui/icons-material/Save'
 import Button from '@mui/material/Button'
 
 import Dialog from '@mui/material/Dialog'
@@ -8,6 +6,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { useState, Fragment } from 'react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
+import { EyeIcon, SaveIcon } from '@/theme'
 
 export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
   const [open, setOpen] = useState(false)

@@ -1,6 +1,3 @@
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import MinusIcon from '@mui/icons-material/Remove'
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -10,6 +7,7 @@ import { Loading } from '@/components/Loading'
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useGetSavedSearchesQuery } from '@/redux/openUniPopulations'
+import { CheckIcon, CloseIcon, RemoveIcon } from '@/theme'
 import { formatDate } from '@/util/timeAndDate'
 import { CustomOpenUniSearch } from './CustomOpenUniSearch'
 import { OpenUniPopulationResults } from './OpenUniPopulationResults'
@@ -44,7 +42,7 @@ export const CustomOpenUniPopulation = () => {
           <CloseIcon color="error" />: Student has failed the course. <br />
         </Typography>
         <Typography sx={{ display: 'flex' }}>
-          <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the
+          <RemoveIcon color="disabled" />: Student has enrolled, but has not received any grade from the
         </Typography>
         course. <br />
         <b>Empty cell</b>: Student has no enrollments for the course. <br />

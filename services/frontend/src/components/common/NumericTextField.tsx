@@ -1,9 +1,9 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import { useCallback, useState } from 'react'
+
+import { KeyboardArrowDownIcon, KeyboardArrowUpIcon } from '@/theme'
 
 /**
  * Numeric TextField component with internal state, that can be used where debouncing is wanted

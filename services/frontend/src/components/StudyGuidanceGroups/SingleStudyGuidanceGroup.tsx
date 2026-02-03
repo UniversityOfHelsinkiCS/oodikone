@@ -1,7 +1,3 @@
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import LabelIcon from '@mui/icons-material/Label'
-
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
@@ -13,8 +9,8 @@ import { FilterView } from '@/components/FilterView'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
-
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { CalendarMonthIcon, LabelIcon, KeyboardBackspaceIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { PageTitle } from '../common/PageTitle'
 import { StyledMessage } from '../common/StyledMessage'

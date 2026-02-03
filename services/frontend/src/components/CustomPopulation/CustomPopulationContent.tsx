@@ -1,5 +1,3 @@
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-import LabelIcon from '@mui/icons-material/Label'
 import Box from '@mui/material/Box'
 
 import Button from '@mui/material/Button'
@@ -22,6 +20,7 @@ import { RightsNotification } from '@/components/RightsNotification'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useProgress } from '@/hooks/progress'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { KeyboardBackspaceIcon, LabelIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { PageTitle } from '../common/PageTitle'

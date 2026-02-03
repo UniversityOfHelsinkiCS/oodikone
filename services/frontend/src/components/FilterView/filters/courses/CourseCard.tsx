@@ -1,10 +1,10 @@
-import ClearIcon from '@mui/icons-material/Clear'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { ClearIcon } from '@/theme'
 import { FilterSelect } from '../common/FilterSelect'
 import { FilterType } from './filterType'
 

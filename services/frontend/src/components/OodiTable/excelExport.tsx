@@ -1,4 +1,3 @@
-import DownloadIcon from '@mui/icons-material/Download'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -17,6 +16,7 @@ import { useMemo, useState } from 'react'
 import { utils, writeFile } from 'xlsx'
 
 import { DateFormat } from '@/constants/date'
+import { DownloadIcon } from '@/theme'
 import { getTimestamp, reformatDate } from '@/util/timeAndDate'
 import { OodiTable } from './index'
 

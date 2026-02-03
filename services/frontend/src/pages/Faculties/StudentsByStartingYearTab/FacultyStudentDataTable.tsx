@@ -1,5 +1,3 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -18,6 +16,7 @@ import { PopulationLink } from '@/components/common/PopulationLink'
 import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 

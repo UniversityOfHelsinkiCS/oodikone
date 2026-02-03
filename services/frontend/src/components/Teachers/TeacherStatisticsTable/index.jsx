@@ -1,4 +1,3 @@
-import ArrowIcon from '@mui/icons-material/NorthEast'
 import Typography from '@mui/material/Typography'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
@@ -7,6 +6,7 @@ import { calculatePercentage, isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { ArrowIcon } from '@/theme'
 
 const columnHelper = createColumnHelper()
 

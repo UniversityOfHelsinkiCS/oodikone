@@ -1,7 +1,3 @@
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import MinusIcon from '@mui/icons-material/Remove'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -22,6 +18,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { CheckIcon, CloseIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 import { TableInfo } from './info'
@@ -87,7 +84,7 @@ const getRowContent = (student, courseCode, year, start, end, criteria) => {
   }
 
   if (hasEnrolled(student, courseCode)) {
-    return <MinusIcon color="disabled" />
+    return <RemoveIcon color="disabled" />
   }
 
   return null

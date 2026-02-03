@@ -1,6 +1,3 @@
-import CropSquareIcon from '@mui/icons-material/CropSquare'
-import DoneIcon from '@mui/icons-material/Done'
-import RemoveIcon from '@mui/icons-material/Remove'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
@@ -17,6 +14,7 @@ import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/compone
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
+import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 

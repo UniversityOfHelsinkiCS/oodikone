@@ -1,6 +1,3 @@
-import CheckIcon from '@mui/icons-material/Check'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import CropSquareIcon from '@mui/icons-material/CropSquare'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -18,6 +15,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationStudents/StudentTable/ModulesTab'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
+import { CheckIcon, ContentCopyIcon, CropSquareIcon } from '@/theme'
 
 const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null

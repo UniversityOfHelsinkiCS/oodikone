@@ -1,4 +1,3 @@
-import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
@@ -15,6 +14,7 @@ import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useCreateTagMutation } from '@/redux/tags'
+import { AddIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 import { Tag } from '@oodikone/shared/types'
 

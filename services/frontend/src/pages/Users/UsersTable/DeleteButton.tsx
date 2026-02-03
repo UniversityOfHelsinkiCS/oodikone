@@ -1,10 +1,9 @@
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
-import WarningIcon from '@mui/icons-material/Warning'
 import Button from '@mui/material/Button'
 
 import { useEffect, useState } from 'react'
 
 import { useDeleteUserMutation } from '@/redux/users'
+import { PersonRemoveIcon, WarningIcon } from '@/theme'
 
 export const DeleteButton = ({ getAllUsersQuery, userId }: { getAllUsersQuery: any; userId: string }) => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)

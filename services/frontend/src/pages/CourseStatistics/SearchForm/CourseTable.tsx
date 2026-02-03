@@ -1,4 +1,3 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import IconButton from '@mui/material/IconButton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -11,6 +10,7 @@ import Typography from '@mui/material/Typography'
 import { memo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { DeleteOutlineIcon } from '@/theme'
 import { getActiveYears } from '../util'
 
 const CourseTable = ({

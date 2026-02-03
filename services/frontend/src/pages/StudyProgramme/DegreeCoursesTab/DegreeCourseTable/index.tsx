@@ -1,5 +1,3 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
@@ -17,6 +15,7 @@ import { Fragment, useEffect, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
+import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseVisibility } from '@/types/courseVisibility'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'

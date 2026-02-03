@@ -1,5 +1,3 @@
-// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import Accordion, { AccordionProps } from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary, { AccordionSummaryProps, accordionSummaryClasses } from '@mui/material/AccordionSummary'
@@ -7,6 +5,8 @@ import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useMemo, useState } from 'react'
+
+import { KeyboardArrowRightIcon } from '@/theme'
 
 const PanelViewAccordion = styled((props: AccordionProps) => <Accordion disableGutters elevation={0} {...props} />)(
   ({ theme }) => ({

@@ -1,8 +1,7 @@
-import LogoutIcon from '@mui/icons-material/Logout'
-import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import Button from '@mui/material/Button'
 
 import { useGetAuthorizedUserQuery, useShowAsUser } from '@/redux/auth'
+import { LogoutIcon, PersonSearchIcon } from '@/theme'
 
 export const MockButton = ({ username }: { username: string }) => {
   const showAsUser = useShowAsUser()

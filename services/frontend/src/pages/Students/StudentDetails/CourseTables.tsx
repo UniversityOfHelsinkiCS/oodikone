@@ -1,8 +1,3 @@
-import CloseIcon from '@mui/icons-material/Close'
-import DoneIcon from '@mui/icons-material/Done'
-import LayersIcon from '@mui/icons-material/Layers'
-import NorthEastIcon from '@mui/icons-material/NorthEast'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -18,6 +13,7 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
+import { CloseIcon, DoneIcon, LayersIcon, NorthEastIcon, SwapHorizIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 
 const creditsColumnIndex = 3

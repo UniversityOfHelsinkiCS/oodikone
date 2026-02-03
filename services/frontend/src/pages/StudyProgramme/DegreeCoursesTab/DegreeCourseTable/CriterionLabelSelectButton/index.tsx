@@ -1,4 +1,3 @@
-import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered'
 import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
 import ListItemText from '@mui/material/ListItemText'
@@ -9,6 +8,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { useEffect, useState } from 'react'
 
 import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
+import { FormatListNumberedIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
 

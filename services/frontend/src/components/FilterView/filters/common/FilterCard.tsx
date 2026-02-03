@@ -1,15 +1,13 @@
-import ClearIcon from '@mui/icons-material/Clear'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import Box from '@mui/material/Box'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-
 import { useEffect, useState } from 'react'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ClearIcon, KeyboardArrowRightIcon } from '@/theme'
 import type { Filter } from '../createFilter'
 
 const ConditionalInfoBox = ({ info }) => {

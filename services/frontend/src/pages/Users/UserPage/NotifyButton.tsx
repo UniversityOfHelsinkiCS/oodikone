@@ -1,5 +1,3 @@
-import EmailIcon from '@mui/icons-material/Email'
-import SendIcon from '@mui/icons-material/Send'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -11,6 +9,7 @@ import { useEffect, useState } from 'react'
 
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
+import { EmailIcon, SendIcon } from '@/theme'
 import { EmailPreview } from './EmailPreview'
 
 export const NotifyButton = ({ userEmail }: { userEmail: string }) => {

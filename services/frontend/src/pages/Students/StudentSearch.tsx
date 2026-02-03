@@ -1,4 +1,3 @@
-import SearchIcon from '@mui/icons-material/Search'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -19,6 +18,7 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { useSearchStudentsQuery } from '@/redux/students'
+import { SearchIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 import { ActiveStudyRight } from '@oodikone/shared/types/studentData'
 

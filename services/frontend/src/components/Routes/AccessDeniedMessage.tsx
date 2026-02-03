@@ -1,4 +1,3 @@
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb'
 import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
@@ -7,6 +6,7 @@ import Link from '@mui/material/Link'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
+import { DoNotDisturbIcon } from '@/theme'
 
 export const AccessDeniedMessage = () => {
   useTitle('Access denied')

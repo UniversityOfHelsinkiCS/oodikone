@@ -1,5 +1,3 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import IconButton from '@mui/material/IconButton'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
@@ -7,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { formatPassRate } from '@/pages/CourseStatistics/util'
+import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { AttemptData } from '@/types/attemptData'
 
 const ContentCell = ({ content, obfuscated }: { content: string; obfuscated: boolean }) => {

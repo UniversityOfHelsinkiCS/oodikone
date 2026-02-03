@@ -1,4 +1,3 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -11,6 +10,7 @@ import { sortBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 import { DateFormat } from '@/constants/date'
+import { AccessTimeIcon } from '@/theme'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { formatDate } from '@/util/timeAndDate'
 

@@ -1,6 +1,3 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
-import SendIcon from '@mui/icons-material/Send'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
@@ -22,6 +19,7 @@ import {
   useGetSavedCourseListsQuery,
   useUpdateCourseListMutation,
 } from '@/redux/completedCoursesSearch'
+import { DeleteIcon, SaveIcon, SendIcon } from '@/theme'
 import { queryParamsToString } from '@/util/queryparams'
 
 export const SearchModal = ({ setValues }) => {

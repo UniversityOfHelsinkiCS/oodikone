@@ -1,6 +1,3 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
-import SendIcon from '@mui/icons-material/Send'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -19,6 +16,7 @@ import {
   useUpdateCustomPopulationSearchMutation,
 } from '@/redux/customPopulationSearch'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
+import { DeleteIcon, SaveIcon, SendIcon } from '@/theme'
 import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
 import { PageTitle } from '../common/PageTitle'
 import { Section } from '../Section'

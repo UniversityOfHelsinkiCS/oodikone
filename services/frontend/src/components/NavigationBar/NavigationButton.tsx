@@ -1,4 +1,3 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
@@ -10,6 +9,7 @@ import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { ArrowDropDownIcon } from '@/theme'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
 import { NavigationItem } from './navigationItems'
 

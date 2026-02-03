@@ -1,6 +1,7 @@
-import SearchIcon from '@mui/icons-material/Search'
 import Button from '@mui/material/Button'
 import { useNavigate } from 'react-router'
+
+import { SearchIcon } from '@/theme'
 
 export const NewQueryButton = () => {
   const navigate = useNavigate()

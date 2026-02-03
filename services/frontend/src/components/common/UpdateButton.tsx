@@ -1,8 +1,8 @@
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
+
+import { CheckIcon, CloseIcon } from '@/theme'
 
 export const UpdateButton = ({
   stats,

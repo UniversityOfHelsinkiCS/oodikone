@@ -1,4 +1,3 @@
-import SearchIcon from '@mui/icons-material/Search'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -17,6 +16,7 @@ import { validateInputLength } from '@/common'
 import { Link } from '@/components/common/Link'
 import { StyledTable } from '@/components/common/StyledTable'
 import { useFindTeachersQuery } from '@/redux/teachers'
+import { SearchIcon } from '@/theme'
 import { splitByEmptySpace } from '@oodikone/shared/util'
 
 export const TeacherSearchTab = () => {

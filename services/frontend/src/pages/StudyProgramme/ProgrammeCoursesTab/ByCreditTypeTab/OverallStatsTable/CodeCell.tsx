@@ -1,9 +1,9 @@
-import NorthEastIcon from '@mui/icons-material/NorthEast'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { Link } from '@/components/common/Link'
+import { NorthEastIcon } from '@/theme'
 
 export const CodeCell = ({ code }: { code: string }) => {
   return (

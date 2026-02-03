@@ -1,7 +1,7 @@
-import SearchIcon from '@mui/icons-material/Search'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 
+import { SearchIcon } from '@/theme'
 import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 
 export const StudyProgrammeFilter = ({

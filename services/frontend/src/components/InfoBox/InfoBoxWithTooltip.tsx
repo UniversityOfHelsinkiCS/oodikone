@@ -1,4 +1,3 @@
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import { SxProps, Theme } from '@mui/material/styles'
@@ -9,6 +8,7 @@ import Typography from '@mui/material/Typography'
 import ReactMarkdown from 'react-markdown'
 
 import { formatContent } from '@/common'
+import { HelpOutlineIcon } from '@/theme'
 
 const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />

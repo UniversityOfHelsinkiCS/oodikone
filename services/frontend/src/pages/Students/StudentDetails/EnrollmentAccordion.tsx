@@ -1,4 +1,3 @@
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowDropDown'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
@@ -17,6 +16,7 @@ import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithToolt
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import { ArrowForwardIosSharpIcon } from '@/theme'
 
 const calculateSemesterEnrollmentsByStudyright = (semesters, years, studyrights) => {
   const programmeNames = {}

@@ -1,4 +1,3 @@
-import SendIcon from '@mui/icons-material/Send'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
@@ -14,6 +13,7 @@ import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useSendFeedbackMutation } from '@/redux/feedback'
+import { SendIcon } from '@/theme'
 
 export const Feedback = () => {
   useTitle('Feedback')

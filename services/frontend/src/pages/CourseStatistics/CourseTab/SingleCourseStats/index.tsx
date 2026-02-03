@@ -1,4 +1,3 @@
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
@@ -18,6 +17,7 @@ import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { useGetSemestersQuery } from '@/redux/semesters'
+import { DoNotDisturbIcon } from '@/theme'
 import {
   Attempts,
   AvailableStats,

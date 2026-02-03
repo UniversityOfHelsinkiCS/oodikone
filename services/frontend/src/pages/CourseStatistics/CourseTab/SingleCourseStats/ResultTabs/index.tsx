@@ -1,5 +1,3 @@
-import PersonIcon from '@mui/icons-material/Person'
-import ReplayIcon from '@mui/icons-material/Replay'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
@@ -7,6 +5,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
+import { PersonIcon, ReplayIcon } from '@/theme'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'

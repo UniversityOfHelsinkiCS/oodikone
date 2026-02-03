@@ -1,4 +1,3 @@
-import PushPinIcon from '@mui/icons-material/PushPin'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -10,6 +9,7 @@ import { Link } from '@/components/common/Link'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
+import { PushPinIcon } from '@/theme'
 import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
 import { CombinedDegreeProgramme } from './'
 

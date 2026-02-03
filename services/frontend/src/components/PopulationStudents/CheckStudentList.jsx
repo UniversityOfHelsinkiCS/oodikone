@@ -1,6 +1,4 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Accordion from '@mui/material/Accordion'
-
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
@@ -12,6 +10,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { arrayOf, string } from 'prop-types'
 import { useState } from 'react'
+
+import { ExpandMoreIcon } from '@/theme'
 
 export const CheckStudentList = ({ students }) => {
   const [modalOpen, setModalOpen] = useState(false)

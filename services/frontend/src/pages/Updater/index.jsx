@@ -1,5 +1,4 @@
 /* eslint-disable no-alert */
-import RefreshIcon from '@mui/icons-material/Refresh'
 import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -19,6 +18,7 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { Section } from '@/components/Section'
 import { languageCenterViewEnabled } from '@/conf'
 import { useTitle } from '@/hooks/title'
+import { RefreshIcon } from '@/theme'
 
 export const Updater = () => {
   const [messages, setMessages] = useState([])

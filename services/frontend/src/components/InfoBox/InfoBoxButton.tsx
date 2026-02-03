@@ -1,5 +1,6 @@
-import InfoIcon from '@mui/icons-material/Info'
 import Button from '@mui/material/Button'
+
+import { InfoIcon } from '@/theme'
 
 interface InfoBoxButtonProps {
   cypress?: string

@@ -1,9 +1,9 @@
-import AddIcon from '@mui/icons-material/Add'
-import RemoveIcon from '@mui/icons-material/Remove'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
+
+import { AddIcon, RemoveIcon } from '@/theme'
 
 type EnrollmentDateSelectorProps = {
   year: number

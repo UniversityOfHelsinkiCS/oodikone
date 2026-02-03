@@ -1,4 +1,3 @@
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import Button from '@mui/material/Button'
 
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -23,6 +22,7 @@ import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/S
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useCurriculumState } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { KeyboardBackspaceIcon } from '@/theme'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 

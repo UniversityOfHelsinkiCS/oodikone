@@ -1,5 +1,3 @@
-import LogoutIcon from '@mui/icons-material/Logout'
-import RefreshIcon from '@mui/icons-material/Refresh'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -12,6 +10,7 @@ import { Backdrop } from '@/components/common/Backdrop'
 import { PageLayout } from '@/components/common/PageLayout'
 import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
+import { LogoutIcon, RefreshIcon } from '@/theme'
 
 const names = [
   'mluukkai',

@@ -1,6 +1,7 @@
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAlt'
 import Button from '@mui/material/Button'
 import { forwardRef } from 'react'
+
+import { FilterAltOutlinedIcon } from '@/theme'
 
 type FilterToggleIconProps = {
   isActive: boolean

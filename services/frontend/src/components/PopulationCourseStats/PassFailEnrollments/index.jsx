@@ -1,5 +1,3 @@
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
-import ArrowIcon from '@mui/icons-material/NorthEast'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -11,6 +9,7 @@ import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { ArrowIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 
 const columnHelper = createColumnHelper()

@@ -1,8 +1,8 @@
-import NorthEastIcon from '@mui/icons-material/NorthEast'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
 import { Link } from '@/components/common/Link'
+import { NorthEastIcon } from '@/theme'
 import { getTitle, getUrl } from '@/util/populationLink'
 import { Tag } from '@oodikone/shared/types'
 

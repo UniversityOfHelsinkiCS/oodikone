@@ -1,5 +1,3 @@
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Box from '@mui/material/Box'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
@@ -7,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
 import { PercentageBar } from '@/components/common/PercentageBar'
+import { ExpandLessIcon, ExpandMoreIcon } from '@/theme'
 import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'
 
 type CollapsibleCreditRowProps = {

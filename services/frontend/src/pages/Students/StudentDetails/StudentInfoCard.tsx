@@ -1,4 +1,3 @@
-import RefreshIcon from '@mui/icons-material/Refresh'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -12,6 +11,7 @@ import { useStudentNameVisibility } from '@/components/common/StudentNameVisibil
 import { DateFormat } from '@/constants/date'
 import { useSisUrl } from '@/hooks/useSisUrl'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { RefreshIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { EnrollmentAccordion } from './EnrollmentAccordion'

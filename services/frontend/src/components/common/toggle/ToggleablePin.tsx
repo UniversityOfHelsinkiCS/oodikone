@@ -1,7 +1,7 @@
-import PushPinIcon from '@mui/icons-material/PushPin'
 import IconButton from '@mui/material/IconButton'
 
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
+import { PushPinIcon } from '@/theme'
 import { type PopulationSearchProgramme } from '@/types/populationSearch'
 
 export const ToggleablePin = ({ programme }: { programme: PopulationSearchProgramme }) => {

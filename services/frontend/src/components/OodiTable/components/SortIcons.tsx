@@ -1,8 +1,7 @@
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import SwapVertIcon from '@mui/icons-material/SwapVert'
 import styled from '@mui/material/styles/styled'
 import type { SortDirection } from '@tanstack/react-table'
+
+import { ArrowDownwardIcon, ArrowUpwardIcon, SwapVertIcon } from '@/theme'
 
 const OtSortIconWrapper = styled('div')(() => ({
   position: 'absolute',

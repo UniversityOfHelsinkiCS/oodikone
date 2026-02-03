@@ -1,9 +1,9 @@
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useShowAsUser } from '@/redux/auth'
+import { ExitToAppIcon } from '@/theme'
 
 export const StopMockingButton = () => {
   const showAsUser = useShowAsUser()

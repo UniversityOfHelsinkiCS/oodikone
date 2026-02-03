@@ -1,5 +1,3 @@
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Box from '@mui/material/Box'
 
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -17,6 +15,7 @@ import { Fragment, useState } from 'react'
 
 import { PercentageBar } from '@/components/common/PercentageBar'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
+import { ExpandLessIcon, ExpandMoreIcon } from '@/theme'
 import { PopulationQuery } from '@/types/populationSearch'
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getAge } from '@/util/timeAndDate'

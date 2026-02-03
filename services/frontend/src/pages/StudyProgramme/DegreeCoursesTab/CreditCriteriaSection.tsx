@@ -1,4 +1,3 @@
-import SaveIcon from '@mui/icons-material/Save'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid2'
@@ -12,6 +11,7 @@ import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Section } from '@/components/Section'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
+import { SaveIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { ProgressCriteria } from '@oodikone/shared/types'
 

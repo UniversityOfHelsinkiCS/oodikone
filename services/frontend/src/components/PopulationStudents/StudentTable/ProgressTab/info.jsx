@@ -1,10 +1,7 @@
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import MinusIcon from '@mui/icons-material/Remove'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
-
 import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
+
+import { CheckIcon, CloseIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 
 export const TableInfo = () => (
   <Alert severity="primary" sx={{ my: 2 }} variant="outlined">
@@ -22,7 +19,7 @@ export const TableInfo = () => (
       <CloseIcon color="error" />: Student has failed the course.
     </Typography>
     <Typography sx={{ display: 'flex' }}>
-      <MinusIcon color="disabled" />: Student has enrolled, but has not received any grade from the course.
+      <RemoveIcon color="disabled" />: Student has enrolled, but has not received any grade from the course.
     </Typography>
 
     <Typography variant="h6">Semester enrollments:</Typography>

@@ -1,10 +1,9 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import TableCell from '@mui/material/TableCell'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
+import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 
 export const YearCell = ({
   calendarYears,
