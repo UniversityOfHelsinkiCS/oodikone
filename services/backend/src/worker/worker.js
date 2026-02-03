@@ -3,7 +3,7 @@ const { Worker: BullMQWorker } = require('bullmq')
 const dayjs = require('dayjs')
 
 const { redis, concurrentWorkers } = require('../config')
-const logger = require('../util/logger')
+const logger = require('../util/logger').default
 const { queueName } = require('./queue')
 
 const connection = {
