@@ -30,6 +30,7 @@ runs:
       with:
         name: backend-image
     - name: 'Load built backend image'
+      shell: bash
       run: docker load --input backend.tar
 
     - name: 'Download frontend image'
@@ -37,6 +38,7 @@ runs:
       with:
         name: frontend-image
     - name: 'Load built frontend image'
+      shell: bash
       run: docker load --input frontend.tar
 
     - name: 'Run services, pull rest of the needed images'
