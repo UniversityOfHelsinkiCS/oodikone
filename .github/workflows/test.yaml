@@ -41,6 +41,7 @@ jobs:
           outputs: type=docker,dest=/tmp/backend.tar
         env:
           DOCKER_BUILD_SUMMARY: false
+
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v6
         with:
@@ -61,7 +62,6 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: oodikone-frontend
-          tags: staging ${{ github.sha }}
           context: services
           containerfiles: |
             services/frontend/Dockerfile
@@ -69,9 +69,11 @@ jobs:
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
             STAGING=true
-          outputs: type=docker,dest=/tmp/backend.tar
+          tags: oodikone-frontend:staging
+          outputs: type=docker,dest=/tmp/frontend.tar
         env:
           DOCKER_BUILD_SUMMARY: false
+
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v6
         with:
