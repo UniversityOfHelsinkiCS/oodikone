@@ -27,6 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
+
       - name: 'Build image and export it'
         uses: docker/build-push-action@v6
         with:
@@ -54,7 +55,8 @@ jobs:
       - name: Get current time
         id: get_current_time
         run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
-      - name: Build frontend image
+
+      - name: Build frontend image and export it
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
@@ -67,6 +69,14 @@ jobs:
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
             STAGING=true
+          outputs: type=docker,dest=/tmp/backend.tar
+        env:
+          DOCKER_BUILD_SUMMARY: false
+      - name: 'Upload image for other jobs'
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-image
+          path: /tmp/frontend.tar
 
   check_migration_files:
     name: Check if new migrations have been added
