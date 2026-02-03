@@ -10,9 +10,8 @@ import {
   CourseYearlyStatsQuery,
 } from '@oodikone/shared/routes/courses'
 import type { CourseWithSubsId } from '@oodikone/shared/types/course'
-import { uniq } from '@oodikone/shared/util'
 import { getCourseYearlyStats } from '../services/courses'
-import { getCoursesByNameAndOrCode, getCoursesByCodes } from '../services/courses/courseFinders'
+import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
 import { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } from '../util'
 
 const router = Router()
@@ -20,49 +19,30 @@ const router = Router()
 router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMultiQuery>(
   '/v2/coursesmulti',
   async (req, res) => {
-    const { name, code, combineSubstitutions, includeSpecial } = req.query
+    const { name, code, includeSpecial } = req.query
     if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
       return res.status(400).json({ error: 'Query parameter name or code is invalid' })
     }
 
     const courses = await getCoursesByNameAndOrCode(name, code, includeSpecial === 'true')
 
-    if (combineSubstitutions === 'false') {
-      const courseCodes = courses.map(course => course.code)
-      const substitutions = uniq(
-        courses.flatMap(course => course.substitutions).filter(code => !courseCodes.includes(code))
-      )
-      const substitutionDetails = await getCoursesByCodes(substitutions)
-      for (const substitution of substitutionDetails) {
-        courses.push(substitution.toJSON())
-      }
-    }
-
-    const mergedCourses: Record<string, CourseWithSubsId> = {}
+    const mergedCourses = new Map<string, CourseWithSubsId>()
 
     for (const course of courses) {
       if (!(course.max_attainment_date && course.min_attainment_date)) continue
 
-      const groupId = combineSubstitutions === 'true' ? course.subsId?.toString() : course.code
-      if (!groupId) continue
+      if (!mergedCourses.has(course.code)) mergedCourses.set(course.code, structuredClone(course))
+      const mergedCourse = mergedCourses.get(course.code)!
 
-      if (!mergedCourses[groupId]) {
-        mergedCourses[groupId] = {
-          ...course,
-          substitutions: combineSubstitutions === 'true' ? course.substitutions : [],
-        }
-      } else {
-        const mergedCourse = mergedCourses[groupId]
-        if (mergedCourse.max_attainment_date < course.max_attainment_date) {
-          mergedCourse.max_attainment_date = course.max_attainment_date
-        }
-        if (mergedCourse.min_attainment_date > course.min_attainment_date) {
-          mergedCourse.min_attainment_date = course.min_attainment_date
-        }
+      if (mergedCourse.max_attainment_date < course.max_attainment_date) {
+        mergedCourse.max_attainment_date = course.max_attainment_date
+      }
+      if (mergedCourse.min_attainment_date > course.min_attainment_date) {
+        mergedCourse.min_attainment_date = course.min_attainment_date
       }
     }
 
-    res.json({ courses: Object.values(mergedCourses) })
+    res.json({ courses: Array.from(mergedCourses.values()) })
   }
 )
 

@@ -7,18 +7,18 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { memo } from 'react'
-
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DeleteIcon } from '@/theme'
 import { getActiveYears } from '../util'
 
-const CourseTable = ({
+export const CourseTable = ({
+  combineSubstitutions,
   courses,
   hidden,
   onSelectCourse,
   title,
 }: {
+  combineSubstitutions: boolean
   courses: any[]
   hidden: boolean
   onSelectCourse: (course: any) => void
@@ -49,7 +49,7 @@ const CourseTable = ({
           {getActiveYears(course)}
         </Typography>
       </TableCell>
-      <TableCell>{[course.code, ...course.substitutions].join(', ')}</TableCell>
+      <TableCell>{combineSubstitutions ? [course.code, ...course.substitutions].join(', ') : course.code}</TableCell>
       {title === 'Selected courses' && (
         <TableCell align="right">
           <IconButton>
@@ -86,5 +86,3 @@ const areEqual = (prevProps, nextProps) => {
   }
   return prevProps.courses.every(c1 => nextProps.courses.some(c2 => c1.code === c2.code))
 }
-
-export const MemoizedCourseTable = memo(CourseTable, areEqual)
