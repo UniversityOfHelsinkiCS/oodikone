@@ -3,7 +3,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 
 import { useShowAsUser } from '@/redux/auth'
-import { ExitToAppIcon } from '@/theme'
+import { LogoutIcon } from '@/theme'
 
 export const StopMockingButton = () => {
   const showAsUser = useShowAsUser()
@@ -11,7 +11,7 @@ export const StopMockingButton = () => {
   return (
     <MenuItem onClick={() => showAsUser(null)}>
       <ListItemIcon>
-        <ExitToAppIcon color="warning" />
+        <LogoutIcon color="warning" />
       </ListItemIcon>
       <Typography color="warning">Stop mocking</Typography>
     </MenuItem>

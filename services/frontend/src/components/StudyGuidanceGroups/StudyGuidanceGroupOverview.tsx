@@ -22,7 +22,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { AddIcon, DeleteIcon, ModeIcon, ArrowIcon, SaveIcon } from '@/theme'
+import { AddIcon, DeleteIcon, ModeIcon, NorthEastIcon, SaveIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StyledTable } from '../common/StyledTable'
 import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
@@ -37,7 +37,7 @@ const LinkToGroup = ({ group }: { group: GroupsWithTags }) => {
     <Link data-cy={`study-guidance-group-link-${group.id}`} sx={{ color: 'text.primary' }} to={destination}>
       <Typography sx={{ display: 'flex' }}>
         {getTextIn(group.name)}
-        <ArrowIcon color="primary" />
+        <NorthEastIcon color="primary" />
       </Typography>
     </Link>
   )

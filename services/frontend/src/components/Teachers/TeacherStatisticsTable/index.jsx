@@ -6,7 +6,7 @@ import { calculatePercentage, isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
-import { ArrowIcon } from '@/theme'
+import { NorthEastIcon } from '@/theme'
 
 const columnHelper = createColumnHelper()
 
@@ -44,7 +44,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
               {row.original.name}
               {isDefaultServiceProvider() && (
                 <Link target="_blank" to={`/teachers/${row.original.id}`}>
-                  <ArrowIcon />
+                  <NorthEastIcon />
                 </Link>
               )}
             </div>
@@ -65,7 +65,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
                 target="_blank"
                 to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${row.original.id}"]&separate=false`}
               >
-                <ArrowIcon />
+                <NorthEastIcon />
               </Link>
             </div>
           ),

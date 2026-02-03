@@ -3,7 +3,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { utils, writeFile } from 'xlsx'
 
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '@/common'
-import { FileDownloadIcon } from '@/theme'
+import { DownloadIcon } from '@/theme'
 import { getTimestamp } from '@/util/timeAndDate'
 
 export const UnihowDataExport = ({ students }) => {
@@ -29,7 +29,7 @@ export const UnihowDataExport = ({ students }) => {
       <Button
         color="primary"
         onClick={() => writeFile(getXlsx(), filename)}
-        startIcon={<FileDownloadIcon />}
+        startIcon={<DownloadIcon />}
         variant="contained"
       >
         Export (UniHow)

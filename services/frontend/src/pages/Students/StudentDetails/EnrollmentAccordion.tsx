@@ -16,7 +16,7 @@ import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithToolt
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
-import { ArrowForwardIosSharpIcon } from '@/theme'
+import { ArrowDropDownIcon } from '@/theme'
 
 const calculateSemesterEnrollmentsByStudyright = (semesters, years, studyrights) => {
   const programmeNames = {}
@@ -129,7 +129,7 @@ export const EnrollmentAccordion = ({ student }) => {
 
   return (
     <StyledAccordion expanded={active} onChange={() => setActive(!active)}>
-      <AccordionSummary expandIcon={<ArrowForwardIosSharpIcon />}>Enrollments</AccordionSummary>
+      <AccordionSummary expandIcon={<ArrowDropDownIcon />}>Enrollments</AccordionSummary>
       <AccordionDetails>
         <StyledTable showCellBorders sx={{ marginBottom: 1 }}>
           <TableHead>

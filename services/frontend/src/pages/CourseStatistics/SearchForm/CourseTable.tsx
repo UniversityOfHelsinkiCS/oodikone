@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography'
 import { memo } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DeleteOutlineIcon } from '@/theme'
+import { DeleteIcon } from '@/theme'
 import { getActiveYears } from '../util'
 
 const CourseTable = ({
@@ -53,7 +53,7 @@ const CourseTable = ({
       {title === 'Selected courses' && (
         <TableCell align="right">
           <IconButton>
-            <DeleteOutlineIcon />
+            <DeleteIcon />
           </IconButton>
         </TableCell>
       )}

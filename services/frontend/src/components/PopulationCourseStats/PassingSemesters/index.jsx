@@ -10,7 +10,7 @@ import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
-import { ArrowIcon, KeyboardArrowRightIcon } from '@/theme'
+import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 
 const columnHelper = createColumnHelper()
@@ -113,7 +113,7 @@ export const PassingSemesters = ({ onlyIamRights, courseStatistics }) => {
                   <Link
                     to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
                   >
-                    <ArrowIcon sx={{ ml: 1 }} />
+                    <NorthEastIcon sx={{ ml: 1 }} />
                   </Link>
                 ) : null}
               </Stack>

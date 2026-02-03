@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
-import { PersonIcon, ReplayIcon } from '@/theme'
+import { PersonIcon, RefreshIcon } from '@/theme'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { ResultTab } from './tabs/ResultTab'
@@ -58,7 +58,7 @@ export const ResultTabs = ({
     <>
       <Tabs onChange={() => setTab(tab ^ 1)} value={tab}>
         <Tab data-cy="StudentsTab" icon={<PersonIcon />} iconPosition="start" label="Students" />
-        <Tab data-cy="AttemptsTab" icon={<ReplayIcon />} iconPosition="start" label="Attempts" />
+        <Tab data-cy="AttemptsTab" icon={<RefreshIcon />} iconPosition="start" label="Attempts" />
       </Tabs>
       {tab === 0 && (
         <ResultTab

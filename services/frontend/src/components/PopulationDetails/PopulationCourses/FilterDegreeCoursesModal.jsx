@@ -6,7 +6,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { useState, Fragment } from 'react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
-import { EyeIcon, SaveIcon } from '@/theme'
+import { VisibilityIcon, SaveIcon } from '@/theme'
 
 export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
   const [open, setOpen] = useState(false)
@@ -17,7 +17,7 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
 
   return (
     <Fragment>
-      <Button onClick={() => setModalOpenState(true)} startIcon={<EyeIcon />} variant="outlined">
+      <Button onClick={() => setModalOpenState(true)} startIcon={<VisibilityIcon />} variant="outlined">
         Manage Courses Shown
       </Button>
       <Dialog className="MyDialogThings" maxWidth="md" open={open}>
