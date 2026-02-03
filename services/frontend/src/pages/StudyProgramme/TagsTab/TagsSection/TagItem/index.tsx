@@ -8,7 +8,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { useState } from 'react'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
-import { DeleteIcon, PersonAddAlt1Icon, SellIcon, VisibilityIcon } from '@/theme'
+import { DeleteIcon, PersonAddAlt1Icon, TagIcon, VisibilityIcon } from '@/theme'
 import { Tag } from '@oodikone/shared/types'
 import { AddStudentsDialog } from './AddStudentsDialog'
 import { DeleteTagDialog } from './DeleteTagDialog'
@@ -46,7 +46,7 @@ export const TagItem = ({
         }
       >
         <ListItemIcon>
-          <SellIcon />
+          <TagIcon />
         </ListItemIcon>
         <ListItemText
           primary={

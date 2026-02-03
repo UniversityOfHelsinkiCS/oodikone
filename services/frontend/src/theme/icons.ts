@@ -31,7 +31,7 @@ export { default as ArrowForwardIosSharpIcon } from '@mui/icons-material/ArrowDr
 export { default as LabelIcon } from '@mui/icons-material/Label'
 export { default as DeleteIcon } from '@mui/icons-material/Delete'
 export { default as PersonAddAlt1Icon } from '@mui/icons-material/PersonAddAlt1'
-export { default as SellIcon } from '@mui/icons-material/Sell'
+export { default as TagIcon } from '@mui/icons-material/Sell'
 export { default as VisibilityIcon } from '@mui/icons-material/Visibility'
 export { default as SaveIcon } from '@mui/icons-material/Save'
 export { default as CalendarMonthIcon } from '@mui/icons-material/CalendarMonth'
