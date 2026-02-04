@@ -147,8 +147,7 @@ jobs:
           password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
-          sleep 30 # wait for backend to start and run migrations
+          docker compose --file docker-compose.ci.yml up --detach backend --wait
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
   build_and_push_anon_user_db:
@@ -182,8 +181,7 @@ jobs:
           password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
-          sleep 30 # wait for backend to start and run migrations
+          docker compose --file docker-compose.ci.yml up --detach backend --wait
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
   # === Other tests ===
@@ -220,7 +218,7 @@ jobs:
         run: docker load --input frontend.tar
 
       - name: 'Run services, pull rest of the needed images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --no-build
+        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --no-build --wait
 
       - name: 'Check that exit statuses are not errors'
         run: |
