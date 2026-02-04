@@ -147,7 +147,7 @@ jobs:
           password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend --wait
+          docker compose --file docker-compose.ci.yml up --detach backend --quiet-pull --wait
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
   build_and_push_anon_user_db:
@@ -181,7 +181,7 @@ jobs:
           password: ${{ secrets.password }}
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend --wait
+          docker compose --file docker-compose.ci.yml up --detach backend --quiet-pull --wait
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
   # === Other tests ===
