@@ -63,4 +63,4 @@ runs:
     - name: 'Print logs on failure'
       shell: bash
       if: failure()
-      run: docker compose --file docker-compose.ci.yml logs
+      run: docker compose --file docker-compose.ci.yml --profile oodikone logs
