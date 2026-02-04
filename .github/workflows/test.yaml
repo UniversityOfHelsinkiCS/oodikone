@@ -220,7 +220,7 @@ jobs:
         run: docker load --input frontend.tar
 
       - name: 'Run services, pull rest of the needed images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
+        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --no-build
 
       - name: 'Check that exit statuses are not errors'
         run: |
@@ -260,7 +260,6 @@ jobs:
 
       - name: Start oodikone (without frontend and backend)
         run: npm run oodikone:ci:setup
-
       - name: Run api-tests
         run: npm run oodikone:ci:api
 
