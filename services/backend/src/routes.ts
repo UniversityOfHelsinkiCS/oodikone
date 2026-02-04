@@ -42,9 +42,10 @@ const routes = (app: Express, url: string) => {
   app.use(jsonExpress())
   app.use(compression())
 
+  // For docker healthchecks, has to run before `currentUserMiddleware`
   app.get('/health', (_, res) => {
     return res.status(200).send('OK')
-  }) // For docker healthchecks
+  })
 
   app.use(headersMiddleware)
   app.use(currentUserMiddleware) // eslint-disable-line @typescript-eslint/no-misused-promises
