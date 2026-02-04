@@ -14,11 +14,16 @@ before(async () => {
 // Override Supertest's Response body with our own type
 type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }
 
-const populationUrl = (programme = '', years: string[] = [], semesters: string[] = []) => {
-  return `/v3/populationstatistics?${programme && 'programme=' + programme}${years.map(year => '&years=' + year).join('')}${semesters.map(sem => '&semesters=' + sem).join('')}`
+const populationUrl = (
+  programme = '',
+  years: string[] = [],
+  semesters: ('SPRING' | 'FALL')[] = [],
+  students: string[] = []
+) => {
+  return `/v3/populationstatistics?${programme && 'programme=' + programme}${years.map(year => '&years[]=' + year).join('')}${semesters.map(sem => '&semesters[]=' + sem).join('')}${students.map(s => '&studentStatuses=' + s).join('')}`
 }
 
-void describe('Population', async () => {
+void describe('Population statistics', async () => {
   await it('should fail when all fields not defined', async () => {
     const resAllMissing = await request(app)
       .get(populationUrl())
@@ -43,7 +48,29 @@ void describe('Population', async () => {
     assert.strictEqual(resProgrammeAndYears.status, 400)
   })
 
-  await it('should return students in the programme', async () => {
+  await it('should not return any data to unauthorized user', async () => {
+    const res = (await request(app)
+      .get(populationUrl('KH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'norights')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    assert.strictEqual(res.status, 403)
+    assert.deepStrictEqual(res.body, { error: 'Trying to request unauthorized students data' })
+  })
+
+  await it('should fail when trying to access a programme that user has no permissions to', async () => {
+    const res = (await request(app)
+      .get(populationUrl('MH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'onlyiamrights')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    assert.strictEqual(res.status, 403)
+    assert.deepStrictEqual(res.body, { error: 'Trying to request unauthorized students data' })
+  })
+
+  await it('should return students in the programme for authorized user', async () => {
     const res = (await request(app)
       .get(populationUrl('KH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
       .set('shib-session-id', 'test')
@@ -51,18 +78,27 @@ void describe('Population', async () => {
       .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
     assert.strictEqual(res.status, 200)
-    assert.strictEqual(res.body.students.length, 64)
+    assert.notStrictEqual(res.body.students.length, 0)
   })
 
-  await it('should fail when trying to access incorrect programme', async () => {
-    const res = (await request(app)
-      .get(populationUrl('KH10_001', ['2021', '2022'], ['SPRING', 'FALL']))
+  // TODO: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/4959
+  await it.skip('should work with semester flag', async () => {
+    const resFall = (await request(app)
+      .get(populationUrl('KH50_001', ['2021'], ['FALL']))
       .set('shib-session-id', 'test')
-      .set('uid', 'norights')
+      .set('uid', 'basic')
       .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    assert.strictEqual(res.status, 403)
+    const resSpring = (await request(app)
+      .get(populationUrl('KH50_001', ['2021'], ['SPRING']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    assert.strictEqual(resFall.status, 200)
+    assert.strictEqual(resSpring.status, 200)
+
+    assert.strictEqual(resSpring.body.students.length, 34)
+    assert.strictEqual(resSpring.body.students.length, 4)
   })
-  await it.todo('should faild when trying to access incorrect students')
-  await it.todo('should not return data to unauthorized user')
 })

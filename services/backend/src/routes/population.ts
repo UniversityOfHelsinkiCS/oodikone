@@ -128,6 +128,8 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
       return res.status(403).json({ error: 'Trying to request unauthorized students data' })
     }
 
+    // NOTE: Years are academic years
+    // TODO: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/4959
     const { startDate, endDate } = parseDateRangeFromParams({
       ...req.query,
       years: req.query.years,
