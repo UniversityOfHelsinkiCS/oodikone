@@ -59,3 +59,7 @@ RUN npm ci --omit=dev
 
 EXPOSE 8080
 CMD ["node", "dist/index.js"]
+
+# Docker knows when backend is ready to take requests
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=5 \
+  CMD curl --fail http://localhost:8080/health || exit 1
