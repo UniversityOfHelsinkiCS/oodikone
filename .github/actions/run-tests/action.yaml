@@ -43,7 +43,7 @@ runs:
 
     - name: 'Run services, pull rest of the needed images'
       shell: bash
-      run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
+      run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --no-build
 
     - name: 'Run cypress'
       uses: cypress-io/github-action@v7
