@@ -81,6 +81,25 @@ void describe('Population statistics', async () => {
     assert.notStrictEqual(res.body.students.length, 0)
   })
 
+  await it('should work with the programme flag', async () => {
+    const resBachelor = (await request(app)
+      .get(populationUrl('KH50_001', ['2021'], ['SPRING', 'FALL']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    const resMaster = (await request(app)
+      .get(populationUrl('MH50_001', ['2021'], ['SPRING', 'FALL']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    assert.strictEqual(resBachelor.status, 200)
+    assert.strictEqual(resBachelor.body.students.length, 38)
+
+    assert.strictEqual(resMaster.status, 200)
+    assert.strictEqual(resMaster.body.students.length, 36)
+  })
   // TODO: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/4959
   await it.skip('should work with semester flag', async () => {
     const resFall = (await request(app)
@@ -100,5 +119,32 @@ void describe('Population statistics', async () => {
 
     assert.strictEqual(resSpring.body.students.length, 34)
     assert.strictEqual(resSpring.body.students.length, 4)
+  })
+
+  await it('should work with year flag correctly', async () => {
+    const res2021 = (await request(app)
+      .get(populationUrl('KH50_001', ['2021'], ['FALL', 'SPRING']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+    const res2022 = (await request(app)
+      .get(populationUrl('KH50_001', ['2022'], ['FALL', 'SPRING']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    const res2021_2022 = (await request(app)
+      .get(populationUrl('KH50_001', ['2021', '2022'], ['FALL', 'SPRING']))
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+
+    assert.strictEqual(res2021.status, 200)
+    assert.strictEqual(res2022.status, 200)
+    assert.strictEqual(res2021.body.students.length, 38)
+    assert.strictEqual(res2022.body.students.length, 26)
+
+    assert.strictEqual(res2021_2022.status, 200)
+    assert.strictEqual(res2021_2022.body.students.length, 38 + 26)
   })
 })
