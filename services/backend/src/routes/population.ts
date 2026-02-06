@@ -101,7 +101,15 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
   '/v3/populationstatistics',
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights, studentsUserCanAccess } = req.user
-    const { years, semesters, programme, combinedProgramme, studentStatuses } = req.query
+    const { programme, combinedProgramme } = req.query
+
+    // NOTE: Make sure we have only arrays, "/...&years=2021" is parsed by express as years: 2021, not [2021]
+    const handleQueryArrays = <T>(requestField: T | T[]): T[] => {
+      return Array.isArray(requestField) ? requestField : [requestField]
+    }
+    const years = handleQueryArrays(req.query.years)
+    const semesters = handleQueryArrays(req.query.semesters)
+    const studentStatuses = handleQueryArrays(req.query.studentStatuses) // NOTE: TRANSFERRED means transferred out of the program
 
     const requiredFields = [years, semesters, programme]
     if (requiredFields.some(field => !field)) {
@@ -112,9 +120,11 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
       return res.status(400).json({ error: 'Semester should be either SPRING OR FALL' })
     }
 
-    const hasCorrectStatus = (studentStatuses: string[]) =>
-      studentStatuses.every(status => ['EXCHANGE', 'NONDEGREE', 'TRANSFERRED'].includes(status))
-    if (studentStatuses && !hasCorrectStatus(studentStatuses)) {
+    const hasCorrectStatus = (studentStatuses: (string | undefined)[]) =>
+      studentStatuses.every(status => status && ['EXCHANGE', 'NONDEGREE', 'TRANSFERRED'].includes(status))
+
+    // NOTE: This has always the length of at least 1, [undefined]
+    if (studentStatuses[0] && !hasCorrectStatus(studentStatuses)) {
       return res.status(400).json({ error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' })
     }
 
@@ -129,11 +139,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     }
 
     // NOTE: Years are academic years
-    // TODO: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/4959
-    const { startDate, endDate } = parseDateRangeFromParams({
-      ...req.query,
-      years: req.query.years,
-    })
+    const { startDate, endDate } = parseDateRangeFromParams({ semesters, years })
 
     const studentNumbers = await getStudentNumbersWithStudyRights({
       programmeCodes: [programme],

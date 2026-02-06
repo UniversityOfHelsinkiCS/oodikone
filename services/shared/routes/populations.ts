@@ -85,12 +85,12 @@ export type PopulationstatisticsResBody = {
 }
 export type PopulationstatisticsReqBody = never
 export type PopulationstatisticsQuery = {
-  years: string[]
-  semesters: string[]
+  years: string[] | string
+  semesters: string[] | string
   programme: string
   combinedProgramme?: string
   studyTrack?: string
-  studentStatuses?: string[]
+  studentStatuses?: string[] | string
 }
 
 // populationstatisticsbycourse
