@@ -1,5 +1,5 @@
 import Stack from '@mui/material/Stack'
-import { FC, useMemo } from 'react'
+import { useMemo, type FC, type ReactNode } from 'react'
 
 import { selectViewFilters } from '@/redux/filters'
 import { useAppSelector } from '@/redux/hooks'
@@ -15,13 +15,13 @@ import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => React.ReactNode
+  children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => ReactNode
   name: string
   filters: Filter[]
   students: Student[]
   coursestatistics: ExpandedCourseStats | undefined
   displayTray: boolean
-  initialOptions: Record<Filter['key'], any>
+  initialOptions: Record<Filter['key'], Filter['defaultOptions']>
 }> = ({ children, name, filters, students, coursestatistics, displayTray, initialOptions }) => {
   const storedOptions = useAppSelector(state => selectViewFilters(state, name))
 
@@ -37,16 +37,14 @@ export const FilterView: FC<{
   const precomputed = useMemo(
     () =>
       Object.fromEntries(
-        filters
-          .filter(({ precompute }) => precompute !== undefined)
-          .map(({ precompute, key }) => [
-            key,
-            precompute!({
-              students: students.slice(), // Copy instead of pass
-              options: filterOptions[key],
-              args: filterArgs[key],
-            }),
-          ])
+        filters.map(({ key, precompute }) => [
+          key,
+          precompute?.({
+            students: students.slice(), // Copy instead of pass
+            options: filterOptions[key],
+            args: filterArgs[key],
+          }),
+        ])
       ),
     [filters]
   )

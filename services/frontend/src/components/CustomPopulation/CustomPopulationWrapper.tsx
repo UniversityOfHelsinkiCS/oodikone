@@ -69,7 +69,7 @@ export const CustomPopulationWrapper = ({
       coursestatistics={population?.coursestatistics}
       displayTray={populationStudents.length > 0}
       filters={filters}
-      initialOptions={[]}
+      initialOptions={{}}
       name="CustomPopulation"
       students={populationStudents}
     >
