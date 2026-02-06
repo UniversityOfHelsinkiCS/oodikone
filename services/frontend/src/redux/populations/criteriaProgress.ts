@@ -33,24 +33,16 @@ const getCriteriaBase = (criteria: ProgressCriteria): [boolean, Record<string, C
 }
 
 export const getProgressCriteria = (
-  startDate: string,
   criteria: ProgressCriteria,
-  credits: any, // AnonymousCredit[],
-  hops: any // StudentStudyPlan | undefined,
+  criteriaCoursesBySubstitutionMap: Map<string, string>,
+  startDate: string,
+  hops: any, // StudentStudyPlan | undefined,
+  credits: any[] // AnonymousCredit[],
 ) => {
   const [thereAreCriteria, criteriaChecked] = getCriteriaBase(criteria)
   if (!thereAreCriteria) return criteriaChecked
 
   const startDateFromISO = new Date(startDate)
-
-  const criteriaCoursesBySubstitutionMap = new Map<string, string>()
-  for (const [courseCode, substitutionCodes] of Object.entries(criteria.allCourses)) {
-    criteriaCoursesBySubstitutionMap.set(courseCode, courseCode)
-
-    for (const substitutionCode of substitutionCodes) {
-      criteriaCoursesBySubstitutionMap.set(substitutionCode, courseCode)
-    }
-  }
 
   const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 

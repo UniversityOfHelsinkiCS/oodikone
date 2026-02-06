@@ -43,14 +43,29 @@ export const formatPopulationData = <T extends RequiredFields>(
     creditsAndEnrollmentsByStudent.get(studentnumber)![1].push(rest)
   }
 
+  const criteriaCoursesBySubstitutionMap = new Map<string, string>()
+  for (const [courseCode, substitutionCodes] of Object.entries(otherParams.criteria.allCourses)) {
+    criteriaCoursesBySubstitutionMap.set(courseCode, courseCode)
+
+    for (const substitutionCode of substitutionCodes) {
+      criteriaCoursesBySubstitutionMap.set(substitutionCode, courseCode)
+    }
+  }
+
   const formattedStudents = students.map(student => {
-    const [enrollments, courses] = creditsAndEnrollmentsByStudent.get(student.studentNumber)!
+    const [enrollments, credits] = creditsAndEnrollmentsByStudent.get(student.studentNumber)!
     const hops = student.studyplans.find(plan => plan.programme_code === code)
 
     return {
       ...student,
-      criteriaProgress: getProgressCriteria(student.studyrightStart, otherParams.criteria, credits, hops),
-      courses: courses.map(credit => {
+      criteriaProgress: getProgressCriteria(
+        otherParams.criteria,
+        criteriaCoursesBySubstitutionMap,
+        student.studyrightStart,
+        hops,
+        credits
+      ),
+      courses: credits.map(credit => {
         const passed = [CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(
           credit.credittypecode
         )
