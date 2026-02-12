@@ -3,7 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 import type { Credit, Student } from '@oodikone/shared/models'
 import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { splitByEmptySpace } from '@oodikone/shared/util'
+import { match, splitByEmptySpace } from '@oodikone/shared/util'
 import { dbConnections } from '../database/connection'
 import {
   StudentModel,
@@ -103,18 +103,16 @@ const byStudentNumber = async (studentNumber: string) => {
   }
 }
 
-const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] => {
-  switch (unifyCourses) {
-    case 'unifyStats':
-      return [true, false]
-    case 'openStats':
-      return [true]
-    case 'regularStats':
-      return [false]
-    default:
-      return [true, false]
-  }
-}
+const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] =>
+  match(
+    unifyCourses,
+    [
+      ['unifyStats', [true, false]],
+      ['openStats', [true]],
+      ['regularStats', [false]],
+    ],
+    [true, false]
+  )
 
 /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
 export const findByCourseAndSemesters = async (

@@ -14,9 +14,6 @@ const usersApi = RTKApi.injectEndpoints({
       query: uid => `/users/${uid}`,
       providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),
-    getUserFromSisuByEppn: builder.query({
-      query: eppn => `/users/from-sisu-by-eppn/${eppn}`,
-    }),
     modifyRoles: builder.mutation<void, { username: string; roles: Record<Role, boolean> }>({
       query: ({ username, roles }) => ({
         url: '/users/modify-roles',
@@ -58,20 +55,6 @@ const usersApi = RTKApi.injectEndpoints({
         body: { language },
       }),
     }),
-    addUser: builder.mutation({
-      query: user => ({
-        url: '/users/add',
-        method: 'POST',
-        body: { user },
-      }),
-    }),
-    deleteUser: builder.mutation<void, string>({
-      query: userId => ({
-        url: '/users/delete',
-        method: 'DELETE',
-        body: { userId },
-      }),
-    }),
   }),
   overrideExisting: false,
 })
@@ -80,13 +63,10 @@ export const {
   useGetUserQuery,
   useGetRolesQuery,
   useLazyGetAllUsersQuery,
-  useLazyGetUserFromSisuByEppnQuery,
   useModifyRolesMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
   useGetUserAccessEmailPreviewQuery,
   useSendUserAccessEmailMutation,
   useModifyLanguageMutation,
-  useAddUserMutation,
-  useDeleteUserMutation,
 } = usersApi

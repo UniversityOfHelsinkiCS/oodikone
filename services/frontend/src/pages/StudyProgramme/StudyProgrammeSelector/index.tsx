@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack'
 import { debounce } from 'lodash-es'
 import { useState } from 'react'
 
-import { isDefaultServiceProvider } from '@/common'
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
@@ -94,7 +93,7 @@ export const StudyProgrammeSelector = () => {
         progId: `${programme.progId} - ${secondProgramme[0]?.progId}`,
       })
     }
-    if (isDefaultServiceProvider() && programme.code.startsWith('2_')) {
+    if (programme.code.startsWith('2_')) {
       continue
     }
 

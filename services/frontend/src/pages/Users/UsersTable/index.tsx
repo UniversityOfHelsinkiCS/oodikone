@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useCallback, useMemo } from 'react'
 
-import { isDefaultServiceProvider } from '@/common'
 import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { MockButton } from '@/components/Users/MockButton'
@@ -17,7 +16,6 @@ import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 import { CopyEmailAddressesButton } from './CopyEmailAddressesButton'
-import { DeleteButton } from './DeleteButton'
 import { StatusMessage } from './StatusMessage'
 
 export const UsersTable = ({
@@ -128,9 +126,6 @@ export const UsersTable = ({
         Cell: ({ row }) => (
           <Stack direction="row" gap={1}>
             <MockButton username={row.original.username} />
-            {!isDefaultServiceProvider() && (
-              <DeleteButton getAllUsersQuery={getAllUsersQuery} userId={row.original.id} />
-            )}
           </Stack>
         ),
         enableSorting: false,
@@ -158,7 +153,7 @@ export const UsersTable = ({
         username: true,
         roles: true,
         programmeRights: true,
-        iamGroups: isDefaultServiceProvider(),
+        iamGroups: true,
         lastLogin: true,
       },
     },
