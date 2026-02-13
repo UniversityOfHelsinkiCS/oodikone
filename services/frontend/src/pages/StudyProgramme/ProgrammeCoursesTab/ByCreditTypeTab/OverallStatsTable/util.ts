@@ -1,6 +1,7 @@
 import { range } from 'lodash-es'
 
 import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
+import { createEmptyStats } from '@oodikone/shared/util/studyProgramme'
 
 export const filterDataByYear = (
   data: StudyProgrammeCourse[],
@@ -15,45 +16,36 @@ export const filterDataByYear = (
       return arr
     })
     .map(course => {
-      const values = Object.entries(course.years).reduce(
-        (acc, curr) => {
-          if (yearRange.includes(Number(curr[0]))) {
-            acc.totalAllStudents += curr[1].totalAllStudents
-            acc.totalAllPassed += curr[1].totalPassed
-            acc.totalAllNotCompleted += curr[1].totalNotCompleted
-            acc.totalAllCredits += curr[1].totalAllCredits
-            acc.totalProgrammeStudents += curr[1].totalProgrammeStudents
-            acc.totalProgrammeCredits += curr[1].totalProgrammeCredits
-            acc.totalOtherProgrammeStudents += curr[1].totalOtherProgrammeStudents
-            acc.totalOtherProgrammeCredits += curr[1].totalOtherProgrammeCredits
-            acc.totalWithoutStudyRightStudents += curr[1].totalWithoutStudyRightStudents
-            acc.totalWithoutStudyRightCredits += curr[1].totalWithoutStudyRightCredits
-            acc.totalTransferCredits += curr[1].totalTransferCredits
-            acc.totalTransferStudents += curr[1].totalTransferStudents
-          }
+      const values = Object.entries(course.years).reduce((acc, curr) => {
+        if (yearRange.includes(Number(curr[0]))) {
+          acc.allStudents += curr[1].allStudents
+          acc.allPassed += curr[1].allPassed
+          acc.allNotPassed += curr[1].allNotPassed
+          acc.allCredits += curr[1].allCredits
+          acc.degreeStudents += curr[1].degreeStudents
+          acc.degreeStudentsCredits += curr[1].degreeStudentsCredits
+          acc.exchangeStudents += curr[1].exchangeStudents
+          acc.exchangeStudentsCredits += curr[1].exchangeStudentsCredits
+          acc.otherUniversityStudents += curr[1].otherUniversityStudents
+          acc.otherUniversityCredits += curr[1].otherUniversityCredits
+          acc.otherStudents += curr[1].otherStudents
+          acc.otherStudentsCredits += curr[1].otherStudentsCredits
+          acc.transferStudents += curr[1].transferStudents
+          acc.transferStudentsCredits += curr[1].transferStudentsCredits
 
-          return acc
-        },
-        {
-          totalAllStudents: 0,
-          totalAllPassed: 0,
-          totalAllNotCompleted: 0,
-          totalAllCredits: 0,
-          totalProgrammeStudents: 0,
-          totalProgrammeCredits: 0,
-          totalOtherProgrammeStudents: 0,
-          totalOtherProgrammeCredits: 0,
-          totalWithoutStudyRightStudents: 0,
-          totalWithoutStudyRightCredits: 0,
-          totalTransferCredits: 0,
-          totalTransferStudents: 0,
+          acc.separateStudents += curr[1].separateStudents
+          acc.separateStudentsCredits += curr[1].separateStudentsCredits
+
+          acc.openStudents += curr[1].openStudents
+          acc.openStudentsCredits += curr[1].openStudentsCredits
         }
-      )
+
+        return acc
+      }, createEmptyStats(!!course.isStudyModule))
       return {
         ...values,
         code: course.code,
         name: getTextIn(course.name),
-        isStudyModule: !!course.isStudyModule,
       }
     })
 

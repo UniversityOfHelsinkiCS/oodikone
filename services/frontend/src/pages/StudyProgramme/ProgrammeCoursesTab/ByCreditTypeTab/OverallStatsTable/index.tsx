@@ -54,35 +54,49 @@ export const OverallStatsTable = ({
   ]
 
   const creditColumns = [
-    columnHelper.accessor(`totalAllCredits`, {
+    columnHelper.accessor(`allCredits`, {
       header: 'Total credits',
     }),
-    columnHelper.accessor('totalProgrammeCredits', {
-      header: 'Major credits',
+    columnHelper.group({
+      header: 'Credits produced by',
+      columns: [
+        columnHelper.accessor('degreeStudentsCredits', {
+          header: 'Degree students',
+        }),
+        columnHelper.accessor('openStudentsCredits', {
+          header: 'Open university',
+        }),
+        columnHelper.accessor('exchangeStudentsCredits', {
+          header: 'Exchange students',
+        }),
+        columnHelper.accessor('otherUniversityCredits', {
+          header: 'Other universities',
+        }),
+        columnHelper.accessor('separateStudentsCredits', {
+          header: 'Separate studies',
+        }),
+        columnHelper.accessor('otherStudentsCredits', {
+          header: 'Other', // TODO clarify
+        }),
+      ],
     }),
-    columnHelper.accessor('totalOtherProgrammeCredits', {
-      header: 'Non-major credits',
-    }),
-    columnHelper.accessor('totalWithoutStudyRightCredits', {
-      header: 'Non-degree credits',
-    }),
-    columnHelper.accessor('totalTransferCredits', {
+    columnHelper.accessor('transferStudentsCredits', {
       header: 'Transferred credits',
     }),
   ]
 
   const studentColumns = [
-    columnHelper.accessor('totalAllStudents', {
+    columnHelper.accessor('allStudents', {
       header: 'Total',
     }),
     columnHelper.group({
       id: 'breakdown',
       header: 'Breakdown of total',
       columns: [
-        columnHelper.accessor('totalAllPassed', {
+        columnHelper.accessor('allPassed', {
           header: 'Passed',
         }),
-        columnHelper.accessor('totalAllNotCompleted', {
+        columnHelper.accessor('allNotPassed', {
           header: 'Not completed',
         }),
       ],
@@ -91,14 +105,23 @@ export const OverallStatsTable = ({
       id: 'breakdown-passed',
       header: 'Breakdown of passed students',
       columns: [
-        columnHelper.accessor('totalProgrammeStudents', {
-          header: 'Major students',
+        columnHelper.accessor('degreeStudents', {
+          header: 'Degree students',
         }),
-        columnHelper.accessor('totalOtherProgrammeStudents', {
-          header: 'Non-major students',
+        columnHelper.accessor('openStudents', {
+          header: 'Open uni students',
         }),
-        columnHelper.accessor('totalWithoutStudyRightStudents', {
-          header: 'Non-degree students',
+        columnHelper.accessor('exchangeStudents', {
+          header: 'Exchange students',
+        }),
+        columnHelper.accessor('otherUniversityStudents', {
+          header: 'Other university students',
+        }),
+        columnHelper.accessor('separateStudents', {
+          header: 'Separate studies',
+        }),
+        columnHelper.accessor('otherStudents', {
+          header: 'Other students', // TODO clarify
         }),
       ],
     }),
@@ -106,7 +129,7 @@ export const OverallStatsTable = ({
       id: 'excluded',
       header: 'Not included in total or passed',
       columns: [
-        columnHelper.accessor('totalTransferStudents', {
+        columnHelper.accessor('transferStudents', {
           header: 'Transferred students',
         }),
       ],

@@ -1,201 +1,324 @@
 import { range } from 'lodash-es'
 
-import { Name, StudyProgrammeCourse } from '@oodikone/shared/types'
+import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { getOpenUniCourseCode } from '../../util'
-import { getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses, getAllProgrammeCourses } from '.'
-import {
-  getOtherStudentsForProgrammeCourses,
-  getOwnStudentsForProgrammeCourses,
-  getStudentsForProgrammeCourses,
-  getStudentsWithoutStudyRightForProgrammeCourses,
-  getTransferStudentsForProgrammeCourses,
-} from './studentGetters'
+import { createEmptyStats, yearStatNumberKeys, YearStats } from '@oodikone/shared/util/studyProgramme'
 
-const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
-  const providerCode = mapToProviders([studyProgramme])[0]
-  const normalCourses = await getAllProgrammeCourses(providerCode)
-  return normalCourses.reduce((acc, curr) => {
-    acc.push(curr.code)
-    if (curr.substitutions?.includes(`AY${curr.code}`)) {
-      acc.push(`AY${curr.code}`)
-    }
-    return acc
-  }, [] as string[])
-}
+import { getOpenUniCourseCode } from '../../util'
+import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
+import { getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
+
+const START_YEAR = 2017
+const JULY = 6
+const AUGUST = 7
 
 const getCurrentYearStartDate = () => new Date(new Date().getFullYear(), 0, 1)
 
-const getFrom = (academicYear: string, year: number) =>
-  academicYear === 'ACADEMIC_YEAR' ? new Date(year, 7, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
+const getFrom = (yearType: YearType, year: number) =>
+  yearType === 'ACADEMIC_YEAR' ? new Date(year, AUGUST, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)
 
-const getTo = (academicYear: string, year: number) =>
-  academicYear === 'ACADEMIC_YEAR' ? new Date(year + 1, 6, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
+const getTo = (yearType: YearType, year: number) =>
+  yearType === 'ACADEMIC_YEAR' ? new Date(year + 1, JULY, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
 
-const promiseKeys = ['passed', 'notCompleted', 'ownProgramme', 'noStudyright', 'otherProgramme', 'transfer'] as const
+const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
+  const providerCode = mapToProviders([studyProgramme])[0]
+  if (!providerCode) return []
 
-type CommonFields = {
+  const normalCourses = await getAllProgrammeCourses(providerCode)
+  const courseCodes = new Set<string>()
+
+  for (const course of normalCourses) {
+    courseCodes.add(course.code)
+    if (course.substitutions?.includes(`AY${course.code}`)) {
+      courseCodes.add(`AY${course.code}`)
+    }
+  }
+
+  return [...courseCodes]
+}
+
+const getYearKey = (date: Date, isAcademicYear: boolean) => {
+  const year = date.getFullYear()
+  if (!isAcademicYear) return year
+  return date.getMonth() >= 7 ? year : year - 1
+}
+
+type YearAccumulator = {
+  stats: YearStats
+  allPassed: Set<string>
+
+  degreeStudents: Set<string>
+  exchangeStudents: Set<string>
+  otherUniversityStudents: Set<string>
+  separateStudents: Set<string>
+  otherStudents: Set<string>
+
+  openStudents: Set<string>
+  transferStudents: Set<string>
+}
+
+type CourseAccumulator = {
   code: string
   name: Name
-  year: number
-  type: (typeof promiseKeys)[number]
-  isStudyModule?: boolean
+  isStudyModule: boolean
+  years: Map<number, YearAccumulator>
 }
-type YearlyFields = StudyProgrammeCourse['years'][number]
-type CombinedPromises = Promise<(CommonFields & Partial<YearlyFields>)[]>[]
 
-const makeYearlyPromises = (
-  years: number[],
-  academicYear: string,
-  type: (typeof promiseKeys)[number],
-  programmeCourses: string[],
-  studyProgramme: string
-): CombinedPromises =>
-  years.map(async year => {
-    const from = getFrom(academicYear, year)
-    const to = getTo(academicYear, year)
+const createYearAccumulator = (isStudyModule: boolean): YearAccumulator => ({
+  stats: createEmptyStats(isStudyModule),
+  allPassed: new Set(),
+  degreeStudents: new Set(),
+  exchangeStudents: new Set(),
+  otherUniversityStudents: new Set(),
+  separateStudents: new Set(),
+  otherStudents: new Set(),
 
-    const addYear = <T extends object>(course: T) => Object.assign(course, { year })
+  openStudents: new Set(),
+  transferStudents: new Set(),
+})
 
-    switch (type) {
-      case 'passed':
-        return (await getStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-      case 'notCompleted':
-        return (await getNotCompletedForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-      case 'ownProgramme':
-        return (await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
-      case 'noStudyright':
-        return (await getStudentsWithoutStudyRightForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-      case 'otherProgramme':
-        return (await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyProgramme)).map(addYear)
-      case 'transfer':
-        return (await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)).map(addYear)
-      default:
-        // This is to satisfy ts-eslint, never acually reached
-        throw new Error('Invalid arg in studyProgrammeCourses')
+const ensureCourse = (
+  courseMap: Map<string, CourseAccumulator>,
+  code: string,
+  name: Name,
+  isStudyModule: boolean
+): CourseAccumulator => {
+  if (!courseMap.has(code)) {
+    courseMap.set(code, {
+      code,
+      name,
+      isStudyModule,
+      years: new Map(),
+    })
+  }
+
+  const course = courseMap.get(code)!
+  course.isStudyModule = course.isStudyModule || isStudyModule
+  course.name = course.name ?? name
+  return course
+}
+
+const ensureYear = (course: CourseAccumulator, year: number, isStudyModule: boolean) => {
+  if (!course.years.has(year)) {
+    course.years.set(year, createYearAccumulator(isStudyModule))
+  }
+  const yearAccumulator = course.years.get(year)!
+  yearAccumulator.stats.isStudyModule ??= isStudyModule
+  return yearAccumulator
+}
+
+const finalizeYearStats = (yearAccumulator: YearAccumulator): YearStats => {
+  const { stats } = yearAccumulator
+
+  stats.allPassed = yearAccumulator.allPassed.size
+
+  stats.degreeStudents = yearAccumulator.degreeStudents.size
+  stats.exchangeStudents = yearAccumulator.exchangeStudents.size
+  stats.otherUniversityStudents = yearAccumulator.otherUniversityStudents.size
+  stats.separateStudents = yearAccumulator.separateStudents.size
+  stats.otherStudents = yearAccumulator.otherStudents.size
+
+  stats.openStudents = yearAccumulator.openStudents.size
+  stats.transferStudents = yearAccumulator.transferStudents.size
+
+  stats.allStudents = stats.allPassed + stats.allNotPassed
+
+  return stats
+}
+
+const mergeOpenUniversityCourses = (
+  courses: Record<string, StudyProgrammeCourse>,
+  yearRange: number[],
+  maxYear: number
+) => {
+  for (const code of Object.keys(courses)) {
+    if (!code.startsWith('AY')) continue
+    const match = getOpenUniCourseCode(code)
+    if (!match) continue
+    const normCode = match[1]
+    const ayCourse = courses[code]
+
+    if (!courses[normCode]) {
+      courses[normCode] = {
+        code: normCode,
+        name: ayCourse.name,
+        isStudyModule: ayCourse.isStudyModule,
+        years: {},
+      }
     }
-  })
 
-const emptyStats = {
-  totalAllStudents: 0,
-  totalPassed: 0,
-  totalNotCompleted: 0,
-  totalAllCredits: 0,
-  totalProgrammeStudents: 0,
-  totalProgrammeCredits: 0,
-  totalOtherProgrammeStudents: 0,
-  totalOtherProgrammeCredits: 0,
-  totalWithoutStudyRightStudents: 0,
-  totalWithoutStudyRightCredits: 0,
-  totalTransferCredits: 0,
-  totalTransferStudents: 0,
-} as const
+    const mergedCourse = courses[normCode]
+    yearRange
+      .filter(year => year <= maxYear)
+      .forEach(year => {
+        mergedCourse.years[year] ??= createEmptyStats(mergedCourse.isStudyModule)
+        const source = ayCourse.years[year]
+        if (!source) return
+        const target = mergedCourse.years[year]
+        yearStatNumberKeys.forEach(property => {
+          target[property] += source[property]
+        })
+        target.isStudyModule = target.isStudyModule || source.isStudyModule
+      })
+
+    delete courses[code]
+  }
+
+  return courses
+}
+
+const getYearRange = async (unixMillis: number, isAcademicYear: boolean) => {
+  const startDate = isAcademicYear ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
+  const lastYear = startDate.getFullYear()
+  return range(START_YEAR, lastYear + 1)
+}
 
 export const getStudyProgrammeCoursesForStudyTrack = async (
   unixMillis: number,
   studyProgramme: string,
-  academicYear: string,
+  academicYear: YearType,
   combinedProgramme: string
 ) => {
-  const startDate =
-    academicYear === 'ACADEMIC_YEAR' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
-  const startYear = startDate.getFullYear()
-  const yearRange = range(2017, startYear + 1)
+  const isAcademicYear = academicYear === 'ACADEMIC_YEAR'
+  const yearRange = await getYearRange(unixMillis, isAcademicYear)
+  if (yearRange.length === 0) {
+    return []
+  }
+
   const mainProgrammeCourses = await getAllStudyProgrammeCourses(studyProgramme)
   const secondProgrammeCourses = combinedProgramme ? await getAllStudyProgrammeCourses(combinedProgramme) : []
-  const programmeCourses = [...mainProgrammeCourses, ...secondProgrammeCourses]
+  const programmeCourses = [...new Set([...mainProgrammeCourses, ...secondProgrammeCourses])]
 
-  const courses = (
-    await Promise.all(
-      promiseKeys.flatMap(key => makeYearlyPromises(yearRange, academicYear, key, programmeCourses, studyProgramme))
-    )
-  ).flat()
+  if (programmeCourses.length === 0) {
+    return []
+  }
 
+  const firstYear = yearRange[0]
+  const lastYear = yearRange[yearRange.length - 1]
+  const from = getFrom(academicYear, firstYear)
+  const to = getTo(academicYear, lastYear)
+
+  const [programmeCredits, transferCredits] = await Promise.all([
+    getProgrammeCourseAggregates({
+      courseCodes: programmeCourses,
+      from,
+      to,
+    }),
+    getTransferCourseAggregates({
+      courseCodes: programmeCourses,
+      from,
+      to,
+    }),
+  ])
+
+  const courseMap = new Map<string, CourseAccumulator>()
   let maxYear = 0
-  const allCourses = courses.reduce(
-    (acc, currentCourseStats) => {
-      if (currentCourseStats.year > maxYear) {
-        maxYear = currentCourseStats.year
-      }
 
-      acc[currentCourseStats.code] ??= {
-        code: currentCourseStats.code,
-        name: currentCourseStats.name,
-        isStudyModule: !!currentCourseStats.isStudyModule,
-        years: {},
-      }
+  for (const row of programmeCredits) {
+    const attainmentDate = new Date(row.attainmentDate)
+    const year = getYearKey(attainmentDate, isAcademicYear)
 
-      acc[currentCourseStats.code].years[currentCourseStats.year] ??= {
-        ...emptyStats,
-        isStudyModule: !!currentCourseStats.isStudyModule,
-      }
+    if (!yearRange.includes(year)) continue
+    maxYear = Math.max(maxYear, year)
 
-      const currentYear = acc[currentCourseStats.code].years[currentCourseStats.year]
+    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const yearAccumulator = ensureYear(course, year, row.isStudyModule)
+    const { stats } = yearAccumulator
 
-      switch (currentCourseStats.type) {
-        case 'passed':
-          currentYear.totalPassed += currentCourseStats.totalPassed ?? 0
-          currentYear.totalAllStudents += currentYear.totalPassed
-          currentYear.totalAllCredits += currentCourseStats.totalAllCredits ?? 0
-          break
-        case 'notCompleted':
-          currentYear.totalNotCompleted += currentCourseStats.totalNotCompleted ?? 0
-          currentYear.totalAllStudents += currentYear.totalNotCompleted
-          break
-        case 'ownProgramme':
-          currentYear.totalProgrammeStudents += currentCourseStats.totalProgrammeStudents ?? 0
-          currentYear.totalProgrammeCredits += currentCourseStats.totalProgrammeCredits ?? 0
-          break
-        case 'otherProgramme':
-          currentYear.totalOtherProgrammeStudents += currentCourseStats.totalOtherProgrammeStudents ?? 0
-          currentYear.totalOtherProgrammeCredits += currentCourseStats.totalOtherProgrammeCredits ?? 0
-          break
-        case 'noStudyright':
-          currentYear.totalWithoutStudyRightStudents += currentCourseStats.totalWithoutStudyRightStudents ?? 0
-          currentYear.totalWithoutStudyRightCredits += currentCourseStats.totalWithoutStudyRightCredits ?? 0
-          break
-        case 'transfer':
-          currentYear.totalTransferStudents += currentCourseStats.totalTransferStudents ?? 0
-          currentYear.totalTransferCredits += currentCourseStats.totalTransferCredits ?? 0
-          break
-      }
-      return acc
-    },
-    {} as Record<string, StudyProgrammeCourse>
+    stats.allCredits += row.credits
+    yearAccumulator.allPassed.add(row.studentNumber)
+
+    // Order here is important
+    // e.g. degree student can have many open uni study rights => still group as degree student
+    // Open uni students should only have open uni studyrights
+    switch (row.variant) {
+      case 'degree':
+        yearAccumulator.degreeStudents.add(row.studentNumber)
+        stats.degreeStudentsCredits += row.credits
+        break
+      case 'exchange':
+        yearAccumulator.exchangeStudents.add(row.studentNumber)
+        stats.exchangeStudentsCredits += row.credits
+        break
+      case 'separate':
+        yearAccumulator.separateStudents.add(row.studentNumber)
+        stats.separateStudentsCredits += row.credits
+        break
+      case 'otherUniversity':
+        yearAccumulator.otherUniversityStudents.add(row.studentNumber)
+        stats.otherUniversityCredits += row.credits
+        break
+      case 'other':
+        yearAccumulator.otherStudents.add(row.studentNumber)
+        stats.otherStudentsCredits += row.credits
+        break
+      case 'openUni':
+        yearAccumulator.openStudents.add(row.studentNumber)
+        stats.openStudentsCredits += row.credits
+        break
+      default:
+        break
+    }
+  }
+
+  for (const row of transferCredits) {
+    const attainmentDate = new Date(row.attainmentDate)
+    const year = getYearKey(attainmentDate, isAcademicYear)
+    if (!yearRange.includes(year)) continue
+    maxYear = Math.max(maxYear, year)
+
+    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const yearAccumulator = ensureYear(course, year, row.isStudyModule)
+    yearAccumulator.transferStudents.add(row.studentNumber)
+    yearAccumulator.stats.transferStudentsCredits += row.credits
+  }
+
+  const notCompletedResults = await Promise.all(
+    yearRange.map(year => {
+      const yearFrom = getFrom(academicYear, year)
+      const yearTo = getTo(academicYear, year)
+      return getNotCompletedForProgrammeCourses(yearFrom, yearTo, programmeCourses)
+    })
   )
 
-  const ayCourses = Object.keys(allCourses).filter(courseCode => courseCode.startsWith('AY'))
-  const properties = Object.keys(emptyStats)
-
-  ayCourses.forEach(ayCourse => {
-    const openUniCourseCode = getOpenUniCourseCode(ayCourse)
-    if (!openUniCourseCode) return
-
-    const normCode = openUniCourseCode[1]
-
-    if (allCourses[normCode]) {
-      const mergedCourse = {} as StudyProgrammeCourse
-      mergedCourse.code = allCourses[normCode].code
-      mergedCourse.name = allCourses[normCode].name
-      mergedCourse.years = {}
-
-      yearRange
-        .filter(year => year <= maxYear)
-        .forEach(year => {
-          if (!allCourses[normCode].years[year]) {
-            mergedCourse.years[year] = emptyStats
-          } else {
-            mergedCourse.years[year] = { ...allCourses[normCode].years[year] }
-          }
-          if (allCourses[ayCourse].years[year]) {
-            properties.forEach(prop => {
-              mergedCourse.years[year][prop] += allCourses[ayCourse].years[year][prop]
-            })
-          }
-        })
-      allCourses[normCode] = mergedCourse
-      delete allCourses[ayCourse]
+  notCompletedResults.forEach((results, index) => {
+    const year = yearRange[index]
+    if (!results) return
+    if (results.length > 0) {
+      maxYear = Math.max(maxYear, year)
+    }
+    for (const result of results) {
+      const course = ensureCourse(courseMap, result.code, result.name, result.isStudyModule ?? false)
+      const yearAccumulator = ensureYear(course, year, result.isStudyModule ?? false)
+      yearAccumulator.stats.allNotPassed += result.allNotPassed
     }
   })
-  return Object.values(allCourses)
+
+  if (maxYear === 0) {
+    maxYear = lastYear
+  }
+
+  const coursesRecord: Record<string, StudyProgrammeCourse> = {}
+
+  for (const [code, course] of courseMap.entries()) {
+    const years: Record<number, YearStats> = {}
+    for (const [year, yearAccumulator] of course.years.entries()) {
+      if (year > maxYear) continue
+      years[year] = finalizeYearStats(yearAccumulator)
+    }
+
+    if (Object.keys(years).length === 0) {
+      continue
+    }
+
+    coursesRecord[code] = {
+      code,
+      name: course.name,
+      isStudyModule: course.isStudyModule,
+      years,
+    }
+  }
+
+  const mergedCourses = mergeOpenUniversityCourses(coursesRecord, yearRange, maxYear)
+  return Object.values(mergedCourses)
 }

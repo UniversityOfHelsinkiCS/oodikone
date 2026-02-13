@@ -1,3 +1,4 @@
+import { yearStatNumberKeys } from '../util/studyProgramme'
 import { ChartGraduationTimes, GraduationStatistics } from './graduations'
 import { Name } from './name'
 
@@ -7,20 +8,8 @@ export type StudyProgrammeCourse = {
   name: Name
   years: Record<
     number,
-    {
-      isStudyModule?: boolean
-      totalAllStudents: number
-      totalPassed: number
-      totalNotCompleted: number
-      totalAllCredits: number
-      totalProgrammeStudents: number
-      totalProgrammeCredits: number
-      totalOtherProgrammeStudents: number
-      totalOtherProgrammeCredits: number
-      totalWithoutStudyRightStudents: number
-      totalWithoutStudyRightCredits: number
-      totalTransferCredits: number
-      totalTransferStudents: number
+    Record<(typeof yearStatNumberKeys)[number], number> & {
+      isStudyModule: boolean
     }
   >
 }

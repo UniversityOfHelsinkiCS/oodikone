@@ -52,15 +52,13 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       },
     })
 
-    const allEnrollments = {} as Record<string, string[]>
+    const allEnrollments = new Map<string, Set<string>>()
     for (const { studentnumber, course_code: courseCode } of enrollmentsCourses) {
       const code = getCourseCode(courseCode)
-      if (!(code in allEnrollments)) {
-        allEnrollments[code] = []
+      if (!allEnrollments.has(code)) {
+        allEnrollments.set(code, new Set())
       }
-      if (!allEnrollments[code].includes(studentnumber)) {
-        allEnrollments[code].push(studentnumber)
-      }
+      allEnrollments.get(code)!.add(studentnumber)
     }
 
     const credits = await CreditModel.findAll({
@@ -75,7 +73,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       },
     })
 
-    const courseNames = (
+    const courseCodeToName = (
       await CourseModel.findAll({
         attributes: ['code', 'name'],
         where: {
@@ -87,63 +85,50 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       return acc
     }, new Map())
 
-    const creditCourses = credits.map(credit => {
-      return {
-        code: getCourseCode(credit.course_code),
-        studentNumber: credit.student_studentnumber,
-        creditTypeCode: credit.credittypecode,
-        courseName: courseNames.get(credit.course_code)!,
-        isStudyModule: credit.isStudyModule,
-      }
-    })
+    const creditCourses = credits.map(credit => ({
+      code: getCourseCode(credit.course_code),
+      studentNumber: credit.student_studentnumber,
+      creditTypeCode: credit.credittypecode,
+      courseName: courseCodeToName.get(credit.course_code)!,
+      isStudyModule: credit.isStudyModule,
+    }))
 
-    const passedByCourseCodes = {} as Record<string, string[]>
-    const notCompletedByCourseCodes = {} as Record<string, string[]>
-    const courses: Record<string, { code: string; name: Name; isStudyModule: boolean }> = {}
-    for (const course of creditCourses) {
-      if (!(course.code in courses)) {
-        courses[course.code] = {
-          code: course.code,
-          name: course.courseName,
-          isStudyModule: course.isStudyModule,
-        }
-        passedByCourseCodes[course.code] = []
-        notCompletedByCourseCodes[course.code] = []
+    const passedByCourseCodes = new Map<string, Set<string>>()
+    const notCompletedByCourseCodes = new Map<string, Set<string>>()
+    const courses = new Map<string, { name: Name; isStudyModule: boolean }>()
+
+    for (const { code, courseName, creditTypeCode, isStudyModule, studentNumber } of creditCourses) {
+      if (!courses.has(code)) {
+        courses.set(code, {
+          isStudyModule,
+          name: courseName,
+        })
+        passedByCourseCodes.set(code, new Set())
+        notCompletedByCourseCodes.set(code, new Set())
       }
-      if ([CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(course.creditTypeCode)) {
-        passedByCourseCodes[course.code].push(course.studentNumber)
+      if ([CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(creditTypeCode)) {
+        passedByCourseCodes.get(code)!.add(studentNumber)
       }
-      if (
-        course.creditTypeCode === CreditTypeCode.FAILED &&
-        !passedByCourseCodes[course.code].includes(course.studentNumber)
-      ) {
-        notCompletedByCourseCodes[course.code].push(course.studentNumber)
+      if (creditTypeCode === CreditTypeCode.FAILED && !passedByCourseCodes.get(code)!.has(studentNumber)) {
+        notCompletedByCourseCodes.get(code)!.add(studentNumber)
       }
     }
 
     // If student has enrollments, but no attainment for a particular course, they have no credit info.
     programmeCourses.forEach(courseCode => {
-      if (allEnrollments[courseCode]) {
-        allEnrollments[courseCode].forEach(studentnumber => {
-          if (passedByCourseCodes[courseCode] && !passedByCourseCodes[courseCode].includes(studentnumber)) {
-            notCompletedByCourseCodes[courseCode].push(studentnumber)
-          }
-        })
-      }
+      allEnrollments.get(courseCode)?.forEach(studentnumber => {
+        if (passedByCourseCodes.get(courseCode)?.has(studentnumber)) {
+          notCompletedByCourseCodes.get(courseCode)?.add(studentnumber)
+        }
+      })
     })
 
-    return Object.keys(courses)
-      .reduce<Array<{ code: string; name: Name; isStudyModule: boolean }>>(
-        (acc, val) => [...acc, { ...courses[val] }],
-        []
-      )
-      .map(course => ({
-        code: course.code,
-        name: course.name,
-        type: 'notCompleted' as const,
-        isStudyModule: course.isStudyModule,
-        totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
-      }))
+    return [...courses.entries()].map(([code, { isStudyModule, name }]) => ({
+      code,
+      name,
+      isStudyModule,
+      allNotPassed: notCompletedByCourseCodes.get(code)?.size ?? 0,
+    }))
   } catch (error) {
     logger.error(`getNotCompletedForProgrammeCourses failed ${error}`)
     return []
