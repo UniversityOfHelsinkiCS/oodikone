@@ -143,7 +143,6 @@ export const SingleStudyGuidanceGroupPanels = ({
           programme={group.tags?.studyProgramme?.split('+').at(0)}
           studyGuidanceGroup={group}
           variant="studyGuidanceGroupPopulation"
-          year={groupYear ?? undefined}
         />
       ),
     },

@@ -65,7 +65,6 @@ export const PopulationStudents = ({
   filteredCourses,
   dataExport,
   studyGuidanceGroup,
-  year,
   generalTabColumnFunction,
   generalTabFormattingFunction,
 }: PopulationStudentsProps) => {
@@ -123,7 +122,7 @@ export const PopulationStudents = ({
   > = {
     population: {
       tabs:
-        year === 'All' || (programme && !isBachelorOrLicentiateProgramme(programme))
+        Array.isArray(years) || (programme && !isBachelorOrLicentiateProgramme(programme))
           ? ['General', 'Courses', 'Modules', 'Tags']
           : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
       tooltip: populationStatisticsToolTips.studentsClass,
