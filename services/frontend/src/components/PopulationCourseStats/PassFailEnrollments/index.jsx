@@ -213,6 +213,11 @@ export const PassFailEnrollments = ({
     state: { expanded },
   }
 
+  // HACK: Courses of class "curriculum" view doesn't render otherwise
+  // Also if this is removed and "Show all ..." returns no fields,
+  // the toggle Course <-> Module get's removed.
+  if (courseTableMode === 'curriculum' && !data.length) return null
+
   return (
     <OodiTable
       columns={columns}
