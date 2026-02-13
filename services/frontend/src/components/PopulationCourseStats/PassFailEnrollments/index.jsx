@@ -11,10 +11,17 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseFilterToggle } from '../CourseFilterToggle'
+import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
 const columnHelper = createColumnHelper()
 
-export const PassFailEnrollments = ({ onlyIamRights, courseStatistics }) => {
+export const PassFailEnrollments = ({
+  onlyIamRights,
+  courseStatistics,
+  courseTableMode,
+  showModules,
+  setShowModules,
+}) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
@@ -206,14 +213,19 @@ export const PassFailEnrollments = ({ onlyIamRights, courseStatistics }) => {
     state: { expanded },
   }
 
-  if (!data.length) return null
-
   return (
     <OodiTable
       columns={columns}
       data={data}
       options={tableOptions}
-      toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />}
+      toolbarContent={
+        <>
+          <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+          {courseTableMode === 'all' && (
+            <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
+          )}
+        </>
+      }
     />
   )
 }

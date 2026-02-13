@@ -59,6 +59,7 @@ export const PopulationDetails = ({
   const [courseTableMode, setCourseTableMode] = useState<'curriculum' | 'all'>('curriculum')
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
+  const [showModules, setShowModules] = useState(false) // Shows courses if modules not selected
 
   const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected())
   const combinedHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgramme))
@@ -133,6 +134,8 @@ export const PopulationDetails = ({
             isLoading={isLoading}
             onlyIamRights={onlyIamRights}
             query={query}
+            setShowModules={setShowModules}
+            showModules={showModules}
             studentAmountLimit={studentAmountLimit}
           />
         </>

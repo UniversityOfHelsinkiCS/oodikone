@@ -17,6 +17,8 @@ export const PopulationCourses = ({
   curriculum,
   courseTableMode,
   studentAmountLimit,
+  setShowModules,
+  showModules,
 }: {
   isLoading: boolean
   query: Pick<PopulationQuery, 'programme' | 'years'>
@@ -25,6 +27,8 @@ export const PopulationCourses = ({
   curriculum: ExtendedCurriculumDetails
   courseTableMode: 'curriculum' | 'all'
   studentAmountLimit: number
+  setShowModules: (input: boolean) => void
+  showModules: boolean
 }) => {
   const tooltipText =
     courseTableMode === 'curriculum'
@@ -42,13 +46,23 @@ export const PopulationCourses = ({
       <SegmentDimmer isLoading={isLoading} />
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
+          courseTableMode={courseTableMode}
           curriculum={curriculum}
           filteredCourses={filteredCourses}
           onlyIamRights={onlyIamRights}
           pending={isLoading}
+          setShowModules={setShowModules}
+          showModules={showModules}
         />
       ) : (
-        <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
+        <PopulationCourseStatsFlat
+          courseTableMode={courseTableMode}
+          filteredCourses={filteredCourses}
+          onlyIamRights={onlyIamRights}
+          setShowModules={setShowModules}
+          showModules={showModules}
+          studentAmountLimit={studentAmountLimit}
+        />
       )}
     </>
   )

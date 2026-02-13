@@ -12,6 +12,7 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseFilterToggle } from '../CourseFilterToggle'
+import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
 const columnHelper = createColumnHelper()
 
@@ -32,7 +33,7 @@ const yearColumn = (year, cumulative) =>
     columns: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
   })
 
-export const PassingSemesters = ({ onlyIamRights, courseStatistics }) => {
+export const PassingSemesters = ({ onlyIamRights, courseStatistics, courseTableMode, showModules, setShowModules }) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
@@ -184,6 +185,9 @@ export const PassingSemesters = ({ onlyIamRights, courseStatistics }) => {
           <Button onClick={() => setCumulativeStats(!cumulativeStats)} sx={{ my: 'auto', mx: 1 }} variant="outlined">
             {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
           </Button>
+          {courseTableMode === 'all' && (
+            <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
+          )}
         </>
       }
     />

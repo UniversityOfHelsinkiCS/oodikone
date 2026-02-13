@@ -1,4 +1,4 @@
-import { Credit, Enrollment } from '../models'
+import { Credit, Enrollment, Course } from '../models'
 import {
   Name,
   ProgrammeModuleWithRelevantAttributes,
@@ -10,11 +10,7 @@ import {
 } from '../types'
 import { FormattedStudent } from '../types/studentData'
 
-export type CourseStats = {
-  code: string
-  name: Name
-  substitutions: string[]
-}
+export type CourseStats = Pick<Course, 'code' | 'name' | 'substitutions' | 'is_study_module'>
 
 export type AttainmentDates = {
   latestTotal?: Date
@@ -61,7 +57,7 @@ export type CloseToGraduationData = {
 }
 
 export type PopulationCourseStats = {
-  courses: Pick<CourseStats, 'code' | 'name' | 'substitutions'>[]
+  courses: CourseStats[]
   enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber'>[]
   credits: Pick<
     Credit,

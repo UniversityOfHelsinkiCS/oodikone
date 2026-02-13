@@ -11,6 +11,7 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseFilterToggle } from '../CourseFilterToggle'
+import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
 const mapCourseData = course =>
   course.courses
@@ -45,7 +46,13 @@ const mapCourseData = course =>
 
 const columnHelper = createColumnHelper()
 
-export const GradeDistribution = ({ onlyIamRights, courseStatistics }) => {
+export const GradeDistribution = ({
+  onlyIamRights,
+  courseStatistics,
+  courseTableMode,
+  showModules,
+  setShowModules,
+}) => {
   const { getTextIn } = useLanguage()
 
   const [expanded, setExpanded] = useState({})
@@ -165,10 +172,15 @@ export const GradeDistribution = ({ onlyIamRights, courseStatistics }) => {
       data={data}
       options={tableOptions}
       toolbarContent={
-        <OodiTableExcelExport
-          data={excelData}
-          exportColumnKeys={columns.flatMap(column => column.columns ?? [column]).map(({ header }) => header)}
-        />
+        <>
+          <OodiTableExcelExport
+            data={excelData}
+            exportColumnKeys={columns.flatMap(column => column.columns ?? [column]).map(({ header }) => header)}
+          />
+          {courseTableMode === 'all' && (
+            <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
+          )}
+        </>
       }
     />
   )

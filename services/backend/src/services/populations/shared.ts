@@ -1,6 +1,7 @@
 import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
+import { CourseStats } from '@oodikone/shared/routes/populations'
 import { Name, DegreeProgrammeType } from '@oodikone/shared/types'
 import { SISStudyRightElementModel, CourseModel } from '../../models'
 import { SemesterStart } from '../../util/semester'
@@ -75,9 +76,9 @@ export const getOptionsForStudents = (
   return optionMap
 }
 
-export const getCourses = (courses: string[]): Promise<Array<Pick<CourseModel, 'code' | 'name' | 'substitutions'>>> =>
+export const getCourses = (courses: string[]): Promise<Array<CourseStats>> =>
   CourseModel.findAll({
-    attributes: ['code', 'name', 'substitutions'],
+    attributes: ['code', 'name', 'substitutions', 'is_study_module'],
     where: {
       code: { [Op.in]: courses },
     },
