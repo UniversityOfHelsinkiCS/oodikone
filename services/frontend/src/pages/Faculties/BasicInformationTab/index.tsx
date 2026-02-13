@@ -1,7 +1,5 @@
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
-import Switch from '@mui/material/Switch'
-import Typography from '@mui/material/Typography'
 
 import { useState, type Dispatch, type SetStateAction } from 'react'
 
@@ -130,7 +128,6 @@ export const BasicInformationTab = ({
   specialGroups: boolean
   studyProgrammes: boolean
 }) => {
-  const [showAll, setShowAll] = useState(false)
   const [academicYear, setAcademicYear] = useState(false)
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
@@ -159,13 +156,13 @@ export const BasicInformationTab = ({
   const { data: degreeProgrammes } = useGetProgrammesQuery()
 
   const tableStats: { data: (number | string)[][]; titles: string[] } | null = credits.data
-    ? makeTableStats(calculateTotals(credits.data), showAll, academicYear)
+    ? makeTableStats(calculateTotals(credits.data), academicYear)
     : null
-  const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), showAll, academicYear) : null
+  const graphStats = credits.data ? makeGraphData(calculateTotals(credits.data), academicYear) : null
   const programmeStats = credits.data?.ids.reduce((obj, id) => {
     return {
       ...obj,
-      [id]: makeTableStats(credits.data![id].stats, showAll, academicYear)?.data,
+      [id]: makeTableStats(credits.data![id].stats, academicYear)?.data,
     }
   }, {})
 
@@ -179,10 +176,17 @@ export const BasicInformationTab = ({
   const thesisWritersIsError = thesisWriters.isError || (thesisWriters.isSuccess && !thesisWriters.data)
   const hasErrors = basicsIsError || creditsIsError || thesisWritersIsError
 
-  const creditSortingTitles = ['Code', 'Total', 'Degree', 'Exchange', 'Open uni', 'Transferred']
-  if (showAll) {
-    creditSortingTitles.splice(5, 0, 'Other uni', 'Separate')
-  }
+  const creditSortingTitles = [
+    'Code',
+    'Total',
+    'Degree',
+    'Exchange',
+    'Open uni',
+    'Other uni',
+    'Separate',
+    'Transferred',
+    'Other',
+  ]
 
   const transferShortTitles = ['Code', 'Started', 'Accepted', 'Graduated']
   if (special === 'SPECIAL_INCLUDED') {
@@ -334,12 +338,6 @@ export const BasicInformationTab = ({
         title="Credits produced by the faculty"
       >
         <Stack gap={2}>
-          <Stack alignItems="center">
-            <Stack alignItems="center" direction="row">
-              <Switch checked={showAll} onChange={() => setShowAll(!showAll)} />
-              <Typography>Show special categories</Typography>
-            </Stack>
-          </Stack>
           {credits.isSuccess && credits.data ? (
             <Stack gap={2}>
               <StackedBarChart

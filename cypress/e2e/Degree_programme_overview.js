@@ -93,31 +93,14 @@ describe('Degree programme overview', () => {
     it('Basic information contains correct credits', () => {
       const years = getEmptyYears()
       const tableContents = [
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        [2023, 1519, 1519, 0, 0, 222],
-        [2022, 3235, 3205, 0, 30, 209],
-        [2021, 5133, 5108, 0, 25, 428],
-        [2020, 5801, 5796, 0, 5, 94],
-        [2019, 5305, 5305, 0, 0, 162],
-        [2018, 3442, 3432, 0, 10, 21],
-        [2017, 1211, 1211, 0, 0, 189],
-      ]
-
-      cy.checkTableStats(tableContents, 'credits-produced-by-the-study-programme')
-    })
-
-    it("Toggling 'Show special categories' on displays additional information", () => {
-      cy.cs('special-categories-toggle').click()
-      const years = getEmptyYears()
-      const tableContents = [
-        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0]),
-        [2023, 1519, 1519, 0, 0, 0, 0, 222],
-        [2022, 3235, 3205, 0, 30, 0, 0, 209],
-        [2021, 5133, 5108, 0, 25, 0, 0, 428],
-        [2020, 5801, 5796, 0, 5, 0, 0, 94],
-        [2019, 5305, 5305, 0, 0, 0, 0, 162],
-        [2018, 3442, 3432, 0, 10, 0, 0, 21],
-        [2017, 1211, 1211, 0, 0, 0, 0, 189],
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
+        [2023, 1519, 1519, 0, 0, 0, 0, 222, 0],
+        [2022, 3235, 3205, 0, 30, 0, 0, 209, 0],
+        [2021, 5133, 5108, 0, 25, 0, 0, 428, 0],
+        [2020, 5801, 5796, 0, 5, 0, 0, 94, 0],
+        [2019, 5305, 5305, 0, 0, 0, 0, 162, 0],
+        [2018, 3442, 3432, 0, 10, 0, 0, 21, 0],
+        [2017, 1211, 1211, 0, 0, 0, 0, 189, 0],
       ]
 
       cy.checkTableStats(tableContents, 'credits-produced-by-the-study-programme')
@@ -190,14 +173,14 @@ describe('Degree programme overview', () => {
       cy.checkTableStats(studentTableContents, 'students-of-the-study-programme')
 
       const creditTableContents = [
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        ['2023 - 2024', 160, 160, 0, 0, 67],
-        ['2022 - 2023', 2725, 2720, 0, 5, 337],
-        ['2021 - 2022', 4092, 4042, 0, 50, 198],
-        ['2020 - 2021', 5420, 5415, 0, 5, 321],
-        ['2019 - 2020', 6043, 6043, 0, 0, 101],
-        ['2018 - 2019', 4856, 4851, 0, 5, 107],
-        ['2017 - 2018', 2350, 2345, 0, 5, 26],
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
+        ['2023 - 2024', 160, 160, 0, 0, 0, 0, 67, 0],
+        ['2022 - 2023', 2725, 2720, 0, 5, 0, 0, 337, 0],
+        ['2021 - 2022', 4092, 4042, 0, 50, 0, 0, 198, 0],
+        ['2020 - 2021', 5420, 5415, 0, 5, 0, 0, 321, 0],
+        ['2019 - 2020', 6043, 6043, 0, 0, 0, 0, 101, 0],
+        ['2018 - 2019', 4856, 4851, 0, 5, 0, 0, 107, 0],
+        ['2017 - 2018', 2350, 2345, 0, 5, 0, 0, 26, 0],
       ]
 
       cy.checkTableStats(creditTableContents, 'credits-produced-by-the-study-programme')

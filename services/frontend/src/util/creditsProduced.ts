@@ -7,11 +7,7 @@ const getFormattedYear = (year: number, isAcademicYear: boolean) => {
   return `${year}`
 }
 
-export const makeGraphData = (
-  data: Record<string, Record<string, number>> | undefined,
-  showAll: boolean,
-  isAcademicYear: boolean
-) => {
+export const makeGraphData = (data: Record<string, Record<string, number>> | undefined, isAcademicYear: boolean) => {
   if (!data) {
     return null
   }
@@ -20,8 +16,7 @@ export const makeGraphData = (
     ...new Set(
       Object.keys(data)
         .flatMap(year => Object.keys(data[year]))
-        .filter(key => key !== 'total' && key !== 'other')
-        .filter(key => showAll || !['agreement', 'separate'].includes(key))
+        .filter(key => key !== 'total')
     ),
   ]
 
@@ -32,6 +27,7 @@ export const makeGraphData = (
     'open-uni': 'Open university',
     transferred: 'Transferred',
     'incoming-exchange': 'Exchange students',
+    other: 'Other',
   }
 
   const years: string[] = []
@@ -52,11 +48,7 @@ export const makeGraphData = (
   return { data: graphStats, years }
 }
 
-export const makeTableStats = (
-  data: Record<string, Record<string, number>> | undefined,
-  showAll: boolean,
-  isAcademicYear: boolean
-) => {
+export const makeTableStats = (data: Record<string, Record<string, number>> | undefined, isAcademicYear: boolean) => {
   if (!data) {
     return null
   }
@@ -71,27 +63,34 @@ export const makeTableStats = (
     const separate = yearData?.separate || 0
     const agreement = yearData?.agreement || 0
     const transferred = yearData?.transferred || 0
+    const other = yearData?.other || 0
     const total = basic + openUni + exchange + separate + agreement
 
-    // TODO: Other-category missing for now, clarify what go in that, and fix those
     const yearStats = [
       getFormattedYear(year, isAcademicYear),
       Math.round(total),
       Math.round(basic),
       Math.round(exchange),
       Math.round(openUni),
+      Math.round(agreement),
+      Math.round(separate),
       Math.round(transferred),
+      Math.round(other),
     ]
-    if (showAll) {
-      yearStats.splice(5, 0, Math.round(agreement), Math.round(separate))
-    }
     tableStats.push(yearStats)
   }
 
-  const titles = ['Code', 'Total', 'Degree students', 'Exchange students', 'Open university', 'Transferred']
-  if (showAll) {
-    titles.splice(5, 0, 'Other university', 'Separate')
-  }
+  const titles = [
+    'Code',
+    'Total',
+    'Degree students',
+    'Exchange students',
+    'Open university',
+    'Other university',
+    'Separate',
+    'Transferred',
+    'Other',
+  ]
 
   return { data: tableStats, titles }
 }

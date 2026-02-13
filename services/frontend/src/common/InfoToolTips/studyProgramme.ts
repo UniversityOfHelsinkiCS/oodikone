@@ -35,11 +35,11 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
     **Transferred**: Hyväksiluetut opintopisteet. Tilastointipäivämäärä on hyväksilukupäivämäärä, eli vaikka suoritus olisi vuodelta 2021, jos opintopiste hyväksiluetaan 2024, se lasketaan vuodelle 2024.
 
-    Lisäksi painamalla "Show special categories" -valintaa, saat näkyviin myös harvinaisemmat kategoriat:
-
     **Separate**: Opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
 
     **Other university**: Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opiskeluoikeudella.
+
+    **Other**: Sisältää tohtorin- ja lisensiaatintutkintoon liittyvät opintopisteet, täydennyskoulutuksen, erikoistumiskoulutuksen, erikoislääkäri- ja erikoishammaslääkärikoulutuksen sekä lukiolaisten opintopisteet.
   `,
   creditsOfProgrammeCourses: `
     Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan.

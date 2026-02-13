@@ -1,6 +1,5 @@
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
-import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
@@ -45,7 +44,6 @@ export const BasicInformationTab = ({
   specialGroupsExcluded: boolean
   studyProgramme: string
 }) => {
-  const [showAll, setShowAll] = useState(false)
   const [showMedian, setShowMedian] = useState(false)
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
@@ -69,12 +67,12 @@ export const BasicInformationTab = ({
   })
 
   const creditStats = credits.data?.[studyProgramme]?.stats
-  const tableStats = makeTableStats(creditStats, showAll, academicYear)
-  const creditGraphStats = makeGraphData(creditStats, showAll, academicYear)
+  const tableStats = makeTableStats(creditStats, academicYear)
+  const creditGraphStats = makeGraphData(creditStats, academicYear)
 
   const secondStats = credits.data?.[combinedProgramme]?.stats
-  const secondTableStats = secondStats ? makeTableStats(secondStats, showAll, academicYear) : null
-  const secondCreditGraphStats = secondStats ? makeGraphData(secondStats, showAll, academicYear) : null
+  const secondTableStats = secondStats ? makeTableStats(secondStats, academicYear) : null
+  const secondCreditGraphStats = secondStats ? makeGraphData(secondStats, academicYear) : null
 
   const doCombo = graduations?.data?.doCombo
   const timesData = graduations?.data?.graduationTimes
@@ -153,12 +151,6 @@ export const BasicInformationTab = ({
       >
         {creditGraphStats && tableStats && isDefaultServiceProvider() ? (
           <Stack gap={2}>
-            <Stack alignItems="center">
-              <Stack alignItems="center" direction="row">
-                <Switch checked={showAll} data-cy="special-categories-toggle" onChange={() => setShowAll(!showAll)} />
-                <Typography>Show special categories</Typography>
-              </Stack>
-            </Stack>
             <StackedBarChart
               cypress="credits-produced-by-the-study-programme"
               data={creditGraphStats.data}

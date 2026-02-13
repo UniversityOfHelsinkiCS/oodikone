@@ -47,14 +47,12 @@ const basicDegreeExtentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCo
   This is probably very rare to cause differences, only one such was found in MH60_001
 */
 
-// TODO: How should licentiate and doctorate studies be categorized?
 const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: ExtentCode) => {
   if (degreeStudyRightExtentCode && basicDegreeExtentCodes.includes(degreeStudyRightExtentCode)) {
     return 'basic'
   }
   switch (extentCode) {
     case ExtentCode.OPEN_UNIVERSITY_STUDIES:
-    case ExtentCode.SUMMER_AND_WINTER_SCHOOL:
       return 'open-uni'
     case ExtentCode.MASTER:
     case ExtentCode.BACHELOR_AND_MASTER:
@@ -63,6 +61,7 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
     case ExtentCode.NON_DEGREE_STUDIES:
     case ExtentCode.NON_DEGREE_PEGAGOGICAL_STUDIES_FOR_TEACHERS:
     case ExtentCode.NON_DEGREE_PROGRAMME_FOR_SPECIAL_EDUCATION_TEACHERS:
+    case ExtentCode.SPECIALIZATION_STUDIES:
       return 'separate'
     case ExtentCode.EXCHANGE_STUDIES:
     case ExtentCode.EXCHANGE_STUDIES_POSTGRADUATE:
@@ -72,9 +71,9 @@ const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: Exten
     case ExtentCode.DOCTOR:
     case ExtentCode.LICENTIATE:
     case ExtentCode.CONTINUING_EDUCATION:
-    case ExtentCode.SPECIALIZATION_STUDIES:
     case ExtentCode.SPECIALIST_TRAINING_IN_MEDICINE_AND_DENTISTRY:
     case ExtentCode.STUDIES_FOR_SECONDARY_SCHOOL_STUDENTS:
+    case ExtentCode.SUMMER_AND_WINTER_SCHOOL:
     case undefined:
       return 'other'
     default:
