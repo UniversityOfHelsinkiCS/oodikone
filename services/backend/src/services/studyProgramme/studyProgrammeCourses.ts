@@ -2,9 +2,8 @@ import { range } from 'lodash-es'
 
 import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
 import { mapToProviders } from '@oodikone/shared/util'
-import { createEmptyStats, yearStatNumberKeys, YearStats } from '@oodikone/shared/util/studyProgramme'
+import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 
-import { getOpenUniCourseCode } from '../../util'
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
 import { getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
 
@@ -124,47 +123,6 @@ const finalizeYearStats = (yearAccumulator: YearAccumulator): YearStats => {
   stats.allStudents = stats.allPassed + stats.allNotPassed
 
   return stats
-}
-
-const mergeOpenUniversityCourses = (
-  courses: Record<string, StudyProgrammeCourse>,
-  yearRange: number[],
-  maxYear: number
-) => {
-  for (const code of Object.keys(courses)) {
-    if (!code.startsWith('AY')) continue
-    const match = getOpenUniCourseCode(code)
-    if (!match) continue
-    const normCode = match[1]
-    const ayCourse = courses[code]
-
-    if (!courses[normCode]) {
-      courses[normCode] = {
-        code: normCode,
-        name: ayCourse.name,
-        isStudyModule: ayCourse.isStudyModule,
-        years: {},
-      }
-    }
-
-    const mergedCourse = courses[normCode]
-    yearRange
-      .filter(year => year <= maxYear)
-      .forEach(year => {
-        mergedCourse.years[year] ??= createEmptyStats(mergedCourse.isStudyModule)
-        const source = ayCourse.years[year]
-        if (!source) return
-        const target = mergedCourse.years[year]
-        yearStatNumberKeys.forEach(property => {
-          target[property] += source[property]
-        })
-        target.isStudyModule = target.isStudyModule || source.isStudyModule
-      })
-
-    delete courses[code]
-  }
-
-  return courses
 }
 
 const getYearRange = async (unixMillis: number, isAcademicYear: boolean) => {
@@ -319,6 +277,5 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     }
   }
 
-  const mergedCourses = mergeOpenUniversityCourses(coursesRecord, yearRange, maxYear)
-  return Object.values(mergedCourses)
+  return Object.values(coursesRecord)
 }
