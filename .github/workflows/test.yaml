@@ -204,6 +204,25 @@ jobs:
             exit 1;
           fi
 
+      - name: 'Save Docker images for downstream jobs'
+        run: |
+          docker save \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db \
+            redis:7.2.6 \
+            postgres:15.10 \
+            "quay.io/toska/jami:production" \
+            nginx:latest \
+          | zstd -T0 -3 -o /tmp/docker-images.tar.zst
+
+      - name: 'Upload Docker images artifact'
+        uses: actions/upload-artifact@v6
+        with:
+          name: docker-images
+          path: /tmp/docker-images.tar.zst
+          retention-days: 1
+
       - name: 'Print logs on failure'
         if: failure()
         run: docker compose --file docker-compose.ci.yml --profile oodikone logs
@@ -224,6 +243,15 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
+
+      - name: 'Download Docker images'
+        uses: actions/download-artifact@v7
+        with:
+          name: docker-images
+          path: /tmp
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v3
@@ -287,6 +315,15 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
+
+      - name: 'Download Docker images'
+        uses: actions/download-artifact@v7
+        with:
+          name: docker-images
+          path: /tmp
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
