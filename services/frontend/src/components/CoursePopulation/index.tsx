@@ -102,12 +102,17 @@ export const CoursePopulation = () => {
     }
   }
 
-  const { dateFrom, dateTo } = getFromToDates(from, to, separate ? JSON.parse(separate) : false)
+  const isSeparate = separate ? JSON.parse(separate) : false
+  const { dateFrom, dateTo } = getFromToDates(from, to, isSeparate)
 
   // Dates must be set
   if (!dateFrom || !dateTo) return null
 
-  const dateRange = `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
+  const singleSemester =
+    from === to && isSeparate ? Object.values(allSemesters).find(s => s.semestercode === Number(from)) : null
+  const dateRange = singleSemester
+    ? (getTextIn(singleSemester.name) ?? '')
+    : `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
   if (!population || !semesters) return <PageLoading isLoading />
 
