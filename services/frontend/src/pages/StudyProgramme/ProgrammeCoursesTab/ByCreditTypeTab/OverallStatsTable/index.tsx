@@ -2,6 +2,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
+import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
@@ -76,7 +77,7 @@ export const OverallStatsTable = ({
           header: 'Separate studies',
         }),
         columnHelper.accessor('otherStudentsCredits', {
-          header: 'Other', // TODO clarify
+          header: 'Other',
         }),
       ],
     }),
@@ -87,7 +88,7 @@ export const OverallStatsTable = ({
 
   const studentColumns = [
     columnHelper.accessor('allStudents', {
-      header: 'Total',
+      header: 'Total students',
     }),
     columnHelper.group({
       id: 'breakdown',
@@ -97,13 +98,18 @@ export const OverallStatsTable = ({
           header: 'Passed',
         }),
         columnHelper.accessor('allNotPassed', {
-          header: 'Not completed',
+          header: _ => (
+            <TableHeaderWithTooltip
+              header="Not Completed"
+              tooltipText="Opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät saaneet arvosanaa tai ovat saaneet hylätyn arvosanan."
+            />
+          ),
         }),
       ],
     }),
     columnHelper.group({
       id: 'breakdown-passed',
-      header: 'Breakdown of passed students',
+      header: 'Breakdown of passed',
       columns: [
         columnHelper.accessor('degreeStudents', {
           header: 'Degree students',
@@ -121,7 +127,7 @@ export const OverallStatsTable = ({
           header: 'Separate studies',
         }),
         columnHelper.accessor('otherStudents', {
-          header: 'Other students', // TODO clarify
+          header: 'Other students',
         }),
       ],
     }),
@@ -130,7 +136,7 @@ export const OverallStatsTable = ({
       header: 'Not included in total or passed',
       columns: [
         columnHelper.accessor('transferStudents', {
-          header: 'Transferred students',
+          header: 'Students with transferred credits',
         }),
       ],
     }),

@@ -100,6 +100,7 @@ export const ByCreditTypeTab = ({
             <Toggle
               cypress="show-credits-students-toggle"
               firstLabel="Show credits"
+              infoBoxContent={studyProgrammeToolTips.programmeCoursesStudentSwitch}
               secondLabel="Show students"
               setValue={setShowStudents}
               value={showStudents}

@@ -60,6 +60,10 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
     Huom: Oodi/Sisu -datassa olevien puutteiden vuoksi kategorioiden välillä voi esiintyä pieniä eroja (esim. suoritukseen ei liitetty opinto-oikeutta, suoritus kirjattu opinto-oikeuden voimassaoloaikojen ulkopuolelle, yms.).
   `,
+  programmeCoursesStudentSwitch: `
+    **Show credits**: Näyttää hyväksytyistä suorituksesta kertyneet **opintopisteet**  
+    **Show students**: Näyttää kaikki ilmoittautuneet ja/tai arvosanan saaneet **opiskelijat**
+  `,
   graduatedAndThesisWritersOfTheProgramme: `
     **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
 
