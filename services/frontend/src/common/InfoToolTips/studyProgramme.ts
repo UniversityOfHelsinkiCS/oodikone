@@ -41,33 +41,24 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
     **Other**: Sisältää tohtorin- ja lisensiaatintutkintoon liittyvät opintopisteet, täydennyskoulutuksen, erikoistumiskoulutuksen, erikoislääkäri- ja erikoishammaslääkärikoulutuksen sekä lukiolaisten opintopisteet.
   `,
-  creditsOfProgrammeCourses: `
-    Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan.
+  programmeCoursesByCreditType: `
+    Opintopisteet ja opiskelijamäärät suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Mukana ovat kurssit ja opintokokonaisuudet.
 
-    **Major credits**: Sisältää ne opintopisteet, joiden suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan. Sisältää myös ohjelmaan siirtyneet ensisijaiset opiskelijat.
+    **Degree students**: Suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus koulutusohjelmaan (alempi tai ylempi). Sisältää myös ohjelmaan siirtyneet ensisijaiset opiskelijat.
 
-    **Non-major credits**: Sisältää koulutusohjelman tuottamat opintopisteet, joiden suorittajalla ei ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan.
-    Sisältää esimerkiksi vaihto-opiskelijat ja erillisopinto-oikeudella opiskelevat. Sisältää myös opintopisteet, jotka opiskelija on suorittanut koulutusohjelmaan ennen opintojen aloittamista koulutusohjelmassa tai opintojen päätyttyä.
+    **Open university**: Suorittajalla on ollut suoritushetkellä vain avoimen yliopiston opinto-oikeus.
 
-    **Non-degree credits**: Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
+    **Exchange students**: Vaihto-opiskelijan opinto-oikeudella tehdyt suoritukset.
 
-    **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. **Luku ei sisälly total-sarakkeeseen**.
+    **Other universities**: Korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opinto-oikeudella tehdyt suoritukset.
+    
+    **Separate studies**: Erillisopinto-oikeudella tai opettajankoulutuksen erillisopinto-oikeudella tehdyt suoritukset.
 
-    **Type**: Kertoo onko kyseessä kurssi (course) vai opintokokonaisuus (module).
-  `,
-  studentsOfProgrammeCourses: `
-    Sisältää kurssien opiskelijat.
+    **Other**: Täydennyskoulutuksen, tohtoreiden, lisensiaattien, lääketieteen/hammaslääketieteen/eläinlääketieten -erikoistumisopintojen, lukiolaisten ja kesäkoulun opinto-oikeuksilla tehdyt suoritukset.
 
-    **Not completed**: Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
+    **Transferred credits**: Hyväksiluetut suoritukset (ei lasketa total-sarakkeisiin).
 
-    **Major students**: Sisältää opiskelijat, joilla on ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan.
-
-    **Non-major students**: Sisältää kurssin opiskelijat, joilla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan. Sisältää
-    esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat.
-
-    **Transferred students**: Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet. Lukua **ei lasketa mukaan Total-sarakkeeseen**.
-
-    **Type**: Kertoo onko kyseessä kurssi (course) vai opintokokonaisuus (module).
+    Huom: Oodi/Sisu -datassa olevien puutteiden vuoksi kategorioiden välillä voi esiintyä pieniä eroja (esim. suoritukseen ei liitetty opinto-oikeutta, suoritus kirjattu opinto-oikeuden voimassaoloaikojen ulkopuolelle, yms.).
   `,
   graduatedAndThesisWritersOfTheProgramme: `
     **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
