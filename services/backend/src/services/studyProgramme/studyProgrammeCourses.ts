@@ -186,9 +186,6 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     stats.allCredits += row.credits
     yearAccumulator.allPassed.add(row.studentNumber)
 
-    // Order here is important
-    // e.g. degree student can have many open uni study rights => still group as degree student
-    // Open uni students should only have open uni studyrights
     switch (row.variant) {
       case 'degree':
         yearAccumulator.degreeStudents.add(row.studentNumber)

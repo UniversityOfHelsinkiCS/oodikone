@@ -53,6 +53,19 @@ export type TransferCourseCreditRow = {
 
 const { sequelize } = dbConnections
 
+/**
+NOTE:
+ 1. There are some attainments that are linked to a valid study right, but the attainmentdate
+    is outside the study right's validity period. (maybe human error when the credits were registered)
+ 2. There are some attainments with no attached study right at all.
+ 3. Possibly some other edge cases.
+
+ Such cases get variant "none" and are not included in any category
+
+ Order of cases is somewhat important. refer to linjaukset.md, but TLDR;
+   degree student -> has any degree (bsc / msc) study right in the university
+   openuni -> only if no other study rights
+**/
 export const getProgrammeCourseAggregates = async (params: {
   courseCodes: string[]
   from: Date
