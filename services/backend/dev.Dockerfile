@@ -10,4 +10,4 @@ COPY . .
 RUN npm ci
 
 EXPOSE 8080
-CMD ["node_modules/.bin/tsx", "watch", "--clear-screen=false", "index.ts"]
+CMD ["node_modules/.bin/nodemon", "--exec", "node --import tsx index.ts", "--ext", "ts,js,json", "--watch", "src", "--watch", "index.ts", "--legacy-watch"]
