@@ -96,7 +96,7 @@ describe('Degree programme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0]),
         [2023, 1519, 1519, 0, 0, 0, 0, 222, 0],
         [2022, 3235, 3205, 0, 30, 0, 0, 209, 0],
-        [2021, 5133, 5108, 0, 25, 0, 0, 428, 0],
+        [2021, 5133, 5108, 0, 25, 0, 0, 428, 25],
         [2020, 5801, 5796, 0, 5, 0, 0, 94, 0],
         [2019, 5305, 5305, 0, 0, 0, 0, 162, 0],
         [2018, 3442, 3432, 0, 10, 0, 0, 21, 0],
@@ -177,7 +177,7 @@ describe('Degree programme overview', () => {
         ['2023 - 2024', 160, 160, 0, 0, 0, 0, 67, 0],
         ['2022 - 2023', 2725, 2720, 0, 5, 0, 0, 337, 0],
         ['2021 - 2022', 4092, 4042, 0, 50, 0, 0, 198, 0],
-        ['2020 - 2021', 5420, 5415, 0, 5, 0, 0, 321, 0],
+        ['2020 - 2021', 5420, 5415, 0, 5, 0, 0, 321, 25],
         ['2019 - 2020', 6043, 6043, 0, 0, 0, 0, 101, 0],
         ['2018 - 2019', 4856, 4851, 0, 5, 0, 0, 107, 0],
         ['2017 - 2018', 2350, 2345, 0, 5, 0, 0, 26, 0],
@@ -522,12 +522,12 @@ describe('Degree programme overview', () => {
         })
         cy.get('tbody').within(() => {
           cy.get('tr')
-            .eq(9)
+            .eq(8)
             .within(() => {
               cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT21001')
-              cy.get('td').eq(2).contains('Lineaarialgebra ja matriisilaskenta II')
-              cy.get('td').eq(3).contains('1220')
+              cy.get('td').eq(1).contains('MAT11004')
+              cy.get('td').eq(2).contains('Differentiaalilaskenta')
+              cy.get('td').eq(3).contains('1170')
             })
         })
       })
@@ -565,7 +565,7 @@ describe('Degree programme overview', () => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT11001')
               cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('1330')
+              cy.get('td').eq(3).contains('1220')
             })
         })
       })
@@ -624,13 +624,31 @@ describe('Degree programme overview', () => {
       })
 
       it("'Show credits/Show students' toggle works", () => {
-        cy.get('thead tr').within(() => {
-          cy.get('th').should('have.length', 8)
-          const headers = ['Type', 'Code', 'Name', 'Total', 'Major', 'Non-major', 'Non-degree', 'Transferred']
-          headers.forEach((header, index) => {
-            cy.get('th').eq(index).contains(header)
+        cy.get('thead tr')
+          .eq(0)
+          .within(() => {
+            cy.get('th').should('have.length', 6)
+            const headers = ['Type', 'Code', 'Name', 'Total credits', 'Credits produced by', 'Transferred credits']
+            headers.forEach((header, index) => {
+              cy.get('th').eq(index).contains(header)
+            })
           })
-        })
+        cy.get('thead tr')
+          .eq(1)
+          .within(() => {
+            cy.get('th').should('have.length', 6)
+            const headers = [
+              'Degree students',
+              'Open university',
+              'Exchange students',
+              'Other universities',
+              'Separate studies',
+              'Other',
+            ]
+            headers.forEach((header, index) => {
+              cy.get('th').eq(index).contains(header)
+            })
+          })
 
         cy.cs('show-credits-students-toggle').click()
 
@@ -654,13 +672,16 @@ describe('Degree programme overview', () => {
         cy.get('thead tr')
           .eq(1)
           .within(() => {
-            cy.get('th').should('have.length', 6)
+            cy.get('th').should('have.length', 9)
             const headers = [
               'Passed',
               'Not completed',
-              'Major students',
-              'Non-major students',
-              'Non-degree students',
+              'Degree students',
+              'Open uni students',
+              'Exchange students',
+              'Other university students',
+              'Separate studies',
+              'Other students',
               'Transferred students',
             ]
             headers.forEach((header, index) => {
@@ -675,7 +696,7 @@ describe('Degree programme overview', () => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT11001')
               cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('309')
+              cy.get('td').eq(3).contains('375')
             })
         })
       })
