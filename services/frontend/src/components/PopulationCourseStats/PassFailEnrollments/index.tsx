@@ -19,7 +19,7 @@ const columnHelper = createColumnHelper<CourseModule | (FilteredCourse & { name:
 
 export const PassFailEnrollments = ({
   courseStatistics,
-  onlyIamRights = true,
+  onlyIamRights = false,
   courseTableMode,
   showModules,
   setShowModules,
