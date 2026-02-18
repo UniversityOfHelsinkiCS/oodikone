@@ -74,7 +74,7 @@ export const PassFailEnrollments = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        maxSize: 100, // Hand picked magic number
+        maxSize: 400, // quick and dirty
         header: 'Name',
         cell: ({ row }) => {
           const name = getTextIn(row.original.name)
