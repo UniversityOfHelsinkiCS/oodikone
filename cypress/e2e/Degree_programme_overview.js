@@ -662,7 +662,7 @@ describe('Degree programme overview', () => {
               'Name',
               'Total',
               'Breakdown of total',
-              'Breakdown of passed students',
+              'Breakdown of passed',
               'Not included in total or passed',
             ]
             headers.forEach((header, index) => {
