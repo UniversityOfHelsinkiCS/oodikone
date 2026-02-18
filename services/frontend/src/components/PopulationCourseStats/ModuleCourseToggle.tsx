@@ -1,6 +1,12 @@
 import { Toggle } from '@/components/common/toggle/Toggle'
 
-export const ModuleCourseToggle = ({ showModules, setShowModules }) => {
+export const ModuleCourseToggle = ({
+  showModules,
+  setShowModules,
+}: {
+  showModules: boolean
+  setShowModules: (input: boolean) => void
+}) => {
   return (
     <Toggle
       cypress="module-course-toggle"

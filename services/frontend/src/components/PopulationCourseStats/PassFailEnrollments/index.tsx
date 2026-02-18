@@ -10,17 +10,25 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
+import { CourseModule, FilteredCourse, FilteredCourseModule } from '@/util/coursesOfPopulation'
+import { Name } from '@oodikone/shared/types'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
-const columnHelper = createColumnHelper()
+const columnHelper = createColumnHelper<CourseModule | (FilteredCourse & { name: Name; code: string })>()
 
 export const PassFailEnrollments = ({
-  onlyIamRights,
   courseStatistics,
+  onlyIamRights = true,
   courseTableMode,
   showModules,
   setShowModules,
+}: {
+  courseStatistics: CourseModule[] | FilteredCourseModule[]
+  onlyIamRights?: boolean
+  courseTableMode?: 'all' | 'curriculum'
+  showModules?: boolean
+  setShowModules?: (input: boolean) => void
 }) => {
   const { getTextIn } = useLanguage()
 
@@ -28,20 +36,19 @@ export const PassFailEnrollments = ({
 
   const [data, excelData] = useMemo(() => {
     const excelData = courseStatistics
-      // Export only the courses, not the modules
       .flatMap(row => row?.courses ?? [row])
       .map(({ name, code, stats }) => ({
         Name: getTextIn(name),
         Code: code,
-        'Total students': stats.totalStudents,
-        Passed: stats.passed,
-        Failed: stats.failed,
-        'Enrolled, no grade': stats.totalEnrolledNoGrade,
-        'Pass rate': calculatePercentage(stats.passed, stats.totalStudents),
-        'Attempts total': stats.attempts,
-        'Attempts per student': stats.perStudent,
-        'Passed%': calculatePercentage(stats.passedOfPopulation, 100),
-        'Attempted%': calculatePercentage(stats.triedOfPopulation, 100),
+        'Total students': stats?.totalStudents,
+        Passed: stats?.passed,
+        Failed: stats?.failed,
+        'Enrolled, no grade': stats?.totalEnrolledNoGrade,
+        'Pass rate': calculatePercentage(stats?.passed ?? 0, stats?.totalStudents ?? 1),
+        'Attempts total': stats?.attempts,
+        'Attempts per student': stats?.perStudent,
+        'Passed%': calculatePercentage(stats?.passedOfPopulation ?? 0, 100),
+        'Attempted%': calculatePercentage(stats?.triedOfPopulation ?? 0, 100),
       }))
 
     return [courseStatistics, excelData]
@@ -67,7 +74,7 @@ export const PassFailEnrollments = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        maxSize: '32em', // Hand picked magic number
+        maxSize: 100, // Hand picked magic number
         header: 'Name',
         cell: ({ row }) => {
           const name = getTextIn(row.original.name)
@@ -90,7 +97,7 @@ export const PassFailEnrollments = ({
           const linkComponent =
             row.originalSubRows === undefined ? (
               <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
-                <CourseFilterToggle courseCode={code} courseName={name} />
+                <CourseFilterToggle courseCode={code} courseName={name ?? ''} />
                 {!onlyIamRights ? (
                   <Link
                     to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&unifyOpenUniCourses=false`}
@@ -119,7 +126,8 @@ export const PassFailEnrollments = ({
             </Stack>
           )
         },
-        sortingFn: (rowA, rowB) => getTextIn(rowA.original.name)?.localeCompare(getTextIn(rowB.original.name)) ?? 0,
+        sortingFn: (rowA, rowB) =>
+          getTextIn(rowA.original.name)?.localeCompare(getTextIn(rowB.original.name) ?? '') ?? 0,
       }),
       columnHelper.accessor('code', { header: 'Code' }),
       columnHelper.group({
@@ -226,9 +234,11 @@ export const PassFailEnrollments = ({
       toolbarContent={
         <>
           <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-          {courseTableMode === 'all' && (
-            <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
-          )}
+          {courseTableMode === 'all' &&
+            showModules !== undefined &&
+            setShowModules !== undefined && ( // Check if optional fields are set
+              <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
+            )}
         </>
       }
     />

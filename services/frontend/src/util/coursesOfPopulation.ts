@@ -1,10 +1,42 @@
 import { ExpandedCourseStats } from '@/redux/populations/util'
 import { CourseStats } from '@oodikone/shared/routes/populations'
-import { CreditTypeCode, EnrollmentState, FormattedStudent } from '@oodikone/shared/types'
+import {
+  CreditTypeCode,
+  EnrollmentState,
+  FormattedStudent,
+  Module,
+  Name,
+  ProgrammeCourse,
+} from '@oodikone/shared/types'
 
 type EnrollmentObject = {
   [EnrollmentState.ENROLLED]: string[]
   [EnrollmentState.REJECTED]: string[]
+}
+
+export type CourseModule = Pick<Module, 'code'> & {
+  name: Name
+  courses: FilteredProgrammeCourse[]
+  stats?: FilteredCourseStats
+}
+export type FilteredProgrammeCourse = FilteredCourse & ProgrammeCourse
+export type FilteredCourseModule = FilteredCourse & { name: Name; code: string }
+
+export type FilteredCourseStats = {
+  attempts: number
+  failed: number
+  improvedPassedGrade: number
+  passed: number
+  passedOfPopulation: number
+  passingSemesters: Record<string, number> // Key can also be BEFORE or LATER
+  passingSemestersCumulative: Record<string, number>
+  perStudent: number
+  percentage: number
+  percentageWithEnrollments: number
+  students: number
+  totalEnrolledNoGrade: number
+  totalStudents: number
+  triedOfPopulation: number
 }
 
 export type FilteredCourse = {
@@ -24,22 +56,7 @@ export type FilteredCourse = {
       }
     }
   >
-  stats: {
-    attempts: number
-    failed: number
-    improvedPassedGrade: number
-    passed: number
-    passedOfPopulation: number
-    passingSemesters: Record<string, number> // Key can also be BEFORE or LATER
-    passingSemestersCumulative: Record<string, number>
-    perStudent: number
-    percentage: number
-    percentageWithEnrollments: number
-    students: number
-    totalEnrolledNoGrade: number
-    totalStudents: number
-    triedOfPopulation: number
-  }
+  stats: FilteredCourseStats
   students: {
     all: string[]
     enrolledNoGrade: string[]

@@ -38,7 +38,6 @@ export type {
   GraduationTimes,
   MedianEntry,
   Module,
-  CourseModule,
   ProgrammeCourse,
   ProgrammeModule,
   ProgrammeOrStudyTrackGraduationStats,

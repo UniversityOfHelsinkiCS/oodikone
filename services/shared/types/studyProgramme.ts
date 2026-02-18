@@ -131,5 +131,3 @@ export type Module = {
   courses: ProgrammeCourse[]
   order: number
 }
-
-export type CourseModule = Omit<Module, 'order'> & { name: Name }

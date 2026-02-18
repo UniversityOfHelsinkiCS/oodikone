@@ -4,9 +4,9 @@ import { orderBy } from 'lodash-es'
 import { useState, useEffect } from 'react'
 
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
-import { FilteredCourse } from '@/util/coursesOfPopulation'
+import { FilteredCourse, FilteredCourseStats, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
-import type { Module, CourseModule, Name, CurriculumDetails, ProgrammeCourse } from '@oodikone/shared/types'
+import type { Module, Name, CurriculumDetails } from '@oodikone/shared/types'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
@@ -43,35 +43,50 @@ export const PopulationCourseStats = ({
   const [tab, setTab] = useState(0)
 
   useEffect(() => {
-    const modules: Record<string, Module & { module: { code: string; name: Name } }> = (filteredCourses ?? [])
+    // Change courses type from FilteredCourse[] to FilteredProgrammeCourse[] + add module-field to object so we can deconstruct it below
+    const modules: Record<
+      string,
+      Omit<Module, 'courses'> & { courses: FilteredProgrammeCourse[] } & {
+        module: { code: string; name: Name; stats?: FilteredCourseStats }
+      }
+    > = (filteredCourses ?? [])
       .filter(({ course }) => visibleCoursesFilter(course, curriculum))
       // it needs to be with flatMap and filter and not map and find
       // because there can be many mandatoryCourses with the same course code
       // as they can belong to many categories
       .flatMap(course => {
-        const defaultProgrammeCourses: (ProgrammeCourse & FilteredCourse)[] = curriculum.defaultProgrammeCourses
+        const defaultProgrammeCourses: FilteredProgrammeCourse[] = curriculum.defaultProgrammeCourses
           .filter(pg => pg.code === course.course.code)
           .map(programmeCourse => ({ ...course, ...programmeCourse }))
 
-        const secondProgrammeCourses: (ProgrammeCourse & FilteredCourse)[] = curriculum.secondProgrammeCourses
+        const secondProgrammeCourses: FilteredProgrammeCourse[] = curriculum.secondProgrammeCourses
           .filter(pg => pg.code === course.course.code)
           .map(programmeCourse => ({ ...course, ...programmeCourse }))
 
         return [defaultProgrammeCourses, secondProgrammeCourses].flat()
       })
       .reduce((modules, course) => {
-        // FIXME: This is sus, I don't know if this assertion holds. CHECK!
-        modules[course.parent_code!] ??= { module: { code: course.parent_code, name: course.parent_name }, courses: [] }
+        modules[course.parent_code!] ??= {
+          module: { code: course.parent_code, name: course.parent_name, stats: {} },
+          courses: [],
+        }
         modules[course.parent_code!].courses.push(course)
 
         return modules
       }, {})
+
+    // Add statistics to modules
+    Object.keys(modules).map(parentCode => {
+      const moduleWithCode = filteredCourses.find(course => course.course.code === parentCode)
+      modules[parentCode].module.stats = moduleWithCode?.stats
+    })
 
     setModules(
       orderBy(
         Object.values(modules).map(({ module, courses }) => ({
           name: module.name,
           code: module.code,
+          stats: module.stats,
           courses,
         })),
         item => item.code
