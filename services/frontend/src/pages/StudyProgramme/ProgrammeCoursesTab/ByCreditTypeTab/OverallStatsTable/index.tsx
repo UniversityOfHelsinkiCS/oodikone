@@ -100,7 +100,7 @@ export const OverallStatsTable = ({
         columnHelper.accessor('allNotPassed', {
           header: _ => (
             <TableHeaderWithTooltip
-              header="Not Completed"
+              header="Not completed"
               tooltipText="Opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät saaneet arvosanaa tai ovat saaneet hylätyn arvosanan."
             />
           ),

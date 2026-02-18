@@ -682,7 +682,7 @@ describe('Degree programme overview', () => {
               'Other university students',
               'Separate studies',
               'Other students',
-              'Transferred students',
+              'Students with transferred credits',
             ]
             headers.forEach((header, index) => {
               cy.get('th').eq(index).contains(header)
