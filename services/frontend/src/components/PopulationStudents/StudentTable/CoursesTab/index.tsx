@@ -47,8 +47,8 @@ export type CourseTabModule = {
 const studentMapper = (
   student: FormattedStudent,
   includeSubstitutions: boolean,
-  curriculumCourseCodes,
-  substituteToPrimaryCodes
+  curriculumCourseCodes: string[],
+  substituteToPrimaryCodes: Record<string, string[]>
 ) => {
   const courseMap = {}
 

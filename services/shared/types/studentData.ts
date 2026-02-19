@@ -100,6 +100,18 @@ export type StudentPageStudent = {
   sisPersonId: string
 }
 
+export type StudentCourse = {
+  course_code: string
+  date: string
+  passed: boolean
+  grade: string
+  credits: number
+  isStudyModuleCredit: boolean
+  credittypecode: CreditTypeCode
+  language: string
+  studyright_id: string
+}
+
 export type FormattedStudent = {
   obfuscated?: true
 
@@ -128,16 +140,6 @@ export type FormattedStudent = {
   transferSource: string | undefined
   studyRights: StudentStudyRight[]
   studyplans: StudentStudyPlan[]
-  courses: {
-    course_code: string
-    date: string
-    passed: boolean
-    grade: string
-    credits: number
-    isStudyModuleCredit: boolean
-    credittypecode: CreditTypeCode
-    language: string
-    studyright_id: string
-  }[]
+  courses: StudentCourse[]
   enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studyright_id'>[]
 }

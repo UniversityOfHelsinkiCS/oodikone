@@ -105,7 +105,7 @@ export const PopulationStudents = ({
     Progress: (
       <ProgressTab
         curriculum={curriculum}
-        months={months}
+        months={months ?? Infinity}
         programme={programme}
         students={filteredStudents}
         studyGuidanceGroupProgramme={programme}
