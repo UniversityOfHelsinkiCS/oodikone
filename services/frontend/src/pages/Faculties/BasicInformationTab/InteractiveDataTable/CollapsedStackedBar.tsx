@@ -7,14 +7,12 @@ import exporting from 'highcharts/modules/exporting'
 import ReactHighcharts from 'react-highcharts'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { theme } from '@/theme'
 import { NameWithCode } from '@oodikone/shared/types'
 
 exporting(ReactHighcharts.Highcharts)
 exportData(ReactHighcharts.Highcharts)
 accessibility(ReactHighcharts.Highcharts)
-
-// TODO: Move to theme
-const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
 export const CollapsedStackedBar = ({
   data,
@@ -39,7 +37,12 @@ export const CollapsedStackedBar = ({
     names[0] += ' (new in faculty)'
   }
   const dataTranspose = transpose(data)
-    .map((obj, index) => ({ name: names[index], data: obj, color: colors[index], type: 'bar' as const }))
+    .map((obj, index) => ({
+      name: names[index],
+      data: obj,
+      color: theme.palette.graphColors[index],
+      type: 'bar' as const,
+    }))
     .reverse()
 
   const differenceArray: Record<string, Record<string, number>> = Object.keys(differenceData).reduce(

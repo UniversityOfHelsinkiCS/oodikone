@@ -83,6 +83,7 @@ const baseTheme = {
       doctor: blueGrey[200],
       postgrad: blueGrey[300],
     },
+    graphColors: ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1'],
   },
 } as const
 
