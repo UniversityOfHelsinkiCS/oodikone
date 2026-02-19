@@ -147,10 +147,10 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
               )!
               return {
                 statutory: !!enrollment.statutoryAbsence,
-                startDate: dayjs(startDate).toDate(),
+                startDate: dayjs(startDate),
                 // endDate is by default the startDate of the upcoming semester (e.g. fall semester ends at 1st Jan, instead of 31 Dec)
                 // this would mess up the calculations
-                endDate: dayjs(endDate).subtract(1, 'day').toDate(),
+                endDate: dayjs(endDate).subtract(1, 'day'),
               }
             }) ?? []
 
@@ -158,14 +158,11 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
         let nonStatutoryAbsences = 0
         let toSubtract = 0
 
-        for (const absence of absentSemesters) {
-          const semesterStart = dayjs(absence.startDate)
-          const semesterEnd = dayjs(absence.endDate)
+        for (const { statutory, startDate, endDate } of absentSemesters) {
+          const start = sreStart.isAfter(startDate) ? sreStart : startDate
+          const end = sreEnd.isBefore(endDate) ? sreEnd : endDate
 
-          const start = sreStart.isAfter(semesterStart) ? sreStart : semesterStart
-          const end = sreEnd.isBefore(semesterEnd) ? sreEnd : semesterEnd
-
-          if (absence.statutory) {
+          if (statutory) {
             toSubtract += monthsVisited(start, end)
           } else if (nonStatutoryAbsences < 2) {
             nonStatutoryAbsences++
