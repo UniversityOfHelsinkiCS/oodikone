@@ -9,6 +9,10 @@ export const getTimestamp = () => formatDate(new Date(), DateFormat.ISO_DATE)
 
 export const isWithinSixMonths = (date: string | Date) => dayjs(date) > dayjs().subtract(6, 'months')
 
+/** example: 25th of January - 1st of March = 3 months visited */
+export const monthsVisited = (start: Dayjs, end: Dayjs) =>
+  end.startOf('month').diff(start.startOf('month'), 'month') + 1
+
 export const reformatDate = (date: string | Date | null | undefined, outputFormat: string) =>
   formatDate(date, outputFormat as DateFormat)
 

@@ -94,6 +94,7 @@ export const useFormat = ({
     getOption,
     getSemesterEnrollments,
     getGraduationDate,
+    getStudyTimeMonths,
     getCombinedGraduationDate,
     getStartYearAtUniversity,
     getPrimaryProgramme,
@@ -110,7 +111,7 @@ export const useFormat = ({
     getTVEX,
     getExtent,
     getUpdatedAt,
-  } = useGeneratePrimitiveFunctions(variant)
+  } = useGeneratePrimitiveFunctions(variant, allSemesters)
 
   const getStudentSemesterEnrollmentContent = getSemesterEnrollmentsContent({
     getTextIn,
@@ -214,6 +215,7 @@ export const useFormat = ({
       graduationDate: getGraduationDate(studentBlob),
       graduationDateCombinedProg:
         !!combinedProgramme || showBachelorAndMaster ? getCombinedGraduationDate(studentBlob) : null,
+      studyTimeMonths: isMastersProgramme ? getStudyTimeMonths(studentBlob) : null,
       startYearAtUniversity: getStartYearAtUniversity(studentBlob),
       associatedProgramme: relatedProgrammeMap?.get(student.studentNumber),
       primaryProgramme: getPrimaryProgramme(studentBlob),

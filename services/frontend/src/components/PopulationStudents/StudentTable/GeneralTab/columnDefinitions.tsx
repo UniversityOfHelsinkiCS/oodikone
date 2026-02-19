@@ -10,6 +10,8 @@ import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { creditDateFilter } from '@/components/FilterView/filters'
+import { useFilters } from '@/components/FilterView/useFilters'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
@@ -20,18 +22,25 @@ import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 
-export const useGetColumnDefinitions = ({
-  getTextIn,
-  useFilterSelector,
+type GeneralTabColDefProps = {
+  programme: string | undefined
+  combinedProgramme: string | undefined
+  isMastersProgramme: boolean
+  includePrimaryProgramme: boolean
+  year: string | undefined
+}
 
+export const useGetColumnDefinitions = ({
   programme,
   combinedProgramme,
   isMastersProgramme,
   includePrimaryProgramme,
   year,
-}): ColumnDef<FormattedStudentData, any>[] => {
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+}: GeneralTabColDefProps): ColumnDef<FormattedStudentData, any>[] => {
+  const { getTextIn } = useLanguage()
+  const { useFilterSelector } = useFilters()
   const { setStatusNotification, closeNotification } = useStatusNotification()
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
 
   return useMemo(
     () => [
@@ -190,9 +199,21 @@ export const useGetColumnDefinitions = ({
           )
         },
       }),
-
       columnHelper.accessor('graduationDate', {
         header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
+      }),
+      columnHelper.accessor('studyTimeMonths', {
+        header: _ => (
+          <TableHeaderWithTooltip
+            header="Study time in months"
+            tooltipText={`Time passed since starting in the master's programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
+
+            **Example:**  
+            from 31st of January to 1st of March = 3 months  
+            from 1st of January to 30th of March = 3 months
+            `}
+          />
+        ),
       }),
       columnHelper.accessor('graduationDateCombinedProg', {
         header: _ => {

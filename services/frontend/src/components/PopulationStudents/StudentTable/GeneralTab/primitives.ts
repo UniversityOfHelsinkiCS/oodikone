@@ -1,7 +1,14 @@
-import { getAllProgrammesOfStudent, getStudentTotalCredits, getStudyRightStatusText } from '@/common'
+import dayjs from 'dayjs'
+import {
+  getAllProgrammesOfStudent,
+  getSemestersBetweenRange,
+  getStudentTotalCredits,
+  getStudyRightStatusText,
+} from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { formatDate } from '@/util/timeAndDate'
+import { SemestersData } from '@/redux/semesters'
+import { formatDate, monthsVisited } from '@/util/timeAndDate'
 
 import { EnrollmentType } from '@oodikone/shared/types'
 import type {
@@ -28,7 +35,7 @@ export type StudentBlob = Student & {
 
 const nullFunction = (_: StudentBlob) => null
 
-export const useGeneratePrimitiveFunctions = (variant: Variant) => {
+export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: SemestersData['semesters']) => {
   const { getTextIn } = useLanguage()
 
   const variantIsOneOf = (...options: Variant[]): boolean => options.includes(variant)
@@ -115,6 +122,59 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
   const getGraduationDate = variantIsOneOf('population', 'customPopulation', 'studyGuidanceGroupPopulation')
     ? ({ relevantStudyRightElement }: StudentBlob) =>
         relevantStudyRightElement?.graduated ? formatDate(relevantStudyRightElement.endDate, DateFormat.ISO_DATE) : null
+    : nullFunction
+
+  /** Study time in months rounded up not counting allowed absences */
+  const getStudyTimeMonths = variantIsOneOf('population')
+    ? ({ relevantStudyRight, relevantStudyRightElement }: StudentBlob) => {
+        if (!relevantStudyRightElement?.graduated) return null
+
+        const sreStart = dayjs(relevantStudyRightElement.startDate)
+        const sreEnd = dayjs(relevantStudyRightElement.endDate)
+
+        const relevantSemesters = getSemestersBetweenRange(sreStart, sreEnd, allSemesters)
+        const relevantSemesterCodes = relevantSemesters.map(s => s.semestercode)
+
+        const absentSemesters =
+          relevantStudyRight?.semesterEnrollments
+            ?.filter(
+              enrollment =>
+                relevantSemesterCodes.includes(enrollment.semester) && enrollment.type === EnrollmentType.ABSENT
+            )
+            .map(enrollment => {
+              const { startdate: startDate, enddate: endDate } = relevantSemesters.find(
+                rs => rs.semestercode === enrollment.semester
+              )!
+              return {
+                statutory: !!enrollment.statutoryAbsence,
+                startDate: dayjs(startDate).toDate(),
+                // endDate is by default the startDate of the upcoming semester (e.g. fall semester ends at 1st Jan, instead of 31 Dec)
+                // this would mess up the calculations
+                endDate: dayjs(endDate).subtract(1, 'day').toDate(),
+              }
+            }) ?? []
+
+        // Any number of statutory absences and 2 regular absences allowed
+        let nonStatutoryAbsences = 0
+        let toSubtract = 0
+
+        for (const absence of absentSemesters) {
+          const semesterStart = dayjs(absence.startDate)
+          const semesterEnd = dayjs(absence.endDate)
+
+          const start = sreStart.isAfter(semesterStart) ? sreStart : semesterStart
+          const end = sreEnd.isBefore(semesterEnd) ? sreEnd : semesterEnd
+
+          if (absence.statutory) {
+            toSubtract += monthsVisited(start, end)
+          } else if (nonStatutoryAbsences < 2) {
+            nonStatutoryAbsences++
+            toSubtract += monthsVisited(start, end)
+          }
+        }
+
+        return monthsVisited(sreStart, sreEnd) - toSubtract
+      }
     : nullFunction
 
   const getCombinedGraduationDate = variantIsOneOf('population', 'studyGuidanceGroupPopulation')
@@ -258,6 +318,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant) => {
     getOption,
     getSemesterEnrollments,
     getGraduationDate,
+    getStudyTimeMonths,
     getCombinedGraduationDate,
     getStartYearAtUniversity,
     getPrimaryProgramme,

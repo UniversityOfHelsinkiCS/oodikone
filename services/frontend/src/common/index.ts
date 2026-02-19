@@ -1,5 +1,7 @@
-import dayjs, { extend as dayjsExtend } from 'dayjs'
+import dayjs, { Dayjs, extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { maxBy, orderBy, range } from 'lodash-es'
 
 import { serviceProvider } from '@/conf'
@@ -18,6 +20,8 @@ import {
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
 dayjsExtend(isBetween)
+dayjsExtend(isSameOrAfter)
+dayjsExtend(isSameOrBefore)
 
 export const isFall = (semester: number) => semester % 2 === 1
 
@@ -343,6 +347,19 @@ export const getSemesterCodeAt = (allSemesters?: SemestersData['semesters'], tar
       new Date(semester.startdate) <= new Date(targetDate) && new Date(semester.enddate) >= new Date(targetDate)
   )?.semestercode
 }
+
+/**
+ * @returns all semesters from semesterEnrollments that occurred partially or fully during a given period
+ */
+export const getSemestersBetweenRange = (start: Dayjs, end: Dayjs, allSemesters?: SemestersData['semesters']) =>
+  Object.values(allSemesters ?? {}).filter(semester => {
+    const semesterStart = dayjs(semester.startdate)
+    const semesterEnd = dayjs(semester.enddate)
+
+    return dayjs(semesterStart).isSameOrBefore(end)
+      ? semesterEnd.isSameOrAfter(start)
+      : semesterStart.isSameOrBefore(end) && semesterEnd.isSameOrAfter(start)
+  })
 
 /**
  * Extracts items from a string separated by commas, semicolons, spaces, or newlines.

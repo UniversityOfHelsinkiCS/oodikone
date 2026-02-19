@@ -4,8 +4,6 @@ import { ReactNode, useMemo } from 'react'
 
 import { isMastersProgramme } from '@/common'
 import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
-import { useFilters } from '@/components/FilterView/useFilters'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -41,6 +39,7 @@ export type FormattedStudentData = {
     }[]
   } | null
   graduationDate: string | null
+  studyTimeMonths: number | null
   graduationDateCombinedProg: string | null
   startYearAtUniversity: number | null
   associatedProgramme: string | undefined
@@ -83,15 +82,10 @@ export const GeneralTab = ({
   columnFunction: () => [string[], string[]]
   formattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
-  const { getTextIn } = useLanguage()
-  const { useFilterSelector } = useFilters()
   const { data: degreeProgrammes } = useGetProgrammesQuery()
   const { isAdmin } = useGetAuthorizedUserQuery()
 
   const columns = useGetColumnDefinitions({
-    getTextIn,
-    useFilterSelector,
-
     programme,
     combinedProgramme,
     includePrimaryProgramme,
