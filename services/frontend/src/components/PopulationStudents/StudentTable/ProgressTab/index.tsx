@@ -244,16 +244,22 @@ export const ProgressTable = ({
     3: 'Passive',
   }
 
-  const getSemesterEnrollmentVal = (student: FormattedStudent, semesters: number[]) => {
+  const getSemesterEnrollmentStatus = (student: FormattedStudent, semesters: number[]) => {
     const fall =
       studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
         semester => semester.semester === Math.min(...semesters)
       )?.type ?? 0
+
     const spring =
       studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
         semester => semester.semester === Math.max(...semesters)
       )?.type ?? 0
 
+    return { fall, spring }
+  }
+
+  const getSemesterEnrollmentVal = (student: FormattedStudent, semesters: number[]) => {
+    const { fall, spring } = getSemesterEnrollmentStatus(student, semesters)
     return [helpTexts[fall], helpTexts[spring]]
   }
 
@@ -283,6 +289,21 @@ export const ProgressTable = ({
     )
   }
 
+  const getSortingValue = (student: FormattedStudent, label: Label, year: string) => {
+    // Values:
+    // -1 Course completed
+    // 0 Failed
+    // 1 Enrolled
+    // 2 None of aove
+    const criteriaCourses = student.criteriaProgress[year]?.coursesSatisfied
+    const course = criteriaCourses?.[label.code]
+
+    if (course) return -1
+    if (student.courses.find(course => course.course_code === label.code)?.passed === false) return 0
+    if (!course && hasEnrolled(student, label.code)) return 1
+    return 2
+  }
+
   const createContent = (labels: Label[], year: string, start: dayjs.Dayjs, end: dayjs.Dayjs, semesters: number[]) => {
     return (
       labels?.map(label =>
@@ -307,6 +328,31 @@ export const ProgressTable = ({
                 </Typography>
               </Tooltip>
             )
+          },
+          invertSorting: true,
+          sortingFn: (rowA, rowB) => {
+            switch (label.code) {
+              case 'Credits':
+                // NOTE: Convert boolean to int: (true -> 1, false -> 0) with + operator
+                // Also notice rowB rowA order
+                return +rowB.original.criteriaProgress[year].credits - +rowA.original.criteriaProgress[year].credits
+
+              case 'Criteria':
+                // NOTE: rowB rowA order
+                return (
+                  rowB.original.criteriaProgress[year].totalSatisfied -
+                  rowA.original.criteriaProgress[year].totalSatisfied
+                )
+
+              case 'Enrollment': {
+                const semestersA = getSemesterEnrollmentStatus(rowA.original, semesters)
+                const semestersB = getSemesterEnrollmentStatus(rowB.original, semesters)
+                return semestersA.fall + semestersA.spring - (semestersB.fall + semestersB.spring)
+              }
+
+              default:
+                return getSortingValue(rowA.original, label, year) - getSortingValue(rowB.original, label, year)
+            }
           },
         })
       ) ?? []
