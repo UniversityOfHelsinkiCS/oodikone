@@ -152,7 +152,7 @@ const getCriteriaHeaders = (months: number, programme: string) => {
 
 type Label = {
   code: string
-  name: Name
+  name: Name | null
 }
 
 export const ProgressTable = ({
@@ -180,14 +180,14 @@ export const ProgressTable = ({
   const defaultCourses = keyBy(curriculum?.defaultProgrammeCourses, 'code')
   const coursesSecondProgramme = keyBy(curriculum?.secondProgrammeCourses, 'code')
 
-  const getCourseName = (courseCode: string): Name => {
+  const getCourseName = (courseCode: string): Name | null => {
     if (defaultCourses[courseCode]) {
       return defaultCourses[courseCode].name
     }
     if (coursesSecondProgramme[courseCode]) {
       return coursesSecondProgramme[courseCode].name
     }
-    return { fi: '', sv: '', en: '' }
+    return null
   }
 
   const labelCriteria = Object.keys(criteria?.courses ?? {}).reduce<Record<string, Label[]>>((acc, year, index) => {
@@ -308,7 +308,7 @@ export const ProgressTable = ({
     return (
       labels?.map(label =>
         columnHelper.accessor(() => undefined, {
-          id: `${year}-${label.code}-${label.name.fi}`,
+          id: `${year}-${label.code}-${label.name?.fi ?? ''}`,
           header: getTextIn(label.name) ?? label.code,
           cell: ({ row: { original: student } }) => {
             const title = label.code.includes('Criteria')
