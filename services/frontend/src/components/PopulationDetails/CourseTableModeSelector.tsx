@@ -19,7 +19,6 @@ type CourseTableModeSelectorProps = {
   setCurriculum: Dispatch<SetStateAction<CurriculumOption | null>>
   studentAmountLimit: number
   onStudentAmountLimitChange: (input: string) => void
-  showModules: boolean
 }
 
 export const CourseTableModeSelector = ({
@@ -30,7 +29,6 @@ export const CourseTableModeSelector = ({
   curriculumList,
   setCurriculum,
   studentAmountLimit,
-  showModules,
 }: CourseTableModeSelectorProps) => (
   <RadioGroup>
     <Box>
@@ -59,7 +57,6 @@ export const CourseTableModeSelector = ({
             <StudentAmountLimiter
               disabled={courseTableMode !== 'all'}
               onStudentAmountLimitChange={value => onStudentAmountLimitChange(value.toString())}
-              showModules={showModules}
               studentAmountLimit={studentAmountLimit}
             />
           </>

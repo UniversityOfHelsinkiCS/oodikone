@@ -126,7 +126,6 @@ export const PopulationDetails = ({
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             setCourseTableMode={setCourseTableMode}
             setCurriculum={setCurriculum}
-            showModules={showModules}
             studentAmountLimit={studentAmountLimit}
           />
           <PopulationCourses

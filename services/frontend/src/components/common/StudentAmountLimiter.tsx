@@ -6,15 +6,13 @@ export const StudentAmountLimiter = ({
   onStudentAmountLimitChange,
   studentAmountLimit,
   disabled = false,
-  showModules = false,
 }: {
   onStudentAmountLimitChange: (value: string | number) => void
   studentAmountLimit: number
-  showModules?: boolean
   disabled?: boolean
 }) => (
   <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-    <Typography fontWeight={500}>Show all {showModules ? 'modules' : 'courses'} with at least</Typography>
+    <Typography fontWeight={500}>Show all courses or modules with at least</Typography>
     <NumericTextField
       disabled={disabled}
       initialValue={studentAmountLimit}
