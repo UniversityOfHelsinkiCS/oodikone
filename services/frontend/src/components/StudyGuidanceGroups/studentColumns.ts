@@ -17,6 +17,8 @@ export const useColumns = ({ group }: { group: GroupsWithTags }): [string[], str
         'citizenships',
         'programmeStatus',
         'creditsHops',
+        'creditsBeforeStarting',
+        'coursesBeforeStarting',
         'curriculumPeriod',
         'graduationDate',
         'gender',
