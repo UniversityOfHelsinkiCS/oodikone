@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 
-import { sendFeedbackToToska } from '../services/mailService'
+import { sendFeedback } from '../services/mailService'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
@@ -20,7 +20,7 @@ router.post('/email', async (req: EmailRequest, res: Response) => {
     throw new ApplicationError('User not found', 404)
   }
 
-  await sendFeedbackToToska({
+  await sendFeedback({
     feedbackContent: content,
     user,
   })
