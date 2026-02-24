@@ -1,7 +1,7 @@
 import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
-export const useColumns = ({ showCombinedProgrammeColumns, isMastersProgramme }): [string[], string[]] => {
+export const useColumns = ({ showCombinedProgrammeColumns }): [string[], string[]] => {
   const { isAdmin } = useGetAuthorizedUserQuery()
   const { visible: namesVisible } = useStudentNameVisibility()
 
@@ -10,8 +10,6 @@ export const useColumns = ({ showCombinedProgrammeColumns, isMastersProgramme })
   const combinedProgrammeColumns = showCombinedProgrammeColumns
     ? ['graduationDateCombinedProg', 'creditsCombinedProg']
     : []
-
-  const mastersProgrammeColumns = isMastersProgramme ? ['studyTimeMonths'] : []
 
   const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
 
@@ -34,6 +32,7 @@ export const useColumns = ({ showCombinedProgrammeColumns, isMastersProgramme })
       'programmeStatus',
       'option',
       'semesterEnrollments',
+      'studyTimeMonths',
       'graduationDate',
       'startYearAtUniversity',
       'transferredFrom',
@@ -45,7 +44,6 @@ export const useColumns = ({ showCombinedProgrammeColumns, isMastersProgramme })
       'tvex',
       'tags',
       ...combinedProgrammeColumns,
-      ...mastersProgrammeColumns,
       ...adminColumns,
     ],
     excelRequired,

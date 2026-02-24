@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import { useEffect, useState } from 'react'
 
-import { isMastersProgramme } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { Link } from '@/components/common/Link'
 import { PanelView } from '@/components/common/PanelView'
@@ -154,7 +153,6 @@ export const PopulationDetails = ({
               generalTabColumnFunction={() =>
                 columnsGeneralTab({
                   showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
-                  isMastersProgramme: isMastersProgramme(query.programme),
                 })
               }
               generalTabFormattingFunction={() =>

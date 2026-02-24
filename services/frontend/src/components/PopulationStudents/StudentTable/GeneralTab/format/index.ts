@@ -220,7 +220,7 @@ export const useFormat = ({
       graduationDate: getGraduationDate(studentBlob),
       graduationDateCombinedProg:
         !!combinedProgramme || showBachelorAndMaster ? getCombinedGraduationDate(studentBlob) : null,
-      studyTimeMonths: isMastersProgramme ? getStudyTimeMonths(studentBlob) : null,
+      studyTimeMonths: getStudyTimeMonths(studentBlob),
       startYearAtUniversity: getStartYearAtUniversity(studentBlob),
       associatedProgramme: relatedProgrammeMap?.get(student.studentNumber),
       primaryProgramme: getPrimaryProgramme(studentBlob),

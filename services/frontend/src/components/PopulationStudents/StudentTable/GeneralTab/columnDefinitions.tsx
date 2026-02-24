@@ -222,7 +222,7 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header="Study time in months"
-            tooltipText={`Time passed since starting in the master's programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
+            tooltipText={`Time passed since starting in the programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
 
             **Example:**  
             from 31st of January to 1st of March = 3 months  
