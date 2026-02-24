@@ -132,7 +132,7 @@ export const useGetColumnDefinitions = ({
         enableSorting: false,
         columns: [
           columnHelper.accessor('creditsTotal', { header: 'Total' }),
-          columnHelper.accessor('creditsHops', { header: 'In HOPS' }),
+          columnHelper.accessor('creditsHops', { header: 'In study plan' }),
           columnHelper.accessor('creditsSince', {
             header: _ => {
               if (creditDateFilterOptions) {
@@ -163,6 +163,27 @@ export const useGetColumnDefinitions = ({
               if (isMastersProgramme) return 'In Bachelor HOPS'
               return 'In Master HOPS'
             },
+          }),
+        ],
+      }),
+      columnHelper.group({
+        id: 'beforeStarting',
+        header: () => (
+          <TableHeaderWithTooltip
+            header="Before starting"
+            tooltipText={`Credits and courses that
+              1. are included in the primary study plan for the programme
+              2. were either completed or transferred
+              3. were attained before starting in the current programme
+              `}
+          />
+        ),
+        columns: [
+          columnHelper.accessor('creditsBeforeStarting', {
+            header: 'Credits',
+          }),
+          columnHelper.accessor('coursesBeforeStarting', {
+            header: 'Courses',
           }),
         ],
       }),

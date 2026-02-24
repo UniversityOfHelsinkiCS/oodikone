@@ -88,6 +88,7 @@ export const useFormat = ({
 
   const {
     getCreditsBetween,
+    getAttainmentsBeforeStudyRight,
     getCombinedCredits,
     getStudyRightStart,
     getProgrammeStart,
@@ -176,6 +177,7 @@ export const useFormat = ({
       ...programmeDetails,
     }
 
+    const attainmentsBeforeStudyRight = getAttainmentsBeforeStudyRight(studentBlob)
     const { attainmentDate, grade, language } = getCourseInformation(studentBlob)
     const enrollmentDate = getEnrollmentDate(studentBlob)
 
@@ -203,6 +205,9 @@ export const useFormat = ({
         creditDateFilterOptions?.startDate,
         creditDateFilterOptions?.endDate
       ),
+      creditsBeforeStarting: attainmentsBeforeStudyRight?.creditCount ?? 0,
+      coursesBeforeStarting: attainmentsBeforeStudyRight?.courseCount ?? 0,
+
       studyRightStart: getStudyRightStart(studentBlob),
       programmeStart: getProgrammeStart(studentBlob),
       option: getOption(studentBlob),

@@ -26,6 +26,8 @@ export const useColumns = ({ showCombinedProgrammeColumns, isMastersProgramme })
       'creditsTotal',
       'creditsHops',
       'creditsSince',
+      'creditsBeforeStarting',
+      'coursesBeforeStarting',
       'studyTrack',
       'studyRightStart',
       'programmeStart',

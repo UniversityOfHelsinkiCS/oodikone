@@ -10,7 +10,7 @@ import { DateFormat } from '@/constants/date'
 import { SemestersData } from '@/redux/semesters'
 import { formatDate, monthsVisited } from '@/util/timeAndDate'
 
-import { EnrollmentType } from '@oodikone/shared/types'
+import { CreditTypeCode, EnrollmentType } from '@oodikone/shared/types'
 import type {
   ProgrammeModuleWithRelevantAttributes,
   FormattedStudent as Student,
@@ -51,6 +51,27 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
             return sinceDate <= courseDate && courseDate <= untilDate
           }),
         })
+      }
+    : nullFunction
+
+  const getAttainmentsBeforeStudyRight = variantIsOneOf('population')
+    ? ({ relevantStudyRightElement, courses, primaryStudyplan }: StudentBlob) => {
+        if (!relevantStudyRightElement) return null
+        const studyRightStart = new Date(relevantStudyRightElement.startDate)
+
+        let creditCount = 0
+        let courseCount = 0
+        for (const course of courses) {
+          if (
+            (course.credittypecode === CreditTypeCode.PASSED || course.credittypecode === CreditTypeCode.APPROVED) &&
+            new Date(course.date) < studyRightStart &&
+            primaryStudyplan?.included_courses.includes(course.course_code)
+          ) {
+            creditCount += course.credits
+            courseCount += 1
+          }
+        }
+        return { creditCount, courseCount }
       }
     : nullFunction
 
@@ -309,6 +330,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
 
   return {
     getCreditsBetween,
+    getAttainmentsBeforeStudyRight,
     getCombinedCredits,
     getStudyRightStart,
     getProgrammeStart,

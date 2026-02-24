@@ -26,6 +26,8 @@ export type FormattedStudentData = {
   creditsHops: number
   creditsCombinedProg: number | null
   creditsSince: number | null
+  creditsBeforeStarting: number | null
+  coursesBeforeStarting: number | null
   studyRightStart: string | null
   programmeStart: string | null
   option: string | null
