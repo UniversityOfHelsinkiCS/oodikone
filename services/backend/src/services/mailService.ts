@@ -27,13 +27,7 @@ const sendEmail = async (options = {}) => {
   return await pateClient.post('/', options)
 }
 
-export const sendFeedbackToToska = async ({
-  feedbackContent,
-  user,
-}: {
-  feedbackContent: string
-  user: FormattedUser
-}) => {
+export const sendFeedback = async ({ feedbackContent, user }: { feedbackContent: string; user: FormattedUser }) => {
   const { name, userId, email } = user
   const userDetails = `Sent by ${name}, userid: ${userId}, email: ${email}`
   const text = [feedbackContent, userDetails].join('<br />')

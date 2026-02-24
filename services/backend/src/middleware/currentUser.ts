@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express'
 import { intersection } from 'lodash-es'
 
 import { requiredGroup } from '../config'
-import { getMockedUser, getOrganizationAccess, getUserToska } from '../services/userService'
+import { getMockedUser, getOrganizationAccess, getUser } from '../services/userService'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
 
@@ -24,7 +24,7 @@ type Headers = {
   'x-show-as-user'?: string
 }
 
-const toskaUserMiddleware = async (req: Request, _: Response, next: NextFunction) => {
+export default async (req: Request, _: Response, next: NextFunction) => {
   const {
     'shib-session-id': sessionId,
     'x-show-as-user': showAsUser,
@@ -60,7 +60,7 @@ const toskaUserMiddleware = async (req: Request, _: Response, next: NextFunction
   const user =
     showAsUser && specialGroup?.superAdmin
       ? await getMockedUser({ userToMock: showAsUser, mockedBy: username })
-      : await getUserToska({
+      : await getUser({
           username,
           name: name!,
           email: email!,
@@ -79,5 +79,3 @@ const toskaUserMiddleware = async (req: Request, _: Response, next: NextFunction
 
   next()
 }
-
-export default toskaUserMiddleware

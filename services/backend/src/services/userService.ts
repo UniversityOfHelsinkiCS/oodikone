@@ -231,7 +231,7 @@ export const getMockedUser = async ({ userToMock, mockedBy }: { userToMock: stri
   return mockedUser
 }
 
-export const getUserToska = async ({
+export const getUser = async ({
   username,
   name,
   email,
