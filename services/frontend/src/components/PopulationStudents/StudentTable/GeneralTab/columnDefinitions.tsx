@@ -159,9 +159,9 @@ export const useGetColumnDefinitions = ({
           }),
           columnHelper.accessor('creditsCombinedProg', {
             header: () => {
-              if (combinedProgramme === 'MH90_001') return 'In licentiate HOPS'
-              if (isMastersProgramme) return 'In Bachelor HOPS'
-              return 'In Master HOPS'
+              if (combinedProgramme === 'MH90_001') return 'In licentiate study plan'
+              if (isMastersProgramme) return 'In Bachelor study plan'
+              return 'In Master study plan'
             },
           }),
         ],
@@ -193,7 +193,7 @@ export const useGetColumnDefinitions = ({
         id: 'startDates',
         header: () => (
           <TableHeaderWithTooltip
-            header="Started date in"
+            header="Start date in"
             tooltipText={`**University**: First degree-leading study right granted in the University  
              **Study right\\***: Study right associated with current programme  
              **Programme\\***: Start date in the current programme
