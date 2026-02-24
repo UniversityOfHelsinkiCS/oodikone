@@ -188,19 +188,49 @@ export const useGetColumnDefinitions = ({
         ],
       }),
       columnHelper.accessor('grade', { header: 'Grade' }),
-      columnHelper.accessor('studyTrack', {
-        header: 'Study track',
-        cell: cell => {
-          const studyTrack = cell.getValue()
-          if (!studyTrack) return null
 
-          return <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
+      columnHelper.group({
+        id: 'startDates',
+        header: () => (
+          <TableHeaderWithTooltip
+            header="Started date in"
+            tooltipText={`**University**: First degree-leading study right granted in the University  
+             **Study right\\***: Study right associated with current programme  
+             **Programme\\***: Start date in the current programme
+
+             \\* if applicable`}
+          />
+        ),
+        columns: [
+          columnHelper.accessor('startYearAtUniversity', { header: 'University' }),
+          columnHelper.accessor('studyRightStart', { header: 'Study right' }),
+          columnHelper.accessor('programmeStart', { header: 'Programme' }),
+        ],
+      }),
+      columnHelper.accessor('graduationDate', {
+        header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
+      }),
+      columnHelper.accessor('graduationDateCombinedProg', {
+        header: _ => {
+          if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
+          if (isMastersProgramme) return 'Bachelor graduation date'
+          return 'Master graduation date'
         },
       }),
 
-      columnHelper.accessor('programmeStart', { header: 'Started in programme' }),
-      columnHelper.accessor('studyRightStart', { header: 'Start of study right' }),
-      columnHelper.accessor('startYearAtUniversity', { header: 'Start year at uni' }),
+      columnHelper.accessor('studyTimeMonths', {
+        header: _ => (
+          <TableHeaderWithTooltip
+            header="Study time in months"
+            tooltipText={`Time passed since starting in the master's programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
+
+            **Example:**  
+            from 31st of January to 1st of March = 3 months  
+            from 1st of January to 30th of March = 3 months
+            `}
+          />
+        ),
+      }),
 
       columnHelper.accessor('semesterEnrollments', {
         maxSize: Number.MAX_SAFE_INTEGER - 1, // MAGIC NUMBER; we want to fit all enrollments without size constraints
@@ -220,27 +250,14 @@ export const useGetColumnDefinitions = ({
           )
         },
       }),
-      columnHelper.accessor('graduationDate', {
-        header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
-      }),
-      columnHelper.accessor('studyTimeMonths', {
-        header: _ => (
-          <TableHeaderWithTooltip
-            header="Study time in months"
-            tooltipText={`Time passed since starting in the master's programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
 
-            **Example:**  
-            from 31st of January to 1st of March = 3 months  
-            from 1st of January to 30th of March = 3 months
-            `}
-          />
-        ),
-      }),
-      columnHelper.accessor('graduationDateCombinedProg', {
-        header: _ => {
-          if (combinedProgramme === 'MH90_001') return 'Licentiate graduation date'
-          if (isMastersProgramme) return 'Bachelor graduation date'
-          return 'Master graduation date'
+      columnHelper.accessor('studyTrack', {
+        header: 'Study track',
+        cell: cell => {
+          const studyTrack = cell.getValue()
+          if (!studyTrack) return null
+
+          return <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
         },
       }),
 
