@@ -54,7 +54,11 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
       }
     : nullFunction
 
-  const getAttainmentsBeforeStudyRight = variantIsOneOf('population', 'studyGuidanceGroupPopulation')
+  const getAttainmentsBeforeStudyRight = variantIsOneOf(
+    'population',
+    'customPopulation',
+    'studyGuidanceGroupPopulation'
+  )
     ? ({ relevantStudyRightElement, courses, primaryStudyplan }: StudentBlob) => {
         if (!relevantStudyRightElement || !primaryStudyplan) return null
         const studyRightStart = new Date(relevantStudyRightElement.startDate)

@@ -8,7 +8,14 @@ export const useColumns = ({ programme }): [string[], string[]] => {
   const nameColumns = namesVisible ? ['lastName', 'firstNames'] : []
 
   const populationWithProgrammeColumns = programme
-    ? ['option', 'transferredFrom', 'semesterEnrollments', 'curriculumPeriod']
+    ? [
+        'creditsBeforeStarting',
+        'coursesBeforeStarting',
+        'option',
+        'transferredFrom',
+        'semesterEnrollments',
+        'curriculumPeriod',
+      ]
     : ['primaryProgramme']
 
   const adminColumns = isAdmin ? ['extent', 'updatedAt'] : []
