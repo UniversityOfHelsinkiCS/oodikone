@@ -536,7 +536,7 @@ export const ProgressTable = ({
           ) : (
             <Typography variant="h6">
               There is no criteria set for this programme. You can create one{' '}
-              <Link to={`/study-programme/${programme}?tab=3)!`}>here</Link>.
+              <Link to={`/study-programme/${programme}?tab=3`}>here</Link>.
             </Typography>
           )}
         </Box>
