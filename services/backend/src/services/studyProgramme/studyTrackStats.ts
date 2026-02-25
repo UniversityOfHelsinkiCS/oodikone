@@ -411,11 +411,7 @@ const getMainStatsByTrackAndYear = async (
 
   const graduatedCount: Record<string, number> = {}
   years.forEach(year => {
-    if (!yearlyStats[year]) {
-      graduatedCount[year] = 0
-    } else {
-      graduatedCount[year] = yearlyStats[year][studyProgramme].graduated
-    }
+    graduatedCount[year] = yearlyStats[year] ? yearlyStats[year][studyProgramme].graduated : 0
   })
 
   const { mainStatsByYear, mainStatsByTrack, otherCountriesCount } = combineStats(

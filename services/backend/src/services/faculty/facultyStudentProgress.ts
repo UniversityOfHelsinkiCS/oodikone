@@ -154,7 +154,7 @@ export const combineFacultyStudentProgress = async (
       }
 
       for (const year of Object.keys(graduatedCountOfProgramme)) {
-        graduatedCount[level][year] = cloneDeep(graduatedCountOfProgramme[year])
+        graduatedCount[level][year] += cloneDeep(graduatedCountOfProgramme[year])
       }
     }
   }
