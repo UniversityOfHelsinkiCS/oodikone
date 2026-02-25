@@ -335,7 +335,33 @@ export const CloseToGraduation = () => {
 
   const displayedData = (selectedTab === 0 ? students?.bachelor : students?.masterAndLicentiate) ?? []
 
+  const muiFilterTextFieldProps = ({ column }) => {
+    if (column.columnDef.filterVariant && ['multi-select', 'select', 'text'].includes(column.columnDef.filterVariant)) {
+      let placeholder = ''
+      switch (column.columnDef.header) {
+        case 'Faculty':
+          placeholder = 'Matemaattis-luonnontieteellinen tiedekunta'
+          break
+        case 'Programme':
+          placeholder = 'Matemaattisten tieteiden kandiohjelma'
+          break
+        case 'Study track':
+          placeholder = 'Matematiikka'
+          break
+        case 'Curriculum period':
+          placeholder = '2023-2026'
+          break
+        case 'Student number':
+          placeholder = '012345678'
+          break
+      }
+      return { placeholder }
+    }
+    return {}
+  }
+
   const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
+  defaultOptions.muiFilterTextFieldProps = muiFilterTextFieldProps // Add "patched" filter-placeholders to MRT options
 
   const table = useMaterialReactTable({
     ...defaultOptions,
