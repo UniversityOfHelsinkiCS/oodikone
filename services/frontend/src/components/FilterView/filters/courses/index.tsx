@@ -114,13 +114,14 @@ export const courseFilter = createFilter({
   render: CourseFilterCard,
 
   selectors: {
-    isCourseSelected: ({ courseFilters }, course) => !!courseFilters[course],
+    // NOTE: Remember FilterType.ALL === 0 when checking if courseFilters[course] exists
+    isCourseSelected: ({ courseFilters }, course) => Object.values(FilterType).includes(courseFilters[course]),
     selectedCourseName: ({ courses }, courseCodes) => courses[courseCodes[0]]?.name,
   },
 
   actions: {
     toggleCourseSelection: (options, code) => {
-      if (!options.courseFilters[code]) {
+      if (!Object.values(FilterType).includes(options.courseFilters[code])) {
         options.courseFilters[code] = FilterType.ALL
       } else {
         delete options.courseFilters[code]
