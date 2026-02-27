@@ -76,7 +76,10 @@ export const courseFilter = createFilter({
       {} as Record<string, string[]>
     )
 
-    options.courses = Object.fromEntries(args.courses.map(course => [course.code, course]))
+    /* option.courses maybe frozen even when it should be used only within the scope of createFilter factory. */ {
+      delete options.courses
+      options.courses = Object.fromEntries(args.courses.map(course => [course.code, course]))
+    }
     options.substitutedBy = substitutedBy
   },
 
