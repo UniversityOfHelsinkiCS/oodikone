@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -12,7 +11,7 @@ import { DegreeProgrammeType } from '@oodikone/shared/types'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import type { FormattedStudentData } from '../index'
 
-import { useGeneratePrimitiveFunctions, StudentBlob, Variant } from '../primitives'
+import { useGeneratePrimitiveFunctions, Variant } from '../primitives'
 import { getProgrammeDetails, getSemesterEnrollmentsContent, useGetRelevantSemesterData } from './util'
 
 const useGetCreditDateFilterOptions = () => {
@@ -113,6 +112,8 @@ export const useFormat = ({
     getTVEX,
     getExtent,
     getUpdatedAt,
+    getCourseInformation,
+    getEnrollmentDate,
   } = useGeneratePrimitiveFunctions(variant, allSemesters)
 
   const getStudentSemesterEnrollmentContent = getSemesterEnrollmentsContent({
@@ -139,37 +140,6 @@ export const useFormat = ({
         .shift()?.semestercode ?? null)
     : null
 
-  const getCourseInformation =
-    variant === 'coursePopulation'
-      ? ({ courses }: StudentBlob) => {
-          if (!from || !to) return { grade: '-', attainmentDate: '', language: '' }
-
-          const validCourses = courses.filter(({ course_code }) => coursecodes.includes(course_code))
-          const grade = getHighestGradeOfCourseBetweenRange(validCourses, from, to)
-          if (!grade) return { grade: '-', attainmentDate: '', language: '' }
-
-          const { date: attainmentDate, language } = validCourses
-            .filter(course => course.grade === grade)
-            .sort((a, b) => +new Date(b.date) - +new Date(a.date))
-            .pop() ?? { attainmentDate: '', language: '' }
-
-          return { grade, attainmentDate, language }
-        }
-      : (_: StudentBlob) => ({ grade: null, attainmentDate: null, language: null })
-
-  const getEnrollmentDate =
-    variant === 'coursePopulation'
-      ? ({ enrollments }: StudentBlob) => {
-          if (!fromSemester || !toSemester || !enrollments?.length) return null
-          return (
-            enrollments
-              ?.filter(({ course_code }) => coursecodes.includes(course_code))
-              ?.filter(({ semestercode }) => fromSemester <= semestercode && semestercode <= toSemester)
-              ?.shift()?.enrollment_date_time ?? null
-          )
-        }
-      : (_: StudentBlob) => null
-
   const formatStudent = (student: Student): FormattedStudentData => {
     const programmeDetails = getStudentProgrammeDetails(student)
 
@@ -179,8 +149,8 @@ export const useFormat = ({
     }
 
     const attainmentsBeforeStudyRight = getAttainmentsBeforeStudyRight(studentBlob)
-    const { attainmentDate, grade, language } = getCourseInformation(studentBlob)
-    const enrollmentDate = getEnrollmentDate(studentBlob)
+    const courseInformation = getCourseInformation(studentBlob, from, to, coursecodes)
+    const enrollmentDate = getEnrollmentDate(studentBlob, fromSemester, toSemester, coursecodes)
 
     return {
       /* EXCEL ONLY */
@@ -235,10 +205,12 @@ export const useFormat = ({
       mostRecentAttainment: getMostRecentAttainment(studentBlob),
       tags: getTags(studentBlob),
       studyTrack: getStudyTracks(studentBlob),
-      grade,
-      attainmentDate: attainmentDate ? formatDate(attainmentDate, DateFormat.ISO_DATE) : 'No attainment',
+      grade: courseInformation?.grade ?? null,
+      attainmentDate: courseInformation?.attainmentDate
+        ? formatDate(courseInformation.attainmentDate, DateFormat.ISO_DATE)
+        : 'No attainment',
       enrollmentDate: enrollmentDate ? formatDate(enrollmentDate, DateFormat.ISO_DATE) : 'No enrollment',
-      language,
+      language: courseInformation?.language ?? null,
       tvex: getTVEX(studentBlob),
 
       /* ADMIN COLUMNS */
