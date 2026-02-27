@@ -20,6 +20,7 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
   return useMemo(
     () => [
       columnHelper.accessor('code', {
+        id: 'Course',
         header: 'Course',
         cell: ({ row }) => {
           const { code, name } = row.original
@@ -27,6 +28,12 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
         },
         aggregationRows: () => [{ id: 'total', value: undefined }],
         aggregatedCell: () => <CourseContainer code="Total" getTextIn={getTextIn} name={{ en: 'All courses total' }} />,
+        // TODO: pls DRY. This is same as in FacultiesTab
+        filterFn: (row, columnId, filterValue) => {
+          const { code, name } = row.original
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          return code.toLowerCase().includes(filterValue) || getTextIn(name).toLowerCase().includes(filterValue)
+        },
       }),
       columnHelper.accessor('all', {
         header: 'Total',

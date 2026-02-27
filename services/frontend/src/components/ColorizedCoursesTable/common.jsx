@@ -1,4 +1,5 @@
-import { createContext, useContext } from 'react'
+import TextField from '@mui/material/TextField'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 export const ColorizedCoursesTableContext = createContext(null)
 
@@ -81,4 +82,16 @@ export const getColor = (stats, columnAmount, colorMode, numberMode, courseTotal
   return {
     backgroundColor: `rgba(${color},${Math.min(1.0, relativeAlphaValue)}) !important`,
   }
+}
+
+// NOTE: Give setCourseFilter as a useDebouncedState to make the text box work nicely
+export const CourseFilter = ({ setCourseFilter }) => {
+  const [textField, setTextField] = useState('')
+  useEffect(() => {
+    setCourseFilter(textField)
+  }, [textField])
+
+  return (
+    <TextField label="Course name/code filter" onChange={event => setTextField(event.target.value)} value={textField} />
+  )
 }

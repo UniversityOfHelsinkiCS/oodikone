@@ -1,9 +1,11 @@
+import { getFilteredRowModel } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import {
   calculateTotals,
   emptyFields,
   useColorizedCoursesTableContext,
+  CourseFilter,
 } from '@/components/ColorizedCoursesTable/common'
 import '@/components/ColorizedCoursesTable/index.css'
 import {
@@ -14,6 +16,7 @@ import {
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { useColumns } from './logic'
 
@@ -23,6 +26,8 @@ export const FacultiesTab = () => {
 
   const { getTextIn } = useLanguage()
   const facultyQuery = useGetFacultiesQuery()
+
+  const [courseFilter, setCourseFilter] = useDebouncedState('', 250)
 
   const facultyMap = useMemo(
     () =>
@@ -91,7 +96,10 @@ export const FacultiesTab = () => {
     initialState: { columnPinning: { left: ['Course'] } },
     state: {
       useZebrastripes: colorMode === 'none',
+      columnFilters: [{ id: 'Course', value: courseFilter }],
     },
+    onColumnFiltersChange: setCourseFilter,
+    getFilteredRowModel: getFilteredRowModel(),
   }
 
   return (
@@ -106,7 +114,12 @@ export const FacultiesTab = () => {
         cy="ooditable-faculties"
         data={tableData}
         options={tableOptions}
-        toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ id }) => id)} />}
+        toolbarContent={
+          <>
+            <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ id }) => id)} />
+            <CourseFilter setCourseFilter={setCourseFilter} />
+          </>
+        }
       />
     </div>
   )

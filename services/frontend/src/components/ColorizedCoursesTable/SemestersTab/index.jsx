@@ -1,9 +1,11 @@
+import { getFilteredRowModel } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import {
   calculateNewTotalColumnValues,
   calculateTotals,
   useColorizedCoursesTableContext,
+  CourseFilter,
 } from '@/components/ColorizedCoursesTable/common'
 import {
   ColorModeSelector,
@@ -14,11 +16,13 @@ import '@/components/ColorizedCoursesTable/index.css'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useColumns } from './logic'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()
   const { semesters, numberMode, colorMode, selectedSemesters, data } = useColorizedCoursesTableContext()
+  const [courseFilter, setCourseFilter] = useDebouncedState('', 250)
 
   const totalRow = useMemo(() => {
     if (!data) return {}
@@ -50,10 +54,13 @@ export const SemestersTab = () => {
   )
 
   const tableOptions = {
-    initialState: { columnPinning: { left: ['code'] } },
+    initialState: { columnPinning: { left: ['Course'] } },
     state: {
       useZebrastripes: colorMode === 'none',
+      columnFilters: [{ id: 'Course', value: courseFilter }],
     },
+    onColumnFiltersChange: setCourseFilter,
+    getFilteredRowModel: getFilteredRowModel(),
   }
 
   return (
@@ -68,7 +75,12 @@ export const SemestersTab = () => {
         cy="ooditable-semesters"
         data={tableData}
         options={tableOptions}
-        toolbarContent={<OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />}
+        toolbarContent={
+          <>
+            <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />
+            <CourseFilter setCourseFilter={setCourseFilter} />
+          </>
+        }
       />
     </div>
   )
