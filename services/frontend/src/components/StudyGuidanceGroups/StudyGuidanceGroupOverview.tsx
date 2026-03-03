@@ -69,7 +69,9 @@ const EditTagModal = ({
   const [formErrors, setFormErrors] = useState({})
 
   useEffect(() => {
-    setFormValues({ [tagName]: initialState ?? '' })
+    // Magic number: previous year (if initialState not set)
+    const initialYear = formValues[tagName] === '' ? new Date().getFullYear() - 1 : Number(formValues[tagName])
+    setFormValues({ [tagName]: initialState ?? (tagName === 'year' ? initialYear : '') })
     setFormErrors({})
   }, [group, tagName, open])
 
@@ -130,7 +132,7 @@ const EditTagModal = ({
                     label="Select degree programme"
                     name={tagName}
                     onChange={event => handleChange(tagName, event.target.value)}
-                    value={formValues[tagName] ?? undefined}
+                    value={formValues[tagName]}
                   >
                     {selectFieldItems?.map(({ key, value, description, text }) => (
                       <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
@@ -142,11 +144,7 @@ const EditTagModal = ({
                 </FormControl>
               ) : (
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <EnrollmentDateSelector
-                    setYear={value => handleChange(tagName, value)}
-                    // Magic number: previous year (if none set)
-                    year={formValues[tagName] === '' ? new Date().getFullYear() - 1 : Number(formValues[tagName])}
-                  />
+                  <EnrollmentDateSelector setYear={value => handleChange(tagName, value)} year={formValues[tagName]} />
                 </Box>
               )}
             </Box>
