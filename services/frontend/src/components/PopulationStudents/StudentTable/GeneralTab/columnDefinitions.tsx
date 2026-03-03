@@ -170,11 +170,11 @@ export const useGetColumnDefinitions = ({
         id: 'beforeStarting',
         header: () => (
           <TableHeaderWithTooltip
-            header="Before starting"
+            header={`Prior to ${isMastersProgramme ? 'master' : 'bachelor'}`}
             tooltipText={`Credits and courses that
-              1. are included in the primary study plan for the programme
+              1. were attained before starting in the current programme
               2. were either completed or transferred
-              3. were attained before starting in the current programme
+              3. are included in the primary study plan for the programme
               `}
           />
         ),
