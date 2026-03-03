@@ -193,7 +193,7 @@ export const useGetColumnDefinitions = ({
         id: 'startDates',
         header: () => (
           <TableHeaderWithTooltip
-            header="Start date in"
+            header="Start date"
             tooltipText={`**University**: First degree-leading study right granted in the University  
              **Study right\\***: Study right associated with current programme  
              **Programme\\***: Start date in the current programme
