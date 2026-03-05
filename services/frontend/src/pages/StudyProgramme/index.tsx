@@ -64,7 +64,8 @@ export const StudyProgramme = () => {
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
 
-  const { data: programmes } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const programmes = data?.filteredProgrammes ?? {}
 
   const [programmeId, secondProgrammeId] = [...(studyProgrammeId?.split('+') ?? []), '', '']
 

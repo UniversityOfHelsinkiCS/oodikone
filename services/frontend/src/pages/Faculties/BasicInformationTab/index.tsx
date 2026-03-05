@@ -153,7 +153,8 @@ export const BasicInformationTab = ({
     yearType,
   })
 
-  const { data: degreeProgrammes } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const degreeProgrammes = data?.filteredProgrammes ?? {}
 
   const tableStats: { data: (number | string)[][]; titles: string[] } | null = credits.data
     ? makeTableStats(calculateTotals(credits.data), academicYear)

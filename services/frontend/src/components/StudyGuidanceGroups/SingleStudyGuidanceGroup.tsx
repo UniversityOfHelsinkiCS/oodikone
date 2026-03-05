@@ -29,7 +29,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
 
   const navigate = useNavigate()
   const { getTextIn } = useLanguage()
-  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes().allProgrammes
 
   const { viewFilters, initialOptions } = useGetFilters(group, population)
 

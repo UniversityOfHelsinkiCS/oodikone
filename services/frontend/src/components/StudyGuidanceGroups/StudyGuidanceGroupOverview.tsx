@@ -4,6 +4,7 @@ import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
+import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Select from '@mui/material/Select'
@@ -84,7 +85,7 @@ const EditTagModal = ({
     return errors
   }
 
-  const handleChange = (name, value) => {
+  const handleChange = (name: string, value) => {
     setFormValues(prev => ({ ...prev, [name]: value }))
   }
 
@@ -134,12 +135,33 @@ const EditTagModal = ({
                     onChange={event => handleChange(tagName, event.target.value)}
                     value={formValues[tagName]}
                   >
-                    {selectFieldItems?.map(({ key, value, description, text }) => (
-                      <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
-                        <Typography sx={{ mr: 1 }}>{text}</Typography>
-                        <Typography fontWeight="lighter">{description}</Typography>
+                    <ListSubheader>Programmes you have access to</ListSubheader>
+                    {selectFieldItems?.filteredProgrammes.length !== 0 ? (
+                      selectFieldItems?.filteredProgrammes?.map(({ key, value, description, text }) => (
+                        <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
+                          <Typography sx={{ mr: 1 }}>{text}</Typography>
+                          <Typography fontWeight="lighter">{description}</Typography>
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled value="">
+                        None found
                       </MenuItem>
-                    ))}
+                    )}
+
+                    <ListSubheader>All programmes</ListSubheader>
+                    {selectFieldItems?.allProgrammes.length !== 0 ? (
+                      selectFieldItems?.allProgrammes?.map(({ key, value, description, text }) => (
+                        <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
+                          <Typography sx={{ mr: 1 }}>{text}</Typography>
+                          <Typography fontWeight="lighter">{description}</Typography>
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled value="">
+                        None found
+                      </MenuItem>
+                    )}
                   </Select>
                 </FormControl>
               ) : (
@@ -200,7 +222,7 @@ const TagCell = ({
   const getText = () => {
     switch (tagName) {
       case 'studyProgramme':
-        return degreeProgrammes?.find(programme => programme.value === group.tags?.studyProgramme)?.text
+        return degreeProgrammes?.allProgrammes?.find(programme => programme.value === group.tags?.studyProgramme)?.text
       case 'year':
         return startYearToAcademicYear(group.tags?.year)
       default:

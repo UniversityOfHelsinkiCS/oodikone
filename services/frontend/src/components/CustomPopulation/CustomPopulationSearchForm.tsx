@@ -41,7 +41,9 @@ export const CustomPopulationSearchForm = ({
 
   const [selectedSearch, setSelectedSearch] = useState<CustomPopulationSearch | null>(null)
 
-  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
+  // Only show programmes the current user has access to,
+  // see customPopulationInfo above
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes().filteredProgrammes
   const { data: searches, isFetching } = useGetCustomPopulationSearchesQuery(undefined)
 
   const [createSearch] = useCreateCustomPopulationSearchMutation()
@@ -88,7 +90,7 @@ export const CustomPopulationSearchForm = ({
     }
   }
 
-  const onSearch = event => {
+  const onSearch = (event: React.MouseEvent) => {
     event.preventDefault()
     const studentNumbers = extractItems(studentNumberInput)
 

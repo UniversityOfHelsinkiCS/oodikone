@@ -16,6 +16,7 @@ import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { PopulationSearchProgramme } from '@/types/populationSearch'
 import { createPinnedFirstComparator } from '@/util/comparator'
 import { isNewProgramme } from '@/util/studyProgramme'
+import { PopulationstatisticsStudyprogrammesResBody } from '@oodikone/shared/routes/populations'
 
 type StudyProgrammeSelectorProps = {
   programme: PopulationSearchProgramme | null
@@ -32,21 +33,22 @@ export const DegreeProgrammeSelector = ({
   setShowBachelorAndMaster,
   handleChange,
 }: StudyProgrammeSelectorProps) => {
-  const { data: programmes = {}, isLoading } = useGetProgrammesQuery()
+  const { data, isFetching: isLoading } = useGetProgrammesQuery()
   const { data: degreeProgrammePins } = useGetStudyProgrammePinsQuery()
   const degreeProgrammeType = useDegreeProgrammeTypes([programme?.code ?? ''])
 
   const { getTextIn } = useLanguage()
 
+  const programmes = data?.filteredProgrammes ?? {}
   const pinnedProgrammes = degreeProgrammePins?.studyProgrammes ?? []
 
   // TODO: make it make sense
-  const degreeProgrammes =
-    (programmes.KH90_001 || programmes.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
+  const degreeProgrammes: PopulationstatisticsStudyprogrammesResBody['filteredProgrammes'] =
+    (programmes?.KH90_001 || programmes?.MH90_001) && !Object.keys(programmes).includes('KH90_001+MH90_001')
       ? {
           ...programmes,
           'KH90_001+MH90_001': {
-            ...programmes.KH90_001,
+            ...(programmes.KH90_001 ?? {}),
             code: 'KH90_001+MH90_001',
             name: {
               fi: 'Eläinlääketieteen kandiohjelma ja lisensiaatin koulutusohjelma',

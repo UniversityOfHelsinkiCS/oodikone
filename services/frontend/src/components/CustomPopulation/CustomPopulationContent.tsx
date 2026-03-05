@@ -48,7 +48,7 @@ export const CustomPopulationContent = ({
   isFetchingPopulation: boolean
   resetState: () => void
 }) => {
-  const studyProgrammes = useFilteredAndFormattedStudyProgrammes()
+  const studyProgrammes = useFilteredAndFormattedStudyProgrammes().filteredProgrammes
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
 
   const { getTextIn } = useLanguage()

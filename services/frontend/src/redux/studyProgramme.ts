@@ -115,15 +115,18 @@ const getDataForCombined = (studyProgrammes: ProgrammeModuleWithRelevantAttribut
     )
 }
 
-const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn, language: Language) => {
+const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn: GetTextIn, language: Language) => {
+  if (!dataForCombined.KH90_001 || !dataForCombined.MH90_001) return []
+
   return [
     {
       key: 'KH90_001+MH90_001',
       value: 'KH90_001+MH90_001',
       description: 'KH90_001+MH90_001',
       text: getCombinedProgrammeName(
-        getTextIn(dataForCombined?.KH90_001),
-        getTextIn(dataForCombined?.MH90_001),
+        // getTextIn SHOULD never be undefined or null
+        getTextIn(dataForCombined?.KH90_001)!,
+        getTextIn(dataForCombined?.MH90_001)!,
         language
       ),
     },
@@ -132,11 +135,21 @@ const getCombinedOptions = (dataForCombined: Record<string, Name>, getTextIn, la
 
 /** Returns only newest degree programmes and formats them to be used in Semantic UI dropdown menus */
 export const useFilteredAndFormattedStudyProgrammes = () => {
-  const { data = {} } = useGetProgrammesQuery()
-  const studyProgrammes = Object.values(data)
+  const { data } = useGetProgrammesQuery()
+  const filteredStudyProgrammes = Object.values(data?.filteredProgrammes ?? {})
+  const allStudyProgrammes = Object.values(data?.allProgrammes ?? {})
   const { language, getTextIn } = useLanguage()
-  const filteredAndFormatted = getFilteredAndFormattedStudyProgrammes(getTextIn, studyProgrammes)
-  const dataForCombined = getDataForCombined(studyProgrammes)
-  const combinedOptions = getCombinedOptions(dataForCombined, getTextIn, language)
-  return [...filteredAndFormatted, ...combinedOptions]
+
+  const formattedFilteredProgrammes = getFilteredAndFormattedStudyProgrammes(getTextIn, filteredStudyProgrammes)
+  const dataForCombinedFiltered = getDataForCombined(filteredStudyProgrammes)
+  const combinedOptionsFiltered = getCombinedOptions(dataForCombinedFiltered, getTextIn, language)
+
+  const formattedAllProgrammes = getFilteredAndFormattedStudyProgrammes(getTextIn, allStudyProgrammes)
+  const dataForCombinedAll = getDataForCombined(allStudyProgrammes)
+  const combinedOptionsAll = getCombinedOptions(dataForCombinedAll, getTextIn, language)
+
+  return {
+    filteredProgrammes: [...formattedFilteredProgrammes, ...combinedOptionsFiltered],
+    allProgrammes: [...formattedAllProgrammes, ...combinedOptionsAll],
+  }
 }

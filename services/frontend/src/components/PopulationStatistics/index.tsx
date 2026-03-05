@@ -80,7 +80,8 @@ const useUserHasRestrictedAccess = () => {
 }
 
 const useGetProgrammes = (): Record<string, DegreeProgramme> => {
-  const { data: studyProgrammes } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const studyProgrammes = data?.filteredProgrammes ?? {}
 
   return {
     ...studyProgrammes,

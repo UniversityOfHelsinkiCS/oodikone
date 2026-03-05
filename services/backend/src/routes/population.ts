@@ -15,12 +15,12 @@ import {
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
 } from '@oodikone/shared/routes/populations'
-import { Unification, Unarray } from '@oodikone/shared/types'
-import { mapToProviders } from '@oodikone/shared/util'
+import { Unification } from '@oodikone/shared/types'
+import { keyBy, mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import { getCourseProvidersForCourses, maxYearsToCreatePopulationFrom } from '../services/courses'
 import { encrypt } from '../services/encrypt'
-import { getDegreeProgrammesOfOrganization, ProgrammesOfOrganization } from '../services/faculty/faculty'
+import { getDegreeProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
@@ -260,14 +260,13 @@ router.get<never, PopulationstatisticsStudyprogrammesResBody>(
     const filteredProgrammes = hasFullAccessToStudentData(roles)
       ? programmes
       : programmes.filter(programme => allRights.includes(programme.code))
-    const formattedProgrammes = filteredProgrammes.reduce<Record<string, Unarray<ProgrammesOfOrganization>>>(
-      (acc, curr) => {
-        acc[curr.code] = curr
-        return acc
-      },
-      {}
-    )
-    res.json(formattedProgrammes)
+    const formattedFilteredProgrammes = keyBy(filteredProgrammes, 'code')
+    const formattedAllProgrammes = keyBy(programmes, 'code')
+
+    res.json({
+      allProgrammes: formattedAllProgrammes,
+      filteredProgrammes: formattedFilteredProgrammes,
+    })
   }
 )
 

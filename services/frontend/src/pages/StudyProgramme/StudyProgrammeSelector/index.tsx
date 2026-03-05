@@ -31,7 +31,7 @@ export type CombinedDegreeProgramme = Omit<
 export const StudyProgrammeSelector = () => {
   const { getTextIn } = useLanguage()
   const { data: programmes, isLoading } = useGetProgrammesQuery()
-  const studyProgrammes = Object.values(programmes ?? {})
+  const studyProgrammes = Object.values(programmes?.filteredProgrammes ?? {})
   const currentCurriculumPeriod = useCurrentCurriculumPeriod()
   const [filter, setFilter] = useState('')
   const [otherProgrammesVisible, setOtherProgrammesVisible] = useState(false)

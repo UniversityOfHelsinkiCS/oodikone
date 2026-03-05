@@ -115,8 +115,8 @@ export type CustomPopulationQuery = {
 
 // populationstatistics/studyprogrammes
 export type PopulationstatisticsStudyprogrammesResBody = Record<
-  string,
-  Unarray<ProgrammeModuleWithRelevantAttributes[]>
+  'allProgrammes' | 'filteredProgrammes',
+  Record<string, Unarray<ProgrammeModuleWithRelevantAttributes[]>>
 >
 
 // populationstatistics/maxYearsToCreatePopulationFrom

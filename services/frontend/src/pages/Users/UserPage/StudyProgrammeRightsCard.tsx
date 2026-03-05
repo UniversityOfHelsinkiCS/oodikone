@@ -51,7 +51,8 @@ export const StudyProgrammeRightsCard = ({ user }: { user: User }) => {
   const { setStatusNotification } = useStatusNotification()
   const [editing, setEditing] = useState(false)
   const [filterOldProgrammes, setFilterOldProgrammes] = useState(true)
-  const { data: programmes = {} } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const programmes = data?.filteredProgrammes ?? {}
   const studyProgrammes = Object.values(programmes)
   const [addUserUnitsMutation, addResult] = useAddUserUnitsMutation()
   const [removeUserUnitsMutation, removeResult] = useRemoveUserUnitsMutation()
