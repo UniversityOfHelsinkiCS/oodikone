@@ -67,14 +67,14 @@ export const useFormat = ({
   // TODO: Use years correctly
   const { data: semesters, isSuccess: semestersSuccess } = useGetRelevantSemesterData(years.at(0))
   const { data, isSuccess: programmesSuccess } = useGetProgrammesQuery()
-  const programmes = data?.filteredProgrammes
+  const programmes = data?.filteredProgrammes ?? {}
 
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
     ? semesters
     : { currentSemester: null, allSemesters: {}, firstSemester: 0, lastSemester: 0 }
 
   const isMastersProgramme = programmesSuccess
-    ? programmes?.[programme ?? '']?.degreeProgrammeType === DegreeProgrammeType.MASTER
+    ? programmes[programme ?? '']?.degreeProgrammeType === DegreeProgrammeType.MASTER
     : false
 
   const getStudentProgrammeDetails = getProgrammeDetails({
