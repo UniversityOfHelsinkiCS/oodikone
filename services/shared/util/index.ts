@@ -64,7 +64,6 @@ export const omitKeys = <T extends object, K extends keyof T>(input: T, toOmit: 
   return Object.fromEntries(Object.entries(input).filter(([key, _]) => !toOmit.includes(key as K))) as Omit<T, K>
 }
 
-// eslint-disable-next-line import-x/no-unused-modules
 export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): Record<K, T> =>
   Object.fromEntries(input.map(item => [item[key], item]))
 
