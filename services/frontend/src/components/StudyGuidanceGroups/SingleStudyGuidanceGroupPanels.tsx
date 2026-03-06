@@ -106,7 +106,6 @@ export const SingleStudyGuidanceGroupPanels = ({
           curriculum={curriculum}
           curriculumList={curriculumList}
           filteredCourses={filteredCourses}
-          filteredStudents={filteredStudents}
           setCurriculum={setCurriculum}
           studyProgramme={group.tags?.studyProgramme ? programme : null}
           year={groupYear}

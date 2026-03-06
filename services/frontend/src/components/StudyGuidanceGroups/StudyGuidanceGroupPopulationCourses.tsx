@@ -9,7 +9,6 @@ import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 
 export const StudyGuidanceGroupPopulationCourses = ({
   filteredCourses,
-  filteredStudents,
   studyProgramme,
   year,
   curriculum,
@@ -18,8 +17,13 @@ export const StudyGuidanceGroupPopulationCourses = ({
 }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
   const curriculumsAvailable = studyProgramme && year
-  const [courseTableMode, setCourseTableMode] = useState(curriculumsAvailable ? 'curriculum' : 'all')
-  const onStudentAmountLimitChange = value => {
+  const [courseTableMode, setCourseTableMode] = useState<'all' | 'curriculum'>(
+    curriculumsAvailable ? 'curriculum' : 'all'
+  )
+  const [showModules, setShowModules] = useState(false) // Shows courses if modules not selected
+  const onlyIamRights = false // Show links to courses for everyone
+
+  const onStudentAmountLimitChange = (value: string | number) => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
   return (
@@ -29,11 +33,9 @@ export const StudyGuidanceGroupPopulationCourses = ({
           courseTableMode={courseTableMode}
           curriculum={curriculum}
           curriculumList={curriculumList}
-          filteredStudents={filteredStudents}
           onStudentAmountLimitChange={onStudentAmountLimitChange}
           setCourseTableMode={setCourseTableMode}
           setCurriculum={setCurriculum}
-          setStudentAmountLimit={setStudentAmountLimit}
           studentAmountLimit={studentAmountLimit}
         />
       ) : (
@@ -43,9 +45,24 @@ export const StudyGuidanceGroupPopulationCourses = ({
         />
       )}
       {courseTableMode === 'curriculum' ? (
-        <PopulationCourseStats curriculum={curriculum} filteredCourses={filteredCourses} />
+        <PopulationCourseStats
+          courseTableMode={courseTableMode}
+          curriculum={curriculum}
+          filteredCourses={filteredCourses}
+          onlyIamRights={onlyIamRights}
+          pending={false}
+          setShowModules={setShowModules}
+          showModules={showModules}
+        />
       ) : (
-        <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
+        <PopulationCourseStatsFlat
+          courseTableMode={courseTableMode}
+          filteredCourses={filteredCourses}
+          onlyIamRights={onlyIamRights}
+          setShowModules={setShowModules}
+          showModules={showModules}
+          studentAmountLimit={studentAmountLimit}
+        />
       )}
     </Paper>
   )
