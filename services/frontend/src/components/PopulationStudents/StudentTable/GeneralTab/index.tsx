@@ -84,8 +84,9 @@ export const GeneralTab = ({
   columnFunction: () => [string[], string[]]
   formattingFunction: () => Partial<FormattedStudentData>[]
 }) => {
-  const { data: degreeProgrammes } = useGetProgrammesQuery()
+  const { data: degreeData } = useGetProgrammesQuery()
   const { isAdmin } = useGetAuthorizedUserQuery()
+  const degreeProgrammes = degreeData?.filteredProgrammes ?? {}
 
   const columns = useGetColumnDefinitions({
     programme,

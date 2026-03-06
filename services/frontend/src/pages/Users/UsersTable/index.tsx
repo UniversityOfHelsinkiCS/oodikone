@@ -31,7 +31,8 @@ export const UsersTable = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { data: roles = [] } = useGetRolesQuery()
-  const { data: studyProgrammes = {} } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const studyProgrammes = data?.filteredProgrammes ?? {}
 
   const iamGroups = [...new Set(users.map(user => user.iamGroups).flat())]
 

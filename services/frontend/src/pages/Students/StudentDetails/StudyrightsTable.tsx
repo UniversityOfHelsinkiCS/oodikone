@@ -69,9 +69,11 @@ export const StudyrightsTable = ({
   selectedStudyPlanId: string | null
 }) => {
   const { getTextIn } = useLanguage()
-  const { data: studyProgrammes } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
   const { data: semesters } = useGetSemestersQuery()
   const { currentSemester } = semesters ?? { currentSemester: null }
+
+  const studyProgrammes = data?.filteredProgrammes ?? {}
 
   if (!student) return null
 

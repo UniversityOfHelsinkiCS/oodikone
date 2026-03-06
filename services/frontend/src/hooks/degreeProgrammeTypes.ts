@@ -1,7 +1,8 @@
 import { useGetProgrammesQuery } from '@/redux/populations'
 
 export const useDegreeProgrammeTypes = (programmeCodes: string[]) => {
-  const { data: degreeProgrammes } = useGetProgrammesQuery()
+  const { data } = useGetProgrammesQuery()
+  const degreeProgrammes = data?.filteredProgrammes
   if (!degreeProgrammes) {
     return {} as Record<string, string | null>
   }
