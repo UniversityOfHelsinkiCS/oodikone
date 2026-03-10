@@ -6,17 +6,17 @@
     "dev": "nodemon ./src/index.js"
   },
   "dependencies": {
-    "bullmq": "^5.53.2",
-    "cron": "^4.3.1",
-    "express": "^4.21.2",
+    "bullmq": "^5.70.4",
+    "cron": "^4.4.0",
+    "express": "^4.22.1",
     "express-async-errors": "^3.1.1",
     "knex": "^3.1.0",
     "lodash-es": "^4.17.23",
-    "pg": "^8.16.0",
+    "pg": "^8.20.0",
     "redis": "^4.7.1",
-    "winston": "^3.17.0",
+    "winston": "^3.19.0",
     "winston-gelf-transporter": "^1.0.2",
-    "winston-loki": "^6.1.3",
+    "winston-loki": "^6.1.4",
     "winston-transport-sentry-node": "^3.0.0"
   },
   "overrides": {
