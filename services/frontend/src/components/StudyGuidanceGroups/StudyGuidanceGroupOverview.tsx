@@ -69,6 +69,11 @@ const EditTagModal = ({
   const [formValues, setFormValues] = useState({ [tagName]: initialState ?? '' })
   const [formErrors, setFormErrors] = useState({})
 
+  // Remove duplicate entries in Associated degree programme selector
+  const filteredProgrammeCodes = selectFieldItems?.filteredProgrammes.map(programme => programme.key) ?? []
+  const filteredAllProgrammes =
+    selectFieldItems?.allProgrammes.filter(programme => !filteredProgrammeCodes.includes(programme.key)) ?? []
+
   useEffect(() => {
     // Magic number: previous year (if initialState not set)
     const initialYear = formValues[tagName] === '' ? new Date().getFullYear() - 1 : Number(formValues[tagName])
@@ -150,8 +155,8 @@ const EditTagModal = ({
                     )}
 
                     <ListSubheader>Other programmes</ListSubheader>
-                    {selectFieldItems?.allProgrammes.length !== 0 ? (
-                      selectFieldItems?.allProgrammes?.map(({ key, value, description, text }) => (
+                    {filteredAllProgrammes.length !== 0 ? (
+                      filteredAllProgrammes.map(({ key, value, description, text }) => (
                         <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
                           <Typography sx={{ mr: 1 }}>{text}</Typography>
                           <Typography fontWeight="lighter">{description}</Typography>
@@ -266,12 +271,6 @@ const TagCell = ({
 
 export const StudyGuidanceGroupOverview = ({ groups }: { groups: GroupsWithTags[] }) => {
   const degreeProgrammes = useFilteredAndFormattedStudyProgrammes()
-
-  // Remove duplicate entries in Associated degree programme selector
-  const filteredProgrammeCodes = degreeProgrammes.filteredProgrammes.map(programme => programme.key)
-  degreeProgrammes.allProgrammes = degreeProgrammes.allProgrammes.filter(
-    programme => !filteredProgrammeCodes.includes(programme.key)
-  )
 
   if (groups.length === 0) {
     return <StyledMessage>You do not have access to any study guidance groups.</StyledMessage>
