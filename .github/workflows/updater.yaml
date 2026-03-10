@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
       - name: 'Build the image'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: updater/sis-updater-worker/
           push: false
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
       - name: 'Build the image'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: updater/sis-updater-scheduler/
           push: false
