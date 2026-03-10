@@ -15,7 +15,7 @@
     "pg": "^8.20.0",
     "redis": "^4.7.1",
     "redis-lock": "^1.0.0",
-    "sequelize": "^6.37.7",
+    "sequelize": "^6.37.8",
     "umzug": "^3.8.2",
     "winston": "^3.17.0",
     "winston-gelf-transporter": "^1.0.2",
