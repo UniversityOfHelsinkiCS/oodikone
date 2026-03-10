@@ -29,7 +29,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get current time
         id: get_current_time
@@ -64,7 +64,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Build backend image
         id: build-image
@@ -99,7 +99,7 @@ jobs:
     if: success()
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
@@ -118,7 +118,7 @@ jobs:
     if: failure()
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:

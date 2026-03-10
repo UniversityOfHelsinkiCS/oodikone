@@ -17,7 +17,7 @@ jobs:
     name: 'Lint packages'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install node-24 for cypress
         uses: actions/setup-node@v6
@@ -88,7 +88,7 @@ jobs:
             spec: cypress/e2e/University.js
     name: ${{ matrix.name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
         with:
