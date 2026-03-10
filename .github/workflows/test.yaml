@@ -100,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
@@ -128,7 +128,7 @@ jobs:
       - name: 'Load built backend image'
         run: docker load --input backend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
@@ -163,7 +163,7 @@ jobs:
       - name: 'Load built backend image'
         run: docker load --input backend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
@@ -187,7 +187,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
@@ -254,7 +254,7 @@ jobs:
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
