@@ -149,7 +149,7 @@ const EditTagModal = ({
                       </MenuItem>
                     )}
 
-                    <ListSubheader>All programmes</ListSubheader>
+                    <ListSubheader>Other programmes</ListSubheader>
                     {selectFieldItems?.allProgrammes.length !== 0 ? (
                       selectFieldItems?.allProgrammes?.map(({ key, value, description, text }) => (
                         <MenuItem key={key} sx={{ justifyContent: 'space-between' }} value={value}>
@@ -266,6 +266,12 @@ const TagCell = ({
 
 export const StudyGuidanceGroupOverview = ({ groups }: { groups: GroupsWithTags[] }) => {
   const degreeProgrammes = useFilteredAndFormattedStudyProgrammes()
+
+  // Remove duplicate entries in Associated degree programme selector
+  const filteredProgrammeCodes = degreeProgrammes.filteredProgrammes.map(programme => programme.key)
+  degreeProgrammes.allProgrammes = degreeProgrammes.allProgrammes.filter(
+    programme => !filteredProgrammeCodes.includes(programme.key)
+  )
 
   if (groups.length === 0) {
     return <StyledMessage>You do not have access to any study guidance groups.</StyledMessage>
