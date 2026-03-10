@@ -7,11 +7,12 @@
     "dev": "nodemon ./src/index.js"
   },
   "dependencies": {
+    "@types/pg": "^8.18.0",
     "async": "^3.2.6",
     "bullmq": "^5.53.2",
     "knex": "^3.1.0",
     "lodash-es": "^4.17.23",
-    "pg": "^8.16.0",
+    "pg": "^8.20.0",
     "redis": "^4.7.1",
     "redis-lock": "^1.0.0",
     "sequelize": "^6.37.7",
