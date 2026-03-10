@@ -16,7 +16,7 @@
     "@mui/material": "^6.4.12",
     "@mui/x-date-pickers": "^7.29.4",
     "@oodikone/shared": "file:../shared",
-    "@reduxjs/toolkit": "^2.8.2",
+    "@reduxjs/toolkit": "^2.11.2",
     "@sentry/browser": "^10.43.0",
     "@tanstack/react-table": "^8.21.3",
     "@types/lodash-es": "^4.17.12",
