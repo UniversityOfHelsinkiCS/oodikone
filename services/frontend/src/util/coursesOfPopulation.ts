@@ -17,12 +17,12 @@ type EnrollmentObject = {
 export type CourseModule = Pick<Module, 'code'> & {
   name: Name
   courses: FilteredProgrammeCourse[]
-  stats?: FilteredCourseStats
+  stats?: Partial<FilteredCourseStats>
 }
 export type FilteredProgrammeCourse = FilteredCourse & ProgrammeCourse
 export type FilteredCourseModule = FilteredCourse & { name: Name; code: string }
 
-export type FilteredCourseStats = {
+type FilteredCourseStats = {
   attempts: number
   failed: number
   improvedPassedGrade: number

@@ -159,12 +159,18 @@ export const PassFailEnrollments = ({
           columnHelper.accessor(() => undefined, {
             header: 'Pass rate',
             cell: ({ row }) =>
-              row.original.stats
+              row.original.stats?.passed && row.original.stats?.totalStudents
                 ? calculatePercentage(row.original.stats?.passed, row.original.stats?.totalStudents)
                 : null,
             sortingFn: (rowA, rowB) => {
-              const a = rowA.original.stats ? rowA.original.stats.passed / rowA.original.stats.totalStudents : 0
-              const b = rowB.original.stats ? rowB.original.stats.passed / rowB.original.stats.totalStudents : 0
+              const a =
+                rowA.original.stats?.passed && rowA.original.stats?.totalStudents
+                  ? rowA.original.stats.passed / rowA.original.stats.totalStudents
+                  : 0
+              const b =
+                rowB.original.stats?.passed && rowB.original.stats?.totalStudents
+                  ? rowB.original.stats.passed / rowB.original.stats.totalStudents
+                  : 0
 
               return a - b
             },
@@ -194,14 +200,18 @@ export const PassFailEnrollments = ({
                 id: 'passedPercentage',
                 header: 'Passed',
                 cell: ({ row }) =>
-                  row.original.stats ? calculatePercentage(row.original.stats?.passedOfPopulation, 100) : null,
+                  row.original.stats?.passedOfPopulation
+                    ? calculatePercentage(row.original.stats?.passedOfPopulation, 100)
+                    : null,
                 sortingFn: (rowA, rowB) =>
                   (rowA.original.stats?.passedOfPopulation ?? 0) - (rowB.original.stats?.passedOfPopulation ?? 0),
               }),
               columnHelper.accessor(() => undefined, {
                 header: 'Attempted',
                 cell: ({ row }) =>
-                  row.original.stats ? calculatePercentage(row.original.stats?.triedOfPopulation, 100) : null,
+                  row.original.stats?.triedOfPopulation
+                    ? calculatePercentage(row.original.stats?.triedOfPopulation, 100)
+                    : null,
                 sortingFn: (rowA, rowB) =>
                   (rowA.original.stats?.triedOfPopulation ?? 0) - (rowB.original.stats?.triedOfPopulation ?? 0),
               }),

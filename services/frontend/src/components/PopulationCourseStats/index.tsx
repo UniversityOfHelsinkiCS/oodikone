@@ -4,9 +4,9 @@ import { orderBy } from 'lodash-es'
 import { useState, useEffect } from 'react'
 
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
-import { FilteredCourse, FilteredCourseStats, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
+import { FilteredCourse, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
-import type { Module, Name, CurriculumDetails } from '@oodikone/shared/types'
+import type { Module, CurriculumDetails } from '@oodikone/shared/types'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 import { PassingSemesters } from './PassingSemesters'
@@ -47,7 +47,7 @@ export const PopulationCourseStats = ({
     const modules: Record<
       string,
       Omit<Module, 'courses'> & { courses: FilteredProgrammeCourse[] } & {
-        module: { code: string; name: Name; stats?: FilteredCourseStats }
+        module: CourseModule
       }
     > = (filteredCourses ?? [])
       .filter(({ course }) => visibleCoursesFilter(course, curriculum))
@@ -78,7 +78,8 @@ export const PopulationCourseStats = ({
     // Add statistics to modules
     Object.keys(modules).map(parentCode => {
       const moduleWithCode = filteredCourses.find(course => course.course.code === parentCode)
-      modules[parentCode].module.stats = moduleWithCode?.stats
+      const { students, passed, passedOfPopulation } = moduleWithCode?.stats ?? {}
+      modules[parentCode].module.stats = { students, passed, passedOfPopulation }
     })
 
     setModules(
