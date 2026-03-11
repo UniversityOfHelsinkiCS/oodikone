@@ -20,6 +20,7 @@ export type Course = {
   createdAt: Date
   updatedAt: Date
   substitutions: string[]
+  substitution_groups: string[][]
   course_unit_type: string
   mainCourseCode: string
 }

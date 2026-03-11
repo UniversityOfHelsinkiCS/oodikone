@@ -73,6 +73,9 @@ export class CourseModel extends Model implements Course {
   @Column(DataType.JSONB)
   declare substitutions: Course['substitutions']
 
+  @Column(DataType.JSONB)
+  declare substitution_groups: Course['substitution_groups']
+
   @Column(DataType.STRING)
   declare course_unit_type: Course['course_unit_type']
 
