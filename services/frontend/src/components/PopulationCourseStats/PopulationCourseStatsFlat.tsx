@@ -2,7 +2,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 
-import type { FilteredCourse, FilteredCourseModule } from '@/util/coursesOfPopulation'
+import type { FilteredCourse, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
 import { GradeDistribution } from './GradeDistribution'
 import { PassFailEnrollments } from './PassFailEnrollments'
 
@@ -29,14 +29,21 @@ export const PopulationCourseStatsFlat = ({
 
   if (!filteredCourses) return null
 
-  const courseStatistics: FilteredCourseModule[] = filteredCourses
+  const courseStatistics: UnionOfFilteredModuleCourse = filteredCourses
     .filter(({ stats }) => studentAmountLimit <= stats.students)
     .filter(({ course }) => (showModules ? course.is_study_module : !course.is_study_module))
-    .map(course => ({
-      ...course,
-      name: course.course.name,
-      code: course.course.code,
-    }))
+    .map(course => {
+      const { students, passed, passedOfPopulation } = course.stats
+      // Modules have only some stats while courses have all
+      const stats = showModules ? { students, passed, passedOfPopulation } : course.stats
+
+      return {
+        ...course,
+        name: course.course.name,
+        code: course.course.code,
+        stats,
+      }
+    })
 
   const panes = [
     {

@@ -20,7 +20,11 @@ export type CourseModule = Pick<Module, 'code'> & {
   stats?: Partial<FilteredCourseStats>
 }
 export type FilteredProgrammeCourse = FilteredCourse & ProgrammeCourse
-export type FilteredCourseModule = FilteredCourse & { name: Name; code: string }
+type FilteredCourseModule = FilteredCourse & { name: Name; code: string }
+export type UnionOfFilteredModuleCourse = (
+  | (Omit<FilteredCourseModule, 'stats'> & { stats: Partial<FilteredCourseStats> })
+  | CourseModule
+)[]
 
 type FilteredCourseStats = {
   attempts: number

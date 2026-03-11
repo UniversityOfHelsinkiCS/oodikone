@@ -10,12 +10,12 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
-import { CourseModule, FilteredCourse, FilteredCourseModule } from '@/util/coursesOfPopulation'
-import { Name } from '@oodikone/shared/types'
+import { CourseModule, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
+import { Unarray } from '@oodikone/shared/types'
 import { CourseFilterToggle } from '../CourseFilterToggle'
 import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
-const columnHelper = createColumnHelper<CourseModule | (FilteredCourse & { name: Name; code: string })>()
+const columnHelper = createColumnHelper<Unarray<UnionOfFilteredModuleCourse>>()
 
 export const PassFailEnrollments = ({
   courseStatistics,
@@ -24,7 +24,7 @@ export const PassFailEnrollments = ({
   showModules,
   setShowModules,
 }: {
-  courseStatistics: CourseModule[] | FilteredCourseModule[]
+  courseStatistics: UnionOfFilteredModuleCourse
   onlyIamRights?: boolean
   courseTableMode?: 'all' | 'curriculum'
   showModules?: boolean
@@ -36,7 +36,10 @@ export const PassFailEnrollments = ({
 
   const [data, excelData] = useMemo(() => {
     const excelData = courseStatistics
-      .flatMap(row => row?.courses ?? [row])
+      .flatMap(row => {
+        const isModule = (x: object): x is CourseModule => !!Object.hasOwn(x, 'courses')
+        return isModule(row) ? row?.courses : [row]
+      })
       .map(({ name, code, stats }) => ({
         Name: getTextIn(name),
         Code: code,
@@ -159,8 +162,8 @@ export const PassFailEnrollments = ({
           columnHelper.accessor(() => undefined, {
             header: 'Pass rate',
             cell: ({ row }) =>
-              row.original.stats?.passed && row.original.stats?.totalStudents
-                ? calculatePercentage(row.original.stats?.passed, row.original.stats?.totalStudents)
+              row.original.stats?.totalStudents
+                ? calculatePercentage(row.original.stats?.passed ?? 0, row.original.stats?.totalStudents)
                 : null,
             sortingFn: (rowA, rowB) => {
               const a =
