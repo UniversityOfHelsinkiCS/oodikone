@@ -18,14 +18,24 @@ import {
 import { CurriculumPicker } from '@/components/common/CurriculumPicker'
 import { StyledAccordion } from '@/components/common/StyledAccordion'
 import { StyledTable } from '@/components/common/StyledTable'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
 import { ArrowDropDownIcon, CloseIcon, DoneIcon } from '@/theme'
+import { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
+import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { useCurriculumState } from '../../../hooks/useCurriculums'
 
-const ModuleTable = ({ data, cypress, getTextIn }) => (
+const ModuleTable = ({
+  data,
+  cypress,
+  getTextIn,
+}: {
+  data: StudentPageStudent['courses']
+  cypress: string
+  getTextIn: GetTextIn
+}) => (
   <StyledTable data-cy={cypress}>
     <TableHead>
       <TableRow>
@@ -48,7 +58,15 @@ const ModuleTable = ({ data, cypress, getTextIn }) => (
   </StyledTable>
 )
 
-export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
+export const BachelorHonours = ({
+  absentYears,
+  programmeCode,
+  student,
+}: {
+  absentYears: Absence[]
+  programmeCode: string
+  student: StudentPageStudent
+}) => {
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(
     programmeCode,
     new Date().getFullYear().toString()
@@ -60,8 +78,8 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   if (!student?.courses || !student?.studyRights) return null
 
-  let studyStartDate
-  let reason
+  let studyStartDate: dayjs.Dayjs
+  let reason = ''
   let graduated = false
   let inspection = false
   let inTime = false
@@ -72,8 +90,9 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   if (studyRightWithCorrectProgramme) {
     studyStartDate = dayjs(studyRightWithCorrectProgramme.startDate)
-    graduated = !!studyRightWithCorrectProgramme.studyRightElements.find(element => element.code === programmeCode)
-      .graduated
+    graduated =
+      studyRightWithCorrectProgramme.studyRightElements.find(element => element.code === programmeCode)?.graduated ??
+      false
   }
 
   const mandatoryModuleCodes = mandatoryModules ? mandatoryModules.map(mod => mod.code).filter(Boolean) : []
@@ -84,7 +103,7 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
     intermediateHonoursModules[programmeCode].includes(mod.course.code)
   )
 
-  const mainModules = []
+  const mainModules: StudentPageStudent['courses'] = []
   if (degreeModule) mainModules.push(degreeModule)
   if (basicModules.length) mainModules.push(...basicModules)
   if (intermediateModules.length) mainModules.push(...intermediateModules)
@@ -96,7 +115,8 @@ export const BachelorHonours = ({ absentYears, programmeCode, student }) => {
 
   if (degreeModule) {
     const graduationDate = dayjs(degreeModule.date)
-    const yearsForGraduation = graduationDate.diff(studyStartDate, 'years', true)
+    // HACK: StudyStartDate should never be null even though db allows it
+    const yearsForGraduation = graduationDate.diff(studyStartDate!, 'years', true)
 
     // calculate time student has been absent during bachelors degree
     const timeAbsent = absentYears.reduce((acc, curr) => {
