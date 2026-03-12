@@ -285,8 +285,8 @@ export const StudyGuidanceGroupOverview = ({ groups }: { groups: GroupsWithTags[
           lisäominaisuuksia.
         </p>
         <p>
-          <Link to="/close-to-graduation">Students close to graduation</Link> voit tarkastella ohjausryhmiesi lähellä
-          valmistumista olevia opiskelijoita (sekä opiskelijoita, joiden tietoihin sinulla on lukuoikeudet).
+          <Link to="/close-to-graduation">Students close to graduation</Link> näkymässä voit tarkastella ohjausryhmiesi
+          lähellä valmistumista olevia opiskelijoita (sekä opiskelijoita, joiden tietoihin sinulla on lukuoikeudet).
         </p>
       </StyledMessage>
       <StyledTable data-cy="study-guidance-group-overview-data-table" showCellBorders>
