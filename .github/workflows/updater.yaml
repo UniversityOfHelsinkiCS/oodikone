@@ -115,7 +115,6 @@ jobs:
     name: 'Build and release Updater worker'
     runs-on: ubuntu-latest
     needs: test_updater
-    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -145,7 +144,6 @@ jobs:
     name: 'Build and release Updater scheduler'
     runs-on: ubuntu-latest
     needs: test_updater
-    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
