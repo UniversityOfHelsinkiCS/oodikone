@@ -8,6 +8,7 @@ export const filterToolTips = {
 
     Jos opiskelijan opinto-oikeus ei ole ollut voimassa valitun lukukauden aikana, häntä ei lasketa mukaan mihinkään kategoriaan. Huomioi myös, että osa ilmoittautumisen laiminlyöneistä opiskelijoista on saattanut valmistua valitusta ohjelmasta.
   `,
+  hetu: 'Rajaa opiskelijoita sen mukaan onko heillä suomalaista henkilötunnusta. Filters students based on if they have a Finnish personal identity code.',
   startingYear:
     'Valitse opiskelijoita sen mukaan, minä vuonna heidän ensimmäinen opinto-oikeutensa yliopistolla alkoi (ei siis ainoastaan tarkasteltavan tutkinnon oikeus). Avoimia opinto-oikeuksia ei oteta huomioon.',
   studentNumber:
