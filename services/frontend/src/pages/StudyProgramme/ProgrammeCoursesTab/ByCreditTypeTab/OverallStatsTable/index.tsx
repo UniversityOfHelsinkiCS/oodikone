@@ -64,8 +64,21 @@ export const OverallStatsTable = ({
         columnHelper.accessor('degreeStudentsCredits', {
           header: 'Degree students',
         }),
-        columnHelper.accessor('openStudentsCredits', {
-          header: 'Open university',
+        columnHelper.accessor('openStudentsHasHetuCredits', {
+          header: () => (
+            <TableHeaderWithTooltip
+              header="Open university (with HETU)"
+              tooltipText="Credits produced by open university students with a Finnish personal identity code (HETU)"
+            />
+          ),
+        }),
+        columnHelper.accessor('openStudentsNoHetuCredits', {
+          header: () => (
+            <TableHeaderWithTooltip
+              header="Open university (no HETU)"
+              tooltipText="Credits produced by open university students who do not have a Finnish personal identity code (HETU)"
+            />
+          ),
         }),
         columnHelper.accessor('exchangeStudentsCredits', {
           header: 'Exchange students',
@@ -114,8 +127,21 @@ export const OverallStatsTable = ({
         columnHelper.accessor('degreeStudents', {
           header: 'Degree students',
         }),
-        columnHelper.accessor('openStudents', {
-          header: 'Open uni students',
+        columnHelper.accessor('openStudentsHasHetu', {
+          header: () => (
+            <TableHeaderWithTooltip
+              header="Open university students with HETU"
+              tooltipText="HETU = Finnish personal identity code"
+            />
+          ),
+        }),
+        columnHelper.accessor('openStudentsNoHetu', {
+          header: () => (
+            <TableHeaderWithTooltip
+              header="Open university students without HETU"
+              tooltipText="HETU = Finnish personal identity code"
+            />
+          ),
         }),
         columnHelper.accessor('exchangeStudents', {
           header: 'Exchange students',

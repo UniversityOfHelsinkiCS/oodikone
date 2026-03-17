@@ -36,8 +36,11 @@ export const filterDataByYear = (
           acc.separateStudents += curr[1].separateStudents
           acc.separateStudentsCredits += curr[1].separateStudentsCredits
 
-          acc.openStudents += curr[1].openStudents
-          acc.openStudentsCredits += curr[1].openStudentsCredits
+          acc.openStudentsHasHetu += curr[1].openStudentsHasHetu
+          acc.openStudentsHasHetuCredits += curr[1].openStudentsHasHetuCredits
+
+          acc.openStudentsNoHetu += curr[1].openStudentsNoHetu
+          acc.openStudentsNoHetuCredits += curr[1].openStudentsNoHetuCredits
         }
 
         return acc
