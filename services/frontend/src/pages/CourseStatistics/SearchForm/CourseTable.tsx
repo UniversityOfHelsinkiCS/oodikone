@@ -79,10 +79,3 @@ export const CourseTable = ({
     </TableContainer>
   )
 }
-
-const areEqual = (prevProps, nextProps) => {
-  if (prevProps.courses.length !== nextProps.courses.length) {
-    return false
-  }
-  return prevProps.courses.every(c1 => nextProps.courses.some(c2 => c1.code === c2.code))
-}
