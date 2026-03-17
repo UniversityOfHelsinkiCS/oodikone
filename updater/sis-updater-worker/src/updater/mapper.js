@@ -240,7 +240,7 @@ const timify = date => new Date(date).getTime()
 
 export const courseMapper =
   courseIdToAttainments =>
-  ([groupId, courses], substitutions) => {
+  ([groupId, courses], substitutions, substitution_groups) => {
     const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
 
     const { min_attainment_date, max_attainment_date } = courses.reduce(
@@ -270,6 +270,7 @@ export const courseMapper =
       max_attainment_date,
       is_study_module: course_unit_type == null, // Only course units have a course_unit_type so if it's null, it must be a study module
       substitutions,
+      substitution_groups,
       course_unit_type,
     }
   }
