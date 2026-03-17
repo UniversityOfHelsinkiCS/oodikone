@@ -237,7 +237,7 @@ export const getTransferCourseAggregates = async (params: {
   }
 }
 
-export const getStudentToHetuSplit = async (studentNumbers: string[]): Promise<Map<string, boolean>> => {
+export const getStudentHetuStateMap = async (studentNumbers: string[]): Promise<Map<string, boolean>> => {
   if (!studentNumbers.length) return new Map()
 
   try {

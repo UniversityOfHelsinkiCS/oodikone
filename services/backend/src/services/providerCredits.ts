@@ -5,6 +5,7 @@ import { mapToProviders } from '@oodikone/shared/util'
 import { getCreditStats, setCreditStats } from './analyticsService'
 import { getCourseCodesOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
+import { getStudentHetuStateMap } from './studyProgramme/studentGetters'
 import { defineYear } from './studyProgramme/studyProgrammeHelpers'
 import { getSISStudyRightsOfStudents } from './studyProgramme/studyRightFinders'
 
@@ -47,13 +48,17 @@ const basicDegreeExtentCodes = [ExtentCode.BACHELOR, ExtentCode.MASTER, ExtentCo
   This is probably very rare to cause differences, only one such was found in MH60_001
 */
 
-const getCategory = (extentCode?: ExtentCode, degreeStudyRightExtentCode?: ExtentCode) => {
+const getCategory = (hasHetu: boolean, extentCode?: ExtentCode, degreeStudyRightExtentCode?: ExtentCode) => {
   if (degreeStudyRightExtentCode && basicDegreeExtentCodes.includes(degreeStudyRightExtentCode)) {
     return 'basic'
   }
   switch (extentCode) {
     case ExtentCode.OPEN_UNIVERSITY_STUDIES:
-      return 'open-uni'
+      if (hasHetu) {
+        return 'open-uni-hetu'
+      } else {
+        return 'open-uni-no-hetu'
+      }
     case ExtentCode.MASTER:
     case ExtentCode.BACHELOR_AND_MASTER:
     case ExtentCode.BACHELOR:
@@ -121,38 +126,43 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
 
   const students = [...new Set(credits.map(({ studentNumber }) => studentNumber))]
 
-  const studyRights = await getSISStudyRightsOfStudents(students)
+  const [studyRights, studentToHetuStateMap] = await Promise.all([
+    getSISStudyRightsOfStudents(students),
+    getStudentHetuStateMap(students),
+  ])
 
-  const studyRightIdToStudyRightMap = studyRights.reduce<Record<string, (typeof studyRights)[number]>>((obj, cur) => {
-    obj[cur.id] = cur
-    return obj
-  }, {})
+  const studyRightIdToStudyRightMap = new Map(studyRights.map(sr => [sr.id, sr]))
 
-  const studentNumberToStudyRightsMap = studyRights.reduce<Record<string, typeof studyRights>>((obj, cur) => {
-    obj[cur.studentNumber] ??= []
-    obj[cur.studentNumber].push(cur)
-    return obj
-  }, {})
+  const studentNumberToStudyRightsMap = studyRights.reduce((map, cur) => {
+    // Node does not support getOrInsert as of writing :-(
+    if (map.has(cur.studentNumber)) {
+      map.get(cur.studentNumber)!.push(cur)
+    } else {
+      map.set(cur.studentNumber, [cur])
+    }
+    return map
+  }, new Map<string, [(typeof studyRights)[number]]>())
 
   const stats: Record<string, Record<string, number>> = {}
 
   for (const { attainmentDate, studentNumber, credits: numOfCredits, studyrightId, semestercode } of credits) {
-    const studyRightLinkedToAttainment = studyRightIdToStudyRightMap[studyrightId]
+    const studyRightLinkedToAttainment = studyRightIdToStudyRightMap.get(studyrightId)
     const attainmentYear = defineYear(attainmentDate, isAcademicYear)
     const degreeStudyRight = getBasicDegreeStudyRight(
-      studentNumberToStudyRightsMap[studentNumber],
+      studentNumberToStudyRightsMap.get(studentNumber),
       attainmentDate,
       semestercode
     )
+    const hasHetu = !!studentToHetuStateMap.get(studentNumber)
 
     if (!studyRightLinkedToAttainment && !degreeStudyRight) {
       continue
     }
 
-    const category = getCategory(studyRightLinkedToAttainment?.extentCode, degreeStudyRight?.extentCode)
+    const category = getCategory(hasHetu, studyRightLinkedToAttainment?.extentCode, degreeStudyRight?.extentCode)
     stats[attainmentYear] ??= {}
     stats[attainmentYear][category] ??= 0
-    stats[attainmentYear][category] += numOfCredits || 0
+    stats[attainmentYear][category] += numOfCredits
   }
 
   const transferredCredits = await getTransferredCredits(rapoFormattedProviderCode, since)
@@ -164,7 +174,7 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
     const attainmentYear = defineYear(createdate, isAcademicYear)
     stats[attainmentYear] ??= {}
     stats[attainmentYear].transferred ??= 0
-    stats[attainmentYear].transferred += credits || 0
+    stats[attainmentYear].transferred += credits
   })
 
   return { stats, id: providerCode }

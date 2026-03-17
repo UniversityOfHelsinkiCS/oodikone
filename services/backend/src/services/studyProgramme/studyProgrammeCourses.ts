@@ -5,7 +5,7 @@ import { mapToProviders } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
-import { getStudentToHetuSplit, getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
+import { getStudentHetuStateMap, getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
 
 const START_YEAR = 2017
 const JULY = 6
@@ -175,7 +175,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     }),
   ])
 
-  const openUniStudentHetuMap = await getStudentToHetuSplit(
+  const openUniStudentHetuMap = await getStudentHetuStateMap(
     programmeCredits.filter(c => c.variant === 'openUni').map(c => c.studentNumber)
   )
 
