@@ -1,6 +1,7 @@
-import { QueryTypes } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 
 import { CreditTypeCode, ExtentCode, Name } from '@oodikone/shared/types'
+import { StudentModel } from 'src/models'
 import { dbConnections } from '../../database/connection'
 import logger from '../../util/logger'
 
@@ -233,5 +234,28 @@ export const getTransferCourseAggregates = async (params: {
   } catch (error) {
     logger.error('getTransferCourseAggregates failed', { error })
     return []
+  }
+}
+
+export const getStudentToHetuSplit = async (studentNumbers: string[]): Promise<Map<string, boolean>> => {
+  if (!studentNumbers.length) return new Map()
+
+  try {
+    return new Map(
+      (
+        await StudentModel.findAll({
+          attributes: ['studentnumber', 'hasPersonalIdentityCode'],
+          where: {
+            studentnumber: {
+              [Op.in]: studentNumbers,
+            },
+          },
+          raw: true,
+        })
+      ).map(student => [student.studentnumber, student.hasPersonalIdentityCode])
+    )
+  } catch (error) {
+    logger.error('getOpenUniHetutonSplit failed', { error })
+    return new Map()
   }
 }

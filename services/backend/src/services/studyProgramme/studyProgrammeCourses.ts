@@ -5,7 +5,7 @@ import { mapToProviders } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
-import { getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
+import { getStudentToHetuSplit, getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
 
 const START_YEAR = 2017
 const JULY = 6
@@ -52,7 +52,8 @@ type YearAccumulator = {
   separateStudents: Set<string>
   otherStudents: Set<string>
 
-  openStudents: Set<string>
+  openStudentsHasHetu: Set<string>
+  openStudentsNoHetu: Set<string>
   transferStudents: Set<string>
 }
 
@@ -72,7 +73,8 @@ const createYearAccumulator = (isStudyModule: boolean): YearAccumulator => ({
   separateStudents: new Set(),
   otherStudents: new Set(),
 
-  openStudents: new Set(),
+  openStudentsHasHetu: new Set(),
+  openStudentsNoHetu: new Set(),
   transferStudents: new Set(),
 })
 
@@ -117,7 +119,8 @@ const finalizeYearStats = (yearAccumulator: YearAccumulator): YearStats => {
   stats.separateStudents = yearAccumulator.separateStudents.size
   stats.otherStudents = yearAccumulator.otherStudents.size
 
-  stats.openStudents = yearAccumulator.openStudents.size
+  stats.openStudentsHasHetu = yearAccumulator.openStudentsHasHetu.size
+  stats.openStudentsNoHetu = yearAccumulator.openStudentsNoHetu.size
   stats.transferStudents = yearAccumulator.transferStudents.size
 
   stats.allStudents = stats.allPassed + stats.allNotPassed
@@ -131,6 +134,9 @@ const getYearRange = async (unixMillis: number, isAcademicYear: boolean) => {
   return range(START_YEAR, lastYear + 1)
 }
 
+/**
+ * @endpoint "programme courses"
+ */
 export const getStudyProgrammeCoursesForStudyTrack = async (
   unixMillis: number,
   studyProgramme: string,
@@ -168,6 +174,10 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
       to,
     }),
   ])
+
+  const openUniStudentHetuMap = await getStudentToHetuSplit(
+    programmeCredits.filter(c => c.variant === 'openUni').map(c => c.studentNumber)
+  )
 
   const courseMap = new Map<string, CourseAccumulator>()
   let maxYear = 0
@@ -208,8 +218,13 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
         stats.otherStudentsCredits += row.credits
         break
       case 'openUni':
-        yearAccumulator.openStudents.add(row.studentNumber)
-        stats.openStudentsCredits += row.credits
+        if (openUniStudentHetuMap.get(row.studentNumber)) {
+          stats.openStudentsHasHetuCredits += row.credits
+          yearAccumulator.openStudentsHasHetu.add(row.studentNumber)
+        } else {
+          stats.openStudentsNoHetuCredits += row.credits
+          yearAccumulator.openStudentsNoHetu.add(row.studentNumber)
+        }
         break
       default:
         break
