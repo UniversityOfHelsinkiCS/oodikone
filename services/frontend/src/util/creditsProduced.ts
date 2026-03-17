@@ -24,7 +24,8 @@ export const makeGraphData = (data: Record<string, Record<string, number>> | und
     agreement: 'Other university',
     separate: 'Separate studies',
     basic: 'Degree students',
-    'open-uni': 'Open university',
+    'open-uni-hetu': 'Open university (hetu)',
+    'open-uni-no-hetu': 'Open university (no hetu)',
     transferred: 'Transferred',
     'incoming-exchange': 'Exchange students',
     other: 'Other',
@@ -58,20 +59,22 @@ export const makeTableStats = (data: Record<string, Record<string, number>> | un
   for (let year = currentYear - (isAcademicYear && new Date().getMonth() < 7 ? 1 : 0); year >= 2017; year--) {
     const yearData = data[getFormattedYear(year, isAcademicYear)]
     const basic = yearData?.basic || 0
-    const openUni = yearData?.['open-uni'] || 0
+    const openUniHetu = yearData?.['open-uni-hetu'] || 0
+    const openUniNoHetu = yearData?.['open-uni-no-hetu'] || 0
     const exchange = yearData?.['incoming-exchange'] || 0
     const separate = yearData?.separate || 0
     const agreement = yearData?.agreement || 0
     const transferred = yearData?.transferred || 0
     const other = yearData?.other || 0
-    const total = basic + openUni + exchange + separate + agreement
+    const total = basic + openUniHetu + openUniNoHetu + exchange + separate + agreement
 
     const yearStats = [
       getFormattedYear(year, isAcademicYear),
       Math.round(total),
       Math.round(basic),
       Math.round(exchange),
-      Math.round(openUni),
+      Math.round(openUniHetu),
+      Math.round(openUniNoHetu),
       Math.round(agreement),
       Math.round(separate),
       Math.round(transferred),
@@ -85,7 +88,8 @@ export const makeTableStats = (data: Record<string, Record<string, number>> | un
     'Total',
     'Degree students',
     'Exchange students',
-    'Open university',
+    'Open university (hetu)',
+    'Open university (no hetu)',
     'Other university',
     'Separate',
     'Transferred',
