@@ -13,6 +13,7 @@ import {
   courseFilter,
   creditsEarnedFilter,
   genderFilter,
+  hetuFilter,
   gradeFilter,
   programmeFilter,
   startYearAtUniFilter,
@@ -208,6 +209,7 @@ export const CoursePopulation = () => {
         ageFilter(),
         courseFilter({ courses: population?.coursestatistics.courses }),
         creditsEarnedFilter(),
+        hetuFilter(),
         startYearAtUniFilter(),
         programmeFilter({
           additionalModes: [
