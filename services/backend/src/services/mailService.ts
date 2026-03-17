@@ -1,8 +1,8 @@
 import axios from 'axios'
 
+import logger from 'src/util/logger'
 import { isProduction, pateToken } from '../config'
 import { FormattedUser } from '../types'
-import { ApplicationError } from '../util/customErrors'
 
 const pateClient = axios.create({
   baseURL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
@@ -22,8 +22,8 @@ const baseSettings = {
 }
 
 const sendEmail = async (options = {}) => {
-  if (!isProduction) throw new ApplicationError('Email sending is disabled in development mode.')
-  if (!pateToken) throw new ApplicationError('Email sending failed because pate token is missing.')
+  if (!isProduction) return logger.error('Email sending is disabled in development mode.')
+  if (!pateToken) return logger.error('Email sending failed because pate token is missing.')
   return await pateClient.post('/', options)
 }
 
