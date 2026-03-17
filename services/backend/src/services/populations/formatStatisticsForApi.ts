@@ -69,6 +69,7 @@ export const formatStudentForAPI = (
     sis_person_id: student.sis_person_id,
     citizenships: student.citizenships,
     curriculumVersion: getCurriculumVersion(hops?.curriculum_period_id),
+    hasPersonalIdentityCode: student.hasPersonalIdentityCode,
 
     tags,
     transferredStudyright,

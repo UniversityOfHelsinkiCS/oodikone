@@ -79,6 +79,7 @@ type StudentPersonalData = Pick<
   | 'gender_code'
   | 'birthdate'
   | 'sis_person_id'
+  | 'hasPersonalIdentityCode'
 >
 
 type StudentStudyRightElement = Pick<
@@ -125,6 +126,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
       'gender_code',
       'birthdate',
       'sis_person_id',
+      'hasPersonalIdentityCode',
     ],
     include: [
       {

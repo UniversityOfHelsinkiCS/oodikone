@@ -19,6 +19,7 @@ type StudentPersonalData = Pick<
   | 'gender_code'
   | 'birthdate'
   | 'sis_person_id'
+  | 'hasPersonalIdentityCode'
 >
 
 export type StudentStudyRightElement = Pick<
@@ -135,6 +136,7 @@ export type FormattedStudent = {
   citizenships: Name[]
   criteriaProgress: Record<string, CriteriaYear>
   curriculumVersion: string | null
+  hasPersonalIdentityCode: boolean
 
   transferredStudyright: boolean
   transferSource: string | undefined
