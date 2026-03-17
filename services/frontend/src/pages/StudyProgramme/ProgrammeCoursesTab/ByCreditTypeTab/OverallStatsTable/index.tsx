@@ -147,12 +147,6 @@ export const OverallStatsTable = ({
     [showStudents]
   ) as ColumnDef<FilteredColumnData>[]
 
-  const options = {
-    state: {
-      useZebrastripes: false,
-    },
-  }
-
   const columnKeys = useMemo(() => {
     const squashGroups = column => {
       if (column.columns) return column.columns.flatMap(squashGroups)
@@ -166,7 +160,6 @@ export const OverallStatsTable = ({
       columns={columns}
       cy="overall-stats-table"
       data={filteredData}
-      options={options}
       toolbarContent={<OodiTableExcelExport data={filteredData} exportColumnKeys={columnKeys} />}
     />
   )
