@@ -93,6 +93,7 @@ export const OodiTableExcelExport = <TData extends object>({
     }),
     columnHelper.accessor('sample', {
       header: 'Sample values',
+      enableSorting: false,
       cell: cell => {
         const value = cell.getValue<React.ReactNode>()
         return (
@@ -112,15 +113,14 @@ export const OodiTableExcelExport = <TData extends object>({
     [data]
   )
 
-  const prepData = exportData.slice(0, 10)
-
   const pivotedData = useMemo(
     () =>
       exportColumnKeys.map(accessorKey => ({
         header: accessorKey,
-        sample: prepData
+        sample: data
           .map(row => row[accessorKey])
-          .filter(value => value !== undefined)
+          .filter(Boolean)
+          .slice(0, 8)
           .map(churnSampleData),
       })),
     [exportColumnKeys, exportData]

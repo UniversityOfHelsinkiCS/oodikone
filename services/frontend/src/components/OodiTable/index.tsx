@@ -28,7 +28,7 @@ export const OodiTable = <TData,>({
   cy,
 }: {
   data: TData[]
-  columns: ColumnDef<TData>[]
+  columns: ColumnDef<TData, any>[]
   isExportView?: true
   options?: Partial<TableOptions<TData>>
   toolbarContent?: ReactNode
