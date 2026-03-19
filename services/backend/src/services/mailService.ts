@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-import logger from "../util/logger"
 import { isProduction, pateToken } from '../config'
 import { FormattedUser } from '../types'
+import logger from '../util/logger'
 
 const pateClient = axios.create({
   baseURL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
