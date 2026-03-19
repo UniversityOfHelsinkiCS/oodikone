@@ -75,7 +75,14 @@ export default tseslint.config(
       'prefer-const': 'error',
       'prefer-destructuring': 'off', // Disabled in favor of @typescript-eslint
       'dot-notation': 'off', // Disabled in favor of @typescript-eslint
-      'no-restricted-imports': ['error', { 'patterns': [{ 'regex': '^@mui/[^/]+$' }] }],
+      'no-restricted-imports': ['error',
+        {
+          'patterns':
+            [
+              { 'regex': '^@mui/[^/]+$', 'message': 'Import only the needed module. This has no effect in prod due to tree-shake, but speeds up development builds.' },
+              { 'regex': '^src/.*', 'message': 'Root imports will not resolve in production build (instead silently crash).' }
+            ]
+        }],
       'quotes': ['error', 'single',
         { avoidEscape: true, allowTemplateLiterals: false }
       ],
