@@ -673,12 +673,13 @@ describe('Degree programme overview', () => {
         cy.get('thead tr')
           .eq(1)
           .within(() => {
-            cy.get('th').should('have.length', 9)
+            cy.get('th').should('have.length', 10)
             const headers = [
               'Passed',
               'Not completed',
               'Degree students',
-              'Open uni students',
+              'Open uni students (with hetu)',
+              'Open uni students (without hetu)',
               'Exchange students',
               'Other university students',
               'Separate studies',
