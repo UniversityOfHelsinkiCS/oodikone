@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import logger from 'src/util/logger'
+import logger from "../util/logger"
 import { isProduction, pateToken } from '../config'
 import { FormattedUser } from '../types'
 
