@@ -182,7 +182,7 @@ jobs:
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - lint_packages
-    if: always() && !cancelled()
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
