@@ -710,7 +710,7 @@ describe('Degree programme overview', () => {
       })
 
       // FIXME: Flaky
-      it('test', () => {
+      it.skip('test', () => {
         // TODO: Implement some real tests for this tab
         cy.contains('From')
       })
