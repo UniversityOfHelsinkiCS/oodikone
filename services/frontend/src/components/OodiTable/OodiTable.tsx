@@ -66,6 +66,9 @@ export const OodiTableContainer = <OTData,>({
                     backgroundColor: 'grey.100',
                   }
                 : {},
+              '& tr:hover > td': {
+                backgroundColor: 'grey.200',
+              },
             }}
           >
             {table.getAggregationRowModel().rows.map(row => OodiTableDataRow(row, true))}
