@@ -6,6 +6,7 @@ import {
   courseFilter,
   creditDateFilter,
   creditsEarnedFilter,
+  hetuFilter,
   enrollmentStatusFilter,
   genderFilter,
   hopsFilter,
@@ -51,6 +52,7 @@ export const CustomPopulationWrapper = ({
       transferredToProgrammeFilter(),
       startYearAtUniFilter(),
       tagsFilter(),
+      hetuFilter(),
       programmeFilter(),
       creditDateFilter(),
       enrollmentStatusFilter({
