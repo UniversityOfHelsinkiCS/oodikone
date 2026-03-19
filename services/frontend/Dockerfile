@@ -28,6 +28,8 @@ ENV REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED=$LANGUAGE_CENTER_VIEW_ENABLED
 ARG SIS_URL='https://sisu.helsinki.fi'
 ENV REACT_APP_SIS_URL=$SIS_URL
 
+RUN npm install -g serve@^14
+
 WORKDIR /opt/app-root/shared
 COPY ./shared .
 
@@ -36,7 +38,7 @@ COPY ./frontend/package*.json .
 RUN npm ci --include=dev
 COPY ./frontend .
 
-RUN npm run build && npm install -g serve@^14
+RUN npm run build
 
 EXPOSE 5000
 CMD ["serve", "--single", "--listen", "5000", "build"]

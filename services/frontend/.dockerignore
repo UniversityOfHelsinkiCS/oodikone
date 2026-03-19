@@ -1,6 +1,0 @@
-.dockerignore
-.eslintrc.json
-.gitignore
-*Dockerfile
-build/
-node_modules/

@@ -1,0 +1,7 @@
+*/.dockerignore
+*/.eslintrc.json
+*/.gitignore
+*/*Dockerfile
+*/build
+*/dist
+*/node_modules
