@@ -107,8 +107,9 @@ class DbConnections extends EventEmitter {
         logger,
       })
 
-      const migrations = (await migrator.up()).map(m => m.name)
-      logger.info({ message: 'Migrations up to date', meta: migrations })
+      const newMigrations = (await migrator.up()).map(m => m.name)
+      const executedMigrations = await migrator.executed()
+      logger.info({ message: 'Migrations up to date', meta: newMigrations, latest: executedMigrations.at(-1)?.name })
     } catch (error) {
       logger.error({ message: 'Migration error', meta: JSON.stringify(error) })
       throw error
