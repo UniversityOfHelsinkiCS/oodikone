@@ -68,8 +68,6 @@ export const useFormat = ({
   const { data, isSuccess: programmesSuccess } = useGetProgrammesQuery()
   const programmes = data?.filteredProgrammes ?? {}
 
-  console.log("Integrated CI test ????")
-
   const { currentSemester, allSemesters, firstSemester, lastSemester } = semestersSuccess
     ? semesters
     : { currentSemester: null, allSemesters: {}, firstSemester: 0, lastSemester: 0 }
@@ -130,16 +128,16 @@ export const useFormat = ({
 
   const fromSemester = from
     ? (Object.values(allSemesters)
-      .filter(({ startdate }) => new Date(startdate) <= new Date(from))
-      .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))
-      .shift()?.semestercode ?? null)
+        .filter(({ startdate }) => new Date(startdate) <= new Date(from))
+        .sort((a, b) => +new Date(b.startdate) - +new Date(a.startdate))
+        .shift()?.semestercode ?? null)
     : null
 
   const toSemester = to
     ? (Object.values(allSemesters)
-      .filter(({ enddate }) => new Date(to) <= new Date(enddate))
-      .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))
-      .shift()?.semestercode ?? null)
+        .filter(({ enddate }) => new Date(to) <= new Date(enddate))
+        .sort((a, b) => +new Date(a.enddate) - +new Date(b.enddate))
+        .shift()?.semestercode ?? null)
     : null
 
   const formatStudent = (student: Student): FormattedStudentData => {
