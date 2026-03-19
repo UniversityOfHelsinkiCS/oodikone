@@ -1,8 +1,8 @@
 import { Op, QueryTypes } from 'sequelize'
 
 import { CreditTypeCode, ExtentCode, Name } from '@oodikone/shared/types'
-import { StudentModel } from 'src/models'
 import { dbConnections } from '../../database/connection'
+import { StudentModel } from '../../models'
 import logger from '../../util/logger'
 
 // Categories here are as per Linjaukset.md in internal docs.
