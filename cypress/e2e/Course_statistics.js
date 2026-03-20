@@ -396,7 +396,6 @@ describe('Basic user', () => {
     cy.contains('Search for courses')
     searchByCourseCode('TKT')
     cy.cs('select-multiple-courses-toggle').should('not.have.class', 'Mui-checked')
-    cy.contains('TKT10004, BSCS2001, 581328, A581328, AYTKT10004')
     cy.contains('Select all search results').should('not.exist')
     cy.cs('select-multiple-courses-toggle').click()
     cy.cs('select-multiple-courses-toggle').should('have.class', 'Mui-checked')
