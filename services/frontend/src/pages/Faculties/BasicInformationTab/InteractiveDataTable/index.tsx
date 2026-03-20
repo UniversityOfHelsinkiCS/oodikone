@@ -123,7 +123,7 @@ export const InteractiveDataTable = ({
         <TableHead>
           <TableRow>
             {titles.map((title, index) => (
-              <TableCell key={title}>
+              <TableCell key={title} sx={{ px: 0, py: 0.5 }}>
                 <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
                   {index === 0 && (
                     <Box sx={{ marginRight: 1 }}>
