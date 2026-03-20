@@ -21,6 +21,7 @@ import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { AddIcon, SearchIcon } from '@/theme'
+import { SearchResultCourse } from '@/types/api/courses'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { queryParamsToString } from '@/util/queryparams'
 import { CourseTable } from './CourseTable'
@@ -37,7 +38,7 @@ export const SearchForm = () => {
   const [courseCode, setCourseCode] = useState('')
   const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState('')
   const [debouncedCourseCode, setDebouncedCourseCode] = useDebouncedState('')
-  const [selectedCourses, setSelectedCourses] = useState({})
+  const [selectedCourses, setSelectedCourses] = useState<Record<string, SearchResultCourse>>({})
 
   const isInputValid = validateInputLength(courseName, 5) || validateInputLength(courseCode, 2)
   const isDebouncedInputValid =
@@ -65,7 +66,7 @@ export const SearchForm = () => {
     setDebouncedCourseCode(event.target.value)
   }
 
-  const onSelectCourse = course => {
+  const onSelectCourse = (course: SearchResultCourse) => {
     const isSelected = !!selectedCourses[course.code]
 
     if (isSelected) {
@@ -148,7 +149,7 @@ export const SearchForm = () => {
   const noSelectedCourses = !selected.length
 
   const addAllCourses = () => {
-    const newSelectedCourses = courses.reduce((newSelected, course) => {
+    const newSelectedCourses = courses.reduce<Record<string, SearchResultCourse>>((newSelected, course) => {
       newSelected[course.code] = { ...course }
       return newSelected
     }, {})

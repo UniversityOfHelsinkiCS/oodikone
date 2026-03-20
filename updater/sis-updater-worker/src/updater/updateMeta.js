@@ -128,7 +128,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
     course.substitution_groups = course.substitution_groups
       .map(subGroup => subGroup.map(id => idToCodeMap.get(id) ?? null))
-      .map(subGroup => subGroup.filter(substitution_groups => !!substitution_groups))
+      .map(subGroup => subGroup.filter(substitution_groups => !!substitution_groups)) // Filter out undefined/null entries
 
     course.mainCourseCode = [course.code, ...course.substitution_groups]
       .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))

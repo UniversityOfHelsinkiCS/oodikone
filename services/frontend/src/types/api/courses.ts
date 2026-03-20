@@ -1,21 +1,10 @@
-import { Name } from '@oodikone/shared/types'
+import { Unarray } from '@oodikone/shared/types'
+import { CourseWithSubsId } from '@oodikone/shared/types/course'
+
+export type SearchResultCourse = Unarray<GetCourseSearchResultResponse['courses']>
 
 export type GetCourseSearchResultResponse = {
-  courses: Array<{
-    code: string
-    course_unit_type: string
-    coursetypecode: string
-    createdAt: string
-    id: string
-    is_study_module: boolean
-    mainCourseCode: string | null
-    max_attainment_date: string
-    min_attainment_date: string
-    name: Name
-    subsId: number
-    substitutions: string[]
-    updatedAt: string
-  }>
+  courses: Array<Omit<CourseWithSubsId, 'courseType' | 'credits' | 'enrollments' | 'organizations'>>
 }
 
 export type GetCourseSearchResultRequest = {
