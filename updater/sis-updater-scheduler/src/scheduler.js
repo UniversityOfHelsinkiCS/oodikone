@@ -82,7 +82,7 @@ const scheduleMeta = async (clean = true) => {
     table: IMPORTER_TABLES.courseUnits,
     distinct: 'group_id',
     pluck: 'group_id',
-    limit: isDev ? DEV_SCHEDULE_COUNT : null,
+    limit: null,
     clean,
   })
 
@@ -92,7 +92,7 @@ const scheduleMeta = async (clean = true) => {
     whereIn: ['type', ['StudyModule', 'DegreeProgramme']],
     distinct: 'group_id',
     pluck: 'group_id',
-    limit: isDev ? DEV_SCHEDULE_COUNT : null,
+    limit: null,
     clean,
   })
 
