@@ -11,7 +11,6 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 S3_CONFIG_FILE=~/.s3cfg
 S3_BUCKET="s3://psyduck"
-DOCKER_COMPOSE=$PROJECT_ROOT/docker-compose.yml
 
 ## Following the naming convention in docker-compose, these are names for database
 ## services. The real data databases inside service will have names suffixed by "-real".
@@ -137,29 +136,6 @@ reset_databases() {
   done
 
   successmsg "Database setup finished"
-}
-
-reset_jami_data() {
-  local database="jami-db"
-  local dump_destination="$DUMP_DIR/$database.sql.gz"
-  local s3_path="jami"
-
-  infomsg "Removing old data"
-
-
-
-  infomsg "Removing database and related volume"
-  docker volume rm oodikone-jami-data || warningmsg "This is okay, continuing"
-  docker-compose -f "$DOCKER_COMPOSE" down "$database" || warningmsg "This is okay, continuing"
-
-  infomsg "Starting postgres in the background"
-  docker-compose -f "$DOCKER_COMPOSE" up -d "$database"
-  retry docker-compose -f "$DOCKER_COMPOSE" exec "$database" pg_isready --dbname="postgres"
-
-  infomsg "Populating Jami"
-  docker exec -i "$database" /bin/bash -c "gunzip | psql -U postgres" < "$dump_destination" 2> /dev/null
-  docker-compose stop "$database"
-  msg ""
 }
 
 reset_all_real_data() {
