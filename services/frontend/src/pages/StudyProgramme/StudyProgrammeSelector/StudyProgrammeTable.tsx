@@ -1,11 +1,13 @@
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useMemo } from 'react'
-
 import { Link } from '@/components/common/Link'
+import { StyledTable } from '@/components/common/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
@@ -29,81 +31,6 @@ export const StudyProgrammeTable = ({
   const [addStudyProgrammePins] = useAddStudyProgrammePinMutation()
   const [removeStudyProgrammePins] = useRemoveStudyProgrammePinMutation()
 
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
-    () => [
-      {
-        accessorKey: 'code',
-        header: 'Code',
-        size: 160,
-      },
-      {
-        accessorKey: 'progId',
-        header: 'Id',
-        size: 100,
-      },
-      {
-        accessorKey: 'name',
-        header: 'Name',
-        Cell: ({ row }) => <Link to={`/study-programme/${row.original.code}`}>{getTextIn(row.original.name)}</Link>,
-        minSize: 490,
-      },
-      {
-        id: 'pin',
-        header: 'Pin',
-        Header: (
-          <TableHeaderWithTooltip
-            header="Pin"
-            tooltipText={`
-              Click the pin icon to pin/unpin a programme.
-              Pinned programmes are shown first here and in the degree programme search in Class statistics.
-            `}
-          />
-        ),
-        Cell: ({ row }) => {
-          const isPinned = pinnedProgrammes.includes(row.original.code)
-          return (
-            <IconButton
-              data-cy={`pin-programme-${row.original.code}-button`}
-              onClick={
-                isPinned
-                  ? () => void removeStudyProgrammePins({ programmeCode: row.original.code })
-                  : () => void addStudyProgrammePins({ programmeCode: row.original.code })
-              }
-              sx={{
-                color: theme =>
-                  isPinned ? theme.palette.studyProgrammePin.pinned : theme.palette.studyProgrammePin.unpinned,
-              }}
-            >
-              <PushPinIcon fontSize="small" />
-            </IconButton>
-          )
-        },
-        size: 100,
-        muiTableHeadCellProps: {
-          align: 'center',
-        },
-        muiTableBodyCellProps: {
-          align: 'center',
-        },
-      },
-    ],
-    [addStudyProgrammePins, getTextIn, pinnedProgrammes, removeStudyProgrammePins]
-  )
-
-  const table = useMaterialReactTable({
-    columns,
-    data: programmes,
-    enableBottomToolbar: false,
-    enableColumnActions: false,
-    enablePagination: false,
-    enableSorting: false,
-    enableTopToolbar: false,
-    layoutMode: 'grid',
-    initialState: {
-      density: 'compact',
-    },
-  })
-
   if (!visible || programmes == null || programmes.length === 0) {
     return null
   }
@@ -113,7 +40,55 @@ export const StudyProgrammeTable = ({
       <Typography component="h3" variant="h6">
         {header}
       </Typography>
-      <MaterialReactTable table={table} />
+      <StyledTable slimBody slimHeader>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: 100 }}>Code</TableCell>
+            <TableCell sx={{ width: 100 }}>Id</TableCell>
+            <TableCell sx={{ minWidth: 160 }}>Name</TableCell>
+            <TableCell sx={{ width: 80 }}>
+              <TableHeaderWithTooltip
+                header="Pin"
+                tooltipText={`
+                  Click the pin icon to pin/unpin a programme.
+                  Pinned programmes are shown first here and in the degree programme search in Class statistics.
+                `}
+              />
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {programmes.map(programme => (
+            <TableRow key={programme?.code}>
+              <TableCell>{programme?.code}</TableCell>
+              <TableCell>{programme?.progId}</TableCell>
+              <TableCell>
+                <Link to={`/study-programme/${programme?.code}`}>{getTextIn(programme?.name)}</Link>
+              </TableCell>
+              <TableCell>
+                {
+                  <IconButton
+                    data-cy={`pin-programme-${programme?.code}-button`}
+                    onClick={
+                      pinnedProgrammes.includes(programme?.code)
+                        ? () => void removeStudyProgrammePins({ programmeCode: programme?.code })
+                        : () => void addStudyProgrammePins({ programmeCode: programme?.code })
+                    }
+                    sx={{
+                      color: theme =>
+                        pinnedProgrammes.includes(programme?.code)
+                          ? theme.palette.studyProgrammePin.pinned
+                          : theme.palette.studyProgrammePin.unpinned,
+                    }}
+                  >
+                    <PushPinIcon fontSize="small" />
+                  </IconButton>
+                }
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </StyledTable>
     </Stack>
   )
 }
