@@ -7,11 +7,31 @@ import Table from '@mui/material/Table'
  */
 export const StyledTable = styled(Table, {
   shouldForwardProp: prop => prop !== 'showCellBorders' && prop !== 'zebraStriped',
-})<{ showCellBorders?: true; zebraStriped?: true }>(({ theme, showCellBorders, zebraStriped }) => {
+})<{ showCellBorders?: true; zebraStriped?: true; slimHeader?: true; slimBody?: true }>(({
+  theme,
+  showCellBorders,
+  zebraStriped,
+  slimHeader,
+  slimBody,
+}) => {
   return {
     '&': {
       border: `1px solid ${theme.palette.grey[300]}`,
     },
+
+    '& .MuiTableHead-root .MuiTableCell-root': slimHeader
+      ? {
+          paddingTop: '0.5em',
+          paddingBottom: '0.5em',
+        }
+      : {},
+
+    '& .MuiTableBody-root .MuiTableCell-root': slimBody
+      ? {
+          paddingTop: '0.5em',
+          paddingBottom: '0.5em',
+        }
+      : {},
 
     '& .MuiTableHead-root': {
       backgroundColor: theme.palette.grey[100],
