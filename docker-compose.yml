@@ -170,7 +170,7 @@ services:
       - npm_config_cache=/tmp
       - PORT=3003
       - NODE_ENV=dev
-      - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
+      - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/jami-db-real
     ports:
       - 3003:3003
     container_name: jami
