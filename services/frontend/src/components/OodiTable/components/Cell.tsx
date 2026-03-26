@@ -10,13 +10,14 @@ import { flexRender } from './util'
 export const OodiTableDataRow = <OTData,>(row: Row<OTData>, aggregate = false) => (
   <TableRow key={row.id}>
     {row.getVisibleCells().map(cell => {
-      const { maxSize } = cell.column.columnDef
+      const { size, maxSize } = cell.column.columnDef
       return (
         <TableCell
           className="ot-data-cell"
           key={cell.id}
           sx={{
             ...getCommonPinningStyles(cell.column),
+            width: size ?? undefined,
             maxWidth: maxSize !== Number.MAX_SAFE_INTEGER ? maxSize : '20em',
           }}
         >
