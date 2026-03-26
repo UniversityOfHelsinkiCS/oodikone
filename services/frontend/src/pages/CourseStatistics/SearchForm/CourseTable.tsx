@@ -1,13 +1,13 @@
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { GroupChip } from '@/components/common/EquivalenceGroupChip'
+import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DeleteIcon } from '@/theme'
 import { SearchResultCourse } from '@/types/api/courses'
@@ -37,19 +37,6 @@ export const CourseTable = ({
     </TableRow>
   )
 
-  const formatSubstitutionGroups = (course: SearchResultCourse): string[] =>
-    course.substitution_groups?.map(sb => (sb.length !== 1 ? `${sb.join(', ')}` : sb[0])) ?? ['???']
-
-  const SubstitutionGroups = (course: SearchResultCourse) => (
-    <Stack>
-      {formatSubstitutionGroups(course).map(sg => (
-        <Typography fontSize="0.9rem" key={sg}>
-          {sg}
-        </Typography>
-      ))}
-    </Stack>
-  )
-
   const toCourseRow = (course: SearchResultCourse) => {
     return (
       <TableRow
@@ -66,9 +53,19 @@ export const CourseTable = ({
           </Typography>
         </TableCell>
         <TableCell>
-          <Typography fontSize="0.95rem">{course.code}</Typography>
+          <Typography fontSize="0.9rem">{course.code}</Typography>
         </TableCell>
-        <TableCell>{combineSubstitutions ? SubstitutionGroups(course) : course.code}</TableCell>
+        <TableCell>
+          {combineSubstitutions ? (
+            <Stack>
+              {course.substitution_groups?.map(group => <GroupChip group={group} key={group.join(':')} />) ?? (
+                <Typography fontSize="0.9rem">Equivalent groups not available!</Typography>
+              )}
+            </Stack>
+          ) : (
+            course.code
+          )}
+        </TableCell>
         {title === 'Selected courses' && (
           <TableCell align="right">
             <IconButton>
@@ -85,18 +82,16 @@ export const CourseTable = ({
   }
 
   return (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>{title}</TableCell>
-            <TableCell>Main course code</TableCell>
-            <TableCell>Equivalent groups</TableCell>
-            {title === 'Selected courses' && <TableCell />}
-          </TableRow>
-        </TableHead>
-        <TableBody>{noContent ? getEmptyListRow() : courses.map(toCourseRow)}</TableBody>
-      </Table>
-    </TableContainer>
+    <StyledTable>
+      <TableHead>
+        <TableRow>
+          <TableCell>{title}</TableCell>
+          <TableCell>Main course code</TableCell>
+          <TableCell>Equivalent groups</TableCell>
+          {title === 'Selected courses' && <TableCell />}
+        </TableRow>
+      </TableHead>
+      <TableBody>{noContent ? getEmptyListRow() : courses.map(toCourseRow)}</TableBody>
+    </StyledTable>
   )
 }
