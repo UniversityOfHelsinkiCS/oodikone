@@ -63,6 +63,7 @@ const studyRightMapper = (personIdToStudentNumber, admissionNamesById, semesterE
       extentCode,
       admissionType: admissionNamesById[studyRight.admission_type_urn],
       semesterEnrollments: getStudyRightSemesterEnrollments(semesterEnrollmentsForStudyRight),
+      transferInfo: studyRight.study_right_transfer,
       facultyCode: getOrganisationCode(studyRight.organisation_id),
       expirationRuleUrns: studyRight.study_right_expiration_rules_urn,
       tvex: !!studyRight.code_urns?.includes(TVEX_URN_CODE),

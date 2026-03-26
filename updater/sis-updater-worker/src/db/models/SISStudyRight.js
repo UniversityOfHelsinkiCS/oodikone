@@ -17,6 +17,7 @@ SISStudyRight.init(
     extentCode: INTEGER,
     admissionType: STRING,
     semesterEnrollments: JSONB,
+    transferInfo: JSONB,
     facultyCode: STRING,
     expirationRuleUrns: ARRAY(STRING),
     tvex: BOOLEAN,

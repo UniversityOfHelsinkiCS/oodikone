@@ -71,6 +71,9 @@ export class SISStudyRightModel extends Model implements SISStudyRight {
   @Column(DataType.JSONB)
   declare semesterEnrollments: SISStudyRight['semesterEnrollments']
 
+  @Column(DataType.JSONB)
+  declare transferInfo: SISStudyRight['transferInfo']
+
   @HasMany(() => CreditModel, { foreignKey: 'studyright_id', sourceKey: 'id' })
   declare credits: SISStudyRight['credits']
 

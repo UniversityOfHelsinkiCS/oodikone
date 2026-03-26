@@ -1,4 +1,4 @@
-import type { ExtentCode, SemesterEnrollment } from '../types'
+import type { ExtentCode, SemesterEnrollment, TransferInfo } from '../types'
 
 import type { Credit } from './credit'
 import type { Enrollment } from './enrollment'
@@ -22,6 +22,7 @@ export type SISStudyRight = {
   extentCode: ExtentCode
   admissionType: string
   semesterEnrollments: SemesterEnrollment[] | null
+  transferInfo: TransferInfo | null
   credits: Credit[]
   enrollments: Enrollment[]
   tvex: boolean
