@@ -1,18 +1,30 @@
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
+import { createColumnHelper, TableOptions } from '@tanstack/react-table'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ExportToExcelDialog } from '@/components/common/MRTExcelExport'
 import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseSearchState } from '@/pages/CourseStatistics'
-import { FormattedStats } from '@/types/courseStat'
-import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
+import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
+
 import { queryParamsToString } from '@/util/queryparams'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades } from '../util'
 import { ObfuscatedCell } from './ObfuscatedCell'
 import { TimeCell } from './TimeCell'
-import { commonOptions, formatPercentage, getGradeColumns, resolveGrades } from './util'
+import { formatPercentage, getGradeColumns, resolveGrades } from './util'
 
-const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) => {
+type TableData = {
+  name: string
+  code: number
+  totalAttempts: number
+  passed: number
+  failed: number
+  passRate: string
+  enrollments?: number
+  rowObfuscated?: boolean
+  grades: Record<string, number>
+}
+
+const getTableData = (stats: FormattedStats[], useThesisGrades: boolean): TableData[] => {
   return stats.map(stat => {
     const {
       name,
@@ -42,7 +54,7 @@ const getTableData = (stats: FormattedStats[], useThesisGrades: boolean) => {
 }
 
 export const AttemptsTable = ({
-  data: { name, stats },
+  data: { stats },
   separate,
   showGrades,
   userHasAccessToAllStats,
@@ -50,7 +62,7 @@ export const AttemptsTable = ({
   openOrRegular,
   alternatives,
 }: {
-  data: { name: string; stats: FormattedStats[] }
+  data: ProgrammeStats
   separate: boolean
   showGrades: boolean
   userHasAccessToAllStats: boolean
@@ -58,14 +70,10 @@ export const AttemptsTable = ({
   openOrRegular: CourseSearchState
   alternatives: string[]
 }) => {
-  const { language } = useLanguage()
-
-  const [exportModalOpen, setExportModalOpen] = useState(false)
-  const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
   const showPopulation = useCallback(
-    (yearCode: string) => {
+    (yearCode: number) => {
       const queryObject = {
         from: yearCode,
         to: yearCode,
@@ -81,51 +89,12 @@ export const AttemptsTable = ({
 
   const useThesisGrades = isThesisGrades(stats[0].attempts.grades)
   const data = useMemo(() => getTableData(stats, useThesisGrades), [stats, useThesisGrades])
-
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
-    () => [
-      {
-        accessorKey: 'name',
-        header: 'Time',
-        Cell: ({ cell, row }) => (
-          <TimeCell
-            href={showPopulation(row.original.code)}
-            isEmptyRow={row.original.totalAttempts === 0}
-            name={cell.getValue<string>()}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ),
-        sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
-      },
-      {
-        accessorKey: 'totalAttempts',
-        header: 'Total attempts',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
-      },
-      {
-        accessorKey: 'passed',
-        header: 'Passed',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
-      },
-      {
-        accessorKey: 'failed',
-        header: 'Failed',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>() || 0),
-      },
-      {
-        accessorKey: 'passRate',
-        header: 'Pass rate',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<string>()),
-      },
-      {
-        accessorKey: 'enrollments',
-        header: 'Enrollments',
-        Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : cell.getValue<number>()),
-      },
-      ...getGradeColumns(resolveGrades(stats)),
-    ],
-    [showPopulation, stats, userHasAccessToAllStats]
-  )
+  const excelData = useMemo(() => {
+    return data.map(({ grades, ...rest }) => ({
+      ...rest,
+      ...Object.fromEntries(Object.entries(grades).map(([key, val]) => [key, val])),
+    }))
+  }, [data])
 
   useEffect(() => {
     setColumnVisibility(prev => {
@@ -142,20 +111,58 @@ export const AttemptsTable = ({
       updatedVisibility.passRate = !showGrades
       updatedVisibility.enrollments = !showGrades
 
-      return { ...updatedVisibility }
+      return {
+        ...updatedVisibility,
+        name: true,
+        totalAttempts: true,
+      }
     })
   }, [showGrades, stats])
 
-  const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
+  const columnHelper = createColumnHelper<TableData>()
+  const ooditable_columns = useMemo(
+    () => [
+      columnHelper.accessor('name', {
+        header: 'Time',
+        cell: ctx => (
+          <TimeCell
+            href={showPopulation(ctx.row.original.code)}
+            isEmptyRow={ctx.row.original.totalAttempts === 0}
+            name={ctx.getValue()}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+          />
+        ),
+        sortingFn: (rowA, rowB) => rowB.original.code - rowA.original.code,
+      }),
+      columnHelper.accessor('totalAttempts', {
+        header: 'Total attempts',
+        cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
+      }),
+      columnHelper.accessor('passed', {
+        header: 'Passed',
+        cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue() || 0),
+      }),
+      columnHelper.accessor('failed', {
+        header: 'Failed',
+        cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue() || 0),
+      }),
+      columnHelper.accessor('passRate', {
+        header: 'Pass rate',
+        cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
+      }),
+      columnHelper.accessor('enrollments', {
+        header: 'Enrollments',
+        cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
+      }),
+      ...getGradeColumns(resolveGrades(stats)),
+    ],
+    [showPopulation, stats, userHasAccessToAllStats]
+  )
 
-  const table = useMaterialReactTable({
-    ...defaultOptions,
-    ...commonOptions,
-    columns,
-    data,
+  const ooditable_table: Partial<TableOptions<TableData>> = {
+    enableSortingRemoval: false,
     initialState: {
-      ...defaultOptions.initialState,
-      ...commonOptions.initialState,
+      sorting: [{ id: 'name', desc: false }],
     },
     state: {
       columnVisibility,
@@ -164,29 +171,25 @@ export const AttemptsTable = ({
         'totalAttempts',
         'passed',
         'failed',
-        ...resolveGrades(stats).map(({ key }) => `grades.${key}`),
+        ...resolveGrades(stats).map(({ key }) => key),
         'passRate',
         'enrollments',
       ],
     },
     onColumnVisibilityChange: setColumnVisibility,
-    muiTableBodyCellProps: {
-      ...defaultOptions?.muiTableHeadCellProps,
-      ...commonOptions?.muiTableBodyCellProps,
-    },
-  })
+  }
 
   return (
-    <div>
-      <ExportToExcelDialog
-        exportColumns={columns}
-        exportData={exportData}
-        featureName={`attempt_statistics_${name}`}
-        onClose={() => setExportModalOpen(false)}
-        open={exportModalOpen}
+    <>
+      <OodiTable
+        columns={ooditable_columns}
+        data={data}
+        options={ooditable_table}
+        toolbarContent={
+          <OodiTableExcelExport data={excelData} exportColumnKeys={ooditable_table.state?.columnOrder ?? []} />
+        }
       />
-      <MaterialReactTable table={table} />
       <TotalsDisclaimer userHasAccessToAllStats={userHasAccessToAllStats} />
-    </div>
+    </>
   )
 }
