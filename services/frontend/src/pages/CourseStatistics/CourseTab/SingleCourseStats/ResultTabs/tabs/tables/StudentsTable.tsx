@@ -160,6 +160,7 @@ export const StudentsTable = ({
   )
 
   const ooditable_table: Partial<TableOptions<TableData>> = {
+    manualPagination: true,
     enableSortingRemoval: false,
     initialState: {
       sorting: [{ id: 'name', desc: false }],
