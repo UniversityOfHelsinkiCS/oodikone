@@ -8,14 +8,13 @@ export const formatPercentage = (rate: number) => {
   return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`
 }
 
-export const getGradeColumns = (grades: { key: string; title: string }[]) => {
-  return grades.map(({ key, title }) => ({
+export const getGradeColumns = (grades: { key: string; title: string }[]) =>
+  grades.map(({ key, title }) => ({
     id: `grades.${key}`,
     accessorFn: row => row.grades[key],
     header: title,
-    Cell: ({ cell, row }) => (row.original.rowObfuscated ? <ObfuscatedCell /> : (cell.getValue() ?? 0)),
+    cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
   }))
-}
 
 const gradesOrder = {
   0: 0,
@@ -72,20 +71,4 @@ export const resolveGrades = (stats: FormattedStats[]) => {
   }
   const grades = [...new Set(allGrades)]
   return getSortedGrades(grades)
-}
-
-export const commonOptions = {
-  defaultColumn: { size: 0 },
-  enableColumnFilters: false,
-  enableColumnOrdering: false,
-  enableDensityToggle: false,
-  enableGlobalFilter: false,
-  enableHiding: false,
-  initialState: {
-    sorting: [{ id: 'name', desc: false }],
-    showColumnFilters: false,
-  },
-  muiTableBodyCellProps: {
-    align: 'right' as const,
-  },
 }
