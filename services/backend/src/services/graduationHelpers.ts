@@ -1,13 +1,26 @@
-export const countTimeCategories = (times: number[], goal: number) => {
+/** Map years to semesters */
+export const GraduationTarget = {
+  ONE_YEAR: 2,
+  TWO_YEARS: 4,
+  THREE_YEARS: 6,
+  THREE_POINT_FIVE_YEARS: 7,
+  FOUR_YEARS: 8,
+  FIVE_YEARS: 10,
+  SIX_YEARS: 12,
+} as const
+
+/** Uses semesters, not months */
+export const countTimeCategories = (times: number[], target: number) => {
   const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
-  times.forEach(time => {
-    if (time <= goal) {
-      statistics.onTime += 1
-    } else if (time <= goal + 12) {
-      statistics.yearOver += 1
+
+  for (const time of times) {
+    if (time <= target) {
+      statistics.onTime++
+    } else if (time <= target + GraduationTarget.ONE_YEAR) {
+      statistics.yearOver++
     } else {
-      statistics.wayOver += 1
+      statistics.wayOver++
     }
-  })
+  }
   return statistics
 }

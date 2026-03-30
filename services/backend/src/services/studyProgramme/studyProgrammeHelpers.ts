@@ -6,6 +6,7 @@ import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
 import { programmeCodes } from '../../config/programmeCodes'
 import { ProgrammeModuleModel } from '../../models'
 import { getDegreeProgrammeType } from '../../util'
+import { GraduationTarget } from '../graduationHelpers'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
@@ -44,15 +45,16 @@ export const getStatsBasis = (years: Array<string | number>) => {
 }
 
 export const getMedian = (values: number[]) => {
-  if (values.length === 0) {
-    return 0
+  if (!values.length) return 0
+
+  // compareFn mandatory
+  const sorted = values.toSorted((a, b) => a - b)
+
+  const half = Math.floor(sorted.length / 2)
+  if (sorted.length % 2) {
+    return sorted[half]
   }
-  values.sort((a, b) => a - b)
-  const half = Math.floor(values.length / 2)
-  if (values.length % 2) {
-    return values[half]
-  }
-  return (values[half - 1] + values[half]) / 2.0
+  return (sorted[half - 1] + sorted[half]) / 2.0
 }
 
 export function defineYear(date: Date, isAcademicYear: true): string
@@ -183,9 +185,9 @@ export const getGoal = async (programme?: string) => {
     return 0
   }
   if ([DegreeProgrammeType.DOCTOR, DegreeProgrammeType.LICENTIATE].includes(degreeProgrammeType)) {
-    return 48
+    return GraduationTarget.FOUR_YEARS
   }
-  return (minimumCredits / 60) * 12
+  return ((minimumCredits / 60) * 12) / 6 // 60 Credits per year divided to semesters
 }
 
 export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code)

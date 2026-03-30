@@ -1,4 +1,5 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import { indexOf, orderBy } from 'lodash-es'
 
 import {
@@ -10,12 +11,14 @@ import {
   ExtentCode,
   Phase,
   EnrollmentType,
+  TransferInfo,
 } from '@oodikone/shared/types'
 import { ChartGraduationTimes } from '@oodikone/shared/types/graduations'
 import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
 import { mapToProviders } from '@oodikone/shared/util'
 import { getDegreeProgrammeType, getMinimumCreditsOfProgramme, sortByProgrammeCode } from '../../util'
-import { countTimeCategories } from '../graduationHelpers'
+import logger from '../../util/logger'
+import { countTimeCategories, GraduationTarget } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getStudyRightThesisCredits, getOrganizationThesisCredits } from './creditGetters'
 import { getGraduatedStats } from './studyProgrammeBasics'
@@ -34,6 +37,8 @@ import {
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
 
+dayjs.extend(isSameOrAfter)
+
 /**
  * For bachelor + master study right combo. This rules out master's programmes that don't
  * follow the two-phase degree structure (e.g. degree programmes in medicine and dentistry)
@@ -47,19 +52,6 @@ export const shouldIncludeComboStats = async (studyProgramme: string) => {
   return minimumCredits !== null && minimumCredits <= 180
 }
 
-const calculateAbsenceInMonths = (
-  absence: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters'][string],
-  startDate: Date,
-  endDate: Date
-) => {
-  if (endDate < absence.startdate || absence.enddate < startDate) {
-    return 0
-  }
-
-  // Without 'true' as the third argument, the result will be truncated, not rounded (e.g. 4.999 would be 4, not 5). This is why we use Math.round() instead
-  return Math.round(dayjs(absence.enddate).diff(absence.startdate, 'months', true))
-}
-
 /**
  * Absence rules:
  * 1. Student can have any number of statutory absences (lakisääteinen poissaolo)
@@ -67,29 +59,58 @@ const calculateAbsenceInMonths = (
  * 2b. If study right started before 1.8.2015, student can have 4 non-statutory absences instead of 2
  *
  * Additional _non-statutory_ absences will consume semesters
+ *
+ * @returns duration of studies in SEMESTERS (not months!)
  */
 export const calculateDurationOfStudies = (
   startDate: Date,
   graduationDate: Date,
   semesterEnrollments: SemesterEnrollment[],
-  semesters: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters']
+  semesters: Awaited<ReturnType<typeof getSemestersAndYears>>['semesters'],
+  transferInfo?: TransferInfo | null
 ) => {
-  const allowedNonStatutoryAbsences = dayjs(startDate).isBefore(dayjs('2015-08-01'), 'day') ? 4 : 2
-
-  const semestersWithStatutoryAbsence = semesterEnrollments
-    .filter(enrollment => enrollment.statutoryAbsence)
-    .map(enrollment => enrollment.semester)
-
-  const semestersWithNonStatutoryAbsence = semesterEnrollments
-    .filter(enrollment => enrollment.type === EnrollmentType.ABSENT && !enrollment.statutoryAbsence)
-    .map(enrollment => enrollment.semester)
-    .slice(0, allowedNonStatutoryAbsences)
-
-  const monthsToSubtract = [...semestersWithStatutoryAbsence, ...semestersWithNonStatutoryAbsence].reduce(
-    (acc, semester) => acc + calculateAbsenceInMonths(semesters[semester], startDate, graduationDate),
-    0
+  /** Transferred students: unclear whether this should be based on the original start date or not. Likely doesn't matter. */
+  const allowedNonStatutoryAbsences = dayjs(transferInfo?.originalStartDate ?? startDate).isBefore(
+    dayjs('2015-08-01'),
+    'day'
   )
-  return Math.round(dayjs(graduationDate).subtract(monthsToSubtract, 'months').diff(startDate, 'months', true))
+    ? 4
+    : 2
+
+  /** A semester ending and the next one starting overlap, this takes care of that */
+  const getCorrectSemester = (date: Dayjs) =>
+    Object.values(semesters).find(
+      ({ startdate: semesterStart, enddate: semesterEnd }) =>
+        date.isSameOrAfter(semesterStart, 'day') && date.isBefore(semesterEnd, 'day')
+    )?.semestercode
+
+  const startSemester = getCorrectSemester(dayjs(startDate))
+  const endSemester = getCorrectSemester(dayjs(graduationDate))
+
+  if (!startSemester || !endSemester) {
+    logger.error(`calculateDurationOfStudies(): No semesters found! start={${startDate}}, end={${graduationDate}}`)
+    return -1
+  }
+
+  const validSemesters = semesterEnrollments.filter(se => se.semester <= endSemester && se.semester >= startSemester)
+
+  const semestersWithStatutoryAbsence =
+    validSemesters.filter(e => e.statutoryAbsence).length + (transferInfo?.usedStatutoryAbsenceTerms ?? 0)
+
+  const semestersWithNonStatutoryAbsence = Math.min(
+    validSemesters.filter(enrollment => enrollment.type === EnrollmentType.ABSENT && !enrollment.statutoryAbsence)
+      .length + (transferInfo?.usedAbsenceTerms ?? 0),
+    allowedNonStatutoryAbsences
+  )
+
+  return (
+    (transferInfo?.usedTerms ?? 0) +
+    endSemester -
+    startSemester -
+    semestersWithStatutoryAbsence -
+    semestersWithNonStatutoryAbsence +
+    1
+  )
 }
 
 export type GraduationTimes = {
@@ -188,7 +209,13 @@ const getGraduationTimeAndThesisWriterStats = async ({
 
     const graduationDate = correctStudyRightElement.endDate
 
-    const duration = calculateDurationOfStudies(startDate, graduationDate, studyRight.semesterEnrollments, semesters)
+    const duration = calculateDurationOfStudies(
+      startDate,
+      graduationDate,
+      studyRight.semesterEnrollments,
+      semesters,
+      studyRight.transferInfo
+    )
     const graduationYear = defineYear(graduationDate, isAcademicYear)
 
     if (!graduationTimes[graduationYear] || !graduationTimesCombo[graduationYear]) {
@@ -204,7 +231,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
 
   const goal = await getGoal(studyProgramme)
   const times: ChartGraduationTimes = { medians: [], goal }
-  const comboTimes: ChartGraduationTimes = { medians: [], goal: goal + 36 }
+  const comboTimes: ChartGraduationTimes = { medians: [], goal: goal + GraduationTarget.THREE_YEARS }
 
   for (const year of years.toReversed()) {
     const median = getMedian(graduationTimes[year])
@@ -219,7 +246,7 @@ const getGraduationTimeAndThesisWriterStats = async ({
 
     if (doCombo) {
       const median = getMedian(graduationTimesCombo[year])
-      const statistics = countTimeCategories(graduationTimesCombo[year], goal + 36)
+      const statistics = countTimeCategories(graduationTimesCombo[year], goal + GraduationTarget.THREE_YEARS)
       comboTimes.medians.push({
         y: median,
         amount: graduationTimesCombo[year].length,

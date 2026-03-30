@@ -10,7 +10,7 @@ import {
   SemesterEnrollment,
 } from '@oodikone/shared/types'
 import { createLocaleComparator, keysOf } from '../../util'
-import { countTimeCategories } from '../graduationHelpers'
+import { countTimeCategories, GraduationTarget } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
 import { calculateDurationOfStudies, shouldIncludeComboStats } from './studyProgrammeGraduations'
@@ -39,7 +39,7 @@ const getGraduationTimeStats = async (
   combinedProgramme?: string
 ) => {
   const goal = await getGoal(combinedProgramme ?? studyProgramme)
-  const finalGraduationTimes = { goals: { basic: goal, combo: goal + 36 } }
+  const finalGraduationTimes = { goals: { basic: goal, combo: goal + GraduationTarget.THREE_YEARS } }
 
   const calculateGraduationTimes = (
     graduationTimes: Record<string, Record<string, number[]>>,
@@ -276,7 +276,13 @@ const getMainStatsByTrackAndYear = async (
 
     const graduationDate = studyRightElement.endDate
 
-    const duration = calculateDurationOfStudies(startDate, graduationDate, studyRight.semesterEnrollments, semesters)
+    const duration = calculateDurationOfStudies(
+      startDate,
+      graduationDate,
+      studyRight.semesterEnrollments,
+      semesters,
+      studyRight.transferInfo
+    )
 
     if (countAsBachelorMaster) {
       if (!graduationTimesCombo[programmeOrStudyTrack]) {
@@ -313,7 +319,8 @@ const getMainStatsByTrackAndYear = async (
       bachelorStartDate,
       studyRight.studyRightElements.find(element => element.code === combinedProgramme)!.endDate,
       studyRight.semesterEnrollments,
-      semesters
+      semesters,
+      studyRight.transferInfo
     )
     if (graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme]) {
       graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme].push(combinedDuration)

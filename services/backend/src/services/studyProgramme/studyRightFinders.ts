@@ -14,15 +14,18 @@ export const getStudyRightsInProgramme = async (
     where.graduated = true
   }
 
-  const studyRights = await SISStudyRightModel.findAll({
-    attributes: ['id'],
-    include: {
-      model: SISStudyRightElementModel,
-      as: 'studyRightElements',
-      attributes: [],
-      where,
-    },
-  })
+  const studyRightIds = (
+    await SISStudyRightModel.findAll({
+      attributes: ['id'],
+      include: {
+        model: SISStudyRightElementModel,
+        as: 'studyRightElements',
+        attributes: [],
+        where,
+      },
+      raw: true,
+    })
+  ).map(sr => sr.id)
 
   const include: Includeable[] = [
     {
@@ -54,11 +57,11 @@ export const getStudyRightsInProgramme = async (
 
   return (
     await SISStudyRightModel.findAll({
-      attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber'],
+      attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber', 'transferInfo'],
       include,
       where: {
         id: {
-          [Op.in]: studyRights.map(studyRight => studyRight.toJSON().id),
+          [Op.in]: studyRightIds,
         },
       },
     })
