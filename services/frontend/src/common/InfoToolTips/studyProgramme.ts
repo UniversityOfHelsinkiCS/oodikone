@@ -72,22 +72,22 @@ export const studyProgrammeToolTips: Record<string, string> = {
   averageGraduationTimes: `
     Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
 
-    Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen 12 kuukauden sisällä tavoiteajasta valmistuneita ja punainen yli 12 kuukautta tavoiteajan ylittäneitä.
+    Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen kahden lukukauden sisällä tavoiteajasta valmistuneita ja punainen yli 2 lukukautta tavoiteajan ylittäneitä.
 
-    **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui tavoiteajassa, 12 kuukauden sisällä tavoiteajasta tai tätä myöhemmin.
+    **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui tavoiteajassa, kahden lukukauden sisällä tavoiteajasta tai tätä myöhemmin.
 
-    **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
+    **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
 
     Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   `,
   averageGraduationTimesStudyTracks: `
     Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
 
-    Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen 12 kuukauden sisällä tavoiteajasta valmistuneita ja punainen yli 12 kuukautta tavoiteajan ylittäneitä.
+    Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen kahden lukukauden sisällä tavoiteajasta valmistuneita ja punainen yli 2 lukukautta tavoiteajan ylittäneitä.
 
-    **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista valmistui tavoiteajassa, 12 kuukauden sisällä tavoiteajasta tai tätä myöhemmin.
+    **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista valmistui tavoiteajassa, kahden lukukauden sisällä tavoiteajasta tai tätä myöhemmin.
 
-    **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.
+    **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
 
     Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 
