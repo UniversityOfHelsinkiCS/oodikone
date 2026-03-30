@@ -119,7 +119,7 @@ export const MedianTimeBarChart = ({
             color: '#90A959',
           },
           {
-            value: goal + 12.1,
+            value: goal + 2.1,
             color: '#FEE191',
           },
           {
@@ -157,7 +157,7 @@ export const MedianTimeBarChart = ({
         {
           color: '#FEE191',
           width: 2,
-          value: goal + 12,
+          value: goal + 2,
           dashStyle: 'ShortDash',
         },
       ],
