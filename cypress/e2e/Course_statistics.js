@@ -33,6 +33,7 @@ const checkGradeTable = gradesTableContents => {
 }
 
 const checkTableContents = contents => {
+  cy.get('table tbody').scrollIntoView()
   cy.get('table tbody').within(() => {
     contents.forEach((values, trIndex) => {
       cy.get('tr')
