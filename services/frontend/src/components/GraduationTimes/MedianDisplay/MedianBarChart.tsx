@@ -120,11 +120,11 @@ export const MedianBarChart = ({
       yearLabel === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
-    const timeText = `<br />${sortingText}<br /><b>median study time: ${median} months</b><br />`
+    const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
     const statisticsText = `<br />${statistics.onTime} graduated on time<br />${statistics.yearOver} graduated max year overtime<br />${statistics.wayOver} graduated over year late`
 
     if (!facultyGraph) {
-      const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
+      const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} semesters **</b></p>` : ''
       return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
@@ -201,7 +201,7 @@ export const MedianBarChart = ({
             color: theme.palette.graduationTimes.onTime,
           },
           {
-            value: goal + 12.1,
+            value: goal + 2.1,
             color: theme.palette.graduationTimes.yearOver,
           },
           {
@@ -230,7 +230,7 @@ export const MedianBarChart = ({
     yAxis: {
       min: 0,
       max: maxValue,
-      title: { text: 'Graduation time (months)' },
+      title: { text: 'Graduation time (semesters)' },
       labels: {
         overflow: 'justify',
       },
@@ -246,7 +246,7 @@ export const MedianBarChart = ({
         {
           color: theme.palette.graduationTimes.yearOver,
           width: 2,
-          value: goal + 12,
+          value: goal + 2,
           dashStyle: 'ShortDash',
         },
       ],
