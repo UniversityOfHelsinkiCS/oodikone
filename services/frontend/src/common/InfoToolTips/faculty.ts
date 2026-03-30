@@ -47,12 +47,11 @@ export const facultyToolTips: Record<string, string> = {
     Toisin sanoen luvut vastaavat *Degree programme overview* -näkymän lukuja, kun näkymässä on valittuna *Special study rights excluded*.
 
     - **Breakdown**/**Median study times**:
-      - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), 12 kuukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
-      - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 12 kuukautta.  
+      - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), kahden lukukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
+      - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** lukukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.  
     - **Graduation year**/**Starting year**:
       - **Graduation year**: Ryhmittelee opiskelijat valmistumisvuosittain (kalenterivuosi).
-      - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on aloitusvuosi kandiohjelmassa ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.  
- `,
+      - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on aloitusvuosi kandiohjelmassa ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.`,
   studentProgress: `
     Kuvaa tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna.
     Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
