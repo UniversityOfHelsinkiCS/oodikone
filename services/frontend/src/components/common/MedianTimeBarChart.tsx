@@ -61,7 +61,7 @@ export const MedianTimeBarChart = ({
         ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
         : `<b>${amount} students graduated in year ${year}</b>`
 
-    const timeText = `<br />${sortingText}<br /><b>median study time: ${y} months</b><br />`
+    const timeText = `<br />${sortingText}<br /><b>median study time: ${y} semesters</b><br />`
 
     const statisticsText = `<br />${statistics.onTime} graduated on time<br />${statistics.yearOver} graduated max year overtime<br />${statistics.wayOver} graduated over year late`
 
@@ -141,7 +141,7 @@ export const MedianTimeBarChart = ({
     yAxis: {
       min: 0,
       max: maxValue,
-      title: { text: 'Graduation time (months)' },
+      title: { text: 'Graduation time (semesters)' },
       labels: {
         overflow: 'justify',
       },
