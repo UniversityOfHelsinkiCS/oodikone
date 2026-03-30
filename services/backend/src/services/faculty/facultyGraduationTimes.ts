@@ -3,6 +3,7 @@ import { cloneDeep, omit } from 'lodash-es'
 import { Name, DegreeProgrammeType, Unarray } from '@oodikone/shared/types'
 import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
+import { GraduationTarget } from '../graduationHelpers'
 import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
@@ -253,21 +254,22 @@ export const countGraduationTimes = async (faculty: string, programmesOfFaculty:
   } = await getStatsByStartYear(programmesOfFaculty)
 
   const goals = {
-    bachelor: 36,
-    bcMsCombo: faculty === 'H90' ? 72 : 60,
-    master: 24,
-    doctor: 48,
+    bachelor: GraduationTarget.THREE_YEARS,
+    bcMsCombo: faculty === 'H90' ? GraduationTarget.SIX_YEARS : GraduationTarget.FIVE_YEARS,
+    master: GraduationTarget.TWO_YEARS,
+    doctor: GraduationTarget.FOUR_YEARS,
     exceptions: {
-      MH30_004: 6, // months more
-      '420420-ma': 6,
-      '420074-ma': 6,
-      '420119-ma': 6,
-      MH30_001: 48,
-      '320011-ma': 48,
-      '320001-ma': 48,
-      MH30_003: 42,
-      '320002-ma': 42,
-      '320009-ma': 42,
+      // Exceptions are additions to the base amount
+      MH30_004: GraduationTarget.HALF_YEAR,
+      '420420-ma': GraduationTarget.HALF_YEAR,
+      '420074-ma': GraduationTarget.HALF_YEAR,
+      '420119-ma': GraduationTarget.HALF_YEAR,
+      MH30_001: GraduationTarget.FOUR_YEARS,
+      '320011-ma': GraduationTarget.FOUR_YEARS,
+      '320001-ma': GraduationTarget.FOUR_YEARS,
+      MH30_003: GraduationTarget.THREE_POINT_FIVE_YEARS,
+      '320002-ma': GraduationTarget.THREE_POINT_FIVE_YEARS,
+      '320009-ma': GraduationTarget.THREE_POINT_FIVE_YEARS,
     } as Record<string, number>,
   }
 

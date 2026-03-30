@@ -1,5 +1,6 @@
 /** Map years to semesters */
 export const GraduationTarget = {
+  HALF_YEAR: 1,
   ONE_YEAR: 2,
   TWO_YEARS: 4,
   THREE_YEARS: 6,
