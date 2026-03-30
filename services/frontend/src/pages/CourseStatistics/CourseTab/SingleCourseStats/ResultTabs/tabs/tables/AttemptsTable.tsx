@@ -165,18 +165,7 @@ export const AttemptsTable = ({
     initialState: {
       sorting: [{ id: 'name', desc: false }],
     },
-    state: {
-      columnVisibility,
-      columnOrder: [
-        'name',
-        'totalAttempts',
-        'passed',
-        'failed',
-        ...resolveGrades(stats).map(({ key }) => key),
-        'passRate',
-        'enrollments',
-      ],
-    },
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
   }
 
