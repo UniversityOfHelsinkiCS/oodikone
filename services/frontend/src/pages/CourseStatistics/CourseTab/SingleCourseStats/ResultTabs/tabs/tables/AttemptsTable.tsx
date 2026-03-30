@@ -154,7 +154,7 @@ export const AttemptsTable = ({
         header: 'Enrollments',
         cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
       }),
-      ...getGradeColumns(resolveGrades(stats)),
+      ...getGradeColumns<TableData>(resolveGrades(stats)),
     ],
     [showPopulation, stats, userHasAccessToAllStats]
   )

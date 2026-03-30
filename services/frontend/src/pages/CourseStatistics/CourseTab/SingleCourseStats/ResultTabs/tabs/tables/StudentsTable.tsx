@@ -137,7 +137,7 @@ export const StudentsTable = ({
         header: 'Failed',
         cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue() || 0),
       }),
-      ...getGradeColumns(resolveGrades(stats)),
+      ...getGradeColumns<TableData>(resolveGrades(stats)),
       columnHelper.accessor('enrolledNoGrade', {
         header: _ => (
           <TableHeaderWithTooltip

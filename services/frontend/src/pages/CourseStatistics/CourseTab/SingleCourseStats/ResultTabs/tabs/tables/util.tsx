@@ -1,3 +1,4 @@
+import { ColumnDef } from '@tanstack/react-table'
 import { flatten } from 'lodash-es'
 
 import { FAILED_GRADES, NUMERIC_GRADES, OTHER_PASSED_GRADES } from '@/constants/grades'
@@ -8,12 +9,14 @@ export const formatPercentage = (rate: number) => {
   return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`
 }
 
-export const getGradeColumns = (grades: { key: string; title: string }[]) =>
+export const getGradeColumns = <T extends { grades; rowObfuscated?: boolean }>(
+  grades: { key: string; title: string }[]
+): ColumnDef<T>[] =>
   grades.map(({ key, title }) => ({
     id: `grades.${key}`,
     accessorFn: row => row.grades[key],
     header: title,
-    cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : ctx.getValue()),
+    cell: ctx => (ctx.row.original.rowObfuscated ? <ObfuscatedCell /> : (ctx.getValue() ?? 0)),
   }))
 
 const gradesOrder = {
