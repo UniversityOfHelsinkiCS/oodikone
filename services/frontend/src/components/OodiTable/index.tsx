@@ -1,6 +1,6 @@
 import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
-import { ReactNode, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from './features'
 import { OodiTableContainer } from './OodiTable'
@@ -34,15 +34,8 @@ export const OodiTable = <TData,>({
   toolbarContent?: ReactNode
   cy?: string
 }) => {
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: Math.min(200, data.length),
-  })
-
   // should maybe use a deep merging tool or write own
-  const config: Partial<TableOptions<TData>> = {
-    ...options,
-  }
+  const { ...config }: Partial<TableOptions<TData>> = options
 
   const table = useReactTable<TData>({
     _features: [VerticalHeaderFeature, AggregationRowFeature, ZebrastripesFeature],
@@ -51,9 +44,7 @@ export const OodiTable = <TData,>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onPaginationChange: setPagination,
     ...config,
-    state: { pagination, ...config.state },
   })
   return <OodiTableContainer cy={cy} isExportView={isExportView} table={table} toolbarContent={toolbarContent} />
 }
