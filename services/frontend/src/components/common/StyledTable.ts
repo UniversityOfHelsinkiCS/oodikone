@@ -6,7 +6,8 @@ import Table from '@mui/material/Table'
  * To be paired with StyledCell
  */
 export const StyledTable = styled(Table, {
-  shouldForwardProp: prop => prop !== 'showCellBorders' && prop !== 'zebraStriped',
+  shouldForwardProp: prop =>
+    prop !== 'showCellBorders' && prop !== 'zebraStriped' && prop !== 'slimHeader' && prop !== 'slimBody',
 })<{ showCellBorders?: true; zebraStriped?: true; slimHeader?: true; slimBody?: true }>(({
   theme,
   showCellBorders,
