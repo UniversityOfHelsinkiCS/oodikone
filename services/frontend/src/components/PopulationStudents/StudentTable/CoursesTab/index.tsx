@@ -73,8 +73,12 @@ const studentMapper = (
   }, {})
 
   // curriculumCourseCode -> passedSubstGroup
-  const passedSubstitutionsToCurriculumCourses = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, StudentCourse[]>>((acc, code) => {
-    const passedSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup => substGroup.every(sgCode => allPassedCourseCodes.includes(sgCode)))
+  const passedSubstitutionsToCurriculumCourses = Object.keys(substitutionsToCurriculumCourses).reduce<
+    Record<string, StudentCourse[]>
+  >((acc, code) => {
+    const passedSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup =>
+      substGroup.every(sgCode => allPassedCourseCodes.includes(sgCode))
+    )
     // TODO: Implement better logic to select the most optimal substitution_groups, now we select shortest and first group
     // Also this .find (and at(0)!) should never be undefined because the codes are student's completed courses => they exist under student.courses
     const passedSubstitutionGroupCourses = passedSubstitutionGroups
@@ -88,8 +92,12 @@ const studentMapper = (
   }, {})
 
   const enrollmentCodes = enrollments.map(e => e.course_code)
-  const enrollmentsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, FormattedStudent["enrollments"]>>((acc, code) => {
-    const enrolledSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup => substGroup.every(sgCode => enrollmentCodes.includes(sgCode)))
+  const enrollmentsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<
+    Record<string, FormattedStudent['enrollments']>
+  >((acc, code) => {
+    const enrolledSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup =>
+      substGroup.every(sgCode => enrollmentCodes.includes(sgCode))
+    )
     // TODO: Same as above
     const enrolledSubstitutionGroupCourses = enrolledSubstitutionGroups
       .map(sg => sg.map(code => student.enrollments.find(course => course.course_code === code)!))
@@ -102,18 +110,20 @@ const studentMapper = (
     return acc
   }, {})
 
-  const hopsItemsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, string[]>>((acc, code) => {
-    // TODO: Same as above
-    const hopsSubstitutionGroups = substitutionsToCurriculumCourses[code]
-      .filter(substGroup => substGroup.every(sgCode => hopsItems.includes(sgCode)))
-      .toSorted((a, b) => b.length - a.length)
-      .at(0)!
-    if (hopsSubstitutionGroups?.length) {
-      acc[code] = hopsSubstitutionGroups
-    }
-    return acc
-  }, {})
-
+  const hopsItemsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, string[]>>(
+    (acc, code) => {
+      // TODO: Same as above
+      const hopsSubstitutionGroups = substitutionsToCurriculumCourses[code]
+        .filter(substGroup => substGroup.every(sgCode => hopsItems.includes(sgCode)))
+        .toSorted((a, b) => b.length - a.length)
+        .at(0)!
+      if (hopsSubstitutionGroups?.length) {
+        acc[code] = hopsSubstitutionGroups
+      }
+      return acc
+    },
+    {}
+  )
 
   const mapSubstitutionCourses = (coursesToAdd: typeof passedSubstitutionsToCurriculumCourses) => {
     for (const [code, substitutionGroup] of Object.entries(coursesToAdd)) {
@@ -146,7 +156,7 @@ const studentMapper = (
       courseMap[code] ??= {
         substitutedBy: substitutionGroup,
         enrollmentDate: substitutionGroup.at(0)!.enrollment_date_time,
-        exportValue: "HOPS"
+        exportValue: 'HOPS',
       }
     }
   }
@@ -183,7 +193,7 @@ const studentMapper = (
       courseMap[code] ??= {
         inHops: true,
         substitutedBy: substitutionGroup,
-        exporValue: "HOPS",
+        exporValue: 'HOPS',
       }
     }
   }
@@ -270,15 +280,14 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
   // All substitutionGroups for a given course code => course.substitution_groups
   const substitutionsForCourseCode: Record<string, string[][]> = useMemo(
     () =>
-      courses
-        .reduce((acc, course) => {
-          const substitutionGroups = course.course.substitution_groups ?? []
-          if (substitutionGroups.length) {
-            acc[course.course.code] ??= []
-            acc[course.course.code].push(...(substitutionGroups.filter(group => group.length)))
-          }
-          return acc
-        }, {}),
+      courses.reduce((acc, course) => {
+        const substitutionGroups = course.course.substitution_groups ?? []
+        if (substitutionGroups.length) {
+          acc[course.course.code] ??= []
+          acc[course.course.code].push(...substitutionGroups.filter(group => group.length))
+        }
+        return acc
+      }, {}),
     [substitutionGroupsCourseCodes, courses]
   )
 

@@ -12,7 +12,7 @@ const save = () => {
 }
 
 const selectSavedPopulation = name => {
-  cy.cs('history-search').click().type(`${name}{enter}`)
+  cy.cs('history-search').type(`${name}{enter}`)
 }
 
 const deleteAllSearches = () => {
