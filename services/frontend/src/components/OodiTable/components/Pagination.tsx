@@ -17,7 +17,7 @@ export const OodiTablePagination = <TData,>({ table }: { table: Table<TData> }) 
   useEffect(
     () =>
       setPagination({
-        pageIndex: pagination.pageIndex,
+        pageIndex: 0,
         pageSize: Math.max(pagination.pageSize, pageRowOptions[0]),
       }),
     [table.getCoreRowModel().rows.length]
