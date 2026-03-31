@@ -10,7 +10,7 @@ import {
 } from '../types'
 import { FormattedStudent } from '../types/studentData'
 
-export type CourseStats = Pick<Course, 'code' | 'name' | 'substitutions' | 'is_study_module'>
+export type CourseStats = Pick<Course, 'code' | 'name' | 'is_study_module' | 'substitution_groups'>
 
 export type AttainmentDates = {
   latestTotal?: Date

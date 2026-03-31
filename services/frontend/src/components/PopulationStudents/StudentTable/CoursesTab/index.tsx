@@ -7,7 +7,7 @@ import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
-import { FormattedStudent } from '@oodikone/shared/types/studentData'
+import { FormattedStudent, StudentCourse } from '@oodikone/shared/types/studentData'
 import { IncludeSubstitutionsToggle } from '../../IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from './columnDefinitions'
 
@@ -22,7 +22,7 @@ export type Courses = Record<
   {
     grade?: string
     completionDate?: string
-    substitutedBy?: string
+    substitutedBy?: StudentCourse[]
     inHops?: boolean
     enrollmentDate?: Date
     passed?: boolean
@@ -48,11 +48,12 @@ const studentMapper = (
   student: FormattedStudent,
   includeSubstitutions: boolean,
   curriculumCourseCodes: string[],
-  substituteToPrimaryCodes: Record<string, string[]>
+  substitutionsForCourseCode: Record<string, string[][]>
 ) => {
   const courseMap = {}
 
   // NB: there can be many attainments/enrollments for each course code
+  // All passed courses that are included in curriculum
   const passedCourses = student.courses.filter(
     course => curriculumCourseCodes.includes(course.course_code) && course.passed
   )
@@ -61,74 +62,142 @@ const studentMapper = (
     studyPlan.included_courses.filter(code => curriculumCourseCodes.includes(code))
   )
 
-  const passedSubstituteCourses = student.courses.filter(course => !!substituteToPrimaryCodes[course.course_code])
-  const substituteEnrollments = student.enrollments.filter(
-    enrollment => !!substituteToPrimaryCodes[enrollment.course_code]
-  )
-  const substituteHopsItems = student.studyplans.flatMap(studyPlan =>
-    studyPlan.included_courses.filter(code => !!substituteToPrimaryCodes[code])
-  )
+  // All passed courses including random AY-codes etc
+  const allPassedCourseCodes = student.courses.filter(course => course.passed).map(course => course.course_code)
+  const substitutionsToCurriculumCourses = curriculumCourseCodes.reduce<Record<string, string[][]>>((acc, code) => {
+    const substitutionsToCurriculumCourse = substitutionsForCourseCode[code]
+    if (substitutionsToCurriculumCourse) {
+      acc[code] = substitutionsToCurriculumCourse
+    }
+    return acc
+  }, {})
 
-  const mapCourses = (coursesToAdd: typeof passedCourses, substitutions: boolean) => {
+  // curriculumCourseCode -> passedSubstGroup
+  const passedSubstitutionsToCurriculumCourses = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, StudentCourse[]>>((acc, code) => {
+    const passedSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup => substGroup.every(sgCode => allPassedCourseCodes.includes(sgCode)))
+    // TODO: Implement better logic to select the most optimal substitution_groups, now we select shortest and first group
+    // Also this .find (and at(0)!) should never be undefined because the codes are student's completed courses => they exist under student.courses
+    const passedSubstitutionGroupCourses = passedSubstitutionGroups
+      .map(sg => sg.map(code => student.courses.find(course => course.course_code === code)!))
+      .toSorted((a, b) => b.length - a.length)
+      .at(0)! // We know that this will exist
+    if (passedSubstitutionGroups.length) {
+      acc[code] = passedSubstitutionGroupCourses
+    }
+    return acc
+  }, {})
+
+  const enrollmentCodes = enrollments.map(e => e.course_code)
+  const enrollmentsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, FormattedStudent["enrollments"]>>((acc, code) => {
+    const enrolledSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup => substGroup.every(sgCode => enrollmentCodes.includes(sgCode)))
+    // TODO: Same as above
+    const enrolledSubstitutionGroupCourses = enrolledSubstitutionGroups
+      .map(sg => sg.map(code => student.enrollments.find(course => course.course_code === code)!))
+      .toSorted((a, b) => b.length - a.length)
+      .at(0)! // We know that this will exist
+    if (enrolledSubstitutionGroupCourses?.length) {
+      acc[code] = enrolledSubstitutionGroupCourses
+    }
+
+    return acc
+  }, {})
+
+  const hopsItemsWithSubstitutions = Object.keys(substitutionsToCurriculumCourses).reduce<Record<string, string[]>>((acc, code) => {
+    // TODO: Same as above
+    const hopsSubstitutionGroups = substitutionsToCurriculumCourses[code]
+      .filter(substGroup => substGroup.every(sgCode => hopsItems.includes(sgCode)))
+      .toSorted((a, b) => b.length - a.length)
+      .at(0)!
+    if (hopsSubstitutionGroups?.length) {
+      acc[code] = hopsSubstitutionGroups
+    }
+    return acc
+  }, {})
+
+
+  const mapSubstitutionCourses = (coursesToAdd: typeof passedSubstitutionsToCurriculumCourses) => {
+    for (const [code, substitutionGroup] of Object.entries(coursesToAdd)) {
+      courseMap[code] ??= {
+        substitutedBy: substitutionGroup,
+        exportValue: `Substitutes ${code}`,
+      }
+    }
+  }
+
+  const mapCourses = (coursesToAdd: typeof passedCourses) => {
     for (const course of coursesToAdd) {
-      const codes = substitutions ? substituteToPrimaryCodes[course.course_code] : [course.course_code]
-      codes.forEach(code => {
-        if (!courseMap[code] || compareCourseGrades(courseMap[code], course)) {
-          courseMap[code] = {
-            grade: course.grade,
-            completionDate: course.date,
-            passed: course.passed,
-            substitutedBy: substitutions ? course.course_code : undefined,
-            credittypecode: course.credittypecode,
-            exportValue: course.grade,
-          }
+      const code = course.course_code
+
+      if (!courseMap[code] || compareCourseGrades(courseMap[code], course)) {
+        courseMap[code] = {
+          grade: course.grade,
+          completionDate: course.date,
+          passed: course.passed,
+          substitutedBy: undefined,
+          credittypecode: course.credittypecode,
+          exportValue: course.grade,
         }
-      })
+      }
     }
   }
 
-  const mapEnrollments = (enrollmentsToAdd: typeof enrollments, substitutions: boolean) => {
+  const mapSubstitutionEnrollments = (enrollmentsToAdd: typeof enrollmentsWithSubstitutions) => {
+    for (const [code, substitutionGroup] of Object.entries(enrollmentsToAdd)) {
+      courseMap[code] ??= {
+        substitutedBy: substitutionGroup,
+        enrollmentDate: substitutionGroup.at(0)!.enrollment_date_time,
+        exportValue: "HOPS"
+      }
+    }
+  }
+
+  const mapEnrollments = (enrollmentsToAdd: typeof enrollments) => {
     for (const enrollment of enrollmentsToAdd) {
-      const codes = substitutions ? substituteToPrimaryCodes[enrollment.course_code] : [enrollment.course_code]
-      codes.forEach(code => {
-        if (
-          !courseMap[code] ||
-          (!!courseMap[code].enrollmentDate &&
-            new Date(courseMap[code].enrollmentDate) < new Date(enrollment.enrollment_date_time))
-        )
-          courseMap[code] = {
-            enrollmentDate: enrollment.enrollment_date_time,
-            substitutedBy: substitutions ? enrollment.course_code : undefined,
-            exportValue: 'HOPS',
-          }
-      })
-    }
-  }
-
-  const mapHopsSelections = (selectionsToAdd: typeof hopsItems, substitutions: boolean) => {
-    for (const selection of selectionsToAdd) {
-      const codes = substitutions ? substituteToPrimaryCodes[selection] : [selection]
-      codes.forEach(code => {
-        courseMap[code] ??= {
-          inHops: true,
-          substitutedBy: substitutions ? selection : undefined,
+      const code = enrollment.course_code
+      if (
+        !courseMap[code] ||
+        (!!courseMap[code].enrollmentDate &&
+          new Date(courseMap[code].enrollmentDate) < new Date(enrollment.enrollment_date_time))
+      )
+        courseMap[code] = {
+          enrollmentDate: enrollment.enrollment_date_time,
+          substitutedBy: undefined,
           exportValue: 'HOPS',
         }
-      })
     }
   }
 
-  mapCourses(passedCourses, false)
-  if (includeSubstitutions) mapCourses(passedSubstituteCourses, true)
+  const mapHopsSelections = (selectionsToAdd: typeof hopsItems) => {
+    for (const selection of selectionsToAdd) {
+      const code = selection
+      courseMap[code] ??= {
+        inHops: true,
+        substitutedBy: undefined,
+        exportValue: 'HOPS',
+      }
+    }
+  }
+
+  const mapSubstitutionHopsSelections = (selectionsToAdd: typeof hopsItemsWithSubstitutions) => {
+    for (const [code, substitutionGroup] of Object.entries(selectionsToAdd)) {
+      courseMap[code] ??= {
+        inHops: true,
+        substitutedBy: substitutionGroup,
+        exporValue: "HOPS",
+      }
+    }
+  }
+
+  mapCourses(passedCourses)
+  if (includeSubstitutions) mapSubstitutionCourses(passedSubstitutionsToCurriculumCourses)
+
+  mapEnrollments(enrollments)
+  if (includeSubstitutions) mapSubstitutionEnrollments(enrollmentsWithSubstitutions)
+
+  mapHopsSelections(hopsItems)
+  if (includeSubstitutions) mapSubstitutionHopsSelections(hopsItemsWithSubstitutions)
 
   const totalPassed = Object.keys(courseMap).length
-
-  mapEnrollments(enrollments, false)
-  if (includeSubstitutions) mapEnrollments(substituteEnrollments, true)
-
-  mapHopsSelections(hopsItems, false)
-  if (includeSubstitutions) mapHopsSelections(substituteHopsItems, true)
-
   const totalPlanned = Object.keys(courseMap).length - totalPassed
 
   return {
@@ -163,7 +232,7 @@ const gradeOrdering = ['0', 'Hyl.', 'TT', 'HT', '1', '2', '3', '4', '5', 'Hyv.']
 /**
  * @returns true if current course (the latter) has the same or better grade than old course
  */
-const compareCourseGrades = (previous, current) =>
+const compareCourseGrades = (previous: StudentCourse, current: StudentCourse) =>
   gradeOrdering.indexOf(previous.grade) <= gradeOrdering.indexOf(current.grade)
 
 export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTabContainerProps) => {
@@ -182,11 +251,12 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
 
   const curriculumCourseCodes = useMemo(() => curriculumCourses.map(course => course.code), [curriculumCourses])
 
-  const substitutionCourseCodes = useMemo(
+  // All substitution_groups entries as codes
+  const substitutionGroupsCourseCodes = useMemo(
     () =>
       courses
         .filter(course => curriculumCourseCodes.includes(course.course.code))
-        .flatMap(course => course.course.substitutions),
+        .flatMap(course => course.course.substitution_groups.map(sbGr => sbGr)),
     [courses, curriculumCourseCodes]
   )
 
@@ -196,20 +266,20 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
    * g.g. course code TKT20015 -> BSCS2002/TKT10001 in curriculum 2020-2023
    * but most of the time there is only one main code
    */
-  const substituteToPrimaryCodes: Record<string, string[]> = useMemo(
+
+  // All substitutionGroups for a given course code => course.substitution_groups
+  const substitutionsForCourseCode: Record<string, string[][]> = useMemo(
     () =>
       courses
-        .filter(course => substitutionCourseCodes.includes(course.course.code))
         .reduce((acc, course) => {
-          const mainCodes = course.course.substitutions.filter(sub => curriculumCourseCodes.includes(sub))
-          // If no mainCode in curriculum, leave blank as nothing would be shown in course tab anyway
-          if (mainCodes.length) {
+          const substitutionGroups = course.course.substitution_groups ?? []
+          if (substitutionGroups.length) {
             acc[course.course.code] ??= []
-            acc[course.course.code].push(...mainCodes)
+            acc[course.course.code].push(...(substitutionGroups.filter(group => group.length)))
           }
           return acc
         }, {}),
-    [curriculumCourseCodes, substitutionCourseCodes, courses]
+    [substitutionGroupsCourseCodes, courses]
   )
 
   const coursesByParentModule = useMemo(() => {
@@ -232,9 +302,9 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
   const formattedStudents = useMemo(
     () =>
       students.map(student =>
-        studentMapper(student, includeSubstitutions, curriculumCourseCodes, substituteToPrimaryCodes)
+        studentMapper(student, includeSubstitutions, curriculumCourseCodes, substitutionsForCourseCode)
       ),
-    [students, studentMapper]
+    [students, studentMapper, includeSubstitutions]
   )
 
   const columns = useGetColumnDefinitions(coursesByParentModule)

@@ -16,6 +16,7 @@ import { CheckIcon, ContentCopyIcon, CropSquareIcon, RemoveIcon, SwapHorizIcon }
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { CreditTypeCode } from '@oodikone/shared/types'
 import { Courses, CourseTabModule, CourseTabStudent } from '.'
+import dayjs from 'dayjs'
 
 const columnHelper = createColumnHelper<CourseTabStudent>()
 const dateFormat = DateFormat.DISPLAY_DATE
@@ -153,33 +154,13 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                 if (!correctCourse) return null
 
                 const sub = correctCourse.substitutedBy
-                const substitutePrefix = sub ? `Substituting course: ${sub}\n` : ''
 
-                if (correctCourse.grade) {
-                  const isTransferred = correctCourse.credittypecode === CreditTypeCode.APPROVED
-                  const title =
-                    substitutePrefix +
-                    (isTransferred
-                      ? `Grade: ${correctCourse.grade}\nTransferred on: ${formatDate(correctCourse.completionDate, dateFormat)}`
-                      : `Grade: ${correctCourse.grade}\nCompleted on: ${formatDate(correctCourse.completionDate, dateFormat)}`)
-                  return (
-                    <div title={title}>
-                      {isTransferred ? (
-                        <SwapHorizIcon
-                          sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }}
-                        />
-                      ) : (
-                        <CheckIcon
-                          sx={{ color: sub ? theme.palette.ooditable.hops : theme.palette.ooditable.success }}
-                        />
-                      )}
-                    </div>
-                  )
-                } else if (correctCourse.enrollmentDate) {
+                if (correctCourse.enrollmentDate) {
+                  const subPrefix = sub ? `Substituted by: ${sub?.map(course => course.course_code)?.join(", ")}\n` : ""
                   return (
                     <div
                       title={
-                        substitutePrefix + `Last enrollment ${formatDate(correctCourse.enrollmentDate, dateFormat)}`
+                        `${subPrefix}Last enrollment ${formatDate(correctCourse.enrollmentDate, dateFormat)}`
                       }
                     >
                       <RemoveIcon
@@ -191,10 +172,48 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                       />
                     </div>
                   )
-                } else if (correctCourse.inHops) {
+                }
+                else if (correctCourse.inHops) {
+                  const subString = sub ? `Substituted by: ${sub?.join(", ")}\n\n` : ""
                   return (
-                    <div title={substitutePrefix + 'In primary studyplan'}>
+                    <div title={`${subString}In primary studyplan`} >
                       <CropSquareIcon sx={{ color: theme.palette.ooditable.hops }} />
+                    </div >
+                  )
+                }
+                else if (correctCourse.grade) {
+                  // NOTE: Contains only normally-passed-courses because substitutions don't have a grade field
+                  const isTransferred = correctCourse.credittypecode === CreditTypeCode.APPROVED
+                  const title =
+                    (isTransferred
+                      ? `Grade: ${correctCourse.grade}\nTransferred on: ${formatDate(correctCourse.completionDate, dateFormat)}`
+                      : `Grade: ${correctCourse.grade}\nCompleted on: ${formatDate(correctCourse.completionDate, dateFormat)}`)
+
+                  return (
+                    <div title={title}>
+                      {isTransferred ? (
+                        <SwapHorizIcon
+                          sx={{ color: theme.palette.ooditable.success }}
+                        />
+                      ) : (
+                        <CheckIcon
+                          sx={{ color: theme.palette.ooditable.success }}
+                        />
+                      )}
+                    </div>
+                  )
+                }
+                else if (sub) {
+                  const subStringPrefix = `Substituted by:\n\n`
+                  const subString = subStringPrefix + sub.map(course => (
+                    `${course.course_code}\nGrade: ${course.grade}\nCompleted on: ${formatDate(course.date, dateFormat)}`
+                  )).join("\n\n")
+
+                  return (
+                    <div title={subString}>
+                      <CheckIcon
+                        sx={{ color: theme.palette.ooditable.hops }}
+                      />
                     </div>
                   )
                 }
