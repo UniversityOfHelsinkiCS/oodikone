@@ -22,7 +22,7 @@ export type Courses = Record<
   {
     grade?: string
     completionDate?: string
-    substitutedBy?: StudentCourse[]
+    substitutedBy?: StudentCourse[] | string[]
     inHops?: boolean
     enrollmentDate?: Date
     passed?: boolean

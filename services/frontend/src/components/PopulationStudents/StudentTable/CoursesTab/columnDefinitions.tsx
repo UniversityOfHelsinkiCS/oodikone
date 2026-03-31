@@ -26,6 +26,11 @@ const getSortingValue = (course: Courses['number'] | undefined) => {
   return 1
 }
 
+const isCourseCodes = (courses: unknown): courses is string[] => {
+  if (Array.isArray(courses) && courses.length && typeof courses.at(0) === 'string') return true
+  return false
+}
+
 export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): ColumnDef<CourseTabStudent, any>[] => {
   const { getTextIn } = useLanguage()
   const theme = useTheme()
@@ -155,7 +160,10 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                 const sub = correctCourse.substitutedBy
 
                 if (correctCourse.enrollmentDate) {
-                  const subPrefix = sub ? `Substituted by: ${sub?.map(course => course.course_code)?.join(', ')}\n` : ''
+                  const subPrefix =
+                    sub && !isCourseCodes(sub)
+                      ? `Substituted by: ${sub?.map(course => course.course_code)?.join(', ')}\n`
+                      : ''
                   return (
                     <div title={`${subPrefix}Last enrollment ${formatDate(correctCourse.enrollmentDate, dateFormat)}`}>
                       <RemoveIcon
@@ -168,9 +176,7 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                     </div>
                   )
                 } else if (correctCourse.inHops) {
-                  const subString = sub
-                    ? `Substituted by: ${sub?.map(course => course.course_code).join(', ')}\n\n`
-                    : ''
+                  const subString = sub && isCourseCodes(sub) ? `Substituted by: ${sub?.join(', ')}\n\n` : ''
                   return (
                     <div title={`${subString}In primary studyplan`}>
                       <CropSquareIcon sx={{ color: theme.palette.ooditable.hops }} />
@@ -194,14 +200,15 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                   )
                 } else if (sub) {
                   const subStringPrefix = `Substituted by:\n\n`
-                  const subString =
-                    subStringPrefix +
-                    sub
-                      .map(
-                        course =>
-                          `${course.course_code}\nGrade: ${course.grade}\nCompleted on: ${formatDate(course.date, dateFormat)}`
-                      )
-                      .join('\n\n')
+                  const subString = isCourseCodes(sub)
+                    ? subStringPrefix + sub.join(', ')
+                    : subStringPrefix +
+                      sub
+                        .map(
+                          course =>
+                            `${course.course_code}\nGrade: ${course.grade}\nCompleted on: ${formatDate(course.date, dateFormat)}`
+                        )
+                        .join('\n\n')
 
                   return (
                     <div title={subString}>
