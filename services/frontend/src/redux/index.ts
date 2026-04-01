@@ -1,7 +1,7 @@
 import { setupListeners } from '@reduxjs/toolkit/query/react'
 import { configureStore } from '@reduxjs/toolkit/react'
 
-import { handleRequest, RTKApi } from '@/apiConnection'
+import { RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'
 import { actionHistoryMiddleware } from './actionHistory'
 import { reducer as filters } from './filters'
@@ -22,7 +22,6 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }).concat(
       RTKApi.middleware,
-      handleRequest,
       actionHistoryMiddleware
     ),
 })
