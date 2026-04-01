@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
 import { formatToArray } from '@oodikone/shared/util'
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 
 // Set up dev user for development environment, mimicking production admin user
 const baseHeaders: Record<string, string> = isDev
@@ -28,7 +29,7 @@ const getHeaders = () => {
   return headers
 }
 
-const api = async (url: string, req?: RequestInit) => fetch(url, req)
+const api = Fetchios.create({ baseUrl: apiBasePath })
 
 type ApiMethods = 'get' | 'post' | 'put' | 'delete'
 
@@ -47,7 +48,8 @@ export const callApi = async (
   const apiRequestController = new AbortController()
   const signal = timeout !== 0 ? apiRequestController.signal : undefined
 
-  const options: RequestInit = {
+  const options = {
+    params,
     signal,
     headers: {
       'Content-Type': 'application/json',
@@ -55,20 +57,20 @@ export const callApi = async (
     },
   }
 
-  const buildUrl = () => {
-    const urlParams = new URLSearchParams(params)
-    return apiBasePath + url + urlParams.toString()
-  }
+  // const buildUrl = () => e{
+  //   const urlParams = new URLSearchParams(params)
+  //   return apiBasePath + url + urlParams.toString()
+  // }
 
   switch (method) {
     case 'get':
-      return api(buildUrl(), { method: 'get', ...options })
+      return api.get(url, options)
     case 'post':
-      return api(buildUrl(), { method: 'post', ...options, body: data })
+      return api.post(url, data, options)
     case 'put':
-      return api(buildUrl(), { method: 'put', ...options, body: data })
+      return api.put(url, data, options)
     case 'delete':
-      return api(buildUrl(), { method: 'delete', ...options, body: data })
+      return api.delete(url, options)
     default:
       throw new Error('Invalid method used for API call.')
   }
