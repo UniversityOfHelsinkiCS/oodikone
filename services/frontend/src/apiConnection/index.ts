@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import * as Sentry from '@sentry/browser'
-import axios from 'axios'
+import axios, { AxiosProgressEvent } from 'axios'
 
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
@@ -39,11 +39,11 @@ const actionTypes = prefix => ({
   success: `${prefix}SUCCESS`,
 })
 
-export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
+export const callApi = async (url, method = 'get', data, params = {}, timeout = 0, progressCallback?: (progress: number) => void) => {
   const options = { headers: getHeaders(), timeout }
 
-  const onDownloadProgress = ({ loaded, total }) => {
-    if (progressCallback) progressCallback(Math.round((loaded / total) * 100))
+  const onDownloadProgress = ({ loaded, total }: AxiosProgressEvent) => {
+    if (progressCallback) progressCallback(Math.min(100, Math.round((loaded / (total ?? 1)) * 100)))
   }
 
   switch (method) {
