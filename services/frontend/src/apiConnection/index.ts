@@ -1,12 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import axios, { AxiosProgressEvent } from 'axios'
 
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
 import { formatToArray } from '@oodikone/shared/util'
 
 // Set up dev user for development environment, mimicking production admin user
-const baseHeaders = isDev
+const baseHeaders: Record<string, string> = isDev
   ? {
       uid: 'mluukkai',
       displayName: 'Matti Luukkainen',
@@ -29,33 +28,49 @@ const getHeaders = () => {
   return headers
 }
 
-const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout: 120_000 })
+const api = async (url: string, req?: RequestInit) => fetch(url, req)
 
+type ApiMethods = 'get' | 'post' | 'put' | 'delete'
+
+/**
+ * Calls API with minimal preprocessing.
+ * NOTE! `data` -attribute has to be JSON.stringified in-order for the predefined
+ *       'Content-Type' to work and the receiving Express instance to parse the body correctly.
+ */
 export const callApi = async (
-  url,
-  method = 'get',
-  data,
-  params = {},
-  timeout = 0,
-  progressCallback?: (progress: number) => void
+  url: string,
+  method: ApiMethods = 'get',
+  data?: BodyInit,
+  params: Record<string, any> = {},
+  timeout = 30_000
 ) => {
-  const options = { headers: getHeaders(), timeout }
+  const apiRequestController = new AbortController()
+  const signal = timeout !== 0 ? apiRequestController.signal : undefined
 
-  const onDownloadProgress = ({ loaded, total }: AxiosProgressEvent) => {
-    if (progressCallback) progressCallback(Math.min(100, Math.round((loaded / (total ?? 1)) * 100)))
+  const options: RequestInit = {
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      ...getHeaders(),
+    },
+  }
+
+  const buildUrl = () => {
+    const urlParams = new URLSearchParams(params)
+    return apiBasePath + url + urlParams.toString()
   }
 
   switch (method) {
     case 'get':
-      return api.get(url, { ...options, params, onDownloadProgress })
+      return api(buildUrl(), { method: 'get', ...options })
     case 'post':
-      return api.post(url, data, options)
+      return api(buildUrl(), { method: 'post', ...options, body: data })
     case 'put':
-      return api.put(url, data, options)
+      return api(buildUrl(), { method: 'put', ...options, body: data })
     case 'delete':
-      return api.delete(url, { headers: options.headers, data })
+      return api(buildUrl(), { method: 'delete', ...options, body: data })
     default:
-      return Promise.reject(new Error('Invalid http method'))
+      throw new Error('Invalid method used for API call.')
   }
 }
 

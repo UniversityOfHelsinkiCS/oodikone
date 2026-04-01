@@ -28,7 +28,7 @@ export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) =>
   )
 
   const updateStudent = async () => {
-    await callApi('/updater/update/v2/customlist/students', 'post', [student.studentNumber])
+    await callApi('/updater/update/v2/customlist/students', 'post', JSON.stringify([student.studentNumber]))
   }
 
   return (
