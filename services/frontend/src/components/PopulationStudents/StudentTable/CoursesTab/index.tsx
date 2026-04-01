@@ -266,16 +266,9 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
     () =>
       courses
         .filter(course => curriculumCourseCodes.includes(course.course.code))
-        .flatMap(course => course.course.substitution_groups.map(sbGr => sbGr)),
+        .flatMap(course => course.course.substitution_groups?.map(sbGr => sbGr) ?? []),
     [courses, curriculumCourseCodes]
   )
-
-  /**
-   * Justification for using array:
-   * there are instances where a course substitutes multiple different courses currently present in curriculum
-   * g.g. course code TKT20015 -> BSCS2002/TKT10001 in curriculum 2020-2023
-   * but most of the time there is only one main code
-   */
 
   // All substitutionGroups for a given course code => course.substitution_groups
   const substitutionsForCourseCode: Record<string, string[][]> = useMemo(
