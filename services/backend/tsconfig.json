@@ -17,7 +17,8 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["index.ts", "src", "tests"],
   "exclude": ["../frontend"]

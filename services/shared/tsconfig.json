@@ -17,6 +17,7 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "inlineSources": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   }
 }
