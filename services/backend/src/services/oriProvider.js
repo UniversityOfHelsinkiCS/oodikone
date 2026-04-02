@@ -1,13 +1,12 @@
-const axios = require('axios')
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 
 const { sisUrl, sisGrapqlAppAccount, sisGrapqlAppKey } = require('../config')
 const { ApplicationError } = require('../util/customErrors')
 
 export const getSisuAccessToken = async eppn => {
   const oriAppAuthPath = `${sisUrl}/ori/application-auth`
-  let sisuResponse
   try {
-    sisuResponse = await axios.post(
+    const sisuResponse = await Fetchios.post(
       oriAppAuthPath,
       {
         username: sisGrapqlAppAccount,
@@ -16,13 +15,14 @@ export const getSisuAccessToken = async eppn => {
       },
       { 'content-type': 'application/json' }
     )
+
+    return sisuResponse.data.authToken
   } catch (error) {
     throw new ApplicationError(
       'Could not find the user in Sisu, either with the eppn of the user or the new person.',
       404
     )
   }
-  return sisuResponse.data.authToken
 }
 
 export const decodeJwtTokenPayloadToObject = token => {
@@ -53,23 +53,16 @@ export const personSearchQuery = `query privatePerson($subjectUserId: ID!) {
   }`
 
 export const getGraphqlData = async (accessToken, queryObject) => {
-  const graphQlUrl = `${sisUrl}/api`
-  const authHeader = `Application ${accessToken}`
-  const config = {
-    url: graphQlUrl,
-    method: 'post',
-    headers: {
-      Authorization: authHeader,
-      'Accept-Charset': 'UTF-8',
-      'Content-Type': 'application/json',
-    },
-    data: queryObject,
-  }
-  let graphQlResponse
   try {
-    graphQlResponse = await axios(config)
+    const graphQlResponse = await Fetchios.post(`${sisUrl}/api`, queryObject, {
+      headers: {
+        Authorization: `Application ${accessToken}`,
+        'Accept-Charset': 'UTF-8',
+        'Content-Type': 'application/json',
+      },
+    })
+    return graphQlResponse.data.data.private_person
   } catch (error) {
     throw new ApplicationError('Graphql request failed for unclear reasons.', 500)
   }
-  return graphQlResponse.data.data.private_person
 }

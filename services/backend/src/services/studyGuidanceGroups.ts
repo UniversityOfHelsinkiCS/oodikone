@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/node'
-import { AxiosError } from 'axios'
 import { uniq } from 'lodash-es'
 
 import type { StudyGuidanceGroup, Tags, TagsByGroupId, GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
@@ -14,15 +13,16 @@ const getGroupsFromImporter = async (sisPersonId: string): Promise<StudyGuidance
 
   try {
     const response: { data: Record<string, StudyGuidanceGroup> } = await importerClient.get(
-      `/person-groups/person/${sisPersonId}`
+      `/person-groups/person/${sisPersonId}`,
+      {}
     )
 
     return response?.data ? Object.values(response.data) : []
   } catch (error) {
     logger.error('Could not fetch study guidance groups!')
-    if (error instanceof AxiosError) {
+    if (error instanceof Error) {
       logger.error(error.stack)
-      logger.error(JSON.stringify(error.response?.data))
+      logger.error(JSON.stringify(error.message))
       Sentry.captureException(error)
     }
   }

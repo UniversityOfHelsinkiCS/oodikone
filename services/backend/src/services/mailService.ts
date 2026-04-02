@@ -1,11 +1,10 @@
-import axios from 'axios'
-
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 import { isProduction, pateToken } from '../config'
 import { FormattedUser } from '../types'
 import logger from '../util/logger'
 
-const pateClient = axios.create({
-  baseURL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
+const pateClient = Fetchios.create({
+  baseUrl: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/pate/',
   params: {
     token: pateToken,
   },
@@ -24,7 +23,7 @@ const baseSettings = {
 const sendEmail = async (options = {}) => {
   if (!isProduction) return logger.error('Email sending is disabled in development mode.')
   if (!pateToken) return logger.error('Email sending failed because pate token is missing.')
-  return await pateClient.post('/', options)
+  return await pateClient.post('', options, {})
 }
 
 export const sendFeedback = async ({ feedbackContent, user }: { feedbackContent: string; user: FormattedUser }) => {

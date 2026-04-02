@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/node'
-import axios from 'axios'
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 
 import { importerToken, isStaging, jamiUrl } from '../config'
 import { IamAccess } from '../types'
 import logger from './logger'
 
-const jamiClient = axios.create({
-  baseURL: jamiUrl,
+const jamiClient = Fetchios.create({
+  baseUrl: jamiUrl,
   params: {
     token: importerToken,
   },
@@ -25,11 +25,15 @@ export const getUserIamAccess = async (
   if (iamGroups.length === 0) return {}
 
   try {
-    const { data } = await jamiClient.post('/', {
-      userId: sisPersonId,
-      getSisuAccess: !isStaging && !!sisPersonId,
-      iamGroups,
-    })
+    const { data } = await jamiClient.post<Pick<UserIamAccess, 'specialGroup'>>(
+      '',
+      {
+        userId: sisPersonId,
+        getSisuAccess: !isStaging && !!sisPersonId,
+        iamGroups,
+      },
+      {}
+    )
 
     const { specialGroup, ...resetOfIamAccess } = data
     return { iamAccess: resetOfIamAccess, specialGroup }
@@ -46,7 +50,8 @@ export const getUserIamAccess = async (
 
 export const getUserIams = async (userId: string) => {
   try {
-    const { data } = await jamiClient.get(`/${userId}`)
+    const { data } = await jamiClient.get<any>(userId, {})
+
     return data.iamGroups as string[]
   } catch (error: any) {
     if (error.response.status !== 404) {
@@ -65,12 +70,12 @@ type Access = {
 }
 
 export const getAllUserAccess = async (userIds: string[]) => {
-  const { data } = await jamiClient.post('access-and-special-groups', { userIds })
+  const { data } = await jamiClient.post('access-and-special-groups', { userIds }, {})
   return data as Access[]
 }
 
 jamiClient
-  .get('/ping', { timeout: 4000 })
+  .get('ping', { timeout: 4000 })
   .then(() => {
     logger.info('JAMI connected')
   })
