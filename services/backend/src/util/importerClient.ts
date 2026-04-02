@@ -1,11 +1,10 @@
-import axios from 'axios'
-
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 import { importerToken, importerUrl } from '../config'
 import logger from './logger'
 
-const importerClient = axios.create({
+const importerClient = Fetchios.create({
   headers: { token: importerToken },
-  baseURL: importerUrl,
+  baseUrl: importerUrl,
   timeout: 10000,
 })
 

@@ -30,7 +30,7 @@ export const Updater = () => {
 
   const apiCall = async (url, method, data) => {
     try {
-      const response = await callApi(url, method, JSON.stringify(data))
+      const response = await callApi(url, method, data)
       setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: response.data, color: 'green' }))
     } catch {
       setMessages(oldMessages => oldMessages.concat({ time: new Date(), message: 'Updater api error', color: 'red' }))

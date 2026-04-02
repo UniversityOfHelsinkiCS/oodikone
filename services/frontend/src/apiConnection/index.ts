@@ -41,7 +41,7 @@ type ApiMethods = 'get' | 'post' | 'put' | 'delete'
 export const callApi = async (
   url: string,
   method: ApiMethods = 'get',
-  data?: BodyInit,
+  data?: any,
   params: Record<string, any> = {},
   timeout = 30_000
 ) => {

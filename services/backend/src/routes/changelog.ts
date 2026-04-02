@@ -1,7 +1,7 @@
-import axios from 'axios'
 import { Router } from 'express'
 
 import { Release } from '@oodikone/shared/types'
+import { Fetchios } from '@oodikone/shared/util/fetchios'
 import { isDev, isTest } from '../config'
 
 const router = Router()
@@ -39,8 +39,11 @@ router.get<never, Release[]>('/', async (_, res) => {
     return res.status(200).json(fakeRelease)
   }
 
-  const response = await axios.get('https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases')
-  const releasesFromAPI: Release[] = response.data.map((release: Record<string, any>) => ({
+  const response = await Fetchios.get<Record<string, any>[]>(
+    'https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases',
+    {}
+  )
+  const releasesFromAPI: Release[] = response.data.map(release => ({
     description: release.body,
     time: release.published_at,
     title: release.name,
