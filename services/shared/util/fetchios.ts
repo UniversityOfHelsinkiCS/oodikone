@@ -41,7 +41,7 @@ const convertDataBasedOnCT = <R>(contentType: string, res: Response): Promise<R>
 }
 
 const handleRequestData = <R>(url: string, options: RequestInit): Promise<Res<R>> =>
-  fetch(url, options).then(async res => {
+  globalThis.fetch(url, options).then(async res => {
     const ct = res.headers.get('content-type') ?? ''
 
     return {
