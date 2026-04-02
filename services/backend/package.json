@@ -2,7 +2,7 @@
   "name": "backend",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p .",
     "test": "node --import tsx --test --test-reporter spec --test-force-exit"
   },
   "dependencies": {
