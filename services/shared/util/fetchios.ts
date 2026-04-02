@@ -13,12 +13,16 @@ const buildUrl = (
   baseParams?: Params,
   params?: Params
 ) => {
+  const base = new URL(baseUrl.replace(/\/?$/, '/'))
+  const path = new URL(url.replace(/^\//, ''), base)
+
   const baseUrlParams = new URLSearchParams(baseParams)
   const urlParams = new URLSearchParams(params)
 
-  Array.from(urlParams.entries()).forEach(([key, val]) => baseUrlParams.set(key, val))
+  Array.from(baseUrlParams.entries()).forEach(([key, val]) => path.searchParams.set(key, val))
+  Array.from(urlParams.entries()).forEach(([key, val]) => path.searchParams.set(key, val))
 
-  return `${baseUrl}${url}?${baseUrlParams.toString()}`
+  return path.href
 }
 
 const buildSignal = (timeout: number | undefined): AbortSignal | undefined =>
@@ -50,12 +54,22 @@ const handleRequestData = <R>(url: string, options: RequestInit): Promise<Res<R>
     }
   })
 
-const fetcher = <T>({ baseUrl, params: baseParams, timeout: baseTimeout }: BaseConfig) => ({
+const fetcher = <T>({
+  baseUrl,
+  params: baseParams,
+  timeout: baseTimeout,
+  headers: baseHeaders,
+  ...baseRest
+}: BaseConfig) => ({
   get: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
-      headers,
+      headers: {
+        ...baseHeaders,
+        ...headers,
+      },
       method: 'GET',
+      ...baseRest,
       ...rest,
     }),
   post: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
@@ -63,10 +77,12 @@ const fetcher = <T>({ baseUrl, params: baseParams, timeout: baseTimeout }: BaseC
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
         'Content-Type': getMimeType(data),
+        ...baseHeaders,
         ...headers,
       },
       method: 'POST',
       body: prepData(data),
+      ...baseRest,
       ...rest,
     }),
   put: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
@@ -74,17 +90,23 @@ const fetcher = <T>({ baseUrl, params: baseParams, timeout: baseTimeout }: BaseC
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
         'Content-Type': getMimeType(data),
+        ...baseHeaders,
         ...headers,
       },
       method: 'PUT',
       body: prepData(data),
+      ...baseRest,
       ...rest,
     }),
   delete: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
-      headers,
+      headers: {
+        ...baseHeaders,
+        ...headers,
+      },
       method: 'DELETE',
+      ...baseRest,
       ...rest,
     }),
 })
