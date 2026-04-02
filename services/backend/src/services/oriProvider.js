@@ -3,7 +3,7 @@ const axios = require('axios')
 const { sisUrl, sisGrapqlAppAccount, sisGrapqlAppKey } = require('../config')
 const { ApplicationError } = require('../util/customErrors')
 
-const getSisuAccessToken = async eppn => {
+export const getSisuAccessToken = async eppn => {
   const oriAppAuthPath = `${sisUrl}/ori/application-auth`
   let sisuResponse
   try {
@@ -25,20 +25,20 @@ const getSisuAccessToken = async eppn => {
   return sisuResponse.data.authToken
 }
 
-const decodeJwtTokenPayloadToObject = token => {
+export const decodeJwtTokenPayloadToObject = token => {
   const payload = token.split('.')[1]
   const paddedPayload = `${payload}==`
   const bufferObj = Buffer.from(paddedPayload, 'base64')
   return JSON.parse(bufferObj.toString('utf-8'))
 }
 
-const getSisuAuthData = async eppn => {
+export const getSisuAuthData = async eppn => {
   const accessToken = await getSisuAccessToken(eppn)
   const tokenData = decodeJwtTokenPayloadToObject(accessToken)
   return { accessToken, tokenData }
 }
 
-const personSearchQuery = `query privatePerson($subjectUserId: ID!) {
+export const personSearchQuery = `query privatePerson($subjectUserId: ID!) {
       private_person(id: $subjectUserId) {
           id
           first_name:firstNames
@@ -52,7 +52,7 @@ const personSearchQuery = `query privatePerson($subjectUserId: ID!) {
       }
   }`
 
-const getGraphqlData = async (accessToken, queryObject) => {
+export const getGraphqlData = async (accessToken, queryObject) => {
   const graphQlUrl = `${sisUrl}/api`
   const authHeader = `Application ${accessToken}`
   const config = {
@@ -72,12 +72,4 @@ const getGraphqlData = async (accessToken, queryObject) => {
     throw new ApplicationError('Graphql request failed for unclear reasons.', 500)
   }
   return graphQlResponse.data.data.private_person
-}
-
-module.exports = {
-  getSisuAccessToken,
-  decodeJwtTokenPayloadToObject,
-  getSisuAuthData,
-  personSearchQuery,
-  getGraphqlData,
 }
