@@ -13,7 +13,7 @@ const buildUrl = (
   baseParams?: Params,
   params?: Params
 ) => {
-  const base = new URL(baseUrl.replace(/\/?$/, '/'))
+  const base = baseUrl ? new URL(url ? baseUrl.replace(/\/?$/, '/') : baseUrl) : ''
   const path = new URL(url.replace(/^\//, ''), base)
 
   const baseUrlParams = new URLSearchParams(baseParams)
@@ -114,11 +114,11 @@ const fetcher = <T>({
 export const Fetchios = {
   create: <R>(config: BaseConfig) => fetcher<R>(config),
   get: <R>(url: string | undefined, config: RequestConfig): Promise<Res<R>> =>
-    fetcher<R>({ baseUrl: undefined }).get(url, config),
+    fetcher<R>({ baseUrl: url }).get(undefined, config),
   post: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Res<R>> =>
-    fetcher<T>({ baseUrl: undefined }).post<R>(url, data, config),
+    fetcher<T>({ baseUrl: url }).post<R>(undefined, data, config),
   put: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Res<R>> =>
-    fetcher<T>({ baseUrl: undefined }).put<R>(url, data, config),
+    fetcher<T>({ baseUrl: url }).put<R>(undefined, data, config),
   delete: <R>(url: string | undefined, config: RequestConfig): Promise<Res<R>> =>
-    fetcher<R>({ baseUrl: undefined }).delete(url, config),
+    fetcher<R>({ baseUrl: url }).delete(undefined, config),
 }
