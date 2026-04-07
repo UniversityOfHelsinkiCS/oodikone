@@ -79,7 +79,11 @@ export const PopulationCourseStats = ({
     Object.keys(modules).map(parentCode => {
       const moduleWithCode = filteredCourses.find(course => course.course.code === parentCode)
       const { students, passed, passedOfPopulation } = moduleWithCode?.stats ?? {}
-      modules[parentCode].module.stats = { students, passed, passedOfPopulation }
+      modules[parentCode].module.stats = {
+        students: students ?? 0,
+        passed: passed ?? 0,
+        passedOfPopulation: passedOfPopulation ?? 0,
+      }
     })
 
     setModules(
