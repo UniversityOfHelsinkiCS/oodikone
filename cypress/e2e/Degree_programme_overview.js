@@ -355,14 +355,14 @@ describe('Degree programme overview', () => {
     describe('Population link button works for', () => {
       it('a single year', () => {
         cy.cs('2023-population-link-button').first().click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma 2023 - 2024')
-        cy.contains('Class size 8 students')
+        cy.contains('Matemaattisten tieteiden kandiohjelma')
+        cy.contains('Class of 2023 - 2024, 8 students')
       })
 
       it('total', () => {
         cy.cs('total-population-link-button').click()
         cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Class size 227 students')
+        cy.contains('Class of 2017 - 2026, 227 students')
       })
 
       it('Links to class statistics page with study track info included work', () => {
@@ -371,9 +371,9 @@ describe('Degree programme overview', () => {
           cy.get('a').click()
         })
 
-        cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
+        cy.contains('Matemaattisten tieteiden kandiohjelma')
         cy.contains('Studytrack MAT-MAT')
-        cy.contains('Class size 26 students')
+        cy.contains('Class of 2022 - 2023, 26 students')
         cy.contains('Showing 3 out of 26 students')
       })
     })
@@ -465,9 +465,9 @@ describe('Degree programme overview', () => {
       it('Links to class statistics page with study track info included work', () => {
         cy.cs('2020-population-link-button').first().click()
 
-        cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
+        cy.contains('Matemaattisten tieteiden kandiohjelma')
         cy.contains('Studytrack MAT-MAT')
-        cy.contains('Class size 30 students')
+        cy.contains('Class of 2020 - 2021, 30 students')
         cy.contains('Showing 10 out of 30 students')
       })
 
@@ -825,7 +825,8 @@ describe('Degree programme overview', () => {
         cy.contains('Students added to tag')
 
         cy.cs('population-link-button').click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma 2022 - 2023')
+        cy.contains('Matemaattisten tieteiden kandiohjelma')
+        cy.contains('Class of 2022 - 2023')
         cy.contains(`Tagged with: ${tagName}`)
         cy.contains('Students (5)')
           .parent()

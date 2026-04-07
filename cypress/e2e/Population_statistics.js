@@ -74,8 +74,8 @@ describe('Population statistics tests', () => {
           selectStudyProgramme('Matemaattisten tieteiden kandiohjelma')
           cy.wait('@studytracks').its('response.statusCode').should('be.oneOf', [200, 304])
           cy.contains('See class').click()
-          cy.contains('Matemaattisten tieteiden kandiohjelma 2017 - 2018')
-          cy.contains('Class size 47 students')
+          cy.contains('Matemaattisten tieteiden kandiohjelma')
+          cy.contains('Class of 2017 - 2018, 47 students')
         })
 
         // TODO: Delete MUI
@@ -95,7 +95,7 @@ describe('Population statistics tests', () => {
       cy.visit(pathToMathBSc2020)
       cy.cs('filtered-students')
       cy.contains('Matemaattisten tieteiden kandiohjelma')
-      cy.contains('Class size 30 students')
+      cy.contains('Class of 2020 - 2021, 30 students')
       cy.contains('Excludes exchange students')
       cy.contains('Excludes students with non-degree study right')
       cy.contains('Excludes students who have transferred out of this programme')
