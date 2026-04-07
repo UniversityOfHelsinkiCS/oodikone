@@ -104,7 +104,7 @@ const useGetProgrammeTexts = (programmeCode: string, combinedProgrammeCode?: str
 
   const programmes = useGetProgrammes()
   const programmeName = getTextIn(programmes[programmeCode]?.name) ?? ''
-  const programmeId = programmes[programmeCode].progId
+  const programmeId = programmes[programmeCode]?.progId ?? ''
 
   if (combinedProgrammeCode) {
     const combinedProgrammeName = getTextIn(programmes[combinedProgrammeCode]?.name) ?? ''
