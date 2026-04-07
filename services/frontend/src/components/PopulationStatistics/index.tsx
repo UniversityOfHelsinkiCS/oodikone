@@ -99,18 +99,19 @@ const useGetProgrammes = (): Record<string, DegreeProgramme> => {
   }
 }
 
-const useGetProgrammeText = (programmeCode: string, combinedProgrammeCode?: string): string => {
+const useGetProgrammeTexts = (programmeCode: string, combinedProgrammeCode?: string) => {
   const { language, getTextIn } = useLanguage()
 
   const programmes = useGetProgrammes()
   const programmeName = getTextIn(programmes[programmeCode]?.name) ?? ''
+  const programmeId = programmes[programmeCode].progId
 
   if (combinedProgrammeCode) {
     const combinedProgrammeName = getTextIn(programmes[combinedProgrammeCode]?.name) ?? ''
-    return getCombinedProgrammeName(programmeName, combinedProgrammeName, language)
+    return { programmeName: getCombinedProgrammeName(programmeName, combinedProgrammeName, language), programmeId }
   }
 
-  return programmeName
+  return { programmeName, programmeId }
 }
 
 const HelpInfoCard = ({
@@ -183,7 +184,7 @@ export const PopulationStatistics = () => {
   )
 
   const showBachelorAndMaster = !!combinedProgrammeCode || !!query.showBachelorAndMaster
-  const programmeText = useGetProgrammeText(programmeCode, combinedProgrammeCode)
+  const { programmeName, programmeId } = useGetProgrammeTexts(programmeCode, combinedProgrammeCode)
 
   const { data: semesters } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
@@ -257,7 +258,8 @@ export const PopulationStatistics = () => {
         in the class. For example, if you are looking for students of a specialist training in
         medicine or dentistry, you must choose “Students with non-degree study right”.`
 
-  const title = `${programmeText} ${getYearText(query.years)}${showBachelorAndMaster ? ' (Bachelor & Master view)' : ''} ${programmeCode}`
+  const title = programmeName
+  const semesterText = query.semesters.length === 1 ? ` (${query.semesters.at(0)})` : ''
 
   // Show search form if URL contains no query
   if (skipQuery) return <PopulationSearch />
@@ -278,8 +280,17 @@ export const PopulationStatistics = () => {
           <PageTitle title={title}>
             <StudyTrackNames />
             <Typography color="text.secondary" fontWeight="standard" variant="h6">
-              Class size {students.length} students
+              {programmeId} - {programmeCode}
             </Typography>
+            <Typography color="text.secondary" fontWeight="standard" variant="h6">
+              Class of {getYearText(query.years)}
+              {semesterText}, {students.length} students
+            </Typography>
+            {showBachelorAndMaster ? (
+              <Typography color="text.secondary" fontWeight="standard" variant="h6">
+                Includes Master's studies
+              </Typography>
+            ) : null}
           </PageTitle>
           {isError ? <HelpInfoCard body={errorCardBody} severity="error" title={errorCardTitle} /> : null}
           {dataIsReady && !students.length ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
