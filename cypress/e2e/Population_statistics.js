@@ -401,8 +401,8 @@ describe('Population statistics tests', () => {
   describe('When using IAM user', () => {
     beforeEach(() => {
       cy.init(pathToMathBSc2020, 'onlyiamrights')
-      cy.contains('Matemaattisten tieteiden kandiohjelma 2020 - 2021')
-      cy.contains('Class size 30 students')
+      cy.contains('Matemaattisten tieteiden kandiohjelma')
+      cy.contains('Class of 2020 - 2021, 30 students')
     })
 
     it('Population statistics is visible', () => {
