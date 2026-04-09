@@ -7,13 +7,22 @@ export type BaseConfig = { baseUrl?: string; params?: Params; timeout?: number }
 // eslint-disable-next-line import-x/no-unused-modules
 export type RequestConfig = { params?: Params; timeout?: number } & RequestInit
 
+const buildBaseUrl = (baseUrl: string) => {
+  try {
+    return new URL(baseUrl)
+  } catch (_) {
+    // Invalid URLs will be caught here if the baseUrl cannot be extended on top of page origin.
+    return new URL(baseUrl, globalThis?.location.origin)
+  }
+}
+
 const buildUrl = (
   baseUrl: string | undefined = '',
   url: string | undefined = '',
   baseParams?: Params,
   params?: Params
 ) => {
-  const base = baseUrl ? new URL(url ? baseUrl.replace(/\/?$/, '/') : baseUrl) : ''
+  const base = baseUrl ? buildBaseUrl(url ? baseUrl.replace(/\/?$/, '/') : baseUrl) : ''
   const path = new URL(url.replace(/^\//, ''), base)
 
   const baseUrlParams = new URLSearchParams(baseParams)
