@@ -22,12 +22,12 @@ type PopulationCourseStatsProps = {
 }
 
 const visibleCoursesFilter = (course: CourseStats, mandatoryCourses: CurriculumDetails) =>
-  mandatoryCourses?.defaultProgrammeCourses?.some(
+  mandatoryCourses.defaultProgrammeCourses.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
-  ) ??
-  mandatoryCourses?.secondProgrammeCourses?.some(
+  ) ||
+  mandatoryCourses.secondProgrammeCourses.some(
     programmeCourse => programmeCourse.code === course.code && programmeCourse.visible.visibility
-  ) ??
+  ) ||
   false
 
 export const PopulationCourseStats = ({
