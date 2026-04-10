@@ -39,19 +39,24 @@ router.get<never, Release[]>('/', async (_, res) => {
     return res.status(200).json(fakeRelease)
   }
 
-  const response = await Fetchios.get<Record<string, any>[]>(
+  const { data } = await Fetchios.get<Record<string, any>[]>(
     'https://api.github.com/repos/UniversityOfHelsinkiCS/oodikone/releases',
     {}
   )
-  const releasesFromAPI: Release[] = response.data.map(release => ({
-    description: release.body,
-    time: release.published_at,
-    title: release.name,
-    version: release.tag_name,
-  }))
 
-  changelog.data = releasesFromAPI
-  res.status(200).json(releasesFromAPI)
+  if (data) {
+    const releasesFromAPI: Release[] = data.map(release => ({
+      description: release.body,
+      time: release.published_at,
+      title: release.name,
+      version: release.tag_name,
+    }))
+
+    changelog.data = releasesFromAPI
+    res.status(200).json(releasesFromAPI)
+  }
+
+  res.status(500).send()
 })
 
 export default router

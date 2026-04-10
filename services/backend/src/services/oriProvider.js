@@ -5,24 +5,25 @@ const { ApplicationError } = require('../util/customErrors')
 
 export const getSisuAccessToken = async eppn => {
   const oriAppAuthPath = `${sisUrl}/ori/application-auth`
-  try {
-    const sisuResponse = await Fetchios.post(
-      oriAppAuthPath,
-      {
-        username: sisGrapqlAppAccount,
-        key: sisGrapqlAppKey,
-        executingEppn: eppn,
-      },
-      { 'content-type': 'application/json' }
-    )
 
-    return sisuResponse.data.authToken
-  } catch (error) {
+  const { data: sisuResponse, error } = await Fetchios.post(
+    oriAppAuthPath,
+    {
+      username: sisGrapqlAppAccount,
+      key: sisGrapqlAppKey,
+      executingEppn: eppn,
+    },
+    { 'content-type': 'application/json' }
+  )
+
+  if (error) {
     throw new ApplicationError(
       'Could not find the user in Sisu, either with the eppn of the user or the new person.',
       404
     )
   }
+
+  return sisuResponse.authToken
 }
 
 export const decodeJwtTokenPayloadToObject = token => {

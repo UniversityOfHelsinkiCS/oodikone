@@ -11,23 +11,23 @@ const importerClient = getImporterClient()
 const getGroupsFromImporter = async (sisPersonId: string): Promise<StudyGuidanceGroup[]> => {
   if (!importerClient || !sisPersonId) return []
 
-  try {
-    const response: { data: Record<string, StudyGuidanceGroup> } = await importerClient.get(
-      `/person-groups/person/${sisPersonId}`,
-      {}
-    )
+  const { data, error } = await importerClient.get<Record<string, StudyGuidanceGroup>>(
+    `/person-groups/person/${sisPersonId}`,
+    {}
+  )
 
-    return response?.data ? Object.values(response.data) : []
-  } catch (error) {
+  if (error) {
     logger.error('Could not fetch study guidance groups!')
     if (error instanceof Error) {
       logger.error(error.stack)
       logger.error(JSON.stringify(error.message))
       Sentry.captureException(error)
     }
+
+    return []
   }
 
-  return []
+  return data ? Object.values(data) : []
 }
 
 export const getAllGroupsAndStudents = async (sisPersonId: string) => {
