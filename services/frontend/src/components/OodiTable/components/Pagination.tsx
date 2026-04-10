@@ -11,6 +11,8 @@ export const OodiTablePagination = <TData,>({ table }: { table: Table<TData> }) 
     pageSize: Math.min(200, tableRows),
   })
 
+  // This hook is important to proc table re-render on page size change,
+  // even when we are using the value from useState instead of table.getState().
   useEffect(() => table.setPageSize(pagination.pageSize), [pagination.pageSize])
   useEffect(() => table.setPageIndex(pagination.pageIndex), [pagination.pageIndex])
 
@@ -30,7 +32,7 @@ export const OodiTablePagination = <TData,>({ table }: { table: Table<TData> }) 
       onPageChange={(_, newPage) => setPagination({ ...pagination, pageIndex: newPage })}
       onRowsPerPageChange={event => setPagination({ pageIndex: 0, pageSize: Number(event.target.value) })}
       page={table.getState().pagination.pageIndex}
-      rowsPerPage={table.getState().pagination.pageSize}
+      rowsPerPage={pagination.pageSize}
       rowsPerPageOptions={pageRowOptions}
     />
   )
