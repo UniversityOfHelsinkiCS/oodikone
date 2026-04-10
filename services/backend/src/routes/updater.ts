@@ -57,7 +57,7 @@ router.post('/update/v2/customlist/:type', async (req: PostCustomListRequest, re
     programmes: refreshProgrammesByList,
   }
   if (typeof typeToJob[type] !== 'function') {
-    return res.status(400).json('Bad job type')
+    return res.status(400).json('Updater does not recognize this job type: ' + type)
   }
   const response = await typeToJob[type](list)
   if (response) {

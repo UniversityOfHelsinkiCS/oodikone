@@ -46,7 +46,7 @@ router.get<never, SearchResBody, SearchReqBody, SearchQuery>('/', async (req, re
   // the students have enrolled to their courses in last 8 months
   // (acual logic a bit different, see Importer)
   const { data: teacherRightsToStudents, error } = importerClient
-    ? await tryCatch<{ data: string[] }>(importerClient.post('/teacher-rights/', { teacherId, studentNumbers }, {}))
+    ? await tryCatch(importerClient.post<string[]>('/teacher-rights/', { teacherId, studentNumbers }, {}))
     : { data: null, error: null }
 
   if (error) {
