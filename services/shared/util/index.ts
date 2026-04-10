@@ -41,7 +41,7 @@ type Err<E> = {
   error: E
 }
 
-type Result<T, E = Error> = Ok<T> | Err<E>
+export type Result<T, E = Error> = Ok<T> | Err<E>
 
 /**
  * @returns data, error object with distinct values.
