@@ -55,18 +55,21 @@ const convertDataBasedOnCT = <R>(contentType: string, res: Response): Promise<R>
 }
 
 const handleRequestData = <R>(url: string, options: RequestInit): Promise<Result<R>> =>
-  globalThis.fetch(url, options).then(async res => {
-    const ct = res.headers.get('content-type') ?? ''
+  globalThis
+    .fetch(url, options)
+    .then(async res => {
+      const ct = res.headers.get('content-type') ?? ''
 
-    return {
-      ...res,
-      data: await convertDataBasedOnCT<R>(ct, res),
-      error: null,
-    }
-  }).catch(async err => ({
-    data: null,
-    error: err,
-  }))
+      return {
+        ...res,
+        data: await convertDataBasedOnCT<R>(ct, res),
+        error: null,
+      }
+    })
+    .catch(error => ({
+      data: null,
+      error,
+    }))
 
 const fetcher = <T>({
   baseUrl,
@@ -86,7 +89,11 @@ const fetcher = <T>({
       ...baseRest,
       ...rest,
     }),
-  post: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
+  post: <R>(
+    url: string | undefined,
+    data: T,
+    { params, headers, timeout, ...rest }: RequestConfig
+  ): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
@@ -99,7 +106,11 @@ const fetcher = <T>({
       ...baseRest,
       ...rest,
     }),
-  put: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
+  put: <R>(
+    url: string | undefined,
+    data: T,
+    { params, headers, timeout, ...rest }: RequestConfig
+  ): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
