@@ -1,4 +1,5 @@
-type Res<T> = Response & { data: T }
+import type { Result } from '../util'
+
 type Params = Record<string, string> | string
 
 // eslint-disable-next-line import-x/no-unused-modules
@@ -53,15 +54,19 @@ const convertDataBasedOnCT = <R>(contentType: string, res: Response): Promise<R>
   else return res.blob() as Promise<R>
 }
 
-const handleRequestData = <R>(url: string, options: RequestInit): Promise<Res<R>> =>
+const handleRequestData = <R>(url: string, options: RequestInit): Promise<Result<R>> =>
   globalThis.fetch(url, options).then(async res => {
     const ct = res.headers.get('content-type') ?? ''
 
     return {
       ...res,
       data: await convertDataBasedOnCT<R>(ct, res),
+      error: null,
     }
-  })
+  }).catch(async err => ({
+    data: null,
+    error: err,
+  }))
 
 const fetcher = <T>({
   baseUrl,
@@ -70,7 +75,7 @@ const fetcher = <T>({
   headers: baseHeaders,
   ...baseRest
 }: BaseConfig) => ({
-  get: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
+  get: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
@@ -81,7 +86,7 @@ const fetcher = <T>({
       ...baseRest,
       ...rest,
     }),
-  post: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
+  post: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
@@ -94,7 +99,7 @@ const fetcher = <T>({
       ...baseRest,
       ...rest,
     }),
-  put: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
+  put: <R>(url: string | undefined, data: T, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
@@ -107,7 +112,7 @@ const fetcher = <T>({
       ...baseRest,
       ...rest,
     }),
-  delete: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Res<R>> =>
+  delete: <R>(url: string | undefined, { params, headers, timeout, ...rest }: RequestConfig): Promise<Result<R>> =>
     handleRequestData(buildUrl(baseUrl, url, baseParams, params), {
       signal: buildSignal(timeout ?? baseTimeout),
       headers: {
@@ -122,12 +127,12 @@ const fetcher = <T>({
 
 export const Fetchios = {
   create: <R>(config: BaseConfig) => fetcher<R>(config),
-  get: <R>(url: string | undefined, config: RequestConfig): Promise<Res<R>> =>
+  get: <R>(url: string | undefined, config: RequestConfig): Promise<Result<R>> =>
     fetcher<R>({ baseUrl: url }).get(undefined, config),
-  post: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Res<R>> =>
+  post: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Result<R>> =>
     fetcher<T>({ baseUrl: url }).post<R>(undefined, data, config),
-  put: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Res<R>> =>
+  put: <R, T = unknown>(url: string | undefined, data: T, config: RequestConfig): Promise<Result<R>> =>
     fetcher<T>({ baseUrl: url }).put<R>(undefined, data, config),
-  delete: <R>(url: string | undefined, config: RequestConfig): Promise<Res<R>> =>
+  delete: <R>(url: string | undefined, config: RequestConfig): Promise<Result<R>> =>
     fetcher<R>({ baseUrl: url }).delete(undefined, config),
 }
