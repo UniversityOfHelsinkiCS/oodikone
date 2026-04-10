@@ -93,7 +93,7 @@ export const useGetColumnDefinitions = ({
           if (!programmeName) return null
           return (
             <Tooltip arrow title={programmeName}>
-              <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
+              <span>{programmeName}</span>
             </Tooltip>
           )
         },
@@ -111,7 +111,7 @@ export const useGetColumnDefinitions = ({
           if (!programmeName) return null
           return (
             <Tooltip arrow title={programmeName}>
-              <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{programmeName}</span>
+              <span>{programmeName}</span>
             </Tooltip>
           )
         },
@@ -253,12 +253,6 @@ export const useGetColumnDefinitions = ({
 
       columnHelper.accessor('studyTrack', {
         header: 'Study track',
-        cell: cell => {
-          const studyTrack = cell.getValue()
-          if (!studyTrack) return null
-
-          return <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{studyTrack}</span>
-        },
       }),
 
       columnHelper.accessor('option', {
@@ -269,15 +263,7 @@ export const useGetColumnDefinitions = ({
 
           return (
             <Tooltip arrow title={value}>
-              <span
-                style={{
-                  display: 'block',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {value}
-              </span>
+              <span>{value}</span>
             </Tooltip>
           )
         },
@@ -328,7 +314,7 @@ export const useGetColumnDefinitions = ({
 
           return (
             <Tooltip arrow title={transferSource}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{transferSource}</span>
+              <span>{transferSource}</span>
             </Tooltip>
           )
         },

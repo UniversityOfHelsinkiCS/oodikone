@@ -47,7 +47,7 @@ export const OverallStatsTable = ({
         const text = row.original.name
         return (
           <Tooltip arrow title={text}>
-            <span style={{ display: 'block', textOverflow: 'ellipsis', overflow: 'hidden' }}>{text}</span>
+            <span>{text}</span>
           </Tooltip>
         )
       },

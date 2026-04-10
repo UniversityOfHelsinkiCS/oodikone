@@ -19,6 +19,8 @@ export const OodiTableDataRow = <OTData,>(row: Row<OTData>, aggregate = false) =
             ...getCommonPinningStyles(cell.column),
             width: size ?? undefined,
             maxWidth: maxSize !== Number.MAX_SAFE_INTEGER ? maxSize : '20em',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
           }}
         >
           {flexRender(aggregate ? cell.column.columnDef.aggregatedCell : cell.column.columnDef.cell, cell.getContext())}
