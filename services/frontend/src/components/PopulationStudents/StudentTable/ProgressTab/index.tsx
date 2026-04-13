@@ -508,8 +508,6 @@ export const ProgressTable = ({
 
   const tableOptions = {}
 
-  if (!students.length) return null
-
   return (
     <>
       {!isStudyGuidanceGroupProgramme && (

@@ -90,8 +90,6 @@ export const FacultiesTab = () => {
     totalRow.bySemesters[numberMode]
   )
 
-  if (!facultyMap) return null
-
   const tableOptions = {
     initialState: { columnPinning: { left: ['Course'] } },
     state: {
