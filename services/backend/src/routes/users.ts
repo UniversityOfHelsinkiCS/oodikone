@@ -22,9 +22,7 @@ router.get<never, CanError<GetUsersResBody>>('/', auth.roles(['admin']), async (
 
 type GetUserRolesResBody = readonly string[]
 
-router.get<never, CanError<GetUserRolesResBody>>('/roles', auth.roles(['admin']), (_, res) => {
-  res.json(roles)
-})
+router.get<never, GetUserRolesResBody>('/roles', auth.roles(['admin']), (_, res) => res.json(roles))
 
 type GetUserByIdParams = { uid: string }
 type GetUserByIdResBody = Omit<FormattedUser, 'studentsUserCanAccess' | 'isAdmin' | 'mockedBy' | 'userId'>
@@ -45,18 +43,14 @@ type ModifyUserRolesReqBody = {
   username: string
   roles: Record<Role, boolean>
 }
-type ModifyUserRolesResBody = never
 
-router.post<never, CanError<ModifyUserRolesResBody, Error>, ModifyUserRolesReqBody>(
+router.post<never, CanError<void, Error>, ModifyUserRolesReqBody>(
   '/modify-roles',
   auth.roles(['admin']),
   async (req, res) => {
     const { username, roles } = req.body
     const { error } = await tryCatch(userService.modifyAccess(username, roles))
-
-    if (error) {
-      return res.status(400).json(error)
-    }
+    if (error) return res.status(400).json(error)
 
     return res.status(204).end()
   }
@@ -73,29 +67,22 @@ router.get<never, CanError<UserEmailPreviewResBody>>('/email/preview', auth.role
 })
 
 type PostUserEmailReqBody = { email: string }
-type PostUserEmailResBody = never
 
-router.post<never, CanError<PostUserEmailResBody>, PostUserEmailReqBody>(
-  '/email',
-  auth.roles(['admin']),
-  async (req, res) => {
-    const { email } = req.body
-    if (!email) return res.status(400).json({ error: 'Email address is missing' })
+router.post<never, CanError<void>, PostUserEmailReqBody>('/email', auth.roles(['admin']), async (req, res) => {
+  const { email } = req.body
+  if (!email) return res.status(400).json({ error: 'Email address is missing' })
 
-    const { error } = await tryCatch(sendNotificationAboutAccessToUser(email))
-    if (error) return res.status(500).json({ error: error.message })
+  const { error } = await tryCatch(sendNotificationAboutAccessToUser(email))
+  if (error) return res.status(500).json({ error: error.message })
 
-    logger.info('Succesfully sent message about Oodikone access to user')
-    return res.status(200).end()
-  }
-)
+  logger.info('Succesfully sent message about Oodikone access to user')
+  return res.status(200).end()
+})
 
 type ElementsParams = { uid: string }
 type ElementsReqBody = { codes: string[] }
 
-type PostUserUIDElementsResBody = void
-
-router.post<never, CanError<PostUserUIDElementsResBody>, ElementsReqBody, ElementsParams>(
+router.post<never, CanError<void>, ElementsReqBody, ElementsParams>(
   '/:uid/elements',
   auth.roles(['admin']),
   async (req, res) => {
@@ -106,9 +93,7 @@ router.post<never, CanError<PostUserUIDElementsResBody>, ElementsReqBody, Elemen
   }
 )
 
-type DeleteUserUIDElementsResBody = void
-
-router.delete<never, CanError<DeleteUserUIDElementsResBody>, ElementsReqBody, ElementsParams>(
+router.delete<never, CanError<void>, ElementsReqBody, ElementsParams>(
   '/:uid/elements',
   auth.roles(['admin']),
   async (req, res) => {
@@ -120,9 +105,7 @@ router.delete<never, CanError<DeleteUserUIDElementsResBody>, ElementsReqBody, El
 )
 
 type ChangeLanguageReqBody = { language: Language }
-type PostChangeLanguageResBody = void
-
-router.post<never, CanError<PostChangeLanguageResBody>, ChangeLanguageReqBody>('/language', async (req, res) => {
+router.post<never, CanError<void>, ChangeLanguageReqBody>('/language', async (req, res) => {
   const { language } = req.body
 
   if (!LANGUAGE_CODES.includes(language)) {
