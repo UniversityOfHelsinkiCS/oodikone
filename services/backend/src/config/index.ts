@@ -7,9 +7,7 @@ export const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 export const runningInCI = process.env.CI === 'true'
 
 // IAM group
-export const requiredGroup = isStaging
-  ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
-  : ['grp-oodikone-users', 'grp-oodikone-basic-users']
+export const requiredGroup = ['grp-oodikone-users', 'grp-oodikone-basic-users']
 
 // Pate
 export const pateToken = process.env.PATE_API_TOKEN ?? ''
