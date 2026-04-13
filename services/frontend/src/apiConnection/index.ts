@@ -3,7 +3,7 @@ import axios, { AxiosProgressEvent } from 'axios'
 
 import { showAsUserKey } from '@/common'
 import { apiBasePath, isDev } from '@/conf'
-import { formatToArray } from '@oodikone/shared/util'
+import { queryParamsToString } from '@/util/queryparams'
 
 // Set up dev user for development environment, mimicking production admin user
 const baseHeaders = isDev
@@ -83,16 +83,7 @@ export const RTKApi = createApi({
       Object.entries(getHeaders()).forEach(([key, value]) => headers.set(key, value))
       return headers
     },
-    paramsSerializer: params => {
-      const searchParams = new URLSearchParams()
-
-      Object.entries(params).map(([key, val]) => {
-        const subfix = Array.isArray(val) ? '[]' : ''
-        formatToArray(val).forEach(item => searchParams.append(key + subfix, item))
-      })
-
-      return searchParams.toString()
-    },
+    paramsSerializer: params => queryParamsToString(params),
   }),
   endpoints: () => ({}),
 })

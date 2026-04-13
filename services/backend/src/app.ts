@@ -1,4 +1,3 @@
-import 'express-async-errors'
 import express from 'express'
 
 import { baseUrl, backendPort } from './config'
