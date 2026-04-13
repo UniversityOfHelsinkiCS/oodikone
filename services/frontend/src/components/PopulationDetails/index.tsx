@@ -105,7 +105,7 @@ export const PopulationDetails = ({
       //   />
       // ),
       content: (
-        <CreditAccumulationGraph students={filteredStudents} />
+        <CreditAccumulationGraph students={filteredStudents} studyPlanFilter={studyPlanFilterIsActive} />
       ),
     },
     query.years.length <= 1

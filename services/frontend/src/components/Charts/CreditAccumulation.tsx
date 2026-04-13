@@ -7,20 +7,51 @@ import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 const INITIAL_GRAPH_HEIGHT = 600
 
 /**
 * Credit accumulation graph for **class statatistics**
 */
-export const CreditAccumulationGraph = ({ students }: { students: FormattedStudent[] }) => {
+export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { students: FormattedStudent[], studyPlanFilter: boolean }) => {
+  const [graphHeight, setGraphHeight] = useState(INITIAL_GRAPH_HEIGHT)
+  const [cutStudyplanCredits, setCutStudyplanCredits] = useState(false)
 
-  const [graphHeight, setGraphHeight] = useState(INITIAL_GRAPH_HEIGHT);
+  const populationStudyStart = new Date(students[0].studyrightStart).getTime()
+  const creditDateThreshold = studyPlanFilter && !cutStudyplanCredits
+    ? Math.min(...students.flatMap(s => s.courses.map(c => new Date(c.date).getTime())))
+    : populationStudyStart
+
+
+  const studyRightStartMarker = studyPlanFilter ? [{
+    name: "Population study start",
+    type: "line",
+
+    markLine: {
+      silent: true, // Ignore mouse events
+      symbol: 'none', // Disable default arrow shape
+      lineStyle: {
+        color: '#ff0000',
+        type: 'dashed',
+        width: 3,
+      },
+      label: {
+        show: true,
+        formatter: 'Population study start',
+        position: 'insideEndTop'
+      },
+      data: [
+        { xAxis: populationStudyStart }
+      ],
+    }
+  }] : []
 
   const series = useMemo(() => (
     students.map(student => {
       const courses = student.courses
-        .filter((c) => dayjs(c.date).isSameOrAfter(student.studyrightStart) && !c.isStudyModuleCredit)
+        .filter((c) => dayjs(c.date).isSameOrAfter(creditDateThreshold) && !c.isStudyModuleCredit)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
       let credits = 0
@@ -43,7 +74,7 @@ export const CreditAccumulationGraph = ({ students }: { students: FormattedStude
         sampling: 'lttb',
       }
     })
-  ), [students])
+  ), [creditDateThreshold, students])
 
   const option = useMemo(() => (
     {
@@ -88,10 +119,10 @@ export const CreditAccumulationGraph = ({ students }: { students: FormattedStude
         splitLine: { show: true },
         scale: true,
       },
-      series,
+      series: [...series, ...studyRightStartMarker],
       animation: true,
     }
-  ), [series])
+  ), [series, studyRightStartMarker])
 
   const GraphSizeButton = ({ height, label }) => (
     <Button
@@ -102,7 +133,6 @@ export const CreditAccumulationGraph = ({ students }: { students: FormattedStude
       {label}
     </Button>
   )
-
 
   return (
     <>
@@ -118,7 +148,12 @@ export const CreditAccumulationGraph = ({ students }: { students: FormattedStude
           <GraphSizeButton height={INITIAL_GRAPH_HEIGHT} label='Medium' />
           <GraphSizeButton height={900} label='Large' />
         </Stack>
-
+        {studyPlanFilter && (
+          <FormControlLabel
+            control={<Switch checked={cutStudyplanCredits} onChange={(e) => setCutStudyplanCredits(e.target.checked)} />}
+            label="Display credits from study right start"
+          />
+        )}
         <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
       </Stack>
 
