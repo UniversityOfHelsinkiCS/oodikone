@@ -71,8 +71,9 @@ export const studentNumberFilter = createFilter({
   filter(student, { options }) {
     const { allowlist, blocklist } = options
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    return allowlist.includes(student.studentNumber) || !blocklist.includes(student.studentNumber)
+    return (
+      (!allowlist.length || allowlist.includes(student.studentNumber)) && !blocklist.includes(student.studentNumber)
+    )
   },
 
   render: StudentNumberFilterCard,
