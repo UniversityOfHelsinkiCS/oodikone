@@ -5,7 +5,7 @@ import * as auth from '../middleware/auth'
 import { getProvidersOfFaculty, isFaculty } from '../services/organizations'
 import { getTeachersBySearchTerm, getTeacherStatistics, getYearlyStatistics } from '../services/teachers'
 import { CategoryID, getTeacherStats, findAndSaveTeachers, getCategoriesAndYears } from '../services/teachers/top'
-import { getFullStudyProgrammeRights, validateParamLength } from '../util'
+import { getFullStudyProgrammeRights, handleQueryArrays, validateParamLength } from '../util'
 
 const router = Router()
 
@@ -91,11 +91,12 @@ router.get('/stats', async (req: GetTeacherStatsRequest, res: Response) => {
   const { roles, programmeRights, iamGroups } = req.user
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
-  const { providers, semesterStart, semesterEnd } = req.query
-  if (!providers || !semesterStart) {
+  const { providers: providerStack, semesterStart, semesterEnd } = req.query
+  if (!providerStack || !semesterStart) {
     return res.status(422).send('Missing required query parameters')
   }
 
+  const providers = handleQueryArrays(providerStack)
   const providerRights = mapToProviders(fullStudyProgrammeRights)
   if (
     !(
