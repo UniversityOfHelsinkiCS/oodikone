@@ -1,6 +1,5 @@
 import { Language } from '../language'
-import { Role } from '../types'
-import { FormattedUser } from '../types/user'
+import { FormattedUser, Role } from '../types'
 
 export type ChangeLanguageReqBody = { language: Language }
 export type UserIDElementsParams = { uid: string }
@@ -14,7 +13,7 @@ export type ModifyUserRolesReqBody = {
   username: string
   roles: Record<Role, boolean>
 }
-export type GetUserRolesResBody = readonly string[]
+export type GetUserRolesResBody = readonly Role[]
 export type GetUserByIdParams = { uid: string }
 export type GetUserByIdResBody = Omit<FormattedUser, 'studentsUserCanAccess' | 'isAdmin' | 'mockedBy' | 'userId'>
-export type GetUsersResBody = Omit<FormattedUser, 'studentsUserCanAccess' | 'isAdmin' | 'mockedBy' | 'userId'>[]
+export type GetUsersResBody = GetUserByIdResBody[]

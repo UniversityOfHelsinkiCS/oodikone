@@ -1,16 +1,16 @@
 import { RTKApi } from '@/apiConnection'
-import { Email, User } from '@/types/api/users'
+import { UserEmailPreviewResBody, GetUserByIdResBody, GetUsersResBody } from '@oodikone/shared/routes/users'
 import { Role } from '@oodikone/shared/types'
 
 const usersApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getAllUsers: builder.query<User[], void>({
+    getAllUsers: builder.query<GetUsersResBody, void>({
       query: () => '/users',
     }),
     getRoles: builder.query<Role[], void>({
       query: () => '/users/roles',
     }),
-    getUser: builder.query<User, string>({
+    getUser: builder.query<GetUserByIdResBody, string>({
       query: uid => `/users/${uid}`,
       providesTags: result => (result ? [{ type: 'Users', id: result.id }] : []),
     }),
@@ -22,7 +22,7 @@ const usersApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
-    addUserUnits: builder.mutation({
+    addUserUnits: builder.mutation<void, unknown>({
       query: ({ uid, codes }) => ({
         url: `/users/${uid}/elements`,
         method: 'POST',
@@ -30,7 +30,7 @@ const usersApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
-    removeUserUnits: builder.mutation({
+    removeUserUnits: builder.mutation<void, unknown>({
       query: ({ uid, codes }) => ({
         url: `/users/${uid}/elements`,
         method: 'DELETE',
@@ -38,7 +38,7 @@ const usersApi = RTKApi.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
-    getUserAccessEmailPreview: builder.query<Email, void>({
+    getUserAccessEmailPreview: builder.query<UserEmailPreviewResBody, void>({
       query: () => '/users/email/preview',
     }),
     sendUserAccessEmail: builder.mutation<void, string>({
@@ -48,7 +48,7 @@ const usersApi = RTKApi.injectEndpoints({
         body: { email: recipientAddress },
       }),
     }),
-    modifyLanguage: builder.mutation({
+    modifyLanguage: builder.mutation<void, unknown>({
       query: ({ language }) => ({
         url: '/users/language',
         method: 'POST',

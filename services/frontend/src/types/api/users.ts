@@ -1,20 +1,4 @@
-import { Language } from '@oodikone/shared/language'
-import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
+import { GetUserByIdResBody, UserEmailPreviewResBody } from '@oodikone/shared/routes/users'
 
-export type User = {
-  email: string
-  iamGroups: string[]
-  id: string
-  language: Language
-  lastLogin: string
-  name: string
-  programmeRights: DetailedProgrammeRights[]
-  roles: Role[]
-  sisPersonId: string
-  username: string
-}
-
-export type Email = {
-  html: string
-  subject: string
-}
+export type User = GetUserByIdResBody
+export type Email = UserEmailPreviewResBody
