@@ -140,7 +140,6 @@ export const StudyProgramme = () => {
             combinedProgramme={secondProgrammeId}
             degreeProgramme={programmeId}
             key="DegreeCoursesTabContent"
-            year={`${new Date().getFullYear()}`}
           />
         ),
       },

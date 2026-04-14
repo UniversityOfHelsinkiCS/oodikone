@@ -8,12 +8,10 @@ import { useState, Fragment } from 'react'
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 import { VisibilityIcon } from '@/theme'
 
-export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
+export const FilterDegreeCoursesModal = ({ degreeProgramme }: { degreeProgramme: string }) => {
   const [open, setOpen] = useState(false)
 
-  const setModalOpenState = state => {
-    setOpen(state)
-  }
+  const setModalOpenState = (state: boolean) => setOpen(state)
 
   return (
     <Fragment>
@@ -23,8 +21,7 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme, years }) => {
       <Dialog className="MyDialogThings" maxWidth="md" onClose={() => setModalOpenState(false)} open={open}>
         <DialogTitle>Hide degree courses</DialogTitle>
         <DialogContent className="MyDialogContent">
-          <DegreeCoursesTab degreeProgramme={degreeProgramme} years={years} />
-
+          <DegreeCoursesTab combinedProgramme="" degreeProgramme={degreeProgramme} />
           <Button
             color="primary"
             onClick={() => setModalOpenState(false)}

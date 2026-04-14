@@ -14,15 +14,13 @@ import { DegreeCourseTable } from './DegreeCourseTable'
 export const DegreeCoursesTab = ({
   combinedProgramme,
   degreeProgramme,
-  year,
 }: {
   combinedProgramme: string
   degreeProgramme: string
-  year: string
 }) => {
   const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(degreeProgramme, year)
+  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(degreeProgramme, new Date().getFullYear())
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
 
   const getModules = (courses: ProgrammeCourse[]): Module[] => {
