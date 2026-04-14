@@ -13,7 +13,7 @@ const courseStatsApi = RTKApi.injectEndpoints({
         separate?: boolean
         combineSubstitutions?: boolean
       }) => ({
-        url: '/v3/courseyearlystats',
+        url: '/courseyearlystats',
         params: { codes, separate, combineSubstitutions },
       }),
       transformResponse: (

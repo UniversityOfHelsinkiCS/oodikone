@@ -98,7 +98,7 @@ const obfuscateStuff = ({
 }
 
 router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReqBody, PopulationstatisticsQuery>(
-  '/v3/populationstatistics',
+  '/populationstatistics',
   async (req, res) => {
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights, studentsUserCanAccess } = req.user
     const { programme, combinedProgramme } = req.query
@@ -168,7 +168,7 @@ router.get<
   CanError<PopulationstatisticsbycourseResBody>,
   PopulationstatisticsbycourseReqBody,
   PopulationstatisticsbycourseParams
->('/v3/populationstatisticsbycourse', async (req, res) => {
+>('/populationstatisticsbycourse', async (req, res) => {
   const {
     id: userId,
     roles: userRoles,
@@ -218,7 +218,7 @@ router.get<
 
 // Used in custom population and single study guidance groups
 router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
-  '/v3/populationstatisticsbystudentnumbers',
+  '/populationstatisticsbystudentnumbers',
   async (req, res) => {
     const { studentNumbers, tags } = req.body
     const { id: userId, roles, studentsUserCanAccess } = req.user
@@ -248,7 +248,7 @@ router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
 )
 
 router.get<never, PopulationstatisticsStudyprogrammesResBody>(
-  '/v3/populationstatistics/studyprogrammes',
+  '/populationstatistics/studyprogrammes',
   async (req, res) => {
     const { roles, programmeRights } = req.user
     const programmes = await getDegreeProgrammesOfOrganization(rootOrgId, false)
@@ -274,7 +274,7 @@ router.get<
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
   never,
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery
->('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
+>('/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const courseCodes = JSON.parse(req.query.courseCodes) as string[]
   const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
   const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)

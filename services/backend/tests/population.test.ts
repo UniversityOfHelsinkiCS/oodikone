@@ -24,7 +24,7 @@ const populationUrl = (
   semesters: ('SPRING' | 'FALL')[] = [],
   students: string[] = []
 ) => {
-  return `/v3/populationstatistics?${programme && 'programme=' + programme}${years.map(year => '&years=' + year).join('')}${semesters.map(sem => '&semesters=' + sem).join('')}${students.map(s => '&studentStatuses=' + s).join('')}`
+  return `/populationstatistics?${programme && 'programme=' + programme}${years.map(year => '&years=' + year).join('')}${semesters.map(sem => '&semesters=' + sem).join('')}${students.map(s => '&studentStatuses=' + s).join('')}`
 }
 
 void describe('Population statistics', async () => {

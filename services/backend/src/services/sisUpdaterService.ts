@@ -8,39 +8,39 @@ const client = axios.create({ baseURL: SIS_UPDATER_URL })
 const params = { params: { token: SECRET_TOKEN } }
 
 export const abortUpdate = async () => {
-  const response = await client.get('/v1/abort', params)
+  const response = await client.get('/abort', params)
   return response.data?.message
 }
 
 export const updateSISCoursesByCourseCode = async (coursecodes: string[]) => {
   const data = { coursecodes }
-  const response = await client.post('/v1/courses', data, params)
+  const response = await client.post('/courses', data, params)
   return response.data
 }
 
 export const updateSISMetadata = async () => {
-  const response = await client.get('/v1/meta', params)
+  const response = await client.get('/meta', params)
   return response.data
 }
 
 export const updateSISProgrammes = async () => {
-  const response = await client.get('/v1/programmes', params)
+  const response = await client.get('/programmes', params)
   return response.data
 }
 
 export const updateSISRedisCache = async () => {
-  const response = await client.get('/v1/rediscache', params)
+  const response = await client.get('/rediscache', params)
   return response.data
 }
 
 export const updateSISStudents = async () => {
-  const response = await client.get('/v1/students', params)
+  const response = await client.get('/students', params)
   return response.data
 }
 
 export const updateSISStudentsByStudentNumber = async (studentnumbers: string[]) => {
   const data = { studentnumbers }
-  const response = await client.post('/v1/students', data, params)
+  const response = await client.post('/students', data, params)
   return response.data
 }
 
@@ -54,6 +54,6 @@ export const updateSISStudyPlans = async (days: number) => {
     limit: 1000,
   })
   const studentnumbers = result.map(r => r.studentnumber)
-  const response = await client.post('v1/studyplans', { studentnumbers }, params)
+  const response = await client.post('studyplans', { studentnumbers }, params)
   return response.data
 }

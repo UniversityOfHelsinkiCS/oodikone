@@ -16,7 +16,7 @@ const populationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getPopulationStatistics: builder.query<Output<PopulationstatisticsResBody>, PopulationQuery>({
       query: params => ({
-        url: '/v3/populationstatistics/',
+        url: '/populationstatistics/',
         method: 'GET',
         params,
       }),
@@ -24,7 +24,7 @@ const populationApi = RTKApi.injectEndpoints({
     }),
     getCustomPopulation: builder.query<Output<GetCustomPopulationResBody>, CustomPopulationQuery>({
       query: ({ studentNumbers, tags }) => ({
-        url: '/v3/populationstatisticsbystudentnumbers',
+        url: '/populationstatisticsbystudentnumbers',
         method: 'POST',
         body: {
           studentNumbers,
@@ -38,7 +38,7 @@ const populationApi = RTKApi.injectEndpoints({
       PopulationstatisticsbycourseParams
     >({
       query: ({ coursecodes, from, to, separate, unifyCourses }) => ({
-        url: '/v3/populationstatisticsbycourse',
+        url: '/populationstatisticsbycourse',
         params: { coursecodes, from, to, separate, unifyCourses },
       }),
       transformResponse: formatPopulationData<PopulationstatisticsbycourseResBody>,
@@ -48,12 +48,12 @@ const populationApi = RTKApi.injectEndpoints({
       PopulationstatisticsMaxYearsToCreatePopulationFormQuery
     >({
       query: ({ courseCodes }) => ({
-        url: '/v3/populationstatistics/maxYearsToCreatePopulationFrom',
+        url: '/populationstatistics/maxYearsToCreatePopulationFrom',
         params: { courseCodes },
       }),
     }),
     getProgrammes: builder.query<PopulationstatisticsStudyprogrammesResBody, void>({
-      query: () => '/v3/populationstatistics/studyprogrammes',
+      query: () => '/populationstatistics/studyprogrammes',
       keepUnusedDataFor: 60 * 60,
     }),
   }),

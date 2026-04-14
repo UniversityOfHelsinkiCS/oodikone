@@ -26,14 +26,14 @@ const refreshProgrammesByList = (programmeCodes: string[]) => {
   return 'Added jobs for refreshing programme'
 }
 
-router.get('/update/v2/meta', async (_req: Request, res: Response) => {
+router.get('/update/meta', async (_req: Request, res: Response) => {
   const response = await updateSISMetadata()
   if (response) {
     res.status(200).json('Update SIS meta scheduled')
   }
 })
 
-router.get('/update/v2/students', async (_req: Request, res: Response) => {
+router.get('/update/students', async (_req: Request, res: Response) => {
   const response = await updateSISStudents()
   if (response) {
     res.status(200).json('Update SIS students scheduled')
@@ -47,7 +47,7 @@ interface PostCustomListRequest extends Request {
   }
 }
 
-router.post('/update/v2/customlist/:type', async (req: PostCustomListRequest, res: Response) => {
+router.post('/update/customlist/:type', async (req: PostCustomListRequest, res: Response) => {
   const { type } = req.params
   const list = req.body
   const typeToJob = {
@@ -65,7 +65,7 @@ router.post('/update/v2/customlist/:type', async (req: PostCustomListRequest, re
   }
 })
 
-router.get('/update/v2/programmes', async (_req: Request, res: Response) => {
+router.get('/update/programmes', async (_req: Request, res: Response) => {
   const response = await updateSISProgrammes()
   if (response) {
     res.status(200).json('Update SIS programmes scheduled')

@@ -269,7 +269,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.intercept(
         'GET',
-        'api/v2/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
+        'api/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
       ).as('stQuery')
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()

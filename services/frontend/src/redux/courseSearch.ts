@@ -5,7 +5,7 @@ const courseSearchApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getCourseSearchResult: builder.query<GetCourseSearchResultResponse, GetCourseSearchResultRequest>({
       query: ({ name, code, includeSpecial }) => ({
-        url: '/v2/coursesmulti',
+        url: '/coursesmulti',
         params: { name, code, includeSpecial },
       }),
     }),

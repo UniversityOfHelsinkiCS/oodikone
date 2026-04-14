@@ -27,8 +27,8 @@ describe('Population statistics tests', () => {
   describe('When using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
-      cy.intercept('/api/v3/populationstatistics/studyprogrammes').as('studyprogrammes')
-      cy.intercept('/api/v2/studyprogrammes/**/studytracks').as('studytracks')
+      cy.intercept('/api/populationstatistics/studyprogrammes').as('studyprogrammes')
+      cy.intercept('/api/studyprogrammes/**/studytracks').as('studytracks')
     })
 
     describe('Population search', () => {
@@ -251,7 +251,7 @@ describe('Population statistics tests', () => {
       it('Is displayed and link to individual course stats page works', () => {
         cy.visit(pathToMathBSc2020)
         cy.contains('Courses of class').click()
-        cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
+        cy.intercept('/api/courseyearlystats**').as('coursePage')
         cy.cs('toggle-group-module-MAT110').click()
         cy.contains('td', 'MAT11001').siblings().find('[data-testid="NorthEastIcon"]').click()
         cy.wait('@coursePage')

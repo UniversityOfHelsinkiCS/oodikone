@@ -22,7 +22,7 @@ import {
 const router = Router()
 
 router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMultiQuery>(
-  '/v2/coursesmulti',
+  '/coursesmulti',
   async (req, res) => {
     const { name, code, includeSpecial } = req.query
     if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
@@ -54,7 +54,7 @@ router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMul
 type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearlyStats>>
 
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
-  '/v3/courseyearlystats',
+  '/courseyearlystats',
   async (req, res) => {
     const { codes, combineSubstitutions, separate } = req.query
 

@@ -20,20 +20,20 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       { id: string; yearType: YearType; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getColorizedTableCourseStats: builder.query<
       any, // TODO: Type
       { id: string }
     >({
-      query: ({ id }) => `/v2/studyprogrammes/${id}/colorizedtablecoursestats`,
+      query: ({ id }) => `/studyprogrammes/${id}/colorizedtablecoursestats`,
     }),
     getCreditStats: builder.query<
       CreditStatsPayload,
       { codes: string[]; specialGroups: SpecialGroups; yearType: YearType }
     >({
       query: ({ codes, specialGroups, yearType }) =>
-        `/v2/studyprogrammes/creditstats?codes=${JSON.stringify(
+        `/studyprogrammes/creditstats?codes=${JSON.stringify(
           codes
         )}&yearType=${yearType}&specialGroups=${specialGroups}`,
     }),
@@ -42,38 +42,38 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
       { id: string; yearType: YearType; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
       query: ({ id, yearType, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getStudyTrackStats: builder.query<
       StudyTrackStats,
       { id: string; specialGroups: SpecialGroups; combinedProgramme: string }
     >({
       query: ({ id, specialGroups, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/studytrackstats?special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/studytrackstats?special_groups=${specialGroups}&combined_programme=${combinedProgramme}`,
     }),
     getProgrammeCoursesStats: builder.query<
       StudyProgrammeCourse[],
       { id: string; yearType: YearType; combinedProgramme: string }
     >({
       query: ({ id, yearType, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}`,
     }),
     getStudyTracks: builder.query<Record<string, Name | string>, { id: string }>({
-      query: ({ id }) => `/v2/studyprogrammes/${id}/studytracks`,
+      query: ({ id }) => `/studyprogrammes/${id}/studytracks`,
     }),
     updateBasicView: builder.query<
       any, // TODO: Type
       { id: string; combinedProgramme: string }
     >({
       query: ({ id, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/update_basicview?combined_programme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/update_basicview?combined_programme=${combinedProgramme}`,
     }),
     updateStudyTrackView: builder.query<
       any, // TODO: Type
       { id: string; combinedProgramme: string }
     >({
       query: ({ id, combinedProgramme }) =>
-        `/v2/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
+        `/studyprogrammes/${id}/update_studytrackview?combined_programme=${combinedProgramme}`,
     }),
   }),
   overrideExisting: false,

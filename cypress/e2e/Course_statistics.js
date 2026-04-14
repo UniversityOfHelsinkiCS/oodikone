@@ -92,17 +92,17 @@ const clickAway = () => {
 
 const getCourseSearchHooksForSingleYear = code => {
   cy.intercept({
-    pathname: '/api/v2/coursesmulti',
+    pathname: '/api/coursesmulti',
     query: { code },
   }).as('courses')
 
   cy.intercept({
-    pathname: '/api/v3/courseyearlystats',
+    pathname: '/api/courseyearlystats',
     query: { 'codes[]': code },
   }).as('yearlystats')
 
   cy.intercept({
-    pathname: '/api/v3/populationstatisticsbycourse',
+    pathname: '/api/populationstatisticsbycourse',
   }).as('coursestats')
 }
 
@@ -263,17 +263,17 @@ describe('Basic user', () => {
 
     it('Searching multiple courses having substitution mappings shows course statistics', () => {
       cy.intercept({
-        pathname: '/api/v2/coursesmulti',
+        pathname: '/api/coursesmulti',
         query: { code: 'TKT' },
       }).as('courses')
 
       cy.intercept({
-        pathname: '/api/v3/courseyearlystats',
+        pathname: '/api/courseyearlystats',
         query: { 'codes[]': 'TKT20001', 'codes[]': 'TKT10002' },
       }).as('yearlystats')
 
       cy.intercept({
-        pathname: '/api/v3/populationstatisticsbycourse',
+        pathname: '/api/populationstatisticsbycourse',
       }).as('coursestats')
 
       cy.cs('select-multiple-courses-toggle').should('not.have.class', 'Mui-checked')
@@ -309,17 +309,17 @@ describe('Basic user', () => {
 
   it('On searches with multiple courses, has correct links on the Course tab', () => {
     cy.intercept({
-      pathname: '/api/v2/coursesmulti',
+      pathname: '/api/coursesmulti',
       query: { code: 'BSCS' },
     }).as('courses')
 
     cy.intercept({
-      pathname: '/api/v3/courseyearlystats',
+      pathname: '/api/courseyearlystats',
       query: { 'codes[]': 'BSCS1003', 'codes[]': 'BSCS1001' },
     }).as('yearlystats')
 
     cy.intercept({
-      pathname: '/api/v3/populationstatisticsbycourse',
+      pathname: '/api/populationstatisticsbycourse',
     }).as('coursestats')
 
     cy.cs('select-multiple-courses-toggle').should('not.have.class', 'Mui-checked')

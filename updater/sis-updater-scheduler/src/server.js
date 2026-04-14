@@ -42,7 +42,7 @@ const app = express()
 app.use(express.json())
 app.use(message)
 
-app.get('/v1/healthcheck', async (_, res) => {
+app.get('/healthcheck', async (_, res) => {
   const latestMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
   const threshold = new Date().getTime() - 1000 * 60 * 60 * 6 // 6 hours ago
   if (!latestMessage || new Date(latestMessage).getTime() < threshold) {
@@ -53,20 +53,20 @@ app.get('/v1/healthcheck', async (_, res) => {
 
 app.use(auth)
 
-app.get('/v1/meta', async (_, res) => {
+app.get('/meta', async (_, res) => {
   await scheduleMeta()
 
   res.locals.msg('Scheduled meta')
 })
 
-app.get('/v1/students', async (_, res) => {
+app.get('/students', async (_, res) => {
   await scheduleStudents()
 
   logger.info('Scheduled students')
   res.locals.msg('Scheduled students')
 })
 
-app.post('/v1/studyplans', async (req, res) => {
+app.post('/studyplans', async (req, res) => {
   const { studentnumbers } = req.body
   const msg = `Scheduling update of ${studentnumbers.length} students whose studyplan has not been updated recently`
   logger.info(msg)
@@ -75,14 +75,14 @@ app.post('/v1/studyplans', async (req, res) => {
   res.locals.msg('Shceduled studyplans update')
 })
 
-app.get('/v1/programmes', async (_, res) => {
+app.get('/programmes', async (_, res) => {
   await scheduleProgrammes()
 
   logger.info('Scheduled programmes')
   res.locals.msg('Scheduled programmes')
 })
 
-app.post('/v1/students', async (req, res) => {
+app.post('/students', async (req, res) => {
   const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
 
   logger.info(`Scheduling ${studentnumbers.length} custom studentnumbers`)
@@ -91,13 +91,13 @@ app.post('/v1/students', async (req, res) => {
   res.locals.msg('Scheduled studentnumbers')
 })
 
-app.get('/v1/rediscache', async (req, res) => {
+app.get('/rediscache', async (req, res) => {
   await queue.add('reload_redis')
   logger.info('Scheduled redis cache reloading')
   res.locals.msg('Scheduled redis cache reloading')
 })
 
-app.get('/v1/abort', async (req, res) => {
+app.get('/abort', async (req, res) => {
   const jobCountsBeforeDrain = await queue.getJobCounts()
   await queue.drain()
   const jobCountsAfterDrain = await queue.getJobCounts()
@@ -115,7 +115,7 @@ app.get('/v1/abort', async (req, res) => {
   res.locals.msg(`Removed approximately ${differenceString} from queue`)
 })
 
-app.post('/v1/courses', async (req, res) => {
+app.post('/courses', async (req, res) => {
   await scheduleByCourseCodes(req.body.coursecodes)
 
   logger.info('Scheduled courses')

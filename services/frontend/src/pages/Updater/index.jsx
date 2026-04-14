@@ -37,11 +37,11 @@ export const Updater = () => {
     }
   }
 
-  const updateSISMeta = () => void apiCall('/updater/update/v2/meta')
-  const updateSISStudents = () => void apiCall('/updater/update/v2/students')
-  const updateSISProgrammes = () => void apiCall('/updater/update/v2/programmes')
+  const updateSISMeta = () => void apiCall('/updater/update/meta')
+  const updateSISStudents = () => void apiCall('/updater/update/students')
+  const updateSISProgrammes = () => void apiCall('/updater/update/programmes')
   const updateSISCustomList = () =>
-    void apiCall(`/updater/update/v2/customlist/${type}`, 'post', customList.trim().split('\n'))
+    void apiCall(`/updater/update/customlist/${type}`, 'post', customList.trim().split('\n'))
   const refreshTeacherLeaderboardForCurrentAndPreviousYear = () =>
     void apiCall('/updater/refresh-teacher-leaderboard', 'post')
   const abortSisUpdater = () => void apiCall('/updater/abort')

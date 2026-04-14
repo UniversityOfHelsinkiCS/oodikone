@@ -72,7 +72,7 @@ describe('Users tests', () => {
       })
 
       it("only the mocked user's programmes are visible", () => {
-        cy.intercept('/api/v3/populationstatistics/studyprogrammes').as('studyprogrammes')
+        cy.intercept('/api/populationstatistics/studyprogrammes').as('studyprogrammes')
         cy.visit('/populations')
         cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
 

@@ -91,6 +91,6 @@ All things listed below should work automatically, if new combinations are done.
 
 ## Study guidance groups
 
-- Backend: student data is fetched by bachelor degree programme code in `/v3/populationstatisticsbystudentnumbers`. Separation from code 'KHxx_xxx+MHxx_xxx' is done in backend.
+- Backend: student data is fetched by bachelor degree programme code in `/populationstatisticsbystudentnumbers`. Separation from code 'KHxx_xxx+MHxx_xxx' is done in backend.
 - Frontend: things are done in the same way as with class stats.
 - **Need manual work**: `./oodikone/services/frontend/src/redux/elementdetails.js` add combined programme codes (both bachelor and master) to `combinedProgrammeCodes` and modify `combinedOptions` list accordingly in `useFilterAndFormattedElementDetails()` function.
