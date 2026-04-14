@@ -6,16 +6,30 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker/DatePicker'
 
-import dayjs from 'dayjs'
-import { useRef, type MutableRefObject } from 'react'
+import dayjs, { type Dayjs } from 'dayjs'
+import { Ref, useRef, type MutableRefObject } from 'react'
 import 'dayjs/locale/fi'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { useGetSemestersQuery, type SemestersData } from '@/redux/semesters'
 
-export const DateSelector = ({ value, onChange, before, after, showSemesters }) => {
-  const datetimeRef: MutableRefObject<HTMLInputElement | null> = useRef(null)
+export type DateSelectorValue = Dayjs | null
+
+export const DateSelector = ({
+  value,
+  onChange,
+  before,
+  after,
+  showSemesters,
+}: {
+  value: DateSelectorValue
+  onChange: (input: DateSelectorValue) => void
+  before?: DateSelectorValue
+  after?: DateSelectorValue
+  showSemesters: boolean
+}) => {
+  const datetimeRef: MutableRefObject<Dayjs | null> = useRef(null)
   const { data: semesters, isFetching } = useGetSemestersQuery()
   const { semesters: allSemesters } = semesters ?? ({ semesters: {} } as SemestersData)
   const { getTextIn } = useLanguage()
@@ -26,7 +40,7 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
 
   const today = dayjs().startOf('day')
 
-  const triggerOnChange = date => {
+  const triggerOnChange = (date: Dayjs) => {
     if (datetimeRef.current !== date) {
       datetimeRef.current = date
       onChange(datetimeRef.current)
@@ -91,7 +105,7 @@ export const DateSelector = ({ value, onChange, before, after, showSemesters }) 
       className="date-picker"
       format={DateFormat.DISPLAY_DATE}
       formatDensity="dense"
-      inputRef={datetimeRef}
+      inputRef={datetimeRef as Ref<HTMLInputElement>}
       maxDate={dayjs(before ?? today)}
       minDate={after ? dayjs(after) : undefined}
       onChange={onChange}
