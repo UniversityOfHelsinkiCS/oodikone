@@ -12,6 +12,7 @@ export const ExternalGradeFilterToggle = ({ grade }) => {
       active={isActive}
       applyFilter={() => filterDispatch(gradeFilter.actions.selectGrade(grade))}
       clearFilter={() => filterDispatch(gradeFilter.actions.unselectGrade(grade))}
+      disabled={false}
       popupContent="Rajaa opiskelijat kurssin arvosanan perusteella."
     />
   )
