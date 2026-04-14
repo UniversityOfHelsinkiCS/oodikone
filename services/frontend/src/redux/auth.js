@@ -71,7 +71,7 @@ const { useLogoutMutation: internalMutation } = authorizationApi
 const devLogout = () => window.location.reload()
 
 export const useLogoutMutation = () => {
-  const [productionLogout, ...rest] = internalMutation()
+  const [productionLogout] = internalMutation()
   const showAsUser = useShowAsUser()
 
   const handleLogout = () => {
@@ -79,5 +79,6 @@ export const useLogoutMutation = () => {
     const logout = isDev ? devLogout : productionLogout
     logout()
   }
-  return [handleLogout, ...rest]
+
+  return handleLogout
 }

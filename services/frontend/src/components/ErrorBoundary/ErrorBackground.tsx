@@ -44,7 +44,7 @@ const dummyData = names.map(name => ({
 
 export const ErrorBackground = ({ header, content }) => {
   useTitle(header)
-  const [logout] = useLogoutMutation()
+  const logout = useLogoutMutation()
 
   return (
     <PageLayout maxWidth="lg">

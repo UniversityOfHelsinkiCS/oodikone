@@ -7,7 +7,7 @@ import { useLogoutMutation } from '@/redux/auth'
 import { LogoutIcon } from '@/theme'
 
 export const LogOutButton = () => {
-  const [logout] = useLogoutMutation()
+  const logout = useLogoutMutation()
 
   return (
     <MenuItem disabled={isDev} onClick={() => logout()}>
