@@ -26,7 +26,7 @@ import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters } from '../services/students'
-import { getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
+import { getFullStudyProgrammeRights, handleQueryArrays, hasFullAccessToStudentData } from '../util'
 
 const router = Router()
 
@@ -103,10 +103,6 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     const { id: userId, roles: userRoles, programmeRights: userProgrammeRights, studentsUserCanAccess } = req.user
     const { programme, combinedProgramme } = req.query
 
-    // NOTE: Make sure we have only arrays, "/...&years=2021" is parsed by express as years: 2021, not [2021]
-    const handleQueryArrays = <T>(requestField: T | T[]): T[] => {
-      return Array.isArray(requestField) ? requestField : [requestField]
-    }
     const years = handleQueryArrays(req.query.years)
     const semesters = handleQueryArrays(req.query.semesters)
     const studentStatuses = handleQueryArrays(req.query.studentStatuses) // NOTE: TRANSFERRED means transferred out of the program

@@ -12,7 +12,12 @@ import {
 import type { CourseWithSubsId } from '@oodikone/shared/types/course'
 import { getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
-import { getFullStudyProgrammeRights, hasFullAccessToStudentData, validateParamLength } from '../util'
+import {
+  getFullStudyProgrammeRights,
+  handleQueryArrays,
+  hasFullAccessToStudentData,
+  validateParamLength,
+} from '../util'
 
 const router = Router()
 
@@ -53,7 +58,9 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
   async (req, res) => {
     const { codes, combineSubstitutions, separate } = req.query
 
-    if (!codes) {
+    const courseCodes = handleQueryArrays(codes)
+
+    if (!courseCodes) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 
@@ -75,7 +82,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const useCombineSubstitutions = combineSubstitutions !== 'false'
     const useSeparate = separate === 'true'
 
-    const results = await getCourseYearlyStats(codes, useSeparate, anonymizationSalt, useCombineSubstitutions)
+    const results = await getCourseYearlyStats(courseCodes, useSeparate, anonymizationSalt, useCombineSubstitutions)
     res.json(results)
   }
 )
