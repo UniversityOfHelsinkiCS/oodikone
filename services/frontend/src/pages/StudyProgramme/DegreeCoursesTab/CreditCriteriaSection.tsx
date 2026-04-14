@@ -111,17 +111,15 @@ export const CreditCriteriaSection = ({
       <Stack gap={2}>
         <Grid container spacing={1}>
           {inputs.map((input, index) => {
-            const value = creditLimits[input.key]
+            const value = creditLimits[input.key] ?? input.previousValue
             const error = value !== null && value < 0
             return (
               <Grid key={input.key} size={4}>
                 <TextField
                   error={error}
                   fullWidth
-                  helperText={error ? 'Please enter a number above 0' : `Previously set to ${input.previousValue}`}
                   label={`${input.label} year (${(index + 1) * 12} months)`}
                   onChange={event => setCreditLimits({ ...creditLimits, [input.key]: Number(event.target.value) })}
-                  placeholder={`Enter criteria for the ${input.label.toLowerCase()} year`}
                   size="small"
                   slotProps={{
                     input: {
@@ -129,7 +127,7 @@ export const CreditCriteriaSection = ({
                     },
                   }}
                   type="number"
-                  value={value ?? ''}
+                  value={value}
                 />
               </Grid>
             )
