@@ -1,20 +1,16 @@
-import Divider from '@mui/material/Divider'
 import Paper from '@mui/material/Paper'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingSection } from '@/components/Loading'
-import { useTitle } from '@/hooks/title'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { ColorizedCoursesTableContext } from './common'
 import { FacultiesTab } from './FacultiesTab'
 import { SemestersTab } from './SemestersTab'
 import './index.css'
 
-export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, panes, dividerText }) => {
-  useTitle(title)
+export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes }) => {
   const { data: semesterData } = useGetSemestersQuery()
   const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
   const semesters = Object.values(allSemesters).filter(
@@ -22,7 +18,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
     semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode
   )
 
-  const { data, isFetching, isLoading, isError } = fetchDataHook({ id: studyProgramme })
+  const { data, isFetching, isLoading, isError } = fetchDataHook(fetchDataHookParams)
 
   const [tab, setTab] = useState(0)
   const [numberMode, setNumberMode] = useState('completions')
@@ -91,16 +87,8 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
   }
 
   return (
-    <ColorizedCoursesTableContext.Provider value={settingsContext}>
-      <div className="colorized-courses-table">
-        {dividerText ? (
-          <Divider sx={{ width: '100%', mt: 3, mb: 1 }}>
-            <Typography fontSize="1.3rem" variant="overline">
-              {dividerText}
-            </Typography>
-          </Divider>
-        ) : null}
-
+    <div className="colorized-courses-table">
+      <ColorizedCoursesTableContext.Provider value={settingsContext}>
         {displayedPanes.length > 1 ? (
           <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
             {displayedPanes.map(({ label }) => (
@@ -109,7 +97,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, studyProgramme, title, pa
           </Tabs>
         ) : null}
         <Paper variant="outlined">{displayedPanes.at(tab)?.render() ?? null}</Paper>
-      </div>
-    </ColorizedCoursesTableContext.Provider>
+      </ColorizedCoursesTableContext.Provider>
+    </div>
   )
 }

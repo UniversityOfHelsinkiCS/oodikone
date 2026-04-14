@@ -2,10 +2,11 @@ import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
+import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
 import { useTabs } from '@/hooks/tabs'
+import { useGetColorizedTableCourseStatsQuery } from '@/redux/studyProgramme'
 import { CalendarMonthIcon, SchoolIcon } from '@/theme'
 import { ByCreditTypeTab } from './ByCreditTypeTab'
-import { BySemesterTab } from './BySemesterTab'
 
 export const ProgrammeCoursesTab = ({
   academicYear,
@@ -41,7 +42,13 @@ export const ProgrammeCoursesTab = ({
       cypress: 'by-semester-tab',
       label: 'By semester',
       icon: <CalendarMonthIcon />,
-      component: <BySemesterTab key="BySemesterTab" studyProgramme={studyProgramme} />,
+      component: (
+        <ColorizedCoursesTable
+          fetchDataHook={useGetColorizedTableCourseStatsQuery}
+          fetchDataHookParams={{ id: studyProgramme }}
+          panes={['Semesters']}
+        />
+      ),
     },
   ]
 

@@ -1,11 +1,25 @@
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+
 import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
+import { useTitle } from '@/hooks/title'
 import { useGetLanguageCenterDataQuery } from '@/redux/languageCenterView'
 
-export const LanguageCenterView = () => (
-  <ColorizedCoursesTable
-    dividerText="Language center statistics"
-    fetchDataHook={useGetLanguageCenterDataQuery}
-    panes={['Faculties', 'Semesters']}
-    title="Language center view"
-  />
-)
+export const LanguageCenterView = () => {
+  useTitle('Language center view')
+
+  return (
+    <>
+      <Divider sx={{ width: '100%', mt: 3, mb: 1 }}>
+        <Typography fontSize="1.3rem" variant="overline">
+          Language center statistics
+        </Typography>
+      </Divider>
+      <ColorizedCoursesTable
+        fetchDataHook={useGetLanguageCenterDataQuery}
+        fetchDataHookParams={undefined}
+        panes={['Faculties', 'Semesters']}
+      />
+    </>
+  )
+}
