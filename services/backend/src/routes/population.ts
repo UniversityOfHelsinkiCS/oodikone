@@ -222,9 +222,12 @@ router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
   async (req, res) => {
     const { studentNumbers, tags } = req.body
     const { id: userId, roles, studentsUserCanAccess } = req.user
+
+    const students = handleQueryArrays(studentNumbers)
+
     const filteredStudentNumbers = hasFullAccessToStudentData(roles)
-      ? studentNumbers
-      : intersection(studentNumbers, studentsUserCanAccess)
+      ? students
+      : intersection(students, studentsUserCanAccess)
 
     const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
 
@@ -238,7 +241,7 @@ router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
     const result = await statisticsOf(filteredStudentNumbers, studyRights, tagMap, startDate)
 
     const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
-    const discardedStudentNumbers = difference(studentNumbers, filteredStudentNumbers)
+    const discardedStudentNumbers = difference(students, filteredStudentNumbers)
 
     res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
   }

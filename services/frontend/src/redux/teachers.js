@@ -11,7 +11,7 @@ const teachersApi = RTKApi.injectEndpoints({
     getTeacherStatistics: builder.query({
       query: ({ semesterStart, semesterEnd, providers }) =>
         `/teachers/stats?${providers
-          .map(provider => `providers[]=${provider}`)
+          .map(provider => `providers=${provider}`)
           .join('&')}&semesterStart=${semesterStart}&semesterEnd=${semesterEnd}`,
     }),
     getTopTeachers: builder.query({
