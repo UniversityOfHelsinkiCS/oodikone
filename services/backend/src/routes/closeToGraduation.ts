@@ -14,7 +14,7 @@ router.get<never, CloseToGraduationResBody>('/', async (req, res) => {
     const studentNumbers = await getAllStudentsUserHasInGroups(user.sisPersonId)
     const result = await getCloseToGraduationData(studentNumbers)
 
-    res.json(result)
+    return res.json(result)
   }
 
   const result = await getCloseToGraduationData()
