@@ -66,7 +66,7 @@ export const admissionTypeFilter = createFilter({
       .flatMap(student =>
         findAllStudyRightsForProgramme(student, args.programme)
           .filter(studyRight => !studyRight.cancelled && !!studyRight.admissionType)
-          .map(studyRight => studyRight.admissionType)
+          .map(studyRight => (studyRight.admissionType !== 'Koepisteet' ? studyRight.admissionType : 'Valintakoe'))
       )
       .reduce((acc, cur) => {
         acc[cur] ??= 0
