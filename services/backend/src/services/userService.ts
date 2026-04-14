@@ -2,11 +2,10 @@ import { isEqual, keyBy, omit, uniq } from 'lodash-es'
 import { LRUCache } from 'lru-cache'
 
 import { User } from '@oodikone/shared/models/user'
-import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
+import { DetailedProgrammeRights, Role, ExpandedUser, FormattedUser, IamAccess } from '@oodikone/shared/types'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { UserModel } from '../models/user'
-import { ExpandedUser, FormattedUser, IamAccess } from '../types'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import * as jami from '../util/jami'

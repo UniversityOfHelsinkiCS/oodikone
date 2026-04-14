@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/node'
 import axios from 'axios'
 
+import { IamAccess } from '@oodikone/shared/types'
 import { importerToken, isStaging, jamiUrl } from '../config'
-import { IamAccess } from '../types'
 import logger from './logger'
 
 const jamiClient = axios.create({

@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
 import { CanError } from '@oodikone/shared/routes'
+import { FormattedUser } from '@oodikone/shared/types'
 import { omitKeys } from '@oodikone/shared/util'
-import { FormattedUser } from '../types/user'
 import { ApplicationError } from '../util/customErrors'
 
 const router = Router()

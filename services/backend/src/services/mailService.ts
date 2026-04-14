@@ -1,7 +1,7 @@
 import axios from 'axios'
 
+import { FormattedUser } from '@oodikone/shared/types'
 import { isProduction, pateToken } from '../config'
-import { FormattedUser } from '../types'
 import logger from '../util/logger'
 
 const pateClient = axios.create({

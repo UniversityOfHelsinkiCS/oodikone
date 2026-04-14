@@ -1,31 +1,34 @@
 import { Router } from 'express'
 
-import { LANGUAGE_CODES, Language } from '@oodikone/shared/language'
+import { LANGUAGE_CODES } from '@oodikone/shared/language'
 import { CanError } from '@oodikone/shared/routes'
-import { Role } from '@oodikone/shared/types'
+import {
+  ChangeLanguageReqBody,
+  GetUserByIdParams,
+  GetUserByIdResBody,
+  GetUserRolesResBody,
+  GetUsersResBody,
+  ModifyUserRolesReqBody,
+  PostUserEmailReqBody,
+  UserEmailPreviewResBody,
+  UserIDElementsParams,
+  UserIDElementsReqBody,
+} from '@oodikone/shared/routes/users'
 import { tryCatch } from '@oodikone/shared/util'
 import { roles } from '../config/roles'
 import * as auth from '../middleware/auth'
 import { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } from '../services/mailService'
 import * as userService from '../services/userService'
-import { FormattedUser } from '../types'
 import logger from '../util/logger'
 
 const router = Router()
-
-type GetUsersResBody = Omit<FormattedUser, 'studentsUserCanAccess' | 'isAdmin' | 'mockedBy' | 'userId'>[]
 
 router.get<never, CanError<GetUsersResBody>>('/', auth.roles(['admin']), async (_, res) => {
   const results = await userService.findAll()
   res.json(results)
 })
 
-type GetUserRolesResBody = readonly string[]
-
 router.get<never, GetUserRolesResBody>('/roles', auth.roles(['admin']), (_, res) => res.json(roles))
-
-type GetUserByIdParams = { uid: string }
-type GetUserByIdResBody = Omit<FormattedUser, 'studentsUserCanAccess' | 'isAdmin' | 'mockedBy' | 'userId'>
 
 router.get<never, CanError<GetUserByIdResBody>, never, GetUserByIdParams>(
   '/:uid',
@@ -39,11 +42,6 @@ router.get<never, CanError<GetUserByIdResBody>, never, GetUserByIdParams>(
   }
 )
 
-type ModifyUserRolesReqBody = {
-  username: string
-  roles: Record<Role, boolean>
-}
-
 router.post<never, CanError<void, Error>, ModifyUserRolesReqBody>(
   '/modify-roles',
   auth.roles(['admin']),
@@ -56,17 +54,10 @@ router.post<never, CanError<void, Error>, ModifyUserRolesReqBody>(
   }
 )
 
-type UserEmailPreviewResBody = {
-  subject: string
-  html: string
-}
-
 router.get<never, CanError<UserEmailPreviewResBody>>('/email/preview', auth.roles(['admin']), (_, res) => {
   const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
   res.json({ subject: accessMessageSubject, html: accessMessageText })
 })
-
-type PostUserEmailReqBody = { email: string }
 
 router.post<never, CanError<void>, PostUserEmailReqBody>('/email', auth.roles(['admin']), async (req, res) => {
   const { email } = req.body
@@ -79,10 +70,7 @@ router.post<never, CanError<void>, PostUserEmailReqBody>('/email', auth.roles(['
   return res.status(200).end()
 })
 
-type ElementsParams = { uid: string }
-type ElementsReqBody = { codes: string[] }
-
-router.post<never, CanError<void>, ElementsReqBody, ElementsParams>(
+router.post<never, CanError<void>, UserIDElementsReqBody, UserIDElementsParams>(
   '/:uid/elements',
   auth.roles(['admin']),
   async (req, res) => {
@@ -93,7 +81,7 @@ router.post<never, CanError<void>, ElementsReqBody, ElementsParams>(
   }
 )
 
-router.delete<never, CanError<void>, ElementsReqBody, ElementsParams>(
+router.delete<never, CanError<void>, UserIDElementsReqBody, UserIDElementsParams>(
   '/:uid/elements',
   auth.roles(['admin']),
   async (req, res) => {
@@ -104,7 +92,6 @@ router.delete<never, CanError<void>, ElementsReqBody, ElementsParams>(
   }
 )
 
-type ChangeLanguageReqBody = { language: Language }
 router.post<never, CanError<void>, ChangeLanguageReqBody>('/language', async (req, res) => {
   const { language } = req.body
 

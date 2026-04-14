@@ -1,6 +1,8 @@
-import { Language } from '@oodikone/shared/language'
-import type { User } from '@oodikone/shared/models/user'
-import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
+import { Language } from '../language'
+import type { User } from '../models/user'
+import { DetailedProgrammeRights, Role } from '../types'
+
+export type IamAccess = Record<string, Record<'read' | 'write' | 'admin', boolean>>
 
 export type ExpandedUser = User & {
   iamGroups: string[]

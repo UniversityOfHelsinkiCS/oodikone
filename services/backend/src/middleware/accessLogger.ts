@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { omit } from 'lodash-es'
 import morgan from 'morgan'
 
-import { FormattedUser } from '../types'
+import { FormattedUser } from '@oodikone/shared/types'
 import { getFullStudyProgrammeRights } from '../util'
 import logger from '../util/logger'
 
