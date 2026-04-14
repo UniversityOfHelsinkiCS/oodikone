@@ -15,16 +15,15 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
-import { ProgressBar } from '@/components/ProgressBar'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useDebouncedState } from '@/hooks/debouncedState'
-import { useProgress } from '@/hooks/progress'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { KeyboardBackspaceIcon, LabelIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { PageTitle } from '../common/PageTitle'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
+import { Loading } from '../Loading'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { UnihowDataExport } from './UnihowDataExport'
@@ -60,8 +59,6 @@ export const CustomPopulationContent = ({
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
-
-  const { progress } = useProgress(isFetchingPopulation)
 
   const panels = [
     {
@@ -147,7 +144,7 @@ export const CustomPopulationContent = ({
   return (
     <Box>
       {isFetchingPopulation ? (
-        <ProgressBar progress={progress} />
+        <Loading />
       ) : (
         <>
           <PageTitle title={populationName ? `Custom population: ${populationName}` : 'Custom population'}>
