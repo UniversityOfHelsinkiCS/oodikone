@@ -105,7 +105,12 @@ export const PopulationDetails = ({
       //   />
       // ),
       content: (
-        <CreditAccumulationGraph students={filteredStudents} studyPlanFilter={studyPlanFilterIsActive} />
+        <CreditAccumulationGraph
+          students={filteredStudents}
+          programmeCodes={[programme, combinedProgramme].filter(c => c !== undefined)}
+          showBachelorAndMaster={!!showBachelorAndMaster}
+          studyPlanFilter={studyPlanFilterIsActive}
+        />
       ),
     },
     query.years.length <= 1

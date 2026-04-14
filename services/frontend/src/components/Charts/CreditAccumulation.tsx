@@ -9,13 +9,15 @@ import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
+import { getGraduationDataPoints, getGraduationsByCodes } from './util'
 
 const INITIAL_GRAPH_HEIGHT = 600
 
 /**
-* Credit accumulation graph for **class statatistics**
+* Credit accumulation graph for **class statistics**
 */
-export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { students: FormattedStudent[], studyPlanFilter: boolean }) => {
+export const CreditAccumulationGraph = ({ students, programmeCodes, showBachelorAndMaster, studyPlanFilter }: { students: FormattedStudent[], programmeCodes: string[], showBachelorAndMaster: boolean, studyPlanFilter: boolean }) => {
+
   const [graphHeight, setGraphHeight] = useState(INITIAL_GRAPH_HEIGHT)
   const [cutStudyplanCredits, setCutStudyplanCredits] = useState(false)
 
@@ -24,14 +26,13 @@ export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { student
     ? Math.min(...students.flatMap(s => s.courses.map(c => new Date(c.date).getTime())))
     : populationStudyStart
 
-
   const studyRightStartMarker = studyPlanFilter ? [{
     name: "Population study start",
     type: "line",
 
     markLine: {
-      silent: true, // Ignore mouse events
-      symbol: 'none', // Disable default arrow shape
+      silent: true,
+      symbol: 'none',
       lineStyle: {
         color: '#ff0000',
         type: 'dashed',
@@ -48,14 +49,22 @@ export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { student
     }
   }] : []
 
-  const series = useMemo(() => (
+  const creditPoints = useMemo(() => (
     students.map(student => {
+      const studyplan = student.studyplans.find(sp => sp.programme_code === programmeCodes.at(0))
+
       const courses = student.courses
-        .filter((c) => dayjs(c.date).isSameOrAfter(creditDateThreshold) && !c.isStudyModuleCredit)
+        .filter((c) => (
+          dayjs(c.date).isSameOrAfter(creditDateThreshold) &&
+          !c.isStudyModuleCredit &&
+          (studyPlanFilter ? !!(c.isStudyModuleCredit || studyplan?.included_courses.includes(c.course_code)) : true)
+        ))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
       let credits = 0
-      const points: [number, number][] = []
+      const points: number[][] = []
+      const markPointsForStudent: any[] = [];
+      const graduations = getGraduationsByCodes(student, programmeCodes, showBachelorAndMaster)
 
       for (const c of courses) {
         if (c.credittypecode === CreditTypeCode.PASSED || c.credittypecode === CreditTypeCode.APPROVED) {
@@ -64,29 +73,39 @@ export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { student
         }
       }
 
+      // Guard: students can graduate without having a single course in hops
+      if (points.length) {
+        graduations.forEach(grad => getGraduationDataPoints(points, markPointsForStudent, grad))
+        points.sort((a, b) => a[0] - b[0])
+      }
+
       return {
         name: student.studentNumber,
         type: 'line',
         showSymbol: false,
+        markPoint: markPointsForStudent.length ? {
+          symbol: 'diamond',
+          symbolSize: 20,
+          data: markPointsForStudent
+        } : undefined,
+        symbolSize: 8,
         data: points,
         smooth: 0.1,
         emphasis: { focus: 'series' },
         sampling: 'lttb',
       }
     })
-  ), [creditDateThreshold, students])
+  ), [creditDateThreshold, students, studyPlanFilter])
 
   const option = useMemo(() => (
     {
       tooltip: {
         trigger: 'axis',
-        type: 'shadow',
-        axisPointer: {
-          animation: false,
-          snap: true,
-          type: 'cross',
-        },
         valueFormatter: (val: number) => `${val} cr`,
+        axisPointer: {
+          type: 'cross',
+          snap: true,
+        },
       },
       grid: {
         show: true,
@@ -119,10 +138,10 @@ export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { student
         splitLine: { show: true },
         scale: true,
       },
-      series: [...series, ...studyRightStartMarker],
+      series: [...creditPoints, ...studyRightStartMarker],
       animation: true,
     }
-  ), [series, studyRightStartMarker])
+  ), [creditPoints, studyRightStartMarker])
 
   const GraphSizeButton = ({ height, label }) => (
     <Button
@@ -147,13 +166,13 @@ export const CreditAccumulationGraph = ({ students, studyPlanFilter }: { student
           <GraphSizeButton height={400} label='Small' />
           <GraphSizeButton height={INITIAL_GRAPH_HEIGHT} label='Medium' />
           <GraphSizeButton height={900} label='Large' />
+          {studyPlanFilter && (
+            <FormControlLabel
+              control={<Switch checked={cutStudyplanCredits} onChange={(e) => setCutStudyplanCredits(e.target.checked)} />}
+              label="Display credits from study right start"
+            />
+          )}
         </Stack>
-        {studyPlanFilter && (
-          <FormControlLabel
-            control={<Switch checked={cutStudyplanCredits} onChange={(e) => setCutStudyplanCredits(e.target.checked)} />}
-            label="Display credits from study right start"
-          />
-        )}
         <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
       </Stack>
 
