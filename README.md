@@ -1,4 +1,5 @@
 # Oodikone
+
 [![Maintainability](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone/maintainability.svg)](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone)
 
 An application for analyzing university data, running at [https://oodikone.helsinki.fi/](https://oodikone.helsinki.fi/).
@@ -129,7 +130,6 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 - `npm run docker:down`: stops the whole environment
 - `npm run testupdater`: runs tests for updater
 - `npm run flushredis`: clears Redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views
-- `npm run rapodiff`: runs [Rapodiff](./services/backend/src/rapodiff/)
 - `npm run install:local`: installs `node_modules` for each package (backend, frontend, sis-updater-scheduler and sis-updater-worker) locally
 - `npm run install:docker`: installs `node_modules` for each package inside containers
 - `npm run install:both`: runs both `npm run install:local` and `npm run install:docker`
@@ -186,8 +186,6 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 - After creating a release, Oodikone is deployed to production
 - Updater is deployed to production when pushed if tests pass
 - Test databases can be updated, instructions in [anonyymioodi README](anonyymioodi/README.md)
-
-[Rapodiff](./services/backend/src/rapodiff/) can be used to check differences between Rapo and Oodikone data.
 
 ## ❓FAQ
 

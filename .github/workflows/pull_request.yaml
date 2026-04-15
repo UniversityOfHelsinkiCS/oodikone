@@ -8,7 +8,6 @@ on:
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
-      - '!services/backend/src/rapodiff/**'
       - 'docker-compose.ci.yml'
       - 'package*.json'
 

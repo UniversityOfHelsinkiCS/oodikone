@@ -25,7 +25,7 @@ export default tseslint.config(
       'nyc-config.cjs',
       '.lintstagedrc.mjs',
       'cypress.config.js',
-    ]
+    ],
   },
 
   // Global options (excl. e2e)
@@ -44,8 +44,8 @@ export default tseslint.config(
       parser: tseslint.parser,
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['*.{js,cjs}']
-        }
+          allowDefaultProject: ['*.{js,cjs}'],
+        },
       },
       globals: {
         ...globals.browser,
@@ -53,13 +53,13 @@ export default tseslint.config(
       },
     },
     plugins: {
-      'import-x': eslintPluginImportX
+      'import-x': eslintPluginImportX,
     },
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
     },
     rules: {
-      'camelcase': 'off', // TODO: Enable. old db/backend logic is still using snake_case every now and then and needs a big refactor
+      camelcase: 'off', // TODO: Enable. old db/backend logic is still using snake_case every now and then and needs a big refactor
       'class-methods-use-this': 'off', // Disabled in favor of @typescript-eslint
       'consistent-return': 'off', // Disabled in favor of @typescript-eslint
       'id-denylist': ['error', 'err'],
@@ -75,31 +75,42 @@ export default tseslint.config(
       'prefer-const': 'error',
       'prefer-destructuring': 'off', // Disabled in favor of @typescript-eslint
       'dot-notation': 'off', // Disabled in favor of @typescript-eslint
-      'no-restricted-imports': ['error',
+      'no-restricted-imports': [
+        'error',
         {
-          'patterns':
-            [
-              { 'regex': '^@mui/[^/]+$', 'message': 'Import only the needed module. This has no effect in prod due to tree-shake, but speeds up development builds.' },
-              { 'regex': '^src/.*', 'message': 'Root imports will not resolve in production build (instead silently crash).' }
-            ]
-        }],
-      'quotes': ['error', 'single',
-        { avoidEscape: true, allowTemplateLiterals: false }
+          patterns: [
+            {
+              regex: '^@mui/[^/]+$',
+              message:
+                'Import only the needed module. This has no effect in prod due to tree-shake, but speeds up development builds.',
+            },
+            {
+              regex: '^src/.*',
+              message: 'Root imports will not resolve in production build (instead silently crash).',
+            },
+          ],
+        },
       ],
+      quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: false }],
 
       'import-x/no-commonjs': 'error',
       'import-x/no-default-export': 'error',
       'import-x/no-extraneous-dependencies': ['error', { devDependencies: false }],
-      'import-x/no-unused-modules': ['error',
+      'import-x/no-unused-modules': [
+        'error',
         {
           missingExports: true,
           unusedExports: true,
-          src: ['{services,updater}/**/*.{js,jsx,ts,tsx}']
-        }],
-      'import-x/order': ['error', {
-        alphabetize: { order: 'asc', caseInsensitive: true },
-        groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
-      }],
+          src: ['{services,updater}/**/*.{js,jsx,ts,tsx}'],
+        },
+      ],
+      'import-x/order': [
+        'error',
+        {
+          alphabetize: { order: 'asc', caseInsensitive: true },
+          groups: [['builtin', 'external'], ['internal'], ['parent'], ['sibling', 'index']],
+        },
+      ],
 
       // TypeScript
       '@typescript-eslint/no-unused-vars': [
@@ -112,9 +123,7 @@ export default tseslint.config(
       '@typescript-eslint/consistent-return': 'error', // NOTE: This is weaker than tsconfig.json noImplicitReturns, and should be replaced once ts migration complete
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/dot-notation': 'error',
-      '@typescript-eslint/prefer-destructuring': ['error',
-        { VariableDeclarator: { object: true } }
-      ],
+      '@typescript-eslint/prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
       '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'with-single-extends' }],
       '@typescript-eslint/no-explicit-any': 'off', // TODO: enable when feeling brave
       '@typescript-eslint/no-implied-eval': 'error',
@@ -134,12 +143,12 @@ export default tseslint.config(
             'services/frontend/tsconfig.json',
             'services/frontend/tsconfig.node.json',
             'services/backend/tsconfig.json',
-            'services/shared/tsconfig.json'
+            'services/shared/tsconfig.json',
           ],
         }),
         createNodeResolver({
           extensions: ['.js', '.jsx', 'cjs', 'mjs', '.ts', '.tsx'],
-        })
+        }),
       ],
     },
   },
@@ -147,22 +156,22 @@ export default tseslint.config(
   {
     files: ['services/backend/src/routes/*.{ts,js}'],
     rules: {
-      '@typescript-eslint/no-misused-promises': 'off', // Errors come mainly from Express route handlers that are handled correctly by express-async-errors      
+      '@typescript-eslint/no-misused-promises': 'off', // Errors come mainly from Express route handlers that are handled correctly by express-async-errors
       '@typescript-eslint/consistent-return': 'off',
-    }
+    },
   },
 
   // Disable type-aware linting for javascript files
   {
     files: ['{updater,services}/**/*.{js,cjs}'],
-    extends: [tseslint.configs.disableTypeChecked]
+    extends: [tseslint.configs.disableTypeChecked],
   },
 
   // Frontend camelCase and react
   {
     files: ['services/frontend/**/*.{js,jsx,mjs,cjs,ts,tsx}'],
     plugins: {
-      'react': eslintPluginReact,
+      react: eslintPluginReact,
     },
     extends: [
       eslintPluginReact.configs.flat.recommended,
@@ -173,14 +182,15 @@ export default tseslint.config(
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
-        }
-      }
+        },
+      },
     },
     rules: {
-      'camelcase': 'warn',
+      camelcase: 'warn',
       'react/prop-types': 'off', // Typescript but worse
       'react/no-unescaped-entities': 'off',
-      'react/function-component-definition': ['error',
+      'react/function-component-definition': [
+        'error',
         { namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
       ],
       'react/no-array-index-key': 'error',
@@ -188,9 +198,7 @@ export default tseslint.config(
       'react/no-this-in-sfc': 'error',
       'react/prefer-stateless-function': 'error',
       'react/jsx-boolean-value': ['error', 'never'],
-      'react/jsx-filename-extension': ['error',
-        { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }
-      ],
+      'react/jsx-filename-extension': ['error', { allow: 'as-needed', extensions: ['.jsx', '.tsx'] }],
       'react/jsx-no-leaked-render': 'warn', // TODO: enable, tho not that useful after full ts migration
       'react/jsx-no-useless-fragment': 'error',
       'react/jsx-props-no-spreading': 'warn', // TODO: enable, improves readability
@@ -198,29 +206,25 @@ export default tseslint.config(
       'react/jsx-tag-spacing': 'warn',
     },
     settings: {
-      'react': {
-        'version': 'detect'
-      }
-    }
+      react: {
+        version: 'detect',
+      },
+    },
   },
 
   // Cypress should only use rules provided by the plugin below
   {
     files: ['cypress/**/*.js'],
-    extends: [
-      eslintPluginCypress.configs.recommended
-    ]
+    extends: [eslintPluginCypress.configs.recommended],
   },
 
   // Override for backend api tests
   {
-    files: [
-      "services/backend/tests**/*.ts"
-    ],
+    files: ['services/backend/tests**/*.ts'],
     rules: {
-      "import-x/no-extraneous-dependencies": "off",
+      'import-x/no-extraneous-dependencies': 'off',
       'no-console': 'off',
-    }
+    },
   },
 
   // Overrides for CommonJS
@@ -228,7 +232,7 @@ export default tseslint.config(
     files: [
       'services/backend/**/*.js',
       'updater/sis-updater-worker/src/db/migrations/*.cjs',
-      'updater/sis-updater-scheduler/**/*.js'
+      'updater/sis-updater-scheduler/**/*.js',
     ],
     languageOptions: {
       sourceType: 'commonjs',
@@ -239,20 +243,9 @@ export default tseslint.config(
     },
   },
 
-  // Rapodiff
-  {
-    files: ['services/backend/src/rapodiff/**/*'],
-    rules: {
-      'no-console': 'off',
-    },
-  },
-
   // Migration files
   {
-    files: [
-      'updater/sis-updater-worker/src/db/migrations/*.cjs',
-      'services/backend/src/database/**/*.js'
-    ],
+    files: ['updater/sis-updater-worker/src/db/migrations/*.cjs', 'services/backend/src/database/**/*.js'],
     rules: {
       'import-x/no-unused-modules': 'off',
       '@typescript-eslint/no-empty-function': 'off',
@@ -270,5 +263,5 @@ export default tseslint.config(
       'no-promise-executor-return': 'off',
     },
   },
-  eslintPluginPrettierRecommended, // This must be the last plugin so it can override other configs
+  eslintPluginPrettierRecommended // This must be the last plugin so it can override other configs
 )
