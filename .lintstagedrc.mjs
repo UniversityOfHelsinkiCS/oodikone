@@ -5,9 +5,9 @@ const dockerCmdBase = `docker run --rm --volume ${cwd}:/oodikone --workdir /oodi
 const relativeFilePaths = files => [...files.map(file => relative(cwd, file))].join(' ')
 
 export default {
-  '{services,updater}/**/*.{js,jsx,ts,tsx}': () => 'eslint --fix --report-unused-disable-directives',
-  'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
-  'services/frontend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
+  '{services/shared,updater}/**/*.{js,jsx,ts,tsx}': () => 'eslint --fix --report-unused-disable-directives',
+  'services/backend/**/*.{js.jsx,ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
+  'services/frontend/**/*.{js,jsx,ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
   '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': () => 'prettier . --write',
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
   Dockerfile: files =>
