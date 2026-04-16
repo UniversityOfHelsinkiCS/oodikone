@@ -1,6 +1,18 @@
-import { FormattedStudent } from "@oodikone/shared/types"
+import { FormattedStudent } from '@oodikone/shared/types'
 
-export const getGraduationsByCodes = (student: FormattedStudent, programmeCodes: string[], showBachelorAndMaster: boolean): number[] => {
+export const getIncludedCourseCodesByProgrammeCodes = (
+  student: FormattedStudent,
+  programmeCodes: string[]
+): Set<string> => {
+  const studyplans = student.studyplans.filter(studyplan => programmeCodes.includes(studyplan.programme_code))
+  return new Set(studyplans.flatMap(studyplan => studyplan.included_courses))
+}
+
+export const getGraduationsByCodes = (
+  student: FormattedStudent,
+  programmeCodes: string[],
+  showBachelorAndMaster: boolean
+): number[] => {
   if (showBachelorAndMaster) {
     return (
       student.studyRights
@@ -20,7 +32,13 @@ export const getGraduationsByCodes = (student: FormattedStudent, programmeCodes:
 
 /** HACK: markPoint (in this case the graduation marker) needs a datapoint to attach to. This creates a synthetic data point
 to the time of graduation and attaches the markPoint to it (remember to sort the datapoints again) */
-export const getGraduationDataPoints = (dataPoints: number[][], markPoints: { coord: number[], name: string }[], graduationDate: number) => {
+export const getGraduationDataPoints = (
+  dataPoints: number[][],
+  markPoints: { coord: number[]; name: string }[],
+  graduationDate: number
+) => {
+  dataPoints.sort((a, b) => a[0] - b[0])
+
   const index = dataPoints.findIndex(point => point[0] > graduationDate)
   let y: number
   if (index <= 0) {
@@ -33,6 +51,6 @@ export const getGraduationDataPoints = (dataPoints: number[][], markPoints: { co
 
   const coord = [graduationDate, y]
   dataPoints.push(coord)
+  dataPoints.sort((a, b) => a[0] - b[0])
   markPoints.push({ coord, name: `Graduation` })
-
 }
