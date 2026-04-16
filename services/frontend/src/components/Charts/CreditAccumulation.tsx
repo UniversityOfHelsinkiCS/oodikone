@@ -15,16 +15,20 @@ const INITIAL_GRAPH_HEIGHT = 600
 
 /**
 * Credit accumulation graph for **class statistics**
+*
+* @param students (size must be more than 0)
 */
 export const CreditAccumulationGraph = ({ students, programmeCodes, showBachelorAndMaster, studyPlanFilter }: { students: FormattedStudent[], programmeCodes: string[], showBachelorAndMaster: boolean, studyPlanFilter: boolean }) => {
 
   const [graphHeight, setGraphHeight] = useState(INITIAL_GRAPH_HEIGHT)
   const [cutStudyplanCredits, setCutStudyplanCredits] = useState(false)
 
+  // Is same for all students in a population
   const populationStudyStart = new Date(students[0].studyrightStart).getTime()
-  const creditDateThreshold = studyPlanFilter && !cutStudyplanCredits
+  const creditDateThreshold = useMemo(() => studyPlanFilter && !cutStudyplanCredits
     ? Math.min(...students.flatMap(s => s.courses.map(c => new Date(c.date).getTime())))
     : populationStudyStart
+    , [studyPlanFilter, cutStudyplanCredits, students, populationStudyStart])
 
   const studyRightStartMarker = studyPlanFilter ? [{
     name: "Population study start",
@@ -57,7 +61,7 @@ export const CreditAccumulationGraph = ({ students, programmeCodes, showBachelor
         .filter((c) => (
           dayjs(c.date).isSameOrAfter(creditDateThreshold) &&
           !c.isStudyModuleCredit &&
-          (studyPlanFilter ? !!(c.isStudyModuleCredit || studyplan?.included_courses.includes(c.course_code)) : true)
+          (studyPlanFilter ? studyplan?.included_courses.includes(c.course_code) : true)
         ))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 

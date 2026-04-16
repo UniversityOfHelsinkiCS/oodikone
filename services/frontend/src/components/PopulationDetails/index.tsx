@@ -36,6 +36,7 @@ import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
+import Typography from '@mui/material/Typography'
 
 type PopulationDetailsProps = {
   isLoading: boolean
@@ -104,14 +105,15 @@ export const PopulationDetails = ({
       //     studyRightId={null}
       //   />
       // ),
-      content: (
+      content: filteredStudents.length ? (
+        // TODO: make wrapper for when no data.
         <CreditAccumulationGraph
           students={filteredStudents}
           programmeCodes={[programme, combinedProgramme].filter(c => c !== undefined)}
           showBachelorAndMaster={!!showBachelorAndMaster}
           studyPlanFilter={studyPlanFilterIsActive}
         />
-      ),
+      ) : <Typography>Nothing to show!</Typography>,
     },
     query.years.length <= 1
       ? {
