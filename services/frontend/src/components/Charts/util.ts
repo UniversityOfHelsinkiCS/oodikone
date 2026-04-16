@@ -4,6 +4,7 @@ export const getIncludedCourseCodesByProgrammeCodes = (
   student: FormattedStudent,
   programmeCodes: string[]
 ): Set<string> => {
+  if (!programmeCodes) return new Set()
   const studyplans = student.studyplans.filter(studyplan => programmeCodes.includes(studyplan.programme_code))
   return new Set(studyplans.flatMap(studyplan => studyplan.included_courses))
 }
@@ -13,6 +14,7 @@ export const getGraduationsByCodes = (
   programmeCodes: string[],
   showBachelorAndMaster: boolean
 ): number[] => {
+  if (!programmeCodes) return []
   if (showBachelorAndMaster) {
     return (
       student.studyRights

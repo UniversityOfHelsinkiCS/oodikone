@@ -1,10 +1,8 @@
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
-import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { ToggleWithTooltip } from '@/components/common/toggle/ToggleWithTooltip'
-import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { creditDateFilter, hopsFilter as studyPlanFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { AgeStats } from '@/components/PopulationDetails/AgeStats'
@@ -19,6 +17,7 @@ import { useCurriculumState } from '../../hooks/useCurriculums'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 import { createAcademicYearStartDate } from './utils'
+import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
 
 dayjsExtend(isBetween)
 
@@ -73,27 +72,19 @@ export const SingleStudyGuidanceGroupPanels = ({
               onChange={toggleCreditDateFilter}
             />
           )}
-          <CreditAccumulationGraphHighCharts
-            absences={null}
-            endDate={null}
-            infoBoxContent={populationStatisticsToolTips.creditAccumulation}
+          <CreditAccumulationGraph
             programmeCodes={group?.tags?.studyProgramme ? [programme, combinedProgramme] : []}
-            selectedStudyPlan={null}
-            showBachelorAndMaster={null}
-            singleStudent={false}
-            startDate={null}
             students={filteredStudents}
-            studyPlanFilterIsActive={studyPlanFilterIsActive}
-            studyRightId={null}
+            studyPlanFilter={studyPlanFilterIsActive}
           />
         </>
       ),
     },
     (programme || group?.tags?.studyProgramme) && groupYear
       ? {
-          title: 'Credit statistics',
-          content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
-        }
+        title: 'Credit statistics',
+        content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
+      }
       : null,
     {
       title: 'Age distribution',

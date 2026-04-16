@@ -16,18 +16,21 @@ const INITIAL_GRAPH_HEIGHT = 600
 /**
  * Credit accumulation graph for **class statistics**
  *
- * @param students (size must be more than 0)
+ * @param students filteredStudents (size must be more than 0)
+ * @param programmeCodes array of 1 or 2 (for combined programme) codes
+ * @param studyPlanFilter whether hops filter is active
+ * @param showBachelorAndMaster (optional)
  */
 export const CreditAccumulationGraph = ({
   students,
   programmeCodes,
-  showBachelorAndMaster,
   studyPlanFilter,
+  showBachelorAndMaster,
 }: {
   students: FormattedStudent[]
   programmeCodes: string[]
-  showBachelorAndMaster: boolean
   studyPlanFilter: boolean
+  showBachelorAndMaster?: boolean
 }) => {
   const [graphHeight, setGraphHeight] = useState(INITIAL_GRAPH_HEIGHT)
   const [cutStudyplanCredits, setCutStudyplanCredits] = useState(false)
@@ -87,7 +90,7 @@ export const CreditAccumulationGraph = ({
         let credits = 0
         const points: number[][] = []
         const markPointsForStudent: any[] = []
-        const graduations = getGraduationsByCodes(student, programmeCodes, showBachelorAndMaster)
+        const graduations = getGraduationsByCodes(student, programmeCodes, !!showBachelorAndMaster)
 
         for (const c of courses) {
           if (c.credittypecode === CreditTypeCode.PASSED || c.credittypecode === CreditTypeCode.APPROVED) {
