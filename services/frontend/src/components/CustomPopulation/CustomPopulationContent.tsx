@@ -9,7 +9,6 @@ import { useEffect } from 'react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PanelView } from '@/components/common/PanelView'
 import { StyledMessage } from '@/components/common/StyledMessage'
-import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -23,6 +22,7 @@ import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { KeyboardBackspaceIcon, LabelIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
 import { PageTitle } from '../common/PageTitle'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
@@ -67,18 +67,10 @@ export const CustomPopulationContent = ({
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
       content: (
-        <CreditAccumulationGraphHighCharts
-          absences={null}
-          customPopulation
-          endDate={null}
-          programmeCodes={null}
-          selectedStudyPlan={null}
-          showBachelorAndMaster={null}
-          singleStudent={false}
-          startDate={null}
+        <CreditAccumulationGraph
+          programmeCodes={[associatedProgramme].filter(Boolean) as string[]}
           students={filteredStudents}
-          studyPlanFilterIsActive={null} // Atm the filter is not enabled in the view
-          studyRightId={null}
+          studyPlanFilter={false} // Not enabled for custom population yet.
         />
       ),
     },
