@@ -11,15 +11,12 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import accessibility from 'highcharts/modules/accessibility'
-import exportData from 'highcharts/modules/export-data'
-import exporting from 'highcharts/modules/exporting'
 import { chunk, flattenDeep, groupBy } from 'lodash-es'
 import { useMemo, useState } from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock'
 
 import { getStudyRightElementTargetDates } from '@/common'
-import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
+import { StudentCreditAccumulation } from '@/components/Charts/StudentCreditAccumulation'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
@@ -28,9 +25,6 @@ import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 
 dayjsExtend(isSameOrAfter)
-exporting(ReactHighcharts.Highcharts)
-exportData(ReactHighcharts.Highcharts)
-accessibility(ReactHighcharts.Highcharts)
 
 const getEarliestAttainmentDate = ({ courses }) => {
   if (!courses?.length) return null
@@ -38,19 +32,40 @@ const getEarliestAttainmentDate = ({ courses }) => {
   return courses[0].date
 }
 
+const getEarliestStudyRightStartDate = ({ studyRights }) => {
+  if (!studyRights?.length) return null
+
+  const startDates = studyRights
+    .map(({ startDate }) => new Date(startDate).getTime())
+    .filter(time => !Number.isNaN(time))
+
+  if (!startDates.length) return null
+  return new Date(Math.min(...startDates))
+}
+
 const getCoursesIncludedInStudyPlan = (student, studyPlan) =>
   student.courses.filter(({ course }) => studyPlan.included_courses.includes(course.code))
 
 const resolveGraphStartDate = (student, graphYearStart, selectedStudyPlan, studyRightTargetStart) => {
   const earliestAttainmentDate = getEarliestAttainmentDate(student)
+  const earliestStudyRightStartDate = getEarliestStudyRightStartDate(student)
   if (!selectedStudyPlan)
-    return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart ?? new Date()).getTime())
+    return Math.min(
+      new Date(earliestAttainmentDate ?? earliestStudyRightStartDate ?? graphYearStart ?? new Date()).getTime(),
+      new Date(graphYearStart ?? new Date()).getTime()
+    )
   const filteredCourses = getCoursesIncludedInStudyPlan(student, selectedStudyPlan)
 
-  return Math.min(
+  if (!filteredCourses.length) {
+    return new Date(studyRightTargetStart ?? earliestStudyRightStartDate ?? graphYearStart ?? new Date()).getTime()
+  }
+
+  const candidateTimes = [
     ...flattenDeep<number>(filteredCourses.map(({ date }) => new Date(date).getTime())),
-    new Date(studyRightTargetStart).getTime()
-  )
+    new Date(studyRightTargetStart ?? earliestStudyRightStartDate ?? graphYearStart ?? new Date()).getTime(),
+  ].filter(time => Number.isFinite(time))
+
+  return candidateTimes.length ? Math.min(...candidateTimes) : new Date(graphYearStart ?? new Date()).getTime()
 }
 
 const resolveGraphEndDate = (
@@ -110,16 +125,12 @@ const CreditsGraph = ({
     selectedStudyRightElement
   )
   return (
-    <CreditAccumulationGraphHighCharts
+    <StudentCreditAccumulation
       absences={absences}
       endDate={endDate}
-      programmeCodes={null}
       selectedStudyPlan={selectedStudyPlan}
-      showBachelorAndMaster={null}
-      singleStudent
       startDate={selectedStart}
-      students={[student]}
-      studyPlanFilterIsActive={null}
+      student={student}
       studyRightId={studyRightId}
     />
   )
@@ -222,7 +233,7 @@ const GradeGraph = ({ student }: { student: any }) => {
 
   const series = useMemo(
     () => gradeMeanSeries(student, groupSize, allSemesters, getTextIn),
-    [student, groupSize, semesters, getTextIn]
+    [student, groupSize, allSemesters, getTextIn]
   )
   const { totalMeans, groupMeans, semesterMeans } = series
 
