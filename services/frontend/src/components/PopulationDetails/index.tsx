@@ -5,12 +5,11 @@ import FormGroup from '@mui/material/FormGroup'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
-import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { Link } from '@/components/common/Link'
 import { PanelView } from '@/components/common/PanelView'
-import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import {
   hopsFilter as studyPlanFilter,
   hopsFilter,
@@ -28,6 +27,7 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -35,8 +35,6 @@ import { CreditStatistics } from './CreditGainStats'
 import { PopulationCourses } from './PopulationCourses'
 import { PopulationQueryCard } from './PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from './studentColumns'
-import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
-import Typography from '@mui/material/Typography'
 
 type PopulationDetailsProps = {
   isLoading: boolean
@@ -90,36 +88,23 @@ export const PopulationDetails = ({
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
-      // content: (
-      //   <CreditAccumulationGraphHighCharts
-      //     absences={null}
-      //     endDate={null}
-      //     infoBoxContent={populationStatisticsToolTips.creditAccumulation}
-      //     programmeCodes={[programme, combinedProgramme].filter(Boolean)}
-      //     selectedStudyPlan={null}
-      //     showBachelorAndMaster={!!showBachelorAndMaster}
-      //     singleStudent={false}
-      //     startDate={null}
-      //     students={filteredStudents}
-      //     studyPlanFilterIsActive={studyPlanFilterIsActive}
-      //     studyRightId={null}
-      //   />
-      // ),
       content: filteredStudents.length ? (
         // TODO: make wrapper for when no data.
         <CreditAccumulationGraph
-          students={filteredStudents}
           programmeCodes={[programme, combinedProgramme].filter(c => c !== undefined)}
           showBachelorAndMaster={!!showBachelorAndMaster}
+          students={filteredStudents}
           studyPlanFilter={studyPlanFilterIsActive}
         />
-      ) : <Typography>Nothing to show!</Typography>,
+      ) : (
+        <Typography>Nothing to show!</Typography>
+      ),
     },
     query.years.length <= 1
       ? {
-        title: 'Credit statistics',
-        content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
-      }
+          title: 'Credit statistics',
+          content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
+        }
       : null,
     {
       title: 'Age distribution',
@@ -154,41 +139,41 @@ export const PopulationDetails = ({
     },
     !onlyIamRights
       ? {
-        title: `Students (${filteredStudents.length})`,
-        content: (
-          <PopulationStudents
-            combinedProgramme={combinedProgramme}
-            curriculum={curriculum}
-            filteredCourses={filteredCourses}
-            filteredStudents={filteredStudents}
-            generalTabColumnFunction={() =>
-              columnsGeneralTab({
-                showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
-              })
-            }
-            generalTabFormattingFunction={() =>
-              formatGeneralTab({
-                variant: 'population',
-                filteredStudents,
+          title: `Students (${filteredStudents.length})`,
+          content: (
+            <PopulationStudents
+              combinedProgramme={combinedProgramme}
+              curriculum={curriculum}
+              filteredCourses={filteredCourses}
+              filteredStudents={filteredStudents}
+              generalTabColumnFunction={() =>
+                columnsGeneralTab({
+                  showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,
+                })
+              }
+              generalTabFormattingFunction={() =>
+                formatGeneralTab({
+                  variant: 'population',
+                  filteredStudents,
 
-                years: query.years,
+                  years: query.years,
 
-                programme: query.programme,
-                combinedProgramme: query.combinedProgramme,
+                  programme: query.programme,
+                  combinedProgramme: query.combinedProgramme,
 
-                showBachelorAndMaster: query.showBachelorAndMaster,
-                includePrimaryProgramme: false,
+                  showBachelorAndMaster: query.showBachelorAndMaster,
+                  includePrimaryProgramme: false,
 
-                coursecodes: [],
-                from: undefined,
-                to: undefined,
-              })
-            }
-            programme={programme}
-            variant="population"
-          />
-        ),
-      }
+                  coursecodes: [],
+                  from: undefined,
+                  to: undefined,
+                })
+              }
+              programme={programme}
+              variant="population"
+            />
+          ),
+        }
       : null,
   ].filter(panel => !!panel)
 
