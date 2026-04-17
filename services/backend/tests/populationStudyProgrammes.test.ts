@@ -1,18 +1,13 @@
 import { Express } from 'express'
 import assert from 'node:assert/strict'
 import { describe, it, before } from 'node:test'
-import { Sequelize } from 'sequelize'
-import request, { Response } from 'supertest'
+import request from 'supertest'
 
-import { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
-import { dbConnections } from '../src/database/connection'
 import { initTests } from './utils'
 
 let app: Express
-let connection: Sequelize
 before(async () => {
   app = await initTests()
-  connection = dbConnections.sequelize
 })
 
 void describe('Population statistics (study programme)', async () => {
@@ -62,7 +57,7 @@ void describe('Population statistics (study programme)', async () => {
     }
 
     assert.strictEqual(Object.keys(res.body.allProgrammes).length, 972)
-    assert.deepStrictEqual(res.body.allProgrammes['KH50_001'], testMathProgramme)
+    assert.deepStrictEqual(res.body.allProgrammes.KH50_001, testMathProgramme)
   })
 
   await it('should return the programmes, that user has access to, to filteredProgrammes', async () => {
@@ -96,8 +91,8 @@ void describe('Population statistics (study programme)', async () => {
 
     assert.strictEqual(Object.keys(res.body.filteredProgrammes).length, 2) // Basic has access to math bachelor + master
 
-    assert.deepStrictEqual(res.body.filteredProgrammes['KH50_001'], testMathProgramme)
-    assert.deepStrictEqual(res.body.allProgrammes['KH50_001'], testMathProgramme) // All programmes should still include filteredProgramme programmes
+    assert.deepStrictEqual(res.body.filteredProgrammes.KH50_001, testMathProgramme)
+    assert.deepStrictEqual(res.body.allProgrammes.KH50_001, testMathProgramme) // All programmes should still include filteredProgramme programmes
   })
 
   await it.todo(
