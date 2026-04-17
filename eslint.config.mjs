@@ -220,7 +220,7 @@ export default tseslint.config(
 
   // Override for backend api tests
   {
-    files: ['services/backend/tests**/*.ts'],
+    files: ['services/backend/tests/**/*.ts'],
     rules: {
       'import-x/no-extraneous-dependencies': 'off',
       'no-console': 'off',
