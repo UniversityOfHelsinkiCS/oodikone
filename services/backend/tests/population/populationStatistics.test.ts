@@ -5,8 +5,8 @@ import { Sequelize } from 'sequelize'
 import request, { Response } from 'supertest'
 
 import { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
-import { dbConnections } from '../src/database/connection'
-import { initTests } from './utils'
+import { dbConnections } from '../../src/database/connection'
+import { initTests } from '../utils'
 
 let app: Express
 let connection: Sequelize
