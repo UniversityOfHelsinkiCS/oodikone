@@ -1,5 +1,6 @@
 const {
   isDev,
+  isStaging,
   REDIS_LAST_WEEKLY_SCHEDULE,
   REDIS_LAST_HOURLY_SCHEDULE,
   EXIT_AFTER_IMMEDIATES,
@@ -31,6 +32,11 @@ const JOB_TYPES = {
 const scheduleJob = async type => {
   if (!JOB_TYPES[type]) {
     logger.info(`Cannot schedule unknown job type '${type}'.`)
+    return
+  }
+
+  if (isStaging) {
+    logger.info('Skipping scheduling update job in staging: ', type)
     return
   }
 
