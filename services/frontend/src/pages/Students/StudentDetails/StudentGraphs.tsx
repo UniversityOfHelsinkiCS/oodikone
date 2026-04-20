@@ -1,30 +1,21 @@
-import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+
 import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-
-import dayjs, { extend as dayjsExtend } from 'dayjs'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import { chunk, flattenDeep, groupBy } from 'lodash-es'
-import { useMemo, useState } from 'react'
-import ReactHighcharts from 'react-highcharts/ReactHighstock'
+import { flattenDeep } from 'lodash-es'
+import { useState } from 'react'
 
 import { getStudyRightElementTargetDates } from '@/common'
 import { StudentCreditAccumulation } from '@/components/Charts/StudentCreditAccumulation'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { DateFormat } from '@/constants/date'
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import { StudentGradeGraphs } from '@/components/Charts/StudentGradeGraphs'
+import { StyledMessage } from '@/components/common/StyledMessage'
 import type { Absence } from '@/types/students'
-import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
-
-dayjsExtend(isSameOrAfter)
 
 const getEarliestAttainmentDate = ({ courses }) => {
   if (!courses?.length) return null
@@ -136,165 +127,46 @@ const CreditsGraph = ({
   )
 }
 
-const semesterChunkify = (courses, semesters, getTextIn: ReturnType<typeof useLanguage>['getTextIn']) => {
-  const semesterChunks = courses.reduce((acc, curr) => {
-    const semester = semesters.find(
-      semester => dayjs(curr.date).isSameOrAfter(semester.startdate) && dayjs(curr.date).isBefore(semester.enddate)
-    )
-    const semesterData = acc.find(data => data.semester === semester.name)
-    if (semesterData) {
-      semesterData.data.push(curr)
-    } else {
-      acc.push({ data: [curr], semester: semester.name })
-    }
-    return acc
-  }, [])
-
-  const semesterMeans = semesterChunks.reduce((acc, curr) => {
-    const gradeSum = curr.data.reduce((a, b) => a + b.grade * b.credits, 0)
-    const creditSum = curr.data.reduce((a, b) => a + b.credits, 0)
-    if (curr.data.length > 0)
-      acc.push({
-        name: getTextIn(curr.semester),
-        y: gradeSum / creditSum,
-        x: new Date(curr.data[curr.data.length - 1].date).getTime(),
-      })
-    return acc
-  }, [])
-
-  return semesterMeans
-}
-
-const gradeMeanSeries = (
-  student: any,
-  chunksize: number,
-  semesters: SemestersData['semesters'] | undefined,
-  getTextIn: ReturnType<typeof useLanguage>['getTextIn']
-) => {
-  const filteredCourses = student.courses.filter(
-    course => !Number.isNaN(Number(course.grade)) && !course.isStudyModuleCredit && course.passed
-  )
-
-  const coursesGroupedByDate = groupBy(filteredCourses, 'date')
-
-  const gradesAndMeans = Object.values(coursesGroupedByDate).reduce(
-    (acc, courses) => {
-      for (const course of courses) {
-        acc.grades.push({
-          grade: Number(course.grade),
-          date: course.date,
-          credits: course.credits,
-        })
-        // Weighted average: each grade is multiplied by the amount of credits the course is worth
-        acc.totalGradeSum += Number(course.grade) * course.credits
-        acc.totalCredits += course.credits
-      }
-      acc.mean.push({ y: acc.totalGradeSum / acc.totalCredits, x: new Date(courses[0].date).getTime() })
-      return acc
-    },
-    {
-      grades: [] as Array<{ grade: number; date: string; credits: number }>,
-      mean: [] as Array<{ y: number; x: number }>,
-      totalGradeSum: 0,
-      totalCredits: 0,
-    }
-  )
-
-  const size = Number(chunksize) ? chunksize : 3
-  const chunks = chunk(gradesAndMeans.grades, size)
-
-  const groupMeans = chunks.reduce<Array<{ name: string; y: number; x: number }>>((acc, curr) => {
-    const gradeSum = curr.reduce((a, b) => a + b.grade * b.credits, 0)
-    const creditSum = curr.reduce((a, b) => a + b.credits, 0)
-    if (curr.length > 0)
-      acc.push({
-        name: `${curr.length} courses between ${reformatDate(curr[0].date, DateFormat.DISPLAY_DATE)} and ${reformatDate(curr[curr.length - 1].date, DateFormat.DISPLAY_DATE)}`,
-        y: gradeSum / creditSum,
-        x: new Date(curr[curr.length - 1].date).getTime(),
-      })
-    return acc
-  }, [])
-
-  const semesterMeans = semesterChunkify(gradesAndMeans.grades, Object.values(semesters ?? {}), getTextIn)
-
-  return {
-    totalMeans: [{ data: gradesAndMeans.mean }],
-    groupMeans: [{ data: groupMeans }],
-    semesterMeans: [{ data: semesterMeans }],
-  }
-}
-
-const GradeGraph = ({ student }: { student: any }) => {
-  const { getTextIn } = useLanguage()
+const GradeGraphs = ({ student }: { student: StudentPageStudent }) => {
+  const [graphMode, setGraphMode] = useState<'total' | 'group' | 'semester'>('total')
   const [groupSize, setGroupSize] = useState(5)
-  const [graphMode, setGraphMode] = useState('total')
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} }
-
-  const series = useMemo(
-    () => gradeMeanSeries(student, groupSize, allSemesters, getTextIn),
-    [student, groupSize, allSemesters, getTextIn]
-  )
-  const { totalMeans, groupMeans, semesterMeans } = series
-
-  const defaultOptions = {
-    chart: {
-      type: 'spline',
-    },
-    tooltip: {
-      pointFormat: '{point.y:.2f}',
-    },
-    xAxis: {
-      type: 'datetime',
-    },
-    yAxis: {
-      min: 1,
-      max: 5.1,
-      endOnTick: false,
-    },
-  }
-
-  const totalMeanOptions = { ...defaultOptions, series: totalMeans }
-  const groupMeanOptions = { ...defaultOptions, series: groupMeans }
-  const semesterMeanOptions = { ...defaultOptions, series: semesterMeans }
 
   return (
-    <Stack alignItems="center" spacing={2}>
-      <Alert severity="info" sx={{ maxWidth: '75%' }}>
-        <AlertTitle>Grade graph</AlertTitle>
-        Painotettu keskiarvo lasketaan kaikista niistä opintojaksoista, joiden arviointiasteikko on 0–5.{' '}
-        <b>Total mean</b> näyttää, kuinka keskiarvo on kehittynyt opintojen aikana. <b>Group mean</b> jakaa kurssit
-        valitun kokoisiin ryhmiin ja laskee niiden keskiarvot. <b>Semester mean</b> laskee jokaisen lukukauden
-        keskiarvon.
-      </Alert>
-      <ToggleButtonGroup
-        color="primary"
-        exclusive
-        onChange={(_event, newMode) => setGraphMode(newMode)}
-        value={graphMode}
-      >
-        <ToggleButton value="total">Show total mean</ToggleButton>
-        <ToggleButton value="group">Show group mean</ToggleButton>
-        <ToggleButton value="semester">Show semester mean</ToggleButton>
-      </ToggleButtonGroup>
-      {graphMode === 'group' && (
-        <TextField
-          data-cy="group-size-input"
-          label="Group size"
-          onChange={event => {
-            if (!Number.isNaN(Number(event.target.value))) {
-              setGroupSize(Number(event.target.value))
-            }
-          }}
-          value={groupSize}
-        />
-      )}
-      <Box width="100%">
-        {graphMode === 'total' && <ReactHighcharts config={totalMeanOptions} />}
-        {graphMode === 'group' && <ReactHighcharts config={groupMeanOptions} />}
-        {graphMode === 'semester' && <ReactHighcharts config={semesterMeanOptions} />}
-      </Box>
-    </Stack>
+    <>
+      <Stack alignItems="center" spacing={2}>
+        <StyledMessage showIcon title="Grade graph" variant="standard">
+          Painotettu keskiarvo lasketaan kaikista niistä opintojaksoista, joiden arviointiasteikko on 0–5.{' '}
+          <b>Total mean</b> näyttää, kuinka keskiarvo on kehittynyt opintojen aikana. <b>Group mean</b> jakaa kurssit
+          valitun kokoisiin ryhmiin ja laskee niiden keskiarvot. <b>Semester mean</b> laskee jokaisen lukukauden
+          keskiarvon.
+        </StyledMessage>
+
+        <ToggleButtonGroup
+          color="primary"
+          exclusive
+          onChange={(_event, newMode) => setGraphMode(newMode)}
+          value={graphMode}
+        >
+          <ToggleButton value="total">Show total mean</ToggleButton>
+          <ToggleButton value="group">Show group mean</ToggleButton>
+          <ToggleButton value="semester">Show semester mean</ToggleButton>
+        </ToggleButtonGroup>
+        {graphMode === 'group' && (
+          <TextField
+            data-cy="group-size-input"
+            label="Group size"
+            onChange={event => {
+              if (!Number.isNaN(Number(event.target.value))) {
+                setGroupSize(Number(event.target.value))
+              }
+            }}
+            size="small"
+            value={groupSize}
+          />
+        )}
+      </Stack>
+      <StudentGradeGraphs graphMode={graphMode} groupSize={groupSize} student={student} />
+    </>
   )
 }
 
@@ -326,7 +198,7 @@ export const StudentGraphs = ({
             student={student}
           />
         )}
-        {activeTab === 1 && <GradeGraph student={student} />}
+        {activeTab === 1 && <GradeGraphs student={student} />}
       </Box>
     </Paper>
   )

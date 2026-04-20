@@ -284,7 +284,7 @@ export const StudentCreditAccumulation = ({
                 showSymbol: false,
                 silent: true,
                 lineStyle: {
-                  color: '#96d7c3',
+                  color: '#99d8c4',
                   width: 2,
                 },
                 data: goalSeries.points,
