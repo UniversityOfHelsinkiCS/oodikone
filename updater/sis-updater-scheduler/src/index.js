@@ -36,7 +36,7 @@ const scheduleJob = async type => {
   }
 
   if (isStaging) {
-    logger.info('Skipping scheduling update job in staging: ', type)
+    logger.info(`Skipping scheduling update job in staging: ${type}`)
     return
   }
 
