@@ -152,7 +152,7 @@ export const StudentGradeGraphs = ({
       },
       grid: {
         show: true,
-        width: '99%',
+        width: '100%',
         left: 'left',
         top: 55,
       },
@@ -172,10 +172,10 @@ export const StudentGradeGraphs = ({
       ],
       xAxis: {
         type: 'time',
-        maxX: '',
       },
       yAxis: {
         type: 'value',
+        position: 'right',
         min: 1,
         max: 5.1,
         splitLine: { show: true },
