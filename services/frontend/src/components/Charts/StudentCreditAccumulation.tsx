@@ -147,7 +147,7 @@ export const StudentCreditAccumulation = ({
     const filteredAbsences = absences.filter(absence => {
       const absenceStart = new Date(absence.startDate).getTime()
       const absenceEnd = new Date(absence.endDate).getTime()
-      return graphStart <= absenceStart && absenceEnd <= graphEnd
+      return absenceStart <= graphEnd && absenceEnd >= graphStart
     })
 
     return createGoalLineData(graphStart, graphEnd, filteredAbsences)
@@ -167,6 +167,18 @@ export const StudentCreditAccumulation = ({
     () => getStudentTransferMarkers(student, text => getTextIn(text as never)),
     [student, getTextIn]
   )
+
+  const yAxisMax = useMemo(() => {
+    const studentMax = pointData.points.reduce((max, point) => Math.max(max, point.value[1]), 0)
+    const goalMax = hasStudyRights
+      ? goalSeries.points.reduce((max, [, credits]) => (Number.isFinite(credits) ? Math.max(max, credits) : max), 0)
+      : 0
+
+    const maxCredits = Math.max(studentMax, goalMax)
+    if (maxCredits <= 0) return undefined
+
+    return Math.ceil(maxCredits / 10) * 10
+  }, [pointData.points, goalSeries.points, hasStudyRights])
 
   const tooltipsByTimestamp = useMemo(() => {
     const byTimestamp = new Map<number, string[]>()
@@ -192,8 +204,16 @@ export const StudentCreditAccumulation = ({
         },
         formatter: (
           rawParams:
-            | { seriesName?: string; data?: { tooltipHtml?: string }; value?: [number, number] }
-            | Array<{ seriesName?: string; data?: { tooltipHtml?: string }; value?: [number, number] }>
+            | {
+                seriesName?: string
+                data?: { tooltipHtml?: string }
+                value?: [number, number]
+              }
+            | Array<{
+                seriesName?: string
+                data?: { tooltipHtml?: string }
+                value?: [number, number]
+              }>
         ) => {
           const params = Array.isArray(rawParams) ? rawParams : [rawParams]
 
@@ -207,9 +227,6 @@ export const StudentCreditAccumulation = ({
 
           const studentPoint = params.find(param => param.data?.tooltipHtml)
           if (studentPoint?.data?.tooltipHtml) return studentPoint.data.tooltipHtml
-
-          const goalPoint = params.find(param => param.seriesName === 'Goal' && param.value)
-          if (hasStudyRights && goalPoint?.value) return `Goal: ${Math.round(goalPoint.value[1])} cr`
 
           return ''
         },
@@ -231,19 +248,31 @@ export const StudentCreditAccumulation = ({
         },
       },
       dataZoom: [
-        { type: 'inside', xAxisIndex: 0, filterMode: 'none' },
-        { type: 'slider', xAxisIndex: 0, filterMode: 'none' },
+        { type: 'inside', xAxisIndex: [0, 1], filterMode: 'none' },
+        { type: 'slider', xAxisIndex: [0, 1], filterMode: 'none' },
       ],
-      xAxis: {
-        type: 'time',
-        min: xAxisMin,
-        max: endDate,
-      },
+      xAxis: [
+        {
+          type: 'time',
+          min: xAxisMin,
+          max: endDate,
+        },
+        {
+          type: 'time',
+          min: xAxisMin,
+          max: endDate,
+          show: false,
+          axisPointer: {
+            show: false,
+          },
+        },
+      ],
       yAxis: {
         type: 'value',
         name: 'Credits',
         position: 'right',
         min: 0,
+        max: yAxisMax,
         splitLine: { show: true },
       },
       series: [
@@ -281,17 +310,29 @@ export const StudentCreditAccumulation = ({
               {
                 name: 'Goal',
                 type: 'line',
+                xAxisIndex: 1,
+                data: goalSeries.points,
                 showSymbol: false,
                 silent: true,
+                tooltip: { show: false },
                 lineStyle: {
                   color: '#99d8c4',
                   width: 2,
                 },
-                data: goalSeries.points,
                 markArea: {
                   silent: true,
+                  label: {
+                    show: true,
+                    position: 'insideTop',
+                    color: '#1f2937',
+                    fontSize: 11,
+                    padding: [2, 4],
+                    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+                    borderRadius: 3,
+                  },
                   data: goalSeries.markAreas.map(area => [
                     {
+                      name: area.label,
                       xAxis: area.range[0].xAxis,
                       itemStyle: {
                         color: `${area.color}33`,
@@ -347,6 +388,7 @@ export const StudentCreditAccumulation = ({
       tooltipsByTimestamp,
       hasStudyRights,
       xAxisMin,
+      yAxisMax,
     ]
   )
 

@@ -15,6 +15,27 @@ const resolveCourseCode = (course: CourseWithCode) => course.course_code ?? cour
 
 const toMillis = (date: Date | string) => new Date(date).getTime()
 
+const getEnrollmentLabel = (enrollmentType: number, statutoryAbsence: boolean) => {
+  if (enrollmentType === 2) return statutoryAbsence ? 'Absent (statutory)' : 'Absent'
+  if (enrollmentType === 3) return 'No enrollment'
+  return 'No study right'
+}
+
+const getTermLabel = (startDate: number) => {
+  const date = new Date(startDate)
+  const month = date.getMonth()
+  const year = date.getFullYear()
+  const season = month >= 7 ? 'Fall' : 'Spring'
+  return `${season} ${year}`
+}
+
+const getTermRangeLabel = (startDate: number, endTermDate: number) => {
+  const startTerm = getTermLabel(startDate)
+  const endTerm = getTermLabel(endTermDate)
+  if (startTerm === endTerm) return startTerm
+  return `${startTerm} - ${endTerm}`
+}
+
 export const getIncludedCourseCodesByProgrammeCodes = (
   student: FormattedStudent,
   programmeCodes: string[]
@@ -68,37 +89,79 @@ export const createGoalLineData = (
     statutoryAbsence: boolean
   }[]
 ) => {
+  const DAY_MS = 24 * 60 * 60 * 1000
+
   const getColor = (type: number) => {
     if (type === 2) return '#ffb300'
     if (type === 3) return '#e53935'
     return '#96d7c3'
   }
 
-  const absenceIsBetweenGraphDates = (startDate: number, endDate: number) =>
-    (graphStartDate <= startDate && startDate <= graphEndDate) || (graphStartDate <= endDate && endDate <= graphEndDate)
-
   let totalAbsenceYears = 0
+  const now = Date.now()
+  type ClippedAbsence = {
+    start: number
+    end: number
+    enrollmenttype: number
+    statutoryAbsence: boolean
+    labelStart: number
+    labelEnd: number
+  }
+
   const relevantAbsences = absences
-    .filter(absence => {
+    .map(absence => {
       const start = toMillis(absence.startDate)
       const end = toMillis(absence.endDate)
-      if (absence.enrollmenttype === 3) {
-        return absenceIsBetweenGraphDates(start, end) && start <= Date.now()
+
+      if (!Number.isFinite(start) || !Number.isFinite(end)) return null
+
+      const clippedStart = Math.max(start, graphStartDate)
+      const clippedEndByGraph = Math.min(end, graphEndDate)
+      const clippedEnd = absence.enrollmenttype === 3 ? Math.min(clippedEndByGraph, now) : clippedEndByGraph
+
+      if (clippedEnd <= clippedStart) return null
+
+      return {
+        start: clippedStart,
+        end: clippedEnd,
+        enrollmenttype: absence.enrollmenttype,
+        statutoryAbsence: absence.statutoryAbsence,
+        labelStart: clippedStart,
+        labelEnd: clippedStart,
       }
-      return absenceIsBetweenGraphDates(start, end)
     })
-    .sort((a, b) => toMillis(a.startDate) - toMillis(b.startDate))
+    .filter((absence): absence is ClippedAbsence => absence !== null)
+    .sort((a, b) => a.start - b.start)
+
+  const mergedAbsences = relevantAbsences.reduce<ClippedAbsence[]>((merged, absence) => {
+    const previous = merged[merged.length - 1]
+
+    if (
+      previous &&
+      previous.enrollmenttype === absence.enrollmenttype &&
+      previous.statutoryAbsence === absence.statutoryAbsence &&
+      absence.start <= previous.end + DAY_MS
+    ) {
+      previous.end = Math.max(previous.end, absence.end)
+      previous.labelEnd = absence.labelEnd
+      return merged
+    }
+
+    merged.push({ ...absence })
+    return merged
+  }, [])
 
   const points: number[][] = [[graphStartDate, 0]]
   const markAreas: Array<{
     range: [{ xAxis: number }, { xAxis: number }]
     color: string
     borderType: 'solid' | 'dashed'
+    label: string
   }> = []
 
-  for (const absence of relevantAbsences) {
-    const absenceStart = toMillis(absence.startDate)
-    const absenceEnd = toMillis(absence.endDate)
+  for (const absence of mergedAbsences) {
+    const absenceStart = absence.start
+    const absenceEnd = absence.end
     const targetCreditsBeforeAbsence =
       ((absenceStart - graphStartDate) / (365.25 * 24 * 60 * 60 * 1000) - totalAbsenceYears) * 60
 
@@ -107,10 +170,15 @@ export const createGoalLineData = (
 
     points.push([absenceStart, targetCreditsBeforeAbsence])
     points.push([absenceEnd, targetCreditsBeforeAbsence])
+    const enrollmentLabel = getEnrollmentLabel(absence.enrollmenttype, absence.statutoryAbsence)
+    const termLabel = getTermRangeLabel(absence.labelStart, absence.labelEnd)
+    const text = `${enrollmentLabel}\n(${termLabel})`
+
     markAreas.push({
       range: [{ xAxis: absenceStart }, { xAxis: absenceEnd }],
       color: getColor(absence.enrollmenttype),
       borderType: absence.statutoryAbsence ? 'dashed' : 'solid',
+      label: text,
     })
   }
 
