@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 
 import { Graduated, SpecialGroups, YearType } from '@oodikone/shared/types'
 import { CreditStatsPayload } from '@oodikone/shared/types/studyProgramme'
@@ -23,15 +23,15 @@ import { logInfoForGrafana } from '../util/logInfoForGrafana'
 
 const router = Router()
 
-interface GetCreditStatsRequest extends Request {
-  query: {
-    codes: string
-    specialGroups: SpecialGroups
-    yearType: YearType
-  }
+type StudyProgrammeParams = { id: string }
+type UpdateStudyProgrammeQuery = { combined_programme: string }
+type CreditStatsQuery = {
+  codes: string
+  specialGroups: SpecialGroups
+  yearType: YearType
 }
 
-router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => {
+router.get<StudyProgrammeParams, unknown, never, CreditStatsQuery>('/creditstats', async (req, res) => {
   const { codes, specialGroups, yearType } = req.query
   const stats: CreditStatsPayload = {}
   for (const code of JSON.parse(codes)) {
@@ -40,15 +40,13 @@ router.get('/creditstats', async (req: GetCreditStatsRequest, res: Response) => 
   return res.json(stats)
 })
 
-interface GetStatsRequest extends Request {
-  query: {
-    year_type: YearType
-    special_groups: SpecialGroups
-    combined_programme: string
-  }
+type StatsRequestQuery = {
+  year_type: YearType
+  special_groups: SpecialGroups
+  combined_programme: string
 }
 
-router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
+router.get<StudyProgrammeParams, unknown, never, StatsRequestQuery>('/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const { year_type: yearType, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
@@ -75,7 +73,7 @@ router.get('/:id/basicstats', async (req: GetStatsRequest, res: Response) => {
   return res.json(updatedStats)
 })
 
-router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) => {
+router.get<StudyProgrammeParams, unknown, never, StatsRequestQuery>('/:id/graduationstats', async (req, res) => {
   const code = req.params.id
   const { year_type: yearType, special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
@@ -102,14 +100,12 @@ router.get('/:id/graduationstats', async (req: GetStatsRequest, res: Response) =
   return res.json(updatedStats)
 })
 
-interface GetCourseStatsRequest extends Request {
-  query: {
-    combinedProgramme: string
-    yearType: YearType
-  }
+type CourseStatsQuery = {
+  combinedProgramme: string
+  yearType: YearType
 }
 
-router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response) => {
+router.get<StudyProgrammeParams, unknown, never, CourseStatsQuery>('/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const { combinedProgramme, yearType } = req.query
   const date = new Date()
@@ -123,15 +119,13 @@ router.get('/:id/coursestats', async (req: GetCourseStatsRequest, res: Response)
   }
 })
 
-interface GetStudyTrackStatsRequest extends Request {
-  query: {
-    graduated: Graduated
-    special_groups: SpecialGroups
-    combined_programme: string
-  }
+type StudyTrackStatsQuery = {
+  graduated: Graduated
+  special_groups: SpecialGroups
+  combined_programme: string
 }
 
-router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: Response) => {
+router.get<StudyProgrammeParams, unknown, never, StudyTrackStatsQuery>('/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
   const { special_groups: specialGroups, combined_programme: combinedProgramme } = req.query
   if (!code) {
@@ -159,7 +153,7 @@ router.get('/:id/studytrackstats', async (req: GetStudyTrackStatsRequest, res: R
   return res.json(updated)
 })
 
-router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response) => {
+router.get<StudyProgrammeParams>('/:id/colorizedtablecoursestats', async (req, res) => {
   const code = req.params.id
   try {
     const data = await getStudyProgrammeStatsForColorizedCoursesTable(code)
@@ -169,7 +163,7 @@ router.get('/:id/colorizedtablecoursestats', async (req: Request, res: Response)
   }
 })
 
-router.get('/:id/studytracks', async (req: Request, res: Response) => {
+router.get<StudyProgrammeParams>('/:id/studytracks', async (req, res) => {
   const code = req.params.id
   if (!code) {
     return res.status(422).end()
@@ -182,42 +176,42 @@ router.get('/:id/studytracks', async (req: Request, res: Response) => {
   }
 })
 
-interface GetUpdateViewRequest extends Request {
-  query: {
-    combined_programme: string
+router.get<StudyProgrammeParams, unknown, never, UpdateStudyProgrammeQuery>(
+  '/:id/update_basicview',
+  async (req, res) => {
+    const code = req.params.id
+    const combinedProgramme = req.query?.combined_programme
+    if (!code) {
+      return res.status(400).json({ error: 'Missing code' })
+    }
+    try {
+      const result = await updateBasicView(code, combinedProgramme)
+      return res.json(result)
+    } catch (error) {
+      const message = `Failed to update basic stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
+      logger.error(message, { error })
+      return res.status(500).json({ error: message })
+    }
   }
-}
+)
 
-router.get('/:id/update_basicview', async (req: GetUpdateViewRequest, res: Response) => {
-  const code = req.params.id
-  const combinedProgramme = req.query?.combined_programme
-  if (!code) {
-    return res.status(400).json({ error: 'Missing code' })
+router.get<StudyProgrammeParams, unknown, never, UpdateStudyProgrammeQuery>(
+  '/:id/update_studytrackview',
+  async (req, res) => {
+    const code = req.params.id
+    const combinedProgramme = req.query?.combined_programme
+    if (!code) {
+      return res.status(400).json({ error: 'Missing code' })
+    }
+    try {
+      const result = await updateStudyTrackView(code, combinedProgramme)
+      return res.json(result)
+    } catch (error) {
+      const message = `Failed to update study track stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
+      logger.error(message, { error })
+      return res.status(500).json({ error: message })
+    }
   }
-  try {
-    const result = await updateBasicView(code, combinedProgramme)
-    return res.json(result)
-  } catch (error) {
-    const message = `Failed to update basic stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
-    logger.error(message, { error })
-    return res.status(500).json({ error: message })
-  }
-})
-
-router.get('/:id/update_studytrackview', async (req: GetUpdateViewRequest, res: Response) => {
-  const code = req.params.id
-  const combinedProgramme = req.query?.combined_programme
-  if (!code) {
-    return res.status(400).json({ error: 'Missing code' })
-  }
-  try {
-    const result = await updateStudyTrackView(code, combinedProgramme)
-    return res.json(result)
-  } catch (error) {
-    const message = `Failed to update study track stats for programme ${code}${combinedProgramme ? `+${combinedProgramme}` : ''}`
-    logger.error(message, { error })
-    return res.status(500).json({ error: message })
-  }
-})
+)
 
 export default router
