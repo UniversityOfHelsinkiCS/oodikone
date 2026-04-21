@@ -15,7 +15,7 @@ import { ExternalLink } from '@/components/common/ExternalLink'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { Section } from '@/components/Section'
-import { languageCenterViewEnabled, isStaging } from '@/conf'
+import { languageCenterViewEnabled } from '@/conf'
 import { useTitle } from '@/hooks/title'
 import { RefreshIcon } from '@/theme'
 
@@ -77,14 +77,13 @@ export const Updater = () => {
           title="Updater (data pulled from sis-importer-db and brought to sis-db)"
         >
           <Stack direction="row" spacing={2}>
-            <Button disabled={isStaging} onClick={updateSISMeta} variant="contained">
+            <Button onClick={updateSISMeta} variant="contained">
               Update meta
             </Button>
-            <Button disabled={isStaging} onClick={updateSISStudents} variant="contained">
+            <Button onClick={updateSISStudents} variant="contained">
               Update students
             </Button>
             <Button
-              disabled={isStaging}
               onClick={() => {
                 if (window.confirm('This breaks all curriculum-related features for a few minutes. Continue?')) {
                   updateSISProgrammes()
@@ -94,7 +93,7 @@ export const Updater = () => {
             >
               Update curriculums
             </Button>
-            <Button disabled={isStaging} onClick={refreshSISRedisCache} variant="contained">
+            <Button onClick={refreshSISRedisCache} variant="contained">
               Refresh updater redis
             </Button>
           </Stack>
@@ -105,7 +104,7 @@ export const Updater = () => {
         >
           {jobs ? (
             <Stack alignItems="flex-start" spacing={2}>
-              <Button disabled={isStaging} onClick={updateJobs} startIcon={<RefreshIcon />} variant="contained">
+              <Button onClick={updateJobs} startIcon={<RefreshIcon />} variant="contained">
                 Update messages
               </Button>
               <Typography variant="h6">Jobs running: {jobs.active?.length}</Typography>
@@ -128,7 +127,6 @@ export const Updater = () => {
           ) : null}
           <Stack direction="row" spacing={2}>
             <Button
-              disabled={isStaging}
               onClick={() => {
                 if (window.confirm('This is not ran in worker yet. Continue?')) refreshAllTeacherLeaderboards()
               }}
@@ -136,25 +134,21 @@ export const Updater = () => {
             >
               Refresh all teacher leaderboards
             </Button>
-            <Button
-              disabled={isStaging}
-              onClick={refreshTeacherLeaderboardForCurrentAndPreviousYear}
-              variant="contained"
-            >
+            <Button onClick={refreshTeacherLeaderboardForCurrentAndPreviousYear} variant="contained">
               Refresh teacher leaderboards of current and previous year
             </Button>
-            <Button disabled={isStaging} onClick={refreshFaculties} variant="contained">
+            <Button onClick={refreshFaculties} variant="contained">
               Refresh faculties
             </Button>
-            <Button disabled={isStaging} onClick={refreshStudyProgrammes} variant="contained">
+            <Button onClick={refreshStudyProgrammes} variant="contained">
               Refresh degree programmes
             </Button>
             {languageCenterViewEnabled ? (
-              <Button disabled={isStaging} onClick={refreshLanguageCenterData} variant="contained">
+              <Button onClick={refreshLanguageCenterData} variant="contained">
                 Refresh language center data
               </Button>
             ) : null}
-            <Button disabled={isStaging} onClick={refreshCloseToGraduationData} variant="contained">
+            <Button onClick={refreshCloseToGraduationData} variant="contained">
               Refresh close to graduation data
             </Button>
           </Stack>
