@@ -133,6 +133,9 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     course.mainCourseCode = [course.code, ...course.substitution_groups]
       .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))
       .at(0)
+
+    // HACK: Fix updater explosion, delete this after substitutions are finished
+    if (Array.isArray(course.mainCourseCode)) course.mainCourseCode = course.mainCourseCode.at(0)
   }
 
   await bulkCreate(Course, courses)
