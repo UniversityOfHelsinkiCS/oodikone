@@ -22,7 +22,6 @@
     "papaparse": "^5.5.3",
     "pg": "^8.20.0",
     "redis": "^4.7.1",
-    "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6",
     "umzug": "^3.8.2",
