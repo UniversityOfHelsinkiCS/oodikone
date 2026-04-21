@@ -4,6 +4,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { maxBy, orderBy, range } from 'lodash-es'
 
+import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import { SemestersData } from '@/redux/semesters'
 import type { Absence } from '@/types/students'
 import type { SISStudyRightElement } from '@oodikone/shared/models'
@@ -87,23 +88,25 @@ export const getStudentGradeMeanWeightedByCredits = (student: FormattedStudent, 
   return mean
 }
 
+const openUniTexts = { fi: 'Avoin yo', en: 'Open uni', sv: 'Öppna uni' } as const
+const studyModuleTexts = { en: 'Study module', fi: 'Opintokokonaisuus', sv: 'Studiehelhet' } as const
+
 export const getTextInWithOpen = (
   course: { code: string; name: Name },
-  getTextIn: any,
+  getTextIn: GetTextIn,
   isOpenCourse: boolean,
   isStudyModuleCredit: boolean
 ) => {
   if (!course) return ''
-  const openUniTexts = { fi: 'Avoin yo', en: 'Open uni', sv: 'Öppna uni' }
   let courseName = getTextIn(course.name)
   if (
     isOpenCourse &&
-    !Object.values(openUniTexts).some(text => courseName.toLowerCase().startsWith(text.toLowerCase()))
+    !Object.values(openUniTexts).some(text => courseName?.toLowerCase().startsWith(text.toLowerCase()))
   ) {
     courseName = `${getTextIn(openUniTexts)}: ${courseName}`
   }
   if (isStudyModuleCredit) {
-    courseName += ` [${getTextIn({ en: 'Study module', fi: 'Opintokokonaisuus', sv: 'Studiehelhet' })}]`
+    courseName += ` [${getTextIn(studyModuleTexts)}]`
   }
   courseName += ` (${course.code})`
   return courseName

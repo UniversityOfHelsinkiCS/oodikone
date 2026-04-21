@@ -5,15 +5,11 @@ import FormLabel from '@mui/material/FormLabel'
 import Paper from '@mui/material/Paper'
 import RadioMui from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
-import dayjs from 'dayjs'
-import { Options } from 'highcharts'
-import accessibility from 'highcharts/modules/accessibility'
-import exportData from 'highcharts/modules/export-data'
-import exporting from 'highcharts/modules/exporting'
+import dayjs, { Dayjs } from 'dayjs'
+import ReactECharts from 'echarts-for-react'
 
 import { groupBy, range } from 'lodash-es'
-import { useState } from 'react'
-import ReactHighcharts from 'react-highcharts'
+import { useMemo, useState } from 'react'
 
 import { getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
 import { Toggle } from '@/components/common/toggle/Toggle'
@@ -26,23 +22,15 @@ import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 import { generateGradientColors } from '@/util/color'
 import { FormattedStudent } from '@oodikone/shared/types'
 
-exporting(ReactHighcharts.Highcharts)
-exportData(ReactHighcharts.Highcharts)
-accessibility(ReactHighcharts.Highcharts)
-
-/*
-This file is bit of a legacy mess still and imo not worth the effort refactoring unless replacing legacy react-highcharts
-(last publish 6 years ago as of 2025 btw) with the official newer version or something else entirely
-*/
-const splitStudentCredits = (student, timeSlots, cumulative) => {
+const splitStudentCredits = (student: FormattedStudent, timeSlots: any[], cumulative: boolean) => {
   if (!timeSlots.length) return []
 
   let timeSlotN = 0
-  const results = new Array(timeSlots.length).fill(0)
+  const results: number[] = new Array(timeSlots.length).fill(0)
 
   student.courses
     .filter(course => course.passed && !course.isStudyModuleCredit && dayjs(course.date).isAfter(timeSlots[0].start))
-    .sort((a, b) => dayjs(a.date) > dayjs(b.date))
+    .sort((a, b) => Number(dayjs(a.date) > dayjs(b.date)))
     .forEach(course => {
       while (timeSlotN < timeSlots.length && dayjs(course.date).isAfter(timeSlots[timeSlotN].end)) timeSlotN++
       if (timeSlots.length <= timeSlotN) return
@@ -58,17 +46,17 @@ const splitStudentCredits = (student, timeSlots, cumulative) => {
   return results
 }
 
-const hasGraduatedBeforeDate = (student, programme, date) => {
+const hasGraduatedBeforeDate = (student: FormattedStudent, programme: string, date: Dayjs) => {
   const correctStudyRight = student.studyRights.find(studyRight =>
     studyRight.studyRightElements.some(el => el.code === programme)
   )
   if (!correctStudyRight) return false
   const studyRightElement = correctStudyRight.studyRightElements.find(el => el.code === programme)
-  return studyRightElement.graduated && date.isAfter(studyRightElement.endDate, 'day')
+  return Boolean(studyRightElement?.graduated && date.isAfter(studyRightElement?.endDate, 'day'))
 }
 
 const getChartData = (
-  students: any[],
+  students: FormattedStudent[],
   timeSlots: any[],
   programme: string,
   timeDivision: TimeDivision,
@@ -87,43 +75,41 @@ const getChartData = (
   const colors = generateGradientColors(limits.length - 1)
   colors.push('#ddd') // Color for graduated (grey)
 
-  const data: { y: number; custom: { students: number[] } }[][] = limits.map(() =>
+  const data: { value: number; students: Array<FormattedStudent['studentNumber']> }[][] = limits.map(() =>
     timeSlots.map(() => ({
-      y: 0,
-      custom: { students: [] },
+      value: 0,
+      students: [],
     }))
   )
 
   const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
 
   timeSlots.forEach((slot, timeSlotIndex) => {
-    students
-      .map((student, i) => [student, i])
-      .forEach(([student, studentIndex]) => {
-        const hasGraduated = programme && hasGraduatedBeforeDate(student, programme, dayjs(slot.end))
-        const credits = studentCredits[studentIndex][timeSlotIndex]
+    students.forEach((student, studentIndex) => {
+      const hasGraduated = !!programme && hasGraduatedBeforeDate(student, programme, dayjs(slot.end))
+      const credits = studentCredits[studentIndex][timeSlotIndex]
 
-        const rangeIndex = hasGraduated
-          ? limits.indexOf('Graduated')
-          : limits.findIndex(limit => {
-              if (limit === 'Graduated') {
-                return false
-              }
+      const rangeIndex = hasGraduated
+        ? limits.indexOf('Graduated')
+        : limits.findIndex(limit => {
+            if (limit === 'Graduated') {
+              return false
+            }
 
-              const [min, max] = limit
+            const [min, max] = limit
 
-              if (min == null) {
-                return credits < max
-              }
-              if (max == null) {
-                return credits >= min
-              }
-              return credits >= min && credits < max
-            })
+            if (min == null) {
+              return credits < max
+            }
+            if (max == null) {
+              return credits >= min
+            }
+            return credits >= min && credits < max
+          })
 
-        data[rangeIndex][timeSlotIndex].y += 1
-        data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
-      })
+      data[rangeIndex][timeSlotIndex].value += 1
+      data[rangeIndex][timeSlotIndex].students.push(student.studentNumber)
+    })
   })
 
   const series = data.map((slots, limitN) => {
@@ -170,7 +156,7 @@ export const CreditDistributionDevelopment = ({
 }: CreditDistributionDevelopmentProps) => {
   const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState<TimeDivision>(TimeDivision.SEMESTER)
-  const [isAscending, setIsAscending] = useState(true)
+  const [isAscending, setIsAscending] = useState(false)
 
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
@@ -220,56 +206,111 @@ export const CreditDistributionDevelopment = ({
   const labels = timeSlots.map(ts => ts.label)
   const bcMsTitle = combinedProgramme === 'MH90_001' ? 'Bachelor + Licentiate' : 'Bachelor + Master'
   const title = combinedProgramme ? bcMsTitle : ''
+  const ascendingSeries = useMemo(() => {
+    const graduatedSeries = series.find(seriesItem => seriesItem.name === 'Graduated')
+    const nonGraduatedSeries = series.filter(seriesItem => seriesItem.name !== 'Graduated')
+    return graduatedSeries ? [...nonGraduatedSeries, graduatedSeries] : nonGraduatedSeries
+  }, [series])
 
-  const config: Options = {
-    series: isAscending ? series : series.toReversed(),
-    title: { text: title },
-    tooltip: {
-      formatter() {
-        // Highcharts formatter only accepts a subset of HTML as a string
-        // eslint-disable-next-line react/no-this-in-sfc
-        return `<div style="text-align: center; width: 100%"><b>${this.x}</b>, ${this.series.name}<br/>${this.y}/${this.total} students (${Math.round(this.percentage)}%)</div>`
-      },
-    },
-    xAxis: {
-      categories: labels,
-    },
-    yAxis: {
-      allowDecimals: false,
-      min: 0,
-      max: filteredStudents.length,
-      endOnTick: false,
-      reversed: false,
-      title: { text: 'Students' },
-    },
-    chart: {
-      type: 'column',
-      height: '450px',
-    },
-    plotOptions: {
-      column: {
-        stacking: 'normal',
-        dataLabels: {
-          enabled: true,
+  const displayedSeries = useMemo(
+    () => (isAscending ? ascendingSeries : ascendingSeries.toReversed()),
+    [isAscending, ascendingSeries]
+  )
+
+  const option = useMemo(
+    () => ({
+      title: title
+        ? {
+            text: title,
+            left: 'center',
+          }
+        : undefined,
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: { name?: string; seriesName?: string; value?: unknown; dataIndex?: number }) => {
+          const value =
+            typeof params.value === 'number'
+              ? params.value
+              : Number.isFinite(Number(params.value))
+                ? Number(params.value)
+                : 0
+          const dataIndex = params.dataIndex ?? 0
+          const total = displayedSeries.reduce(
+            (sum, currentSeries) => sum + (currentSeries.data[dataIndex]?.value ?? 0),
+            0
+          )
+          const percentage = total ? Math.round((value / total) * 100) : 0
+
+          return `<div style="text-align: left; width: 100%"><b>${params.name ?? ''}</b>, ${params.seriesName ?? ''}<br/>${value}/${total} students (${percentage}%)</div>`
         },
       },
-      series: {
-        cursor: 'pointer',
-        point: {
-          events: {
-            click(event) {
-              const point = event.point as Highcharts.Point & { custom: { students: number[] } }
-              filterDispatch(studentNumberFilter.actions.addToAllowlist(point.custom.students))
-            },
+      xAxis: {
+        type: 'category',
+        data: labels,
+      },
+      grid: {
+        show: false,
+        left: '5%',
+        right: '5%',
+        // top: 'top',
+        bottom: '10%',
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {},
+          dataView: {
+            readOnly: true,
           },
         },
       },
-    },
-  }
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: filteredStudents.length,
+        minInterval: 1,
+        name: 'Students',
+      },
+      series: displayedSeries.map(seriesItem => ({
+        name: seriesItem.name,
+        type: 'bar',
+        stack: 'students',
+        data: seriesItem.data,
+        itemStyle: {
+          color: seriesItem.color,
+        },
+        label: {
+          show: true,
+          formatter: (params: { value?: unknown }) => {
+            const numericValue =
+              typeof params.value === 'number'
+                ? params.value
+                : Number.isFinite(Number(params.value))
+                  ? Number(params.value)
+                  : 0
+            return numericValue ? `${numericValue}` : ''
+          },
+        },
+      })),
+      animation: true,
+    }),
+    [title, labels, filteredStudents.length, displayedSeries]
+  )
+
+  const onEvents = useMemo(
+    () => ({
+      click: (params: { componentType?: string; data?: { students?: Array<FormattedStudent['studentNumber']> } }) => {
+        if (params.componentType !== 'series') return
+        if (!params.data?.students?.length) return
+
+        filterDispatch(studentNumberFilter.actions.addToAllowlist(params.data.students))
+      },
+    }),
+    [filterDispatch]
+  )
 
   return (
     <Paper sx={{ p: 2, my: 2 }} variant="outlined">
-      <Box sx={{ m: 2, width: '100%', display: 'flex', justifyContent: 'center', gap: '5em' }}>
+      <Box sx={{ mt: 2, mx: 2, width: '100%', display: 'flex', justifyContent: 'center', gap: '5em' }}>
         <ToggleContainer>
           <FormLabel sx={{ mb: 1 }}>Chart settings</FormLabel>
           <Toggle
@@ -282,7 +323,7 @@ export const CreditDistributionDevelopment = ({
             firstLabel="Ascending"
             secondLabel="Descending"
             setValue={() => setIsAscending(prev => !prev)}
-            value={isAscending}
+            value={!isAscending}
           />
         </ToggleContainer>
         <FormControl>
@@ -294,7 +335,7 @@ export const CreditDistributionDevelopment = ({
           </RadioGroup>
         </FormControl>
       </Box>
-      <ReactHighcharts config={config} />
+      <ReactECharts notMerge onEvents={onEvents} option={option} replaceMerge={['series']} style={{ height: 450 }} />
     </Paper>
   )
 }
