@@ -14,7 +14,7 @@
     "cli": "./cli.sh",
     "oodikone": "./run.sh oodikone anon up --detach",
     "oodikone:real": "./run.sh oodikone real up --detach",
-    "oodikone:ci:setup": "npm run docker:down && docker compose --file docker-compose.ci.yml --profile tests --profile updater up --detach",
+    "oodikone:ci:setup": "npm run docker:down && docker compose --file docker-compose.ci.yml --profile tests up --detach",
     "oodikone:ci:api": "docker compose --file docker-compose.test.yml up --exit-code-from api-tests",
     "updater": "./run.sh updater anon up --detach",
     "updater:real": "./run.sh updater real up --detach",
