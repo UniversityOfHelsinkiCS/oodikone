@@ -42,7 +42,7 @@ const routes = (app: Express, url: string) => {
   app.use(compression())
 
   app.use(headersMiddleware)
-  app.use(currentUserMiddleware) // eslint-disable-line @typescript-eslint/no-misused-promises
+  app.use(currentUserMiddleware)
   app.use(accessLogger)
   app.use(`${url}/login`, login)
   app.use(url, courses)
