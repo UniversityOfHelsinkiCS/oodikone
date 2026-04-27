@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { LineGraph } from '@/components/common/LineGraph'
+import { LineGraph } from '@/components/Charts/LineGraph'
 import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
 import { StackedBarChart } from '@/components/common/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
