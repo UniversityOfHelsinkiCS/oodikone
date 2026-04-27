@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
+import { BarChart } from '@/components/Charts/BarChart'
 import { LineGraph } from '@/components/Charts/LineGraph'
 import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
@@ -19,7 +20,6 @@ import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
-import { BarChart } from './BarChart'
 
 const getGraduatedText = (code: string) => {
   if (code.startsWith('T') || code.startsWith('LIS')) {
