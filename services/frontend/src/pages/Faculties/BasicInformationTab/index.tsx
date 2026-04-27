@@ -5,7 +5,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { LineGraph } from '@/components/Charts/LineGraph'
-import { StackedBarChart } from '@/components/common/StackedBarChart'
+import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { Section } from '@/components/Section'
