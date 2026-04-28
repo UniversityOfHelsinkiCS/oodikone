@@ -280,7 +280,7 @@ export const StudentCreditAccumulation = ({
           name: student.studentNumber,
           type: 'line',
           showSymbol: true,
-          symbol: 'emptyCircle',
+          symbol: 'circle',
           symbolSize: 8,
           smooth: 0.1,
           itemStyle: {
