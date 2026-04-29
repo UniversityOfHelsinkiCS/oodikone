@@ -34,6 +34,9 @@ export const LineGraph = ({
       lineStyle: {
         color,
       },
+      emphasis: {
+        focus: 'series',
+      },
     }
   })
 
