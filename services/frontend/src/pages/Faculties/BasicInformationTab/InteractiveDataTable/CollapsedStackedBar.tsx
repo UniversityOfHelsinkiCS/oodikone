@@ -1,18 +1,8 @@
-/* eslint-disable react/no-this-in-sfc  */
-/* eslint-disable-next-line import-x/default */
-import HighCharts from 'highcharts'
-import accessibility from 'highcharts/modules/accessibility'
-import exportData from 'highcharts/modules/export-data'
-import exporting from 'highcharts/modules/exporting'
-import ReactHighcharts from 'react-highcharts'
+import ReactECharts from 'echarts-for-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { theme } from '@/theme'
 import { NameWithCode } from '@oodikone/shared/types'
-
-exporting(ReactHighcharts.Highcharts)
-exportData(ReactHighcharts.Highcharts)
-accessibility(ReactHighcharts.Highcharts)
 
 export const CollapsedStackedBar = ({
   data,
@@ -30,20 +20,18 @@ export const CollapsedStackedBar = ({
   plotLinePlaces: string[][]
 }) => {
   const { getTextIn } = useLanguage()
+
   const transpose = (matrix: number[][]) => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [] as number[][])
   }
-  if (names[0] === 'Started studying') {
-    names[0] += ' (new in faculty)'
-  }
-  const dataTranspose = transpose(data)
-    .map((obj, index) => ({
-      name: names[index],
-      data: obj,
-      color: theme.palette.graphColors[index],
-      type: 'bar' as const,
-    }))
-    .reverse()
+  const seriesNames = names.map((name, index) =>
+    index === 0 && name === 'Started studying' ? 'Started studying (new in faculty)' : name
+  )
+  const dataTranspose = transpose(data).map((obj, index) => ({
+    name: seriesNames[index],
+    data: obj,
+    color: theme.palette.graphColors[index],
+  }))
 
   const differenceArray: Record<string, Record<string, number>> = Object.keys(differenceData).reduce(
     (programmes, programme) => ({
@@ -51,7 +39,7 @@ export const CollapsedStackedBar = ({
       [programme]: differenceData[programme].reduce(
         (results, value, currentIndex) => ({
           ...results,
-          [names[currentIndex]]: value,
+          [seriesNames[currentIndex]]: value,
         }),
         {}
       ),
@@ -70,19 +58,8 @@ export const CollapsedStackedBar = ({
     ? plotLinePlaces.map(value => ({
         color: '#90A959',
         width: 1,
-        value: Number(value[0]) - 0.5,
-        dashStyle: 'Solid' as const,
-        label: {
-          text: value[1],
-          style: {
-            color: 'black',
-            fontWeight: 'bold',
-            position: 'absolute',
-          },
-          align: 'right' as const,
-          x: 0,
-          y: 5,
-        },
+        value: Number(value[0]),
+        label: value[1],
       }))
     : []
 
@@ -101,82 +78,181 @@ export const CollapsedStackedBar = ({
     return '#7B9FCF'
   }
 
-  const config: HighCharts.Options = {
-    chart: {
-      type: 'bar',
-      marginTop: 60,
-      height: getFlexHeight(labels.length),
+  const formatNumber = (value: unknown) => {
+    const numericValue = typeof value === 'number' ? value : Number(value)
+
+    if (!Number.isFinite(numericValue)) return ''
+    if (Number.isInteger(numericValue)) return `${numericValue}`
+    return `${numericValue.toFixed(1)}`
+  }
+
+  const getNumericValue = (value: unknown) => {
+    const numericValue = typeof value === 'number' ? value : Number(value)
+    return Number.isFinite(numericValue) ? numericValue : 0
+  }
+
+  const totals = labels.map((_, index) =>
+    dataTranspose.reduce((sum, series) => sum + getNumericValue(series.data[index]), 0)
+  )
+
+  // Prevents clutter
+  const labelCutoff = Math.round(Math.max(...totals) * 0.05)
+
+  const totalMarkPoints = labels.map((label, index) => ({
+    coord: [totals[index], label],
+    value: totals[index],
+  }))
+
+  const series = dataTranspose.map((graphSeries, index) => ({
+    name: graphSeries.name,
+    type: 'bar',
+    stack: 'total',
+    data: graphSeries.data,
+    itemStyle: {
+      color: graphSeries.color,
     },
-    series: dataTranspose,
-    xAxis: {
-      categories: labels,
-      title: {
-        text: '',
+    label: {
+      show: true,
+      position: 'insideLeft',
+      formatter: (params: { value?: unknown }) => {
+        const value = getNumericValue(params.value)
+        if (value <= labelCutoff) return ''
+        return formatNumber(value)
       },
-      plotLines: chartPlotLinePlaces,
     },
-    yAxis: {
-      min: 0,
-      title: {
-        text: '',
-      },
-      stackLabels: {
-        enabled: true,
-      },
+    labelLayout: {
+      hideOverlap: true,
+    },
+    markPoint:
+      index === dataTranspose.length - 1
+        ? {
+            showSymbol: false,
+            symbolSize: 0,
+            label: {
+              show: true,
+              position: 'right',
+              distance: 10,
+              formatter: (params: { value?: unknown }) => `(${formatNumber(params.value)})`,
+            },
+            data: totalMarkPoints,
+          }
+        : undefined,
+  }))
+
+  const plotLineSeries = chartPlotLinePlaces.length
+    ? [
+        {
+          name: 'Plot lines',
+          type: 'line',
+          data: [],
+          silent: true,
+          tooltip: { show: false },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            lineStyle: {
+              color: '#000',
+              width: 1,
+            },
+            data: chartPlotLinePlaces.map(place => ({
+              yAxis: place.value,
+              lineStyle: {
+                width: 0,
+              },
+              label: {
+                show: true,
+                formatter: place.label,
+                position: 'insideEnd',
+                color: '#000',
+                fontWeight: 'bold',
+                distance: 5,
+              },
+            })),
+          },
+        },
+      ]
+    : []
+
+  const option = {
+    grid: {
+      top: 20,
+      left: 10,
+      right: 10,
+      bottom: 75,
+      show: true,
     },
     legend: {
-      layout: 'horizontal',
-      align: 'left',
-      x: 20,
-      verticalAlign: 'top',
-      y: -10,
-      floating: true,
-      backgroundColor: 'white',
-      borderColor: '#CCC',
-      borderWidth: 1,
-      shadow: false,
+      type: 'scroll',
+      borderWidth: 0,
+      data: series.map(item => item.name),
     },
     tooltip: {
-      shared: true,
-      backgroundColor: 'white',
-      formatter() {
-        let tooltipString = `<b>${getTextIn(longLabels[this.x!])}</b><br /><p>${this.x} - ${
-          longLabels[this.x!]?.code
-        }</p><br />`
-        const diffArray = differenceArray[this.x!]
-        this.points?.forEach(point => {
-          tooltipString += `<span style="color:${point.color as string}">●</span> <b>${point.series.name}: ${point.y}</b>
-          (<span style="color:${getColor(diffArray[point.series.name])};font-weight:bold">${getCorrectSign(
-            diffArray[point.series.name]
-          )}</span>)<br />`
+      confine: true,
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+      backgroundColor: '#fff',
+      borderColor: '#CCC',
+      borderWidth: 1,
+      formatter: (rawParams: unknown) => {
+        const params = Array.isArray(rawParams) ? rawParams : [rawParams]
+        const barParams = params.filter(
+          param =>
+            (param as { seriesType?: string })?.seriesType === 'bar' &&
+            (param as { componentType?: string })?.componentType === 'series'
+        ) as Array<{ dataIndex?: number; seriesName?: string; value?: unknown; color?: string }>
+
+        const firstPoint = barParams[0]
+        if (!firstPoint) return ''
+
+        const dataIndex = firstPoint.dataIndex ?? 0
+        const label = labels[dataIndex] ?? ''
+        const labelInfo = longLabels[label]
+        let tooltipString = `<b>${getTextIn(labelInfo) ?? ''}</b><p>${label} - ${labelInfo?.code ?? ''}</p>`
+        const diffArray = differenceArray[label] ?? {}
+
+        barParams.forEach(point => {
+          const value = getNumericValue(point.value)
+          const seriesName = point.seriesName ?? ''
+          const diffValue = diffArray[seriesName]
+          tooltipString += `<span style="color:${point.color ?? '#000'}">●</span> <b>${seriesName}: ${formatNumber(
+            value
+          )}</b>`
+          if (typeof diffValue === 'number') {
+            tooltipString += ` (<span style="color:${getColor(diffValue)};font-weight:bold">${getCorrectSign(
+              diffValue
+            )}</span>)`
+          }
+          tooltipString += '<br />'
         })
-        tooltipString += `<b>Total: ${this.points?.reduce((prev, current) => prev + current.y!, 0)}</b>`
+        const total = barParams.reduce((sum, current) => sum + getNumericValue(current.value), 0)
+
+        tooltipString += `<b>Total: ${formatNumber(total)}</b>`
         return tooltipString
       },
     },
-    plotOptions: {
-      series: {
-        stacking: 'normal',
-        dataLabels: {
-          enabled: true,
-          align: 'left',
-          formatter() {
-            if (Number.isInteger(this.y)) return `${this.y}`
-            return `${this.y?.toFixed(1)}`
-          },
-          filter: {
-            property: 'y',
-            operator: '>',
-            value: 2,
-          },
-        },
+
+    xAxis: {
+      type: 'value',
+      axisLine: { show: true },
+      axisTick: { show: false },
+      min: 0,
+    },
+    yAxis: {
+      type: 'category',
+      data: labels,
+      inverse: true,
+      axisLine: {
+        show: true,
       },
     },
+    series: [...series, ...plotLineSeries],
   }
 
   if (!dataTranspose) {
     return <>No data provided</>
   }
 
-  return <ReactHighcharts config={config} />
+  return <ReactECharts option={option} opts={{ renderer: 'canvas' }} style={{ height: getFlexHeight(labels.length) }} />
 }
