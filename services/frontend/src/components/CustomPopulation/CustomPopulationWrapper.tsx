@@ -72,7 +72,6 @@ export const CustomPopulationWrapper = ({
       displayTray={populationStudents.length > 0}
       filters={filters}
       initialOptions={{}}
-      name="CustomPopulation"
       students={populationStudents}
     >
       {(filteredStudents, filteredCourses) => (

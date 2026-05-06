@@ -199,48 +199,49 @@ export const CoursePopulation = () => {
     },
   ]
 
+  const filters = [
+    genderFilter(),
+    studentNumberFilter(),
+    ageFilter(),
+    courseFilter({ courses: population?.coursestatistics.courses }),
+    creditsEarnedFilter(),
+    hetuFilter(),
+    startYearAtUniFilter(),
+    programmeFilter({
+      additionalModes: [
+        {
+          key: 'attainment',
+          label: 'Attainment',
+          predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
+            const correctProgramme = findCorrectProgramme(
+              student,
+              codes,
+              allSemesters,
+              new Date(dateFrom),
+              new Date(dateTo),
+              currentSemester?.semestercode
+            )
+            return correctProgramme?.code === studyRightElement.code
+          },
+          description: 'Student had an active study right at the time of course attainment.',
+        },
+      ],
+    }),
+    gradeFilter({
+      courseCodes: codes,
+      from: dateFrom,
+      to: dateTo,
+    }),
+  ]
+
   return (
     <FilterView
       coursestatistics={population?.coursestatistics}
       displayTray={!isFetching}
-      filters={[
-        genderFilter(),
-        studentNumberFilter(),
-        ageFilter(),
-        courseFilter({ courses: population?.coursestatistics.courses }),
-        creditsEarnedFilter(),
-        hetuFilter(),
-        startYearAtUniFilter(),
-        programmeFilter({
-          additionalModes: [
-            {
-              key: 'attainment',
-              label: 'Attainment',
-              predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
-                const correctProgramme = findCorrectProgramme(
-                  student,
-                  codes,
-                  allSemesters,
-                  new Date(dateFrom),
-                  new Date(dateTo),
-                  currentSemester?.semestercode
-                )
-                return correctProgramme?.code === studyRightElement.code
-              },
-              description: 'Student had an active study right at the time of course attainment.',
-            },
-          ],
-        }),
-        gradeFilter({
-          courseCodes: codes,
-          from: dateFrom,
-          to: dateTo,
-        }),
-      ]}
+      filters={filters}
       initialOptions={{
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
       }}
-      name="CoursePopulation"
       students={population?.students ?? []}
     >
       {(filteredStudents, filteredCourses) => (

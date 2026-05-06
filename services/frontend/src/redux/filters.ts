@@ -2,36 +2,30 @@ import { createSlice, createSelector } from '@reduxjs/toolkit/react'
 
 import type { RootState } from '@/redux'
 
+export const selectViewFilters = createSelector(
+  (state: RootState) => state.filters,
+  state => state?.filterState ?? {}
+)
+
 const slice = createSlice({
   name: 'filters',
   initialState: {
-    views: {},
+    filterState: {},
   },
   reducers: {
-    setViewFilterOptions(state, action) {
-      const { view, filter, options } = action.payload
-
-      state.views[view] ??= {}
-      state.views[view][filter] = options
+    setViewFilterOptions: (state, { payload }) => {
+      state.filterState[payload.filter] = payload.options
     },
 
-    resetViewFilter(state, action) {
-      const { view, filter } = action.payload
-      delete state.views[view]?.[filter]
+    resetViewFilter: (state, { payload }) => {
+      delete state.filterState?.[payload.filter]
     },
 
-    resetAllViewFilters(state, action) {
-      const { view } = action.payload
-      state.views[view] = {}
+    resetAllViewFilters: state => {
+      state.filterState = {}
     },
   },
 })
-
-export const selectViewFilters = createSelector(
-  (state: RootState) => state?.filters?.views,
-  (_: RootState, view: string): string => view,
-  (state, view) => state?.[view] ?? {}
-)
 
 export const { setViewFilterOptions, resetViewFilter, resetAllViewFilters } = slice.actions
 export const { reducer } = slice

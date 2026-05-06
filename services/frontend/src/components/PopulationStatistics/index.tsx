@@ -271,7 +271,6 @@ export const PopulationStatistics = () => {
       displayTray={!isLoading}
       filters={filters}
       initialOptions={initialOptions}
-      name="PopulationStatistics"
       students={students}
     >
       {(filteredStudents, filteredCourses) => (

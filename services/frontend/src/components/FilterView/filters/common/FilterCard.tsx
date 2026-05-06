@@ -32,24 +32,20 @@ export const FilterCard = ({
 
   const handleOnClick = () => setOpened(state => !state)
 
-  const iconStyle = {
-    transition: 'transform 300ms',
-    ...(opened ? { transform: 'rotate(90deg)' } : {}),
-  }
-
   return (
-    <Stack
-      data-active={active}
-      data-cy={`${key}-filter-card`}
-      padding={0.5}
-      spacing={Number(opened) * 1.2}
-      sx={{ width: '100%' }}
-    >
+    <Stack data-active={active} data-cy={`${key}-filter-card`} padding={0.5} spacing={Number(opened) * 1.2}>
       <Box
         data-cy={`${key}-header`}
         sx={{ alignItems: 'center', justifyContent: 'center', cursor: 'pointer', display: 'inline-flex' }}
       >
-        <IconButton onClick={handleOnClick} size="small" sx={iconStyle}>
+        <IconButton
+          onClick={handleOnClick}
+          size="small"
+          sx={{
+            transition: 'transform 300ms',
+            ...(opened && { transform: 'rotate(90deg)' }),
+          }}
+        >
           <KeyboardArrowRightIcon />
         </IconButton>
         <Typography
@@ -64,7 +60,7 @@ export const FilterCard = ({
         {active ? (
           <ClearIcon
             data-cy={`${key}-clear`}
-            onClick={() => onClear()}
+            onClick={onClear}
             sx={{
               color: theme => theme.palette.error.dark,
               m: '0 0.5',

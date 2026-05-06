@@ -7,12 +7,10 @@ export type FilterContext = {
 }
 
 export type FilterViewContextState = {
-  viewName: string
   getContextByKey: (key: string) => FilterContext
 }
 
 const defaultState: FilterViewContextState = {
-  viewName: '<Unset>',
   getContextByKey: () => ({
     precomputed: null,
     options: {},

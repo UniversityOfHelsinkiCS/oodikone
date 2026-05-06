@@ -61,7 +61,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
       displayTray={!!population.coursestatistics}
       filters={viewFilters}
       initialOptions={initialOptions}
-      name={`StudyGuidanceGroup(${group.id})`}
       students={population.students}
     >
       {(filteredStudents, filteredCourses) => (

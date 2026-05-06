@@ -6,7 +6,6 @@ const settingsSlice = createSlice({
   initialState: {
     language: DEFAULT_LANG,
     namesVisible: false,
-    chartHeight: 600,
   },
   reducers: {
     toggleStudentNameVisibility: state => {

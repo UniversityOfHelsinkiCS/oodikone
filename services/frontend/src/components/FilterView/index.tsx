@@ -1,29 +1,31 @@
 import Stack from '@mui/material/Stack'
-import { useMemo, type FC, type ReactNode } from 'react'
+import { useMemo } from 'react'
+import type { FC, ReactNode } from 'react'
 
 import { selectViewFilters } from '@/redux/filters'
 import { useAppSelector } from '@/redux/hooks'
 import type { ExpandedCourseStats } from '@/redux/populations/util'
-import { filterCourses, type FilteredCourse } from '@/util/coursesOfPopulation'
+import { filterCourses } from '@/util/coursesOfPopulation'
+import type { FilteredCourse } from '@/util/coursesOfPopulation'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 
 import { PageLayout } from '../common/PageLayout'
 import { FilterViewContext } from './context'
-import type { FilterContext, FilterViewContextState } from './context'
+import type { FilterContext } from './context'
 
 import type { Filter } from './filters/createFilter'
 import { FilterTray } from './FilterTray'
 
 export const FilterView: FC<{
-  children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => ReactNode
-  name: string
-  filters: Filter[]
   students: Student[]
   coursestatistics: ExpandedCourseStats | undefined
+  children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => ReactNode
+  filters: Filter[]
   displayTray: boolean
   initialOptions: Record<Filter['key'], Filter['defaultOptions']>
-}> = ({ children, name, filters, students, coursestatistics, displayTray, initialOptions }) => {
-  const storedOptions = useAppSelector(state => selectViewFilters(state, name))
+}> = ({ children, filters, students, coursestatistics, initialOptions }) => {
+  const storedOptions = useAppSelector(state => selectViewFilters(state))
+  const filtersInUse = filters.some(({ key }) => !!storedOptions[key])
 
   const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
   const filterOptions = useMemo(
@@ -69,14 +71,17 @@ export const FilterView: FC<{
     return [fstudents, fcourses]
   }, [filters, filterOptions])
 
-  const ctxState: FilterViewContextState = { viewName: name, getContextByKey: getFilterContext }
-
   return (
-    <FilterViewContext.Provider value={ctxState}>
-      <Stack direction="row" id="filterview-stack">
-        {displayTray ? (
-          <FilterTray allStudents={students} filters={filters} numberOfFilteredStudents={filteredStudents.length} />
-        ) : null}
+    <FilterViewContext.Provider value={{ getContextByKey: getFilterContext }}>
+      <Stack direction="row">
+        {!!coursestatistics && (
+          <FilterTray
+            allStudents={students}
+            filters={filters}
+            filtersInUse={filtersInUse}
+            numberOfFilteredStudents={filteredStudents.length}
+          />
+        )}
         <PageLayout maxWidth="80vw">{children(filteredStudents, filteredCourses)}</PageLayout>
       </Stack>
     </FilterViewContext.Provider>

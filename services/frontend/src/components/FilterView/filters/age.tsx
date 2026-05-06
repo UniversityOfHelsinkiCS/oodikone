@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
@@ -9,12 +9,9 @@ import { createFilter } from './createFilter'
 const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: FilterTrayProps) => {
   const { min, max } = bounds
 
-  const onChange = useCallback(
-    ([min, max]) => {
-      onOptionsChange({ min, max })
-    },
-    [onOptionsChange]
-  )
+  const onChange = ([min, max]) => {
+    onOptionsChange({ min, max })
+  }
 
   const value: [number, number] = useMemo(
     () => [options.min ?? min, options.max ?? max],

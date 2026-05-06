@@ -4,8 +4,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useContext } from 'react'
 
-import { setViewFilterOptions, resetViewFilter, resetAllViewFilters, selectViewFilters } from '@/redux/filters'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { setViewFilterOptions, resetViewFilter, resetAllViewFilters } from '@/redux/filters'
+import { useAppDispatch } from '@/redux/hooks'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { FilterViewContext } from './context'
 import type { FilterContext } from './context'
@@ -18,42 +18,18 @@ export type FilterTrayProps = {
 } & FilterContext
 
 export const FilterTray = ({
+  numberOfFilteredStudents,
   allStudents,
   filters,
-  numberOfFilteredStudents,
+  filtersInUse,
 }: {
+  numberOfFilteredStudents: number
   allStudents: Student[]
   filters: Filter[]
-  numberOfFilteredStudents: number
+  filtersInUse: boolean
 }) => {
-  const { viewName, getContextByKey } = useContext(FilterViewContext)
-
   const dispatch = useAppDispatch()
-  const storedOptions = useAppSelector(state => selectViewFilters(state, viewName))
-
-  const resetAllFilters = () => dispatch(resetAllViewFilters({ view: viewName }))
-
-  const filterSet = filters
-    .sort(({ title: a }, { title: b }) => a.localeCompare(b))
-    .map(filter => {
-      const { key, isActive, render } = filter
-      const ctx = getContextByKey(key)
-
-      const active = isActive(ctx.options)
-      const onClear = () => dispatch(resetViewFilter({ view: viewName, filter: key }))
-
-      const props: FilterTrayProps = {
-        students: allStudents,
-        onOptionsChange: options => dispatch(setViewFilterOptions({ view: viewName, filter: key, options })),
-        ...ctx,
-      }
-
-      return (
-        <FilterCard active={active} filter={filter} key={key} onClear={onClear}>
-          {render(props)}
-        </FilterCard>
-      )
-    })
+  const { getContextByKey } = useContext(FilterViewContext)
 
   return (
     <Paper
@@ -61,8 +37,8 @@ export const FilterTray = ({
         py: 3,
         px: 2,
         borderRadius: 0,
-        maxWidth: '18em',
-        flex: '0 0 18em',
+        width: '20em',
+        minWidth: '20em',
         height: 'fit-content',
       }}
       variant="outlined"
@@ -78,14 +54,36 @@ export const FilterTray = ({
           color="inherit"
           data-cy="reset-all-filters"
           disableElevation
-          disabled={!filters.some(({ key }) => !!storedOptions[key])}
-          onClick={resetAllFilters}
+          disabled={!filtersInUse}
+          onClick={() => dispatch(resetAllViewFilters())}
           variant="contained"
         >
           Reset All Filters
         </Button>
       </Stack>
-      {filterSet}
+      {filters
+        .sort(({ title: a }, { title: b }) => a.localeCompare(b))
+        .map(filter => {
+          const { key, isActive, render } = filter
+          const ctx = getContextByKey(key)
+
+          const props: FilterTrayProps = {
+            ...ctx,
+            students: allStudents,
+            onOptionsChange: options => dispatch(setViewFilterOptions({ filter: key, options })),
+          }
+
+          return (
+            <FilterCard
+              active={isActive(ctx.options)}
+              filter={filter}
+              key={key}
+              onClear={() => dispatch(resetViewFilter({ filter: key }))}
+            >
+              {render(props)}
+            </FilterCard>
+          )
+        })}
     </Paper>
   )
 }
