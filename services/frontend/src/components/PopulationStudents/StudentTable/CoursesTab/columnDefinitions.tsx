@@ -81,6 +81,8 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
       }),
       columnHelper.accessor('firstNames', { header: 'First names' }),
       columnHelper.accessor('lastName', { header: 'Last name' }),
+      columnHelper.accessor('email', { header: 'email' }),
+      columnHelper.accessor('secondaryEmail', { header: 'secondaryEmail' }),
       columnHelper.group({
         id: 'total',
         header: _ => <Typography fontWeight="bold">Summary</Typography>,

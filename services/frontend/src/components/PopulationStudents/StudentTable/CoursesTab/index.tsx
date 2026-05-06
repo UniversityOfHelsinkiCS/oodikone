@@ -213,6 +213,8 @@ const studentMapper = (
   return {
     firstNames: student.firstnames,
     lastName: student.lastname,
+    email: student.email,
+    secondaryEmail: student.secondaryEmail,
     studentNumber: student.studentNumber,
     sisuID: student.sis_person_id,
     totalPassed,
@@ -249,8 +251,8 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
   const { visible: namesVisible } = useStudentNameVisibility()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
-  const columnVisibility: VisibilityState | undefined = useMemo(
-    () => (!namesVisible ? { firstNames: false, lastName: false } : undefined),
+  const columnVisibility: VisibilityState = useMemo(
+    () => ({ firstNames: namesVisible, lastName: namesVisible, email: false, secondaryEmail: false }),
     [namesVisible]
   )
 
