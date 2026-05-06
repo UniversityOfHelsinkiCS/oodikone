@@ -101,6 +101,6 @@ export const studentNumberFilter = createFilter({
   },
 
   selectors: {
-    studentListIsEqualToAllowlist: ({ allowlist }, students) => isEqual(allowlist, students),
+    studentListIsEqualToAllowlist: ({ allowlist }, students) => students.length && isEqual(students, allowlist),
   },
 })

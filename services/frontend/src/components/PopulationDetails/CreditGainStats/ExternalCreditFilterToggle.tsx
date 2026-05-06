@@ -12,7 +12,7 @@ export const ExternalCreditFilterToggle = ({ students, helpText }: { students: s
       active={currentFilterIsActive}
       applyFilter={() => filterDispatch(studentNumberFilter.actions.setAllowlist(students))}
       clearFilter={() => filterDispatch(studentNumberFilter.actions.setAllowlist([]))}
-      disabled={someFilterIsActive ? !currentFilterIsActive : null}
+      disabled={someFilterIsActive ? !currentFilterIsActive : !students.length}
       popupContent={helpText}
     />
   )
