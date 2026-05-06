@@ -78,10 +78,7 @@ type FilterFactory = {
   key: string
   actions: Record<
     string,
-    <P>(payload: P) => (
-      view: string,
-      getContext: FilterViewContextState['getContextByKey']
-    ) => {
+    <P>(payload: P) => (getContext: FilterViewContextState['getContextByKey']) => {
       payload: P
       type: string
     }
@@ -136,11 +133,10 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
   const actions = mapValues(opt_actions, ([key, action]) => {
     return [
       key,
-      payload => (view: string, getContext: FilterViewContextState['getContextByKey']) => {
+      payload => (getContext: FilterViewContextState['getContextByKey']) => {
         const ctx = getContext(options.key)
 
         return setViewFilterOptions({
-          view,
           filter: options.key,
           options: action(structuredClone(ctx.options), payload),
         })
