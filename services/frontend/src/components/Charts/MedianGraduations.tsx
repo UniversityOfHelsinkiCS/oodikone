@@ -210,6 +210,7 @@ export const MedianGraduations = ({
       nameLocation: 'end',
       nameGap: 12,
       nameRotate: 0,
+      inverse: true,
     },
     series: [
       {
