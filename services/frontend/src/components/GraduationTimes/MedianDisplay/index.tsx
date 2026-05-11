@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { MedianBarChart } from '@/components/GraduationTimes/MedianDisplay/MedianBarChart'
+import { MedianGraduations } from '@/components/Charts/MedianGraduations'
 import {
   FacultyClassSizes,
   GraduationStats,
@@ -59,7 +59,7 @@ export const MedianDisplay = ({
       ) : null}
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
-        <MedianBarChart
+        <MedianGraduations
           classSizes={classSizes?.[level] ?? {}}
           cypress={`${level}-median-bar-chart`}
           data={data}
@@ -71,7 +71,7 @@ export const MedianDisplay = ({
           yearLabel={yearLabel}
         />
         {programmeDataVisible && year && year in levelProgrammeData ? (
-          <MedianBarChart
+          <MedianGraduations
             classSizes={'programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks}
             cypress={`${level}-median-bar-chart-faculty`}
             data={levelProgrammeData[year].data}
