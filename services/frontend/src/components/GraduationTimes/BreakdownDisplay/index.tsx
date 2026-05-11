@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChart'
+import { GraduationBreakdown } from '@/components/Charts/GraduationBreakdown'
 import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@oodikone/shared/types'
 
 export const BreakdownDisplay = ({
@@ -30,9 +30,14 @@ export const BreakdownDisplay = ({
     <Box>
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
-        <BreakdownBarChart cypress={`${level}-breakdown-bar-chart`} data={data} handleClick={handleClick} mode={mode} />
+        <GraduationBreakdown
+          cypress={`${level}-breakdown-bar-chart`}
+          data={data}
+          handleClick={handleClick}
+          mode={mode}
+        />
         {programmeDataVisible && year && year in levelProgrammeData ? (
-          <BreakdownBarChart
+          <GraduationBreakdown
             cypress={`${level}BreakdownBarChartFaculty`}
             data={levelProgrammeData[year].data}
             facultyGraph={false}
