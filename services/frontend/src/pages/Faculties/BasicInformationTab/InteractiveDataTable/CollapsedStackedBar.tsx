@@ -182,7 +182,6 @@ export const CollapsedStackedBar = ({
       show: true,
     },
     legend: {
-      type: 'scroll',
       borderWidth: 0,
       data: series.map(item => item.name),
     },
@@ -246,6 +245,7 @@ export const CollapsedStackedBar = ({
       axisLine: {
         show: true,
       },
+      z: 10,
     },
     series: [...series, ...plotLineSeries],
   }
@@ -254,5 +254,5 @@ export const CollapsedStackedBar = ({
     return <>No data provided</>
   }
 
-  return <ReactECharts option={option} opts={{ renderer: 'canvas' }} style={{ height: getFlexHeight(labels.length) }} />
+  return <ReactECharts option={option} opts={{ renderer: 'svg' }} style={{ height: getFlexHeight(labels.length) }} />
 }

@@ -98,15 +98,12 @@ export const GraduationBreakdown = ({
     },
     label: {
       show: true,
-      position: 'insideRight',
+      position: 'right',
       color: '#424949',
       formatter: (params: { value?: number }) => {
         const value = typeof params.value === 'number' ? params.value : Number(params.value)
         return value ? `${value}` : ''
       },
-    },
-    labelLayout: {
-      hideOverlap: true,
     },
     emphasis: {
       focus: 'series',
@@ -150,6 +147,7 @@ export const GraduationBreakdown = ({
       nameLocation: 'start',
       nameGap: 12,
       inverse: true,
+      z: 10,
     },
     series,
   }

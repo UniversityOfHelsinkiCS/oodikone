@@ -45,9 +45,6 @@ export const BarChart = ({ id, graphStats, years }: { id: string; graphStats: Gr
   }))
 
   const option = {
-    legend: {
-      type: 'scroll',
-    },
     tooltip: {
       trigger: 'item',
     },

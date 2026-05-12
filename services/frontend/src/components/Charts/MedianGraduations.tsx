@@ -189,7 +189,7 @@ export const MedianGraduations = ({
     },
     grid: {
       top: 60,
-      left: 10,
+      left: 15,
       right: 20,
       bottom: 30,
       containLabel: true,
@@ -211,6 +211,7 @@ export const MedianGraduations = ({
       nameGap: 12,
       nameRotate: 0,
       inverse: true,
+      z: 10,
     },
     series: [
       {

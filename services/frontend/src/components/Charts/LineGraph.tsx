@@ -41,9 +41,6 @@ export const LineGraph = ({
   })
 
   const option = {
-    legend: {
-      type: 'scroll',
-    },
     tooltip: {
       trigger: 'axis',
     },

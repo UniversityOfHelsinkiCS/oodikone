@@ -98,7 +98,7 @@ export const ProgressBarChart = ({ cypress, data }: { cypress: string; data: Pro
 
   const option = {
     legend: {
-      type: 'scroll',
+      type: 'plain',
       selected: Object.keys(legendSelection).length ? legendSelection : undefined,
     },
     tooltip: {
@@ -126,6 +126,7 @@ export const ProgressBarChart = ({ cypress, data }: { cypress: string; data: Pro
     xAxis: {
       type: 'category',
       data: categories,
+      z: 10,
     },
     yAxis: {
       type: 'value',
