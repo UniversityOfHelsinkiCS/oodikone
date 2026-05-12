@@ -21,7 +21,8 @@ void describe('Population statistics by course', async () => {
     assert.deepEqual(res.status, 400)
     assert.deepEqual(res.body.error, 'The body should have a yearcode and coursecode defined')
   })
-  await it('should not return anything with missing auth', async () => {
+
+  await it('should return correct amount of students for a course', async () => {
     const res = await request(app)
       .get('/populationstatisticsbycourse?coursecodes=["MAT21005"]&from=70&to=70')
       .set('shib-session-id', 'test')
@@ -129,6 +130,4 @@ void describe('Population statistics by course', async () => {
     assert.strictEqual(res.body.students.length, 40)
     assert.deepStrictEqual(res.body.students.sort((a, b) => b.studentNumber - a.studentNumber).at(-1), testStudent)
   })
-
-  await it.todo('should return correct amount of students for a course')
 })
