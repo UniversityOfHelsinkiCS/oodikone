@@ -4,7 +4,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import { maxBy, orderBy, range } from 'lodash-es'
 
-import { SemestersData } from '@/redux/semesters'
+import type { SemestersData } from '@/hooks/useSemesters'
 import type { Absence } from '@/types/students'
 import type { SISStudyRightElement } from '@oodikone/shared/models'
 import {

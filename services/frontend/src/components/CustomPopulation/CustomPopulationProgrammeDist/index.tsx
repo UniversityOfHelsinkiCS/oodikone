@@ -11,7 +11,7 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { useSemesters } from '@/hooks/useSemesters'
 import { FormattedStudent, Name } from '@oodikone/shared/types'
 import { findCorrectProgramme, NO_PROGRAMME } from './util'
 
@@ -27,9 +27,8 @@ export const CustomPopulationProgrammeDist = ({
   to?: string
 }) => {
   const { getTextIn } = useLanguage()
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
-  if (!allSemesters || !currentSemester) return null
+  const { semesters, currentSemester } = useSemesters()
+  if (!currentSemester) return null
 
   const allProgrammes: Record<string, { name: Name; programmeStudents: number }> = {}
   for (const student of students) {
@@ -39,7 +38,7 @@ export const CustomPopulationProgrammeDist = ({
       programme = findCorrectProgramme(
         student,
         coursecodes,
-        allSemesters,
+        semesters,
         new Date(from!),
         new Date(to!),
         currentSemester.semestercode

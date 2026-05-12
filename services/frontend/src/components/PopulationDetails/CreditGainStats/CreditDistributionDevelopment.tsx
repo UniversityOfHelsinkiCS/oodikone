@@ -22,7 +22,7 @@ import { studentNumberFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useDeepMemo } from '@/hooks/deepMemo'
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import { useSemesters } from '@/hooks/useSemesters'
 import { generateGradientColors } from '@/util/color'
 import { FormattedStudent } from '@oodikone/shared/types'
 
@@ -175,8 +175,7 @@ export const CreditDistributionDevelopment = ({
   const { getTextIn } = useLanguage()
   const { filterDispatch } = useFilters()
 
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} as SemestersData['semesters'] }
+  const { semesters } = useSemesters()
 
   const timeSlots = (() => {
     const startDate = dayjs().year(year).endOf('year')
@@ -190,7 +189,7 @@ export const CreditDistributionDevelopment = ({
     }
 
     if (timeDivision === TimeDivision.ACADEMIC_YEAR) {
-      return Object.values(groupBy(allSemesters, 'yearcode'))
+      return Object.values(groupBy(semesters, 'yearcode'))
         .map(([a, b]) => [dayjs(a.startdate), dayjs(b.enddate)])
         .filter(([a, b]) => startDate.isBefore(b) && dayjs().isAfter(a))
         .map(([start, end]) => ({
@@ -201,7 +200,7 @@ export const CreditDistributionDevelopment = ({
     }
 
     if (timeDivision === TimeDivision.SEMESTER) {
-      return Object.values(allSemesters)
+      return Object.values(semesters)
         .filter(semester => startDate.isBefore(semester.enddate) && dayjs().isAfter(semester.startdate))
         .map(semester => ({
           start: dayjs(semester.startdate),

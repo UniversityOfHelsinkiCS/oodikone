@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
 import { getAllProgrammesOfStudent, isFall } from '@/common'
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
 
+import { type SemestersData, useSemesters } from '@/hooks/useSemesters'
 import { DegreeProgrammeType, EnrollmentType, type FormattedStudent as Student } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
@@ -23,18 +23,16 @@ export const useGetRelevantSemesterData = (
         lastSemester: number
       }
     } => {
-  const { isSuccess, data: semesters } = useGetSemestersQuery()
+  const { semesters, currentSemester } = useSemesters()
 
-  if (!isSuccess) return { data: null, isSuccess }
-
-  const { currentSemester, semesters: allSemesters } = semesters
-  const [firstSemester, lastSemester] = getFirstAndLastSemester(semesters, year)
+  if (!currentSemester) return { data: null, isSuccess: false }
+  const [firstSemester, lastSemester] = getFirstAndLastSemester(semesters, currentSemester, year)
 
   return {
-    isSuccess,
+    isSuccess: true,
     data: {
       currentSemester,
-      allSemesters,
+      allSemesters: semesters,
 
       firstSemester,
       lastSemester,
@@ -45,14 +43,17 @@ export const useGetRelevantSemesterData = (
 /*
  * NOTE: Developer HAS to make sure that useGetSemesters has cached data before this call
  */
-const getFirstAndLastSemester = (semesters: SemestersData, year: number | undefined | null): [number, number] => {
-  const { semesters: allSemesters, currentSemester } = semesters
+const getFirstAndLastSemester = (
+  semesters: SemestersData['semesters'],
+  currentSemester: SemestersData['currentSemester'],
+  year: number | undefined | null
+): [number, number] => {
   const { semestercode: currentSemesterCode } = currentSemester ?? { semestercode: 0 }
 
   const lastSemester = currentSemesterCode + 1 * Number(isFall(currentSemesterCode))
 
   const firstSemester = year
-    ? (Object.values(allSemesters).find(
+    ? (Object.values(semesters).find(
         semester => new Date(semester.startdate).getTime() === new Date(Date.UTC(year, 7, 1)).getTime()
       )?.semestercode ?? lastSemester)
     : lastSemester - 13

@@ -12,7 +12,7 @@ import 'dayjs/locale/fi'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { useGetSemestersQuery, type SemestersData } from '@/redux/semesters'
+import { useSemesters } from '@/hooks/useSemesters'
 
 export type DateSelectorValue = Dayjs | null
 
@@ -30,13 +30,10 @@ export const DateSelector = ({
   showSemesters: boolean
 }) => {
   const datetimeRef: MutableRefObject<Dayjs | null> = useRef(null)
-  const { data: semesters, isFetching } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? ({ semesters: {} } as SemestersData)
+  const { semesters, isLoading } = useSemesters()
   const { getTextIn } = useLanguage()
 
-  if (isFetching) return null
-
-  if (!Object.keys(allSemesters).length) return null
+  if (isLoading || !Object.keys(semesters).length) return null
 
   const today = dayjs().startOf('day')
 
@@ -76,7 +73,7 @@ export const DateSelector = ({
           borderTop: '1px solid #f9f9f9',
         }}
       >
-        {Object.values(allSemesters)
+        {Object.values(semesters)
           .filter(({ startdate, enddate }) => {
             const start = dayjs(startdate)
             const end = dayjs(enddate)

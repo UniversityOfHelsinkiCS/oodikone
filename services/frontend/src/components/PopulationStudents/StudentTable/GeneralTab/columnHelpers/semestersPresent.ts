@@ -2,23 +2,14 @@ import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
 import { isFall, isMastersProgramme } from '@/common'
-import { type SemestersData } from '@/redux/semesters'
+import type { GetTextIn } from '@/components/LanguagePicker/useLanguage'
+import type { SemestersData } from '@/hooks/useSemesters'
 
 import './semestersPresent.css'
-import { CloseToGraduationData } from '@oodikone/shared/routes/populations'
+import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 import { EnrollmentType } from '@oodikone/shared/types'
 
 dayjsExtend(isBetween)
-
-type SemesterPresentFnsProps = {
-  getTextIn: (arg0: any) => string | null | undefined
-  programme: string | null
-  studentToSecondStudyrightEndMap: Map<string, string | null> | null
-  studentToStudyrightEndMap: Map<string, string | null> | null
-  year: number
-  semestersToAddToStart: number | null
-  semesters: SemestersData | null | undefined
-}
 
 export const getSemestersPresentFunctions = ({
   getTextIn,
@@ -28,7 +19,15 @@ export const getSemestersPresentFunctions = ({
   year,
   semestersToAddToStart,
   semesters,
-}: SemesterPresentFnsProps) => {
+}: {
+  getTextIn: GetTextIn
+  programme: string | null
+  studentToSecondStudyrightEndMap: Map<string, string | null> | null
+  studentToStudyrightEndMap: Map<string, string | null> | null
+  year: number
+  semestersToAddToStart: number | null
+  semesters: SemestersData
+}) => {
   const allSemesters = semesters?.semesters ?? {}
   const { semestercode: currentSemesterCode } = semesters?.currentSemester ?? { semestercode: 0 }
 

@@ -2,7 +2,7 @@ import Stack from '@mui/material/Stack'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import type { SemestersData } from '@/redux/semesters'
+import type { SemestersData } from '@/hooks/useSemesters'
 import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
 import { createFilter } from './createFilter'

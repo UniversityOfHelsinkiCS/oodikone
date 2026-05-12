@@ -28,8 +28,8 @@ import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useTitle } from '@/hooks/title'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
@@ -81,12 +81,12 @@ export const CoursePopulation = () => {
     [population?.students, codes]
   )
 
-  const { data: semesters, isFetching: semestersFetching } = useGetSemestersQuery()
   const {
     semesters: allSemesters,
     years: semesterYears,
     currentSemester,
-  } = semesters ?? { semesters: {}, years: {}, currentSemester: null }
+    isLoading: semestersFetching,
+  } = useSemesters()
 
   const getFromToDates = (from: number, to: number, separate: boolean) => {
     if (semestersFetching) return {}
@@ -115,7 +115,7 @@ export const CoursePopulation = () => {
     ? (getTextIn(singleSemester.name) ?? '')
     : `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
-  if (!population || !semesters) return <PageLoading isLoading />
+  if (!population || !currentSemester) return <PageLoading isLoading />
 
   const getStudentRelevantProgrammes = (students: FormattedStudent[]) =>
     students.reduce<Map<string, string>>((programmes, student) => {

@@ -5,15 +5,14 @@ import Tabs from '@mui/material/Tabs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { LoadingSection } from '@/components/Loading'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { useSemesters } from '@/hooks/useSemesters'
 import { ColorizedCoursesTableContext } from './common'
 import { FacultiesTab } from './FacultiesTab'
 import { SemestersTab } from './SemestersTab'
 import './index.css'
 
 export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes }) => {
-  const { data: semesterData } = useGetSemestersQuery()
-  const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
+  const { semesters: allSemesters, currentSemester } = useSemesters()
   const semesters = Object.values(allSemesters).filter(
     // 135 = Fall 2017
     semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode

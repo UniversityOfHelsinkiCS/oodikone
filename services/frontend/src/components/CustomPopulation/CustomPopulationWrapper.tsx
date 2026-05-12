@@ -15,9 +15,8 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
-import { useGetSemestersQuery } from '@/redux/semesters'
-
 import { CustomPopulationState } from '.'
 import { CustomPopulationContent } from './CustomPopulationContent'
 
@@ -28,8 +27,7 @@ export const CustomPopulationWrapper = ({
   customPopulationState: CustomPopulationState
   resetState: () => void
 }) => {
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+  const { semesters } = useSemesters()
 
   const { data: population, isFetching } = useGetCustomPopulationQuery(
     {
@@ -56,7 +54,7 @@ export const CustomPopulationWrapper = ({
       programmeFilter(),
       creditDateFilter(),
       enrollmentStatusFilter({
-        allSemesters,
+        allSemesters: semesters,
         programme: associatedProgramme,
       }),
     ]
@@ -64,7 +62,7 @@ export const CustomPopulationWrapper = ({
       filtersList.push(hopsFilter({ programmeCode: associatedProgramme, combinedProgrammeCode: '' }))
     }
     return filtersList
-  }, [population, allSemesters, associatedProgramme])
+  }, [population, semesters, associatedProgramme])
 
   return (
     <FilterView

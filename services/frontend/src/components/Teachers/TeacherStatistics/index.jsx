@@ -14,9 +14,9 @@ import { useState } from 'react'
 import { getCurrentSemester } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProvidersQuery } from '@/redux/providers'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { createLocaleComparator } from '@/util/comparator'
@@ -31,8 +31,7 @@ export const TeacherStatistics = () => {
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const [getTeacherStatistics, { data: teacherData, isFetching, isLoading }] = useLazyGetTeacherStatisticsQuery()
   const { data: providersData = [] } = useGetProvidersQuery()
-  const { data: semesterData } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesterData ?? { semesters: {} }
+  const { semesters: allSemesters } = useSemesters()
 
   const semesters = Object.values(allSemesters)
     .reverse()

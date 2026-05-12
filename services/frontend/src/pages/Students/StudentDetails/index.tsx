@@ -8,7 +8,7 @@ import { useParams } from 'react-router'
 
 import { bachelorHonoursProgrammes as bachelorCodes } from '@/common'
 import { useTitle } from '@/hooks/title'
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import { type SemestersData, useSemesters } from '@/hooks/useSemesters'
 import { useGetStudentQuery } from '@/redux/students'
 
 import type { Absence } from '@/types/students'
@@ -69,8 +69,7 @@ export const StudentDetails = () => {
   useTitle(studentNumber ? `${studentNumber} - Student statistics` : 'Student statistics')
   const [graphYearStart, setGraphYear] = useState<string | null>(null) // numeric
   const [selectedStudyPlanId, setSelectedStudyPlanId] = useState<string | null>(null)
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+  const { semesters } = useSemesters()
 
   const {
     data: student,
@@ -87,11 +86,11 @@ export const StudentDetails = () => {
     return <Alert severity="error">Student not found or no sufficient permissions</Alert>
   }
 
-  if (!student || !studentNumber || isEmpty(student) || !allSemesters) {
+  if (!student || !studentNumber || isEmpty(student) || !semesters) {
     return null
   }
 
-  if (!Object.keys(allSemesters).length) {
+  if (!Object.keys(semesters).length) {
     return null
   }
 
@@ -125,7 +124,7 @@ export const StudentDetails = () => {
     }
   }
 
-  const absences = getAbsentYears(student.studyRights, allSemesters)
+  const absences = getAbsentYears(student.studyRights, semesters)
 
   return (
     <Stack spacing={2} width="100%">

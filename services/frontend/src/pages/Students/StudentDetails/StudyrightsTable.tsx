@@ -18,8 +18,8 @@ import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithToolt
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { FilterAltIcon, NorthEastIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
@@ -70,8 +70,7 @@ export const StudyrightsTable = ({
 }) => {
   const { getTextIn } = useLanguage()
   const { data } = useGetProgrammesQuery()
-  const { data: semesters } = useGetSemestersQuery()
-  const { currentSemester } = semesters ?? { currentSemester: null }
+  const { currentSemester } = useSemesters()
 
   const studyProgrammes = data?.filteredProgrammes ?? {}
 

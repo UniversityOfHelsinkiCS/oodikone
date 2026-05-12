@@ -12,8 +12,8 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { findCorrectProgramme } from '@/components/CustomPopulation/CustomPopulationProgrammeDist/util'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/Loading'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { FormattedStudent, Name } from '@oodikone/shared/types'
 
 type CreditGainObj = Record<string, { credits: number; name: Name; students: string[] }>
@@ -76,8 +76,7 @@ export const CoursePopulationCreditGainTable = ({
   const [tab, setTab] = useState(0)
 
   const { data: faculties } = useGetFacultiesQuery()
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
+  const { semesters, currentSemester } = useSemesters()
 
   if (!faculties || !currentSemester) {
     return <Loading />
@@ -95,7 +94,7 @@ export const CoursePopulationCreditGainTable = ({
     const programme = findCorrectProgramme(
       student,
       codes,
-      allSemesters,
+      semesters,
       new Date(from),
       new Date(to),
       currentSemester.semestercode

@@ -34,9 +34,9 @@ import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { HelpOutlineIcon } from '@/theme'
 import { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
@@ -186,8 +186,7 @@ export const PopulationStatistics = () => {
   const showBachelorAndMaster = !!combinedProgrammeCode || !!query.showBachelorAndMaster
   const { programmeName, programmeId } = useGetProgrammeTexts(programmeCode, combinedProgrammeCode)
 
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters, currentSemester } = semesters ?? { semesters: {}, currentSemester: null }
+  const { semesters: allSemesters, currentSemester } = useSemesters()
 
   const enableStudyRightTypeFilter =
     useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'

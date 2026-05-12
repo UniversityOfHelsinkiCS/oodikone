@@ -10,12 +10,12 @@ import { useLocation, useNavigate } from 'react-router'
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { useSemesters } from '@/hooks/useSemesters'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { DoNotDisturbIcon } from '@/theme'
 import {
   Attempts,
@@ -81,9 +81,8 @@ export const SingleCourseStats = ({
   const [separate, setSeparate] = useState<boolean>(false)
   const { coursecode } = stats
 
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters, years: semesterYears } = semesters ?? { semesters: {}, years: {} }
-  const semestersReversed = Object.values(allSemesters ?? [])
+  const { semesters, years: semesterYears } = useSemesters()
+  const semestersReversed = Object.values(semesters ?? [])
     .map(({ semestercode, name, yearcode }) => ({
       key: semestercode,
       texts: Object.values(name) as string[],

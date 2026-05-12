@@ -17,12 +17,11 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { CheckIcon, CloseIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
-import { Semester } from '@oodikone/shared/models'
 import { CreditTypeCode, FormattedStudent, Name, ProgressCriteria, SemesterEnrollment } from '@oodikone/shared/types'
 import { StudentCourse } from '@oodikone/shared/types/studentData'
 import { TableInfo } from './info'
@@ -171,10 +170,7 @@ export const ProgressTable = ({
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
-  const { data } = useGetSemestersQuery()
-  // HACK: We want data to be semesters or empty object, but eslint doesn't like it. {} accepts also 0 and "" but that isn't possible here
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  const { semesters: allSemesters }: { semesters: Record<string, Semester> | {} } = data ?? { semesters: {} }
+  const { semesters: allSemesters } = useSemesters()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
   const defaultCourses = keyBy(curriculum?.defaultProgrammeCourses, 'code')
@@ -360,7 +356,7 @@ export const ProgressTable = ({
   }
 
   const generateYearColumns = (startYear: dayjs.Dayjs, endYear: dayjs.Dayjs, criteriaIndex: number) => {
-    const semesters = Object.values<Semester>(allSemesters)
+    const semesters = Object.values(allSemesters)
       .filter(
         semester =>
           dayjs(semester.startdate).isSameOrAfter(startYear) && dayjs(semester.enddate).isSameOrBefore(endYear)
@@ -401,7 +397,7 @@ export const ProgressTable = ({
               const startYear = dayjs(academicYearStart).add(year, 'years')
               const endYear = dayjs(academicYearEnd).add(year, 'years')
 
-              const semesters = Object.values<Semester>(allSemesters)
+              const semesters = Object.values(allSemesters)
                 .filter(
                   semester =>
                     dayjs(semester.startdate).isSameOrAfter(startYear) &&

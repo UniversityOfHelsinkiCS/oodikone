@@ -21,8 +21,8 @@ import { LoadingSection } from '@/components/Loading'
 import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
+import { useSemesters } from '@/hooks/useSemesters'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
-import { useGetSemestersQuery } from '@/redux/semesters'
 import { CheckIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
@@ -39,8 +39,8 @@ const CheckIconWithTitle = ({ visible, title }: { visible: boolean; title?: stri
 export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
   const { data: students, isFetching } = useGetStudentsCloseToGraduationQuery()
-  const { data: semesterData } = useGetSemestersQuery()
-  const { semesters: allSemesters, currentSemester } = semesterData ?? { semesters: {}, currentSemester: null }
+  const semesterData = useSemesters()
+  const { semesters, currentSemester } = semesterData
 
   const [selectedTab, setSelectedTab] = useState(0)
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -57,7 +57,7 @@ export const CloseToGraduation = () => {
         semestersToAddToStart: null,
         semesters: semesterData,
       }),
-    [allSemesters, getTextIn, students]
+    [semesters, getTextIn, students]
   )
   const currentSemesterCode = currentSemester?.semestercode
   const semestersToInclude = useMemo(
@@ -299,8 +299,8 @@ export const CloseToGraduation = () => {
         filterVariant: 'date-range',
       },
       ...semestersToInclude.map(semester => ({
-        id: getTextIn(allSemesters[`${semester}`]?.name)!,
-        header: `Enrollment status – ${getTextIn(allSemesters[`${semester}`]?.name)}`,
+        id: getTextIn(semesters[`${semester}`]?.name)!,
+        header: `Enrollment status – ${getTextIn(semesters[`${semester}`]?.name)}`,
         accessorFn: row => {
           if (!row.studyright.semesterEnrollments) {
             return 'Not enrolled'
@@ -311,7 +311,7 @@ export const CloseToGraduation = () => {
         visibleInShowHideMenu: false,
       })),
     ],
-    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, allSemesters, semestersToInclude]
+    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, semesters, semestersToInclude]
   )
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({

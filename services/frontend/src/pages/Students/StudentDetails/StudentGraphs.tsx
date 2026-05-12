@@ -22,7 +22,7 @@ import { getStudyRightElementTargetDates } from '@/common'
 import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { SemestersData, useGetSemestersQuery } from '@/redux/semesters'
+import { SemestersData, useSemesters } from '@/hooks/useSemesters'
 import type { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
@@ -217,11 +217,10 @@ const GradeGraph = ({ student }: { student: any }) => {
   const { getTextIn } = useLanguage()
   const [groupSize, setGroupSize] = useState(5)
   const [graphMode, setGraphMode] = useState('total')
-  const { data: semesters } = useGetSemestersQuery()
-  const { semesters: allSemesters } = semesters ?? { semesters: {} }
+  const { semesters } = useSemesters()
 
   const series = useMemo(
-    () => gradeMeanSeries(student, groupSize, allSemesters, getTextIn),
+    () => gradeMeanSeries(student, groupSize, semesters, getTextIn),
     [student, groupSize, semesters, getTextIn]
   )
   const { totalMeans, groupMeans, semesterMeans } = series

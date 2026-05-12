@@ -8,7 +8,7 @@ import {
 } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
-import { SemestersData } from '@/redux/semesters'
+import type { SemestersData } from '@/hooks/useSemesters'
 import { formatDate, monthsVisited } from '@/util/timeAndDate'
 
 import { CreditTypeCode, EnrollmentType } from '@oodikone/shared/types'

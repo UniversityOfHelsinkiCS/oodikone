@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 
 import { isMastersProgramme } from '@/common'
 import * as filters from '@/components/FilterView/filters'
-import { useGetSemestersQuery } from '@/redux/semesters'
+import { useSemesters } from '@/hooks/useSemesters'
 import { GetCustomPopulationResBody } from '@oodikone/shared/routes/populations'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
@@ -15,8 +15,7 @@ export const useGetFilters = (
   group: GroupsWithTags | undefined,
   population: Pick<GetCustomPopulationResBody, 'coursestatistics'> | undefined
 ) => {
-  const { data } = useGetSemestersQuery()
-  const { semesters: allSemesters } = data ?? { semesters: {} }
+  const { semesters } = useSemesters()
 
   const initialOptions = {}
 
@@ -28,7 +27,7 @@ export const useGetFilters = (
   const viewFilters = [
     filters.studentNumberFilter(),
     filters.enrollmentStatusFilter({
-      allSemesters: allSemesters ?? [],
+      allSemesters: semesters ?? [],
       programme: groupProgramme,
     }),
     filters.ageFilter(),
