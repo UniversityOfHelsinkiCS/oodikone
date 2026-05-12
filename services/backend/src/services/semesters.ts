@@ -55,7 +55,7 @@ export const getCurrentSemester = async () => {
 
 export const getSemestersAndYears = async () => {
   const semesters = await SemesterModel.findAll()
-  return semesters.reduce(
+  return semesters.reduce<SemestersAndYears>(
     (acc, semester) => {
       const { semestercode, name, yearcode, yearname, startdate, enddate } = semester
       acc.semesters[semestercode] = { semestercode, name, yearcode, startdate, enddate }
@@ -68,6 +68,6 @@ export const getSemestersAndYears = async () => {
 
       return acc
     },
-    { years: {}, semesters: {} } as SemestersAndYears
+    { years: {}, semesters: {} }
   )
 }
