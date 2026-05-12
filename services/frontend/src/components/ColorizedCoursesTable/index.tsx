@@ -15,7 +15,8 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
   const { semesters: allSemesters, currentSemester } = useSemesters()
   const semesters = Object.values(allSemesters).filter(
     // 135 = Fall 2017
-    semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester.semestercode
+    // INFO: If semesters is defined, currentSemester will be defined.
+    semester => semester.semestercode >= 135 && semester.semestercode <= currentSemester!.semestercode
   )
 
   const { data, isFetching, isLoading, isError } = fetchDataHook(fetchDataHookParams)
@@ -23,13 +24,13 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
   const [tab, setTab] = useState(0)
   const [numberMode, setNumberMode] = useState('completions')
   const [colorMode, setColorMode] = useState('none')
-  const [semesterFilter, setSemesterFilter] = useState(null)
+  const [semesterFilter, setSemesterFilter] = useState<{ start: number; end: number }>({ start: 135, end: 135 })
   const [filterEmptyCourses, setFilterEmptyCourses] = useState(true)
 
   const selectedSemesters = useMemo(() => {
-    const selectedSemestersArray = []
+    const selectedSemestersArray: number[] = []
     if (semesterFilter?.start && semesterFilter?.end) {
-      for (let i = parseInt(semesterFilter.start, 10); i <= parseInt(semesterFilter.end, 10); i++) {
+      for (let i = semesterFilter.start; i <= semesterFilter.end; i++) {
         selectedSemestersArray.push(i)
       }
     }

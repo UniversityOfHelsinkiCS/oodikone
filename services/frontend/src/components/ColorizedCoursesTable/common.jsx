@@ -2,7 +2,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import { createContext, useContext, useState, useEffect } from 'react'
 
-export const ColorizedCoursesTableContext = createContext(null)
+export const ColorizedCoursesTableContext = createContext()
 
 export const useColorizedCoursesTableContext = () => useContext(ColorizedCoursesTableContext)
 
