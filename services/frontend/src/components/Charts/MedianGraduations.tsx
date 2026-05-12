@@ -107,7 +107,7 @@ export const MedianGraduations = ({
     code: string,
     amount: number,
     median: number,
-    statistics: GraduationStatistics,
+    statistics: GraduationStatistics | undefined,
     realGoal: number | undefined
   ) => {
     const sortingText =
@@ -115,7 +115,7 @@ export const MedianGraduations = ({
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
     const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
-    const statisticsText = `<br />${statistics.onTime} graduated on time<br />${statistics.yearOver} graduated max year overtime<br />${statistics.wayOver} graduated over year late`
+    const statisticsText = `<br />${statistics?.onTime} graduated on time<br />${statistics?.yearOver} graduated max year overtime<br />${statistics?.wayOver} graduated over year late`
 
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} semesters **</b></p>` : ''
@@ -184,7 +184,7 @@ export const MedianGraduations = ({
         const code = chartData.code ?? name
         const amount = chartData.amount ?? 0
         const median = typeof params.value === 'number' ? params.value : Number(params.value)
-        return getTooltipText(name, code, amount, median, chartData.statistics!, chartData.realGoal)
+        return getTooltipText(name, code, amount, median, chartData.statistics, chartData.realGoal)
       },
     },
     grid: {
@@ -207,7 +207,7 @@ export const MedianGraduations = ({
       type: 'category',
       data: seriesData.map(item => item.name),
       name: getLabel(),
-      nameLocation: 'end',
+      nameLocation: 'start',
       nameGap: 12,
       nameRotate: 0,
       inverse: true,
