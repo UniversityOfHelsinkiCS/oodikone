@@ -58,7 +58,7 @@ export const populationStatisticsToolTips = {
     **Distribution development**
 
     Pylväsdiagrammi kertoo opiskelijoiden jakauman opintopistehaarukoihin kalenterivuosittain, lukuvuosittain tai lukukausittain eriteltynä.
-    Välien järjestystä pylväässä voi muuttaa valitsemalla **Stack ordering** -valikosta haluamansa järjestyksen.
+    Välien järjestystä pylväässä voi muuttaa valitsemalla **Chart settings** -valikosta haluamansa järjestyksen.
 
     Pylväiden osat toimivat myös suodattimina. Klikkaamalla pylvään osaa näkyviin jäävät vain kyseiset opiskelijat (esimerkiksi keväällä 2024 0–30 opintopistettä suorittaneet).
 
