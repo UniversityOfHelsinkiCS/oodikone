@@ -244,16 +244,17 @@ export const CreditDistributionDevelopment = ({
           return `<div style="text-align: left; width: 100%"><b>${params.name ?? ''}</b>, ${params.seriesName ?? ''}<br/>${value}/${total} students (${percentage}%)</div>`
         },
       },
+      legend: {},
       xAxis: {
         type: 'category',
         data: labels,
       },
       grid: {
         show: false,
-        left: '5%',
-        right: '5%',
-        // top: 'top',
-        bottom: '10%',
+        top: 60,
+        left: '15%',
+        right: '15%',
+        bottom: 90,
       },
       toolbox: {
         feature: {

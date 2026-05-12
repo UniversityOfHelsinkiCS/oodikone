@@ -61,6 +61,7 @@ export const StackedBarChart = ({
   })
 
   const option = {
+    legend: {},
     tooltip: {
       trigger: 'item',
       formatter: (params: { seriesName?: string; value?: unknown; dataIndex?: number }) => {
