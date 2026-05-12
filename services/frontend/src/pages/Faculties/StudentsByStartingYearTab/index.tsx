@@ -13,10 +13,10 @@ import { exportStudentTable } from './exportStudentTable'
 import { FacultyStudentDataTable } from './FacultyStudentDataTable'
 import { ProgressSection } from './ProgressSection'
 
-type ProgrammeKeys = {
-  progId: string
-  code: string
-}
+const priority = {
+  'urn:code:degree-program-type:bachelors-degree': 1,
+  'urn:code:degree-program-type:masters-degree': 2,
+} as const
 
 export const StudentsByStartingYearTab = ({
   faculty,
@@ -29,33 +29,26 @@ export const StudentsByStartingYearTab = ({
   setSpecialGroups: (value: boolean) => void
   specialGroups: boolean
 }) => {
+  const { getTextIn } = useLanguage()
   const [showPercentages, setShowPercentages] = useState(false)
 
   const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const { getTextIn } = useLanguage()
-  const studentStats = useGetFacultyStudentStatsQuery({
+  const {
+    data: studentStats,
+    isError,
+    isSuccess,
+    isFetching: isLoading,
+  } = useGetFacultyStudentStatsQuery({
     id: faculty.id,
     specialGroups: specials,
   })
 
-  const isLoading = studentStats.isLoading || studentStats.isFetching
-  const isError = studentStats.isError || (studentStats.isSuccess && !studentStats.data)
+  const programmeKeys: string[] = Object.keys(studentStats?.programmeStats ?? {}).sort((a, b) => {
+    const aPriority = priority[studentStats?.programmeNames[a]?.degreeProgrammeType ?? ''] ?? 3
+    const bPriority = priority[studentStats?.programmeNames[b]?.degreeProgrammeType ?? ''] ?? 3
 
-  const programmeKeys: ProgrammeKeys[] = studentStats?.data?.programmeStats
-    ? Object.keys(studentStats?.data?.programmeStats || {})
-        .sort((a, b) => {
-          const priority = {
-            'urn:code:degree-program-type:bachelors-degree': 1,
-            'urn:code:degree-program-type:masters-degree': 2,
-          }
-
-          const aPriority = priority[studentStats?.data?.programmeNames[a]?.degreeProgrammeType ?? ''] ?? 3
-          const bPriority = priority[studentStats?.data?.programmeNames[b]?.degreeProgrammeType ?? ''] ?? 3
-
-          return aPriority - bPriority
-        })
-        .map(programme => ({ progId: studentStats?.data?.programmeNames[programme]?.progId ?? '', code: programme }))
-    : []
+    return aPriority - bPriority
+  })
 
   return (
     <Stack gap={2}>
@@ -63,7 +56,7 @@ export const StudentsByStartingYearTab = ({
         <ToggleContainer>
           <Toggle
             cypress="study-right-toggle"
-            disabled={isError || isLoading}
+            disabled={isLoading || isError || (isSuccess && !studentStats)}
             firstLabel="All study rights"
             infoBoxContent={facultyToolTips.studyRightToggle}
             secondLabel="Special study rights excluded"
@@ -74,14 +67,7 @@ export const StudentsByStartingYearTab = ({
       </Section>
       <Section
         cypress="faculty-student-table"
-        exportOnClick={() =>
-          exportStudentTable(
-            studentStats?.data,
-            faculty.code,
-            programmeKeys.map(listObj => listObj.code),
-            getTextIn
-          )
-        }
+        exportOnClick={() => exportStudentTable(studentStats, faculty.code, programmeKeys, getTextIn)}
         infoBoxContent={facultyToolTips.studentsStatsOfTheFaculty}
         isError={isError}
         isLoading={isLoading}
@@ -98,17 +84,17 @@ export const StudentsByStartingYearTab = ({
               value={showPercentages}
             />
           </ToggleContainer>
-          {studentStats?.data ? (
+          {studentStats ? (
             <FacultyStudentDataTable
-              extraTableStats={studentStats?.data.facultyTableStatsExtra}
-              programmeNames={studentStats?.data.programmeNames}
-              programmeStats={studentStats?.data.programmeStats}
+              extraTableStats={studentStats.facultyTableStatsExtra}
+              programmeNames={studentStats.programmeNames}
+              programmeStats={studentStats.programmeStats}
               requiredRights={requiredRights}
               showPercentages={showPercentages}
-              sortedKeys={programmeKeys.map(listObj => listObj.code)}
-              tableStats={studentStats?.data.facultyTableStats}
-              titles={studentStats?.data.titles}
-              years={studentStats?.data.years}
+              sortedKeys={programmeKeys}
+              tableStats={studentStats.facultyTableStats}
+              titles={studentStats.titles}
+              years={studentStats.years}
             />
           ) : null}
         </Stack>

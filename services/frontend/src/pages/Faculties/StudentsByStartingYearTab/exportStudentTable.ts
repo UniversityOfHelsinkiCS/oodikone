@@ -60,35 +60,28 @@ export const exportStudentTable = (
   const tableSheet = utils.json_to_sheet(tableStats)
   utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
-  const progressStats = sortedkeys.reduce(
-    (results, programme) => [
-      ...results,
-      ...Object.keys(programmeStats[programme])
-        .sort(sortByYear)
-        .map((yearRow, yearIndex) => {
-          return {
-            'Academic Year': years[yearIndex],
-            Programme: programme,
-            Name: getTextIn(programmeNames[programme].name) ?? '',
-            ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
-          }
-        }),
-    ],
-    [] as Record<string, string | number>[]
-  )
+  const progressStats: Record<string, string | number>[] = sortedkeys.flatMap(programme => [
+    ...Object.keys(programmeStats[programme])
+      .sort(sortByYear)
+      .map(yearRow => ({
+        'Academic Year': yearRow,
+        Programme: programme,
+        Name: getTextIn(programmeNames[programme].name) ?? '',
+        ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
+      })),
+  ])
+
   const sheet = utils.json_to_sheet(progressStats)
   utils.book_append_sheet(book, sheet, 'FacultyProgrammeStats')
 
   const countriesHeadersForEachYear = years.reduce(
     (result, year) => ({
       ...result,
-      [year]: [
-        ...new Set(
-          Object.keys(countriesExtra[year])
-            .reduce((acc, programme) => [...acc, ...Object.keys(countriesExtra[year][programme])], [] as string[])
-            .sort()
-        ),
-      ],
+      [year]: Array.from(
+        new Set(
+          Object.keys(countriesExtra[year]).flatMap(programme => [...Object.keys(countriesExtra[year][programme])])
+        )
+      ).sort(),
     }),
     {} as Record<string, string[]>
   )
@@ -106,24 +99,18 @@ export const exportStudentTable = (
   )
 
   years.forEach(year => {
-    const countriesStats = Object.keys(countriesExtra[year]).reduce(
-      (result, programme) => [
-        ...result,
-        {
-          'Academic Year': year,
-          Programme: programme,
-          Name: getTextIn(programmeNamesByCode[programme]) ?? '',
-          ...countriesHeadersForEachYear[year].reduce(
-            (stats, country) => ({
-              ...stats,
-              [country]: countriesExtra[year][programme][country] || '',
-            }),
-            {}
-          ),
-        },
-      ],
-      [] as Record<string, string | number>[]
-    )
+    const countriesStats = Object.keys(countriesExtra[year]).map(programme => ({
+      'Academic Year': year,
+      Programme: programme,
+      Name: getTextIn(programmeNamesByCode[programme]) ?? '',
+      ...countriesHeadersForEachYear[year].reduce(
+        (stats, country) => ({
+          ...stats,
+          [country]: countriesExtra[year][programme][country] || '',
+        }),
+        {}
+      ),
+    }))
     const countriesSheet = utils.json_to_sheet(countriesStats)
     utils.book_append_sheet(book, countriesSheet, `CountriesStats-${year}`)
   })
