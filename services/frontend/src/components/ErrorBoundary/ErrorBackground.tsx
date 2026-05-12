@@ -2,8 +2,8 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import ReactECharts from 'echarts-for-react'
 import { random } from 'lodash-es'
-import ReactHighchart from 'react-highcharts'
 
 import toskaLogo from '@/assets/toska.svg'
 import { Backdrop } from '@/components/common/Backdrop'
@@ -12,63 +12,83 @@ import { useTitle } from '@/hooks/title'
 import { useLogoutMutation } from '@/redux/auth'
 import { LogoutIcon, RefreshIcon } from '@/theme'
 
-const names = [
-  'mluukkai',
-  'jakousa',
-  'totutotu',
-  'sasumaki',
-  'ikuisma',
-  'eero3',
-  'mitiaine',
-  'rimi',
-  'esakemp',
-  'woltsu',
-  'cxcorp',
-  'ajhaa',
-  'joonashak',
-  'vaahtokarkki',
-  'otahontas',
-  'saarasat',
-  'popalmu',
-  'ollikehy',
-] as const
-
-const dummyData = names.map(name => ({
-  name,
-  data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].reduce((acc, i) => {
-    acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
-    return acc
-  }, [] as number[]),
-  type: 'line' as const,
-}))
+const dummyData = [...Array(18).keys()].map(_ => [...Array(new Date().getFullYear() - 2016).keys()].reduce<number[]>((acc, i) => {
+  acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
+  return acc
+}, []))
 
 export const ErrorBackground = ({ header, content }) => {
   useTitle(header)
   const [logout] = useLogoutMutation()
+  const yearLabels = dummyData[0]?.map((_, index) => (2017 + index).toString()) ?? []
 
   return (
     <PageLayout maxWidth="lg">
       <Stack sx={{ alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
-        <ReactHighchart
-          config={{
-            plotOptions: { series: { label: { connectorAllowed: false }, pointStart: 2010 } },
-            series: dummyData,
-            title: { text: 'Students of Computer Science 2018-2020' },
-            yAxis: { title: { text: 'Cumulative credits' } },
-          }}
-        />
-        <ReactHighchart
-          config={{
-            chart: { type: 'column' },
-            series: dummyData.map(element => ({
-              name: element.name,
-              data: [Math.max(...element.data)],
-              type: 'column',
+        <ReactECharts
+          option={{
+            title: {
+              text: `Students of Computer Science 2017-${new Date().getFullYear()}`,
+            },
+            tooltip: {
+              trigger: 'axis',
+            },
+            grid: {
+              left: 40,
+              right: 20,
+              top: 40,
+              bottom: 30,
+              containLabel: true,
+            },
+            xAxis: {
+              type: 'category',
+              data: yearLabels,
+            },
+            yAxis: {
+              type: 'value',
+              name: 'Cumulative credits',
+            },
+            series: dummyData.map(data => ({
+              type: 'line',
+              data,
             })),
-            title: { text: "Your students' future" },
-            xAxis: { categories: ['2018'] },
-            yAxis: { title: { text: 'Cumulative credits' } },
           }}
+          opts={{ renderer: 'svg' }}
+          style={{ height: 300, width: '100%' }}
+        />
+        <ReactECharts
+          option={{
+            title: {
+              text: "Your students' future",
+            },
+            tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                type: 'shadow',
+              },
+            },
+            grid: {
+              left: 40,
+              right: 20,
+              top: 40,
+              bottom: 30,
+              containLabel: true,
+            },
+            xAxis: {
+              type: 'category',
+              data: ['2018'],
+            },
+            yAxis: {
+              type: 'value',
+              name: 'Cumulative credits',
+            },
+            series: dummyData.map(data => ({
+              type: 'bar',
+              data: [Math.max(...data)],
+            })),
+          }}
+          opts={{ renderer: 'svg' }}
+          style={{ height: 300, width: '100%' }}
         />
       </Stack>
       <Backdrop
