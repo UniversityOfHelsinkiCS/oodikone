@@ -125,12 +125,26 @@ export const GraduationBreakdown = ({
         return getTooltipText(id, seriesName, amount)
       },
     },
+    toolbox: {
+      feature: {
+        dataView: {
+          readOnly: true,
+          title: 'View table data',
+        },
+        saveAsImage: {
+          name: 'Oodikone-graduation-breakdown',
+        },
+      },
+    },
     grid: {
       top: 60,
       left: 10,
       right: 20,
-      bottom: 30,
+      bottom: 60,
       containLabel: true,
+    },
+    legend: {
+      bottom: 0,
     },
     xAxis: {
       type: 'value',

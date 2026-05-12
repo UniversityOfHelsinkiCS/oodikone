@@ -194,6 +194,13 @@ export const MedianGraduations = ({
       bottom: 30,
       containLabel: true,
     },
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: 'Oodikone-graduation-medians',
+        },
+      },
+    },
     xAxis: {
       type: 'value',
       min: 0,

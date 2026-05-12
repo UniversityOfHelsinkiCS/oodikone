@@ -108,7 +108,7 @@ export const ProgrammeProgressChart = ({
     legend: {
       borderColor: '#CCC',
       borderWidth: 1,
-      top: 0,
+      bottom: 0,
       selected: Object.keys(legendSelection).length ? legendSelection : undefined,
     },
     tooltip: {
@@ -133,11 +133,18 @@ export const ProgrammeProgressChart = ({
         return tooltipString
       },
     },
+    toolbox: {
+      feature: {
+        saveAsImage: {
+          name: 'Oodikone-progress-of-students',
+        },
+      },
+    },
     grid: {
-      top: 60,
+      top: 50,
       left: 10,
       right: 20,
-      bottom: 10,
+      bottom: 50,
       containLabel: true,
     },
     xAxis: {
