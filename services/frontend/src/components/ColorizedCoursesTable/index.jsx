@@ -1,4 +1,5 @@
 import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useEffect, useMemo, useState } from 'react'
@@ -87,17 +88,19 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
   }
 
   return (
-    <div className="colorized-courses-table">
-      <ColorizedCoursesTableContext.Provider value={settingsContext}>
-        {displayedPanes.length > 1 ? (
-          <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
-            {displayedPanes.map(({ label }) => (
-              <Tab key={label} label={label} />
-            ))}
-          </Tabs>
-        ) : null}
-        <Paper variant="outlined">{displayedPanes.at(tab)?.render() ?? null}</Paper>
-      </ColorizedCoursesTableContext.Provider>
-    </div>
+    <Stack alignItems="center">
+      {displayedPanes.length > 1 && (
+        <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+          {displayedPanes.map(({ label }) => (
+            <Tab key={label} label={label} />
+          ))}
+        </Tabs>
+      )}
+      <Paper variant="outlined">
+        <ColorizedCoursesTableContext.Provider value={settingsContext}>
+          {displayedPanes.at(tab)?.render() ?? null}
+        </ColorizedCoursesTableContext.Provider>
+      </Paper>
+    </Stack>
   )
 }

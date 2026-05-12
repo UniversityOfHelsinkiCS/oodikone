@@ -1,18 +1,9 @@
 import Box from '@mui/material/Box'
+
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { getColor } from '@/components/ColorizedCoursesTable/common'
-
-const CourseContainer = ({ getTextIn, name, code }) => (
-  <div
-    style={{ display: 'flex', flexDirection: 'column', alignItems: 'baseline', height: 'auto', padding: '0.5em 0' }}
-    title={getTextIn(name) ?? code}
-  >
-    <b>{code}</b>
-    <i style={{ color: 'gray', maxWidth: '100%' }}>{getTextIn(name) ?? null}</i>
-  </div>
-)
+import { getColor, CourseContainer } from '@/components/ColorizedCoursesTable/common'
 
 const columnHelper = createColumnHelper()
 

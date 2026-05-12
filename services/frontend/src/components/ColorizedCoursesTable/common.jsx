@@ -1,3 +1,4 @@
+import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import { createContext, useContext, useState, useEffect } from 'react'
 
@@ -95,3 +96,10 @@ export const CourseFilter = ({ setCourseFilter }) => {
     <TextField label="Course name/code filter" onChange={event => setTextField(event.target.value)} value={textField} />
   )
 }
+
+export const CourseContainer = ({ getTextIn, name, code }) => (
+  <Stack alignItems="baseline" flexDirection="column" py={1} title={getTextIn(name) ?? code}>
+    <b>{code}</b>
+    <i className="colored-info-expander">{getTextIn(name) ?? null}</i>
+  </Stack>
+)

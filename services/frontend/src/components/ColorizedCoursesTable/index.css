@@ -1,17 +1,3 @@
-.colorized-courses-table {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.colorized-courses-table > div {
-  max-width: 100%;
-}
-
-input[type='radio'] {
-  margin-left: 2em;
-}
-
 .options-container {
   display: flex;
   flex-direction: row;
@@ -28,9 +14,9 @@ input[type='radio'] {
   max-width: 25vw;
 }
 
-table tr th,
-td > div > i {
-  max-width: 340px;
+.colored-info-expander {
+  color: gray;
+  width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
