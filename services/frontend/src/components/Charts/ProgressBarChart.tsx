@@ -68,7 +68,7 @@ export const ProgressBarChart = ({ cypress, data }: { cypress: string; data: Pro
       hideOverlap: true,
     },
     emphasis: {
-      focus: 'series',
+      focus: 'none',
     },
     data: Array.from({ length: pointCount }, (_, pointIndex) => {
       const rawValue = getNumericValue(graphSeries.data[pointIndex])
