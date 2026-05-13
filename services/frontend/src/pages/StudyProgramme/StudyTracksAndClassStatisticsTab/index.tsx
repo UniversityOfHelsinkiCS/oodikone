@@ -212,7 +212,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         }
         isError={hasErrors}
         isLoading={isFetchingOrLoading}
-        title={`Students of the ${isStudyProgrammeMode ? 'degree programme' : `studytrack ${studyTrack}`} by starting year`}
+        title={`Students of the ${isStudyProgrammeMode ? 'degree programme' : `study track ${studyTrack}`} by starting year`}
       >
         {studyTrackStats ? (
           <Stack gap={2}>
