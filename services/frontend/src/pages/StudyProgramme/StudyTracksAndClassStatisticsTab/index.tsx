@@ -12,6 +12,7 @@ import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { GraduationTimes } from '@/components/GraduationTimes'
 import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChartV2'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
@@ -19,6 +20,7 @@ import { hasAccessToProgrammePopulation } from '@/util/access'
 import { calculateStats } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
 import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@oodikone/shared/types'
+import { exportStudentTable } from './exportStudentTable'
 import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
@@ -35,6 +37,8 @@ export const StudyTracksAndClassStatisticsTab = ({
   specialGroupsExcluded: boolean
   studyProgramme: string
 }) => {
+  const { getTextIn } = useLanguage()
+
   const [studyTrack, setStudyTrack] = useState(studyProgramme)
   const [showMedian, setShowMedian] = useState(false)
   const [showPercentages, setShowPercentages] = useState(false)
@@ -200,6 +204,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
       <Section
         cypress="study-track-overview"
+        exportOnClick={() => exportStudentTable(studyTrackStats, studyProgramme, studyTrack, getTextIn)}
         infoBoxContent={
           combinedProgramme
             ? studyProgrammeToolTips.studyTrackOverviewCombinedProgramme
