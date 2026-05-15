@@ -47,7 +47,7 @@ export const GraduationTimesTab = ({
     groupBy,
     isError,
     isLoading,
-    mode: 'faculty',
+    mode: 'programme',
     names: programmeNames,
     showMedian,
     yearLabel,

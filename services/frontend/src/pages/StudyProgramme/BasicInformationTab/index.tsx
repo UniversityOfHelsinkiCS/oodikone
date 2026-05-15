@@ -218,7 +218,7 @@ export const BasicInformationTab = ({
         infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
-        title="Average graduation times by graduation years"
+        title="Average graduation times by graduation year"
       >
         {graduations.isSuccess && graduations.data && (
           <Stack gap={2}>
@@ -237,14 +237,14 @@ export const BasicInformationTab = ({
                   <GraduationTimes
                     data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
                     goal={graduations?.data?.comboTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                    title={getGraduationGraphTitle(studyProgramme, true)}
                     {...commonProps}
                   />
                 )}
                 <GraduationTimes
                   data={graduations.data?.graduationTimes.medians.map(item => ({ median: item.y, ...item }))}
                   goal={graduations?.data?.graduationTimes?.goal}
-                  title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  title={getGraduationGraphTitle(studyProgramme, false)}
                   {...commonProps}
                 />
                 {combinedProgramme && (
@@ -262,13 +262,13 @@ export const BasicInformationTab = ({
                   <GraduationTimes
                     data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
                     goal={graduations?.data?.comboTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                    title={getGraduationGraphTitle(studyProgramme, true)}
                     {...commonProps}
                   />
                 )}
                 <GraduationTimes
                   data={timesData?.medians.map(item => ({ median: item.y, ...item }))}
-                  title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  title={getGraduationGraphTitle(studyProgramme, false)}
                   {...commonProps}
                 />
                 {combinedProgramme && (

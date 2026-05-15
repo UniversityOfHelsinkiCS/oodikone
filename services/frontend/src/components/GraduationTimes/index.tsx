@@ -13,7 +13,7 @@ import {
 } from '@oodikone/shared/types'
 
 export type GraduationTimesProps = {
-  mode: 'faculty' | 'programme' | 'study track'
+  mode: 'faculty' | 'programme' | 'study track' // "Mode" is one step below the current view in hierarchy e.g. viewing a programme overview -> mode should be study track
   classSizes?: FacultyClassSizes | ProgrammeClassSizes | undefined
   data: GraduationStats[] | undefined
   goal?: number | undefined
@@ -22,7 +22,7 @@ export type GraduationTimesProps = {
   allowExpand?: boolean
   isLoading: boolean
   isError: boolean
-  level?: 'unset' | 'bachelor' | 'master' | 'bscMscCombo' | 'doctor'
+  level?: 'unset' | 'bachelor' | 'master' | 'bcMsCombo' | 'doctor'
   levelProgrammeData?: ProgrammeMedians
   names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
   showMedian: boolean

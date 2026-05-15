@@ -23,6 +23,12 @@ const resolveCourseCode = (course: CourseWithCode) => course.course_code ?? cour
 
 const toMillis = (date: Date | string) => new Date(date).getTime()
 
+
+/** expandKey is only provided to the expanded instance of a chart */
+export const getSeriesLabel = (expandKey: string | undefined | null, yearLabel: string | undefined, mode: string) => (
+  expandKey ? `${mode.charAt(0).toUpperCase()}${mode.slice(1)}` : yearLabel
+)
+
 const getEnrollmentLabel = (enrollmentType: number, statutoryAbsence: boolean) => {
   if (enrollmentType === 2) return statutoryAbsence ? 'Absent (statutory)' : 'Absent'
   if (enrollmentType === 3) return 'No enrollment'

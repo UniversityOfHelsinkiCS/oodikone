@@ -4,10 +4,10 @@ import ReactECharts from 'echarts-for-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { GraduationStats, Name, NameWithCode } from '@oodikone/shared/types'
-import { getOnEvents } from './util'
+import { getOnEvents, getSeriesLabel } from './util'
 
 
-type GraduationProps =
+type GraduationBreakdownProps =
   | {
     cypress: string
     data: GraduationStats[]
@@ -24,8 +24,8 @@ type GraduationProps =
     data: GraduationStats[]
     handleClick: (seriesCategory: string) => void
     mode: 'faculty' | 'programme' | 'study track'
+    yearLabel: 'Graduation year' | 'Start year'
 
-    yearLabel?: never
     names?: never
     expandKey?: never
     fullWidth?: never
@@ -36,7 +36,7 @@ type GraduationProps =
     handleClick: (seriesCategory: string) => void
     mode: 'faculty' | 'programme' | 'study track'
     names: Record<string, Name | NameWithCode> | Record<string, string | Name> | undefined
-    expandKey: string
+    expandKey: string | null
     yearLabel: 'Graduation year' | 'Start year'
 
     fullWidth?: never
@@ -51,7 +51,7 @@ export const GraduationBreakdown = ({
   names,
   expandKey,
   yearLabel,
-}: GraduationProps) => {
+}: GraduationBreakdownProps) => {
   const { language } = useLanguage()
   const theme = useTheme()
 
@@ -89,13 +89,6 @@ export const GraduationBreakdown = ({
       return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
     }
     return `<b>${seriesName}</b>: ${amount}`
-  }
-
-  const getLabel = () => {
-    if (mode === 'faculty') {
-      return expandKey ? 'Graduation year' : 'Faculty'
-    }
-    return expandKey ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const barWidth = data.length > 8 ? 16 : 20
@@ -185,7 +178,7 @@ export const GraduationBreakdown = ({
     yAxis: {
       type: 'category',
       data: categories,
-      name: getLabel(),
+      name: getSeriesLabel(expandKey, yearLabel, mode),
       nameLocation: 'start',
       nameGap: 12,
       inverse: true,

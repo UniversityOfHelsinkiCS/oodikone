@@ -69,7 +69,6 @@ export const MedianDisplay = ({
           cypress={`${level}-median-bar-chart`}
           classSizes={!!classSizes && 'programme' in classSizes ? classSizes.programme : {}}
           data={data}
-          expandKey={expandKey}
           fullWidth
           goal={goal ?? 0}
           handleClick={handleClick}
@@ -80,10 +79,9 @@ export const MedianDisplay = ({
       ) : (
         <Stack direction={{ sm: 'column', md: 'row' }}>
           <MedianGraduations
-            classSizes={classSizes?.[level] ?? {}}
+            classSizes={!!classSizes ? ('programme' in classSizes ? classSizes.programme : level in classSizes ? classSizes[level] : {}) : {}}
             cypress={`${level}-median-bar-chart`}
             data={data}
-            expandKey={expandKey}
             goal={goal ?? 0}
             handleClick={handleClick}
             mode={mode}
@@ -97,7 +95,6 @@ export const MedianDisplay = ({
               cypress={`${level}-median-bar-chart-faculty`}
               data={levelProgrammeData[expandKey].data}
               expandKey={expandKey}
-              facultyGraph={false}
               goal={goal ?? 0}
               goalExceptions={goalExceptions}
               handleClick={handleClick}

@@ -11,7 +11,7 @@ import {
   NameWithCode,
   ProgrammeClassSizes,
 } from '@oodikone/shared/types'
-import { getOnEvents } from './util'
+import { getOnEvents, getSeriesLabel } from './util'
 
 type GraduationPoint = GraduationStats & { color?: string; realGoal?: number }
 
@@ -20,7 +20,6 @@ export const MedianGraduations = ({
   cypress,
   data,
   expandKey,
-  facultyGraph = true,
   fullWidth,
   goal,
   goalExceptions,
@@ -34,7 +33,7 @@ export const MedianGraduations = ({
   classSizes?: FacultyClassSizes['programmes'] | ProgrammeClassSizes['studyTracks' | 'programme']
   cypress: string
   data: GraduationStats[]
-  expandKey: string | null
+  expandKey?: string
   facultyGraph?: boolean
   fullWidth?: true,
   goal: number
@@ -50,7 +49,7 @@ export const MedianGraduations = ({
   const theme = useTheme()
 
   let modData: GraduationPoint[] | null = null
-  if (!facultyGraph && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
+  if (!expandKey && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
     if (modData) {
@@ -75,9 +74,7 @@ export const MedianGraduations = ({
   }, goal * 2)
 
   const getClassSize = (category: string) => {
-    if (facultyGraph) return classSizes?.[category]
-    // if (class)
-    return classSizes?.[category]?.[expandKey ?? '']
+    return expandKey ? classSizes?.[category]?.[expandKey ?? ''] : classSizes?.[category]
   }
 
   const getPercentage = (amount: number, category: string) => {
@@ -114,23 +111,16 @@ export const MedianGraduations = ({
   ) => {
     const sortingText =
       yearLabel === 'Start year'
-        ? `<b>From class of ${facultyGraph ? name : expandKey}, ${amount}/${getClassSize(code)} students have graduated</b>`
-        : `<b>${amount} students graduated in year ${facultyGraph ? name : expandKey}</b>`
+        ? `<b>From class of ${!expandKey ? name : expandKey}, ${amount}/${getClassSize(code)} students have graduated</b>`
+        : `<b>${amount} students graduated in year ${!expandKey ? name : expandKey}</b>`
     const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
     const statisticsText = `<br />${statistics?.onTime} graduated on time<br />${statistics?.yearOver} graduated max year overtime<br />${statistics?.wayOver} graduated over year late`
 
-    if (!facultyGraph) {
+    if (expandKey) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} semesters **</b></p>` : ''
       return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br />${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
-  }
-
-  const getLabel = () => {
-    if (mode === 'faculty') {
-      return facultyGraph ? 'Graduation year' : 'Faculty'
-    }
-    return facultyGraph ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const resolveBarColor = (median: number, override?: string) => {
@@ -161,7 +151,7 @@ export const MedianGraduations = ({
 
   const option = {
     title: {
-      text: !facultyGraph ? `Year ${expandKey} by ${yearLabel.toLowerCase()}` : '',
+      text: expandKey ? `Year ${expandKey} by ${yearLabel.toLowerCase()}` : '',
       left: 'center',
     },
     tooltip: {
@@ -216,10 +206,9 @@ export const MedianGraduations = ({
     yAxis: {
       type: 'category',
       data: seriesData.map(item => item.name),
-      name: getLabel(),
+      name: getSeriesLabel(expandKey, yearLabel, mode),
       nameLocation: 'start',
       nameGap: 12,
-      nameRotate: 0,
       inverse: true,
       z: 10,
     },

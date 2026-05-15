@@ -51,6 +51,7 @@ export const BreakdownDisplay = ({
           data={data}
           handleClick={handleClick}
           mode={mode}
+          yearLabel={yearLabel}
         />
         {programmeDataVisible && expandKey && levelProgrammeData && expandKey in levelProgrammeData ? (
           <GraduationBreakdown

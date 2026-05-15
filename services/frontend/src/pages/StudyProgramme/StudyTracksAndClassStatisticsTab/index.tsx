@@ -184,8 +184,7 @@ export const StudyTracksAndClassStatisticsTab = ({
     names: studyTrackStats?.studyTracks,
     showMedian: showMedian,
 
-    level: "programme",
-    mode: "programme",
+    mode: "study track",
     yearLabel: "Start year",
   } as const
 
@@ -321,6 +320,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                     classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes!}
                     data={studyTrackStats.graduationTimes[studyProgramme].medians.combo.map(formatMedianEntries)}
                     goal={studyTrackStats.graduationTimes.goals.combo}
+                    levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
                     title={getGraduationGraphTitle(studyProgramme, true)}
                     {...graduationTimeCommonProps}
                   />
