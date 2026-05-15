@@ -24,13 +24,11 @@
     "dayjs": "^1.11.13",
     "echarts": "^6.0.0",
     "echarts-for-react": "^3.0.6",
-    "highcharts": "^11.4.8",
     "lodash-es": "^4.17.23",
     "material-react-table": "^3.2.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-highcharts": "^16.1.0",
     "react-markdown": "^10.1.0",
     "react-range": "^1.10.0",
     "react-redux": "^9.2.0",
@@ -42,16 +40,8 @@
     "@types/node": "^24.10.1",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
-    "@types/react-highcharts": "^16.0.7",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "typescript": "^5.9.2",
     "vite": "^7.3.1"
-  },
-  "overrides": {
-    "react-highcharts": {
-      "highcharts": "$highcharts",
-      "react": "$react",
-      "react-dom": "$react-dom"
-    }
   }
 }
