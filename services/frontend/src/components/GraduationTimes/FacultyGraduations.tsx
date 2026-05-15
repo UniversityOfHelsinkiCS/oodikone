@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { GraduationTimes } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
 import { GetAllGraduationStatsResponse } from '@/types/api/university'
 
 export const FacultyGraduations = ({
@@ -25,7 +25,7 @@ export const FacultyGraduations = ({
   const facultyNames = data?.programmeNames
   const classSizes = data?.classSizes
 
-  const commonProps = {
+  const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
     allowExpand: true,
     classSizes,
     names: facultyNames,

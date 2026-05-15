@@ -61,7 +61,8 @@ export const MedianDisplay = ({
           the faculty level bar color is based on the typical goal time of {goal} months
         </Typography>
       )}
-      <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
+
+      {allowExpand ? <Typography>Click a bar to view that year's {mode} level breakdown</Typography> : null}
 
       {!allowExpand ? (
         <MedianGraduations

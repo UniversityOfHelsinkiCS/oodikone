@@ -8,10 +8,8 @@ import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { BarChart } from '@/components/Charts/BarChart'
 import { LineGraph } from '@/components/Charts/LineGraph'
 import { StackedBarChart } from '@/components/Charts/StackedBarChart'
-import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChartV2'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DataTable } from '@/components/StudyProgramme/DataTable'
@@ -20,6 +18,7 @@ import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
+import { GraduationTimes, type GraduationTimesProps } from '@/components/GraduationTimes'
 
 const getGraduatedText = (code: string) => {
   if (code.startsWith('T') || code.startsWith('LIS')) {
@@ -86,6 +85,16 @@ export const BasicInformationTab = ({
   const creditsIsError = credits.isError || (credits.isSuccess && !credits.data)
   const graduationsIsError = graduations.isError || (graduations.isSuccess && !graduations.data)
   const hasErrors = basicsIsError || creditsIsError || graduationsIsError
+
+  const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
+    allowExpand: false,
+    groupBy: 'byGradYear',
+    isError: graduationsIsError,
+    isLoading: graduationsIsLoading,
+    mode: 'programme',
+    showMedian,
+    yearLabel: 'Graduation year',
+  } as const
 
   return (
     <Stack gap={2}>
@@ -209,9 +218,9 @@ export const BasicInformationTab = ({
         infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
-        title="Average graduation times"
+        title="Average graduation times by graduation years"
       >
-        {graduations.isSuccess && graduations.data ? (
+        {graduations.isSuccess && graduations.data && (
           <Stack gap={2}>
             <ToggleContainer>
               <Toggle
@@ -224,52 +233,55 @@ export const BasicInformationTab = ({
             </ToggleContainer>
             {showMedian ? (
               <>
-                {doCombo ? (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={graduations?.data?.comboTimes?.medians}
+                {doCombo && (
+                  <GraduationTimes
+                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
                     goal={graduations?.data?.comboTimes?.goal}
                     title={getGraduationGraphTitle(studyProgramme, doCombo)}
-                  />
-                ) : null}
-                {studyProgramme !== 'MH90_001' && (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={timesData?.medians}
-                    goal={graduations?.data.graduationTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme)}
+                    {...commonProps}
                   />
                 )}
-                {combinedProgramme ? (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={timesDataSecondProgramme?.medians}
-                    goal={graduations?.data.graduationTimesSecondProgramme?.goal}
+                <GraduationTimes
+                  data={graduations.data?.graduationTimes.medians.map(item => ({ median: item.y, ...item }))}
+                  goal={graduations?.data?.graduationTimes?.goal}
+                  title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  {...commonProps}
+                />
+                {combinedProgramme && (
+                  <GraduationTimes
+                    data={graduations.data?.graduationTimesSecondProgramme.medians.map(item => ({ median: item.y, ...item }))}
+                    goal={graduations?.data?.graduationTimesSecondProgramme?.goal}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
+                    {...commonProps}
                   />
-                ) : null}
+                )}
               </>
             ) : (
               <>
-                {doCombo ? (
-                  <BreakdownBarChart
-                    data={graduations?.data?.comboTimes?.medians}
+                {doCombo && (
+                  <GraduationTimes
+                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
+                    goal={graduations?.data?.comboTimes?.goal}
                     title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                    {...commonProps}
                   />
-                ) : null}
-                {studyProgramme !== 'MH90_001' && (
-                  <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyProgramme)} />
                 )}
-                {combinedProgramme ? (
-                  <BreakdownBarChart
-                    data={timesDataSecondProgramme?.medians}
+                <GraduationTimes
+                  data={timesData?.medians.map(item => ({ median: item.y, ...item }))}
+                  title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  {...commonProps}
+                />
+                {combinedProgramme && (
+                  <GraduationTimes
+                    data={timesDataSecondProgramme?.medians.map(item => ({ median: item.y, ...item }))}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
+                    {...commonProps}
                   />
-                ) : null}
+                )}
               </>
             )}
           </Stack>
-        ) : null}
+        )}
       </Section>
 
       <Section

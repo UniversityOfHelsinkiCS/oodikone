@@ -16,13 +16,13 @@ export type GraduationTimesProps = {
   mode: 'faculty' | 'programme' | 'study track'
   classSizes?: FacultyClassSizes | ProgrammeClassSizes | undefined
   data: GraduationStats[] | undefined
-  goal: number | undefined
-  goalExceptions: Record<string, number> | { needed: boolean }
+  goal?: number | undefined
+  goalExceptions?: Record<string, number> | { needed: boolean }
   groupBy?: 'byGradYear' | 'byStartYear'
   allowExpand?: boolean
   isLoading: boolean
   isError: boolean
-  level: string
+  level?: 'unset' | 'bachelor' | 'master' | 'bscMscCombo' | 'doctor'
   levelProgrammeData?: ProgrammeMedians
   names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
   showMedian: boolean
@@ -34,12 +34,12 @@ export const GraduationTimes = ({
   classSizes,
   data,
   goal,
-  goalExceptions,
+  goalExceptions = { needed: false },
   groupBy = 'byStartYear',
   allowExpand = true,
   isLoading,
   isError,
-  level,
+  level = 'unset',
   levelProgrammeData,
   mode,
   names,
