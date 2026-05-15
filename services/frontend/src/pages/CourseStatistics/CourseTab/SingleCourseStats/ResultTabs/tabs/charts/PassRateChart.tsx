@@ -1,17 +1,29 @@
 import useTheme from '@mui/material/styles/useTheme'
 
-import accessibility from 'highcharts/modules/accessibility'
-import exportData from 'highcharts/modules/export-data'
-import exporting from 'highcharts/modules/exporting'
-import ReactHighcharts from 'react-highcharts'
+import ReactECharts from 'echarts-for-react'
 
 import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { FormattedStats, ProgrammeStats, ViewMode } from '@/types/courseStat'
-import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from './util'
+import { absoluteToRelative, getDataObject } from './util'
 
-exporting(ReactHighcharts.Highcharts)
-exportData(ReactHighcharts.Highcharts)
-accessibility(ReactHighcharts.Highcharts)
+const formatNumber = (value: unknown) => {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+
+  if (!Number.isFinite(numericValue)) {
+    return ''
+  }
+
+  if (Number.isInteger(numericValue)) {
+    return `${numericValue}`
+  }
+
+  return `${numericValue.toFixed(2)}`
+}
+
+const getNumericValue = (value: unknown) => {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numericValue) ? numericValue : 0
+}
 
 const getPassRateSeries = (stats: FormattedStats[], viewMode: ViewMode) => {
   const all: number[] = []
@@ -73,21 +85,75 @@ export const PassRateChart = ({
   const statYears = stats.map(year => year.name)
 
   const series = getPassRateSeries(stats, viewMode)
-  const maxPassRateVal = isRelative ? 100 : getMaxValueOfSeries(series.absolute)
+  console.log(series)
+  const chartSeries = isRelative ? series.relative : series.absolute
+  const chartColors = isRelative ? colorsRelative : colors
+  const yAxisTitle = isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`
 
-  const graphOptions = getGraphOptions(
-    colors,
-    colorsRelative,
-    isRelative,
-    maxPassRateVal,
-    statYears,
-    `Pass rate for group ${data.name}`,
-    viewMode
-  )
+  const option = {
+    color: chartColors,
+    title: {
+      text: `Pass rate for group ${data.name}`,
+      left: 'center',
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: (params: { seriesName?: string; value?: unknown; dataIndex?: number }) => {
+        const value = getNumericValue(params.value)
+
+        if (isRelative) {
+          const dataIndex = params.dataIndex ?? 0
+          const total = chartSeries.reduce((sum, seriesItem) => sum + getNumericValue(seriesItem.data[dataIndex]), 0)
+          const percentage = total ? (value / total) * 100 : 0
+          return `<b>${params.seriesName ?? ''}</b>: ${formatNumber(percentage)}%`
+        }
+
+        return `<b>${params.seriesName ?? ''}</b>: ${formatNumber(value)}`
+      },
+    },
+    legend: {
+      bottom: 0,
+    },
+    grid: {
+      top: 60,
+      left: 10,
+      right: 10,
+      bottom: 60,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: statYears,
+    },
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: isRelative ? 100 : undefined,
+      minInterval: 1,
+      name: yAxisTitle,
+      axisLabel: {
+        margin: 30,
+        formatter: isRelative ? '{value}%' : '{value}',
+      },
+    },
+    series: chartSeries.map((seriesItem, index) => ({
+      name: seriesItem.name,
+      type: 'bar',
+      stack: seriesItem.stack,
+      data: seriesItem.data,
+      itemStyle: {
+        borderRadius: 0,
+        color: chartColors[index],
+      },
+      emphasis: {
+        focus: 'series',
+      },
+    })),
+  }
 
   return (
     <div>
-      <ReactHighcharts config={{ ...graphOptions, series: isRelative ? series.relative : series.absolute }} />
+      <ReactECharts notMerge option={option} opts={{ renderer: 'svg' }} style={{ height: 450 }} />
       <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )
