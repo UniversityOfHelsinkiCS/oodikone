@@ -1,7 +1,7 @@
 import { col, fn, Includeable, Op } from 'sequelize'
 
 import { SISStudyRight } from '@oodikone/shared/models'
-import { Name, CreditTypeCode } from '@oodikone/shared/types'
+import { CreditTypeCode } from '@oodikone/shared/types'
 import { StudentModel, SISStudyRightModel, SISStudyRightElementModel, CreditModel } from '../../models'
 
 export const getStudyRightsInProgramme = async (
@@ -73,20 +73,15 @@ export const getStudyTracksForProgramme = async (studyProgramme: string) => {
     attributes: [[fn('DISTINCT', col('study_track')), 'studyTrack']],
     where: {
       code: studyProgramme,
+      study_track: { [Op.ne]: null },
     },
     raw: true,
   })
 
-  return result
-    .map(studyTrack => studyTrack.studyTrack)
-    .filter(studyTrack => studyTrack != null)
-    .reduce<Record<string, Name | 'All students of the programme'>>(
-      (acc, track) => {
-        acc[track.code] = track.name
-        return acc
-      },
-      { [studyProgramme]: 'All students of the programme' }
-    )
+  return Object.assign(
+    { [studyProgramme]: 'All students of the programme' },
+    Object.fromEntries(result.map(({ studyTrack }) => [studyTrack!.code, studyTrack!.name]))
+  )
 }
 
 export const getSISStudyRightsOfStudents = async (
@@ -96,11 +91,11 @@ export const getSISStudyRightsOfStudents = async (
 > =>
   (
     await SISStudyRightModel.findAll({
+      attributes: ['id', 'studentNumber', 'extentCode', 'semesterEnrollments', 'startDate', 'endDate'],
       where: {
         studentNumber: {
           [Op.in]: studentNumbers,
         },
       },
-      attributes: ['id', 'studentNumber', 'extentCode', 'semesterEnrollments', 'startDate', 'endDate'],
     })
   ).map(studyRight => studyRight.toJSON())

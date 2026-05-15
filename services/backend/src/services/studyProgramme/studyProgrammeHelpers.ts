@@ -13,34 +13,33 @@ export function getYearsArray(since: number, isAcademicYear: false, yearsCombine
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined?: false): number[]
 export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean): Array<string | number>
 export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean) {
-  const years: Array<string | number> = []
-  const allYears = 'Total'
-  if (yearsCombined) {
-    years.push(allYears)
-  }
   const today = new Date()
   const until = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
-  for (let i = since; i <= until; i++) {
-    const year = isAcademicYear ? `${i} - ${i + 1}` : i
-    years.push(year)
+  const years: Array<string | number> = []
+
+  if (yearsCombined) {
+    years.push('Total')
   }
+
+  for (let i = since; i <= until; i++) {
+    years.push(isAcademicYear ? `${i} - ${i + 1}` : i)
+  }
+
   return years
 }
 
 export function getYearsObject(params: { years: Array<string | number>; emptyArrays: true }): Record<string, []>
-export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: false }): Record<string, 0>
+export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: false }): Record<string, number>
 export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: boolean }) {
-  const { years, emptyArrays = false } = params
-  return years.reduce<Record<string, 0 | []>>((acc, year) => {
-    acc[year] = emptyArrays ? [] : 0
-    return acc
-  }, {})
+  const { years, emptyArrays } = params
+
+  return Object.fromEntries(years.map(year => [year, emptyArrays ? [] : 0]))
 }
 
 export const getStatsBasis = (years: Array<string | number>) => {
   return {
     graphStats: new Array<number>(years.length).fill(0),
-    tableStats: getYearsObject({ years }) as Record<string, number>,
+    tableStats: getYearsObject({ years }),
   }
 }
 

@@ -58,13 +58,7 @@ export const calculateStats = (
   numberOfCreditCategories = 7
 ) => {
   const tableStats: Array<Array<number | string>> = []
-  if (creditCounts === undefined) {
-    return null
-  }
-
-  if (Object.keys(creditCounts).length === 0) {
-    return null
-  }
+  if (!creditCounts || !Object.keys(creditCounts).length) return null
 
   const limits = getCreditCategories(
     true,
@@ -74,13 +68,17 @@ export const calculateStats = (
     numberOfCreditCategories - 1,
     minimumAmountOfCredits
   )
-  const tableTitles = ['', 'All']
-  for (const limit of limits) {
-    if (limit == 'Graduated') tableTitles.push('Graduated')
-    else if (limit[0] === undefined) tableTitles.push(`< ${limit[1]} credits`)
-    else if (limit[1] === undefined) tableTitles.push(`≥ ${limit[0]} credits`)
-    else tableTitles.push(`${limit[0]}–${limit[1]} credits`)
-  }
+  const tableTitles = ['', 'All'].concat(
+    limits.map(limit => {
+      if (limit == 'Graduated') return 'Graduated'
+      else if (limit[0] === undefined) return `< ${limit[1]} credits`
+      else if (limit[1] === undefined) return `≥ ${limit[0]} credits`
+
+      return `${limit[0]}–${limit[1]} credits`
+    })
+  )
+
+  const chartTitles = tableTitles.map(item => item.replace('<', 'Less than').replace('≥', 'At least'))
 
   Object.keys(creditCounts).forEach(year => {
     const yearGraduatedCount = graduatedCount ? graduatedCount[year] : 0
@@ -99,11 +97,7 @@ export const calculateStats = (
 
   const totalCounts: Array<number | string> = ['Total']
   for (let i = 1; i < tableStats[0].length; i++) {
-    let columnSum = 0
-    for (const stats of tableStats) {
-      columnSum += stats[i] as number
-    }
-    totalCounts.push(columnSum)
+    totalCounts.push(tableStats.reduce((sum, stats) => sum + (stats[i] as number), 0))
   }
   tableStats.push(totalCounts)
 
@@ -114,7 +108,8 @@ export const calculateStats = (
     for (let j = tableStats.length - 1; j >= 0; j--) {
       column.push(tableStats[j][i] as number)
     }
-    chartStats.push({ name: tableTitles[i].replace('<', 'Less than').replace('≥', 'At least'), data: column })
+
+    chartStats.push({ name: chartTitles[i], data: column })
   }
 
   return { tableStats, chartStats, tableTitles }

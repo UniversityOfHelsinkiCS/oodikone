@@ -206,8 +206,7 @@ const getMainStatsByTrackAndYear = async (
         startedInProgramme
       )
       if (firstPresentAt) {
-        const firstPresentYear = defineYear(firstPresentAt, true)
-        if (year === firstPresentYear) {
+        if (year === defineYear(firstPresentAt, true)) {
           yearlyStats[year][programmeOrStudyTrack].started += 1
         }
       }
@@ -332,33 +331,35 @@ const getMainStatsByTrackAndYear = async (
     emptyArrays: true,
   })
 
+  const creditCountsByTrack: Record<string, Record<string, number[]>> = {}
+
   const creditCountsCombo: Record<string, number[]> = doCombo
     ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
     : {}
 
+  const creditCountsComboByTrack: Record<string, Record<string, number[]>> = {}
+
   for (const studyRight of studyRightsOfProgramme) {
-    if (!studyRight.semesterEnrollments || !studyRight.student) {
-      continue
-    }
+    if (!studyRight.semesterEnrollments || !studyRight.student) continue
+
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
-    if (!studyRightElement) {
-      continue
-    }
+    if (!studyRightElement) continue
 
     const [hasTransferredFromProgramme, hasTransferredToProgramme] = hasTransferredFromOrToProgramme(
       studyRight,
       studyRightElement
     )
 
-    if (!includeAllSpecials && (hasTransferredToProgramme || hasTransferredFromProgramme)) {
-      continue
-    }
+    if (!includeAllSpecials && (hasTransferredToProgramme || hasTransferredFromProgramme)) continue
 
     const startedInProgramme = new Date(studyRightElement.startDate)
     const startYear = defineYear(startedInProgramme, true)
-    if (!years.includes(startYear)) {
-      continue
-    }
+
+    if (!years.includes(startYear)) continue
+
+    const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
+    const bachelorsStartYear = defineYear(startedInBachelor, true)
+
     updateCounts(
       startYear,
       studyProgramme,
@@ -380,18 +381,31 @@ const getMainStatsByTrackAndYear = async (
       )
     }
 
-    const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
-    // TODO: FIXME: This could be written better
     if (!studyRightElement.graduated) {
-      if (countAsBachelorMaster) {
-        const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
-        if (startedInBachelor && years.includes(defineYear(startedInBachelor, true))) {
-          creditCountsCombo[defineYear(startedInBachelor, true)].push(
-            getCreditCount(studyRight.student.credits, startedInBachelor)
+      if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
+        creditCountsCombo[bachelorsStartYear].push(getCreditCount(studyRight.student.credits, startedInBachelor))
+
+        if (studyTrack) {
+          creditCountsComboByTrack[studyTrack] ??= doCombo
+            ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
+            : {}
+
+          creditCountsComboByTrack[studyTrack][startYear].push(
+            getCreditCount(studyRight.student.credits, startedInProgramme)
           )
         }
       } else {
         creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
+        if (studyTrack) {
+          creditCountsByTrack[studyTrack] ??= getYearsObject({
+            years: years.filter(year => year !== 'Total'),
+            emptyArrays: true,
+          })
+
+          creditCountsByTrack[studyTrack][startYear].push(
+            getCreditCount(studyRight.student.credits, startedInProgramme)
+          )
+        }
       }
     }
   }
@@ -416,16 +430,22 @@ const getMainStatsByTrackAndYear = async (
     }
   }
 
-  const graduatedCount: Record<string, number> = {}
-  years.forEach(year => {
-    graduatedCount[year] = yearlyStats[year] ? yearlyStats[year][studyProgramme].graduated : 0
-  })
+  const graduatedCount: Record<string, number> = Object.fromEntries(
+    years.map(year => [year, yearlyStats[year]?.[studyProgramme].graduated ?? 0])
+  )
 
   const { mainStatsByYear, mainStatsByTrack, otherCountriesCount } = combineStats(
     years,
     yearlyStats,
     studyProgramme,
     combinedProgramme
+  )
+
+  const graduatedCountByTrack: Record<string, Record<string, number>> = Object.fromEntries(
+    Object.keys(mainStatsByTrack).map(track => [
+      track,
+      Object.fromEntries(years.map(year => [year, yearlyStats[year]?.[track]?.graduated ?? 0])),
+    ])
   )
 
   const finalGraduationTimes = await getGraduationTimeStats(
@@ -448,8 +468,11 @@ const getMainStatsByTrackAndYear = async (
     mainStatsByTrack,
     otherCountriesCount,
     creditCounts,
+    creditCountsByTrack,
     creditCountsCombo,
+    creditCountsComboByTrack,
     graduatedCount,
+    graduatedCountByTrack,
     graduationTimes: finalGraduationTimes,
     graduationTimesSecondProg: finalCombinedGraduationTimes,
   }
@@ -468,10 +491,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   settings: { specialGroups: boolean }
   studyRightsOfProgramme: SISStudyRight[]
 }) => {
-  const isAcademicYear = true
-  const includeYearsCombined = true
-  const since = getStartDate(isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
+  const years = getYearsArray(getStartDate(true).getFullYear(), true, true)
 
   const studyTracks = await getStudyTracksForProgramme(studyProgramme)
 
@@ -485,17 +505,21 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     combinedProgramme
   )
 
-  const getCorrectCombinedTitles = () => {
-    if (combinedProgramme === 'MH90_001') return tableTitles.studytracksCombined.licentiate
-    return tableTitles.studytracksCombined.master
-  }
-  const graduatedTitles = combinedProgramme ? getCorrectCombinedTitles() : tableTitles.studytracksBasic
+  const graduatedTitles = combinedProgramme
+    ? combinedProgramme === 'MH90_001'
+      ? tableTitles.studytracksCombined.licentiate
+      : tableTitles.studytracksCombined.master
+    : tableTitles.studytracksBasic
 
+  // FIXME: Clean this object. Thanks.
   const studyTrackStats: StudyTrackStats = {
     creditCounts: stats.creditCounts,
+    creditCountsByTrack: stats.creditCountsByTrack,
     creditCountsCombo: stats.creditCountsCombo,
+    creditCountsComboByTrack: stats.creditCountsComboByTrack,
     doCombo,
     graduatedCount: stats.graduatedCount,
+    graduatedCountByTrack: stats.graduatedCountByTrack,
     graduationTimes: stats.graduationTimes,
     graduationTimesSecondProg: stats.graduationTimesSecondProg,
     id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,

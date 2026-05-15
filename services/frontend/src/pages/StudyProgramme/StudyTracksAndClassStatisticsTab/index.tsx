@@ -1,5 +1,4 @@
 import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 
@@ -56,7 +55,6 @@ export const StudyTracksAndClassStatisticsTab = ({
     data: studyTrackStats,
     isError,
     isFetching,
-    isLoading,
     isSuccess,
   } = useGetStudyTrackStatsQuery({
     id: studyProgramme,
@@ -65,16 +63,12 @@ export const StudyTracksAndClassStatisticsTab = ({
   })
 
   useEffect(() => {
-    if (!studyTrack && studyTrackStats?.mainStatsByTrack[studyProgramme]) {
-      setStudyTrack(studyProgramme)
-    }
+    if (!studyTrack && studyTrackStats?.mainStatsByTrack[studyProgramme]) setStudyTrack(studyProgramme)
   }, [studyProgramme, studyTrack, studyTrackStats, specialGroupsExcluded])
 
   const hasErrors = (isSuccess && !studyTrackStats) || isError
-  const isFetchingOrLoading = isFetching || isLoading
 
-  const noData = isSuccess && studyTrackStats.mainStatsByYear && !studyTrackStats.mainStatsByYear.Total.length
-  if (noData) {
+  if (isSuccess && !studyTrackStats?.mainStatsByYear.Total?.length) {
     return (
       <Alert severity="warning" variant="outlined">
         There is no data available for the selected programme between 2017-{new Date().getFullYear()}
@@ -83,101 +77,110 @@ export const StudyTracksAndClassStatisticsTab = ({
   }
 
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
+  const targetCredits = getTargetCreditsForProgramme(programmeCode)
 
-  const progressStats = calculateStats(
-    studyTrackStats?.creditCounts,
-    studyTrackStats?.graduatedCount,
-    getTargetCreditsForProgramme(programmeCode)
-  )
-  if (progressStats?.chartStats) {
-    progressStats.chartStats.forEach(creditCategory => {
+  const getProgressStats = () => {
+    const creditCounts =
+      studyTrack === studyProgramme ? studyTrackStats?.creditCounts : studyTrackStats?.creditCountsByTrack[studyTrack]
+
+    const graduatedCount =
+      studyTrack === studyProgramme
+        ? studyTrackStats?.graduatedCount
+        : studyTrackStats?.graduatedCountByTrack[studyTrack]
+
+    const progressStats = calculateStats(creditCounts, graduatedCount, targetCredits)
+    progressStats?.chartStats.forEach(creditCategory => {
       const [total, ...years] = creditCategory.data
       creditCategory.data = [total, ...years.reverse()]
     })
+
+    return progressStats
   }
 
-  const progressComboStats =
-    Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0
-      ? calculateStats(
-          studyTrackStats?.creditCountsCombo,
-          studyTrackStats?.graduatedCount,
-          getTargetCreditsForProgramme(programmeCode) + 180
-        )
-      : null
+  const getProgressComboStats = () => {
+    const creditCounts =
+      studyTrack === studyProgramme
+        ? studyTrackStats?.creditCountsCombo
+        : studyTrackStats?.creditCountsComboByTrack[studyTrack]
 
-  if (progressComboStats?.chartStats) {
-    progressComboStats.chartStats.forEach(creditCategory => {
+    const graduatedCount =
+      studyTrack === studyProgramme
+        ? studyTrackStats?.graduatedCount
+        : studyTrackStats?.graduatedCountByTrack[studyTrack]
+
+    const progressComboStats =
+      Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0
+        ? calculateStats(creditCounts, graduatedCount, targetCredits + 180)
+        : null
+
+    progressComboStats?.chartStats?.forEach(creditCategory => {
       const [total, ...years] = creditCategory.data
       creditCategory.data = [total, ...years.reverse()]
     })
-  }
 
-  const studyTrackStatsGraduationStats = {
-    basic: {} as {
-      studyTrackStatsGraduationStats?: ProgrammeMedians
-      studyTrackStatsClassSizes?: ProgrammeClassSizes
-    },
-    combo: {} as {
-      studyTrackStatsGraduationStats?: ProgrammeMedians
-      studyTrackStatsClassSizes?: ProgrammeClassSizes
-    },
+    return progressComboStats
   }
 
   const hasStudyTracks = Object.keys(studyTrackStats?.studyTracks ?? {}).length > 1 && studyTrack === studyProgramme
   const isStudyProgrammeMode = studyTrack === '' || studyTrack === studyProgramme
 
   const calculateStudyTrackStats = (combo = false) => {
-    if (!studyTrackStats?.graduationTimes) {
-      return {}
-    }
+    if (!studyTrackStats?.graduationTimes) return {}
 
     const graduationStats = Object.entries(studyTrackStats.graduationTimes).filter(
       ([key]) => key !== 'goals' && key !== studyProgramme
     ) as [string, ProgrammeOrStudyTrackGraduationStats][]
 
-    const studyTrackStatsGraduationStats = graduationStats.reduce((acc, [programme, { medians }]) => {
+    const studyTrackStatsGraduationStats = graduationStats.reduce<ProgrammeMedians>((acc, [programme, { medians }]) => {
       for (const { name, amount, statistics, y } of Object.values(combo ? medians.combo : medians.basic)) {
-        if (!acc[name]) {
-          acc[name] = { data: [], programmes: [programme] }
-        } else {
-          acc[name].programmes.push(programme)
-        }
+        acc[name] ??= { data: [], programmes: [] }
+        acc[name].programmes.push(programme)
         acc[name].data.push({ amount, name: programme, statistics, code: programme, median: y })
       }
-      return acc
-    }, {} as ProgrammeMedians)
 
+      return acc
+    }, {})
+
+    // NOTE: Assigning undefined to a field "should" set it to not be active.
+    //       The behaviour is not really guaranteed, so it should be delete instead.
+    //       Asserting the correctness of the value is acceptable.
     const studyTrackStatsClassSizes: ProgrammeClassSizes = {
-      programme: Object.values(
-        studyTrackStats.graduationTimes[studyProgramme].medians[combo ? 'combo' : 'basic']
-      ).reduce(
-        (acc, { name, classSize }) => {
-          acc[name] = classSize!
-          return acc
-        },
-        {} as Record<string, number>
+      programme: Object.fromEntries(
+        Object.values(studyTrackStats.graduationTimes[studyProgramme].medians[combo ? 'combo' : 'basic']).map(
+          ({ name, classSize }) => [name, classSize!]
+        )
       ),
-      studyTracks: graduationStats.reduce(
-        (acc, [programme, { medians }]) => {
-          acc[programme] = {}
-          for (const { name, classSize } of Object.values(combo ? medians.combo : medians.basic)) {
-            acc[programme][name] = classSize!
-          }
-          return acc
-        },
-        {} as Record<string, Record<string, number>>
-      ),
+      studyTracks: graduationStats.reduce((acc, [programme, { medians }]) => {
+        acc[programme] ??= {}
+        Object.values(combo ? medians.combo : medians.basic).forEach(
+          ({ name, classSize }) => (acc[programme][name] = classSize!)
+        )
+
+        return acc
+      }, {}),
     }
 
     return { studyTrackStatsGraduationStats, studyTrackStatsClassSizes }
   }
 
-  if (hasStudyTracks && Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1) {
-    studyTrackStatsGraduationStats.basic = calculateStudyTrackStats()
-    if (studyTrackStats?.doCombo) {
-      studyTrackStatsGraduationStats.combo = calculateStudyTrackStats(true)
-    }
+  type gradStats = {
+    studyTrackStatsGraduationStats?: ProgrammeMedians
+    studyTrackStatsClassSizes?: ProgrammeClassSizes
   }
+
+  const studyTrackStatsGraduationStats: {
+    basic: gradStats
+    combo: gradStats
+  } =
+    hasStudyTracks && Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1
+      ? {
+          basic: calculateStudyTrackStats(),
+          combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},
+        }
+      : {
+          basic: {},
+          combo: {},
+        }
 
   return (
     <Stack gap={2}>
@@ -191,7 +194,7 @@ export const StudyTracksAndClassStatisticsTab = ({
           <ToggleContainer>
             <Toggle
               cypress="study-right-toggle"
-              disabled={hasErrors || isFetchingOrLoading}
+              disabled={hasErrors || isFetching}
               firstLabel="All study rights"
               infoBoxContent={studyProgrammeToolTips.studyRightToggle}
               secondLabel="Special study rights excluded"
@@ -211,7 +214,7 @@ export const StudyTracksAndClassStatisticsTab = ({
             : studyProgrammeToolTips.studyTrackOverview
         }
         isError={hasErrors}
-        isLoading={isFetchingOrLoading}
+        isLoading={isFetching}
         title={`Students of the ${isStudyProgrammeMode ? 'degree programme' : `study track ${studyTrack}`} by starting year`}
       >
         {studyTrackStats ? (
@@ -255,32 +258,22 @@ export const StudyTracksAndClassStatisticsTab = ({
         ) : null}
       </Section>
 
-      {isStudyProgrammeMode ? (
-        <Section
-          cypress="progress-of-students"
-          infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
-          isError={hasErrors}
-          isLoading={isFetchingOrLoading}
-          title="Progress of students of the degree programme by starting year"
-        >
-          {studyTrackStats ? (
-            <ProgressOfStudents
-              progressComboStats={progressComboStats}
-              progressStats={progressStats}
-              studyProgramme={studyProgramme}
-              years={studyTrackStats.years}
-            />
-          ) : null}
-        </Section>
-      ) : (
-        <Section title={`Progress of students of the study track ${studyTrack} by starting year`}>
-          <Alert severity="info" variant="outlined">
-            <AlertTitle>Date unavailable</AlertTitle>
-            Progress data is currently only available for all students of the degree programme. Please select ”All
-            students of the programme” to view the progress data.
-          </Alert>
-        </Section>
-      )}
+      <Section
+        cypress="progress-of-students"
+        infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
+        isError={hasErrors}
+        isLoading={isFetching}
+        title="Progress of students of the degree programme by starting year"
+      >
+        {studyTrackStats ? (
+          <ProgressOfStudents
+            progressComboStats={getProgressComboStats()}
+            progressStats={getProgressStats()}
+            studyProgramme={studyProgramme}
+            years={studyTrackStats.years}
+          />
+        ) : null}
+      </Section>
 
       {isSuccess && studyTrackStats?.graduationTimes[studyTrack] ? (
         <Section
@@ -291,7 +284,7 @@ export const StudyTracksAndClassStatisticsTab = ({
               : studyProgrammeToolTips.averageGraduationTimesStudyTracks
           }
           isError={hasErrors}
-          isLoading={isFetchingOrLoading}
+          isLoading={isFetching}
           title="Average graduation times by starting year"
         >
           <Stack gap={2}>

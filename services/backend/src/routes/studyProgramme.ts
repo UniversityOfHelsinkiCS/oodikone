@@ -147,10 +147,13 @@ router.get<StudyProgrammeParams, unknown, never, StudyTrackStatsQuery>('/:id/stu
     },
     studyRightsOfProgramme,
   })
+
   if (updated) {
     await setStudyTrackStats(updated, specialGroups)
+    return res.json(updated)
   }
-  return res.json(updated)
+
+  return res.status(500).end()
 })
 
 router.get<StudyProgrammeParams>('/:id/colorizedtablecoursestats', async (req, res) => {
