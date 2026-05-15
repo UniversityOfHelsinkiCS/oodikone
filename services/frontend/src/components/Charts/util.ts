@@ -11,6 +11,14 @@ type StudyPlanLike = {
   included_courses: string[]
 }
 
+export const getOnEvents = (handleClick: ((category: string) => void) | undefined) => (
+  handleClick ? {
+    click: (params: { name: string }) => {
+      handleClick(params.name)
+    },
+  } : undefined
+)
+
 const resolveCourseCode = (course: CourseWithCode) => course.course_code ?? course.course?.code
 
 const toMillis = (date: Date | string) => new Date(date).getTime()

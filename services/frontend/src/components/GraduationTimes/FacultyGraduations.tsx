@@ -24,17 +24,19 @@ export const FacultyGraduations = ({
   const programmeData = data?.byGradYear.programmes.medians
   const facultyNames = data?.programmeNames
   const classSizes = data?.classSizes
+
   const commonProps = {
+    allowExpand: true,
     classSizes,
     names: facultyNames,
     goalExceptions,
     groupBy: 'byGradYear' as const,
     isError,
     isLoading,
-    mode: universityMode ? ('faculty' as const) : ('programme' as const),
+    mode: universityMode ? 'faculty' as const : 'programme' as const,
     showMedian,
     yearLabel: 'Graduation year' as const,
-  }
+  } as const
 
   return (
     <Stack gap={2}>

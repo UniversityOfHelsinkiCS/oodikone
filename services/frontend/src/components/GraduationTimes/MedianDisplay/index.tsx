@@ -12,9 +12,29 @@ import {
   ProgrammeMedians,
 } from '@oodikone/shared/types'
 
+type MedianDisplayProps = {
+  mode: 'faculty' | 'programme' | 'study track'
+  classSizes: FacultyClassSizes | ProgrammeClassSizes | undefined
+  allowExpand: boolean
+  names: Record<string, string | Name> | Record<string, Name | NameWithCode> | undefined
+  data: GraduationStats[]
+  expandKey: string | null
+  goal: number | undefined
+  goalExceptions: Record<string, number> | { needed: boolean }
+  groupBy: 'byGradYear' | 'byStartYear'
+  handleClick: (seriesCategory: string) => void
+  level: string
+  levelProgrammeData: ProgrammeMedians | undefined
+  programmeDataVisible: boolean
+  title: string
+  yearLabel: 'Graduation year' | 'Start year'
+}
+
 export const MedianDisplay = ({
+  allowExpand,
   classSizes,
   data,
+  expandKey,
   goal,
   goalExceptions,
   groupBy,
@@ -25,24 +45,8 @@ export const MedianDisplay = ({
   names,
   programmeDataVisible,
   title,
-  year,
   yearLabel,
-}: {
-  classSizes: FacultyClassSizes | ProgrammeClassSizes
-  data: GraduationStats[]
-  goal: number
-  goalExceptions: Record<string, number> | { needed: boolean }
-  groupBy: 'byGradYear' | 'byStartYear'
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
-  level: string
-  levelProgrammeData: ProgrammeMedians
-  mode: 'faculty' | 'programme' | 'study track'
-  names: Record<string, Name | NameWithCode> | Record<string, string | Name>
-  programmeDataVisible: boolean
-  title: string
-  year: number | null
-  yearLabel: 'Graduation year' | 'Start year'
-}) => {
+}: MedianDisplayProps) => {
   return (
     <Box>
       {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
@@ -51,43 +55,60 @@ export const MedianDisplay = ({
           data in Sisu
         </Typography>
       )}
-      {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) ? (
+      {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) && (
         <Typography>
           <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring, but
           the faculty level bar color is based on the typical goal time of {goal} months
         </Typography>
-      ) : null}
+      )}
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
-      <Stack direction={{ sm: 'column', md: 'row' }}>
+
+      {!allowExpand ? (
         <MedianGraduations
-          classSizes={classSizes?.[level] ?? {}}
           cypress={`${level}-median-bar-chart`}
+          classSizes={!!classSizes && 'programme' in classSizes ? classSizes.programme : {}}
           data={data}
-          goal={goal}
+          expandKey={expandKey}
+          fullWidth
+          goal={goal ?? 0}
           handleClick={handleClick}
           mode={mode}
-          names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
           title={title}
           yearLabel={yearLabel}
         />
-        {programmeDataVisible && year && year in levelProgrammeData ? (
+      ) : (
+        <Stack direction={{ sm: 'column', md: 'row' }}>
           <MedianGraduations
-            classSizes={'programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks}
-            cypress={`${level}-median-bar-chart-faculty`}
-            data={levelProgrammeData[year].data}
-            facultyGraph={false}
-            goal={goal}
-            goalExceptions={goalExceptions}
+            classSizes={classSizes?.[level] ?? {}}
+            cypress={`${level}-median-bar-chart`}
+            data={data}
+            expandKey={expandKey}
+            goal={goal ?? 0}
             handleClick={handleClick}
-            level={level}
             mode={mode}
             names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
             title={title}
-            year={year}
             yearLabel={yearLabel}
           />
-        ) : null}
-      </Stack>
-    </Box>
+          {programmeDataVisible && expandKey && levelProgrammeData && expandKey in levelProgrammeData && (
+            <MedianGraduations
+              classSizes={!!classSizes ? ('programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks) : {}}
+              cypress={`${level}-median-bar-chart-faculty`}
+              data={levelProgrammeData[expandKey].data}
+              expandKey={expandKey}
+              facultyGraph={false}
+              goal={goal ?? 0}
+              goalExceptions={goalExceptions}
+              handleClick={handleClick}
+              level={level}
+              mode={mode}
+              names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) as any : undefined}
+              title={title}
+              yearLabel={yearLabel}
+            />
+          )}
+        </Stack>
+      )}
+    </Box >
   )
 }

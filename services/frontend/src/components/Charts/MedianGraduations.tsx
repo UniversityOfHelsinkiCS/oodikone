@@ -11,6 +11,7 @@ import {
   NameWithCode,
   ProgrammeClassSizes,
 } from '@oodikone/shared/types'
+import { getOnEvents } from './util'
 
 type GraduationPoint = GraduationStats & { color?: string; realGoal?: number }
 
@@ -18,7 +19,9 @@ export const MedianGraduations = ({
   classSizes,
   cypress,
   data,
+  expandKey,
   facultyGraph = true,
+  fullWidth,
   goal,
   goalExceptions,
   handleClick,
@@ -26,21 +29,21 @@ export const MedianGraduations = ({
   mode,
   names,
   title,
-  year,
   yearLabel,
 }: {
-  classSizes: FacultyClassSizes['programmes'] | ProgrammeClassSizes['studyTracks']
+  classSizes?: FacultyClassSizes['programmes'] | ProgrammeClassSizes['studyTracks' | 'programme']
   cypress: string
   data: GraduationStats[]
+  expandKey: string | null
   facultyGraph?: boolean
+  fullWidth?: true,
   goal: number
   goalExceptions?: Record<string, number> | { needed: boolean }
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number) => void
+  handleClick: (seriesCategory: string) => void | undefined
   level?: string
   mode: 'faculty' | 'programme' | 'study track'
   names?: Record<string, Name | NameWithCode>
   title: string
-  year?: number | null
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
   const { language } = useLanguage()
@@ -72,10 +75,9 @@ export const MedianGraduations = ({
   }, goal * 2)
 
   const getClassSize = (category: string) => {
-    if (facultyGraph) {
-      return classSizes[category]
-    }
-    return classSizes[category][year!]
+    if (facultyGraph) return classSizes?.[category]
+    // if (class)
+    return classSizes?.[category]?.[expandKey ?? '']
   }
 
   const getPercentage = (amount: number, category: string) => {
@@ -112,8 +114,8 @@ export const MedianGraduations = ({
   ) => {
     const sortingText =
       yearLabel === 'Start year'
-        ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
-        : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
+        ? `<b>From class of ${facultyGraph ? name : expandKey}, ${amount}/${getClassSize(code)} students have graduated</b>`
+        : `<b>${amount} students graduated in year ${facultyGraph ? name : expandKey}</b>`
     const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
     const statisticsText = `<br />${statistics?.onTime} graduated on time<br />${statistics?.yearOver} graduated max year overtime<br />${statistics?.wayOver} graduated over year late`
 
@@ -159,12 +161,13 @@ export const MedianGraduations = ({
 
   const option = {
     title: {
-      text: !facultyGraph ? `Year ${year} by ${yearLabel.toLowerCase()}` : '',
+      text: !facultyGraph ? `Year ${expandKey} by ${yearLabel.toLowerCase()}` : '',
       left: 'center',
     },
     tooltip: {
       trigger: 'item',
       backgroundColor: 'white',
+      confine: true,
       formatter: (params: {
         name?: string
         value?: number
@@ -266,15 +269,9 @@ export const MedianGraduations = ({
     ],
   }
 
-  const onEvents = {
-    click: (params: { name?: string }) => {
-      handleClick({ point: { name: params.name } }, facultyGraph)
-    },
-  }
-
   return (
-    <Box data-cy={cypress} width={{ sm: '100%', md: '50%' }}>
-      <ReactECharts onEvents={onEvents} option={option} opts={{ renderer: 'svg' }} style={{ height: getHeight() }} />
+    <Box data-cy={cypress} width={{ sm: '100%', md: fullWidth ? '100%' : '50%' }}>
+      <ReactECharts onEvents={getOnEvents(handleClick)} option={option} opts={{ renderer: 'svg' }} style={{ height: getHeight() }} />
     </Box>
   )
 }

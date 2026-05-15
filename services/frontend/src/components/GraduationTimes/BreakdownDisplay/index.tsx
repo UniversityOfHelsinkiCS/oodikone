@@ -8,24 +8,40 @@ import { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@oodikone
 export const BreakdownDisplay = ({
   data,
   handleClick,
+  allowExpand,
+  expandKey,
   level,
   levelProgrammeData,
   mode,
   names,
   programmeDataVisible,
-  year,
   yearLabel,
 }: {
   data: GraduationStats[]
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
+  handleClick: (seriesCategory: string) => void
+  allowExpand: boolean
+  expandKey: string | null,
   level: string
-  levelProgrammeData: ProgrammeMedians
+  levelProgrammeData?: ProgrammeMedians
   mode: 'faculty' | 'programme' | 'study track'
   names: Record<string, Name | NameWithCode> | Record<string, string | Name> | undefined
   programmeDataVisible: boolean
-  year: number | null
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
+
+  if (!allowExpand) {
+    return (
+      <Box>
+        <GraduationBreakdown
+          cypress={`${level}-breakdown-bar-chart`}
+          data={data}
+          mode={mode}
+          fullWidth
+        />
+      </Box>
+    )
+  }
+
   return (
     <Box>
       <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
@@ -36,15 +52,14 @@ export const BreakdownDisplay = ({
           handleClick={handleClick}
           mode={mode}
         />
-        {programmeDataVisible && year && year in levelProgrammeData ? (
+        {programmeDataVisible && expandKey && levelProgrammeData && expandKey in levelProgrammeData ? (
           <GraduationBreakdown
             cypress={`${level}BreakdownBarChartFaculty`}
-            data={levelProgrammeData[year].data}
-            facultyGraph={false}
+            data={levelProgrammeData[expandKey].data}
             handleClick={handleClick}
             mode={mode}
             names={names}
-            year={year}
+            expandKey={expandKey}
             yearLabel={yearLabel}
           />
         ) : null}

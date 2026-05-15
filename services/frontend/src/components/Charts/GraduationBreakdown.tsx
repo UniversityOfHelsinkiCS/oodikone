@@ -4,33 +4,61 @@ import ReactECharts from 'echarts-for-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { GraduationStats, Name, NameWithCode } from '@oodikone/shared/types'
+import { getOnEvents } from './util'
+
+
+type GraduationProps =
+  | {
+    cypress: string
+    data: GraduationStats[]
+    fullWidth: true
+    mode: 'faculty' | 'programme' | 'study track'
+
+    yearLabel?: never
+    handleClick?: never
+    names?: never
+    expandKey?: never
+  }
+  | {
+    cypress: string
+    data: GraduationStats[]
+    handleClick: (seriesCategory: string) => void
+    mode: 'faculty' | 'programme' | 'study track'
+
+    yearLabel?: never
+    names?: never
+    expandKey?: never
+    fullWidth?: never
+  }
+  | {
+    cypress: string
+    data: GraduationStats[]
+    handleClick: (seriesCategory: string) => void
+    mode: 'faculty' | 'programme' | 'study track'
+    names: Record<string, Name | NameWithCode> | Record<string, string | Name> | undefined
+    expandKey: string
+    yearLabel: 'Graduation year' | 'Start year'
+
+    fullWidth?: never
+  }
 
 export const GraduationBreakdown = ({
   cypress,
   data,
-  facultyGraph = true,
+  fullWidth,
   handleClick,
   mode,
   names,
-  year = null,
+  expandKey,
   yearLabel,
-}: {
-  cypress: string
-  data: GraduationStats[]
-  facultyGraph?: boolean
-  handleClick: (event, isFacultyGraph: boolean, seriesCategory?: number | string) => void
-  mode: 'faculty' | 'programme' | 'study track'
-  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
-  year?: number | null
-  yearLabel?: 'Graduation year' | 'Start year'
-}) => {
+}: GraduationProps) => {
   const { language } = useLanguage()
   const theme = useTheme()
 
-  const categories = data.map(item => item.name.toString())
+  const categories = data.map(item => item.name)
   const codeMap: Record<string, string | undefined> = {}
 
-  if (!facultyGraph) {
+  if (expandKey) {
     for (const item of data) {
       codeMap[item.name || item.code!] = item.code
     }
@@ -56,7 +84,7 @@ export const GraduationBreakdown = ({
   }
 
   const getTooltipText = (id: string, seriesName: string, amount: number) => {
-    if (!facultyGraph) {
+    if (expandKey) {
       const code = codeMap[id] ?? ''
       return `<b>${getFacultyOrProgrammeName(code)}</b> • ${code}<br /><b>${seriesName}</b>: ${amount}`
     }
@@ -65,9 +93,9 @@ export const GraduationBreakdown = ({
 
   const getLabel = () => {
     if (mode === 'faculty') {
-      return facultyGraph ? 'Graduation year' : 'Faculty'
+      return expandKey ? 'Graduation year' : 'Faculty'
     }
-    return facultyGraph ? yearLabel! : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
+    return expandKey ? yearLabel : `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`
   }
 
   const barWidth = data.length > 8 ? 16 : 20
@@ -112,7 +140,7 @@ export const GraduationBreakdown = ({
 
   const option = {
     title: {
-      text: !facultyGraph ? `Year ${year} by ${yearLabel!.toLowerCase()}` : '',
+      text: expandKey ? `Year ${expandKey} by ${yearLabel?.toLowerCase()}` : '',
       left: 'center',
     },
     tooltip: {
@@ -166,18 +194,10 @@ export const GraduationBreakdown = ({
     series,
   }
 
-  const onEvents = {
-    click: (params: { name?: string }) => {
-      if (!params.name) {
-        return
-      }
-      handleClick({ point: { name: params.name } }, facultyGraph, params.name)
-    },
-  }
 
   return (
-    <Box data-cy={cypress} width={{ sm: '100%', md: '50%' }}>
-      <ReactECharts onEvents={onEvents} option={option} opts={{ renderer: 'svg' }} style={{ height: getHeight() }} />
+    <Box data-cy={cypress} width={{ sm: '100%', md: fullWidth ? '100%' : '50%' }}>
+      <ReactECharts onEvents={getOnEvents(handleClick)} option={option} opts={{ renderer: 'svg' }} style={{ height: getHeight() }} />
     </Box>
   )
 }
