@@ -471,7 +471,8 @@ describe('Degree programme overview', () => {
         cy.contains('Showing 10 out of 30 students')
       })
 
-      it('Info message about missing progress stats is displayed', () => {
+      // FIXME: This feature was implemented. The data is no-good, so maybe reimplement this when it's clean.
+      it.skip('Info message about missing progress stats is displayed', () => {
         cy.contains('Progress of students of the study track MAT-MAT by starting year')
         cy.contains('Progress data is currently only available for all students of the degree programme.')
       })
