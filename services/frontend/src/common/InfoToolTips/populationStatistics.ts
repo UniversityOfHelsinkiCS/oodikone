@@ -20,11 +20,11 @@ export const populationStatisticsToolTips = {
   creditAccumulation: `
     Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.
     Kun hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron.
-    Opiskelijanumeron yhteydessä olevaa ympyrää klikkaamalla siirtyy ”student statistics”-sivulle, ja näkee valitun opiskelijan opintotiedot.
+    Yksittäisen opiskelijan kuvaajaa klikkaamalla siirtyy **student statistics**-sivulle, ja näkee valitun opiskelijan opintotiedot.
     Timantin muotoinen ikoni kertoo opiskelijan valmistuneen valitusta koulutusohjelmasta kyseisellä hetkellä.
 
-    X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla olevan sinisen näkymän harmaita ”kahvoja” siirtämällä.
-    Y-akselin skaalaa voi säätää harmaista painikkeista ”small” ”medium” ja "large”
+    X-akselin skaalaa voi säätää kuvaajan alla olevaa liukusäädintä käyttäen.  
+    Taulukon korkeutta voi säätää viereisistä painikkeista (small, medium, large).
   `,
   creditStatistics: `
     **Credits gained**
@@ -58,7 +58,7 @@ export const populationStatisticsToolTips = {
     **Distribution development**
 
     Pylväsdiagrammi kertoo opiskelijoiden jakauman opintopistehaarukoihin kalenterivuosittain, lukuvuosittain tai lukukausittain eriteltynä.
-    Välien järjestystä pylväässä voi muuttaa valitsemalla **Stack ordering** -valikosta haluamansa järjestyksen.
+    Välien järjestystä pylväässä voi muuttaa valitsemalla **Chart settings** -valikosta haluamansa järjestyksen.
 
     Pylväiden osat toimivat myös suodattimina. Klikkaamalla pylvään osaa näkyviin jäävät vain kyseiset opiskelijat (esimerkiksi keväällä 2024 0–30 opintopistettä suorittaneet).
 

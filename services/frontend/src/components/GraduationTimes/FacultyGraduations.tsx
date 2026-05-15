@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 
-import { GraduationTimes } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
 import { GetAllGraduationStatsResponse } from '@/types/api/university'
 
 export const FacultyGraduations = ({
@@ -24,7 +24,9 @@ export const FacultyGraduations = ({
   const programmeData = data?.byGradYear.programmes.medians
   const facultyNames = data?.programmeNames
   const classSizes = data?.classSizes
-  const commonProps = {
+
+  const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
+    allowExpand: true,
     classSizes,
     names: facultyNames,
     goalExceptions,
@@ -34,7 +36,7 @@ export const FacultyGraduations = ({
     mode: universityMode ? ('faculty' as const) : ('programme' as const),
     showMedian,
     yearLabel: 'Graduation year' as const,
-  }
+  } as const
 
   return (
     <Stack gap={2}>

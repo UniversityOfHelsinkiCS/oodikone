@@ -12,63 +12,75 @@ import {
   ProgrammeMedians,
 } from '@oodikone/shared/types'
 
+export type GraduationTimesProps = {
+  mode: 'faculty' | 'programme' | 'study track' // "Mode" is one step below the current view in hierarchy e.g. viewing a programme overview -> mode should be study track
+  classSizes?: FacultyClassSizes | ProgrammeClassSizes | undefined
+  data: GraduationStats[] | undefined
+  goal?: number | undefined
+  goalExceptions?: Record<string, number> | { needed: boolean }
+  groupBy?: 'byGradYear' | 'byStartYear'
+  allowExpand?: boolean
+  isLoading: boolean
+  isError: boolean
+  level?: 'unset' | 'bachelor' | 'master' | 'bcMsCombo' | 'doctor'
+  levelProgrammeData?: ProgrammeMedians
+  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
+  showMedian: boolean
+  title: string
+  yearLabel: 'Graduation year' | 'Start year'
+}
+
 export const GraduationTimes = ({
   classSizes,
   data,
   goal,
-  goalExceptions,
+  goalExceptions = { needed: false },
   groupBy = 'byStartYear',
-  isError,
+  allowExpand = true,
   isLoading,
-  level,
+  isError,
+  level = 'unset',
   levelProgrammeData,
   mode,
   names,
   showMedian,
   title,
   yearLabel,
-}: {
-  classSizes?: FacultyClassSizes | ProgrammeClassSizes
-  data: GraduationStats[] | undefined
-  goal: number | undefined
-  goalExceptions: Record<string, number> | { needed: boolean }
-  groupBy?: 'byGradYear' | 'byStartYear'
-  isError: boolean
-  isLoading: boolean
-  level: string
-  levelProgrammeData?: ProgrammeMedians
-  mode: 'faculty' | 'programme' | 'study track'
-  names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
-  showMedian: boolean
-  title: string
-  yearLabel: 'Graduation year' | 'Start year'
-}) => {
+}: GraduationTimesProps) => {
   const [programmeDataVisible, setProgrammeDataVisible] = useState(false)
-  const [year, setYear] = useState<number | null>(null)
+  const [expandKey, setExpandKey] = useState<string | null>(null)
 
-  const handleClick = (event, isFacultyGraph: boolean, seriesCategory: number | string | null = null) => {
-    if (isFacultyGraph) {
-      setYear(seriesCategory ?? event.point.name)
+  const handleClick = (category: string) => {
+    if (category) {
+      setExpandKey(category)
       setProgrammeDataVisible(true)
     } else {
       setProgrammeDataVisible(false)
-      setYear(null)
+      setExpandKey(null)
     }
   }
 
-  const dataIsLoaded = classSizes && data && names && goal && levelProgrammeData
-
   return (
-    <Section
-      cypress={`${level}-graduation-times`}
-      isError={isError}
-      isLoading={isLoading ? !dataIsLoaded : false}
-      title={title}
-    >
-      {showMedian && dataIsLoaded ? (
+    <Section cypress={`${level}-graduation-times`} isError={isError} isLoading={isLoading} title={title}>
+      {!showMedian ? (
+        <BreakdownDisplay
+          allowExpand={allowExpand}
+          data={data!}
+          expandKey={expandKey}
+          handleClick={handleClick}
+          level={level}
+          levelProgrammeData={levelProgrammeData}
+          mode={mode}
+          names={names}
+          programmeDataVisible={programmeDataVisible}
+          yearLabel={yearLabel}
+        />
+      ) : (
         <MedianDisplay
+          allowExpand={allowExpand}
           classSizes={classSizes}
-          data={data}
+          data={data!}
+          expandKey={expandKey}
           goal={goal}
           goalExceptions={goalExceptions}
           groupBy={groupBy}
@@ -76,26 +88,12 @@ export const GraduationTimes = ({
           level={level}
           levelProgrammeData={levelProgrammeData}
           mode={mode}
-          names={names}
+          names={names ?? {}}
           programmeDataVisible={programmeDataVisible}
           title={title}
-          year={year}
           yearLabel={yearLabel}
         />
-      ) : null}
-      {!showMedian && dataIsLoaded ? (
-        <BreakdownDisplay
-          data={data}
-          handleClick={handleClick}
-          level={level}
-          levelProgrammeData={levelProgrammeData}
-          mode={mode}
-          names={names}
-          programmeDataVisible={programmeDataVisible}
-          year={year}
-          yearLabel={yearLabel}
-        />
-      ) : null}
+      )}
     </Section>
   )
 }

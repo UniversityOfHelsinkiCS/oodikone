@@ -1,5 +1,4 @@
 import { calculatePercentage } from '@/common'
-import { ViewMode } from '@/types/courseStat'
 
 type Series = {
   name: string
@@ -24,43 +23,3 @@ export const getDataObject = (name: string, data: number[], stack: string): Seri
     type: 'column' as const,
   }
 }
-
-export const getGraphOptions = (
-  colors: string[],
-  colorsRelative: string[],
-  isRelative: boolean,
-  max: number,
-  statYears: string[],
-  title: string,
-  viewMode: ViewMode
-) => ({
-  chart: {
-    type: 'column',
-  },
-  colors: isRelative ? colorsRelative : colors,
-  title: {
-    text: title,
-  },
-  xAxis: {
-    categories: statYears,
-  },
-  yAxis: {
-    allowDecimals: false,
-    title: {
-      text: isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`,
-    },
-    max,
-    floor: -max,
-  },
-  plotOptions: {
-    column: {
-      stacking: 'normal' as const,
-      borderRadius: 3,
-    },
-    series: {
-      tooltip: {
-        valueSuffix: isRelative ? '%' : '',
-      },
-    },
-  },
-})

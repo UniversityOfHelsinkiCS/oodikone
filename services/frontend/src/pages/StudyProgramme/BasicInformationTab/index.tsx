@@ -5,12 +5,12 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { LineGraph } from '@/components/common/LineGraph'
-import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
-import { StackedBarChart } from '@/components/common/StackedBarChart'
+import { BarChart } from '@/components/Charts/BarChart'
+import { LineGraph } from '@/components/Charts/LineGraph'
+import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChartV2'
+import { GraduationTimes, type GraduationTimesProps } from '@/components/GraduationTimes'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DataTable } from '@/components/StudyProgramme/DataTable'
@@ -19,7 +19,6 @@ import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getGraduationGraphTitle, isNewProgramme } from '@/util/studyProgramme'
 import { getTimestamp } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
-import { BarChart } from './BarChart'
 
 const getGraduatedText = (code: string) => {
   if (code.startsWith('T') || code.startsWith('LIS')) {
@@ -86,6 +85,16 @@ export const BasicInformationTab = ({
   const creditsIsError = credits.isError || (credits.isSuccess && !credits.data)
   const graduationsIsError = graduations.isError || (graduations.isSuccess && !graduations.data)
   const hasErrors = basicsIsError || creditsIsError || graduationsIsError
+
+  const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
+    allowExpand: false,
+    groupBy: 'byGradYear',
+    isError: graduationsIsError,
+    isLoading: graduationsIsLoading,
+    mode: 'programme',
+    showMedian,
+    yearLabel: 'Graduation year',
+  } as const
 
   return (
     <Stack gap={2}>
@@ -209,7 +218,7 @@ export const BasicInformationTab = ({
         infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
-        title="Average graduation times"
+        title="Average graduation times by graduation year"
       >
         {graduations.isSuccess && graduations.data ? (
           <Stack gap={2}>
@@ -225,45 +234,51 @@ export const BasicInformationTab = ({
             {showMedian ? (
               <>
                 {doCombo ? (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={graduations?.data?.comboTimes?.medians}
+                  <GraduationTimes
+                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
                     goal={graduations?.data?.comboTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                    title={getGraduationGraphTitle(studyProgramme, true)}
+                    {...commonProps}
                   />
                 ) : null}
-                {studyProgramme !== 'MH90_001' && (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={timesData?.medians}
-                    goal={graduations?.data.graduationTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme)}
-                  />
-                )}
+                <GraduationTimes
+                  data={graduations.data?.graduationTimes.medians.map(item => ({ median: item.y, ...item }))}
+                  goal={graduations?.data?.graduationTimes?.goal}
+                  title={getGraduationGraphTitle(studyProgramme, false)}
+                  {...commonProps}
+                />
                 {combinedProgramme ? (
-                  <MedianTimeBarChart
-                    byStartYear={false}
-                    data={timesDataSecondProgramme?.medians}
-                    goal={graduations?.data.graduationTimesSecondProgramme?.goal}
+                  <GraduationTimes
+                    data={graduations.data?.graduationTimesSecondProgramme.medians.map(item => ({
+                      median: item.y,
+                      ...item,
+                    }))}
+                    goal={graduations?.data?.graduationTimesSecondProgramme?.goal}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
+                    {...commonProps}
                   />
                 ) : null}
               </>
             ) : (
               <>
                 {doCombo ? (
-                  <BreakdownBarChart
-                    data={graduations?.data?.comboTimes?.medians}
-                    title={getGraduationGraphTitle(studyProgramme, doCombo)}
+                  <GraduationTimes
+                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
+                    goal={graduations?.data?.comboTimes?.goal}
+                    title={getGraduationGraphTitle(studyProgramme, true)}
+                    {...commonProps}
                   />
                 ) : null}
-                {studyProgramme !== 'MH90_001' && (
-                  <BreakdownBarChart data={timesData?.medians} title={getGraduationGraphTitle(studyProgramme)} />
-                )}
+                <GraduationTimes
+                  data={timesData?.medians.map(item => ({ median: item.y, ...item }))}
+                  title={getGraduationGraphTitle(studyProgramme, false)}
+                  {...commonProps}
+                />
                 {combinedProgramme ? (
-                  <BreakdownBarChart
-                    data={timesDataSecondProgramme?.medians}
+                  <GraduationTimes
+                    data={timesDataSecondProgramme?.medians.map(item => ({ median: item.y, ...item }))}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
+                    {...commonProps}
                   />
                 ) : null}
               </>

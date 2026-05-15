@@ -10,7 +10,7 @@ import { Section } from '@/components/Section'
 import { useGetAllFacultiesGraduationStatsQuery } from '@/redux/facultyStats'
 
 export const FacultyGraduationsTab = () => {
-  const { data, isFetching, isLoading, isError } = useGetAllFacultiesGraduationStatsQuery()
+  const { data, isFetching, isError } = useGetAllFacultiesGraduationStatsQuery()
 
   const [medianMode, setMedianMode] = useState(false)
 
@@ -24,7 +24,7 @@ export const FacultyGraduationsTab = () => {
         <ToggleContainer>
           <Toggle
             cypress="graduation-time-toggle"
-            disabled={isFetching || isLoading || isError}
+            disabled={isFetching || isError}
             firstLabel="Breakdown"
             secondLabel="Median times"
             setValue={() => setMedianMode(!medianMode)}
@@ -32,13 +32,7 @@ export const FacultyGraduationsTab = () => {
           />
         </ToggleContainer>
       </Section>
-      <FacultyGraduations
-        data={data}
-        isError={isError}
-        isLoading={isFetching || isLoading}
-        showMedian={medianMode}
-        universityMode
-      />
+      <FacultyGraduations data={data} isError={isError} isLoading={isFetching} showMedian={medianMode} universityMode />
     </Stack>
   )
 }

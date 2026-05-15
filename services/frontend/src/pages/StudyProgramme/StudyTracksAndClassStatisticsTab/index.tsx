@@ -1,3 +1,4 @@
+/* eslint no-unsafe-optional-chaining: "warn" */
 import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
@@ -6,11 +7,9 @@ import { useEffect, useState } from 'react'
 
 import { getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
-import { MedianTimeBarChart } from '@/components/common/MedianTimeBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { GraduationTimes } from '@/components/GraduationTimes'
-import { BreakdownBarChart } from '@/components/GraduationTimes/BreakdownDisplay/BreakdownBarChartV2'
+import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
@@ -18,7 +17,12 @@ import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { hasAccessToProgrammePopulation } from '@/util/access'
 import { calculateStats } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
-import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@oodikone/shared/types'
+import {
+  ProgrammeOrStudyTrackGraduationStats,
+  ProgrammeClassSizes,
+  ProgrammeMedians,
+  MedianEntry,
+} from '@oodikone/shared/types'
 import { exportStudentTable } from './exportStudentTable'
 import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
@@ -182,6 +186,21 @@ export const StudyTracksAndClassStatisticsTab = ({
           combo: {},
         }
 
+  const formatMedianEntries = (item: MedianEntry) => ({ median: item.y, ...item })
+
+  const graduationTimeCommonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'title'> = {
+    allowExpand: hasStudyTracks,
+    isError: hasErrors,
+    isLoading: isFetching,
+    goalExceptions: { needed: false },
+
+    names: studyTrackStats?.studyTracks,
+    showMedian,
+
+    mode: 'study track',
+    yearLabel: 'Start year',
+  } as const
+
   return (
     <Stack gap={2}>
       <Section cypress="study-track-selector">
@@ -217,7 +236,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         isLoading={isFetching}
         title={`Students of the ${isStudyProgrammeMode ? 'degree programme' : `study track ${studyTrack}`} by starting year`}
       >
-        {studyTrackStats ? (
+        {!!studyTrackStats && (
           <Stack gap={2}>
             {hasAccessToPopulation ? (
               <>
@@ -237,7 +256,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                 value={showPercentages}
               />
             </ToggleContainer>
-            {studyTrackStats ? (
+            {!!studyTrackStats && (
               <StudyTrackDataTable
                 combinedProgramme={combinedProgramme}
                 dataOfAllTracks={studyTrackStats.mainStatsByYear}
@@ -253,9 +272,9 @@ export const StudyTracksAndClassStatisticsTab = ({
                 titles={studyTrackStats.populationTitles}
                 years={studyTrackStats.years}
               />
-            ) : null}
+            )}
           </Stack>
-        ) : null}
+        )}
       </Section>
 
       <Section
@@ -275,7 +294,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         ) : null}
       </Section>
 
-      {isSuccess && studyTrackStats?.graduationTimes[studyTrack] ? (
+      {isSuccess && studyTrack in studyTrackStats?.graduationTimes ? (
         <Section
           cypress="average-graduation-times"
           infoBoxContent={
@@ -299,102 +318,54 @@ export const StudyTracksAndClassStatisticsTab = ({
             </ToggleContainer>
             {hasStudyTracks ? (
               <Stack gap={2}>
-                {studyTrackStats.doCombo && studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats ? (
+                {studyTrackStats.doCombo && !!studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats ? (
                   <GraduationTimes
                     classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes}
-                    data={studyTrackStats.graduationTimes[studyProgramme].medians.combo.map(year => ({
-                      amount: year.amount,
-                      median: year.y,
-                      name: year.name,
-                      statistics: year.statistics,
-                      times: null,
-                    }))}
+                    data={studyTrackStats.graduationTimes[studyProgramme].medians.combo.map(formatMedianEntries)}
                     goal={studyTrackStats.graduationTimes.goals.combo}
-                    goalExceptions={{ needed: false }}
-                    isError={false}
-                    isLoading={false}
-                    level="programme"
                     levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
-                    mode="study track"
-                    names={studyTrackStats.studyTracks}
-                    showMedian={showMedian}
                     title={getGraduationGraphTitle(studyProgramme, true)}
-                    yearLabel="Start year"
+                    {...graduationTimeCommonProps}
                   />
                 ) : null}
-                {studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats ? (
+                {!!studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats && (
                   <GraduationTimes
                     classSizes={studyTrackStatsGraduationStats.basic.studyTrackStatsClassSizes}
-                    data={studyTrackStats.graduationTimes[studyProgramme].medians.basic.map(year => ({
-                      amount: year.amount,
-                      median: year.y,
-                      name: year.name,
-                      statistics: year.statistics,
-                      times: null,
-                    }))}
+                    data={studyTrackStats.graduationTimes[studyProgramme].medians.basic.map(formatMedianEntries)}
                     goal={studyTrackStats.graduationTimes.goals.basic}
-                    goalExceptions={{ needed: false }}
-                    isError={false}
-                    isLoading={false}
-                    level="programme"
                     levelProgrammeData={studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats}
-                    mode="study track"
-                    names={studyTrackStats.studyTracks}
-                    showMedian={showMedian}
                     title={getGraduationGraphTitle(studyProgramme, false)}
-                    yearLabel="Start year"
+                    {...graduationTimeCommonProps}
                   />
-                ) : null}
+                )}
               </Stack>
             ) : (
               <Stack gap={2}>
-                {showMedian ? (
-                  <>
-                    {studyTrackStats.doCombo ? (
-                      <MedianTimeBarChart
-                        byStartYear
-                        data={studyTrackStats?.graduationTimes[studyTrack].medians.combo}
-                        goal={studyTrackStats?.graduationTimes.goals.combo}
-                        title={getGraduationGraphTitle(studyProgramme, studyTrackStats.doCombo)}
-                      />
-                    ) : null}
-                    <MedianTimeBarChart
-                      byStartYear
-                      data={studyTrackStats?.graduationTimes[studyTrack].medians.basic}
-                      goal={studyTrackStats?.graduationTimes.goals.basic}
-                      title={getGraduationGraphTitle(studyProgramme, false)}
-                    />
-                    {combinedProgramme ? (
-                      <MedianTimeBarChart
-                        byStartYear
-                        data={studyTrackStats?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
-                        goal={studyTrackStats?.graduationTimesSecondProg.goals.combo}
-                        title={getGraduationGraphTitle(combinedProgramme, true)}
-                      />
-                    ) : null}
-                  </>
-                ) : (
-                  <>
-                    {studyTrackStats.doCombo ? (
-                      <BreakdownBarChart
-                        byStartYear
-                        data={studyTrackStats?.graduationTimes[studyTrack]?.medians?.combo}
-                        title={getGraduationGraphTitle(studyProgramme, studyTrackStats.doCombo)}
-                      />
-                    ) : null}
-                    <BreakdownBarChart
-                      byStartYear
-                      data={studyTrackStats?.graduationTimes[studyTrack]?.medians?.basic}
-                      title={getGraduationGraphTitle(studyProgramme, false)}
-                    />
-                    {combinedProgramme ? (
-                      <BreakdownBarChart
-                        byStartYear
-                        data={studyTrackStats?.graduationTimesSecondProg[combinedProgramme]?.medians?.combo}
-                        title={getGraduationGraphTitle(combinedProgramme, true)}
-                      />
-                    ) : null}
-                  </>
+                {studyTrackStats.doCombo ? (
+                  <GraduationTimes
+                    data={studyTrackStats.graduationTimes[studyTrack].medians.combo.map(formatMedianEntries)}
+                    goal={studyTrackStats.graduationTimes.goals.combo}
+                    title={getGraduationGraphTitle(studyProgramme, true)}
+                    {...graduationTimeCommonProps}
+                  />
+                ) : null}
+                <GraduationTimes
+                  classSizes={studyTrackStatsGraduationStats.basic.studyTrackStatsClassSizes}
+                  data={studyTrackStats.graduationTimes[studyTrack].medians.basic.map(formatMedianEntries)}
+                  goal={studyTrackStats.graduationTimes.goals.basic}
+                  title={getGraduationGraphTitle(studyProgramme, false)}
+                  {...graduationTimeCommonProps}
+                />
+                {!!combinedProgramme && (
+                  <GraduationTimes
+                    classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes}
+                    data={studyTrackStats.graduationTimesSecondProg[combinedProgramme].medians.combo.map(
+                      formatMedianEntries
+                    )}
+                    goal={studyTrackStats.graduationTimesSecondProg.goals.combo}
+                    title={getGraduationGraphTitle(combinedProgramme, true)}
+                    {...graduationTimeCommonProps}
+                  />
                 )}
               </Stack>
             )}

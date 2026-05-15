@@ -5,12 +5,11 @@ import FormGroup from '@mui/material/FormGroup'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
+import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
-import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { Link } from '@/components/common/Link'
 import { PanelView } from '@/components/common/PanelView'
-import { CreditAccumulationGraphHighCharts } from '@/components/CreditAccumulationGraphHighCharts'
 import {
   hopsFilter as studyPlanFilter,
   hopsFilter,
@@ -28,6 +27,7 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -88,20 +88,16 @@ export const PopulationDetails = ({
   const panels = [
     {
       title: `Credit accumulation (for ${filteredStudents.length} students)`,
-      content: (
-        <CreditAccumulationGraphHighCharts
-          absences={null}
-          endDate={null}
-          infoBoxContent={populationStatisticsToolTips.creditAccumulation}
-          programmeCodes={[programme, combinedProgramme].filter(Boolean)}
-          selectedStudyPlan={null}
+      content: filteredStudents.length ? (
+        // TODO: make wrapper for when no data.
+        <CreditAccumulationGraph
+          programmeCodes={[programme, combinedProgramme].filter(c => c !== undefined)}
           showBachelorAndMaster={!!showBachelorAndMaster}
-          singleStudent={false}
-          startDate={null}
           students={filteredStudents}
-          studyPlanFilterIsActive={studyPlanFilterIsActive}
-          studyRightId={null}
+          studyPlanFilter={studyPlanFilterIsActive}
         />
+      ) : (
+        <Typography>Nothing to show!</Typography>
       ),
     },
     query.years.length <= 1

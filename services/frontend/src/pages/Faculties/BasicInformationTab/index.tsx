@@ -4,8 +4,8 @@ import Stack from '@mui/material/Stack'
 import { useState, type Dispatch, type SetStateAction } from 'react'
 
 import { facultyToolTips } from '@/common/InfoToolTips'
-import { LineGraph } from '@/components/common/LineGraph'
-import { StackedBarChart } from '@/components/common/StackedBarChart'
+import { LineGraph } from '@/components/Charts/LineGraph'
+import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { Section } from '@/components/Section'
@@ -286,7 +286,7 @@ export const BasicInformationTab = ({
           <Stack gap={2}>
             <LineGraph
               cypress="graduated-of-the-faculty"
-              exportFileName={`oodikon"graduated-of-the-faculty"_${faculty.code}_${getTimestamp()}`}
+              exportFileName={`oodikone_graduated-of-the-faculty"_${faculty.code}_${getTimestamp()}`}
               graphStats={basics.data.graduationInfo.graphStats}
               years={basics.data.years}
             />

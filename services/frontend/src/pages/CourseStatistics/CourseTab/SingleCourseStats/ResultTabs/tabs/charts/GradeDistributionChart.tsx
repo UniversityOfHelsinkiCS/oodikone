@@ -1,18 +1,30 @@
 import useTheme from '@mui/material/styles/useTheme'
 
-import accessibility from 'highcharts/modules/accessibility'
-import exportData from 'highcharts/modules/export-data'
-import exporting from 'highcharts/modules/exporting'
-import ReactHighcharts from 'react-highcharts'
+import ReactECharts from 'echarts-for-react'
 
 import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { ProgrammeStats, ViewMode } from '@/types/courseStat'
 import { getGradeSpread, getSeriesType, getThesisGradeSpread } from '../util'
-import { absoluteToRelative, getDataObject, getGraphOptions, getMaxValueOfSeries } from './util'
+import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from './util'
 
-exporting(ReactHighcharts.Highcharts)
-exportData(ReactHighcharts.Highcharts)
-accessibility(ReactHighcharts.Highcharts)
+const formatNumber = (value: unknown) => {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+
+  if (!Number.isFinite(numericValue)) {
+    return ''
+  }
+
+  if (Number.isInteger(numericValue)) {
+    return `${numericValue}`
+  }
+
+  return `${numericValue.toFixed(2)}`
+}
+
+const getNumericValue = (value: unknown) => {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numericValue) ? numericValue : 0
+}
 
 const calculateSumAll = (newSeries: Record<string, number[]>) => {
   return Object.values(newSeries)[0].map((_, index) =>
@@ -100,19 +112,83 @@ export const GradeDistributionChart = ({
   const seriesType = getSeriesType(grades)
   const maxGradeValue = isRelative ? 100 : getMaxValueOfSeries(series.absolute)
 
-  const graphOptions = getGraphOptions(
-    colors[seriesType],
-    colors[seriesType],
-    isRelative,
-    maxGradeValue,
-    statYears,
-    `Grades for group ${data.name}`,
-    viewMode
-  )
+  const chartSeries = isRelative ? series.relative : series.absolute
+  const chartColors = colors[seriesType]
+  const yAxisTitle = isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`
+
+  const option = {
+    color: chartColors,
+    title: {
+      text: `Grades for group ${data.name}`,
+      left: 'center',
+    },
+    toolbox: {
+      feature: {
+        dataView: {
+          readOnly: true,
+        },
+      },
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: (params: { seriesName?: string; value?: unknown; dataIndex?: number; name?: string }) => {
+        const value = getNumericValue(params.value)
+        const category = params.name ?? ''
+        const categoryLine = category ? `<b>${category}</b><br/>` : ''
+
+        if (isRelative) {
+          const dataIndex = params.dataIndex ?? 0
+          const total = chartSeries.reduce((sum, seriesItem) => sum + getNumericValue(seriesItem.data[dataIndex]), 0)
+          const percentage = total ? (value / total) * 100 : 0
+          return `${categoryLine}<b>${params.seriesName ?? ''}</b>: ${formatNumber(percentage)}%`
+        }
+
+        return `${categoryLine}<b>${params.seriesName ?? ''}</b>: ${formatNumber(value)}`
+      },
+    },
+    legend: {
+      bottom: 0,
+    },
+    grid: {
+      top: 60,
+      left: 10,
+      right: 10,
+      bottom: 60,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: statYears,
+    },
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: isRelative ? 100 : maxGradeValue,
+      minInterval: 1,
+      name: yAxisTitle,
+      axisLabel: {
+        margin: 50,
+        formatter: isRelative ? '{value}%' : '{value}',
+      },
+    },
+    series: chartSeries.map((seriesItem, index) => ({
+      name: seriesItem.name,
+      type: 'bar',
+      stack: seriesItem.stack,
+      data: seriesItem.data,
+      itemStyle: {
+        borderRadius: 1,
+        color: chartColors[index],
+      },
+      emphasis: {
+        focus: 'series',
+      },
+    })),
+  }
 
   return (
     <div>
-      <ReactHighcharts config={{ ...graphOptions, series: isRelative ? series.relative : series.absolute }} />
+      <ReactECharts notMerge option={option} opts={{ renderer: 'svg' }} style={{ height: 450 }} />
       <TotalsDisclaimer shownAsZero userHasAccessToAllStats={userHasAccessToAllStats} />
     </div>
   )

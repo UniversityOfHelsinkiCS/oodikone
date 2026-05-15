@@ -14,6 +14,7 @@ import {
   setFacultyProgressStats,
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress, FacultyProgressData } from '../services/faculty/facultyStudentProgress'
+import { GraduationTarget } from '../services/graduationHelpers'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
 import logger from '../util/logger'
 
@@ -137,7 +138,12 @@ router.get('/allgraduationstats', async (_req: Request, res: Response) => {
   }
 
   const universityData = {
-    goals: { bachelor: 36, bcMsCombo: 60, master: 24, doctor: 48 },
+    goals: {
+      bachelor: GraduationTarget.THREE_YEARS,
+      bcMsCombo: GraduationTarget.FIVE_YEARS,
+      master: GraduationTarget.TWO_YEARS,
+      doctor: GraduationTarget.FOUR_YEARS,
+    },
     programmeNames: getProgrammeNames(allFaculties),
     byGradYear: {
       medians: {} as Record<string, LevelGraduationStats[]>,

@@ -6,7 +6,7 @@ import { utils, writeFile } from 'xlsx'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { GraduationTimes } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
@@ -38,18 +38,20 @@ export const GraduationTimesTab = ({
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
   const isError = graduationStats.isError || (graduationStats.isSuccess && !graduationStats.data)
-  const isLoading = graduationStats.isLoading || graduationStats.isFetching
-  const commonProps = {
+  const isLoading = graduationStats.isFetching
+
+  const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
+    allowExpand: true,
     classSizes,
     goalExceptions,
     groupBy,
     isError,
     isLoading,
-    mode: 'programme' as const,
+    mode: 'programme',
     names: programmeNames,
     showMedian,
     yearLabel,
-  }
+  } as const
 
   const exportToExcel = (data?: GetFacultyGraduationTimesResponse, programmeNames?: Record<string, Name>) => {
     if (!data || !programmeNames) {
