@@ -85,7 +85,6 @@ export const PassRateChart = ({
   const statYears = stats.map(year => year.name)
 
   const series = getPassRateSeries(stats, viewMode)
-  console.log(series)
   const chartSeries = isRelative ? series.relative : series.absolute
   const chartColors = isRelative ? colorsRelative : colors
   const yAxisTitle = isRelative ? `Share of ${viewMode.toLowerCase()}` : `Number of ${viewMode.toLowerCase()}`
@@ -96,19 +95,28 @@ export const PassRateChart = ({
       text: `Pass rate for group ${data.name}`,
       left: 'center',
     },
+    toolbox: {
+      feature: {
+        dataView: {
+          readOnly: true,
+        },
+      },
+    },
     tooltip: {
       trigger: 'item',
-      formatter: (params: { seriesName?: string; value?: unknown; dataIndex?: number }) => {
+      formatter: (params: { seriesName?: string; value?: unknown; dataIndex?: number; name?: string }) => {
         const value = getNumericValue(params.value)
+        const category = params.name ?? ''
+        const categoryLine = category ? `<b>${category}</b><br/>` : ''
 
         if (isRelative) {
           const dataIndex = params.dataIndex ?? 0
           const total = chartSeries.reduce((sum, seriesItem) => sum + getNumericValue(seriesItem.data[dataIndex]), 0)
           const percentage = total ? (value / total) * 100 : 0
-          return `<b>${params.seriesName ?? ''}</b>: ${formatNumber(percentage)}%`
+          return `${categoryLine}<b>${params.seriesName ?? ''}</b>: ${formatNumber(percentage)}%`
         }
 
-        return `<b>${params.seriesName ?? ''}</b>: ${formatNumber(value)}`
+        return `${categoryLine}<b>${params.seriesName ?? ''}</b>: ${formatNumber(value)}`
       },
     },
     legend: {
@@ -132,7 +140,7 @@ export const PassRateChart = ({
       minInterval: 1,
       name: yAxisTitle,
       axisLabel: {
-        margin: 30,
+        margin: 50,
         formatter: isRelative ? '{value}%' : '{value}',
       },
     },
