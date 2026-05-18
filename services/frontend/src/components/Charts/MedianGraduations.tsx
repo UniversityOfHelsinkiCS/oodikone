@@ -111,8 +111,8 @@ export const MedianGraduations = ({
   ) => {
     const sortingText =
       yearLabel === 'Start year'
-        ? `<b>From class of ${expandKey ?? name}, ${amount}/${getClassSize(code)} students have graduated</b>`
-        : `<b>${amount} students graduated in year ${expandKey ?? name}</b>`
+        ? `<b class="grad-vals">From class of ${expandKey ?? name}, ${amount}/${getClassSize(code)} students have graduated</b>`
+        : `<b class="grad-vals">${amount} students graduated in year ${expandKey ?? name}</b>`
     const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
     const statisticsText = `<br />${statistics?.onTime} graduated on time<br />${statistics?.yearOver} graduated max year overtime<br />${statistics?.wayOver} graduated over year late`
 

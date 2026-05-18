@@ -207,18 +207,19 @@ describe('Degree programme overview', () => {
         .should('contain', 47)
         .should('contain', 76)
 
-      cy.cs('bachelor-breakdown-bar-chart-section')
+      cy.cs('unset-breakdown-bar-chart')
       cy.cs('graduation-time-toggle').click()
-      cy.cs('bachelor-median-time-bar-chart-section').within(() => {
-        cy.contains('Graduation year')
-        cy.contains('2022')
-        cy.contains('48 graduated').trigger('mouseover')
-        cy.contains('48 students graduated in year 2022')
-        cy.contains('median study time: 6 semesters')
-        cy.contains('26 graduated on time')
-        cy.contains('10 graduated max year overtime')
-        cy.contains('12 graduated over year late')
+      cy.cs('unset-median-bar-chart').within(() => {
+        cy.contains('48 graduated').should('be.visible')
+        cy.contains('48 graduated').trigger('mousemove')
       })
+
+      cy.get('.grad-vals').contains('48 students graduated in year 2022').should('be.visible')
+
+      cy.contains('median study time: 6 semesters')
+      cy.contains('26 graduated on time')
+      cy.contains('10 graduated max year overtime')
+      cy.contains('12 graduated over year late')
 
       cy.cs('programmes-before-or-after-stacked-bar-chart-section')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
