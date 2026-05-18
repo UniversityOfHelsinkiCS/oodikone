@@ -190,3 +190,20 @@ Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
     cy.get('tr').filter(':visible').should('have.length', correctStats.length)
   })
 })
+
+/**
+ * Hover on the selected element.
+ */
+Cypress.Commands.add('hover', { prevSubject: 'element' }, (subject, options = {}) => {
+  cy.wrap(subject).trigger('mouseover', {
+    bubbles: true,
+    cancelable: true,
+    ...options,
+  })
+
+  cy.wrap(subject).trigger('mousemove', {
+    bubbles: true,
+    cancelable: true,
+    ...options,
+  })
+})
