@@ -78,6 +78,7 @@ export const getGradeSpread = (series: Array<Record<string, number>>) => {
     HT: [],
     TT: [],
     'Hyv.': [],
+    substituted: []
   } as Record<string, number[]>
 
   const getMergedKey = (key: string) => (Number(key) ? Math.round(Number(key)).toString() : key)

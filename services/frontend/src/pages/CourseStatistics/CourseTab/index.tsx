@@ -34,7 +34,7 @@ export const CourseTab = ({
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: AvailableStats
-  alternatives: string[]
+  alternatives: string[][]
   programmes: CourseStudyProgramme[]
 }) => {
   const { getTextIn } = useLanguage()
@@ -47,7 +47,7 @@ export const CourseTab = ({
   }))
 
   const multipleCourses = courses.length > 1
-  const alternativeCourses = stats[selected].alternatives.filter(course => course.code !== selected)
+  const alternativeCourseGroups = stats[selected].alternatives.filter(group => !group.map(({ code }) => code).includes(selected))
 
   return (
     <Stack>
@@ -58,14 +58,14 @@ export const CourseTab = ({
             <Box>
               <PrimaryCourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} />
             </Box>
-            {alternativeCourses.length ? (
+            {alternativeCourseGroups.length ? (
               <>
                 <Typography component="h6" variant="subtitle2">
                   Substitutions
                 </Typography>
                 <Grid container spacing={1}>
-                  {alternativeCourses.map(course => (
-                    <SecondaryCourseLabel code={course.code} key={course.code} name={getTextIn(course.name)!} />
+                  {alternativeCourseGroups.map(group => (
+                    <SecondaryCourseLabel group={group} key={JSON.stringify(group)} />
                   ))}
                 </Grid>
               </>

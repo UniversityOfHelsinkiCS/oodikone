@@ -47,7 +47,7 @@ export type Realisation = {
 }
 
 export type CourseStat = {
-  alternatives: { code: string; name: Name }[]
+  alternatives: { code: string; name: Name }[][]
   coursecode: string
   facultyStats: Record<string, FacultyStat>
   name: Name
