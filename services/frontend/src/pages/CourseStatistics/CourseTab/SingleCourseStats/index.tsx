@@ -67,7 +67,7 @@ export const SingleCourseStats = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: string[]
+  alternatives: string[][]
   programmes: CourseStudyProgramme[]
 }) => {
   const navigate = useNavigate()
@@ -106,7 +106,7 @@ export const SingleCourseStats = ({
   }
 
   const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
-    courseCodes: JSON.stringify(stats.alternatives.map(course => course.code)),
+    courseCodes: JSON.stringify([...new Set(stats.alternatives.flatMap(group => group.flatMap(({ code }) => code)))]),
   })
 
   let maxYearsToCreatePopulationFrom = 0
@@ -251,10 +251,12 @@ export const SingleCourseStats = ({
     const grades = countFilteredStudents(allStudents.grades, filter)
     const totalGrades = Object.values(grades).reduce((total, studentsWithGrade) => total + studentsWithGrade, 0)
     const totalPassed = Object.keys(grades).reduce((total, grade) => (grade !== '0' ? total + grades[grade] : total), 0)
-    const totalFailed = grades['0'] + enrolledNoGrade
+    const totalFailed = grades['0'] ?? 0
     const total = totalGrades + enrolledNoGrade
     const passRate = totalPassed / total
     const failRate = 1 - passRate
+
+    // console.log("Total passed:", totalPassed, enrolledNoGrade, grades, allStudents)
 
     return {
       total,
@@ -311,6 +313,7 @@ export const SingleCourseStats = ({
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
+          // console.log("Student enrollments:", studentsEnrollments, studentsEnrollments.enrolledStudentsWithNoGrade)
           const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name as Name)! : name

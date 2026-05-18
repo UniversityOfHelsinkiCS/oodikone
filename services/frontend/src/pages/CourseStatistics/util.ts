@@ -70,9 +70,8 @@ export const getCourseStats = (
 export const getCourseAlternativeCodes = (
   courseStats: Record<string, CourseStat>,
   selectedCourse: string | undefined
-): string[] =>
-  [selectedCourse!].concat(
-    courseStats[selectedCourse!]?.alternatives?.map(({ code }) => code).filter(code => code !== selectedCourse)
+): string[][] =>
+  courseStats[selectedCourse!]?.alternatives?.map(group => group.map(({ code }) => code)).filter(group => !group.includes(selectedCourse ?? "")
   )
 
 export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
@@ -104,8 +103,8 @@ export const getAllStudyProgrammes = (
     selectedCourseCode
       ? courseStats[selectedCourseCode]?.statistics?.flatMap(({ students }) => students.studentNumbers)
       : Object.values(courseStats).flatMap(programme =>
-          programme.statistics.flatMap(({ students }) => students.studentNumbers)
-        )
+        programme.statistics.flatMap(({ students }) => students.studentNumbers)
+      )
   )
 
   const all: Record<string, CourseStudyProgramme> = {}
