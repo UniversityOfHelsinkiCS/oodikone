@@ -49,7 +49,7 @@ describe('University view', () => {
     it.skip('years in the tables can be clicked to show faculty level breakdown', () => {
       cy.cs('study-right-toggle').click()
       cy.cs('bachelors-faculty-progress-table-show-button3').click()
-      cy.contains('29.5%').trigger('mouseover', { force: true })
+      cy.contains('29.5%').hover()
       cy.contains('Matemaattis-luonnontieteellinen tiedekunta')
       cy.contains('H50')
       cy.contains('0 Credits: 0')

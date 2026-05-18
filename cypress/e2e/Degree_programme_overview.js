@@ -211,7 +211,7 @@ describe('Degree programme overview', () => {
       cy.cs('graduation-time-toggle').click()
       cy.cs('unset-median-bar-chart').within(() => {
         cy.contains('48 graduated').should('be.visible')
-        cy.contains('48 graduated').trigger('mousemove')
+        cy.contains('48 graduated').hover()
       })
 
       cy.get('.grad-vals').contains('48 students graduated in year 2022').should('be.visible')
@@ -245,7 +245,7 @@ describe('Degree programme overview', () => {
         .within(() => {
           cy.contains('Master study right')
           cy.contains('2 graduated').should('be.visible')
-          cy.contains('2 graduated').trigger('mousemove')
+          cy.contains('2 graduated').hover()
         })
 
       cy.get('.grad-vals').contains('2 students graduated in year 2021').should('be.visible')
@@ -259,7 +259,7 @@ describe('Degree programme overview', () => {
         .within(() => {
           cy.contains('Bachelor + master study right')
           cy.contains('11 graduated').should('be.visible')
-          cy.contains('11 graduated').trigger('mousemove')
+          cy.contains('11 graduated').hover()
         })
 
       cy.get('.grad-vals').contains('11 students graduated in year 2023').should('be.visible')
@@ -410,7 +410,7 @@ describe('Degree programme overview', () => {
         .should('contain', 'At least 180 credits')
         .should('contain', '58.5%') // The percentage for total graduated, to check that the graph renders
 
-      cy.cs('programme-progress-bar-chart-section').contains('58.5%').trigger('mousemove')
+      cy.cs('programme-progress-bar-chart-section').contains('58.5%').hover()
       cy.contains('Graduated: 134')
     })
 
@@ -420,7 +420,7 @@ describe('Degree programme overview', () => {
           cy.contains('2020 - 2021')
         })
 
-        cy.get('text').contains('16').trigger('mousemove')
+        cy.get('text').contains('16').hover()
         cy.contains('On time: 16')
 
         cy.cs('unset-graduation-times-section').within(() => {
@@ -430,7 +430,7 @@ describe('Degree programme overview', () => {
 
         cy.contains('Year 2019 - 2020 by start year')
 
-        cy.get('text').contains('13').trigger('mousemove')
+        cy.get('text').contains('13').hover()
         cy.contains('Matematiikka')
         cy.contains('MAT-MAT')
         cy.contains('On time: 13')
@@ -440,7 +440,7 @@ describe('Degree programme overview', () => {
 
       cy.cs('average-graduation-times-section').within(() => {
         cy.contains('2020 - 2021')
-        cy.contains('19 graduated').trigger('mousemove')
+        cy.contains('19 graduated').hover()
         cy.contains('From class of 2020 - 2021, 19/30 students have graduated')
         cy.contains('median study time: 6 semesters')
         cy.contains('16 graduated on time')
@@ -495,7 +495,7 @@ describe('Degree programme overview', () => {
         cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
           cy.contains('Start year')
           cy.contains('2020 - 2021')
-          cy.get('[aria-label="2020 - 2021, 9. On time."]').trigger('mouseover')
+          cy.get('[aria-label="2020 - 2021, 9. On time."]').hover()
           cy.contains('Graduated On time: 9 students')
         })
 
@@ -503,7 +503,7 @@ describe('Degree programme overview', () => {
         cy.cs('bachelor-median-time-bar-chart').within(() => {
           cy.contains('Start year')
           cy.contains('2020 - 2021')
-          cy.contains('12 graduated').trigger('mouseover')
+          cy.contains('12 graduated').hover()
           cy.contains('From class of 2020 - 2021, 12/13 students have graduated')
           cy.contains('median study time: 34 months')
           cy.contains('9 graduated on time')

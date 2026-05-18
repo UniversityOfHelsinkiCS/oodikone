@@ -34,7 +34,7 @@ describe('Population statistics tests', () => {
     describe('Population search', () => {
       it('Info box works', () => {
         cy.cs('PopulationSearch-info-box-content').should('not.exist')
-        cy.cs('PopulationSearch-info-box-button').trigger('mouseover')
+        cy.cs('PopulationSearch-info-box-button').hover()
         cy.cs('PopulationSearch-info-box-content').should('be.visible')
         cy.cs('PopulationSearch-info-box-content').contains('Tässä osiossa voi tarkastella')
         cy.cs('PopulationSearch-info-box-button').trigger('mouseout')
