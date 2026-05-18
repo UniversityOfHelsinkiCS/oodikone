@@ -410,19 +410,27 @@ describe('Degree programme overview', () => {
         .should('contain', 'At least 180 credits')
         .should('contain', '58.5%') // The percentage for total graduated, to check that the graph renders
 
-      cy.cs('programme-progress-bar-chart-section').contains('58.5%').trigger('mouseover', { force: true })
+      cy.cs('programme-progress-bar-chart-section').contains('58.5%').trigger('mousemove')
       cy.contains('Graduated: 134')
     })
 
     it('Average graduation times section', () => {
       cy.cs('average-graduation-times-section').within(() => {
-        cy.contains('2020 - 2021')
-        cy.get('[aria-label="2020 - 2021, 16. On time."]').trigger('mouseover')
+        cy.cs('unset-graduation-times-section').within(() => {
+          cy.contains('2020 - 2021')
+        })
+
+        cy.get('text').contains('16').trigger('mousemove')
         cy.contains('On time: 16')
-        cy.contains("Click a bar to view that year's study track level breakdown")
-        cy.get('[aria-label="2019 - 2020, 22. On time."]').click()
+
+        cy.cs('unset-graduation-times-section').within(() => {
+          cy.contains("Click a bar to view that year's study track level breakdown")
+          cy.get('text').contains('22').click()
+        })
+
         cy.contains('Year 2019 - 2020 by start year')
-        cy.get('[aria-label="MAT-MAT, 13. On time."]').trigger('mouseover')
+
+        cy.get('text').contains('13').trigger('mousemove')
         cy.contains('Matematiikka')
         cy.contains('MAT-MAT')
         cy.contains('On time: 13')
@@ -432,7 +440,7 @@ describe('Degree programme overview', () => {
 
       cy.cs('average-graduation-times-section').within(() => {
         cy.contains('2020 - 2021')
-        cy.contains('19 graduated').trigger('mouseover')
+        cy.contains('19 graduated').trigger('mousemove')
         cy.contains('From class of 2020 - 2021, 19/30 students have graduated')
         cy.contains('median study time: 6 semesters')
         cy.contains('16 graduated on time')
