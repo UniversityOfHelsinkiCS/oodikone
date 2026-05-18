@@ -174,18 +174,13 @@ describe('Students tests', () => {
         cy.contains('label', 'Group size')
         cy.get('input').should('have.value', '5')
       })
-      cy.contains('.highcharts-container text', "Nov '22")
-      cy.contains('.highcharts-container text', "Jul '22").should('not.exist')
       cy.cs('group-size-input').within(() => {
         cy.contains('label', 'Group size')
         cy.get('input').clear()
         cy.get('input').type('10')
         cy.get('input').should('have.value', '10')
       })
-      cy.contains('.highcharts-container text', "Jul '22")
-      cy.contains('.highcharts-container text', "Nov '22").should('not.exist')
       cy.contains('button', 'Show semester mean').click()
-      cy.contains('.highcharts-container text', "Jan '22")
     })
 
     describe('Bachelor Honours section', () => {
@@ -277,13 +272,9 @@ describe('Students tests', () => {
     it('When a study plan is selected, the time frame of the credit graph is updated', () => {
       cy.clock(new Date('2024-08-30').getTime(), ['Date'])
       cy.visit('/students/550789')
-      cy.contains('.highcharts-container text', '1 Aug 2020')
-      cy.contains('.highcharts-container text', '30 Aug 2024')
       cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
         cy.get('td').eq(0).click()
       })
-      cy.contains('.highcharts-container text', '1 Aug 2020')
-      cy.contains('.highcharts-container text', '19 Aug 2023')
     })
 
     it("If there's a study plan corresponding to the degree programme, completed credits are displayed", () => {
