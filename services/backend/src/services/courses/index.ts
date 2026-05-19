@@ -40,7 +40,7 @@ type FormattedCredit = {
   credits: number
 }
 
-const isSingleCredit = (creditGroup: Credit[]): boolean => creditGroup.length === 1
+const isSingleCredit = (creditGroup: Credit[]): boolean => creditGroup.length === 1 || [...new Set(creditGroup.map(credit => credit.course_code))].length === 1
 
 const parseCredit = (
   creditGroup: Credit[],

@@ -89,7 +89,6 @@ export const ResultTab = ({
               <div key={data.name}>
                 {settings.viewMode === 'STUDENTS' ? (
                   <StudentsTable
-                    alternatives={alternatives}
                     courseCodes={courseCodes}
                     data={data}
                     openOrRegular={openOrRegular}
@@ -99,7 +98,7 @@ export const ResultTab = ({
                   />
                 ) : (
                   <AttemptsTable
-                    alternatives={alternatives}
+                    courseCodes={courseCodes}
                     data={data}
                     openOrRegular={openOrRegular}
                     separate={settings.separate}

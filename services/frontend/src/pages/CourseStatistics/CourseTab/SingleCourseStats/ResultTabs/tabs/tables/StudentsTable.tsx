@@ -47,7 +47,6 @@ export const StudentsTable = ({
 
   openOrRegular,
   courseCodes,
-  alternatives,
 }: {
   data: ProgrammeStats
   separate: boolean
@@ -56,7 +55,6 @@ export const StudentsTable = ({
 
   openOrRegular: CourseSearchState
   courseCodes: string[]
-  alternatives: string[][]
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
@@ -72,7 +70,7 @@ export const StudentsTable = ({
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`
     },
-    [alternatives, separate, openOrRegular]
+    [courseCodes, separate, openOrRegular]
   )
 
   const data = useMemo(() => getTableData(stats), [stats])
