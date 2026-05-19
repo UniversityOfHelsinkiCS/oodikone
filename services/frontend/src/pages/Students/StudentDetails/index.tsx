@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 
-import { isEmpty, orderBy } from 'lodash-es'
+import { orderBy } from 'lodash-es'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 
@@ -86,7 +86,7 @@ export const StudentDetails = () => {
     return <Alert severity="error">Student not found or no sufficient permissions</Alert>
   }
 
-  if (!student || !studentNumber || isEmpty(student) || !semesters) {
+  if (!student || !studentNumber || !Object.keys(student).length || !semesters) {
     return null
   }
 

@@ -1,7 +1,8 @@
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 
 import { Name, DegreeProgrammeType, Unarray } from '@oodikone/shared/types'
 import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
+import { omitKeys } from '@oodikone/shared/util'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { GraduationTarget } from '../graduationHelpers'
 import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
@@ -54,12 +55,12 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
     const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
 
     if (!medians[level]) {
-      medians[level] = cloneDeep(graduationTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
+      medians[level] = cloneDeep(graduationTimes.medians).map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
     } else {
       for (const statsForYear of graduationTimes.medians) {
         const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
         if (!correctYear) {
-          medians[level].push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+          medians[level].push({ ...omitKeys(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
           continue
         }
         correctYear.times.push(...statsForYear.times)
@@ -73,12 +74,12 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
 
     if (level === 'master' && comboTimes.medians.length) {
       if (!medians.bcMsCombo) {
-        medians.bcMsCombo = cloneDeep(comboTimes.medians).map(year => ({ ...omit(year, ['y']), median: year.y }))
+        medians.bcMsCombo = cloneDeep(comboTimes.medians).map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
       } else {
         for (const statsForYear of comboTimes.medians) {
           const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
           if (!correctYear) {
-            medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+            medians.bcMsCombo.push({ ...omitKeys(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
             continue
           }
           correctYear.times.push(...statsForYear.times)
@@ -101,7 +102,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
         programmes.medians[level][year.name] = { data: [], programmes: [] }
       }
       programmes.medians[level][year.name].data.push(
-        omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
+        omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
       )
       programmes.medians[level][year.name].programmes.push(code)
     }
@@ -116,7 +117,7 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
           programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
         }
         programmes.medians.bcMsCombo[year.name].data.push(
-          omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
+          omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
         )
         programmes.medians.bcMsCombo[year.name].programmes.push(code)
       }
@@ -168,7 +169,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     classSizes.programmes[code] = classSizesByYear
 
     if (!medians[level]) {
-      medians[level] = cloneDeep(basicStats).map(year => ({ ...omit(year, ['y', 'classSize']), median: year.y }))
+      medians[level] = cloneDeep(basicStats).map(year => ({ ...omitKeys(year, ['y', 'classSize']), median: year.y }))
     }
     classSizes[level] ??= {}
     for (const statsForYear of basicStats) {
@@ -177,7 +178,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
 
       const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
       if (!correctYear) {
-        medians[level].push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+        medians[level].push({ ...omitKeys(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
         continue
       }
       correctYear.times.push(...statsForYear.times)
@@ -190,7 +191,10 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
 
     if (level === 'master' && comboStats.length) {
       if (!medians.bcMsCombo) {
-        medians.bcMsCombo = cloneDeep(comboStats).map(year => ({ ...omit(year, ['y', 'classSize']), median: year.y }))
+        medians.bcMsCombo = cloneDeep(comboStats).map(year => ({
+          ...omitKeys(year, ['y', 'classSize']),
+          median: year.y,
+        }))
       }
       classSizes.bcMsCombo ??= {}
       for (const statsForYear of comboStats) {
@@ -198,7 +202,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
         ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize ?? 0
         const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
         if (!correctYear) {
-          medians.bcMsCombo.push({ ...omit(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+          medians.bcMsCombo.push({ ...omitKeys(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
           continue
         }
         correctYear.times.push(...statsForYear.times)
@@ -220,7 +224,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
         programmes.medians[level][year.name] = { data: [], programmes: [] }
       }
       programmes.medians[level][year.name].data.push(
-        omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
+        omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
       )
       programmes.medians[level][year.name].programmes.push(code)
     }
@@ -235,7 +239,7 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
           programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
         }
         programmes.medians.bcMsCombo[year.name].data.push(
-          omit({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
+          omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
         )
         programmes.medians.bcMsCombo[year.name].programmes.push(code)
       }

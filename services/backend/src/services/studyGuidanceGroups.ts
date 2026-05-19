@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/node'
 import { AxiosError } from 'axios'
-import { uniq } from 'lodash-es'
 
 import type { StudyGuidanceGroup, Tags, TagsByGroupId, GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { StudyGuidanceGroupTagModel } from '../models/kone'
@@ -50,7 +49,7 @@ export const getAllStudentsUserHasInGroups = async (sisPersonId: string) => {
     .map(group => group.members)
     .flat()
     .map(member => member.personStudentNumber)
-  return uniq(students)
+  return Array.from(new Set(students))
 }
 
 const getTagToUpdate = (studyProgramme?: string | null, year?: string | null) => {

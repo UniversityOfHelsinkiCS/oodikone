@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 
 import dayjs from 'dayjs'
-import { omit, sortBy } from 'lodash-es'
+import { sortBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -24,6 +24,7 @@ import { AddIcon, SearchIcon } from '@/theme'
 import { SearchResultCourse } from '@/types/api/courses'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { queryParamsToString } from '@/util/queryparams'
+import { omitKeys } from '@oodikone/shared/util'
 import { CourseTable } from './CourseTable'
 import { FetchStatisticsButton } from './FetchStatisticsButton'
 import { MultipleCoursesAlert } from './MultipleCoursesAlert'
@@ -70,7 +71,7 @@ export const SearchForm = () => {
     const isSelected = !!selectedCourses[course.code]
 
     if (isSelected) {
-      setSelectedCourses(previousSelectedCourses => omit(previousSelectedCourses, course.code))
+      setSelectedCourses(previousSelectedCourses => omitKeys(previousSelectedCourses, [course.code]))
     } else {
       setSelectedCourses(previousSelectedCourses => ({
         ...previousSelectedCourses,

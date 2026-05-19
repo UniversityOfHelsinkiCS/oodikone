@@ -1,8 +1,8 @@
-import { isEqual, keyBy, omit, uniq } from 'lodash-es'
 import { LRUCache } from 'lru-cache'
 
 import { User } from '@oodikone/shared/models/user'
 import { DetailedProgrammeRights, Role, ExpandedUser, FormattedUser, IamAccess } from '@oodikone/shared/types'
+import { keyBy, omitKeys } from '@oodikone/shared/util'
 import { roles } from '../config/roles'
 import { sequelizeUser } from '../database/connection'
 import { UserModel } from '../models/user'
@@ -48,7 +48,7 @@ export const modifyElementDetails = async (id: string, codes: string[], enable: 
     throw new Error(`User with id ${id} not found`)
   }
   if (enable === true) {
-    user.programmeRights = uniq([...user.programmeRights, ...codes])
+    user.programmeRights = Array.from(new Set([...user.programmeRights, ...codes]))
   } else {
     user.programmeRights = user.programmeRights.filter(code => !codes.includes(code))
   }
@@ -134,7 +134,16 @@ const formatUser = async (user: ExpandedUser, getStudentAccess = true) => {
 
 const formatUserForFrontend = async (user: ExpandedUser) => {
   const formattedUser = await formatUser(user, false)
-  return omit(formattedUser, ['studentsUserCanAccess', 'isAdmin', 'mockedBy', 'userId'])
+  return omitKeys(formattedUser, ['studentsUserCanAccess', 'isAdmin', 'mockedBy', 'userId'])
+}
+
+const arraysAreEqual = <T>(a: T[], b: T[]): boolean => {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false
+  }
+
+  return true
 }
 
 const updateAccessGroups = async (
@@ -159,7 +168,7 @@ const updateAccessGroups = async (
     ...(fullSisuAccess ? ['fullSisuAccess'] : []),
   ] as Role[]
 
-  if (!isEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
+  if (!arraysAreEqual(newAccessGroups.sort(), currentAccessGroups.sort())) {
     userFromDb.roles = newAccessGroups
     await userFromDb.save()
   }
@@ -172,7 +181,7 @@ export const findAll = async () => {
 
   const formattedUsers = await Promise.all(
     users.map(async user => {
-      const { iamGroups, specialGroup, access } = userAccessMap[user.sisuPersonId] || {}
+      const { iamGroups, specialGroup, access } = userAccessMap[user.sisuPersonId] ?? {}
       const detailedProgrammeRights = getStudyProgrammeRights(access, specialGroup, user.programmeRights)
       const formattedUser = await formatUserForFrontend({ ...user, detailedProgrammeRights, iamGroups })
       return formattedUser
@@ -261,6 +270,7 @@ export const getUser = async ({
     sisuPersonId: sisId,
     lastLogin: new Date(),
   })
+
   await updateAccessGroups(iamGroups, specialGroup, sisId, upsertResult)
 
   const userJSON = upsertResult.toJSON()

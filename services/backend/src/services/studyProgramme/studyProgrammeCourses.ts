@@ -1,7 +1,5 @@
-import { range } from 'lodash-es'
-
 import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
-import { mapToProviders } from '@oodikone/shared/util'
+import { mapToProviders, range } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'

@@ -4,7 +4,6 @@ import Tabs from '@mui/material/Tabs'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { range } from 'lodash-es'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -27,6 +26,7 @@ import { CheckIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
 import { getFullLanguage } from '@oodikone/shared/language'
+import { range } from '@oodikone/shared/util'
 
 const NUMBER_OF_DISPLAYED_SEMESTERS = 6
 

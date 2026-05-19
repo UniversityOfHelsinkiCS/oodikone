@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { omit } from 'lodash-es'
 import morgan from 'morgan'
 
 import { FormattedUser } from '@oodikone/shared/types'
+import { omitKeys } from '@oodikone/shared/util'
 import { getFullStudyProgrammeRights } from '../util'
 import logger from '../util/logger'
 
@@ -52,7 +52,7 @@ const accessLogger = morgan((tokens, req: Request, res: Response): undefined => 
   const onlyIamRights = !user.isAdmin && fullStudyProgrammeRights.length === 0
 
   logger.info(message, {
-    ...omit(meta, ['studentsUserCanAccess']), // Don't log student list which might be huge
+    ...omitKeys(meta, ['studentsUserCanAccess']), // Don't log student list which might be huge
     isUsageStats: true, // Pass this as a custom field so we can filter by it in Graylog
     isIamRights: onlyIamRights || usingIamRights, // Needed for Grafana IAM users panel
   })

@@ -8,7 +8,7 @@ import RadioGroup from '@mui/material/RadioGroup'
 import dayjs, { Dayjs } from 'dayjs'
 import ReactECharts from 'echarts-for-react'
 
-import { groupBy, range } from 'lodash-es'
+import { groupBy } from 'lodash-es'
 import { useMemo, useState } from 'react'
 
 import { getCreditCategories, getTargetCreditsForProgramme, TimeDivision } from '@/common'
@@ -21,6 +21,7 @@ import { useDeepMemo } from '@/hooks/deepMemo'
 import { useSemesters } from '@/hooks/useSemesters'
 import { generateGradientColors } from '@/util/color'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { range } from '@oodikone/shared/util'
 
 const splitStudentCredits = (student: FormattedStudent, timeSlots: any[], cumulative: boolean) => {
   if (!timeSlots.length) return []

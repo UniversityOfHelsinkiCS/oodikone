@@ -2,7 +2,7 @@ import dayjs, { Dayjs, extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import { maxBy, orderBy, range } from 'lodash-es'
+import { maxBy, orderBy } from 'lodash-es'
 
 import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import type { SemestersData } from '@/hooks/useSemesters'
@@ -18,6 +18,7 @@ import {
   EnrollmentType,
 } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
+import { range } from '@oodikone/shared/util'
 
 dayjsExtend(isBetween)
 dayjsExtend(isSameOrAfter)

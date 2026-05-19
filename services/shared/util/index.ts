@@ -64,11 +64,23 @@ export const omitKeys = <T extends object, K extends keyof T>(input: T, toOmit: 
   return Object.fromEntries(Object.entries(input).filter(([key, _]) => !toOmit.includes(key as K))) as Omit<T, K>
 }
 
-export const keyBy = <T extends object, K extends keyof T>(input: T[], key: K): Record<K, T> =>
-  Object.fromEntries(input.map(item => [item[key], item]))
+export const keyBy = <T extends object, K extends keyof T>(input: T[] | undefined, key: K): Record<K, T> =>
+  Object.fromEntries(input?.map(item => [item[key], item]) ?? [])
 
 export const mapValues = <T extends object, K extends keyof T, R>(input: T, f: (value: [K, T[K]]) => [K, R]) => {
   return Object.fromEntries(Object.entries(input).map(entry => f(entry as [K, T[K]])))
 }
 
 export const splitByEmptySpace = (str: string) => str.split(/\s+/g)
+
+/*
+ * Returns range of values (exclusive) between start..end or 0..start.
+ */
+export const range = (start: number, end?: number, step?: number): number[] => {
+  const a = end !== undefined ? start : 0
+  const b = end ?? start
+  const c = step ?? 1
+
+  const length = Math.max(Math.ceil((b - a) / c), 0)
+  return Array.from({ length }, (_, index) => a + c * index)
+}
