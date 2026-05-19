@@ -163,6 +163,7 @@ export const GradeDistribution = ({
     getSubRows: row => row.courses,
     paginateExpandedRows: false,
     onExpandedChange: setExpanded,
+    initialState: { sorting: [{ id: 'code', desc: false }] },
     state: { expanded },
   }
 

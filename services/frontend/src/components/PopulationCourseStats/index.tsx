@@ -1,6 +1,5 @@
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import { orderBy } from 'lodash-es'
 import { useState, useEffect } from 'react'
 
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
@@ -87,15 +86,12 @@ export const PopulationCourseStats = ({
     })
 
     setModules(
-      orderBy(
-        Object.values(modules).map(({ module, courses }) => ({
-          name: module.name,
-          code: module.code,
-          stats: module.stats,
-          courses,
-        })),
-        item => item.code
-      )
+      Object.values(modules).map(({ module, courses }) => ({
+        name: module.name,
+        code: module.code,
+        stats: module.stats,
+        courses,
+      }))
     )
   }, [filteredCourses, curriculum])
 
