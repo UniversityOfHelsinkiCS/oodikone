@@ -30,6 +30,7 @@ export const ResultTab = ({
 
   toggleOpenAndRegularCourses,
   openOrRegular,
+  courseCodes,
   alternatives,
 }: {
   availableStats: AvailableStats
@@ -41,7 +42,8 @@ export const ResultTab = ({
 
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: string[]
+  courseCodes: string[]
+  alternatives: string[][]
 }) => {
   const [settings, setSettings] = useState<ResultTabSettings>({
     isRelative: false,
@@ -88,6 +90,7 @@ export const ResultTab = ({
                 {settings.viewMode === 'STUDENTS' ? (
                   <StudentsTable
                     alternatives={alternatives}
+                    courseCodes={courseCodes}
                     data={data}
                     openOrRegular={openOrRegular}
                     separate={settings.separate}

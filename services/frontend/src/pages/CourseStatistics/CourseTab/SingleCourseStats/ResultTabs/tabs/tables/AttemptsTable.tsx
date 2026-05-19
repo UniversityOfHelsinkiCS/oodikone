@@ -68,7 +68,7 @@ export const AttemptsTable = ({
   userHasAccessToAllStats: boolean
 
   openOrRegular: CourseSearchState
-  alternatives: string[]
+  alternatives: string[][]
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 

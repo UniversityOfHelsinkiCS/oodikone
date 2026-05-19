@@ -424,7 +424,7 @@ export const SingleCourseStats = ({
     const queryObject = {
       from: fromYear,
       to: toYear,
-      coursecodes: JSON.stringify(alternatives),
+      coursecodes: JSON.stringify(coursecode),
       separate,
       unifyCourses: openOrRegular,
     }
@@ -532,6 +532,7 @@ export const SingleCourseStats = ({
         alternatives={alternatives}
         availableStats={availableStats}
         comparison={statistics.comparison}
+        courseCodes={[coursecode]}
         loading={loading}
         openOrRegular={openOrRegular}
         primary={statistics.primary}

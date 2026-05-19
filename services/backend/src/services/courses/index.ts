@@ -1,11 +1,11 @@
 import crypto from 'crypto'
 import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
+import { Credit } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
 import { isOpenUniCourseCode } from '../../util'
-import { getSortRank } from '../../util/sortRank'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
   getCreditsForCourses,
@@ -13,7 +13,6 @@ import {
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
 import { FormattedProgramme, getIsOpen } from './helpers'
-import { Credit } from '@oodikone/shared/models'
 
 const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): FormattedProgramme => ({
   code: studyRightElement.code,
@@ -49,22 +48,23 @@ const parseCredit = (
   mainCourseCode: string,
   studyRightElements: Array<SISStudyRightElementModel>
 ): FormattedCredit => {
-  // if (creditGroup.length === 0)
-  //   return null
-
-  // The first credit by attainment_date which is used to derive semester, student number and studyright
-  const credit = isSingleCredit(creditGroup) ? creditGroup.at(0)! : creditGroup.sort((a, b) => b.attainment_date > a.attainment_date ? 1 : -1).at(0)!
+  // For groups, take the date when the group was finished eg. the last course of the group was passed
+  const credit = isSingleCredit(creditGroup)
+    ? creditGroup.at(0)!
+    : creditGroup.sort((a, b) => b.attainment_date.getTime() - a.attainment_date.getTime()).at(0)!
 
   const {
     semester,
-    course_code: courseCode, // HACK: this might not work
     attainment_date: attainmentDate,
     student_studentnumber: studentNumber,
     studyright_id: studyRightId,
   } = credit
 
-  const credits = isSingleCredit(creditGroup) ? credit.credits : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
-  const grade = isSingleCredit(creditGroup) ? credit.grade : "substituted" // HACK: Not sure if this will work
+  const courseCode = isSingleCredit(creditGroup) ? credit.course_code : mainCourseCode
+  const credits = isSingleCredit(creditGroup)
+    ? credit.credits
+    : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
+  const grade = isSingleCredit(creditGroup) ? credit.grade : 'substituted'
 
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
@@ -78,11 +78,11 @@ const parseCredit = (
   const programme = programmeOfCredit
     ? formatStudyRightElement(programmeOfCredit)
     : {
-      code: 'OTHER',
-      name: { en: 'Other', fi: 'Muu', sv: 'Andra' },
-      facultyCode: 'OTHER',
-      organization: { name: { en: 'Other', fi: 'Muu', sv: 'Andra' } },
-    }
+        code: 'OTHER',
+        name: { en: 'Other', fi: 'Muu', sv: 'Andra' },
+        facultyCode: 'OTHER',
+        organization: { name: { en: 'Other', fi: 'Muu', sv: 'Andra' } },
+      }
 
   return {
     yearCode,
@@ -92,7 +92,7 @@ const parseCredit = (
     attainmentDate,
     courseCode,
     grade,
-    passed: isSingleCredit(creditGroup) ? CreditModel.passed(credit) : true,
+    passed: isSingleCredit(creditGroup) ? !CreditModel.failed(credit) : true,
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
     programme,
     credits,
@@ -131,14 +131,16 @@ const parseEnrollment = (enrollment: EnrollmentModel, anonymizationSalt: string 
 
 const getSubstitutionGroupDetails = async (codeGroups: string[][]) => {
   const substitutionGroupDetails = await CourseModel.findAll({
-    attributes: ["code", "name"],
+    attributes: ['code', 'name'],
     where: {
-      code: { [Op.in]: codeGroups.flatMap(group => group) }
+      code: { [Op.in]: codeGroups.flatMap(group => group) },
     },
-    raw: true
+    raw: true,
   })
 
-  return codeGroups.map(group => group.map(code => substitutionGroupDetails.find(subCourse => subCourse.code === code)!))
+  return codeGroups.map(group =>
+    group.map(code => substitutionGroupDetails.find(subCourse => subCourse.code === code)!)
+  )
 }
 
 const getYearlyStatsOfNew = async (
@@ -151,13 +153,16 @@ const getYearlyStatsOfNew = async (
   studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
 ) => {
   // Includes main course code and substitutions (if enabled)
-  const creditGroupCodes = (combineSubstitutions && course?.substitution_groups) ? course.substitution_groups.concat([[courseCode]]) : [[courseCode]]
+  const creditGroupCodes =
+    combineSubstitutions && course?.substitution_groups
+      ? [[courseCode]].concat(course.substitution_groups)
+      : [[courseCode]]
 
   let filteredCreditGroupCodes: string[][]
   switch (unification) {
     case Unification.REGULAR:
       // Include only course codes / group of course codes WITHOUT ANY AY prefix
-      filteredCreditGroupCodes = creditGroupCodes.filter(group => !group.some(course => isOpenUniCourseCode(course)))
+      filteredCreditGroupCodes = creditGroupCodes.filter(group => group.every(course => !isOpenUniCourseCode(course)))
       break
     case Unification.OPEN:
       // Include only courses / group of courses WITH ONLY AY  prefix
@@ -165,13 +170,14 @@ const getYearlyStatsOfNew = async (
       break
     case Unification.UNIFY:
     default:
+      // Include all courses / group of courses
       filteredCreditGroupCodes = creditGroupCodes
       break
   }
 
   const [creditGroups, enrollments] = await Promise.all([
     getCreditsForCourses(filteredCreditGroupCodes, unification),
-    getEnrollmentsForCourses(courseCode, unification),
+    getEnrollmentsForCourses(filteredCreditGroupCodes, unification),
   ])
 
   const counter = new CourseYearlyStatsCounter()
@@ -189,7 +195,12 @@ const getYearlyStatsOfNew = async (
       programme,
       courseCode: creditCourseCode,
       credits,
-    } = parseCredit(creditGroup, anonymizationSalt, courseCode, studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? [])
+    } = parseCredit(
+      creditGroup,
+      anonymizationSalt,
+      courseCode,
+      studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? []
+    )
 
     counter.markStudyProgramme(
       studentNumber,
@@ -222,7 +233,7 @@ const getYearlyStatsOfNew = async (
 
   const substitutionGroups: Pick<CourseModel, 'code' | 'name'>[][] =
     combineSubstitutions && course?.substitution_groups.length
-      ? (await getSubstitutionGroupDetails(course.substitution_groups))
+      ? await getSubstitutionGroupDetails(course.substitution_groups)
       : [[{ code: course!.code, name: course!.name }]]
 
   return {
@@ -294,13 +305,13 @@ export const getCourseYearlyStats = async (
 
   const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap([...studentNumbers])
 
-
   const statsRegular = await Promise.all(
     courseCodes.map(async courseCode => {
-      const course: Pick<CourseModel, 'code' | 'name' | 'substitutions' | 'substitution_groups'> | null = await CourseModel.findOne({
-        attributes: ['code', 'name', 'substitutions', 'substitution_groups'],
-        where: { code: courseCode },
-      })
+      const course: Pick<CourseModel, 'code' | 'name' | 'substitutions' | 'substitution_groups'> | null =
+        await CourseModel.findOne({
+          attributes: ['code', 'name', 'substitutions', 'substitution_groups'],
+          where: { code: courseCode },
+        })
 
       if (!course) {
         return null
