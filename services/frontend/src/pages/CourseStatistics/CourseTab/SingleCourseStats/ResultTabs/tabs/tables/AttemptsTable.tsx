@@ -60,7 +60,7 @@ export const AttemptsTable = ({
   userHasAccessToAllStats,
 
   openOrRegular,
-  alternatives,
+  courseCodes
 }: {
   data: ProgrammeStats
   separate: boolean
@@ -68,7 +68,7 @@ export const AttemptsTable = ({
   userHasAccessToAllStats: boolean
 
   openOrRegular: CourseSearchState
-  alternatives: string[][]
+  courseCodes: string[]
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
@@ -77,14 +77,14 @@ export const AttemptsTable = ({
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(alternatives),
+        coursecodes: JSON.stringify(courseCodes),
         separate,
         unifyCourses: openOrRegular,
       }
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`
     },
-    [alternatives, separate, openOrRegular]
+    [courseCodes, separate, openOrRegular]
   )
 
   const useThesisGrades = isThesisGrades(stats[0].attempts.grades)

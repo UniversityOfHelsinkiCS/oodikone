@@ -119,12 +119,9 @@ export class CourseYearlyStatsCounter {
     // mark best effort grade
     const current = this.groups[groupCode].students.grades[studentNumber]
 
-    // if (studentNumber === '015136558') console.log('015136558', courseCode, passed, grade, yearCode, groupCode)
-    // if (!passed && groupName === '2019-2020') console.log('Not passed:', studentNumber, passed, grade, yearCode, groupName)
     if (current?.passed && !passed) return
     if (current?.passed && Number(grade) <= Number(current?.grade)) return
     this.groups[groupCode].students.grades[studentNumber] = { grade, passed }
-    // if (!passed && groupName === '2019-2020') console.log('Not passed:', Object.entries(this.groups[groupCode].students.grades).filter(entry => !entry[1].passed))
   }
 
   public markEnrollmentToGroup(
