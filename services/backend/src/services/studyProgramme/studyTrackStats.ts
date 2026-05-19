@@ -15,21 +15,22 @@ import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
 import { calculateDurationOfStudies, shouldIncludeComboStats } from './studyProgrammeGraduations'
 import {
+  computePercentiles,
   defineYear,
+  getCreditCount,
   getGoal,
   getMedian,
+  getMonthlyCredits,
   getPercentage,
   getStartDate,
   getStudyRightElementsWithPhase,
+  getYearlyMonthlyCreditsObj,
   getYearsArray,
   getYearsObject,
   hasTransferredFromOrToProgramme,
   tableTitles,
 } from './studyProgrammeHelpers'
 import { getStudyTracksForProgramme } from './studyRightFinders'
-
-const getCreditCount = (credits: Credit[], startDate: Date) =>
-  credits.filter(credit => startDate <= credit.attainment_date).reduce((prev, curr) => prev + curr.credits, 0)
 
 const getGraduationTimeStats = async (
   studyProgramme: string,
@@ -63,9 +64,9 @@ const getGraduationTimeStats = async (
           y: getMedian(oneYearStats),
           times: [...oneYearStats],
         }
-        ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
+          ; (finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
       }
-      ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
+      ; (finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
         createLocaleComparator('name', true)
       )
     }
@@ -339,6 +340,11 @@ const getMainStatsByTrackAndYear = async (
 
   const creditCountsComboByTrack: Record<string, Record<string, number[]>> = {}
 
+  const monthlyCreditsByStartingYear = getYearlyMonthlyCreditsObj()
+  const monthlyCreditsByStartingYearByTrack: Record<string, ReturnType<typeof getYearlyMonthlyCreditsObj>> = {}
+  const monthlyCreditsByStartingYearCombo = getYearlyMonthlyCreditsObj()
+  const monthlyCreditsByStartingYearComboByTrack: Record<string, ReturnType<typeof getYearlyMonthlyCreditsObj>> = {}
+
   for (const studyRight of studyRightsOfProgramme) {
     if (!studyRight.semesterEnrollments || !studyRight.student) continue
 
@@ -379,6 +385,23 @@ const getMainStatsByTrackAndYear = async (
         startedInProgramme,
         studyRightElement
       )
+    }
+
+    const academicStartYear = Number(startYear.slice(0, 4))
+    const addCreditsTo = (destination: Record<string, number[]>) => getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, destination)
+
+    if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
+      addCreditsTo(monthlyCreditsByStartingYearCombo[academicStartYear])
+      if (studyTrack) {
+        monthlyCreditsByStartingYearComboByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
+        addCreditsTo(monthlyCreditsByStartingYearComboByTrack[studyTrack][academicStartYear])
+      }
+    } else {
+      addCreditsTo(monthlyCreditsByStartingYear[academicStartYear])
+      if (studyTrack) {
+        monthlyCreditsByStartingYearByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
+        addCreditsTo(monthlyCreditsByStartingYearByTrack[studyTrack][academicStartYear])
+      }
     }
 
     if (!studyRightElement.graduated) {
@@ -464,6 +487,10 @@ const getMainStatsByTrackAndYear = async (
   )
 
   return {
+    monthlyCreditsByStartingYear,
+    monthlyCreditsByStartingYearByTrack,
+    monthlyCreditsByStartingYearCombo,
+    monthlyCreditsByStartingYearComboByTrack,
     mainStatsByYear,
     mainStatsByTrack,
     otherCountriesCount,
@@ -505,6 +532,13 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     combinedProgramme
   )
 
+  const percentiles: StudyTrackStats["percentiles"] = {
+    main: computePercentiles(stats.monthlyCreditsByStartingYear),
+    byTrack: Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))),
+    combo: computePercentiles(stats.monthlyCreditsByStartingYearCombo),
+    comboByTrack: Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track])]))),
+  }
+
   const graduatedTitles = combinedProgramme
     ? combinedProgramme === 'MH90_001'
       ? tableTitles.studytracksCombined.licentiate
@@ -517,6 +551,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     creditCountsByTrack: stats.creditCountsByTrack,
     creditCountsCombo: stats.creditCountsCombo,
     creditCountsComboByTrack: stats.creditCountsComboByTrack,
+    percentiles,
     doCombo,
     graduatedCount: stats.graduatedCount,
     graduatedCountByTrack: stats.graduatedCountByTrack,

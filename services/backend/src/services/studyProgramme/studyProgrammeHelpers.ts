@@ -1,7 +1,7 @@
 import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
-import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import { Credit, SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
 import { programmeCodes } from '../../config/programmeCodes'
 import { ProgrammeModuleModel } from '../../models'
@@ -56,6 +56,7 @@ export const getMedian = (values: number[]) => {
   return (sorted[half - 1] + sorted[half]) / 2.0
 }
 
+/** @returns academic starting year e.g. "2019-2020" */
 export function defineYear(date: Date, isAcademicYear: true): string
 export function defineYear(date: Date, isAcademicYear: false): number
 export function defineYear(date: Date, isAcademicYear: boolean): string | number
@@ -74,9 +75,99 @@ export function defineYear(date: Date, isAcademicYear: boolean) {
   return `${year} - ${year + 1}`
 }
 
-export const getStartDate = (isAcademicYear: boolean) => {
-  return isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
+const filterCreditsByDate = (credits: Credit[], threshold: Date) => credits.filter(credit => threshold <= credit.attainment_date)
+
+export const getCreditCount = (credits: Credit[], startDate: Date) => (
+  filterCreditsByDate(credits, startDate).reduce((prev, curr) => prev + curr.credits, 0)
+)
+
+/**
+* @param startDate exact date when started in programme to cut credits with
+* @param startYear academic start year
+*/
+export const getMonthlyCredits = (credits: Credit[], startDate: Date, startYear: number, monthlyCredits: Record<string, number[]>) => {
+  const filteredCredits = filterCreditsByDate(credits, startDate)
+  const studentMonthlyCredits = getMonthlyCreditsObj(startYear)
+
+  for (const credit of filteredCredits) {
+    const creditKey = `${credit.attainment_date.getFullYear()}-${credit.attainment_date.getMonth() + 1}`
+    studentMonthlyCredits[creditKey].push(credit.credits)
+  }
+
+  /* Add credits of individual student to the main obj */
+  let accumulator = 0
+  for (const creditKey of Object.keys(monthlyCredits)) {
+    for (const credit of studentMonthlyCredits[creditKey]) {
+      accumulator += credit
+    }
+
+    monthlyCredits[creditKey].push(accumulator)
+  }
 }
+
+export const getStartDate = (isAcademicYear: boolean, year: number = 2017) => {
+  return isAcademicYear ? new Date(`${year}-08-01`) : new Date(`${year}-01-01`)
+}
+
+export const getYearlyMonthlyCreditsObj = () => {
+  const yearlyMonthlyCredits: Record<string, ReturnType<typeof getMonthlyCreditsObj>> = {}
+  const today = new Date()
+
+  for (let year = getStartDate(true).getFullYear(); year <= today.getFullYear(); year++) {
+    yearlyMonthlyCredits[year] = getMonthlyCreditsObj(year)
+  }
+
+  return yearlyMonthlyCredits
+}
+
+const getMonthlyCreditsObj = (academicStartYear?: number) => {
+  const today = new Date()
+  let time = getStartDate(true, academicStartYear)
+
+  const monthlyCredits: Record<string, number[]> = {}
+  today.setDate(1)
+
+  /* NB: JS months start at 0. We need them to start at 1. */
+  while (time < today) {
+    monthlyCredits[`${time.getFullYear()}-${time.getMonth() + 1}`] = []
+    time.setMonth(time.getMonth() + 1)
+  }
+
+  return monthlyCredits
+}
+
+export const computePercentiles = (yearlyMonthlyCredits: Record<string, Record<string, number[]>>, percentiles = [10, 25, 50, 75, 90]) => {
+  const values: Record<string, Record<string, [string, number][]>> = {}
+
+  const interpolate = (percentile: number, credits: number[]) => {
+    const n = credits.length
+    const p = percentile / 100
+
+    const index = (n - 1) * p
+    const lower = Math.ceil(index)
+    const upper = Math.floor(index)
+    const weight = index - lower
+
+    if (upper >= n) return credits[lower]
+    if (lower === upper) return credits[lower]
+
+    return credits[lower] * (1 - weight) + credits[upper] * weight
+  }
+
+  for (const yearKey of Object.keys(yearlyMonthlyCredits)) {
+    for (const monthlyKey of Object.keys(yearlyMonthlyCredits[yearKey])) {
+      const sortedCredits = yearlyMonthlyCredits[yearKey][monthlyKey].sort((a, b) => a - b)
+      for (const percentile of percentiles) {
+        values[yearKey] ??= {}
+        values[yearKey][percentile] ??= []
+        values[yearKey][percentile].push([monthlyKey, Number(interpolate(percentile, sortedCredits).toFixed(1))])
+      }
+    }
+  }
+
+  return values
+}
+
 
 // In the object programmes should be {bachelorCode: masterCode}
 export const combinedStudyProgrammes = { KH90_001: 'MH90_001' } as const

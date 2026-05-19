@@ -74,6 +74,13 @@ export type ProgrammeGraduationStats = {
   programmesBeforeOrAfterTitles: (string | number)[]
 }
 
+type StudyTrackProgressPercentiles = {
+  main: Record<string, Record<string, [string, number][]>>
+  byTrack: Record<string, Record<string, Record<string, [string, number][]>>>
+  combo: Record<string, Record<string, [string, number][]>>
+  comboByTrack: Record<string, Record<string, Record<string, [string, number][]>>>
+}
+
 export type StudyTrackStats = {
   creditCounts: Record<string, number[]>
   creditCountsByTrack: Record<string, Record<string, number[]>>
@@ -88,6 +95,7 @@ export type StudyTrackStats = {
   mainStatsByTrack: Record<string, (number | string)[][]>
   mainStatsByYear: Record<string, (number | string)[][]>
   otherCountriesCount: Record<string, Record<string, Record<string, number>>>
+  percentiles: StudyTrackProgressPercentiles
   populationTitles: string[]
   studyTracks: Record<string, string | Name>
   years: string[]
