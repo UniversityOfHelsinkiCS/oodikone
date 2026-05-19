@@ -5,19 +5,21 @@ import type { SxProps } from '@mui/material/styles'
 export const StyledMessage = ({
   children,
   variant = 'outlined',
+  severity = 'info',
   sx: propSx,
   showIcon,
   title,
 }: {
   children: React.ReactNode
   variant?: 'outlined' | 'standard' | 'filled'
+  severity?: 'info' | 'success' | 'warning' | 'error'
   sx?: SxProps
   showIcon?: boolean
   title?: string
 }) => (
   <Alert
     icon={showIcon ? null : false} // Null keeps icon enabled (default behaviour)
-    severity="info"
+    severity={severity}
     sx={{ margin: 'auto', maxWidth: '800px', ...propSx }}
     variant={variant}
   >
