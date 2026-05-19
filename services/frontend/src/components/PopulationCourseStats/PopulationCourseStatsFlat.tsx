@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
@@ -16,6 +17,13 @@ type PopulationCourseStatsFlatProps = {
   showModules?: boolean
   setShowModules?: (input: boolean) => void
 }
+
+const Warning = ({ showModules, studentAmountLimit }) => (
+  <Alert severity="warning">
+    There are no <b>{showModules ? 'modules' : 'courses'}</b> available with the student amount limit of{' '}
+    <span>{studentAmountLimit}</span>.
+  </Alert>
+)
 
 export const PopulationCourseStatsFlat = ({
   filteredCourses,
@@ -49,25 +57,31 @@ export const PopulationCourseStatsFlat = ({
     {
       menuItem: 'Pass/fail',
       render: () => (
-        <PassFailEnrollments
-          courseStatistics={courseStatistics}
-          courseTableMode={courseTableMode}
-          onlyIamRights={onlyIamRights}
-          setShowModules={setShowModules}
-          showModules={showModules}
-        />
+        <>
+          {!courseStatistics.length && <Warning showModules={showModules} studentAmountLimit={studentAmountLimit} />}
+          <PassFailEnrollments
+            courseStatistics={courseStatistics}
+            courseTableMode={courseTableMode}
+            onlyIamRights={onlyIamRights}
+            setShowModules={setShowModules}
+            showModules={showModules}
+          />
+        </>
       ),
     },
     {
       menuItem: 'Grades',
       render: () => (
-        <GradeDistribution
-          courseStatistics={courseStatistics}
-          courseTableMode={courseTableMode}
-          onlyIamRights={onlyIamRights}
-          setShowModules={setShowModules}
-          showModules={showModules}
-        />
+        <>
+          {!courseStatistics.length && <Warning showModules={showModules} studentAmountLimit={studentAmountLimit} />}
+          <GradeDistribution
+            courseStatistics={courseStatistics}
+            courseTableMode={courseTableMode}
+            onlyIamRights={onlyIamRights}
+            setShowModules={setShowModules}
+            showModules={showModules}
+          />
+        </>
       ),
     },
   ]
