@@ -8,9 +8,10 @@ import { AddIcon, RemoveIcon } from '@/theme'
 type EnrollmentDateSelectorProps = {
   year: number
   setYear: React.Dispatch<React.SetStateAction<number>> | (() => void)
+  slim?: boolean
 }
 
-export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelectorProps) => {
+export const EnrollmentDateSelector = ({ year, setYear, slim = false }: EnrollmentDateSelectorProps) => {
   const currentYear = new Date().getFullYear()
   const lowestYear = 2017
   const options = [...Array(currentYear + 1 - lowestYear).keys()].map(value => currentYear - value)
@@ -33,7 +34,7 @@ export const EnrollmentDateSelector = ({ year, setYear }: EnrollmentDateSelector
         }}
         data-cy="population-year-selector"
         onChange={({ target: { value } }) => setYear(parseInt(value, 10))}
-        sx={{ width: 'fit-content', pl: 1, pr: 1 }}
+        sx={{ width: 'fit-content', pl: 1, pr: 1, height: slim ? 45 : null }}
         value={year.toString()}
       >
         {options.map(option => (
