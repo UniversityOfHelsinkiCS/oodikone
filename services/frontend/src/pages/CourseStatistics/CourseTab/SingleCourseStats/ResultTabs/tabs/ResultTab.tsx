@@ -31,7 +31,6 @@ export const ResultTab = ({
   toggleOpenAndRegularCourses,
   openOrRegular,
   courseCodes,
-  alternatives,
 }: {
   availableStats: AvailableStats
   datasets: (ProgrammeStats | undefined)[]
@@ -43,7 +42,6 @@ export const ResultTab = ({
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   courseCodes: string[]
-  alternatives: string[][]
 }) => {
   const [settings, setSettings] = useState<ResultTabSettings>({
     isRelative: false,

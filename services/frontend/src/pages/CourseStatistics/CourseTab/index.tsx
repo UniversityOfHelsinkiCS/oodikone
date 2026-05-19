@@ -47,7 +47,6 @@ export const CourseTab = ({
   }))
 
   const multipleCourses = courses.length > 1
-  const alternativeCourseGroups = stats[selected].alternatives.filter(group => !group.map(({ code }) => code).includes(selected))
 
   return (
     <Stack>
@@ -58,13 +57,13 @@ export const CourseTab = ({
             <Box>
               <PrimaryCourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} />
             </Box>
-            {alternativeCourseGroups.length ? (
+            {alternatives.length ? (
               <>
                 <Typography component="h6" variant="subtitle2">
-                  Substitutions
+                  Substitution groups
                 </Typography>
                 <Grid container spacing={1}>
-                  {alternativeCourseGroups.map(group => (
+                  {alternatives.map(group => (
                     <SecondaryCourseLabel group={group} key={JSON.stringify(group)} />
                   ))}
                 </Grid>
@@ -74,7 +73,6 @@ export const CourseTab = ({
         </Stack>
       </Section>
       <SingleCourseStats
-        alternatives={alternatives}
         availableStats={availableStats}
         loading={loading}
         openOrRegular={openOrRegular}

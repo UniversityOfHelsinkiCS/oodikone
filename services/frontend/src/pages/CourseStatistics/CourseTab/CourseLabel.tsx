@@ -7,9 +7,6 @@ export const PrimaryCourseLabel = ({ code, name }: { code: string; name: string 
   <Chip color={'primary'} icon={<StarIcon fontSize="small" />} label={`${code} • ${name}`} />
 )
 
-export const SecondaryCourseLabel = ({ group }) => {
-  const courseLabels = group.map(({ code }) => code)
-  return (
-    <GroupChip group={courseLabels} separator={" • "} />
-  );
-}
+export const SecondaryCourseLabel = ({ group }: { group: string[] }) => (
+  <GroupChip group={group.map(code => code)} separator={' • '} />
+)
