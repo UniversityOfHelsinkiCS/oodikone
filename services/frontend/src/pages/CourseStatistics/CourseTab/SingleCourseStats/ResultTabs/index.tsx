@@ -19,6 +19,7 @@ export const ResultTabs = ({
   loading,
   toggleOpenAndRegularCourses,
   openOrRegular,
+  courseCodes,
   alternatives,
 }: {
   availableStats: AvailableStats
@@ -29,7 +30,8 @@ export const ResultTabs = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: string[]
+  courseCodes: string[]
+  alternatives: string[][]
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -64,6 +66,7 @@ export const ResultTabs = ({
         <ResultTab
           alternatives={alternatives}
           availableStats={availableStats}
+          courseCodes={courseCodes}
           datasets={[primary, comparison]}
           initialSettings={{ viewMode: 'STUDENTS', separate }}
           loading={loading}
@@ -77,6 +80,7 @@ export const ResultTabs = ({
         <ResultTab
           alternatives={alternatives}
           availableStats={availableStats}
+          courseCodes={courseCodes}
           datasets={[primary, comparison]}
           initialSettings={{ viewMode: 'ATTEMPTS', separate }}
           loading={loading}

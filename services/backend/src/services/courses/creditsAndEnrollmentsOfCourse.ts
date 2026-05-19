@@ -1,6 +1,7 @@
 import { Op } from 'sequelize'
 
-import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
+import { Credit } from '@oodikone/shared/models'
+import { EnrollmentState, Unification } from '@oodikone/shared/types'
 import {
   StudentModel,
   CreditModel,
@@ -11,10 +12,8 @@ import {
   SISStudyRightElementModel,
 } from '../../models'
 import { getIsOpen } from './helpers'
-import { Credit } from '@oodikone/shared/models'
 
 export const getCreditsForCourses = async (codeGroups: string[][], unification: Unification) => {
-  // TODO: Code group includes also the main course code
   const allCourseCodes = codeGroups.flatMap(group => group)
 
   // We need the credits grouped by student numbers so that we can check if a student has
@@ -26,7 +25,6 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
     include: [
       {
         model: CreditModel,
-        required: false,
         attributes: [
           'grade',
           'course_code',
@@ -42,17 +40,18 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
           },
           is_open: getIsOpen(unification),
         },
-        include: [{
-          model: SemesterModel,
-          required: true,
-          duplicating: false,
-          attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
-          where: {
-            startdate: {
-              [Op.lte]: new Date(),
+        order: [['attainment_date', 'ASC']],
+        include: [
+          {
+            model: SemesterModel,
+            attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+            where: {
+              startdate: {
+                [Op.lte]: new Date(),
+              },
             },
           },
-        }],
+        ],
       },
     ],
   })
@@ -64,24 +63,25 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
     return acc
   }, {})
 
-  // Check which substitution groups are completed eg. all courses of a group are passed
   const completedGroups: Credit[][] = []
   for (const studentCredits of Object.values(studentNumberToCredits)) {
-    const courseCodesOfCredits = studentCredits.map(credit => CreditModel.passed(credit) && credit.course_code)
+    const codesOfPassedCredits = studentCredits.map(credit => CreditModel.passed(credit) && credit.course_code)
     for (const group of codeGroups) {
-      // For single courses we can include also failed courses
       if (group.length === 1) {
-        // TODO: Now failed courses are calculated for only single courses/substitutions
-        // should we also calculate fail rate for substitution groups?
-        const completedCredit = studentCredits.find(credit => credit.course_code === group.at(0))
-        if (completedCredit) {
-          completedGroups.push([completedCredit])
+        // Failed courses are only calculated for the original course and 1-to-1 substitutions
+        const credits = studentCredits.filter(credit => credit.course_code === group.at(0))
+        if (credits.length) {
+          completedGroups.push(credits)
         }
       }
       // For substitution groups we must only get passed groups
-      else if (group.every(code => courseCodesOfCredits.includes(code))) {
+      else if (group.every(code => codesOfPassedCredits.includes(code))) {
         // The credit in question should always exist because we just checked that it does
-        completedGroups.push(group.map(code => studentCredits.find(credit => credit.course_code === code && CreditModel.passed({ credittypecode: credit.credittypecode }))!))
+        completedGroups.push(
+          group.map(code => studentCredits.find(credit => credit.course_code === code && CreditModel.passed(credit))!)
+        )
+      } else {
+        // "Partially completed substitution, do not count towards anything"
       }
     }
   }
@@ -130,7 +130,7 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
   }, {})
 }
 
-export const getEnrollmentsForCourses = async (courseCode: string, unification: Unification) =>
+export const getEnrollmentsForCourses = async (codeGroup: string[][], unification: Unification) =>
   EnrollmentModel.findAll({
     attributes: ['studentnumber', 'enrollment_date_time', 'course_code'],
     include: [
@@ -145,9 +145,9 @@ export const getEnrollmentsForCourses = async (courseCode: string, unification: 
       },
     ],
     where: {
-      // TODO: Should we also include 1-to-1 substitutions or even 1-to-many substitutionGroups
+      // Include only enrollments from the original course and 1-to-1 substitutions
       course_code: {
-        [Op.eq]: courseCode,
+        [Op.in]: codeGroup.filter(group => group.length === 1).flatMap(group => group),
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
       state: EnrollmentState.ENROLLED,
