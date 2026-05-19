@@ -57,7 +57,6 @@ export const SingleCourseStats = ({
   loading,
   toggleOpenAndRegularCourses,
   openOrRegular,
-  alternatives,
   programmes,
 }: {
   availableStats: AvailableStats
@@ -67,7 +66,6 @@ export const SingleCourseStats = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
-  alternatives: string[][]
   programmes: CourseStudyProgramme[]
 }) => {
   const navigate = useNavigate()
@@ -529,7 +527,6 @@ export const SingleCourseStats = ({
         </Section>
       ) : null}
       <ResultTabs
-        alternatives={alternatives}
         availableStats={availableStats}
         comparison={statistics.comparison}
         courseCodes={[coursecode]}
