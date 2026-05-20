@@ -25,10 +25,10 @@ import {
 } from '@oodikone/shared/types'
 import { exportStudentTable } from './exportStudentTable'
 import { ProgressOfStudents } from './ProgressOfStudents'
+import { StudentProgressPercentiles } from './StudentProgressPercentiles'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
 import { YearSelector } from './YearSelector'
-import { StudentProgressPercentiles } from './StudentProgressPercentiles'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
@@ -179,13 +179,13 @@ export const StudyTracksAndClassStatisticsTab = ({
   } =
     hasStudyTracks && Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1
       ? {
-        basic: calculateStudyTrackStats(),
-        combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},
-      }
+          basic: calculateStudyTrackStats(),
+          combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},
+        }
       : {
-        basic: {},
-        combo: {},
-      }
+          basic: {},
+          combo: {},
+        }
 
   const formatMedianEntries = (item: MedianEntry) => ({ median: item.y, ...item })
 
@@ -304,10 +304,10 @@ export const StudyTracksAndClassStatisticsTab = ({
         {!!studyTrackStats && (
           <StudentProgressPercentiles
             data={studyTrackStats.percentiles}
+            doCombo={studyTrackStats.doCombo}
+            graduationTimeGoals={studyTrackStats?.graduationTimes?.goals}
             isCombinedProgramme={!!combinedProgramme}
             studyTrack={studyTrack !== studyProgramme ? studyTrack : undefined}
-            graduationTimeGoals={studyTrackStats?.graduationTimes?.goals}
-            doCombo={studyTrackStats.doCombo}
           />
         )}
       </Section>

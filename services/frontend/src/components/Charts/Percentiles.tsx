@@ -68,7 +68,7 @@ export const PercentileGraph = (props: PercentileProps) => {
       style: {
         fill: '#666',
         text: 'Percentile',
-      }
+      },
     },
     yAxis: {
       type: 'value',
@@ -90,7 +90,5 @@ export const PercentileGraph = (props: PercentileProps) => {
     series: [...markLines, ...series],
   }
 
-  return (
-    <ReactECharts option={option} opts={{ renderer: 'svg' }} style={{ height: 520, width: '100%' }} />
-  )
+  return <ReactECharts option={option} opts={{ renderer: 'svg' }} style={{ height: 520, width: '100%' }} />
 }
