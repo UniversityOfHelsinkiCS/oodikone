@@ -60,7 +60,8 @@ export const AttemptsTable = ({
   userHasAccessToAllStats,
 
   openOrRegular,
-  courseCodes
+  alternatives,
+  courseCodes,
 }: {
   data: ProgrammeStats
   separate: boolean
@@ -68,16 +69,18 @@ export const AttemptsTable = ({
   userHasAccessToAllStats: boolean
 
   openOrRegular: CourseSearchState
+  alternatives: string[][]
   courseCodes: string[]
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
+  const uniqueCourseCodes = [...new Set(courseCodes.concat(alternatives.flatMap(group => group.flatMap(code => code))))]
 
   const showPopulation = useCallback(
     (yearCode: number) => {
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(courseCodes),
+        coursecodes: JSON.stringify(uniqueCourseCodes),
         separate,
         unifyCourses: openOrRegular,
       }

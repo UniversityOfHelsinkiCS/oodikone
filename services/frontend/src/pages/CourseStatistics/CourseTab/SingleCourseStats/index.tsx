@@ -58,6 +58,7 @@ export const SingleCourseStats = ({
   toggleOpenAndRegularCourses,
   openOrRegular,
   programmes,
+  alternatives,
 }: {
   availableStats: AvailableStats
   stats: CourseStat
@@ -67,6 +68,7 @@ export const SingleCourseStats = ({
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   programmes: CourseStudyProgramme[]
+  alternatives: string[][]
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -103,8 +105,12 @@ export const SingleCourseStats = ({
     }
   }
 
+  const uniqueCourseCodes = [
+    ...new Set([coursecode].concat(stats.alternatives.flatMap(group => group.flatMap(({ code }) => code)))),
+  ]
+
   const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
-    courseCodes: JSON.stringify([...new Set(stats.alternatives.flatMap(group => group.flatMap(({ code }) => code)))]),
+    courseCodes: JSON.stringify(uniqueCourseCodes),
   })
 
   let maxYearsToCreatePopulationFrom = 0
@@ -419,7 +425,7 @@ export const SingleCourseStats = ({
     const queryObject = {
       from: fromYear,
       to: toYear,
-      coursecodes: JSON.stringify(coursecode),
+      coursecodes: JSON.stringify(uniqueCourseCodes),
       separate,
       unifyCourses: openOrRegular,
     }
@@ -524,6 +530,7 @@ export const SingleCourseStats = ({
         </Section>
       ) : null}
       <ResultTabs
+        alternatives={alternatives}
         availableStats={availableStats}
         comparison={statistics.comparison}
         courseCodes={[coursecode]}
