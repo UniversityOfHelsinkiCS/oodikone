@@ -254,8 +254,6 @@ export const SingleCourseStats = ({
     const passRate = totalPassed / total
     const failRate = 1 - passRate
 
-    // console.log("Total passed:", totalPassed, enrolledNoGrade, grades, allStudents)
-
     return {
       total,
       totalPassed,
@@ -311,7 +309,6 @@ export const SingleCourseStats = ({
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
           const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
-          // console.log("Student enrollments:", studentsEnrollments, studentsEnrollments.enrolledStudentsWithNoGrade)
           const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name as Name)! : name

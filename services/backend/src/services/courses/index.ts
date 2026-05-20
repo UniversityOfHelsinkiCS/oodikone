@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
-import { Credit } from '@oodikone/shared/models'
+import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
@@ -40,7 +40,9 @@ type FormattedCredit = {
   credits: number
 }
 
-const isSingleCredit = (creditGroup: Credit[]): boolean => creditGroup.length === 1 || [...new Set(creditGroup.map(credit => credit.course_code))].length === 1
+// Is group in question for a single course (original or 1-to-1 substitution) or a substitution group with multiple courses
+const isSingleCourse = (group: Credit[] | Enrollment[]): boolean =>
+  group.length === 1 || [...new Set(group.map((course: Credit | Enrollment) => course.course_code))].length === 1
 
 const parseCredit = (
   creditGroup: Credit[],
@@ -48,23 +50,27 @@ const parseCredit = (
   mainCourseCode: string,
   studyRightElements: Array<SISStudyRightElementModel>
 ): FormattedCredit => {
-  // For groups, take the date when the group was finished eg. the last course of the group was passed
-  const credit = isSingleCredit(creditGroup)
-    ? creditGroup.at(0)!
-    : creditGroup.sort((a, b) => b.attainment_date.getTime() - a.attainment_date.getTime()).at(0)!
+  const singleCourse = isSingleCourse(creditGroup)
+  // Latest attainment for a course
+  const credit =
+    creditGroup
+      .sort((a, b) => b.attainment_date.getTime() - a.attainment_date.getTime())
+      .find(credit => !CreditModel.failed(credit)) ?? creditGroup.at(0)!
 
+  const courseCode = singleCourse ? credit.course_code : mainCourseCode
+  const grade = singleCourse ? credit.grade : 'substituted'
+  const credits = singleCourse ? credit.credits : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
+
+  // Take the first attainment for the course (see Student statistics info-box)
+  // TODO: Substitution groups should be marked for the semester when
+  // the group was first finished eg. when was the first time the last missing
+  // course of the group was passed
   const {
     semester,
     attainment_date: attainmentDate,
     student_studentnumber: studentNumber,
     studyright_id: studyRightId,
-  } = credit
-
-  const courseCode = isSingleCredit(creditGroup) ? credit.course_code : mainCourseCode
-  const credits = isSingleCredit(creditGroup)
-    ? credit.credits
-    : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
-  const grade = isSingleCredit(creditGroup) ? credit.grade : 'substituted'
+  } = creditGroup.at(-1)!
 
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
@@ -92,7 +98,7 @@ const parseCredit = (
     attainmentDate,
     courseCode,
     grade,
-    passed: isSingleCredit(creditGroup) ? !CreditModel.failed(credit) : true,
+    passed: singleCourse ? !CreditModel.failed(credit) : true,
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
     programme,
     credits,
@@ -109,7 +115,7 @@ type FormattedEnrollment = {
   studentNumber: string
 }
 
-const parseEnrollment = (enrollment: EnrollmentModel, anonymizationSalt: string | null): FormattedEnrollment => {
+const parseEnrollment = (enrollment: Enrollment, anonymizationSalt: string | null): FormattedEnrollment => {
   const {
     studentnumber: studentNumber,
     semester,
@@ -175,7 +181,7 @@ const getYearlyStatsOfNew = async (
       break
   }
 
-  const [creditGroups, enrollments] = await Promise.all([
+  const [creditGroups, enrollmentGroups] = await Promise.all([
     getCreditsForCourses(filteredCreditGroupCodes, unification),
     getEnrollmentsForCourses(filteredCreditGroupCodes, unification),
   ])
@@ -219,14 +225,30 @@ const getYearlyStatsOfNew = async (
     counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
   }
 
-  for (const enrollment of enrollments) {
-    const { studentNumber, semesterCode, semesterName, yearCode, yearName, courseCode, enrollmentDateTime } =
-      parseEnrollment(enrollment, anonymizationSalt)
+  for (const enrollments of enrollmentGroups) {
+    for (const enrollment of enrollments) {
+      const {
+        studentNumber,
+        semesterCode,
+        semesterName,
+        yearCode,
+        yearName,
+        courseCode: enrollmentCourseCode,
+        enrollmentDateTime,
+      } = parseEnrollment(enrollment, anonymizationSalt)
 
-    const groupCode = separate ? semesterCode : yearCode
-    const groupName = separate ? semesterName : yearName
+      const groupCode = separate ? semesterCode : yearCode
+      const groupName = separate ? semesterName : yearName
 
-    counter.markEnrollmentToGroup(studentNumber, enrollmentDateTime, groupCode, groupName, courseCode, yearCode)
+      counter.markEnrollmentToGroup(
+        studentNumber,
+        enrollmentDateTime,
+        groupCode,
+        groupName,
+        enrollmentCourseCode,
+        yearCode
+      )
+    }
   }
 
   const statistics = await counter.getFinalStatistics(anonymizationSalt)
