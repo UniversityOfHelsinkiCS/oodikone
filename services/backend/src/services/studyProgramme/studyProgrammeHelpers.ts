@@ -122,7 +122,7 @@ export const getYearlyMonthlyCreditsObj = () => {
 
 const getMonthlyCreditsObj = (academicStartYear?: number) => {
   const today = new Date()
-  let time = getStartDate(true, academicStartYear)
+  const time = getStartDate(true, academicStartYear)
 
   const monthlyCredits: Record<string, number[]> = {}
   today.setDate(1)

@@ -1,4 +1,4 @@
-import { Credit, SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
   MedianEntry,
@@ -521,6 +521,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   const years = getYearsArray(getStartDate(true).getFullYear(), true, true)
 
   const studyTracks = await getStudyTracksForProgramme(studyProgramme)
+  const hasStudyTracks = Object.keys(studyTracks).length > 1
 
   const doCombo = await shouldIncludeComboStats(studyProgramme)
   const stats = await getMainStatsByTrackAndYear(
@@ -534,9 +535,9 @@ export const getStudyTrackStatsForStudyProgramme = async ({
 
   const percentiles: StudyTrackStats["percentiles"] = {
     main: computePercentiles(stats.monthlyCreditsByStartingYear),
-    byTrack: Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))),
-    combo: computePercentiles(stats.monthlyCreditsByStartingYearCombo),
-    comboByTrack: Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track])]))),
+    byTrack: hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))) : undefined, 
+    combo: doCombo ? computePercentiles(stats.monthlyCreditsByStartingYearCombo) : undefined,
+    comboByTrack: doCombo && hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track])]))) : undefined,
   }
 
   const graduatedTitles = combinedProgramme
