@@ -10,7 +10,7 @@ import {
   CourseYearlyStatsQuery,
 } from '@oodikone/shared/routes/courses'
 import type { CourseWithSubsId } from '@oodikone/shared/types/course'
-import { getCourseYearlyStats } from '../services/courses'
+import { getCourseDetails, getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
 import {
   getFullStudyProgrammeRights,
@@ -86,5 +86,14 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     res.json(results)
   }
 )
+
+router.get<never, CanError<unknown>, never, { code: string }>('/coursedetails', async (req, res) => {
+  const { code } = req.query
+
+  if (!code) return res.status(500).end()
+  const details = await getCourseDetails(code)
+
+  return res.json(details)
+})
 
 export default router

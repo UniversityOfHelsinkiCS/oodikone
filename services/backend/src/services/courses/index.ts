@@ -327,3 +327,10 @@ export const getCourseProvidersForCourses = async (codes: string[]) => {
     })
   ).map(({ code }) => code)
 }
+
+export const getCourseDetails = async (code: string) =>
+  CourseModel.findOne({
+    attributes: ['code', 'name'],
+    where: { code },
+    raw: true,
+  })

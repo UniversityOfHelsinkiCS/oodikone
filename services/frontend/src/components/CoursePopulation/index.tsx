@@ -19,7 +19,6 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
 } from '@/components/FilterView/filters'
-import { useFilters } from '@/components/FilterView/useFilters'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
@@ -29,6 +28,7 @@ import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/S
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useTitle } from '@/hooks/title'
 import { useSemesters } from '@/hooks/useSemesters'
+import { useGetCourseDetailsQuery } from '@/redux/courseStats'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
@@ -42,12 +42,10 @@ import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 
 const CourseTitle = ({ codes, dateRange, unifyCourses }) => {
-  const { useFilterSelector } = useFilters()
   const { getTextIn } = useLanguage()
+  const { data } = useGetCourseDetailsQuery({ code: codes[0] })
 
-  const courseName = useFilterSelector(courseFilter.selectors.selectedCourseName(codes))
-  const header = courseName ? `${getTextIn(courseName)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
-
+  const header = data?.name ? `${getTextIn(data?.name)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
   const subHeader = codes.join(', ')
 
   return <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
