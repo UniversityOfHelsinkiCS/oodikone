@@ -19,6 +19,7 @@ export const ResultTabs = ({
   loading,
   toggleOpenAndRegularCourses,
   openOrRegular,
+  alternatives,
   courseCodes,
 }: {
   availableStats: AvailableStats
@@ -29,6 +30,7 @@ export const ResultTabs = ({
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
+  alternatives: string[][]
   courseCodes: string[]
 }) => {
   const navigate = useNavigate()
@@ -62,6 +64,7 @@ export const ResultTabs = ({
       </Tabs>
       {tab === 0 && (
         <ResultTab
+          alternatives={alternatives}
           availableStats={availableStats}
           courseCodes={courseCodes}
           datasets={[primary, comparison]}
@@ -75,6 +78,7 @@ export const ResultTabs = ({
       )}
       {tab === 1 && (
         <ResultTab
+          alternatives={alternatives}
           availableStats={availableStats}
           courseCodes={courseCodes}
           datasets={[primary, comparison]}

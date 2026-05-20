@@ -73,6 +73,7 @@ export const CourseTab = ({
         </Stack>
       </Section>
       <SingleCourseStats
+        alternatives={alternatives}
         availableStats={availableStats}
         loading={loading}
         openOrRegular={openOrRegular}
