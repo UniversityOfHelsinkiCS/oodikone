@@ -387,20 +387,21 @@ const getMainStatsByTrackAndYear = async (
       )
     }
 
-    const academicStartYear = Number(startYear.slice(0, 4))
-    const addCreditsTo = (destination: Record<string, number[]>) => getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, destination)
-
     if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
-      addCreditsTo(monthlyCreditsByStartingYearCombo[academicStartYear])
+      const bscStartYear = Number(bachelorsStartYear.slice(0, 4))
+
+      getMonthlyCredits(studyRight.student.credits, startedInBachelor, bscStartYear, monthlyCreditsByStartingYearCombo[bscStartYear])
       if (studyTrack) {
         monthlyCreditsByStartingYearComboByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
-        addCreditsTo(monthlyCreditsByStartingYearComboByTrack[studyTrack][academicStartYear])
+        getMonthlyCredits(studyRight.student.credits, startedInBachelor, bscStartYear, monthlyCreditsByStartingYearComboByTrack[studyTrack][bscStartYear])
       }
     } else {
-      addCreditsTo(monthlyCreditsByStartingYear[academicStartYear])
+      const academicStartYear = Number(startYear.slice(0, 4))
+
+      getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, monthlyCreditsByStartingYear[academicStartYear])
       if (studyTrack) {
         monthlyCreditsByStartingYearByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
-        addCreditsTo(monthlyCreditsByStartingYearByTrack[studyTrack][academicStartYear])
+        getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, monthlyCreditsByStartingYearByTrack[studyTrack][academicStartYear])
       }
     }
 
@@ -535,7 +536,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
 
   const percentiles: StudyTrackStats["percentiles"] = {
     main: computePercentiles(stats.monthlyCreditsByStartingYear),
-    byTrack: hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))) : undefined, 
+    byTrack: hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))) : undefined,
     combo: doCombo ? computePercentiles(stats.monthlyCreditsByStartingYearCombo) : undefined,
     comboByTrack: doCombo && hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track])]))) : undefined,
   }
