@@ -64,9 +64,9 @@ const getGraduationTimeStats = async (
           y: getMedian(oneYearStats),
           times: [...oneYearStats],
         }
-          ; (finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
+        ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
       }
-      ; (finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
+      ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
         createLocaleComparator('name', true)
       )
     }
@@ -390,18 +390,38 @@ const getMainStatsByTrackAndYear = async (
     if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
       const bscStartYear = Number(bachelorsStartYear.slice(0, 4))
 
-      getMonthlyCredits(studyRight.student.credits, startedInBachelor, bscStartYear, monthlyCreditsByStartingYearCombo[bscStartYear])
+      getMonthlyCredits(
+        studyRight.student.credits,
+        startedInBachelor,
+        bscStartYear,
+        monthlyCreditsByStartingYearCombo[bscStartYear]
+      )
       if (studyTrack) {
         monthlyCreditsByStartingYearComboByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
-        getMonthlyCredits(studyRight.student.credits, startedInBachelor, bscStartYear, monthlyCreditsByStartingYearComboByTrack[studyTrack][bscStartYear])
+        getMonthlyCredits(
+          studyRight.student.credits,
+          startedInBachelor,
+          bscStartYear,
+          monthlyCreditsByStartingYearComboByTrack[studyTrack][bscStartYear]
+        )
       }
     } else {
       const academicStartYear = Number(startYear.slice(0, 4))
 
-      getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, monthlyCreditsByStartingYear[academicStartYear])
+      getMonthlyCredits(
+        studyRight.student.credits,
+        startedInProgramme,
+        academicStartYear,
+        monthlyCreditsByStartingYear[academicStartYear]
+      )
       if (studyTrack) {
         monthlyCreditsByStartingYearByTrack[studyTrack] ??= getYearlyMonthlyCreditsObj()
-        getMonthlyCredits(studyRight.student.credits, startedInProgramme, academicStartYear, monthlyCreditsByStartingYearByTrack[studyTrack][academicStartYear])
+        getMonthlyCredits(
+          studyRight.student.credits,
+          startedInProgramme,
+          academicStartYear,
+          monthlyCreditsByStartingYearByTrack[studyTrack][academicStartYear]
+        )
       }
     }
 
@@ -534,11 +554,26 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     combinedProgramme
   )
 
-  const percentiles: StudyTrackStats["percentiles"] = {
+  const percentiles: StudyTrackStats['percentiles'] = {
     main: computePercentiles(stats.monthlyCreditsByStartingYear),
-    byTrack: hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track])]))) : undefined,
+    byTrack: hasStudyTracks
+      ? Object.fromEntries(
+          Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => [
+            track,
+            computePercentiles(stats.monthlyCreditsByStartingYearByTrack[track]),
+          ])
+        )
+      : undefined,
     combo: doCombo ? computePercentiles(stats.monthlyCreditsByStartingYearCombo) : undefined,
-    comboByTrack: doCombo && hasStudyTracks ? Object.fromEntries(Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => ([track, computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track])]))) : undefined,
+    comboByTrack:
+      doCombo && hasStudyTracks
+        ? Object.fromEntries(
+            Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => [
+              track,
+              computePercentiles(stats.monthlyCreditsByStartingYearComboByTrack[track]),
+            ])
+          )
+        : undefined,
   }
 
   const graduatedTitles = combinedProgramme

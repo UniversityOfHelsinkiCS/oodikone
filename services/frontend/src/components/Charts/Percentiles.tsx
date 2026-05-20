@@ -10,6 +10,8 @@ type PercentileProps = {
 }
 
 export const PercentileGraph = (props: PercentileProps) => {
+  const classSize = props.data[Object.keys(props.data).at(0) ?? ''].length
+
   const series = Object.entries(props.data).map(([percentile, values]) => ({
     name: `${percentile}th`,
     type: 'line',
@@ -58,6 +60,10 @@ export const PercentileGraph = (props: PercentileProps) => {
     },
     title: {
       text: props.title,
+      subtext: `Class size: ${classSize}`,
+      subtextStyle: {
+        fontSize: 14,
+      },
       left: 'center',
       top: 'top',
     },
@@ -79,7 +85,7 @@ export const PercentileGraph = (props: PercentileProps) => {
     },
     grid: {
       show: true,
-      top: 60,
+      top: 80,
       left: 60,
       right: 60,
       bottom: 70,
@@ -90,5 +96,5 @@ export const PercentileGraph = (props: PercentileProps) => {
     series: [...markLines, ...series],
   }
 
-  return <ReactECharts option={option} opts={{ renderer: 'svg' }} style={{ height: 520, width: '100%' }} />
+  return <ReactECharts option={option} opts={{ renderer: 'svg' }} style={{ height: 550, width: '100%' }} />
 }

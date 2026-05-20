@@ -30,7 +30,6 @@ export type ProgrammeOrStudyTrackGraduationStats = {
   }
 }
 
-// eslint-disable-next-line import-x/no-unused-modules
 export type Goals = {
   basic: number
   combo: number
