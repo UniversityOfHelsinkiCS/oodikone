@@ -82,21 +82,24 @@ export const getCreditCount = (credits: Credit[], startDate: Date) => (
 )
 
 /**
-* @param startDate exact date when started in programme to cut credits with
+* @param startDate exact date when started in programme to cut credit attainment date
 * @param startYear academic start year
 */
 export const getMonthlyCredits = (credits: Credit[], startDate: Date, startYear: number, monthlyCredits: Record<string, number[]>) => {
   const filteredCredits = filterCreditsByDate(credits, startDate)
   const studentMonthlyCredits = getMonthlyCreditsObj(startYear)
 
+  /* Add all credits to a per-month credit map */
   for (const credit of filteredCredits) {
     const creditKey = `${credit.attainment_date.getFullYear()}-${credit.attainment_date.getMonth() + 1}`
     studentMonthlyCredits[creditKey].push(credit.credits)
   }
 
-  /* Add credits of individual student to the main obj */
+  /* Add monthly cumulative credits of individual student to the main obj,
+    must iterate over months in order */
   let accumulator = 0
-  for (const creditKey of Object.keys(monthlyCredits)) {
+  const sortedKeys = Object.keys(monthlyCredits).sort((a, b) => +new Date(a) - +new Date(b))
+  for (const creditKey of sortedKeys) {
     for (const credit of studentMonthlyCredits[creditKey]) {
       accumulator += credit
     }
