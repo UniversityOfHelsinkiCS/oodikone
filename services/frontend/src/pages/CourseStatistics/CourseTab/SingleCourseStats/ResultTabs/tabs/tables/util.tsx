@@ -1,5 +1,4 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { flatten } from 'lodash-es'
 
 import { FAILED_GRADES, NUMERIC_GRADES, OTHER_PASSED_GRADES } from '@/constants/grades'
 import { FormattedStats } from '@/types/courseStat'
@@ -9,7 +8,7 @@ export const formatPercentage = (rate: number) => {
   return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`
 }
 
-export const getGradeColumns = <T extends { grades; rowObfuscated?: boolean }>(
+export const getGradeColumns = <T extends { grades: Record<string, number>; rowObfuscated?: boolean }>(
   grades: { key: string; title: string }[]
 ): ColumnDef<T>[] =>
   grades.map(({ key, title }) => ({
@@ -37,41 +36,37 @@ const gradesOrder = {
   L: 7,
 } as const
 
-const sortGrades = (a: string, b: string) => gradesOrder[a] - gradesOrder[b]
+const getSortedGrades = (grades: string[]) =>
+  grades
+    .sort((a: string, b: string) => Number(gradesOrder[a] - gradesOrder[b]))
+    .map(grade => {
+      if (grade === '0') {
+        return { key: grade, title: 'Failed' }
+      } else if (OTHER_PASSED_GRADES.includes(grade.toLowerCase())) {
+        return { key: grade, title: 'Other passed' }
+      }
 
-const getSortedGrades = (grades: string[]) => {
-  return grades.sort(sortGrades).map(grade => {
-    if (grade === '0') {
-      return { key: grade, title: 'Failed' }
-    }
-    if (OTHER_PASSED_GRADES.includes(grade.toLowerCase())) {
-      return { key: grade, title: 'Other passed' }
-    }
-    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
-  })
-}
+      return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
+    })
 
 export const resolveGrades = (stats: FormattedStats[]) => {
-  const allGrades = [
-    '0',
-    ...flatten(
-      stats.map(({ students }) =>
-        [...Object.keys(students.grades)].map(grade => {
-          const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-          if (FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
-            return '0'
-          }
-          if (parsedGrade === 'LA') {
-            return 'LUB'
-          }
-          return parsedGrade
-        })
-      )
-    ),
-  ] as string[]
-  if (allGrades.filter(grade => NUMERIC_GRADES.includes(grade)).length) {
-    allGrades.push(...NUMERIC_GRADES)
+  const studentGrades = new Set('0')
+
+  stats.forEach(({ students }) => {
+    Object.keys(students.grades).forEach(grade => {
+      const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
+
+      if (parsedGrade === 'LA') {
+        studentGrades.add('LUB')
+      } else if (!FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
+        studentGrades.add(parsedGrade)
+      }
+    })
+  })
+
+  if (Object.keys(studentGrades).some(grade => NUMERIC_GRADES.includes(grade))) {
+    NUMERIC_GRADES.forEach(grade => studentGrades.add(grade))
   }
-  const grades = [...new Set(allGrades)]
-  return getSortedGrades(grades)
+
+  return getSortedGrades([...studentGrades])
 }
