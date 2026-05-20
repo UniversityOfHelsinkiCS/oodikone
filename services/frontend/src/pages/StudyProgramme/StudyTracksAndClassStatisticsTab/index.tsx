@@ -28,6 +28,7 @@ import { ProgressOfStudents } from './ProgressOfStudents'
 import { StudyTrackDataTable } from './StudyTrackDataTable'
 import { StudyTrackSelector } from './StudyTrackSelector'
 import { YearSelector } from './YearSelector'
+import { StudentProgressPercentiles } from './StudentProgressPercentiles'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
@@ -178,13 +179,13 @@ export const StudyTracksAndClassStatisticsTab = ({
   } =
     hasStudyTracks && Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1
       ? {
-          basic: calculateStudyTrackStats(),
-          combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},
-        }
+        basic: calculateStudyTrackStats(),
+        combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},
+      }
       : {
-          basic: {},
-          combo: {},
-        }
+        basic: {},
+        combo: {},
+      }
 
   const formatMedianEntries = (item: MedianEntry) => ({ median: item.y, ...item })
 
@@ -284,14 +285,31 @@ export const StudyTracksAndClassStatisticsTab = ({
         isLoading={isFetching}
         title="Progress of students of the degree programme by starting year"
       >
-        {studyTrackStats ? (
+        {!!studyTrackStats && (
           <ProgressOfStudents
             progressComboStats={getProgressComboStats()}
             progressStats={getProgressStats()}
             studyProgramme={studyProgramme}
             years={studyTrackStats.years}
           />
-        ) : null}
+        )}
+      </Section>
+
+      <Section
+        isError={hasErrors}
+        isLoading={isFetching}
+        title="Monthly credit accumulation of the students by starting year"
+        // infoBoxContent={} // TODO
+      >
+        {!!studyTrackStats && (
+          <StudentProgressPercentiles
+            data={studyTrackStats.percentiles}
+            isCombinedProgramme={!!combinedProgramme}
+            studyTrack={studyTrack !== studyProgramme ? studyTrack : undefined}
+            graduationTimeGoals={studyTrackStats?.graduationTimes?.goals}
+            doCombo={studyTrackStats.doCombo}
+          />
+        )}
       </Section>
 
       {isSuccess && studyTrack in studyTrackStats?.graduationTimes ? (

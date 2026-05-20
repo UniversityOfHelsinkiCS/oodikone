@@ -25,9 +25,9 @@ export const ProgressOfStudents = ({
   years: string[]
 }) => {
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       {progressComboStats !== null && (
-        <Stack gap={2}>
+        <Stack spacing={2}>
           <Typography variant="h6">Bachelor + master study right</Typography>
           <ProgressBarChart
             cypress="programme-bachelor-masters"
@@ -41,7 +41,7 @@ export const ProgressOfStudents = ({
         </Stack>
       )}
       {progressStats !== null && (
-        <Stack gap={2}>
+        <Stack spacing={2}>
           {progressComboStats != null && <Typography variant="h6">Master study right</Typography>}
           <ProgressBarChart
             cypress="programme"

@@ -76,9 +76,9 @@ export type ProgrammeGraduationStats = {
 
 type StudyTrackProgressPercentiles = {
   main: Record<string, Record<string, [string, number][]>>
-  byTrack: Record<string, Record<string, Record<string, [string, number][]>>>
-  combo: Record<string, Record<string, [string, number][]>>
-  comboByTrack: Record<string, Record<string, Record<string, [string, number][]>>>
+  byTrack: undefined | Record<string, Record<string, Record<string, [string, number][]>>>
+  combo: undefined | Record<string, Record<string, [string, number][]>>
+  comboByTrack: undefined | Record<string, Record<string, Record<string, [string, number][]>>>
 }
 
 export type StudyTrackStats = {
