@@ -75,17 +75,22 @@ export function defineYear(date: Date, isAcademicYear: boolean) {
   return `${year} - ${year + 1}`
 }
 
-const filterCreditsByDate = (credits: Credit[], threshold: Date) => credits.filter(credit => threshold <= credit.attainment_date)
+const filterCreditsByDate = (credits: Credit[], threshold: Date) =>
+  credits.filter(credit => threshold <= credit.attainment_date)
 
-export const getCreditCount = (credits: Credit[], startDate: Date) => (
+export const getCreditCount = (credits: Credit[], startDate: Date) =>
   filterCreditsByDate(credits, startDate).reduce((prev, curr) => prev + curr.credits, 0)
-)
 
 /**
-* @param startDate exact date when started in programme to cut credit attainment date
-* @param startYear academic start year
-*/
-export const getMonthlyCredits = (credits: Credit[], startDate: Date, startYear: number, monthlyCredits: Record<string, number[]>) => {
+ * @param startDate exact date when started in programme to cut credit attainment date
+ * @param startYear academic start year
+ */
+export const getMonthlyCredits = (
+  credits: Credit[],
+  startDate: Date,
+  startYear: number,
+  monthlyCredits: Record<string, number[]>
+) => {
   const filteredCredits = filterCreditsByDate(credits, startDate)
   const studentMonthlyCredits = getMonthlyCreditsObj(startYear)
 
@@ -108,7 +113,7 @@ export const getMonthlyCredits = (credits: Credit[], startDate: Date, startYear:
   }
 }
 
-export const getStartDate = (isAcademicYear: boolean, year: number = 2017) => {
+export const getStartDate = (isAcademicYear: boolean, year = 2017) => {
   return isAcademicYear ? new Date(`${year}-08-01`) : new Date(`${year}-01-01`)
 }
 
@@ -139,16 +144,20 @@ const getMonthlyCreditsObj = (academicStartYear?: number) => {
   return monthlyCredits
 }
 
-export const computePercentiles = (yearlyMonthlyCredits: Record<string, Record<string, number[]>>, percentiles = [10, 25, 50, 75, 90]) => {
+export const computePercentiles = (
+  yearlyMonthlyCredits: Record<string, Record<string, number[]>>,
+  percentiles = [10, 25, 50, 75, 90]
+) => {
   const values: Record<string, Record<string, [string, number][]>> = {}
 
   const interpolate = (percentile: number, credits: number[]) => {
     const n = credits.length
-    const p = percentile / 100
+    if (n === 0) return NaN
 
+    const p = percentile / 100
     const index = (n - 1) * p
-    const lower = Math.ceil(index)
-    const upper = Math.floor(index)
+    const lower = Math.floor(index)
+    const upper = Math.ceil(index)
     const weight = index - lower
 
     if (upper >= n) return credits[lower]
@@ -170,7 +179,6 @@ export const computePercentiles = (yearlyMonthlyCredits: Record<string, Record<s
 
   return values
 }
-
 
 // In the object programmes should be {bachelorCode: masterCode}
 export const combinedStudyProgrammes = { KH90_001: 'MH90_001' } as const
