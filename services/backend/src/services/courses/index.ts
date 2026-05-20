@@ -166,17 +166,14 @@ const getYearlyStatsOfNew = async (
 
   let filteredCreditGroupCodes: string[][]
   switch (unification) {
+    // Include only course codes / group of course codes WITHOUT ANY AY prefix
     case Unification.REGULAR:
-      // Include only course codes / group of course codes WITHOUT ANY AY prefix
       filteredCreditGroupCodes = creditGroupCodes.filter(group => group.every(course => !isOpenUniCourseCode(course)))
       break
+    // Include all courses / group of courses
     case Unification.OPEN:
-      // Include only courses / group of courses WITH ONLY AY  prefix
-      filteredCreditGroupCodes = creditGroupCodes.filter(group => group.every(course => isOpenUniCourseCode(course)))
-      break
     case Unification.UNIFY:
     default:
-      // Include all courses / group of courses
       filteredCreditGroupCodes = creditGroupCodes
       break
   }
