@@ -10,15 +10,15 @@ import red from '@mui/material/colors/red'
 
 import createTheme from '@mui/material/styles/createTheme'
 
-import '@fontsource/roboto/300.css'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
+import '@fontsource/ibm-plex-sans/300.css'
+import '@fontsource/ibm-plex-sans/400.css'
+import '@fontsource/ibm-plex-sans/500.css'
+import '@fontsource/ibm-plex-sans/700.css'
 
 const baseTheme = {
   cssVariables: true,
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif',
   },
   palette: {
     primary: { main: indigo[500], light: indigo[100], dark: indigo[700], contrastText: '#fff' },
