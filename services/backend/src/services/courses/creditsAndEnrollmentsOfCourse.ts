@@ -65,7 +65,9 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
 
   const completedGroups: Credit[][] = []
   for (const studentCredits of Object.values(studentNumberToCredits)) {
-    const codesOfPassedCredits = studentCredits.map(credit => CreditModel.passed(credit) && credit.course_code)
+    const codesOfPassedCredits = studentCredits
+      .filter(credit => CreditModel.passed(credit))
+      .map(credit => credit.course_code)
     for (const group of codeGroups) {
       if (group.length === 1) {
         // Failed courses are only calculated for the original course and 1-to-1 substitutions
@@ -86,7 +88,8 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
     }
   }
 
-  return completedGroups
+  // return completedGroups
+  return completedGroups.filter(group => group.length)
 }
 
 export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) => {
