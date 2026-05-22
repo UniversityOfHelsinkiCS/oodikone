@@ -43,7 +43,7 @@ type FormattedCredit = {
 
 // Is group in question for a single course (original or 1-to-1 substitution) or a substitution group with multiple courses
 const isSingleCourse = (group: Credit[] | Enrollment[]): boolean =>
-  group.length === 1 || [...new Set(group.map((course: Credit | Enrollment) => course.course_code))].length === 1
+  group?.length === 1 || [...new Set(group?.map((course: Credit | Enrollment) => course.course_code))].length === 1
 
 const parseCredit = (
   creditGroup: Credit[],
@@ -256,7 +256,7 @@ const getYearlyStatsOfNew = async (
   const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
   const substitutionGroups: Pick<CourseModel, 'code' | 'name'>[][] =
-    combineSubstitutions && course?.substitution_groups.length
+    combineSubstitutions && course?.substitution_groups?.length
       ? await getSubstitutionGroupDetails(course.substitution_groups)
       : [[{ code: course!.code, name: course!.name }]]
 
