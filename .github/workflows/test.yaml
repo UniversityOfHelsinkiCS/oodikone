@@ -261,7 +261,7 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: Start oodikone (without frontend and backend)
-        run: npm run oodikone:ci:setup
+        run: npm run oodikone:ci:setup -- --quiet-pull
 
       - name: Run api-tests
         run: npm run oodikone:ci:api
