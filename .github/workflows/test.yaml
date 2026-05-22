@@ -225,7 +225,7 @@ jobs:
 
       - name: 'Print logs on failure'
         if: failure()
-        run: docker compose --file docker-compose.ci.yml --profile oodikone logs && sleep 5
+        run: docker compose --file docker-compose.ci.yml --profile oodikone logs && sleep 15
 
   # === Backend api-tests ===
   test_api:
