@@ -4,6 +4,7 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
+import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
 import { isOpenUniCourseCode } from '../../util'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
@@ -333,7 +334,8 @@ export const getCourseYearlyStats = async (
         })
 
       if (!course) {
-        return null
+        logger.error('Course for course stats not found with code' + courseCode)
+        return {}
       }
 
       const [openStats, regularStats, unifyStats] = await Promise.all([

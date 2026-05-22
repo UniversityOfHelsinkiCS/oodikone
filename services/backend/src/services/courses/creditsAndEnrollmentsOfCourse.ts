@@ -88,7 +88,6 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
     }
   }
 
-  // return completedGroups
   return completedGroups.filter(group => group.length)
 }
 

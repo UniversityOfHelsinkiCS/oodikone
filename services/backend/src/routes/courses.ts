@@ -60,7 +60,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
 
     const courseCodes = handleQueryArrays(codes)
 
-    if (!courseCodes) {
+    if (!courseCodes?.length) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 
