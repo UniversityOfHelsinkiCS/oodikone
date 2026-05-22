@@ -187,6 +187,8 @@ const getYearlyStatsOfNew = async (
   const counter = new CourseYearlyStatsCounter()
 
   for (const creditGroup of creditGroups) {
+    if (!creditGroup?.length) continue
+
     const {
       studentNumber,
       grade,
@@ -224,6 +226,8 @@ const getYearlyStatsOfNew = async (
   }
 
   for (const enrollments of enrollmentGroups) {
+    if (!enrollments?.length) continue
+
     for (const enrollment of enrollments) {
       const {
         studentNumber,
@@ -335,7 +339,7 @@ export const getCourseYearlyStats = async (
 
       if (!course) {
         logger.error('Course for course stats not found with code' + courseCode)
-        return {}
+        return []
       }
 
       const [openStats, regularStats, unifyStats] = await Promise.all([
