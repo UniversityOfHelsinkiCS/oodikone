@@ -17,6 +17,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+
+      - name: Install safe-chain
+        run: set -o pipefail && curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+
       - name: 'Install dependencies'
         run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
       - name: 'Run linter'

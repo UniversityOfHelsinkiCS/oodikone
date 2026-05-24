@@ -17,6 +17,12 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
+# https://github.com/hadolint/hadolint/wiki/DL4006
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Safe-chain install
+RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+
 WORKDIR /opt/app-root/shared
 COPY ./shared .
 
