@@ -37,15 +37,15 @@ void describe('Population statistics (study programme)', async () => {
     const testMathProgramme = {
       code: 'KH50_001',
       curriculumPeriodIds: [
+        'hy-lv-76',
+        'hy-lv-74',
+        'hy-lv-75',
         'hy-lv-72',
         'hy-lv-73',
         'hy-lv-71',
         'hy-lv-69',
         'hy-lv-68',
         'hy-lv-70',
-        'hy-lv-76',
-        'hy-lv-74',
-        'hy-lv-75',
       ],
       degreeProgrammeType: 'urn:code:degree-program-type:bachelors-degree',
       name: {
@@ -70,15 +70,15 @@ void describe('Population statistics (study programme)', async () => {
     const testMathProgramme = {
       code: 'KH50_001',
       curriculumPeriodIds: [
+        'hy-lv-76',
+        'hy-lv-74',
+        'hy-lv-75',
         'hy-lv-72',
         'hy-lv-73',
         'hy-lv-71',
         'hy-lv-69',
         'hy-lv-68',
         'hy-lv-70',
-        'hy-lv-76',
-        'hy-lv-74',
-        'hy-lv-75',
       ],
       degreeProgrammeType: 'urn:code:degree-program-type:bachelors-degree',
       name: {
