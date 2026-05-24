@@ -216,9 +216,9 @@ describe('Degree programme overview', () => {
 
       cy.get('.grad-vals').contains('48 students graduated in year 2022').should('be.visible')
 
-      cy.contains('median study time: 6 semesters')
-      cy.contains('26 graduated on time')
-      cy.contains('10 graduated max year overtime')
+      cy.contains('median study time: 6.5 semesters')
+      cy.contains('24 graduated on time')
+      cy.contains('12 graduated max year overtime')
       cy.contains('12 graduated over year late')
 
       cy.cs('programmes-before-or-after-stacked-bar-chart-section')

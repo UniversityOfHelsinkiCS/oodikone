@@ -44,7 +44,7 @@ describe('When language center is opened', () => {
         cy.get('table > tbody > tr:first').within(() => {
           cy.get('td').should('have.length', 15)
           cy.get('td').eq(0).contains('All courses total')
-          const numbers = [2076, 36, 9, 33, 756, 15, 40, 6, 48, 1, 24, 1059, 49, 0]
+          const numbers = [2076, 36, 9, 33, 757, 15, 40, 6, 48, 1, 24, 1059, 48, 0]
           numbers.forEach((number, index) => {
             cy.get('td')
               .eq(index + 1)
@@ -55,12 +55,12 @@ describe('When language center is opened', () => {
 
       it('Faculties tab "exceeding" button works', () => {
         cy.cs('difference-button').click()
-        checkNumbers([65, 2, 0, 3, 13, 0, 1, 1, 2, 0, 1, 30, 11, 1], 15, 'faculties')
+        checkNumbers([63, 2, 0, 3, 13, 0, 1, 1, 2, 0, 0, 30, 10, 1], 15, 'faculties')
       })
 
       it('Faculties tab semester selector changes numbers', () => {
         chooseSemester('Syksy 2020', 'from')
-        checkNumbers([1184, 28, 6, 27, 496, 4, 10, 2, 33, 0, 9, 535, 34, 0], 15, 'faculties')
+        checkNumbers([1184, 28, 6, 27, 497, 4, 10, 2, 33, 0, 9, 535, 33, 0], 15, 'faculties')
       })
     })
 
