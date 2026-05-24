@@ -646,11 +646,11 @@ describe('Basic user', () => {
             ['2023-2024', 6, 1, null, '16.67 %', 6],
             ['2022-2023', 26, 26, null, '100.00 %', 26],
             ['2021-2022', 41, 14, null, '34.15 %', 41],
-            ['2020-2021', 21, 21, null, '100.00 %', '—'],
-            ['2019-2020', 28, 28, null, '100.00 %', '—'],
-            ['2018-2019', 29, 27, 2, '93.10 %', '—'],
-            ['2017-2018', 26, 22, 4, '84.62 %', '—'],
-            ['2016-2017', 1, 1, null, '100.00 %', 'u'],
+            ['2020-2021', 21, 21, null, '100.00 %', null],
+            ['2019-2020', 28, 28, null, '100.00 %', null],
+            ['2018-2019', 29, 27, 2, '93.10 %', null],
+            ['2017-2018', 26, 22, 4, '84.62 %', null],
+            ['2016-2017', 1, 1, null, '100.00 %', null],
           ]
           checkTableContents(tableContents)
         })
@@ -1200,7 +1200,7 @@ describe('Only course statistics', () => {
     cy.contains('tr', coursecode).click()
 
     cy.wait('@yearlystats').its('response.statusCode').should('be.oneOf', [200, 304])
-    cy.url().should('contain', `courseCodes =% 5B % 22${coursecode}% 22 % 5D`)
+    cy.url().should('contain', `courseCodes=%5B%22${coursecode}%22%5D`)
 
     cy.contains('Filter statistics by degree programmes').should('not.exist')
     cy.contains('Show population').should('not.exist')
@@ -1211,15 +1211,15 @@ describe('Only course statistics', () => {
 
     const attemptsTableContents = [
       // [Time, Total attempts, Passed, Failed, Pass rate, Enrollments]
-      ['Total *', 255, 217, 20, '91.56 %', 73],
+      ['Total *', 240, 212, 8, '96.36 %', 73],
       emptyYear('2023-2024'),
-      ['2022-2023', 28, 28, 0, '100.00 %', 28],
-      ['2021-2022', 45, 27, 0, '60.00 %', 45],
-      ['2020-2021', 34, 34, 0, '100.00 %'],
-      ['2019-2020', 60, 57, 3, '95.00 %'],
-      ['2018-2019', 46, 39, 7, '84.78 %'],
-      ['2017-2018', 35, 26, 9, '74.29 %'],
-      ['2016-2017', 7, 6, 1, '85.71 %'],
+      ['2022-2023', 28, 27, 0, '96.43 %', 28],
+      ['2021-2022', 45, 26, 0, '57.78 %', 45],
+      ['2020-2021', 31, 31, 0, '100.00 %'],
+      ['2019-2020', 56, 56, 0, '100.00 %'],
+      ['2018-2019', 42, 39, 3, '92.86 %'],
+      ['2017-2018', 32, 28, 4, '87.50 %'],
+      ['2016-2017', 6, 5, 1, '83.33 %'],
       emptyYear('2015-2016'),
       emptyYear('2014-2015'),
       emptyYear('2013-2014'),
