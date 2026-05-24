@@ -42,7 +42,7 @@ void describe('Population statistics by course', async () => {
       email: 'sisutestidata65689@testisisudata.fi',
       secondaryEmail: null,
       phoneNumber: '+358501234567',
-      updatedAt: '2024-12-16T15:39:02.937Z',
+      updatedAt: '2026-05-24T13:43:07.827Z',
       studyrightStart: '1899-12-31T22:20:11.000Z',
       option: null,
       birthdate: '1999-03-01T00:00:00.000Z',
@@ -99,9 +99,7 @@ void describe('Population statistics by course', async () => {
               studyTrack: {
                 code: 'MAT-MAT',
                 name: {
-                  en: 'Mathematics',
                   fi: 'Matematiikka',
-                  sv: 'Matematik',
                 },
               },
             },
@@ -120,7 +118,7 @@ void describe('Population statistics by course', async () => {
               studyTrack: null,
             },
           ],
-          tvex: null,
+          tvex: false,
         },
       ],
       studyplans: [],
