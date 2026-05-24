@@ -420,7 +420,7 @@ describe('Degree programme overview', () => {
           cy.contains('2020 - 2021')
         })
 
-        cy.get('text').contains('16').hover()
+        cy.get('text').contains('16').scrollIntoView().hover()
         cy.contains('On time: 16')
 
         cy.cs('unset-graduation-times-section').within(() => {
