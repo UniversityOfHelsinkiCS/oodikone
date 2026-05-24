@@ -10,6 +10,7 @@ ENV NODE_ENV=development
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 # Safe-chain install
+RUN apk --no-cache add curl
 RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
 
 COPY ./package* ./

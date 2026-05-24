@@ -9,6 +9,7 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 # Safe-chain install
+RUN apk --no-cache add curl
 RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
 
 WORKDIR /opt/app-root/backend
