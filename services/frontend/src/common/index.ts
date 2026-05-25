@@ -116,11 +116,11 @@ export const getTextInWithOpen = (
 export const getUnifyTextIn = (unifyCourses: string) => {
   switch (unifyCourses) {
     case 'regularStats':
-      return '(normal)'
+      return 'Normal'
     case 'openStats':
-      return '(open)'
+      return 'Open'
     case 'unifyStats':
-      return '(open and normal)'
+      return 'Open and normal'
     default:
       return ''
   }
@@ -131,10 +131,10 @@ export const getStudentToTargetCourseDateMap = (
   students: Pick<FormattedStudent, 'studentNumber' | 'courses'>[],
   codes: string[]
 ) => {
-  const codeSet = new Set(codes)
+  const uniqueCourses = new Set(codes)
   return students.reduce((acc, student) => {
     const targetCourse = student.courses
-      .filter(course => codeSet.has(course.course_code))
+      .filter(course => uniqueCourses.has(course.course_code))
       .sort((a, b) => +new Date(b.date) - +new Date(a.date))[0]
     acc[student.studentNumber] = targetCourse ? targetCourse.date : null
     return acc

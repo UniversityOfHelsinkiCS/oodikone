@@ -277,7 +277,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
     raw: true,
   })) as { date: Date } | null
 
-  if (lastAttainmentDate === null) return 0
+  if (lastAttainmentDate?.date == null) return 0
 
   const newestAttainmentDate = lastAttainmentDate?.date.getFullYear()
   const attainmentDateThreshold = new Date(newestAttainmentDate - 6, 0, 1)
@@ -396,9 +396,28 @@ export const getCourseProvidersForCourses = async (codes: string[]) => {
   ).map(({ code }) => code)
 }
 
-export const getCourseDetails = async (code: string) =>
-  CourseModel.findOne({
-    attributes: ['code', 'name'],
-    where: { code },
+export const getCourseDetails = async (codes: string[]) =>
+  CourseModel.findAll({
+    attributes: ['code', 'name', 'substitution_groups'],
+    where: { code: { [Op.in]: codes } },
     raw: true,
   })
+
+// Add all substitution_groups and coursecodes together
+export const searchAndCombineSubstitutionGroupsToCodes = async (coursecodes: string[]) => {
+  const substitutionGroups = await CourseModel.findAll({
+    raw: true,
+    attributes: ['substitution_groups'],
+    where: {
+      code: { [Op.in]: coursecodes },
+    },
+  })
+
+  return [
+    ...new Set(
+      coursecodes.concat(
+        substitutionGroups.flatMap(({ substitution_groups }) => substitution_groups.flatMap(code => code))
+      )
+    ),
+  ]
+}

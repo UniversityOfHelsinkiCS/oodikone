@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
 
@@ -41,41 +42,40 @@ import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 
-const CourseTitle = ({ codes, dateRange, unifyCourses }) => {
-  const { getTextIn } = useLanguage()
-  const { data } = useGetCourseDetailsQuery({ code: codes[0] })
-
-  const header = data?.name ? `${getTextIn(data?.name)} ${dateRange} ${getUnifyTextIn(unifyCourses)}` : null
-  const subHeader = codes.join(', ')
-
-  return <PageTitle subtitle={subHeader} title={header ? `Population of course ${header}` : undefined} />
-}
-
 export const CoursePopulation = () => {
   useTitle('Course population')
 
   const location = useLocation()
   const { getTextIn } = useLanguage()
 
-  const [codes, setCodes] = useState<string[]>([])
+  const [codes, setCodes] = useState<{ allCodes: string[]; mainCodes: string[] }>({
+    allCodes: [],
+    mainCodes: [],
+  })
 
-  const { coursecodes, from, to, separate, unifyCourses } = parseQueryParams(location.search)
+  const { coursecodes, from, to, separate, unifyCourses, includeSubstitutions } = parseQueryParams(location.search)
 
+  const { data: courseDetails } = useGetCourseDetailsQuery({ codes: codes.mainCodes })
   const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
     to,
     separate,
     unifyCourses,
+    includeSubstitutions,
   })
 
   useEffect(() => {
     const parsedCourseCodes = JSON.parse(coursecodes)
-    if (parsedCourseCodes.length) setCodes(parsedCourseCodes)
+    if (parsedCourseCodes.length) setCodes({ ...codes, mainCodes: parsedCourseCodes })
   }, [coursecodes])
 
+  useEffect(() => {
+    if (population?.allCourseCodes?.length) setCodes({ ...codes, allCodes: population.allCourseCodes })
+  }, [population])
+
   const studentToTargetCourseDateMap = useMemo(
-    () => getStudentToTargetCourseDateMap(population?.students ?? [], codes),
+    () => getStudentToTargetCourseDateMap(population?.students ?? [], codes.allCodes),
     [population?.students, codes]
   )
 
@@ -130,16 +130,27 @@ export const CoursePopulation = () => {
       return programmes
     }, new Map())
 
+  // Page title data
+  const courseNames = courseDetails?.map(({ name }) => getTextIn(name)) ?? []
+  const header = courseNames.length ? `${courseNames?.join(', ')}` : undefined
+
   const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FilteredCourse[]) => [
     {
       title: 'Grade distribution',
       content: (
-        <CoursePopulationGradeDist courseCodes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+        <CoursePopulationGradeDist
+          courseCodes={codes.allCodes}
+          from={dateFrom}
+          students={filteredStudents}
+          to={dateTo}
+        />
       ),
     },
     {
       title: 'Language distribution',
-      content: <CoursePopulationLanguageDist codes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />,
+      content: (
+        <CoursePopulationLanguageDist codes={codes.allCodes} from={dateFrom} students={filteredStudents} to={dateTo} />
+      ),
     },
     {
       title: 'Programme distribution',
@@ -151,7 +162,12 @@ export const CoursePopulation = () => {
               sx={{ mb: 2 }}
             />
           </Box>
-          <CustomPopulationProgrammeDist coursecodes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+          <CustomPopulationProgrammeDist
+            coursecodes={codes.allCodes}
+            from={dateFrom}
+            students={filteredStudents}
+            to={dateTo}
+          />
         </>
       ),
     },
@@ -162,7 +178,12 @@ export const CoursePopulation = () => {
     {
       title: 'Credit gains',
       content: (
-        <CoursePopulationCreditGainTable codes={codes} from={dateFrom} students={filteredStudents} to={dateTo} />
+        <CoursePopulationCreditGainTable
+          codes={codes.allCodes}
+          from={dateFrom}
+          students={filteredStudents}
+          to={dateTo}
+        />
       ),
     },
     {
@@ -184,7 +205,7 @@ export const CoursePopulation = () => {
               showBachelorAndMaster: false,
               includePrimaryProgramme: true,
 
-              coursecodes: codes,
+              coursecodes: codes.allCodes,
               from: dateFrom,
               to: dateTo,
               relatedProgrammeMap: getStudentRelevantProgrammes(filteredStudents),
@@ -213,7 +234,7 @@ export const CoursePopulation = () => {
           predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
             const correctProgramme = findCorrectProgramme(
               student,
-              codes,
+              codes.allCodes,
               allSemesters,
               new Date(dateFrom),
               new Date(dateTo),
@@ -226,7 +247,7 @@ export const CoursePopulation = () => {
       ],
     }),
     gradeFilter({
-      courseCodes: codes,
+      courseCodes: codes.allCodes,
       from: dateFrom,
       to: dateTo,
     }),
@@ -244,7 +265,20 @@ export const CoursePopulation = () => {
     >
       {(filteredStudents, filteredCourses) => (
         <>
-          <CourseTitle codes={codes} dateRange={dateRange} unifyCourses={unifyCourses} />
+          <PageTitle title={header}>
+            <Typography color="text.secondary" variant="h6">
+              {codes.mainCodes.join(', ')}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              variant="h6"
+            >{`Class of ${dateRange}, ${population.students.length} students`}</Typography>
+            <Typography color="text.secondary" variant="h6">
+              {(includeSubstitutions === 'true' ? 'Include' : 'Exclude') +
+                ' substitutions, ' +
+                getUnifyTextIn(unifyCourses)}
+            </Typography>
+          </PageTitle>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />
         </>
       )}

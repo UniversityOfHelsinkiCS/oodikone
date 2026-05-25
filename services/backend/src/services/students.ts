@@ -118,7 +118,7 @@ const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] =>
 
 /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
 export const findByCourseAndSemesters = async (
-  coursecodes: string[],
+  codes: string[],
   from: number,
   to: number,
   separate: boolean,
@@ -169,7 +169,7 @@ export const findByCourseAndSemesters = async (
           credit c
         WHERE
           c.student_studentnumber = s.studentnumber
-          AND c.course_code IN (:coursecodes)
+          AND c.course_code IN (:codes)
           AND c.is_open IN (:isOpen)
           AND c.attainment_date BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
       )
@@ -180,7 +180,7 @@ export const findByCourseAndSemesters = async (
           enrollment e
         WHERE
           e.studentnumber = s.studentnumber
-          AND e.course_code IN (:coursecodes)
+          AND e.course_code IN (:codes)
           AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
           AND e.enrollment_date_time >= '2021-05-31'
           AND e.state = :enrollmentState
@@ -188,7 +188,7 @@ export const findByCourseAndSemesters = async (
     `,
     {
       replacements: {
-        coursecodes,
+        codes,
         minYearCode: from,
         maxYearCode: to,
         isOpen: unifyStatus,

@@ -58,7 +58,7 @@ export const SingleCourseStats = ({
   toggleOpenAndRegularCourses,
   openOrRegular,
   programmes,
-  alternatives,
+  combineSubstitutions,
 }: {
   availableStats: AvailableStats
   stats: CourseStat
@@ -68,7 +68,7 @@ export const SingleCourseStats = ({
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   programmes: CourseStudyProgramme[]
-  alternatives: string[][]
+  combineSubstitutions: boolean
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -425,9 +425,10 @@ export const SingleCourseStats = ({
     const queryObject = {
       from: fromYear,
       to: toYear,
-      coursecodes: JSON.stringify(uniqueCourseCodes),
+      coursecodes: JSON.stringify([coursecode]),
       separate,
       unifyCourses: openOrRegular,
+      includeSubstitutions: combineSubstitutions,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate(`/coursepopulation?${searchString}`)
@@ -530,8 +531,8 @@ export const SingleCourseStats = ({
         </Section>
       ) : null}
       <ResultTabs
-        alternatives={alternatives}
         availableStats={availableStats}
+        combineSubstitutions={combineSubstitutions}
         comparison={statistics.comparison}
         courseCodes={[coursecode]}
         loading={loading}

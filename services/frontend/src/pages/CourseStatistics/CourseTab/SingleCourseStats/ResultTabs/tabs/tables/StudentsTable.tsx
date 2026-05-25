@@ -46,7 +46,7 @@ export const StudentsTable = ({
   userHasAccessToAllStats,
 
   openOrRegular,
-  alternatives,
+  combineSubstitutions,
   courseCodes,
 }: {
   data: ProgrammeStats
@@ -55,20 +55,20 @@ export const StudentsTable = ({
   userHasAccessToAllStats: boolean
 
   openOrRegular: CourseSearchState
-  alternatives: string[][]
+  combineSubstitutions: boolean
   courseCodes: string[]
 }) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
-  const uniqueCourseCodes = [...new Set(courseCodes.concat(alternatives.flatMap(group => group.flatMap(code => code))))]
 
   const showPopulation = useCallback(
     (yearCode: number) => {
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(uniqueCourseCodes),
+        coursecodes: JSON.stringify(courseCodes),
         separate,
         unifyCourses: openOrRegular,
+        includeSubstitutions: combineSubstitutions,
       }
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`

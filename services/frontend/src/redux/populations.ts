@@ -37,9 +37,9 @@ const populationApi = RTKApi.injectEndpoints({
       Output<PopulationstatisticsbycourseResBody>,
       PopulationstatisticsbycourseParams
     >({
-      query: ({ coursecodes, from, to, separate, unifyCourses }) => ({
+      query: ({ coursecodes, from, to, separate, unifyCourses, includeSubstitutions }) => ({
         url: '/populationstatisticsbycourse',
-        params: { coursecodes, from, to, separate, unifyCourses },
+        params: { coursecodes, from, to, separate, unifyCourses, includeSubstitutions },
       }),
       transformResponse: formatPopulationData<PopulationstatisticsbycourseResBody>,
     }),

@@ -22,6 +22,7 @@ export const CourseTab = ({
   openOrRegular,
   stats,
   availableStats,
+  combineSubstitutions,
   alternatives,
   programmes,
 }: {
@@ -34,6 +35,7 @@ export const CourseTab = ({
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: AvailableStats
+  combineSubstitutions: boolean
   alternatives: string[][]
   programmes: CourseStudyProgramme[]
 }) => {
@@ -73,8 +75,8 @@ export const CourseTab = ({
         </Stack>
       </Section>
       <SingleCourseStats
-        alternatives={alternatives}
         availableStats={availableStats}
+        combineSubstitutions={combineSubstitutions}
         loading={loading}
         openOrRegular={openOrRegular}
         programmes={programmes}

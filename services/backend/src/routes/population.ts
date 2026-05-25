@@ -18,7 +18,11 @@ import {
 import { Unification } from '@oodikone/shared/types'
 import { keyBy, mapToProviders } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
-import { getCourseProvidersForCourses, maxYearsToCreatePopulationFrom } from '../services/courses'
+import {
+  getCourseProvidersForCourses,
+  maxYearsToCreatePopulationFrom,
+  searchAndCombineSubstitutionGroupsToCodes,
+} from '../services/courses'
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
@@ -175,7 +179,8 @@ router.get<
     programmeRights: userProgrammeRights,
     studentsUserCanAccess: allStudentsUserCanAccess,
   } = req.user
-  const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses } = req.query
+  const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses, ...restParams } = req.query
+  const includeSubstitutions = restParams.includeSubstitutions === 'true'
 
   if (!coursecodeJSON || !from || !to) {
     return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
@@ -183,16 +188,17 @@ router.get<
 
   const isSeparate = separate === 'true'
   const coursecodes = JSON.parse(coursecodeJSON)
+  const codes = includeSubstitutions ? await searchAndCombineSubstitutionGroupsToCodes(coursecodes) : coursecodes
 
   const toFromDiff = Math.abs(Number(to) - Number(from) + 1)
   const requestedYearsToCreatePopulationFrom = Math.ceil(isSeparate ? toFromDiff / 2 : toFromDiff) // 2 semesters = 1 year
 
-  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(coursecodes, Unification.REGULAR)
+  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(codes, Unification.REGULAR)
   if (requestedYearsToCreatePopulationFrom > maxYearsForPopulation) {
     return res.status(400).json({ error: `Max years to create population from is ${maxYearsForPopulation}` })
   }
 
-  const studentNumbers = await findByCourseAndSemesters(coursecodes, Number(from), Number(to), isSeparate, unifyCourses)
+  const studentNumbers = await findByCourseAndSemesters(codes, Number(from), Number(to), isSeparate, unifyCourses)
 
   const courseProviders: string[] = await getCourseProvidersForCourses(coursecodes)
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
@@ -213,7 +219,7 @@ router.get<
     studentsUserCanAccess,
   })
 
-  return res.json(processed)
+  return res.json({ ...processed, mainCourseCodes: coursecodes, allCourseCodes: codes })
 })
 
 // Used in custom population and single study guidance groups

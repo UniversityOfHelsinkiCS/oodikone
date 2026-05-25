@@ -112,6 +112,7 @@ export const CourseStatistics = () => {
         <CourseTab
           alternatives={alternatives}
           availableStats={availableStats[selected]}
+          combineSubstitutions={combineSubstitutions === 'true'}
           loading={isLoading || !isSuccess}
           openOrRegular={openOrRegular}
           programmes={programmes}

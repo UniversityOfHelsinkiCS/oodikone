@@ -87,11 +87,12 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
   }
 )
 
-router.get<never, CanError<unknown>, never, { code: string }>('/coursedetails', async (req, res) => {
-  const { code } = req.query
+router.get<never, CanError<unknown>, never, { codes: string | string[] }>('/coursedetails', async (req, res) => {
+  const { codes: coursecodes } = req.query
+  const codes = handleQueryArrays(coursecodes)
 
-  if (!code) return res.status(500).end()
-  const details = await getCourseDetails(code)
+  if (!codes?.length) return res.status(500).end()
+  const details = await getCourseDetails(codes)
 
   return res.json(details)
 })

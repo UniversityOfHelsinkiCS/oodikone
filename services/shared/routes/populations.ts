@@ -90,7 +90,10 @@ export type PopulationstatisticsQuery = {
 }
 
 // populationstatisticsbycourse
-export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody
+export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody & {
+  mainCourseCodes: string[]
+  allCourseCodes: string[]
+}
 export type PopulationstatisticsbycourseReqBody = never
 export type PopulationstatisticsbycourseParams = {
   coursecodes: string
@@ -98,6 +101,7 @@ export type PopulationstatisticsbycourseParams = {
   to: string
   separate: string
   unifyCourses: UnifyStatus
+  includeSubstitutions: string
 }
 
 // populationstatisticsbystudentnumbers
