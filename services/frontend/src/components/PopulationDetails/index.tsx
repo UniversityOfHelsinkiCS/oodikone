@@ -28,6 +28,8 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
+import { CurriculumPicker } from '../common/CurriculumPicker'
+import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -117,10 +119,8 @@ export const PopulationDetails = ({
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
             curriculum={curriculum}
-            curriculumList={curriculumList}
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             setCourseTableMode={setCourseTableMode}
-            setCurriculum={setCurriculum}
             studentAmountLimit={studentAmountLimit}
           />
           <PopulationCourses
@@ -187,6 +187,11 @@ export const PopulationDetails = ({
                 Search for a new class
               </Button>
             </Link>
+            <Stack flexDirection="row" gap={1} p={1} sx={{ alignItems: 'center', alignContent: 'center' }}>
+              <Typography fontWeight={800}>Choose curriculum</Typography>
+              <CurriculumPicker curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
+              <InfoBox content={'Valitsee tarkasteltavan populaation opetussuunnitelman.'} mini />
+            </Stack>
             <FormControlLabel
               control={
                 <Switch

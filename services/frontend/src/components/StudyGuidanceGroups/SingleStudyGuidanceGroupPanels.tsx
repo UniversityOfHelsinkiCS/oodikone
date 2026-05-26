@@ -1,3 +1,8 @@
+import Button from '@mui/material/Button'
+import FormGroup from '@mui/material/FormGroup'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 
@@ -9,12 +14,16 @@ import { AgeStats } from '@/components/PopulationDetails/AgeStats'
 import { CreditStatistics } from '@/components/PopulationDetails/CreditGainStats'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
+import { KeyboardBackspaceIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
 import { useCurriculumState } from '../../hooks/useCurriculums'
 import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
+import { CurriculumPicker } from '../common/CurriculumPicker'
+import { Link } from '../common/Link'
+import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from './StudyGuidanceGroupPopulationCourses'
 import { createAcademicYearStartDate } from './utils'
@@ -95,9 +104,7 @@ export const SingleStudyGuidanceGroupPanels = ({
       content: (
         <StudyGuidanceGroupPopulationCourses
           curriculum={curriculum}
-          curriculumList={curriculumList}
           filteredCourses={filteredCourses}
-          setCurriculum={setCurriculum}
           studyProgramme={group.tags?.studyProgramme ? programme : null}
           year={groupYear}
         />
@@ -138,5 +145,31 @@ export const SingleStudyGuidanceGroupPanels = ({
     },
   ]
 
-  return <PanelView panels={panels} />
+  return (
+    <>
+      <Paper sx={{ p: 2, my: 2 }} variant="outlined">
+        <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+          <FormGroup sx={{ gap: 1 }}>
+            <Link sx={{ width: 'fit-content' }} to="/studyguidancegroups">
+              <Button startIcon={<KeyboardBackspaceIcon />} sx={{ mb: '10px' }} variant="contained">
+                Back to groups
+              </Button>
+            </Link>
+            <Stack flexDirection="row" gap={1} p={1} sx={{ alignItems: 'center', alignContent: 'center' }}>
+              <Stack flexDirection="row" gap={1} p={1} sx={{ alignItems: 'center', alignContent: 'center' }}>
+                <Typography fontWeight={800}>Choose curriculum</Typography>
+                <CurriculumPicker
+                  curriculum={curriculum}
+                  curriculumList={curriculumList}
+                  setCurriculum={setCurriculum}
+                />
+                <InfoBox content={'Valitsee tarkasteltavan populaation opetussuunnitelman.'} mini />
+              </Stack>
+            </Stack>
+          </FormGroup>
+        </Stack>
+      </Paper>
+      <PanelView panels={panels} />
+    </>
+  )
 }

@@ -16,7 +16,14 @@ export const CurriculumPicker = ({
   curriculumList: CurriculumOption[]
   setCurriculum: Dispatch<SetStateAction<CurriculumOption | null>>
 }) => {
-  if (!curriculumList.length || !curriculum) return null
+  if (!curriculumList.length || !curriculum)
+    return (
+      <FormControl disabled variant="standard">
+        <Select value={'disabled'}>
+          <MenuItem value={'disabled'}>Curriculums unavailable</MenuItem>
+        </Select>
+      </FormControl>
+    )
 
   return (
     <FormControl disabled={disabled} variant="standard">

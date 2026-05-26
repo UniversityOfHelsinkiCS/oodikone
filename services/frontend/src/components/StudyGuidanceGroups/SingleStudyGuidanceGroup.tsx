@@ -1,16 +1,14 @@
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { useNavigate } from 'react-router'
 
 import { FilterView } from '@/components/FilterView'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
-import { CalendarMonthIcon, LabelIcon, KeyboardBackspaceIcon } from '@/theme'
+import { CalendarMonthIcon, LabelIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 import { PageTitle } from '../common/PageTitle'
 import { StyledMessage } from '../common/StyledMessage'
@@ -27,7 +25,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
     },
   })
 
-  const navigate = useNavigate()
   const { getTextIn } = useLanguage()
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes().allProgrammes
 
@@ -47,10 +44,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
   const groupProgramme = group.tags?.studyProgramme
   const groupYear = group.tags?.year
 
-  const handleBack = () => {
-    void navigate('/studyguidancegroups')
-  }
-
   if (isLoading || population === undefined) {
     return <PageLoading isLoading />
   }
@@ -67,14 +60,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
         <>
           <PageTitle title={`Study guidance group: ${getTextIn(group.name)}`}>
             <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
-              <Button
-                onClick={handleBack}
-                startIcon={<KeyboardBackspaceIcon />}
-                sx={{ gridColumn: '1' }}
-                variant="outlined"
-              >
-                Back to groups
-              </Button>
               <Box gap={1} sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                 {!!groupProgramme && (
                   <Tooltip arrow title="Associated degree programme set for the study guidance group">
@@ -104,7 +89,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
                   </Typography>
                 )}
               </Box>
-              <Box sx={{ width: '176px' }} />
             </Box>
           </PageTitle>
           <SingleStudyGuidanceGroupPanels

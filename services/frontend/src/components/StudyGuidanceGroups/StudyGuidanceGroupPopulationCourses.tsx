@@ -7,14 +7,7 @@ import { CourseTableModeSelector } from '@/components/PopulationDetails/CourseTa
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 
-export const StudyGuidanceGroupPopulationCourses = ({
-  filteredCourses,
-  studyProgramme,
-  year,
-  curriculum,
-  curriculumList,
-  setCurriculum,
-}) => {
+export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProgramme, year, curriculum }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
   const curriculumsAvailable = studyProgramme && year
   const [courseTableMode, setCourseTableMode] = useState<'all' | 'curriculum'>(
@@ -32,10 +25,8 @@ export const StudyGuidanceGroupPopulationCourses = ({
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
           curriculum={curriculum}
-          curriculumList={curriculumList}
           onStudentAmountLimitChange={onStudentAmountLimitChange}
           setCourseTableMode={setCourseTableMode}
-          setCurriculum={setCurriculum}
           studentAmountLimit={studentAmountLimit}
         />
       ) : (
