@@ -10,7 +10,6 @@ import { UserModel } from '../models/user'
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import * as jami from '../util/jami'
 import { sendNotificationAboutNewUser } from './mailService'
-import { getSisuAuthData, personSearchQuery, getGraphqlData } from './oriProvider'
 import { getStudentnumbersByElementdetails } from './students'
 import { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } from './studyGuidanceGroups'
 
@@ -202,10 +201,6 @@ export const findOne = async (id: string) => {
   return formattedUser
 }
 
-export const findByUsername = async (username: string) => {
-  return (await UserModel.findOne({ where: { username } }))?.toJSON()
-}
-
 export const getOrganizationAccess = async (sisPersonId: string, iamGroups: string[]) => {
   if (!iamGroups.length) {
     return {}
@@ -280,39 +275,4 @@ export const getUser = async ({
   userDataCache.set(username, user)
 
   return user
-}
-
-export const addNewUser = async user => {
-  const name = user.first_name.concat(' ', user.last_name)
-  try {
-    await UserModel.upsert({
-      fullName: name,
-      username: user.eppn,
-      email: user.email_address,
-      sisuPersonId: user.id,
-      roles: [],
-      lastLogin: new Date(),
-    })
-    return true
-  } catch (error) {
-    throw new Error('Could not add or update user.')
-  }
-}
-
-export const getUserFromSisuByEppn = async (requesterEppn: string, newUserEppn: string) => {
-  const { accessToken: requesterAccessToken } = await getSisuAuthData(requesterEppn)
-  const { tokenData: newUserTokenData } = await getSisuAuthData(newUserEppn)
-  const personData = await getGraphqlData(requesterAccessToken, {
-    query: personSearchQuery,
-    variables: { subjectUserId: newUserTokenData.personid },
-  })
-  return personData
-}
-
-export const deleteUserById = async userId => {
-  await UserModel.destroy({
-    where: {
-      id: userId,
-    },
-  })
 }
