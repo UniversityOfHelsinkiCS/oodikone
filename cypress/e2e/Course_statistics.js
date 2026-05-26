@@ -191,7 +191,10 @@ describe('Basic user', () => {
 
       cy.wait('@coursestats').its('response.statusCode').should('be.oneOf', [200, 304])
 
-      cy.contains('Population of course Pro gradu -tutkielma tietojenkäsittelytieteessä 2007-2020 (open and normal)')
+      cy.contains('Pro gradu -tutkielma tietojenkäsittelytieteessä')
+      cy.contains('Class of 2007-2020, 10 students')
+      cy.contains('Include substitutions, Open and normal')
+
       cy.contains('Showing 10 out of 10 students')
 
       const gradesTableContents = [
@@ -220,9 +223,9 @@ describe('Basic user', () => {
       cy.contains('Show population').click()
 
       cy.wait('@coursestats').its('response.statusCode').should('be.oneOf', [200, 304])
-      cy.contains(
-        'Population of course Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot 2011-2018 (open and normal)'
-      )
+      cy.contains('Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')
+      cy.contains('Class of 2011-2018, 4 students')
+      cy.contains('Include substitutions, Open and normal')
       cy.contains('Showing 4 out of 4 students')
 
       const gradesTableContents = [
@@ -336,7 +339,9 @@ describe('Basic user', () => {
     cy.url().should('contain', 'courseCodes=%5B%22BSCS1001%22%2C%22BSCS1003%22%5D')
 
     cy.cs('course-population-for-2023-2024').click()
-    cy.contains('Population of course Introduction to Programming 2023-2024 (open and normal)')
+    cy.contains('Introduction to Programming')
+    cy.contains('Class of 2023-2024')
+    cy.contains('Include substitutions, Open and normal')
 
     // NOTE: These should also have `cy.intercept`s.
     //       The calls should be either cached or cheap so this is only
@@ -347,7 +352,9 @@ describe('Basic user', () => {
     // Check the link has updated correctly
     cy.cs('course-population-for-2022-2023').invoke('attr', 'href').should('include', 'BSCS1003')
     cy.cs('course-population-for-2022-2023').click()
-    cy.contains('Population of course Data Structures and Algorithms 2022-2023 (open and normal)')
+    cy.contains('Data Structures and Algorithms')
+    cy.contains('Class of 2022-2023')
+    cy.contains('Include susbtitutions, Open and normal')
   })
 
   it('Searching course by name displays right courses', () => {
@@ -439,7 +446,11 @@ describe('Basic user', () => {
       cy.contains('TKT20003') // Käyttöjärjestelmät
       cy.contains('582219') //  Käyttöjärjestelmät
       cy.cs('course-population-for-2020-2021').click()
-      cy.contains('Population of course Käyttöjärjestelmät 2020-2021 (open and normal')
+
+      cy.contains('Käyttöjärjestelmät')
+      cy.contains('Class of 2020-2021, 19 students')
+      cy.contains('Include substitutions, Open and normal')
+
       cy.contains('TKT20003')
 
       cy.contains('Students (19)').click()
@@ -455,7 +466,11 @@ describe('Basic user', () => {
       cy.contains('BSCS1003') // Data Structures and Algorithms
       cy.contains('58131') // Tietorakenteet
       cy.cs('course-population-for-2019-2020').click()
-      cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
+
+      cy.contains('Tietorakenteet ja algoritmit')
+      cy.contains('Class of 2019-2020')
+      cy.contains('Include substitutions, Open and normal, 33 students')
+
       cy.contains('Students (33)').click()
       cy.contains('td', '394776').siblings().eq(2).contains('3')
       cy.contains('td', '497388').siblings().eq(2).contains('2')
@@ -469,7 +484,11 @@ describe('Basic user', () => {
       cy.contains('BSCS1003') // Data Structures and Algorithms
       cy.contains('58131') // Tietorakenteet
       cy.cs('course-population-for-2019-2020').click()
-      cy.contains('Population of course Tietorakenteet ja algoritmit 2019-2020 (open and normal)')
+
+      cy.contains('Tietorakenteet ja algoritmit')
+      cy.contains('Class of 2019-2020, 33 students')
+      cy.contains('Include substitutions, Open and normal')
+
       cy.contains('Students (33)').click()
       cy.get('table tbody td').filter(':contains("Hidden")').should('have.length', 9)
     })
@@ -481,7 +500,11 @@ describe('Basic user', () => {
     cy.contains('TKT20003') // Käyttöjärjestelmät
     cy.contains('582219') // Käyttöjärjestelmät
     cy.cs('course-population-for-2021-2022').click()
-    cy.contains('Population of course Käyttöjärjestelmät 2021-2022 (open and normal)')
+
+    cy.contains('Käyttöjärjestelmät')
+    cy.contains('Class of 2021-2022')
+    cy.contains('Include substitutions, Open and normal')
+
     cy.contains('Language distribution').click()
     cy.contains('td', 'finnish').siblings().eq(0).contains('5')
     cy.contains('td', 'english').siblings().eq(0).contains('2')
