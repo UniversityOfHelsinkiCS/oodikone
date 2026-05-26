@@ -1,4 +1,3 @@
-import Paper from '@mui/material/Paper'
 import { useState } from 'react'
 
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
@@ -20,7 +19,7 @@ export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProg
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
   return (
-    <Paper sx={{ padding: 2 }}>
+    <>
       {curriculumsAvailable ? (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
@@ -55,6 +54,6 @@ export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProg
           studentAmountLimit={studentAmountLimit}
         />
       )}
-    </Paper>
+    </>
   )
 }
