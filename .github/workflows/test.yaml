@@ -174,15 +174,8 @@ jobs:
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
-  # === Other tests ===
-  test_service_exit_statuses:
-    name: 'Check services run correctly'
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
-      - lint_packages
-    if: always() && !cancelled() && needs.lint_packages.result == 'success'
+  pull_docker_images:
+    name: 'Pull all needed docker images and cache them'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -193,16 +186,8 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
 
-      - name: 'Run services, pull rest of the needed images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
-
-      - name: 'Check that exit statuses are not errors'
-        run: |
-          docker ps -a
-          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
-            echo 'Some process had nonzero exit code';
-            exit 1;
-          fi
+      - name: 'Pull required images'
+        run: docker compose --file docker-compose.ci.yml --profile oodikone pull --quiet
 
       - name: 'Save Docker images for downstream jobs'
         run: |
@@ -223,6 +208,46 @@ jobs:
           path: /tmp/docker-images.tar.zst
           retention-days: 1
 
+  # === Other tests ===
+  test_service_exit_statuses:
+    name: 'Check services run correctly'
+    needs:
+      - pull_docker_images
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+      - lint_packages
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v4
+        with:
+          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+
+      - name: 'Download Docker images'
+        uses: actions/download-artifact@v8
+        with:
+          name: docker-images
+          path: /tmp
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+
+      - name: 'Run services, pull rest of the needed images'
+        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
+
+      - name: 'Check that exit statuses are not errors'
+        run: |
+          docker ps -a
+          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+            echo 'Some process had nonzero exit code';
+            exit 1;
+          fi
+
       - name: 'Print logs on failure'
         if: failure()
         run: docker compose --file docker-compose.ci.yml --profile oodikone logs && sleep 15
@@ -230,6 +255,7 @@ jobs:
   # === Backend api-tests ===
   test_api:
     needs:
+      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -272,6 +298,7 @@ jobs:
   # === End-to-end tests ===
   test_end_to_end:
     needs:
+      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
