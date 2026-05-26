@@ -60,15 +60,22 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: oodikone-frontend
-          tags: staging ${{ github.sha }}
-          context: services
-          containerfiles: |
-            services/frontend/Dockerfile
           build-args: |
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
             BASE_PATH=/oodikone
             STAGING=true
+          context: services
+          file: services/frontend/Dockerfile
+          tags: oodikone-frontend:staging
+          outputs: type=docker,dest=/tmp/backend.tar
+        env:
+          DOCKER_BUILD_SUMMARY: false
+
+      - name: 'Upload image for other jobs'
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-image
+          path: /tmp/frontend.tar
 
   pull_docker_images:
     name: 'Pull all needed docker images and cache them'
@@ -352,11 +359,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: backend-image
+      - name: 'Download frontend image'
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
       - name: 'Load built backend image'
         run: docker load --input backend.tar
+      - name: 'Load built frontend image'
+        run: docker load --input frontend.tar
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
@@ -395,11 +408,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: backend-image
+      - name: 'Download frontend image'
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
       - name: 'Load built backend image'
         run: docker load --input backend.tar
+      - name: 'Load built frontend image'
+        run: docker load --input frontend.tar
 
       - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
