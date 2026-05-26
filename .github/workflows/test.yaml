@@ -230,8 +230,11 @@ jobs:
   # === Backend api-tests ===
   test_api:
     needs:
-      - test_service_exit_statuses
-    if: always() && !cancelled() && needs.test_service_exit_statuses.result == 'success'
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+      - lint_packages
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     strategy:
       fail-fast: false
     runs-on: ubuntu-24.04
@@ -269,9 +272,11 @@ jobs:
   # === End-to-end tests ===
   test_end_to_end:
     needs:
-      - test_service_exit_statuses
-      - test_api
-    if: always() && !cancelled() && needs.test_api.result == 'success'
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+      - lint_packages
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     strategy:
       fail-fast: false
       matrix:
