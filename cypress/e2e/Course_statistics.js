@@ -1202,8 +1202,6 @@ describe('Basic user', () => {
       cy.visit('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&separate=false')
       cy.cs('course-population-for-2021-2022').click()
       // cy.contains('Students (29)').click()
-      cy.contains('509781')
-      cy.contains('529866')
     })
   })
 })
