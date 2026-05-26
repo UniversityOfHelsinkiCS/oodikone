@@ -83,7 +83,7 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: 'Pull required images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --quiet
+        run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
 
       - name: 'Save Docker images for downstream jobs'
         run: |
