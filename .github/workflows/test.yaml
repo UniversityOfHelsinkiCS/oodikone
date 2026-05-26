@@ -156,7 +156,7 @@ jobs:
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach sis-updater-worker
+          docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
@@ -263,7 +263,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install node-24 for cypress
+      - name: Install node-24
         uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -348,9 +348,15 @@ jobs:
         with:
           name: docker-images
           path: /tmp
+      - name: 'Download backend image'
+        uses: actions/download-artifact@v8
+        with:
+          name: backend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: 'Load built backend image'
+        run: docker load --input backend.tar
 
       - name: 'Run tests'
         uses: ./.github/actions/run-tests
@@ -385,11 +391,17 @@ jobs:
         with:
           name: docker-images
           path: /tmp
+      - name: 'Download backend image'
+        uses: actions/download-artifact@v8
+        with:
+          name: backend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: 'Load built backend image'
+        run: docker load --input backend.tar
 
-      - name: 'Run services, pull rest of the needed images'
+      - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
 
       - name: 'Check that exit statuses are not errors'
