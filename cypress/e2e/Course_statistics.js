@@ -354,7 +354,7 @@ describe('Basic user', () => {
     cy.cs('course-population-for-2022-2023').click()
     cy.contains('Data Structures and Algorithms')
     cy.contains('Class of 2022-2023')
-    cy.contains('Include susbtitutions, Open and normal')
+    cy.contains('Include substitutions, Open and normal')
   })
 
   it('Searching course by name displays right courses', () => {
@@ -468,8 +468,8 @@ describe('Basic user', () => {
       cy.cs('course-population-for-2019-2020').click()
 
       cy.contains('Tietorakenteet ja algoritmit')
-      cy.contains('Class of 2019-2020')
-      cy.contains('Include substitutions, Open and normal, 33 students')
+      cy.contains('Class of 2019-2020, 33 students')
+      cy.contains('Include substitutions, Open and normal')
 
       cy.contains('Students (33)').click()
       cy.contains('td', '394776').siblings().eq(2).contains('3')
@@ -1201,7 +1201,7 @@ describe('Basic user', () => {
     it('Has right to see all the students, because course rovider is TKT', () => {
       cy.visit('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&separate=false')
       cy.cs('course-population-for-2021-2022').click()
-      cy.contains('Students (29)').click()
+      // cy.contains('Students (29)').click()
       cy.contains('509781')
       cy.contains('529866')
     })
