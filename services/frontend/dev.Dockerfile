@@ -9,7 +9,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
 
 WORKDIR /opt/app-root/frontend
-COPY . .
+COPY --chown=1001:1001 . .
+
+USER 1001
 RUN npm ci
 
 EXPOSE 3000

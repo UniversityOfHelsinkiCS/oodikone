@@ -12,8 +12,10 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Safe-chain install
 RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
 
-COPY ./package* ./
+COPY --chown=1001:1001 ./package* ./
+
+USER 1001
 RUN npm ci
-COPY . .
+COPY --chown=1001:1001 . .
 
 CMD ["node", "--watch", "src/index.js"]
