@@ -13,6 +13,66 @@ import { DeleteIcon } from '@/theme'
 import { SearchResultCourse } from '@/types/api/courses'
 import { getActiveYears } from '../util'
 
+const EmptyListRow = () => (
+  <TableRow>
+    <TableCell align="center" colSpan={3}>
+      No results.
+    </TableCell>
+  </TableRow>
+)
+
+const CourseRow = ({
+  course,
+  title,
+  onSelectCourse,
+  combineSubstitutions,
+}: {
+  course: SearchResultCourse
+  title: string
+  onSelectCourse: (course: SearchResultCourse) => void
+  combineSubstitutions: boolean
+}) => {
+  const { getTextIn } = useLanguage()
+
+  return (
+    <TableRow
+      data-cy={`course-${course.code}`}
+      hover
+      key={course.id}
+      onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
+      style={{ cursor: course.min_attainment_date ? 'pointer' : 'default' }}
+    >
+      <TableCell>
+        <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
+        <Typography color="text.secondary" variant="body2">
+          {getActiveYears(course)}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography fontSize="0.9rem">{course.code}</Typography>
+      </TableCell>
+      <TableCell>
+        {combineSubstitutions ? (
+          <Stack>
+            {course?.substitution_groups.map(group => (
+              <GroupChip getTextIn={getTextIn} group={group} key={group.map(({ code }) => code).join(':')} />
+            )) ?? <Typography fontSize="0.9rem">Equivalent groups not available!</Typography>}
+          </Stack>
+        ) : (
+          course.code
+        )}
+      </TableCell>
+      {title === 'Selected courses' && (
+        <TableCell align="right">
+          <IconButton>
+            <DeleteIcon />
+          </IconButton>
+        </TableCell>
+      )}
+    </TableRow>
+  )
+}
+
 export const CourseTable = ({
   combineSubstitutions,
   courses,
@@ -21,61 +81,14 @@ export const CourseTable = ({
   title,
 }: {
   combineSubstitutions: boolean
-  courses: any[]
+  courses: SearchResultCourse[]
   hidden: boolean
-  onSelectCourse: (course: any) => void
+  onSelectCourse: (course: SearchResultCourse) => void
   title: string
 }) => {
-  const { getTextIn } = useLanguage()
+  // TODO: Figure a better type for this
+
   const noContent = courses.length === 0
-
-  const getEmptyListRow = () => (
-    <TableRow>
-      <TableCell align="center" colSpan={3}>
-        No results.
-      </TableCell>
-    </TableRow>
-  )
-
-  const toCourseRow = (course: SearchResultCourse) => {
-    return (
-      <TableRow
-        data-cy={`course-${course.code}`}
-        hover
-        key={course.id}
-        onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
-        style={{ cursor: course.min_attainment_date ? 'pointer' : 'default' }}
-      >
-        <TableCell>
-          <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
-          <Typography color="text.secondary" variant="body2">
-            {getActiveYears(course)}
-          </Typography>
-        </TableCell>
-        <TableCell>
-          <Typography fontSize="0.9rem">{course.code}</Typography>
-        </TableCell>
-        <TableCell>
-          {combineSubstitutions ? (
-            <Stack>
-              {course.substitution_groups?.map(group => <GroupChip group={group} key={group.join(':')} />) ?? (
-                <Typography fontSize="0.9rem">Equivalent groups not available!</Typography>
-              )}
-            </Stack>
-          ) : (
-            course.code
-          )}
-        </TableCell>
-        {title === 'Selected courses' && (
-          <TableCell align="right">
-            <IconButton>
-              <DeleteIcon />
-            </IconButton>
-          </TableCell>
-        )}
-      </TableRow>
-    )
-  }
 
   if (hidden) {
     return null
@@ -91,7 +104,21 @@ export const CourseTable = ({
           {title === 'Selected courses' && <TableCell />}
         </TableRow>
       </TableHead>
-      <TableBody>{noContent ? getEmptyListRow() : courses.map(toCourseRow)}</TableBody>
+      <TableBody>
+        {noContent ? (
+          <EmptyListRow />
+        ) : (
+          courses?.map(course => (
+            <CourseRow
+              combineSubstitutions={combineSubstitutions}
+              course={course}
+              key={course.code}
+              onSelectCourse={onSelectCourse}
+              title={title}
+            />
+          ))
+        )}
+      </TableBody>
     </StyledTable>
   )
 }

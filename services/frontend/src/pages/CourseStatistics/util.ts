@@ -67,14 +67,6 @@ export const getCourseStats = (
 ): Record<string, CourseStat> =>
   Object.fromEntries(Object.entries(courseStats).map(([courseCode, value]) => [courseCode, value[openOrRegular]]))
 
-export const getCourseAlternativeCodes = (
-  courseStats: Record<string, CourseStat>,
-  selectedCourse: string | undefined
-): string[][] =>
-  courseStats[selectedCourse!]?.alternatives
-    ?.map(group => group.map(({ code }) => code))
-    .filter(group => !group.includes(selectedCourse ?? ''))
-
 export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
   Object.fromEntries(
     Object.entries(courseStats).map(([courseCode, { unifyStats, openStats, regularStats }]) => [

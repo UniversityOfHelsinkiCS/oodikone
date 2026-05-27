@@ -28,7 +28,7 @@ const courseStatsApi = RTKApi.injectEndpoints({
       },
     }),
     getCourseDetails: builder.query({
-      query: ({ codes }: { codes: string[] }) => ({
+      query: ({ codes }: { codes: string | string[] }) => ({
         url: '/coursedetails',
         params: { codes },
       }),

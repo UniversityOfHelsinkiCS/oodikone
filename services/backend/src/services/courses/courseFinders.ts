@@ -40,8 +40,8 @@ const codeLikeTerm = (code: string) => {
   }
 }
 
-const getRawCourses = async (name: string, code: string, includeSpecial: boolean) =>
-  await CourseModel.findAll({
+const getRawCourses = async (name: string, code: string, includeSpecial: boolean) => {
+  const courses = await CourseModel.findAll({
     where: {
       ...(includeSpecial ? {} : { mainCourseCode: { [Op.ne]: null } }),
       ...nameLikeTerm(name),
@@ -49,6 +49,25 @@ const getRawCourses = async (name: string, code: string, includeSpecial: boolean
     },
     raw: true,
   })
+
+  const coursesWithSubstitutionGroupDetails = await Promise.all(
+    courses.map(async course => {
+      const groupDetails = await Promise.all(
+        course?.substitution_groups?.map(async group => {
+          return await CourseModel.findAll({
+            attributes: ['name', 'code'],
+            where: { code: { [Op.in]: group } },
+            raw: true,
+          })
+        })
+      )
+
+      return { ...course, substitution_groups: groupDetails }
+    })
+  )
+
+  return coursesWithSubstitutionGroupDetails
+}
 
 const getCourses = async (name: string, code: string, includeSpecial: boolean) => {
   const rawCourses = await getRawCourses(name, code, includeSpecial)

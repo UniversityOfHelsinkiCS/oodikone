@@ -8,6 +8,7 @@ import { Section } from '@/components/Section'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { AvailableStats, CourseStat } from '@/types/courseStat'
+import { Name } from '@oodikone/shared/types'
 import { PrimaryCourseLabel, SecondaryCourseLabel } from './CourseLabel'
 import { CourseSelector } from './CourseSelector'
 import { SingleCourseStats } from './SingleCourseStats'
@@ -36,7 +37,7 @@ export const CourseTab = ({
   stats: Record<string, CourseStat>
   availableStats: AvailableStats
   combineSubstitutions: boolean
-  alternatives: string[][]
+  alternatives: { code: string; name: Name }[][]
   programmes: CourseStudyProgramme[]
 }) => {
   const { getTextIn } = useLanguage()
@@ -66,7 +67,7 @@ export const CourseTab = ({
                 </Typography>
                 <Grid container spacing={1}>
                   {alternatives.map(group => (
-                    <SecondaryCourseLabel group={group} key={JSON.stringify(group)} />
+                    <SecondaryCourseLabel getTextIn={getTextIn} group={group} key={JSON.stringify(group)} />
                   ))}
                 </Grid>
               </>

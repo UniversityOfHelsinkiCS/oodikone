@@ -21,14 +21,7 @@ import { FacultyStatisticsTab } from './FacultyStatisticsTab'
 import { NewQueryButton } from './NewQueryButton'
 import { SearchForm } from './SearchForm'
 import { SummaryTab } from './SummaryTab'
-import {
-  ALL,
-  getAllStudyProgrammes,
-  getAvailableStats,
-  getCourseAlternativeCodes,
-  getCourseStats,
-  getSummaryStatistics,
-} from './util'
+import { ALL, getAllStudyProgrammes, getAvailableStats, getCourseStats, getSummaryStatistics } from './util'
 
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 
@@ -75,7 +68,7 @@ export const CourseStatistics = () => {
     )
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
-  const alternatives = getCourseAlternativeCodes(stats, selected)
+  const alternatives = stats[selected]?.alternatives
   const allProgrammes = getAllStudyProgrammes(stats, undefined)
   const programmes = getAllStudyProgrammes(stats, selected)
   const summaryStatistics = getSummaryStatistics(

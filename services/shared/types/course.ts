@@ -1,3 +1,5 @@
 import { Course } from '../models'
 
-export type CourseWithSubsId = Course & { subsId?: number }
+export type CourseWithSubsId = Omit<Course, 'substitution_groups'> & { substitution_groups: Course[][] } & {
+  subsId?: number
+}
