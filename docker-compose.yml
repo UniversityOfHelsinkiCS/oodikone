@@ -45,9 +45,9 @@ services:
     profiles:
       - oodikone
     volumes:
-      - backend-nodemod:/opt/app-root/backend/node_modules
       - ./services/backend/:/opt/app-root/backend
       - ./services/shared/:/opt/app-root/shared
+      - backend-nodemod:/opt/app-root/backend/node_modules
 
   frontend:
     <<: *defaults
@@ -60,9 +60,9 @@ services:
     profiles:
       - oodikone
     volumes:
-      - frontend-nodemod:/opt/app-root/frontend/node_modules
       - ./services/frontend/:/opt/app-root/frontend
       - ./services/shared/:/opt/app-root/shared
+      - frontend-nodemod:/opt/app-root/frontend/node_modules
 
   kone-db:
     <<: *defaults
