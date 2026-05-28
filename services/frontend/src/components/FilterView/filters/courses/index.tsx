@@ -1,21 +1,22 @@
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { CourseStats } from '@oodikone/shared/routes/populations'
+import { CreditTypeCode, FormattedStudent } from '@oodikone/shared/types'
+import { getSortRank } from '@oodikone/shared/util/sortRank'
 import type { FilterTrayProps } from '../../FilterTray'
 import { FilterSearchableSelect } from '../common/FilterSearchableSelect'
 import { createFilter } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
 
-type CourseStats = Record<string, any>
-
 const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
-  const courseStats: CourseStats = options.courses
+  const courseStats: CourseStats[] = options.courses
 
   const courseFilters: Record<string, number> = options?.courseFilters
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
     .filter(cs => !courseFilters[cs.code])
-    .sort((a, b) => a.code.localeCompare(b.code))
+    .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
     .map(cs => ({
       key: `courseFilter-option-${cs.code}`,
       text: `${cs.code} - ${getTextIn(cs.name)}`,
@@ -62,19 +63,24 @@ export const courseFilter = createFilter({
     substitutedBy: [],
   },
 
-  precompute: ({ args, options }) => {
-    const substitutedBy = args.courses.reduce(
-      (acc, course) => {
-        const { code, substitutions } = course
-        for (const original of substitutions) {
-          acc[original] ??= []
-          acc[original].push(code)
+  precompute: ({
+    args,
+    options,
+  }: {
+    args: { courses: CourseStats[] }
+    options: { courses?: Record<string, CourseStats>; substitutedBy?: Record<string, string[][]> }
+  }) => {
+    const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
+      const { code, substitution_groups } = course
+      if (substitution_groups) {
+        for (const group of substitution_groups) {
+          acc[code] ??= []
+          acc[code].push(group)
         }
+      }
 
-        return acc
-      },
-      {} as Record<string, string[]>
-    )
+      return acc
+    }, {})
 
     /* option.courses maybe frozen even when it should be used only within the scope of createFilter factory. */ {
       delete options.courses
@@ -85,14 +91,30 @@ export const courseFilter = createFilter({
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter(student, { options }) {
+  filter(
+    student: FormattedStudent,
+    {
+      options,
+    }: {
+      options: {
+        courseFilters?: any
+        courses?: Record<string, CourseStats>
+        substitutedBy?: Record<string, string[][]>
+      }
+    }
+  ) {
     const { courses, enrollments } = student
+    const passedCoursesCodes = courses
+      .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
+      .map(({ course_code }) => course_code)
+    const courseCodes = courses.map(({ course_code }) => course_code)
+    const enrollmentCodes = enrollments.map(({ course_code }) => course_code)
 
-    for (const [code, filterType] of Object.entries(options.courseFilters)) {
-      const found = [code, ...(options.substitutedBy[code] ?? [])].some(course => {
-        const enrolled = enrollments.some(({ course_code }) => course_code === course)
-        const attainment = courses.some(({ course_code }) => course_code === code)
-        const passed = courses.some(({ course_code, passed }) => course_code === code && passed)
+    for (const [mainCode, filterType] of Object.entries(options.courseFilters)) {
+      const found = [[mainCode], ...(options.substitutedBy![mainCode] ?? [])].some(group => {
+        const passed = group.every(code => passedCoursesCodes.includes(code))
+        const attainment = group.every(code => courseCodes.includes(code))
+        const enrolled = group.every(code => enrollmentCodes.includes(code))
 
         switch (filterType) {
           case FilterType.ALL:

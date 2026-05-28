@@ -26,10 +26,11 @@ const filterTexts = {
     label: 'Enrolled, No Grade',
   },
 }
-const getSubstitutionTooltip = (substitutions: string[]) => (
+const getSubstitutionTooltip = (substitution_groups: string[][]) => (
   <Typography fontSize="0.9rem" whiteSpace="pre-line">
-    Included course substitutions:
-    {substitutions.map(code => `\n${code}`)}
+    Included course's equivalent groups:
+    <br />
+    {substitution_groups.map(group => group.join(', ')).join('\n\n')}
   </Typography>
 )
 export const CourseCard = ({
@@ -64,7 +65,7 @@ export const CourseCard = ({
         <Box sx={{ mb: 2 }}>
           <Typography>{getTextIn(course?.name)}</Typography>
           {course?.substitutions?.length ? (
-            <Tooltip title={getSubstitutionTooltip(course.substitutions)}>
+            <Tooltip title={getSubstitutionTooltip(course.substitution_groups)}>
               <Typography sx={{ color: 'text.secondary' }}>
                 {course?.code}... +{course?.substitutions?.length}
               </Typography>
