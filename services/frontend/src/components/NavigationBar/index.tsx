@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router'
 
 import { Link } from '@/components/common/Link'
+import { isDev } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { formatToArray } from '@oodikone/shared/util'
@@ -79,7 +80,19 @@ export const NavigationBar = () => {
   )
 
   return (
-    <AppBar elevation={0} position="static">
+    <AppBar
+      elevation={0}
+      position="static"
+      sx={theme =>
+        isDev
+          ? {
+              background: `linear-gradient(-45deg, ${theme.palette.primary.main}, ${theme.palette.success.main}, ${theme.palette.primary.main})`,
+              backgroundSize: '300% 150%',
+              animation: 'gradient-shift 15s ease-in-out infinite',
+            }
+          : {}
+      }
+    >
       <Toolbar
         data-cy="nav-bar"
         disableGutters
