@@ -14,6 +14,14 @@ html {
   min-height: 100vh;
 }
 
+.no-bullet-list {
+  list-style: none;
+}
+
+.no-bullet-list > li {
+  margin-left: -1em; /* move text left by the width of the bullet */
+}
+
 @keyframes gradient-shift {
   0% {
     background-position: 0% 50%;

@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@mui/material/styles'
 import dayjs, { Dayjs, extend as dayjsExtend } from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
@@ -440,7 +441,10 @@ export const getEnrollmentTypeTextForExcel = (type: number, statutoryAbsence?: b
   return 'No study right'
 }
 
-export const formatContent = (content: string) => content.replace(/\n +/g, '\n')
+export const useFormatContent = (content: string | ((theme: Theme) => string)) => {
+  const theme = useTheme()
+  return (content instanceof Function ? content(theme) : content).replace(/\s+$/g, '\n')
+}
 
 export const filterInternalReleases = (release: Release) => !release.title.startsWith('Internal:')
 

@@ -1,3 +1,15 @@
+import { Theme } from '@mui/material/styles'
+import { default as ReactDOMServer } from 'react-dom/server'
+
+import { CheckIcon, CropSquareIcon, RemoveIcon } from '@/theme'
+
+const iconToSvg = (Icon, color?) =>
+  ReactDOMServer.renderToStaticMarkup(
+    <span style={{ display: 'inline-block', color }}>
+      <Icon style={{ height: '16px', width: '16px', fill: 'currentColor' }} />
+    </span>
+  )
+
 export const populationStatisticsToolTips = {
   advanced: {
     semesters:
@@ -129,73 +141,77 @@ export const populationStatisticsToolTips = {
 
     Valikoituja selvennyksiä: 
     - **Credits**
-      - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
-      - **Since** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
+      - **All** opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
+      - **Since** opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
     - **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
     - **Degree programme**: Näyttää opiskelijan uusimman opinto-oikeuden. Opiskelijan kaikki opinto-oikeudet näkyvät uusimmasta vanhimpaan Excel-tiedostossa, sekä laittamalla hiiri solun päälle.
     - **Other programme**: Näkyy, jos ryhmälle on asetettu opinto-oikeus. Tämä korvaa Degree programme -sarakkeen, ja toimii muuten samoin mutta näyttää opiskelijan muista opinto-oikeuksista uusimman.
     - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
   `,
-  studentsClass: `
-    **Students**
+  studentsClass: (theme: Theme) => `
+**Students**
 
-    Taulukko näyttää oletusarvoisesti vain opiskelijanumerot. Valitsemalla "Show student names" saat näkyviin myös opiskelijoiden nimet.
+Taulukko näyttää oletusarvoisesti vain opiskelijanumerot. Valitsemalla "Show student names" saat näkyviin myös opiskelijoiden nimet.
 
-    Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "Student statistics" -näkymään.
+Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "Student statistics" -näkymään.
 
-    Klikkaamalla "Sisu"-kuvaketta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+Klikkaamalla "Sisu"-kuvaketta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
 
-    **General**
+**General**
 
-    Valikoituja selvennyksiä: 
-    - **Credits**
-      - **All** listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
-      - **HOPS** listaa opiskelijan kaikki HOPSiin sijoitut opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
-      - **Since start in programme** listaa opiskelijan ohjelmassa aloittamisen jälkeen suoritut opintopisteet
-    - **Transferred from**: Owpiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
-    - **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
-    - **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
-    - **Semesters present**: Näyttää opiskelijan ilmoittautumiset lukukausittain. Laita hiiri solun yläpuolelle nähdäksesi tekstimuotoisen selityksen ilmoittautumisista.
-      - Värikoodit:
-        - Vihreä = Läsnäoleva
-        - Keltainen = Ilmoittautunut poissaolevaksi
-        - Punainen = Ei ilmoittautumista, mutta opiskelijalla on ollut opinto-oikeus
-        - Harmaa = Opiskelijalla ei ollut tällöin opinto-oikeutta
-        - Kruunu kertoo opiskelijan valmistuneen kyseisenä lukukautena. Jos näkymässä on yhdistettynä alempi ja ylempi tutkinto, ylemmän valmistumisen kruunussa on timantti.
-      - Excel-versiossa sarakkeessa näkyy tieto opiskelijan ensimmäisestä ilmoittautumisesta, jonka jälkeen ilmoittautumiset esitettynä symbolein:
-        - \\+ = Ilmoittautunut läsnäolevaksi
-        - o = Ilmoittautunut poissaolevaksi
-        - _ = Ei ilmoittautumista
+Valikoituja selvennyksiä: 
+- **Credits**
+  - **All**: opiskelijan suoritetut opintopisteet valitun tarkastelujakson ajalta
+  - **HOPS**: opiskelijan kaikki HOPSiin sijoitut opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+  - **Since start in programme**: opiskelijan ohjelmassa aloittamisen jälkeen suoritut opintopisteet
+- **Transferred from**: Opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
+- **Start of study right**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+- **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
+- **Semesters present**: Näyttää opiskelijan ilmoittautumiset lukukausittain. Laita hiiri solun yläpuolelle nähdäksesi tekstimuotoisen selityksen ilmoittautumisista.
+  - Värikoodit:
+    - Vihreä = Läsnäoleva
+    - Keltainen = Ilmoittautunut poissaolevaksi
+    - Punainen = Ei ilmoittautumista, mutta opiskelijalla on ollut opinto-oikeus
+    - Harmaa = Opiskelijalla ei ollut tällöin opinto-oikeutta
+    - Kruunu kertoo opiskelijan valmistuneen kyseisenä lukukautena. Jos näkymässä on yhdistettynä alempi ja ylempi tutkinto, ylemmän valmistumisen kruunussa on timantti.
+  - Excel-versiossa sarakkeessa näkyy tieto opiskelijan ensimmäisestä ilmoittautumisesta, jonka jälkeen ilmoittautumiset esitettynä symbolein:
+    <ul class="no-bullet-list">
+      <li>+ = Ilmoittautunut läsnäolevaksi</li>
+      <li>o = Ilmoittautunut poissaolevaksi</li>
+      <li>_ = Ei ilmoittautumista</li>
+    </ul>
 
-    **Courses**
+**Courses**
 
-    Tällä välilehdellä näkyy, mitä opetussuunnitelmaan kuuluvia kursseja opiskelija on suorittanut. Valitsemalla "Include substitutions" otetaan mukaan myös arvosanat vastaavista kursseista.
+Tällä välilehdellä näkyy, mitä opetussuunnitelmaan kuuluvia kursseja opiskelija on suorittanut. Valitsemalla "Include substitutions" otetaan mukaan myös arvosanat vastaavista kursseista.
 
-    Merkkien selitykset:
-    - ✓ Vihreä tarkastusmerkki = Opiskelija on suorittanut kurssin hyväksytysti
-    - ✓ Harmaa tarkastusmerkki = Opiskelija on suorittanut kurssin vastaavalla kurssikoodilla
-    - — Keltainen viiva = Opiskelijalla on alle 6kk vanha ilmoittautuminen kurssille
-    - — Harmaa viiva = Opiskelijalla on yli 6kk vanha ilmoittautuminen kurssille
-    - □ Harmaa laatikko = Opiskelija on lisännyt kurssin opintosuunitelmaansa, mutta ei ole ilmoittautunut kurssille tai suorittanut sitä
+Merkkien selitykset:
+<ul class="no-bullet-list">
+  <li>${iconToSvg(CheckIcon, theme.palette.ooditable.success)} Vihreä tarkastusmerkki = Opiskelija on suorittanut kurssin hyväksytysti</li>
+  <li>${iconToSvg(CheckIcon, theme.palette.ooditable.enrollment)} Harmaa tarkastusmerkki = Opiskelija on suorittanut kurssin vastaavalla kurssikoodilla</li>
+  <li>${iconToSvg(RemoveIcon, theme.palette.ooditable.recentEnrollment)} Keltainen viiva = Opiskelijalla on alle 6kk vanha ilmoittautuminen kurssille</li>
+  <li>${iconToSvg(RemoveIcon, theme.palette.ooditable.enrollment)} Harmaa viiva = Opiskelijalla on yli 6kk vanha ilmoittautuminen kurssille</li>
+  <li>${iconToSvg(CropSquareIcon, theme.palette.ooditable.hops)} Harmaa laatikko = Opiskelija on lisännyt kurssin opintosuunitelmaansa, mutta ei ole ilmoittautunut kurssille tai suorittanut sitä</li>
+</ul>
 
-    **Modules**
+**Modules**
 
-    Tällä välilehdellä näkyy, mitä opintokokonaisuuksia opiskelija on valinnut opintosuunnitelmaansa. Näkymä ei huomioi valinnaisia opintokokonaisuuksia.
+Tällä välilehdellä näkyy, mitä opintokokonaisuuksia opiskelija on valinnut opintosuunnitelmaansa. Näkymä ei huomioi valinnaisia opintokokonaisuuksia.
 
-    **Tags**
+**Tags**
 
-    Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Degree Program" > "Overview" > haluttu koulutusohjelma.
+Opiskelijoille voi luoda tageja ryhmittelyä varten kohdassa "Degree Program" > "Overview" > haluttu koulutusohjelma.
 
-    **Progress**
+**Progress**
 
-    Tämä näkymä on tällä hetkellä käytössä vain kandivaiheen opinto-ohjelmissa.
-    Tällä välilehdellä näkyy opintojen kehitys annettujen kriteerien mukaan akateemista vuotta kohti. Kurssi merkataan tehdyksi, jos sillä on suoritusmerkintä tai hyväksiluku 
-    minä tahansa lukuvuonna. Opintopistekriteerin täyttämiseen vaaditaan, että opintopisteet on suoritettu kyseisen akateemisen vuoden aikana.
+Tämä näkymä on tällä hetkellä käytössä vain kandivaiheen opinto-ohjelmissa.
+Tällä välilehdellä näkyy opintojen kehitys annettujen kriteerien mukaan akateemista vuotta kohti. Kurssi merkataan tehdyksi, jos sillä on suoritusmerkintä tai hyväksiluku 
+minä tahansa lukuvuonna. Opintopistekriteerin täyttämiseen vaaditaan, että opintopisteet on suoritettu kyseisen akateemisen vuoden aikana.
 
-    **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kolme pistettä sisältävää kuvaketta, voit ladata itsellesi Excel tiedoston.
-    Tiedosto sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
+**Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kolme pistettä sisältävää kuvaketta, voit ladata itsellesi Excel tiedoston.
+Tiedosto sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
 
-    **Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa.**
+**Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa.**
   `,
   studentsCustom: `
     **Students**
@@ -208,11 +224,11 @@ export const populationStatisticsToolTips = {
 
     Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä
 
-    **All credits** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+    **All credits** opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
 
-    **Credits in HOPS** listaa tarkasteltavaan opinto-ohjelmaan liitettyyn opintosuunnitelmaan kuuluvat opintopisteet
+    **Credits in HOPS** tarkasteltavaan opinto-ohjelmaan liitettyyn opintosuunnitelmaan kuuluvat opintopisteet
 
-    **Credits since start** listaa kuinka paljon opintopisteitä on kertynyt valitussa opinto-ohjelmassa aloittamisen jälkeen
+    **Credits since start** kuinka paljon opintopisteitä on kertynyt valitussa opinto-ohjelmassa aloittamisen jälkeen
   `,
   programmeDistributionCoursePopulation: {
     fi: `**Koulutusohjelma määritetään seuraavasti**:

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 
 import ReactMarkdown from 'react-markdown'
 
-import { formatContent } from '@/common'
+import { useFormatContent } from '@/common'
 import { HelpOutlineIcon } from '@/theme'
 
 const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -34,7 +34,7 @@ export const InfoBox = ({
       arrow
       title={
         <Typography component="div" data-cy={`${cypress}-info-box-content`} sx={{ padding: 1 }} variant="body2">
-          <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
+          <ReactMarkdown>{useFormatContent(content)}</ReactMarkdown>
         </Typography>
       }
     >

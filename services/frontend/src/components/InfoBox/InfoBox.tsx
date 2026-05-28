@@ -4,7 +4,7 @@ import Button from '@mui/material/Button'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
-import { formatContent } from '@/common'
+import { useFormatContent } from '@/common'
 import { InfoBoxButton } from './InfoBoxButton'
 
 interface InfoBoxProps {
@@ -21,10 +21,12 @@ export const InfoBox = ({ content, cypress = '' }: InfoBoxProps) => {
   const [open, setOpen] = useState(false)
   const toggleOpen = () => setOpen(prev => !prev)
 
+  const md = useFormatContent(content)
+
   if (open) {
     return (
       <Alert icon={false} severity="info" variant="outlined">
-        <ReactMarkdown>{formatContent(content)}</ReactMarkdown>
+        <ReactMarkdown>{md}</ReactMarkdown>
         <Button color="info" data-cy={`${cypress}-close-info`} fullWidth onClick={toggleOpen} variant="outlined">
           Close Info
         </Button>
