@@ -152,7 +152,7 @@ const updateAccessGroups = async (
 
   userFromDb: UserModel
 ) => {
-  const { jory, superAdmin, openUni, fullSisuAccess } = specialGroup
+  const { jory, superAdmin, fullSisuAccess } = specialGroup
   const currentAccessGroups = userFromDb?.roles ?? []
 
   const newAccessGroups = [
@@ -163,7 +163,6 @@ const updateAccessGroups = async (
     ...(jory || iamGroups.includes(facultyStatisticsGroup) ? ['facultyStatistics'] : []),
     ...(currentAccessGroups.includes('teachers') ? ['teachers'] : []),
     ...(superAdmin || currentAccessGroups.includes('admin') ? ['admin'] : []),
-    ...(openUni ? ['openUniSearch'] : []),
     ...(fullSisuAccess ? ['fullSisuAccess'] : []),
   ] as Role[]
 

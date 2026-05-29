@@ -3,6 +3,5 @@ export type Role =
   | 'courseStatistics'
   | 'facultyStatistics'
   | 'fullSisuAccess'
-  | 'openUniSearch'
   | 'studyGuidanceGroups'
   | 'teachers'

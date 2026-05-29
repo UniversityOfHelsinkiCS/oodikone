@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { Navigate, Route, Routes as RouterRoutes } from 'react-router'
 
 import { CoursePopulation } from '@/components/CoursePopulation'
-import { CustomOpenUniPopulation } from '@/components/CustomOpenUniPopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
@@ -76,10 +75,6 @@ export const Routes = () => (
 
         <Route element={<ProtectedRoute requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']} />}>
           <Route element={<CloseToGraduation />} path="/close-to-graduation" />
-        </Route>
-
-        <Route element={<ProtectedRoute requiredRoles={['openUniSearch']} />}>
-          <Route element={<CustomOpenUniPopulation />} path="/openunipopulation" />
         </Route>
 
         {/* Access control inside ProtectedRoute */}

@@ -25,10 +25,6 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
       return true
     }
 
-    if (checkUserAccess(['admin', 'openUniSearch'], roles) && subItemKey === 'openUniSearch') {
-      return true
-    }
-
     if (
       (checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) ||
         fullStudyProgrammeRights.length > 0) &&

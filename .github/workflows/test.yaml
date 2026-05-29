@@ -334,8 +334,6 @@ jobs:
               cypress/e2e/Users.js
           - name: 'Test faculty statistics'
             spec: cypress/e2e/Faculty_statistics.js
-          - name: 'Test open uni search'
-            spec: cypress/e2e/Openuni.js
           - name: 'Test language center view'
             spec: cypress/e2e/Language_center.js
           - name: 'Test study guidance groups'

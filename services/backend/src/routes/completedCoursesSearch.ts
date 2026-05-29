@@ -5,10 +5,10 @@ import { CanError } from '@oodikone/shared/routes'
 import { tryCatch } from '@oodikone/shared/util'
 import { Courses, FormattedStudent, getCompletedCourses } from '../services/completedCoursesSearch'
 import {
-  getOpenUniSearches,
-  createNewSearch,
-  deleteSearch,
-  updateSearch,
+  getUserSearches,
+  createNewUserSearch,
+  deleteUserSearch,
+  updateUserSearch,
   FoundSearch,
 } from '../services/openUni/openUniManageSearches'
 import { hasFullAccessToStudentData, safeJSONParse } from '../util'
@@ -72,7 +72,7 @@ export type GetSearchResBody = FoundSearch[]
 
 router.get<never, GetSearchResBody>('/searches', async (req, res) => {
   const userId = req.user.id
-  const foundSearches = await getOpenUniSearches(userId)
+  const foundSearches = await getUserSearches(userId)
   return res.json(foundSearches)
 })
 
@@ -98,7 +98,7 @@ router.post<never, CreateSearchResBody, CreateSearchReqBody>('/searches', async 
   if (courseCodes && !Array.isArray(courseCodes)) {
     return res.status(400).json({ error: 'Courselist must be type of array' })
   }
-  const createdSearch = await createNewSearch(userId, name, courseCodes)
+  const createdSearch = await createNewUserSearch(userId, name, courseCodes)
   if (!createdSearch) {
     return res.status(400).json({ error: 'Failed to create courselist' })
   }
@@ -130,7 +130,7 @@ router.put<UpdateSearchParams, UpdateSearchResBody, UpdateSearchReqBody>('/searc
     return res.status(422).end()
   }
 
-  const updatedSearch = await updateSearch(userId, id, courseCodes)
+  const updatedSearch = await updateUserSearch(userId, id, courseCodes)
   if (!updatedSearch) {
     return res.status(404).json({ error: 'Courselist could not be found' })
   }
@@ -155,7 +155,7 @@ router.delete<DeleteSearchParams, DeleteSearchResBody>('/searches/:id', async (r
     return res.status(422).end()
   }
 
-  const deletedSearch = await deleteSearch(userId, id)
+  const deletedSearch = await deleteUserSearch(userId, id)
   if (!deletedSearch) {
     return res.status(404).json({ error: 'Courselist could not be found' })
   }

@@ -8,11 +8,10 @@ Roles are defined [here](../services/backend/src/config/roles.ts). Criteria for 
 - courseStatistics
 - facultyStatistics
 - fullSisuAccess
-- openUniSearch
 - studyGuidanceGroups
 - teachers
 
-The roles `facultyStatistics`, `openUniSearch`, and `studyGuidanceGroups` simply enable certain views (_Faculties_, _Open uni student population_, and _Guidance groups_ respectively).
+The roles `facultyStatistics` and `studyGuidanceGroups` simply enable certain views (_Faculties_ and _Guidance groups_ respectively).
 
 ### courseStatistics
 
@@ -43,7 +42,6 @@ The roles `facultyStatistics`, `openUniSearch`, and `studyGuidanceGroups` simply
 | Custom population    |             |  ✅   |       ✅       |
 | Completed courses    |     ✅      |  ✅   |       ✅       |
 | Close to graduation  |             |  ✅   |       ✅       |
-| Open uni population  |             |  ✅   |                |
 | Courses              |             |  ✅   |       ✅       |
 
 \* = anyone who can log in to Oodikone, check the [IAM groups](#iam-groups) section for more information
@@ -63,7 +61,6 @@ A user must be a member of either the `grp-oodikone-basic-users` or `grp-oodikon
 | grp-oodikone-basic-users | courseStatistics              |
 | grp-oodikone-users       | facultyStatistics             |
 | grp-toska                | admin                         |
-| hy-ypa-opa-dojo          | openUniSearch                 |
 
 `grp-oodikone-basic-users`: basically the whole staff (hy-\*-allstaff)
 

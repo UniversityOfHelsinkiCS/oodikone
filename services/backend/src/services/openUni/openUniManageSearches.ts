@@ -14,7 +14,7 @@ export type FoundSearch = {
   updatedAt: Date
 }
 
-export const getOpenUniSearches = async (userId: string) => {
+export const getUserSearches = async (userId: string) => {
   const savedSearches = await getOpenUniSearchesByUser(userId)
   if (savedSearches === undefined) {
     return []
@@ -34,7 +34,7 @@ export const getOpenUniSearches = async (userId: string) => {
   return foundSearches
 }
 
-export const createNewSearch = async (userId: string, name: string, courseCodes: string[]) => {
+export const createNewUserSearch = async (userId: string, name: string, courseCodes: string[]) => {
   const savedSearches = await getOpenUniSearchesByUser(userId)
   if (savedSearches?.some(search => search.name === name)) {
     return null
@@ -51,7 +51,7 @@ export const createNewSearch = async (userId: string, name: string, courseCodes:
   }
 }
 
-export const deleteSearch = async (userId: string, id: string) => {
+export const deleteUserSearch = async (userId: string, id: string) => {
   try {
     const deleted = await deleteOpenUniSearch(userId, id)
     if (!deleted) {
@@ -64,7 +64,7 @@ export const deleteSearch = async (userId: string, id: string) => {
   }
 }
 
-export const updateSearch = async (userId: string, id: string, courseCodes: string[]) => {
+export const updateUserSearch = async (userId: string, id: string, courseCodes: string[]) => {
   try {
     const updated = await updateOpenUniPopulationSearch(userId, id, courseCodes)
     if (!updated) {

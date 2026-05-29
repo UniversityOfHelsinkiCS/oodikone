@@ -58,17 +58,6 @@ const onlyStudyGuidanceGroupsUser = {
   hypersonsisuid: 'hy-hlo-2222222',
 }
 
-// TODO add user into anon-DB (check the need for changing hypersonid)
-// REMEMBER TO ADD ROLE openUniSearch
-// const openUniUser = {
-//   uid: 'openuniuser',
-//   displayname: 'Open Uni User',
-//   'shib-session-id': 'mock-cypress-session',
-//   hygroupcn: 'grp-oodikone-basics-users;hy-ypa-opa-dojo',
-//   mail: 'grp-toska+mockopenuniuser@helsinki.fi',
-//   hypersonsisuid: 'hy-hlo-9999999',
-// }
-
 const userHeaders = [
   adminUserHeaders,
   basicUserHeaders,

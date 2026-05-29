@@ -5,7 +5,6 @@ export const roles = [
   'courseStatistics',
   'facultyStatistics',
   'fullSisuAccess',
-  'openUniSearch',
   'studyGuidanceGroups',
   'teachers',
 ] as const

@@ -15,7 +15,6 @@ import completedCoursesSearch from './routes/completedCoursesSearch'
 import courseExclusions from './routes/courseExclusions'
 import courses from './routes/courses'
 import curriculumPeriods from './routes/curriculumPeriods'
-import customOpenUniSearch from './routes/customOpenUniSearch'
 import customPopulationSearch from './routes/customPopulationSearch'
 import faculties from './routes/faculties'
 import feedback from './routes/feedback'
@@ -55,7 +54,6 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/course-exclusions`, courseExclusions)
   app.use(`${url}/studyprogrammes`, studyProgramme)
   app.use(`${url}/programme-criteria`, studyProgrammeCriteria)
-  app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)
   app.use(`${url}/changelog`, changelog)
   app.use(`${url}/completedcoursessearch`, completedCoursesSearch)
   if (languageCenterViewEnabled) {
