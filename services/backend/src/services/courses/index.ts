@@ -151,7 +151,7 @@ const getSubstitutionGroupDetails = async (codeGroups: string[][]) => {
 }
 
 const getYearlyStatsOfNew = async (
-  course: Pick<CourseModel, 'code' | 'name' | 'substitutions' | 'substitution_groups'> | null,
+  course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null,
   courseCode: string,
   separate: boolean,
   unification: Unification,
@@ -331,11 +331,10 @@ export const getCourseYearlyStats = async (
 
   const statsRegular = await Promise.all(
     courseCodes.map(async courseCode => {
-      const course: Pick<CourseModel, 'code' | 'name' | 'substitutions' | 'substitution_groups'> | null =
-        await CourseModel.findOne({
-          attributes: ['code', 'name', 'substitutions', 'substitution_groups'],
-          where: { code: courseCode },
-        })
+      const course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null = await CourseModel.findOne({
+        attributes: ['code', 'name', 'substitution_groups'],
+        where: { code: courseCode },
+      })
 
       if (!course) {
         logger.error('Course for course stats not found with code' + courseCode)
