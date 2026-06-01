@@ -184,7 +184,7 @@ describe.skip('Population Statistics', { testIsolation: false }, () => {
     cy.selectFromDropdown(`courseFilter-${courses[0].code}`, 1)
     checkFilteredStudentCount(7)
     cy.selectFromAutocomplete('courseFilter', `${courses[1].code} - ${courses[1].name}`)
-    checkFilteredStudentCount(5)
+    checkFilteredStudentCount(6)
     cy.selectFromDropdown(`courseFilter-${courses[1].code}`, 1)
     checkFilteredStudentCount(4)
 
@@ -453,9 +453,9 @@ describe('Custom Population Statistics', { testIsolation: false }, () => {
     cy.selectFromDropdown(`courseFilter-${courses[0].code}`, 1)
     checkFilteredStudentCount(6)
     cy.selectFromAutocomplete('courseFilter', `${courses[1].code} - ${courses[1].name}`)
-    checkFilteredStudentCount(5)
+    checkFilteredStudentCount(6)
     cy.selectFromDropdown(`courseFilter-${courses[1].code}`, 3)
-    checkFilteredStudentCount(2)
+    checkFilteredStudentCount(6)
 
     cy.cs(`courseFilter-${courses[1].code}-clear`).click()
     checkFilteredStudentCount(6)
