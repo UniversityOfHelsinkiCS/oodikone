@@ -1,9 +1,16 @@
 import { filterToolTips } from '@/common/InfoToolTips'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const StartYearAtUniFilterCard = ({
+  options,
+  onOptionsChange,
+  students,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const { selected } = options
 
   const countsByYear = {}
@@ -31,7 +38,7 @@ const StartYearAtUniFilterCard = ({ options, onOptionsChange, students }: Filter
   )
 }
 
-export const startYearAtUniFilter = createFilter({
+export const startYearAtUniFilter = createFilter<Options, Args, Precompute>({
   key: 'startYearAtUniFilter',
 
   title: 'Starting year',

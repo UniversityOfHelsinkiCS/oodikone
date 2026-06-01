@@ -1,7 +1,10 @@
 import { DegreeProgrammeType } from '@oodikone/shared/types'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 const DEFAULT_STATE = '0' as const
 
@@ -17,7 +20,7 @@ const GRADUATION_PHASE = {
   GRADUATED_MASTER: '2',
 } as const
 
-const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayProps) => {
+const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const isCombinedExtent = !!args.code && (!!args.combinedProgrammeCode || !!args.showBachelorAndMaster)
   const isLicentiate = args.combinedProgrammeCode === 'MH90_001'
 
@@ -58,7 +61,7 @@ const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayP
   )
 }
 
-export const graduatedFromProgrammeFilter = createFilter({
+export const graduatedFromProgrammeFilter = createFilter<Options, Args, Precompute>({
   key: 'graduatedFromProgrammeFilter',
 
   title: 'Graduated from programme',

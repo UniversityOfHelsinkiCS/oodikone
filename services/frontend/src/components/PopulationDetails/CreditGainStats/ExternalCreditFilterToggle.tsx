@@ -3,9 +3,9 @@ import { FilterToggle } from '@/components/FilterView/FilterToggle'
 import { useFilters } from '@/components/FilterView/useFilters'
 
 export const ExternalCreditFilterToggle = ({ students, helpText }: { students: string[]; helpText: string }) => {
-  const { filterDispatch, useFilterSelector } = useFilters()
+  const { useFilterDispatch: filterDispatch, useFilterSelector } = useFilters()
   const currentFilterIsActive = useFilterSelector(studentNumberFilter.selectors.studentListIsEqualToAllowlist(students))
-  const someFilterIsActive = useFilterSelector(studentNumberFilter.selectors.isActive())
+  const someFilterIsActive = useFilterSelector(studentNumberFilter.selectors.isActive(undefined))
 
   return (
     <FilterToggle

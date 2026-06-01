@@ -94,7 +94,7 @@ export const CustomPopulationProgrammeDist = ({
 }
 
 const ProgrammeFilterToggleCell = ({ code, name }: { code: string; name: string }) => {
-  const { useFilterSelector, filterDispatch } = useFilters()
+  const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isProgrammeSelected(code))
   const title = (

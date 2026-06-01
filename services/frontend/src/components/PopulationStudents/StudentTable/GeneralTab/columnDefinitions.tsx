@@ -41,7 +41,7 @@ export const useGetColumnDefinitions = ({
   const { getTextIn } = useLanguage()
   const { useFilterSelector } = useFilters()
   const { setStatusNotification, closeNotification } = useStatusNotification()
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions(undefined))
 
   return useMemo(
     () => [

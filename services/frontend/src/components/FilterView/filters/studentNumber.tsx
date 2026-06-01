@@ -6,11 +6,18 @@ import { isEqual, union } from 'lodash-es'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { SwapVertIcon } from '@/theme'
 import { formatToArray } from '@oodikone/shared/util'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSearchableSelect } from './common/FilterSearchableSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const StudentNumberFilterCard = ({
+  options,
+  onOptionsChange,
+  students,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const dropdownOptions = students.map(({ studentNumber }) => ({
     key: studentNumber,
     text: studentNumber,
@@ -54,7 +61,7 @@ const StudentNumberFilterCard = ({ options, onOptionsChange, students }: FilterT
   )
 }
 
-export const studentNumberFilter = createFilter({
+export const studentNumberFilter = createFilter<Options, Args, Precompute>({
   key: 'studentNumber',
 
   title: 'Student number',

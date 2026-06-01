@@ -160,7 +160,7 @@ export const CreditDistributionDevelopment = ({
   const [isAscending, setIsAscending] = useState(false)
 
   const { getTextIn } = useLanguage()
-  const { filterDispatch } = useFilters()
+  const { useFilterDispatch: filterDispatch } = useFilters()
 
   const { semesters } = useSemesters()
 

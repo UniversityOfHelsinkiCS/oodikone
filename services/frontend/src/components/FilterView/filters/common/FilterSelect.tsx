@@ -11,25 +11,37 @@ import Tooltip from '@mui/material/Tooltip'
 type ValidValueType = string | number
 
 type SelectOption<T extends ValidValueType> = {
-  key?: string
-  text: string
   value: T
+  text: string
+  key?: string
   disabled?: boolean
 }
 
-type FilterSelectProps<T extends ValidValueType> = {
+type FilterSelectBaseProps<T extends ValidValueType> = {
   label?: string
   options: SelectOption<T>[]
-  value: T | T[]
-  onChange: (event: SelectChangeEvent<T | T[]>) => void
   filterKey?: string
-  multiple?: true
-  InputItem?: (value: T | T[]) => JSX.Element
   MenuItem?: (option: SelectOption<T>) => JSX.Element
   sx?: SxProps<Theme>
 }
 
-const DefaultMenuItem = option => (
+type SingleFilterSelectProps<T extends ValidValueType> = FilterSelectBaseProps<T> & {
+  multiple?: false
+  value: T
+  onChange: (event: SelectChangeEvent<T>) => void
+  InputItem?: (value: T) => JSX.Element
+}
+
+type MultiFilterSelectProps<T extends ValidValueType> = FilterSelectBaseProps<T> & {
+  multiple: true
+  value: T[]
+  onChange: (event: SelectChangeEvent<T[]>) => void
+  InputItem?: (value: T[]) => JSX.Element
+}
+
+type FilterSelectProps<T extends ValidValueType> = SingleFilterSelectProps<T> | MultiFilterSelectProps<T>
+
+const DefaultMenuItem = <T extends ValidValueType>(option: SelectOption<T>) => (
   <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
     {option.text}
   </MenuItem>
@@ -55,19 +67,35 @@ export const FilterSelect = <T extends ValidValueType = string>({
           {label}
         </InputLabel>
         <Tooltip title={disabled ? 'No valid values found' : null}>
-          <Select
-            data-cy={`${filterKey}-selector`}
-            disabled={disabled}
-            label={label}
-            labelId={filterKey}
-            multiple={multiple}
-            onChange={onChange}
-            renderValue={InputItem}
-            size="small"
-            value={value}
-          >
-            {options.map(MenuItem ?? DefaultMenuItem)}
-          </Select>
+          {multiple ? (
+            <Select
+              data-cy={`${filterKey}-selector`}
+              disabled={disabled}
+              label={label}
+              labelId={filterKey}
+              multiple={multiple}
+              onChange={onChange}
+              renderValue={InputItem}
+              size="small"
+              value={value}
+            >
+              {options.map(MenuItem ?? DefaultMenuItem)}
+            </Select>
+          ) : (
+            <Select
+              data-cy={`${filterKey}-selector`}
+              disabled={disabled}
+              label={label}
+              labelId={filterKey}
+              multiple={multiple}
+              onChange={onChange}
+              renderValue={InputItem}
+              size="small"
+              value={value}
+            >
+              {options.map(MenuItem ?? DefaultMenuItem)}
+            </Select>
+          )}
         </Tooltip>
       </FormControl>
     </Box>

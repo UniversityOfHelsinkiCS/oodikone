@@ -39,7 +39,7 @@ export const SingleStudyGuidanceGroupPanels = ({
   filteredCourses: FilteredCourse[]
   group: GroupsWithTags
 }) => {
-  const { useFilterSelector, filterDispatch } = useFilters()
+  const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
   const groupYear = group.tags?.year
   const groupProgramme = group.tags?.studyProgramme
@@ -54,8 +54,8 @@ export const SingleStudyGuidanceGroupPanels = ({
 
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, groupYear!) // TODO: fix year
 
-  const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive())
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
+  const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive(undefined))
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive(undefined))
 
   const toggleCreditDateFilter = () => {
     if (creditDateFilterActive) {

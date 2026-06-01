@@ -2,11 +2,14 @@ import { orderBy } from 'lodash-es'
 
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const CitizenshipFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+type Options = { selected: string }
+type Args = undefined
+type Precompute = null
+
+const CitizenshipFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps<Options, Args, Precompute>) => {
   const { getTextIn } = useLanguage()
   const { selected } = options
 
@@ -44,7 +47,7 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, students }: FilterTra
   )
 }
 
-export const citizenshipFilter = createFilter({
+export const citizenshipFilter = createFilter<Options, Args, Precompute>({
   key: 'Citizenship',
 
   title: 'Citizenship',

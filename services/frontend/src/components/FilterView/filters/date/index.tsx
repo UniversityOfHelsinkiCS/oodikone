@@ -1,16 +1,23 @@
 import 'dayjs/locale/fi'
 
+import { Dayjs } from 'dayjs'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
-import { FilterTrayProps } from '../../FilterTray'
-import { createFilter } from '../createFilter'
+import { createFilter, FilterTrayProps } from '../createFilter'
+
+type Options = {
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+}
+type Args = undefined
+type Precompute = any
 
 /**
  * Filter courses according to the date when credits were earned.
  * Unlike other filters, this one does not filter out students from the population. Rather it
  * operates on the students' courses, filtering them according to the date range input.
  */
-const ParticipationDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
+const ParticipationDateFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const { startDate, endDate } = options
 
   return (
@@ -29,7 +36,7 @@ const ParticipationDateFilterCard = ({ options, onOptionsChange }: FilterTrayPro
   )
 }
 
-export const creditDateFilter = createFilter({
+export const creditDateFilter = createFilter<Options, Args, Precompute>({
   key: 'ParticipationDate',
 
   title: 'Date of course participation',

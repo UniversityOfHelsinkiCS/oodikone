@@ -35,8 +35,8 @@ type CreditListStudent = {
 
 export const CreditsGainedTable = ({ filteredStudents, programmeGoalTime, type, year }: CreditsGainedTableProps) => {
   const { useFilterSelector } = useFilters()
-  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions())
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions(undefined))
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive(undefined))
 
   let creditList: CreditListStudent[] = []
 

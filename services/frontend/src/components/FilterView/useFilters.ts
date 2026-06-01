@@ -1,21 +1,20 @@
 import { useContext } from 'react'
 
-import { useAppDispatch } from '@/redux/hooks'
-import { FilterViewContext } from './context'
+import { FilterViewContext, FilterViewContextState } from './context'
+import { FilterOptions } from './filters/createFilter'
+// import { Action, FilterOptions, Selector } from './filters/createFilter'
 
-export const useFilters = () => {
-  const dispatch = useAppDispatch()
-  const { getContextByKey } = useContext(FilterViewContext)
+// type GenericAction<Options extends FilterOptions> = Action<Options, any>
+// type GenericSelector<Options extends FilterOptions> = Selector<Options, any, any>
 
-  const filterDispatch = filterAction => dispatch(filterAction(getContextByKey))
+export const useFilters = <Options extends FilterOptions>() => {
+  const { getContextByKey, setFilterOptions } = useContext(FilterViewContext) as FilterViewContextState<Options>
 
-  const useFilterSelector = filterSelector => {
-    const { options } = getContextByKey(filterSelector.filter)
-    return filterSelector(options)
-  }
+  const useFilterDispatch = filterAction => filterAction(getContextByKey, setFilterOptions)
+  const useFilterSelector = filterSelector => filterSelector(getContextByKey)
 
   return {
     useFilterSelector,
-    filterDispatch,
+    useFilterDispatch,
   }
 }

@@ -3,19 +3,26 @@ import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
 import { useDebounce } from '@/hooks/debounce'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRange } from './common/FilterRange'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds }: FilterTrayProps) => {
+type Options = { min: number | null; max: number | null }
+type Args = undefined
+type Precompute = { min: number | undefined; max: number | undefined }
+
+const CreditsEarnedFilterCard = ({
+  options,
+  onOptionsChange,
+  precomputed: bounds,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const { min, max } = bounds
 
   const onChange = ([min, max]) => {
     onOptionsChange({ min, max })
   }
 
-  const intMin = Math.floor(min)
-  const intMax = Math.ceil(max)
+  const intMin = Math.floor(min ?? 0)
+  const intMax = Math.ceil(max ?? 0)
 
   const value: [number, number] = useMemo(
     () => [options.min ?? intMin, options.max ?? intMax],
@@ -26,8 +33,8 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds
 
   return (
     <FilterRange
-      max={max}
-      min={min}
+      max={intMax}
+      min={intMin}
       range={range}
       setRange={setRange}
       text="Valitse opintopistehaitari, jolle asettuvat opiskelijat näytetään"
@@ -35,7 +42,7 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange, precomputed: bounds
   )
 }
 
-export const creditsEarnedFilter = createFilter({
+export const creditsEarnedFilter = createFilter<Options, Args, Precompute>({
   key: 'creditsEarnedFilter',
 
   title: 'Credits earned',

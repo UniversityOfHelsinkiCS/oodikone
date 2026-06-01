@@ -37,6 +37,7 @@ import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { findCorrectProgramme } from '../CustomPopulation/CustomPopulationProgrammeDist/util'
+import type { GenericFilter } from '../FilterView/filters/createFilter'
 import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
 import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
 import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
@@ -218,7 +219,7 @@ export const CoursePopulation = () => {
     },
   ]
 
-  const filters = [
+  const filters: GenericFilter[] = [
     genderFilter(),
     studentNumberFilter(),
     ageFilter(),

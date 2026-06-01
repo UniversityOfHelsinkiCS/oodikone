@@ -1,6 +1,6 @@
 import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from './features'
 import { OodiTableContainer } from './OodiTable'
@@ -34,12 +34,14 @@ export const OodiTable = <TData,>({
   toolbarContent?: ReactNode
   cy?: string
 }) => {
+  const [fallbackData] = useState()
+
   // should maybe use a deep merging tool or write own
   const { ...config }: Partial<TableOptions<TData>> = options
 
   const table = useReactTable<TData>({
     _features: [VerticalHeaderFeature, AggregationRowFeature, ZebrastripesFeature],
-    data,
+    data: data ?? fallbackData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

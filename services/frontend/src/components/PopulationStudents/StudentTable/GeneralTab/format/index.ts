@@ -16,7 +16,7 @@ import { getProgrammeDetails, getSemesterEnrollmentsContent, useGetRelevantSemes
 
 const useGetCreditDateFilterOptions = () => {
   const { useFilterSelector } = useFilters()
-  return useFilterSelector(creditDateFilter.selectors.selectOptions())
+  return useFilterSelector(creditDateFilter.selectors.selectOptions(undefined))
 }
 
 /**

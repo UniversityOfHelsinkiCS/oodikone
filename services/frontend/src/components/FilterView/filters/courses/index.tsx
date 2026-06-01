@@ -2,16 +2,24 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CourseStats } from '@oodikone/shared/routes/populations'
 import { CreditTypeCode, FormattedStudent } from '@oodikone/shared/types'
 import { getSortRank } from '@oodikone/shared/util/sortRank'
-import type { FilterTrayProps } from '../../FilterTray'
 import { FilterSearchableSelect } from '../common/FilterSearchableSelect'
-import { createFilter } from '../createFilter'
+import { createFilter, FilterTrayProps } from '../createFilter'
 import { CourseCard } from './CourseCard'
 import { FilterType } from './filterType'
 
-const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
-  const courseStats: CourseStats[] = options.courses
+type FTValue = (typeof FilterType)[keyof typeof FilterType]
+type Options = {
+  courseFilters: Record<string, FTValue>
+  courses: Record<string, CourseStats>
+  substitutedBy: Record<string, string[][]>
+}
+type Args = { courses: CourseStats[] }
+type Precompute = any
 
-  const courseFilters: Record<string, number> = options?.courseFilters
+const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
+  const courseStats = options.courses
+
+  const courseFilters = options?.courseFilters
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
@@ -23,10 +31,10 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
       value: cs.code,
     }))
 
-  const setCourseFilter = (code: string, type: number | null) => {
+  const setCourseFilter = (code: string, type: FTValue | null) => {
     const newOpts = structuredClone(options)
-    newOpts.courseFilters[code] = type
     if (type === null) delete newOpts.courseFilters[code]
+    else newOpts.courseFilters[code] = type
 
     onOptionsChange(newOpts)
   }
@@ -45,14 +53,14 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
           course={courseStats[code]}
           filterType={type}
           key={`courseFilter-selected-course-${code}`}
-          onChange={type => setCourseFilter(code, type)}
+          onChange={type => setCourseFilter(code, type as FTValue)}
         />
       ))}
     </>
   )
 }
 
-export const courseFilter = createFilter({
+export const courseFilter = createFilter<Options, Args, Precompute>({
   key: 'courseFilter',
 
   title: 'Courses',
@@ -60,7 +68,7 @@ export const courseFilter = createFilter({
   defaultOptions: {
     courseFilters: {},
     courses: {},
-    substitutedBy: [],
+    substitutedBy: {},
   },
 
   precompute: ({
@@ -91,18 +99,7 @@ export const courseFilter = createFilter({
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter(
-    student: FormattedStudent,
-    {
-      options,
-    }: {
-      options: {
-        courseFilters?: any
-        courses?: Record<string, CourseStats>
-        substitutedBy?: Record<string, string[][]>
-      }
-    }
-  ) {
+  filter(student: FormattedStudent, { options }) {
     const { courses, enrollments } = student
     const passedCoursesCodes = courses
       .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
@@ -146,7 +143,7 @@ export const courseFilter = createFilter({
   },
 
   actions: {
-    toggleCourseSelection: (options, code) => {
+    toggleCourseSelection: (options, code: string) => {
       if (!Object.values(FilterType).includes(options.courseFilters[code])) {
         options.courseFilters[code] = FilterType.ALL
       } else {

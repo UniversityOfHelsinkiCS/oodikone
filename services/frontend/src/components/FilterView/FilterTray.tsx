@@ -2,35 +2,32 @@ import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { useContext } from 'react'
 
-import { setViewFilterOptions, resetViewFilter, resetAllViewFilters } from '@/redux/filters'
-import { useAppDispatch } from '@/redux/hooks'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
-import { FilterViewContext } from './context'
-import type { FilterContext } from './context'
 import { FilterCard } from './filters/common/FilterCard'
-import { Filter } from './filters/createFilter'
+import type { FilterContext, FilterOptions, FilterTrayProps, GenericFilter } from './filters/createFilter'
 
-export type FilterTrayProps = {
-  students: Student[]
-  onOptionsChange: (options: FilterContext['options']) => void
-} & FilterContext
-
-export const FilterTray = ({
+export const FilterTray = <Options extends FilterOptions, Args, Precompute>({
   numberOfFilteredStudents,
   allStudents,
   filters,
   filtersInUse,
+
+  getContextByKey,
+  setFilterOptions,
+  resetFilterOptions,
+  resetAllFilterOptions,
 }: {
   numberOfFilteredStudents: number
   allStudents: Student[]
-  filters: Filter[]
+  filters: GenericFilter<Options, Args, Precompute>[]
   filtersInUse: boolean
-}) => {
-  const dispatch = useAppDispatch()
-  const { getContextByKey } = useContext(FilterViewContext)
 
+  getContextByKey: (key: string) => FilterContext<Options, Args, Precompute>
+  setFilterOptions: (filter: string, options: Options) => void
+  resetFilterOptions: (filter: string) => void
+  resetAllFilterOptions: () => void
+}) => {
   return (
     <Paper
       sx={{
@@ -55,7 +52,7 @@ export const FilterTray = ({
           data-cy="reset-all-filters"
           disableElevation
           disabled={!filtersInUse}
-          onClick={() => dispatch(resetAllViewFilters())}
+          onClick={() => resetAllFilterOptions()}
           variant="contained"
         >
           Reset All Filters
@@ -64,25 +61,16 @@ export const FilterTray = ({
       {filters
         .sort(({ title: a }, { title: b }) => a.localeCompare(b))
         .map(filter => {
-          const { key, isActive, render } = filter
+          const { key } = filter
           const ctx = getContextByKey(key)
 
-          const props: FilterTrayProps = {
+          const props: FilterTrayProps<Options, Args, Precompute> = {
             ...ctx,
             students: allStudents,
-            onOptionsChange: options => dispatch(setViewFilterOptions({ filter: key, options })),
+            onOptionsChange: (options: Options) => setFilterOptions(key, options),
           }
 
-          return (
-            <FilterCard
-              active={isActive(ctx.options)}
-              filter={filter}
-              key={key}
-              onClear={() => dispatch(resetViewFilter({ filter: key }))}
-            >
-              {render(props)}
-            </FilterCard>
-          )
+          return <FilterCard filter={filter} key={key} onClear={() => resetFilterOptions(key)} props={props} />
         })}
     </Paper>
   )

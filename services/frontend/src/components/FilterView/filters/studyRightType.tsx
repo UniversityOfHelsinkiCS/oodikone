@@ -1,7 +1,10 @@
 import { ExtentCode } from '@oodikone/shared/types'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 const DEFAULT_STATE = '0' as const
 
@@ -11,7 +14,7 @@ const STUDYRIGHT_TYPES = [
   { text: 'Master only', value: '2' },
 ]
 
-const StudyRightTypeFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
+const StudyRightTypeFilterCard = ({ onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const modeOptions = STUDYRIGHT_TYPES.map(({ text, value }) => ({
     key: text,
     text,
@@ -28,7 +31,7 @@ const StudyRightTypeFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
   )
 }
 
-export const studyRightTypeFilter = createFilter({
+export const studyRightTypeFilter = createFilter<Options, Args, Precompute>({
   key: 'studyRightTypeFilter',
 
   title: 'Study right type',

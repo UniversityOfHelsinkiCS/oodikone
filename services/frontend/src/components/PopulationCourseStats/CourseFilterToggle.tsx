@@ -5,7 +5,7 @@ import { isCourseSelected, toggleCourseSelection } from '@/components/FilterView
 import { useFilters } from '@/components/FilterView/useFilters'
 
 export const CourseFilterToggle = ({ courseCode, courseName }: { courseCode: string; courseName: string }) => {
-  const { useFilterSelector, filterDispatch } = useFilters()
+  const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isCourseSelected(courseCode))
 

@@ -17,6 +17,7 @@ import {
 } from '@/components/FilterView/filters'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
+import { GenericFilter } from '../FilterView/filters/createFilter'
 import { CustomPopulationState } from '.'
 import { CustomPopulationContent } from './CustomPopulationContent'
 
@@ -41,7 +42,7 @@ export const CustomPopulationWrapper = ({
   const associatedProgramme = population?.studyProgramme
   const discardedStudentNumbers = population?.discardedStudentNumbers ?? []
 
-  const filters = useMemo(() => {
+  const filters: GenericFilter[] = useMemo(() => {
     const filtersList = [
       genderFilter(),
       ageFilter(),

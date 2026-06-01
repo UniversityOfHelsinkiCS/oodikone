@@ -1,10 +1,17 @@
 import { useMemo } from 'react'
 
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+type Options = { selected: string }
+type Args = undefined
+type Precompute = null
+
+const CurriculumPeriodFilterCard = ({
+  options,
+  onOptionsChange,
+  students,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const { selected } = options
 
   const dropdownOptions = useMemo(
@@ -28,7 +35,7 @@ const CurriculumPeriodFilterCard = ({ options, onOptionsChange, students }: Filt
   )
 }
 
-export const curriculumPeriodFilter = createFilter({
+export const curriculumPeriodFilter = createFilter<Options, Args, Precompute>({
   key: 'CurriculumPeriod',
 
   title: 'Curriculum period',

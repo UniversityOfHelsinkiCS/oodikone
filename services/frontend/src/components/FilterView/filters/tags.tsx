@@ -1,11 +1,14 @@
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps<Options, Args, Precompute>) => {
   const { includedTags, excludedTags } = options
 
   const tagCounts: Record<string, { count: number; name: string }> = {}
@@ -53,7 +56,7 @@ const TagsFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps)
   )
 }
 
-export const tagsFilter = createFilter({
+export const tagsFilter = createFilter<Options, Args, Precompute>({
   key: 'Tags',
 
   title: 'Tags',

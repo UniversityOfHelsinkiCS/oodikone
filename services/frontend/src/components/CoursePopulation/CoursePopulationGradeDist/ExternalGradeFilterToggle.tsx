@@ -3,7 +3,7 @@ import { FilterToggle } from '@/components/FilterView/FilterToggle'
 import { useFilters } from '@/components/FilterView/useFilters'
 
 export const ExternalGradeFilterToggle = ({ grade }) => {
-  const { useFilterSelector, filterDispatch } = useFilters()
+  const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(gradeFilter.selectors.isGradeSelected(grade))
 

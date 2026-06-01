@@ -1,7 +1,14 @@
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
 import { FilterSwitch } from './common/FilterSwitch'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = {
+  activeProgramme: boolean
+  activeCombinedProgramme: boolean
+  combinedIsSelected: string
+}
+type Args = any
+type Precompute = any
 
 const CombinedProgramme = ({ options, onOptionsChange, combinedProgramme }) => {
   // For combined programme, we show radiobuttons due to many possible options
@@ -74,7 +81,11 @@ const SingleProgramme = ({ options, onOptionsChange }) => {
   return <FilterSwitch filterKey="hopsFilter" options={modeOptions} />
 }
 
-const HopsFilterCard = ({ options, onOptionsChange, precomputed: combinedProgramme }: FilterTrayProps) => {
+const HopsFilterCard = ({
+  options,
+  onOptionsChange,
+  precomputed: combinedProgramme,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   if (combinedProgramme)
     return (
       <CombinedProgramme combinedProgramme={combinedProgramme} onOptionsChange={onOptionsChange} options={options} />
@@ -82,7 +93,7 @@ const HopsFilterCard = ({ options, onOptionsChange, precomputed: combinedProgram
   return <SingleProgramme onOptionsChange={onOptionsChange} options={options} />
 }
 
-export const hopsFilter = createFilter({
+export const hopsFilter = createFilter<Options, Args, Precompute>({
   key: 'hops',
 
   title: 'Personal study plan',

@@ -4,13 +4,11 @@ import { configureStore } from '@reduxjs/toolkit/react'
 import { RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'
 import { actionHistoryMiddleware } from './actionHistory'
-import { reducer as filters } from './filters'
 import { reducer as selectedCourse } from './selectedCourse'
 import { reducer as settings } from './settings'
 
 export const store = configureStore({
   reducer: {
-    filters,
     selectedCourse,
     settings,
     [RTKApi.reducerPath]: RTKApi.reducer,

@@ -3,9 +3,12 @@ import Stack from '@mui/material/Stack'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { SemestersData } from '@/hooks/useSemesters'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 const STATUS_OPTIONS = [
   { key: 'enrl-status-present', text: 'Present', value: 1 },
@@ -13,7 +16,7 @@ const STATUS_OPTIONS = [
   { key: 'enrl-status-passive', text: 'Passive', value: 3 },
 ]
 
-const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
+const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const allSemesters = args.allSemesters as SemestersData['semesters']
   const { getTextIn } = useLanguage()
 
@@ -53,7 +56,7 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
   )
 }
 
-export const enrollmentStatusFilter = createFilter({
+export const enrollmentStatusFilter = createFilter<Options, Args, Precompute>({
   key: 'enrollmentStatusFilter',
 
   title: 'Enrollment status',

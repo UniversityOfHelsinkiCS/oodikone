@@ -1,10 +1,13 @@
 import { filterToolTips } from '@/common/InfoToolTips'
 import { DegreeProgrammeType, EnrollmentType } from '@oodikone/shared/types'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const { combinedProgrammeCode, showBachelorAndMaster } = args
   const { activeProgramme, activeCombinedProgramme } = options
 
@@ -53,7 +56,7 @@ const StudyRightStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
   )
 }
 
-export const studyRightStatusFilter = createFilter({
+export const studyRightStatusFilter = createFilter<Options, Args, Precompute>({
   key: 'studyRightStatusFilter',
 
   title: 'Study right status',

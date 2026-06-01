@@ -1,11 +1,14 @@
 import { filterToolTips } from '@/common/InfoToolTips'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 const DEFAULT_STATE = 0
 
-const HetuFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
+const HetuFilterCard = ({ onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const modeOptions = [
     { key: 'All', text: 'All', value: 0 },
     { key: 'Has hetu', text: 'Has hetu', value: 1 },
@@ -28,7 +31,7 @@ const HetuFilterCard = ({ onOptionsChange }: FilterTrayProps) => {
  * 1 - Has hetu
  * 2 - No hetu
  */
-export const hetuFilter = createFilter({
+export const hetuFilter = createFilter<Options, Args, Precompute>({
   key: 'hetuFilter',
   title: 'Personal identity code',
 

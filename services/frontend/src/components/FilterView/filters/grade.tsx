@@ -5,14 +5,17 @@ import Typography from '@mui/material/Typography'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { FilterTrayProps } from '../FilterTray'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 /**
  * Grade filter.
  * Only applicable to a single course.
  */
-const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps) => {
+const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps<Options, Args, Precompute>) => {
   const { grades } = precomputed
   const { selected } = options
   const name = 'gradeFilter'
@@ -55,7 +58,7 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
   )
 }
 
-export const gradeFilter = createFilter({
+export const gradeFilter = createFilter<Options, Args, Precompute>({
   key: 'gradeFilter',
 
   title: 'Grade',

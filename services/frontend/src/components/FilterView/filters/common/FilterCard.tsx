@@ -8,27 +8,22 @@ import { useEffect, useState } from 'react'
 
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ClearIcon, KeyboardArrowRightIcon } from '@/theme'
-import type { Filter } from '../createFilter'
+import type { Filter, FilterOptions, FilterTrayProps } from '../createFilter'
 
-const ConditionalInfoBox = ({ info }) => {
-  return info ? <InfoBox content={info} mini /> : null
-}
-
-export const FilterCard = ({
-  active,
+export const FilterCard = <Options extends FilterOptions, Args, Precompute>({
   filter,
-  children,
+  props,
   onClear,
 }: {
-  active: boolean
-  filter: Filter
-  children: React.ReactNode
+  filter: Filter<Options, Args, Precompute>
+  props: FilterTrayProps<Options, Args, Precompute>
   onClear: () => void
 }) => {
-  const [opened, setOpened] = useState<boolean>(active)
-  useEffect(() => setOpened(active), [active])
+  const { render, isActive, info, key, title } = filter
 
-  const { info, key, title } = filter
+  const active = isActive(props.options, undefined)
+  const [opened, setOpened] = useState<boolean>(active)
+  useEffect(() => setOpened(opened || active), [active])
 
   const handleOnClick = () => setOpened(state => !state)
 
@@ -70,11 +65,11 @@ export const FilterCard = ({
             }}
           />
         ) : null}
-        <ConditionalInfoBox info={info} />
+        {!!info && <InfoBox content={info} mini />}
       </Box>
       <Collapse in={opened} sx={{ transition: '300ms' }}>
         <Paper sx={{ p: 1.5 }} variant="outlined">
-          {children}
+          {render(props)}
         </Paper>
       </Collapse>
     </Stack>

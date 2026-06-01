@@ -1,6 +1,9 @@
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = any
+type Args = any
+type Precompute = any
 
 const GENDERS = {
   female: { label: 'Female', value: 2 },
@@ -9,7 +12,7 @@ const GENDERS = {
   unknown: { label: 'Unknown', value: 0 },
 }
 
-const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps) => {
+const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProps<Options, Args, Precompute>) => {
   const { selected } = options
 
   const count = (genderCode: number) => students.filter(student => Number(student.gender_code) === genderCode).length
@@ -31,7 +34,7 @@ const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProp
   )
 }
 
-export const genderFilter = createFilter({
+export const genderFilter = createFilter<Options, Args, Precompute>({
   key: 'genderFilter',
 
   title: 'Gender',

@@ -2,11 +2,18 @@ import { useMemo } from 'react'
 
 import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRange } from './common/FilterRange'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: FilterTrayProps) => {
+type Options = { min: number | null; max: number | null }
+type Args = undefined
+type Precompute = { min: number | null; max: number | null }
+
+const AgeFilterCard = ({
+  options,
+  onOptionsChange,
+  precomputed: bounds,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const { min, max } = bounds
 
   const onChange = ([min, max]) => {
@@ -14,7 +21,7 @@ const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: Filter
   }
 
   const value: [number, number] = useMemo(
-    () => [options.min ?? min, options.max ?? max],
+    () => [options.min ?? min ?? 0, options.max ?? max ?? 100],
     [options.min, options.max, min, max]
   )
 
@@ -22,8 +29,8 @@ const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: Filter
 
   return (
     <FilterRange
-      max={max}
-      min={min}
+      max={max ?? 100}
+      min={min ?? 0}
       range={range}
       setRange={setRange}
       text="Valitse ikähaitari, jolle asettuvat opiskelijat näytetään"
@@ -31,7 +38,7 @@ const AgeFilterCard = ({ options, onOptionsChange, precomputed: bounds }: Filter
   )
 }
 
-export const ageFilter = createFilter({
+export const ageFilter = createFilter<Options, Args, Precompute>({
   key: 'ageFilter',
 
   title: 'Age',

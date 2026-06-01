@@ -1,11 +1,14 @@
 import Alert from '@mui/material/Alert'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { StudyTrack } from '@oodikone/shared/types'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const StudyTrackFilterCard = ({ onOptionsChange, options }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const StudyTrackFilterCard = ({ onOptionsChange, options }: FilterTrayProps<Options, Args, Precompute>) => {
   const { selected, studyTracks } = options as { selected: string[]; studyTracks: StudyTrack[] }
   const { getTextIn } = useLanguage()
 
@@ -35,7 +38,7 @@ const StudyTrackFilterCard = ({ onOptionsChange, options }: FilterTrayProps) => 
   )
 }
 
-export const studyTrackFilter = createFilter({
+export const studyTrackFilter = createFilter<Options, Args, Precompute>({
   key: 'studyTrackFilter',
   title: 'Study track',
   defaultOptions: {
@@ -58,7 +61,7 @@ export const studyTrackFilter = createFilter({
     return student.studyRights
       .flatMap(studyRight => studyRight.studyRightElements)
       .filter(element => element.code === args.code && element.studyTrack !== null)
-      .some(element => selected.includes(element.studyTrack?.code))
+      .some(element => selected.includes(element.studyTrack?.code ?? ''))
   },
 
   selectors: {

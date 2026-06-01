@@ -55,7 +55,7 @@ export const PopulationDetails = ({
   filteredStudents,
   filteredCourses,
 }: PopulationDetailsProps) => {
-  const { filterDispatch, useFilterSelector } = useFilters()
+  const { useFilterDispatch: filterDispatch, useFilterSelector } = useFilters()
   const { getTextIn } = useLanguage()
 
   const { programme, combinedProgramme, showBachelorAndMaster } = query
@@ -66,11 +66,11 @@ export const PopulationDetails = ({
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
   const [showModules, setShowModules] = useState(false) // Shows courses if modules not selected
 
-  const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected())
+  const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected(undefined))
   const combinedHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isCombinedSelected(combinedProgramme))
   const bothHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isBothSelected(combinedProgramme))
-  const transferredSelected = useFilterSelector(transferredToProgrammeFilter.selectors.getState())
-  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive())
+  const transferredSelected = useFilterSelector(transferredToProgrammeFilter.selectors.getState(undefined))
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive(undefined))
 
   const { isFetching: authLoading, programmeRights, fullAccessToStudentData } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)

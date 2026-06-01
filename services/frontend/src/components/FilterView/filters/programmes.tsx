@@ -6,29 +6,24 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { FilterTrayProps } from '../FilterTray'
+import { SISStudyRightElement } from '@oodikone/shared/models'
+import { FormattedStudent, Name, Unarray } from '@oodikone/shared/types'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
 dayjsExtend(isSameOrBefore)
 dayjsExtend(isSameOrAfter)
 
-const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
-
-const SelectInputItem = ({ text }) => (
-  <Typography fontWeight={500} px={0.5}>
-    {text}
-  </Typography>
-)
-
-const CourseMenuStack = ({ disabled, text, value, description }) => (
-  <MenuItem disabled={disabled} value={value}>
-    <Stack>
-      <Typography fontWeight={500}>{text}</Typography>
-      <Typography sx={{ color: '#5b5b5b', fontSize: '0.9em' }}>{description}</Typography>
-    </Stack>
-  </MenuItem>
-)
+type Options = { selectedProgrammes: string[]; mode: string }
+type Args = {
+  additionalModes: {
+    key: string
+    label: string
+    predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => boolean
+    description: string
+  }[]
+}
+type Precompute = Record<string, { code: string; name: Name }[]>
 
 const ProgrammeFilterCard = ({
   args,
@@ -36,18 +31,13 @@ const ProgrammeFilterCard = ({
   options,
   precomputed: studentToProgrammeMap,
   students,
-}: FilterTrayProps) => {
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const additionalModes = args?.additionalModes ?? []
 
   const { getTextIn } = useLanguage()
   const { selectedProgrammes } = options
 
-  // TODO: retype
-  const visibleProgrammes: {
-    code
-    name
-    studentCount
-  }[] = []
+  const visibleProgrammes: { code: string; name: Name; studentCount: number }[] = []
   students.forEach(student => {
     studentToProgrammeMap[student.studentNumber].forEach(programme => {
       const prog = visibleProgrammes.find(prog => prog.code === programme.code)
@@ -104,21 +94,26 @@ const ProgrammeFilterCard = ({
         filterKey="programmeFilter"
         label="Select programme"
         multiple
-        onChange={({ target }) => onOptionsChange({ ...options, selectedProgrammes: target.value })}
+        onChange={({ target }) => onOptionsChange({ ...options, selectedProgrammes: target.value as string[] })}
         options={dropdownOptions}
         sx={{ mb: 2 }}
         value={selectedProgrammes}
       />
       <FilterSelect
-        InputItem={value => <SelectInputItem text={modeOptions.find(mode => value === mode.value)!.text} />}
+        InputItem={value => (
+          <Typography fontWeight={500} px={0.5}>
+            {modeOptions.find(mode => value === mode.value)!.text}
+          </Typography>
+        )}
         MenuItem={option => (
-          <CourseMenuStack
-            description={modes.find(mode => option.key === mode.key)?.description}
-            disabled={option.disabled}
-            key={option.key}
-            text={option.text}
-            value={option.value}
-          />
+          <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
+            <Stack>
+              <Typography fontWeight={500}>{option.text}</Typography>
+              <Typography sx={{ color: '#5b5b5b', fontSize: '0.9em' }}>
+                {modes.find(mode => option.key === mode.key)?.description}
+              </Typography>
+            </Stack>
+          </MenuItem>
         )}
         filterKey="programmeFilter-mode"
         label="Select Mode"
@@ -130,12 +125,14 @@ const ProgrammeFilterCard = ({
   )
 }
 
-const getStudentProgrammes = student =>
+const getStudentProgrammes = (student: FormattedStudent) =>
   (student?.studyRights ?? []).flatMap(({ studyRightElements, cancelled }) =>
     studyRightElements.map(element => ({ ...element, cancelled }))
   )
 
-const createStudentToProgrammeMap = (students, studyRightPredicate) => {
+const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
+
+const createStudentToProgrammeMap = (students: FormattedStudent[], studyRightPredicate) => {
   const studentToProgrammeMap = {}
 
   for (const student of students) {
@@ -148,13 +145,16 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
       continue
     }
 
-    studentToProgrammeMap[student.studentNumber] = filteredProgrammes.reduce((acc, { code, name }) => {
-      if (acc.some(programme => programme.code === code)) {
+    studentToProgrammeMap[student.studentNumber] = filteredProgrammes.reduce<{ code: string; name: Name }[]>(
+      (acc, { code, name }) => {
+        if (acc.some(programme => programme.code === code)) {
+          return acc
+        }
+        acc.push({ code, name })
         return acc
-      }
-      acc.push({ code, name })
-      return acc
-    }, [])
+      },
+      []
+    )
   }
 
   return studentToProgrammeMap
@@ -162,7 +162,7 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
 
 const MODE_PREDICATES = {
   any: () => true,
-  active: (_, studyRightElement) =>
+  active: (_, studyRightElement: Unarray<ReturnType<typeof getStudentProgrammes>>) =>
     !studyRightElement.cancelled &&
     dayjs().isSameOrAfter(studyRightElement.startDate, 'day') &&
     (dayjs().isSameOrBefore(studyRightElement.endDate, 'day') || studyRightElement.endDate == null),
@@ -180,10 +180,6 @@ export const programmeFilter = createFilter({
 
   precompute: ({ students, options, args }) => {
     let predicate = (..._: any[]) => true
-
-    if (args?.studyRightPredicate) {
-      predicate = args.studyRightPredicate
-    }
 
     if (options.mode) {
       let modePredicate = MODE_PREDICATES[options.mode]
@@ -213,11 +209,11 @@ export const programmeFilter = createFilter({
   },
 
   selectors: {
-    isProgrammeSelected: ({ selectedProgrammes }, programme) => selectedProgrammes.includes(programme),
+    isProgrammeSelected: ({ selectedProgrammes }, programme: string) => selectedProgrammes.includes(programme),
   },
 
   actions: {
-    toggleProgrammeSelection: (options, programme) => {
+    toggleProgrammeSelection: (options, programme: string) => {
       const index = options.selectedProgrammes.indexOf(programme)
 
       if (index === -1) {

@@ -1,8 +1,11 @@
 import { ADMISSION_TYPES } from '@/common'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterSelect } from './common/FilterSelect'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
+
+type Options = { selected: string }
+type Args = { programme: string }
+type Precompute = Record<string, number>
 
 const findAllStudyRightsForProgramme = (student: FormattedStudent, programme: string) =>
   student.studyRights.filter(studyRight => studyRight.studyRightElements.some(el => el.code === programme))
@@ -20,7 +23,11 @@ export const filter = (programme: string, value: string | null) => (student: For
   )
 }
 
-const AdmissionTypeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps) => {
+const AdmissionTypeFilterCard = ({
+  options,
+  onOptionsChange,
+  precomputed,
+}: FilterTrayProps<Options, Args, Precompute>) => {
   const { selected } = options
 
   const selectOptions = Object.entries(ADMISSION_TYPES)
@@ -50,7 +57,7 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, precomputed }: Filt
   )
 }
 
-export const admissionTypeFilter = createFilter({
+export const admissionTypeFilter = createFilter<Options, Args, Precompute>({
   key: 'admissionTypeFilter',
 
   title: 'Admission type',

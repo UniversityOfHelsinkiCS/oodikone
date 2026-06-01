@@ -1,17 +1,32 @@
 import { ReactNode } from 'react'
-import { setViewFilterOptions } from '@/redux/filters'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { mapValues } from '@oodikone/shared/util'
 
-import type { FilterContext, FilterViewContextState } from '../context'
-import type { FilterTrayProps } from '../FilterTray'
+import type { FilterViewContextState } from '../context'
 
-type Selector<T, R> = (options: FilterContext['options'], args: T) => R
-type Action<P> = (options: FilterContext['options'], payload: P) => FilterContext['options']
+export type FilterOptions<T = any> = Record<string, T>
+type Selector<Options extends FilterOptions, T, R> = (options: Options, args: T) => R
+type Action<Option extends FilterOptions, T> = (options: Option, args: T) => Option
 
-export type Filter = {
-  args?: any
+/**
+ * Per filter context, used with-in FilterView.
+ */
+export type FilterContext<Options extends FilterOptions, Args = undefined, Precompute = undefined> = {
+  precomputed: Precompute
+  options: Options
+  args: Args
+}
 
+export type FilterTrayProps<Options extends FilterOptions, Args = undefined, Precompute = undefined> = FilterContext<
+  Options,
+  Args,
+  Precompute
+> & {
+  students: Student[]
+  onOptionsChange: (options: Options) => void
+}
+
+type FilterSettings<Options extends FilterOptions, Args, Precompute, SelectorT, SelectorR, ActionT> = {
   /**
    * Non-user visible (unique) identifier for the filter.
    */
@@ -33,94 +48,134 @@ export type Filter = {
    * Fallback for `resolveFilterOptions` if values are not stored
    * and initial values are not set.
    */
-  defaultOptions: Record<any, any>
+  defaultOptions: Options
 
   /**
    * Function used to filter the students.
    */
-  filter: (students: Student, ctx: FilterContext) => boolean
+  filter: (student: Student, ctx: FilterContext<Options, Args, Precompute>) => boolean
 
   /**
    * (Optional) Function used to mutate the students.
    */
-  mutate?: (students: Student, ctx: FilterContext) => Student
+  mutate?: (student: Student, ctx: FilterContext<Options, Args, Precompute>) => Student
 
   /**
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (ctx: Omit<FilterContext, 'precomputed'> & { students: Student[] }) => any
+  precompute?: (
+    ctx: Pick<FilterContext<Options, Args, null>, 'options' | 'args'> & { students: Student[] }
+  ) => Precompute
 
   /**
    * Filter tray render component.
    */
-  render: (props: FilterTrayProps) => ReactNode
+  render: (props: FilterTrayProps<Options, Args, Precompute>) => ReactNode
 
-  isActive: Selector<void, boolean>
-}
+  isActive: Selector<Options, SelectorT, SelectorR>
 
-/** TODO: Find acual types */
-type FilterOptions = Filter & {
   /**
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, Selector<any, any>>
+  selectors?: Record<string, Selector<Options, SelectorT, SelectorR>>
 
   /**
    * By default `setOptions` and `reset` are assigned.
    * NOTE: `reset` will set the value to null, this may not be desired!
    */
-  actions?: Record<string, Action<any>>
+  actions?: Record<string, Action<Options, ActionT>>
 }
 
-type FilterFactory = {
-  key: string
-  actions: Record<
-    string,
-    <P>(payload: P) => (getContext: FilterViewContextState['getContextByKey']) => {
-      payload: P
-      type: string
-    }
-  >
-  selectors: Record<
-    string,
-    <T, R = any>(
-      args?: T
-    ) => {
-      (opts: FilterContext['options']): R
-      filter: string
-    }
-  >
-  (args?: any): Filter
-}
+const assignSelectors = <Options extends FilterOptions, T, R>(
+  isActive: Selector<Options, T, R>,
+  selectors: Record<string, Selector<Options, T, R>> | undefined
+): Record<string, Selector<Options, T, R>> =>
+  Object.assign(
+    {
+      selectOptions: (opts: Options) => opts,
+      isActive,
+    },
+    selectors
+  )
+
+const assignActions = <Options extends FilterOptions, T>(
+  defaultOptions: Options,
+  actions: Record<string, Action<Options, T>> | undefined
+): Record<string, Action<Options, T>> =>
+  Object.assign(
+    {
+      setOptions: (_prevOpts: Options, opts: Options) => opts,
+      reset: () => defaultOptions,
+    },
+    actions
+  )
+
+/**
+ * Filter wrapper that allows ANY filter to be assigned.
+ */
+export type GenericFilter<Options extends FilterOptions = any, Args = any, Precompute = any> = Filter<
+  Options,
+  Args,
+  Precompute
+>
+
+export type Filter<
+  Options extends FilterOptions,
+  Args,
+  Precompute,
+  SelectorT = any,
+  SelectorR = any,
+  ActionT = any,
+> = Pick<
+  FilterSettings<Options, Args, Precompute, SelectorT, SelectorR, ActionT>,
+  'key' | 'title' | 'info' | 'defaultOptions' | 'filter' | 'mutate' | 'precompute' | 'render' | 'isActive'
+> & { args?: Args }
 
 /**
  * Unlike the name suggests, this function returns a filter factory.
  */
-export const createFilter = (options: FilterOptions): FilterFactory => {
-  const opt_selectors: NonNullable<FilterOptions['selectors']> = Object.assign(options.selectors ?? {}, {
-    selectOptions: (opts, _) => opts,
-    isActive: options.isActive,
-  })
+export const createFilter = <
+  Options extends FilterOptions,
+  Args,
+  Precompute,
+  SelectorT = any,
+  SelectorR = any,
+  ActionT = any,
+>(
+  options: FilterSettings<Options, Args, Precompute, SelectorT, SelectorR, ActionT>
+): {
+  (args?: Args): Filter<Options, Args, Precompute, SelectorT, SelectorR, ActionT>
+  key: string
+  actions: Record<
+    string,
+    (
+      payload: ActionT
+    ) => (
+      getContext: FilterViewContextState<Options>['getContextByKey'],
+      setFilterOptions: FilterViewContextState<Options>['setFilterOptions']
+    ) => void
+  >
+  selectors: Record<
+    string,
+    (args: SelectorT) => (getContext: FilterViewContextState<Options>['getContextByKey']) => SelectorR
+  >
+} => {
+  const opt_selectors = assignSelectors(options.isActive, options.selectors)
+  const opt_actions = assignActions(options.defaultOptions, options.actions)
 
   /**
    * Selectors are wrapped redux selectors that act on the filter's options.
    */
   const selectors = mapValues(opt_selectors, ([key, selector]) => {
-    const gift = args => {
-      const wrapper = (opts: FilterContext['options']) => selector(opts, args)
-      wrapper.filter = options.key
+    const useSelector = (args: SelectorT) => (getContext: FilterViewContextState<Options>['getContextByKey']) => {
+      const ctx = getContext(options.key)
 
-      return wrapper
+      return selector(ctx.options, args)
     }
 
-    return [key, gift]
-  })
-
-  const opt_actions: NonNullable<FilterOptions['actions']> = Object.assign(options.actions ?? {}, {
-    setOptions: (_, value) => value,
-    reset: (..._) => options.defaultOptions,
+    return [key, useSelector]
   })
 
   /**
@@ -131,17 +186,19 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * the useFilterDispatch hook.
    */
   const actions = mapValues(opt_actions, ([key, action]) => {
-    return [
-      key,
-      payload => (getContext: FilterViewContextState['getContextByKey']) => {
+    const useAction =
+      (payload: ActionT) =>
+      (
+        getContext: FilterViewContextState<Options>['getContextByKey'],
+        setFilterOptions: FilterViewContextState<Options>['setFilterOptions']
+      ) => {
         const ctx = getContext(options.key)
 
-        return setViewFilterOptions({
-          filter: options.key,
-          options: action(structuredClone(ctx.options), payload),
-        })
-      },
-    ]
+        const res = action(structuredClone(ctx.options), payload)
+        setFilterOptions(options.key, res)
+      }
+
+    return [key, useAction]
   })
 
   /**
@@ -191,7 +248,7 @@ export const createFilter = (options: FilterOptions): FilterFactory => {
    * Activity of the filter is also reflected in the user interface.
    */
   return Object.assign(
-    (args?: any): Filter => ({
+    (args?: Args) => ({
       args,
 
       key: options.key,

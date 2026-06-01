@@ -48,6 +48,7 @@ import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
 import { PageTitle } from '../common/PageTitle'
+import { GenericFilter } from '../FilterView/filters/createFilter'
 import { PageLoading } from '../Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
@@ -143,7 +144,7 @@ const StudyTrackNames = () => {
   const { useFilterSelector } = useFilters()
   const { getTextIn } = useLanguage()
 
-  const selectedStudyTracks = useFilterSelector(studyTrackFilter.selectors.selectedStudyTracks())
+  const selectedStudyTracks = useFilterSelector(studyTrackFilter.selectors.selectedStudyTracks(undefined))
   const studyTrackString = selectedStudyTracks.map(elem => `${elem.code} - ${getTextIn(elem.name)}`)
 
   if (selectedStudyTracks.length === 0) return null
@@ -191,7 +192,7 @@ export const PopulationStatistics = () => {
   const enableStudyRightTypeFilter =
     useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
-  const filters = [
+  const filters: GenericFilter[] = [
     !useUserHasRestrictedAccess() ? ageFilter() : null,
     citizenshipFilter(),
     courseFilter({ courses }),

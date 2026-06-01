@@ -1,11 +1,14 @@
 import { useMemo } from 'react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
-import { FilterTrayProps } from '../FilterTray'
 import { FilterRadio } from './common/FilterRadio'
-import { createFilter } from './createFilter'
+import { createFilter, FilterTrayProps } from './createFilter'
 
-const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTrayProps) => {
+type Options = any
+type Args = any
+type Precompute = any
+
+const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const { transferred } = options
 
   const toggle = buttonValue =>
@@ -33,7 +36,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }: FilterTr
   )
 }
 
-export const transferredToProgrammeFilter = createFilter({
+export const transferredToProgrammeFilter = createFilter<Options, Args, Precompute>({
   key: 'transferredToProgrammeFilter',
 
   title: 'Transferred to programme',
@@ -59,7 +62,9 @@ export const transferredToProgrammeFilter = createFilter({
   },
 
   selectors: {
-    getState: ({ transferred }, _value) => transferred,
+    getState: ({ transferred }) => {
+      return transferred
+    },
   },
 
   render: TransferredToProgrammeFilterCard,
