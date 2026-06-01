@@ -109,28 +109,29 @@ export const courseFilter = createFilter({
       .map(({ course_code }) => course_code)
     const courseCodes = courses.map(({ course_code }) => course_code)
     const enrollmentCodes = enrollments.map(({ course_code }) => course_code)
-
     for (const [mainCode, filterType] of Object.entries(options.courseFilters)) {
-      const found = [[mainCode], ...(options.substitutedBy![mainCode] ?? [])].some(group => {
-        const passed = group.every(code => passedCoursesCodes.includes(code))
-        const attainment = group.every(code => courseCodes.includes(code))
-        const enrolled = group.every(code => enrollmentCodes.includes(code))
+      let foundPassed = false
+      let foundAttainment = false
+      let foundEnrollment = false
 
-        switch (filterType) {
-          case FilterType.ALL:
-            return enrolled || attainment
-          case FilterType.PASSED:
-            return passed
-          case FilterType.FAILED:
-            return attainment && !passed
-          case FilterType.ENROLLED_NO_GRADE:
-            return enrolled && !attainment
-          default:
-            return false
-        }
+      void [[mainCode], ...(options.substitutedBy?.[mainCode] ?? [])].forEach(group => {
+        foundPassed = foundPassed ? true : group.every(code => passedCoursesCodes.includes(code))
+        foundAttainment = foundAttainment ? true : group.every(code => courseCodes.includes(code))
+        foundEnrollment = foundEnrollment ? true : group.every(code => enrollmentCodes.includes(code))
       })
 
-      if (!found) return false
+      switch (filterType) {
+        case FilterType.ALL:
+          return foundEnrollment || foundAttainment
+        case FilterType.PASSED:
+          return foundPassed
+        case FilterType.FAILED:
+          return foundAttainment && !foundPassed
+        case FilterType.ENROLLED_NO_GRADE:
+          return foundEnrollment && !foundAttainment
+        default:
+          return false
+      }
     }
 
     return true
