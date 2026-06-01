@@ -126,7 +126,22 @@ Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suori
 Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joilla on oikeus suorittaa sekä kandidaatin että maisterin tutkinto (**Bachelor + master study right**) ja niihin, joilla on oikeus suorittaa vain maisterin tutkinto (**Master study right**). *Bachelor + master study right* -tilastoissa aloitusvuosi on opiskelijan aloitusvuosi kandiohjelmassa, ja mukana ovat kaikki suoritukset, jotka opiskelija on suorittanut aloitettuaan kandiohjelmassa.
 
 Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
-`,
+  `,
+  percentiles: `
+Näyttää valittuna akateemisena vuonna aloittaneiden opiskelijoiden kumulatiiviset opintopistokertymät persentiileittäin.
+
+Kuvaajiin piirtyy viivoja kuvaamaan kyseisen ohjelman tavoitevalmistumisaikoja ja opintopistetavoitteita:
+
+- **Kandiohjelmat**: yleensä 3 vuotta ja 180 op
+- **Maisteriohjelmat**: yleensä 2 vuotta ja 120 op
+
+Maisteriohjelmia tarkastellessa näytetään lisäksi kandi+maisteri -oikeudella opiskelevat (yleensä 3v + 2v / 180 op + 120 op). Tällöin näytetään opiskelijat, jotka **ovat aloittaneet kandiohjelmassa valittuna lukukautena, ja ovat jo siirtyneet maisteriohjelmaan**.
+
+**Esim. 75:s persentiili**:
+- 25% otannan opiskelijoista on suorittanut enemmän opintopisteitä
+- 75% on suorittanut vähemmän opintopisteitä
+- Huomaa, että kuvaajassa näkyvät arvot interpoloidaan lineaarisesti opintopistekertymistä, jos opiskelijoiden lukumäärä/opintopistekertymä ei mene muuten tasan kyseisiin väleihin.
+  `,
   notCompleted: `
 Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
 `,

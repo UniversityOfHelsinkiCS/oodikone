@@ -296,10 +296,10 @@ export const StudyTracksAndClassStatisticsTab = ({
       </Section>
 
       <Section
+        infoBoxContent={studyProgrammeToolTips.percentiles}
         isError={hasErrors}
         isLoading={isFetching}
         title="Monthly credit accumulation of the students by starting year"
-        // infoBoxContent={} // TODO
       >
         {!!studyTrackStats && (
           <StudentProgressPercentiles
