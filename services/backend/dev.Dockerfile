@@ -5,12 +5,6 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=development
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-# https://github.com/hadolint/hadolint/wiki/DL4006
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Safe-chain install
-RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-
 WORKDIR /opt/app-root/backend
 COPY --chown=1001:1001 . .
 

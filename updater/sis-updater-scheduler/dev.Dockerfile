@@ -6,13 +6,8 @@ ENV TZ="Europe/Helsinki"
 
 ENV NODE_ENV=development
 
-# https://github.com/hadolint/hadolint/wiki/DL4006
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Safe-chain install
-RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-
-COPY --chown=1001:1001 ./package* ./
+COPY --chown=1001:1001 ./.npmrc .
+COPY --chown=1001:1001 ./package* .
 
 USER 1001
 RUN npm ci

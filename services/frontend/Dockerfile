@@ -28,18 +28,13 @@ ENV REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED=$LANGUAGE_CENTER_VIEW_ENABLED
 ARG SIS_URL='https://sisu.helsinki.fi'
 ENV REACT_APP_SIS_URL=$SIS_URL
 
-# https://github.com/hadolint/hadolint/wiki/DL4006
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Safe-chain install
-RUN curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-
 RUN npm install -g serve@^14
 
 WORKDIR /opt/app-root/shared
 COPY ./shared .
 
 WORKDIR /opt/app-root/frontend
+COPY ./frontend/.npmrc .
 COPY ./frontend/package*.json .
 RUN npm ci --include=dev
 COPY ./frontend .
