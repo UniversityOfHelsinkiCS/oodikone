@@ -1,7 +1,9 @@
+import { getOpenUniCourseCode } from '../../src/util'
 import { CourseModel, OrganizationModel } from '../models'
 
 export const getAllProviders = async () => {
   const providers = OrganizationModel.findAll({
+    raw: true,
     attributes: ['code', 'name'],
   })
   return providers
@@ -9,7 +11,8 @@ export const getAllProviders = async () => {
 
 export const getCourseCodesOfProvider = async (provider: string) => {
   const coursesByProvider = await CourseModel.findAll({
-    attributes: ['id', 'code', 'substitutions'],
+    raw: true,
+    attributes: ['id', 'code', 'substitution_groups'],
     include: {
       model: OrganizationModel,
       required: true,
@@ -22,12 +25,13 @@ export const getCourseCodesOfProvider = async (provider: string) => {
     },
   })
 
-  const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
-    if (!substitutions?.length) {
+  const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitution_groups }) => {
+    if (!substitution_groups?.length) {
       return [code]
     }
-    const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
-    return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
+    // This is ok to flatten, because we only want all credits completed by students, not what courses are
+    // completed and how => we don't care about substitutions
+    return [code].concat(substitution_groups.filter(group => group.some(code => getOpenUniCourseCode(code))).flat())
   })
 
   return coursesWithOpenUniSubstitutions.flat()
