@@ -65,9 +65,9 @@ export const PercentileGraph = (props: PercentileProps) => {
           optionToContent(opt) {
             const filteredData = opt.series.filter(s => Boolean(s.data))
 
-            let table = `<table><thead><tr><td style="padding: 0 2em 0 0">Date (YYYY-MM)</td>`
+            let table = `<table><thead><tr><th style="padding: 0 2em 0 0">Date (YYYY-MM)</th>`
             for (const row of filteredData) {
-              table += `<td style="padding: 0 2em 0 0">${row.name}</td>`
+              table += `<th style="padding: 0 2em 0 0">${row.name}</th>`
             }
             table += `</tr></thead><tbody>`
 
