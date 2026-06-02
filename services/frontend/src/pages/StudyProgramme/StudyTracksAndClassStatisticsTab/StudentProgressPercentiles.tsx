@@ -24,6 +24,7 @@ const hasData = (data: Record<string, [string, number][]> | undefined): data is 
 }
 
 type Props = {
+  classSizes: StudyTrackStats['classSizes']
   data: StudyTrackStats['percentiles']
   doCombo: boolean
   isCombinedProgramme: boolean
@@ -32,6 +33,7 @@ type Props = {
 }
 
 export const StudentProgressPercentiles = ({
+  classSizes,
   data,
   studyTrack,
   graduationTimeGoals,
@@ -69,6 +71,7 @@ export const StudentProgressPercentiles = ({
               {hasData(data.comboByTrack?.[studyTrack][chosenYear]) && (
                 <Section>
                   <PercentileGraph
+                    classSize={classSizes.comboByTrack?.[studyTrack]?.[chosenYear] ?? 0}
                     data={data.comboByTrack[studyTrack][chosenYear]}
                     goalLines={goalLinesCombo}
                     title={`Bachelor + master study right (${studyTrack}), class of ${yearRange}`}
@@ -81,7 +84,8 @@ export const StudentProgressPercentiles = ({
               {hasData(data.combo?.[chosenYear]) && (
                 <Section>
                   <PercentileGraph
-                    data={data.combo?.[chosenYear]}
+                    classSize={classSizes.combo?.[chosenYear] ?? 0}
+                    data={data.combo[chosenYear]}
                     goalLines={goalLinesCombo}
                     title={`Bachelor + master study right, class of ${yearRange}`}
                   />
@@ -97,6 +101,7 @@ export const StudentProgressPercentiles = ({
           {hasData(data.byTrack?.[studyTrack][chosenYear]) ? (
             <Section>
               <PercentileGraph
+                classSize={classSizes.byTrack?.[studyTrack]?.[chosenYear] ?? 0}
                 data={data.byTrack[studyTrack][chosenYear]}
                 goalLines={goalLinesBasic}
                 title={`${doCombo ? 'Master' : 'Bachelor'} study right (${studyTrack}), class of ${yearRange}`}
@@ -111,6 +116,7 @@ export const StudentProgressPercentiles = ({
           {hasData(data.main[chosenYear]) ? (
             <Section>
               <PercentileGraph
+                classSize={classSizes.main?.[chosenYear] ?? 0}
                 data={data.main[chosenYear]}
                 goalLines={isCombinedProgramme ? goalLinesCombo : goalLinesBasic}
                 title={`${doCombo ? 'Master' : 'Bachelor'} study right, class of ${yearRange}`}

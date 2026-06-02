@@ -303,6 +303,7 @@ export const StudyTracksAndClassStatisticsTab = ({
       >
         {!!studyTrackStats && (
           <StudentProgressPercentiles
+            classSizes={studyTrackStats.classSizes}
             data={studyTrackStats.percentiles}
             doCombo={studyTrackStats.doCombo}
             graduationTimeGoals={studyTrackStats?.graduationTimes?.goals}

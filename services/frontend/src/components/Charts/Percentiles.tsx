@@ -2,6 +2,7 @@ import ReactECharts from 'echarts-for-react'
 
 type PercentileProps = {
   data: Record<string, [string, number][]>
+  classSize: number
   title?: string
   goalLines?: {
     dates?: (Date | string)[]
@@ -10,8 +11,6 @@ type PercentileProps = {
 }
 
 export const PercentileGraph = (props: PercentileProps) => {
-  const classSize = props.data[Object.keys(props.data).at(0) ?? ''].length
-
   const series = Object.entries(props.data).map(([percentile, values]) => ({
     name: `${percentile}th`,
     type: 'line',
@@ -88,7 +87,7 @@ export const PercentileGraph = (props: PercentileProps) => {
     },
     title: {
       text: props.title,
-      subtext: `Class size: ${classSize}`,
+      subtext: `Class size: ${props.classSize}`,
       subtextStyle: {
         fontSize: 14,
       },
