@@ -554,6 +554,33 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     combinedProgramme
   )
 
+  const getClassSize = (accumulatedCredits: typeof stats.monthlyCreditsByStartingYear) =>
+    Object.fromEntries(
+      Object.entries(accumulatedCredits).map(([year, values]) => [year, Object.values(values).at(0)?.length ?? 0])
+    )
+
+  const classSizes: StudyTrackStats['classSizes'] = {
+    main: getClassSize(stats.monthlyCreditsByStartingYear),
+    combo: doCombo ? getClassSize(stats.monthlyCreditsByStartingYearCombo) : undefined,
+    byTrack: hasStudyTracks
+      ? Object.fromEntries(
+          Object.keys(stats.monthlyCreditsByStartingYearByTrack).map(track => [
+            track,
+            getClassSize(stats.monthlyCreditsByStartingYearByTrack[track]),
+          ])
+        )
+      : undefined,
+    comboByTrack:
+      doCombo && hasStudyTracks
+        ? Object.fromEntries(
+            Object.keys(stats.monthlyCreditsByStartingYearComboByTrack).map(track => [
+              track,
+              getClassSize(stats.monthlyCreditsByStartingYearComboByTrack[track]),
+            ])
+          )
+        : undefined,
+  }
+
   const percentiles: StudyTrackStats['percentiles'] = {
     main: computePercentiles(stats.monthlyCreditsByStartingYear),
     byTrack: hasStudyTracks
@@ -589,6 +616,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     creditCountsCombo: stats.creditCountsCombo,
     creditCountsComboByTrack: stats.creditCountsComboByTrack,
     percentiles,
+    classSizes,
     doCombo,
     graduatedCount: stats.graduatedCount,
     graduatedCountByTrack: stats.graduatedCountByTrack,

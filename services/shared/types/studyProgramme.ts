@@ -80,7 +80,15 @@ type StudyTrackProgressPercentiles = {
   comboByTrack: undefined | Record<string, Record<string, Record<string, [string, number][]>>>
 }
 
+type ClassSizes = {
+  main: Record<string, number>
+  byTrack: undefined | Record<string, Record<string, number>>
+  combo: undefined | Record<string, number>
+  comboByTrack: undefined | Record<string, Record<string, number>>
+}
+
 export type StudyTrackStats = {
+  classSizes: ClassSizes
   creditCounts: Record<string, number[]>
   creditCountsByTrack: Record<string, Record<string, number[]>>
   creditCountsCombo: Record<string, number[]>
