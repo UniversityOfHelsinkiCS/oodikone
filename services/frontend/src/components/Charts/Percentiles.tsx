@@ -58,6 +58,34 @@ export const PercentileGraph = (props: PercentileProps) => {
       type: 'time',
       boundaryGap: false,
     },
+    toolbox: {
+      feature: {
+        dataView: {
+          readOnly: true,
+          optionToContent(opt) {
+            const filteredData = opt.series.filter(s => Boolean(s.data))
+
+            let table = `<table><thead><tr><td style="padding: 0 2em 0 0">Date (YYYY-MM)</td>`
+            for (const row of filteredData) {
+              table += `<td style="padding: 0 2em 0 0">${row.name}</td>`
+            }
+            table += `</tr></thead><tbody>`
+
+            for (let i = 0; i < filteredData[0].data.length; i++) {
+              table += `<tr><td>${filteredData[0].data[i][0]}</td>`
+              for (const row of filteredData) {
+                table += `<td>${row.data[i][1]}`
+              }
+              table += `</tr>`
+            }
+
+            table += `</tbody></table>`
+
+            return table
+          },
+        },
+      },
+    },
     title: {
       text: props.title,
       subtext: `Class size: ${classSize}`,
