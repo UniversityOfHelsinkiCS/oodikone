@@ -34,7 +34,7 @@ const api = axios.create({ baseURL: apiBasePath, headers: getHeaders(), timeout:
 export const callApi = async (
   url,
   method = 'get',
-  data,
+  data?,
   params = {},
   timeout = 0,
   progressCallback?: (progress: number) => void
