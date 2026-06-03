@@ -1,8 +1,11 @@
 export const filterToolTips = {
   citizenship:
     'Rajaa opiskelijoita kansalaisuuden perusteella. Tulokseen sisältyvät opiskelijat, joilla on valitun valtion kansalaisuus, riippumatta siitä, onko heillä myös muita kansalaisuuksia.',
-  courseCredits:
-    'Rajaa opiskelijoiden kurssisuorituksia ja ilmoittautimisia määritetyn ajanjakson mukaan. Huom! ilmoittautumiset voivat tapahtua huomattavasti kurssisuorituksia aikaisemmin.',
+  courseCredits: `Rajaa opiskelijoiden **kurssisuorituksia ja ilmoittautumisia** määritetyn ajanjakson mukaan.  
+Huom! ilmoittautumiset voivat tapahtua huomattavasti kurssisuorituksia aikaisemmin.
+
+**Suodattaa opiskelijoiden kurssisuorituksia ja ilmoittautumisia, ei vaikuta opiskelijoiden lukumäärään.**
+`,
   enrollmentStatus: `
 Suodata opiskelijoita sen mukaan, ovatko he ilmoittautuneet **läsnäolevaksi** (present), **poissaolevaksi** (absent) vai **laiminlyöneet ilmoittautumisen** (passive) valituille lukukausille. Jos lukukausia on valittuna enemmän kuin yksi, opiskelijan ilmoittautumisen tulee täsmätä jokaisella valitulla lukukaudella.
 
