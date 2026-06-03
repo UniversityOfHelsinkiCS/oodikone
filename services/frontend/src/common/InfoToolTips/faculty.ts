@@ -76,15 +76,15 @@ Sort bars in the yearly charts by programme code or other column values. Sorting
 `,
 }
 
-facultyToolTips.studentsStatsOfTheFaculty = studyProgrammeToolTips.studyTrackOverview.replace(
+facultyToolTips.studentsStatsOfTheFaculty = studyProgrammeToolTips.common.studyTrackOverview.replace(
   'Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.',
   ''
 )
 facultyToolTips.studentsOfTheFaculty =
   'Taulukon luvut on laskettu **yhdistämällä** tiedekunnan koulutusohjelmien luvut. Näin ollen tämän näkymän luvut täsmäävät *Degree programme* -näkymän lukuihin. Kategorioiden merkitykset ovat seuraavat:\n'
-    .concat(studyProgrammeToolTips.studentsOfTheStudyProgramme)
+    .concat(studyProgrammeToolTips.common.studentsOfTheStudyProgramme)
     .replace('Transferred away', 'Transferred out of programme')
     .replace('Transferred to', 'Transferred into programme')
-facultyToolTips.graduatedToggle = studyProgrammeToolTips.graduatedToggle
-facultyToolTips.studyRightToggle = studyProgrammeToolTips.studyRightToggle
-facultyToolTips.yearToggle = studyProgrammeToolTips.yearToggle
+facultyToolTips.graduatedToggle = studyProgrammeToolTips.common.graduatedToggle
+facultyToolTips.studyRightToggle = studyProgrammeToolTips.common.studyRightToggle
+facultyToolTips.yearToggle = studyProgrammeToolTips.common.yearToggle

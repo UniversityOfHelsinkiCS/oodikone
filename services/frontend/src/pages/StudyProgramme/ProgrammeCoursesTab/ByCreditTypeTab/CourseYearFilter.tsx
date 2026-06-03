@@ -61,7 +61,7 @@ export const CourseYearFilter = ({
         <Toggle
           cypress="year-toggle"
           firstLabel="Calendar year"
-          infoBoxContent={studyProgrammeToolTips.yearToggle}
+          infoBoxContent={studyProgrammeToolTips.common.yearToggle}
           secondLabel="Academic year"
           setValue={setAcademicYear}
           value={academicYear}

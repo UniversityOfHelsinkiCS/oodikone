@@ -216,7 +216,7 @@ export const StudyTracksAndClassStatisticsTab = ({
               cypress="study-right-toggle"
               disabled={hasErrors || isFetching}
               firstLabel="All study rights"
-              infoBoxContent={studyProgrammeToolTips.studyRightToggle}
+              infoBoxContent={studyProgrammeToolTips.common.studyRightToggle}
               secondLabel="Special study rights excluded"
               setValue={setSpecialGroupsExcluded}
               value={specialGroupsExcluded}
@@ -230,8 +230,8 @@ export const StudyTracksAndClassStatisticsTab = ({
         exportOnClick={() => exportStudentTable(studyTrackStats, studyProgramme, studyTrack, getTextIn)}
         infoBoxContent={
           combinedProgramme
-            ? studyProgrammeToolTips.studyTrackOverviewCombinedProgramme
-            : studyProgrammeToolTips.studyTrackOverview
+            ? studyProgrammeToolTips.common.studyTrackOverviewCombinedProgramme
+            : studyProgrammeToolTips.common.studyTrackOverview
         }
         isError={hasErrors}
         isLoading={isFetching}
@@ -280,7 +280,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
       <Section
         cypress="progress-of-students"
-        infoBoxContent={studyProgrammeToolTips.studyTrackProgress}
+        infoBoxContent={studyProgrammeToolTips.studyTracksAndClassStatisticsTab.progressOfStudents}
         isError={hasErrors}
         isLoading={isFetching}
         title="Progress of students of the degree programme by starting year"
@@ -296,7 +296,7 @@ export const StudyTracksAndClassStatisticsTab = ({
       </Section>
 
       <Section
-        infoBoxContent={studyProgrammeToolTips.percentiles}
+        infoBoxContent={studyProgrammeToolTips.studyTracksAndClassStatisticsTab.percentiles}
         isError={hasErrors}
         isLoading={isFetching}
         title="Monthly credit accumulation of the students by starting year"
@@ -318,8 +318,8 @@ export const StudyTracksAndClassStatisticsTab = ({
           cypress="average-graduation-times"
           infoBoxContent={
             studyProgramme.includes('MH')
-              ? studyProgrammeToolTips.averageGraduationTimesStudyTracksMaster
-              : studyProgrammeToolTips.averageGraduationTimesStudyTracks
+              ? studyProgrammeToolTips.studyTracksAndClassStatisticsTab.averageGraduationTimesStudyTracksMaster
+              : studyProgrammeToolTips.studyTracksAndClassStatisticsTab.averageGraduationTimesStudyTracks
           }
           isError={hasErrors}
           isLoading={isFetching}

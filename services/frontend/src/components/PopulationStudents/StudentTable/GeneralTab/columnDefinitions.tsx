@@ -7,6 +7,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
+import { populationStudentsToolTips } from '@/common/InfoToolTips/populationStudents'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { creditDateFilter } from '@/components/FilterView/filters'
@@ -85,7 +86,7 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header="Associated programme"
-            tooltipText="Programme associated with the attainment or enrollment. View **programme distribution** above for more details."
+            tooltipText={populationStudentsToolTips.generalTab.associatedProgramme}
           />
         ),
         cell: cell => {
@@ -103,7 +104,7 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header="Primary degree programme"
-            tooltipText="Programme associated with the most recently acquired active study right. Columns showing degree programme specific data (e.g. Started in programme or Credits in HOPS) refer to the programme displayed here."
+            tooltipText={populationStudentsToolTips.generalTab.primaryProgramme}
           />
         ),
         cell: cell => {
@@ -118,10 +119,7 @@ export const useGetColumnDefinitions = ({
       }),
       columnHelper.accessor('programmeStatus', {
         header: _ => (
-          <TableHeaderWithTooltip
-            header="Status"
-            tooltipText="Shows the status of the studyright associated with the corresponding programme. Status is active only if an active semester enrollment for the ongoing semester exists."
-          />
+          <TableHeaderWithTooltip header="Status" tooltipText={populationStudentsToolTips.generalTab.programmeStatus} />
         ),
       }),
       columnHelper.accessor('email', { header: 'email' }),
@@ -171,11 +169,7 @@ export const useGetColumnDefinitions = ({
         header: () => (
           <TableHeaderWithTooltip
             header={`Prior to ${isMastersProgramme ? 'master' : 'bachelor'}`}
-            tooltipText={`Credits and courses that
-              1. were attained before starting in the current programme
-              2. were either completed or transferred
-              3. are included in the primary study plan for the programme
-              `}
+            tooltipText={populationStudentsToolTips.generalTab.beforeStarting}
           />
         ),
         columns: [
@@ -192,14 +186,7 @@ export const useGetColumnDefinitions = ({
       columnHelper.group({
         id: 'startDates',
         header: () => (
-          <TableHeaderWithTooltip
-            header="Start date"
-            tooltipText={`**University**: First degree-leading study right granted in the University  
-             **Study right\\***: Study right associated with current programme  
-             **Programme\\***: Start date in the current programme
-
-             \\* if applicable`}
-          />
+          <TableHeaderWithTooltip header="Start date" tooltipText={populationStudentsToolTips.generalTab.startDates} />
         ),
         columns: [
           columnHelper.accessor('startYearAtUniversity', { header: 'University' }),
@@ -222,12 +209,7 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header="Study time in months"
-            tooltipText={`Time passed since starting in the programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
-
-            **Example:**  
-            from 31st of January to 1st of March = 3 months  
-            from 1st of January to 30th of March = 3 months
-            `}
+            tooltipText={populationStudentsToolTips.generalTab.studyTimeMonths}
           />
         ),
       }),
@@ -272,7 +254,7 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header={includePrimaryProgramme ? 'Degree programmes' : 'Other programmes'}
-            tooltipText="If a student has more than one programme, hover your mouse on the cell to view the rest. They are also displayed in the exported Excel file."
+            tooltipText={populationStudentsToolTips.generalTab.programmes}
           />
         ),
         cell: cell => {
@@ -327,17 +309,12 @@ export const useGetColumnDefinitions = ({
         header: _ => (
           <TableHeaderWithTooltip
             header="Latest attainment date"
-            tooltipText="Date of the most recent course completion that is included in the HOPS"
+            tooltipText={populationStudentsToolTips.generalTab.mostRecentAttainment}
           />
         ),
       }),
       columnHelper.accessor('tvex', {
-        header: _ => (
-          <TableHeaderWithTooltip
-            header="TVEX"
-            tooltipText="Student is enrolled to a bilingual programme (kaksikielinen tutkinto, tvåspråkig examen)"
-          />
-        ),
+        header: _ => <TableHeaderWithTooltip header="TVEX" tooltipText={populationStudentsToolTips.generalTab.tvex} />,
         cell: cell => {
           const isTVEX = !!cell.getValue()
           if (!isTVEX) return null

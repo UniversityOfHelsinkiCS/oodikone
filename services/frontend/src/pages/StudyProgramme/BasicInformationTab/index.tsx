@@ -104,7 +104,7 @@ export const BasicInformationTab = ({
             cypress="year-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="Calendar year"
-            infoBoxContent={studyProgrammeToolTips.yearToggle}
+            infoBoxContent={studyProgrammeToolTips.common.yearToggle}
             secondLabel="Academic year"
             setValue={setAcademicYear}
             value={academicYear}
@@ -113,7 +113,7 @@ export const BasicInformationTab = ({
             cypress="study-right-toggle"
             disabled={isFetchingOrLoading || hasErrors}
             firstLabel="All study rights"
-            infoBoxContent={studyProgrammeToolTips.studyRightToggle}
+            infoBoxContent={studyProgrammeToolTips.common.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroupsExcluded}
             value={specialGroupsExcluded}
@@ -123,7 +123,7 @@ export const BasicInformationTab = ({
 
       <Section
         cypress="students-of-the-study-programme"
-        infoBoxContent={studyProgrammeToolTips.studentsOfTheStudyProgramme}
+        infoBoxContent={studyProgrammeToolTips.common.studentsOfTheStudyProgramme}
         isError={basicsIsError}
         isLoading={basicsIsLoading}
         title="Students of the degree programme"
@@ -152,7 +152,7 @@ export const BasicInformationTab = ({
 
       <Section
         cypress="credits-produced-by-the-study-programme"
-        infoBoxContent={studyProgrammeToolTips.creditsProducedByTheStudyProgramme}
+        infoBoxContent={studyProgrammeToolTips.basicInformationTab.creditsProducedByTheStudyProgramme}
         isError={creditsIsError}
         isLoading={creditsIsLoading}
         title="Credits produced by the degree programme"
@@ -192,7 +192,7 @@ export const BasicInformationTab = ({
 
       <Section
         cypress="graduated-and-thesis-writers-of-the-programme"
-        infoBoxContent={studyProgrammeToolTips.graduatedAndThesisWritersOfTheProgramme}
+        infoBoxContent={studyProgrammeToolTips.basicInformationTab.graduatedAndThesisWritersOfTheProgramme}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
         title={getGraduatedText(studyProgramme)}
@@ -215,7 +215,7 @@ export const BasicInformationTab = ({
 
       <Section
         cypress="average-graduation-times"
-        infoBoxContent={studyProgrammeToolTips.averageGraduationTimes}
+        infoBoxContent={studyProgrammeToolTips.common.averageGraduationTimes}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
         title="Average graduation times by graduation year"
@@ -289,7 +289,7 @@ export const BasicInformationTab = ({
 
       <Section
         cypress="programmes-before-or-after"
-        infoBoxContent={studyProgrammeToolTips.programmesBeforeOrAfter}
+        infoBoxContent={studyProgrammeToolTips.basicInformationTab.programmesBeforeOrAfter}
         isError={graduationsIsError}
         isLoading={graduationsIsLoading}
         title={

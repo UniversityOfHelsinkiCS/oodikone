@@ -80,9 +80,9 @@ export const DegreeProgrammeSelector = ({
     : []
 
   const bachelorAndMasterInfoTooltip = `If you choose a Bachelor's programme, toggling 'Show
-    Bachelor + Master' on will also show information about the students' master's studies. If you
-    choose a Master's programme, you can see information about the students' bachelor's studies.
-    #### This feature is experimental and might still change`
+Bachelor + Master' on will also show information about the students' master's studies. If you
+choose a Master's programme, you can see information about the students' bachelor's studies.
+#### This feature is experimental and might still change`
 
   if (Object.values(degreeProgrammes).length === 0 && !isLoading) {
     return (

@@ -80,7 +80,7 @@ export const ByCreditTypeTab = ({
   return (
     <Section
       cypress="by-credit-type"
-      infoBoxContent={studyProgrammeToolTips.programmeCoursesByCreditType}
+      infoBoxContent={studyProgrammeToolTips.programmeCoursesTab.byCreditType}
       isError={isError}
       isLoading={isLoading || !fromYear || !toYear || !years}
       title="Programme courses by credit type"
@@ -100,7 +100,7 @@ export const ByCreditTypeTab = ({
             <Toggle
               cypress="show-credits-students-toggle"
               firstLabel="Show credits"
-              infoBoxContent={studyProgrammeToolTips.programmeCoursesStudentSwitch}
+              infoBoxContent={studyProgrammeToolTips.programmeCoursesTab.studentSwitch}
               secondLabel="Show students"
               setValue={setShowStudents}
               value={showStudents}

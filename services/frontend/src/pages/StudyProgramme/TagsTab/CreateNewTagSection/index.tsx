@@ -57,7 +57,11 @@ export const CreateNewTagSection = ({ studyTrack, tags }: { studyTrack: string; 
   }, [isSuccess])
 
   return (
-    <Section cypress="create-new-tag" infoBoxContent={studyProgrammeToolTips.tags} title="Create new tag">
+    <Section
+      cypress="create-new-tag"
+      infoBoxContent={studyProgrammeToolTips.tagsTab.createNewTag}
+      title="Create new tag"
+    >
       <Stack direction="column">
         <Stack alignItems="center" direction="row" gap={1}>
           <TextField

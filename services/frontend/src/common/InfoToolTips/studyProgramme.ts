@@ -1,17 +1,18 @@
-export const studyProgrammeToolTips: Record<string, string> = {
-  yearToggle: `
+export const studyProgrammeToolTips = {
+  common: {
+    yearToggle: `
 **Calendar year**: Näyttää tilastot kalenterivuosille jaoteltuna (esim. 1.1.–31.12.2024)  
 **Academic year**: Näyttää tilastot lukuvuosille jaoteltuna (esim. 1.8.2023–31.7.2024)
 `,
-  studyRightToggle: `
+    studyRightToggle: `
 **All study rights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.  
 **Special study rights excluded**: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
 `,
-  graduatedToggle: `
+    graduatedToggle: `
 **Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.  
 **Graduated excluded**: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
 `,
-  studentsOfTheStudyProgramme: `
+    studentsOfTheStudyProgramme: `
 **Started studying**: Sisältää opiskelijat, jotka ovat kyseisenä vuonna ilmoittautuneet ensimmäistä kertaa läsnäolevaksi koulutusohjelmassa. Opiskelija on voinut myös myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
 
 **Accepted**: Sisältää opiskelijat, joiden opiskeluoikeus koulutusohjelmassa on alkanut kyseisenä vuonna. Opiskelija on saattanut ilmoittautua poissaolevaksi tai jättää lukuvuosi-ilmoittautumisen kokonaan tekemättä.
@@ -22,7 +23,40 @@ export const studyProgrammeToolTips: Record<string, string> = {
 
 **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opiskelijat (opiskeluoikeudet). Ohjelmaan siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin opiskelijat siirtyivät vanhoista koulutusohjelmista uusiin ohjelmiin.
 `,
-  creditsProducedByTheStudyProgramme: `
+    averageGraduationTimes: `
+Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
+
+Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen kahden lukukauden sisällä tavoiteajasta valmistuneita ja punainen yli 2 lukukautta tavoiteajan ylittäneitä.
+
+**Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui tavoiteajassa, kahden lukukauden sisällä tavoiteajasta tai tätä myöhemmin.
+
+**Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
+
+Valmistumisajoista on vähennetty lakisääteiset poissaolot.
+`,
+    studyTrackOverview: `
+- **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.
+- **Started studying**: Opiskelijat, jotka ovat ilmoittautuneet läsnäolevaksi samana lukuvuonna kuin heidän opiskeluoikeutensa on alkanut. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
+
+**Current status** kuvastaa opiskelijoiden tilannetta tällä hetkellä.
+- **Present**: Käynnissä olevalle lukukaudelle **läsnäolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
+- **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
+- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
+- **Passive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
+
+Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
+
+Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon. **Citizenships**-kategoriat (**Finland** ja **Other**) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
+
+Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
+
+Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
+`,
+    studyTrackOverviewCombinedProgramme: '', // Defined below
+  },
+
+  basicInformationTab: {
+    creditsProducedByTheStudyProgramme: `
 Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kategoriat vastaavat Rapon kategorioita. Pistemäärät ovat osin epätarkkoja ennen vuotta 2022 sisu-oodi-erojen vuoksi.
 
 Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopisteitä lukuun ottamatta**.
@@ -41,7 +75,22 @@ Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopist
 
 **Other**: Sisältää tohtorin- ja lisensiaatintutkintoon liittyvät opintopisteet, täydennyskoulutuksen, erikoistumiskoulutuksen, erikoislääkäri- ja erikoishammaslääkärikoulutuksen sekä lukiolaisten opintopisteet.
 `,
-  programmeCoursesByCreditType: `
+    graduatedAndThesisWritersOfTheProgramme: `
+**Wrote thesis**: Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
+
+**Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty valmistumispäivän perusteella.
+`,
+    programmesBeforeOrAfter: `
+**Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
+
+Mukana ovat **vain valmistuneet opiskelijat ja vain maisteriohjelmat.**
+
+**Mikäli valittuna on maisteriohjelma:** Sisältää kandiohjelmat, joissa tämän ohjelman opiskelijat ovat opiskelleet ennen tuloaan maisteriohjelmaan. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
+`,
+  },
+
+  programmeCoursesTab: {
+    byCreditType: `
 Opintopisteet ja opiskelijamäärät suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Mukana ovat kurssit ja opintokokonaisuudet.
 
 **Degree students**: Suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus koulutusohjelmaan (alempi tai ylempi). Sisältää myös ohjelmaan siirtyneet ensisijaiset opiskelijat.
@@ -60,27 +109,14 @@ Opintopisteet ja opiskelijamäärät suoritusvuosittain. Suoritukset on jaoteltu
 
 Huom: Oodi/Sisu -datassa olevien puutteiden vuoksi kategorioiden välillä voi esiintyä pieniä eroja (esim. suoritukseen ei liitetty opinto-oikeutta, suoritus kirjattu opinto-oikeuden voimassaoloaikojen ulkopuolelle, yms.).
 `,
-  programmeCoursesStudentSwitch: `
+    studentSwitch: `
 **Show credits**: Näyttää hyväksytyistä suorituksesta kertyneet **opintopisteet**  
 **Show students**: Näyttää kaikki ilmoittautuneet ja/tai arvosanan saaneet **opiskelijat**
 `,
-  graduatedAndThesisWritersOfTheProgramme: `
-**Wrote thesis**: Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
+  },
 
-**Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty valmistumispäivän perusteella.
-`,
-  averageGraduationTimes: `
-Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
-
-Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen kahden lukukauden sisällä tavoiteajasta valmistuneita ja punainen yli 2 lukukautta tavoiteajan ylittäneitä.
-
-**Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui tavoiteajassa, kahden lukukauden sisällä tavoiteajasta tai tätä myöhemmin.
-
-**Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
-
-Valmistumisajoista on vähennetty lakisääteiset poissaolot.
-`,
-  averageGraduationTimesStudyTracks: `
+  studyTracksAndClassStatisticsTab: {
+    averageGraduationTimesStudyTracks: `
 Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
 
 Vihreä **vaakapalkki** kuvaa tavoiteajassa valmistuneita, keltainen kahden lukukauden sisällä tavoiteajasta valmistuneita ja punainen yli 2 lukukautta tavoiteajan ylittäneitä.
@@ -93,32 +129,7 @@ Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 
 Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 `,
-  programmesBeforeOrAfter: `
-**Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
-
-Mukana ovat **vain valmistuneet opiskelijat ja vain maisteriohjelmat.**
-
-**Mikäli valittuna on maisteriohjelma:** Sisältää kandiohjelmat, joissa tämän ohjelman opiskelijat ovat opiskelleet ennen tuloaan maisteriohjelmaan. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
-`,
-  studyTrackOverview: `
-- **All**: Opiskelijat, joiden opiskeluoikeus on alkanut kyseisenä lukuvuonna. Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.
-- **Started studying**: Opiskelijat, jotka ovat ilmoittautuneet läsnäolevaksi samana lukuvuonna kuin heidän opiskeluoikeutensa on alkanut. Opiskelija on voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.
-
-**Current status** kuvastaa opiskelijoiden tilannetta tällä hetkellä.
-- **Present**: Käynnissä olevalle lukukaudelle **läsnäolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
-- **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
-- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
-- **Passive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
-
-Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
-
-Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon. **Citizenships**-kategoriat (**Finland** ja **Other**) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
-
-Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
-
-Yläosan valikosta on mahdollista valita tarkasteluun yhden opintosuunnan opiskelijat. Luvut kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.
-`,
-  studyTrackProgress: `
+    progressOfStudents: `
 Kuvaa koulutusohjelmassa tiettynä lukuvuonna aloittaneiden opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi kategoriaan 20–40 kuuluvat opiskelijat, jotka ovat suorittaneet **vähintään 20**, mutta **alle 40** opintopistettä.
 
 Opintopistekertymään on laskettu kaikki suoritukset, jotka opiskelija on suorittanut koulutusohjelmaan siirryttyään. Myös hyväksiluetut ja muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt suoritukset lasketaan mukaan.
@@ -127,7 +138,7 @@ Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joi
 
 Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
   `,
-  percentiles: `
+    percentiles: `
 Näyttää valittuna akateemisena vuonna aloittaneiden opiskelijoiden kumulatiiviset opintopistokertymät persentiileittäin.
 
 Kuvaajiin piirtyy viivoja kuvaamaan kyseisen ohjelman tavoitevalmistumisaikoja ja opintopistetavoitteita:
@@ -142,15 +153,19 @@ Maisteriohjelmia tarkastellessa näytetään lisäksi kandi+maisteri -oikeudella
 - 75% on suorittanut vähemmän opintopisteitä
 - Huomaa, että kuvaajassa näkyvät arvot interpoloidaan lineaarisesti opintopistekertymistä, jos opiskelijoiden lukumäärä/opintopistekertymä ei mene muuten tasan kyseisiin väleihin.
   `,
-  notCompleted: `
-Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
-`,
-  tags: `
+    averageGraduationTimesStudyTracksMaster: '', // Defined below
+  },
+
+  tagsTab: {
+    createNewTag: `
 Here you can create tags for degree programme. You can either create public tags or *personal* tags. Tags can be used to combine students from other starting years.
 'Associated start year' means what year you want to use as a start year for the students in that tag. For example with this you can move student from earlier starting year to next year if the student was absent during first year.
 However this is optional and you can create a new tag without selecting year.
 `,
-  creditCriteria: `
+  },
+
+  degreeCoursesTab: {
+    creditCriteria: `
 Here you can change visibility of degree courses as and set course and credits criteria, for each year their
 own. Credits criteria is computed as follows: for the first academic year the credits are taken into account
 if they are completed during the first 12 months. For the second year, we take into account the completions
@@ -158,9 +173,15 @@ during the first 24 months, for the third year the first 36 months.
 
 The progress of the students by these criteria will be shown in class statistics view.
 `,
+  },
+
+  // Not used
+  notCompleted: `
+Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
+`,
 }
 
-studyProgrammeToolTips.studyTrackOverviewCombinedProgramme = studyProgrammeToolTips.studyTrackOverview
+studyProgrammeToolTips.common.studyTrackOverviewCombinedProgramme = studyProgrammeToolTips.common.studyTrackOverview
   .replace(
     'Opiskelijoiden, joiden opiskeluoikeuteen kuuluu sekä kandidaatin että maisterin tutkinnon suoritusoikeus, aloituspäivä maisteriohjelmassa on kandidaatin tutkinnon valmistumispäivän jälkeinen päivä.',
     ''
@@ -175,8 +196,8 @@ studyProgrammeToolTips.studyTrackOverviewCombinedProgramme = studyProgrammeToolT
     'kentän **All** arvon (lukuun ottamatta *Current status* -kategorian **Graduated bachelor** -saraketta).'
   )
 
-studyProgrammeToolTips.averageGraduationTimesStudyTracksMaster =
-  studyProgrammeToolTips.averageGraduationTimesStudyTracks.replace(
+studyProgrammeToolTips.studyTracksAndClassStatisticsTab.averageGraduationTimesStudyTracksMaster =
+  studyProgrammeToolTips.studyTracksAndClassStatisticsTab.averageGraduationTimesStudyTracks.replace(
     'on valmistunut.',
     'on valmistunut.\n\n  Maisteriohjelmien tilastoissa opiskelijat on jaettu kahteen ryhmään:\n  - **Bachelor + master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **sekä kandidaatin että maisterin** tutkinto. Tässä kaaviossa aloitusvuosi tarkoittaa opiskelijan aloitusvuotta kandiohjelmassa.\n  - **Master study right** -kaaviossa ovat mukana ne opiskelijat, joilla on oikeus suorittaa **ainoastaan maisterin** tutkinto.'
   )
