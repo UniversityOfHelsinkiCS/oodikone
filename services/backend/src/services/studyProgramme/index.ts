@@ -7,8 +7,8 @@ import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, Programme
 import logger from '../../util/logger'
 
 export const getAllProgrammeCourses = async (providerCode: string) => {
-  const courses = await CourseModel.findAll({
-    attributes: ['id', 'code', 'name', 'substitutions'],
+  const courses: Pick<CourseModel, 'id' | 'code' | 'name' | 'substitution_groups'>[] = await CourseModel.findAll({
+    attributes: ['id', 'code', 'name', 'substitution_groups'],
     include: [
       {
         model: OrganizationModel,

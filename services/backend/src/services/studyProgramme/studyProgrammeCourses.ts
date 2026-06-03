@@ -26,8 +26,9 @@ const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
 
   for (const course of normalCourses) {
     courseCodes.add(course.code)
-    if (course.substitutions?.includes(`AY${course.code}`)) {
-      courseCodes.add(`AY${course.code}`)
+    // We want all AY course codes variants, even from partially completed susbtitution groups
+    for (const code of course?.substitution_groups?.flat() ?? []) {
+      if (code === 'AY' + course.code) courseCodes.add(code)
     }
   }
 
@@ -172,6 +173,8 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
       to,
     }),
   ])
+
+  // console.log("Programme credits:", programmeCredits)
 
   const openUniStudentHetuMap = await getStudentHetuStateMap(
     programmeCredits.filter(c => c.variant === 'openUni').map(c => c.studentNumber)
