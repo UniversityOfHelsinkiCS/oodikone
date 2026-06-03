@@ -1,5 +1,3 @@
 import { Course } from '../models'
 
-export type CourseWithSubsId = Omit<Course, 'substitution_groups'> & { substitution_groups: Course[][] } & {
-  subsId?: number
-}
+export type CourseWithSubsDetails = Omit<Course, 'substitution_groups'> & { substitution_groups: Course[][] }

@@ -1,10 +1,10 @@
 import { Unarray } from '@oodikone/shared/types'
-import { CourseWithSubsId } from '@oodikone/shared/types/course'
+import { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 
 export type SearchResultCourse = Unarray<GetCourseSearchResultResponse['courses']>
 
 export type GetCourseSearchResultResponse = {
-  courses: Array<Omit<CourseWithSubsId, 'courseType' | 'credits' | 'enrollments' | 'organizations'>>
+  courses: Array<Omit<CourseWithSubsDetails, 'courseType' | 'credits' | 'enrollments' | 'organizations'>>
 }
 
 export type GetCourseSearchResultRequest = {

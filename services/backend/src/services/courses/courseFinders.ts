@@ -1,8 +1,6 @@
-import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
-import { CourseWithSubsId } from '@oodikone/shared/types/course'
-import { getSortRank } from '@oodikone/shared/util/sortRank'
+import { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 import { CourseModel } from '../../models'
 
 const nameLikeTerm = (name: string) => {
@@ -40,7 +38,7 @@ const codeLikeTerm = (code: string) => {
   }
 }
 
-const getRawCourses = async (name: string, code: string, includeSpecial: boolean) => {
+export const getCoursesByNameAndOrCode = async (name: string, code: string, includeSpecial: boolean) => {
   const courses = await CourseModel.findAll({
     where: {
       ...(includeSpecial ? {} : { mainCourseCode: { [Op.ne]: null } }),
@@ -51,7 +49,7 @@ const getRawCourses = async (name: string, code: string, includeSpecial: boolean
   })
 
   const coursesWithSubstitutionGroupDetails = await Promise.all(
-    courses.map(async course => {
+    courses.map<Promise<CourseWithSubsDetails>>(async course => {
       const groupDetails = await Promise.all(
         course?.substitution_groups?.map(async group => {
           return await CourseModel.findAll({
@@ -67,44 +65,6 @@ const getRawCourses = async (name: string, code: string, includeSpecial: boolean
   )
 
   return coursesWithSubstitutionGroupDetails
-}
-
-const getCourses = async (name: string, code: string, includeSpecial: boolean) => {
-  const rawCourses = await getRawCourses(name, code, includeSpecial)
-  return rawCourses
-    .map(course => ({
-      ...course,
-      substitutions: orderBy(course.substitutions, [
-        substitution => {
-          if (/^A/.exec(substitution.at(0) ?? '')) return 4 // open university codes come last
-          if (/^\d/.exec(substitution.at(0) ?? '')) return 2 // old numeric codes come second
-          if (/^[A-Za-z]/.exec(substitution.at(0) ?? '')) return 1 // new letter based codes come first
-          return 3 // unknown, comes before open uni?
-        },
-      ]),
-    }))
-    .sort((a, b) => getSortRank(b.code) - getSortRank(a.code)) as CourseWithSubsId[]
-}
-
-export const getCoursesByNameAndOrCode = async (name: string, code: string, includeSpecial: boolean) => {
-  const courses = await getCourses(name, code, includeSpecial)
-
-  const visitedCourses = new Set<string>()
-
-  const assignSubstitutionGroup = (course: CourseWithSubsId, index: number) => {
-    const relatedCourses = courses.filter(currentCourse => course.substitutions.includes(currentCourse.code))
-    relatedCourses.unshift(course)
-    relatedCourses.forEach(relatedCourse => {
-      visitedCourses.add(relatedCourse.id)
-      relatedCourse.subsId = index
-    })
-  }
-
-  courses
-    .filter(course => !visitedCourses.has(course.id) && !visitedCourses.has(course.code))
-    .forEach((course, index) => assignSubstitutionGroup(course, index))
-
-  return courses
 }
 
 export const getCoursesByCodes = (codes: string[]) => {

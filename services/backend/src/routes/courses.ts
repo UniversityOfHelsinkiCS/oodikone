@@ -9,7 +9,7 @@ import {
   CourseYearlyStatsReqBody,
   CourseYearlyStatsQuery,
 } from '@oodikone/shared/routes/courses'
-import type { CourseWithSubsId } from '@oodikone/shared/types/course'
+import type { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 import { getCourseDetails, getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
 import {
@@ -31,7 +31,7 @@ router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMul
 
     const courses = await getCoursesByNameAndOrCode(name, code, includeSpecial === 'true')
 
-    const mergedCourses = new Map<string, CourseWithSubsId>()
+    const mergedCourses = new Map<string, CourseWithSubsDetails>()
 
     for (const course of courses) {
       if (!(course.max_attainment_date && course.min_attainment_date)) continue

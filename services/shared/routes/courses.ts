@@ -1,7 +1,7 @@
-import { CourseWithSubsId } from '../types/course'
+import { CourseWithSubsDetails } from '../types/course'
 
 export type CoursesMultiReqBody = never
-export type CoursesMultiResBody = { courses: CourseWithSubsId[] }
+export type CoursesMultiResBody = { courses: CourseWithSubsDetails[] }
 export type CoursesMultiQuery = {
   name: string
   code: string
