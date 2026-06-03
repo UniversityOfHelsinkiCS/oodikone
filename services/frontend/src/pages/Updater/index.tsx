@@ -120,7 +120,8 @@ export const Updater = () => {
 
     /* eslint-disable prefer-const */
     let interval
-    interval = setInterval(() => void updateJobs, 5000)
+    /* eslint-disable @typescript-eslint/no-misused-promises */
+    interval = setInterval(updateJobs, 5000)
 
     return () => clearInterval(interval)
   }, [])
@@ -164,26 +165,6 @@ export const Updater = () => {
           infoBoxContent={updaterToolTips.refreshDataSection}
           title="Refresh data (calculations done by oodikone-backend and cached in redis)"
         >
-          {jobs ? (
-            <Stack alignItems="flex-start" spacing={2} sx={{ width: '100%', mb: 2 }}>
-              <Typography variant="h6">Jobs running: {jobs.active?.length ?? 0}</Typography>
-              <Grid container spacing={2}>
-                {jobs.active?.map(job => <JobCard job={job} key={`${job.name}-${job.processedOn}`} />)}
-              </Grid>
-
-              <Typography variant="h6">Jobs in queue: {jobs.waiting?.length ?? 0}</Typography>
-              <Grid container spacing={2}>
-                {jobs.waiting?.map(job => (
-                  <Card key={job.name} variant="outlined">
-                    <CardContent>
-                      <Typography variant="body1">{job.name}</Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Grid>
-            </Stack>
-          ) : null}
-
           <Stack direction="row" spacing={2}>
             <Button
               onClick={() => {
@@ -211,7 +192,28 @@ export const Updater = () => {
               Refresh close to graduation data
             </Button>
           </Stack>
+
+          {jobs ? (
+            <Stack alignItems="flex-start" spacing={2} sx={{ width: '100%', my: 2 }}>
+              <Typography variant="h6">Jobs running: {jobs.active?.length ?? 0}</Typography>
+              <Grid container spacing={2}>
+                {jobs.active?.map(job => <JobCard job={job} key={`${job.name}-${job.processedOn}`} />)}
+              </Grid>
+
+              <Typography variant="h6">Jobs in queue: {jobs.waiting?.length ?? 0}</Typography>
+              <Grid container spacing={2}>
+                {jobs.waiting?.map(job => (
+                  <Card key={job.name} variant="outlined">
+                    <CardContent>
+                      <Typography variant="body1">{job.name}</Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Grid>
+            </Stack>
+          ) : null}
         </Section>
+
         <Section title="Update custom list of items (students & courses in updater, programmes & faculties computed on backend)">
           <Stack alignItems="flex-start" spacing={2}>
             <TextField inputRef={customListRef} multiline rows={7} sx={{ minWidth: '30rem' }} />
