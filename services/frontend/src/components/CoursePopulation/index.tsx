@@ -311,7 +311,7 @@ const CoursePopulationCoursesWrapper = ({
             studentAmountLimit={studentAmountLimit}
           />
         </Box>
-        <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
+        <InfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
       </Box>
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>

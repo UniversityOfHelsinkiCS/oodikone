@@ -32,8 +32,8 @@ export const PopulationCourses = ({
 }) => {
   const tooltipText =
     courseTableMode === 'curriculum'
-      ? populationStatisticsToolTips.coursesOfClass
-      : populationStatisticsToolTips.coursesOfPopulation
+      ? populationStatisticsToolTips.coursesOfClass.curriculum
+      : populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast
 
   return (
     <>

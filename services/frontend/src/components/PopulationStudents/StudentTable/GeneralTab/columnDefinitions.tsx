@@ -7,7 +7,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { populationStudentsToolTips } from '@/common/InfoToolTips/populationStudents'
+import { populationStudentsToolTips } from '@/common/InfoToolTips'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { creditDateFilter } from '@/components/FilterView/filters'

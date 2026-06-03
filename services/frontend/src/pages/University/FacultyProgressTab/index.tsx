@@ -2,7 +2,7 @@ import Stack from '@mui/material/Stack'
 
 import { useState } from 'react'
 
-import { facultyToolTips } from '@/common/InfoToolTips'
+import { toolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { FacultyProgress } from '@/components/Faculties/FacultyProgress'
@@ -20,7 +20,7 @@ export const FacultyProgressTab = () => {
     <Stack gap={2}>
       <Section
         cypress="faculty-progress"
-        infoBoxContent={facultyToolTips.common.studentProgress}
+        infoBoxContent={toolTips.faculty.common.studentProgress}
         title="Progress of students of the university"
       >
         <ToggleContainer>
@@ -28,7 +28,7 @@ export const FacultyProgressTab = () => {
             cypress="study-right-toggle"
             disabled={progressStats.isLoading || progressStats.isError}
             firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.common.studyRightToggle}
+            infoBoxContent={toolTips.faculty.common.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={() => setIncludeSpecials(!excludeSpecials)}
             value={excludeSpecials}

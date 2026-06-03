@@ -5,7 +5,7 @@ import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import { coursePopulationToolTips, populationStatisticsToolTips } from '@/common/InfoToolTips'
+import { coursePopulationToolTips, populationStudentsToolTips } from '@/common/InfoToolTips'
 
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
@@ -126,7 +126,7 @@ export const PopulationStudents = ({
         Array.isArray(years) || (programme && !isBachelorOrLicentiateProgramme(programme))
           ? ['General', 'Courses', 'Modules', 'Tags']
           : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
-      tooltip: populationStatisticsToolTips.studentsClass,
+      tooltip: populationStudentsToolTips.studentsClass,
     },
     coursePopulation: {
       tabs: ['General'],
@@ -134,7 +134,7 @@ export const PopulationStudents = ({
     },
     customPopulation: {
       tabs: ['General'],
-      tooltip: populationStatisticsToolTips.studentsCustom,
+      tooltip: populationStudentsToolTips.studentsCustom,
     },
     studyGuidanceGroupPopulation: {
       tabs: studyGuidanceGroup?.tags?.studyProgramme
@@ -142,7 +142,7 @@ export const PopulationStudents = ({
           ? ['General', 'Courses', 'Modules', 'Progress']
           : ['General', 'Courses', 'Modules']
         : ['General'],
-      tooltip: populationStatisticsToolTips.studentsGuidanceGroups,
+      tooltip: populationStudentsToolTips.studentsGuidanceGroups,
     },
   }
 

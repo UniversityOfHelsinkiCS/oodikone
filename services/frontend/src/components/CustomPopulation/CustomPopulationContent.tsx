@@ -89,7 +89,7 @@ export const CustomPopulationContent = ({
       title: 'Courses of population',
       content: (
         <>
-          <InfoBox content={populationStatisticsToolTips.coursesOfPopulation} />
+          <InfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
           <StudentAmountLimiter
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             studentAmountLimit={studentAmountLimit}
