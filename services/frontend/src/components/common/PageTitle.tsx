@@ -13,7 +13,7 @@ export const PageTitle = ({
   children?: React.ReactNode
 }) => {
   return (
-    <Stack sx={{ my: 3, textAlign: 'center', minWidth: '100%' }}>
+    <Stack sx={{ my: 3, textAlign: 'center' }}>
       <Typography variant="h4">{title ?? <Skeleton height="100%" variant="text" width="100%" />}</Typography>
       {subtitle ? (
         <Typography color="text.secondary" fontWeight="500" variant="h6">

@@ -68,7 +68,6 @@ export const CustomPopulationWrapper = ({
   return (
     <FilterView
       coursestatistics={population?.coursestatistics}
-      displayTray={populationStudents.length > 0}
       filters={filters}
       initialOptions={{}}
       students={populationStudents}

@@ -1,6 +1,7 @@
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { AvailableStats, CourseStat, Realisation } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
+import { isSpring } from '@oodikone/shared/util'
 
 export type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
 export type CourseStudyProgramme = {
@@ -31,7 +32,6 @@ export const ALL = {
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
 
-const isSpring = (date: Date) => date.getMonth() < 9
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year: number, spring: boolean) => (spring ? `Spring ${year}` : `Fall ${year}`)
 

@@ -57,7 +57,7 @@ export const CoursePopulation = () => {
   const { coursecodes, from, to, separate, unifyCourses, includeSubstitutions } = parseQueryParams(location.search)
 
   const { data: courseDetails } = useGetCourseDetailsQuery({ codes: codes.mainCodes })
-  const { data: population, isFetching } = useGetPopulationStatisticsByCourseQuery({
+  const { data: population } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
     to,
@@ -257,7 +257,6 @@ export const CoursePopulation = () => {
   return (
     <FilterView
       coursestatistics={population?.coursestatistics}
-      displayTray={!isFetching}
       filters={filters}
       initialOptions={{
         [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },

@@ -1,7 +1,7 @@
 import Accordion, { AccordionProps } from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary, { AccordionSummaryProps, accordionSummaryClasses } from '@mui/material/AccordionSummary'
-import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useMemo, useState } from 'react'
@@ -42,25 +42,23 @@ export const PanelView = ({ panels: initialPanels }) => {
     setActiveIndex([...currentActiveIndex])
   }
 
-  // Remove this after each view is fixed to not include null along other panels
-  const availablePanels = useMemo(() => initialPanels.filter(panel => !!panel), [initialPanels])
-
   const panels = useMemo(
     () =>
-      availablePanels.map((panel, index) => ({
+      initialPanels.filter(Boolean).map((panel, index) => ({
         key: `${panel.title}-${index}`,
         title: panel.title,
-        content: activeIndex.includes(index) && <div key={panel.key}>{panel.content}</div>,
+        content: <div key={panel.key}>{panel.content}</div>,
         onChange: () => togglePanel(index),
+        index,
       })),
-    [availablePanels, activeIndex]
+    [initialPanels, activeIndex]
   )
 
   return (
-    <Box data-cy="panelview-parent">
-      {panels.map(({ key, onChange, title, content }) => (
+    <Stack data-cy="panelview-parent">
+      {panels.map(({ key, index, onChange, title, content }) => (
         <PanelViewAccordion
-          expanded={!!content}
+          expanded={activeIndex.includes(index)}
           key={key}
           onChange={onChange}
           slotProps={{ transition: { unmountOnExit: true } }}
@@ -73,6 +71,6 @@ export const PanelView = ({ panels: initialPanels }) => {
           <AccordionDetails data-cy={`${title}-data`}>{content}</AccordionDetails>
         </PanelViewAccordion>
       ))}
-    </Box>
+    </Stack>
   )
 }

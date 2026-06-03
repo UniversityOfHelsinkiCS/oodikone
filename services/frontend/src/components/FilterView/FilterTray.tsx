@@ -31,16 +31,17 @@ export const FilterTray = <Options extends FilterOptions, Args, Precompute>({
   return (
     <Paper
       sx={{
+        flex: '0 0 20em',
+        width: '20em',
         py: 3,
         px: 2,
         borderRadius: 0,
-        width: '20em',
-        minWidth: '20em',
-        height: 'fit-content',
+        height: '100%',
+        minHeight: 'fit-content',
       }}
       variant="outlined"
     >
-      <Stack spacing={1.5} sx={{ alignItems: 'center', textAlign: 'center', width: '100%', mb: 2 }}>
+      <Stack spacing={1.5} sx={{ alignItems: 'center', textAlign: 'center', mb: 2 }}>
         <Typography component="span" data-cy="filtered-students" fontSize="1.3em" fontWeight={500} variant="subtitle1">
           Filter students
         </Typography>

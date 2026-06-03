@@ -31,6 +31,11 @@ export const mapToProviders = (programmeCodes: string[]) => {
   return programmeCodes.map(programmeCodeToProviderCode)
 }
 
+/**
+ * Month is before september.
+ */
+export const isSpring = (date: Date) => date.getMonth() < 8
+
 type Ok<T> = {
   data: T
   error: null

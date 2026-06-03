@@ -8,10 +8,12 @@ import {
   Name,
   ProgrammeCourse,
 } from '@oodikone/shared/types'
+import { isSpring } from '@oodikone/shared/util'
+import { dateDaysFromNow } from '@oodikone/shared/util/datetime'
 
 type EnrollmentObject = {
-  [EnrollmentState.ENROLLED]: string[]
-  [EnrollmentState.REJECTED]: string[]
+  [EnrollmentState.ENROLLED]: Set<string>
+  [EnrollmentState.REJECTED]: Set<string>
 }
 
 export type CourseModule = Pick<Module, 'code'> & {
@@ -62,12 +64,12 @@ export type FilteredCourse = {
   >
   stats: FilteredCourseStats
   students: {
-    all: string[]
-    enrolledNoGrade: string[]
-    failed: string[]
-    improvedPassedGrade: string[]
-    markedToSemester: string[]
-    passed: string[]
+    all: Set<string>
+    enrolledNoGrade: Set<string>
+    failed: Set<string>
+    improvedPassedGrade: Set<string>
+    markedToSemester: Set<string>
+    passed: Set<string>
   }
 }
 
@@ -97,45 +99,25 @@ const getCumulativePassingSemesters = (semesters: (typeof courseBaseStats)['stat
 }
 
 // courseStatsCounter legacy solution
-const getFinalStats = (course, populationCount: number): FilteredCourse['stats'] => {
-  const { students } = course
-
-  const stats = { ...course.stats }
-
-  stats.students = students.all.size
-  stats.passed = students.passed.size
-  stats.failed = students.failed.size
-  stats.attempts = course.attempts
-  stats.improvedPassedGrade = students.improvedPassedGrade.size
-  stats.percentage = percentageOf(stats.passed, stats.students).toFixed(2)
-  stats.passedOfPopulation = percentageOf(stats.passed, populationCount).toFixed(2)
-  stats.triedOfPopulation = percentageOf(stats.students, populationCount).toFixed(2)
-  stats.perStudent = (percentageOf(course.attempts, stats.passed + stats.failed) / 100).toFixed(2)
-  stats.passingSemestersCumulative = getCumulativePassingSemesters(stats.passingSemesters)
-  stats.totalStudents = stats.students
-  stats.totalEnrolledNoGrade = students.enrolledNoGrade.size
-  stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents).toFixed(2)
-
-  return stats
-}
-
-const reconstructCourse = (course, populationCount: number): FilteredCourse => ({
-  ...course,
-  // courseStatsCounter legacy solution
-  students: Object.fromEntries(
-    Object.entries(course.students).map(([key, val]: [string, any]) => [
-      key,
-      Object.fromEntries(val.entries().map(n => [n, true])),
-    ])
-  ) as FilteredCourse['students'],
-  stats: getFinalStats(course, populationCount),
+const getFinalStats = (
+  { students, stats: courseStats, attempts },
+  populationCount: number
+): FilteredCourse['stats'] => ({
+  ...courseStats,
+  students: students.all.size,
+  passed: students.passed.size,
+  failed: students.failed.size,
+  attempts,
+  improvedPassedGrade: students.improvedPassedGrade.size,
+  percentage: percentageOf(students.passed.size, students.all.size).toFixed(2),
+  passedOfPopulation: percentageOf(students.passed.size, populationCount).toFixed(2),
+  triedOfPopulation: percentageOf(students.all.size, populationCount).toFixed(2),
+  perStudent: (percentageOf(attempts, students.passed.size + students.failed.size) / 100).toFixed(2),
+  passingSemestersCumulative: getCumulativePassingSemesters(courseStats.passingSemesters),
+  totalStudents: students.all.size,
+  totalEnrolledNoGrade: students.enrolledNoGrade.size,
+  percentageWithEnrollments: percentageOf(students.passed.size, students.all.size).toFixed(2),
 })
-
-import { dateDaysFromNow } from '@oodikone/shared/util/datetime'
-
-const isSpring = (date: Date) => {
-  return 0 <= date.getMonth() && date.getMonth() <= 6
-}
 
 const getSemester = (date: Date) => (isSpring(date) ? 'SPRING' : 'FALL')
 
@@ -256,25 +238,17 @@ export const filterCourses = (
     courseStatistics.courses.map(course => [course.code, { course, ...structuredClone(courseBaseStats) }])
   )
 
-  const fstudents = new Set(filteredStudents.map(({ studentNumber }) => studentNumber))
-  const startingYear = new Map(
-    filteredStudents.map(({ studentNumber, studyrightStart }) => [studentNumber, studyrightStart])
-  )
+  for (const { studentNumber: studentnumber, studyrightStart, enrollments, courses } of filteredStudents) {
+    const studentStartingYear = new Date(studyrightStart).getFullYear()
 
-  for (const student of filteredStudents) {
-    const studentnumber = student.studentNumber
-
-    for (const enrollment of student.enrollments) {
-      const { course_code, state, enrollment_date_time } = enrollment
-      if (!fstudents.has(studentnumber)) continue
-
+    for (const { course_code, state, enrollment_date_time } of enrollments) {
       // We cannot display these
       if (course_code === null) continue
       const course = coursestats.get(course_code)
       if (!course) continue
 
       const initialDate = new Date(enrollment_date_time)
-      const semester = getPassingSemester(new Date(startingYear.get(studentnumber)!).getFullYear(), initialDate)
+      const semester = getPassingSemester(studentStartingYear, initialDate)
 
       course.students.all.add(studentnumber)
       course.students.enrolledNoGrade.add(studentnumber)
@@ -282,32 +256,37 @@ export const filterCourses = (
       course.enrollments.semesters[semester][state].add(studentnumber)
     }
 
-    for (const credit of student.courses) {
-      const { course_code, grade, date } = credit
-
+    for (const { course_code, grade, credittypecode, date } of courses) {
       // We cannot display these
       if (course_code === null) continue
       const course = coursestats.get(course_code)
       if (!course) continue
 
-      const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
-      const failingGrade = credit.credittypecode === CreditTypeCode.FAILED
-      const improvedGrade = credit.credittypecode === CreditTypeCode.IMPROVED
+      const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)
+      const improvedGrade = credittypecode === CreditTypeCode.IMPROVED
+      const failingGrade = credittypecode === CreditTypeCode.FAILED
+
+      course.grades[grade] ??= {
+        count: 0,
+        status: {
+          passingGrade,
+          improvedGrade,
+          failingGrade,
+        },
+      }
 
       course.attempts += 1
-      const gradeCount = course.grades[grade]?.count ?? 0
-      course.grades[grade] = { count: gradeCount + 1, status: { passingGrade, failingGrade, improvedGrade } }
+      course.grades[grade].count += 1
 
       course.students.all.add(studentnumber)
       course.students.enrolledNoGrade.delete(studentnumber)
       if (passingGrade) {
         if (!course.students.markedToSemester.has(studentnumber)) {
-          course.students.markedToSemester.add(studentnumber)
-
-          const semester = getPassingSemester(new Date(startingYear.get(studentnumber)!).getFullYear(), new Date(date))
+          const semester = getPassingSemester(studentStartingYear, new Date(date))
           course.stats.passingSemesters[semester]++
         }
 
+        course.students.markedToSemester.add(studentnumber)
         course.students.passed.add(studentnumber)
         course.students.failed.delete(studentnumber)
       } else if (improvedGrade) {
@@ -320,5 +299,10 @@ export const filterCourses = (
     }
   }
 
-  return Array.from(coursestats.values()).map(course => reconstructCourse(course, filteredStudents.length))
+  return Array.from(coursestats.values()).map(
+    (course): FilteredCourse =>
+      Object.assign(course, {
+        stats: getFinalStats(course, filteredStudents.length),
+      })
+  )
 }

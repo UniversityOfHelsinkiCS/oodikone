@@ -16,7 +16,6 @@ import { useFilterStorage } from './useFilterStorage'
 
 export const FilterView = <Options extends FilterOptions>({
   children,
-  displayTray,
   filters,
   students,
   coursestatistics,
@@ -26,7 +25,6 @@ export const FilterView = <Options extends FilterOptions>({
   coursestatistics: ExpandedCourseStats | undefined
   children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => ReactNode
   filters: GenericFilter<Options>[]
-  displayTray: boolean
   initialOptions: Options
 }) => {
   const { storedOptions, setFilterOptions, resetFilterOptions, resetAllFilterOptions } = useFilterStorage<Options>()
@@ -73,20 +71,18 @@ export const FilterView = <Options extends FilterOptions>({
   }, [filters, filterOptions])
 
   return (
-    <Stack direction="row">
-      {!!displayTray && (
-        <FilterTray
-          allStudents={students}
-          filters={filters}
-          filtersInUse={filtersInUse}
-          getContextByKey={getContextByKey}
-          numberOfFilteredStudents={filteredStudents.length}
-          resetAllFilterOptions={resetAllFilterOptions}
-          resetFilterOptions={resetFilterOptions}
-          setFilterOptions={setFilterOptions}
-        />
-      )}
-      <PageLayout maxWidth="80vw">
+    <Stack flexDirection="row">
+      <FilterTray
+        allStudents={students}
+        filters={filters}
+        filtersInUse={filtersInUse}
+        getContextByKey={getContextByKey}
+        numberOfFilteredStudents={filteredStudents.length}
+        resetAllFilterOptions={resetAllFilterOptions}
+        resetFilterOptions={resetFilterOptions}
+        setFilterOptions={setFilterOptions}
+      />
+      <PageLayout width="calc(100% - 20em)">
         <FilterViewContext.Provider value={{ getContextByKey, setFilterOptions }}>
           {children(filteredStudents, filteredCourses)}
         </FilterViewContext.Provider>

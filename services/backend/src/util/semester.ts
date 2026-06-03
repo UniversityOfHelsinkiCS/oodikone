@@ -1,8 +1,5 @@
+import { isSpring } from '@oodikone/shared/util'
 import { dateDaysFromNow } from '@oodikone/shared/util/datetime'
-
-const isSpring = (date: Date) => {
-  return 0 <= date.getMonth() && date.getMonth() <= 6
-}
 
 const getSemester = (date: Date) => (isSpring(date) ? 'SPRING' : 'FALL')
 

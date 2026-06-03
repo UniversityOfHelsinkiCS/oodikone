@@ -268,7 +268,6 @@ export const PopulationStatistics = () => {
   return (
     <FilterView
       coursestatistics={population?.coursestatistics}
-      displayTray={!isLoading}
       filters={filters}
       initialOptions={initialOptions}
       students={students}
