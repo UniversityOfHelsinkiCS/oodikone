@@ -1,6 +1,10 @@
 import { populationStudentsToolTips } from './populationStudents'
 
 export const populationStatisticsToolTips = {
+  curriculumPicker: {
+    fi: `Valitsee käytettävän opetussuunnitelman. Vaikuttaa näytettäviin kursseihin ja opintokokonaisuuksiin.`,
+    en: `Chooses which curriculum to use. Changes which courses and study modules are shown.`,
+  },
   advanced: {
     semesters:
       'Halutessa tarkastella vain syyslukukaudella (1.8.–31.12.) tai kevätlukukaudella (1.1.–31.7.) aloittaneita, haluttu ajanjakso valitaan tästä.',

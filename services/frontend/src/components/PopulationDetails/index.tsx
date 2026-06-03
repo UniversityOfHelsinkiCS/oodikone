@@ -8,6 +8,7 @@ import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
+import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { Link } from '@/components/common/Link'
 import { PanelView } from '@/components/common/PanelView'
 import {
@@ -30,6 +31,7 @@ import { FormattedStudent } from '@oodikone/shared/types'
 import { CreditAccumulationGraph } from '../Charts/CreditAccumulation'
 import { CurriculumPicker } from '../common/CurriculumPicker'
 import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 import { AdvancedSettings } from './AdvancedSettings'
 import { AgeStats } from './AgeStats'
 import { CourseTableModeSelector } from './CourseTableModeSelector'
@@ -54,6 +56,7 @@ export const PopulationDetails = ({
   filteredCourses,
 }: PopulationDetailsProps) => {
   const { filterDispatch, useFilterSelector } = useFilters()
+  const { getTextIn } = useLanguage()
 
   const { programme, combinedProgramme, showBachelorAndMaster } = query
 
@@ -190,7 +193,7 @@ export const PopulationDetails = ({
             <Stack flexDirection="row" gap={1} p={1} sx={{ alignItems: 'center', alignContent: 'center' }}>
               <Typography fontWeight={800}>Choose curriculum</Typography>
               <CurriculumPicker curriculum={curriculum} curriculumList={curriculumList} setCurriculum={setCurriculum} />
-              <InfoBox content={'Valitsee tarkasteltavan populaation opetussuunnitelman.'} mini />
+              <InfoBox content={getTextIn(populationStatisticsToolTips.curriculumPicker) ?? ''} mini />
             </Stack>
             <FormControlLabel
               control={
