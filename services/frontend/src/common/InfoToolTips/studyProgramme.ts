@@ -138,7 +138,8 @@ Maisteriohjelmien tilastoissa opiskelijat jaetaan kahteen ryhmään: niihin, joi
 
 Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
   `,
-    percentiles: `
+    percentiles: {
+      fi: `
 Näyttää valittuna akateemisena vuonna aloittaneiden opiskelijoiden kumulatiiviset opintopistokertymät persentiileittäin.
 
 Kuvaajiin piirtyy viivoja kuvaamaan kyseisen ohjelman tavoitevalmistumisaikoja ja opintopistetavoitteita:
@@ -153,6 +154,22 @@ Maisteriohjelmia tarkastellessa näytetään lisäksi kandi+maisteri -oikeudella
 - 75% on suorittanut vähemmän opintopisteitä
 - Huomaa, että kuvaajassa näkyvät arvot interpoloidaan lineaarisesti opintopistekertymistä, jos opiskelijoiden lukumäärä/opintopistekertymä ei mene muuten tasan kyseisiin väleihin.
   `,
+      en: `
+Shows the cumulative credit totals of students who began their studies in the selected academic year, broken down by percentile.
+
+Lines are drawn on the graphs to illustrate the target completion times and credit targets for the respective programs:
+
+- **Bachelor’s programs**: typically 3 years and 180 credits
+- **Master’s programs**: typically 2 years and 120 credits
+
+When viewing master’s programs, students with a combined bachelor’s and master’s study right (typically 3 years + 2 years / 180 credits + 120 credits) are also shown. In this case, the graph shows students who began a bachelor’s program in the selected academic term and have already transferred to a master’s program.
+
+**E.g., 75th percentile**:
+
+- 25% of the sample students have earned more credits
+- 75% have earned fewer credits
+- Note that the values shown in the graph are linearly interpolated from the cumulative credit totals if the number of students or cumulative credits does not otherwise fall exactly within the specified intervals.`,
+    },
     averageGraduationTimesStudyTracksMaster: '', // Defined below
   },
 

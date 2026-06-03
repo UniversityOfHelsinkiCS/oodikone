@@ -296,7 +296,7 @@ export const StudyTracksAndClassStatisticsTab = ({
       </Section>
 
       <Section
-        infoBoxContent={studyProgrammeToolTips.studyTracksAndClassStatisticsTab.percentiles}
+        infoBoxContent={getTextIn(studyProgrammeToolTips.studyTracksAndClassStatisticsTab.percentiles) ?? ''}
         isError={hasErrors}
         isLoading={isFetching}
         title="Monthly credit accumulation of the students by starting year"
