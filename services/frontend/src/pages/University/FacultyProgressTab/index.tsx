@@ -20,7 +20,7 @@ export const FacultyProgressTab = () => {
     <Stack gap={2}>
       <Section
         cypress="faculty-progress"
-        infoBoxContent={facultyToolTips.studentProgress}
+        infoBoxContent={facultyToolTips.common.studentProgress}
         title="Progress of students of the university"
       >
         <ToggleContainer>
@@ -28,7 +28,7 @@ export const FacultyProgressTab = () => {
             cypress="study-right-toggle"
             disabled={progressStats.isLoading || progressStats.isError}
             firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.studyRightToggle}
+            infoBoxContent={facultyToolTips.common.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={() => setIncludeSpecials(!excludeSpecials)}
             value={excludeSpecials}

@@ -127,7 +127,7 @@ export const InteractiveDataTable = ({
                 <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
                   {index === 0 && (
                     <Box sx={{ marginRight: 1 }}>
-                      <InfoBox content={facultyToolTips.interactiveDataTable} mini />
+                      <InfoBox content={facultyToolTips.basicInformationTab.interactiveDataTable} mini />
                     </Box>
                   )}
                   <TableSortLabel

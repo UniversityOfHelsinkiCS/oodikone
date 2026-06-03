@@ -108,7 +108,7 @@ export const GraduationTimesTab = ({
       <Section
         cypress="average-graduation-times"
         exportOnClick={() => exportToExcel(graduationStats.data, programmeNames)}
-        infoBoxContent={facultyToolTips.averageGraduationTimes}
+        infoBoxContent={facultyToolTips.common.averageGraduationTimes}
         title="Average graduation times by education level"
       >
         <ToggleContainer>
@@ -132,7 +132,7 @@ export const GraduationTimesTab = ({
             cypress="programme-toggle"
             disabled={isError || isLoading}
             firstLabel="New degree programmes"
-            infoBoxContent={facultyToolTips.programmeToggle}
+            infoBoxContent={facultyToolTips.common.programmeToggle}
             secondLabel="All degree programmes"
             setValue={setStudyProgrammes}
             value={studyProgrammes}

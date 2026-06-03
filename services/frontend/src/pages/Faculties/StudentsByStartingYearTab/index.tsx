@@ -58,7 +58,7 @@ export const StudentsByStartingYearTab = ({
             cypress="study-right-toggle"
             disabled={isLoading || isError || (isSuccess && !studentStats)}
             firstLabel="All study rights"
-            infoBoxContent={facultyToolTips.studyRightToggle}
+            infoBoxContent={facultyToolTips.common.studyRightToggle}
             secondLabel="Special study rights excluded"
             setValue={setSpecialGroups}
             value={specialGroups}
@@ -68,7 +68,7 @@ export const StudentsByStartingYearTab = ({
       <Section
         cypress="faculty-student-table"
         exportOnClick={() => exportStudentTable(studentStats, faculty.code, programmeKeys, getTextIn)}
-        infoBoxContent={facultyToolTips.studentsStatsOfTheFaculty}
+        infoBoxContent={facultyToolTips.studentsByStartingYearTab.studentsStatsOfTheFaculty}
         isError={isError}
         isLoading={isLoading}
         title="Students of the faculty by starting year"

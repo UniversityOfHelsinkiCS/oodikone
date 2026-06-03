@@ -83,7 +83,7 @@ export const ProgressSection = ({
             getTextIn
           )
         }
-        infoBoxContent={facultyToolTips.studentProgress}
+        infoBoxContent={facultyToolTips.common.studentProgress}
         title="Progress of students of the faculty by starting year"
       >
         <Stack gap={2}>
