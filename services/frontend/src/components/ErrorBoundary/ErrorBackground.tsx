@@ -25,7 +25,7 @@ export const ErrorBackground = ({ header, content }) => {
   const yearLabels = dummyData[0]?.map((_, index) => (2017 + index).toString()) ?? []
 
   return (
-    <PageLayout maxWidth="lg">
+    <PageLayout maxWidth="lg" width="100%">
       <Stack sx={{ alignItems: 'stretch', height: '100vh', justifyContent: 'space-evenly' }}>
         <ReactECharts
           option={{
