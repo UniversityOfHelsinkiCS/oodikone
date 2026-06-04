@@ -26,5 +26,8 @@
     "winston-gelf-transporter": {
       "gelf-pro": "~1.4"
     }
+  },
+  "devDependencies": {
+    "nodemon": "3.1.14"
   }
 }

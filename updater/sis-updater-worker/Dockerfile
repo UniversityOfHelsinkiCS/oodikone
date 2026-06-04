@@ -13,7 +13,7 @@ ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./.npmrc .
-COPY ./package*.json .
+COPY ./package*.json ./
 RUN npm ci --omit-dev
 COPY . .
 

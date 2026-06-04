@@ -35,7 +35,7 @@ COPY ./shared .
 
 WORKDIR /opt/app-root/frontend
 COPY ./frontend/.npmrc .
-COPY ./frontend/package*.json .
+COPY ./frontend/package*.json ./
 RUN npm ci --include=dev
 COPY ./frontend .
 

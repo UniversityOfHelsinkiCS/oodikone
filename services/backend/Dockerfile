@@ -53,7 +53,7 @@ COPY --from=build /opt/app-root/shared/dist .
 
 WORKDIR /opt/app-root/backend
 COPY --from=build /opt/app-root/backend/.npmrc .
-COPY --from=build /opt/app-root/backend/package*.json .
+COPY --from=build /opt/app-root/backend/package*.json ./
 COPY --from=build /opt/app-root/backend/dist ./dist
 
 RUN npm ci --omit=dev
