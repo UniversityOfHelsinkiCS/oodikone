@@ -366,6 +366,7 @@ const getMainStatsByTrackAndYear = async (
     const startedInBachelor = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
     const bachelorsStartYear = defineYear(startedInBachelor, true)
 
+    /* Stats for "Students of the degree programme by starting year" */
     updateCounts(
       startYear,
       studyProgramme,
@@ -387,7 +388,14 @@ const getMainStatsByTrackAndYear = async (
       )
     }
 
-    if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
+    /* Stats for "Monthly credit accumulation of the students by starting year" */
+    /* DILEMMA: if viewing a master's programme, students with bs+ms study right, but bs start date before 2017-2018
+       do not belong in any category. Other option would be to show bs+ms based on their start date in master's studies,
+       but then we would have (worst case) 50-60 years of bachelors studies in prior to show for some old study rights.
+       */
+    if (doCombo && !years.includes(bachelorsStartYear)) continue
+
+    if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER) {
       const bscStartYear = Number(bachelorsStartYear.slice(0, 4))
 
       getMonthlyCredits(
@@ -425,8 +433,10 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
+    /* Stats for Progress of students of the degree programme by starting year" */
+    /* the DILEMMA from above also applies */
     if (!studyRightElement.graduated) {
-      if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER && years.includes(bachelorsStartYear)) {
+      if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER) {
         creditCountsCombo[bachelorsStartYear].push(getCreditCount(studyRight.student.credits, startedInBachelor))
 
         if (studyTrack) {
