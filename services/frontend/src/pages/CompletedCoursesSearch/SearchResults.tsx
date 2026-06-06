@@ -17,10 +17,11 @@ import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
+import { CreditTypeCode } from '@oodikone/shared/types'
 
-const isPassed = credit => [4, 7, 9].includes(credit)
+const isPassed = credit => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(credit)
 
-const getTotalPassed = student => student.credits.filter(credit => isPassed(credit.creditType)).length
+const getTotalPassed = student => student.credits.filter(credit => isPassed(credit)).length
 
 const getTotalUnfinished = student => Object.values(student.enrollments).length
 
@@ -46,9 +47,14 @@ const getCompletion = (student, courseCode, { icon }) => {
     return `Latest enrollment: ${formatDate(enrollment.date, DateFormat.ISO_DATE)}`
   }
 
-  const substitutionString = completion.substitution ? ` as ${completion.substitution}` : ''
+  const substituted = !!completion.substitution?.length
+  const substitutionString = substituted ? ` as ${completion.substitution.join(', ')}` : ''
 
-  return icon ? <DoneIcon fontSize="small" style={{ color: green[700] }} /> : `Passed${substitutionString}`
+  return icon ? (
+    <DoneIcon fontSize="small" style={{ color: substituted ? grey[700] : green[700] }} />
+  ) : (
+    `Passed${substitutionString}`
+  )
 }
 
 const getCellTitle = (student, courseCode) => {
@@ -57,13 +63,17 @@ const getCellTitle = (student, courseCode) => {
   if (!credit && !enrollment) {
     return 'Student has the course in their primary study plan'
   }
-  const title = credit
-    ? `Passed on ${formatDate(credit.date, DateFormat.ISO_DATE)}\nCourse code: ${
-        credit.substitution ?? credit.courseCode
-      }`
-    : `Last enrollment on ${formatDate(enrollment.date, DateFormat.ISO_DATE)}\nCourse code ${
-        enrollment.substitution ?? enrollment.courseCode
-      }`
+  let title
+  if (credit) {
+    const substitutionString = credit.substitution?.length ? `Substituted by: ${credit.substitution?.join(', ')}` : ''
+    title = `Passed on ${formatDate(credit.date, DateFormat.ISO_DATE)}\n${substitutionString}`
+  } else {
+    const substitutionString = enrollment.substitution?.length
+      ? `Substituted by: ${enrollment.substitution?.join(', ')}`
+      : ''
+    title = `Last enrollment on ${formatDate(enrollment.date, DateFormat.ISO_DATE)}\n${substitutionString}`
+  }
+
   return title
 }
 

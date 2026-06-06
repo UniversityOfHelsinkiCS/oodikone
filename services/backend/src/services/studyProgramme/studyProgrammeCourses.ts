@@ -174,8 +174,6 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     }),
   ])
 
-  // console.log("Programme credits:", programmeCredits)
-
   const openUniStudentHetuMap = await getStudentHetuStateMap(
     programmeCredits.filter(c => c.variant === 'openUni').map(c => c.studentNumber)
   )
