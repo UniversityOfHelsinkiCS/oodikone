@@ -44,6 +44,11 @@ export const updateSISStudentsByStudentNumber = async (studentnumbers: string[])
   return response.data
 }
 
+export const nukeRedis = async () => {
+  const response = await client.get('/nuke_redis', params)
+  return response.data
+}
+
 export const updateSISStudyPlans = async (days: number) => {
   const limitDate = new Date()
   limitDate.setDate(limitDate.getDate() - days)

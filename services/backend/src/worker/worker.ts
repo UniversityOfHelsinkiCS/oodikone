@@ -1,10 +1,10 @@
-const Sentry = require('@sentry/node')
-const { Worker: BullMQWorker } = require('bullmq')
-const dayjs = require('dayjs')
+import * as Sentry from '@sentry/node'
+import { Worker as BullMQWorker } from 'bullmq'
+import dayjs from 'dayjs'
 
-const { redis, concurrentWorkers } = require('../config')
-const logger = require('../util/logger').default
-const { queueName } = require('./queue')
+import { redis, concurrentWorkers } from '../config'
+import logger from '../util/logger'
+import { jobQueue } from './queue'
 
 const connection = {
   host: redis,
@@ -14,7 +14,7 @@ const connection = {
 // https://github.com/taskforcesh/bullmq/issues/2075#issuecomment-1646079335
 process.execArgv = process.execArgv.filter(arg => !arg.includes('--max_old_space_size='))
 
-const worker = new BullMQWorker(queueName, `${__dirname}/processor.js`, {
+const worker = new BullMQWorker(jobQueue.name, `${__dirname}/processor.js`, {
   connection,
   useWorkerThreads: true,
   concurrency: concurrentWorkers,
@@ -38,7 +38,7 @@ worker.on('error', error => {
 })
 
 worker.on('failed', (job, error) => {
-  logger.error(`Job ${job.id} failed. ${error.stack ?? ''}`)
+  logger.error(`Job ${job?.id ?? 'unknown id'} failed. ${error.stack ?? ''}`)
   Sentry.captureException(error)
 })
 

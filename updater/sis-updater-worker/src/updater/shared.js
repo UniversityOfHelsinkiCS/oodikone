@@ -198,6 +198,13 @@ export const loadMapsOnDemand = async () => {
   loadedAt = new Date().getTime()
 }
 
+/** Equivalent to `redis-cli flushall`. Drops _everything_. */
+export const nukeRedis = async () => {
+  const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
+  await redisClient.flushAll()
+  await unlock()
+}
+
 export const getCountry = countryId => localMaps.countries[countryId]
 
 export const educationTypeToExtentcode = {

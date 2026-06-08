@@ -2,7 +2,7 @@ import { intersection } from 'lodash-es'
 
 import { update } from './updater/index.js'
 import { purgeByStudentNumber, prePurge, purge } from './updater/purge.js'
-import { loadMapsOnDemand } from './updater/shared.js'
+import { loadMapsOnDemand, nukeRedis } from './updater/shared.js'
 import {
   fixVarhaiskasvatusStudyRights,
   studentsThatNeedToBeFixed,
@@ -49,6 +49,9 @@ export default async job => {
       break
     case 'reload_redis':
       await loadMapsOnDemand()
+      break
+    case 'nuke_redis':
+      await nukeRedis()
       break
     default:
       throw new Error(`Unknown job type: ${job.name}`)

@@ -4,6 +4,7 @@ import { languageCenterViewEnabled } from '../config'
 import { refreshFaculties, refreshProgrammes } from '../events'
 import {
   abortUpdate,
+  nukeRedis,
   updateSISCoursesByCourseCode,
   updateSISMetadata,
   updateSISProgrammes,
@@ -12,17 +13,17 @@ import {
   updateSISStudentsByStudentNumber,
 } from '../services/sisUpdaterService'
 import logger from '../util/logger'
-import { getJobs, jobMaker, removeWaitingJobs } from '../worker/queue'
+import { jobQueue } from '../worker/queue'
 
 const router = Router()
 
 const refreshFacultiesByList = (facultyCodes: string[]) => {
-  facultyCodes.forEach(code => jobMaker.faculty(code))
+  facultyCodes.forEach(code => jobQueue.refreshFaculty(code))
   return 'Added jobs for refreshing faculties'
 }
 
 const refreshProgrammesByList = (programmeCodes: string[]) => {
-  programmeCodes.forEach(code => jobMaker.programme(code))
+  programmeCodes.forEach(code => jobQueue.refreshProgramme(code))
   return 'Added jobs for refreshing programme'
 }
 
@@ -80,11 +81,17 @@ router.get('/refresh_redis_cache', async (req: Request, res: Response) => {
   }
 })
 
+router.get('/nuke_redis', async (req: Request, res: Response) => {
+  logger.info(`${req.user.username} requested complete wipe of redis`)
+  const response = await nukeRedis()
+  if (response) res.status(200).json('Complete flush of redis scheduled')
+})
+
 router.post('/refresh-teacher-leaderboard', (req: Request, res: Response) => {
   logger.info(
     `${req.user.username} requested refresh of teacher leaderboard for the current and previous academic year`
   )
-  jobMaker.teacherLeaderboard()
+  jobQueue.refreshTeacherLeaderboard()
   res.status(200).json('Teacher leaderboard for the current and previous academic year refreshed')
 })
 
@@ -104,13 +111,13 @@ router.post('/refresh_language_center_data', (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of language center data`)
   if (!languageCenterViewEnabled)
     res.status(418).json({ error: 'The language center functionality is not activated in your environment.' })
-  jobMaker.languagecenter()
+  jobQueue.refreshLanguagecenter()
   res.status(200).json('Added job for refreshing language center data')
 })
 
 router.post('/refresh-close-to-graduation', (req: Request, res: Response) => {
   logger.info(`${req.user.username} requested refresh of close to graduation data`)
-  jobMaker.closeToGraduation()
+  jobQueue.refreshCloseToGraduation()
   res.status(200).json('Added job for refreshing close to graduation data')
 })
 
@@ -120,13 +127,12 @@ router.get('/abort', async (_req: Request, res: Response) => {
 })
 
 router.get('/jobs', async (_req: Request, res: Response) => {
-  const waiting = await getJobs('waiting')
-  const active = await getJobs('active')
-  res.status(200).json({ waiting, active })
+  const jobs = await jobQueue.getJobs()
+  res.status(200).json(jobs)
 })
 
 router.delete('/jobs', async (_req: Request, res: Response) => {
-  await removeWaitingJobs()
+  await jobQueue.clearWaitingJobs()
   res.status(200).end()
 })
 

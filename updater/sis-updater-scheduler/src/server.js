@@ -97,6 +97,12 @@ app.get('/rediscache', async (req, res) => {
   res.locals.msg('Scheduled redis cache reloading')
 })
 
+app.get('/nuke_redis', async (req, res) => {
+  await queue.add('nuke_redis')
+  logger.info('Scheduled wiping of redis')
+  res.locals.msg('Scheduled wiping of redis')
+})
+
 app.get('/abort', async (req, res) => {
   const jobCountsBeforeDrain = await queue.getJobCounts()
   await queue.drain()

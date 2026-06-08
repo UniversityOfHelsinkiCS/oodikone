@@ -13,7 +13,7 @@ import { updateBasicView, updateStudyTrackView } from './services/studyProgramme
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
-import { jobMaker, addToFlow } from './worker/queue'
+import { jobQueue } from './worker/queue'
 
 const schedule = (cronTime: string, onTick: () => void) => {
   const onComplete = null
@@ -41,7 +41,7 @@ export const refreshFaculties = async () => {
   logger.info('Adding jobs to refresh all faculties')
   const faculties = await getFaculties()
   for (const faculty of faculties) {
-    jobMaker.faculty(faculty.code)
+    jobQueue.refreshFaculty(faculty.code)
   }
 }
 
@@ -53,12 +53,13 @@ export const refreshLanguageCenterData = async () => {
 }
 
 const refreshProgrammesAndFaculties = async () => {
+  logger.info('Refreshing all degree programmes and faculties')
   const facultyCodes = (await getFaculties()).map(faculty => faculty.code)
   for (const faculty of facultyCodes) {
     const programmeCodes = (await getDegreeProgrammesOfFaculty(faculty, true))
       .map(programme => programme.code)
       .filter(code => isRelevantProgramme(code))
-    await addToFlow(faculty, programmeCodes)
+    await jobQueue.addToFlow(faculty, programmeCodes)
   }
 }
 
@@ -82,7 +83,7 @@ export const refreshProgrammes = async () => {
   }
   for (const code of programmeCodes) {
     // If combined programme is given, this updates only the bachelor programme
-    jobMaker.programme(code)
+    jobQueue.refreshProgramme(code)
   }
 }
 
@@ -96,8 +97,12 @@ const dailyJobs = async () => {
   try {
     await refreshTeacherLeaderboard()
     await refreshProgrammesAndFaculties()
-    if (languageCenterViewEnabled) jobMaker.languagecenter()
-    jobMaker.closeToGraduation()
+
+    if (languageCenterViewEnabled) {
+      jobQueue.refreshLanguagecenter()
+    }
+
+    jobQueue.refreshCloseToGraduation()
   } catch (error) {
     logger.error('Daily jobs failed', error)
   }
@@ -118,11 +123,11 @@ export const startCron = () => {
     })
     schedule('0 19 * * 1', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
-      jobMaker.studyplansUpdate(4)
+      jobQueue.refreshStudyplans(4)
     })
     schedule('0 10 * * 2', () => {
       logger.info('Updating students whose studyplans have not been updated recently')
-      jobMaker.studyplansUpdate(5)
+      jobQueue.refreshStudyplans(5)
     })
   }
 }

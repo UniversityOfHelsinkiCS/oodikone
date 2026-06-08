@@ -2,6 +2,11 @@
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid2'
@@ -25,12 +30,11 @@ import { RefreshIcon } from '@/theme'
 
 const useTicker = () => {
   const [now, setNow] = useState(() => Date.now())
-  const intervalMs = 1000
 
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), intervalMs)
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
-  }, [intervalMs])
+  }, [])
 
   return now
 }
@@ -77,6 +81,7 @@ export const Updater = () => {
   const [type, setType] = useState('students')
   const [jobs, setJobs] = useState<Jobs | null>(null)
   const [syntheticError, setSyntheticError] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const customListRef = useRef<HTMLInputElement>(null!)
   const jsonDataRef = useRef('')
 
@@ -106,6 +111,10 @@ export const Updater = () => {
   const refreshLanguageCenterData = () => void apiCall('/updater/refresh_language_center_data', 'post')
   const refreshCloseToGraduationData = () => void apiCall('/updater/refresh-close-to-graduation', 'post')
   const removeWaitingJobs = () => void callApi('/updater/jobs', 'delete')
+  const flushRedis = () => {
+    void apiCall('/updater/nuke_redis')
+    setDialogOpen(false)
+  }
 
   useEffect(() => {
     const updateJobs = async () => {
@@ -118,10 +127,7 @@ export const Updater = () => {
     }
     void updateJobs()
 
-    /* eslint-disable prefer-const */
-    let interval
-    /* eslint-disable @typescript-eslint/no-misused-promises */
-    interval = setInterval(updateJobs, 5000)
+    const interval = setInterval(() => void updateJobs(), 5000)
 
     return () => clearInterval(interval)
   }, [])
@@ -132,9 +138,36 @@ export const Updater = () => {
     <PageLayout maxWidth="lg">
       <PageTitle title="Updater" />
       <Stack spacing={2}>
-        <Button color="error" onClick={() => setSyntheticError(true)} variant="contained">
-          Cause frontend crash
-        </Button>
+        <Grid container>
+          <Grid paddingRight={1} size={6}>
+            <Button color="error" fullWidth onClick={() => setSyntheticError(true)} variant="contained">
+              Cause frontend crash
+            </Button>
+          </Grid>
+          <Grid paddingLeft={1} size={6}>
+            <Button color="error" fullWidth onClick={() => setDialogOpen(true)} variant="contained">
+              Destroy redis
+            </Button>
+          </Grid>
+        </Grid>
+        <Dialog onClose={() => setDialogOpen(false)} open={dialogOpen}>
+          <DialogTitle>Completely flush redis?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Fully clears redis. This includes all cached data in updater/backend and anything BullMQ might have
+              stored. Equivalent to `redis-cli flushall` in container or `npm run flushredis` in development. 99% of
+              errors will be fixed by just refreshing the data for the relevant feature, e.g. faculty/study programme.
+            </DialogContentText>
+            <DialogActions>
+              <Button color="error" onClick={() => void flushRedis()} variant="contained">
+                I know what I'm doing, flush redis
+              </Button>
+              <Button onClick={() => setDialogOpen(false)} variant="contained">
+                Go back
+              </Button>
+            </DialogActions>
+          </DialogContent>
+        </Dialog>
         <Section
           infoBoxContent={updaterToolTips.updaterSection}
           title="Updater (data pulled from sis-importer-db and brought to sis-db)"
