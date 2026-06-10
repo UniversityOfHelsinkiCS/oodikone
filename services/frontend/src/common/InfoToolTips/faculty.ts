@@ -22,6 +22,7 @@ Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet.
 `,
     programmeToggle: `
 **New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
+
 **All degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
 `,
     averageGraduationTimes: `
