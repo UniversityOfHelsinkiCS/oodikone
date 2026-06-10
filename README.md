@@ -238,6 +238,20 @@ npm run cypress:run
 
 Remember to revert the `baseUrl` in [cypress.config.js](./cypress.config.js) to its original value when you're done.
 
+## How to read clients minds
+
+Search for client queries in grafana using a variation of this query:
+
+```
+{app="oodikone"} | regexp `\s(?P<payload>\{.*\}$)` | line_format `{{.payload}}` | json userId, mockedBy | userId = `client` | mockedBy != `admin`
+```
+
+For quick access to _any and all params_ under certain path:
+
+```
+{app="oodikone"} |= `path` | regexp `\s(?P<payload>\{.*\}$)` | line_format `{{.payload}}` | json userId, mockedBy | userId = `client` | mockedBy != `admin`
+```
+
 ## ✌🏼 Maintainers and contribution
 
 [Toska](https://toska.dev) - University of Helsinki
