@@ -33,37 +33,51 @@ dayjsExtend(isSameOrAfter)
 
 const columnHelper = createColumnHelper<FormattedStudent>()
 
-const getCourses = (
+/** Return course + all of it's substitution groups */
+const getCourseGroups = (
   courseCode: string,
   criteria: ProgressCriteria | undefined,
   student: FormattedStudent
-): StudentCourse[] => {
-  return student.courses.filter(
-    course => course.course_code === courseCode || criteria?.allCourses[courseCode]?.includes(course.course_code)
-  )
+): StudentCourse[][] => {
+  const studentCourseCodes = student.courses.map(({ course_code }) => course_code)
+
+  // Return groups that have all courses in student.courses
+  const courseGroups: StudentCourse[][] = []
+  for (const group of [[courseCode]].concat(criteria?.allCourseGroups[courseCode] ?? [])) {
+    if (group.every(code => studentCourseCodes.includes(code))) {
+      // We know all of the group's courses exist, we just checked that
+      courseGroups.push(
+        ...group.map(code => student.courses.filter(course => course.course_code === code).toSorted((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()))
+      )
+    }
+  }
+  return courseGroups
 }
 
-const hasCreditTransfer = (courses: StudentCourse[]) =>
-  courses?.some(course => course.credittypecode === CreditTypeCode.APPROVED)
+const hasCreditTransfer = (courseGroups: StudentCourse[][]) =>
+  courseGroups.some(group => group.every(course => course.credittypecode === CreditTypeCode.APPROVED))
 
-const hasPassedDuringAcademicYear = (courses: StudentCourse[], start: dayjs.Dayjs, end: dayjs.Dayjs) => {
+const hasPassedDuringAcademicYear = (courseGroups: StudentCourse[][], start: dayjs.Dayjs, end: dayjs.Dayjs) => {
+  // Check if any courseGroup has all courses passed and has *LATEST* course completed before the end date
+  //
+  // TODO: If student has improved their grade of one of the courses, this will probably not count the group as
+  // passed during academic year
   return (
-    courses.some(course => course.passed) &&
-    courses.some(course => dayjs(course.date).isBetween(dayjs(start), dayjs(end)))
+    courseGroups.some(group => group.every(course => course.passed)) &&
+    courseGroups.some(group => group.some(
+      course => dayjs(course.date).isBetween(dayjs(start), dayjs(end))) && group.every(course => dayjs(course.date).isBefore(end))
+    )
   )
 }
 
-const hasPassedOutsideAcademicYear = (courses: StudentCourse[]) => courses?.some(course => course.passed)
+const hasPassedOutsideAcademicYear = (courseGroups: StudentCourse[][]) => courseGroups.some(group => group.every(course => course.passed))
 
-const hasFailed = (courses: StudentCourse[]) => courses?.some(course => course.passed === false)
+const hasFailed = (courseGroups: StudentCourse[][]) => courseGroups.some(group => group.some(course => !course.passed))
 
-const hasEnrolled = (student: FormattedStudent, courseCode: string) => {
-  return student.enrollments?.map(course => course.course_code).includes(courseCode)
-}
+// Return enrollments only for main course codes
+const hasEnrolled = (student: FormattedStudent, courseCode: string) => student.enrollments?.map(course => course.course_code).includes(courseCode)
 
-const getEnrollment = (student: FormattedStudent, courseCode: string) => {
-  return student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
-}
+const getEnrollment = (student: FormattedStudent, courseCode: string) => student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
 
 const getRowContent = (
   student: FormattedStudent,
@@ -80,7 +94,12 @@ const getRowContent = (
     return null
   }
 
-  const courses = getCourses(courseCode, criteria, student)
+  const courses = getCourseGroups(courseCode, criteria, student)
+
+
+  if (student.studentNumber === "015017237") {
+    console.log("Courses:", courses, courseCode)
+  }
 
   if (hasCreditTransfer(courses)) {
     return <SwapHorizIcon color="success" />
@@ -115,14 +134,16 @@ const getExcelText = (
     return student.criteriaProgress[year]?.credits ? 'Passed' : ''
   }
 
-  const courses = getCourses(courseCode, criteria, student)
+  const courseGroups = getCourseGroups(courseCode, criteria, student)
 
-  if (hasPassedOutsideAcademicYear(courses)) {
-    return `Passed ${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
+  if (hasPassedOutsideAcademicYear(courseGroups)) {
+    const latestCompletedGroup = courseGroups.filter(group => group.every(course => course.passed)).at(0)!
+    return `Passed ${latestCompletedGroup.length === 1 ? formatDate(latestCompletedGroup[0]?.date, DateFormat.ISO_DATE) : "(substituted)"}`
   }
 
-  if (hasFailed(courses)) {
-    return `Failed ${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
+  if (hasFailed(courseGroups)) {
+    const latestFailedCourse = courseGroups.find(group => group.some(course => !course.passed))?.find(course => !course.passed)
+    return `Failed ${formatDate(!!latestFailedCourse ? latestFailedCourse.date : "(substituted)", DateFormat.ISO_DATE)}`
   }
 
   if (hasEnrolled(student, courseCode)) {
@@ -411,12 +432,12 @@ export const ProgressTable = ({
                     ? [[getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.totalSatisfied ?? 0]]
                     : label.code === 'Enrollment'
                       ? (() => {
-                          const [fall, spring] = getSemesterEnrollmentVal(student, semesters)
-                          return [
-                            [`${getTextIn(label.name)} - FALL`, fall],
-                            [`${getTextIn(label.name)} - SPRING`, spring],
-                          ]
-                        })()
+                        const [fall, spring] = getSemesterEnrollmentVal(student, semesters)
+                        return [
+                          [`${getTextIn(label.name)} - FALL`, fall],
+                          [`${getTextIn(label.name)} - SPRING`, spring],
+                        ]
+                      })()
                       : [[getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.credits ? 'Passed' : '']]
                 ) ?? []
               )
@@ -460,15 +481,15 @@ export const ProgressTable = ({
           }),
           ...(namesVisible
             ? [
-                columnHelper.accessor(() => undefined, {
-                  header: 'Last name',
-                  cell: ({ row }) => row.original.lastname,
-                }),
-                columnHelper.accessor(() => undefined, {
-                  header: 'First names',
-                  cell: ({ row }) => row.original.firstnames,
-                }),
-              ]
+              columnHelper.accessor(() => undefined, {
+                header: 'Last name',
+                cell: ({ row }) => row.original.lastname,
+              }),
+              columnHelper.accessor(() => undefined, {
+                header: 'First names',
+                cell: ({ row }) => row.original.firstnames,
+              }),
+            ]
             : []),
         ],
       }),

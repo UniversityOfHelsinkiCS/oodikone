@@ -1,12 +1,15 @@
 import type { FetchBaseQueryMeta } from '@reduxjs/toolkit/query'
 import type { PopulationCourseStats } from '@oodikone/shared/routes/populations'
 import { CreditTypeCode } from '@oodikone/shared/types'
-import type { FormattedStudent, ProgressCriteria } from '@oodikone/shared/types'
+import type { FormattedStudent, ProgressCriteria, Unarray } from '@oodikone/shared/types'
 
 import { getProgressCriteria } from './criteriaProgress'
 
+type PopulationCourseStatsEnrollment = Omit<Unarray<PopulationCourseStats["enrollments"]>, "studentnumber">
+export type PopulationCourseStatsCredit = Omit<Unarray<PopulationCourseStats["credits"]>, "student_studentnumber">
+
 export interface ExpandedCourseStats extends PopulationCourseStats {
-  dataByStudent: Map<string, [any[], any[]]>
+  dataByStudent: Map<string, [PopulationCourseStatsEnrollment[], PopulationCourseStatsCredit[]]>
 }
 
 type RequiredFields = {
@@ -43,15 +46,6 @@ export const formatPopulationData = <T extends RequiredFields>(
     creditsAndEnrollmentsByStudent.get(studentnumber)![1].push(rest)
   }
 
-  const criteriaCoursesBySubstitutionMap = new Map<string, string>()
-  for (const [courseCode, substitutionCodes] of Object.entries(otherParams.criteria.allCourses)) {
-    criteriaCoursesBySubstitutionMap.set(courseCode, courseCode)
-
-    for (const substitutionCode of substitutionCodes) {
-      criteriaCoursesBySubstitutionMap.set(substitutionCode, courseCode)
-    }
-  }
-
   const formattedStudents = students.map(student => {
     const [enrollments, credits] = creditsAndEnrollmentsByStudent.get(student.studentNumber)!
     const hops = student.studyplans.find(plan => plan.programme_code === code)
@@ -60,10 +54,9 @@ export const formatPopulationData = <T extends RequiredFields>(
       ...student,
       criteriaProgress: getProgressCriteria(
         otherParams.criteria,
-        criteriaCoursesBySubstitutionMap,
         student.studyrightStart,
         hops,
-        credits
+        credits,
       ),
       courses: credits.map(credit => {
         const passed = [CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(
