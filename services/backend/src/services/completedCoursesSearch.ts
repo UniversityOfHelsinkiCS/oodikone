@@ -1,62 +1,28 @@
 import { col, fn, Op, where } from 'sequelize'
 
-import { CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
+import {
+  CompletedCoursesCourse,
+  CompletedCoursesStudent,
+  CreditTypeCode,
+  EnrollmentState,
+  StudentCredits,
+} from '@oodikone/shared/types'
 import { omitKeys } from '@oodikone/shared/util'
 import { CourseModel, CreditModel, EnrollmentModel, StudentModel, StudyplanModel } from '../models'
 
-export type Courses = Array<Pick<CourseModel, 'code' | 'name' | 'substitution_groups'>>
-
-interface StudentCredit {
-  date: Date
-  courseCode: string
-  creditType: CreditTypeCode
-  substitution: string[] | null
-}
-
-interface StudentEnrollment {
-  date: Date
-  courseCode: string
-  substitution: string[] | null
-}
-
-interface StudentInfo {
-  firstnames: string
-  lastname: string
-  email: string
-  sis_person_id: string
-  coursesInStudyPlan: string[]
-  secondaryEmail: string | null
-  credits: StudentCredit[]
-  enrollments: Record<string, StudentEnrollment>
-}
-
-type StudentCredits = Record<
-  string,
-  Omit<StudentInfo, 'credits' | 'enrollments'> & {
-    credits: StudentCredit[]
-    enrollments: StudentEnrollment[]
-  }
->
-
-export interface FormattedStudent extends StudentInfo {
-  studentNumber: string
-  allEnrollments: StudentEnrollment[]
-}
-
-interface StudentWithStudyplanNested
-  extends Pick<
-    StudentModel,
-    'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'
-  > {
+type StudentWithStudyplanNested = Pick<
+  StudentModel,
+  'studentnumber' | 'firstnames' | 'lastname' | 'email' | 'sis_person_id' | 'secondary_email'
+> & {
   studyplans: { included_courses: string[] }[]
 }
 
-interface StudentWithCourses extends Omit<StudentWithStudyplanNested, 'studyplans'> {
+type StudentWithCourses = Omit<StudentWithStudyplanNested, 'studyplans'> & {
   coursesInStudyPlan: string[]
 }
 
 const getCourses = async (courseCodes: string[]) => {
-  const courses: Courses = (
+  const courses: CompletedCoursesCourse[] = (
     await CourseModel.findAll({
       attributes: ['code', 'name', 'substitution_groups'],
       where: where(fn('LOWER', col('code')), {
@@ -67,25 +33,28 @@ const getCourses = async (courseCodes: string[]) => {
   return courses
 }
 
-const getPassedCredits = async (courses: Courses, fullCourseCodes: string[], studentNumbers: string[]) => {
-  const credits: Array<
-    Pick<CreditModel, 'course_code' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'>
-  > = await CreditModel.findAll({
-    raw: true,
-    attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
-    order: [['attainment_date', 'DESC']],
-    where: {
-      course_code: {
-        [Op.in]: fullCourseCodes,
+const getPassedCredits = async (
+  courses: CompletedCoursesCourse[],
+  fullCourseCodes: string[],
+  studentNumbers: string[]
+) => {
+  const credits: Pick<CreditModel, 'course_code' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'>[] =
+    await CreditModel.findAll({
+      raw: true,
+      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
+      order: [['attainment_date', 'DESC']],
+      where: {
+        course_code: {
+          [Op.in]: fullCourseCodes,
+        },
+        student_studentnumber: {
+          [Op.in]: studentNumbers,
+        },
+        credittypecode: {
+          [Op.not]: CreditTypeCode.FAILED,
+        },
       },
-      student_studentnumber: {
-        [Op.in]: studentNumbers,
-      },
-      credittypecode: {
-        [Op.not]: CreditTypeCode.FAILED,
-      },
-    },
-  })
+    })
 
   const creditsByStudentNumber = Object.groupBy(credits, ({ student_studentnumber }) => student_studentnumber)
 
@@ -125,7 +94,11 @@ const getPassedCredits = async (courses: Courses, fullCourseCodes: string[], stu
   return formattedCredits
 }
 
-const getEnrollments = async (courses: Courses, fullCourseCodes: string[], studentNumbers: string[]) => {
+const getEnrollments = async (
+  courses: CompletedCoursesCourse[],
+  fullCourseCodes: string[],
+  studentNumbers: string[]
+) => {
   const enrollments: Array<Pick<EnrollmentModel, 'course_code' | 'enrollment_date_time' | 'studentnumber'>> =
     await EnrollmentModel.findAll({
       attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
@@ -208,7 +181,7 @@ const getStudents = async (studentNumbers: string[]): Promise<StudentWithCourses
 export const getCompletedCourses = async (
   studentNumbers: string[],
   courseCodes: string[]
-): Promise<{ students: Omit<FormattedStudent, 'allEnrollments'>[]; courses: Courses }> => {
+): Promise<{ students: Omit<CompletedCoursesStudent, 'allEnrollments'>[]; courses: CompletedCoursesCourse[] }> => {
   const courses = await getCourses(courseCodes)
   const courseCodesSet = new Set(courseCodes)
 
@@ -280,22 +253,25 @@ export const getCompletedCourses = async (
     })
   })
 
-  const students = Object.keys(studentCredits).reduce((acc: FormattedStudent[], studentNumber) => {
-    const student = studentCredits[studentNumber]
-    acc.push({
-      studentNumber,
-      sis_person_id: student.sis_person_id,
-      credits: student.credits,
-      enrollments: {},
-      allEnrollments: student.enrollments,
-      firstnames: student.firstnames,
-      lastname: student.lastname,
-      email: student.email,
-      secondaryEmail: student.secondaryEmail,
-      coursesInStudyPlan: student.coursesInStudyPlan,
-    })
-    return acc
-  }, [] as FormattedStudent[])
+  const students = Object.keys(studentCredits).reduce<CompletedCoursesStudent[]>(
+    (acc: CompletedCoursesStudent[], studentNumber) => {
+      const student = studentCredits[studentNumber]
+      acc.push({
+        studentNumber,
+        sis_person_id: student.sis_person_id,
+        credits: student.credits,
+        enrollments: {},
+        allEnrollments: student.enrollments,
+        firstnames: student.firstnames,
+        lastname: student.lastname,
+        email: student.email,
+        secondaryEmail: student.secondaryEmail,
+        coursesInStudyPlan: student.coursesInStudyPlan,
+      })
+      return acc
+    },
+    []
+  )
 
   students.forEach(student => {
     courseCodes.forEach(courseCode => {

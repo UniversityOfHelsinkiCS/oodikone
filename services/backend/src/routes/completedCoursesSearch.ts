@@ -2,8 +2,9 @@ import { Router } from 'express'
 import { difference, intersection } from 'lodash-es'
 
 import { CanError } from '@oodikone/shared/routes'
+import type { CompletedCoursesStudent, CompletedCoursesCourse } from '@oodikone/shared/types'
 import { tryCatch } from '@oodikone/shared/util'
-import { Courses, FormattedStudent, getCompletedCourses } from '../services/completedCoursesSearch'
+import { getCompletedCourses } from '../services/completedCoursesSearch'
 import {
   getUserSearches,
   createNewUserSearch,
@@ -19,11 +20,14 @@ const router = Router()
 
 const importerClient = getImporterClient()
 
-export type SearchResBody = CanError<
-  { discardedStudentNumbers: string[] } & { students: Omit<FormattedStudent, 'allEnrollments'>[]; courses: Courses }
+type SearchResBody = CanError<
+  { discardedStudentNumbers: string[] } & {
+    students: Omit<CompletedCoursesStudent, 'allEnrollments'>[]
+    courses: CompletedCoursesCourse[]
+  }
 >
-export type SearchReqBody = never
-export type SearchQuery = {
+type SearchReqBody = never
+type SearchQuery = {
   studentlist: string
   courselist: string
 }

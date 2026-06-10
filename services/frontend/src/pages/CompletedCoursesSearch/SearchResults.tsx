@@ -17,20 +17,18 @@ import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
-import { CreditTypeCode } from '@oodikone/shared/types'
+import { CompletedCoursesStudent, CreditTypeCode } from '@oodikone/shared/types'
+import { SearchValues } from '.'
 
-const isPassed = credit => [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(credit)
+const isPassed = (creditType: CreditTypeCode) =>
+  [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(creditType)
 
-const getTotalPassed = student => student.credits.filter(credit => isPassed(credit)).length
-
-const getTotalUnfinished = student => Object.values(student.enrollments).length
-
-const getCompletion = (student, courseCode, { icon }) => {
+const getCompletion = (student: CompletedCoursesStudent, courseCode: string, icon: boolean) => {
   const completion = student.credits.find(credit => credit.courseCode === courseCode && isPassed(credit.creditType))
   const enrollment = student.enrollments[courseCode]
   const isInStudyPlan = student.coursesInStudyPlan.includes(courseCode)
 
-  if (completion === undefined) {
+  if (!completion) {
     if (!enrollment) {
       if (isInStudyPlan) {
         return <CropSquareIcon fontSize="small" style={{ color: grey[500] }} />
@@ -47,9 +45,8 @@ const getCompletion = (student, courseCode, { icon }) => {
     return `Latest enrollment: ${formatDate(enrollment.date, DateFormat.ISO_DATE)}`
   }
 
-  const substituted = !!completion.substitution?.length
-  const substitutionString = substituted ? ` as ${completion.substitution.join(', ')}` : ''
-
+  const substituted = Array.isArray(completion.substitution) && !!completion.substitution.length
+  const substitutionString = substituted ? ` as ${completion.substitution!.join(', ')}` : ''
   return icon ? (
     <DoneIcon fontSize="small" style={{ color: substituted ? grey[700] : green[700] }} />
   ) : (
@@ -57,13 +54,13 @@ const getCompletion = (student, courseCode, { icon }) => {
   )
 }
 
-const getCellTitle = (student, courseCode) => {
+const getCellTitle = (student: CompletedCoursesStudent, courseCode: string) => {
   const credit = student.credits.find(credit => credit.courseCode === courseCode)
   const enrollment = student.enrollments[courseCode]
   if (!credit && !enrollment) {
     return 'Student has the course in their primary study plan'
   }
-  let title
+  let title: string
   if (credit) {
     const substitutionString = credit.substitution?.length ? `Substituted by: ${credit.substitution?.join(', ')}` : ''
     title = `Passed on ${formatDate(credit.date, DateFormat.ISO_DATE)}\n${substitutionString}`
@@ -98,7 +95,7 @@ const RightsNotification = ({ discardedStudentNumbers }: { discardedStudentNumbe
   )
 }
 
-export const SearchResults = ({ searchValues }) => {
+export const SearchResults = ({ searchValues }: { searchValues: SearchValues }) => {
   const { courseList, studentList } = searchValues
   const { visible: namesVisible } = useStudentNameVisibility()
   const { data, isFetching } = useGetCompletedCoursesQuery({ courseList, studentList })
@@ -116,8 +113,12 @@ export const SearchResults = ({ searchValues }) => {
     })
   }, [namesVisible])
 
-  const staticColumns = useMemo<MRT_ColumnDef<any>[]>(
-    () => [
+  const staticColumns = useMemo<MRT_ColumnDef<CompletedCoursesStudent>[]>(() => {
+    const getTotalPassed = (student: CompletedCoursesStudent) =>
+      student.credits.filter(credit => isPassed(credit.creditType)).length
+    const getTotalUnfinished = (student: CompletedCoursesStudent) =>
+      (data?.courses?.length ?? 0) - student.credits.length
+    return [
       {
         accessorKey: 'lastname',
         header: 'Last name',
@@ -139,27 +140,27 @@ export const SearchResults = ({ searchValues }) => {
         header: 'Email',
       },
       {
-        accessorFn: student => getTotalPassed(student),
+        accessorFn: getTotalPassed,
         id: 'passed',
         header: 'Passed',
       },
       {
-        accessorFn: student => getTotalUnfinished(student),
+        accessorFn: getTotalUnfinished,
         id: 'unfinished',
         header: 'Unfinished',
       },
-    ],
-    []
-  )
+    ]
+  }, [data])
 
-  const dynamicColumns = useMemo(() => {
+  const dynamicColumns = useMemo<MRT_ColumnDef<CompletedCoursesStudent>[]>(() => {
+    if (!data) return []
     const courseOrder = courseList ?? []
 
     return (
-      data?.courses
-        .toSorted(({ code: a }, { code: b }) => courseOrder.indexOf(b) < courseOrder.indexOf(a))
+      data.courses
+        .toSorted((a, b) => courseOrder.indexOf(a.code) - courseOrder.indexOf(b.code))
         .map(course => ({
-          accessorFn: student => getCompletion(student, course.code, { icon: false }),
+          accessorFn: (student: CompletedCoursesStudent) => getCompletion(student, course.code, false),
           id: course.code,
           header: `${course.code} – ${getTextIn(course.name)}`,
           Header: () => (
@@ -173,14 +174,17 @@ export const SearchResults = ({ searchValues }) => {
               sx={{ display: 'flex', justifyContent: 'center' }}
               title={getCellTitle(cell.row.original, course.code)}
             >
-              {getCompletion(cell.row.original, course.code, { icon: true })}
+              {getCompletion(cell.row.original, course.code, true)}
             </Box>
           ),
         })) ?? []
     )
   }, [data, getTextIn])
 
-  const columns = useMemo(() => [...staticColumns, ...dynamicColumns], [staticColumns, dynamicColumns])
+  const columns: any[] /* MRT getting replaced anyway */ = useMemo(
+    () => [...staticColumns, ...dynamicColumns],
+    [staticColumns, dynamicColumns]
+  )
 
   const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
 
@@ -204,7 +208,7 @@ export const SearchResults = ({ searchValues }) => {
         onClose={() => setExportModalOpen(false)}
         open={exportModalOpen}
       />
-      {data?.discardedStudentNumbers?.length > 0 && (
+      {!!data?.discardedStudentNumbers?.length && (
         <div style={{ width: '75%' }}>
           <RightsNotification discardedStudentNumbers={data.discardedStudentNumbers} />
         </div>

@@ -14,9 +14,11 @@ import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
 import { SearchModal } from './SearchModal'
 import { SearchResults } from './SearchResults'
 
+export type SearchValues = { courseList: string[]; studentList: string[] }
+
 export const CompletedCourses = () => {
   useTitle('Completed courses of students')
-  const [searchValues, setValues] = useState({ courseList: [], studentList: [] })
+  const [searchValues, setValues] = useState<SearchValues>({ courseList: [], studentList: [] })
 
   return (
     <PageLayout maxWidth="lg">

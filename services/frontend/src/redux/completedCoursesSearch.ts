@@ -1,8 +1,9 @@
 import { RTKApi } from '@/apiConnection'
+import type { CompletedCoursesRes } from '@oodikone/shared/routes/completedCoursesOfStudents'
 
 const completedCoursesSearchApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
-    getCompletedCourses: builder.query<any, { courseList: string[]; studentList: string[] }>({
+    getCompletedCourses: builder.query<CompletedCoursesRes, { courseList: string[]; studentList: string[] }>({
       query: ({ courseList, studentList }) =>
         `completedcoursessearch?courselist=${JSON.stringify(courseList)}&studentlist=${JSON.stringify(studentList)}`,
     }),
