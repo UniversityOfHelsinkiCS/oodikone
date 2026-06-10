@@ -1,6 +1,6 @@
 import { Model, ARRAY, DATE, DOUBLE, STRING, TEXT } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class Studyplan extends Model {}
 
@@ -53,7 +53,7 @@ Studyplan.init(
   },
   {
     underscored: false,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'studyplan',
     tableName: 'studyplan',
   }

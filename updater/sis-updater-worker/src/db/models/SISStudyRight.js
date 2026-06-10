@@ -1,5 +1,5 @@
 import { Model, ARRAY, BOOLEAN, DATE, INTEGER, JSONB, STRING } from 'sequelize'
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class SISStudyRight extends Model {}
 
@@ -26,7 +26,7 @@ SISStudyRight.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     tableName: 'sis_study_rights',
   }
 )

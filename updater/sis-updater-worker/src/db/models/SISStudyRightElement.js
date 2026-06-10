@@ -1,6 +1,6 @@
 import { Model, BOOLEAN, DATE, INTEGER, JSONB, STRING } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class SISStudyRightElement extends Model {}
 
@@ -24,7 +24,7 @@ SISStudyRightElement.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     tableName: 'sis_study_right_elements',
   }
 )

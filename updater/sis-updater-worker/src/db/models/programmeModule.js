@@ -1,6 +1,6 @@
 import { Model, ARRAY, DATE, INTEGER, JSONB, STRING, TEXT } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class ProgrammeModule extends Model {}
 
@@ -59,7 +59,7 @@ ProgrammeModule.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'programme_module',
     tableName: 'programme_modules',
   }

@@ -19,12 +19,14 @@ import logger from '../utils/logger.js'
 import { lock } from '../utils/redis.js'
 
 class DbConnections extends EventEmitter {
+  RETRY_ATTEMPTS = 15
+  knexConnection = false
+  seqConnection = false
+  knex = undefined
+  sequelize = undefined
+
   constructor() {
     super()
-    this.RETRY_ATTEMPTS = 15
-    this.knexConnection = false
-    this.seqConnection = false
-
     this.sequelize = new Sequelize(DB_URL, {
       dialect: 'postgres',
       pool: {
@@ -38,11 +40,19 @@ class DbConnections extends EventEmitter {
     })
   }
 
+  /**
+   * Registers named connection as established and emits 'connect' to the scheduler.
+   * @param {'knexConnection' | 'seqConnection'} conn
+   */
   establish(conn) {
     this[conn] = true
     if (this.knexConnection && this.seqConnection) this.emit('connect')
   }
 
+  /**
+   * Tries to connect to the importer. Calls itself recursively if the connection fails.
+   * @param {number} [attempt=1] - Current connection attempt.
+   */
   async connect(attempt = 1) {
     try {
       if (!this.knexConnection) {
@@ -80,6 +90,9 @@ class DbConnections extends EventEmitter {
     }
   }
 
+  /**
+   * Runs migrations from `src/db/migrations` using Umzug.
+   */
   async runMigrations() {
     const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
     try {
@@ -120,4 +133,3 @@ class DbConnections extends EventEmitter {
 }
 
 export const dbConnections = new DbConnections()
-export const { sequelize } = dbConnections

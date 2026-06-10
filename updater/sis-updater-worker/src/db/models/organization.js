@@ -1,6 +1,6 @@
 import { Model, DATE, JSONB, STRING } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class Organization extends Model {}
 
@@ -32,7 +32,7 @@ Organization.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'organization',
     tableName: 'organization',
   }

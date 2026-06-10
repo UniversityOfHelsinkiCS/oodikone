@@ -1,6 +1,6 @@
 import { Model, BOOLEAN, DATE, JSONB, STRING } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class Course extends Model {}
 
@@ -52,7 +52,7 @@ Course.init(
   },
   {
     underscored: false,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'course',
     tableName: 'course',
   }

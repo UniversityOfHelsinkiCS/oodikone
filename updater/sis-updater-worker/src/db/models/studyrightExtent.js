@@ -1,6 +1,6 @@
 import { Model, DATE, INTEGER, JSONB } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class StudyrightExtent extends Model {}
 
@@ -21,7 +21,7 @@ StudyrightExtent.init(
     },
   },
   {
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'studyright_extent',
     tableName: 'studyright_extents',
   }

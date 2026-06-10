@@ -1,6 +1,6 @@
 import { Model, DATE, INTEGER, JSONB } from 'sequelize'
 
-import { sequelize } from '../connection.js'
+import { dbConnections } from '../connection.js'
 
 class CreditType extends Model {}
 
@@ -22,7 +22,7 @@ CreditType.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: dbConnections.sequelize,
     modelName: 'credit_type',
     tableName: 'credit_types',
   }
