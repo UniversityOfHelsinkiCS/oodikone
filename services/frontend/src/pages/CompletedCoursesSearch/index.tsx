@@ -34,6 +34,10 @@ export const CompletedCourses = () => {
             grade.
           </Stack>
           <Stack direction="row">
+            <DoneIcon fontSize="small" sx={{ color: grey[700] }} />: Student has completed another course/set of courses
+            that substitute the original course. Hover for details.
+          </Stack>
+          <Stack direction="row">
             <RemoveIcon fontSize="small" sx={{ color: yellow[800] }} />: Student has not completed the course, but has
             an active enrollment from less than 6 months ago.
           </Stack>
@@ -45,7 +49,7 @@ export const CompletedCourses = () => {
             <CropSquareIcon fontSize="small" sx={{ color: grey[500] }} />: Student has the course in their primary study
             plan, but has not enrolled to, or completed it.
           </Stack>
-          <b>Empty cell</b>: Student has no completion or enrollment for the course.
+          <b>Empty cell</b>: None apply.
         </Alert>
         <SearchModal setValues={setValues} />
         {searchValues.courseList.length > 0 && searchValues.studentList.length > 0 && (
