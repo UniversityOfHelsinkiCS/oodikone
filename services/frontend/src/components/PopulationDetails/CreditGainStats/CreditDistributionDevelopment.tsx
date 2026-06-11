@@ -190,7 +190,7 @@ export const CreditDistributionDevelopment = ({
     switch (timeDivision) {
       case TimeDivision.CALENDAR_YEAR: {
         return range(year, dayjs().year() + 1).map(year => ({
-          start: dayjs().year(year),
+          start: dayjs().year(year).startOf('year'),
           end: dayjs().year(year).endOf('year'),
           label: year.toString(),
         }))
