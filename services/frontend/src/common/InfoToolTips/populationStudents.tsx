@@ -34,7 +34,7 @@ Credits and courses that
 Time passed since starting in the programme until graduation, excluding allowed absences (unlimited statutory and 2 non-statutory absences). Each unique calendar month increments the amount.
 
 **Example:**  
-from 31st of January to 1st of March = 3 months
+from 31st of January to 1st of March = 3 months  
 from 1st of January to 30th of March = 3 months`,
     programmes:
       'If a student has more than one programme, hover your mouse on the cell to view the rest. They are also displayed in the exported Excel file.',
