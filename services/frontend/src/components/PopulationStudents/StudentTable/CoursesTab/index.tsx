@@ -72,8 +72,8 @@ const studentMapper = (
     return acc
   }, {})
 
-  // curriculumCourseCode -> passedSubstGroup
-  const passedSubstitutionsToCurriculumCourses = Object.keys(substitutionsToCurriculumCourses).reduce<
+  /** curriculumCourseCode -> passedSubstGroup */
+  const curriculumCoursesToPassedSubstitutionGroups = Object.keys(substitutionsToCurriculumCourses).reduce<
     Record<string, StudentCourse[]>
   >((acc, code) => {
     const passedSubstitutionGroups = substitutionsToCurriculumCourses[code].filter(substGroup =>
@@ -125,7 +125,7 @@ const studentMapper = (
     {}
   )
 
-  const mapSubstitutionCourses = (coursesToAdd: typeof passedSubstitutionsToCurriculumCourses) => {
+  const mapSubstitutionCourses = (coursesToAdd: typeof curriculumCoursesToPassedSubstitutionGroups) => {
     for (const [code, substitutionGroup] of Object.entries(coursesToAdd)) {
       courseMap[code] ??= {
         substitutedBy: substitutionGroup,
@@ -199,7 +199,7 @@ const studentMapper = (
   }
 
   mapCourses(passedCourses)
-  if (includeSubstitutions) mapSubstitutionCourses(passedSubstitutionsToCurriculumCourses)
+  if (includeSubstitutions) mapSubstitutionCourses(curriculumCoursesToPassedSubstitutionGroups)
 
   mapEnrollments(enrollments)
   if (includeSubstitutions) mapSubstitutionEnrollments(enrollmentsWithSubstitutions)
@@ -207,7 +207,10 @@ const studentMapper = (
   mapHopsSelections(hopsItems)
   if (includeSubstitutions) mapSubstitutionHopsSelections(hopsItemsWithSubstitutions)
 
-  const totalPassed = Object.keys(courseMap).length
+  const totalPassed = Object.values(courseMap).reduce(
+    (acc: number, course: any) => (course.substitutedBy?.length > 0 || !!course?.passed ? acc + 1 : acc),
+    0
+  )
   const totalPlanned = Object.keys(courseMap).length - totalPassed
 
   return {
