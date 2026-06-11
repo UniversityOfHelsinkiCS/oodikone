@@ -5,7 +5,7 @@ import FormLabel from '@mui/material/FormLabel'
 import Paper from '@mui/material/Paper'
 import RadioMui from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import ReactECharts from 'echarts-for-react'
 
 import { groupBy } from 'lodash-es'
@@ -19,11 +19,18 @@ import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useDeepMemo } from '@/hooks/deepMemo'
 import { useSemesters } from '@/hooks/useSemesters'
+import { theme } from '@/theme'
 import { generateGradientColors } from '@/util/color'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { range } from '@oodikone/shared/util'
 
-const splitStudentCredits = (student: FormattedStudent, timeSlots: any[], cumulative: boolean) => {
+type TimeSlot = {
+  start: dayjs.Dayjs
+  end: dayjs.Dayjs
+  label: string
+}
+
+const splitStudentCredits = (student: FormattedStudent, timeSlots: TimeSlot[], cumulative: boolean) => {
   if (!timeSlots.length) return []
 
   let timeSlotN = 0
@@ -31,8 +38,9 @@ const splitStudentCredits = (student: FormattedStudent, timeSlots: any[], cumula
 
   student.courses
     .filter(course => course.passed && !course.isStudyModuleCredit && dayjs(course.date).isAfter(timeSlots[0].start))
-    .sort((a, b) => Number(dayjs(a.date) > dayjs(b.date)))
+    .sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix())
     .forEach(course => {
+      // Find correct timeslot
       while (timeSlotN < timeSlots.length && dayjs(course.date).isAfter(timeSlots[timeSlotN].end)) timeSlotN++
       if (timeSlots.length <= timeSlotN) return
 
@@ -47,18 +55,31 @@ const splitStudentCredits = (student: FormattedStudent, timeSlots: any[], cumula
   return results
 }
 
-const hasGraduatedBeforeDate = (student: FormattedStudent, programme: string, date: Dayjs) => {
+const hasGraduatedBetweenDates = (
+  student: FormattedStudent,
+  programme: string,
+  slot: TimeSlot,
+  cumulative: boolean
+) => {
+  const { start, end } = slot
   const correctStudyRight = student.studyRights.find(studyRight =>
     studyRight.studyRightElements.some(el => el.code === programme)
   )
   if (!correctStudyRight) return false
+
   const studyRightElement = correctStudyRight.studyRightElements.find(el => el.code === programme)
-  return Boolean(studyRightElement?.graduated && date.isAfter(studyRightElement?.endDate, 'day'))
+
+  // If we want cumulative graduations, we only want to check for correct end date. If not, check also the start date
+  return Boolean(
+    studyRightElement?.graduated &&
+      (start.isBefore(studyRightElement?.endDate, 'day') || cumulative) &&
+      end.isAfter(studyRightElement?.endDate, 'day')
+  )
 }
 
 const getChartData = (
   students: FormattedStudent[],
-  timeSlots: any[],
+  timeSlots: TimeSlot[],
   programme: string,
   timeDivision: TimeDivision,
   cumulative: boolean,
@@ -73,8 +94,9 @@ const getChartData = (
     timeSlots.length,
     6
   )
-  const colors = generateGradientColors(limits.length - 1)
-  colors.push('#ddd') // Color for graduated (grey)
+
+  // Also add color for graduated
+  const colors = generateGradientColors(limits.length - 1).concat(theme.palette.grey[300])
 
   const data: { value: number; students: Array<FormattedStudent['studentNumber']> }[][] = limits.map(() =>
     timeSlots.map(() => ({
@@ -83,12 +105,10 @@ const getChartData = (
     }))
   )
 
-  const studentCredits = students.map(student => splitStudentCredits(student, timeSlots, cumulative))
-
   timeSlots.forEach((slot, timeSlotIndex) => {
-    students.forEach((student, studentIndex) => {
-      const hasGraduated = !!programme && hasGraduatedBeforeDate(student, programme, dayjs(slot.end))
-      const credits = studentCredits[studentIndex][timeSlotIndex]
+    students.forEach(student => {
+      const hasGraduated = !!programme && hasGraduatedBetweenDates(student, programme, slot, cumulative)
+      const credits = splitStudentCredits(student, timeSlots, cumulative)[timeSlotIndex]
 
       const rangeIndex = hasGraduated
         ? limits.indexOf('Graduated')
@@ -117,7 +137,7 @@ const getChartData = (
     const color = colors[limitN]
 
     const limit = limits[limitN]
-    let name
+    let name: string
 
     if (limit === 'Graduated') {
       name = 'Graduated'
@@ -167,38 +187,42 @@ export const CreditDistributionDevelopment = ({
   const timeSlots = (() => {
     const startDate = dayjs().year(year).endOf('year')
 
-    if (timeDivision === TimeDivision.CALENDAR_YEAR) {
-      return range(year, dayjs().year() + 1).map(year => ({
-        start: dayjs().year(year),
-        end: dayjs().year(year).endOf('year'),
-        label: year.toString(),
-      }))
-    }
-
-    if (timeDivision === TimeDivision.ACADEMIC_YEAR) {
-      return Object.values(groupBy(semesters, 'yearcode'))
-        .map(([a, b]) => [dayjs(a.startdate), dayjs(b.enddate)])
-        .filter(([a, b]) => startDate.isBefore(b) && dayjs().isAfter(a))
-        .map(([start, end]) => ({
-          start,
-          end,
-          label: `${start.year()}-${end.year()}`,
+    switch (timeDivision) {
+      case TimeDivision.CALENDAR_YEAR: {
+        return range(year, dayjs().year() + 1).map(year => ({
+          start: dayjs().year(year),
+          end: dayjs().year(year).endOf('year'),
+          label: year.toString(),
         }))
-    }
+      }
 
-    if (timeDivision === TimeDivision.SEMESTER) {
-      return Object.values(semesters)
-        .filter(semester => startDate.isBefore(semester.enddate) && dayjs().isAfter(semester.startdate))
-        .map(semester => ({
-          start: dayjs(semester.startdate),
-          end: dayjs(semester.enddate),
-          label: getTextIn(semester.name) ?? '',
-        }))
+      case TimeDivision.ACADEMIC_YEAR: {
+        return Object.values(groupBy(semesters, 'yearcode'))
+          .map(([a, b]) => [dayjs(a.startdate), dayjs(b.enddate)])
+          .filter(([a, b]) => startDate.isBefore(b) && dayjs().isAfter(a))
+          .map(([start, end]) => ({
+            start,
+            end,
+            label: `${start.year()}-${end.year()}`,
+          }))
+      }
+
+      case TimeDivision.SEMESTER: {
+        return Object.values(semesters)
+          .filter(semester => startDate.isBefore(semester.enddate) && dayjs().isAfter(semester.startdate))
+          .map(semester => ({
+            start: dayjs(semester.startdate),
+            end: dayjs(semester.enddate),
+            label: getTextIn(semester.name) ?? '',
+          }))
+      }
+
+      default:
+        return []
     }
-    return []
   })()
 
-  const series = useDeepMemo(
+  const series: ReturnType<typeof getChartData> = useDeepMemo(
     () => getChartData(filteredStudents, timeSlots, programme, timeDivision, cumulative, combinedProgramme),
     [filteredStudents, timeSlots, programme, timeDivision, cumulative, combinedProgramme]
   )
