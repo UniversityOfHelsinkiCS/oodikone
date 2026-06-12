@@ -98,15 +98,23 @@ export const updateStudyplans = async (
     return res
   }, {})
 
-  const programmeModuleIdToType = programmeModules.reduce((res, cur) => {
-    res[cur.id] = cur.type
-    return res
-  }, {})
-
-  const programmeModuleIdToCode = programmeModules.reduce((res, cur) => {
-    res[cur.id] = cur.code
-    return res
-  }, {})
+  const {
+    types: programmeModuleIdToType,
+    codes: programmeModuleIdToCode,
+    periodIds: programmeModuleIdToValidityPeriod,
+  } = programmeModules.reduce(
+    ({ types, codes, periodIds }, cur) => {
+      types[cur.id] = cur.type
+      codes[cur.id] = cur.code
+      periodIds[cur.id] = cur.curriculum_period_ids
+      return { types, codes, periodIds }
+    },
+    {
+      types: {},
+      codes: {},
+      periodIds: {},
+    }
+  )
 
   const programmeModuleIdToStudyModuleCode = programmeModules.reduce((res, mod) => {
     if (mod.type === 'StudyModule') {
@@ -234,6 +242,7 @@ export const updateStudyplans = async (
   )
 
   const mapStudyplan = studyplanMapper(
+    programmeModuleIdToValidityPeriod,
     personIdToStudentNumber,
     programmeModuleIdToCode,
     programmeModuleIdToStudyModuleCode,

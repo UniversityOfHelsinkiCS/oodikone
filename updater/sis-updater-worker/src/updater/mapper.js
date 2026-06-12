@@ -338,6 +338,7 @@ const getCorrectAttainment = (attainments, courseUnitIdToCode, courseUnitId, stu
 
 export const studyplanMapper =
   (
+    programmeModuleIdToValidityPeriod,
     personIdToStudentNumber,
     programmeModuleIdToCode,
     programmeModuleIdToStudyModuleCode,
@@ -475,7 +476,7 @@ export const studyplanMapper =
         programme_code: code,
         included_courses: includedCourses,
         sisu_id: studyplan.id,
-        curriculum_period_id: studyplan.curriculum_period_id,
+        curriculum_period_id: programmeModuleIdToValidityPeriod[programmeId]?.[0] ?? '',
         sis_study_right_id: studyrightId,
         includedModules,
       }
