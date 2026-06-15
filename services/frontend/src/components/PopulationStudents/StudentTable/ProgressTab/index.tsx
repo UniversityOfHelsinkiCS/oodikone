@@ -21,7 +21,14 @@ import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { CheckIcon, CloseIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
-import { CreditTypeCode, FormattedStudent, Name, ProgressCriteria, SemesterEnrollment } from '@oodikone/shared/types'
+import {
+  CreditTypeCode,
+  EnrollmentState,
+  FormattedStudent,
+  Name,
+  ProgressCriteria,
+  SemesterEnrollment,
+} from '@oodikone/shared/types'
 import { StudentCourse } from '@oodikone/shared/types/studentData'
 import { keyBy, range } from '@oodikone/shared/util'
 import { TableInfo } from './info'
@@ -254,7 +261,7 @@ export const ProgressTable = ({
     return { fall, spring }
   }
 
-  const getSemesterEnrollmentVal = (student: FormattedStudent, semesters: number[]) => {
+  const getSemesterEnrollmentVal = (student: FormattedStudent, semesters: number[]): [string, string] => {
     const { fall, spring } = getSemesterEnrollmentStatus(student, semesters)
     return [helpTexts[fall], helpTexts[spring]]
   }
@@ -406,19 +413,48 @@ export const ProgressTable = ({
                 .map(semester => semester.semestercode)
 
               return (
-                labelCriteria[criteriaHeaders[year].label]?.flatMap(label =>
-                  label.code === 'Criteria'
-                    ? [[getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.totalSatisfied ?? 0]]
-                    : label.code === 'Enrollment'
-                      ? (() => {
-                          const [fall, spring] = getSemesterEnrollmentVal(student, semesters)
-                          return [
-                            [`${getTextIn(label.name)} - FALL`, fall],
-                            [`${getTextIn(label.name)} - SPRING`, spring],
-                          ]
-                        })()
-                      : [[getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.credits ? 'Passed' : '']]
-                ) ?? []
+                labelCriteria[criteriaHeaders[year].label]?.flatMap(label => {
+                  let result: (string | number | null | undefined)[][] = []
+                  switch (label.code) {
+                    case 'Criteria': {
+                      result = [
+                        [getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.totalSatisfied ?? 0],
+                      ]
+                      break
+                    }
+
+                    case 'Enrollment': {
+                      result = (() => {
+                        const [fall, spring] = getSemesterEnrollmentVal(student, semesters)
+                        return [
+                          [`${getTextIn(label.name)} - FALL`, fall],
+                          [`${getTextIn(label.name)} - SPRING`, spring],
+                        ]
+                      })()
+                      break
+                    }
+
+                    case 'Credits': {
+                      result = [
+                        [getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.credits ? 'Passed' : ''],
+                      ]
+                      break
+                    }
+
+                    default: {
+                      const course = student.courses.find(course => course.course_code === label.code)
+                      const enrollment = student.enrollments.find(enrollment => enrollment.course_code === label.code)
+                      result = [
+                        [
+                          getTextIn(label.name),
+                          course?.passed ? 'Passed' : enrollment?.state === EnrollmentState.ENROLLED ? 'Enrolled' : '',
+                        ],
+                      ]
+                      break
+                    }
+                  }
+                  return result
+                }) ?? []
               )
             })
             .filter(([key, _]) => !!key)
