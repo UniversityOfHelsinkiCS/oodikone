@@ -715,7 +715,7 @@ describe('Degree programme overview', () => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT11001')
               cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('375')
+              cy.get('td').eq(3).contains('287')
             })
         })
       })
