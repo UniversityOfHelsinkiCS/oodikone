@@ -27,7 +27,7 @@ export const getAllProgrammeCourses = async (providerCode: string) => {
   return courses
 }
 
-const getCourseCode = (code: string) => {
+const removeOpenUniCodePrefix = (code: string) => {
   if (code.startsWith('AY')) {
     return code.replace('AY', '')
   }
@@ -40,6 +40,7 @@ const getCourseCode = (code: string) => {
 export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   try {
     const enrollmentsCourses = await EnrollmentModel.findAll({
+      raw: true,
       attributes: ['studentnumber', 'course_code'],
       where: {
         course_code: {
@@ -54,7 +55,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
 
     const allEnrollments = new Map<string, Set<string>>()
     for (const { studentnumber, course_code: courseCode } of enrollmentsCourses) {
-      const code = getCourseCode(courseCode)
+      const code = removeOpenUniCodePrefix(courseCode)
       if (!allEnrollments.has(code)) {
         allEnrollments.set(code, new Set())
       }
@@ -86,7 +87,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     }, new Map())
 
     const creditCourses = credits.map(credit => ({
-      code: getCourseCode(credit.course_code),
+      code: removeOpenUniCodePrefix(credit.course_code),
       studentNumber: credit.student_studentnumber,
       creditTypeCode: credit.credittypecode,
       courseName: courseCodeToName.get(credit.course_code)!,
@@ -117,7 +118,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     // If student has enrollments, but no attainment for a particular course, they have no credit info.
     programmeCourses.forEach(courseCode => {
       allEnrollments.get(courseCode)?.forEach(studentnumber => {
-        if (passedByCourseCodes.get(courseCode)?.has(studentnumber)) {
+        if (!passedByCourseCodes.get(courseCode)?.has(studentnumber)) {
           notCompletedByCourseCodes.get(courseCode)?.add(studentnumber)
         }
       })
