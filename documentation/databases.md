@@ -48,9 +48,9 @@ The `kone-db` database contains information used in various features of Oodikone
 title: kone-db
 ---
 erDiagram
+  completed_courses_searches
   custom_population_searches
   excluded_courses
-  open_uni_population_searches
   progress_criteria
   study_guidance_group_tags
   degree_programme_pins

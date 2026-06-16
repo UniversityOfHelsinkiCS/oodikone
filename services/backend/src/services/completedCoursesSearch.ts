@@ -9,6 +9,8 @@ import {
 } from '@oodikone/shared/types'
 import { omitKeys } from '@oodikone/shared/util'
 import { CourseModel, CreditModel, EnrollmentModel, StudentModel, StudyplanModel } from '../models'
+import { CompletedCoursesSearchModel } from '../models/kone'
+import logger from '../util/logger'
 
 type StudentWithStudyplanNested = Pick<
   StudentModel,
@@ -287,5 +289,60 @@ export const getCompletedCourses = async (
   return {
     students: students.map(student => omitKeys(student, ['allEnrollments'])),
     courses,
+  }
+}
+
+export type FoundSearch = {
+  id: string
+  userId: string
+  name: string
+  courseList: string[]
+  updatedAt: Date
+}
+
+export const getUserSearches = async (userId: string): Promise<FoundSearch[]> => {
+  const savedSearches = await CompletedCoursesSearchModel.findAll({ where: { userId } })
+
+  return savedSearches.map(search => ({
+    id: search.id,
+    userId: search.userId,
+    name: search.name,
+    courseList: search.courseCodes,
+    updatedAt: search.updatedAt,
+  }))
+}
+
+export const createNewUserSearch = async (userId: string, name: string, courseCodes: string[]) => {
+  const savedSearches = await CompletedCoursesSearchModel.findAll({ where: { userId } })
+  if (savedSearches.some(search => search.name === name)) {
+    return null
+  }
+  try {
+    return await CompletedCoursesSearchModel.create({ userId, name, courseCodes })
+  } catch (error) {
+    logger.error(`Couldn't create new completed courses search instance: ${error}`)
+    return null
+  }
+}
+
+export const updateUserSearch = async (userId: string, id: string, courseCodes: string[]) => {
+  try {
+    const searchToUpdate = await CompletedCoursesSearchModel.findOne({ where: { userId, id } })
+    if (!searchToUpdate) {
+      return null
+    }
+    return await searchToUpdate.update({ courseCodes })
+  } catch (error) {
+    logger.error(`Couldn't update completed courses search instance: ${error}`)
+    return null
+  }
+}
+
+export const deleteUserSearch = async (userId: string, id: string) => {
+  try {
+    return await CompletedCoursesSearchModel.destroy({ where: { userId, id } })
+  } catch (error) {
+    logger.error(`Couldn't delete completed courses search instance: ${error}`)
+    return null
   }
 }

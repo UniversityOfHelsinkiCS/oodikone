@@ -24,9 +24,9 @@ import {
   TeacherModel,
 } from '../models'
 import {
+  CompletedCoursesSearchModel,
   CustomPopulationSearchModel,
   ExcludedCourseModel,
-  OpenUniPopulationSearchModel,
   ProgressCriteriaModel,
   StudyGuidanceGroupTagModel,
   StudyProgrammePinModel,
@@ -107,9 +107,9 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE!, {
   logging: false,
   password: conf.KONE_PASSWORD,
   models: [
+    CompletedCoursesSearchModel,
     CustomPopulationSearchModel,
     ExcludedCourseModel,
-    OpenUniPopulationSearchModel,
     ProgressCriteriaModel,
     StudyGuidanceGroupTagModel,
     StudyProgrammePinModel,
