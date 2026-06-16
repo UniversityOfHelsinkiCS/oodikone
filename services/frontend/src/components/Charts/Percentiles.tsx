@@ -28,22 +28,38 @@ export const PercentileGraph = (props: PercentileProps) => {
         colorBy: 'series',
         showSymbol: false,
         symbol: 'circle',
-        smooth: 0.2,
+        smooth: 0.1,
+        z: 10,
         data: values,
       }
     })
 
-  /** Credit and graduation goals */
+  /** Goal is 5 credits a month (60 per year).
+  Monthly incrementation to ensure the line is always drawn
+  (one continuous line would not if either end is not visible). */
+  const getCreditGainDataPoints = (data?: [string, number][]) =>
+    data?.map(([date, _], idx) => {
+      if (idx === 0) {
+        return [{ coord: [date, 0] }, { coord: [date, 0] }]
+      }
+
+      const [prevDate] = data[idx - 1]
+
+      return [{ coord: [prevDate, (idx - 1) * 5] }, { coord: [date, idx * 5] }]
+    }) ?? []
+
+  /** Credit and graduation targets */
   const markLines = [
     {
       type: 'line',
       name: '',
       markLine: {
+        z: 0,
         silent: true,
         symbol: 'none',
         lineStyle: {
           color: 'grey',
-          type: 'dashed',
+          type: 'solid',
           width: 1.5,
         },
         data: props.goalLines?.credits?.map(goal => ({ yAxis: goal })) ?? [],
@@ -53,14 +69,32 @@ export const PercentileGraph = (props: PercentileProps) => {
       type: 'line',
       name: '',
       markLine: {
+        z: 0,
         silent: true,
         symbol: 'none',
         lineStyle: {
           color: '#ee3333',
-          type: 'dashed',
+          type: 'solid',
           width: 1.5,
         },
         data: props.goalLines?.dates?.map(goal => ({ xAxis: goal })) ?? [],
+      },
+    },
+    {
+      type: 'line',
+      name: '',
+      silent: true,
+      filtermode: 'none',
+      animation: false,
+      markLine: {
+        z: 1,
+        symbol: 'none',
+        lineStyle: {
+          color: 'grey',
+          type: 'solid',
+          width: 1.5,
+        },
+        data: getCreditGainDataPoints(props.data['90']),
       },
     },
   ]
