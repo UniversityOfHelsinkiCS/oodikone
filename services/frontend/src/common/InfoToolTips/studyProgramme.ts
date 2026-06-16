@@ -142,7 +142,7 @@ Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat m
       fi: `
 Näyttää valittuna akateemisena vuonna aloittaneiden opiskelijoiden kumulatiiviset opintopistokertymät persentiileittäin.
 
-Kuvaajiin piirtyy viivoja kuvaamaan kyseisen ohjelman tavoitevalmistumisaikoja ja opintopistetavoitteita:
+Kuvaajiin piirtyy viivoja kuvaamaan kyseisen ohjelman tavoitevalmistumisaikoja, opintopistetavoitteita ja vuosittaista opintopistekertymätavoitetta (60 op per lukuvuosi):
 
 - **Kandiohjelmat**: yleensä 3 vuotta ja 180 op
 - **Maisteriohjelmat**: yleensä 2 vuotta ja 120 op
@@ -157,7 +157,7 @@ Maisteriohjelmia tarkastellessa näytetään lisäksi kandi+maisteri -oikeudella
       en: `
 Shows the cumulative credit totals of students who began their studies in the selected academic year, broken down by percentile.
 
-Lines are drawn on the graphs to illustrate the target completion times and credit targets for the respective programs:
+Lines are drawn on the graphs to illustrate the target completion times, credit targets for the respective programs, and the yearly credit gain target (60 cr per academic year):
 
 - **Bachelor’s programs**: typically 3 years and 180 credits
 - **Master’s programs**: typically 2 years and 120 credits
