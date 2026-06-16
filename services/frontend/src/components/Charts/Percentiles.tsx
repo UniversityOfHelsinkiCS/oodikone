@@ -11,14 +11,27 @@ type PercentileProps = {
 }
 
 export const PercentileGraph = (props: PercentileProps) => {
-  const series = Object.entries(props.data).map(([percentile, values]) => ({
-    name: `${percentile}th`,
-    type: 'line',
-    showSymbol: false,
-    symbol: 'circle',
-    smooth: 0.2,
-    data: values,
-  }))
+  const colors = [
+    '#800080', // purple
+    '#3ba272', // green
+    '#ffa500', // orange
+    '#ee3333', // red
+    '#333333', // black
+  ] as const
+  const series = Object.entries(props.data)
+    .sort(([a, _], [b, __]) => Number(b) - Number(a))
+    .map(([percentile, values], idx) => {
+      return {
+        name: `${percentile}th`,
+        type: 'line',
+        color: colors[idx],
+        colorBy: 'series',
+        showSymbol: false,
+        symbol: 'circle',
+        smooth: 0.2,
+        data: values,
+      }
+    })
 
   /** Credit and graduation goals */
   const markLines = [
@@ -29,9 +42,9 @@ export const PercentileGraph = (props: PercentileProps) => {
         silent: true,
         symbol: 'none',
         lineStyle: {
-          color: '#888888',
-          type: 'solid',
-          width: 1,
+          color: 'grey',
+          type: 'dashed',
+          width: 1.5,
         },
         data: props.goalLines?.credits?.map(goal => ({ yAxis: goal })) ?? [],
       },
@@ -43,9 +56,9 @@ export const PercentileGraph = (props: PercentileProps) => {
         silent: true,
         symbol: 'none',
         lineStyle: {
-          color: '#ff0000',
-          type: 'solid',
-          width: 1,
+          color: '#ee3333',
+          type: 'dashed',
+          width: 1.5,
         },
         data: props.goalLines?.dates?.map(goal => ({ xAxis: goal })) ?? [],
       },
