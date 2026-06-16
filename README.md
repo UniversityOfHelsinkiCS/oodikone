@@ -147,10 +147,10 @@ It is recommended to spend some time to become familiar with `docker` and `docke
 - `./run.sh oodikone anon pull`: pull all images related to Oodikone development
 - `./run.sh updater real up --build --force-recreate --detach`: start updater detached (in the background) in real data mode, but build new images before starting
 - `docker compose ps`: view the containers in the running environment
-- `docker compose logs frontend`: print logs for just frontend
-- `docker compose logs --follow --tail 100 backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
-- `docker exec -it backend sh`: open bash terminal inside backend container
-- `docker exec -it sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database
+- `docker compose logs oodikone-frontend`: print logs for just frontend
+- `docker compose logs --follow --tail 100 oodikone-backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
+- `docker exec -it oodikone-backend sh`: open bash terminal inside backend container
+- `docker exec -it oodikone-sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database
 
 ### User types for development
 

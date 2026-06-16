@@ -167,7 +167,7 @@ jobs:
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
+          docker compose --file docker-compose.ci.yml up --detach --quiet-pull oodikone-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
@@ -207,7 +207,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach oodikone-backend
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
@@ -254,7 +254,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach oodikone-backend
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 

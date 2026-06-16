@@ -1,3 +1,5 @@
+name: oodikone
+
 services:
   backend:
     environment:
@@ -20,3 +22,4 @@ services:
 
 volumes:
   redis-data-real:
+    name: oodikone-redis-data-real

@@ -8,7 +8,7 @@ These instructions explain how to update the schemas for the following databases
 
 The steps to **add, remove, or modify columns** are mostly the same for each database, but the file paths and container names differ. Always **double-check** that you have the correct function name, column name, data type, and other relevant details in your migration file.
 
-> [!NOTE]  
+> [!NOTE]
 > If you need to change the `sis-importer-db` schema, see the instructions in the [sis-importer repo](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/README.md#tricks--tips).
 
 ## General guidelines
@@ -25,7 +25,7 @@ The steps to **add, remove, or modify columns** are mostly the same for each dat
 - Use **snake_case** in the actual database columns.
 - If a model has `underscored: true`, Sequelize automatically converts camelCase to snake_case in all queries. Otherwise, specify the column name explicitly.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > The column name **in the database** (snake_case) must be used in the migration file, not the camelCase name from your model.
 
 ### Verifying the migration locally
@@ -73,7 +73,7 @@ If you need to **revert a migration locally**, follow these steps:
 
 ## `sis-db`
 
-> [!NOTE]  
+> [!NOTE]
 > These instructions assume that needed data is already in the `sis-importer-db`. If not, you must add the data there first. See the [sis-importer repo](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/README.md#tricks--tips) for more details.
 
 1. **Update the updater model:**

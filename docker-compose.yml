@@ -1,3 +1,5 @@
+name: oodikone
+
 x-defaults: &defaults
   restart: unless-stopped
 
@@ -7,7 +9,7 @@ x-build_defaults: &build_defaults
 services:
   adminer:
     <<: *defaults
-    container_name: adminer
+    container_name: oodikone-adminer
     environment:
       ADMINER_DESIGN: pepa-linha
     image: adminer:4.8.1
@@ -18,10 +20,10 @@ services:
 
   backend:
     <<: *defaults
+    container_name: oodikone-backend
     build:
       <<: *build_defaults
       context: services/backend
-    container_name: backend
     depends_on:
       - kone-db
       - redis
@@ -51,10 +53,10 @@ services:
 
   frontend:
     <<: *defaults
+    container_name: oodikone-frontend
     build:
       <<: *build_defaults
       context: services/frontend
-    container_name: frontend
     ports:
       - 3000:3000
     profiles:
@@ -66,7 +68,7 @@ services:
 
   kone-db:
     <<: *defaults
-    container_name: kone-db
+    container_name: oodikone-kone-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
     profiles:
       - oodikone
@@ -75,8 +77,8 @@ services:
 
   redis:
     <<: *defaults
+    container_name: oodikone-redis
     command: 'redis-server --appendonly yes'
-    container_name: redis
     image: redis:7.2.6
     ports:
       - '6379:6379'
@@ -85,7 +87,7 @@ services:
 
   sis-db:
     <<: *defaults
-    container_name: sis-db
+    container_name: oodikone-sis-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
     volumes:
       - sis-db-data:/data
@@ -95,7 +97,7 @@ services:
 
   sis-importer-db:
     <<: *defaults
-    container_name: sis-importer-db
+    container_name: oodikone-sis-importer-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
     profiles:
       - updater
@@ -106,10 +108,10 @@ services:
 
   sis-updater-scheduler:
     <<: *defaults
+    container_name: oodikone-updater-scheduler
     build:
       <<: *build_defaults
       context: updater/sis-updater-scheduler
-    container_name: sis-updater-scheduler
     depends_on:
       - redis
       - sis-importer-db
@@ -130,10 +132,10 @@ services:
 
   sis-updater-worker:
     <<: *defaults
+    container_name: oodikone-updater-worker
     build:
       <<: *build_defaults
       context: updater/sis-updater-worker
-    container_name: sis-updater-worker
     depends_on:
       - redis
       - sis-db
@@ -154,7 +156,7 @@ services:
 
   user-db:
     <<: *defaults
-    container_name: user-db
+    container_name: oodikone-user-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
     profiles:
       - oodikone
@@ -163,6 +165,7 @@ services:
 
   jami:
     <<: *defaults
+    container_name: oodikone-jami
     image: quay.io/toska/jami:production
     env_file:
       - .env
@@ -173,15 +176,14 @@ services:
       - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/jami-db-real
     ports:
       - 3003:3003
-    container_name: jami
 
   jami-db:
     <<: *defaults
+    container_name: oodikone-jami-db
     image: postgres:15.10
     environment:
       - PGDATA=/data
       - POSTGRES_PASSWORD=postgres
-    container_name: jami-db
     ports:
       - 5433:5432
     volumes:
@@ -189,12 +191,22 @@ services:
 
 volumes:
   backend-nodemod:
+    name: oodikone-backend-nodemod
   frontend-nodemod:
+    name: oodikone-frontend-nodemod
   kone-db-data:
+    name: oodikone-kone-db-data
   redis-data:
+    name: oodikone-redis-data
   sis-db-data:
+    name: oodikone-sis-db-data
   sis-importer-db-data:
+    name: oodikone-sis-importer-db-data
   sis-updater-scheduler-nodemod:
+    name: oodikone-updater-scheduler-nodemod
   sis-updater-worker-nodemod:
+    name: oodikone-updater-worker-nodemod
   user-db-data:
+    name: oodikone-user-db-data
   jami-data:
+    name: oodikone-jami-data

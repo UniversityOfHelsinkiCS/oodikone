@@ -52,13 +52,13 @@ fi
 
 
 infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
-database=${args[0]}
+database="${args[0]}"
 docker-compose down --remove-orphans
 docker-compose up -d "$database"
 
 database_dump="$database.sqz"
 infomsg "Attempting to restore database $database from dump $database_dump"
-retry docker-compose exec "$database" pg_isready --dbname="$database"
-docker exec -i "$database" /bin/bash -c "pg_restore --username=postgres \
+retry docker-compose exec "oodikone-$database" pg_isready --dbname="$database"
+docker exec -i "oodikone-$database" /bin/bash -c "pg_restore --username=postgres \
 --format=custom --dbname=$database --no-owner" < "$database_dump"
 successmsg "Database $database succesfully created"

@@ -1,10 +1,12 @@
+name: oodikone
+
 x-defaults: &defaults
   restart: unless-stopped
 
 services:
   backend:
     <<: *defaults
-    container_name: backend
+    container_name: oodikone-backend
     depends_on:
       - kone-db
       - redis
@@ -31,7 +33,7 @@ services:
 
   frontend:
     <<: *defaults
-    container_name: frontend
+    container_name: oodikone-frontend
     build:
       context: services
       dockerfile: frontend/Dockerfile
@@ -41,7 +43,7 @@ services:
 
   kone-db:
     <<: *defaults
-    container_name: kone-db
+    container_name: oodikone-kone-db
     environment:
       PGDATA: /data
       POSTGRES_DB: kone-db
@@ -50,16 +52,16 @@ services:
 
   redis:
     <<: *defaults
+    container_name: oodikone-redis
     command: >
       sh -c 'redis-server --appendonly yes && redis-cli flushall'
     image: redis:7.2.6
-    container_name: redis
     ports:
       - 6379:6379
 
   sis-db:
     <<: *defaults
-    container_name: sis-db
+    container_name: oodikone-sis-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
     environment:
       PGDATA: /data
@@ -69,7 +71,7 @@ services:
 
   user-db:
     <<: *defaults
-    container_name: user-db
+    container_name: oodikone-user-db
     environment:
       PGDATA: /data
       POSTGRES_DB: user-db
@@ -78,6 +80,7 @@ services:
 
   jami:
     <<: *defaults
+    container_name: oodikone-jami
     image: quay.io/toska/jami:production
     environment:
       - npm_config_cache=/tmp
@@ -86,21 +89,20 @@ services:
       - DATABASE_URL=postgres://postgres:postgres@jami-db:5432/postgres
     ports:
       - 3003:3003
-    container_name: jami
 
   jami-db:
     <<: *defaults
+    container_name: oodikone-jami-db
     image: postgres:15.10
     environment:
       - PGDATA=/data
       - POSTGRES_PASSWORD=postgres
-    container_name: jami-db
     ports:
       - 5433:5432
 
   nginx:
+    container_name: oodikone-nginx
     image: nginx:latest
-    container_name: nginx
     depends_on:
       - frontend
       - backend
@@ -114,16 +116,16 @@ services:
   # Following services are used to run sis-updater-worker when anon sis-db needs to be updated. Could probably also use production version, but this certainly works.
   sis-importer-db:
     <<: *defaults
-    container_name: sis-importer-db
+    container_name: oodikone-sis-importer-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
     profiles:
       - updater
 
   sis-updater-worker:
     <<: *defaults
+    container_name: oodikone-updater-worker
     build:
       context: updater/sis-updater-worker
-    container_name: sis-updater-worker
     depends_on:
       - redis
       - sis-db
@@ -142,9 +144,9 @@ services:
 
   sis-updater-scheduler:
     <<: *defaults
+    container_name: oodikone-updater-scheduler
     build:
       context: updater/sis-updater-scheduler
-    container_name: sis-updater-scheduler
     depends_on:
       - redis
       - sis-importer-db

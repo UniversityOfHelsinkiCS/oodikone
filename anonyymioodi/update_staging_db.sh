@@ -56,7 +56,7 @@ function create_dumps() {
 function create_dump_from_db() {
   echo "Dumping db $1..."
 
-  docker exec "$1" pg_dump -Fc -U postgres "$1" > "$dump_directory/$1.sqz" || die "Failed to dump db $1"
+  docker exec "oodikone-$1" pg_dump -Fc -U postgres "$1" > "$dump_directory/$1.sqz" || die "Failed to dump db $1"
 }
 
 

@@ -4,7 +4,7 @@ x-defaults: &defaults
 services:
   kone-db:
     <<: *defaults
-    container_name: kone-db
+    container_name: oodikone-kone-db
     environment:
       PGDATA: /data
       POSTGRES_DB: kone-db
@@ -13,7 +13,7 @@ services:
 
   sis-db:
     <<: *defaults
-    container_name: sis-db
+    container_name: oodikone-sis-db
     environment:
       PGDATA: /data
       POSTGRES_DB: sis-db
@@ -23,7 +23,7 @@ services:
 
   sis-importer-db:
     <<: *defaults
-    container_name: sis-importer-db
+    container_name: oodikone-sis-importer-db
     environment:
       PGDATA: /data
       POSTGRES_DB: sis-importer-db
@@ -32,7 +32,7 @@ services:
 
   user-db:
     <<: *defaults
-    container_name: user-db
+    container_name: oodikone-user-db
     environment:
       PGDATA: /data
       POSTGRES_DB: user-db

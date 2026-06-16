@@ -116,7 +116,7 @@ reset_databases() {
 
   for database in "${databases[@]}"; do
     local database_dump="$database_dump_dir/$database.sql.gz"
-    local database_container="$database"
+    local database_container="oodikone-$database"
     local database_name="$database-real"
 
     infomsg "Attempting to create database $database_name from dump $database_dump inside container $database_container"
@@ -215,6 +215,7 @@ set_up_oodikone_from_scratch() {
     "$PROJECT_ROOT"
     "$PROJECT_ROOT/services/frontend"
     "$PROJECT_ROOT/services/backend"
+    "$PROJECT_ROOT/services/shared"
     "$PROJECT_ROOT/updater/sis-updater-scheduler"
     "$PROJECT_ROOT/updater/sis-updater-worker"
   )
@@ -223,7 +224,7 @@ set_up_oodikone_from_scratch() {
   "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes --rmi all || infomsg "Cleaning errored, but will continue"
   for folder in "${folders_to_set_up[@]}"; do
     cd "$folder" || die "Couldn't change directory to folder $folder"
-    rm -rf node_modules|| die "Couldn't remove node_modules in folder $folder"
+    rm -rf node_modules || die "Couldn't remove node_modules in folder $folder"
   done
 
   infomsg "Installing npm packages locally to root and each subfolder to enable linting and formatting"
