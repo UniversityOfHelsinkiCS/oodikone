@@ -23,7 +23,7 @@ Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 Parameters:
 * Option: oodikone/updater/both
 * Version: anon/real. Not necessary when running down/logs/pull.
-* Command: will be passed to docker-compose.
+* Command: will be passed to docker compose.
 EOF
 }
 

@@ -18,11 +18,11 @@ source "$PROJECT_ROOT"/scripts/functions_for_setup.sh
 # Try to run cleanup function if things fail.
 trap cleanup SIGINT SIGTERM ERR EXIT
 
-# Run docker-compose down on cleanup
+# Run docker compose down on cleanup
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
-  warningmsg "Trying to run docker-compose down and remove orphans"
-  docker-compose --profile oodikone --profile updater down --remove-orphans
+  warningmsg "Trying to run docker compose down and remove orphans"
+  docker compose --profile oodikone --profile updater down --remove-orphans
 }
 
 # === CLI ===

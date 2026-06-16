@@ -12,7 +12,7 @@ DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 S3_CONFIG_FILE=~/.s3cfg
 S3_BUCKET="s3://psyduck"
 
-## Following the naming convention in docker-compose, these are names for database
+## Following the naming convention in docker compose, these are names for database
 ## services. The real data databases inside service will have names suffixed by "-real".
 KONE_DB_NAME="kone-db"
 SIS_DB_NAME="sis-db"
@@ -112,7 +112,7 @@ reset_databases() {
   infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
   npm run docker:down
-  docker-compose up -d "${databases[@]}"
+  docker compose up -d "${databases[@]}"
 
   for database in "${databases[@]}"; do
     local database_dump="$database_dump_dir/$database.sql.gz"
