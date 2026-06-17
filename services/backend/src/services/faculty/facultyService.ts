@@ -1,4 +1,4 @@
-import { Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
+import { FacultyGraduationStatistics, Name, ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types'
 import { DegreeProgramme } from '../../routes/faculties'
 import { redisClient } from '../redis'
 import { FacultyProgressData } from './facultyStudentProgress'
@@ -29,16 +29,16 @@ const createRedisKeyForFacultyStudents = (id: string, specialGroups: SpecialGrou
   return `FACULTY_STUDENTS_STATS_${id}_${specialGroups}`
 }
 
-/*
+/**
   Faculty data objects have graduation times left in as arrays, so that
-  university-level evaluation overview can count median-times by itself.
+  university-level evaluation overview can count median-times by itself (in backend).
   Faculties, however, don't need this, and it isn't needed in frontend
-  for universityview either. This removes them from the object.
+  for university view either. This clears the array.
 */
-const removeGraduationTimes = (data: GraduationData) => {
+const removeGraduationTimes = (data: FacultyGraduationStatistics) => {
   Object.values(data.byGradYear.medians).forEach(array =>
     array.forEach(yearStat => {
-      yearStat.times = null
+      yearStat.times = []
     })
   )
 }
@@ -158,7 +158,7 @@ export type GraduationData = {
   classSizes: Record<string, Record<string, number | Record<string, number>>>
 }
 
-export const setGraduationStats = async (data: GraduationData, programmeFilter: ProgrammeFilter) => {
+export const setGraduationStats = async (data: FacultyGraduationStatistics, programmeFilter: ProgrammeFilter) => {
   const { id } = data
   const redisKey = createRedisKeyForGraduationTimeStats(id, programmeFilter)
   await redisClient.set(redisKey, JSON.stringify(data))
@@ -170,7 +170,7 @@ export const getGraduationStats = async (id: string, programmeFilter: ProgrammeF
   if (!dataFromRedis) {
     return null
   }
-  const data = JSON.parse(dataFromRedis) as GraduationData
+  const data = JSON.parse(dataFromRedis) as FacultyGraduationStatistics
   if (!keepGraduationTimes) {
     removeGraduationTimes(data)
   }

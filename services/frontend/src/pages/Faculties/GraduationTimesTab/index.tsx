@@ -10,9 +10,9 @@ import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTi
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
-import { GetFacultiesResponse, GetFacultyGraduationTimesResponse } from '@/types/api/faculty'
+import { GetFacultiesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
-import { Name } from '@oodikone/shared/types'
+
 
 export const GraduationTimesTab = ({
   faculty,
@@ -23,22 +23,28 @@ export const GraduationTimesTab = ({
   setStudyProgrammes: (value: boolean) => void
   studyProgrammes: boolean
 }) => {
+  const { getTextIn } = useLanguage()
   const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_DEGREE_PROGRAMMES'
-  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.id, studyProgrammeFilter })
-  const { getTextIn } = useLanguage()
+
+  const {
+    data,
+    isError: queryError,
+    isSuccess: querySuccess,
+    isFetching
+  } = useGetFacultyGraduationTimesQuery({ id: faculty?.id, studyProgrammeFilter })
 
   const groupBy = groupByStartYear ? ('byStartYear' as const) : ('byGradYear' as const)
   const yearLabel = groupByStartYear ? ('Start year' as const) : ('Graduation year' as const)
-  const data = graduationStats?.data?.[groupBy].medians
-  const goals = graduationStats?.data?.goals
+
+  const groupedData = data?.[groupBy].medians
+  const goals = data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty?.code === 'H30' }
-  const programmeData = graduationStats?.data?.[groupBy].programmes.medians
-  const programmeNames = graduationStats?.data?.programmeNames
-  const classSizes = graduationStats?.data?.classSizes
-  const isError = graduationStats.isError || (graduationStats.isSuccess && !graduationStats.data)
-  const isLoading = graduationStats.isFetching
+  const programmeData = data?.[groupBy].programmes.medians
+  const classSizes = data?.classSizes
+
+  const isError = queryError || (querySuccess && !data)
 
   const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
     allowExpand: true,
@@ -46,19 +52,17 @@ export const GraduationTimesTab = ({
     goalExceptions,
     groupBy,
     isError,
-    isLoading,
+    isLoading: isFetching,
     mode: 'programme',
-    names: programmeNames,
+    names: data?.programmeNames,
     showMedian,
     yearLabel,
   } as const
 
-  const exportToExcel = (data?: GetFacultyGraduationTimesResponse, programmeNames?: Record<string, Name>) => {
-    if (!data || !programmeNames) {
-      return
-    }
+  const exportToExcel = () => {
+    if (!data) return
+    const programmeNames = data.programmeNames
 
-    const educationLevels = ['bachelor', 'bcMsCombo', 'master', 'doctor', 'licentiate'] as const
     const sheetTitles = {
       bachelor: 'Bachelor',
       bcMsCombo: 'Bachelor + Master',
@@ -69,20 +73,17 @@ export const GraduationTimesTab = ({
 
     const book = utils.book_new()
 
-    educationLevels.forEach(level => {
+    Object.keys(sheetTitles).forEach(level => {
       const levelData = data[groupBy]?.programmes?.medians[level]
-      if (!levelData) {
-        return
-      }
+      if (!levelData) return
 
       const sheetData: Record<string, any>[] = []
 
       Object.keys(levelData).forEach(year => {
         const yearData = levelData[year]
         const { programmes } = yearData
-        const { data } = yearData
 
-        data.forEach((item, index) => {
+        yearData.data.forEach((item, index) => {
           sheetData.push({
             Code: programmes[index],
             Abbreviation: item.name,
@@ -107,14 +108,14 @@ export const GraduationTimesTab = ({
     <Stack gap={2}>
       <Section
         cypress="average-graduation-times"
-        exportOnClick={() => exportToExcel(graduationStats.data, programmeNames)}
+        exportOnClick={() => exportToExcel()}
         infoBoxContent={facultyToolTips.common.averageGraduationTimes}
         title="Average graduation times by education level"
       >
         <ToggleContainer>
           <Toggle
             cypress="graduation-time-toggle"
-            disabled={isError || isLoading}
+            disabled={isError || isFetching}
             firstLabel="Breakdown"
             secondLabel="Median study times"
             setValue={setShowMedian}
@@ -122,7 +123,7 @@ export const GraduationTimesTab = ({
           />
           <Toggle
             cypress="group-by-toggle"
-            disabled={isError || isLoading}
+            disabled={isError || isFetching}
             firstLabel="Group by: Graduation year"
             secondLabel="Starting year"
             setValue={setGroupByStartYear}
@@ -130,7 +131,7 @@ export const GraduationTimesTab = ({
           />
           <Toggle
             cypress="programme-toggle"
-            disabled={isError || isLoading}
+            disabled={isError || isFetching}
             firstLabel="New degree programmes"
             infoBoxContent={facultyToolTips.common.programmeToggle}
             secondLabel="All degree programmes"
@@ -141,7 +142,7 @@ export const GraduationTimesTab = ({
       </Section>
       <Stack gap={2}>
         <GraduationTimes
-          data={data?.bachelor}
+          data={groupedData?.bachelor}
           goal={goals?.bachelor}
           level="bachelor"
           levelProgrammeData={programmeData?.bachelor}
@@ -149,7 +150,7 @@ export const GraduationTimesTab = ({
           {...commonProps}
         />
         <GraduationTimes
-          data={data?.bcMsCombo}
+          data={groupedData?.bcMsCombo}
           goal={goals?.bcMsCombo}
           level="bcMsCombo"
           levelProgrammeData={programmeData?.bcMsCombo}
@@ -157,7 +158,7 @@ export const GraduationTimesTab = ({
           {...commonProps}
         />
         <GraduationTimes
-          data={data?.master}
+          data={groupedData?.master}
           goal={goals?.master}
           level="master"
           levelProgrammeData={programmeData?.master}
@@ -165,7 +166,7 @@ export const GraduationTimesTab = ({
           {...commonProps}
         />
         <GraduationTimes
-          data={data?.doctor}
+          data={groupedData?.doctor}
           goal={goals?.doctor}
           level="doctor"
           levelProgrammeData={programmeData?.doctor}

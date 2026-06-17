@@ -65,7 +65,7 @@ export const getStudyRightsInProgramme = async (
         },
       },
     })
-  ).map(studyRight => studyRight.toJSON())
+  ).map(studyRight => studyRight.toJSON<SISStudyRight>())
 }
 
 export const getStudyTracksForProgramme = async (studyProgramme: string) => {

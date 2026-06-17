@@ -1,11 +1,12 @@
+
 import Box from '@mui/material/Box'
 import useTheme from '@mui/material/styles/useTheme'
 import ReactECharts from 'echarts-for-react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import {
-  FacultyClassSizes,
-  GraduationStatistics,
+import type {
+  ClassSizes,
+  GraduationTimeCategories,
   GraduationStats,
   Name,
   NameWithCode,
@@ -30,7 +31,7 @@ export const MedianGraduations = ({
   title,
   yearLabel,
 }: {
-  classSizes?: FacultyClassSizes['programmes'] | ProgrammeClassSizes['studyTracks' | 'programme']
+  classSizes?: ClassSizes['programmes'] | ProgrammeClassSizes['studyTracks' | 'programme']
   cypress: string
   data: GraduationStats[]
   expandKey?: string
@@ -106,7 +107,7 @@ export const MedianGraduations = ({
     code: string,
     amount: number,
     median: number,
-    statistics: GraduationStatistics | undefined,
+    statistics: GraduationTimeCategories | undefined,
     realGoal: number | undefined
   ) => {
     const sortingText =
@@ -164,7 +165,7 @@ export const MedianGraduations = ({
         data?: {
           code?: string
           amount?: number
-          statistics?: GraduationStatistics
+          statistics?: GraduationTimeCategories
           realGoal?: number
           name?: string
         }

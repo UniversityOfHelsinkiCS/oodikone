@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import type { CanError, GenericApplicationError } from '@oodikone/shared/routes'
 import type {
+  FacultyGraduationStatistics,
   Graduated,
   Name,
   NameWithCode,
@@ -22,7 +23,6 @@ import {
   setBasicStats,
   getThesisWritersStats,
   setThesisWritersStats,
-  getGraduationStats,
   setGraduationStats,
   getFacultyStudentStats,
   setFacultyStudentStats,
@@ -30,7 +30,7 @@ import {
   setFacultyProgressStats,
   type BasicData,
   type ThesisWriterData,
-  GraduationData,
+  getGraduationStats,
 } from '../services/faculty/facultyService'
 import { combineFacultyStudentProgress } from '../services/faculty/facultyStudentProgress'
 import { combineFacultyStudents } from '../services/faculty/facultyStudents'
@@ -135,14 +135,13 @@ router.get<
   return res.json(await getFacultyCredits(faculty.code, yearType === 'ACADEMIC_YEAR'))
 })
 
-type GetGraduationStatsResBody = GraduationData
 type GetGraduationStatsQuery = {
   programme_filter: ProgrammeFilter
 }
 
 router.get<
   GetStatsParams,
-  CanError<GetGraduationStatsResBody, GenericApplicationError>,
+  CanError<FacultyGraduationStatistics, GenericApplicationError>,
   GetStatsReqBody,
   GetGraduationStatsQuery
 >('/:id/graduationtimes', auth.roles(['facultyStatistics']), async (req, res) => {

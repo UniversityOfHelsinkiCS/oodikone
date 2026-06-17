@@ -1,5 +1,5 @@
 import { RTKApi } from '@/apiConnection'
-import {
+import type {
   GetFacultiesResponse,
   GetFacultyBasicStatsResponse,
   GetFacultyBasicStatsRequest,
@@ -7,7 +7,6 @@ import {
   GetFacultyCreditStatsRequest,
   GetFacultyThesisStatsResponse,
   GetFacultyThesisStatsRequest,
-  GetFacultyGraduationTimesResponse,
   GetFacultyGraduationTimesRequest,
   GetFacultyProgressStatsResponse,
   GetFacultyProgressStatsRequest,
@@ -20,7 +19,7 @@ import {
   UpdateFacultyProgressTabResponse,
   UpdateFacultyProgressTabRequest,
 } from '@/types/api/faculty'
-import { GetAllGraduationStatsResponse } from '@/types/api/university'
+import type { FacultyGraduationStatistics, UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -39,7 +38,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, studyProgrammeFilter, specialGroups }) =>
         `/faculties/${id}/thesisstats?year_type=${yearType}&programme_filter=${studyProgrammeFilter}&special_groups=${specialGroups}`,
     }),
-    getFacultyGraduationTimes: builder.query<GetFacultyGraduationTimesResponse, GetFacultyGraduationTimesRequest>({
+    getFacultyGraduationTimes: builder.query<FacultyGraduationStatistics, GetFacultyGraduationTimesRequest>({
       query: ({ id, studyProgrammeFilter }) =>
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),
@@ -49,7 +48,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
     getAllFacultiesProgressStats: builder.query<GetAllProgressStatsResponse, GetAllProgressStatsRequest>({
       query: ({ includeSpecials }) => `/university/allprogressstats?&specialsIncluded=${includeSpecials}`,
     }),
-    getAllFacultiesGraduationStats: builder.query<GetAllGraduationStatsResponse, void>({
+    getAllFacultiesGraduationStats: builder.query<UniversityGraduationStatistics, void>({
       query: () => '/university/allgraduationstats',
     }),
     getFacultyStudentStats: builder.query<GetFacultyStudentStatsResponse, GetFacultyStudentStatsRequest>({

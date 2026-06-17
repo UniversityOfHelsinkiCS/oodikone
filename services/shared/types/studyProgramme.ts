@@ -1,5 +1,5 @@
 import { yearStatNumberKeys } from '../util/studyProgramme'
-import { ChartGraduationTimes, GraduationStatistics } from './graduations'
+import { ChartGraduationTimes, GraduationTimeCategories } from './graduations'
 import { Name } from './name'
 
 export type StudyProgrammeCourse = {
@@ -18,7 +18,7 @@ export type MedianEntry = {
   amount: number
   classSize?: number
   name: string
-  statistics: GraduationStatistics
+  statistics: GraduationTimeCategories
   times: number[]
   y: number
 }
@@ -80,7 +80,7 @@ type StudyTrackProgressPercentiles = {
   comboByTrack: undefined | Record<string, Record<string, Record<string, [string, number][]>>>
 }
 
-type ClassSizes = {
+type ProgrammeClassSizes = {
   main: Record<string, number>
   byTrack: undefined | Record<string, Record<string, number>>
   combo: undefined | Record<string, number>
@@ -88,7 +88,7 @@ type ClassSizes = {
 }
 
 export type StudyTrackStats = {
-  classSizes: ClassSizes
+  classSizes: ProgrammeClassSizes
   creditCounts: Record<string, number[]>
   creditCountsByTrack: Record<string, Record<string, number[]>>
   creditCountsCombo: Record<string, number[]>

@@ -3,7 +3,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import { indexOf, orderBy } from 'lodash-es'
 
 import {
-  GraduationStatistics,
+  GraduationTimeCategories,
   Name,
   SemesterEnrollment,
   StudyTrack,
@@ -118,7 +118,7 @@ export type GraduationTimes = {
     y: number
     amount: number
     name: string | number
-    statistics: GraduationStatistics
+    statistics: GraduationTimeCategories
     times: number[]
   }>
   goal: number

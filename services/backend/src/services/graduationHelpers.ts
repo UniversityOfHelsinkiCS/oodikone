@@ -8,7 +8,7 @@ export const GraduationTarget = {
   FOUR_YEARS: 8,
   FIVE_YEARS: 10,
   SIX_YEARS: 12,
-} as const
+}
 
 /** Uses semesters, not months */
 export const countTimeCategories = (times: number[], target: number) => {

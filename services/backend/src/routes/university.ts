@@ -1,11 +1,11 @@
 import { Request, Response, Router } from 'express'
 import { cloneDeep } from 'lodash-es'
 
-import { Graduated, NameWithCode } from '@oodikone/shared/types'
+import { FacultyGraduationStatistics, Graduated, NameWithCode } from '@oodikone/shared/types'
 import { magicFacultyCode } from '../config/organizationConstants'
 import { OrganizationModel } from '../models'
 import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
-import { countGraduationTimes, LevelGraduationStats } from '../services/faculty/facultyGraduationTimes'
+import { countGraduationTimes } from '../services/faculty/facultyGraduationTimes'
 import { getSortedFaculties } from '../services/faculty/facultyHelpers'
 import {
   getFacultyProgressStats,
@@ -17,18 +17,19 @@ import { combineFacultyStudentProgress, FacultyProgressData } from '../services/
 import { GraduationTarget } from '../services/graduationHelpers'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
 import logger from '../util/logger'
+import { MediansByCategory,  UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 
 const router = Router()
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'doctor'] as const
 
-const getProgrammeNames = (faculties: OrganizationModel[]) => {
-  return faculties.reduce<Record<string, NameWithCode>>((obj, faculty) => {
+const getProgrammeNames = (faculties: OrganizationModel[]) => (
+  faculties.reduce<Record<string, NameWithCode>>((obj, faculty) => {
     const { name, code } = faculty.toJSON()
     obj[faculty.code] = { code, ...name }
     return obj
   }, {})
-}
+)
 
 interface GetProgressStatsRequest extends Request {
   query: {
@@ -120,16 +121,20 @@ router.get('/allprogressstats', async (req: GetProgressStatsRequest, res: Respon
   res.status(200).json(universityData)
 })
 
-router.get('/allgraduationstats', async (_req: Request, res: Response) => {
-  const degreeNames = ['bachelor', 'bcMsCombo', 'master', 'doctor'] as const
+router.get('/allgraduationstats', async (_req: Request, res: Response<UniversityGraduationStatistics>) => {
+  const degreeTypes = ['bachelor', 'bcMsCombo', 'master', 'doctor'] as const
+  /** University view does not support old degree programmes */
+  const programmeFilter = 'NEW_DEGREE_PROGRAMMES' as const
+
   const allFaculties = await getSortedFaculties()
   const facultyCodes = allFaculties.map(faculty => faculty.code)
-  const facultyData: Record<string, Awaited<ReturnType<typeof countGraduationTimes>>> = {}
-  const programmeFilter = 'NEW_DEGREE_PROGRAMMES'
+  const facultyData: Record<string, FacultyGraduationStatistics> = {}
+
   for (const facultyCode of facultyCodes) {
-    let data: any = await getGraduationStats(facultyCode, programmeFilter, true)
+    let data = await getGraduationStats(facultyCode, programmeFilter, true)
+
     if (!data) {
-      logger.info(`Data missing from server: Refreshing graduation faculty data for faculty ${facultyCode}`)
+      logger.info(`Data missing from redis: Refreshing graduation faculty data for faculty ${facultyCode}`)
       const programmes = await getDegreeProgrammesOfFaculty(facultyCode, true)
       data = await countGraduationTimes(facultyCode, programmes)
       await setGraduationStats(data, programmeFilter)
@@ -137,48 +142,51 @@ router.get('/allgraduationstats', async (_req: Request, res: Response) => {
     facultyData[facultyCode] = data
   }
 
-  const universityData = {
-    goals: {
-      bachelor: GraduationTarget.THREE_YEARS,
-      bcMsCombo: GraduationTarget.FIVE_YEARS,
-      master: GraduationTarget.TWO_YEARS,
-      doctor: GraduationTarget.FOUR_YEARS,
+
+  const goals: UniversityGraduationStatistics['goals'] = {
+    bachelor: GraduationTarget.THREE_YEARS,
+    bcMsCombo: GraduationTarget.FIVE_YEARS,
+    master: GraduationTarget.TWO_YEARS,
+    doctor: GraduationTarget.FOUR_YEARS,
+  }
+  const programmeNames = getProgrammeNames(allFaculties)
+
+  const byGradYear: UniversityGraduationStatistics['byGradYear'] = {
+    medians: {
+      bachelor: [],
+      bcMsCombo: [],
+      master: [],
+      doctor: [],
     },
-    programmeNames: getProgrammeNames(allFaculties),
-    byGradYear: {
-      medians: {} as Record<string, LevelGraduationStats[]>,
-      programmes: {
-        medians: {} as Record<
-          string,
-          Record<string, { programmes: string[]; data: Array<LevelGraduationStats & { name: string; code: string }> }>
-        >,
-      },
-    },
-    classSizes: {
-      bachelor: null as Record<string, number> | null,
-      bcMsCombo: null as Record<string, number> | null,
-      master: null as Record<string, number> | null,
-      doctor: null as Record<string, number> | null,
-      programmes: {} as Record<string, Record<string, Record<string, number>>>,
-    },
+    programmes: {
+      medians: {
+        bachelor: {},
+        bcMsCombo: {},
+        master: {},
+        doctor: {},
+      }
+    }
+  }
+  const classSizes: UniversityGraduationStatistics['classSizes'] = {
+    programmes: {},
   }
 
-  const unifyTotals = (facultyData: Record<string, LevelGraduationStats[]>, isLast: boolean) => {
-    const mediansForUniversity = universityData.byGradYear.medians
-    for (const degree of degreeNames) {
-      if (!mediansForUniversity[degree]) mediansForUniversity[degree] = []
-      if (!facultyData[degree]) continue
-      for (const yearStats of facultyData[degree]) {
-        const universityStats = mediansForUniversity[degree]
-        const universityYearStats = mediansForUniversity[degree].find(stats => stats.name === yearStats.name)
+  /** Computes university level stats */
+  const unifyTotals = (facultyData: MediansByCategory, isLast: boolean) => {
+    const mediansForUniversity = byGradYear.medians
+    for (const degreeType of degreeTypes) {
+      if (!facultyData[degreeType]) continue
+
+      for (const facultyYearStats of facultyData[degreeType]) {
+        const universityYearStats = mediansForUniversity[degreeType].find(stats => stats.name === facultyYearStats.name)
         if (!universityYearStats) {
-          universityStats.push(yearStats)
+          mediansForUniversity[degreeType].push(facultyYearStats)
         } else {
-          universityYearStats.times.push(...yearStats.times)
-          universityYearStats.amount += yearStats.amount
-          universityYearStats.statistics.onTime += yearStats.statistics.onTime
-          universityYearStats.statistics.yearOver += yearStats.statistics.yearOver
-          universityYearStats.statistics.wayOver += yearStats.statistics.wayOver
+          universityYearStats.times.push(...facultyYearStats.times)
+          universityYearStats.amount += facultyYearStats.amount
+          universityYearStats.statistics.onTime += facultyYearStats.statistics.onTime
+          universityYearStats.statistics.yearOver += facultyYearStats.statistics.yearOver
+          universityYearStats.statistics.wayOver += facultyYearStats.statistics.wayOver
           if (isLast) {
             universityYearStats.median = getMedian(universityYearStats.times)
           }
@@ -187,29 +195,30 @@ router.get('/allgraduationstats', async (_req: Request, res: Response) => {
     }
   }
 
-  const unifyProgrammeStats = (facultyData: Record<string, LevelGraduationStats[]>, facultyCode: string) => {
-    const mediansForUniversity = universityData.byGradYear.programmes.medians
-    for (const degree of degreeNames) {
-      if (!facultyData[degree]) continue
-      if (!mediansForUniversity[degree]) mediansForUniversity[degree] = {}
-      for (const yearData of facultyData[degree]) {
-        if (!mediansForUniversity[degree][yearData.name]) {
-          mediansForUniversity[degree][yearData.name] = { programmes: [], data: [] }
+  /** Computes faculty breakdown */
+  const unifyFacultyStats = (facultyData: MediansByCategory, facultyCode: string) => {
+    const mediansForUniversity = byGradYear.programmes.medians
+    for (const degreeType of degreeTypes) {
+      if (!facultyData[degreeType]) continue
+
+      for (const facultyYearStats of facultyData[degreeType]) {
+        if (!mediansForUniversity[degreeType][facultyYearStats.name]) {
+          mediansForUniversity[degreeType][facultyYearStats.name] = { programmes: [], data: [] }
         }
-        const uniYearStats = mediansForUniversity[degree][yearData.name]
+        const uniYearStats = mediansForUniversity[degreeType][facultyYearStats.name]
         if (!uniYearStats.programmes.find(prog => prog === facultyCode)) {
           uniYearStats.programmes.push(facultyCode)
         }
         const uniYearFacultyStats = uniYearStats.data.find(item => item.code === facultyCode)
         if (!uniYearFacultyStats) {
-          uniYearStats.data.push({ ...cloneDeep(yearData), name: facultyCode, code: facultyCode })
+          uniYearStats.data.push({ ...cloneDeep(facultyYearStats), name: facultyCode, code: facultyCode })
         } else {
           uniYearFacultyStats.times.push(...uniYearFacultyStats.times)
           uniYearFacultyStats.median = getMedian(uniYearFacultyStats.times)
-          uniYearFacultyStats.amount += yearData.amount
-          uniYearFacultyStats.statistics.onTime += yearData.statistics.onTime
-          uniYearFacultyStats.statistics.yearOver += yearData.statistics.yearOver
-          uniYearFacultyStats.statistics.wayOver += yearData.statistics.wayOver
+          uniYearFacultyStats.amount += facultyYearStats.amount
+          uniYearFacultyStats.statistics.onTime += facultyYearStats.statistics.onTime
+          uniYearFacultyStats.statistics.yearOver += facultyYearStats.statistics.yearOver
+          uniYearFacultyStats.statistics.wayOver += facultyYearStats.statistics.wayOver
         }
       }
     }
@@ -218,27 +227,20 @@ router.get('/allgraduationstats', async (_req: Request, res: Response) => {
   for (let i = 0; i < facultyCodes.length; i++) {
     const facultyCode = facultyCodes[i]
     const data = facultyData[facultyCode]
-    unifyTotals(data.byGradYear.medians, i === facultyCodes.length - 1)
-    unifyProgrammeStats(data.byGradYear.medians, facultyCode)
-    for (const degree of degreeNames) {
-      if (!data.classSizes[degree]) {
-        continue
-      }
-      const facultyClassSizes = data.classSizes[degree] as Record<string, number>
-      if (!universityData.classSizes[degree]) {
-        universityData.classSizes[degree] = facultyClassSizes
-      } else {
-        Object.entries(facultyClassSizes).forEach(([key, value]) => {
-          universityData.classSizes[degree]![key] += value
-        })
-      }
-    }
 
-    const { programmes, ...rest } = data.classSizes
-    universityData.classSizes.programmes[facultyCode] = rest as Record<string, Record<string, number>>
+    unifyTotals(data.byGradYear.medians, i === facultyCodes.length - 1)
+    unifyFacultyStats(data.byGradYear.medians, facultyCode)
+
+    const { programmes: _, ...rest } = data.classSizes
+    classSizes.programmes[facultyCode] = rest
   }
 
-  res.status(200).json(universityData)
+  res.status(200).json({
+    goals,
+    programmeNames,
+    byGradYear,
+    classSizes,
+  })
 })
 
 export default router

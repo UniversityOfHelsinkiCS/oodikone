@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography'
 
 import { MedianGraduations } from '@/components/Charts/MedianGraduations'
 import {
-  FacultyClassSizes,
+  ClassSizes,
   GraduationStats,
   Name,
   NameWithCode,
@@ -14,7 +14,7 @@ import {
 
 type MedianDisplayProps = {
   mode: 'faculty' | 'programme' | 'study track'
-  classSizes: FacultyClassSizes | ProgrammeClassSizes | undefined
+  classSizes: ClassSizes | ProgrammeClassSizes | undefined
   allowExpand: boolean
   names: Record<string, string | Name> | Record<string, Name | NameWithCode> | undefined
   data: GraduationStats[]

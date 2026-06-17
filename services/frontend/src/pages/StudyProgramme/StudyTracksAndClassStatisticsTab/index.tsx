@@ -137,10 +137,10 @@ export const StudyTracksAndClassStatisticsTab = ({
     ) as [string, ProgrammeOrStudyTrackGraduationStats][]
 
     const studyTrackStatsGraduationStats = graduationStats.reduce<ProgrammeMedians>((acc, [programme, { medians }]) => {
-      for (const { name, amount, statistics, y } of Object.values(combo ? medians.combo : medians.basic)) {
+      for (const { name, amount, statistics, y, times } of Object.values(combo ? medians.combo : medians.basic)) {
         acc[name] ??= { data: [], programmes: [] }
         acc[name].programmes.push(programme)
-        acc[name].data.push({ amount, name: programme, statistics, code: programme, median: y })
+        acc[name].data.push({ amount, name: programme, statistics, code: programme, median: y, times })
       }
 
       return acc
@@ -177,7 +177,7 @@ export const StudyTracksAndClassStatisticsTab = ({
     basic: gradStats
     combo: gradStats
   } =
-    hasStudyTracks && Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1
+    Object.keys(studyTrackStats?.graduationTimes ?? {}).length > 1
       ? {
           basic: calculateStudyTrackStats(),
           combo: studyTrackStats?.doCombo ? calculateStudyTrackStats(true) : {},

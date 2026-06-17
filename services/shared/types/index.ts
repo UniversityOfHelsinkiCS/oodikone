@@ -23,9 +23,13 @@ export type {
   ProgrammeModuleWithRelevantAttributes,
 } from './faculty'
 export type {
-  FacultyClassSizes,
+  ClassSizes,
   GraduationStats,
   GraduationStatistics,
+  GraduationTimeCategories,
+  MediansByCategory,
+  MediansByProgrammes,
+  FacultyGraduationStatistics,
   ProgrammeClassSizes,
   ProgrammeMedians,
 } from './graduations'

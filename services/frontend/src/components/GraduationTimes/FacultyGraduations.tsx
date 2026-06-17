@@ -1,8 +1,21 @@
 import Stack from '@mui/material/Stack'
 
 import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
-import { GetAllGraduationStatsResponse } from '@/types/api/university'
+import { ClassSizes, UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 
+type UniFacultyGraduationsProps = {
+  isError: boolean
+  isLoading: boolean
+  showMedian: boolean
+  faculty?: string
+  universityMode: true
+  data: UniversityGraduationStatistics | undefined
+}
+
+/**
+* This component should be merged with the one used in faculties tab,
+* but is left as an exercise to a future oodikone developer.
+*/
 export const FacultyGraduations = ({
   data,
   faculty,
@@ -10,20 +23,13 @@ export const FacultyGraduations = ({
   isLoading,
   showMedian,
   universityMode,
-}: {
-  data: GetAllGraduationStatsResponse | undefined
-  isError: boolean
-  isLoading: boolean
-  faculty?: string
-  showMedian: boolean
-  universityMode?: boolean
-}) => {
+}: UniFacultyGraduationsProps) => {
   const medians = data?.byGradYear.medians
   const goals = data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty === 'H30' }
   const programmeData = data?.byGradYear.programmes.medians
   const facultyNames = data?.programmeNames
-  const classSizes = data?.classSizes
+  const classSizes = data?.classSizes as ClassSizes // illegal override, underlying type is acually correct
 
   const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
     allowExpand: true,

@@ -1,22 +1,15 @@
-import { cloneDeep } from 'lodash-es'
-
-import { Name, DegreeProgrammeType, Unarray } from '@oodikone/shared/types'
+import { Name, DegreeProgrammeType, FacultyGraduationStatistics, ClassSizes } from '@oodikone/shared/types'
 import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
 import { omitKeys } from '@oodikone/shared/util'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { GraduationTarget } from '../graduationHelpers'
-import { getGraduationStatsForStudyTrack, GraduationTimes } from '../studyProgramme/studyProgrammeGraduations'
+import { getGraduationStatsForStudyTrack } from '../studyProgramme/studyProgrammeGraduations'
 import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
+import type { GraduationStatistics, MediansByCategory, MediansByProgrammes } from '@oodikone/shared/types'
 
-export type LevelGraduationStats = Omit<Unarray<GraduationTimes['medians']>, 'y'> & { median: number }
-
-type ProgrammeStats = {
-  data: Array<Omit<LevelGraduationStats, 'times'> & { code: string }>
-  programmes: string[]
-}
 
 export const programmeTypes = {
   [DegreeProgrammeType.BACHELOR]: 'bachelor',
@@ -24,13 +17,17 @@ export const programmeTypes = {
   [DegreeProgrammeType.DOCTOR]: 'doctor',
 } as const
 
-const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
+const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganization): Promise<GraduationStatistics['byGradYear']> => {
   const newStats: ProgrammeGraduationStats[] = []
-  const medians: Record<string, LevelGraduationStats[]> = {}
-  const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
+  const medians: MediansByCategory = { bachelor: [], master: [], bcMsCombo: [], doctor: [] }
+  const programmes: { medians: MediansByProgrammes } = {
+    medians: {
+      bachelor: {}, master: {}, bcMsCombo: {}, doctor: {}
+    }
+  }
 
   for (const programme of facultyProgrammes) {
-    if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
+    if (!programme.degreeProgrammeType || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
     const statsFromRedis = await getGraduationStats(programme.code, '', 'CALENDAR_YEAR', 'SPECIAL_INCLUDED')
@@ -54,13 +51,13 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
     const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
     const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
 
-    if (!medians[level]) {
-      medians[level] = cloneDeep(graduationTimes.medians).map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
+    if (!medians[level].length) {
+      medians[level] = graduationTimes.medians.map(year => ({ ...omitKeys(structuredClone(year), ['y']), median: year.y }))
     } else {
       for (const statsForYear of graduationTimes.medians) {
         const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
         if (!correctYear) {
-          medians[level].push({ ...omitKeys(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+          medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
           continue
         }
         correctYear.times.push(...statsForYear.times)
@@ -73,13 +70,13 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
     }
 
     if (level === 'master' && comboTimes.medians.length) {
-      if (!medians.bcMsCombo) {
-        medians.bcMsCombo = cloneDeep(comboTimes.medians).map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
+      if (!medians.bcMsCombo.length) {
+        medians.bcMsCombo = comboTimes.medians.map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
       } else {
         for (const statsForYear of comboTimes.medians) {
           const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
           if (!correctYear) {
-            medians.bcMsCombo.push({ ...omitKeys(cloneDeep(statsForYear), ['y']), median: statsForYear.y })
+            medians.bcMsCombo.push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
             continue
           }
           correctYear.times.push(...statsForYear.times)
@@ -98,42 +95,42 @@ const getStatsByGraduationYear = async (facultyProgrammes: ProgrammesOfOrganizat
 
     for (const year of graduationTimes.medians) {
       if (year.y === 0) continue
-      if (!programmes.medians[level][year.name]) {
-        programmes.medians[level][year.name] = { data: [], programmes: [] }
-      }
-      programmes.medians[level][year.name].data.push(
-        omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
-      )
+
+      programmes.medians[level][year.name] ??= { data: [], programmes: [] }
       programmes.medians[level][year.name].programmes.push(code)
+      programmes.medians[level][year.name].data.push(
+        omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y'])
+      )
+
     }
 
     if (level === 'master' && comboTimes.medians.length) {
-      if (!programmes.medians.bcMsCombo) {
-        programmes.medians.bcMsCombo = {}
-      }
       for (const year of comboTimes.medians) {
         if (year.y === 0) continue
-        if (!programmes.medians.bcMsCombo[year.name]) {
-          programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
-        }
-        programmes.medians.bcMsCombo[year.name].data.push(
-          omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y'])
-        )
+
+        programmes.medians.bcMsCombo[year.name] ??= { data: [], programmes: [] }
         programmes.medians.bcMsCombo[year.name].programmes.push(code)
+        programmes.medians.bcMsCombo[year.name].data.push(
+          omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y'])
+        )
       }
     }
   }
   return { medians, programmes }
 }
 
-const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) => {
-  const newStats: Array<Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>> = []
-  const medians: Record<string, LevelGraduationStats[]> = {}
-  const programmes: { medians: Record<string, Record<string, ProgrammeStats>> } = { medians: {} }
-  const classSizes: Record<string, Record<string, number | Record<string, number>>> = { programmes: {} }
+const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization): Promise<GraduationStatistics['byStartYear'] & Pick<GraduationStatistics, 'classSizes'>> => {
+  const classSizes: ClassSizes = { bachelor: {}, master: {}, bcMsCombo: {}, doctor: {}, programmes: {} }
+  const newStats: Awaited<ReturnType<typeof getStudyTrackStatsForStudyProgramme>>[] = []
+  const medians: MediansByCategory = { bachelor: [], master: [], bcMsCombo: [], doctor: [] }
+  const programmes: { medians: MediansByProgrammes } = {
+    medians: {
+      bachelor: {}, master: {}, bcMsCombo: {}, doctor: {}
+    }
+  }
 
   for (const programme of facultyProgrammes) {
-    if (programme.degreeProgrammeType == null || !(programme.degreeProgrammeType in programmeTypes)) {
+    if (!programme.degreeProgrammeType || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
     const statsFromRedis = await getStudyTrackStats(programme.code, '', 'SPECIAL_EXCLUDED')
@@ -168,17 +165,17 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     )
     classSizes.programmes[code] = classSizesByYear
 
-    if (!medians[level]) {
-      medians[level] = cloneDeep(basicStats).map(year => ({ ...omitKeys(year, ['y', 'classSize']), median: year.y }))
+    if (!medians[level].length) {
+      medians[level] = structuredClone(basicStats).map(year => ({ ...omitKeys(year, ['y', 'classSize']), median: year.y }))
     }
-    classSizes[level] ??= {}
+
     for (const statsForYear of basicStats) {
       classSizes[level][statsForYear.name] ??= 0
-      ;(classSizes[level][statsForYear.name] as number) += statsForYear.classSize ?? 0
+      classSizes[level][statsForYear.name] += statsForYear.classSize ?? 0
 
       const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
       if (!correctYear) {
-        medians[level].push({ ...omitKeys(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+        medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y', 'classSize']), median: statsForYear.y })
         continue
       }
       correctYear.times.push(...statsForYear.times)
@@ -190,19 +187,19 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
     }
 
     if (level === 'master' && comboStats.length) {
-      if (!medians.bcMsCombo) {
-        medians.bcMsCombo = cloneDeep(comboStats).map(year => ({
+      if (!medians.bcMsCombo.length) {
+        medians.bcMsCombo = structuredClone(comboStats).map(year => ({
           ...omitKeys(year, ['y', 'classSize']),
           median: year.y,
         }))
       }
-      classSizes.bcMsCombo ??= {}
+
       for (const statsForYear of comboStats) {
         classSizes.bcMsCombo[statsForYear.name] ??= 0
-        ;(classSizes.bcMsCombo[statsForYear.name] as number) += statsForYear.classSize ?? 0
+        classSizes.bcMsCombo[statsForYear.name] += statsForYear.classSize ?? 0
         const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
         if (!correctYear) {
-          medians.bcMsCombo.push({ ...omitKeys(cloneDeep(statsForYear), ['y', 'classSize']), median: statsForYear.y })
+          medians.bcMsCombo.push({ ...omitKeys(structuredClone(statsForYear), ['y', 'classSize']), median: statsForYear.y })
           continue
         }
         correctYear.times.push(...statsForYear.times)
@@ -220,37 +217,34 @@ const getStatsByStartYear = async (facultyProgrammes: ProgrammesOfOrganization) 
 
     for (const year of basicStats) {
       if (year.y === 0) continue
-      if (!programmes.medians[level][year.name]) {
-        programmes.medians[level][year.name] = { data: [], programmes: [] }
-      }
-      programmes.medians[level][year.name].data.push(
-        omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
-      )
+      programmes.medians[level][year.name] ??= { data: [], programmes: [] }
       programmes.medians[level][year.name].programmes.push(code)
+      programmes.medians[level][year.name].data.push(
+        omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
+      )
     }
 
     if (level === 'master' && comboStats.length) {
-      if (!programmes.medians.bcMsCombo) {
-        programmes.medians.bcMsCombo = {}
-      }
       for (const year of comboStats) {
         if (year.y === 0) continue
-        if (!programmes.medians.bcMsCombo[year.name]) {
-          programmes.medians.bcMsCombo[year.name] = { data: [], programmes: [] }
-        }
-        programmes.medians.bcMsCombo[year.name].data.push(
-          omitKeys({ ...cloneDeep(year), name: progId, code, median: year.y }, ['times', 'y', 'classSize'])
-        )
+
+        programmes.medians.bcMsCombo[year.name] ??= { data: [], programmes: [] }
         programmes.medians.bcMsCombo[year.name].programmes.push(code)
+        programmes.medians.bcMsCombo[year.name].data.push(
+          omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
+        )
       }
     }
   }
   return { medians, programmes, classSizes }
 }
 
-export const countGraduationTimes = async (faculty: string, programmesOfFaculty: ProgrammesOfOrganization) => {
-  const { medians: mediansByGraduationYear, programmes: programmesByGraduationYear } =
-    await getStatsByGraduationYear(programmesOfFaculty)
+export const countGraduationTimes = async (facultyCode: string, programmesOfFaculty: ProgrammesOfOrganization): Promise<FacultyGraduationStatistics> => {
+  const {
+    medians: mediansByGraduationYear,
+    programmes: programmesByGraduationYear }
+    = await getStatsByGraduationYear(programmesOfFaculty)
+
   const {
     medians: mediansByStartYear,
     programmes: programmesByStartYear,
@@ -259,19 +253,19 @@ export const countGraduationTimes = async (faculty: string, programmesOfFaculty:
 
   const goals = {
     bachelor: GraduationTarget.THREE_YEARS,
-    bcMsCombo: faculty === 'H90' ? GraduationTarget.SIX_YEARS : GraduationTarget.FIVE_YEARS,
+    bcMsCombo: facultyCode === 'H90' ? GraduationTarget.SIX_YEARS : GraduationTarget.FIVE_YEARS,
     master: GraduationTarget.TWO_YEARS,
     doctor: GraduationTarget.FOUR_YEARS,
     exceptions: {
       // Exceptions are additions to the base amount
-      MH30_004: GraduationTarget.HALF_YEAR,
+      'MH30_004': GraduationTarget.HALF_YEAR,
       '420420-ma': GraduationTarget.HALF_YEAR,
       '420074-ma': GraduationTarget.HALF_YEAR,
       '420119-ma': GraduationTarget.HALF_YEAR,
-      MH30_001: GraduationTarget.FOUR_YEARS,
+      'MH30_001': GraduationTarget.FOUR_YEARS,
       '320011-ma': GraduationTarget.FOUR_YEARS,
       '320001-ma': GraduationTarget.FOUR_YEARS,
-      MH30_003: GraduationTarget.THREE_POINT_FIVE_YEARS,
+      'MH30_003': GraduationTarget.THREE_POINT_FIVE_YEARS,
       '320002-ma': GraduationTarget.THREE_POINT_FIVE_YEARS,
       '320009-ma': GraduationTarget.THREE_POINT_FIVE_YEARS,
     } as Record<string, number>,
@@ -283,7 +277,7 @@ export const countGraduationTimes = async (faculty: string, programmesOfFaculty:
   }, {})
 
   return {
-    id: faculty,
+    id: facultyCode,
     goals,
     byGradYear: {
       medians: mediansByGraduationYear,

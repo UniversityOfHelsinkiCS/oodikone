@@ -1,7 +1,6 @@
 import { GraphStat } from '@/types/graphStat'
 import { DegreeProgrammeType, Name, NameWithCode } from '@oodikone/shared/types'
 import { ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
-import { GetAllGraduationStatsResponse } from './university'
 
 type Info = {
   graphStats: GraphStat[]
@@ -53,12 +52,6 @@ export type GetFacultyThesisStatsRequest = {
   yearType: YearType
   studyProgrammeFilter: ProgrammeFilter
   specialGroups: SpecialGroups
-}
-
-export type GetFacultyGraduationTimesResponse = GetAllGraduationStatsResponse & {
-  // NOTE: This is NameWithCode in GetAllGraduationStatsResponse
-  programmeNames: Record<string, Name>
-  id: string
 }
 
 export type GetFacultyGraduationTimesRequest = {

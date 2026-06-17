@@ -4,7 +4,7 @@ import { BreakdownDisplay } from '@/components/GraduationTimes/BreakdownDisplay'
 import { MedianDisplay } from '@/components/GraduationTimes/MedianDisplay'
 import { Section } from '@/components/Section'
 import {
-  FacultyClassSizes,
+  ClassSizes,
   GraduationStats,
   Name,
   NameWithCode,
@@ -14,7 +14,7 @@ import {
 
 export type GraduationTimesProps = {
   mode: 'faculty' | 'programme' | 'study track' // "Mode" is one step below the current view in hierarchy e.g. viewing a programme overview -> mode should be study track
-  classSizes?: FacultyClassSizes | ProgrammeClassSizes | undefined
+  classSizes?: ClassSizes | ProgrammeClassSizes | undefined
   data: GraduationStats[] | undefined
   goal?: number | undefined
   goalExceptions?: Record<string, number> | { needed: boolean }
