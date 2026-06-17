@@ -13,9 +13,9 @@ type UniFacultyGraduationsProps = {
 }
 
 /**
-* This component should be merged with the one used in faculties tab,
-* but is left as an exercise to a future oodikone developer.
-*/
+ * This component should be merged with the one used in faculties tab,
+ * but is left as an exercise to a future oodikone developer.
+ */
 export const FacultyGraduations = ({
   data,
   faculty,

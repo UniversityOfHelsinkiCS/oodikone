@@ -13,7 +13,6 @@ import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { getTimestamp } from '@/util/timeAndDate'
 
-
 export const GraduationTimesTab = ({
   faculty,
   setStudyProgrammes,
@@ -32,7 +31,7 @@ export const GraduationTimesTab = ({
     data,
     isError: queryError,
     isSuccess: querySuccess,
-    isFetching
+    isFetching,
   } = useGetFacultyGraduationTimesQuery({ id: faculty?.id, studyProgrammeFilter })
 
   const groupBy = groupByStartYear ? ('byStartYear' as const) : ('byGradYear' as const)
@@ -61,7 +60,7 @@ export const GraduationTimesTab = ({
 
   const exportToExcel = () => {
     if (!data) return
-    const programmeNames = data.programmeNames
+    const { programmeNames } = data
 
     const sheetTitles = {
       bachelor: 'Bachelor',

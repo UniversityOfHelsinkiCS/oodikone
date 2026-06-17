@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express'
 import { cloneDeep } from 'lodash-es'
 
 import { FacultyGraduationStatistics, Graduated, NameWithCode } from '@oodikone/shared/types'
+import { MediansByCategory, UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 import { magicFacultyCode } from '../config/organizationConstants'
 import { OrganizationModel } from '../models'
 import { getDegreeProgrammesOfFaculty } from '../services/faculty/faculty'
@@ -17,19 +18,17 @@ import { combineFacultyStudentProgress, FacultyProgressData } from '../services/
 import { GraduationTarget } from '../services/graduationHelpers'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
 import logger from '../util/logger'
-import { MediansByCategory,  UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 
 const router = Router()
 
 const degreeNames = ['bachelor', 'bachelorMaster', 'master', 'doctor'] as const
 
-const getProgrammeNames = (faculties: OrganizationModel[]) => (
+const getProgrammeNames = (faculties: OrganizationModel[]) =>
   faculties.reduce<Record<string, NameWithCode>>((obj, faculty) => {
     const { name, code } = faculty.toJSON()
     obj[faculty.code] = { code, ...name }
     return obj
   }, {})
-)
 
 interface GetProgressStatsRequest extends Request {
   query: {
@@ -142,7 +141,6 @@ router.get('/allgraduationstats', async (_req: Request, res: Response<University
     facultyData[facultyCode] = data
   }
 
-
   const goals: UniversityGraduationStatistics['goals'] = {
     bachelor: GraduationTarget.THREE_YEARS,
     bcMsCombo: GraduationTarget.FIVE_YEARS,
@@ -164,8 +162,8 @@ router.get('/allgraduationstats', async (_req: Request, res: Response<University
         bcMsCombo: {},
         master: {},
         doctor: {},
-      }
-    }
+      },
+    },
   }
   const classSizes: UniversityGraduationStatistics['classSizes'] = {
     programmes: {},
