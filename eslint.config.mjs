@@ -263,5 +263,17 @@ export default tseslint.config(
       'no-promise-executor-return': 'off',
     },
   },
+
+  // Frontend tests
+  {
+    files: ['services/frontend/tests/**/*.{ts,tsx}', "services/frontend/playwright/**/*.{ts,tsx}", 'services/frontend/playwright-ct.config.ts'],
+    rules: {
+      'import-x/no-extraneous-dependencies': 'off',
+      'import-x/no-unused-modules': 'off',
+      'import-x/no-default-export': 'off',
+      'react/jsx-filename-extension': 'off',
+    },
+  },
+
   eslintPluginPrettierRecommended // This must be the last plugin so it can override other configs
 )

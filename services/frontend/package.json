@@ -6,7 +6,9 @@
     "start": "vite",
     "build": "tsc --noEmit && NODE_OPTIONS=\"--max-old-space-size=4096\" vite build",
     "preview": "vite preview",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "test:unit": "node --import tsx --test './tests/unit/**/*test.ts' --test-reporter spec --test-force-exit",
+    "test:component": "playwright test -c playwright-ct.config.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -37,11 +39,13 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
+    "@playwright/experimental-ct-react": "1.61.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.10.1",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^4.2.3",
+    "tsx": "4.22.4",
     "typescript": "^5.9.2",
     "vite": "^7.3.1"
   }

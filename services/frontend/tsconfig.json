@@ -28,6 +28,6 @@
     }
   },
   "references": [{ "path": "./tsconfig.node.json" }],
-  "include": ["src"],
+  "include": ["src", "tests", "./playwright-ct.config.ts", "playwright"],
   "exclude": ["../backend"]
 }
