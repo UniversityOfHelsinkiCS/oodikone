@@ -224,6 +224,7 @@ export const MedianGraduations = ({
         },
         markLine: {
           symbol: 'none',
+          silent: true,
           label: {
             show: false,
           },
