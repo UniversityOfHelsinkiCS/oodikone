@@ -367,7 +367,6 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:component
         working-directory: ./services/frontend
-      - uses: actions/upload-artifact@v4
 
   # === End-to-end tests ===
   test_end_to_end:
