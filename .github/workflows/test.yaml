@@ -368,6 +368,13 @@ jobs:
         run: npm run test:component
         working-directory: ./services/frontend
 
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
   # === End-to-end tests ===
   test_end_to_end:
     runs-on: ubuntu-latest
