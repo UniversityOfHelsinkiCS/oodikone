@@ -123,6 +123,7 @@ jobs:
       kone_db_migrations: ${{ steps.check_migrations.outputs.kone_db_migrations }}
       user_db_migrations: ${{ steps.check_migrations.outputs.user_db_migrations }}
       sis_db_migrations: ${{ steps.check_migrations.outputs.sis_db_migrations }}
+
     steps:
       - uses: actions/checkout@v6
       - name: Check if new migrations have been added
@@ -142,11 +143,12 @@ jobs:
 
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
+    runs-on: runner-scaleset
+    if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
       - pull_docker_images
       - check_migration_files
-    runs-on: runner-scaleset
-    if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
+
     steps:
       - uses: actions/checkout@v6
       - name: 'Login to toska docker registry'
@@ -173,13 +175,14 @@ jobs:
 
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
+    runs-on: runner-scaleset
+    if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
       - pull_docker_images
       - build_backend
       - build_frontend
       - check_migration_files
-    runs-on: runner-scaleset
-    if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
+
     steps:
       - uses: actions/checkout@v6
 
@@ -213,13 +216,13 @@ jobs:
 
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
+    runs-on: runner-scaleset
+    if: needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
       - pull_docker_images
       - build_backend
       - build_frontend
       - check_migration_files
-    runs-on: runner-scaleset
-    if: needs.check_migration_files.outputs.user_db_migrations == 'true'
     steps:
       - uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
@@ -260,16 +263,18 @@ jobs:
 
   # === Backend api-tests ===
   test_api:
+    name: 'Run backend api tests'
+    runs-on: runner-scaleset
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
       - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - lint_packages
-    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     strategy:
       fail-fast: false
-    runs-on: ubuntu-24.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -301,15 +306,79 @@ jobs:
       - name: Run api-tests
         run: npm run oodikone:ci:api
 
-  # === End-to-end tests ===
-  test_end_to_end:
+  # === Frontend unit testing ===
+  test_unit_frontend:
+    name: 'Run frontend unit tests'
+    runs-on: runner-scaleset
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
       - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - lint_packages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install node-24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm --prefix ci
+        working_directory: ./services/frontend
+
+      - name: Run unit tests
+        run: npm run test:unit
+        working_directory: ./services/frontend
+
+  # === Frontend component testing ===
+  test_components:
+    name: 'Test frontend components'
+    runs-on: runner-scaleset
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
+    needs:
+      - pull_docker_images
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+      - lint_packages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install node-24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+        working_directory: ./services/frontend
+
+      - name: Install Playwright Browsers
+        run: npm exec playwright install --with-deps
+        working_directory: ./services/frontend
+
+      - name: Run Playwright tests
+        run: npm run test:component
+        working_directory: ./services/frontend
+      - uses: actions/upload-artifact@v4
+
+  # === End-to-end tests ===
+  test_end_to_end:
+    runs-on: runner-scaleset
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
+    needs:
+      - pull_docker_images
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
+      - lint_packages
     strategy:
       fail-fast: false
       matrix:
@@ -340,9 +409,7 @@ jobs:
             spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test university'
             spec: cypress/e2e/University.js
-
     name: ${{ matrix.name }}
-    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -384,14 +451,15 @@ jobs:
   # === Other tests ===
   test_service_exit_statuses:
     name: 'Check services run correctly'
+    runs-on: runner-scaleset
+    if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
       - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
       - lint_packages
-    if: always() && !cancelled() && needs.lint_packages.result == 'success'
-    runs-on: runner-scaleset
+
     steps:
       - uses: actions/checkout@v6
       - name: 'Login to toska docker registry'

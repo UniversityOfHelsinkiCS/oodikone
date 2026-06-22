@@ -24,7 +24,7 @@ jobs:
 
   release_frontend:
     name: 'Build and release frontend'
-    runs-on: ubuntu-latest
+    runs-on: runner-scaleset
     needs: test
 
     steps:
@@ -59,7 +59,7 @@ jobs:
 
   release_backend:
     name: 'Build and release backend'
-    runs-on: ubuntu-latest
+    runs-on: runner-scaleset
     needs: test
 
     steps:
@@ -90,12 +90,11 @@ jobs:
 
   report_success:
     name: 'Report deployment success to the "oodikone_notifications" channel'
-    runs-on: ubuntu-latest
+    runs-on: runner-scaleset
+    if: success()
     needs:
       - release_frontend
       - release_backend
-
-    if: success()
 
     steps:
       - uses: actions/checkout@v6
@@ -109,12 +108,11 @@ jobs:
 
   report_failure:
     name: 'Report deployment failure to the "oodikone_notifications" channel'
-    runs-on: ubuntu-latest
+    runs-on: runner-scaleset
+    if: failure()
     needs:
       - release_frontend
       - release_backend
-
-    if: failure()
 
     steps:
       - uses: actions/checkout@v6
