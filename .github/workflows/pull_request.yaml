@@ -14,18 +14,23 @@ on:
 jobs:
   lint_packages:
     name: 'Lint packages'
-    runs-on: ubuntu-latest
+    runs-on: runner-scaleset
+    if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
+
     steps:
       - uses: actions/checkout@v6
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
   test_api:
+    name: 'Test backend api'
+    runs-on: runner-scaleset
+    if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
     needs:
       - lint_packages
     strategy:
       fail-fast: false
-    runs-on: ubuntu-24.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -49,12 +54,15 @@ jobs:
         run: npm run oodikone:ci:api
 
   test_end_to_end:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: runner-scaleset
+    if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
     needs:
       - lint_packages
       - test_api
     strategy:
       fail-fast: false
+
       matrix:
         include:
           - name: 'Test course statistics'
@@ -83,7 +91,7 @@ jobs:
             spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test university'
             spec: cypress/e2e/University.js
-    name: ${{ matrix.name }}
+
     steps:
       - uses: actions/checkout@v6
       - name: 'Run tests'
