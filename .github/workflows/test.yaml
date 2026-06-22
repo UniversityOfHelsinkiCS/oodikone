@@ -328,7 +328,7 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm --prefix ci
+        run: npm ci
         working-directory: ./services/frontend
 
       - name: Run unit tests
@@ -361,7 +361,7 @@ jobs:
         working-directory: ./services/frontend
 
       - name: Install Playwright Browsers
-        run: npm exec playwright install --with-deps
+        run: npm exec -- playwright install --with-deps
         working-directory: ./services/frontend
 
       - name: Run Playwright tests
