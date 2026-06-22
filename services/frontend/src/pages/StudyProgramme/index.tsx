@@ -61,7 +61,7 @@ export const StudyProgramme = () => {
   const { studyProgrammeId } = useParams()
 
   const [currentTab, setCurrentTab] = useTabs(5 + Number(isAdmin))
-  const [academicYear, setAcademicYear] = useState(false)
+  const [academicYear, setAcademicYear] = useState(true)
   const [specialGroupsExcluded, setSpecialGroupsExcluded] = useState(false)
 
   const { data } = useGetProgrammesQuery()

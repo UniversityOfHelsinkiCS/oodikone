@@ -128,7 +128,7 @@ export const BasicInformationTab = ({
   specialGroups: boolean
   studyProgrammes: boolean
 }) => {
-  const [academicYear, setAcademicYear] = useState(false)
+  const [academicYear, setAcademicYear] = useState(true)
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_DEGREE_PROGRAMMES'
