@@ -644,6 +644,7 @@ describe('Degree programme overview', () => {
       })
 
       it("'Show credits/Show students' toggle works", () => {
+        cy.cs('year-toggle').click()
         cy.get('thead tr')
           .eq(0)
           .within(() => {
