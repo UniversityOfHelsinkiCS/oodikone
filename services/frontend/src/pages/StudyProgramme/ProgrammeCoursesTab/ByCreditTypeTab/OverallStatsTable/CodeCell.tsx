@@ -11,7 +11,7 @@ export const CodeCell = ({ code }: { code: string }) => {
       <Typography variant="body2">{code}</Typography>
       <Link
         title={`Open course statistics for ${code}`}
-        to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=true`}
+        to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=false`}
       >
         <IconButton color="primary" data-cy={`${code.toLowerCase()}-course-statistics-link-button`}>
           <NorthEastIcon fontSize="small" />
