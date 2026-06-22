@@ -110,15 +110,15 @@ describe('Faculty statistics', () => {
       })
 
       it('Toggle years works', () => {
-        cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('contain', '2022')
-        cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('contain', '2022')
-        cy.cs('students-of-the-faculty-interactive-data-table').should('contain', '2022')
-        cy.cs('graduated-of-the-faculty-interactive-data-table').should('contain', '2022')
-        cy.cs('year-toggle').click()
         cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
         cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
         cy.cs('students-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
         cy.cs('graduated-of-the-faculty-interactive-data-table').should('contain', '2022 - 2023')
+        cy.cs('year-toggle').click()
+        cy.cs('credits-produced-by-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('thesis-writers-of-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('students-of-the-faculty-interactive-data-table').should('contain', '2022')
+        cy.cs('graduated-of-the-faculty-interactive-data-table').should('contain', '2022')
       })
 
       it('Toggle programmes works', () => {

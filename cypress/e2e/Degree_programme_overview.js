@@ -62,6 +62,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
+      cy.cs('year-toggle').click()
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
@@ -235,6 +236,7 @@ describe('Degree programme overview', () => {
     it('are split into two graphs', () => {
       cy.init('/study-programme')
       cy.contains('a', 'Matematiikan ja tilastotieteen maisteriohjelma').click({ force: true })
+      cy.cs('year-toggle').click() // Tests are written for calendar year
 
       cy.cs('unset-breakdown-bar-chart')
       cy.cs('unset-breakdown-bar-chart')
@@ -550,6 +552,7 @@ describe('Degree programme overview', () => {
       })
 
       it('time range selection works', () => {
+        cy.cs('year-toggle').click()
         cy.cs('from-year-select').click()
         cy.cs('from-year-select-option-2021').click()
         cy.cs('to-year-select').click()
@@ -568,7 +571,7 @@ describe('Degree programme overview', () => {
       })
 
       it('year toggle works', () => {
-        cy.cs('year-toggle').click()
+        // cy.cs('year-toggle').click() // Default view now Academic years
 
         cy.cs('from-year-select').click()
         cy.cs('from-year-select-option-2017').click()
