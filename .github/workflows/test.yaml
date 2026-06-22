@@ -329,11 +329,11 @@ jobs:
 
       - name: Install dependencies
         run: npm --prefix ci
-        working_directory: ./services/frontend
+        working-directory: ./services/frontend
 
       - name: Run unit tests
         run: npm run test:unit
-        working_directory: ./services/frontend
+        working-directory: ./services/frontend
 
   # === Frontend component testing ===
   test_components:
@@ -358,15 +358,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working_directory: ./services/frontend
+        working-directory: ./services/frontend
 
       - name: Install Playwright Browsers
         run: npm exec playwright install --with-deps
-        working_directory: ./services/frontend
+        working-directory: ./services/frontend
 
       - name: Run Playwright tests
         run: npm run test:component
-        working_directory: ./services/frontend
+        working-directory: ./services/frontend
       - uses: actions/upload-artifact@v4
 
   # === End-to-end tests ===
