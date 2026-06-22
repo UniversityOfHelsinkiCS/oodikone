@@ -14,7 +14,7 @@ on:
 jobs:
   lint_packages:
     name: 'Lint packages'
-    runs-on: runner-scaleset
+    runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
 
     steps:
@@ -24,7 +24,7 @@ jobs:
 
   test_api:
     name: 'Test backend api'
-    runs-on: runner-scaleset
+    runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
     needs:
       - lint_packages
@@ -55,7 +55,7 @@ jobs:
 
   test_end_to_end:
     name: ${{ matrix.name }}
-    runs-on: runner-scaleset
+    runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
     needs:
       - lint_packages
