@@ -1,6 +1,4 @@
-import os from 'os'
 import * as winston from 'winston'
-import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
 
 import { isProduction } from '../config'
@@ -11,18 +9,7 @@ transports.push(
   new LokiTransport({
     host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
     labels: { app: 'oodikone', environment: process.env.NODE_ENV ?? 'production' },
-  }),
-  new WinstonGelfTransporter({
-    handleExceptions: true,
-    host: 'svm-116.cs.helsinki.fi',
-    port: 9503,
-    protocol: 'udp',
-    hostName: os.hostname(),
-    additional: {
-      app: 'oodikone',
-      environment: 'production',
-    },
-  }) as winston.transport
+  })
 )
 
 const { colorize, combine, timestamp, printf } = winston.format
