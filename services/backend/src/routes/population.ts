@@ -112,7 +112,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
     const studentStatuses = handleQueryArrays(req.query.studentStatuses) // NOTE: TRANSFERRED means transferred out of the program
 
     const requiredFields = [years, semesters, programme]
-    if (requiredFields.some(field => !field)) {
+    if (requiredFields.some(field => !field.length)) {
       return res.status(400).json({ error: 'The query should have years, semesters and a programme defined' })
     }
 
@@ -223,13 +223,17 @@ router.get<
 })
 
 // Used in custom population and single study guidance groups
-router.post<never, GetCustomPopulationResBody, CustomPopulationQuery>(
+router.post<never, CanError<GetCustomPopulationResBody>, CustomPopulationQuery>(
   '/populationstatisticsbystudentnumbers',
   async (req, res) => {
-    const { studentNumbers, tags } = req.body
+    const { studentNumbers, tags } = req.body ?? { studentNumbers: [] }
     const { id: userId, roles, studentsUserCanAccess } = req.user
 
     const students = handleQueryArrays(studentNumbers)
+
+    if (!students.length) {
+      return res.status(422).json({ error: 'Body should include student numbers' })
+    }
 
     const filteredStudentNumbers = hasFullAccessToStudentData(roles)
       ? students

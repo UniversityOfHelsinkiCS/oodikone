@@ -51,7 +51,7 @@ router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMul
   }
 )
 
-type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearlyStats>>
+export type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearlyStats>>
 
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
   '/courseyearlystats',
@@ -83,7 +83,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const useSeparate = separate === 'true'
 
     const results = await getCourseYearlyStats(courseCodes, useSeparate, anonymizationSalt, useCombineSubstitutions)
-    res.json(results)
+    return res.json(results)
   }
 )
 

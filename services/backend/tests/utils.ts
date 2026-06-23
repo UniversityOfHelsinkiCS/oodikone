@@ -11,10 +11,13 @@ export const initTests = async () => {
   void (await dbConnections.connect())
 
   dbConnections.on('connect', () => {
-    console.info('Connected to sis db successfully')
+    console.info('Connected to sis db successfully (TEST)')
   })
   dbConnections.on('error', () => {
-    console.error('Failed to connect to sis db!')
+    console.error('Failed to connect to sis db! (TEST)')
+  })
+  dbConnections.on('close', () => {
+    console.info('Closing connection... (TEST)')
   })
 
   const app = express()

@@ -13,11 +13,12 @@ before(async () => {
 void describe('Population statistics by student number', async () => {
   await it('should not return anything with missing parameters', async () => {
     const res = await request(app)
-      .get('/populationstatisticsbystudentnumbers')
+      .post('/populationstatisticsbystudentnumbers')
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
       .set('hygroupcn', 'grp-oodikone-basic-users')
 
-    assert.deepEqual(res.status, 400)
+    assert.deepEqual(res.status, 422)
+    assert.deepEqual(res.body.error, 'Body should include student numbers')
   })
 })

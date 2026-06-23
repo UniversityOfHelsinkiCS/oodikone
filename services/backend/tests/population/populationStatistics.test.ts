@@ -28,28 +28,35 @@ const populationUrl = (
 }
 
 void describe('Population statistics', async () => {
-  await it('should fail when all fields not defined', async () => {
-    const resAllMissing = await request(app)
-      .get(populationUrl())
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')
+  await it('should fail when all fields not defined', async t => {
+    await t.test('(all)', async () => {
+      const resAllMissing = await request(app)
+        .get(populationUrl())
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')
+      assert.strictEqual(resAllMissing.status, 400)
+    })
 
-    const resProgramme = await request(app)
-      .get(populationUrl('KH50_001'))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')
+    await t.test('(all but code)', async () => {
+      const resProgramme = await request(app)
+        .get(populationUrl('KH50_001'))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')
 
-    const resProgrammeAndYears = await request(app)
-      .get(populationUrl('KH50_001', ['2021', '2022']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')
+      assert.strictEqual(resProgramme.status, 400)
+    })
 
-    assert.strictEqual(resAllMissing.status, 400)
-    assert.strictEqual(resProgramme.status, 400)
-    assert.strictEqual(resProgrammeAndYears.status, 400)
+    await t.test('(all but code and years)', async () => {
+      const resProgrammeAndYears = await request(app)
+        .get(populationUrl('KH50_001', ['2021', '2022']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')
+
+      assert.strictEqual(resProgrammeAndYears.status, 400)
+    })
   })
 
   await it('should not return any data to unauthorized user', async () => {
@@ -85,85 +92,99 @@ void describe('Population statistics', async () => {
     assert.notStrictEqual(res.body.students.length, 0)
   })
 
-  await it('should work with the programme flag', async () => {
-    const resBachelor = (await request(app)
-      .get(populationUrl('KH50_001', ['2021'], ['SPRING', 'FALL']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+  await it('should work with the programme flag', async t => {
+    await t.test('(bachelor)', async () => {
+      const resBachelor = (await request(app)
+        .get(populationUrl('KH50_001', ['2021'], ['SPRING', 'FALL']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    const resMaster = (await request(app)
-      .get(populationUrl('MH50_001', ['2021'], ['SPRING', 'FALL']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      assert.strictEqual(resBachelor.status, 200)
+      assert.strictEqual(resBachelor.body.students.length, 38)
+    })
 
-    assert.strictEqual(resBachelor.status, 200)
-    assert.strictEqual(resBachelor.body.students.length, 38)
+    await t.test('(master)', async () => {
+      const resMaster = (await request(app)
+        .get(populationUrl('MH50_001', ['2021'], ['SPRING', 'FALL']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    assert.strictEqual(resMaster.status, 200)
-    assert.strictEqual(resMaster.body.students.length, 36)
+      assert.strictEqual(resMaster.status, 200)
+      assert.strictEqual(resMaster.body.students.length, 36)
+    })
   })
 
-  await it('should work with semester flag', async () => {
-    const resFall = (await request(app)
-      .get(populationUrl('KH50_001', ['2021'], ['FALL']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+  await it('should work with semester flag', async t => {
+    await t.test('(FALL)', async () => {
+      const resFall = (await request(app)
+        .get(populationUrl('KH50_001', ['2021'], ['FALL']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    const resSpring = (await request(app)
-      .get(populationUrl('KH50_001', ['2021'], ['SPRING']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      assert.strictEqual(resFall.status, 200)
+      assert.strictEqual(resFall.body.students.length, 34)
+    })
 
-    assert.strictEqual(resFall.status, 200)
-    assert.strictEqual(resSpring.status, 200)
+    await t.test('(SPRING)', async () => {
+      const resSpring = (await request(app)
+        .get(populationUrl('KH50_001', ['2021'], ['SPRING']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    assert.strictEqual(resFall.body.students.length, 34)
-    assert.strictEqual(resSpring.body.students.length, 4)
+      assert.strictEqual(resSpring.status, 200)
+      assert.strictEqual(resSpring.body.students.length, 4)
+    })
   })
 
-  await it('should work with year flag correctly', async () => {
-    const res2021 = (await request(app)
-      .get(populationUrl('KH50_001', ['2021'], ['FALL', 'SPRING']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
-    const res2022 = (await request(app)
-      .get(populationUrl('KH50_001', ['2022'], ['FALL', 'SPRING']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+  await it('should work with year flag correctly', async t => {
+    await t.test('(2021)', async () => {
+      const res2021 = (await request(app)
+        .get(populationUrl('KH50_001', ['2021'], ['FALL', 'SPRING']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    const res2021_2022 = (await request(app)
-      .get(populationUrl('KH50_001', ['2021', '2022'], ['FALL', 'SPRING']))
-      .set('shib-session-id', 'test')
-      .set('uid', 'basic')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      const dbCount2021 = await connection.query(
+        `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2021-07-31' and "sis_study_right_elements".start_date < '2022-08-01'`,
+        { raw: true, plain: true }
+      )
+      assert.strictEqual(res2021.status, 200)
+      assert.strictEqual(res2021.body.students.length, dbCount2021?.count)
+    })
 
-    const dbCount2021 = await connection.query(
-      `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2021-07-31' and "sis_study_right_elements".start_date < '2022-08-01'`,
-      { raw: true, plain: true }
-    )
-    const dbCount2022 = await connection.query(
-      `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2022-07-31' and "sis_study_right_elements".start_date < '2023-08-01'`,
-      { raw: true, plain: true }
-    )
-    const dbCount2021_2022 = await connection.query(
-      `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2021-07-31' and "sis_study_right_elements".start_date < '2023-08-01'`,
-      { raw: true, plain: true }
-    )
+    await t.test('(2022)', async () => {
+      const res2022 = (await request(app)
+        .get(populationUrl('KH50_001', ['2022'], ['FALL', 'SPRING']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      const dbCount2022 = await connection.query(
+        `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2022-07-31' and "sis_study_right_elements".start_date < '2023-08-01'`,
+        { raw: true, plain: true }
+      )
 
-    assert.strictEqual(res2021.status, 200)
-    assert.strictEqual(res2022.status, 200)
+      assert.strictEqual(res2022.status, 200)
+      assert.strictEqual(res2022.body.students.length, dbCount2022?.count)
+    })
 
-    assert.strictEqual(res2021.body.students.length, dbCount2021?.count)
-    assert.strictEqual(res2022.body.students.length, dbCount2022?.count)
+    await t.test('(2021-2022)', async () => {
+      const res2021_2022 = (await request(app)
+        .get(populationUrl('KH50_001', ['2021', '2022'], ['FALL', 'SPRING']))
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
-    assert.strictEqual(res2021_2022.status, 200)
-    assert.strictEqual(res2021_2022.body.students.length, dbCount2021_2022?.count)
+      const dbCount2021_2022 = await connection.query(
+        `select count(student_number)::integer from "sis_study_right_elements" join "sis_study_rights" on study_right_id = "sis_study_rights".id  where code = 'KH50_001' and "sis_study_right_elements".start_date > '2021-07-31' and "sis_study_right_elements".start_date < '2023-08-01'`,
+        { raw: true, plain: true }
+      )
+      assert.strictEqual(res2021_2022.status, 200)
+      assert.strictEqual(res2021_2022.body.students.length, dbCount2021_2022?.count)
+    })
   })
 
   await it.skip('should return only students who have transferred out of the programme when TRANSFERRED flag is set', async () => {

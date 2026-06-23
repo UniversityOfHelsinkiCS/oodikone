@@ -106,5 +106,5 @@ export const safeJSONParse = async <T>(json: string): Promise<T | null> => {
 
 // NOTE: Make sure we have only arrays, "/...&years=2021" is parsed by express as years: 2021, not [2021]
 export const handleQueryArrays = <T>(requestField: T | T[]): T[] => {
-  return Array.isArray(requestField) ? requestField : [requestField]
+  return requestField ? (Array.isArray(requestField) ? requestField : [requestField]) : []
 }
