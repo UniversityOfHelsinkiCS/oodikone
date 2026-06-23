@@ -645,6 +645,7 @@ describe('Degree programme overview', () => {
 
       it("'Show credits/Show students' toggle works", () => {
         cy.cs('year-toggle').click()
+        cy.wait(500) // So that the toggle has time to load
         cy.get('thead tr')
           .eq(0)
           .within(() => {
