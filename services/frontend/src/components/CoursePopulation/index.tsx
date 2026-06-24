@@ -56,7 +56,10 @@ export const CoursePopulation = () => {
 
   const { coursecodes, from, to, separate, unifyCourses, includeSubstitutions } = parseQueryParams(location.search)
 
-  const { data: courseDetails } = useGetCourseDetailsQuery({ codes: codes.mainCodes })
+  const { data: courseDetails } = useGetCourseDetailsQuery(
+    { codes: codes.mainCodes },
+    { skip: !codes.mainCodes.length }
+  )
   const { data: population } = useGetPopulationStatisticsByCourseQuery({
     coursecodes,
     from,
