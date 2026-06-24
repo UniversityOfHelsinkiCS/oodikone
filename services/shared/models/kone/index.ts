@@ -1,6 +1,6 @@
+export type { CompletedCoursesSearch } from './completedCoursesSearch'
 export type { CustomPopulationSearch } from './customPopulationSearch'
 export type { ExcludedCourse } from './excludedCourse'
-export type { OpenUniPopulationSearch } from './openUniPopulationSearch'
 export type { ProgressCriteria } from './progressCriteria'
 export type { StudyGuidanceGroupTag } from './studyGuidanceGroupTag'
 export type { StudyProgrammePin } from './studyProgrammePin'

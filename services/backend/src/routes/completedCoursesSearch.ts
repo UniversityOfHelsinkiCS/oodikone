@@ -4,14 +4,14 @@ import { difference, intersection } from 'lodash-es'
 import { CanError } from '@oodikone/shared/routes'
 import type { CompletedCoursesStudent, CompletedCoursesCourse } from '@oodikone/shared/types'
 import { tryCatch } from '@oodikone/shared/util'
-import { getCompletedCourses } from '../services/completedCoursesSearch'
 import {
+  getCompletedCourses,
   getUserSearches,
   createNewUserSearch,
   deleteUserSearch,
   updateUserSearch,
   FoundSearch,
-} from '../services/openUni/openUniManageSearches'
+} from '../services/completedCoursesSearch'
 import { hasFullAccessToStudentData, safeJSONParse } from '../util'
 import { getImporterClient } from '../util/importerClient'
 import logger from '../util/logger'
