@@ -3,16 +3,22 @@ import { useMemo } from 'react'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import type { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
+import {
+  getProgrammeDetails,
+  getSemesterEnrollmentsContent,
+  useGetRelevantSemesterData,
+} from '@/components/PopulationStudents/StudentTable/GeneralTab/format/util'
+import {
+  useGeneratePrimitiveFunctions,
+  Variant,
+} from '@/components/PopulationStudents/StudentTable/GeneralTab/primitives'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { formatDate } from '@/util/timeAndDate'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
-import type { FormattedStudentData } from '../index'
-
-import { useGeneratePrimitiveFunctions, Variant } from '../primitives'
-import { getProgrammeDetails, getSemesterEnrollmentsContent, useGetRelevantSemesterData } from './util'
 
 const useGetCreditDateFilterOptions = () => {
   const { useFilterSelector } = useFilters()

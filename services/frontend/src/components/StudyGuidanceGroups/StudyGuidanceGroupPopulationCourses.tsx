@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
+import { StudentAmountLimiter } from '@/components/common/StudentAmountLimiter'
 import { CourseTableModeSelector } from '@/components/PopulationComponents/CourseTableModeSelector'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { useDebouncedState } from '@/hooks/debouncedState'
-import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 
 export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProgramme, year, curriculum }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)

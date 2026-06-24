@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { BasicCell } from './BasicCell'
+import { BasicCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/BasicCell'
 
 const getTooltip = (
   otherCountriesStats: Record<string, Record<string, Record<string, number>>>,

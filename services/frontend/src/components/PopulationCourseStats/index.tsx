@@ -2,13 +2,13 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useState, useEffect } from 'react'
 
+import { GradeDistribution } from '@/components/PopulationCourseStats/GradeDistribution'
+import { PassFailEnrollments } from '@/components/PopulationCourseStats/PassFailEnrollments'
+import { PassingSemesters } from '@/components/PopulationCourseStats/PassingSemesters'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 import type { Module, CurriculumDetails } from '@oodikone/shared/types'
-import { GradeDistribution } from './GradeDistribution'
-import { PassFailEnrollments } from './PassFailEnrollments'
-import { PassingSemesters } from './PassingSemesters'
 
 type PopulationCourseStatsProps = {
   filteredCourses: FilteredCourse[]

@@ -1,6 +1,6 @@
 import Switch from '@mui/material/Switch'
 
-import { Setting } from './Setting'
+import { Setting } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/settings/Setting'
 
 export const ChartSettings = ({
   isRelative,

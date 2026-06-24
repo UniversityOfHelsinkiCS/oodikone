@@ -6,12 +6,11 @@ import { useState } from 'react'
 import { getMonthsForDegree } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { CreditDistributionDevelopment } from '@/components/PopulationComponents/CreditGainStats/CreditDistributionDevelopment'
+import { CreditsGainedTab } from '@/components/PopulationComponents/CreditGainStats/CreditsGainedTab'
+import { StatisticsTab } from '@/components/PopulationComponents/CreditGainStats/StatisticsTab'
 import { PopulationQuery } from '@/types/populationSearch'
-
 import { FormattedStudent } from '@oodikone/shared/types'
-import { CreditDistributionDevelopment } from './CreditDistributionDevelopment'
-import { CreditsGainedTab } from './CreditsGainedTab'
-import { StatisticsTab } from './StatisticsTab'
 
 type CreditStatisticsProps = {
   filteredStudents: FormattedStudent[]

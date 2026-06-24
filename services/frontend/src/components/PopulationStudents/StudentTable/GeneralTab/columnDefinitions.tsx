@@ -14,12 +14,12 @@ import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
+import { FormattedStudentData } from '@/components/PopulationStudents/StudentTable/GeneralTab'
+import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/GeneralTab/util'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { CheckIcon, ContentCopyIcon } from '@/theme'
 import { formatDate } from '@/util/timeAndDate'
-import { FormattedStudentData } from '.'
-import { joinProgrammes } from './util'
 
 const columnHelper = createColumnHelper<FormattedStudentData>()
 

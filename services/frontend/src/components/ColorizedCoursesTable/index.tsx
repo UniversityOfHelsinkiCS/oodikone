@@ -4,12 +4,12 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useEffect, useMemo, useState } from 'react'
 
+import { ColorizedCoursesTableContext } from '@/components/ColorizedCoursesTable/common'
+import { FacultiesTab } from '@/components/ColorizedCoursesTable/FacultiesTab'
+import { SemestersTab } from '@/components/ColorizedCoursesTable/SemestersTab'
 import { LoadingSection } from '@/components/Loading'
 import { useSemesters } from '@/hooks/useSemesters'
-import { ColorizedCoursesTableContext } from './common'
-import { FacultiesTab } from './FacultiesTab'
-import { SemestersTab } from './SemestersTab'
-import './index.css'
+import '@/components/ColorizedCoursesTable/index.css'
 
 export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes }) => {
   const { semesters: allSemesters, currentSemester } = useSemesters()

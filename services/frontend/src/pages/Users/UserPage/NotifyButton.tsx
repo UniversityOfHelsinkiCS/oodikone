@@ -8,9 +8,9 @@ import Stack from '@mui/material/Stack'
 import { useEffect, useState } from 'react'
 
 import { useStatusNotification } from '@/components/StatusNotification/Context'
+import { EmailPreview } from '@/pages/Users/UserPage/EmailPreview'
 import { useGetUserAccessEmailPreviewQuery, useSendUserAccessEmailMutation } from '@/redux/users'
 import { EmailIcon, SendIcon } from '@/theme'
-import { EmailPreview } from './EmailPreview'
 
 export const NotifyButton = ({ userEmail }: { userEmail: string }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)

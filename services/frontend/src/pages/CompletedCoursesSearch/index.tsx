@@ -10,9 +10,9 @@ import { useState } from 'react'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
+import { SearchModal } from '@/pages/CompletedCoursesSearch/SearchModal'
+import { SearchResults } from '@/pages/CompletedCoursesSearch/SearchResults'
 import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
-import { SearchModal } from './SearchModal'
-import { SearchResults } from './SearchResults'
 
 export type SearchValues = { courseList: string[]; studentList: string[] }
 

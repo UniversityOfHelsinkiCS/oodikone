@@ -2,7 +2,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { ProgressBarChart } from '@/components/Charts/ProgressBarChart'
-import { ProgressTable } from './ProgressTable'
+import { ProgressTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressTable'
 
 type ProgressStats = {
   chartStats: {

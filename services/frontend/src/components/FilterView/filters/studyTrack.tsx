@@ -1,8 +1,8 @@
 import Alert from '@mui/material/Alert'
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { StudyTrack } from '@oodikone/shared/types'
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
+import { FilterRange } from '@/components/FilterView/filters/common/FilterRange'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useDebounce } from '@/hooks/debounce'
 import { getAge } from '@/util/timeAndDate'
-import { FilterRange } from './common/FilterRange'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = { min: number | null; max: number | null }
 type Args = undefined

@@ -1,5 +1,6 @@
 import { RTKApi } from '@/apiConnection'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { Language } from '@oodikone/shared/language'
 import {
@@ -11,7 +12,6 @@ import {
   YearType,
 } from '@oodikone/shared/types'
 import { BasicStats, CreditStatsPayload, ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
-import { useGetProgrammesQuery } from './populations'
 
 const studyProgrammeApi = RTKApi.injectEndpoints({
   endpoints: builder => ({

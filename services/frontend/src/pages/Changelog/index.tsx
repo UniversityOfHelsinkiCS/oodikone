@@ -5,9 +5,9 @@ import { filterInternalReleases } from '@/common'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
+import { ReleaseCard } from '@/pages/Changelog/ReleaseCard'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import type { Release } from '@oodikone/shared/types'
-import { ReleaseCard } from './ReleaseCard'
 
 export const Changelog = () => {
   useTitle('Changelog')

@@ -1,6 +1,6 @@
-import { FilterRadio } from './common/FilterRadio'
-import { FilterSwitch } from './common/FilterSwitch'
-import { createFilter, FilterTrayProps } from './createFilter'
+import { FilterRadio } from '@/components/FilterView/filters/common/FilterRadio'
+import { FilterSwitch } from '@/components/FilterView/filters/common/FilterSwitch'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 
 type Options = {
   activeProgramme: boolean

@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
 import { filterToolTips } from '@/common/InfoToolTips'
-import { FilterRadio } from './common/FilterRadio'
-import { createFilter, FilterTrayProps } from './createFilter'
+import { FilterRadio } from '@/components/FilterView/filters/common/FilterRadio'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 
 type Options = any
 type Args = any

@@ -4,8 +4,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Typography from '@mui/material/Typography'
 
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

@@ -5,10 +5,10 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
+import { ResultTab } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/ResultTab'
 import { PersonIcon, RefreshIcon } from '@/theme'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
-import { ResultTab } from './tabs/ResultTab'
 
 export const ResultTabs = ({
   availableStats,

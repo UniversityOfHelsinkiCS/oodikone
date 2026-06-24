@@ -6,11 +6,11 @@ import { useState } from 'react'
 import { LoadingSection } from '@/components/Loading'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 
+import { LeaderForm } from '@/components/Teachers/TeacherLeaderBoard/LeaderForm'
+import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 import { DateFormat } from '@/constants/date'
 import { useGetTopTeachersCategoriesQuery, useGetTopTeachersQuery } from '@/redux/teachers'
 import { reformatDate } from '@/util/timeAndDate'
-import { TeacherStatisticsTable } from '../TeacherStatisticsTable'
-import { LeaderForm } from './LeaderForm'
 
 export const TeacherLeaderBoard = () => {
   const [selectedYear, setSelectedYear] = useState(undefined)

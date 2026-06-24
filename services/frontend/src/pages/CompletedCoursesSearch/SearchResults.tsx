@@ -13,12 +13,12 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
+import { SearchValues } from '@/pages/CompletedCoursesSearch'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { CompletedCoursesStudent, CreditTypeCode } from '@oodikone/shared/types'
-import { SearchValues } from '.'
 
 const isPassed = (creditType: CreditTypeCode) =>
   [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(creditType)

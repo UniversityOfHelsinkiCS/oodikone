@@ -2,9 +2,9 @@ import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 
 import { CourseSearchState } from '@/pages/CourseStatistics'
+import { ProviderOrganizationSelect } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/settings/ProviderOrganizationSelect'
+import { Setting } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/settings/Setting'
 import { AvailableStats } from '@/types/courseStat'
-import { ProviderOrganizationSelect } from './ProviderOrganizationSelect'
-import { Setting } from './Setting'
 
 export const TableSettings = ({
   availableStats,

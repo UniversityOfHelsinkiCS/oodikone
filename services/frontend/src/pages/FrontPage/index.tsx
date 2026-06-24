@@ -9,13 +9,13 @@ import { Link } from '@/components/common/Link'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
+import { FeatureItem } from '@/pages/FrontPage/FeatureItem'
+import { ReleaseItem } from '@/pages/FrontPage/ReleaseItem'
+import { SectionTitle } from '@/pages/FrontPage/SectionTitle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
 import { Release } from '@oodikone/shared/types'
-import { FeatureItem } from './FeatureItem'
-import { ReleaseItem } from './ReleaseItem'
-import { SectionTitle } from './SectionTitle'
 
 export const FrontPage = () => {
   useTitle()

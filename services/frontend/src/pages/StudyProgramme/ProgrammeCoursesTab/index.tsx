@@ -4,9 +4,9 @@ import Tabs from '@mui/material/Tabs'
 
 import { ColorizedCoursesTable } from '@/components/ColorizedCoursesTable'
 import { useTabs } from '@/hooks/tabs'
+import { ByCreditTypeTab } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab'
 import { useGetColorizedTableCourseStatsQuery } from '@/redux/studyProgramme'
 import { CalendarMonthIcon, SchoolIcon } from '@/theme'
-import { ByCreditTypeTab } from './ByCreditTypeTab'
 
 export const ProgrammeCoursesTab = ({
   academicYear,

@@ -5,15 +5,14 @@ import Tabs from '@mui/material/Tabs'
 import { useParams } from 'react-router'
 
 import { PageTitle } from '@/components/common/PageTitle'
+import { TeacherDetails } from '@/components/Teachers/TeacherDetails'
+import { TeacherLeaderBoard } from '@/components/Teachers/TeacherLeaderBoard'
+import { TeacherSearchTab } from '@/components/Teachers/TeacherSearchTab'
+import { TeacherStatistics } from '@/components/Teachers/TeacherStatistics'
 import { useTabs } from '@/hooks/tabs'
-
 import { useTitle } from '@/hooks/title'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { hasFullAccessToTeacherData } from '@/util/access'
-import { TeacherDetails } from './TeacherDetails'
-import { TeacherLeaderBoard } from './TeacherLeaderBoard'
-import { TeacherSearchTab } from './TeacherSearchTab'
-import { TeacherStatistics } from './TeacherStatistics'
 
 const TeachersTabs = () => {
   const { roles, iamGroups } = useGetAuthorizedUserQuery()

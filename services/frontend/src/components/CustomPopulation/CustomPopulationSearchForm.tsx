@@ -7,8 +7,11 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { extractItems } from '@/common'
+import { PageTitle } from '@/components/common/PageTitle'
 import { SearchHistory } from '@/components/common/SearchHistory'
 
+import { CustomPopulationState } from '@/components/CustomPopulation/'
+import { Section } from '@/components/Section'
 import {
   useCreateCustomPopulationSearchMutation,
   useDeleteCustomPopulationSearchMutation,
@@ -18,9 +21,6 @@ import {
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { DeleteIcon, SaveIcon, SendIcon } from '@/theme'
 import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
-import { PageTitle } from '../common/PageTitle'
-import { Section } from '../Section'
-import { CustomPopulationState } from '.'
 
 const customPopulationInfo = `
   In this view you can search for a custom population with a list of student numbers. A custom population can be saved

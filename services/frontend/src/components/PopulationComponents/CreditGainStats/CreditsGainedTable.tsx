@@ -14,10 +14,10 @@ import isBetween from 'dayjs/plugin/isBetween'
 import { getStudentTotalCredits } from '@/common'
 import { hopsFilter as studyPlanFilter, creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
+import { CollapsibleCreditRow } from '@/components/PopulationComponents/CreditGainStats/CollapsibleCreditRow'
 import { DateFormat } from '@/constants/date'
 import { formatDate } from '@/util/timeAndDate'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { CollapsibleCreditRow } from './CollapsibleCreditRow'
 
 dayjsExtend(isBetween)
 

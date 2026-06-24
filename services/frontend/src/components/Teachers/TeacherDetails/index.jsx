@@ -8,9 +8,9 @@ import { Navigate } from 'react-router'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
+import { CoursesTab } from '@/components/Teachers/TeacherDetails/CoursesTab'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 import { useGetTeacherQuery } from '@/redux/teachers'
-import { CoursesTab } from './CoursesTab'
 
 const formatStatisticsForTable = (statistics, getTextIn) => {
   if (!statistics) {

@@ -3,9 +3,14 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { FilterCard } from '@/components/FilterView/filters/common/FilterCard'
+import type {
+  FilterContext,
+  FilterOptions,
+  FilterTrayProps,
+  GenericFilter,
+} from '@/components/FilterView/filters/createFilter'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
-import { FilterCard } from './filters/common/FilterCard'
-import type { FilterContext, FilterOptions, FilterTrayProps, GenericFilter } from './filters/createFilter'
 
 export const FilterTray = <Options extends FilterOptions, Args, Precompute>({
   numberOfFilteredStudents,

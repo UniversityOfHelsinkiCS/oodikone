@@ -1,8 +1,8 @@
 import Stack from '@mui/material/Stack'
 
+import { CreateNewTagSection } from '@/pages/StudyProgramme/TagsTab/CreateNewTagSection'
+import { TagsSection } from '@/pages/StudyProgramme/TagsTab/TagsSection'
 import { useGetTagsByStudyTrackQuery } from '@/redux/tags'
-import { CreateNewTagSection } from './CreateNewTagSection'
-import { TagsSection } from './TagsSection'
 
 export const TagsTab = ({
   combinedProgramme,

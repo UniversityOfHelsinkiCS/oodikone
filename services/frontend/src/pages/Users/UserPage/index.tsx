@@ -5,12 +5,12 @@ import Stack from '@mui/material/Stack'
 import { PageLayout } from '@/components/common/PageLayout'
 import { Loading } from '@/components/Loading'
 import { useTitle } from '@/hooks/title'
+import { IamGroupsCard } from '@/pages/Users/UserPage/IamGroupsCard'
+import { InfoCard } from '@/pages/Users/UserPage/InfoCard'
+import { MissingIdAlert } from '@/pages/Users/UserPage/MissingIdAlert'
+import { RolesCard } from '@/pages/Users/UserPage/RolesCard'
+import { StudyProgrammeRightsCard } from '@/pages/Users/UserPage/StudyProgrammeRightsCard'
 import { useGetUserQuery } from '@/redux/users'
-import { IamGroupsCard } from './IamGroupsCard'
-import { InfoCard } from './InfoCard'
-import { MissingIdAlert } from './MissingIdAlert'
-import { RolesCard } from './RolesCard'
-import { StudyProgrammeRightsCard } from './StudyProgrammeRightsCard'
 
 export const UserPage = ({ userId }: { userId: string }) => {
   const { data: user, isLoading, isError } = useGetUserQuery(userId)

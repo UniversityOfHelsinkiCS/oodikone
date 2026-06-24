@@ -3,13 +3,13 @@ import { useMemo } from 'react'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { IncludeSubstitutionsToggle } from '@/components/PopulationStudents/IncludeSubstitutionsToggle'
+import { useGetColumnDefinitions } from '@/components/PopulationStudents/StudentTable/CoursesTab/columnDefinitions'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedStudent, StudentCourse } from '@oodikone/shared/types/studentData'
-import { IncludeSubstitutionsToggle } from '../../IncludeSubstitutionsToggle'
-import { useGetColumnDefinitions } from './columnDefinitions'
 
 type CoursesTabContainerProps = {
   curriculum: ExtendedCurriculumDetails

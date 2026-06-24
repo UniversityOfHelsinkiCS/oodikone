@@ -1,6 +1,6 @@
+import { FilterRadio } from '@/components/FilterView/filters/common/FilterRadio'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { ExtentCode } from '@oodikone/shared/types'
-import { FilterRadio } from './common/FilterRadio'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

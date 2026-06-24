@@ -1,13 +1,13 @@
 import Stack from '@mui/material/Stack'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { PopulationQuery } from '@/types/populationSearch'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { FilterDegreeCoursesModal } from './FilterDegreeCoursesModal'
 
 export const PopulationCourses = ({
   isLoading,

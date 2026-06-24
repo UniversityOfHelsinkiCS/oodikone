@@ -5,11 +5,15 @@ import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { CourseSearchState } from '@/pages/CourseStatistics'
+import { ObfuscatedCell } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/tables/ObfuscatedCell'
+import { TimeCell } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/tables/TimeCell'
+import {
+  formatPercentage,
+  getGradeColumns,
+  resolveGrades,
+} from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/tables/util'
 import { FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { queryParamsToString } from '@/util/queryparams'
-import { ObfuscatedCell } from './ObfuscatedCell'
-import { TimeCell } from './TimeCell'
-import { formatPercentage, getGradeColumns, resolveGrades } from './util'
 
 type TableData = {
   name: string

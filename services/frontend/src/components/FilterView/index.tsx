@@ -2,17 +2,15 @@ import Stack from '@mui/material/Stack'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 
+import { PageLayout } from '@/components/common/PageLayout'
+import { FilterViewContext } from '@/components/FilterView/context'
+import type { FilterContext, FilterOptions, GenericFilter } from '@/components/FilterView/filters/createFilter'
+import { FilterTray } from '@/components/FilterView/FilterTray'
+import { useFilterStorage } from '@/components/FilterView/useFilterStorage'
 import type { ExpandedCourseStats } from '@/redux/populations/util'
-import { filterCourses } from '@/util/coursesOfPopulation'
 import type { FilteredCourse } from '@/util/coursesOfPopulation'
+import { filterCourses } from '@/util/coursesOfPopulation'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
-
-import { PageLayout } from '../common/PageLayout'
-import { FilterViewContext } from './context'
-
-import type { FilterContext, FilterOptions, GenericFilter } from './filters/createFilter'
-import { FilterTray } from './FilterTray'
-import { useFilterStorage } from './useFilterStorage'
 
 export const FilterView = <Options extends FilterOptions>({
   children,

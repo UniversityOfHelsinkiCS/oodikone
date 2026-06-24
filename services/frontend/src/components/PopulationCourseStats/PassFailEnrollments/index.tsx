@@ -9,11 +9,11 @@ import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { CourseFilterToggle } from '@/components/PopulationCourseStats/CourseFilterToggle'
+import { ModuleCourseToggle } from '@/components/PopulationCourseStats/ModuleCourseToggle'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseModule, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
 import { Unarray } from '@oodikone/shared/types'
-import { CourseFilterToggle } from '../CourseFilterToggle'
-import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
 const columnHelper = createColumnHelper<Unarray<UnionOfFilteredModuleCourse>>()
 

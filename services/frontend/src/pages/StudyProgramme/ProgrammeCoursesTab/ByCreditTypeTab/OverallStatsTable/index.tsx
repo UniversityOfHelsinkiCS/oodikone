@@ -6,9 +6,9 @@ import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithToolt
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { CodeCell } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/OverallStatsTable/CodeCell'
+import { filterDataByYear } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/OverallStatsTable/util'
 import { StudyProgrammeCourse } from '@oodikone/shared/types'
-import { CodeCell } from './CodeCell'
-import { filterDataByYear } from './util'
 
 type FilteredColumnData = ReturnType<typeof filterDataByYear>[number]
 

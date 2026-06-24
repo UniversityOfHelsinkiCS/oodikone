@@ -2,10 +2,10 @@ import dayjs from 'dayjs'
 
 import { isMastersProgramme } from '@/common'
 import * as filters from '@/components/FilterView/filters'
+import { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { useSemesters } from '@/hooks/useSemesters'
 import { GetCustomPopulationResBody } from '@oodikone/shared/routes/populations'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
-import { GenericFilter } from '../FilterView/filters/createFilter'
 
 export const createAcademicYearStartDate = (year: number) => new Date(year, 7, 1)
 

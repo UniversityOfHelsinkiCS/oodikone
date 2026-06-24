@@ -1,8 +1,7 @@
 import { ReactNode } from 'react'
+import type { FilterViewContextState } from '@/components/FilterView/context'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { mapValues } from '@oodikone/shared/util'
-
-import type { FilterViewContextState } from '../context'
 
 export type FilterOptions<T = any> = Record<string, T>
 type Selector<Options extends FilterOptions, T, R> = (options: Options, args: T) => R

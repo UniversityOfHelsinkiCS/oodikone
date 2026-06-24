@@ -10,12 +10,12 @@ import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
+import { Courses, CourseTabModule, CourseTabStudent } from '@/components/PopulationStudents/StudentTable/CoursesTab'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { CheckIcon, ContentCopyIcon, CropSquareIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { CreditTypeCode } from '@oodikone/shared/types'
-import { Courses, CourseTabModule, CourseTabStudent } from '.'
 
 const columnHelper = createColumnHelper<CourseTabStudent>()
 const dateFormat = DateFormat.DISPLAY_DATE

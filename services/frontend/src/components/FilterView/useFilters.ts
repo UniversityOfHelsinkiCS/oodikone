@@ -1,11 +1,7 @@
 import { useContext } from 'react'
 
-import { FilterViewContext, FilterViewContextState } from './context'
-import { FilterOptions } from './filters/createFilter'
-// import { Action, FilterOptions, Selector } from './filters/createFilter'
-
-// type GenericAction<Options extends FilterOptions> = Action<Options, any>
-// type GenericSelector<Options extends FilterOptions> = Selector<Options, any, any>
+import { FilterViewContext, FilterViewContextState } from '@/components/FilterView/context'
+import { FilterOptions } from '@/components/FilterView/filters/createFilter'
 
 export const useFilters = <Options extends FilterOptions>() => {
   const { getContextByKey, setFilterOptions } = useContext(FilterViewContext) as FilterViewContextState<Options>

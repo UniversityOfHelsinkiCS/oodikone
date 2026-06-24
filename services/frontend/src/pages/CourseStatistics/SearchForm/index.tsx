@@ -19,15 +19,15 @@ import { Section } from '@/components/Section'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useToggle } from '@/hooks/toggle'
+import { CourseTable } from '@/pages/CourseStatistics/SearchForm/CourseTable'
+import { FetchStatisticsButton } from '@/pages/CourseStatistics/SearchForm/FetchStatisticsButton'
+import { MultipleCoursesAlert } from '@/pages/CourseStatistics/SearchForm/MultipleCoursesAlert'
 import { useGetCourseSearchResultQuery } from '@/redux/courseSearch'
 import { AddIcon, SearchIcon } from '@/theme'
 import { SearchResultCourse } from '@/types/api/courses'
 import { SearchHistoryItem } from '@/types/searchHistory'
 import { queryParamsToString } from '@/util/queryparams'
 import { omitKeys } from '@oodikone/shared/util'
-import { CourseTable } from './CourseTable'
-import { FetchStatisticsButton } from './FetchStatisticsButton'
-import { MultipleCoursesAlert } from './MultipleCoursesAlert'
 
 export const SearchForm = () => {
   const { getTextIn } = useLanguage()

@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 
+import { ModulesTab } from '@/components/PopulationStudents/StudentTable/ModulesTab/ModulesTable'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
 import { Name, ProgrammeCourse, FormattedStudent as Student } from '@oodikone/shared/types'
-import { ModulesTab } from './ModulesTable'
 
 export type ModuleTabStudent = {
   firstNames: string

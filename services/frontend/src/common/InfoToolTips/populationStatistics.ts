@@ -1,4 +1,4 @@
-import { populationStudentsToolTips } from './populationStudents'
+import { populationStudentsToolTips } from '@/common/InfoToolTips/populationStudents'
 
 export const populationStatisticsToolTips = {
   curriculumPicker: {

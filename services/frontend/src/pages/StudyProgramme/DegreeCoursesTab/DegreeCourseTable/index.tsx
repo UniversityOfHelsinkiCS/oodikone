@@ -14,14 +14,14 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { CriterionLabelSelectButton } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/CriterionLabelSelectButton'
+import { ToggleVisibilityButton } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/ToggleVisibilityButton'
+import { VisibilityChip } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/VisibilityChip'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
 import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseVisibility } from '@/types/courseVisibility'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
-import { CriterionLabelSelectButton } from './CriterionLabelSelectButton'
-import { ToggleVisibilityButton } from './ToggleVisibilityButton'
-import { VisibilityChip } from './VisibilityChip'
 
 export const DegreeCourseTable = ({
   combinedProgramme,

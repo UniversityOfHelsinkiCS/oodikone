@@ -8,10 +8,10 @@ import Tooltip from '@mui/material/Tooltip'
 import { useState } from 'react'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
+import { AddStudentsDialog } from '@/pages/StudyProgramme/TagsTab/TagsSection/TagItem/AddStudentsDialog'
+import { DeleteTagDialog } from '@/pages/StudyProgramme/TagsTab/TagsSection/TagItem/DeleteTagDialog'
 import { DeleteIcon, PersonAddAlt1Icon, TagIcon, VisibilityIcon } from '@/theme'
 import { Tag } from '@oodikone/shared/types'
-import { AddStudentsDialog } from './AddStudentsDialog'
-import { DeleteTagDialog } from './DeleteTagDialog'
 
 export const TagItem = ({
   combinedProgramme,

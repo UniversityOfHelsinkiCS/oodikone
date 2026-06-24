@@ -3,9 +3,17 @@ import useTheme from '@mui/material/styles/useTheme'
 import ReactECharts from 'echarts-for-react'
 
 import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
+import {
+  absoluteToRelative,
+  getDataObject,
+  getMaxValueOfSeries,
+} from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/charts/util'
+import {
+  getGradeSpread,
+  getSeriesType,
+  getThesisGradeSpread,
+} from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/util'
 import { ProgrammeStats, ViewMode } from '@/types/courseStat'
-import { getGradeSpread, getSeriesType, getThesisGradeSpread } from '../util'
-import { absoluteToRelative, getDataObject, getMaxValueOfSeries } from './util'
 
 const formatNumber = (value: unknown) => {
   const numericValue = typeof value === 'number' ? value : Number(value)

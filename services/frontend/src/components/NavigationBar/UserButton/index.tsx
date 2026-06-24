@@ -10,11 +10,11 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { LogOutButton } from '@/components/NavigationBar/UserButton/LogOutButton'
+import { StopMockingButton } from '@/components/NavigationBar/UserButton/StopMockingButton'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { AccountCircleIcon, CheckIcon, LanguageIcon } from '@/theme'
 import { LANGUAGE_CODES, LANGUAGE_TEXTS } from '@oodikone/shared/language'
-import { LogOutButton } from './LogOutButton'
-import { StopMockingButton } from './StopMockingButton'
 
 export const UserButton = () => {
   const { language, setLanguage } = useLanguage()

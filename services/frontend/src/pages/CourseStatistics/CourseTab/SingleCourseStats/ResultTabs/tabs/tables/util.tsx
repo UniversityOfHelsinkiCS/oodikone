@@ -1,8 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import { FAILED_GRADES, NUMERIC_GRADES, OTHER_PASSED_GRADES } from '@/constants/grades'
+import { ObfuscatedCell } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/tables/ObfuscatedCell'
 import { FormattedStats } from '@/types/courseStat'
-import { ObfuscatedCell } from './ObfuscatedCell'
 
 export const formatPercentage = (rate: number) => {
   return Number.isNaN(rate) ? '–' : `${rate.toFixed(2)} %`

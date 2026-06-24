@@ -19,6 +19,8 @@ import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgramm
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
+import { CardHeader } from '@/pages/Users/UserPage/CardHeader'
+import { EditButton } from '@/pages/Users/UserPage/EditButton'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useAddUserUnitsMutation, useRemoveUserUnitsMutation } from '@/redux/users'
 import { CheckCircleIcon, WarningIcon } from '@/theme'
@@ -27,8 +29,6 @@ import { checkUserAccess } from '@/util/access'
 import { createLocaleComparator } from '@/util/comparator'
 import { isNewProgramme } from '@/util/studyProgramme'
 import { DetailedProgrammeRights } from '@oodikone/shared/types'
-import { CardHeader } from './CardHeader'
-import { EditButton } from './EditButton'
 
 const mapAndSortProgrammes = (programmeRights: DetailedProgrammeRights[], studyProgrammes, getTextIn) => {
   return programmeRights

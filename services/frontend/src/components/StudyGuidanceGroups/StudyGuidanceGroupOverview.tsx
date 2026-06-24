@@ -19,15 +19,15 @@ import { useEffect, useState } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { StyledMessage } from '@/components/common/StyledMessage'
+import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { EnrollmentDateSelector } from '@/components/PopulationSearch/EnrollmentDateSelector'
+import { startYearToAcademicYear } from '@/components/StudyGuidanceGroups/utils'
 import { useToggle } from '@/hooks/toggle'
 import { useChangeStudyGuidanceGroupTagsMutation } from '@/redux/studyGuidanceGroups'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { AddIcon, DeleteIcon, EditIcon, NorthEastIcon, SaveIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
-import { StyledTable } from '../common/StyledTable'
-import { EnrollmentDateSelector } from '../PopulationSearch/EnrollmentDateSelector'
-import { startYearToAcademicYear } from './utils'
 
 type FormattedProgrammes = ReturnType<typeof useFilteredAndFormattedStudyProgrammes>
 

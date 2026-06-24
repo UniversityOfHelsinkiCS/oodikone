@@ -2,9 +2,9 @@ import { max, min } from 'lodash-es'
 import { useMemo } from 'react'
 
 import { getStudentTotalCredits } from '@/common'
+import { FilterRange } from '@/components/FilterView/filters/common/FilterRange'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useDebounce } from '@/hooks/debounce'
-import { FilterRange } from './common/FilterRange'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = { min: number | null; max: number | null }
 type Args = undefined

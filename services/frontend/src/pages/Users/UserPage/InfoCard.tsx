@@ -10,12 +10,12 @@ import TableRow from '@mui/material/TableRow'
 import { Link } from '@/components/common/Link'
 import { MockButton } from '@/components/Users/MockButton'
 import { DateFormat } from '@/constants/date'
+import { CardHeader } from '@/pages/Users/UserPage/CardHeader'
+import { NotifyButton } from '@/pages/Users/UserPage/NotifyButton'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { getFullLanguage } from '@oodikone/shared/language'
-import { CardHeader } from './CardHeader'
-import { NotifyButton } from './NotifyButton'
 
 export const InfoCard = ({ user }: { user: User }) => {
   const { username: currentUserName } = useGetAuthorizedUserQuery()

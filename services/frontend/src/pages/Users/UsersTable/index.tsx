@@ -10,13 +10,13 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { MockButton } from '@/components/Users/MockButton'
 import { RoleChip } from '@/components/Users/RoleChip'
 import { DateFormat } from '@/constants/date'
+import { CopyEmailAddressesButton } from '@/pages/Users/UsersTable/CopyEmailAddressesButton'
+import { StatusMessage } from '@/pages/Users/UsersTable/StatusMessage'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetRolesQuery } from '@/redux/users'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
-import { CopyEmailAddressesButton } from './CopyEmailAddressesButton'
-import { StatusMessage } from './StatusMessage'
 
 export const UsersTable = ({
   getAllUsersQuery,

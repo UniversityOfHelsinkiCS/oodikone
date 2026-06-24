@@ -1,9 +1,9 @@
 import { Outlet, useLocation } from 'react-router'
 
+import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, hasFullAccessToTeacherData } from '@/util/access'
 import { Role } from '@oodikone/shared/types'
-import { AccessDeniedMessage } from './AccessDeniedMessage'
 
 interface ProtectedRouteProps {
   requiredRoles?: Role[]

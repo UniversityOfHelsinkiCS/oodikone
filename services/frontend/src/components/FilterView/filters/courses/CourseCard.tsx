@@ -3,10 +3,10 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { FilterType } from '@/components/FilterView/filters/courses/filterType'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ClearIcon } from '@/theme'
-import { FilterSelect } from '../common/FilterSelect'
-import { FilterType } from './filterType'
 
 const filterTexts = {
   [FilterType.ALL]: {

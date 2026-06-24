@@ -1,8 +1,8 @@
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { PageLayout } from '../common/PageLayout'
-import { PageTitle } from '../common/PageTitle'
-import { Section } from '../Section'
-import { PopulationSearchForm } from './PopulationSearchForm'
+import { PageLayout } from '@/components/common/PageLayout'
+import { PageTitle } from '@/components/common/PageTitle'
+import { PopulationSearchForm } from '@/components/PopulationSearch/PopulationSearchForm'
+import { Section } from '@/components/Section'
 
 export const PopulationSearch = () => (
   <PageLayout maxWidth="lg">

@@ -10,11 +10,11 @@ import TableRow from '@mui/material/TableRow'
 import { useState } from 'react'
 
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { Row } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/Row'
+import { SingleStudyTrackRow } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/SingleStudyTrackRow'
+import { getRowKey } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
-import { Row } from './Row'
-import { SingleStudyTrackRow } from './SingleStudyTrackRow'
-import { getRowKey } from './util'
 
 const getSpanValue = (combinedProgramme: string, index: number, showPercentages: boolean) => {
   if (combinedProgramme && showPercentages) return index + 2

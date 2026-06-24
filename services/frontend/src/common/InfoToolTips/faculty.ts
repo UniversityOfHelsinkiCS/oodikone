@@ -1,4 +1,4 @@
-import { studyProgrammeToolTips } from './studyProgramme'
+import { studyProgrammeToolTips } from '@/common/InfoToolTips/studyProgramme'
 
 export const facultyToolTips = {
   common: {

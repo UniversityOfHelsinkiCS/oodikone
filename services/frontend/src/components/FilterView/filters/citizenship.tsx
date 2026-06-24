@@ -1,9 +1,9 @@
 import { orderBy } from 'lodash-es'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = { selected: string }
 type Args = undefined

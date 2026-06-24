@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { CustomPopulationSearchForm } from '@/components/CustomPopulation/CustomPopulationSearchForm'
+import { CustomPopulationWrapper } from '@/components/CustomPopulation/CustomPopulationWrapper'
 import { useTitle } from '@/hooks/title'
 import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
-import { CustomPopulationSearchForm } from './CustomPopulationSearchForm'
-import { CustomPopulationWrapper } from './CustomPopulationWrapper'
 
 export type CustomPopulationState = {
   selectedSearch: CustomPopulationSearch | null

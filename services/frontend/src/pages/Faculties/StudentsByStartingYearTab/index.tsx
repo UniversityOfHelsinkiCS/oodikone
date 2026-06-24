@@ -7,11 +7,11 @@ import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { exportStudentTable } from '@/pages/Faculties/StudentsByStartingYearTab/exportStudentTable'
+import { FacultyStudentDataTable } from '@/pages/Faculties/StudentsByStartingYearTab/FacultyStudentDataTable'
+import { ProgressSection } from '@/pages/Faculties/StudentsByStartingYearTab/ProgressSection'
 import { useGetFacultyStudentStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
-import { exportStudentTable } from './exportStudentTable'
-import { FacultyStudentDataTable } from './FacultyStudentDataTable'
-import { ProgressSection } from './ProgressSection'
 
 const priority = {
   'urn:code:degree-program-type:bachelors-degree': 1,

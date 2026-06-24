@@ -4,19 +4,18 @@ import ReactECharts from 'echarts-for-react'
 import { useMemo, useState } from 'react'
 
 import { getStudyRightElementTargetDates } from '@/common'
+import {
+  createGoalLineData,
+  filterCoursesByStudyPlan,
+  getGraduationDataPoints,
+  getStudentTransferMarkers,
+} from '@/components/Charts/util'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import type { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditTypeCode } from '@oodikone/shared/types'
 import type { StudentPageStudent } from '@oodikone/shared/types/studentData'
-
-import {
-  createGoalLineData,
-  filterCoursesByStudyPlan,
-  getGraduationDataPoints,
-  getStudentTransferMarkers,
-} from './util'
 
 const INITIAL_GRAPH_HEIGHT = 700
 

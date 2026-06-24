@@ -12,8 +12,8 @@ import { facultyToolTips } from '@/common/InfoToolTips'
 import { ExpandableRow } from '@/components/common/ExpandableRow'
 import { StyledTable } from '@/components/common/StyledTable'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { CollapsedStackedBar } from '@/pages/Faculties/BasicInformationTab/InteractiveDataTable/CollapsedStackedBar'
 import { NameWithCode } from '@oodikone/shared/types'
-import { CollapsedStackedBar } from './CollapsedStackedBar'
 
 export const InteractiveDataTable = ({
   cypress,

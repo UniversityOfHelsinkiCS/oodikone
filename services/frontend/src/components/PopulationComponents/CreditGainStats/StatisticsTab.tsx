@@ -3,9 +3,9 @@ import Stack from '@mui/material/Stack'
 
 import { ADMISSION_TYPES } from '@/common'
 import { filter as admissionTypeFilter } from '@/components/FilterView/filters/admissionType'
+import { DividerWithText } from '@/components/PopulationComponents/CreditGainStats/DividerWithText'
+import { StatisticsTable } from '@/components/PopulationComponents/CreditGainStats/StatisticsTable'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { DividerWithText } from './DividerWithText'
-import { StatisticsTable } from './StatisticsTable'
 
 const admissionTypes = Object.values(ADMISSION_TYPES)
 

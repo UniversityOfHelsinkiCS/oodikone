@@ -12,6 +12,12 @@ import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { exportStudentTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/exportStudentTable'
+import { ProgressOfStudents } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressOfStudents'
+import { StudentProgressPercentiles } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudentProgressPercentiles'
+import { StudyTrackDataTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable'
+import { StudyTrackSelector } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackSelector'
+import { YearSelector } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/YearSelector'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { hasAccessToProgrammePopulation } from '@/util/access'
@@ -23,12 +29,6 @@ import {
   ProgrammeMedians,
   MedianEntry,
 } from '@oodikone/shared/types'
-import { exportStudentTable } from './exportStudentTable'
-import { ProgressOfStudents } from './ProgressOfStudents'
-import { StudentProgressPercentiles } from './StudentProgressPercentiles'
-import { StudyTrackDataTable } from './StudyTrackDataTable'
-import { StudyTrackSelector } from './StudyTrackSelector'
-import { YearSelector } from './YearSelector'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,

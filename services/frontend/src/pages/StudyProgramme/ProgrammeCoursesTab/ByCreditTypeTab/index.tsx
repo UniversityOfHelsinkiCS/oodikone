@@ -7,9 +7,9 @@ import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { Section } from '@/components/Section'
+import { CourseYearFilter } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/CourseYearFilter'
+import { OverallStatsTable } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/OverallStatsTable'
 import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
-import { CourseYearFilter } from './CourseYearFilter'
-import { OverallStatsTable } from './OverallStatsTable'
 
 type YearOption = {
   key: number

@@ -3,7 +3,7 @@ import 'dayjs/locale/fi'
 import { Dayjs } from 'dayjs'
 import { filterToolTips } from '@/common/InfoToolTips'
 import { DateRangeSelector } from '@/components/common/DateRangeSelector'
-import { createFilter, FilterTrayProps } from '../createFilter'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 
 type Options = {
   startDate: Dayjs | null

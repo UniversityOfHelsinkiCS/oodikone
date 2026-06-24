@@ -6,13 +6,12 @@ import { isMastersProgramme } from '@/common'
 import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { CheckStudentList } from '@/components/PopulationStudents/CheckStudentList'
+import { useGetColumnDefinitions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnDefinitions'
+import { Programme } from '@/components/PopulationStudents/StudentTable/GeneralTab/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
-
-import { CheckStudentList } from '../../CheckStudentList'
-import { useGetColumnDefinitions } from './columnDefinitions'
-import { Programme } from './util'
 
 export type FormattedStudentData = {
   firstNames: string

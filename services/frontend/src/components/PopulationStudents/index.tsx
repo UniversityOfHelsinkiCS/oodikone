@@ -7,17 +7,17 @@ import { useState } from 'react'
 
 import { coursePopulationToolTips, populationStudentsToolTips } from '@/common/InfoToolTips'
 
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
+import { CoursesTabContainer as CoursesTab } from '@/components/PopulationStudents/StudentTable/CoursesTab'
+import { type FormattedStudentData, GeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab'
+import { ModulesTabContainer as ModulesTab } from '@/components/PopulationStudents/StudentTable/ModulesTab'
+import { ProgressTable as ProgressTab } from '@/components/PopulationStudents/StudentTable/ProgressTab'
+import { TagsTab } from '@/components/PopulationStudents/StudentTable/TagsTab'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { ExpandingInfoBox } from '../InfoBox/ExpandingInfoBox'
-import { CoursesTabContainer as CoursesTab } from './StudentTable/CoursesTab'
-import { type FormattedStudentData, GeneralTab } from './StudentTable/GeneralTab'
-import { ModulesTabContainer as ModulesTab } from './StudentTable/ModulesTab'
-import { ProgressTable as ProgressTab } from './StudentTable/ProgressTab'
-import { TagsTab } from './StudentTable/TagsTab'
 
 type CommonProps = {
   filteredStudents: FormattedStudent[]

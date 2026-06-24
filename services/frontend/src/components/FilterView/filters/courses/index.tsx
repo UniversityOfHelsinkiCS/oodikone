@@ -1,11 +1,11 @@
+import { FilterSearchableSelect } from '@/components/FilterView/filters/common/FilterSearchableSelect'
+import { CourseCard } from '@/components/FilterView/filters/courses/CourseCard'
+import { FilterType } from '@/components/FilterView/filters/courses/filterType'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { CourseStats } from '@oodikone/shared/routes/populations'
 import { CreditTypeCode, FormattedStudent } from '@oodikone/shared/types'
 import { getSortRank } from '@oodikone/shared/util/sortRank'
-import { FilterSearchableSelect } from '../common/FilterSearchableSelect'
-import { createFilter, FilterTrayProps } from '../createFilter'
-import { CourseCard } from './CourseCard'
-import { FilterType } from './filterType'
 
 type FTValue = (typeof FilterType)[keyof typeof FilterType]
 type Options = {

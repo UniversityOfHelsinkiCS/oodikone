@@ -14,6 +14,7 @@ import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/compone
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { TableInfo } from '@/components/PopulationStudents/StudentTable/ProgressTab/info'
 import { DateFormat } from '@/constants/date'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useSemesters } from '@/hooks/useSemesters'
@@ -31,8 +32,7 @@ import {
 } from '@oodikone/shared/types'
 import { StudentCourse } from '@oodikone/shared/types/studentData'
 import { keyBy, range } from '@oodikone/shared/util'
-import { TableInfo } from './info'
-import './index.css'
+import '@/components/PopulationStudents/StudentTable/ProgressTab/index.css'
 
 dayjsExtend(isBetween)
 dayjsExtend(isSameOrBefore)

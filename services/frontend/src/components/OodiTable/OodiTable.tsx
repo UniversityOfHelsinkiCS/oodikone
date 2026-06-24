@@ -7,9 +7,9 @@ import TableHead from '@mui/material/TableHead'
 
 import { type Table as TableType } from '@tanstack/react-table'
 import { ReactNode } from 'react'
-import { OodiTableDataRow } from './components/Cell'
-import { OodiTableHeaderGroup } from './components/Header'
-import { OodiTablePagination } from './components/Pagination'
+import { OodiTableDataRow } from '@/components/OodiTable/components/Cell'
+import { OodiTableHeaderGroup } from '@/components/OodiTable/components/Header'
+import { OodiTablePagination } from '@/components/OodiTable/components/Pagination'
 
 export const OodiTableContainer = <OTData,>({
   table,

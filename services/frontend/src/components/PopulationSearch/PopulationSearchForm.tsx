@@ -8,6 +8,9 @@ import { useNavigate, useLocation } from 'react-router'
 
 import { FilterOldProgrammesToggle } from '@/components/common/FilterOldProgrammesToggle'
 import { SearchHistory } from '@/components/common/SearchHistory'
+import { DegreeProgrammeSelector } from '@/components/PopulationSearch/DegreeProgrammeSelector'
+import { EnrollmentDateSelector } from '@/components/PopulationSearch/EnrollmentDateSelector'
+import { StudyTrackSelector } from '@/components/PopulationSearch/StudyTrackSelector'
 import { useSearchHistory } from '@/hooks/searchHistory'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTracksQuery } from '@/redux/studyProgramme'
@@ -19,10 +22,6 @@ import type {
   StudentStatus,
 } from '@/types/populationSearch'
 import { queryParamsToString } from '@/util/queryparams'
-
-import { DegreeProgrammeSelector } from './DegreeProgrammeSelector'
-import { EnrollmentDateSelector } from './EnrollmentDateSelector'
-import { StudyTrackSelector } from './StudyTrackSelector'
 
 const getDefaultYear = () => {
   const date = new Date()

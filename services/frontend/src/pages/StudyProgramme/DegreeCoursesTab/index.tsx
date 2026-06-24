@@ -3,13 +3,13 @@ import Stack from '@mui/material/Stack'
 import { orderBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
+import { useCurriculumState } from '@/hooks/useCurriculums'
+import { CreditCriteriaSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CreditCriteriaSection'
+import { CurriculumSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CurriculumSection'
+import { DegreeCourseTable } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse } from '@oodikone/shared/types'
-import { useCurriculumState } from '../../../hooks/useCurriculums'
-import { CreditCriteriaSection } from './CreditCriteriaSection'
-import { CurriculumSection } from './CurriculumSection'
-import { DegreeCourseTable } from './DegreeCourseTable'
 
 export const DegreeCoursesTab = ({
   combinedProgramme,

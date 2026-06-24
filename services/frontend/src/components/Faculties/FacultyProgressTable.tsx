@@ -9,8 +9,8 @@ import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/common/ExpandableRow'
 import { StyledTable } from '@/components/common/StyledTable'
+import { ProgrammeProgressChart } from '@/components/Faculties/ProgrammeProgressChart'
 import { NameWithCode } from '@oodikone/shared/types'
-import { ProgrammeProgressChart } from './ProgrammeProgressChart'
 
 export const FacultyProgressTable = ({
   cypress,

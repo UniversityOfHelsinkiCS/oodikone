@@ -3,8 +3,8 @@ import Stack from '@mui/material/Stack'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
+import { FacultyCard } from '@/pages/Faculties/FacultyList/FacultyCard'
 import { GetFacultiesResponse } from '@/types/api/faculty'
-import { FacultyCard } from './FacultyCard'
 
 export const FacultyList = ({ faculties }: { faculties: GetFacultiesResponse[] }) => {
   if (faculties == null) {

@@ -3,17 +3,17 @@ import Chip from '@mui/material/Chip'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { PageTitle } from '@/components/common/PageTitle'
+import { StyledMessage } from '@/components/common/StyledMessage'
 import { FilterView } from '@/components/FilterView'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
+import { SingleStudyGuidanceGroupPanels } from '@/components/StudyGuidanceGroups/SingleStudyGuidanceGroupPanels'
+import { startYearToAcademicYear, useGetFilters } from '@/components/StudyGuidanceGroups/utils'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CalendarMonthIcon, LabelIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
-import { PageTitle } from '../common/PageTitle'
-import { StyledMessage } from '../common/StyledMessage'
-import { SingleStudyGuidanceGroupPanels } from './SingleStudyGuidanceGroupPanels'
-import { startYearToAcademicYear, useGetFilters } from './utils'
 
 export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWithTags | undefined }) => {
   // Sorting is needed for RTK query cache to work properly

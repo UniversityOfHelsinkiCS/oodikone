@@ -3,9 +3,9 @@ export {}
 
 import '@tanstack/react-table'
 
-import { AggregationRowModel, AggregationRowsInput } from './aggregationRows'
-import { VerticalHeaders } from './verticalHeader'
-import { Zebrastripes } from './zebrastripes'
+import { AggregationRowModel, AggregationRowsInput } from '@/components/OodiTable/features/aggregationRows'
+import { VerticalHeaders } from '@/components/OodiTable/features/verticalHeader'
+import { Zebrastripes } from '@/components/OodiTable/features/zebrastripes'
 
 declare module '@tanstack/react-table' {
   interface TableState extends VerticalHeaders {}

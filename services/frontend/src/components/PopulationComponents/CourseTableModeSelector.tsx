@@ -5,8 +5,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Dispatch, SetStateAction } from 'react'
 
+import { StudentAmountLimiter } from '@/components/common/StudentAmountLimiter'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
-import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 
 type CourseTableModeSelectorProps = {
   courseTableMode: 'curriculum' | 'all'

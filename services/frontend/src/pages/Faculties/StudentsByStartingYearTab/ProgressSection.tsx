@@ -5,11 +5,11 @@ import { ProgressBarChart } from '@/components/Charts/ProgressBarChart'
 import { FacultyProgressTable } from '@/components/Faculties/FacultyProgressTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { AccordionWrapper } from '@/pages/Faculties/StudentsByStartingYearTab/AccordionWrapper'
+import { exportProgressTable } from '@/pages/Faculties/StudentsByStartingYearTab/exportProgressTable'
 import { useGetFacultyProgressStatsQuery } from '@/redux/facultyStats'
 import { GetFacultiesResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
-import { AccordionWrapper } from './AccordionWrapper'
-import { exportProgressTable } from './exportProgressTable'
 
 export const ProgressSection = ({
   faculty,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
-import { ErrorBackground } from '../ErrorBoundary/ErrorBackground'
-import { EasterEgg } from './EasterEgg'
+import { EasterEgg } from '@/components/AccessDenied/EasterEgg'
+import { ErrorBackground } from '@/components/ErrorBoundary/ErrorBackground'
 
 export const AccessDenied = () => {
   const [easterEggVisible, setEasterEggVisible] = useState(false)

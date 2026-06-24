@@ -3,9 +3,9 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useState } from 'react'
 
+import { GradeDistribution } from '@/components/PopulationCourseStats/GradeDistribution'
+import { PassFailEnrollments } from '@/components/PopulationCourseStats/PassFailEnrollments'
 import type { FilteredCourse, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
-import { GradeDistribution } from './GradeDistribution'
-import { PassFailEnrollments } from './PassFailEnrollments'
 
 // TODO: When we convert <PassFailEnrollments /> to ts, check optional
 // values in there. Now you just have to remember to define them :)

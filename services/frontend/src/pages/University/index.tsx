@@ -5,8 +5,8 @@ import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
-import { FacultyGraduationsTab } from './FacultyGraduationsTab'
-import { FacultyProgressTab } from './FacultyProgressTab'
+import { FacultyGraduationsTab } from '@/pages/University/FacultyGraduationsTab'
+import { FacultyProgressTab } from '@/pages/University/FacultyProgressTab'
 
 export const University = () => {
   useTitle('University')

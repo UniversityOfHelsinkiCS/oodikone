@@ -2,10 +2,10 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { ExternalLink } from '@/components/common/ExternalLink'
 import { Link } from '@/components/common/Link'
 import { sisUrl } from '@/conf'
 import { PersonIcon } from '@/theme'
-import { ExternalLink } from './ExternalLink'
 
 export const StudentInfoItem = ({ sisPersonId, studentNumber }: { sisPersonId: string; studentNumber: string }) => {
   return (

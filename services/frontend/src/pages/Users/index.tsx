@@ -5,9 +5,9 @@ import { useParams } from 'react-router'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
+import { UserPage } from '@/pages/Users/UserPage'
+import { UsersTable } from '@/pages/Users/UsersTable'
 import { useLazyGetAllUsersQuery } from '@/redux/users'
-import { UserPage } from './UserPage'
-import { UsersTable } from './UsersTable'
 
 export const Users = () => {
   useTitle('Users')

@@ -10,9 +10,9 @@ import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PercentageBar } from '@/components/common/PercentageBar'
 import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
+import { ExternalGradeFilterToggle } from '@/components/CoursePopulation/CoursePopulationGradeDist/ExternalGradeFilterToggle'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { ExternalGradeFilterToggle } from './ExternalGradeFilterToggle'
 
 export const CoursePopulationGradeDist = ({
   students,

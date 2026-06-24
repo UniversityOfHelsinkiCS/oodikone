@@ -1,9 +1,8 @@
 import type { FetchBaseQueryMeta } from '@reduxjs/toolkit/query'
+import { getProgressCriteria } from '@/redux/populations/criteriaProgress'
 import type { PopulationCourseStats } from '@oodikone/shared/routes/populations'
 import { CreditTypeCode } from '@oodikone/shared/types'
 import type { FormattedStudent, ProgressCriteria } from '@oodikone/shared/types'
-
-import { getProgressCriteria } from './criteriaProgress'
 
 export interface ExpandedCourseStats extends PopulationCourseStats {
   dataByStudent: Map<string, [any[], any[]]>

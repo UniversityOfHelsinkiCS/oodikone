@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 
+import { CustomPopulationState } from '@/components/CustomPopulation'
+import { CustomPopulationContent } from '@/components/CustomPopulation/CustomPopulationContent'
 import { FilterView } from '@/components/FilterView'
 import {
   ageFilter,
@@ -15,11 +17,9 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
+import { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetCustomPopulationQuery } from '@/redux/populations'
-import { GenericFilter } from '../FilterView/filters/createFilter'
-import { CustomPopulationState } from '.'
-import { CustomPopulationContent } from './CustomPopulationContent'
 
 export const CustomPopulationWrapper = ({
   customPopulationState,

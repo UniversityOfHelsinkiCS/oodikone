@@ -5,7 +5,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { useFormatContent } from '@/common'
-import { InfoBoxButton } from './InfoBoxButton'
+import { InfoBoxButton } from '@/components/InfoBox/InfoBoxButton'
 
 interface InfoBoxProps {
   content: string

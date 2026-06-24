@@ -11,9 +11,9 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { findCorrectProgramme, NO_PROGRAMME } from '@/components/PopulationComponents/ProgrammeDist/util'
 import { useSemesters } from '@/hooks/useSemesters'
 import { FormattedStudent, Name } from '@oodikone/shared/types'
-import { findCorrectProgramme, NO_PROGRAMME } from './util'
 
 export const CustomPopulationProgrammeDist = ({
   students,

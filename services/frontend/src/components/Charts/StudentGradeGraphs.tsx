@@ -5,12 +5,12 @@ import ReactECharts from 'echarts-for-react'
 import chunk from 'lodash-es/chunk'
 import groupBy from 'lodash-es/groupBy'
 import { useMemo } from 'react'
+import { type GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import type { SemestersData } from '@/hooks/useSemesters'
 import { useGetSemestersQuery } from '@/redux/semesters'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { type GetTextIn, useLanguage } from '../LanguagePicker/useLanguage'
 
 dayjsExtend(isSameOrAfter)
 

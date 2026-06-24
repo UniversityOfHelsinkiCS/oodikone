@@ -3,11 +3,14 @@ import TableRow from '@mui/material/TableRow'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { BasicCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/BasicCell'
+import { OtherCountriesCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/OtherCountriesCell'
+import {
+  getCellKey,
+  shouldBeHidden,
+} from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
+import { YearCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/YearCell'
 import { Name } from '@oodikone/shared/types'
-import { BasicCell } from './BasicCell'
-import { OtherCountriesCell } from './OtherCountriesCell'
-import { getCellKey, shouldBeHidden } from './util'
-import { YearCell } from './YearCell'
 
 export const Row = ({
   calendarYears,

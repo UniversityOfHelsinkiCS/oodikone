@@ -2,9 +2,9 @@ import Box from '@mui/material/Box'
 import useTheme from '@mui/material/styles/useTheme'
 import ReactECharts from 'echarts-for-react'
 
+import { getOnEvents, getSeriesLabel } from '@/components/Charts/util'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { GraduationStats, Name, NameWithCode } from '@oodikone/shared/types'
-import { getOnEvents, getSeriesLabel } from './util'
 
 type GraduationBreakdownProps =
   | {

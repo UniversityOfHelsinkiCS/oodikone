@@ -6,11 +6,11 @@ import { useState } from 'react'
 import { useLocation } from 'react-router'
 
 import { Link } from '@/components/common/Link'
+import { NavigationItem } from '@/components/NavigationBar/navigationItems'
 import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { ArrowDropDownIcon } from '@/theme'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
-import { NavigationItem } from './navigationItems'
 
 export const NavigationButton = ({ item }: { item: NavigationItem }) => {
   const { iamGroups, programmeRights, roles } = useGetAuthorizedUserQuery()

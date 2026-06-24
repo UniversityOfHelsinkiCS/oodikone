@@ -3,9 +3,9 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import type { HeaderGroup } from '@tanstack/react-table'
 
-import { getCommonPinningStyles, verticalStyles } from '../styles'
-import { OodiTableSortIcons } from './SortIcons'
-import { flexRender } from './util'
+import { OodiTableSortIcons } from '@/components/OodiTable/components/SortIcons'
+import { flexRender } from '@/components/OodiTable/components/util'
+import { getCommonPinningStyles, verticalStyles } from '@/components/OodiTable/styles'
 
 const OtHeaderCell = styled(TableCell)(({ theme }) => ({
   position: 'relative',

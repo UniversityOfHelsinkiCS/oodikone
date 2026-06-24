@@ -12,16 +12,22 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
+import { CourseTab } from '@/pages/CourseStatistics/CourseTab'
+import { FacultyStatisticsTab } from '@/pages/CourseStatistics/FacultyStatisticsTab'
+import { NewQueryButton } from '@/pages/CourseStatistics/NewQueryButton'
+import { SearchForm } from '@/pages/CourseStatistics/SearchForm'
+import { SummaryTab } from '@/pages/CourseStatistics/SummaryTab'
+import {
+  ALL,
+  getAllStudyProgrammes,
+  getAvailableStats,
+  getCourseStats,
+  getSummaryStatistics,
+} from '@/pages/CourseStatistics/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetCourseStatsQuery } from '@/redux/courseStats'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { parseQueryParams } from '@/util/queryparams'
-import { CourseTab } from './CourseTab'
-import { FacultyStatisticsTab } from './FacultyStatisticsTab'
-import { NewQueryButton } from './NewQueryButton'
-import { SearchForm } from './SearchForm'
-import { SummaryTab } from './SummaryTab'
-import { ALL, getAllStudyProgrammes, getAvailableStats, getCourseStats, getSummaryStatistics } from './util'
 
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 

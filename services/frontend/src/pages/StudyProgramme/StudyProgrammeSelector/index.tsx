@@ -12,14 +12,14 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/Loading'
 import { AccessDeniedMessage } from '@/components/Routes/AccessDeniedMessage'
 import { useCurrentCurriculumPeriod } from '@/hooks/currentCurriculumPeriod'
+import { StudyProgrammeFilter } from '@/pages/StudyProgramme/StudyProgrammeSelector/StudyProgrammeFilter'
+import { StudyProgrammeTable } from '@/pages/StudyProgramme/StudyProgrammeSelector/StudyProgrammeTable'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetStudyProgrammePinsQuery } from '@/redux/studyProgrammePins'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { createLocaleComparator, createPinnedFirstComparator } from '@/util/comparator'
 import { isNewProgramme } from '@/util/studyProgramme'
 import { DegreeProgrammeType, Name, ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
-import { StudyProgrammeFilter } from './StudyProgrammeFilter'
-import { StudyProgrammeTable } from './StudyProgrammeTable'
 
 export type CombinedDegreeProgramme = Omit<
   ProgrammeModuleWithRelevantAttributes,

@@ -8,6 +8,7 @@ import {
   CourseFilter,
 } from '@/components/ColorizedCoursesTable/common'
 import '@/components/ColorizedCoursesTable/index.css'
+import { useColumns } from '@/components/ColorizedCoursesTable/FacultiesTab/logic'
 import {
   ColorModeSelector,
   NumberModeSelector,
@@ -18,7 +19,6 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { useColumns } from './logic'
 
 export const FacultiesTab = () => {
   const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data } =

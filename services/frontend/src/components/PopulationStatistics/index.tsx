@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography'
 import type { ReactNode } from 'react'
 import { useLocation, type Location } from 'react-router'
 
+import { PageTitle } from '@/components/common/PageTitle'
 import { FilterView } from '@/components/FilterView'
 import {
   admissionTypeFilter,
@@ -28,8 +29,10 @@ import {
   tagsFilter,
   transferredToProgrammeFilter,
 } from '@/components/FilterView/filters'
+import { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { PageLoading } from '@/components/Loading'
 import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
@@ -40,16 +43,12 @@ import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/
 import { HelpOutlineIcon } from '@/theme'
 import { DegreeProgramme } from '@/types/api/faculty'
 import type { PopulationQuery } from '@/types/populationSearch'
+
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
-
 import { parseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
-
-import { PageTitle } from '../common/PageTitle'
-import { GenericFilter } from '../FilterView/filters/createFilter'
-import { PageLoading } from '../Loading'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 

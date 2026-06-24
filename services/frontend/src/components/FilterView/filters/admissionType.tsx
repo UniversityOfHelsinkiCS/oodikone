@@ -1,7 +1,7 @@
 import { ADMISSION_TYPES } from '@/common'
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = { selected: string }
 type Args = { programme: string }

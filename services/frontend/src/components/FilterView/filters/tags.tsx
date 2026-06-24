@@ -1,8 +1,8 @@
 import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 
 type Options = any
 type Args = any

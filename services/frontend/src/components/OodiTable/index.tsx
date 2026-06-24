@@ -2,8 +2,8 @@ import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { useState, type ReactNode } from 'react'
 
-import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from './features'
-import { OodiTableContainer } from './OodiTable'
+import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from '@/components/OodiTable/features'
+import { OodiTableContainer } from '@/components/OodiTable/OodiTable'
 
 /**
  * In loving memory of SortableTable

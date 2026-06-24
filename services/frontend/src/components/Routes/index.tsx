@@ -5,6 +5,7 @@ import { CoursePopulation } from '@/components/CoursePopulation'
 import { CustomPopulation } from '@/components/CustomPopulation'
 import { LanguageCenterView } from '@/components/LanguageCenterView'
 import { PopulationStatistics } from '@/components/PopulationStatistics'
+import { ProtectedRoute } from '@/components/Routes/ProtectedRoute'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { StudyGuidanceGroups } from '@/components/StudyGuidanceGroups'
 import { Teachers } from '@/components/Teachers'
@@ -23,7 +24,6 @@ import { StudyProgramme } from '@/pages/StudyProgramme'
 import { University } from '@/pages/University'
 import { Updater } from '@/pages/Updater'
 import { Users } from '@/pages/Users'
-import { ProtectedRoute } from './ProtectedRoute'
 
 export const Routes = () => (
   <main style={{ flex: 1 }}>

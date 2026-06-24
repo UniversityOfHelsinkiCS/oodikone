@@ -4,8 +4,8 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import type { Row } from '@tanstack/react-table'
 
-import { getCommonPinningStyles } from '../styles'
-import { flexRender } from './util'
+import { flexRender } from '@/components/OodiTable/components/util'
+import { getCommonPinningStyles } from '@/components/OodiTable/styles'
 
 export const OodiTableDataRow = <OTData,>(row: Row<OTData>, aggregate = false) => (
   <TableRow key={row.id}>

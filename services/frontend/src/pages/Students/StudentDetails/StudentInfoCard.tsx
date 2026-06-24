@@ -10,11 +10,11 @@ import { ExternalLink } from '@/components/common/ExternalLink'
 import { useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { sisUrl } from '@/conf'
 import { DateFormat } from '@/constants/date'
+import { EnrollmentAccordion } from '@/pages/Students/StudentDetails/EnrollmentAccordion'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { RefreshIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { EnrollmentAccordion } from './EnrollmentAccordion'
 
 export const StudentInfoCard = ({ student }: { student: StudentPageStudent }) => {
   const { visible: showName } = useStudentNameVisibility()

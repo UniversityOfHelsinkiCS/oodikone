@@ -5,8 +5,8 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
 import { PercentageBar } from '@/components/common/PercentageBar'
+import { ExternalCreditFilterToggle } from '@/components/PopulationComponents/CreditGainStats/ExternalCreditFilterToggle'
 import { ExpandLessIcon, ExpandMoreIcon } from '@/theme'
-import { ExternalCreditFilterToggle } from './ExternalCreditFilterToggle'
 
 type CollapsibleCreditRowProps = {
   min: number | null

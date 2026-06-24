@@ -1,12 +1,12 @@
 import { useParams } from 'react-router'
 
+import { PageLayout } from '@/components/common/PageLayout'
+import { PageTitle } from '@/components/common/PageTitle'
+import { PageLoading } from '@/components/Loading'
+import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from '@/components/StudyGuidanceGroups/SingleStudyGuidanceGroup'
+import { StudyGuidanceGroupOverview } from '@/components/StudyGuidanceGroups/StudyGuidanceGroupOverview'
 import { useTitle } from '@/hooks/title'
 import { useGetAllStudyGuidanceGroupsQuery } from '@/redux/studyGuidanceGroups'
-import { PageLayout } from '../common/PageLayout'
-import { PageTitle } from '../common/PageTitle'
-import { PageLoading } from '../Loading'
-import { SingleStudyGuidanceGroupContainer as SingleStudyGuidanceGroup } from './SingleStudyGuidanceGroup'
-import { StudyGuidanceGroupOverview } from './StudyGuidanceGroupOverview'
 
 export const StudyGuidanceGroups = () => {
   useTitle('Study guidance groups')

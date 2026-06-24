@@ -21,11 +21,11 @@ import { StyledTable } from '@/components/common/StyledTable'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
+import { useCurriculumState } from '@/hooks/useCurriculums'
 import { ArrowDropDownIcon, CloseIcon, DoneIcon } from '@/theme'
 import { Absence } from '@/types/students'
 import { reformatDate } from '@/util/timeAndDate'
 import { StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { useCurriculumState } from '../../../hooks/useCurriculums'
 
 const ModuleTable = ({
   data,

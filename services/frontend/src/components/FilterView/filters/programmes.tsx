@@ -5,11 +5,11 @@ import dayjs, { extend as dayjsExtend } from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent, Name, Unarray } from '@oodikone/shared/types'
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 dayjsExtend(isSameOrBefore)
 dayjsExtend(isSameOrAfter)

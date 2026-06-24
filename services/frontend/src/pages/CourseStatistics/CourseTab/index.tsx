@@ -6,12 +6,12 @@ import Typography from '@mui/material/Typography'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
+import { PrimaryCourseLabel, SecondaryCourseLabel } from '@/pages/CourseStatistics/CourseTab/CourseLabel'
+import { CourseSelector } from '@/pages/CourseStatistics/CourseTab/CourseSelector'
+import { SingleCourseStats } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { AvailableStats, CourseStat } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
-import { PrimaryCourseLabel, SecondaryCourseLabel } from './CourseLabel'
-import { CourseSelector } from './CourseSelector'
-import { SingleCourseStats } from './SingleCourseStats'
 
 export const CourseTab = ({
   selected,

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { FilterContext } from './filters/createFilter'
+import { FilterContext } from '@/components/FilterView/filters/createFilter'
 
 export type FilterViewContextState<Options extends Record<string, any>> = {
   setFilterOptions: (filter: string, options: Options) => void

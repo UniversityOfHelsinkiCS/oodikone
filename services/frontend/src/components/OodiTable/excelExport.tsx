@@ -15,10 +15,10 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { utils, writeFile } from 'xlsx'
 
+import { OodiTable } from '@/components/OodiTable'
 import { DateFormat } from '@/constants/date'
 import { DownloadIcon } from '@/theme'
 import { getTimestamp, reformatDate } from '@/util/timeAndDate'
-import { OodiTable } from './index'
 
 const getDisplayValue = (value: unknown) => {
   switch (typeof value) {

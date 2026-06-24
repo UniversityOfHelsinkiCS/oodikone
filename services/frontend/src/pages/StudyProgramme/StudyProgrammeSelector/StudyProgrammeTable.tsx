@@ -10,10 +10,10 @@ import { Link } from '@/components/common/Link'
 import { StyledTable } from '@/components/common/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { CombinedDegreeProgramme } from '@/pages/StudyProgramme/StudyProgrammeSelector/'
 import { useAddStudyProgrammePinMutation, useRemoveStudyProgrammePinMutation } from '@/redux/studyProgrammePins'
 import { PushPinIcon } from '@/theme'
 import { ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
-import { CombinedDegreeProgramme } from './'
 
 export const StudyProgrammeTable = ({
   header,

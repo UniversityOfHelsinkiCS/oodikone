@@ -9,11 +9,11 @@ import { useEffect, useState } from 'react'
 
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { RoleChip } from '@/components/Users/RoleChip'
+import { CardHeader } from '@/pages/Users/UserPage/CardHeader'
+import { EditButton } from '@/pages/Users/UserPage/EditButton'
 import { useGetRolesQuery, useModifyRolesMutation } from '@/redux/users'
 import { User } from '@/types/api/users'
 import { Role } from '@oodikone/shared/types'
-import { CardHeader } from './CardHeader'
-import { EditButton } from './EditButton'
 
 export const RolesCard = ({ user }: { user: User }) => {
   const [selected, setSelected] = useState<string[]>(user.roles || [])

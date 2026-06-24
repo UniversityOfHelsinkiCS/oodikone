@@ -9,13 +9,13 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useTabs } from '@/hooks/tabs'
 import { useTitle } from '@/hooks/title'
+import { BasicInformationTab } from '@/pages/Faculties/BasicInformationTab'
+import { FacultyList } from '@/pages/Faculties/FacultyList'
+import { GraduationTimesTab } from '@/pages/Faculties/GraduationTimesTab'
+import { StudentsByStartingYearTab } from '@/pages/Faculties/StudentsByStartingYearTab'
+import { UpdateStatisticsTab } from '@/pages/Faculties/UpdateStatisticsTab'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
-import { BasicInformationTab } from './BasicInformationTab'
-import { FacultyList } from './FacultyList'
-import { GraduationTimesTab } from './GraduationTimesTab'
-import { StudentsByStartingYearTab } from './StudentsByStartingYearTab'
-import { UpdateStatisticsTab } from './UpdateStatisticsTab'
 
 export const Faculties = () => {
   const { getTextIn } = useLanguage()

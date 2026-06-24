@@ -4,10 +4,10 @@ import Typography from '@mui/material/Typography'
 import { isEqual, union } from 'lodash-es'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterSearchableSelect } from '@/components/FilterView/filters/common/FilterSearchableSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { SwapVertIcon } from '@/theme'
 import { formatToArray } from '@oodikone/shared/util'
-import { FilterSearchableSelect } from './common/FilterSearchableSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

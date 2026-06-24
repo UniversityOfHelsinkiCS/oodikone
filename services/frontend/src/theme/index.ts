@@ -1,2 +1,2 @@
-export { theme } from './base'
-export * from './icons'
+export { theme } from '@/theme/base'
+export * from '@/theme/icons'

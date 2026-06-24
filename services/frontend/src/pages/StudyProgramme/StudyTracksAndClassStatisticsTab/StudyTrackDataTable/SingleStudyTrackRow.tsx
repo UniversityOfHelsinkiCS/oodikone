@@ -2,9 +2,12 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
-import { BasicCell } from './BasicCell'
-import { OtherCountriesCell } from './OtherCountriesCell'
-import { getCellKey, shouldBeHidden } from './util'
+import { BasicCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/BasicCell'
+import { OtherCountriesCell } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/OtherCountriesCell'
+import {
+  getCellKey,
+  shouldBeHidden,
+} from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
 
 export const SingleStudyTrackRow = ({
   calendarYears,

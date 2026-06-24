@@ -3,9 +3,9 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import { SwapHorizIcon } from '@/theme'
 import { Name } from '@oodikone/shared/types'
-import { GetTextIn } from '../LanguagePicker/useLanguage'
 
 export const GroupChip = ({
   group,

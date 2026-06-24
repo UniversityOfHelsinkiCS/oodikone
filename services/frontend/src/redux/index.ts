@@ -3,9 +3,9 @@ import { configureStore } from '@reduxjs/toolkit/react'
 
 import { RTKApi } from '@/apiConnection'
 import { isDev } from '@/conf'
-import { actionHistoryMiddleware } from './actionHistory'
-import { reducer as selectedCourse } from './selectedCourse'
-import { reducer as settings } from './settings'
+import { actionHistoryMiddleware } from '@/redux/actionHistory'
+import { reducer as selectedCourse } from '@/redux/selectedCourse'
+import { reducer as settings } from '@/redux/settings'
 
 export const store = configureStore({
   reducer: {

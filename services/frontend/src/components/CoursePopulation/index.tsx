@@ -7,6 +7,11 @@ import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
+import { StudentAmountLimiter } from '@/components/common/StudentAmountLimiter'
+import { CoursePopulationCreditGainTable } from '@/components/CoursePopulation/CoursePopulationCreditGainTable'
+import { CoursePopulationGradeDist } from '@/components/CoursePopulation/CoursePopulationGradeDist'
+import { CoursePopulationLanguageDist } from '@/components/CoursePopulation/CoursePopulationLanguageDist'
+import { useColumns as columnsGeneralTab } from '@/components/CoursePopulation/studentColumns'
 import { FilterView } from '@/components/FilterView'
 import {
   ageFilter,
@@ -19,10 +24,12 @@ import {
   startYearAtUniFilter,
   studentNumberFilter,
 } from '@/components/FilterView/filters'
+import type { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
+import { findCorrectProgramme } from '@/components/PopulationComponents/ProgrammeDist/util'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
 import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
@@ -35,13 +42,6 @@ import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
-import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
-import type { GenericFilter } from '../FilterView/filters/createFilter'
-import { findCorrectProgramme } from '../PopulationComponents/ProgrammeDist/util'
-import { CoursePopulationCreditGainTable } from './CoursePopulationCreditGainTable'
-import { CoursePopulationGradeDist } from './CoursePopulationGradeDist'
-import { CoursePopulationLanguageDist } from './CoursePopulationLanguageDist'
-import { useColumns as columnsGeneralTab } from './studentColumns'
 
 export const CoursePopulation = () => {
   useTitle('Course population')

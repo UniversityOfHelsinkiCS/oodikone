@@ -6,9 +6,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 
+import type { Filter, FilterOptions, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ClearIcon, KeyboardArrowRightIcon } from '@/theme'
-import type { Filter, FilterOptions, FilterTrayProps } from '../createFilter'
 
 export const FilterCard = <Options extends FilterOptions, Args, Precompute>({
   filter,

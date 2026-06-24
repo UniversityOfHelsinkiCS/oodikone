@@ -7,14 +7,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router'
 
 import { Link } from '@/components/common/Link'
+import { NavigationButton } from '@/components/NavigationBar/NavigationButton'
+import { navigationItems } from '@/components/NavigationBar/navigationItems'
+import { OodikoneLogo } from '@/components/NavigationBar/OodikoneLogo'
+import { UserButton } from '@/components/NavigationBar/UserButton'
 import { isDev } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { formatToArray } from '@oodikone/shared/util'
-import { NavigationButton } from './NavigationButton'
-import { navigationItems } from './navigationItems'
-import { OodikoneLogo } from './OodikoneLogo'
-import { UserButton } from './UserButton'
 
 export const NavigationBar = () => {
   const { isFetching, fullAccessToStudentData, isAdmin, programmeRights, roles, iamGroups } =

@@ -8,9 +8,9 @@ import Typography from '@mui/material/Typography'
 import { useMemo } from 'react'
 
 import './index.css'
+import { useColorizedCoursesTableContext } from '@/components/ColorizedCoursesTable/common'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { useColorizedCoursesTableContext } from './common'
 
 export const NumberModeSelector = () => {
   const { numberMode, setNumberMode } = useColorizedCoursesTableContext()

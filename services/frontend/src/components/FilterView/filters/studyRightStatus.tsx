@@ -1,7 +1,7 @@
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterRadio } from '@/components/FilterView/filters/common/FilterRadio'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { DegreeProgrammeType, EnrollmentType } from '@oodikone/shared/types'
-import { FilterRadio } from './common/FilterRadio'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

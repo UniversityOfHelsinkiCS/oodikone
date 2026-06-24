@@ -13,11 +13,11 @@ import {
   SemesterRangeSelector,
 } from '@/components/ColorizedCoursesTable/selectorComponents'
 import '@/components/ColorizedCoursesTable/index.css'
+import { useColumns } from '@/components/ColorizedCoursesTable/SemestersTab/logic'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { useDebouncedState } from '@/hooks/debouncedState'
-import { useColumns } from './logic'
 
 export const SemestersTab = () => {
   const { getTextIn } = useLanguage()

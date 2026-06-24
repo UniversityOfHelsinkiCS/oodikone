@@ -1,10 +1,10 @@
 import Stack from '@mui/material/Stack'
 
 import { filterToolTips } from '@/common/InfoToolTips'
+import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
+import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { SemestersData } from '@/hooks/useSemesters'
-import { FilterSelect } from './common/FilterSelect'
-import { createFilter, FilterTrayProps } from './createFilter'
 
 type Options = any
 type Args = any

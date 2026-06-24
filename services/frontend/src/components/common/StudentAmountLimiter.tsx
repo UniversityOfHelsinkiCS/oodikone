@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { NumericTextField } from './NumericTextField'
+import { NumericTextField } from '@/components/common/NumericTextField'
 
 export const StudentAmountLimiter = ({
   onStudentAmountLimitChange,

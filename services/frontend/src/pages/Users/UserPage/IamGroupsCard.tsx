@@ -3,8 +3,8 @@ import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 
+import { CardHeader } from '@/pages/Users/UserPage/CardHeader'
 import { User } from '@/types/api/users'
-import { CardHeader } from './CardHeader'
 
 export const IamGroupsCard = ({ user }: { user: User }) => {
   return (

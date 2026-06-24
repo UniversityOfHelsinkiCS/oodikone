@@ -9,9 +9,9 @@ import Typography from '@mui/material/Typography'
 import { GroupChip } from '@/components/common/EquivalenceGroupChip'
 import { StyledTable } from '@/components/common/StyledTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { getActiveYears } from '@/pages/CourseStatistics/util'
 import { DeleteIcon } from '@/theme'
 import { SearchResultCourse } from '@/types/api/courses'
-import { getActiveYears } from '../util'
 
 const EmptyListRow = () => (
   <TableRow>

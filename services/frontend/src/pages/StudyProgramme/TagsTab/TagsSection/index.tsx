@@ -3,8 +3,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { Section } from '@/components/Section'
+import { TagItem } from '@/pages/StudyProgramme/TagsTab/TagsSection/TagItem'
 import { Tag } from '@oodikone/shared/types'
-import { TagItem } from './TagItem'
 
 export const TagsSection = ({
   combinedProgramme,

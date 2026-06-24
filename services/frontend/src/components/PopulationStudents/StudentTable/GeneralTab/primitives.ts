@@ -6,6 +6,7 @@ import {
   getStudyRightStatusText,
 } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { joinProgrammes } from '@/components/PopulationStudents/StudentTable/GeneralTab/util'
 import { DateFormat } from '@/constants/date'
 import type { SemestersData } from '@/hooks/useSemesters'
 import { formatDate, monthsVisited } from '@/util/timeAndDate'
@@ -19,7 +20,6 @@ import type {
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import type { StudentStudyPlan, StudentStudyRight, StudentStudyRightElement } from '@oodikone/shared/types/studentData'
 import { getSemestersBetweenRange } from '@oodikone/shared/util'
-import { joinProgrammes } from './util'
 
 export type Variant = 'population' | 'coursePopulation' | 'customPopulation' | 'studyGuidanceGroupPopulation'
 

@@ -9,6 +9,7 @@ import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { Section } from '@/components/Section'
+import { InteractiveDataTable } from '@/pages/Faculties/BasicInformationTab/InteractiveDataTable'
 import {
   useGetFacultyBasicStatsQuery,
   useGetFacultyCreditStatsQuery,
@@ -19,7 +20,6 @@ import { GetFacultiesResponse } from '@/types/api/faculty'
 import { makeGraphData, makeTableStats } from '@/util/creditsProduced'
 import { getTimestamp } from '@/util/timeAndDate'
 import { NameWithCode, ProgrammeModuleWithRelevantAttributes } from '@oodikone/shared/types'
-import { InteractiveDataTable } from './InteractiveDataTable'
 
 const calculateTotals = stats => {
   const totals: Record<number, Record<string, number>> = {}

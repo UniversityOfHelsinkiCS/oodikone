@@ -5,13 +5,13 @@ import { TotalsDisclaimer } from '@/components/common/TotalsDisclaimer'
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { AttemptsTable } from '@/pages/CourseStatistics/SummaryTab/AttemptsTable'
+import { exportToExcel } from '@/pages/CourseStatistics/SummaryTab/export'
 import { ALL, CourseStatisticsSummary, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
 import { getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
-import { AttemptsTable } from './AttemptsTable'
-import { exportToExcel } from './export'
 
 export const SummaryTab = ({
   onClickCourse,

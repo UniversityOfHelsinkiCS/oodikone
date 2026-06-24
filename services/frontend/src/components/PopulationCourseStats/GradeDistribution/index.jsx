@@ -8,10 +8,10 @@ import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { CourseFilterToggle } from '@/components/PopulationCourseStats/CourseFilterToggle'
+import { ModuleCourseToggle } from '@/components/PopulationCourseStats/ModuleCourseToggle'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { range } from '@oodikone/shared/util'
-import { CourseFilterToggle } from '../CourseFilterToggle'
-import { ModuleCourseToggle } from '../ModuleCourseToggle'
 
 const mapCourseData = course =>
   course.courses
