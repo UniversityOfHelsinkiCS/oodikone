@@ -32,7 +32,7 @@ import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents
 import { findCorrectProgramme } from '@/components/PopulationComponents/ProgrammeDist/util'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
-import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useTitle } from '@/hooks/title'
 import { useSemesters } from '@/hooks/useSemesters'

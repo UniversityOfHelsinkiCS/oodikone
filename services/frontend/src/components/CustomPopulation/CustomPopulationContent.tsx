@@ -19,7 +19,7 @@ import { CreditAccumulationGraph } from '@/components/PopulationComponents/Credi
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { PopulationStudents } from '@/components/PopulationStudents'
-import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format'
 import { RightsNotification } from '@/components/RightsNotification'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'

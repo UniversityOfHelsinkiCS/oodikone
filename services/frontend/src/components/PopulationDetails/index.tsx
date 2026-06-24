@@ -29,7 +29,7 @@ import { AdvancedSettings } from '@/components/PopulationDetails/AdvancedSetting
 import { PopulationQueryCard } from '@/components/PopulationDetails/PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from '@/components/PopulationDetails/studentColumns'
 import { PopulationStudents } from '@/components/PopulationStudents'
-import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format/index'
+import { useFormat as formatGeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab/format'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useCurriculumState } from '@/hooks/useCurriculums'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
