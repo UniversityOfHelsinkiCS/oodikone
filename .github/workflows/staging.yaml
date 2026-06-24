@@ -13,6 +13,7 @@ on:
       - 'services/**'
       - 'updater/sis-updater-worker/src/db/migrations/**'
       - 'docker-compose.ci.yml'
+      - 'docker-compose.test.yml'
       - 'package*.json'
 
 jobs:
