@@ -50,6 +50,7 @@ ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 WORKDIR /opt/app-root/shared
 COPY --from=build /opt/app-root/shared/dist .
+RUN npm ci --omit=dev
 
 WORKDIR /opt/app-root/backend
 COPY --from=build /opt/app-root/backend/.npmrc .

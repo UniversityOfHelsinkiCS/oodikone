@@ -32,6 +32,7 @@ RUN npm install -g serve@^14
 
 WORKDIR /opt/app-root/shared
 COPY ./shared .
+RUN npm ci --include=dev
 
 WORKDIR /opt/app-root/frontend
 COPY ./frontend/.npmrc .
