@@ -3,10 +3,12 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
+import { getSemesterCodeAt } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
 import { isOpenUniCourseCode } from '../../util'
+import { getSemestersAndYears, SemestersAndYears } from '../semesters'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
   getCreditsForCourses,
@@ -106,10 +108,6 @@ const parseCredit = (
 }
 
 type FormattedEnrollment = {
-  yearCode: number
-  yearName: string
-  semesterCode: number
-  semesterName: Name
   courseCode: string
   enrollmentDateTime: Date
   programme: FormattedProgramme
@@ -123,12 +121,10 @@ const parseEnrollment = (
 ): FormattedEnrollment => {
   const {
     studentnumber: studentNumber,
-    semester,
     enrollment_date_time: enrollmentDateTime,
     course_code: courseCode,
     studyright_id: studyRightId,
   } = enrollment
-  const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
   const programmeOfCredit: SISStudyRightElementModel | undefined =
     studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
@@ -147,10 +143,6 @@ const parseEnrollment = (
       }
 
   return {
-    yearCode,
-    yearName,
-    semesterCode,
-    semesterName,
     courseCode,
     enrollmentDateTime,
     programme,
@@ -170,6 +162,19 @@ const getSubstitutionGroupDetails = async (codeGroups: string[][]) => {
   return codeGroups.map(group =>
     group.map(code => substitutionGroupDetails.find(subCourse => subCourse.code === code)!)
   )
+}
+
+const getSemesterAndYearByDate = (
+  date: Date,
+  semesters: SemestersAndYears['semesters'],
+  years: SemestersAndYears['years']
+) => {
+  const semesterCode = getSemesterCodeAt(semesters, date) ?? getSemesterCodeAt(semesters, new Date())!
+
+  const semester = semesters[semesterCode]
+  const year = years[semester.yearcode]
+
+  return { year, semester }
 }
 
 const getYearlyStatsOfNew = async (
@@ -200,6 +205,8 @@ const getYearlyStatsOfNew = async (
       filteredCreditGroupCodes = creditGroupCodes
       break
   }
+
+  const { semesters, years } = await getSemestersAndYears()
 
   const [creditGroups, enrollmentGroups] = await Promise.all([
     getCreditsForCourses(filteredCreditGroupCodes, unification),
@@ -241,6 +248,7 @@ const getYearlyStatsOfNew = async (
       programme.organization
     )
 
+    // Credits/attainments have quaranteed matching attainment_date and semesters/years
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
     counter.markCreditToGroup(studentNumber, passed, grade, groupCode, groupName, creditCourseCode, yearCode)
@@ -253,10 +261,6 @@ const getYearlyStatsOfNew = async (
     for (const enrollment of enrollments) {
       const {
         studentNumber,
-        semesterCode,
-        semesterName,
-        yearCode,
-        yearName,
         courseCode: enrollmentCourseCode,
         enrollmentDateTime,
         programme,
@@ -266,9 +270,13 @@ const getYearlyStatsOfNew = async (
         studentNumberToSrElementsMap[enrollment.studentnumber ?? 0] ?? []
       )
 
+      // Enrollments can have conflicting enrollment_date_time and semestercode, so we need to manually select
+      // semestercode matching enrollment_date_time
+      const { semester, year } = getSemesterAndYearByDate(enrollment.enrollment_date_time, semesters, years)
+
       counter.markStudyProgramme(
         studentNumber,
-        yearCode,
+        year.yearcode,
         false, // passed
         0, // credits
         programme.code,
@@ -277,8 +285,8 @@ const getYearlyStatsOfNew = async (
         programme.organization
       )
 
-      const groupCode = separate ? semesterCode : yearCode
-      const groupName = separate ? semesterName : yearName
+      const groupCode = separate ? semester.semestercode : year.yearcode
+      const groupName = separate ? semester.name : year.yearname
 
       counter.markEnrollmentToGroup(
         studentNumber,
@@ -286,7 +294,7 @@ const getYearlyStatsOfNew = async (
         groupCode,
         groupName,
         enrollmentCourseCode,
-        yearCode
+        year.yearcode
       )
     }
   }

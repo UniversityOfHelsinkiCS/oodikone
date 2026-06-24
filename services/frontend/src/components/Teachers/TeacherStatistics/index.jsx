@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 
 import { useState } from 'react'
 
-import { getCurrentSemester } from '@/common'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { TeacherStatisticsTable } from '@/components/Teachers/TeacherStatisticsTable'
 import { useSemesters } from '@/hooks/useSemesters'
@@ -20,7 +19,7 @@ import { useGetProvidersQuery } from '@/redux/providers'
 import { useLazyGetTeacherStatisticsQuery } from '@/redux/teachers'
 import { getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
 import { createLocaleComparator } from '@/util/comparator'
-import { mapToProviders } from '@oodikone/shared/util'
+import { getCurrentSemester, mapToProviders } from '@oodikone/shared/util'
 
 export const TeacherStatistics = () => {
   const { getTextIn } = useLanguage()

@@ -1,3 +1,14 @@
+import dayjs, { Dayjs, extend as dayjsExtend } from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+
+import { Semester as BackendSemester } from '../models'
+
+dayjsExtend(isBetween)
+dayjsExtend(isSameOrAfter)
+dayjsExtend(isSameOrBefore)
+
 const handleUnderscoreProgrammeCode = (programmeCode: string) => {
   const [left, right] = programmeCode.split('_')
   const prefix = [...left].filter(char => !Number.isNaN(Number(char))).join('')
@@ -35,6 +46,47 @@ export const mapToProviders = (programmeCodes: string[]) => {
  * Month is before september.
  */
 export const isSpring = (date: Date) => date.getMonth() < 8
+
+/** TODO: Do this better. Needs this funny type, because in frontend Semester has string dates, in backend only Date dates */
+type CombinedSemester = {
+  semestercode: number
+  startdate: string | Date
+  enddate: string | Date
+}
+/**
+ * @returns semestercode that was active during the targetDate
+ */
+export const getSemesterCodeAt = (
+  allSemesters: Record<string, CombinedSemester>,
+  targetDate: Date | string | undefined
+): number | undefined => {
+  if (!targetDate) return undefined
+
+  return Object.values(allSemesters ?? {}).find(
+    semester =>
+      new Date(semester.startdate) <= new Date(targetDate) && new Date(semester.enddate) >= new Date(targetDate)
+  )?.semestercode
+}
+
+export const getCurrentSemester = (allSemesters: Record<string, BackendSemester>) => {
+  if (!allSemesters) return null
+  return Object.values(allSemesters).find(
+    semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
+  )
+}
+
+/**
+ * @returns all semesters from semesterEnrollments that occurred partially or fully during a given period
+ */
+export const getSemestersBetweenRange = (start: Dayjs, end: Dayjs, allSemesters?: Record<string, CombinedSemester>) =>
+  Object.values(allSemesters ?? {}).filter(semester => {
+    const semesterStart = dayjs(semester.startdate)
+    const semesterEnd = dayjs(semester.enddate)
+
+    return dayjs(semesterStart).isSameOrBefore(end)
+      ? semesterEnd.isSameOrAfter(start)
+      : semesterStart.isSameOrBefore(end) && semesterEnd.isSameOrAfter(start)
+  })
 
 type Ok<T> = {
   data: T

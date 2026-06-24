@@ -138,7 +138,7 @@ void describe('Course yearly statistics', async () => {
       })
 
       // TODO: This should be fixed by course_unit_realisation
-      await tt.test('- 2022-2023', { skip: true }, () => {
+      await tt.test('- 2022-2023', () => {
         const stats2022 = body.unifyStats!.statistics.find(year => year.name === '2022-2023')!
         assert.strictEqual(stats2022.students.studentNumbers.length, 27, 'Incorrect amount of total students 2022')
 
@@ -146,7 +146,7 @@ void describe('Course yearly statistics', async () => {
         // Student with enrollment_date_time outside of semestert start and end dates
         assert(
           !!stats2022.enrollments.find(enrollment => enrollment.studentNumber === '455129'),
-          'Student with incorrect semester (by sisu) but a correct enrollment_date was not found in the correct year (by enrollment_date)'
+          'Student with incorrect semester (by updater) but a correct enrollment_date was not found in the correct year (by enrollment_date)'
         )
         assert.strictEqual(stats2022.enrollments.length, 34, 'Enrollments found when none should exist')
         assert.strictEqual(stats2022.allEnrollments.length, 43, 'Enrollments found when none should exist')
@@ -168,8 +168,8 @@ void describe('Course yearly statistics', async () => {
         )
 
         assert('enrollments' in stats2023, 'Missing field enrollment in statsitics')
-        assert.strictEqual(stats2023.enrollments.length, 6, 'Enrollments found when none should exist')
-        assert.strictEqual(stats2023.allEnrollments.length, 6, 'Enrollments found when none should exist')
+        assert.strictEqual(stats2023.enrollments.length, 7, 'Enrollments found when none should exist')
+        assert.strictEqual(stats2023.allEnrollments.length, 7, 'Enrollments found when none should exist')
       })
     })
 

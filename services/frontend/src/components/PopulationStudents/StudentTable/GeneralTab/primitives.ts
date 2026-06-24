@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import {
   getAllProgrammesOfStudent,
   getHighestGradeOfCourseBetweenRange,
-  getSemestersBetweenRange,
   getStudentTotalCredits,
   getStudyRightStatusText,
 } from '@/common'
@@ -19,6 +18,7 @@ import type {
 } from '@oodikone/shared/types'
 import { GenderCodeToText } from '@oodikone/shared/types/genderCode'
 import type { StudentStudyPlan, StudentStudyRight, StudentStudyRightElement } from '@oodikone/shared/types/studentData'
+import { getSemestersBetweenRange } from '@oodikone/shared/util'
 import { joinProgrammes } from './util'
 
 export type Variant = 'population' | 'coursePopulation' | 'customPopulation' | 'studyGuidanceGroupPopulation'

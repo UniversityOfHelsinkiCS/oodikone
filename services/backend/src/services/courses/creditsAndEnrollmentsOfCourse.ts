@@ -158,6 +158,7 @@ export const getEnrollmentsForCourses = async (codeGroups: string[][], unificati
           course_code: {
             [Op.in]: allCourseCodes,
           },
+          // Date when OK changed from Oodi to Sisu data, no proper enrollment data before it?
           enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
           state: EnrollmentState.ENROLLED,
           is_open: getIsOpen(unification),

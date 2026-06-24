@@ -1,12 +1,8 @@
 import { Theme, useTheme } from '@mui/material/styles'
-import dayjs, { Dayjs, extend as dayjsExtend } from 'dayjs'
-import isBetween from 'dayjs/plugin/isBetween'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import dayjs from 'dayjs'
 import { maxBy, orderBy } from 'lodash-es'
 
 import { GetTextIn } from '@/components/LanguagePicker/useLanguage'
-import type { SemestersData } from '@/hooks/useSemesters'
 import type { Absence } from '@/types/students'
 import type { SISStudyRightElement } from '@oodikone/shared/models'
 import {
@@ -20,10 +16,6 @@ import {
 } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 import { range } from '@oodikone/shared/util'
-
-dayjsExtend(isBetween)
-dayjsExtend(isSameOrAfter)
-dayjsExtend(isSameOrBefore)
 
 export const isFall = (semester: number) => semester % 2 === 1
 
@@ -332,38 +324,6 @@ export const getCreditCategories = (
 }
 
 export const validateInputLength = (input: string, minLength: number) => input?.trim().length >= minLength
-
-export const getCurrentSemester = (allSemesters: SemestersData['semesters']) => {
-  if (!allSemesters) return null
-  return Object.values(allSemesters).find(
-    semester => new Date(semester.startdate) <= new Date() && new Date(semester.enddate) >= new Date()
-  )
-}
-
-/**
- * @returns semestercode that was active during the targetDate
- */
-export const getSemesterCodeAt = (allSemesters?: SemestersData['semesters'], targetDate?: Date | string) => {
-  if (!targetDate) return undefined
-
-  return Object.values(allSemesters ?? {}).find(
-    semester =>
-      new Date(semester.startdate) <= new Date(targetDate) && new Date(semester.enddate) >= new Date(targetDate)
-  )?.semestercode
-}
-
-/**
- * @returns all semesters from semesterEnrollments that occurred partially or fully during a given period
- */
-export const getSemestersBetweenRange = (start: Dayjs, end: Dayjs, allSemesters?: SemestersData['semesters']) =>
-  Object.values(allSemesters ?? {}).filter(semester => {
-    const semesterStart = dayjs(semester.startdate)
-    const semesterEnd = dayjs(semester.enddate)
-
-    return dayjs(semesterStart).isSameOrBefore(end)
-      ? semesterEnd.isSameOrAfter(start)
-      : semesterStart.isSameOrBefore(end) && semesterEnd.isSameOrAfter(start)
-  })
 
 /**
  * Extracts items from a string separated by commas, semicolons, spaces, or newlines.

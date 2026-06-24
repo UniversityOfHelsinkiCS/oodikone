@@ -4,7 +4,7 @@ import { Name } from '@oodikone/shared/types'
 import { dateMinFromList, dateMaxFromList } from '@oodikone/shared/util/datetime'
 import { SemesterModel } from '../models'
 
-type SemestersAndYears = {
+export type SemestersAndYears = {
   years: Record<
     string,
     {
