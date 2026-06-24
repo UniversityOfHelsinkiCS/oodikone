@@ -3,7 +3,7 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
-import { getSemesterCodeAt } from '@oodikone/shared/util'
+import { enrollmentTimeDateThreshold, getSemesterCodeAt } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
@@ -359,6 +359,7 @@ export const getCourseYearlyStats = async (
           [Op.in]: courseCodes,
         },
         state: EnrollmentState.ENROLLED,
+        enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
       },
     }),
   ])

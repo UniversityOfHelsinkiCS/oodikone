@@ -2,6 +2,7 @@ import { Op } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { EnrollmentState, Unification } from '@oodikone/shared/types'
+import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
 import {
   StudentModel,
   CreditModel,
@@ -158,8 +159,8 @@ export const getEnrollmentsForCourses = async (codeGroups: string[][], unificati
           course_code: {
             [Op.in]: allCourseCodes,
           },
-          // Date when OK changed from Oodi to Sisu data, no proper enrollment data before it?
-          enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
+          // Date when OK changed from Oodi to Sisu data, studyright_id is null before that date
+          enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
           state: EnrollmentState.ENROLLED,
           is_open: getIsOpen(unification),
         },

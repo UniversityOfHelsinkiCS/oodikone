@@ -7,7 +7,7 @@ import {
   EnrollmentState,
   StudentCredits,
 } from '@oodikone/shared/types'
-import { omitKeys } from '@oodikone/shared/util'
+import { enrollmentTimeDateThreshold, omitKeys } from '@oodikone/shared/util'
 import { CourseModel, CreditModel, EnrollmentModel, StudentModel, StudyplanModel } from '../models'
 
 type StudentWithStudyplanNested = Pick<
@@ -113,6 +113,7 @@ const getEnrollments = async (
         state: {
           [Op.eq]: EnrollmentState.ENROLLED,
         },
+        enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
       },
     })
 

@@ -2,6 +2,7 @@ import { memoize } from 'lodash-es'
 import { Op, QueryTypes } from 'sequelize'
 
 import { Name, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
+import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
 import { dbConnections } from '../../database/connection'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, ProgrammeModuleModel } from '../../models'
 import logger from '../../util/logger'
@@ -48,6 +49,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
         },
         enrollment_date_time: {
           [Op.between]: [from, to],
+          [Op.gte]: enrollmentTimeDateThreshold,
         },
         state: EnrollmentState.ENROLLED,
       },

@@ -3,6 +3,8 @@ import { Op } from 'sequelize'
 import { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
 import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
+import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
+import { dateMaxFromList } from '@oodikone/shared/util/datetime'
 import {
   CreditModel,
   EnrollmentModel,
@@ -48,8 +50,8 @@ export type StudentEnrollment = Pick<
   Enrollment,
   'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
 >
-export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> =>
-  EnrollmentModel.findAll({
+export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> => {
+  return EnrollmentModel.findAll({
     attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
     where: {
       studentnumber: {
@@ -57,11 +59,12 @@ export const getEnrollments = (studentNumbers: string[], startDate: string): Pro
       },
       state: EnrollmentState.ENROLLED,
       enrollment_date_time: {
-        [Op.gte]: startDate,
+        [Op.gte]: dateMaxFromList(new Date(startDate), enrollmentTimeDateThreshold),
       },
     },
     raw: true,
   })
+}
 
 type StudentPersonalData = Pick<
   Student,

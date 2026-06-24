@@ -106,8 +106,8 @@ export const computeLanguageCenterData = async () => {
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
-      semestercode: { [Op.gte]: autumnSemester2017 },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
+      // This doesn't need the `enrollmentTimeDateThreshold`, ColorizedDataTable doesn't use studyright_ids
     },
     raw: true,
   })

@@ -1,9 +1,10 @@
+import dayjs from 'dayjs'
 import { Op, QueryTypes } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
 import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { splitByEmptySpace } from '@oodikone/shared/util'
+import { enrollmentTimeDateThreshold, splitByEmptySpace } from '@oodikone/shared/util'
 import { dbConnections } from '../database/connection'
 import {
   StudentModel,
@@ -182,7 +183,7 @@ export const findByCourseAndSemesters = async (
           e.studentnumber = s.studentnumber
           AND e.course_code IN (:codes)
           AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
-          AND e.enrollment_date_time >= '2021-05-31'
+          AND e.enrollment_date_time >= '${dayjs(enrollmentTimeDateThreshold).format('YYYY-MM-DD')}'
           AND e.state = :enrollmentState
       );
     `,

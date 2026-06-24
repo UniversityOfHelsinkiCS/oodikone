@@ -35,7 +35,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'state'],
     where: {
       course_code: { [Op.in]: courseCodes },
-      semestercode: { [Op.gte]: autumnSemester2017 },
+      semestercode: { [Op.gte]: autumnSemester2017 }, // It is ok to use enrollments before OK sisu-migration, ColorizedTableData doesn't need it
       state: { [Op.in]: [EnrollmentState.ENROLLED, EnrollmentState.REJECTED] },
     },
     raw: true,
