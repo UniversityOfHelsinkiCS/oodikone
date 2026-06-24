@@ -7,11 +7,15 @@ import ReactECharts, { EChartsInstance } from 'echarts-for-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
+import {
+  getGraduationDataPoints,
+  getGraduationsByCodes,
+  getIncludedCourseCodesByProgrammeCodes,
+} from '@/components/Charts/util'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditTypeCode, FormattedStudent } from '@oodikone/shared/types'
-import { InfoBox } from '../InfoBox/InfoBoxWithTooltip'
-import { getGraduationDataPoints, getGraduationsByCodes, getIncludedCourseCodesByProgrammeCodes } from './util'
 
 const INITIAL_GRAPH_HEIGHT = 600
 
