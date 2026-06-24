@@ -24,7 +24,7 @@ import { PageTitle } from '../common/PageTitle'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 import { Loading } from '../Loading'
 import { CreditAccumulationGraph } from '../PopulationComponents/CreditAccumulation'
-import { CustomPopulationProgrammeDist } from './CustomPopulationProgrammeDist'
+import { CustomPopulationProgrammeDist } from '../PopulationComponents/ProgrammeDist'
 import { useColumns as columnsGeneralTab } from './studentColumns'
 import { UnihowDataExport } from './UnihowDataExport'
 
