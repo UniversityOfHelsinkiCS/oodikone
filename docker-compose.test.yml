@@ -2,8 +2,8 @@ services:
   api-tests:
     container_name: oodikone-api-tests
     build:
-      context: services/backend
-      dockerfile: dev.Dockerfile
+      context: services
+      dockerfile: backend/dev.Dockerfile
     volumes:
       - backend-tests-nodemod:/opt/app-root/backend/node_modules
       - ./services/backend/:/opt/app-root/backend

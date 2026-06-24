@@ -22,8 +22,8 @@ services:
     <<: *defaults
     container_name: oodikone-backend
     build:
-      <<: *build_defaults
-      context: services/backend
+      dockerfile: backend/dev.Dockerfile
+      context: services
     depends_on:
       - kone-db
       - redis
@@ -55,8 +55,8 @@ services:
     <<: *defaults
     container_name: oodikone-frontend
     build:
-      <<: *build_defaults
-      context: services/frontend
+      dockerfile: frontend/dev.Dockerfile
+      context: services
     ports:
       - 3000:3000
     profiles:
