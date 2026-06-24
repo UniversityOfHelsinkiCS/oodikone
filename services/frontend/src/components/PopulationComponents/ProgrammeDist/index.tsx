@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import TableBody from '@mui/material/TableBody'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
@@ -10,17 +11,20 @@ import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
+import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { findCorrectProgramme, NO_PROGRAMME } from '@/components/PopulationComponents/ProgrammeDist/util'
 import { useSemesters } from '@/hooks/useSemesters'
 import { FormattedStudent, Name } from '@oodikone/shared/types'
 
 export const CustomPopulationProgrammeDist = ({
+  infotext,
   students,
   coursecodes,
   from,
   to,
 }: {
+  infotext: Name
   students: FormattedStudent[]
   coursecodes?: string[]
   from?: string
@@ -63,33 +67,38 @@ export const CustomPopulationProgrammeDist = ({
     .sort((a, b) => b.programmeStudents - a.programmeStudents)
 
   return (
-    <StyledTable showCellBorders>
-      <TableHead>
-        <TableRow>
-          <StyledCell width={1} />
-          <StyledCell bold>Programme</StyledCell>
-          <StyledCell bold>Code</StyledCell>
-          <StyledCell>
-            <Typography fontWeight="bold">Students</Typography>
-            <Typography fontWeight="lighter">{`n=${students.length}`}</Typography>
-          </StyledCell>
-          <StyledCell bold>Percentage of population</StyledCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {tableRows.map(row => (
-          <TableRow key={`row-${row.code}`}>
+    <>
+      <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+        <InfoBox content={getTextIn(infotext) ?? ''} sx={{ mb: 2 }} />
+      </Box>
+      <StyledTable showCellBorders>
+        <TableHead>
+          <TableRow>
+            <StyledCell width={1} />
+            <StyledCell bold>Programme</StyledCell>
+            <StyledCell bold>Code</StyledCell>
             <StyledCell>
-              <ProgrammeFilterToggleCell code={row.code} name={row.label ?? ''} />
+              <Typography fontWeight="bold">Students</Typography>
+              <Typography fontWeight="lighter">{`n=${students.length}`}</Typography>
             </StyledCell>
-            <StyledCell text>{row.label}</StyledCell>
-            <StyledCell text>{row.code}</StyledCell>
-            <StyledCell text>{row.programmeStudents}</StyledCell>
-            <StyledCell>{row.percentageBar}</StyledCell>
+            <StyledCell bold>Percentage of population</StyledCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </StyledTable>
+        </TableHead>
+        <TableBody>
+          {tableRows.map(row => (
+            <TableRow key={`row-${row.code}`}>
+              <StyledCell>
+                <ProgrammeFilterToggleCell code={row.code} name={row.label ?? ''} />
+              </StyledCell>
+              <StyledCell text>{row.label}</StyledCell>
+              <StyledCell text>{row.code}</StyledCell>
+              <StyledCell text>{row.programmeStudents}</StyledCell>
+              <StyledCell>{row.percentageBar}</StyledCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </StyledTable>
+    </>
   )
 }
 

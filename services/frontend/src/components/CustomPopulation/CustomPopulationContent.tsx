@@ -14,7 +14,6 @@ import { StyledMessage } from '@/components/common/StyledMessage'
 import { useColumns as columnsGeneralTab } from '@/components/CustomPopulation/studentColumns'
 import { UnihowDataExport } from '@/components/CustomPopulation/UnihowDataExport'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
-import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Loading } from '@/components/Loading'
 import { CreditAccumulationGraph } from '@/components/PopulationComponents/CreditAccumulation'
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
@@ -50,8 +49,6 @@ export const CustomPopulationContent = ({
   const studyProgrammes = useFilteredAndFormattedStudyProgrammes().filteredProgrammes
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
 
-  const { getTextIn } = useLanguage()
-
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
   }, [filteredStudents.length])
@@ -74,15 +71,10 @@ export const CustomPopulationContent = ({
     {
       title: 'Programme distribution',
       content: (
-        <>
-          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-            <InfoBox
-              content={getTextIn(populationStatisticsToolTips.programmeDistributionCustomPopulation) ?? ''}
-              sx={{ mb: 2 }}
-            />
-          </Box>
-          <CustomPopulationProgrammeDist students={filteredStudents} />
-        </>
+        <CustomPopulationProgrammeDist
+          infotext={populationStatisticsToolTips.programmeDistributionCustomPopulation}
+          students={filteredStudents}
+        />
       ),
     },
     {

@@ -156,20 +156,13 @@ export const CoursePopulation = () => {
     {
       title: 'Programme distribution',
       content: (
-        <>
-          <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-            <InfoBox
-              content={getTextIn(populationStatisticsToolTips.programmeDistributionCoursePopulation) ?? ''}
-              sx={{ mb: 2 }}
-            />
-          </Box>
-          <CustomPopulationProgrammeDist
-            coursecodes={codes.allCodes}
-            from={dateFrom}
-            students={filteredStudents}
-            to={dateTo}
-          />
-        </>
+        <CustomPopulationProgrammeDist
+          coursecodes={codes.allCodes}
+          from={dateFrom}
+          infotext={populationStatisticsToolTips.programmeDistributionCoursePopulation}
+          students={filteredStudents}
+          to={dateTo}
+        />
       ),
     },
     {
