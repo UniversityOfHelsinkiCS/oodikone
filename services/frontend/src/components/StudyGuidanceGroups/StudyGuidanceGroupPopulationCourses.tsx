@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
+import { CourseTableModeSelector } from '@/components/PopulationComponents/CourseTableModeSelector'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
-import { CourseTableModeSelector } from '@/components/PopulationDetails/CourseTableModeSelector'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { StudentAmountLimiter } from '../common/StudentAmountLimiter'
 
