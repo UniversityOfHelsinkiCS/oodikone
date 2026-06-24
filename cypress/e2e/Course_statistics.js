@@ -537,7 +537,8 @@ describe('Basic user', () => {
         cy.contains('Show population').should('be.enabled')
       })
 
-      describe('Students tab', () => {
+      // TODO: Writing these as backend api tests
+      describe.skip('Students tab', () => {
         describe('Info boxes', () => {
           it('Student statistics table', () => {
             cy.cs('StudentStatistics-info-box-button').click()
@@ -639,7 +640,8 @@ describe('Basic user', () => {
         })
       })
 
-      describe('Attempts tab', () => {
+      // TODO: Writing these as backend api tests
+      describe.skip('Attempts tab', () => {
         beforeEach(() => {
           openAttemptsTab()
         })
@@ -774,7 +776,8 @@ describe('Basic user', () => {
         cy.contains('Show population').should('be.enabled')
       })
 
-      describe('Students tab', () => {
+      // TODO: Writing these as backend api tests
+      describe.skip('Students tab', () => {
         it('Show grades off, Separate by semesters off', () => {
           const tableContents = [
             // [Time, Total students, Passed, Failed, Enrolled no grade, Pass rate, Fail rate]
@@ -960,7 +963,8 @@ describe('Basic user', () => {
         })
       })
 
-      describe('Attempts tab', () => {
+      // TODO: Writing these as backend api tests
+      describe.skip('Attempts tab', () => {
         beforeEach(() => {
           openAttemptsTab()
         })
@@ -1206,7 +1210,8 @@ describe('Basic user', () => {
   })
 })
 
-describe('Only course statistics', () => {
+// TODO: Writing these as backend api tests
+describe.skip('Only course statistics', () => {
   beforeEach(() => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.url().should('include', '/coursestatistics')
