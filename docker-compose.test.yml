@@ -5,9 +5,10 @@ services:
       context: services
       dockerfile: backend/dev.Dockerfile
     volumes:
-      - backend-tests-nodemod:/opt/app-root/backend/node_modules
       - ./services/backend/:/opt/app-root/backend
       - ./services/shared/:/opt/app-root/shared
+      - backend-tests-nodemod:/opt/app-root/backend/node_modules
+      - shared-tests-nodemod:/opt/app-root/shared/node_modules
     environment:
       CI: 'true'
       NODE_ENV: 'test'
@@ -26,3 +27,5 @@ services:
 volumes:
   backend-tests-nodemod:
     name: oodikone-backend-tests-nodemod
+  shared-tests-nodemod:
+    name: oodikone-shared-tests-nodemod
