@@ -52,26 +52,25 @@ const parseCredit = (
   studyRightElements: Array<SISStudyRightElementModel>
 ): FormattedCredit => {
   const singleCourse = isSingleCourse(creditGroup)
-  // Latest attainment for a course
-  const credit =
+
+  // TODO: Calculate substitutions correctly once course_unit_realisation hits
+  const attainment =
     creditGroup
-      .sort((a, b) => b.attainment_date.getTime() - a.attainment_date.getTime())
-      .find(credit => !CreditModel.failed(credit)) ?? creditGroup.at(0)!
+      .sort((a, b) => b.attainment_date.getTime() - a.attainment_date.getTime()) // desc
+      .find(credit => CreditModel.passed(credit)) ??
+    creditGroup.find(credit => CreditModel.failed(credit)) ??
+    creditGroup.at(0)!
 
-  const courseCode = singleCourse ? credit.course_code : mainCourseCode
-  const grade = singleCourse ? credit.grade : 'substituted'
-  const credits = singleCourse ? credit.credits : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
+  const courseCode = singleCourse ? attainment.course_code : mainCourseCode
+  const grade = singleCourse ? attainment.grade : 'substituted'
+  const credits = singleCourse ? attainment.credits : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
 
-  // Take the first attainment for the course (see Student statistics info-box)
-  // TODO: Substitution groups should be marked for the semester when
-  // the group was first finished eg. when was the first time the last missing
-  // course of the group was passed
   const {
     semester,
     attainment_date: attainmentDate,
     student_studentnumber: studentNumber,
     studyright_id: studyRightId,
-  } = creditGroup.at(-1)!
+  } = attainment
 
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
 
@@ -99,7 +98,7 @@ const parseCredit = (
     attainmentDate,
     courseCode,
     grade,
-    passed: singleCourse ? !CreditModel.failed(credit) : true,
+    passed: singleCourse ? !CreditModel.failed(attainment) : true,
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
     programme,
     credits,
@@ -113,17 +112,39 @@ type FormattedEnrollment = {
   semesterName: Name
   courseCode: string
   enrollmentDateTime: Date
+  programme: FormattedProgramme
   studentNumber: string
 }
 
-const parseEnrollment = (enrollment: Enrollment, anonymizationSalt: string | null): FormattedEnrollment => {
+const parseEnrollment = (
+  enrollment: Enrollment,
+  anonymizationSalt: string | null,
+  studyRightElements: Array<SISStudyRightElementModel>
+): FormattedEnrollment => {
   const {
     studentnumber: studentNumber,
     semester,
     enrollment_date_time: enrollmentDateTime,
     course_code: courseCode,
+    studyright_id: studyRightId,
   } = enrollment
   const { yearcode: yearCode, yearname: yearName, semestercode: semesterCode, name: semesterName } = semester
+
+  const programmeOfCredit: SISStudyRightElementModel | undefined =
+    studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
+    studyRightElements
+      .filter(({ startDate, endDate }) => dateIsBetween(enrollmentDateTime, startDate, endDate))
+      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+      .at(0) // The newest studyRightElement
+
+  const programme = programmeOfCredit
+    ? formatStudyRightElement(programmeOfCredit)
+    : {
+        code: 'OTHER',
+        name: { en: 'Other', fi: 'Muu', sv: 'Andra' },
+        facultyCode: 'OTHER',
+        organization: { name: { en: 'Other', fi: 'Muu', sv: 'Andra' } },
+      }
 
   return {
     yearCode,
@@ -132,6 +153,7 @@ const parseEnrollment = (enrollment: Enrollment, anonymizationSalt: string | nul
     semesterName,
     courseCode,
     enrollmentDateTime,
+    programme,
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
   }
 }
@@ -237,7 +259,23 @@ const getYearlyStatsOfNew = async (
         yearName,
         courseCode: enrollmentCourseCode,
         enrollmentDateTime,
-      } = parseEnrollment(enrollment, anonymizationSalt)
+        programme,
+      } = parseEnrollment(
+        enrollment,
+        anonymizationSalt,
+        studentNumberToSrElementsMap[enrollment.studentnumber ?? 0] ?? []
+      )
+
+      counter.markStudyProgramme(
+        studentNumber,
+        yearCode,
+        false, // passed
+        0, // credits
+        programme.code,
+        programme.name,
+        programme.facultyCode,
+        programme.organization
+      )
 
       const groupCode = separate ? semesterCode : yearCode
       const groupName = separate ? semesterName : yearName
@@ -334,11 +372,12 @@ export const getCourseYearlyStats = async (
       const course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null = await CourseModel.findOne({
         attributes: ['code', 'name', 'substitution_groups'],
         where: { code: courseCode },
+        raw: true,
       })
 
       if (!course) {
         logger.error('Course for course stats not found with code' + courseCode)
-        return []
+        return {}
       }
 
       const [openStats, regularStats, unifyStats] = await Promise.all([

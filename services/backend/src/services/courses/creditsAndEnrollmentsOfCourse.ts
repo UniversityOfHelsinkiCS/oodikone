@@ -142,7 +142,7 @@ export const getEnrollmentsForCourses = async (codeGroups: string[][], unificati
     include: [
       {
         model: EnrollmentModel,
-        attributes: ['studentnumber', 'enrollment_date_time', 'course_code'],
+        attributes: ['studentnumber', 'enrollment_date_time', 'course_code', 'studyright_id'],
         include: [
           {
             model: SemesterModel,

@@ -95,7 +95,7 @@ export const getProgrammeCourseAggregates = async (params: {
           WHERE
             cr.course_code IN (:courseCodes)
             AND cr.attainment_date BETWEEN :from AND :to
-            AND cr.credittypecode = :creditType
+            AND cr.credittypecode IN (:creditTypes)
         )
         SELECT
           fc."courseCode",
@@ -176,7 +176,7 @@ export const getProgrammeCourseAggregates = async (params: {
           courseCodes,
           from,
           to,
-          creditType: CreditTypeCode.PASSED,
+          creditTypes: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
           degreeExtentCodes,
           otherUniversityExtentCodes,
           separateStudyExtentCodes,
