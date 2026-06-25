@@ -5,14 +5,16 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=development
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
+USER 1001
+
 WORKDIR /opt/app-root/shared
 COPY --chown=1001:1001 ./shared .
+
 RUN npm ci
 
 WORKDIR /opt/app-root/backend
 COPY --chown=1001:1001 ./backend .
 
-USER 1001
 RUN npm ci
 
 EXPOSE 8080
