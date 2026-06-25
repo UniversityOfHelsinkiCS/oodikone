@@ -532,6 +532,8 @@ describe('Degree programme overview', () => {
 
     describe('By credit type tab', () => {
       beforeEach(() => {
+        cy.cs('show-credits-students-toggle').click()
+        cy.cs('year-toggle').click()
         cy.get('thead').within(() => {
           cy.get('tr')
             .eq(0)
@@ -552,7 +554,6 @@ describe('Degree programme overview', () => {
       })
 
       it('time range selection works', () => {
-        cy.cs('year-toggle').click()
         cy.cs('from-year-select').click()
         cy.cs('from-year-select-option-2021').click()
         cy.cs('to-year-select').click()
@@ -571,7 +572,7 @@ describe('Degree programme overview', () => {
       })
 
       it('year toggle works', () => {
-        // cy.cs('year-toggle').click() // Default view now Academic years
+        cy.cs('year-toggle').click() // Default view now Academic years
 
         cy.cs('from-year-select').click()
         cy.cs('from-year-select-option-2017').click()
@@ -720,7 +721,7 @@ describe('Degree programme overview', () => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT11001')
               cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('289')
+              cy.get('td').eq(3).contains('273')
             })
         })
       })

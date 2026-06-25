@@ -37,7 +37,7 @@ export const ByCreditTypeTab = ({
   const [fromYear, setFromYear] = useState<number | null>(null)
   const [toYear, setToYear] = useState<number | null>(null)
   const [years, setYears] = useState<{ academic: YearOption[]; calendar: YearOption[] } | null>(null)
-  const [showStudents, setShowStudents] = useState(false)
+  const [showStudents, setShowStudents] = useState(true)
 
   useEffect(() => {
     if (!data) {
