@@ -8,11 +8,14 @@ import { useState } from 'react'
 import { coursePopulationToolTips, populationStudentsToolTips } from '@/common/InfoToolTips'
 
 import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
-import { CoursesTabContainer as CoursesTab } from '@/components/PopulationStudents/StudentTable/CoursesTab'
-import { type FormattedStudentData, GeneralTab } from '@/components/PopulationStudents/StudentTable/GeneralTab'
-import { ModulesTabContainer as ModulesTab } from '@/components/PopulationStudents/StudentTable/ModulesTab'
-import { ProgressTable as ProgressTab } from '@/components/PopulationStudents/StudentTable/ProgressTab'
-import { TagsTab } from '@/components/PopulationStudents/StudentTable/TagsTab'
+import { CoursesTabContainer as CoursesTab } from '@/components/PopulationComponents/Students/StudentTable/CoursesTab'
+import {
+  type FormattedStudentData,
+  GeneralTab,
+} from '@/components/PopulationComponents/Students/StudentTable/GeneralTab'
+import { ModulesTabContainer as ModulesTab } from '@/components/PopulationComponents/Students/StudentTable/ModulesTab'
+import { ProgressTable as ProgressTab } from '@/components/PopulationComponents/Students/StudentTable/ProgressTab'
+import { TagsTab } from '@/components/PopulationComponents/Students/StudentTable/TagsTab'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { parseQueryParams } from '@/util/queryparams'

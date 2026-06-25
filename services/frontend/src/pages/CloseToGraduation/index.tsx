@@ -17,7 +17,7 @@ import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithToolt
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { LoadingSection } from '@/components/Loading'
-import { getSemestersPresentFunctions } from '@/components/PopulationStudents/StudentTable/GeneralTab/columnHelpers/semestersPresent'
+import { getSemestersPresentFunctions } from '@/components/PopulationComponents/Students/StudentTable/GeneralTab/columnHelpers/semestersPresent'
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useSemesters } from '@/hooks/useSemesters'

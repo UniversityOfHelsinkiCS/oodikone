@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { ModulesTab } from '@/components/PopulationStudents/StudentTable/ModulesTab/ModulesTable'
+import { ModulesTab } from '@/components/PopulationComponents/Students/StudentTable/ModulesTab/ModulesTable'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
