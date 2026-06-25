@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
-import { makeTableStats } from '../../../src/util/creditsProduced'
+import { makeTableStats } from '@/util/creditsProduced'
 
 const testData: Record<string, Record<string, number>> = {
   '2022': {

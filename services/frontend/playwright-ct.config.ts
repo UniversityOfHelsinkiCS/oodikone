@@ -6,9 +6,9 @@ import { fileURLToPath } from 'url'
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './',
+  testDir: './tests',
   /* The base directory, relative to the config file, for snapshot files created with toMatchSnapshot and toHaveScreenshot. */
-  snapshotDir: './__snapshots__',
+  snapshotDir: './tests/__snapshots__',
   /* Maximum time one test can run for. */
   timeout: 10 * 1000,
   /* Run tests in files in parallel */
@@ -38,6 +38,9 @@ export default defineConfig({
       },
     },
   },
+
+  // Don't run unit tests with playwright
+  testIgnore: '*.test.ts',
 
   /* Configure projects for major browsers */
   projects: [

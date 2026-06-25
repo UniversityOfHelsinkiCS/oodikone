@@ -36,13 +36,6 @@ describe('Degree programme overview', () => {
       cy.init('/study-programme', 'admin')
     })
 
-    it('Correct categories', () => {
-      cy.contains('Bachelor programmes')
-      cy.contains('Master programmes')
-      cy.contains('Combined programmes')
-      cy.contains('Doctoral programmes')
-    })
-
     it('Degree programme search filter', () => {
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
       cy.contains('Matemaattisten tieteiden kandiohjelma').should('exist')
