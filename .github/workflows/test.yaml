@@ -357,8 +357,8 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm ci
-        working-directory: ./services/frontend
+        run: npm ci --prefix shared && npm ci --prefix frontend
+        working-directory: ./services
 
       - name: Install Playwright Browsers
         run: npm exec -- playwright install --with-deps
