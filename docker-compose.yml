@@ -196,7 +196,7 @@ volumes:
     name: oodikone-backend-nodemod
   frontend-nodemod:
     name: oodikone-frontend-nodemod
-  shared-tests-nodemod:
+  shared-nodemod:
     name: oodikone-shared-nodemod
   kone-db-data:
     name: oodikone-kone-db-data
