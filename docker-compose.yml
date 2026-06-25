@@ -49,7 +49,7 @@ services:
     volumes:
       - ./services/backend/:/opt/app-root/backend
       - ./services/shared/:/opt/app-root/shared
-      - shared-tests-nodemod:/opt/app-root/shared/node_modules
+      - shared-nodemod:/opt/app-root/shared/node_modules
       - backend-nodemod:/opt/app-root/backend/node_modules
 
   frontend:
@@ -197,7 +197,7 @@ volumes:
   frontend-nodemod:
     name: oodikone-frontend-nodemod
   shared-tests-nodemod:
-    name: oodikone-shared-tests-nodemod
+    name: oodikone-shared-nodemod
   kone-db-data:
     name: oodikone-kone-db-data
   redis-data:
