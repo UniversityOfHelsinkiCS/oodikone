@@ -65,7 +65,7 @@ services:
     volumes:
       - ./services/frontend/:/opt/app-root/frontend
       - ./services/shared/:/opt/app-root/shared
-      - shared-tests-nodemod:/opt/app-root/shared/node_modules
+      - shared-nodemod:/opt/app-root/shared/node_modules
       - frontend-nodemod:/opt/app-root/frontend/node_modules
 
   kone-db:
