@@ -14,7 +14,7 @@ import { StyledAccordion } from '@/components/common/StyledAccordion'
 import { StyledTable } from '@/components/common/StyledTable'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { getSemestersPresentFunctions } from '@/components/PopulationComponents/Students/StudentTable/GeneralTab/columnHelpers/semestersPresent'
+import { getSemestersPresentFunctions } from '@/components/PopulationComponents/Students/Table/GeneralTab/columnHelpers/semestersPresent'
 import { type SemestersData, useSemesters } from '@/hooks/useSemesters'
 import { ArrowDropDownIcon } from '@/theme'
 

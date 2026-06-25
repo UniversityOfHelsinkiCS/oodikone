@@ -26,7 +26,7 @@ import { CreditAccumulationGraph } from '@/components/PopulationComponents/Credi
 import { CreditStatistics } from '@/components/PopulationComponents/CreditGainStats'
 import { PopulationCourses } from '@/components/PopulationComponents/PopulationCourses'
 import { PopulationStudents } from '@/components/PopulationComponents/Students'
-import { useFormat as formatGeneralTab } from '@/components/PopulationComponents/Students/StudentTable/GeneralTab/format'
+import { useFormat as formatGeneralTab } from '@/components/PopulationComponents/Students/Table/GeneralTab/format'
 import { AdvancedSettings } from '@/components/PopulationDetails/AdvancedSettings'
 import { PopulationQueryCard } from '@/components/PopulationDetails/PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from '@/components/PopulationDetails/studentColumns'

@@ -4,7 +4,7 @@ import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/compone
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { IncludeSubstitutionsToggle } from '@/components/PopulationComponents/Students/IncludeSubstitutionsToggle'
-import { useGetColumnDefinitions } from '@/components/PopulationComponents/Students/StudentTable/CoursesTab/columnDefinitions'
+import { useGetColumnDefinitions } from '@/components/PopulationComponents/Students/Table/CoursesTab/columnDefinitions'
 import { useToggle } from '@/hooks/toggle'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'

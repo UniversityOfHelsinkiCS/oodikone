@@ -3,16 +3,16 @@ import { useMemo } from 'react'
 import { creditDateFilter } from '@/components/FilterView/filters'
 import { useFilters } from '@/components/FilterView/useFilters'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import type { FormattedStudentData } from '@/components/PopulationComponents/Students/StudentTable/GeneralTab'
+import type { FormattedStudentData } from '@/components/PopulationComponents/Students/Table/GeneralTab'
 import {
   getProgrammeDetails,
   getSemesterEnrollmentsContent,
   useGetRelevantSemesterData,
-} from '@/components/PopulationComponents/Students/StudentTable/GeneralTab/format/util'
+} from '@/components/PopulationComponents/Students/Table/GeneralTab/format/util'
 import {
   useGeneratePrimitiveFunctions,
   Variant,
-} from '@/components/PopulationComponents/Students/StudentTable/GeneralTab/primitives'
+} from '@/components/PopulationComponents/Students/Table/GeneralTab/primitives'
 import { DateFormat } from '@/constants/date'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery } from '@/redux/populations'

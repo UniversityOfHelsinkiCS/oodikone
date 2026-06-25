@@ -13,10 +13,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
-import type {
-  FormattedModules,
-  ModuleTabStudent,
-} from '@/components/PopulationComponents/Students/StudentTable/ModulesTab'
+import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationComponents/Students/Table/ModulesTab'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { CheckIcon, ContentCopyIcon, CropSquareIcon } from '@/theme'
 

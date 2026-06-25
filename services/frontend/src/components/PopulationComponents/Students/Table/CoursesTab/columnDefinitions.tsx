@@ -10,11 +10,7 @@ import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { handleClipboardCopy } from '@/components/OodiTable/utils'
-import {
-  Courses,
-  CourseTabModule,
-  CourseTabStudent,
-} from '@/components/PopulationComponents/Students/StudentTable/CoursesTab'
+import { Courses, CourseTabModule, CourseTabStudent } from '@/components/PopulationComponents/Students/Table/CoursesTab'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
 import { CheckIcon, ContentCopyIcon, CropSquareIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
