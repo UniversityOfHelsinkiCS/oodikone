@@ -60,6 +60,64 @@ const testProgrammes = {
       },
       progId: 'DOMAST',
     },
+    KH50_005: {
+      code: 'KH50_005',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:bachelors-degree',
+      name: {
+        en: "Bachelor's Programme in Computer Science",
+        fi: 'Tietojenkäsittelytieteen kandiohjelma',
+        sv: 'Kandidatprogrammet i datavetenskap',
+      },
+      progId: 'TKT',
+    },
+    1: {
+      code: '1',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:bachelor',
+      name: {
+        fi: 'Test1',
+      },
+      progId: 'TKT1',
+    },
+    2: {
+      code: '2',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:bachelor',
+      name: {
+        fi: 'Test2',
+      },
+      progId: 'TKT2',
+    },
+    3: {
+      code: '3',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:bachelor',
+      name: {
+        fi: 'Test3',
+      },
+      progId: 'TKT3',
+    },
+    4: {
+      code: '4',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:bachelor',
+      name: {
+        fi: 'Test4',
+      },
+      progId: 'TKT4',
+    },
+    '820050-ma': {
+      code: '820050-ma',
+      curriculumPeriodIds: ['hy-lv-76'],
+      degreeProgrammeType: 'urn:code:degree-program-type:masters-degree',
+      name: {
+        en: 'Biotechnology (higher)',
+        fi: 'Biotekniikka (ylempi)',
+        sv: 'Bioteknik (högre)',
+      },
+      progId: '820050-ma',
+    },
   },
   allProgrammes: {},
 }
@@ -115,5 +173,41 @@ test.describe('StudyProgrammeSelector', () => {
     await expect(component).toContainText('Master programmes')
     await expect(component).toContainText('Combined programmes')
     await expect(component).toContainText('Doctoral programmes')
+  })
+
+  test('should filter out programmes correctly', async ({ mount, router }) => {
+    void (await router.route('**/populationstatistics/studyprogrammes', async route => {
+      const json = testProgrammes
+      await route.fulfill({ json })
+    }))
+
+    const component = await mount(<ReduxWrapper component={<StudyProgrammeSelector />} />)
+
+    await component.getByLabel('Filter degree programmes').fill('Tietojenkäsittelytieteen')
+    await expect(component).toContainText('Bachelor programmes')
+    await expect(component).toContainText('Tietojenkäsittelytieteen kandiohjelma')
+
+    await expect(component).not.toContainText('Matemaattisten tieteiden kandiohjelma')
+    await expect(component).not.toContainText('Eläinlääketieteen kandiohjelma')
+
+    await expect(component).not.toContainText('Master programmes')
+    await expect(component).not.toContainText('Matematiikan ja tilastotieteen maisteriohjelma')
+    await expect(component).not.toContainText('Eläinlääketieteen lisensiaatin koulutusohjelma')
+
+    await expect(component).not.toContainText('Combined programmes programmes')
+    await expect(component).not.toContainText('Doctoral programmes')
+  })
+
+  test('should display old programmes only when toggled', async ({ mount, router }) => {
+    void (await router.route('**/populationstatistics/studyprogrammes', async route => {
+      const json = testProgrammes
+      await route.fulfill({ json })
+    }))
+
+    const component = await mount(<ReduxWrapper component={<StudyProgrammeSelector />} />)
+
+    await expect(component).not.toContainText('Biotekniikka (ylempi)')
+    await component.getByLabel('Filter out old and specialized programmes').click()
+    await expect(component).toContainText('Biotekniikka (ylempi)')
   })
 })

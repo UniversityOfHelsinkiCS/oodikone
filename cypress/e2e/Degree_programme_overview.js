@@ -32,22 +32,13 @@ const deleteTag = tagName => {
 
 describe('Degree programme overview', () => {
   describe('Degree programme selector', () => {
-    beforeEach(() => {
-      cy.init('/study-programme', 'admin')
-    })
-
     it('Degree programme search filter', () => {
+      cy.init('/study-programme', 'admin')
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
       cy.contains('Matemaattisten tieteiden kandiohjelma').should('exist')
       cy.cs('study-programme-filter').type('Tietojenkäsittelytieteen')
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
       cy.contains('Matemaattisten tieteiden kandiohjelma').should('not.exist')
-    })
-
-    it('Old and specialized programmes filter', () => {
-      cy.contains('Biotekniikka (ylempi)').should('not.exist')
-      cy.cs('filter-old-programmes-toggle').click()
-      cy.contains('Biotekniikka (ylempi)').should('exist')
     })
   })
 
