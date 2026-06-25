@@ -13,6 +13,7 @@ interface CypressWindow extends Window {
 export const runningInCypress = typeof window !== 'undefined' && !!(window as CypressWindow).Cypress
 
 // Base paths
+export const prodBasePath = 'https://oodikone.helsinki.fi'
 export const basePath = process.env.PUBLIC_URL ?? ''
 export const apiBasePath = `${basePath}/api`
 
