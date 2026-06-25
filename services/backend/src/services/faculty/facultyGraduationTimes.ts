@@ -1,6 +1,12 @@
 import { Name, DegreeProgrammeType, FacultyGraduationStatistics, ClassSizes } from '@oodikone/shared/types'
-import type { GraduationStatistics, MediansByCategory, MediansByProgrammes } from '@oodikone/shared/types'
-import { ProgrammeGraduationStats } from '@oodikone/shared/types/studyProgramme'
+import type {
+  GraduationStatistics,
+  MedianEntry,
+  MediansByCategory,
+  MediansByProgrammes,
+  ProgrammeGraduationStats,
+  ProgrammeMedians,
+} from '@oodikone/shared/types'
 import { omitKeys } from '@oodikone/shared/util'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { GraduationTarget } from '../graduationHelpers'
@@ -16,10 +22,45 @@ export const programmeTypes = {
   [DegreeProgrammeType.DOCTOR]: 'doctor',
 } as const
 
+const setYearlyBreakdown = (programmeCode: string, progId: string, level: ProgrammeMedians, year: MedianEntry) => {
+  if (year.y === 0) return
+
+  level[year.name] ??= { data: [], programmes: [] }
+  level[year.name].programmes.push(programmeCode)
+  level[year.name].data.push(
+    omitKeys({ ...structuredClone(year), name: progId, programmeCode, median: year.y }, ['y', 'classSize'])
+  )
+}
+
+const mergeStats = (
+  medians: MediansByCategory,
+  level: keyof MediansByCategory,
+  statsForYear: MedianEntry,
+  classSizes?: ClassSizes
+) => {
+  if (classSizes) {
+    classSizes[level][statsForYear.name] ??= 0
+    classSizes[level][statsForYear.name] += statsForYear.classSize ?? 0
+  }
+
+  const gradStatsForYear = medians[level].find(entry => entry.name === statsForYear.name)
+
+  if (!gradStatsForYear) {
+    medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
+  } else {
+    gradStatsForYear.times.push(...statsForYear.times)
+    gradStatsForYear.median = getMedian(gradStatsForYear.times)
+    gradStatsForYear.amount += statsForYear.amount
+    gradStatsForYear.statistics.onTime += statsForYear.statistics.onTime
+    gradStatsForYear.statistics.yearOver += statsForYear.statistics.yearOver
+    gradStatsForYear.statistics.wayOver += statsForYear.statistics.wayOver
+  }
+}
+
 const getStatsByGraduationYear = async (
   facultyProgrammes: ProgrammesOfOrganization
 ): Promise<GraduationStatistics['byGradYear']> => {
-  const newStats: ProgrammeGraduationStats[] = []
+  const newStats: Pick<ProgrammeGraduationStats, 'id' | 'graduationTimes' | 'comboTimes'>[] = []
   const medians: MediansByCategory = { bachelor: [], master: [], bcMsCombo: [], doctor: [] }
   const programmes: { medians: MediansByProgrammes } = {
     medians: {
@@ -52,73 +93,18 @@ const getStatsByGraduationYear = async (
   }
 
   for (const { id: programmeCode, graduationTimes, comboTimes } of newStats) {
-    const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
+    const { degreeProgrammeType, progId } = facultyProgrammes.find(({ code }) => code === programmeCode)!
     const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
 
-    if (!medians[level].length) {
-      medians[level] = graduationTimes.medians.map(year => ({
-        ...omitKeys(structuredClone(year), ['y']),
-        median: year.y,
-      }))
-    } else {
-      for (const statsForYear of graduationTimes.medians) {
-        const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
-        if (!correctYear) {
-          medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
-          continue
-        }
-        correctYear.times.push(...statsForYear.times)
-        correctYear.median = getMedian(correctYear.times)
-        correctYear.amount += statsForYear.amount
-        correctYear.statistics.onTime += statsForYear.statistics.onTime
-        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
-        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
-      }
-    }
-
-    if (level === 'master' && comboTimes.medians.length) {
-      if (!medians.bcMsCombo.length) {
-        medians.bcMsCombo = comboTimes.medians.map(year => ({ ...omitKeys(year, ['y']), median: year.y }))
-      } else {
-        for (const statsForYear of comboTimes.medians) {
-          const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
-          if (!correctYear) {
-            medians.bcMsCombo.push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
-            continue
-          }
-          correctYear.times.push(...statsForYear.times)
-          correctYear.median = getMedian(correctYear.times)
-          correctYear.amount += statsForYear.amount
-          correctYear.statistics.onTime += statsForYear.statistics.onTime
-          correctYear.statistics.yearOver += statsForYear.statistics.yearOver
-          correctYear.statistics.wayOver += statsForYear.statistics.wayOver
-        }
-      }
-    }
-
-    if (!programmes.medians[level]) {
-      programmes.medians[level] = {}
-    }
-
     for (const year of graduationTimes.medians) {
-      if (year.y === 0) continue
-
-      programmes.medians[level][year.name] ??= { data: [], programmes: [] }
-      programmes.medians[level][year.name].programmes.push(code)
-      programmes.medians[level][year.name].data.push(
-        omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y'])
-      )
+      mergeStats(medians, level, year)
+      setYearlyBreakdown(programmeCode, progId, programmes.medians[level], year)
     }
 
     if (level === 'master' && comboTimes.medians.length) {
       for (const year of comboTimes.medians) {
-        if (year.y === 0) continue
-
-        programmes.medians.bcMsCombo[year.name] ??= { data: [], programmes: [] }
-        programmes.medians.bcMsCombo[year.name].programmes.push(code)
-        programmes.medians.bcMsCombo[year.name].data.push(
-          omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y'])
-        )
+        mergeStats(medians, 'bcMsCombo', year)
+        setYearlyBreakdown(programmeCode, progId, programmes.medians.bcMsCombo, year)
       }
     }
   }
@@ -144,7 +130,7 @@ const getStatsByStartYear = async (
     if (!programme.degreeProgrammeType || !(programme.degreeProgrammeType in programmeTypes)) {
       continue
     }
-    const statsFromRedis = await getStudyTrackStats(programme.code, '', 'SPECIAL_EXCLUDED')
+    const statsFromRedis = await getStudyTrackStats(programme.code, null, 'SPECIAL_EXCLUDED')
     if (statsFromRedis) {
       newStats.push(statsFromRedis)
       continue
@@ -164,9 +150,13 @@ const getStatsByStartYear = async (
   }
 
   for (const { id: programmeCode, graduationTimes } of newStats) {
-    const { degreeProgrammeType, progId, code } = facultyProgrammes.find(({ code }) => code === programmeCode)!
+    const { degreeProgrammeType, progId } = facultyProgrammes.find(({ code }) => code === programmeCode)!
     const level = programmeTypes[degreeProgrammeType as keyof typeof programmeTypes]
-    if (!(programmeCode in graduationTimes)) continue
+
+    if (!(programmeCode in graduationTimes)) {
+      continue
+    }
+
     const statsForProgramme = graduationTimes[programmeCode]
     const basicStats = statsForProgramme.medians.basic
     const comboStats = statsForProgramme.medians.combo
@@ -174,85 +164,21 @@ const getStatsByStartYear = async (
       (acc, year) => ({ ...acc, [year.name]: year.classSize ?? 0 }),
       {}
     )
-    classSizes.programmes[code] = classSizesByYear
-
-    if (!medians[level].length) {
-      medians[level] = structuredClone(basicStats).map(year => ({
-        ...omitKeys(year, ['y', 'classSize']),
-        median: year.y,
-      }))
-    }
+    classSizes.programmes[programmeCode] = classSizesByYear
 
     for (const statsForYear of basicStats) {
-      classSizes[level][statsForYear.name] ??= 0
-      classSizes[level][statsForYear.name] += statsForYear.classSize ?? 0
-
-      const correctYear = medians[level].find(entry => entry.name === statsForYear.name)
-      if (!correctYear) {
-        medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y', 'classSize']), median: statsForYear.y })
-        continue
-      }
-      correctYear.times.push(...statsForYear.times)
-      correctYear.median = getMedian(correctYear.times)
-      correctYear.amount += statsForYear.amount
-      correctYear.statistics.onTime += statsForYear.statistics.onTime
-      correctYear.statistics.yearOver += statsForYear.statistics.yearOver
-      correctYear.statistics.wayOver += statsForYear.statistics.wayOver
+      mergeStats(medians, level, statsForYear, classSizes)
+      setYearlyBreakdown(programmeCode, progId, programmes.medians[level], statsForYear)
     }
 
     if (level === 'master' && comboStats.length) {
-      if (!medians.bcMsCombo.length) {
-        medians.bcMsCombo = structuredClone(comboStats).map(year => ({
-          ...omitKeys(year, ['y', 'classSize']),
-          median: year.y,
-        }))
-      }
-
       for (const statsForYear of comboStats) {
-        classSizes.bcMsCombo[statsForYear.name] ??= 0
-        classSizes.bcMsCombo[statsForYear.name] += statsForYear.classSize ?? 0
-        const correctYear = medians.bcMsCombo.find(entry => entry.name === statsForYear.name)
-        if (!correctYear) {
-          medians.bcMsCombo.push({
-            ...omitKeys(structuredClone(statsForYear), ['y', 'classSize']),
-            median: statsForYear.y,
-          })
-          continue
-        }
-        correctYear.times.push(...statsForYear.times)
-        correctYear.median = getMedian(correctYear.times)
-        correctYear.amount += statsForYear.amount
-        correctYear.statistics.onTime += statsForYear.statistics.onTime
-        correctYear.statistics.yearOver += statsForYear.statistics.yearOver
-        correctYear.statistics.wayOver += statsForYear.statistics.wayOver
-      }
-    }
-
-    if (!programmes.medians[level]) {
-      programmes.medians[level] = {}
-    }
-
-    for (const year of basicStats) {
-      if (year.y === 0) continue
-      programmes.medians[level][year.name] ??= { data: [], programmes: [] }
-      programmes.medians[level][year.name].programmes.push(code)
-      programmes.medians[level][year.name].data.push(
-        omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
-      )
-    }
-
-    if (level === 'master' && comboStats.length) {
-      for (const year of comboStats) {
-        if (year.y === 0) continue
-
-        programmes.medians.bcMsCombo[year.name] ??= { data: [], programmes: [] }
-        programmes.medians.bcMsCombo[year.name].programmes.push(code)
-        programmes.medians.bcMsCombo[year.name].data.push(
-          omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
-        )
+        mergeStats(medians, 'bcMsCombo', statsForYear, classSizes)
+        setYearlyBreakdown(programmeCode, progId, programmes.medians.bcMsCombo, statsForYear)
       }
     }
   }
+
   return { medians, programmes, classSizes }
 }
 

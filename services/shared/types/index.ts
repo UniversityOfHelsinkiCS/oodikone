@@ -45,6 +45,7 @@ export type {
   ProgrammeCourse,
   ProgrammeModule,
   ProgrammeOrStudyTrackGraduationStats,
+  ProgrammeGraduationStats,
   StudyProgrammeCourse,
   StudyTrackStats,
 } from './studyProgramme'
