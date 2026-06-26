@@ -22,13 +22,13 @@ export const programmeTypes = {
   [DegreeProgrammeType.DOCTOR]: 'doctor',
 } as const
 
-const setYearlyBreakdown = (programmeCode: string, progId: string, level: ProgrammeMedians, year: MedianEntry) => {
+const setYearlyBreakdown = (code: string, progId: string, level: ProgrammeMedians, year: MedianEntry) => {
   if (year.y === 0) return
 
   level[year.name] ??= { data: [], programmes: [] }
-  level[year.name].programmes.push(programmeCode)
+  level[year.name].programmes.push(code)
   level[year.name].data.push(
-    omitKeys({ ...structuredClone(year), name: progId, programmeCode, median: year.y }, ['y', 'classSize'])
+    omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
   )
 }
 
