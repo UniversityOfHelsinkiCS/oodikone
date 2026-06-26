@@ -7,25 +7,27 @@ import Typography from '@mui/material/Typography'
 import { useLocation } from 'react-router'
 import { Link } from '@/components/common/Link'
 import { isDev, prodBasePath } from '@/conf'
+import { useGetAuthorizedUserQuery } from '@/redux/auth'
 
-const DevChip = () => {
+const DevChip = ({ prod }: { prod?: true }) => {
   const location = useLocation()
-  const prodUrl = `${prodBasePath}${location.pathname}${location.search}${location.hash}`
+  const url = `${prod ? 'http://localhost:3000' : prodBasePath}${location.pathname}${location.search}${location.hash}`
 
   return (
-    <Tooltip title="Open in production">
+    <Tooltip title={`Open in ${prod ? 'development (visible for admins)' : 'production'}`}>
       <IconButton
         onClick={() => {
-          window.open(prodUrl, '_blank', 'noopener,noreferrer')
+          window.open(url, '_blank', 'noopener,noreferrer')
         }}
       >
-        <Chip color="error" label="dev" size="small" />
+        <Chip color={prod ? 'success' : 'error'} label={prod ? 'prod' : 'dev'} size="small" />
       </IconButton>
     </Tooltip>
   )
 }
 
 export const OodikoneLogo = () => {
+  const { isAdmin } = useGetAuthorizedUserQuery()
   return (
     <Stack alignItems="center" direction="row" gap={1}>
       <Typography
@@ -44,7 +46,7 @@ export const OodikoneLogo = () => {
       >
         oodikone
       </Typography>
-      {isDev ? <DevChip /> : null}
+      {isDev ? <DevChip /> : isAdmin ? <DevChip prod /> : null}
     </Stack>
   )
 }
