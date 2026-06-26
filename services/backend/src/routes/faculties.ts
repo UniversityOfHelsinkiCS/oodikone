@@ -145,6 +145,19 @@ router.get<
   GetStatsReqBody,
   GetGraduationStatsQuery
 >('/:id/graduationtimes', auth.roles(['facultyStatistics']), async (req, res) => {
+  // Recursively clears graduation time arrays "times" from result.
+  // We don't need to send them to client,
+  // but university view (uses same data) needs it to compute medians.
+  const clearTimes = (data: any) => {
+    if (Array.isArray(data)) {
+      data.forEach(clearTimes)
+    } else if (!!data && typeof data === 'object') {
+      if (data.times) data.times = []
+      Object.values(data).forEach(clearTimes)
+    }
+    return data
+  }
+
   const { id: facultyId } = req.params
   const { programme_filter: programmeFilter } = req.query
 
@@ -152,7 +165,7 @@ router.get<
   if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
 
   const data = await getGraduationStats(faculty.code, programmeFilter)
-  if (data) return res.json(data)
+  if (data) return res.json(clearTimes(data))
 
   const programmes = await getDegreeProgrammesOfFaculty(faculty.code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
   if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
@@ -160,7 +173,7 @@ router.get<
   const updatedStats = await countGraduationTimes(faculty.code, programmes)
   if (updatedStats) await setGraduationStats(updatedStats, programmeFilter)
 
-  return res.json(updatedStats)
+  return res.json(clearTimes(updatedStats))
 })
 
 type GetProgressStatsResBody = {
