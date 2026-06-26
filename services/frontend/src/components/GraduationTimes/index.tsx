@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { BreakdownDisplay } from '@/components/GraduationTimes/BreakdownDisplay'
 import { MedianDisplay } from '@/components/GraduationTimes/MedianDisplay'
@@ -60,12 +60,18 @@ export const GraduationTimes = ({
     }
   }
 
+  // Keys are either years e.g. "2025" or year ranges "2025 - 2026"
+  const sortedData = useMemo(
+    () => data?.toSorted((a, b) => Number(b.name.slice(0, 4)) - Number(a.name.slice(0, 4))),
+    [data]
+  )
+
   return (
     <Section cypress={`${level}-graduation-times`} isError={isError} isLoading={isLoading} title={title}>
       {!showMedian ? (
         <BreakdownDisplay
           allowExpand={allowExpand}
-          data={data!}
+          data={sortedData!}
           expandKey={expandKey}
           handleClick={handleClick}
           level={level}
@@ -79,7 +85,7 @@ export const GraduationTimes = ({
         <MedianDisplay
           allowExpand={allowExpand}
           classSizes={classSizes}
-          data={data!}
+          data={sortedData!}
           expandKey={expandKey}
           goal={goal}
           goalExceptions={goalExceptions}
