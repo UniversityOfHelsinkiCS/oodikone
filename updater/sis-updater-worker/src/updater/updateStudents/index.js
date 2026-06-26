@@ -112,10 +112,12 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
     ),
   ])
 
-  const realisationIdToActivityPeriod = courseUnitRealisations.reduce((res, cur) => {
-    res[cur.id] = cur.activity_period
-    return res
-  }, {})
+  const realisationIdToActivityPeriod = courseUnitRealisations
+    .filter(cur => cur.document_state === 'ACTIVE')
+    .reduce((res, cur) => {
+      res[cur.id] = cur.activity_period
+      return res
+    }, {})
 
   const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
     res[curr.id] = curr.group_id
@@ -142,7 +144,7 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
     studyRightIdToEducationType
   )
 
-  const mappedEnrollments = validEnrollments.map(mapEnrollment).filter(({ studentnumber }) => studentnumber != null)
+  const mappedEnrollments = validEnrollments.map(mapEnrollment).filter(Boolean)
   await bulkCreate(Enrollment, mappedEnrollments)
 }
 
