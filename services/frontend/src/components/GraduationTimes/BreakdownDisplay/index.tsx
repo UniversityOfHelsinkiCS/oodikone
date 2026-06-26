@@ -3,6 +3,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { GraduationBreakdown } from '@/components/Charts/GraduationBreakdown'
+import { StyledMessage } from '@/components/common/StyledMessage'
 import type { GraduationStats, Name, NameWithCode, ProgrammeMedians } from '@oodikone/shared/types'
 
 export const BreakdownDisplay = ({
@@ -28,6 +29,14 @@ export const BreakdownDisplay = ({
   programmeDataVisible: boolean
   yearLabel: 'Graduation year' | 'Start year'
 }) => {
+  if (!data.length) {
+    return (
+      <Box sx={{ display: 'flex', mb: 1 }}>
+        <StyledMessage showIcon>No data</StyledMessage>
+      </Box>
+    )
+  }
+
   if (!allowExpand) {
     return (
       <Box>
