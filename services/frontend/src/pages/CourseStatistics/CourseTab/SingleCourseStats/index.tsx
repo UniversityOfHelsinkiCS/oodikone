@@ -29,6 +29,7 @@ import {
 import { DropdownOption } from '@/types/dropdownOption'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
+import { enrollmentTimeDateThresholdYearCode } from '@oodikone/shared/util'
 import { countTotalStats } from './countTotalStats'
 import { ResultTabs } from './ResultTabs'
 import { YearFilter } from './YearFilter'
@@ -273,16 +274,19 @@ export const SingleCourseStats = ({
   const countStudentEnrollmentStats = (
     allAttempts: Attempts,
     filteredEnrollments: Enrollment[],
+    allPassedStudents: Set<string>,
     displayEnrollments: boolean
   ) => {
-    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber }) => {
-      const hasFailed = allAttempts.categories.failed ? allAttempts.categories.failed.includes(studentNumber) : false
-      const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentNumber) : false
-      return !hasFailed && !hasPassed
-    })
     if (!displayEnrollments) {
       return { enrolledStudentsWithNoGrade: undefined, totalEnrollments: undefined }
     }
+
+    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber }) => {
+      const hasFailed = allAttempts.categories.failed?.includes(studentNumber) ?? false
+      const hasPassed = allPassedStudents.has(studentNumber)
+      return !hasFailed && !hasPassed
+    })
+
     return {
       enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
       totalEnrollments: filteredEnrollments.length,
@@ -295,6 +299,13 @@ export const SingleCourseStats = ({
     }
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(programmeCodes)
+
+    const allPassedStudents = statistics.filter(isStatInYearRange).reduce((acc, stats) => {
+      stats.attempts.categories.passed.forEach(studentNumber => acc.add(studentNumber))
+
+      return acc
+    }, new Set<string>())
+
     const formattedStats: FormattedStats[] = statistics
       .filter(isStatInYearRange)
       .map(
@@ -309,12 +320,17 @@ export const SingleCourseStats = ({
           allEnrollments = [],
           yearCode,
         }) => {
-          const displayEnrollments = yearCode >= 72 // Display enrollments only for Sisu era
+          const displayEnrollments = yearCode >= enrollmentTimeDateThresholdYearCode // Display enrollments only for Sisu era
           const filteredEnrollments = enrollments.filter(({ studentNumber }) => filter(studentNumber))
           const filteredAllEnrollments = allEnrollments.filter(({ studentNumber }) => filter(studentNumber))
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
-          const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
+          const studentsEnrollments = countStudentEnrollmentStats(
+            allAttempts,
+            filteredEnrollments,
+            allPassedStudents,
+            displayEnrollments
+          )
           const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
           const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name as Name)! : name
@@ -379,6 +395,7 @@ export const SingleCourseStats = ({
     const excludedProgrammes = getExcluded()
     const primaryProgrammes = primary
     const comparisonProgrammes = comparison.filter(code => isValidProgrammeCode(code))
+
     if (comparison.includes('EXCLUDED')) {
       comparisonProgrammes.push(...excludedProgrammes)
     }

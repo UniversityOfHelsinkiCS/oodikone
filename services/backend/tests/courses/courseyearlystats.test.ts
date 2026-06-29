@@ -2,11 +2,11 @@ import { Express } from 'express'
 import assert from 'node:assert/strict'
 import { describe, it, before, after } from 'node:test'
 import { Sequelize } from 'sequelize'
-import request, { Response } from 'supertest'
+import request from 'supertest'
 
 import { dbConnections } from '../../src/database/connection'
 import { CourseYearlyStatsResBody } from '../../src/routes/courses'
-import { initTests } from '../utils'
+import { initTests, ResponseWithBody } from '../utils'
 
 let app: Express
 let connection: Sequelize
@@ -18,9 +18,6 @@ before(async () => {
 after(async () => {
   await connection.close()
 })
-
-// Override Supertest's Response body with our own type
-type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }
 
 void describe('Course yearly statistics', async () => {
   await it('should return nothing with missing parameters', async () => {
@@ -86,7 +83,12 @@ void describe('Course yearly statistics', async () => {
         const stats2017 = body.unifyStats!.statistics.find(year => year.name === '2017-2018')!
         const { studentNumbers } = stats2017.students
         assert(
-          !('509165' in studentNumbers || '455478' in studentNumbers || '457686' in studentNumbers),
+          !(
+            '509165' in studentNumbers ||
+            '455478' in studentNumbers ||
+            '457686' in studentNumbers ||
+            '547994' in studentNumbers
+          ),
           "Students that have completed course later should not be included in the previous year's stats"
         )
         assert.strictEqual(stats2017.students.studentNumbers.length, 23, 'Incorrect amount of total students 2017')
@@ -118,6 +120,21 @@ void describe('Course yearly statistics', async () => {
         assert('enrollments' in stats2017, 'Missing field enrollment in statsitics')
         assert.strictEqual(stats2017.enrollments.length, 0, 'Enrollments found when none should exist')
         assert.strictEqual(stats2017.allEnrollments.length, 0, 'Enrollments found when none should exist')
+      })
+
+      await tt.test('- 2018-2019', () => {
+        const stats2018 = body.unifyStats!.statistics.find(year => year.name === '2018-2019')!
+
+        // There are more students that have passed this course later even though they have failed the course during 2018-2019
+        assert.deepStrictEqual(
+          stats2018.attempts.categories.failed,
+          ['454128', '546124'],
+          'Incorrect students marked as failed 2018'
+        )
+
+        assert.strictEqual(stats2018.attempts.grades['0'].length, 2)
+        assert.strictEqual((stats2018.attempts.grades['Hyl.'] ?? []).length, 0)
+        assert.strictEqual(stats2018.attempts.categories.failed.length, 2, 'Incorrect amount of failed students 2018')
       })
 
       await tt.test('- 2020-2021', () => {
@@ -176,5 +193,23 @@ void describe('Course yearly statistics', async () => {
     await it.todo('should return correct amount of students for a course with substitutions')
     await it.todo('should return correct amount of students for multiple coursecodes without substitutions')
     await it.todo('should return correct amount of students for multiple coursecodes with substitutions')
+
+    await it('should return correct amontu of students for specific problematic courses', async () => {
+      const res = (await request(app)
+        .get('/courseyearlystats?codes=MAT11003&combineSubstitutions=false')
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
+
+      assert.strictEqual(res.status, 200)
+      assert.strictEqual(res.body.length, 1, 'Query to return anything')
+      const body = res.body.at(0)!
+      assert(
+        'unifyStats' in body && 'regularStats' in body && 'openStats' in body,
+        'All keys of courseyearlystats not defined'
+      )
+
+      // assert.strictEqual()
+    })
   })
 })

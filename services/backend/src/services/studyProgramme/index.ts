@@ -3,6 +3,7 @@ import { Op, QueryTypes } from 'sequelize'
 
 import { Name, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
+import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { dbConnections } from '../../database/connection'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, ProgrammeModuleModel } from '../../models'
 import logger from '../../util/logger'
@@ -40,9 +41,16 @@ const removeOpenUniCodePrefix = (code: string) => {
 
 export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   try {
-    const enrollmentsCourses = await EnrollmentModel.findAll({
+    const enrollmentsCourses: Array<
+      Pick<EnrollmentModel, 'studentnumber' | 'course_code' | 'enrollment_date_time' | 'course'>
+    > = await EnrollmentModel.findAll({
       raw: true,
-      attributes: ['studentnumber', 'course_code'],
+      nest: true,
+      attributes: ['studentnumber', 'course_code', 'enrollment_date_time'],
+      include: {
+        model: CourseModel,
+        attributes: ['is_study_module'],
+      },
       where: {
         course_code: {
           [Op.in]: programmeCourses,
@@ -64,20 +72,29 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       allEnrollments.get(code)!.add(studentnumber)
     }
 
-    const credits = await CreditModel.findAll({
-      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
+    // TODO: This is being called for each year, could be optimized to call only once
+    const credits: Array<
+      Pick<
+        CreditModel,
+        'course_code' | 'student_studentnumber' | 'credittypecode' | 'isStudyModule' | 'attainment_date'
+      >
+    > = await CreditModel.findAll({
+      raw: true,
+      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'isStudyModule', 'attainment_date'],
       where: {
         course_code: {
           [Op.in]: programmeCourses,
         },
-        attainment_date: {
-          [Op.between]: [from, to],
-        },
       },
+      order: [['credittypecode', 'ASC']], // Passed credits for a student have to be handled first
     })
+
+    // Pick only this (between to, from) year's credits
+    const filteredCredits = credits.filter(credit => dateIsBetween(credit.attainment_date, from, to))
 
     const courseCodeToName = (
       await CourseModel.findAll({
+        raw: true,
         attributes: ['code', 'name'],
         where: {
           code: programmeCourses,
@@ -88,7 +105,7 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       return acc
     }, new Map())
 
-    const creditCourses = credits.map(credit => ({
+    const creditCourses = filteredCredits.map(credit => ({
       code: removeOpenUniCodePrefix(credit.course_code),
       studentNumber: credit.student_studentnumber,
       creditTypeCode: credit.credittypecode,
@@ -100,6 +117,15 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     const notCompletedByCourseCodes = new Map<string, Set<string>>()
     const courses = new Map<string, { name: Name; isStudyModule: boolean }>()
 
+    const studentHasPassedCourse = (studentNumber: string, courseCode: string) =>
+      !!credits.find(
+        credit =>
+          credit.student_studentnumber === studentNumber &&
+          credit.course_code === courseCode &&
+          CreditModel.passed(credit)
+      ) ||
+      (passedByCourseCodes.get(courseCode)?.has(studentNumber) ?? false)
+
     for (const { code, courseName, creditTypeCode, isStudyModule, studentNumber } of creditCourses) {
       if (!courses.has(code)) {
         courses.set(code, {
@@ -109,29 +135,38 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
         passedByCourseCodes.set(code, new Set())
         notCompletedByCourseCodes.set(code, new Set())
       }
-      if ([CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(creditTypeCode)) {
+
+      if (CreditModel.passed({ credittypecode: creditTypeCode })) {
         passedByCourseCodes.get(code)!.add(studentNumber)
       }
-      if (creditTypeCode === CreditTypeCode.FAILED && !passedByCourseCodes.get(code)!.has(studentNumber)) {
+      if (creditTypeCode === CreditTypeCode.FAILED && !studentHasPassedCourse(studentNumber, code)) {
         notCompletedByCourseCodes.get(code)!.add(studentNumber)
       }
     }
 
-    // If student has enrollments, but no attainment for a particular course, they have no credit info.
-    programmeCourses.forEach(courseCode => {
-      allEnrollments.get(courseCode)?.forEach(studentnumber => {
-        if (!passedByCourseCodes.get(courseCode)?.has(studentnumber)) {
-          notCompletedByCourseCodes.get(courseCode)?.add(studentnumber)
-        }
-      })
-    })
+    // Add course details to courseMap if there are only enrollments
+    for (const { studentnumber: studentNumber, course_code: courseCode, course } of enrollmentsCourses) {
+      if (!courses.has(courseCode)) {
+        courses.set(courseCode, {
+          isStudyModule: course.is_study_module,
+          name: courseCodeToName.get(courseCode)!,
+        })
+        passedByCourseCodes.set(courseCode, new Set())
+        notCompletedByCourseCodes.set(courseCode, new Set())
+      }
 
-    return [...courses.entries()].map(([code, { isStudyModule, name }]) => ({
-      code,
-      name,
-      isStudyModule,
-      allNotPassed: notCompletedByCourseCodes.get(code)?.size ?? 0,
-    }))
+      if (!studentHasPassedCourse(studentNumber, courseCode)) {
+        notCompletedByCourseCodes.get(courseCode)!.add(studentNumber)
+      }
+    }
+    return [...courses.entries()].map(([code, { isStudyModule, name }]) => {
+      return {
+        code,
+        name,
+        isStudyModule,
+        allNotPassed: notCompletedByCourseCodes.get(code)?.size ?? 0,
+      }
+    })
   } catch (error) {
     logger.error(`getNotCompletedForProgrammeCourses failed ${error}`)
     return []

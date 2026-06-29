@@ -1,8 +1,12 @@
 import express from 'express'
+import { Response } from 'supertest'
 
 import { baseUrl } from '../src/config'
 import { initializeDatabaseConnection, dbConnections } from '../src/database/connection'
 import routes from '../src/routes'
+
+/** Override Supertest's Response body with our own type */
+export type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }
 
 export const initTests = async () => {
   // Copied from "app.ts"

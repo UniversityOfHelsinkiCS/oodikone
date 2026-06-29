@@ -145,3 +145,4 @@ export const range = (start: number, end?: number, step?: number): number[] => {
 /** NOTE: Date when Oodikone changed from Oodi to Sisu. Before it
 there are generally no studyright_id attached to enrollments */
 export const enrollmentTimeDateThreshold = new Date('2021-05-31')
+export const enrollmentTimeDateThresholdYearCode = 72

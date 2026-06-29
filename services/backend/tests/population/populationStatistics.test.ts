@@ -2,11 +2,11 @@ import { Express } from 'express'
 import assert from 'node:assert/strict'
 import { describe, it, before } from 'node:test'
 import { Sequelize } from 'sequelize'
-import request, { Response } from 'supertest'
+import request from 'supertest'
 
 import { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
 import { dbConnections } from '../../src/database/connection'
-import { initTests } from '../utils'
+import { initTests, ResponseWithBody } from '../utils'
 
 let app: Express
 let connection: Sequelize
@@ -14,9 +14,6 @@ before(async () => {
   app = await initTests()
   connection = dbConnections.sequelize
 })
-
-// Override Supertest's Response body with our own type
-type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }
 
 const populationUrl = (
   programme = '',
