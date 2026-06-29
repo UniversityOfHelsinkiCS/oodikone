@@ -190,14 +190,20 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
 
       const isNewGroupId = !(groupId in phaseElements)
       if (isNewGroupId) {
-        phaseElements[groupId] = {
-          startDate: getCorrectStartDateForProgramme(
-            phase,
-            Object.keys(phaseElements).length === 0,
-            latestSnapshot,
-            normalizedDateTime
-          ),
-          code: groupIdToCode[groupId],
+        const startDate = getCorrectStartDateForProgramme(
+          phase,
+          Object.keys(phaseElements).length === 0,
+          latestSnapshot,
+          normalizedDateTime
+        )
+        // Prevent creating elements when there is no startDate.
+        // Only such case should be when student would have moved to phase 2 before phase 1 graduation.
+        // See for example person hy-hlo-113973109.
+        if (startDate) {
+          phaseElements[groupId] = {
+            startDate,
+            code: groupIdToCode[groupId],
+          }
         }
       }
 
