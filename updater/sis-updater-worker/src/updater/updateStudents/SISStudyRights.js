@@ -238,11 +238,19 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
     // Solution: if the student is already in phase 2, ignore changes to phase 1 elements.
     // See for example study right hy-opinoik-78676889, order by snapshot_date_time.
     if (educationPhase1GroupId && !lastPhase2Id) {
-      addElementToMap(1, phase1Elements, educationPhase1GroupId, lastPhase1Id)
+      try {
+        addElementToMap(1, phase1Elements, educationPhase1GroupId, lastPhase1Id)
+      } catch (e) {
+        logger.error(`Failed to generate phase 1 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
+      }
     }
 
     if (educationPhase2GroupId) {
-      addElementToMap(2, phase2Elements, educationPhase2GroupId, lastPhase2Id)
+      try {
+        addElementToMap(2, phase2Elements, educationPhase2GroupId, lastPhase2Id)
+      } catch (e) {
+        logger.error(`Failed to generate phase 2 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
+      }
     }
 
     // We only take one study track per groupId (degree programme).
