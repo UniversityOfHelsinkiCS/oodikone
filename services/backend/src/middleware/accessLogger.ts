@@ -38,6 +38,11 @@ const accessLogger = morgan((tokens, req: Request, res: Response): undefined => 
     meta['req-route'] = req.route.path
   }
 
+  // Ignore admin route that is frequently pinged for updates.
+  if (/.*\/updater\/jobs$/.test(meta.url ?? '')) {
+    return
+  }
+
   const message = [
     `${user.mockedBy ? '(mocking) ' : ''}${user.name}`,
     `${(tokens['response-time'](req, res) ?? '0').split('.')[0]} ms`.padEnd(8, ' '),
