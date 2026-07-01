@@ -272,9 +272,8 @@ export const SingleCourseStats = ({
   }
 
   const countStudentEnrollmentStats = (
-    allAttempts: Attempts,
     filteredEnrollments: Enrollment[],
-    allPassedStudents: Set<string>,
+    allStudents: { passed: Set<string>; failed: Set<string> },
     displayEnrollments: boolean
   ) => {
     if (!displayEnrollments) {
@@ -282,8 +281,8 @@ export const SingleCourseStats = ({
     }
 
     const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber }) => {
-      const hasFailed = allAttempts.categories.failed?.includes(studentNumber) ?? false
-      const hasPassed = allPassedStudents.has(studentNumber)
+      const hasFailed = allStudents.failed.has(studentNumber)
+      const hasPassed = allStudents.passed.has(studentNumber)
       return !hasFailed && !hasPassed
     })
 
@@ -300,11 +299,14 @@ export const SingleCourseStats = ({
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(programmeCodes)
 
-    const allPassedStudents = statistics.filter(isStatInYearRange).reduce((acc, stats) => {
-      stats.attempts.categories.passed.forEach(studentNumber => acc.add(studentNumber))
-
-      return acc
-    }, new Set<string>())
+    const allStudents = statistics.filter(isStatInYearRange).reduce(
+      (acc, stats) => {
+        stats.attempts.categories.passed.forEach(studentNumber => acc.passed.add(studentNumber))
+        stats.attempts.categories.failed.forEach(studentNumber => acc.failed.add(studentNumber))
+        return acc
+      },
+      { passed: new Set<string>(), failed: new Set<string>() }
+    )
 
     const formattedStats: FormattedStats[] = statistics
       .filter(isStatInYearRange)
@@ -312,8 +314,8 @@ export const SingleCourseStats = ({
         ({
           code,
           name,
-          students: allStudents,
-          attempts: allAttempts,
+          students,
+          attempts,
           coursecode,
           obfuscated,
           enrollments = [],
@@ -325,20 +327,15 @@ export const SingleCourseStats = ({
           const filteredAllEnrollments = allEnrollments.filter(({ studentNumber }) => filter(studentNumber))
           const totalEnrollments = displayEnrollments ? filteredAllEnrollments.length : undefined
 
-          const studentsEnrollments = countStudentEnrollmentStats(
-            allAttempts,
-            filteredEnrollments,
-            allPassedStudents,
-            displayEnrollments
-          )
-          const attempts = countAttemptStats(allAttempts, totalEnrollments, filter)
-          const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
+          const studentsEnrollments = countStudentEnrollmentStats(filteredEnrollments, allStudents, displayEnrollments)
+          const attemptStats = countAttemptStats(attempts, totalEnrollments, filter)
+          const studentStats = countStudentStats(students, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
           const parsedName = separate ? getTextIn(name as Name)! : name
 
           return {
             name: parsedName,
-            students: { ...students, ...studentsEnrollments },
-            attempts: { ...attempts, totalEnrollments },
+            students: { ...studentStats, ...studentsEnrollments },
+            attempts: { ...attemptStats, totalEnrollments },
             enrollments: filteredEnrollments,
             code,
             coursecode,

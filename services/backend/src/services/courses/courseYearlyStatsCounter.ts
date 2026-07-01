@@ -124,6 +124,7 @@ export class CourseYearlyStatsCounter {
     this.groups[groupCode].students.grades[studentNumber] = { grade, passed }
   }
 
+  /** NOTE: Duplicates are counted by year eg. you can be both in 2022 and 2023 enrollments */
   public markEnrollmentToGroup(
     studentNumber: string,
     enrollmentDateTime: Date,

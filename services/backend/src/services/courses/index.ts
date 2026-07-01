@@ -126,15 +126,15 @@ const parseEnrollment = (
     studyright_id: studyRightId,
   } = enrollment
 
-  const programmeOfCredit: SISStudyRightElementModel | undefined =
+  const programmeOfEnrollment: SISStudyRightElementModel | undefined =
     studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
     studyRightElements
       .filter(({ startDate, endDate }) => dateIsBetween(enrollmentDateTime, startDate, endDate))
       .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
       .at(0) // The newest studyRightElement
 
-  const programme = programmeOfCredit
-    ? formatStudyRightElement(programmeOfCredit)
+  const programme = programmeOfEnrollment
+    ? formatStudyRightElement(programmeOfEnrollment)
     : {
         code: 'OTHER',
         name: { en: 'Other', fi: 'Muu', sv: 'Andra' },

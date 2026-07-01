@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
-import { EnrollmentState, Unification } from '@oodikone/shared/types'
+import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
 import {
   StudentModel,
@@ -40,6 +40,7 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
             [Op.in]: allCourseCodes,
           },
           is_open: getIsOpen(unification),
+          credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
         },
         order: [['attainment_date', 'ASC']],
         include: [
