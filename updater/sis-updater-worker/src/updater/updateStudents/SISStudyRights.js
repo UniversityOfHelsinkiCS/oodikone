@@ -196,14 +196,14 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
           latestSnapshot,
           normalizedDateTime
         )
-        // Prevent creating elements when there is no startDate.
-        // Only such case should be when student would have moved to phase 2 before phase 1 graduation.
-        // See for example person hy-hlo-113973109.
-        if (startDate) {
-          phaseElements[groupId] = {
-            startDate,
-            code: groupIdToCode[groupId],
-          }
+        // Skip creation of elements when there is no startDate.
+        // This happens when student would seem to have moved to phase 2 before phase 1 graduation.
+        // Sometimes there are multiple different phase 2 educations.
+        // See for example hy-opinoik-120362178 and hy-opinoik-96636971.
+        if (!startDate) return
+        phaseElements[groupId] = {
+          startDate,
+          code: groupIdToCode[groupId],
         }
       }
 
