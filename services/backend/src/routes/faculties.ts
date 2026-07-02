@@ -224,7 +224,7 @@ export type DegreeProgramme = Pick<
   'code' | 'name' | 'degreeProgrammeType' | 'progId'
 >
 
-type GetStudetStatsResBody = {
+type GetStudentStatsResBody = {
   id: string
   years: string[]
   facultyTableStats: Record<string, (number | string)[]>
@@ -241,7 +241,7 @@ type GetStudetStatsResBody = {
 
 router.get<
   GetStatsParams,
-  CanError<GetStudetStatsResBody, GenericApplicationError>,
+  CanError<GetStudentStatsResBody, GenericApplicationError>,
   GetStatsReqBody,
   GetProgressStatsQuery
 >('/:id/studentstats', auth.roles(['facultyStatistics']), async (req, res) => {
