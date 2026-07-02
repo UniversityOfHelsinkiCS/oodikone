@@ -6,7 +6,8 @@ import { utils, writeFile } from 'xlsx'
 import { facultyToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps, GraduationView } from '@/components/GraduationTimes'
+import { GraduationModeSelector } from '@/components/GraduationTimes/ModeSelector'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { useGetFacultyGraduationTimesQuery } from '@/redux/facultyStats'
@@ -23,7 +24,7 @@ export const GraduationTimesTab = ({
   studyProgrammes: boolean
 }) => {
   const { getTextIn } = useLanguage()
-  const [showMedian, setShowMedian] = useState(false)
+  const [view, setView] = useState<GraduationView>('breakdown')
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_DEGREE_PROGRAMMES'
 
@@ -44,6 +45,7 @@ export const GraduationTimesTab = ({
   const classSizes = data?.classSizes
 
   const isError = queryError || (querySuccess && !data)
+  const isDisabled = isError || isFetching
 
   const commonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'level' | 'title'> = {
     allowExpand: true,
@@ -54,7 +56,7 @@ export const GraduationTimesTab = ({
     isLoading: isFetching,
     mode: 'programme',
     names: data?.programmeNames,
-    showMedian,
+    view,
     yearLabel,
   } as const
 
@@ -92,6 +94,7 @@ export const GraduationTimesTab = ({
             'Max. year overtime': item.statistics.yearOver ?? 0,
             Overtime: item.statistics.wayOver ?? 0,
             'Median study time (semesters)': item.median ?? 0,
+            'Average study time (semesters)': item.average ?? 0,
           })
         })
       })
@@ -113,16 +116,8 @@ export const GraduationTimesTab = ({
       >
         <ToggleContainer>
           <Toggle
-            cypress="graduation-time-toggle"
-            disabled={isError || isFetching}
-            firstLabel="Breakdown"
-            secondLabel="Median study times"
-            setValue={setShowMedian}
-            value={showMedian}
-          />
-          <Toggle
             cypress="group-by-toggle"
-            disabled={isError || isFetching}
+            disabled={isDisabled}
             firstLabel="Group by: Graduation year"
             secondLabel="Starting year"
             setValue={setGroupByStartYear}
@@ -130,13 +125,14 @@ export const GraduationTimesTab = ({
           />
           <Toggle
             cypress="programme-toggle"
-            disabled={isError || isFetching}
+            disabled={isDisabled}
             firstLabel="New degree programmes"
             infoBoxContent={facultyToolTips.common.programmeToggle}
             secondLabel="All degree programmes"
             setValue={setStudyProgrammes}
             value={studyProgrammes}
           />
+          <GraduationModeSelector disabled={isDisabled} setValue={setView} value={view} />
         </ToggleContainer>
       </Section>
       <Stack gap={2}>

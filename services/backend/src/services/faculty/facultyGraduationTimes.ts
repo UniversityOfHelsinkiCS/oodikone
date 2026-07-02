@@ -1,7 +1,7 @@
 import { Name, DegreeProgrammeType, FacultyGraduationStatistics, ClassSizes } from '@oodikone/shared/types'
 import type {
   GraduationStatistics,
-  MedianEntry,
+  GraduationStats,
   MediansByCategory,
   MediansByProgrammes,
   ProgrammeGraduationStats,
@@ -11,7 +11,7 @@ import { omitKeys } from '@oodikone/shared/util'
 import { getGraduationStats, getStudyTrackStats, setGraduationStats, setStudyTrackStats } from '../analyticsService'
 import { GraduationTarget } from '../graduationHelpers'
 import { getGraduationStatsForStudyTrack } from '../studyProgramme/studyProgrammeGraduations'
-import { getMedian } from '../studyProgramme/studyProgrammeHelpers'
+import { getAverage, getMedian } from '../studyProgramme/studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from '../studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../studyProgramme/studyTrackStats'
 import type { ProgrammesOfOrganization } from './faculty'
@@ -22,20 +22,18 @@ export const programmeTypes = {
   [DegreeProgrammeType.DOCTOR]: 'doctor',
 } as const
 
-const setYearlyBreakdown = (code: string, progId: string, level: ProgrammeMedians, year: MedianEntry) => {
-  if (year.y === 0) return
+const setYearlyBreakdown = (code: string, name: string, level: ProgrammeMedians, year: GraduationStats) => {
+  if (!year.times.length) return
 
   level[year.name] ??= { data: [], programmes: [] }
   level[year.name].programmes.push(code)
-  level[year.name].data.push(
-    omitKeys({ ...structuredClone(year), name: progId, code, median: year.y }, ['y', 'classSize'])
-  )
+  level[year.name].data.push(omitKeys({ ...structuredClone(year), name, code }, ['classSize']))
 }
 
 const mergeStats = (
   medians: MediansByCategory,
   level: keyof MediansByCategory,
-  statsForYear: MedianEntry,
+  statsForYear: GraduationStats,
   classSizes?: ClassSizes
 ) => {
   if (classSizes) {
@@ -46,10 +44,11 @@ const mergeStats = (
   const gradStatsForYear = medians[level].find(entry => entry.name === statsForYear.name)
 
   if (!gradStatsForYear) {
-    medians[level].push({ ...omitKeys(structuredClone(statsForYear), ['y']), median: statsForYear.y })
+    medians[level].push(structuredClone(statsForYear))
   } else {
     gradStatsForYear.times.push(...statsForYear.times)
     gradStatsForYear.median = getMedian(gradStatsForYear.times)
+    gradStatsForYear.average = getAverage(gradStatsForYear.times)
     gradStatsForYear.amount += statsForYear.amount
     gradStatsForYear.statistics.onTime += statsForYear.statistics.onTime
     gradStatsForYear.statistics.yearOver += statsForYear.statistics.yearOver

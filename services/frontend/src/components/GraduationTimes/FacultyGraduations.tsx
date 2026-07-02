@@ -1,12 +1,12 @@
 import Stack from '@mui/material/Stack'
 
-import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps, GraduationView } from '@/components/GraduationTimes'
 import { ClassSizes, UniversityGraduationStatistics } from '@oodikone/shared/types/graduations'
 
 type UniFacultyGraduationsProps = {
   isError: boolean
   isLoading: boolean
-  showMedian: boolean
+  view: GraduationView
   faculty?: string
   universityMode: true
   data: UniversityGraduationStatistics | undefined
@@ -21,7 +21,7 @@ export const FacultyGraduations = ({
   faculty,
   isError,
   isLoading,
-  showMedian,
+  view,
   universityMode,
 }: UniFacultyGraduationsProps) => {
   const medians = data?.byGradYear.medians
@@ -40,7 +40,7 @@ export const FacultyGraduations = ({
     isError,
     isLoading,
     mode: universityMode ? ('faculty' as const) : ('programme' as const),
-    showMedian,
+    view,
     yearLabel: 'Graduation year' as const,
   } as const
 
