@@ -11,6 +11,7 @@ import { StackedBarChart } from '@/components/Charts/StackedBarChart'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
 import { GraduationTimes, type GraduationTimesProps } from '@/components/GraduationTimes'
+import { GraduationModeSelector } from '@/components/GraduationTimes/ModeSelector'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { DataTable } from '@/components/StudyProgramme/DataTable'
@@ -42,7 +43,7 @@ export const BasicInformationTab = ({
   specialGroupsExcluded: boolean
   studyProgramme: string
 }) => {
-  const [showMedian, setShowMedian] = useState(false)
+  const [view, setView] = useState<GraduationTimesProps['view']>('breakdown')
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const specialGroups = specialGroupsExcluded ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -73,8 +74,6 @@ export const BasicInformationTab = ({
   const secondCreditGraphStats = secondStats ? makeGraphData(secondStats, academicYear) : null
 
   const doCombo = graduations?.data?.doCombo
-  const timesData = graduations?.data?.graduationTimes
-  const timesDataSecondProgramme = graduations?.data?.graduationTimesSecondProgramme
 
   const basicsIsLoading = basics.isLoading || basics.isFetching
   const creditsIsLoading = credits.isLoading || credits.isFetching
@@ -92,7 +91,7 @@ export const BasicInformationTab = ({
     isError: graduationsIsError,
     isLoading: graduationsIsLoading,
     mode: 'programme',
-    showMedian,
+    view,
     yearLabel: 'Graduation year',
   } as const
 
@@ -223,66 +222,32 @@ export const BasicInformationTab = ({
         {graduations.isSuccess && graduations.data ? (
           <Stack gap={2}>
             <ToggleContainer>
-              <Toggle
-                cypress="graduation-time-toggle"
-                firstLabel="Breakdown"
-                secondLabel="Median time"
-                setValue={setShowMedian}
-                value={showMedian}
-              />
+              <GraduationModeSelector setValue={setView} value={view} />
             </ToggleContainer>
-            {showMedian ? (
-              <>
-                {doCombo ? (
-                  <GraduationTimes
-                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
-                    goal={graduations?.data?.comboTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme, true)}
-                    {...commonProps}
-                  />
-                ) : null}
+            <>
+              {doCombo ? (
                 <GraduationTimes
-                  data={graduations.data?.graduationTimes.medians.map(item => ({ median: item.y, ...item }))}
-                  goal={graduations?.data?.graduationTimes?.goal}
-                  title={getGraduationGraphTitle(studyProgramme, false)}
+                  data={graduations.data?.comboTimes.medians}
+                  goal={graduations?.data?.comboTimes?.goal}
+                  title={getGraduationGraphTitle(studyProgramme, true)}
                   {...commonProps}
                 />
-                {combinedProgramme ? (
-                  <GraduationTimes
-                    data={graduations.data?.graduationTimesSecondProgramme.medians.map(item => ({
-                      median: item.y,
-                      ...item,
-                    }))}
-                    goal={graduations?.data?.graduationTimesSecondProgramme?.goal}
-                    title={getGraduationGraphTitle(combinedProgramme, true)}
-                    {...commonProps}
-                  />
-                ) : null}
-              </>
-            ) : (
-              <>
-                {doCombo ? (
-                  <GraduationTimes
-                    data={graduations.data?.comboTimes.medians.map(item => ({ median: item.y, ...item }))}
-                    goal={graduations?.data?.comboTimes?.goal}
-                    title={getGraduationGraphTitle(studyProgramme, true)}
-                    {...commonProps}
-                  />
-                ) : null}
+              ) : null}
+              <GraduationTimes
+                data={graduations.data?.graduationTimes.medians}
+                goal={graduations?.data?.graduationTimes?.goal}
+                title={getGraduationGraphTitle(studyProgramme, false)}
+                {...commonProps}
+              />
+              {combinedProgramme ? (
                 <GraduationTimes
-                  data={timesData?.medians.map(item => ({ median: item.y, ...item }))}
-                  title={getGraduationGraphTitle(studyProgramme, false)}
+                  data={graduations.data?.graduationTimesSecondProgramme.medians}
+                  goal={graduations?.data?.graduationTimesSecondProgramme?.goal}
+                  title={getGraduationGraphTitle(combinedProgramme, true)}
                   {...commonProps}
                 />
-                {combinedProgramme ? (
-                  <GraduationTimes
-                    data={timesDataSecondProgramme?.medians.map(item => ({ median: item.y, ...item }))}
-                    title={getGraduationGraphTitle(combinedProgramme, true)}
-                    {...commonProps}
-                  />
-                ) : null}
-              </>
-            )}
+              ) : null}
+            </>
           </Stack>
         ) : null}
       </Section>

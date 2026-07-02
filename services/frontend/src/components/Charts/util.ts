@@ -24,6 +24,11 @@ const resolveCourseCode = (course: CourseWithCode) => course.course_code ?? cour
 
 const toMillis = (date: Date | string) => new Date(date).getTime()
 
+export const getHeight = (data: unknown[]) => {
+  const multiplier = data.length > 8 ? 35 : 55
+  return data.length * multiplier + 100
+}
+
 /** expandKey is only provided to the expanded instance of a chart */
 export const getSeriesLabel = (expandKey: string | undefined | null, yearLabel: string | undefined, mode: string) =>
   expandKey ? `${mode.charAt(0).toUpperCase()}${mode.slice(1)}` : yearLabel

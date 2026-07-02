@@ -41,6 +41,7 @@ export type { Role } from './role'
 export type {
   GraduationTimes,
   Module,
+  ProgrammeOrStudyTrackGraduationStats,
   ProgrammeCourse,
   ProgrammeModule,
   ProgrammeGraduationStats,

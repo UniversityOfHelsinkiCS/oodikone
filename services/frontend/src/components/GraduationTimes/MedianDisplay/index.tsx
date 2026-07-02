@@ -14,6 +14,7 @@ import type {
 
 type MedianDisplayProps = {
   mode: 'faculty' | 'programme' | 'study track'
+  variant: 'median' | 'average'
   classSizes: ClassSizes | ProgrammeClassSizes | undefined
   allowExpand: boolean
   names: Record<string, string | Name> | Record<string, Name | NameWithCode> | undefined
@@ -45,6 +46,7 @@ export const MedianDisplay = ({
   names,
   programmeDataVisible,
   title,
+  variant,
   yearLabel,
 }: MedianDisplayProps) => {
   return (
@@ -55,6 +57,7 @@ export const MedianDisplay = ({
           data in Sisu
         </Typography>
       )}
+
       {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) ? (
         <Typography>
           <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring, but
@@ -74,6 +77,7 @@ export const MedianDisplay = ({
           handleClick={handleClick}
           mode={mode}
           title={title}
+          variant={variant}
           yearLabel={yearLabel}
         />
       ) : (
@@ -95,6 +99,7 @@ export const MedianDisplay = ({
             mode={mode}
             names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
             title={title}
+            variant={variant}
             yearLabel={yearLabel}
           />
           {programmeDataVisible && expandKey && levelProgrammeData && expandKey in levelProgrammeData ? (
@@ -112,6 +117,7 @@ export const MedianDisplay = ({
               mode={mode}
               names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode> as any) : undefined}
               title={title}
+              variant={variant}
               yearLabel={yearLabel}
             />
           ) : (

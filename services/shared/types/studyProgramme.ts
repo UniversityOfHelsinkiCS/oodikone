@@ -19,15 +19,14 @@ export type Goals = {
   combo: number
 }
 
-export type GraduationTimes = Record<
-  string,
-  {
-    medians: {
-      basic: GraduationStats[]
-      combo: GraduationStats[]
-    }
+export type ProgrammeOrStudyTrackGraduationStats = {
+  medians: {
+    basic: GraduationStats[]
+    combo: GraduationStats[]
   }
-> & {
+}
+
+export type GraduationTimes = Record<string, ProgrammeOrStudyTrackGraduationStats> & {
   goals: Goals
 }
 

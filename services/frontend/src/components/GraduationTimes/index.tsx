@@ -12,6 +12,7 @@ import {
   ProgrammeMedians,
 } from '@oodikone/shared/types'
 
+export type GraduationView = 'breakdown' | 'median' | 'average'
 export type GraduationTimesProps = {
   mode: 'faculty' | 'programme' | 'study track' // "Mode" is one step below the current view in hierarchy e.g. viewing a programme overview -> mode should be study track
   classSizes?: ClassSizes | ProgrammeClassSizes | undefined
@@ -25,7 +26,7 @@ export type GraduationTimesProps = {
   level?: 'unset' | 'bachelor' | 'master' | 'bcMsCombo' | 'doctor'
   levelProgrammeData?: ProgrammeMedians
   names?: Record<string, Name | NameWithCode> | Record<string, string | Name>
-  showMedian: boolean
+  view: GraduationView
   title: string
   yearLabel: 'Graduation year' | 'Start year'
 }
@@ -43,12 +44,12 @@ export const GraduationTimes = ({
   levelProgrammeData,
   mode,
   names,
-  showMedian,
+  view,
   title,
   yearLabel,
 }: GraduationTimesProps) => {
   const [programmeDataVisible, setProgrammeDataVisible] = useState(false)
-  const [expandKey, setExpandKey] = useState<string | null>(null)
+  const [expandKey, setExpandKey] = useState<string>('')
 
   const handleClick = (category: string) => {
     if (category) {
@@ -56,7 +57,7 @@ export const GraduationTimes = ({
       setProgrammeDataVisible(true)
     } else {
       setProgrammeDataVisible(false)
-      setExpandKey(null)
+      setExpandKey('')
     }
   }
 
@@ -68,7 +69,7 @@ export const GraduationTimes = ({
 
   return (
     <Section cypress={`${level}-graduation-times`} isError={isError} isLoading={isLoading} title={title}>
-      {!showMedian ? (
+      {view === 'breakdown' && (
         <BreakdownDisplay
           allowExpand={allowExpand}
           data={sortedData!}
@@ -81,7 +82,8 @@ export const GraduationTimes = ({
           programmeDataVisible={programmeDataVisible}
           yearLabel={yearLabel}
         />
-      ) : (
+      )}
+      {view === 'median' && (
         <MedianDisplay
           allowExpand={allowExpand}
           classSizes={classSizes}
@@ -97,6 +99,27 @@ export const GraduationTimes = ({
           names={names ?? {}}
           programmeDataVisible={programmeDataVisible}
           title={title}
+          variant="median"
+          yearLabel={yearLabel}
+        />
+      )}
+      {view === 'average' && (
+        <MedianDisplay
+          allowExpand={allowExpand}
+          classSizes={classSizes}
+          data={sortedData!}
+          expandKey={expandKey}
+          goal={goal}
+          goalExceptions={goalExceptions}
+          groupBy={groupBy}
+          handleClick={handleClick}
+          level={level}
+          levelProgrammeData={levelProgrammeData}
+          mode={mode}
+          names={names ?? {}}
+          programmeDataVisible={programmeDataVisible}
+          title={title}
+          variant="average"
           yearLabel={yearLabel}
         />
       )}

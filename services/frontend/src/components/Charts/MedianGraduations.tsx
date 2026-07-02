@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import useTheme from '@mui/material/styles/useTheme'
 import ReactECharts from 'echarts-for-react'
 
-import { getOnEvents, getSeriesLabel } from '@/components/Charts/util'
+import { getHeight, getOnEvents, getSeriesLabel } from '@/components/Charts/util'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import type { ClassSizes, GraduationTimeCategories, GraduationStats, Name, NameWithCode } from '@oodikone/shared/types'
 
@@ -22,6 +22,7 @@ export const MedianGraduations = ({
   names,
   title,
   yearLabel,
+  variant,
 }: {
   classSizes?: ClassSizes['programmes']
   cypress: string
@@ -37,13 +38,15 @@ export const MedianGraduations = ({
   names?: Record<string, Name | NameWithCode>
   title: string
   yearLabel: 'Graduation year' | 'Start year'
+  variant: 'median' | 'average'
 }) => {
   const { language } = useLanguage()
   const theme = useTheme()
+  const isMedian = variant === 'median'
 
+  // Change colors for longer goal times
   let modData: GraduationPoint[] | null = null
   if (!expandKey && goalExceptions?.needed && level && ['master', 'bcMsCombo'].includes(level)) {
-    // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
     if (modData) {
       for (const item of modData) {
@@ -82,11 +85,6 @@ export const MedianGraduations = ({
     return `${amount} graduated`
   }
 
-  const getHeight = () => {
-    const multiplier = data.length > 8 ? 35 : 55
-    return data.length * multiplier + 100
-  }
-
   const getFacultyOrProgrammeName = (code: string) => {
     if (!names) {
       return ''
@@ -106,7 +104,7 @@ export const MedianGraduations = ({
       yearLabel === 'Start year'
         ? `<b class="grad-vals">From class of ${expandKey ?? name}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b class="grad-vals">${amount} students graduated in year ${expandKey ?? name}</b>`
-    const timeText = `<br />${sortingText}<br /><b>median study time: ${median} semesters</b><br />`
+    const timeText = `<br />${sortingText}<br /><b>${isMedian ? 'median' : 'average'} study time: ${median} semesters</b><br />`
     const statisticsText = `<br />${statistics?.onTime} graduated on time<br />${statistics?.yearOver} graduated max year overtime<br />${statistics?.wayOver} graduated over year late`
 
     if (expandKey) {
@@ -116,29 +114,23 @@ export const MedianGraduations = ({
     return `${timeText}${statisticsText}`
   }
 
-  const resolveBarColor = (median: number, override?: string) => {
-    if (override) {
-      return override
-    }
-    if (median <= goal) {
-      return theme.palette.graduationTimes.onTime
-    }
-    if (median <= goal + 2) {
-      return theme.palette.graduationTimes.yearOver
-    }
+  const resolveBarColor = (value: number, override?: string) => {
+    if (override) return override
+    if (value <= goal) return theme.palette.graduationTimes.onTime
+    if (value <= goal + 2) return theme.palette.graduationTimes.yearOver
     return theme.palette.graduationTimes.wayOver
   }
 
   const dataWithOverrides: GraduationPoint[] = modData ?? data
   const seriesData = dataWithOverrides.map(item => ({
-    value: item.median,
+    value: isMedian ? item.median : item.average,
     name: item.name.toString(),
     code: item.code ?? item.name,
     amount: item.amount,
     statistics: item.statistics,
     realGoal: item.realGoal,
     itemStyle: {
-      color: resolveBarColor(item.median, item.color),
+      color: resolveBarColor(isMedian ? item.median : item.average, item.color),
     },
   }))
 
@@ -183,7 +175,7 @@ export const MedianGraduations = ({
     toolbox: {
       feature: {
         saveAsImage: {
-          name: 'Oodikone-graduation-medians',
+          name: `Oodikone-graduation-${isMedian ? 'medians' : 'averages'}`,
         },
       },
     },
@@ -258,7 +250,7 @@ export const MedianGraduations = ({
         onEvents={getOnEvents(handleClick)}
         option={option}
         opts={{ renderer: 'svg' }}
-        style={{ height: getHeight() }}
+        style={{ height: getHeight(data) }}
       />
     </Box>
   )

@@ -9,7 +9,8 @@ import { getTargetCreditsForProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
-import { GraduationTimes, GraduationTimesProps } from '@/components/GraduationTimes'
+import { GraduationTimes, GraduationTimesProps, GraduationView } from '@/components/GraduationTimes'
+import { GraduationModeSelector } from '@/components/GraduationTimes/ModeSelector'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { exportStudentTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/exportStudentTable'
@@ -23,12 +24,7 @@ import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { hasAccessToProgrammePopulation } from '@/util/access'
 import { calculateStats } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
-import {
-  ProgrammeOrStudyTrackGraduationStats,
-  ProgrammeClassSizes,
-  ProgrammeMedians,
-  MedianEntry,
-} from '@oodikone/shared/types'
+import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@oodikone/shared/types'
 
 export const StudyTracksAndClassStatisticsTab = ({
   combinedProgramme,
@@ -44,7 +40,7 @@ export const StudyTracksAndClassStatisticsTab = ({
   const { getTextIn } = useLanguage()
 
   const [studyTrack, setStudyTrack] = useState(studyProgramme)
-  const [showMedian, setShowMedian] = useState(false)
+  const [view, setView] = useState<GraduationView>('breakdown')
   const [showPercentages, setShowPercentages] = useState(false)
 
   const { fullAccessToStudentData, programmeRights } = useGetAuthorizedUserQuery()
@@ -137,10 +133,12 @@ export const StudyTracksAndClassStatisticsTab = ({
     ) as [string, ProgrammeOrStudyTrackGraduationStats][]
 
     const studyTrackStatsGraduationStats = graduationStats.reduce<ProgrammeMedians>((acc, [programme, { medians }]) => {
-      for (const { name, amount, statistics, y, times } of Object.values(combo ? medians.combo : medians.basic)) {
+      for (const { name, amount, statistics, median, times, average } of Object.values(
+        combo ? medians.combo : medians.basic
+      )) {
         acc[name] ??= { data: [], programmes: [] }
         acc[name].programmes.push(programme)
-        acc[name].data.push({ amount, name: programme, statistics, code: programme, median: y, times })
+        acc[name].data.push({ amount, name: programme, statistics, code: programme, median, average, times })
       }
 
       return acc
@@ -187,17 +185,13 @@ export const StudyTracksAndClassStatisticsTab = ({
           combo: {},
         }
 
-  const formatMedianEntries = (item: MedianEntry) => ({ median: item.y, ...item })
-
   const graduationTimeCommonProps: Omit<GraduationTimesProps, 'data' | 'goal' | 'title'> = {
     allowExpand: hasStudyTracks,
     isError: hasErrors,
     isLoading: isFetching,
     goalExceptions: { needed: false },
-
     names: studyTrackStats?.studyTracks,
-    showMedian,
-
+    view,
     mode: 'study track',
     yearLabel: 'Start year',
   } as const
@@ -327,20 +321,14 @@ export const StudyTracksAndClassStatisticsTab = ({
         >
           <Stack gap={2}>
             <ToggleContainer>
-              <Toggle
-                cypress="graduation-time-toggle"
-                firstLabel="Breakdown"
-                secondLabel="Median times"
-                setValue={setShowMedian}
-                value={showMedian}
-              />
+              <GraduationModeSelector setValue={setView} value={view} />
             </ToggleContainer>
             {hasStudyTracks ? (
               <Stack gap={2}>
                 {studyTrackStats.doCombo && !!studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats ? (
                   <GraduationTimes
                     classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes}
-                    data={studyTrackStats.graduationTimes[studyProgramme].medians.combo.map(formatMedianEntries)}
+                    data={studyTrackStats.graduationTimes[studyProgramme].medians.combo}
                     goal={studyTrackStats.graduationTimes.goals.combo}
                     levelProgrammeData={studyTrackStatsGraduationStats.combo.studyTrackStatsGraduationStats}
                     title={getGraduationGraphTitle(studyProgramme, true)}
@@ -350,7 +338,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                 {!!studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats && (
                   <GraduationTimes
                     classSizes={studyTrackStatsGraduationStats.basic.studyTrackStatsClassSizes}
-                    data={studyTrackStats.graduationTimes[studyProgramme].medians.basic.map(formatMedianEntries)}
+                    data={studyTrackStats.graduationTimes[studyProgramme].medians.basic}
                     goal={studyTrackStats.graduationTimes.goals.basic}
                     levelProgrammeData={studyTrackStatsGraduationStats.basic.studyTrackStatsGraduationStats}
                     title={getGraduationGraphTitle(studyProgramme, false)}
@@ -362,7 +350,7 @@ export const StudyTracksAndClassStatisticsTab = ({
               <Stack gap={2}>
                 {studyTrackStats.doCombo ? (
                   <GraduationTimes
-                    data={studyTrackStats.graduationTimes[studyTrack].medians.combo.map(formatMedianEntries)}
+                    data={studyTrackStats.graduationTimes[studyTrack].medians.combo}
                     goal={studyTrackStats.graduationTimes.goals.combo}
                     title={getGraduationGraphTitle(studyProgramme, true)}
                     {...graduationTimeCommonProps}
@@ -370,7 +358,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                 ) : null}
                 <GraduationTimes
                   classSizes={studyTrackStatsGraduationStats.basic.studyTrackStatsClassSizes}
-                  data={studyTrackStats.graduationTimes[studyTrack].medians.basic.map(formatMedianEntries)}
+                  data={studyTrackStats.graduationTimes[studyTrack].medians.basic}
                   goal={studyTrackStats.graduationTimes.goals.basic}
                   title={getGraduationGraphTitle(studyProgramme, false)}
                   {...graduationTimeCommonProps}
@@ -378,9 +366,7 @@ export const StudyTracksAndClassStatisticsTab = ({
                 {!!combinedProgramme && (
                   <GraduationTimes
                     classSizes={studyTrackStatsGraduationStats.combo.studyTrackStatsClassSizes}
-                    data={studyTrackStats.graduationTimesSecondProg[combinedProgramme].medians.combo.map(
-                      formatMedianEntries
-                    )}
+                    data={studyTrackStats.graduationTimesSecondProg[combinedProgramme].medians.combo}
                     goal={studyTrackStats.graduationTimesSecondProg.goals.combo}
                     title={getGraduationGraphTitle(combinedProgramme, true)}
                     {...graduationTimeCommonProps}
