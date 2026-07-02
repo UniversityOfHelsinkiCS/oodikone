@@ -150,7 +150,7 @@ export const updateSISStudyRights = async (groupedStudyRights, personIdToStudent
  * this can be seen by observing changes in the said groupIds between snapshots.
  * Therefore, to get the time of transfer, the `snapshotDateTime` of the snapshot where the education has changed is used.
  *
- * If a previous snapshot has no educationGroupId for phase 2, but a following one does, this indicates graduation and moving to the higher (master's level) degree programme, and so on.
+ * If a previous snapshot has no educationGroupId for phase 2, but a following one does, this indicates graduation and moving to the higher (master's level) degree programme. Sometimes educationGroupIds for both phases 1 and 2 are granted simultaneously. In this case the student is assumed to be in phase 1 studies until a graduation for the phase exists.
  *
  * This iterates through the snapshots in chronological order and creates relevant entities from that.
  *
@@ -163,6 +163,8 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
 
   let lastPhase1Id = null
   let lastPhase2Id = null
+  let graduatedPhase1 = false
+  let graduatedPhase2 = false
 
   for (let i = studyRightSnapshots.length - 1; i >= 0; i--) {
     const snapshot = studyRightSnapshots[i]
@@ -178,6 +180,7 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
         educationPhase2ChildGroupId,
       },
       valid,
+      study_right_graduation,
     } = snapshot
 
     // snapshot_date_time is not always defined (at least with some non-degree-leading programmes)
@@ -190,20 +193,14 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
 
       const isNewGroupId = !(groupId in phaseElements)
       if (isNewGroupId) {
-        const startDate = getCorrectStartDateForProgramme(
-          phase,
-          Object.keys(phaseElements).length === 0,
-          latestSnapshot,
-          normalizedDateTime
-        )
-        // Skip creation of elements when there is no startDate.
-        // This happens when student would seem to have moved to phase 2 before phase 1 graduation.
-        // Sometimes there are multiple different phase 2 educations.
-        // See for example hy-opinoik-120362178 and hy-opinoik-96636971.
-        if (!startDate) return
         phaseElements[groupId] = {
-          startDate,
           code: groupIdToCode[groupId],
+          startDate: getCorrectStartDateForProgramme(
+            phase,
+            Object.keys(phaseElements).length === 0,
+            latestSnapshot,
+            normalizedDateTime
+          ),
         }
       }
 
@@ -213,9 +210,9 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
       // Therefore the previous element must come to an end.
       if (lastPhaseId !== null && lastPhaseId !== groupId) {
         // EXCEPTION: If student seems to move programmes as follows "a" -> "b" -> "a"
-        // This is likely a misregistration by some official. In this case drop "b" programme completely.
+        // This is likely a mistake in the data. In this case drop "b" programme completely.
         // See for example study right hy-opinoik-130863612
-        // Oodikone can't display (as of writing) the same study right element twice with different start/enddates.
+        // (Oodikone can't display the same study right element twice with different start/enddates anyway).
         if (!isNewGroupId) {
           delete phaseElements[lastPhaseId]
           delete phaseElements[groupId]['endDate']
@@ -226,28 +223,36 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
 
       if (phase === 1) {
         lastPhase1Id = groupId
+        if (study_right_graduation?.phase1GraduationDate) {
+          phaseElements[groupId]['endDate'] = normalizeDateTime(study_right_graduation.phase1GraduationDate)
+          graduatedPhase1 = true
+        }
       } else {
         lastPhase2Id = groupId
+        if (study_right_graduation?.phase2GraduationDate) {
+          phaseElements[groupId]['endDate'] = normalizeDateTime(study_right_graduation.phase2GraduationDate)
+          graduatedPhase2 = true
+        }
       }
     }
 
-    // If a teacher/administrator/someone makes adjustments to a study right, a new snapshot is created.
-    // Sometimes such changes are made to student's phase 1 studies when the student has already moved to phase 2.
+    // Whenever adjustments are made to a study right, a new snapshot is created.
+    // Sometimes such adjustments are made to student's phase 1 studies when the student has already moved to phase 2.
     // In this case a new snapshot is created that could be missing the phase 2 entirely,
-    // making the ordered-by-date snapshots no longer depict the study right events in chronological order.
-    // Solution: if the student is already in phase 2, ignore changes to phase 1 elements.
+    // making the snapshots (ordered by snapshot_date_time) no longer depict the study right events in chronological order.
+    // Solution: ignore events to phases where student has already graduated.
     // See for example study right hy-opinoik-78676889, order by snapshot_date_time.
-    if (educationPhase1GroupId && !lastPhase2Id) {
+    if (educationPhase1GroupId && !graduatedPhase1) {
       try {
-        addElementToMap(1, phase1Elements, educationPhase1GroupId, lastPhase1Id)
+        addElementToMap(1, phase1Elements, educationPhase1GroupId)
       } catch (e) {
         logger.error(`Failed to generate phase 1 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
       }
     }
 
-    if (educationPhase2GroupId) {
+    if (educationPhase2GroupId && graduatedPhase1 && !graduatedPhase2) {
       try {
-        addElementToMap(2, phase2Elements, educationPhase2GroupId, lastPhase2Id)
+        addElementToMap(2, phase2Elements, educationPhase2GroupId)
       } catch (e) {
         logger.error(`Failed to generate phase 2 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
       }
@@ -270,33 +275,6 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
 
     addStudyTracks(educationPhase1GroupId, educationPhase1ChildGroupId, phase1Elements)
     addStudyTracks(educationPhase2GroupId, educationPhase2ChildGroupId, phase2Elements)
-  }
-
-  const graduations = latestSnapshot.study_right_graduation
-  // If student has graduated from a phase, there cannot be any study right elements
-  // for the same phase that would have started after the graduation (rare but happens because data is cool).
-  // This cleans them up and sets the correct end dates for the phases.
-  if (graduations !== null) {
-    const addGraduationsToElements = (phaseGraduationDate, phaseElements) => {
-      for (const [groupId, data] of Object.entries(phaseElements)) {
-        if (new Date(data.startDate) > new Date(phaseGraduationDate)) {
-          delete phaseElements[groupId]
-        } else {
-          phaseElements[groupId]['endDate'] ??= normalizeDateTime(phaseGraduationDate)
-        }
-      }
-    }
-
-    const phase1Graduation = graduations.phase1GraduationDate
-    const phase2Graduation = graduations.phase2GraduationDate
-
-    if (phase1Graduation) {
-      addGraduationsToElements(phase1Graduation, phase1Elements)
-    }
-
-    if (phase2Graduation) {
-      addGraduationsToElements(phase2Graduation, phase2Elements)
-    }
   }
 
   // The ongoing not-graduated elements do not yet have end date
