@@ -271,23 +271,35 @@ export const SingleCourseStats = ({
     }
   }
 
+  /** Count students that have only enrollments, no passed or failed grade
+
+  NOTE:
+  1. Adds students to allStudents.enrolled
+  2. Assumes this is called year by year in a descending order
+  */
   const countStudentEnrollmentStats = (
     filteredEnrollments: Enrollment[],
-    allStudents: { passed: Set<string>; failed: Set<string> },
+    allStudents: { passed: Set<string>; failed: Set<string>; enrolled: Set<string> },
     displayEnrollments: boolean
   ) => {
     if (!displayEnrollments) {
       return { enrolledStudentsWithNoGrade: undefined, totalEnrollments: undefined }
     }
 
-    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentNumber }) => {
+    const enrolled = new Set<string>()
+    filteredEnrollments.forEach(({ studentNumber }) => {
+      const hasEnrolled = allStudents.enrolled.has(studentNumber)
       const hasFailed = allStudents.failed.has(studentNumber)
       const hasPassed = allStudents.passed.has(studentNumber)
-      return !hasFailed && !hasPassed
+
+      if (!hasFailed && !hasPassed && !hasEnrolled) {
+        allStudents.enrolled.add(studentNumber)
+        enrolled.add(studentNumber)
+      }
     })
 
     return {
-      enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
+      enrolledStudentsWithNoGrade: enrolled.size,
       totalEnrollments: filteredEnrollments.length,
     }
   }
@@ -305,11 +317,12 @@ export const SingleCourseStats = ({
         stats.attempts.categories.failed.forEach(studentNumber => acc.failed.add(studentNumber))
         return acc
       },
-      { passed: new Set<string>(), failed: new Set<string>() }
+      { passed: new Set<string>(), failed: new Set<string>(), enrolled: new Set<string>() }
     )
 
     const formattedStats: FormattedStats[] = statistics
       .filter(isStatInYearRange)
+      .sort((a, b) => b.yearCode - a.yearCode) // Needs to be sorted DESC so that studentEnrollments are calculated correctly
       .map(
         ({
           code,

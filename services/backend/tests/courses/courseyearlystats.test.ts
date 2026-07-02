@@ -270,6 +270,40 @@ void describe('Course yearly statistics', async () => {
       )
     })
 
+    await it('should work correctly in specific cases (MAT11001)', async t => {
+      const res = (await request(app)
+        .get('/courseyearlystats?codes=MAT11001&combineSubstitutions=false')
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
+
+      assert.strictEqual(res.status, 200)
+      assert.strictEqual(res.body.length, 1)
+      const body = res.body.at(0)!
+      assert(
+        'unifyStats' in body && 'regularStats' in body && 'openStats' in body,
+        'All keys of courseyearlystats not defined'
+      )
+
+      await t.test('where a student has failed a course', () => {
+        const stats = body.unifyStats?.statistics!.find(year => year.name === '2018-2019')
+        assert(stats && 'enrollments' in stats, 'Missing field enrollment in statsitics')
+
+        assert(
+          stats.attempts.categories.failed.includes('542874'),
+          "Stats didn't include student with only failed course attainment (failed)"
+        )
+        assert(
+          !stats.attempts.categories.passed.includes('542874'),
+          'Stats did incorrectly include student with only failed course attainment (passed)'
+        )
+        assert(
+          !stats.enrollments.map(({ studentNumber }) => studentNumber).includes('542874'),
+          "Stats didn't include student with only failed course attainment (enrollments)"
+        )
+      })
+    })
+
     await it('should work correctly in specific cases (MAT11002)', async t => {
       const res = (await request(app)
         .get('/courseyearlystats?codes=MAT11002&combineSubstitutions=false')
@@ -376,6 +410,39 @@ void describe('Course yearly statistics', async () => {
           body.unifyStats?.statistics.reduce((acc, yearStats) => acc + yearStats.attempts.categories.passed.length, 0),
           249
         )
+      })
+    })
+
+    await it('should work correctly in specific cases (MAT21003)', async t => {
+      const res = (await request(app)
+        .get('/courseyearlystats?codes=MAT21003&combineSubstitutions=false')
+        .set('shib-session-id', 'test')
+        .set('uid', 'basic')
+        .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
+
+      assert.strictEqual(res.status, 200)
+      assert.strictEqual(res.body.length, 1)
+      const body = res.body.at(0)!
+      assert(
+        'unifyStats' in body && 'regularStats' in body && 'openStats' in body,
+        'All keys of courseyearlystats not defined'
+      )
+
+      await t.test('should not count duplicate failed grades to different years', async tt => {
+        await tt.test('- 2017-2018 should not include failed grade', () => {
+          const year = body.unifyStats?.statistics.find(year => year.name === '2017-2018')
+          assert.strictEqual(year?.attempts.categories.failed.length, 0, 'Failed stats should not include any students')
+          assert.deepStrictEqual(year?.attempts.categories.failed, [], 'Failed stats should not include any students')
+        })
+        await tt.test('- 2018-2019 should include a failed grade', () => {
+          const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
+          assert.strictEqual(year?.attempts.categories.failed.length, 1, 'Failed stats should include only one student')
+          assert.deepStrictEqual(
+            year?.attempts.categories.failed,
+            ['539036'],
+            'Failed stats included the incorrect student'
+          )
+        })
       })
     })
   })
