@@ -4,11 +4,15 @@ import { Response } from 'supertest'
 import { baseUrl } from '../src/config'
 import { initializeDatabaseConnection, dbConnections } from '../src/database/connection'
 import routes from '../src/routes'
+import logger from '../src/util/logger'
 
 /** Override Supertest's Response body with our own type */
 export type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }
 
-export const initTests = async () => {
+export const initTests = async (silent = true) => {
+  /** Enable or disable logging from app */
+  logger.silent = silent
+
   // Copied from "app.ts"
   await initializeDatabaseConnection()
 
