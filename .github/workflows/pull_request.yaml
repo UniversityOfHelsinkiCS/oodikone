@@ -8,6 +8,7 @@ on:
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
+      - 'updater/**'
       - 'docker-compose.ci.yml'
       - 'package*.json'
 

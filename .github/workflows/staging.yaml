@@ -11,6 +11,7 @@ on:
       - 'cypress/**'
       - 'cypress.config.json'
       - 'services/**'
+      - 'updater/**'
       - 'updater/sis-updater-worker/src/db/migrations/**'
       - 'docker-compose.ci.yml'
       - 'docker-compose.test.yml'
