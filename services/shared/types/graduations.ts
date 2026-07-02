@@ -1,5 +1,4 @@
 import { Name, NameWithCode } from './name'
-import { MedianEntry } from './studyProgramme'
 
 /** Used with University/Faculty graduations -> "programmes" are either faculties or programmes depending on context */
 export type ClassSizes = {
@@ -22,14 +21,16 @@ export type GraduationTimeCategories = {
 }
 
 export type ChartGraduationTimes = {
-  medians: MedianEntry[]
+  medians: GraduationStats[]
   goal: number
 }
 
 export type GraduationStats = {
   amount: number
   code?: string
+  classSize?: number
   median: number
+  average: number
   name: string
   statistics: GraduationTimeCategories
   times: number[]

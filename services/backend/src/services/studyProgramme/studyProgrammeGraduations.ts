@@ -34,6 +34,7 @@ import {
   getYearsObject,
   getStudyRightElementsWithPhase,
   hasTransferredFromOrToProgramme,
+  getAverage,
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
 
@@ -234,24 +235,22 @@ const getGraduationTimeAndThesisWriterStats = async ({
   const comboTimes: ChartGraduationTimes = { medians: [], goal: goal + GraduationTarget.THREE_YEARS }
 
   for (const year of years.toReversed()) {
-    const median = getMedian(graduationTimes[year])
-    const statistics = countTimeCategories(graduationTimes[year], goal)
     times.medians.push({
-      y: median,
+      median: getMedian(graduationTimes[year]),
+      average: getAverage(graduationTimes[year]),
       amount: graduationTimes[year].length,
       name: year.toString(),
-      statistics,
+      statistics: countTimeCategories(graduationTimes[year], goal),
       times: [...graduationTimes[year]],
     })
 
     if (doCombo) {
-      const median = getMedian(graduationTimesCombo[year])
-      const statistics = countTimeCategories(graduationTimesCombo[year], goal + GraduationTarget.THREE_YEARS)
       comboTimes.medians.push({
-        y: median,
+        median: getMedian(graduationTimesCombo[year]),
+        average: getAverage(graduationTimesCombo[year]),
         amount: graduationTimesCombo[year].length,
         name: year.toString(),
-        statistics,
+        statistics: countTimeCategories(graduationTimesCombo[year], goal + GraduationTarget.THREE_YEARS),
         times: [...graduationTimesCombo[year]],
       })
     }

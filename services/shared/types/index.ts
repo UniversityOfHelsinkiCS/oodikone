@@ -40,11 +40,9 @@ export type { Release } from './release'
 export type { Role } from './role'
 export type {
   GraduationTimes,
-  MedianEntry,
   Module,
   ProgrammeCourse,
   ProgrammeModule,
-  ProgrammeOrStudyTrackGraduationStats,
   ProgrammeGraduationStats,
   StudyProgrammeCourse,
   StudyTrackStats,

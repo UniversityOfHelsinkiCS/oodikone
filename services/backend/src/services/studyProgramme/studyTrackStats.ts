@@ -1,8 +1,6 @@
 import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
-  MedianEntry,
-  ProgrammeOrStudyTrackGraduationStats,
   StudyTrackStats,
   GenderCode,
   EnrollmentType,
@@ -17,6 +15,7 @@ import { calculateDurationOfStudies, shouldIncludeComboStats } from './studyProg
 import {
   computePercentiles,
   defineYear,
+  getAverage,
   getCreditCount,
   getGoal,
   getMedian,
@@ -40,7 +39,7 @@ const getGraduationTimeStats = async (
   combinedProgramme?: string
 ) => {
   const goal = await getGoal(combinedProgramme ?? studyProgramme)
-  const finalGraduationTimes = { goals: { basic: goal, combo: goal + GraduationTarget.THREE_YEARS } }
+  const finalGraduationTimes = { goals: { basic: goal, combo: goal + GraduationTarget.THREE_YEARS } } as GraduationTimes
 
   const calculateGraduationTimes = (
     graduationTimes: Record<string, Record<string, number[]>>,
@@ -48,7 +47,7 @@ const getGraduationTimeStats = async (
   ) => {
     for (const programmeOrTrack of Object.keys(graduationTimes)) {
       const stats = graduationTimes[programmeOrTrack]
-      finalGraduationTimes[programmeOrTrack] ??= { medians: { basic: [] as MedianEntry[], combo: [] as MedianEntry[] } }
+      finalGraduationTimes[programmeOrTrack] ??= { medians: { basic: [], combo: [] } }
       for (const [year, oneYearStats] of Object.entries(stats)) {
         const classSize = mainStatsByTrack[combinedProgramme ? studyProgramme : programmeOrTrack].find(
           stats => stats[0] === year
@@ -61,21 +60,20 @@ const getGraduationTimeStats = async (
           classSize,
           name: year,
           statistics: countTimeCategories(oneYearStats, finalGraduationTimes.goals[type]),
-          y: getMedian(oneYearStats),
+          median: getMedian(oneYearStats),
+          average: getAverage(oneYearStats),
           times: [...oneYearStats],
         }
-        ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].push(final)
+        finalGraduationTimes[programmeOrTrack].medians[type].push(final)
       }
-      ;(finalGraduationTimes[programmeOrTrack] as ProgrammeOrStudyTrackGraduationStats).medians[type].sort(
-        createLocaleComparator('name', true)
-      )
+      finalGraduationTimes[programmeOrTrack].medians[type].sort(createLocaleComparator('name', true))
     }
   }
 
   calculateGraduationTimes(graduationTimes, 'basic')
   calculateGraduationTimes(graduationTimesCombo, 'combo')
 
-  return finalGraduationTimes as GraduationTimes
+  return finalGraduationTimes
 }
 
 const getEmptyYear = () => ({
@@ -285,35 +283,27 @@ const getMainStatsByTrackAndYear = async (
     )
 
     if (countAsBachelorMaster) {
-      if (!graduationTimesCombo[programmeOrStudyTrack]) {
-        graduationTimesCombo[programmeOrStudyTrack] = getYearsObject({
-          years: years.filter(year => year !== 'Total'),
-          emptyArrays: true,
-        })
-      }
+      graduationTimesCombo[programmeOrStudyTrack] ??= getYearsObject({
+        years: years.filter(year => year !== 'Total'),
+        emptyArrays: true,
+      })
       const startYearInBachelor = defineYear(startDate, true)
-      if (graduationTimesCombo[programmeOrStudyTrack][startYearInBachelor]) {
-        graduationTimesCombo[programmeOrStudyTrack][startYearInBachelor].push(duration)
-      }
+      graduationTimesCombo[programmeOrStudyTrack][startYearInBachelor]?.push(duration)
     } else {
-      if (!graduationTimes[programmeOrStudyTrack]) {
-        graduationTimes[programmeOrStudyTrack] = getYearsObject({
-          years: years.filter(year => year !== 'Total'),
-          emptyArrays: true,
-        })
-      }
+      graduationTimes[programmeOrStudyTrack] ??= getYearsObject({
+        years: years.filter(year => year !== 'Total'),
+        emptyArrays: true,
+      })
       graduationTimes[programmeOrStudyTrack][year].push(duration)
     }
 
     if (!hasGraduatedFromCombinedProgramme) return
     const bachelorStartDate = getStudyRightElementsWithPhase(studyRight, 1)[0]?.startDate
     if (!bachelorStartDate) return
-    if (!graduationTimesCombinedProgrammeCombo[combinedProgramme!]) {
-      graduationTimesCombinedProgrammeCombo[combinedProgramme!] = getYearsObject({
-        years: years.filter(year => year !== 'Total'),
-        emptyArrays: true,
-      })
-    }
+    graduationTimesCombinedProgrammeCombo[combinedProgramme!] ??= getYearsObject({
+      years: years.filter(year => year !== 'Total'),
+      emptyArrays: true,
+    })
     const startYearInNewBachelorProgramme = defineYear(studyRightElement.startDate, true)
     const combinedDuration = calculateDurationOfStudies(
       bachelorStartDate,
@@ -322,9 +312,7 @@ const getMainStatsByTrackAndYear = async (
       semesters,
       studyRight.transferInfo
     )
-    if (graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme]) {
-      graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme].push(combinedDuration)
-    }
+    graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme]?.push(combinedDuration)
   }
 
   const creditCounts: Record<string, number[]> = getYearsObject({

@@ -1,5 +1,5 @@
 import { yearStatNumberKeys } from '../util/studyProgramme'
-import { ChartGraduationTimes, GraduationTimeCategories } from './graduations'
+import { ChartGraduationTimes, GraduationStats } from './graduations'
 import { Name } from './name'
 
 export type StudyProgrammeCourse = {
@@ -14,28 +14,20 @@ export type StudyProgrammeCourse = {
   >
 }
 
-export type MedianEntry = {
-  amount: number
-  classSize?: number
-  name: string
-  statistics: GraduationTimeCategories
-  times: number[]
-  y: number
-}
-
-export type ProgrammeOrStudyTrackGraduationStats = {
-  medians: {
-    basic: MedianEntry[]
-    combo: MedianEntry[]
-  }
-}
-
 export type Goals = {
   basic: number
   combo: number
 }
 
-export type GraduationTimes = Record<string, ProgrammeOrStudyTrackGraduationStats> & {
+export type GraduationTimes = Record<
+  string,
+  {
+    medians: {
+      basic: GraduationStats[]
+      combo: GraduationStats[]
+    }
+  }
+> & {
   goals: Goals
 }
 

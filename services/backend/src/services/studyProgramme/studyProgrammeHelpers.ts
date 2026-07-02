@@ -56,6 +56,11 @@ export const getMedian = (values: number[]) => {
   return (sorted[half - 1] + sorted[half]) / 2.0
 }
 
+export const getAverage = (values: number[]) => {
+  if (!values.length) return 0
+  return Number((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(2))
+}
+
 /** @returns academic starting year e.g. "2019-2020" */
 export function defineYear(date: Date, isAcademicYear: true): string
 export function defineYear(date: Date, isAcademicYear: false): number
