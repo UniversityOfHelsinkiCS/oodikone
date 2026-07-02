@@ -1,8 +1,8 @@
 import { memoize } from 'lodash-es'
 import { Op, QueryTypes } from 'sequelize'
 
-import { Name, CreditTypeCode, EnrollmentState } from '@oodikone/shared/types'
-import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
+import { Name, EnrollmentState } from '@oodikone/shared/types'
+import { enrollmentTimeDateThresholdAcademicYear } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import { dbConnections } from '../../database/connection'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, ProgrammeModuleModel } from '../../models'
@@ -10,6 +10,7 @@ import logger from '../../util/logger'
 
 export const getAllProgrammeCourses = async (providerCode: string) => {
   const courses: Pick<CourseModel, 'id' | 'code' | 'name' | 'substitution_groups'>[] = await CourseModel.findAll({
+    raw: true,
     attributes: ['id', 'code', 'name', 'substitution_groups'],
     include: [
       {
@@ -24,24 +25,13 @@ export const getAllProgrammeCourses = async (providerCode: string) => {
         },
       },
     ],
-    raw: true,
   })
   return courses
 }
 
-const removeOpenUniCodePrefix = (code: string) => {
-  if (code.startsWith('AY')) {
-    return code.replace('AY', '')
-  }
-  if (code.startsWith('A')) {
-    return code.replace('A', '')
-  }
-  return code
-}
-
 export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
   try {
-    const enrollmentsCourses: Array<
+    const enrollments: Array<
       Pick<EnrollmentModel, 'studentnumber' | 'course_code' | 'enrollment_date_time' | 'course'>
     > = await EnrollmentModel.findAll({
       raw: true,
@@ -56,21 +46,12 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
           [Op.in]: programmeCourses,
         },
         enrollment_date_time: {
-          [Op.between]: [from, to],
-          [Op.gte]: enrollmentTimeDateThreshold,
+          [Op.gte]: enrollmentTimeDateThresholdAcademicYear, // This has to be Academic year to match with Course statistics which doesn't display enrollments for ...-2021
         },
         state: EnrollmentState.ENROLLED,
       },
+      order: [['enrollment_date_time', 'DESC']],
     })
-
-    const allEnrollments = new Map<string, Set<string>>()
-    for (const { studentnumber, course_code: courseCode } of enrollmentsCourses) {
-      const code = removeOpenUniCodePrefix(courseCode)
-      if (!allEnrollments.has(code)) {
-        allEnrollments.set(code, new Set())
-      }
-      allEnrollments.get(code)!.add(studentnumber)
-    }
 
     // TODO: This is being called for each year, could be optimized to call only once
     const credits: Array<
@@ -86,11 +67,30 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
           [Op.in]: programmeCourses,
         },
       },
-      order: [['credittypecode', 'ASC']], // Passed credits for a student have to be handled first
+      order: [
+        ['attainment_date', 'DESC'],
+        ['credittypecode', 'ASC'],
+      ], // Passed credits for a student have to be handled first (only PASSED, and FAILED matter)
     })
+
+    const enrolledStudentsByCourseCode = new Map<string, Set<string>>()
 
     // Pick only this (between to, from) year's credits
     const filteredCredits = credits.filter(credit => dateIsBetween(credit.attainment_date, from, to))
+
+    const filteredEnrollments = enrollments
+      // Only include the first enrollment for a course for a student.
+      // This assumes that enrollments are sorted in DESC order by enrollment_date_time
+      .filter(({ course_code: courseCode, studentnumber: studentNumber }) => {
+        const courseEnrollments = enrolledStudentsByCourseCode.get(courseCode)
+        const hasEnrolled = courseEnrollments?.has(studentNumber) ?? false
+
+        if (!courseEnrollments) enrolledStudentsByCourseCode.set(courseCode, new Set<string>())
+        if (!hasEnrolled) enrolledStudentsByCourseCode.get(courseCode)!.add(studentNumber)
+
+        return !hasEnrolled
+      })
+      .filter(enrollment => dateIsBetween(enrollment.enrollment_date_time, from, to))
 
     const courseCodeToName = (
       await CourseModel.findAll({
@@ -106,65 +106,99 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
     }, new Map())
 
     const creditCourses = filteredCredits.map(credit => ({
-      code: removeOpenUniCodePrefix(credit.course_code),
+      code: credit.course_code,
       studentNumber: credit.student_studentnumber,
       creditTypeCode: credit.credittypecode,
       courseName: courseCodeToName.get(credit.course_code)!,
       isStudyModule: credit.isStudyModule,
+      attainmentDate: credit.attainment_date,
     }))
 
     const passedByCourseCodes = new Map<string, Set<string>>()
+    const failedByCourseCodes = new Map<string, Set<string>>()
     const notCompletedByCourseCodes = new Map<string, Set<string>>()
     const courses = new Map<string, { name: Name; isStudyModule: boolean }>()
 
-    const studentHasPassedCourse = (studentNumber: string, courseCode: string) =>
+    const studentHasPassedCourse = (studentNumber: string, courseCode: string): boolean =>
+      (passedByCourseCodes.get(courseCode)?.has(studentNumber) ?? false) ||
       !!credits.find(
         credit =>
           credit.student_studentnumber === studentNumber &&
           credit.course_code === courseCode &&
           CreditModel.passed(credit)
-      ) ||
-      (passedByCourseCodes.get(courseCode)?.has(studentNumber) ?? false)
+      )
 
-    for (const { code, courseName, creditTypeCode, isStudyModule, studentNumber } of creditCourses) {
-      if (!courses.has(code)) {
-        courses.set(code, {
+    /** Student has already been counted as failed or there is a newer failed credit */
+    const studentHasFailedCourse = (
+      studentNumber: string,
+      courseCode: string,
+      attainmentDate: Date = new Date(0)
+    ): boolean =>
+      (failedByCourseCodes.get(courseCode)?.has(studentNumber) ?? false) ||
+      !!credits.find(
+        credit =>
+          credit.student_studentnumber === studentNumber &&
+          credit.course_code === courseCode &&
+          CreditModel.failed(credit) &&
+          credit.attainment_date > attainmentDate
+      )
+
+    const studentHasCredit = (studentNumber: string, courseCode: string): boolean =>
+      studentHasPassedCourse(studentNumber, courseCode) || studentHasFailedCourse(studentNumber, courseCode)
+
+    for (const {
+      code: courseCode,
+      courseName,
+      creditTypeCode,
+      isStudyModule,
+      studentNumber,
+      attainmentDate,
+    } of creditCourses) {
+      if (!courses.has(courseCode)) {
+        courses.set(courseCode, {
           isStudyModule,
           name: courseName,
         })
-        passedByCourseCodes.set(code, new Set())
-        notCompletedByCourseCodes.set(code, new Set())
+        passedByCourseCodes.set(courseCode, new Set())
+        failedByCourseCodes.set(courseCode, new Set())
+        notCompletedByCourseCodes.set(courseCode, new Set())
       }
 
       if (CreditModel.passed({ credittypecode: creditTypeCode })) {
-        passedByCourseCodes.get(code)!.add(studentNumber)
+        passedByCourseCodes.get(courseCode)!.add(studentNumber)
       }
-      if (creditTypeCode === CreditTypeCode.FAILED && !studentHasPassedCourse(studentNumber, code)) {
-        notCompletedByCourseCodes.get(code)!.add(studentNumber)
+      if (
+        CreditModel.failed({ credittypecode: creditTypeCode }) &&
+        !studentHasPassedCourse(studentNumber, courseCode) &&
+        !studentHasFailedCourse(studentNumber, courseCode, attainmentDate)
+      ) {
+        failedByCourseCodes.get(courseCode)!.add(studentNumber)
       }
     }
 
     // Add course details to courseMap if there are only enrollments
-    for (const { studentnumber: studentNumber, course_code: courseCode, course } of enrollmentsCourses) {
+    for (const { studentnumber: studentNumber, course_code: courseCode, course } of filteredEnrollments) {
       if (!courses.has(courseCode)) {
         courses.set(courseCode, {
           isStudyModule: course.is_study_module,
           name: courseCodeToName.get(courseCode)!,
         })
         passedByCourseCodes.set(courseCode, new Set())
+        failedByCourseCodes.set(courseCode, new Set())
         notCompletedByCourseCodes.set(courseCode, new Set())
       }
 
-      if (!studentHasPassedCourse(studentNumber, courseCode)) {
+      if (!studentHasCredit(studentNumber, courseCode)) {
         notCompletedByCourseCodes.get(courseCode)!.add(studentNumber)
       }
     }
+
     return [...courses.entries()].map(([code, { isStudyModule, name }]) => {
       return {
         code,
         name,
         isStudyModule,
-        allNotPassed: notCompletedByCourseCodes.get(code)?.size ?? 0,
+        allNotPassed: (notCompletedByCourseCodes.get(code)?.size ?? 0) + (failedByCourseCodes.get(code)?.size ?? 0),
       }
     })
   } catch (error) {

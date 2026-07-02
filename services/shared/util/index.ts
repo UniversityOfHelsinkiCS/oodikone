@@ -142,7 +142,9 @@ export const range = (start: number, end?: number, step?: number): number[] => {
   return Array.from({ length }, (_, index) => a + c * index)
 }
 
-/** NOTE: Date when Oodikone changed from Oodi to Sisu. Before it
+/** Date when Oodikone changed from Oodi to Sisu. Before it
 there are generally no studyright_id attached to enrollments */
 export const enrollmentTimeDateThreshold = new Date('2021-05-31')
+/** The start of the academic year after Oodi <-> Sisu transfer */
+export const enrollmentTimeDateThresholdAcademicYear = new Date('2021-08-01')
 export const enrollmentTimeDateThresholdYearCode = 72
