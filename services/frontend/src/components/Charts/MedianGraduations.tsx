@@ -166,13 +166,14 @@ export const MedianGraduations = ({
       },
     },
     grid: {
-      top: 60,
-      left: 15,
+      top: 40,
+      left: 20,
       right: 20,
       bottom: 30,
       containLabel: true,
     },
     toolbox: {
+      padding: [0, 15, 8, 15],
       feature: {
         saveAsImage: {
           name: `Oodikone-graduation-${isMedian ? 'medians' : 'averages'}`,

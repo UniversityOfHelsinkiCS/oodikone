@@ -68,7 +68,13 @@ export const GraduationTimes = ({
   )
 
   return (
-    <Section cypress={`${level}-graduation-times`} isError={isError} isLoading={isLoading} title={title}>
+    <Section
+      contentSx={{ mt: 0 }}
+      cypress={`${level}-graduation-times`}
+      isError={isError}
+      isLoading={isLoading}
+      title={title}
+    >
       {view === 'breakdown' && (
         <BreakdownDisplay
           allowExpand={allowExpand}

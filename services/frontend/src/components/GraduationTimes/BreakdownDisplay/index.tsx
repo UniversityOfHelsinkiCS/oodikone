@@ -47,7 +47,6 @@ export const BreakdownDisplay = ({
 
   return (
     <Box>
-      <Typography>Click a bar to view that year's {mode} level breakdown</Typography>
       <Stack direction={{ sm: 'column', md: 'row' }}>
         <GraduationBreakdown
           cypress={`${level}-breakdown-bar-chart`}

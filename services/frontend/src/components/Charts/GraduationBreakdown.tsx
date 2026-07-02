@@ -146,6 +146,7 @@ export const GraduationBreakdown = ({
       },
     },
     toolbox: {
+      padding: [0, 15, 8, 15],
       feature: {
         dataView: {
           readOnly: true,
@@ -157,8 +158,8 @@ export const GraduationBreakdown = ({
       },
     },
     grid: {
-      top: 60,
-      left: 10,
+      top: 40,
+      left: 20,
       right: 20,
       bottom: 60,
       containLabel: true,

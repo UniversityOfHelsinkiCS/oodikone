@@ -65,8 +65,6 @@ export const MedianDisplay = ({
         </Typography>
       ) : null}
 
-      {allowExpand ? <Typography>Click a bar to view that year's {mode} level breakdown</Typography> : null}
-
       {!allowExpand ? (
         <MedianGraduations
           classSizes={!!classSizes && 'programme' in classSizes ? classSizes.programme : {}}
