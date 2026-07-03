@@ -1,17 +1,15 @@
 import { Express } from 'express'
-import assert from 'node:assert/strict'
-import { describe, it, before } from 'node:test'
 import request from 'supertest'
+import { describe, it, beforeAll, assert } from 'vitest'
 
 import { initTests } from '../utils'
 
-let app: Express
-before(async () => {
-  app = await initTests()
-})
-
-void describe('Population statistics by course', async () => {
-  await it('should not return anything with missing parameters', async () => {
+void describe('Population statistics by course', () => {
+  let app: Express
+  beforeAll(async () => {
+    app = await initTests()
+  })
+  it('should not return anything with missing parameters', async () => {
     const res = await request(app)
       .get('/populationstatisticsbycourse')
       .set('shib-session-id', 'test')
@@ -22,7 +20,7 @@ void describe('Population statistics by course', async () => {
     assert.deepEqual(res.body.error, 'The body should have a yearcode and coursecode defined')
   })
 
-  await it('should return correct amount of students for a course', async () => {
+  it('should return correct amount of students for a course', async () => {
     const res = await request(app)
       .get('/populationstatisticsbycourse?coursecodes=["MAT21005"]&from=70&to=70')
       .set('shib-session-id', 'test')
