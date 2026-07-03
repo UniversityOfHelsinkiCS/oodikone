@@ -2,7 +2,7 @@ import { Express } from 'express'
 import request from 'supertest'
 import { describe, it, beforeAll, assert } from 'vitest'
 
-import { initTests } from './utils'
+import { initTests } from '../utils'
 
 void describe('Changelog', () => {
   let app: Express

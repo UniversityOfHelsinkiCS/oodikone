@@ -3,8 +3,8 @@ import request from 'supertest'
 import { describe, it, beforeAll, assert } from 'vitest'
 
 import { Unarray } from '@oodikone/shared/types'
-import { CourseYearlyStatsResBody } from '../../src/routes/courses'
-import { initTests, ResponseWithBody } from '../utils'
+import { CourseYearlyStatsResBody } from '../../../src/routes/courses'
+import { initTests, ResponseWithBody } from '../../utils'
 
 void describe('Course yearly statistics', () => {
   let app: Express

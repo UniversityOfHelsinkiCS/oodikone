@@ -3,7 +3,7 @@ import request from 'supertest'
 import { describe, it, beforeAll, assert } from 'vitest'
 
 import { StudyProgrammeCourse } from '@oodikone/shared/types'
-import { initTests, ResponseWithBody } from '../utils'
+import { initTests, ResponseWithBody } from '../../utils'
 
 const testData = [
   {
