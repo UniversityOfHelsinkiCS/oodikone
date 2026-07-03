@@ -1,17 +1,16 @@
 import { Express } from 'express'
-import assert from 'node:assert/strict'
-import { describe, it, before } from 'node:test'
 import request from 'supertest'
+import { describe, it, beforeAll, assert } from 'vitest'
 
 import { initTests } from './utils'
 
-let app: Express
-before(async () => {
-  app = await initTests()
-})
+void describe('Changelog', () => {
+  let app: Express
+  beforeAll(async () => {
+    app = await initTests()
+  })
 
-void describe('Changelog', async () => {
-  await it('should return dev data in dev env', async () => {
+  it('should return dev data in dev env', async () => {
     const res = await request(app)
       .get('/changelog')
       .set('shib-session-id', 'test')
