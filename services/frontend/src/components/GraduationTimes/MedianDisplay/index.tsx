@@ -49,6 +49,9 @@ export const MedianDisplay = ({
   variant,
   yearLabel,
 }: MedianDisplayProps) => {
+  const isMedian = variant === 'median'
+  const cyTag = `${level}-${isMedian ? 'median' : 'average'}-bar-chart`
+
   return (
     <Box>
       {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
@@ -68,7 +71,7 @@ export const MedianDisplay = ({
       {!allowExpand ? (
         <MedianGraduations
           classSizes={!!classSizes && 'programme' in classSizes ? classSizes.programme : {}}
-          cypress={`${level}-median-bar-chart`}
+          cypress={cyTag}
           data={data}
           fullWidth
           goal={goal ?? 0}
@@ -90,7 +93,7 @@ export const MedianDisplay = ({
                     : {}
                 : {}
             }
-            cypress={`${level}-median-bar-chart`}
+            cypress={cyTag}
             data={data}
             goal={goal ?? 0}
             handleClick={handleClick}
@@ -105,7 +108,7 @@ export const MedianDisplay = ({
               classSizes={
                 classSizes ? ('programmes' in classSizes ? classSizes.programmes : classSizes.studyTracks) : {}
               }
-              cypress={`${level}-median-bar-chart-faculty`}
+              cypress={`${cyTag}-faculty`}
               data={levelProgrammeData[expandKey].data}
               expandKey={expandKey}
               goal={goal ?? 0}

@@ -10,17 +10,11 @@ const checkProgressTables = () => {
   progressLevels.forEach(level => cy.cs(`${level}-faculty-progress-table`))
 }
 
-const graduationTimesLevels = ['bachelor', 'master', 'doctor'] // ? Bachelor + master seems to be missing in test data
+const graduationTimesLevels = ['bachelor', 'bcMsCombo', 'master', 'doctor']
 
-const checkAverageGraduationTimesBreakdownBarCharts = () => {
+const checkGraduationCharts = mode => {
   graduationTimesLevels.forEach(level => {
-    cy.cs(`${level}-breakdown-bar-chart`)
-  })
-}
-
-const checkAverageGraduationTimesMedianBarCharts = () => {
-  graduationTimesLevels.forEach(level => {
-    cy.cs(`${level}-median-bar-chart`)
+    cy.cs(`${level}-${mode}-bar-chart`).should('exist')
   })
 }
 
@@ -73,17 +67,26 @@ describe('University view', () => {
       cy.cs('faculty-graduations-tab').click()
     })
 
-    it('has all the correct median time bar charts', () => {
-      checkAverageGraduationTimesBreakdownBarCharts()
-    })
-
-    it("'Breakdown/Median times' toggle works", () => {
-      cy.cs('graduation-time-toggle').click()
-      checkAverageGraduationTimesMedianBarCharts()
+    describe('Different modes work', () => {
+      it('Breakdown', () => {
+        checkGraduationCharts('breakdown')
+      })
+      it('Median', () => {
+        cy.cs('graduation-mode-selector').within(() => {
+          cy.cs('select-median').click()
+        })
+        checkGraduationCharts('median')
+      })
+      it('Average', () => {
+        cy.cs('graduation-mode-selector').within(() => {
+          cy.cs('select-average').click()
+        })
+        checkGraduationCharts('average')
+      })
     })
 
     it('info boxes contain correct information', () => {
-      cy.cs('average-graduation-times-info-box-button').click()
+      cy.cs('average-graduation-times-info-box-button').hover()
       cy.cs('average-graduation-times-info-box-content').contains('Opiskelijoiden keskimääräiset valmistumisajat')
     })
   })
