@@ -31,12 +31,14 @@ worker.on('completed', job => {
 })
 
 // If there is no error event listener, the worker stops taking jobs after any error.
+// This is only for some internal errors. If a job fails/throws, the below "failed" event is emitted instead.
 worker.on('error', error => {
   logger.error('Job returned error:')
   logger.error(error.toString())
   Sentry.captureException(error)
 })
 
+// Errors from the processor are propagated back here. Thus no logging needs to be done there.
 worker.on('failed', (job, error) => {
   logger.error(`Job ${job?.id ?? 'unknown id'} failed. ${error.stack ?? ''}`)
   Sentry.captureException(error)
