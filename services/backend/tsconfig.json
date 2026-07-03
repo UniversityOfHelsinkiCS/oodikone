@@ -19,6 +19,6 @@
     "inlineSources": true,
     "resolveJsonModule": true
   },
-  "include": ["index.ts", "src", "tests"],
+  "include": ["index.ts", "src", "tests", "vitest.config.ts"],
   "exclude": ["../frontend"]
 }

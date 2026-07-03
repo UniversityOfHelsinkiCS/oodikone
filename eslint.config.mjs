@@ -264,6 +264,15 @@ export default tseslint.config(
     },
   },
 
+
+  // Backend tests
+  {
+    files: ["services/backend/tests/**/*.ts", "services/backend/vitest.config.ts"],
+    rules: {
+      'import-x/no-extraneous-dependencies': 'off',
+    }
+  },
+
   // Frontend tests
   {
     files: ['services/frontend/tests/**/*.{ts,tsx}', "services/frontend/playwright/**/*.{ts,tsx}", 'services/frontend/playwright-ct.config.ts'],
