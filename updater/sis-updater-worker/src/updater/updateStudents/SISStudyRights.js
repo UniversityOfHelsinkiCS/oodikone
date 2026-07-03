@@ -84,19 +84,12 @@ const getCorrectStartDateForProgramme = (phase, isFirstProgramme, latestSnapshot
     : startDateFromSnapshot
 }
 
-const isLastProgramme = (programmes, index) => index === programmes.length - 1
-
 // Each programme (educationPhase1/2GroupId) has their own study right element.
 // Study tracks (educationPhase1/2ChildGroupId) belong to the corresponding study right element.
 const studyRightElementMapper =
-  (phase, phaseProgrammes, latestSnapshot) =>
-  async ([groupId, { startDate, endDate, code, studyTrack: elementStudyTrack }], index) => {
+  (phase, latestSnapshot) =>
+  async ([groupId, { startDate, endDate, code, studyTrack: elementStudyTrack, graduated }]) => {
     const educationInfo = await selectOneById('modules', groupId.replace('EDU', 'DP'), 'group_id')
-
-    // Show only for the latest programme of a phase.
-    const graduated =
-      !!latestSnapshot.study_right_graduation?.[`phase${phase}GraduationDate`] &&
-      isLastProgramme(phaseProgrammes, index)
 
     let studyTrack = elementStudyTrack ?? null
     if (studyTrack) {
@@ -113,7 +106,7 @@ const studyRightElementMapper =
       phase,
       studyRightId: latestSnapshot.id,
       studyTrack,
-      graduated,
+      graduated: !!graduated,
       degreeProgrammeType: educationInfo?.degree_program_type_urn,
     }
   }
@@ -141,7 +134,7 @@ export const updateSISStudyRights = async (groupedStudyRights, personIdToStudent
  * How to studyRightElement:
  *
  * SISU only understands study rights and education phases (there are no elements like in Oodikone).
- * All changes to a study right generate a new snapshot, where the ID remains the same, but other fields can have changes (refer to ORI api docs). The "state" of each snapshot is valid from the snapshot_date_time, until the date_time of the next snapshot.
+ * All changes to a study right generate a new snapshot, where the ID remains the same, but other fields can have _arbitrary_ changes. The "state" of each snapshot is valid from the snapshot_date_time, until the date_time of the next snapshot.
  *
  * The current programme of a student is fetched from accepted_selection_path, educationPhase1/2GroupIds.
  * Study tracks for said programmes (educations) are under the educationPhase1/2ChildGroupids.
@@ -150,17 +143,17 @@ export const updateSISStudyRights = async (groupedStudyRights, personIdToStudent
  * this can be seen by observing changes in the said groupIds between snapshots.
  * Therefore, to get the time of transfer, the `snapshotDateTime` of the snapshot where the education has changed is used.
  *
- * If a previous snapshot has no educationGroupId for phase 2, but a following one does, this indicates graduation and moving to the higher (master's level) degree programme. Sometimes educationGroupIds for both phases 1 and 2 are granted simultaneously. In this case the student is assumed to be in phase 1 studies until a graduation for the phase exists.
+ * If a previous snapshot has no educationGroupId for phase 2, but a following one does, this (usually) indicates graduation and moving to the higher (master's level) degree programme. Sometimes educationGroupIds for both phases 1 and 2 are granted simultaneously. In this case the student is assumed to be in phase 1 studies until a graduation for the phase exists.
  *
- * This iterates through the snapshots in chronological order and creates relevant entities from that.
+ * This iterates through the snapshots in *best guess™* chronological order and creates relevant entities from that.
  *
- * @returns phase 1/2 studyRightElement skeletons containing programme/studytrack codes and start/end dates but missing some key fields
+ * @returns phase 1/2 studyRightElement skeletons containing programme/studytrack codes, start/end dates, graduation info, but missing some education metadata.
  */
 const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
-  const latestSnapshot = studyRightSnapshots[0]
   const phase1Elements = {}
   const phase2Elements = {}
 
+  let latestValidSnapshot = null
   let lastPhase1Id = null
   let lastPhase2Id = null
   let graduatedPhase1 = false
@@ -198,7 +191,7 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
           startDate: getCorrectStartDateForProgramme(
             phase,
             Object.keys(phaseElements).length === 0,
-            latestSnapshot,
+            snapshot,
             normalizedDateTime
           ),
         }
@@ -225,28 +218,34 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
         lastPhase1Id = groupId
         if (study_right_graduation?.phase1GraduationDate) {
           phaseElements[groupId]['endDate'] = normalizeDateTime(study_right_graduation.phase1GraduationDate)
+          phaseElements[groupId]['graduated'] = true
           graduatedPhase1 = true
         }
       } else {
         lastPhase2Id = groupId
         if (study_right_graduation?.phase2GraduationDate) {
           phaseElements[groupId]['endDate'] = normalizeDateTime(study_right_graduation.phase2GraduationDate)
+          phaseElements[groupId]['graduated'] = true
           graduatedPhase2 = true
         }
       }
+      // The latest snapshot might be broken, see e.g. study right hy-opinoik-136933998
+      // (latest snapshot is missing graduations and phase2 programme is moved to phase1, with no trace of prior phase1 education)
+      // If a snapshot has made it this far, it is likely not broken.
+      latestValidSnapshot = snapshot
     }
 
     // Whenever adjustments are made to a study right, a new snapshot is created.
     // Sometimes such adjustments are made to student's phase 1 studies when the student has already moved to phase 2.
     // In this case a new snapshot is created that could be missing the phase 2 entirely,
     // making the snapshots (ordered by snapshot_date_time) no longer depict the study right events in chronological order.
-    // Solution: ignore events to phases where student has already graduated.
+    // Solution: ignore events to phases the student has already graduated from.
     // See for example study right hy-opinoik-78676889, order by snapshot_date_time.
     if (educationPhase1GroupId && !graduatedPhase1) {
       try {
         addElementToMap(1, phase1Elements, educationPhase1GroupId)
       } catch (e) {
-        logger.error(`Failed to generate phase 1 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
+        logger.error(`Failed to generate phase 1 element for studyright id ${snapshot.id}.\nError: ${e}`)
       }
     }
 
@@ -254,7 +253,7 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
       try {
         addElementToMap(2, phase2Elements, educationPhase2GroupId)
       } catch (e) {
-        logger.error(`Failed to generate phase 2 element for studyright id ${latestSnapshot.id}.\nError: ${e}`)
+        logger.error(`Failed to generate phase 2 element for studyright id ${snapshot.id}.\nError: ${e}`)
       }
     }
 
@@ -282,7 +281,7 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
   // (it overshoots by a day so subtract that)
   const addMissingEndDates = phaseElements => {
     for (const groupId of Object.keys(phaseElements)) {
-      phaseElements[groupId]['endDate'] ??= addDaysToDate(latestSnapshot.valid.endDate, -1)
+      phaseElements[groupId]['endDate'] ??= addDaysToDate(latestValidSnapshot.valid.endDate, -1)
     }
   }
 
@@ -308,14 +307,19 @@ export const updateSISStudyRightElements = async (groupedStudyRights, moduleGrou
     const { phase1Elements, phase2Elements } = buildStudyRightElements(group, moduleGroupIdToCode)
 
     if (phase1Elements.length) {
-      const mapper = studyRightElementMapper(1, phase1Elements, latestSnapshot)
+      const mapper = studyRightElementMapper(1, latestSnapshot)
       studyRightElements.push(...(await Promise.all(phase1Elements.map(mapper))))
     }
 
     if (phase2Elements.length) {
-      const mapper = studyRightElementMapper(2, phase2Elements, latestSnapshot)
+      const mapper = studyRightElementMapper(2, latestSnapshot)
       studyRightElements.push(...(await Promise.all(phase2Elements.map(mapper))))
     }
+  }
+
+  for (const sre of studyRightElements) {
+    if (!sre.startDate)
+      logger.warning(`Creating study right element with no startDate for study right: ${sre.studyRightId}`)
   }
 
   await bulkCreate(SISStudyRightElement, studyRightElements)
