@@ -192,8 +192,9 @@ describe('Degree programme overview', () => {
         .should('contain', 47)
         .should('contain', 76)
 
-      cy.cs('unset-breakdown-bar-chart')
-      cy.cs('graduation-time-toggle').click()
+      cy.cs('graduation-mode-selector').within(() => {
+        cy.cs('select-median').click()
+      })
       cy.cs('unset-median-bar-chart').within(() => {
         cy.contains('48 graduated').should('be.visible')
         cy.contains('48 graduated').hover()
@@ -217,15 +218,16 @@ describe('Degree programme overview', () => {
   })
 
   describe('Graduation times of master programmes', () => {
-    it('are split into two graphs', () => {
+    it('are split into three graphs', () => {
       cy.init('/study-programme')
       cy.contains('a', 'Matematiikan ja tilastotieteen maisteriohjelma').click({ force: true })
       cy.cs('year-toggle').click() // Tests are written for calendar year
 
       cy.cs('unset-breakdown-bar-chart')
-      cy.cs('unset-breakdown-bar-chart')
 
-      cy.cs('graduation-time-toggle').click()
+      cy.cs('graduation-mode-selector').within(() => {
+        cy.cs('select-average').click()
+      })
       cy.cs('unset-graduation-times-section')
         .eq(1)
         .within(() => {
@@ -235,7 +237,7 @@ describe('Degree programme overview', () => {
         })
 
       cy.get('.grad-vals').contains('2 students graduated in year 2021').should('be.visible')
-      cy.contains('median study time: 4.5 semesters')
+      cy.contains('average study time: 4.5 semesters')
       cy.contains('1 graduated on time')
       cy.contains('1 graduated max year overtime')
       cy.contains('0 graduated over year late')
@@ -249,7 +251,7 @@ describe('Degree programme overview', () => {
         })
 
       cy.get('.grad-vals').contains('11 students graduated in year 2023').should('be.visible')
-      cy.contains('median study time: 12 semesters')
+      cy.contains('average study time: 11.18 semesters')
       cy.contains('4 graduated on time')
       cy.contains('6 graduated max year overtime')
       cy.contains('1 graduated over year late')
@@ -705,7 +707,7 @@ describe('Degree programme overview', () => {
               cy.get('td').eq(0).contains('Course')
               cy.get('td').eq(1).contains('MAT11001')
               cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('277')
+              cy.get('td').eq(3).contains('272')
             })
         })
       })
