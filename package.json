@@ -13,7 +13,7 @@
     "prettier": "prettier",
     "cli": "./cli.sh",
     "logs": "docker compose --file docker-compose.yml logs backend frontend sis-updater-worker sis-updater-scheduler jami -f",
-    "logs:ci": "docker compose --file docker-compose.ci.yml logs backend frontend sis-updater-worker sis-updater-scheduler jami -f",
+    "logs:ci": "docker compose --file docker-compose.ci.yml logs backend frontend sis-updater-worker sis-updater-scheduler jami",
     "oodikone": "npm run docker:down && ./run.sh oodikone anon up --detach",
     "oodikone:real": "./run.sh oodikone real up --detach",
     "oodikone:ci:setup": "docker compose --file docker-compose.ci.yml --profile tests up --detach",
