@@ -6,6 +6,8 @@ export const isProduction = !isStaging && process.env.NODE_ENV === 'production'
 
 export const runningInCI = process.env.CI === 'true'
 
+export const silentTesting = process.env.SILENT_TESTING === 'true'
+
 // IAM group
 export const requiredGroup = ['grp-oodikone-users', 'grp-oodikone-basic-users']
 

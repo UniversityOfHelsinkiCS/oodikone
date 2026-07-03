@@ -1,7 +1,7 @@
 import * as winston from 'winston'
 import LokiTransport from 'winston-loki'
 
-import { isProduction } from '../config'
+import { isProduction, silentTesting } from '../config'
 
 const transports: winston.transport[] = [new winston.transports.Console()]
 
@@ -30,6 +30,7 @@ const logger = winston.createLogger({
     })
   ),
   transports,
+  silent: silentTesting,
 })
 
 logger.on('error', error => console.error('Logging failed! Reason: ', error)) // eslint-disable-line no-console

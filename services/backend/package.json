@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "test:silent": "SILENT_TESTING=true vitest"
   },
   "dependencies": {
     "@oodikone/shared": "file:../shared",
