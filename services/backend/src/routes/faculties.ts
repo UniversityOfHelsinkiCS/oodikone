@@ -36,6 +36,7 @@ import { combineFacultyStudentProgress } from '../services/faculty/facultyStuden
 import { combineFacultyStudents } from '../services/faculty/facultyStudents'
 import { combineFacultyThesisWriters } from '../services/faculty/facultyThesisWriters'
 import { updateFacultyOverview, updateFacultyProgressOverview } from '../services/faculty/facultyUpdates'
+import { objectKeyAnnihilator } from '../util'
 import { ApplicationError } from '../util/customErrors'
 
 // Faculty uses a lot of tools designed for Degree programme.
@@ -145,19 +146,6 @@ router.get<
   GetStatsReqBody,
   GetGraduationStatsQuery
 >('/:id/graduationtimes', auth.roles(['facultyStatistics']), async (req, res) => {
-  // Recursively clears graduation time arrays "times" from result.
-  // We don't need to send them to client,
-  // but university view (uses same data) needs it to compute medians.
-  const clearTimes = (data: any) => {
-    if (Array.isArray(data)) {
-      data.forEach(clearTimes)
-    } else if (!!data && typeof data === 'object') {
-      if (data.times) data.times = []
-      Object.values(data).forEach(clearTimes)
-    }
-    return data
-  }
-
   const { id: facultyId } = req.params
   const { programme_filter: programmeFilter } = req.query
 
@@ -165,7 +153,9 @@ router.get<
   if (!faculty) throw new ApplicationError(`The organization with the id ${facultyId} was not found.`, 422)
 
   const data = await getGraduationStats(faculty.code, programmeFilter)
-  if (data) return res.json(clearTimes(data))
+  // Times were needed to compute medians/averages serverside, but are not needed in frontend.
+  // They are still kept in redis as university view needs them for the same purpose.
+  if (data) return res.json(objectKeyAnnihilator(data, 'times', []))
 
   const programmes = await getDegreeProgrammesOfFaculty(faculty.code, programmeFilter === 'NEW_DEGREE_PROGRAMMES')
   if (!programmes.length) throw new ApplicationError('Unprocessable request', 422)
@@ -173,7 +163,7 @@ router.get<
   const updatedStats = await countGraduationTimes(faculty.code, programmes)
   if (updatedStats) await setGraduationStats(updatedStats, programmeFilter)
 
-  return res.json(clearTimes(updatedStats))
+  return res.json(objectKeyAnnihilator(updatedStats, 'times', []))
 })
 
 type GetProgressStatsResBody = {

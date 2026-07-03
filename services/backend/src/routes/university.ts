@@ -17,6 +17,7 @@ import {
 import { combineFacultyStudentProgress, FacultyProgressData } from '../services/faculty/facultyStudentProgress'
 import { GraduationTarget } from '../services/graduationHelpers'
 import { getMedian } from '../services/studyProgramme/studyProgrammeHelpers'
+import { objectKeyAnnihilator } from '../util'
 import logger from '../util/logger'
 
 const router = Router()
@@ -232,6 +233,9 @@ router.get('/allgraduationstats', async (_req: Request, res: Response<University
     const { programmes: _, ...rest } = data.classSizes
     classSizes.programmes[facultyCode] = rest
   }
+
+  // Individual times are no longer needed as medians/averages were already computed.
+  objectKeyAnnihilator(byGradYear, 'times', [])
 
   res.status(200).json({
     goals,

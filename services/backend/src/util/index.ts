@@ -108,3 +108,23 @@ export const safeJSONParse = async <T>(json: string): Promise<T | null> => {
 export const handleQueryArrays = <T>(requestField: T | T[]): T[] => {
   return requestField ? (Array.isArray(requestField) ? requestField : [requestField]) : []
 }
+
+/**
+ * Recursively deletes all values from object that match the given key.
+ * Alternatively instead of deleting, replaces the values with something else.
+ */
+export const objectKeyAnnihilator = (data: any, keyToNuke: string, replaceWith?: any) => {
+  if (Array.isArray(data)) {
+    data.forEach(item => objectKeyAnnihilator(item, keyToNuke, replaceWith))
+  } else if (!!data && typeof data === 'object') {
+    if (data.times) {
+      if (replaceWith) {
+        data.times = replaceWith
+      } else {
+        delete data.times
+      }
+    }
+    Object.values(data).forEach(item => objectKeyAnnihilator(item, keyToNuke, replaceWith))
+  }
+  return data
+}
