@@ -99,7 +99,7 @@ void describe('Population statistics', () => {
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
       assert.strictEqual(resBachelor.status, 200)
-      assert.strictEqual(resBachelor.body.students.length, 38)
+      assert.strictEqual(resBachelor.body.students.length, 37)
     })
 
     it('(master)', async () => {
@@ -134,7 +134,12 @@ void describe('Population statistics', () => {
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
       assert.strictEqual(resSpring.status, 200)
-      assert.strictEqual(resSpring.body.students.length, 4)
+      assert.strictEqual(resSpring.body.students.length, 3)
+      // 524071 had previously start date in math of 2022-05-27
+      assert(
+        !resSpring.body.students.map(({ studentNumber }) => studentNumber).includes('524071'),
+        'Most likely student with incorrectly calculated study right start date included in to students'
+      )
     })
   })
 
