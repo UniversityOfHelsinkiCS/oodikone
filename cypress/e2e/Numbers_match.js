@@ -53,7 +53,7 @@ describe('Numbers should match between', () => {
     it('in Course statistics', () => {
       test.forEach(course => {
         // Moved to Course statistics
-        cy.init(`/coursestatistics?courseCodes=%5B%22${course.at(1)}%22%5D&combineSubstitutions=false`, 'admin')
+        cy.init(`/coursestatistics?courseCodes=%5B%22${course.at(1)}%22%5D&combineSubstitutions=false`, 'basic')
         cy.url().should('include', `/coursestatistics?courseCodes=%5B%22${course.at(1)}%22%5D`)
         cy.contains('Course statistics')
         cy.contains(course.at(2)) // course name
