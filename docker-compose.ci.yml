@@ -7,6 +7,10 @@ services:
   backend:
     <<: *defaults
     container_name: oodikone-backend
+    image: oodikone-backend:staging
+    build:
+      context: services
+      dockerfile: backend/Dockerfile
     depends_on:
       - kone-db
       - redis
@@ -24,38 +28,47 @@ services:
       IMPORTER_DB_API_URL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
       JAMI_URL: 'http://jami:3003/'
       CRYPT_KEY: 'e16730fce263d5270ba8dcf84d068a32556542455e71331880d6c1c5e4db9b4e'
-    build:
-      context: services
-      dockerfile: backend/Dockerfile
-    image: oodikone-backend:staging
     profiles:
       - oodikone
 
   frontend:
     <<: *defaults
     container_name: oodikone-frontend
+    image: oodikone-frontend:staging
     build:
       context: services
       dockerfile: frontend/Dockerfile
-    image: oodikone-frontend:staging
     profiles:
       - oodikone
 
   kone-db:
     <<: *defaults
     container_name: oodikone-kone-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
     environment:
       PGDATA: /data
       POSTGRES_DB: kone-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
+    ports:
+      - 4321:5432
+
+  user-db:
+    <<: *defaults
+    container_name: oodikone-user-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: user-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - 4320:5432
 
   redis:
     <<: *defaults
     container_name: oodikone-redis
+    image: redis:7.2.6
     command: >
       sh -c 'redis-server --appendonly yes && redis-cli flushall'
-    image: redis:7.2.6
     ports:
       - 6379:6379
 
@@ -68,15 +81,17 @@ services:
       POSTGRES_DB: sis-db
       POSTGRES_HOST_AUTH_METHOD: trust
     shm_size: 2gb
+    ports:
+      - 12345:5432
 
-  user-db:
+  sis-importer-db:
     <<: *defaults
-    container_name: oodikone-user-db
-    environment:
-      PGDATA: /data
-      POSTGRES_DB: user-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
+    container_name: oodikone-sis-importer-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+    profiles:
+      - updater
+    ports:
+      - 12346:5432
 
   jami:
     <<: *defaults
@@ -108,16 +123,32 @@ services:
       - backend
     ports:
       - 1337:80
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
     profiles:
       - oodikone
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
 
-  # Following services are used to run sis-updater-worker when anon sis-db needs to be updated. Could probably also use production version, but this certainly works.
-  sis-importer-db:
+  # Following services + sis-importer-db are used to run sis-updater-worker when anon sis-db needs to be updated. Could probably also use production version, but this certainly works.
+  sis-updater-scheduler:
     <<: *defaults
-    container_name: oodikone-sis-importer-db
-    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+    container_name: oodikone-updater-scheduler
+    build:
+      context: updater/sis-updater-scheduler
+    depends_on:
+      - redis
+      - sis-importer-db
+    environment:
+      CI: 'true'
+      REDIS_HOST: redis
+      SECRET_TOKEN: dev
+      SIS_IMPORTER_DATABASE: sis-importer-db
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_USER: postgres
+      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
+      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
+    ports:
+      - 8082:8082
     profiles:
       - updater
 
@@ -139,28 +170,5 @@ services:
       SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_USER: postgres
       SIS_PASSWORD: postgres
-    profiles:
-      - updater
-
-  sis-updater-scheduler:
-    <<: *defaults
-    container_name: oodikone-updater-scheduler
-    build:
-      context: updater/sis-updater-scheduler
-    depends_on:
-      - redis
-      - sis-importer-db
-    environment:
-      CI: 'true'
-      REDIS_HOST: redis
-      SECRET_TOKEN: dev
-      SIS_IMPORTER_DATABASE: sis-importer-db
-      SIS_IMPORTER_HOST: sis-importer-db
-      SIS_IMPORTER_PASSWORD: postgres
-      SIS_IMPORTER_USER: postgres
-      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
-      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
-    ports:
-      - 8082:8082
     profiles:
       - updater
