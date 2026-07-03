@@ -104,7 +104,6 @@ const scheduleMeta = async (clean = true) => {
 }
 
 const scheduleStudents = async () => {
-  logger.info('Scheduled students')
   await scheduleFromDb({
     scheduleId: 'students',
     table: IMPORTER_TABLES.persons,
