@@ -1,19 +1,12 @@
 import { Express } from 'express'
-import assert from 'node:assert/strict'
-import { describe, it, before } from 'node:test'
 import { Sequelize } from 'sequelize'
 import request from 'supertest'
+import { describe, it, beforeAll, assert } from 'vitest'
 
+import { CanError } from '@oodikone/shared/routes'
 import { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
 import { dbConnections } from '../../src/database/connection'
 import { initTests, ResponseWithBody } from '../utils'
-
-let app: Express
-let connection: Sequelize
-before(async () => {
-  app = await initTests()
-  connection = dbConnections.sequelize
-})
 
 const populationUrl = (
   programme = '',
@@ -24,9 +17,17 @@ const populationUrl = (
   return `/populationstatistics?${programme && 'programme=' + programme}${years.map(year => '&years=' + year).join('')}${semesters.map(sem => '&semesters=' + sem).join('')}${students.map(s => '&studentStatuses=' + s).join('')}`
 }
 
-void describe('Population statistics', async () => {
-  await it('should fail when all fields not defined', async t => {
-    await t.test('(all)', async () => {
+void describe('Population statistics', () => {
+  let app: Express
+  let connection: Sequelize
+
+  beforeAll(async () => {
+    app = await initTests()
+    connection = dbConnections.sequelize
+  })
+
+  describe('should fail when all fields not defined', () => {
+    it('(all)', async () => {
       const resAllMissing = await request(app)
         .get(populationUrl())
         .set('shib-session-id', 'test')
@@ -35,7 +36,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(resAllMissing.status, 400)
     })
 
-    await t.test('(all but code)', async () => {
+    it('(all but code)', async () => {
       const resProgramme = await request(app)
         .get(populationUrl('KH50_001'))
         .set('shib-session-id', 'test')
@@ -45,7 +46,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(resProgramme.status, 400)
     })
 
-    await t.test('(all but code and years)', async () => {
+    it('(all but code and years)', async () => {
       const resProgrammeAndYears = await request(app)
         .get(populationUrl('KH50_001', ['2021', '2022']))
         .set('shib-session-id', 'test')
@@ -56,29 +57,29 @@ void describe('Population statistics', async () => {
     })
   })
 
-  await it('should not return any data to unauthorized user', async () => {
+  it('should not return any data to unauthorized user', async () => {
     const res = (await request(app)
       .get(populationUrl('KH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
       .set('shib-session-id', 'test')
       .set('uid', 'norights')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CanError<PopulationstatisticsResBody>>
 
     assert.deepStrictEqual(res.body, { error: 'Trying to request unauthorized students data' })
     assert.strictEqual(res.status, 403)
   })
 
-  await it('should fail when trying to access a programme that user has no permissions to', async () => {
+  it('should fail when trying to access a programme that user has no permissions to', async () => {
     const res = (await request(app)
       .get(populationUrl('MH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
       .set('shib-session-id', 'test')
       .set('uid', 'onlyiamrights')
-      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CanError<PopulationstatisticsResBody>>
 
     assert.strictEqual(res.status, 403)
     assert.deepStrictEqual(res.body, { error: 'Trying to request unauthorized students data' })
   })
 
-  await it('should return students in the programme for authorized user', async () => {
+  it('should return students in the programme for authorized user', async () => {
     const res = (await request(app)
       .get(populationUrl('KH50_001', ['2021', '2022'], ['SPRING', 'FALL']))
       .set('shib-session-id', 'test')
@@ -89,8 +90,8 @@ void describe('Population statistics', async () => {
     assert.notStrictEqual(res.body.students.length, 0)
   })
 
-  await it('should work with the programme flag', async t => {
-    await t.test('(bachelor)', async () => {
+  describe('should work with the programme flag', () => {
+    it('(bachelor)', async () => {
       const resBachelor = (await request(app)
         .get(populationUrl('KH50_001', ['2021'], ['SPRING', 'FALL']))
         .set('shib-session-id', 'test')
@@ -101,7 +102,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(resBachelor.body.students.length, 38)
     })
 
-    await t.test('(master)', async () => {
+    it('(master)', async () => {
       const resMaster = (await request(app)
         .get(populationUrl('MH50_001', ['2021'], ['SPRING', 'FALL']))
         .set('shib-session-id', 'test')
@@ -113,8 +114,8 @@ void describe('Population statistics', async () => {
     })
   })
 
-  await it('should work with semester flag', async t => {
-    await t.test('(FALL)', async () => {
+  describe('should work with semester flag', () => {
+    it('(FALL)', async () => {
       const resFall = (await request(app)
         .get(populationUrl('KH50_001', ['2021'], ['FALL']))
         .set('shib-session-id', 'test')
@@ -125,7 +126,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(resFall.body.students.length, 34)
     })
 
-    await t.test('(SPRING)', async () => {
+    it('(SPRING)', async () => {
       const resSpring = (await request(app)
         .get(populationUrl('KH50_001', ['2021'], ['SPRING']))
         .set('shib-session-id', 'test')
@@ -137,8 +138,8 @@ void describe('Population statistics', async () => {
     })
   })
 
-  await it('should work with year flag correctly', async t => {
-    await t.test('(2021)', async () => {
+  describe('should work with year flag correctly', () => {
+    it('(2021)', async () => {
       const res2021 = (await request(app)
         .get(populationUrl('KH50_001', ['2021'], ['FALL', 'SPRING']))
         .set('shib-session-id', 'test')
@@ -153,7 +154,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(res2021.body.students.length, dbCount2021?.count)
     })
 
-    await t.test('(2022)', async () => {
+    it('(2022)', async () => {
       const res2022 = (await request(app)
         .get(populationUrl('KH50_001', ['2022'], ['FALL', 'SPRING']))
         .set('shib-session-id', 'test')
@@ -168,7 +169,7 @@ void describe('Population statistics', async () => {
       assert.strictEqual(res2022.body.students.length, dbCount2022?.count)
     })
 
-    await t.test('(2021-2022)', async () => {
+    it('(2021-2022)', async () => {
       const res2021_2022 = (await request(app)
         .get(populationUrl('KH50_001', ['2021', '2022'], ['FALL', 'SPRING']))
         .set('shib-session-id', 'test')
@@ -184,7 +185,7 @@ void describe('Population statistics', async () => {
     })
   })
 
-  await it.skip('should return only students who have transferred out of the programme when TRANSFERRED flag is set', async () => {
+  it.skip('should return only students who have transferred out of the programme when TRANSFERRED flag is set', async () => {
     // TODO: This doesn't work correctly...
     const resWithTransOut = (await request(app)
       .get(populationUrl('KH50_001', ['2019'], ['FALL', 'SPRING'], ['']))
@@ -213,6 +214,6 @@ void describe('Population statistics', async () => {
     assert.strictEqual(resWithTransOut.body.students.length, dbCountWithTransferredOut?.count)
     assert.strictEqual(resWithoutTransOut.body.students.length, dbCountWithoutTransferredOut?.count)
   })
-  await it.todo('should return only degree-students and non-degree students when NONDEGREE flag is set')
-  await it.todo('should return only degree-students and exchange students when EXCHANGE flag is set')
+  it.todo('should return only degree-students and non-degree students when NONDEGREE flag is set')
+  it.todo('should return only degree-students and exchange students when EXCHANGE flag is set')
 })
