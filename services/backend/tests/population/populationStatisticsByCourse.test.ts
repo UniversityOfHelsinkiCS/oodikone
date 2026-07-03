@@ -9,6 +9,7 @@ void describe('Population statistics by course', () => {
   beforeAll(async () => {
     app = await initTests()
   })
+
   it('should not return anything with missing parameters', async () => {
     const res = await request(app)
       .get('/populationstatisticsbycourse')
