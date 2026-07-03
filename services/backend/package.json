@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "node --import=tsx --test --test-force-exit --test-reporter spec tests/**/*.ts"
+    "test": "node --import=tsx --test --test-force-exit --test-reporter spec tests/**/*.ts",
+    "test:local": "node --env-file=.env.test --test-force-exit --import=tsx --test --test-reporter spec tests/**/*.ts"
   },
   "dependencies": {
     "@oodikone/shared": "file:../shared",

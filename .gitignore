@@ -56,7 +56,7 @@ cypress/videos/
 coverage/
 instrumented/
 
-# Pycharm 
+# Pycharm
 .idea
 
 # VS Code
@@ -68,3 +68,5 @@ instrumented/
 # Target of shared symlink
 services/**/src/shared
 
+
+!services/backend/.env.test

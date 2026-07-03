@@ -74,6 +74,8 @@ services:
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
     profiles:
       - oodikone
+    ports:
+      - 4321:5432
     volumes:
       - kone-db-data:/data
 
@@ -162,6 +164,8 @@ services:
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
     profiles:
       - oodikone
+    ports:
+      - 4320:5432
     volumes:
       - user-db-data:/data
 
