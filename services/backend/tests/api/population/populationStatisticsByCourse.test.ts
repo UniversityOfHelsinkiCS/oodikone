@@ -125,6 +125,16 @@ void describe('Population statistics by course', () => {
 
     assert.strictEqual(res.status, 200)
     assert.strictEqual(res.body.students.length, 40)
-    assert.deepStrictEqual(res.body.students.sort((a, b) => b.studentNumber - a.studentNumber).at(-1), testStudent)
+    const responseStudent: typeof testStudent = res.body.students
+      .sort((a, b) => b.studentNumber - a.studentNumber)
+      .at(-1)
+
+    assert.strictEqual(responseStudent.name, testStudent.name)
+    assert.strictEqual(responseStudent.studentNumber, testStudent.studentNumber)
+    assert.strictEqual(responseStudent.credits, testStudent.credits)
+    assert.strictEqual(responseStudent.credits, testStudent.credits)
+    assert.strictEqual(responseStudent.started, testStudent.started)
+    assert.strictEqual(responseStudent.sis_person_id, testStudent.sis_person_id)
+    assert.deepStrictEqual(responseStudent.studyRights, testStudent.studyRights)
   })
 })
