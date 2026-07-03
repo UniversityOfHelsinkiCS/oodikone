@@ -48,11 +48,16 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
-      - name: Start oodikone detached
-        run: npm run oodikone:ci:setup
+      - name: Start oodikone (without frontend and backend)
+        run: npm run oodikone:ci:setup -- --quiet-pull
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./services/backend
 
       - name: Run api-tests
-        run: npm run oodikone:ci:api
+        run: npm run test
+        working-directory: ./services/backend
 
   test_end_to_end:
     name: ${{ matrix.name }}
@@ -92,6 +97,8 @@ jobs:
             spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test university'
             spec: cypress/e2e/University.js
+          - name: 'Test numbers match'
+            spec: cypress/e2e/Numbers_match.js
 
     steps:
       - uses: actions/checkout@v6
