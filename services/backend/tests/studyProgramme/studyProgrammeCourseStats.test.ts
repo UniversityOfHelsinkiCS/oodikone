@@ -1,22 +1,14 @@
 import { Express } from 'express'
 import assert from 'node:assert/strict'
-import { describe, it, before, after } from 'node:test'
-import { Sequelize } from 'sequelize'
+import { describe, it, before } from 'node:test'
 import request from 'supertest'
 
 import { StudyProgrammeCourse } from '@oodikone/shared/types'
-import { dbConnections } from '../../src/database/connection'
 import { initTests, ResponseWithBody } from '../utils'
 
 let app: Express
-let connection: Sequelize
 before(async () => {
   app = await initTests()
-  connection = dbConnections.sequelize
-})
-
-after(async () => {
-  await connection.close()
 })
 
 const testCourseStatsForCourse = async (courseCode: string, testData: Record<string, number[]>, t: it.TestContext) => {

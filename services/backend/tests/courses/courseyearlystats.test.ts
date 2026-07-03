@@ -1,22 +1,14 @@
 import { Express } from 'express'
 import assert from 'node:assert/strict'
-import { describe, it, before, after } from 'node:test'
-import { Sequelize } from 'sequelize'
+import { describe, it, before } from 'node:test'
 import request from 'supertest'
 
-import { dbConnections } from '../../src/database/connection'
 import { CourseYearlyStatsResBody } from '../../src/routes/courses'
 import { initTests, ResponseWithBody } from '../utils'
 
 let app: Express
-let connection: Sequelize
 before(async () => {
   app = await initTests()
-  connection = dbConnections.sequelize
-})
-
-after(async () => {
-  await connection.close()
 })
 
 void describe('Course yearly statistics', async () => {
