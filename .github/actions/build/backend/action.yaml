@@ -39,3 +39,11 @@ runs:
           BASE_PATH=${{ case(inputs.environment == 'staging', '/oodikone', '') }}
           SENTRY_ENVIRONMENT=${{ inputs.environment }}
           SENTRY_RELEASE=${{ inputs.release_version }}
+
+    - name: Export output image and tag names
+      shell: bash
+      run: |
+        IMAGE=${{ steps.build-image.outputs.image }}
+        TAGS=${{ steps.build-image.outputs.tags }}
+        echo "image=$IMAGE" >> $GITHUB_OUTPUT
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
