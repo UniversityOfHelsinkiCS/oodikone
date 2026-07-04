@@ -44,7 +44,7 @@ runs:
           GIT_SHA=${{ github.sha }}
           STAGING=${{ case(inputs.environment == 'staging', 'true', 'false') }}
           BASE_PATH=${{ case(inputs.environment == 'staging', '/oodikone', '') }}
-          SENTRY_ENVIRONMENT=${{ inputs.enrvironment }}
+          SENTRY_ENVIRONMENT=${{ inputs.environment }}
           SENTRY_RELEASE=${{ inputs.release_version }}
           BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '') }}
