@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: 'Run tests'
-        uses: ./.github/actions/run-tests
+        uses: ./.github/actions/test/e2e
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}

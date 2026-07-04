@@ -338,7 +338,7 @@ jobs:
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Run tests'
-        uses: ./.github/actions/e2e
+        uses: ./.github/actions/test/e2e
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
