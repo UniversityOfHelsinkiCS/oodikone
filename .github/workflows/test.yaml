@@ -163,6 +163,7 @@ jobs:
       fail-fast: false
 
     steps:
+      - uses: actions/checkout@v6
       - name: Run api tests
         uses: ./.github/actions/test/api
         with:
