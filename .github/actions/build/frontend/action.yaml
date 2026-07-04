@@ -26,8 +26,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-
     - name: Get current time
       id: get_current_time
       run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
