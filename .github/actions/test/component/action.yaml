@@ -10,13 +10,16 @@ runs:
         node-version: 24
 
     - name: Install dependencies
+      shell: bash
       run: npm ci --prefix ./services/shared && npm ci --prefix ./services/frontend
 
     - name: Install Playwright Browsers
+      shell: bash
       run: npm exec -- playwright install --with-deps
       working-directory: ./services/frontend
 
     - name: Run Playwright tests
+      shell: bash
       run: npm run test:component --prefix ./services/frontend
 
     - uses: actions/upload-artifact@v4

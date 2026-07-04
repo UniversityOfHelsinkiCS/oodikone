@@ -10,10 +10,13 @@ runs:
         node-version: 24
 
     - name: Install dependencies
+      shell: bash
       run: npm ci --prefix ./services/shared && npm ci --prefix ./services/backend && npm ci --prefix ./services/frontend
 
     - name: Run frontend unit tests
+      shell: bash
       run: npm run test:unit --prefix ./services/frontend
 
     - name: Run backend unit tests
+      shell: bash
       run: npm run test:unit --prefix ./services/backend

@@ -26,10 +26,13 @@ runs:
         password: ${{ secrets.password }}
 
     - name: Start oodikone (without frontend and backend)
+      shell: bash
       run: npm run oodikone:ci:setup -- --quiet-pull --wait
 
     - name: Install dependencies
+      shell: bash
       run: npm ci --prefix ./services/backend
 
     - name: Run api-tests
+      shell: bash
       run: npm run test --prefix ./services/backend
