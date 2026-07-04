@@ -6,6 +6,11 @@ x-defaults: &defaults
 x-build_defaults: &build_defaults
   dockerfile: dev.Dockerfile
 
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 1s
+  timeout: 3s
+  retries: 30
+
 services:
   adminer:
     <<: *defaults
@@ -25,10 +30,14 @@ services:
       dockerfile: backend/dev.Dockerfile
       context: services
     depends_on:
-      - kone-db
-      - redis
-      - sis-db
-      - user-db
+      kone-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      sis-db:
+        condition: service_healthy
+      user-db:
+        condition: service_healthy
     env_file:
       - .env
     tty: true
@@ -51,6 +60,9 @@ services:
       - ./services/shared/:/opt/app-root/shared
       - shared-nodemod:/opt/app-root/shared/node_modules
       - backend-nodemod:/opt/app-root/backend/node_modules
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/api/health']
+      <<: *healthcheck-defaults
 
   frontend:
     <<: *defaults
@@ -58,6 +70,9 @@ services:
     build:
       dockerfile: frontend/dev.Dockerfile
       context: services
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
       - 3000:3000
     profiles:
@@ -78,6 +93,9 @@ services:
       - 4321:5432
     volumes:
       - kone-db-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'kone-db']
+      <<: *healthcheck-defaults
 
   user-db:
     <<: *defaults
@@ -89,6 +107,9 @@ services:
       - 4320:5432
     volumes:
       - user-db-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'user-db']
+      <<: *healthcheck-defaults
 
   redis:
     <<: *defaults
@@ -99,6 +120,9 @@ services:
       - 6379:6379
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      <<: *healthcheck-defaults
 
   sis-db:
     <<: *defaults
@@ -109,6 +133,9 @@ services:
     shm_size: 2gb
     ports:
       - 12345:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-db']
+      <<: *healthcheck-defaults
 
   sis-importer-db:
     <<: *defaults
@@ -120,6 +147,9 @@ services:
       - sis-importer-db-data:/data
     ports:
       - 12346:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-importer-db']
+      <<: *healthcheck-defaults
 
   jami:
     <<: *defaults
@@ -146,6 +176,9 @@ services:
       - 5433:5432
     volumes:
       - jami-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'jami-db-real']
+      <<: *healthcheck-defaults
 
   sis-updater-scheduler:
     <<: *defaults
@@ -154,8 +187,10 @@ services:
       <<: *build_defaults
       context: updater/sis-updater-scheduler
     depends_on:
-      - redis
-      - sis-importer-db
+      redis:
+        condition: service_healthy
+      sis-importer-db:
+        condition: service_healthy
     environment:
       REDIS_HOST: redis
       SECRET_TOKEN: dev
@@ -170,6 +205,9 @@ services:
     volumes:
       - sis-updater-scheduler-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-scheduler/:/opt/app-root/src
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8082/health']
+      <<: *healthcheck-defaults
 
   sis-updater-worker:
     <<: *defaults
@@ -178,9 +216,12 @@ services:
       <<: *build_defaults
       context: updater/sis-updater-worker
     depends_on:
-      - redis
-      - sis-db
-      - sis-importer-db
+      redis:
+        condition: service_healthy
+      sis-db:
+        condition: service_healthy
+      sis-importer-db:
+        condition: service_healthy
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db
       REDIS_HOST: redis

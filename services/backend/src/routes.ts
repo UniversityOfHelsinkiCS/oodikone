@@ -18,6 +18,7 @@ import curriculumPeriods from './routes/curriculumPeriods'
 import customPopulationSearch from './routes/customPopulationSearch'
 import faculties from './routes/faculties'
 import feedback from './routes/feedback'
+import health from './routes/health'
 import languageCenterData from './routes/languageCenterData'
 import login from './routes/login'
 import population from './routes/population'
@@ -70,6 +71,7 @@ const routes = (app: Express, url: string) => {
   app.use(`${url}/close-to-graduation`, auth.roles(['fullSisuAccess', 'studyGuidanceGroups']), closeToGraduation)
   app.use(`${url}/study-programme-pins`, studyProgrammePins)
   app.use(`${url}/curriculum-periods`, curriculumPeriods)
+  app.use(`${url}/health`, health)
   app.get('', (_, res) => {
     res.status(404).json({ error: 'unknown endpoint' })
   })

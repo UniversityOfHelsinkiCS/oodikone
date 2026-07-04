@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/node'
 import { NextFunction, Request, Response } from 'express'
 import { intersection } from 'lodash-es'
 
-import { requiredGroup } from '../config'
+import { requiredGroup, baseUrl } from '../config'
 import { getMockedUser, getOrganizationAccess, getUser } from '../services/userService'
 import { ApplicationError } from '../util/customErrors'
 import logger from '../util/logger'
@@ -35,6 +35,11 @@ export default async (req: Request, _: Response, next: NextFunction) => {
     shib_logout_url: logoutUrl,
     uid: username,
   } = req.headers as Headers
+
+  if (req.path === `${baseUrl}/health`) {
+    next()
+    return
+  }
 
   if (!username || !sessionId)
     throw new ApplicationError(

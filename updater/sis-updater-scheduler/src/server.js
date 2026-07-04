@@ -42,6 +42,11 @@ const app = express()
 app.use(express.json())
 app.use(message)
 
+/** Used for checking if backend is up eg. Docker healthchecks */
+app.get('/health', (_, res) => {
+  return res.status(200).json({ status: 'healthy' })
+})
+
 app.get('/healthcheck', async (_, res) => {
   const latestMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
   const threshold = new Date().getTime() - 1000 * 60 * 60 * 6 // 6 hours ago
