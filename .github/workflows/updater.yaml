@@ -96,7 +96,7 @@ jobs:
       - name: 'Load scheduler image'
         run: docker load --input scheduler.tar
       - name: 'Start worker'
-        run: docker compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker
+        run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull --no-recreate sis-updater-worker
       - name: 'Run hourly jobs'
         run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:

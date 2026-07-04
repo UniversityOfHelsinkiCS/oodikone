@@ -114,7 +114,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend --wait
+          docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
@@ -145,7 +145,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend --wait
+          docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
