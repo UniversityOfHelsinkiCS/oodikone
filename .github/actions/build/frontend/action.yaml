@@ -52,7 +52,7 @@ runs:
     - name: Export output image and tag names
       shell: bash
       run: |
-        IMAGE=${{ steps.build-image.outputs.image }}
-        TAGS=${{ steps.build-image.outputs.tags }}
+        IMAGE="${{ steps.build-image.outputs.image }}"
+        TAGS="${{ steps.build-image.outputs.tags }}"
         echo "image=$IMAGE" >> $GITHUB_OUTPUT
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
