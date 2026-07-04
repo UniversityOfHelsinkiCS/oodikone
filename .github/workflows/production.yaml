@@ -22,8 +22,8 @@ jobs:
         steps:
           - uses: ./.github/actions/build/backend
             with:
-              - environment: 'production'
-              - release-version: ${{ steps.extract_version.outputs.VERSION }}
+              environment: 'production'
+              release-version: ${{ steps.extract_version.outputs.VERSION }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -51,9 +51,9 @@ jobs:
         steps:
           - uses: ./.github/actions/build/frontend
             with:
-              - environment: 'production'
-              - release_version: ${{ steps.extract_version.outputs.VERSION }}
-              - sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
+              environment: 'production'
+              release_version: ${{ steps.extract_version.outputs.VERSION }}
+              sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
