@@ -1,0 +1,41 @@
+name: 'Build backend'
+description: 'Build backend in staging or production versions'
+
+inputs:
+  environment:
+    required: true
+    description: 'staging or production'
+    default: 'production'
+  release_version:
+    required: false
+    description: 'Release version added to production builds'
+    default: ${{ github.sha }}
+
+outputs:
+  image:
+    description: 'Image name provided by buildah action'
+    value: ${{ steps.build-image.outputs.image }}
+  tag:
+    description: 'Tag name provided by buildah action'
+    value: ${{ steps.build-image.outputs.tag }}
+
+runs:
+  using: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Build backend image
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: oodikone-backend
+        tags: ${{ inputs.environment }} ${{ github.sha }}
+        context: services
+        containerfiles: |
+          services/backend/Dockerfile
+        build-args: |
+          GIT_SHA=${{ github.sha }}
+          STAGING=${{ case(inputs.environment == 'staging', 'true', 'false') }}
+          BASE_PATH=${{ case(inputs.environment == 'staging', '/oodikone', '') }}
+          SENTRY_ENVIRONMENT=${{ inputs.environment }}
+          SENTRY_RELEASE=${{ inputs.release_version }}

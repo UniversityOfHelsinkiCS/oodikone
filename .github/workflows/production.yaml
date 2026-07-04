@@ -5,45 +5,6 @@ on:
     types: [published]
 
 jobs:
-  release_frontend:
-    name: 'Build and release frontend'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: 'Get current time'
-        id: get_current_time
-        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
-
-      - name: Extract release version
-        id: extract_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Build frontend image
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: oodikone-frontend
-          tags: production ${{ github.sha }}
-          context: services
-          containerfiles: |
-            services/frontend/Dockerfile
-          build-args: |
-            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
-            SENTRY_ENVIRONMENT=production
-            SENTRY_DSN=${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }}
-
-      - name: Push to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
-
   release_backend:
     name: 'Build and release backend'
     runs-on: ubuntu-latest
@@ -55,18 +16,44 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Build backend image
+      - name: 'Build backend'
         id: build-image
-        uses: redhat-actions/buildah-build@v2
+        runs-on: ubuntu-latest
+        steps:
+          - uses: ./.github/actions/build/backend
+            with:
+              - environment: 'production'
+              - release-version: ${{ steps.extract_version.outputs.VERSION }}
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
         with:
-          image: oodikone-backend
-          tags: production ${{ github.sha }}
-          context: services
-          containerfiles: |
-            services/backend/Dockerfile
-          build-args: |
-            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
-            SENTRY_ENVIRONMENT=production
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_frontend:
+    name: 'Build and release frontend'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract release version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: 'Build frontend'
+        id: build-image
+        runs-on: ubuntu-latest
+        steps:
+          - uses: ./.github/actions/build/frontend
+            with:
+              - environment: 'production'
+              - release_version: ${{ steps.extract_version.outputs.VERSION }}
+              - sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

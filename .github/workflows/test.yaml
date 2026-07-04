@@ -25,61 +25,19 @@ jobs:
     name: 'Build backend'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: docker/setup-buildx-action@v4
-      - name: 'Build image and export it'
-        uses: docker/build-push-action@v7
+      - uses: ./.github/actions/build/backend
         with:
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
-          context: services
-          file: services/backend/Dockerfile
-          push: false
-          tags: oodikone-backend:staging
-          outputs: type=docker,dest=/tmp/backend.tar
-        env:
-          DOCKER_BUILD_SUMMARY: false
-
-      - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          name: backend-image
-          path: /tmp/backend.tar
+          - environment: 'staging'
+          - release-version: ${{ github.sha }}
 
   build_frontend:
     name: 'Build frontend'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: docker/setup-buildx-action@v4
-
-      - name: Get current time
-        id: get_current_time
-        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
-
-      - name: Build frontend image
-        uses: docker/build-push-action@v7
+      - uses: ./.github/actions/build/frontend
         with:
-          build-args: |
-            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-            BASE_PATH=/oodikone
-            STAGING=true
-          context: services
-          file: services/frontend/Dockerfile
-          push: false
-          tags: oodikone-frontend:staging
-          outputs: type=docker,dest=/tmp/frontend.tar
-        env:
-          DOCKER_BUILD_SUMMARY: false
-
-      # - name: 'Upload image for other jobs'
-      #   uses: actions/upload-artifact@v7
-      #   with:
-      #     if-no-files-found: error
-      #     name: frontend-image
-      #     path: /tmp/frontend.tar
+          - environment: 'staging'
+          - release-version: ${{ github.sha }}
 
   pull_docker_images:
     name: 'Pull all needed docker images and cache them'
@@ -191,15 +149,9 @@ jobs:
         with:
           name: docker-images
           path: /tmp
-      - name: 'Download backend image'
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-      - name: 'Load built backend image'
-        run: docker load --input backend.tar
 
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v4
@@ -210,7 +162,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach backend --wait
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
@@ -238,15 +190,9 @@ jobs:
         with:
           name: docker-images
           path: /tmp
-      - name: 'Download backend image'
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-      - name: 'Load built backend image'
-        run: docker load --input backend.tar
 
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v4
@@ -257,7 +203,7 @@ jobs:
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach backend
+          docker compose --file docker-compose.ci.yml up --detach backend --wait
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
@@ -276,44 +222,26 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      name: 'Run api-tests'
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download Docker images
+          uses: actions/download-artifact@v8
+          with:
+            name: docker-images
+            path: /tmp
 
-      - name: Install node-24
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
+        - name: Load Docker images
+          run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
-      - name: Download Docker images
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
+        - uses: ./.github/actions/test/api
+          with:
+            username: ${{ secrets.username }}
+            password: ${{ secrets.password }}
 
-      - name: Load Docker images
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-
-      - name: Login to toska docker registry
-        uses: docker/login-action@v4
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-
-      - name: Start oodikone (without frontend and backend)
-        run: npm run oodikone:ci:setup -- --quiet-pull
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./services/backend
-
-      - name: Run api-tests
-        run: npm run test
-        working-directory: ./services/backend
-
-  # === Frontend unit testing ===
-  test_unit_frontend:
-    name: 'Run frontend unit tests'
+  # === Unit testing ===
+  test_unit:
+    name: 'Run unit tests'
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
@@ -324,21 +252,7 @@ jobs:
       - lint_packages
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install node-24
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./services/frontend
-
-      - name: Run unit tests
-        run: npm run test:unit
-        working-directory: ./services/frontend
+      - uses: ./.github/actions/test/unit
 
   # === Frontend component testing ===
   test_components:
@@ -353,32 +267,7 @@ jobs:
       - lint_packages
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install node-24
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: npm ci --prefix shared && npm ci --prefix frontend
-        working-directory: ./services
-
-      - name: Install Playwright Browsers
-        run: npm exec -- playwright install --with-deps
-        working-directory: ./services/frontend
-
-      - name: Run Playwright tests
-        run: npm run test:component
-        working-directory: ./services/frontend
-
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+      - uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
   test_end_to_end:
@@ -437,24 +326,12 @@ jobs:
         with:
           name: docker-images
           path: /tmp
-      - name: 'Download backend image'
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-image
-      # - name: 'Download frontend image'
-      #   uses: actions/download-artifact@v8
-      #   with:
-      #     name: frontend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-      - name: 'Load built backend image'
-        run: docker load --input backend.tar
-      # - name: 'Load built frontend image'
-      #   run: docker load --input frontend.tar
 
       - name: 'Run tests'
-        uses: ./.github/actions/run-tests
+        uses: ./.github/actions/e2e
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
@@ -487,24 +364,12 @@ jobs:
         with:
           name: docker-images
           path: /tmp
-      - name: 'Download backend image'
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-image
-      # - name: 'Download frontend image'
-      #   uses: actions/download-artifact@v8
-      #   with:
-      #     name: frontend-image
 
       - name: 'Load Docker images'
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-      - name: 'Load built backend image'
-        run: docker load --input backend.tar
-      # - name: 'Load built frontend image'
-      #   run: docker load --input frontend.tar
 
       - name: 'Run services, build rest of the needed images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
+        run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --wait
 
       - name: 'Check that exit statuses are not errors'
         run: |

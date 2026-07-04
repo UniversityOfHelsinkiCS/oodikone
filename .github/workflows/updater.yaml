@@ -5,8 +5,7 @@ on:
     types: [published]
     paths:
       - '.github/workflows/updater.yaml'
-      - 'updater/sis-updater-worker/**'
-      - 'updater/sis-updater-scheduler/**'
+      - 'updater/**'
 
 jobs:
   lint_scheduler_and_worker:
@@ -18,9 +17,6 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install safe-chain
-        run: set -o pipefail && curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
-
       - name: 'Install dependencies'
         run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
       - name: 'Run linter'
@@ -29,6 +25,7 @@ jobs:
   build_worker:
     name: 'Build Updater worker'
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v6
       - uses: docker/setup-buildx-action@v4
@@ -41,6 +38,7 @@ jobs:
           tags: toska/sis-updater-worker:latest
         env:
           DOCKER_BUILD_SUMMARY: false
+
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v7
         with:
@@ -50,6 +48,7 @@ jobs:
   build_scheduler:
     name: 'Build Updater scheduler'
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v6
       - uses: docker/setup-buildx-action@v4
@@ -62,6 +61,7 @@ jobs:
           tags: toska/sis-updater-scheduler:latest
         env:
           DOCKER_BUILD_SUMMARY: false
+
       - name: 'Upload image for other jobs'
         uses: actions/upload-artifact@v7
         with:
@@ -75,6 +75,7 @@ jobs:
       - lint_scheduler_and_worker
       - build_worker
       - build_scheduler
+
     steps:
       - uses: actions/checkout@v6
       - name: 'Login to toska docker registry'
@@ -83,11 +84,13 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+
       - name: 'Download built images'
         uses: actions/download-artifact@v8
         with:
           pattern: 'updater-{worker,scheduler}-image'
           merge-multiple: true
+
       - name: 'Load worker image'
         run: docker load --input worker.tar
       - name: 'Load scheduler image'

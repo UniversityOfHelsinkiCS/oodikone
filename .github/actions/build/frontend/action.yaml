@@ -1,0 +1,51 @@
+name: 'Build frontend'
+description: 'Build frontend in staging or production versions'
+
+inputs:
+  environment:
+    required: true
+    description: 'staging or production'
+    default: 'production'
+  release_version:
+    required: false
+    description: 'Release version added to production builds'
+    default: ${{ github.sha }}
+  sentry_dns:
+    required: false
+    description: 'Sentry url to send error logs to (only production, enforced)'
+    default: ''
+
+outputs:
+  image:
+    description: 'Image name provided by buildah action'
+    value: ${{ steps.build-image.outputs.image }}
+  tag:
+    description: 'Tag name provided by buildah action'
+    value: ${{ steps.build-image.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Get current time
+      id: get_current_time
+      run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
+
+    - name: Build frontend image
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: oodikone-frontend
+        tags: ${{ inputs.environment }} ${{ github.sha }}
+        context: services
+        containerfiles: |
+          services/frontend/Dockerfile
+        build-args: |
+          GIT_SHA=${{ github.sha }}
+          STAGING=${{ case(inputs.environment == 'staging', 'true', 'false') }}
+          BASE_PATH=${{ case(inputs.environment == 'staging', '/oodikone', '') }}
+          SENTRY_ENVIRONMENT=${{ inputs.enrvironment }}
+          SENTRY_RELEASE=${{ input.release_version }}
+          BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
+          SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '' }}

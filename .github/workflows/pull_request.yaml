@@ -5,12 +5,16 @@ on:
     branches:
       - master
     paths:
-      - 'cypress/**'
-      - 'cypress.config.json'
+      - '.github/actions/**'
+      - '.github/workflows/pull_request.yaml'
+      - '.github/workflows/test.yaml'
       - 'services/**'
       - 'updater/**'
       - 'docker-compose.ci.yml'
+      - 'docker-compose.test.yml'
       - 'package*.json'
+      - 'cypress/**'
+      - 'cypress.config.json'
 
 jobs:
   lint_packages:
@@ -23,41 +27,25 @@ jobs:
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
+  test_unit:
+    name: 'Run unit tests'
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
+    needs:
+      - lint_packages
+
+    steps:
+      - uses ./.github/actions/test/unit
+
   test_api:
     name: 'Test backend api'
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
     needs:
       - lint_packages
-    strategy:
-      fail-fast: false
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install node-24 for cypress
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v4
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-
-      - name: Start oodikone (without frontend and backend)
-        run: npm run oodikone:ci:setup -- --quiet-pull
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./services/backend
-
-      - name: Run api-tests
-        run: npm run test
-        working-directory: ./services/backend
+      - uses ./.github/actions/test/api
 
   test_end_to_end:
     name: ${{ matrix.name }}
