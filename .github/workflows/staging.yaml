@@ -36,7 +36,7 @@ jobs:
         uses: ./.github/actions/build/backend
         with:
           environment: 'staging'
-          release-version: ${{ github.sha }}
+          release_version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -60,7 +60,7 @@ jobs:
         uses: ./.github/actions/build/frontend
         with:
           environment: 'staging'
-          release-version: ${{ github.sha }}
+          release_version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

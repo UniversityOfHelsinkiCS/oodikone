@@ -30,7 +30,7 @@ jobs:
         uses: ./.github/actions/build/backend
         with:
           environment: 'staging'
-          release-version: ${{ github.sha }}
+          release_version: ${{ github.sha }}
 
   build_frontend:
     name: 'Build frontend'
@@ -41,7 +41,7 @@ jobs:
         uses: ./.github/actions/build/frontend
         with:
           environment: 'staging'
-          release-version: ${{ github.sha }}
+          release_version: ${{ github.sha }}
 
   pull_docker_images:
     name: 'Pull all needed docker images and cache them'

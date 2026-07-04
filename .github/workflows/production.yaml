@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/build/backend
         with:
           environment: 'production'
-          release-version: ${{ steps.extract_version.outputs.VERSION }}
+          release_version: ${{ steps.extract_version.outputs.VERSION }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
