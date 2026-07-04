@@ -43,40 +43,6 @@ jobs:
           environment: 'staging'
           release_version: ${{ github.sha }}
 
-  pull_docker_images:
-    name: 'Pull all needed docker images and cache them'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v4
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-
-      - name: 'Pull required images'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
-
-      - name: 'Save Docker images for downstream jobs'
-        run: |
-          docker save \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db \
-            redis:7.2.6 \
-            postgres:15.10 \
-            "quay.io/toska/jami:production" \
-            nginx:latest \
-          | zstd -T0 -3 -o /tmp/docker-images.tar.zst
-
-      - name: 'Upload Docker images artifact'
-        uses: actions/upload-artifact@v7
-        with:
-          name: docker-images
-          path: /tmp/docker-images.tar.zst
-          retention-days: 1
-
   # === Update databases ===
   check_migration_files:
     name: Check if new migrations have been added
@@ -108,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
-      - pull_docker_images
+      # - pull_docker_images
       - check_migration_files
 
     steps:
@@ -119,15 +85,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: 'Download Docker images'
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
@@ -140,22 +97,13 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
-      - pull_docker_images
+      # - pull_docker_images
       - build_backend
       - build_frontend
       - check_migration_files
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: 'Download Docker images'
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v4
@@ -175,7 +123,6 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
-      - pull_docker_images
       - build_backend
       - build_frontend
       - check_migration_files
@@ -188,15 +135,6 @@ jobs:
             migrations:
               - 'services/backend/src/database/migrations_user/**'
               - '.github/workflows/test.yaml'
-
-      - name: 'Download Docker images'
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v4
@@ -217,7 +155,6 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
-      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -226,16 +163,6 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v6
-      - name: Download Docker images
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: Load Docker images
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-
       - name: Run api tests
         uses: ./.github/actions/test/api
         with:
@@ -248,7 +175,6 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
-      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -265,7 +191,6 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
-      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -281,7 +206,6 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
-      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -328,15 +252,6 @@ jobs:
         with:
           node-version: 24
 
-      - name: 'Download Docker images'
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-
       - name: 'Run tests'
         uses: ./.github/actions/test/e2e
         with:
@@ -351,7 +266,6 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && needs.lint_packages.result == 'success'
     needs:
-      - pull_docker_images
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -365,15 +279,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: 'Download Docker images'
-        uses: actions/download-artifact@v8
-        with:
-          name: docker-images
-          path: /tmp
-
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --wait
