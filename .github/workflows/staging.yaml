@@ -33,12 +33,10 @@ jobs:
 
       - name: 'Build backend'
         id: build-image
-        runs-on: ubuntu-latest
-        steps:
-          - uses: ./.github/actions/build/backend
-            with:
-              environment: 'staging'
-              release-version: ${{ github.sha }}
+        uses: ./.github/actions/build/backend
+        with:
+          environment: 'staging'
+          release-version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -59,12 +57,10 @@ jobs:
 
       - name: 'Build frontend'
         id: build-image
-        runs-on: ubuntu-latest
-        steps:
-          - uses: ./.github/actions/build/frontend
-            with:
-              environment: 'staging'
-              release-version: ${{ github.sha }}
+        uses: ./.github/actions/build/frontend
+        with:
+          environment: 'staging'
+          release-version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

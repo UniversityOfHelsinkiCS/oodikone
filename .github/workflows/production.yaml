@@ -18,12 +18,10 @@ jobs:
 
       - name: 'Build backend'
         id: build-image
-        runs-on: ubuntu-latest
-        steps:
-          - uses: ./.github/actions/build/backend
-            with:
-              environment: 'production'
-              release-version: ${{ steps.extract_version.outputs.VERSION }}
+        uses: ./.github/actions/build/backend
+        with:
+          environment: 'production'
+          release-version: ${{ steps.extract_version.outputs.VERSION }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -47,13 +45,11 @@ jobs:
 
       - name: 'Build frontend'
         id: build-image
-        runs-on: ubuntu-latest
-        steps:
-          - uses: ./.github/actions/build/frontend
-            with:
-              environment: 'production'
-              release_version: ${{ steps.extract_version.outputs.VERSION }}
-              sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
+        uses: ./.github/actions/build/frontend
+        with:
+          environment: 'production'
+          release_version: ${{ steps.extract_version.outputs.VERSION }}
+          sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

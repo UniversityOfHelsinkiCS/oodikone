@@ -222,22 +222,19 @@ jobs:
       fail-fast: false
 
     steps:
-      name: 'Run api-tests'
-      runs-on: ubuntu-latest
-      steps:
-        - name: Download Docker images
-          uses: actions/download-artifact@v8
-          with:
-            name: docker-images
-            path: /tmp
+      - name: Download Docker images
+        uses: actions/download-artifact@v8
+        with:
+          name: docker-images
+          path: /tmp
 
-        - name: Load Docker images
-          run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
-        - uses: ./.github/actions/test/api
-          with:
-            username: ${{ secrets.username }}
-            password: ${{ secrets.password }}
+      - uses: ./.github/actions/test/api
+        with:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
 
   # === Unit testing ===
   test_unit:
