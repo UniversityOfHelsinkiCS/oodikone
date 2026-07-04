@@ -26,7 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/build/backend
+      - name: Build backend
+        uses: ./.github/actions/build/backend
         with:
           environment: 'staging'
           release-version: ${{ github.sha }}
@@ -36,7 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/build/frontend
+      - name: Build frontend
+        uses: ./.github/actions/build/frontend
         with:
           environment: 'staging'
           release-version: ${{ github.sha }}
@@ -234,7 +236,8 @@ jobs:
       - name: Load Docker images
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
-      - uses: ./.github/actions/test/api
+      - name: Run api tests
+        uses: ./.github/actions/test/api
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
@@ -253,7 +256,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/test/unit
+      - name: Run unit tests (frontend and backend)
+        uses: ./.github/actions/test/unit
 
   # === Frontend component testing ===
   test_components:
@@ -269,7 +273,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/test/component
+      - name: Run frontend component tests
+        uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
   test_end_to_end:
