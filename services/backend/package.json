@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
+    "test:all": "vitest",
+    "test:api": "vitest ./tests/api",
+    "test:unit": "vitest ./tests/unit",
     "test:silent": "SILENT_TESTING=true vitest"
   },
   "dependencies": {
