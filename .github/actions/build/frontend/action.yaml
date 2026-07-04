@@ -46,4 +46,4 @@ runs:
           SENTRY_ENVIRONMENT=${{ inputs.enrvironment }}
           SENTRY_RELEASE=${{ inputs.release_version }}
           BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
-          SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '' }}
+          SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '') }}
