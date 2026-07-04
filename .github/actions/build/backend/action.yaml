@@ -20,7 +20,7 @@ outputs:
     value: ${{ steps.build-image.outputs.tag }}
 
 runs:
-  using: ubuntu-latest
+  using: composite
   steps:
     - uses: actions/checkout@v6
 
