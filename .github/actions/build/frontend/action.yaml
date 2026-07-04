@@ -19,8 +19,8 @@ outputs:
   image:
     description: 'Image name provided by buildah action'
     value: ${{ steps.build-image.outputs.image }}
-  tag:
-    description: 'Tag name provided by buildah action'
+  tags:
+    description: 'Tag names provided by buildah action'
     value: ${{ steps.build-image.outputs.tag }}
 
 runs:
