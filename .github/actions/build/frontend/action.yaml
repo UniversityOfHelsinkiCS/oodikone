@@ -18,10 +18,10 @@ inputs:
 outputs:
   image:
     description: 'Image name provided by buildah action'
-    value: ${{ steps.build-image.outputs.image }}
+    value: ${{ steps.build-image-action.outputs.image }}
   tags:
     description: 'Tag names provided by buildah action'
-    value: ${{ steps.build-image.outputs.tag }}
+    value: ${{ steps.build-image-action.outputs.tag }}
 
 runs:
   using: composite
@@ -32,7 +32,7 @@ runs:
       run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
     - name: Build frontend image
-      id: build-image
+      id: build-image-action
       uses: redhat-actions/buildah-build@v2
       with:
         image: oodikone-frontend
@@ -52,7 +52,7 @@ runs:
     - name: Export output image and tag names
       shell: bash
       run: |
-        IMAGE="${{ steps.build-image.outputs.image }}"
-        TAGS="${{ steps.build-image.outputs.tags }}"
-        echo "image=$IMAGE" >> $GITHUB_OUTPUT
-        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+        IMAGE="${{ steps.build-image-action.outputs.image }}"
+        TAGS="${{ steps.build-image-action.outputs.tags }}"
+        echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+        echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
