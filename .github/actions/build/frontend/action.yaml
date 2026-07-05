@@ -48,11 +48,3 @@ runs:
           SENTRY_RELEASE=${{ inputs.release_version }}
           BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '') }}
-
-    - name: Export output image and tag names
-      shell: bash
-      run: |
-        IMAGE="${{ steps.build-image-action.outputs.image }}"
-        TAGS="${{ steps.build-image-action.outputs.tags }}"
-        echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-        echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
