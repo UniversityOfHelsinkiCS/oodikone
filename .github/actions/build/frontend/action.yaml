@@ -21,7 +21,7 @@ outputs:
     value: ${{ steps.build-image-action.outputs.image }}
   tags:
     description: 'Tag names provided by buildah action'
-    value: ${{ steps.build-image-action.outputs.tag }}
+    value: ${{ steps.build-image-action.outputs.tags }}
 
 runs:
   using: composite
