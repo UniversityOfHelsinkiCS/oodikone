@@ -75,6 +75,8 @@ jobs:
     if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
       - check_migration_files
+      - build_backend
+      - build_frontend
       - lint_packages
 
     steps:
@@ -98,6 +100,8 @@ jobs:
     if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
       - check_migration_files
+      - build_backend
+      - build_frontend
       - lint_packages
 
     steps:
@@ -122,6 +126,8 @@ jobs:
     if: needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
       - check_migration_files
+      - build_backend
+      - build_frontend
       - lint_packages
 
     steps:
@@ -219,7 +225,6 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
-      - lint_packages
     strategy:
       fail-fast: false
 
@@ -239,7 +244,6 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
-      - lint_packages
 
     steps:
       - uses: actions/checkout@v6
@@ -254,7 +258,6 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
-      - lint_packages
 
     steps:
       - uses: actions/checkout@v6
@@ -268,7 +271,6 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
-      - lint_packages
     strategy:
       fail-fast: false
       matrix:
@@ -327,7 +329,6 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
-      - lint_packages
 
     steps:
       - uses: actions/checkout@v6
