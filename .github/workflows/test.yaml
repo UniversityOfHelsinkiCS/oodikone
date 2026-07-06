@@ -206,18 +206,6 @@ jobs:
           SCHEDULE_IMMEDIATE: weekly
           EXIT_AFTER_IMMEDIATES: yes
 
-      - name: Run prepurge
-        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
-        env:
-          SCHEDULE_IMMEDIATE: prepurge
-          EXIT_AFTER_IMMEDIATES: yes
-
-      - name: Run purge
-        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
-        env:
-          SCHEDULE_IMMEDIATE: purge
-          EXIT_AFTER_IMMEDIATES: yes
-
       - name: Push newly build db to toska hub
         if: success()
         run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
