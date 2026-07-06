@@ -228,6 +228,8 @@ services:
       SIS_IMPORTER_HOST: sis-importer-db
       SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_USER: postgres
+      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
+      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
     ports:
       - 8082:8082
     profiles:
