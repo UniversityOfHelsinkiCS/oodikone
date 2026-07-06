@@ -45,7 +45,7 @@ void describe('Population statistics (study programme)', () => {
         'hy-lv-69',
         'hy-lv-68',
         'hy-lv-70',
-      ],
+      ].sort(),
       degreeProgrammeType: 'urn:code:degree-program-type:bachelors-degree',
       name: {
         en: "Bachelor's Programme in Mathematical Sciences",
@@ -54,6 +54,9 @@ void describe('Population statistics (study programme)', () => {
       },
       progId: 'MAT',
     }
+
+    // Sort curriculum periods so that order doesn't mess up tests
+    res.body.allProgrammes.KH50_001.curriculumPeriodIds.sort()
 
     assert.strictEqual(Object.keys(res.body.allProgrammes).length, 972)
     assert.deepStrictEqual(res.body.allProgrammes.KH50_001, testMathProgramme)
@@ -78,7 +81,7 @@ void describe('Population statistics (study programme)', () => {
         'hy-lv-69',
         'hy-lv-68',
         'hy-lv-70',
-      ],
+      ].sort(),
       degreeProgrammeType: 'urn:code:degree-program-type:bachelors-degree',
       name: {
         en: "Bachelor's Programme in Mathematical Sciences",
@@ -89,6 +92,10 @@ void describe('Population statistics (study programme)', () => {
     }
 
     assert.strictEqual(Object.keys(res.body.filteredProgrammes).length, 2) // Basic has access to math bachelor + master
+
+    // Sort curriculum periods so that order doesn't mess up tests
+    res.body.filteredProgrammes.KH50_001.curriculumPeriodIds.sort()
+    res.body.allProgrammes.KH50_001.curriculumPeriodIds.sort()
 
     assert.deepStrictEqual(res.body.filteredProgrammes.KH50_001, testMathProgramme)
     assert.deepStrictEqual(res.body.allProgrammes.KH50_001, testMathProgramme) // All programmes should still include filteredProgramme programmes

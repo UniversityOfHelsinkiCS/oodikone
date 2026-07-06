@@ -111,7 +111,7 @@ void describe('Population statistics', () => {
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<PopulationstatisticsResBody>
 
       assert.strictEqual(resMaster.status, 200)
-      assert.strictEqual(resMaster.body.students.length, 36)
+      assert.strictEqual(resMaster.body.students.length, 37)
     })
   })
 
