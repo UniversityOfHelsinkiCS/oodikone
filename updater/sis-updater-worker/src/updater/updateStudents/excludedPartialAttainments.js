@@ -11,5 +11,6 @@ export const getAttainmentsToBeExcluded = () => {
     return new Set(attainmentIds)
   } catch (error) {
     logger.error({ message: 'Reading excluded attainments from csv failed', meta: error.stack })
+    throw error
   }
 }

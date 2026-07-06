@@ -244,13 +244,16 @@ export const updateStudents = async (personIds, iteration = 0) => {
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced, studyRightIdToEducationType).catch(
       error => {
         logError(error, 'attainments')
+        throw error
       }
     ),
     updateEnrollments(enrollments, personIdToStudentNumber, studyRightIdToEducationType).catch(error => {
       logError(error, 'enrollments')
+      throw error
     }),
     updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots).catch(error => {
       logError(error, 'studyplans')
+      throw error
     }),
   ])
 

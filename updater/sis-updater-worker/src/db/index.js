@@ -160,6 +160,7 @@ export const bulkCreate = async (
           error,
           entity,
         })
+        throw error
       }
     }
   }

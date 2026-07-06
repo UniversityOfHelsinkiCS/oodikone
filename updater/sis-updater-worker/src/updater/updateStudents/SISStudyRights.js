@@ -244,16 +244,18 @@ const buildStudyRightElements = (studyRightSnapshots, groupIdToCode) => {
     if (educationPhase1GroupId && !graduatedPhase1) {
       try {
         addElementToMap(1, phase1Elements, educationPhase1GroupId)
-      } catch (e) {
-        logger.error(`Failed to generate phase 1 element for studyright id ${snapshot.id}.\nError: ${e}`)
+      } catch (error) {
+        logger.error(`Failed to generate phase 1 element for studyright id ${snapshot.id}.\nError: ${error}`)
+        throw error
       }
     }
 
     if (educationPhase2GroupId && graduatedPhase1 && !graduatedPhase2) {
       try {
         addElementToMap(2, phase2Elements, educationPhase2GroupId)
-      } catch (e) {
-        logger.error(`Failed to generate phase 2 element for studyright id ${snapshot.id}.\nError: ${e}`)
+      } catch (error) {
+        logger.error(`Failed to generate phase 2 element for studyright id ${snapshot.id}.\nError: ${error}`)
+        throw error
       }
     }
 

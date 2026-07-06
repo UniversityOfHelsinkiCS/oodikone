@@ -67,6 +67,7 @@ const recursiveWrite = (modArg, parentId, programmeMap, joinMap) => {
       `Could not update programme module with id ${mod.id} and parentId ${parentId} due to faulty children/rule handling`,
       error
     )
+    throw error
   }
 }
 

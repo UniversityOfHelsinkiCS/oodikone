@@ -7,6 +7,7 @@ const {
   SCHEDULE_IMMEDIATE,
 } = require('./config')
 const { knexConnection } = require('./db/connection')
+const { queue } = require('./queue')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 const { startServer } = require('./server')
 const { schedule: scheduleCron } = require('./utils/cron')
@@ -47,12 +48,33 @@ const scheduleJob = async type => {
   logger.info(`Job '${type}' finished.`)
 }
 
+/** Wait for all jobs to finish eg. queue to be empty and then resolve the promise */
+const waitForAllJobs = async () =>
+  new Promise((resolve, reject) => {
+    setInterval(async () => {
+      const jobs = await queue.getJobCounts('active', 'waiting', 'failed')
+      if (jobs.failed > 0) {
+        logger.error('Failed job found.')
+        clearTimeout()
+        return reject()
+      }
+
+      if (jobs.active === 0 && jobs.waiting === 0) {
+        logger.info('All jobs finished.')
+        clearTimeout()
+        return resolve()
+      }
+      logger.info('Jobs still in queue:', jobs)
+    }, 5000)
+  })
+
 const handleImmediates = async () => {
   try {
     logger.info('Handling immediates')
     await Promise.all(SCHEDULE_IMMEDIATE.map(scheduleJob))
 
     if (EXIT_AFTER_IMMEDIATES) {
+      await waitForAllJobs()
       process.exit(0)
     }
   } catch (error) {
