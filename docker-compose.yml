@@ -94,7 +94,7 @@ services:
     volumes:
       - kone-db-data:/data
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   user-db:
@@ -108,7 +108,7 @@ services:
     volumes:
       - user-db-data:/data
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   redis:
@@ -134,7 +134,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -148,7 +148,7 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   jami:
@@ -180,7 +180,7 @@ services:
     volumes:
       - jami-data:/data
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   sis-updater-worker:

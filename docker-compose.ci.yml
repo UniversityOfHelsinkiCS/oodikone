@@ -71,7 +71,7 @@ services:
     ports:
       - 4321:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   user-db:
@@ -85,7 +85,7 @@ services:
     ports:
       - 4320:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   redis:
@@ -112,7 +112,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -124,7 +124,7 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   jami:
@@ -152,7 +152,7 @@ services:
     ports:
       - 5433:5432
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
   nginx:
