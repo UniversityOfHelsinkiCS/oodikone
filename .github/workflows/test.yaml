@@ -152,10 +152,6 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
-    needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
     outputs:
       has_updater_changed: ${{ steps.check_updater_changed.outputs.has_updater_changed }}
 
@@ -175,11 +171,17 @@ jobs:
     name: 'Run updater tests and updates and upload new sis-db to toska hub'
     runs-on: ubuntu-latest
     if: |
+      !failure() &&
+      (needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
       needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
-      needs.check_updater_changed.outputs.has_updater_changed == 'true'
+      needs.check_migration_files.outputs.user_db_migrations == 'true' ||
+      needs.check_migration_files.outputs.sis_db_migrations == 'true')
     needs:
       - check_migration_files
       - check_updater_changed
+      - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
 
     steps:
       - uses: actions/checkout@v6
