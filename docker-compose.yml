@@ -61,7 +61,6 @@ services:
       - shared-nodemod:/opt/app-root/shared/node_modules
       - backend-nodemod:/opt/app-root/backend/node_modules
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8080/api/health']
       <<: *healthcheck-defaults
 
   frontend:
@@ -94,7 +93,7 @@ services:
     volumes:
       - kone-db-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'kone-db']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       <<: *healthcheck-defaults
 
   user-db:
@@ -108,7 +107,7 @@ services:
     volumes:
       - user-db-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'user-db']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       <<: *healthcheck-defaults
 
   redis:
@@ -134,7 +133,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-db']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -148,7 +147,7 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-importer-db']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       <<: *healthcheck-defaults
 
   jami:
@@ -177,8 +176,35 @@ services:
     volumes:
       - jami-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'jami-db-real']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       <<: *healthcheck-defaults
+
+  sis-updater-worker:
+    <<: *defaults
+    container_name: oodikone-updater-worker
+    build:
+      <<: *build_defaults
+      context: updater/sis-updater-worker
+    depends_on:
+      redis:
+        condition: service_healthy
+      sis-db:
+        condition: service_healthy
+      sis-importer-db:
+        condition: service_healthy
+    environment:
+      DB_URL: postgres://postgres@sis-db:5432/sis-db
+      REDIS_HOST: redis
+      SIS_IMPORTER_DATABASE: sis-importer-db
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_USER: postgres
+      SIS_PASSWORD: postgres
+    profiles:
+      - updater
+    volumes:
+      - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
+      - ./updater/sis-updater-worker/:/opt/app-root/src
 
   sis-updater-scheduler:
     <<: *defaults
@@ -208,33 +234,6 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8082/health']
       <<: *healthcheck-defaults
-
-  sis-updater-worker:
-    <<: *defaults
-    container_name: oodikone-updater-worker
-    build:
-      <<: *build_defaults
-      context: updater/sis-updater-worker
-    depends_on:
-      redis:
-        condition: service_healthy
-      sis-db:
-        condition: service_healthy
-      sis-importer-db:
-        condition: service_healthy
-    environment:
-      DB_URL: postgres://postgres@sis-db:5432/sis-db
-      REDIS_HOST: redis
-      SIS_IMPORTER_DATABASE: sis-importer-db
-      SIS_IMPORTER_HOST: sis-importer-db
-      SIS_IMPORTER_PASSWORD: postgres
-      SIS_IMPORTER_USER: postgres
-      SIS_PASSWORD: postgres
-    profiles:
-      - updater
-    volumes:
-      - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
-      - ./updater/sis-updater-worker/:/opt/app-root/src
 
 volumes:
   backend-nodemod:
