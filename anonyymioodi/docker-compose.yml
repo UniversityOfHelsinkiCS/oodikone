@@ -16,7 +16,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.10
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'kone-db']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   user-db:
@@ -28,7 +28,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.10
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'user-db']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   sis-db:
@@ -41,7 +41,7 @@ services:
     image: postgres:15.10
     shm_size: 2gb
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-db']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -53,5 +53,5 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     image: postgres:15.10
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'sis-importer-db']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults

@@ -61,6 +61,7 @@ services:
       - shared-nodemod:/opt/app-root/shared/node_modules
       - backend-nodemod:/opt/app-root/backend/node_modules
     healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/api/health']
       <<: *healthcheck-defaults
 
   frontend:
@@ -93,7 +94,7 @@ services:
     volumes:
       - kone-db-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   user-db:
@@ -107,7 +108,7 @@ services:
     volumes:
       - user-db-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   redis:
@@ -120,7 +121,7 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      test: ['CMD', 'redis-cli', 'ping', '|', 'grep', 'PONG']
       <<: *healthcheck-defaults
 
   sis-db:
@@ -133,7 +134,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -147,13 +148,16 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   jami:
     <<: *defaults
     container_name: oodikone-jami
     image: quay.io/toska/jami:production
+    depends_on:
+      jami-db:
+        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -176,7 +180,7 @@ services:
     volumes:
       - jami-data:/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   sis-updater-worker:

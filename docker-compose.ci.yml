@@ -71,7 +71,7 @@ services:
     ports:
       - 4321:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   user-db:
@@ -85,7 +85,7 @@ services:
     ports:
       - 4320:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   redis:
@@ -97,7 +97,7 @@ services:
     ports:
       - 6379:6379
     healthcheck:
-      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      test: ['CMD', 'redis-cli', 'ping', '|', 'grep', 'PONG']
       <<: *healthcheck-defaults
 
   sis-db:
@@ -112,7 +112,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -124,13 +124,16 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   jami:
     <<: *defaults
     container_name: oodikone-jami
     image: quay.io/toska/jami:production
+    depends_on:
+      jami-db:
+        condition: service_healthy
     environment:
       - npm_config_cache=/tmp
       - PORT=3003
@@ -149,7 +152,7 @@ services:
     ports:
       - 5433:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD', 'pg_isready']
       <<: *healthcheck-defaults
 
   nginx:
