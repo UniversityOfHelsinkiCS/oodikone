@@ -238,9 +238,7 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
+      - run_updater_updates
       - lint_packages
 
     steps:
@@ -255,9 +253,7 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
+      - run_updater_updates
       - lint_packages
 
     steps:
@@ -271,9 +267,7 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
+      - run_updater_updates
       - lint_packages
     strategy:
       fail-fast: false
@@ -332,9 +326,7 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - build_and_push_anon_sis_db
-      - build_and_push_anon_kone_db
-      - build_and_push_anon_user_db
+      - run_updater_updates
       - lint_packages
 
     steps:
