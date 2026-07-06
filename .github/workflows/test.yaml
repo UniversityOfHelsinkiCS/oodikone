@@ -174,9 +174,13 @@ jobs:
   run_updater_updates:
     name: 'Run updater tests and updates and upload new sis-db to toska hub'
     runs-on: ubuntu-latest
-    if: needs.check_updater_changed.outputs.has_updater_changed == 'true'
+    if: |
+      needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
+      needs.check_updater_changed.outputs.has_updater_changed == 'true'
     needs:
+      - check_migration_files
       - check_updater_changed
+
     steps:
       - uses: actions/checkout@v6
 
@@ -215,7 +219,12 @@ jobs:
           EXIT_AFTER_IMMEDIATES: yes
 
       - name: Push newly build db to toska hub
+        if: success()
         run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+
+      - name: Dump logs on failure
+        if: failure()
+        run: npm run logs:ci
 
   # === Backend api-tests ===
   test_api:
