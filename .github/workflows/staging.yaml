@@ -126,6 +126,8 @@ jobs:
     needs:
       - release_frontend
       - release_backend
+      - release_updater_worker
+      - release_updater_scheduler
 
     steps:
       - uses: actions/checkout@v6
@@ -144,6 +146,8 @@ jobs:
     needs:
       - release_frontend
       - release_backend
+      - release_updater_worker
+      - release_updater_scheduler
 
     steps:
       - uses: actions/checkout@v6

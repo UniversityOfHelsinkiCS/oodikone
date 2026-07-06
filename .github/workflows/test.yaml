@@ -75,6 +75,7 @@ jobs:
     if: needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
       - check_migration_files
+      - lint_packages
 
     steps:
       - uses: actions/checkout@v6
@@ -96,9 +97,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
-      - build_backend
-      - build_frontend
       - check_migration_files
+      - lint_packages
 
     steps:
       - uses: actions/checkout@v6
@@ -121,9 +121,9 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
-      - build_backend
-      - build_frontend
       - check_migration_files
+      - lint_packages
+
     steps:
       - uses: actions/checkout@v6
 
