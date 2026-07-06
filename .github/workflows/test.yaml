@@ -145,10 +145,7 @@ jobs:
     name: 'Check if updater has been updated'
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.build_and_push_anon_sis_db.result != "failure" &&
-      needs.build_and_push_anon_kone_db.result != "failure" &&
-      needs.build_and_push_anon_user_db.result != "failure" &&
+      !cancelled() && !failure()
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
@@ -171,7 +168,7 @@ jobs:
   run_updater_updates:
     name: 'Run updater tests and updates and upload new sis-db to toska hub'
     runs-on: ubuntu-latest
-    if: always() && !cancelled() && needs.check_updater_changed.has_updater_changed == "true"
+    if: needs.check_updater_changed.outputs.has_updater_changed == 'true'
     needs:
       - check_updater_changed
     steps:
@@ -219,9 +216,7 @@ jobs:
     name: 'Run backend api tests'
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.lint_packages.result == 'success' &&
-      needs.run_updater_updates.result != "failure"
+      !cancelled() && !failure()
     needs:
       - run_updater_updates
       - lint_packages
@@ -241,9 +236,7 @@ jobs:
     name: 'Run unit tests'
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.lint_packages.result == 'success' &&
-      needs.run_updater_updates.result != "failure"
+      !cancelled() && !failure()
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
@@ -260,9 +253,7 @@ jobs:
     name: 'Test frontend components'
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.lint_packages.result == 'success' &&
-      needs.run_updater_updates.result != "failure"
+      !cancelled() && !failure()
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
@@ -278,9 +269,7 @@ jobs:
   test_end_to_end:
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.lint_packages.result == 'success' &&
-      needs.run_updater_updates.result != "failure"
+      !cancelled() && !failure()
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
@@ -341,9 +330,7 @@ jobs:
     name: 'Check services run correctly'
     runs-on: ubuntu-latest
     if: |
-      always() && !cancelled() &&
-      needs.lint_packages.result == 'success' &&
-      needs.run_updater_updates.result != "failure"
+      !cancelled() && !failure()
     needs:
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
