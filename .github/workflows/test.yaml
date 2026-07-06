@@ -178,8 +178,8 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
 
       - name: Start worker containers
         run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --quiet-pull --detach --wait
