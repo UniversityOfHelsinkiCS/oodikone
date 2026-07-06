@@ -23,7 +23,7 @@
     "both": "./run.sh both anon up --detach",
     "both:real": "./run.sh both real up --detach",
     "docker:down": "./run.sh both anon down --remove-orphans; ./run.sh both real down --remove-orphans",
-    "testupdater": "docker compose --file docker-compose.ci.yml up --detach --no-recreate sis-updater-worker && SCHEDULE_IMMEDIATE=weekly EXIT_AFTER_IMMEDIATES=yes docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start",
+    "testupdater": "docker compose --file docker-compose.ci.yml up --detach --no-recreate --wait sis-updater-worker && SCHEDULE_IMMEDIATE=weekly EXIT_AFTER_IMMEDIATES=yes docker compose --file docker-compose.ci.yml up sis-updater-scheduler --exit-code-from sis-updater-scheduler",
     "flushredis": "docker exec -it oodikone-redis redis-cli flushall",
     "prepare": "husky",
     "install:local": "npm i && npm i --prefix services/shared && npm i --prefix services/frontend && npm i --prefix services/backend && npm i --prefix updater/sis-updater-scheduler && npm i --prefix updater/sis-updater-worker",

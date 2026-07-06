@@ -1,0 +1,40 @@
+name: 'Build updater worker'
+description: 'Build updater worker in staging or production version'
+
+inputs:
+  environment:
+    required: true
+    description: 'staging or production'
+    default: 'production'
+  release_version:
+    required: false
+    description: 'Release version added to production builds'
+    default: ${{ github.sha }}
+
+outputs:
+  image:
+    description: 'Image name provided by buildah action'
+    value: ${{ steps.build-image-action.outputs.image }}
+  tags:
+    description: 'Tag names provided by buildah action'
+    value: ${{ steps.build-image-action.outputs.tags }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Build worker image
+      id: build-image-action
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: updater-worker
+        tags: ${{ inputs.environment }} ${{ github.sha }}
+        context: updater/sis-updater-worker
+        containerfiles: |
+          updater/sis-updater-worker/Dockerfile
+        build-args: |
+          GIT_SHA=${{ github.sha }}
+          STAGING=${{ case(inputs.environment == 'staging', 'true', 'false') }}
+          SENTRY_ENVIRONMENT=${{ inputs.environment }}
+          SENTRY_RELEASE=${{ inputs.release_version }}

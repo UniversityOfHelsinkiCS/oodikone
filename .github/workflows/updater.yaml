@@ -95,25 +95,30 @@ jobs:
         run: docker load --input worker.tar
       - name: 'Load scheduler image'
         run: docker load --input scheduler.tar
+
       - name: 'Start worker'
-        run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull --no-recreate sis-updater-worker
+        run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull --no-recreate --wait sis-updater-worker
+
       - name: 'Run hourly jobs'
-        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
         env:
           SCHEDULE_IMMEDIATE: hourly
           EXIT_AFTER_IMMEDIATES: yes
+
       - name: 'Run weekly jobs'
-        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
         env:
           SCHEDULE_IMMEDIATE: weekly
           EXIT_AFTER_IMMEDIATES: yes
+
       - name: 'Run prepurge'
-        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
         env:
           SCHEDULE_IMMEDIATE: prepurge
           EXIT_AFTER_IMMEDIATES: yes
+
       - name: 'Run purge'
-        run: docker compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler
         env:
           SCHEDULE_IMMEDIATE: purge
           EXIT_AFTER_IMMEDIATES: yes
@@ -125,18 +130,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build worker image
+      - name: 'Build updater worker'
         id: build-image
-        uses: redhat-actions/buildah-build@v2
+        uses: ./.github/actions/build/worker
         with:
-          image: updater-worker
-          tags: staging production ${{ github.sha }}
-          context: updater/sis-updater-worker
-          containerfiles: |
-            updater/sis-updater-worker/Dockerfile
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=production
+          environment: 'production'
+          release_version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
@@ -154,18 +153,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build scheduler image
+      - name: 'Build udpater scheduler'
         id: build-image
-        uses: redhat-actions/buildah-build@v2
+        uses: ./.github/actions/build/scheduler
         with:
-          image: updater-scheduler
-          tags: staging production ${{ github.sha }}
-          context: updater/sis-updater-scheduler
-          containerfiles: |
-            updater/sis-updater-scheduler/Dockerfile
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=production
+          environment: 'production'
+          release_version: ${{ github.sha }}
 
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2

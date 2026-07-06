@@ -65,6 +65,54 @@ jobs:
       - name: Push to quay.io
         uses: redhat-actions/push-to-registry@v2
         with:
+          image: ${{ steps.build-image-action.outputs.image }}
+          tags: ${{ steps.build-image-action.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_updater_worker:
+    name: 'Build and release updater worker'
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 'Build worker'
+        id: build-image
+        uses: ./.github/actions/build/worker
+        with:
+          environment: 'staging'
+          release_version: ${{ github.sha }}
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ secrets.QUAY_IO_TOKEN }}
+
+  release_updater_scheduler:
+    name: 'Build and release updater scheduler'
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 'Build scheduler'
+        id: build-image
+        uses: ./.github/actions/build/scheduler
+        with:
+          environment: 'staging'
+          release_version: ${{ github.sha }}
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
           registry: quay.io/toska
