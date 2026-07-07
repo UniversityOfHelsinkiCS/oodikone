@@ -21,6 +21,7 @@ export const getTeachersBySearchTerm = async (searchTerm: string) => {
         [Op.and]: searchTerms.map(term => ({ [Op.iLike]: `%${term}%` })),
       },
     },
+    order: [['name', 'ASC']],
   })
 }
 
