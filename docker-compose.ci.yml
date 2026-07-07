@@ -64,6 +64,7 @@ services:
     <<: *defaults
     container_name: oodikone-kone-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
+    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: kone-db
@@ -78,6 +79,7 @@ services:
     <<: *defaults
     container_name: oodikone-user-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
+    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: user-db
@@ -104,6 +106,7 @@ services:
     <<: *defaults
     container_name: oodikone-sis-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
+    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: sis-db

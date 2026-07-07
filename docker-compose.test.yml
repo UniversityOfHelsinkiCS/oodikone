@@ -1,31 +1,27 @@
-services:
-  api-tests:
-    container_name: oodikone-api-tests
-    build:
-      context: services
-      dockerfile: backend/dev.Dockerfile
-    volumes:
-      - ./services/backend/:/opt/app-root/backend
-      - ./services/shared/:/opt/app-root/shared
-      - backend-tests-nodemod:/opt/app-root/backend/node_modules
-      - shared-tests-nodemod:/opt/app-root/shared/node_modules
-    environment:
-      CI: 'true'
-      NODE_ENV: 'test'
-      DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
-      DB_URL_USER: postgres://postgres@user-db:5432/user-db
-      FRONT_URL: http://localhost:3000
-      REDIS: redis
-      SECRET_TOKEN: test
-      SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
-      SIS_UPDATER_URL: http://sis-updater-scheduler:8082
-      JAMI_URL: 'http://jami:3003/'
-      IMPORTER_DB_API_URL: 'https://api-toska.apps.ocp-prod-0.k8s.it.helsinki.fi/importer'
-      CRYPT_KEY: 'e16730fce263d5270ba8dcf84d068a32556542455e71331880d6c1c5e4db9b4e'
-    command: npm run test
+name: oodikone
 
-volumes:
-  backend-tests-nodemod:
-    name: oodikone-backend-tests-nodemod
-  shared-tests-nodemod:
-    name: oodikone-shared-tests-nodemod
+x-defaults: &defaults
+  restart: unless-stopped
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 1s
+  timeout: 3s
+  retries: 30
+
+services:
+  sis-db:
+    <<: *defaults
+    container_name: oodikone-sis-db
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
+    pull_policy: always
+    volumes: !reset [] # Remove previous volume definitions
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    shm_size: 2gb
+    ports:
+      - 12345:5432
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      <<: *healthcheck-defaults

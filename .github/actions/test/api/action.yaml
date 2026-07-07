@@ -26,7 +26,7 @@ runs:
 
     - name: Start oodikone (without frontend and backend)
       shell: bash
-      run: npm run oodikone:ci:setup -- --quiet-pull --wait
+      run: docker compose --file docker-compose.ci.yml up
 
     - name: Install dependencies
       shell: bash

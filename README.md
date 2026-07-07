@@ -123,6 +123,8 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 
 - `npm run oodikone`: starts Oodikone with anonymized data
 - `npm run oodikone:real`: starts Oodikone with real data
+- `npm run oodikone:test`: starts Oodikone with non-persistent database (wipes after every reset)
+- `npm run oodikone:ci`: starts Oodikone in CI mode
 - `npm run updater`: starts updater with anonymized data
 - `npm run updater:real`: starts updater with real data
 - `npm run both`: starts Oodikone and updater with anonymized data
