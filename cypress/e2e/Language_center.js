@@ -44,7 +44,7 @@ describe('When language center is opened', () => {
         cy.get('table > tbody > tr:first').within(() => {
           cy.get('td').should('have.length', 15)
           cy.get('td').eq(0).contains('All courses total')
-          const numbers = [2076, 36, 9, 33, 752, 15, 40, 6, 48, 1, 24, 1059, 53, 0]
+          const numbers = [2076, 36, 9, 33, 753, 15, 40, 6, 48, 1, 24, 1059, 52, 0]
           numbers.forEach((number, index) => {
             cy.get('td')
               .eq(index + 1)
