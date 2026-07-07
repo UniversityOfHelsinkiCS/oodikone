@@ -189,6 +189,7 @@ export const StudyrightsTable = ({
 
               return (
                 <TableRow
+                  data-cy={`${code}-${index}`}
                   key={`${studyRight.key}-${code}`}
                   onClick={() => (rowIsFilterable ? handleStudyPlanChange(studyRight.studyPlanId ?? null) : null)}
                   style={{

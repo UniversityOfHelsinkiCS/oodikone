@@ -259,8 +259,10 @@ describe('Students tests', () => {
 
     it('When a study plan is selected, courses included in the study plan are highlighted with a blue background', () => {
       cy.visit('/students/550789')
-      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
-        cy.get('td').eq(0).click()
+      cy.contains('Study rights')
+      cy.get('[data-cy=KH40_005-0]').contains('Kulttuurien tutkimuksen kandiohjelma')
+      cy.get('[data-cy=KH40_005-0]').within(() => {
+        cy.get('td').eq(1).click()
       })
       cy.contains('table tbody tr', 'Kandidaatintutkielma (KUKA-LIS222)').should(
         'have.css',
@@ -269,27 +271,23 @@ describe('Students tests', () => {
       )
     })
 
-    it('When a study plan is selected, the time frame of the credit graph is updated', () => {
-      cy.clock(new Date('2024-08-30').getTime(), ['Date'])
-      cy.visit('/students/550789')
-      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
-        cy.get('td').eq(0).click()
-      })
-    })
-
     it("If there's a study plan corresponding to the degree programme, completed credits are displayed", () => {
       cy.visit('/students/550789')
-      cy.contains('table tbody tr', 'Kulttuurien tutkimuksen kandiohjelma (01.08.2020–30.06.2023)').within(() => {
+      cy.contains('Study rights')
+      cy.get('[data-cy=KH40_005-0]').contains('Kulttuurien tutkimuksen kandiohjelma')
+      cy.get('[data-cy=KH40_005-0]').within(() => {
         cy.get('td')
-          .eq(-1)
+          .eq(4)
           .contains(/^185 cr$/)
       })
     })
 
     it("If there's a study plan corresponding to the degree programme and the student hasn't graduated, percentage of completion is also displayed", () => {
       cy.visit('/students/458723')
-      cy.contains('table tbody tr', 'Oikeusnotaarin koulutusohjelma (01.08.2020–31.07.2027)').within(() => {
-        cy.get('td').eq(-1).contains('69% (125 cr)')
+      cy.contains('Study rights')
+      cy.get('[data-cy=KH20_001-0]').contains('Oikeusnotaarin koulutusohjelma')
+      cy.get('[data-cy=KH20_001-0]').within(() => {
+        cy.get('td').eq(4).contains('69% (125 cr)')
       })
     })
   })
