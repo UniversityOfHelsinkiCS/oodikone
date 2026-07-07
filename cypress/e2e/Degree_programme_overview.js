@@ -46,7 +46,7 @@ describe('Degree programme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click({ force: true })
-      cy.cs('year-toggle').click()
+      cy.cs('year-toggle').click() // NOTE: Tests are written for calendar years
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
@@ -64,11 +64,11 @@ describe('Degree programme overview', () => {
         // [Year, Started studying, Accepted, Graduated, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         [2023, 8, 8, 26, 0, 0],
-        [2022, 25, 26, 48, 1, 4],
-        [2021, 29, 32, 47, 0, 2],
+        [2022, 25, 26, 47, 1, 3],
+        [2021, 29, 32, 48, 0, 2],
         [2020, 26, 27, 12, 1, 3],
         [2019, 28, 34, 1, 0, 1],
-        [2018, 40, 45, 0, 0, 0],
+        [2018, 40, 45, 0, 0, 1],
         [2017, 41, 47, 0, 0, 0],
       ]
 
@@ -97,8 +97,8 @@ describe('Degree programme overview', () => {
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
         [2023, 26, 5],
-        [2022, 48, 13],
-        [2021, 47, 76],
+        [2022, 47, 13],
+        [2021, 48, 76],
         [2020, 12, 23],
         [2019, 1, 19],
         [2018, 0, 0],
@@ -115,8 +115,8 @@ describe('Degree programme overview', () => {
         // [Year, Started studying, Accepted, Graduated]
         ...years.map(year => [year, 0, 0, 0]),
         [2023, 8, 8, 24],
-        [2022, 25, 26, 44],
-        [2021, 29, 32, 46],
+        [2022, 25, 26, 43],
+        [2021, 29, 32, 47],
         [2020, 26, 27, 11],
         [2019, 28, 34, 1],
         [2018, 40, 45, 0],
@@ -129,8 +129,8 @@ describe('Degree programme overview', () => {
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
         [2023, 24, 5],
-        [2022, 44, 12],
-        [2021, 46, 69],
+        [2022, 43, 12],
+        [2021, 47, 69],
         [2020, 11, 22],
         [2019, 1, 18],
         [2018, 0, 0],
@@ -148,11 +148,11 @@ describe('Degree programme overview', () => {
         // [Year, Started studying, Accepted, Graduated, Transferred away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 4, 0, 0],
-        ['2022 - 2023', 25, 26, 36, 0, 0],
-        ['2021 - 2022', 29, 32, 57, 1, 6],
+        ['2022 - 2023', 25, 26, 35, 0, 0],
+        ['2021 - 2022', 29, 32, 58, 1, 5],
         ['2020 - 2021', 26, 27, 30, 0, 3],
         ['2019 - 2020', 28, 34, 7, 1, 1],
-        ['2018 - 2019', 40, 45, 0, 0, 0],
+        ['2018 - 2019', 40, 45, 0, 0, 1],
         ['2017 - 2018', 41, 47, 0, 0, 0],
       ]
       cy.checkTableStats(studentTableContents, 'students-of-the-study-programme')
@@ -196,16 +196,16 @@ describe('Degree programme overview', () => {
         cy.cs('select-median').click()
       })
       cy.cs('unset-median-bar-chart').within(() => {
-        cy.contains('48 graduated').should('be.visible')
-        cy.contains('48 graduated').hover()
+        cy.contains('47 graduated').should('be.visible')
+        cy.contains('47 graduated').hover()
       })
 
-      cy.get('.grad-vals').contains('48 students graduated in year 2022').should('be.visible')
+      cy.get('.grad-vals').contains('47 students graduated in year 2022').should('be.visible')
 
-      cy.contains('median study time: 6.5 semesters')
+      cy.contains('median study time: 6 semesters')
       cy.contains('24 graduated on time')
       cy.contains('12 graduated max year overtime')
-      cy.contains('12 graduated over year late')
+      cy.contains('11 graduated over year late')
 
       cy.cs('programmes-before-or-after-stacked-bar-chart-section')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
@@ -298,10 +298,10 @@ describe('Degree programme overview', () => {
         // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
         ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 1],
         ['2022 - 2023', 26, 25, 0, 0, 24, 2, 19, 7, 0, 25, 1],
-        ['2021 - 2022', 38, 29, 0, 0, 33, 5, 29, 9, 0, 36, 4],
+        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 29, 8, 0, 35, 4],
         ['2020 - 2021', 30, 26, 0, 0, 11, 19, 15, 15, 0, 29, 3],
         ['2019 - 2020', 35, 28, 0, 0, 8, 27, 22, 13, 0, 35, 2],
-        ['2018 - 2019', 45, 40, 0, 0, 6, 39, 26, 19, 0, 44, 1],
+        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 26, 20, 0, 45, 1],
         ['2017 - 2018', 47, 41, 0, 0, 5, 42, 31, 16, 0, 47, 0],
         ['Total', 229, 197, 0, 0, 95, 134, 147, 82, 0, 224, 12],
       ]
@@ -378,10 +378,10 @@ describe('Degree programme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 0, 0, 0, 0, 0, 0, 0],
         ['2022 - 2023', 26, 9, 8, 4, 3, 0, 0, 0, 2],
-        ['2021 - 2022', 38, 8, 4, 9, 8, 4, 0, 0, 5],
+        ['2021 - 2022', 37, 8, 4, 9, 8, 4, 0, 0, 4],
         ['2020 - 2021', 30, 2, 1, 2, 5, 0, 0, 1, 19],
         ['2019 - 2020', 35, 1, 0, 2, 1, 0, 0, 4, 27],
-        ['2018 - 2019', 45, 0, 1, 1, 2, 0, 0, 2, 39],
+        ['2018 - 2019', 46, 0, 1, 1, 2, 0, 0, 2, 40],
         ['2017 - 2018', 47, 0, 1, 3, 0, 0, 1, 0, 42],
         ['Total', 229, 28, 15, 21, 19, 4, 1, 7, 134],
       ]
@@ -456,10 +456,10 @@ describe('Degree programme overview', () => {
         const tableContents = [
           // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
           ['2022 - 2023', 3, 3, 0, 0, 1, 2, 2, 1, 0, 3, 0],
-          ['2021 - 2022', 5, 1, 0, 0, 1, 4, 3, 2, 0, 5, 0],
+          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 3, 1, 0, 4, 0],
           ['2020 - 2021', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],
           ['2019 - 2020', 17, 14, 0, 0, 0, 17, 10, 7, 0, 17, 1],
-          ['2018 - 2019', 23, 21, 0, 0, 2, 21, 11, 12, 0, 23, 0],
+          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 11, 13, 0, 24, 0],
           ['2017 - 2018', 28, 24, 0, 0, 1, 27, 15, 13, 0, 28, 0],
           ['Total', 89, 73, 0, 0, 6, 83, 48, 41, 0, 88, 4],
         ]
