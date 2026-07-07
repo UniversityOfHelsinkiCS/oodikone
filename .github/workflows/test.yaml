@@ -174,7 +174,7 @@ jobs:
               - 'docker-compose.ci.yml'
 
   run_updater_updates:
-    name: 'Run updater tests and updates and upload new sis-db to toska hub'
+    name: 'Run updater tests and updates'
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
@@ -214,9 +214,10 @@ jobs:
           SCHEDULE_IMMEDIATE: weekly
           EXIT_AFTER_IMMEDIATES: yes
 
-      - name: Push newly build db to toska hub
-        if: success()
-        run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+      # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
+      # - name: Push newly build db to toska hub
+      #   if: success()
+      #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
       - name: Dump logs on failure
         if: failure()
