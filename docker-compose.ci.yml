@@ -56,7 +56,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - 3000:3000
+      - 5000:5000
     profiles:
       - oodikone
 
@@ -64,7 +64,6 @@ services:
     <<: *defaults
     container_name: oodikone-kone-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db
-    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: kone-db
@@ -79,7 +78,6 @@ services:
     <<: *defaults
     container_name: oodikone-user-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db
-    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: user-db
@@ -106,7 +104,6 @@ services:
     <<: *defaults
     container_name: oodikone-sis-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db
-    pull_policy: always
     environment:
       PGDATA: /data
       POSTGRES_DB: sis-db
@@ -158,6 +155,7 @@ services:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
       <<: *healthcheck-defaults
 
+  # This is still needed to make backend calls correctly route from localhost:5000/api to localhost:8080
   nginx:
     container_name: oodikone-nginx
     image: nginx:latest
