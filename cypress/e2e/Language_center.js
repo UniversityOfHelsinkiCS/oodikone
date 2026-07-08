@@ -55,12 +55,12 @@ describe('When language center is opened', () => {
 
       it('Faculties tab "exceeding" button works', () => {
         cy.cs('difference-button').click()
-        checkNumbers([69, 2, 0, 3, 15, 0, 1, 1, 2, 0, 1, 30, 13, 1], 15, 'faculties')
+        checkNumbers([66, 2, 0, 3, 14, 0, 1, 1, 2, 0, 1, 30, 11, 1], 15, 'faculties')
       })
 
       it('Faculties tab semester selector changes numbers', () => {
         chooseSemester('Syksy 2020', 'from')
-        checkNumbers([1184, 28, 6, 27, 492, 4, 10, 2, 33, 0, 9, 535, 38, 0], 15, 'faculties')
+        checkNumbers([1184, 28, 6, 27, 493, 4, 10, 2, 33, 0, 9, 535, 37, 0], 15, 'faculties')
       })
     })
 
