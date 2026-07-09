@@ -314,6 +314,11 @@ const getYearlyStatsOfNew = async (
   }
 }
 
+/**
+  Mostly-legacy function that prevents user from opening too big of a populations.
+  At the moment the threshold to prevent a population is so high it will never trigger.
+
+ */
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
   const lastAttainmentDate = (await CourseModel.findOne({
     attributes: [[dbFn('MAX', dbCol('max_attainment_date')), 'date']],
@@ -337,7 +342,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
   })
 
   // MAGIC NUMBER
-  const maxAllowedAttainments = 1000000 // * Lower this value to get a smaller result if necessary
+  const maxAllowedAttainments = 1_000_000 // * Lower this value to get a smaller result if necessary
   return Math.max(1, maxAllowedAttainments / attainmentsWithinThreshold)
 }
 
@@ -426,8 +431,8 @@ export const getCourseYearlyStats = async (
   return statsRegular
 }
 
-export const getCourseProvidersForCourses = async (codes: string[]) => {
-  return (
+export const getCourseProvidersForCourses = async (codes: string[]) =>
+  (
     await OrganizationModel.findAll({
       attributes: ['code'],
       include: {
@@ -441,7 +446,6 @@ export const getCourseProvidersForCourses = async (codes: string[]) => {
       raw: true,
     })
   ).map(({ code }) => code)
-}
 
 export const getCourseDetails = async (codes: string[]) =>
   CourseModel.findAll({

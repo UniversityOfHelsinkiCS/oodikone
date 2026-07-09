@@ -1,15 +1,15 @@
-import dayjs from 'dayjs'
-import { Op, QueryTypes } from 'sequelize'
+import { Op } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
-import { EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
+import { CreditTypeCode, EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
-import { enrollmentTimeDateThreshold, splitByEmptySpace } from '@oodikone/shared/util'
-import { dbConnections } from '../database/connection'
+import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
+import { dateIsBetween, dateMaxFromList } from '@oodikone/shared/util/datetime'
 import {
   StudentModel,
   CreditModel,
   CourseModel,
+  EnrollmentModel,
   ProgrammeModuleModel,
   SemesterModel,
   StudyplanModel,
@@ -17,8 +17,6 @@ import {
   SISStudyRightElementModel,
 } from '../models'
 import { TagModel, TagStudentModel } from '../models/kone'
-
-const { sequelize } = dbConnections
 
 const byStudentNumber = async (studentNumber: string) => {
   const [student, tags] = await Promise.all([
@@ -117,7 +115,13 @@ const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] =>
   }
 }
 
-/* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
+/**
+  Returns students whose latest "active" attainment/enrollment is between to and from.
+
+  NOTE: If you have failed a course in 2021 and passed the same course in 2023
+  you would not be included in from=2020 to=2022 query
+
+ */
 export const findByCourseAndSemesters = async (
   codes: string[],
   from: number,
@@ -125,6 +129,7 @@ export const findByCourseAndSemesters = async (
   separate: boolean,
   unifyCourses: UnifyStatus = 'unifyStats'
 ) => {
+  /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
   const startSemester = await SemesterModel.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
@@ -147,61 +152,108 @@ export const findByCourseAndSemesters = async (
     return []
   }
 
-  const { startdate, semestercode: fromSemester } = startSemester
-  const { enddate, semestercode: toSemester } = endSemester
+  const { startdate } = startSemester
+  const { enddate } = endSemester
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
-  type QueryResult = {
-    studentnumber: string
-  }[]
+  const credits = (await CreditModel.findAll({
+    raw: true,
+    attributes: [
+      ['student_studentnumber', 'studentnumber'],
+      'course_code',
+      ['attainment_date', 'date'],
+      'credittypecode',
+    ],
+    where: {
+      course_code: { [Op.in]: codes },
+      is_open: unifyStatus,
+      credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
+    },
+    order: [
+      ['attainment_date', 'DESC'],
+      ['credittypecode', 'ASC'],
+    ],
+  })) as unknown as Array<{
+    studentnumber: CreditModel['student_studentnumber']
+    course_code: CreditModel['course_code']
+    date: CreditModel['attainment_date']
+    credittypecode: CreditModel['credittypecode']
+  }>
+  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
 
-  const queryResult: QueryResult = await sequelize.query(
-    `
-    SELECT
-      studentnumber
-    FROM
-      student s
-    WHERE
-      EXISTS (
-        SELECT
-          1
-        FROM
-          credit c
-        WHERE
-          c.student_studentnumber = s.studentnumber
-          AND c.course_code IN (:codes)
-          AND c.is_open IN (:isOpen)
-          AND c.attainment_date BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
+  const enrollments = (await EnrollmentModel.findAll({
+    raw: true,
+    attributes: ['studentnumber', 'course_code', ['enrollment_date_time', 'date']],
+    where: {
+      course_code: { [Op.in]: codes },
+      is_open: unifyStatus,
+      state: EnrollmentState.ENROLLED,
+    },
+    order: [['enrollment_date_time', 'DESC']],
+  })) as unknown as Array<{
+    studentnumber: EnrollmentModel['studentnumber']
+    course_code: EnrollmentModel['course_code']
+    date: EnrollmentModel['enrollment_date_time']
+  }>
+  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
+
+  const studentCreditsAndEnrollments: Record<
+    string,
+    Array<{
+      studentnumber: string
+      course_code: string
+      date: Date
+      type: 'credit' | 'enrollment'
+      credittypecode?: CreditTypeCode
+    }>
+  > = {}
+
+  for (const credit of credits) {
+    studentCreditsAndEnrollments[credit.studentnumber] ??= []
+    studentCreditsAndEnrollments[credit.studentnumber].push({ ...credit, type: 'credit' })
+  }
+  for (const enrollment of enrollments) {
+    studentCreditsAndEnrollments[enrollment.studentnumber] ??= []
+    studentCreditsAndEnrollments[enrollment.studentnumber].push({ ...enrollment, type: 'enrollment' })
+  }
+
+  const passedCreditTypes = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED]
+
+  const filteredStudentNumbers = new Set<string>()
+  Object.entries(studentCreditsAndEnrollments).map(([studentNumber, creditsOrEnrollments]) => {
+    const latestCredit = creditsOrEnrollments.find(
+      entry => entry.type === 'credit' && codes.includes(entry.course_code)
+    )
+    const latestEnrollment = creditsOrEnrollments.find(
+      entry => entry.type === 'enrollment' && codes.includes(entry.course_code)
+    )
+
+    if (
+      latestCredit &&
+      passedCreditTypes.includes(latestCredit.credittypecode!) &&
+      dateIsBetween(latestCredit.date, startdate, enddate)
+    ) {
+      filteredStudentNumbers.add(studentNumber)
+    } else if (
+      latestCredit &&
+      latestCredit.credittypecode === CreditTypeCode.FAILED &&
+      dateIsBetween(latestCredit.date, startdate, enddate)
+    ) {
+      filteredStudentNumbers.add(studentNumber)
+    } else if (
+      latestEnrollment &&
+      dateIsBetween(
+        latestEnrollment.date,
+        dateMaxFromList(startdate, enrollmentTimeDateThresholdAcademicYear)!,
+        enddate
       )
-      OR EXISTS (
-        SELECT
-          1
-        FROM
-          enrollment e
-        WHERE
-          e.studentnumber = s.studentnumber
-          AND e.course_code IN (:codes)
-          AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
-          AND e.enrollment_date_time >= '${dayjs(enrollmentTimeDateThreshold).format('YYYY-MM-DD')}'
-          AND e.state = :enrollmentState
-      );
-    `,
-    {
-      replacements: {
-        codes,
-        minYearCode: from,
-        maxYearCode: to,
-        isOpen: unifyStatus,
-        enrollmentState: EnrollmentState.ENROLLED,
-      },
-      type: QueryTypes.SELECT,
-      raw: true,
+    ) {
+      filteredStudentNumbers.add(studentNumber)
     }
-  )
+  })
 
-  const studentNumbers = queryResult.map(result => result.studentnumber)
-  return studentNumbers
+  return [...filteredStudentNumbers]
 }
 
 const formatSharedStudentData = ({
