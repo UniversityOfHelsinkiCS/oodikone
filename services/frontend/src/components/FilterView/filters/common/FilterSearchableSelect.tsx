@@ -44,6 +44,7 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
   const CustomWidthPopper = props => (
     <Popper
       {...props}
+      data-cy={`${filterKey}-popper`}
       id={`${filterKey}-popper`}
       placement="bottom-start"
       style={{ minWidth: '14em', maxWidth: '40em' }}
