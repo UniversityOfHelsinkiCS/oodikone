@@ -2,7 +2,7 @@ import { col, fn, Includeable, Op } from 'sequelize'
 
 import { SISStudyRight } from '@oodikone/shared/models'
 import { CreditTypeCode } from '@oodikone/shared/types'
-import { StudentModel, SISStudyRightModel, SISStudyRightElementModel, CreditModel } from '../../models'
+import { StudentModel, SISStudyRightModel, SISStudyRightElementModel, CreditModel, StudyplanModel } from '../../models'
 
 export const getStudyRightsInProgramme = async (
   programmeCode: string,
@@ -36,23 +36,33 @@ export const getStudyRightsInProgramme = async (
   ]
 
   if (includeStudentsAndCredits) {
-    include.push({
-      model: StudentModel,
-      attributes: ['gender_code', 'citizenships'],
-      include: [
-        {
-          model: CreditModel,
-          attributes: ['attainment_date', 'credits'],
-          where: {
-            isStudyModule: false,
-            credittypecode: {
-              [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
+    include.push(
+      {
+        model: StudentModel,
+        attributes: ['gender_code', 'citizenships'],
+        include: [
+          {
+            model: CreditModel,
+            attributes: ['attainment_date', 'credits', 'course_code'],
+            where: {
+              isStudyModule: false,
+              credittypecode: {
+                [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
+              },
             },
+            required: false,
           },
-          required: false,
+        ],
+      },
+      {
+        model: StudyplanModel,
+        as: 'studyPlans',
+        attributes: ['included_courses'],
+        where: {
+          programme_code: programmeCode,
         },
-      ],
-    })
+      }
+    )
   }
 
   return (
