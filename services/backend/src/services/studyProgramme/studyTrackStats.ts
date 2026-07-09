@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
@@ -84,6 +85,7 @@ const getEmptyYear = () => ({
   passive: 0,
   graduated: 0,
   graduatedCombinedProgramme: 0,
+  attainmentWithinYear: 0,
   male: 0,
   female: 0,
   otherUnknown: 0,
@@ -131,6 +133,8 @@ const combineStats = (
         getPercentage(yearStats.passive, yearStats.all),
         yearStats.graduated,
         getPercentage(yearStats.graduated, yearStats.all),
+        yearStats.attainmentWithinYear,
+        getPercentage(yearStats.attainmentWithinYear, yearStats.all),
         yearStats.male,
         getPercentage(yearStats.male, yearStats.all),
         yearStats.female,
@@ -180,6 +184,8 @@ const getMainStatsByTrackAndYear = async (
   const { semesters } = await getSemestersAndYears()
   const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
 
+  const yearAgo = dayjs().subtract(1, 'year')
+
   const graduationTimes: Record<string, Record<string, number[]>> = {}
   const graduationTimesCombo: Record<string, Record<string, number[]>> = {}
   const graduationTimesCombinedProgrammeCombo: Record<string, Record<string, number[]>> = {}
@@ -209,6 +215,18 @@ const getMainStatsByTrackAndYear = async (
           yearlyStats[year][programmeOrStudyTrack].started += 1
         }
       }
+    }
+
+    const latestAttainmentWithinYearAndInHops = dayjs(
+      studyRight.student.credits
+        .filter(credit => studyRight.studyPlans.some(sp => sp.included_courses.includes(credit.course_code)))
+        .reduce((latest, { attainment_date }) => {
+          return attainment_date > latest ? attainment_date : latest
+        }, new Date('1900-01-01'))
+    ).isSameOrAfter(yearAgo)
+
+    if (latestAttainmentWithinYearAndInHops) {
+      yearlyStats[year][programmeOrStudyTrack].attainmentWithinYear++
     }
 
     /* Gender cols */
