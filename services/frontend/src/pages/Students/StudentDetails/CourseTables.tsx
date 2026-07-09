@@ -15,12 +15,17 @@ import { Section } from '@/components/Section'
 import { DateFormat } from '@/constants/date'
 import { CloseIcon, DoneIcon, LayersIcon, NorthEastIcon, SwapHorizIcon } from '@/theme'
 import { reformatDate } from '@/util/timeAndDate'
+import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 const creditsColumnIndex = 3
 
 // Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
-const isInStudyPlan = (plan, code: string) =>
-  plan && (plan.included_courses.includes(code) ?? plan.included_courses.includes(code.replace('AY', '')))
+const isInStudyPlan = (plan: StudentStudyPlan, code: string) =>
+  plan &&
+  (plan.included_courses.includes(code) ||
+    plan.included_courses.includes(code.replace('AY', '')) ||
+    plan.includedModules.includes(code) ||
+    code === plan.programme_code)
 
 const getAcademicYear = (date: string) => {
   const year = new Date(date).getFullYear()
