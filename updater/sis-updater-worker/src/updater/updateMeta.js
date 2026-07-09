@@ -110,16 +110,16 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
     course.substitutions = newSubstitutions
 
-    const subtitutionSet = new Set()
-    for (const subGroup of course.substitution_groups) {
-      for (const sub of subGroup) subtitutionSet.add(sub)
+    const substitutionSet = new Set()
+    for (const group of course.substitution_groups) {
+      for (const course of group) substitutionSet.add(course)
     }
 
     const idToCodePairs = (
       await Course.findAll({
         attributes: ['id', 'code'],
         where: {
-          id: { [Op.in]: Array.from(subtitutionSet) },
+          id: { [Op.in]: Array.from(substitutionSet) },
         },
         raw: true,
       })
@@ -127,8 +127,8 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const idToCodeMap = new Map(idToCodePairs)
 
     course.substitution_groups = course.substitution_groups
-      .map(subGroup => subGroup.map(id => idToCodeMap.get(id) ?? null))
-      .map(subGroup => subGroup.filter(substitution_groups => !!substitution_groups)) // Filter out undefined/null entries
+      .map(group => group.map(id => idToCodeMap.get(id)))
+      .filter(group => group.filter(Boolean).length > 0) // Filter out empty groups or groups with only undefined
 
     course.mainCourseCode = [course.code, ...course.substitution_groups]
       .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))
