@@ -12,8 +12,9 @@ type Options = {
   courseFilters: Record<string, FTValue>
   courses: Record<string, CourseStats>
   substitutedBy: Record<string, string[][]>
+  includeSubstitutions: boolean
 }
-type Args = { courses: CourseStats[] }
+type Args = { courses: CourseStats[]; includeSubstitutions?: boolean }
 type Precompute = any
 
 const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
@@ -69,14 +70,19 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     courseFilters: {},
     courses: {},
     substitutedBy: {},
+    includeSubstitutions: true,
   },
 
   precompute: ({
     args,
     options,
   }: {
-    args: { courses: CourseStats[] }
-    options: { courses?: Record<string, CourseStats>; substitutedBy?: Record<string, string[][]> }
+    args: { courses: CourseStats[]; includeSubstitutions?: boolean }
+    options: {
+      courses?: Record<string, CourseStats>
+      substitutedBy?: Record<string, string[][]>
+      includeSubstitutions?: boolean
+    }
   }) => {
     const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
       const { code, substitution_groups } = course
@@ -94,6 +100,8 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
       delete options.courses
       options.courses = Object.fromEntries(args.courses.map(course => [course.code, course]))
     }
+
+    options.includeSubstitutions = args.includeSubstitutions ?? true
     options.substitutedBy = substitutedBy
   },
 
@@ -111,11 +119,13 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
       let foundAttainment = false
       let foundEnrollment = false
 
-      void [[mainCode], ...(options.substitutedBy?.[mainCode] ?? [])].forEach(group => {
-        foundPassed = foundPassed ? true : group.every(code => passedCoursesCodes.includes(code))
-        foundAttainment = foundAttainment ? true : group.every(code => courseCodes.includes(code))
-        foundEnrollment = foundEnrollment ? true : group.every(code => enrollmentCodes.includes(code))
-      })
+      void [[mainCode], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainCode] ?? []) : [])].forEach(
+        group => {
+          foundPassed = foundPassed ? true : group.every(code => passedCoursesCodes.includes(code))
+          foundAttainment = foundAttainment ? true : group.every(code => courseCodes.includes(code))
+          foundEnrollment = foundEnrollment ? true : group.every(code => enrollmentCodes.includes(code))
+        }
+      )
 
       switch (filterType) {
         case FilterType.ALL:

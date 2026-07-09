@@ -219,7 +219,10 @@ export const CoursePopulation = () => {
     genderFilter(),
     studentNumberFilter(),
     ageFilter(),
-    courseFilter({ courses: population?.coursestatistics.courses }),
+    courseFilter({
+      courses: population?.coursestatistics.courses,
+      includeSubstitutions: includeSubstitutions === 'true',
+    }),
     creditsEarnedFilter(),
     hetuFilter(),
     startYearAtUniFilter(),
