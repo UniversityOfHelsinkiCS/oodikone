@@ -60,7 +60,14 @@ const byStudentNumber = async (studentNumber: string) => {
         },
         {
           model: StudyplanModel,
-          attributes: ['id', 'included_courses', 'programme_code', 'completed_credits', 'sis_study_right_id'],
+          attributes: [
+            'id',
+            'included_courses',
+            'includedModules',
+            'programme_code',
+            'completed_credits',
+            'sis_study_right_id',
+          ],
         },
       ],
       order: [
