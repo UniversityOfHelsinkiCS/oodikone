@@ -114,8 +114,8 @@ export const StudyTrackDataTable = ({
             <TableCell
               colSpan={
                 !showPercentages
-                  ? getSpanValue(combinedProgramme, 4, showPercentages)
-                  : getSpanValue(combinedProgramme, 8, showPercentages)
+                  ? getSpanValue(combinedProgramme, 5, showPercentages)
+                  : getSpanValue(combinedProgramme, 10, showPercentages)
               }
             >
               Current status
