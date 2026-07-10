@@ -3,7 +3,7 @@ module.exports.isDev = process.env.NODE_ENV === 'development'
 module.exports.isStaging = process.env.STAGING || false
 module.exports.isProduction = process.env.NODE_ENV === 'production'
 module.exports.SECRET_TOKEN = process.env.SECRET_TOKEN
-module.exports.DEV_SCHEDULE_COUNT = 1000
+module.exports.DEV_SCHEDULE_COUNT = null // Set to a number to limit updater to update only DEV_SCHEDULE_COUNT amount of students
 module.exports.REDIS_LAST_HOURLY_SCHEDULE = 'LAST_HOURLY_SCHEDULE'
 module.exports.REDIS_LATEST_MESSAGE_RECEIVED = 'LATEST_MESSAGE_RECEIVED'
 module.exports.LATEST_MESSAGE_RECEIVED_THRESHOLD = 1000 * 60 * 5
