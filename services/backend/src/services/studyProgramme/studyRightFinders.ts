@@ -16,6 +16,7 @@ export const getStudyRightsInProgramme = async (
 
   const studyRightIds = (
     await SISStudyRightModel.findAll({
+      raw: true,
       attributes: ['id'],
       include: {
         model: SISStudyRightElementModel,
@@ -23,7 +24,6 @@ export const getStudyRightsInProgramme = async (
         attributes: [],
         where,
       },
-      raw: true,
     })
   ).map(sr => sr.id)
 
@@ -44,13 +44,13 @@ export const getStudyRightsInProgramme = async (
           {
             model: CreditModel,
             attributes: ['attainment_date', 'credits', 'course_code'],
+            required: false,
             where: {
               isStudyModule: false,
               credittypecode: {
                 [Op.in]: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
               },
             },
-            required: false,
           },
         ],
       },
@@ -58,6 +58,7 @@ export const getStudyRightsInProgramme = async (
         model: StudyplanModel,
         as: 'studyPlans',
         attributes: ['included_courses'],
+        required: false,
         where: {
           programme_code: programmeCode,
         },
