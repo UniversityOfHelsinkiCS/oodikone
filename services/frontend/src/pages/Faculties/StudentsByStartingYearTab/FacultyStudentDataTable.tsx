@@ -130,7 +130,7 @@ export const FacultyStudentDataTable = ({
         <TableHead>
           <TableRow key="FirstHeader">
             <TableCell colSpan={!showPercentages ? 3 : 4} />
-            <TableCell colSpan={!showPercentages ? 4 : 8}>Current status</TableCell>
+            <TableCell colSpan={!showPercentages ? 5 : 10}>Current status</TableCell>
             <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
             <TableCell colSpan={!showPercentages ? 2 : 4}>
               <Stack direction="row" gap={1}>
