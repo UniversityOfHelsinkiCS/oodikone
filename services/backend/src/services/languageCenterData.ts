@@ -1,16 +1,18 @@
 import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
+import { EnrollmentState } from '@oodikone/shared/types'
 import { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } from '../models'
 import { redisClient } from './redis'
 
 export const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
-const isBetween = (start, date, end) => {
+const isBetween = (start: Date, date: Date, end: Date) => {
   return new Date(start).getTime() <= new Date(date).getTime() && new Date(date).getTime() <= new Date(end).getTime()
 }
 
-const findStudyRight = (studyRights, date) => {
+/** Assumes studyrights are in correct order */
+const findStudyRight = (studyRights: SISStudyRightModel[], date: Date) => {
   return studyRights?.find(studyRight => isBetween(studyRight.startDate, date, studyRight.endDate))
 }
 
@@ -23,7 +25,7 @@ const getDifference = stats => {
 }
 
 const getLanguageCenterCourses = async () => {
-  const courses = await CourseModel.findAll({
+  const courses: Pick<CourseModel, 'code' | 'name'>[] = await CourseModel.findAll({
     attributes: ['code', 'name'],
     where: {
       [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
@@ -33,29 +35,37 @@ const getLanguageCenterCourses = async () => {
   return courses
 }
 
-export const createArrayOfCourses = async (attempts, courses) => {
+export const createArrayOfCourses = (attempts: Attempt[], courses: Pick<CourseModel, 'code' | 'name'>[]) => {
   const fields = { completions: 0, enrollments: 0, difference: 0, rejected: 0 }
-  const semesters = {}
-  const faculties = {}
-  const semesterStatsMap = attempts.reduce((obj, cur) => {
+  const semesters: Record<Attempt['semestercode'], boolean> = {}
+  // Remove undefined as a possibility for type
+  const faculties: Record<Exclude<Attempt['faculty'], undefined>, boolean> = {}
+
+  // TODO: Type this properly. Good luck :)
+  const semesterStatsMap = attempts.reduce((acc, cur) => {
     const semester = cur.semestercode
-    faculties[cur.faculty] = true
-    semesters[semester] = true
-    if (!obj[cur.courseCode]) {
-      obj[cur.courseCode] = {}
-    }
-    if (!obj[cur.courseCode][semester]) {
-      obj[cur.courseCode][semester] = { ...fields }
-    }
-    if (cur.faculty && !obj[cur.courseCode][semester][cur.faculty]) {
-      obj[cur.courseCode][semester][cur.faculty] = { ...fields }
-    }
-    const allFacultiesTotal = obj[cur.courseCode][semester]
-    const allStats = [allFacultiesTotal]
     if (cur.faculty) {
-      const semesterFacultyStats = obj[cur.courseCode][semester][cur.faculty]
+      faculties[cur.faculty] = true
+    }
+    semesters[semester] = true
+
+    acc[cur.courseCode] ??= {}
+    // NOTE: This has to be spread because otherwise a ref to fields is saved to
+    // acc[cur.courseCode][semester] which would in the end result in a massive circular object
+    acc[cur.courseCode][semester] ??= { ...fields }
+
+    if (cur.faculty) {
+      acc[cur.courseCode][semester][cur.faculty] ??= { ...fields }
+    }
+
+    const allFacultiesTotal = acc[cur.courseCode][semester]
+    const allStats = [allFacultiesTotal]
+
+    if (cur.faculty) {
+      const semesterFacultyStats = acc[cur.courseCode][semester][cur.faculty]
       allStats.push(semesterFacultyStats)
     }
+
     for (const stats of allStats) {
       if (cur.completed) {
         stats.completions += 1
@@ -65,7 +75,7 @@ export const createArrayOfCourses = async (attempts, courses) => {
         stats.rejected += 1
       }
     }
-    return obj
+    return acc
   }, {})
 
   const courseList = courses
@@ -88,55 +98,60 @@ export const createArrayOfCourses = async (attempts, courses) => {
   return courseList
 }
 
+type Attempt = {
+  studentNumber: string
+  courseCode: string
+  completed: boolean
+  date: Date
+  semestercode: number
+  faculty?: string
+  enrolled?: boolean
+}
+
 export const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
   const autumnSemester2017 = 135
 
   const credits = await CreditModel.findAll({
+    raw: true,
     attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
       semestercode: { [Op.gte]: autumnSemester2017 },
       credittypecode: 4,
     },
-    raw: true,
   })
 
   const enrollments = await EnrollmentModel.findAll({
+    raw: true,
     attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
       [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
-      // This doesn't need the `enrollmentTimeDateThreshold`, ColorizedDataTable doesn't use studyright_ids
+      // EnrollmentDateTimeThreshold need not be used here as we are not counting failed courses
     },
-    raw: true,
   })
 
-  const studyRights = await SISStudyRightModel.findAll({ raw: true })
+  const studyRights = await SISStudyRightModel.findAll({
+    raw: true,
+    order: [['end_date', 'DESC']],
+  })
 
-  const attemptStudyRightToFacultyMap = studyRights.reduce((obj, cur) => {
-    if (!cur.id) return obj
-    obj[cur.id] = cur.facultyCode
-    return obj
+  const attemptStudyRightToFacultyMap = studyRights.reduce<
+    Record<SISStudyRightModel['id'], SISStudyRightModel['facultyCode']>
+  >((acc, cur) => {
+    if (!cur.id) return acc
+    acc[cur.id] = cur.facultyCode
+    return acc
   }, {})
 
-  credits.forEach(credit => {
-    credit.faculty = attemptStudyRightToFacultyMap[credit.studyright_id]
-  })
-
-  enrollments.forEach(enrollment => {
-    enrollment.faculty = attemptStudyRightToFacultyMap[enrollment.studyright_id]
-  })
-
-  const studentNumbers = new Set()
-  const attemptsByStudents = {}
+  const studentNumbers = new Set<string>()
+  const attemptsByStudents: Record<string, Attempt[]> = {}
 
   credits.forEach(credit => {
     const studentNumber = credit.student_studentnumber
     studentNumbers.add(studentNumber)
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
+    attemptsByStudents[studentNumber] ??= []
     attemptsByStudents[studentNumber].push({
       studentNumber,
       courseCode: credit.course_code,
@@ -149,10 +164,8 @@ export const computeLanguageCenterData = async () => {
 
   enrollments.forEach(enrollment => {
     const studentNumber = enrollment.studentnumber
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
     studentNumbers.add(studentNumber)
+    attemptsByStudents[studentNumber] ??= []
     if (
       attemptsByStudents[studentNumber].find(
         attempt =>
@@ -163,6 +176,7 @@ export const computeLanguageCenterData = async () => {
     ) {
       return
     }
+
     attemptsByStudents[studentNumber].push({
       studentNumber,
       courseCode: enrollment.course_code,
@@ -170,23 +184,25 @@ export const computeLanguageCenterData = async () => {
       date: enrollment.enrollment_date_time,
       faculty: attemptStudyRightToFacultyMap[enrollment.studyright_id],
       semestercode: enrollment.semestercode,
-      enrolled: enrollment.state === 'ENROLLED',
+      enrolled: enrollment.state === EnrollmentState.ENROLLED,
     })
   })
 
-  const studentNumberToStudyRightsMap = studyRights.reduce((obj, cur) => {
-    if (!obj[cur.studentNumber]) obj[cur.studentNumber] = []
-    obj[cur.studentNumber].push(cur)
-    return obj
+  const studentNumberToStudyRightsMap = studyRights.reduce<
+    Record<SISStudyRightModel['studentNumber'], SISStudyRightModel[]>
+  >((acc, cur) => {
+    acc[cur.studentNumber] ??= []
+    acc[cur.studentNumber].push(cur)
+    return acc
   }, {})
 
-  const attempts = []
+  const attempts: Attempt[] = []
   studentNumbers.forEach(studentNumber => attempts.push(...attemptsByStudents[studentNumber]))
   // 93033 Avoin yliopisto, yhteistyöoppilaitokset
   // 93034 Kesäyliopistot
-  const isOpenUni = facultyCode => ['9301', 'H930', '93033', '93034'].includes(facultyCode)
-  const isMisc = facultyCode => ['H906', 'H401'].includes(facultyCode) // Language center, Alexander institute (very few numbers)
-  const isHyFaculty = facultyCode => facultyCode.substring(0, 3).match('^H\\d')
+  const isOpenUni = (facultyCode: string) => ['9301', 'H930', '93033', '93034'].includes(facultyCode)
+  const isMisc = (facultyCode: string) => ['H906', 'H401'].includes(facultyCode) // Language center, Alexander institute (very few numbers)
+  const isHyFaculty = (facultyCode: string) => /^H\d/.exec(facultyCode.substring(0, 3))
 
   attempts.forEach(attempt => {
     if (attempt.faculty) {
@@ -210,7 +226,7 @@ export const computeLanguageCenterData = async () => {
     }
   })
 
-  const unorderedTableData = await createArrayOfCourses(attempts, courses)
+  const unorderedTableData = createArrayOfCourses(attempts, courses)
   const tableData = orderBy(unorderedTableData, 'code')
 
   const faculties = [...new Set(attempts.map(({ faculty }) => faculty))]
