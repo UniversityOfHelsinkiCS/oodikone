@@ -215,9 +215,9 @@ jobs:
           EXIT_AFTER_IMMEDIATES: yes
 
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
-      # - name: Push newly build db to toska hub
-      #   if: success()
-      #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+      - name: Push newly build db to toska hub
+        if: success()
+        run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
       - name: Dump logs on failure
         if: failure()
