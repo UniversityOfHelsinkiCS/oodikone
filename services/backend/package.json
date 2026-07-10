@@ -5,6 +5,7 @@
     "build": "tsc",
     "test:all": "vitest",
     "test:api": "vitest ./tests/api",
+    "test:services": "vitest ./tests/services",
     "test:unit": "vitest ./tests/unit",
     "test:silent": "SILENT_TESTING=true vitest"
   },

@@ -1,11 +1,11 @@
 import { describe, it, assert, beforeAll, vi } from 'vitest'
 import { Unification } from '@oodikone/shared/types'
-import { initializeDatabaseConnection } from '../../../../src/database/connection'
+import { initializeDatabaseConnection } from '../../../src/database/connection'
 import {
   maxYearsToCreatePopulationFrom,
   searchAndCombineSubstitutionGroupsToCodes,
-} from '../../../../src/services/courses'
-import { findByCourseAndSemesters } from '../../../../src/services/students'
+} from '../../../src/services/courses'
+import { findByCourseAndSemesters } from '../../../src/services/students'
 
 void describe.concurrent('Search and complete substitution groups to codes', () => {
   beforeAll(async () => {
