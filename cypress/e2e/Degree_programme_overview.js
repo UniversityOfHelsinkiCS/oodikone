@@ -295,15 +295,15 @@ describe('Degree programme overview', () => {
 
     it('Students of the degree programme are shown correctly', () => {
       const tableContents = [
-        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
-        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 5, 3, 0, 8, 1],
-        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 19, 7, 0, 25, 1],
-        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 29, 8, 0, 35, 4],
-        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 15, 15, 0, 29, 3],
-        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 22, 13, 0, 35, 2],
-        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 26, 20, 0, 45, 1],
-        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 31, 16, 0, 47, 0],
-        ['Total', 229, 197, 0, 0, 95, 134, 147, 82, 0, 224, 12],
+        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainments, Men, Women, Other/Unknown, Finland, Other]
+        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 0, 5, 3, 0, 8, 1],
+        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 0, 19, 7, 0, 25, 1],
+        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 0, 29, 8, 0, 35, 4],
+        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3],
+        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 0, 22, 13, 0, 35, 2],
+        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 0, 26, 20, 0, 45, 1],
+        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 0, 31, 16, 0, 47, 0],
+        ['Total', 229, 197, 0, 0, 95, 134, 0, 147, 82, 0, 224, 12],
       ]
 
       cy.checkTableStats(tableContents, 'study-tracks-and-class-statistics')
@@ -454,14 +454,14 @@ describe('Degree programme overview', () => {
       it('Students of the study track are shown correctly', () => {
         cy.cs('study-track-overview-section').contains('Students of the study track MAT-MAT by starting year')
         const tableContents = [
-          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Men, Women, Other/Unknown, Finland, Other]
-          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 2, 1, 0, 3, 0],
-          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 3, 1, 0, 4, 0],
-          ['2020 - 2021', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],
-          ['2019 - 2020', 17, 14, 0, 0, 0, 17, 10, 7, 0, 17, 1],
-          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 11, 13, 0, 24, 0],
-          ['2017 - 2018', 28, 24, 0, 0, 1, 27, 15, 13, 0, 28, 0],
-          ['Total', 89, 73, 0, 0, 6, 83, 48, 41, 0, 88, 4],
+          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainment, Men, Women, Other/Unknown, Finland, Other]
+          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 0, 2, 1, 0, 3, 0],
+          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 0, 3, 1, 0, 4, 0],
+          ['2020 - 2021', 13, 10, 0, 0, 1, 0, 12, 7, 6, 0, 12, 3],
+          ['2019 - 2020', 17, 14, 0, 0, 0, 0, 17, 10, 7, 0, 17, 1],
+          ['2018 - 2019', 24, 21, 0, 0, 2, 0, 22, 11, 13, 0, 24, 0],
+          ['2017 - 2018', 28, 24, 0, 0, 1, 0, 27, 15, 13, 0, 28, 0],
+          ['Total', 89, 73, 0, 0, 6, 83, 48, 0, , 41, 0, 88, 4],
         ]
         cy.checkTableStats(tableContents, 'study-tracks-and-class-statistics')
       })
