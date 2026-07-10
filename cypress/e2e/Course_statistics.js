@@ -468,10 +468,10 @@ describe('Basic user', () => {
       cy.cs('course-population-for-2019-2020').click()
 
       cy.contains('Tietorakenteet ja algoritmit')
-      cy.contains('Class of 2019-2020, 33 students')
+      cy.contains('Class of 2019-2020, 32 students')
       cy.contains('Include substitutions, Open and normal')
 
-      cy.contains('Students (33)').click()
+      cy.contains('Students (32)').click()
       cy.contains('td', '394776').siblings().eq(2).contains('3')
       cy.contains('td', '497388').siblings().eq(2).contains('2')
     })
@@ -486,10 +486,10 @@ describe('Basic user', () => {
       cy.cs('course-population-for-2019-2020').click()
 
       cy.contains('Tietorakenteet ja algoritmit')
-      cy.contains('Class of 2019-2020, 33 students')
+      cy.contains('Class of 2019-2020, 32 students')
       cy.contains('Include substitutions, Open and normal')
 
-      cy.contains('Students (33)').click()
+      cy.contains('Students (32)').click()
       cy.get('table tbody td').filter(':contains("Hidden")').should('have.length', 9)
     })
   })
