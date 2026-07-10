@@ -88,7 +88,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
   const attemptsArray = [] as Attempt[]
   studentList.forEach(studentNumber => attemptsArray.push(...attemptsByStudents[studentNumber]))
 
-  const unorderedTableData = await createArrayOfCourses(attemptsArray, courses)
+  const unorderedTableData = createArrayOfCourses(attemptsArray, courses)
   const tableData = orderBy(unorderedTableData, 'code')
 
   return { tableData }
