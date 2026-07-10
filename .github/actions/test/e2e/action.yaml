@@ -32,7 +32,7 @@ runs:
     - name: 'Run cypress'
       uses: cypress-io/github-action@v7
       with:
-        browser: chrome
+        browser: firefox
         spec: ${{ inputs.spec }}
       env:
         CYPRESS_baseUrl: http://localhost:1337
