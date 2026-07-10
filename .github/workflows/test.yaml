@@ -241,6 +241,25 @@ jobs:
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+  #
+  # === Backend service-tests ===
+  test_services:
+    name: 'Run backend service-tests'
+    runs-on: ubuntu-latest
+    if: |
+      !cancelled() && !failure()
+    needs:
+      - run_updater_updates
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run service-tests
+        uses: ./.github/actions/test/services
+        with:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
 
   # === Unit testing ===
   test_unit:
