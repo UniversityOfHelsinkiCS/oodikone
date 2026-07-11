@@ -43,6 +43,7 @@ runs:
       with:
         name: 'Cypress videos - ${{ inputs.test_name }}'
         path: ./cypress/videos/*
+        retention-days: 7
 
     - name: 'Print logs on failure'
       shell: bash

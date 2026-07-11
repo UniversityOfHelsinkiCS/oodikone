@@ -44,6 +44,7 @@ jobs:
         with:
           name: updater-worker-image
           path: /tmp/worker.tar
+          retention-days: 7
 
   build_scheduler:
     name: 'Build Updater scheduler'
@@ -67,6 +68,7 @@ jobs:
         with:
           name: updater-scheduler-image
           path: /tmp/scheduler.tar
+          retention-days: 7
 
   test_updater:
     name: 'Test Updater'
