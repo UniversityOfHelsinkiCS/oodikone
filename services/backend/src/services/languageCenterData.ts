@@ -134,7 +134,7 @@ export const computeLanguageCenterData = async () => {
 
   const studyRights = await SISStudyRightModel.findAll({
     raw: true,
-    order: [['end_date', 'DESC']],
+    order: [['end_date', 'DESC NULLS LAST']],
   })
 
   const attemptStudyRightToFacultyMap = studyRights.reduce<
