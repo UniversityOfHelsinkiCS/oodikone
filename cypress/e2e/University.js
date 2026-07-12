@@ -73,14 +73,19 @@ describe('University view', () => {
 
     describe('Different modes work', () => {
       it('Breakdown', () => {
+        cy.cs('graduation-mode-selector').within(() => {
+          cy.cs('select-breakdown').click()
+        })
         checkGraduationCharts('breakdown')
       })
+
       it('Median', () => {
         cy.cs('graduation-mode-selector').within(() => {
           cy.cs('select-median').click()
         })
         checkGraduationCharts('median')
       })
+
       it('Average', () => {
         cy.cs('graduation-mode-selector').within(() => {
           cy.cs('select-average').click()
