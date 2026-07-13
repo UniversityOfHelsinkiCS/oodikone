@@ -48,9 +48,7 @@ const getAbsentYears = (studyRights: SISStudyRight[], semesters: SemestersData['
   const maximumSemesterCode = Math.max(...Object.keys(semesterEnrollments).map(Number))
 
   for (let i = minimumSemesterCode + 1; i < maximumSemesterCode; i++) {
-    if (!semesterEnrollments[i]) {
-      semesterEnrollments[i] = { semestercode: i, enrollmenttype: 3, statutoryAbsence: false }
-    }
+    semesterEnrollments[i] ??= { semestercode: i, enrollmenttype: 3, statutoryAbsence: false }
   }
 
   const mergedEnrollments = Object.values(semesterEnrollments)
