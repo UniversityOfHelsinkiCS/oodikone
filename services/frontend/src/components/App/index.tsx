@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import { initShibbolethPinger } from 'unfuck-spa-shibboleth-session'
 
 import { AccessDenied } from '@/components/AccessDenied'
+import { BannerView } from '@/components/Banner'
 import { Footer } from '@/components/Footer'
 import { LanguageProvider } from '@/components/LanguagePicker/useLanguage'
 import { NavigationBar } from '@/components/NavigationBar'
@@ -59,6 +60,7 @@ export const App = () => {
   return (
     <>
       <NavigationBar />
+      <BannerView />
       <Routes />
       <Footer />
     </>
