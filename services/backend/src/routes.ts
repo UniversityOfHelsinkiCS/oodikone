@@ -9,6 +9,7 @@ import * as auth from './middleware/auth'
 import currentUserMiddleware from './middleware/currentUser'
 import errorHandler from './middleware/errorHandler'
 import headersMiddleware from './middleware/headers'
+import banners from './routes/banners'
 import changelog from './routes/changelog'
 import closeToGraduation from './routes/closeToGraduation'
 import completedCoursesSearch from './routes/completedCoursesSearch'
@@ -45,6 +46,7 @@ const routes = (app: Express, url: string) => {
   app.use(currentUserMiddleware)
   app.use(accessLogger)
   app.use(`${url}/login`, login)
+  app.use(`${url}/banners`, banners)
   app.use(url, courses)
   app.use(`${url}/students`, students)
   app.use(url, population)
