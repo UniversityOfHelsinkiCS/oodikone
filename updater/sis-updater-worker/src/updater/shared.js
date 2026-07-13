@@ -104,11 +104,10 @@ const initGradeScaleIdToGradeIdsToGrades = async () =>
         const { localId, numericCorrespondence, passed, abbreviation } = curr
         const { fi, en, sv } = abbreviation || {}
         const abbr = fi || en || sv || 'Unknown'
-        if (!res[localId])
-          res[localId] = {
-            value: numericCorrespondence || abbr,
-            passed,
-          }
+        res[localId] ??= {
+          value: numericCorrespondence || abbr,
+          passed,
+        }
         return res
       }, {})
       return res
@@ -155,7 +154,7 @@ const initCountries = async () =>
   setRedisJSON(
     localMapToRedisKey.countries,
     (await selectAllFrom('countries')).reduce((res, curr) => {
-      if (!res[curr.id]) res[curr.id] = curr
+      res[curr.id] ??= curr
       return res
     }, {})
   )

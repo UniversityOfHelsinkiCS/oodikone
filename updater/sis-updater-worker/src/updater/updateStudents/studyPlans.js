@@ -34,7 +34,7 @@ export const updateStudyplans = async (
       .sort((a, b) => new Date(b.snapshot_date_time) - new Date(a.snapshot_date_time))
     if (!sorted.length) return acc
     const { education_id, person_id } = sorted[0]
-    if (!acc[education_id]) acc[education_id] = {}
+    acc[education_id] ??= {}
     acc[education_id][person_id] = true
     return acc
   }, {})
@@ -47,7 +47,7 @@ export const updateStudyplans = async (
     const { education_id, person_id, id } = sorted[0]
     const educationType = getEducation(education_id)
     const hasBaMa = educationType && isBaMa(educationType)
-    if (!acc[education_id]) acc[education_id] = {}
+    acc[education_id] ??= {}
     acc[education_id][person_id] = {
       personId: person_id,
       studyRightId: id,
@@ -85,15 +85,15 @@ export const updateStudyplans = async (
 
   const courseUnitIdToAttainment = attainments.reduce((res, cur) => {
     if (!cur.course_unit_id) return res
-    if (!res[cur.course_unit_id]) res[cur.course_unit_id] = {}
-    if (!res[cur.course_unit_id][cur.person_id]) res[cur.course_unit_id][cur.person_id] = []
+    res[cur.course_unit_id] ??= {}
+    res[cur.course_unit_id][cur.person_id] ??= []
     res[cur.course_unit_id][cur.person_id].push(cur)
     return res
   }, {})
 
   const moduleAttainments = attainments.reduce((res, attainment) => {
     if (!attainment.module_id) return res
-    if (!res[attainment.module_id]) res[attainment.module_id] = {}
+    res[attainment.module_id] ??= {}
     res[attainment.module_id][attainment.person_id] = attainment
     return res
   }, {})
@@ -130,9 +130,7 @@ export const updateStudyplans = async (
 
   const childModules = studyplans.reduce((res, cur) => {
     cur.module_selections.forEach(module => {
-      if (!res[module.parentModuleId]) {
-        res[module.parentModuleId] = new Set()
-      }
+      res[module.parentModuleId] ??= new Set()
       res[module.parentModuleId].add(module.moduleId)
     })
     return res
@@ -205,9 +203,7 @@ export const updateStudyplans = async (
 
   const moduleIdToParentDegreeProgramme = {}
   const mapParentDegreeProgrammes = (moduleId, degreeProgrammeId, handledModuleIds) => {
-    if (!moduleIdToParentDegreeProgramme[moduleId]) {
-      moduleIdToParentDegreeProgramme[moduleId] = []
-    }
+    moduleIdToParentDegreeProgramme[moduleId] ??= []
     moduleIdToParentDegreeProgramme[moduleId].push(degreeProgrammeId)
     handledModuleIds.add(moduleId)
     if (!childModules[moduleId]) return
