@@ -4,7 +4,7 @@ import logger from '../../utils/logger.js'
 import { termRegistrationTypeToEnrollmenttype } from '../mapper.js'
 import {
   getEducation,
-  getSemester,
+  getSemesterCode,
   getEducationType,
   educationTypeToExtentcode,
   getOrganisationCode,
@@ -35,7 +35,7 @@ const getStudyRightSemesterEnrollments = semesterEnrollments => {
     } = termRegistration
 
     const type = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-    const { semestercode: semester } = getSemester(studyYearStartYear, termIndex)
+    const semester = getSemesterCode(studyYearStartYear, termIndex)
     return type === 2 ? { type, semester, statutoryAbsence } : { type, semester }
   })
 }
