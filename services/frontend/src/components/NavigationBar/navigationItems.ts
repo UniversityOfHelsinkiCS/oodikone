@@ -41,8 +41,9 @@ export const navigationItems: Record<string, NavigationItem> = {
     key: 'admin',
     label: 'Admin',
     items: [
-      { key: 'users', label: 'Users', path: '/users', reqRights: ['admin'] },
+      { key: 'banners', label: 'Banners', path: '/banners', reqRights: ['admin'] },
       { key: 'updater', label: 'Updater', path: '/updater', reqRights: ['admin'] },
+      { key: 'users', label: 'Users', path: '/users', reqRights: ['admin'] },
     ],
   },
 }

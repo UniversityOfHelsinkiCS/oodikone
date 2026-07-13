@@ -48,7 +48,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
       return true
     }
 
-    if (['users', 'updater'].includes(subItemKey) && checkUserAccess(['admin'], roles)) {
+    if (['banners', 'users', 'updater'].includes(subItemKey) && checkUserAccess(['admin'], roles)) {
       return true
     }
 

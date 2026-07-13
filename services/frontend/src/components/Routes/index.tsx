@@ -10,6 +10,7 @@ import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { StudyGuidanceGroups } from '@/components/StudyGuidanceGroups'
 import { Teachers } from '@/components/Teachers'
 import { languageCenterViewEnabled } from '@/conf'
+import { Banners } from '@/pages/Banners'
 import { Changelog } from '@/pages/Changelog'
 import { CloseToGraduation } from '@/pages/CloseToGraduation'
 import { CompletedCourses } from '@/pages/CompletedCoursesSearch'
@@ -43,8 +44,9 @@ export const Routes = () => (
         </Route>
 
         <Route element={<ProtectedRoute requiredRoles={['admin']} />}>
-          <Route element={<Users />} path="/users/:userid?" />
+          <Route element={<Banners />} path="/banners" />
           <Route element={<Updater />} path="/updater" />
+          <Route element={<Users />} path="/users/:userid?" />
         </Route>
 
         <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['fullSisuAccess', 'courseStatistics']} />}>
