@@ -36,6 +36,13 @@ for (const user of userHeaders) {
     })
 
     beforeEach(() => cy.wrap(userInfo).should('not.be.undefined'))
+    beforeEach(() => {
+      cy.intercept('**/api/**', req => {
+        req.on('response', res => {
+          expect(res.statusCode, `${req.method} ${req.url}`).to.be.lessThan(500)
+        })
+      })
+    })
 
     for (const [route, requirements] of getBaseRoutes) {
       it(`Checking access ${route}`, () => {
