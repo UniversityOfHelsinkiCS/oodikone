@@ -49,7 +49,7 @@ set_custom_select_prompt() {
 
   options=(
     "Set up Oodikone from scratch"
-    "Reset all real data"
+    "Reset all data"
     "Reset single database"
     "Restore data from dumps"
     "Docker system prune"
