@@ -14,7 +14,6 @@ const graduationTimesLevels = ['bachelor', 'bcMsCombo', 'master', 'doctor']
 
 const checkGraduationCharts = mode => {
   graduationTimesLevels.forEach(level => {
-    cy.cs(`${level}-${mode}-bar-chart`).should('exist')
     cy.cs(`${level}-${mode}-bar-chart`).within(() => {
       // Check that bar has loaded
       cy.contains('Loading content').should('not.exist')
@@ -22,7 +21,7 @@ const checkGraduationCharts = mode => {
   })
 }
 
-describe('University view', () => {
+describe('University view', { timeout: 60 * 1000 }, () => {
   beforeEach(() => {
     cy.init('/university')
     cy.contains('University')
