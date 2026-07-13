@@ -83,9 +83,7 @@ const updatedStats = (
   transferred: boolean
 ) => {
   const { id, name } = teacher
-  if (!teacherStats[id]) {
-    teacherStats[id] = { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
-  }
+  teacherStats[id] ??= { id, name, passed: 0, failed: 0, credits: 0, transferred: 0 }
   const stats = teacherStats[id]
   if (passed) {
     stats.passed += 1
