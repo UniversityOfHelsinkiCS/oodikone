@@ -47,9 +47,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
   credits.forEach(credit => {
     const studentNumber = credit.student_studentnumber
     studentList.add(studentNumber)
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
+    attemptsByStudents[studentNumber] ??= []
     attemptsByStudents[studentNumber].push({
       studentNumber,
       courseCode: credit.course_code,
@@ -61,9 +59,7 @@ export const getStudyProgrammeStatsForColorizedCoursesTable = async (studyProgra
 
   enrollments.forEach(enrollment => {
     const studentNumber = enrollment.studentnumber
-    if (!attemptsByStudents[studentNumber]) {
-      attemptsByStudents[studentNumber] = []
-    }
+    attemptsByStudents[studentNumber] ??= []
     studentList.add(studentNumber)
     if (
       attemptsByStudents[studentNumber].find(

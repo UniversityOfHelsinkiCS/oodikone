@@ -301,13 +301,10 @@ const getProgrammesBeforeStarting = async ({
     if (studyRight.extentCode !== ExtentCode.BACHELOR_AND_MASTER) return acc
     const phase1Programmes = studyRight.studyRightElements.filter(elem => elem.phase === Phase.ANY)
     const [latestPhase1Programme] = orderBy(phase1Programmes, ['endDate'], ['desc'])
-    if (!acc[latestPhase1Programme.code]) {
-      const programmeWithYears: ProgrammeWithYears = {
-        code: latestPhase1Programme.code,
-        name: latestPhase1Programme.name,
-        ...getYearsObject({ years }),
-      }
-      acc[latestPhase1Programme.code] = programmeWithYears
+    acc[latestPhase1Programme.code] ??= {
+      code: latestPhase1Programme.code,
+      name: latestPhase1Programme.name,
+      ...getYearsObject({ years }),
     }
     const phase2Programmes = studyRight.studyRightElements.filter(elem => elem.phase === Phase.MASTER)
 
@@ -346,15 +343,11 @@ const getProgrammesAfterGraduation = async ({
     const [firstPhase2Programme] = orderBy(phase2Programmes, ['startDate'], ['asc'])
     if (!firstPhase2Programme) return acc
 
-    if (!acc[firstPhase2Programme.code]) {
-      const programmeWithYears: ProgrammeWithYears = {
-        code: firstPhase2Programme.code,
-        name: firstPhase2Programme.name,
-        ...getYearsObject({ years }),
-      }
-      acc[firstPhase2Programme.code] = programmeWithYears
+    acc[firstPhase2Programme.code] ??= {
+      code: firstPhase2Programme.code,
+      name: firstPhase2Programme.name,
+      ...getYearsObject({ years }),
     }
-
     ;(acc[firstPhase2Programme.code][defineYear(firstPhase2Programme.startDate, isAcademicYear)] as number) += 1
     return acc
   }, {})

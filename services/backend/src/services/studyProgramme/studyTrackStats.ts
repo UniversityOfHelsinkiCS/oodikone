@@ -160,9 +160,7 @@ const combineStats = (
       ])
       mainStatsByTrack[programmeOrStudyTrack].push([year, ...yearArray])
       if (Object.keys(yearStats.otherCountriesCounts).length > 0) {
-        if (!otherCountriesCount[programmeOrStudyTrack]) {
-          otherCountriesCount[programmeOrStudyTrack] = {}
-        }
+        otherCountriesCount[programmeOrStudyTrack] ??= {}
         otherCountriesCount[programmeOrStudyTrack][year] = yearStats.otherCountriesCounts
       }
     }

@@ -39,7 +39,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
   }, {})
 
   const courseIdToShareMap = providers.reduce<Record<string, CourseProviderModel[]>>((obj, provider) => {
-    if (!obj[provider.coursecode]) obj[provider.coursecode] = []
+    obj[provider.coursecode] ??= []
     obj[provider.coursecode].push(provider)
     return obj
   }, {})
