@@ -21,7 +21,7 @@ const checkGraduationCharts = mode => {
   })
 }
 
-describe('University view', { timeout: 60 * 1000 }, () => {
+describe('University view', { defaultCommandTimeout: 60 * 1000 }, () => {
   beforeEach(() => {
     cy.init('/university')
     cy.contains('University')
