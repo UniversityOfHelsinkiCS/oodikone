@@ -74,6 +74,7 @@ for (const user of userHeaders) {
         const shouldHaveAccess = mankeli && requiredUserId
 
         if (shouldHaveAccess) {
+          cy.contains('Something broke').should('not.exist')
           cy.contains('Access denied').should('not.exist')
         } else {
           cy.contains('Access denied')
