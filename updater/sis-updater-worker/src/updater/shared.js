@@ -129,22 +129,25 @@ const initOrgToUniOrgId = async () => {
 
 export const getUniOrgId = orgId => localMaps.orgToUniOrgId[orgId]
 
-const initStartYearToSemesters = async () =>
-  setRedisJSON(
-    localMapToRedisKey.startYearToSemesters,
-    (await Semester.findAll()).reduce((res, curr) => {
-      if (!res[curr.startYear]) {
-        res[curr.startYear] = {}
-        if (curr.startYear === FIRST_SEMESTER_START_YEAR) {
-          for (let i = 1900; i < FIRST_SEMESTER_START_YEAR; i++) {
-            res[i] = { 0: curr, 1: curr }
-          }
-        }
-      }
-      res[curr.startYear][curr.termIndex] = curr
-      return res
-    }, {})
-  )
+const initStartYearToSemesters = async () => {
+  const semesters = await Semester.findAll()
+  const startingYearToSemesterObj = semesters.reduce((acc, cur) => {
+    acc[cur.startYear] ??= [cur, cur]
+    acc[cur.startYear][cur.termIndex] = cur
+
+    return acc
+  }, {})
+
+  // Bind semesters before the first year to semestercode 1
+  for (let i = 1900; i < FIRST_SEMESTER_START_YEAR; i++) {
+    startingYearToSemesterObj[i] = [
+      startingYearToSemesterObj[FIRST_SEMESTER_START_YEAR][0],
+      startingYearToSemesterObj[FIRST_SEMESTER_START_YEAR][0],
+    ]
+  }
+
+  setRedisJSON(localMapToRedisKey.startYearToSemesters, startingYearToSemesterObj)
+}
 
 export const getSemester = (studyYearStartYear, termIndex) => {
   return localMaps.startYearToSemesters[studyYearStartYear][termIndex]
