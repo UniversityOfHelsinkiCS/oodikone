@@ -65,6 +65,7 @@ export const callApi = async (
 export const RTKApi = createApi({
   reducerPath: 'api',
   tagTypes: [
+    'Banners',
     'CompletedCoursesSearchList',
     'CustomPopulationSearches',
     'ProgressCriteria',
