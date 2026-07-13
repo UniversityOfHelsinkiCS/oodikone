@@ -48,9 +48,7 @@ export const countTotalStats = (formattedStats: FormattedStats[]) => {
 
     Object.keys(curr.attempts.grades).forEach(grade => {
       const parsedGrade = parseGrade(grade)
-      if (!cgrades[parsedGrade]) {
-        cgrades[parsedGrade] = 0
-      }
+      cgrades[parsedGrade] ??= 0
       cgrades[parsedGrade] += curr.attempts.grades[grade]
 
       if (FAILED_GRADES.includes(parsedGrade.toLowerCase())) {
@@ -62,9 +60,7 @@ export const countTotalStats = (formattedStats: FormattedStats[]) => {
 
     Object.keys(curr.students.grades).forEach(grade => {
       const parsedGrade = parseGrade(grade)
-      if (!bestEffortGrades[parsedGrade]) {
-        bestEffortGrades[parsedGrade] = 0
-      }
+      bestEffortGrades[parsedGrade] ??= 0
       bestEffortGrades[parsedGrade] += curr.students.grades[grade]
     })
 
