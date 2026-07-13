@@ -86,8 +86,11 @@ export const DegreeCourseTable = ({
   }
 
   const areModuleCoursesVisible = (moduleCode: string) => {
-    setModuleCoursesVisible[version] ??= {}
-    return moduleCoursesVisible[version][moduleCode] ?? false
+    if (!moduleCoursesVisible[version]) {
+      setModuleCoursesVisible(prev => ({ ...prev, [version]: {} }))
+      return false
+    }
+    return moduleCoursesVisible[version][moduleCode]
   }
 
   const excludeOne = (course: ProgrammeCourse) => {
