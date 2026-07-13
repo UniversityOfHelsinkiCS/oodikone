@@ -80,7 +80,7 @@ const parseCredit = (
     studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
     studyRightElements
       .filter(({ startDate, endDate }) => dateIsBetween(attainmentDate, startDate, endDate))
-      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+      .sort((a, b) => (b.endDate?.getTime() ?? 0) - (a.endDate?.getTime() ?? 0))
       .at(0) // The newest studyRightElement
 
   const programme = programmeOfCredit
@@ -184,7 +184,9 @@ const getYearlyStatsOfNew = async (
   unification: Unification,
   anonymizationSalt: string | null,
   combineSubstitutions: boolean,
-  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>
+  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>,
+  from: Date,
+  to: Date
 ) => {
   // Includes main course code and substitutions (if enabled)
   const creditGroupCodes =
@@ -209,8 +211,8 @@ const getYearlyStatsOfNew = async (
   const { semesters, years } = await getSemestersAndYears()
 
   const [creditGroups, enrollmentGroups] = await Promise.all([
-    getCreditsForCourses(filteredCreditGroupCodes, unification),
-    getEnrollmentsForCourses(filteredCreditGroupCodes, unification),
+    getCreditsForCourses(filteredCreditGroupCodes, unification, from, to),
+    getEnrollmentsForCourses(filteredCreditGroupCodes, unification, from, to),
   ])
 
   const counter = new CourseYearlyStatsCounter()
@@ -350,12 +352,21 @@ export const getCourseYearlyStats = async (
   courseCodes: string[],
   separate: boolean,
   anonymizationSalt: string | null,
-  combineSubstitutions: boolean
+  combineSubstitutions: boolean,
+  fromYear = '1900',
+  toYear: string = new Date().getFullYear().toString()
 ) => {
+  // Default to 1900 - currentYear+1 so that without parameters the api returns stats for all years
+  const from = new Date(`${fromYear}-08-01`) // FALL
+  const to = new Date(`${parseInt(toYear) + 1}-07-31`) // SPRING next year
+
   const [credits, enrollments] = await Promise.all([
     CreditModel.findAll({
       attributes: ['student_studentnumber'],
-      where: { course_code: { [Op.in]: courseCodes } },
+      where: {
+        course_code: { [Op.in]: courseCodes },
+        attainment_date: { [Op.between]: [from, to] },
+      },
     }),
     EnrollmentModel.findAll({
       attributes: ['studentnumber'],
@@ -364,7 +375,12 @@ export const getCourseYearlyStats = async (
           [Op.in]: courseCodes,
         },
         state: EnrollmentState.ENROLLED,
-        enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
+        enrollment_date_time: {
+          [Op.and]: {
+            [Op.between]: [from, to],
+            [Op.gte]: enrollmentTimeDateThreshold,
+          },
+        },
       },
     }),
   ])
@@ -384,9 +400,9 @@ export const getCourseYearlyStats = async (
   const statsRegular = await Promise.all(
     courseCodes.map(async courseCode => {
       const course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null = await CourseModel.findOne({
+        raw: true,
         attributes: ['code', 'name', 'substitution_groups'],
         where: { code: courseCode },
-        raw: true,
       })
 
       if (!course) {
@@ -402,7 +418,9 @@ export const getCourseYearlyStats = async (
           Unification.OPEN,
           anonymizationSalt,
           combineSubstitutions,
-          studentNumberToSrElementsMap
+          studentNumberToSrElementsMap,
+          from,
+          to
         ),
         getYearlyStatsOfNew(
           course,
@@ -411,7 +429,9 @@ export const getCourseYearlyStats = async (
           Unification.REGULAR,
           anonymizationSalt,
           combineSubstitutions,
-          studentNumberToSrElementsMap
+          studentNumberToSrElementsMap,
+          from,
+          to
         ),
         getYearlyStatsOfNew(
           course,
@@ -420,7 +440,9 @@ export const getCourseYearlyStats = async (
           Unification.UNIFY,
           anonymizationSalt,
           combineSubstitutions,
-          studentNumberToSrElementsMap
+          studentNumberToSrElementsMap,
+          from,
+          to
         ),
       ])
 

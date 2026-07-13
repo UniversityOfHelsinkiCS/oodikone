@@ -56,7 +56,7 @@ export type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearly
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
   '/courseyearlystats',
   async (req, res) => {
-    const { codes, combineSubstitutions, separate } = req.query
+    const { codes, combineSubstitutions, separate, fromYear, toYear } = req.query
 
     const courseCodes = handleQueryArrays(codes)
 
@@ -82,7 +82,14 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const useCombineSubstitutions = combineSubstitutions !== 'false'
     const useSeparate = separate === 'true'
 
-    const results = await getCourseYearlyStats(courseCodes, useSeparate, anonymizationSalt, useCombineSubstitutions)
+    const results = await getCourseYearlyStats(
+      courseCodes,
+      useSeparate,
+      anonymizationSalt,
+      useCombineSubstitutions,
+      fromYear,
+      toYear
+    )
     return res.json(results)
   }
 )

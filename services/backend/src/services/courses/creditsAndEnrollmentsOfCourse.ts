@@ -14,7 +14,7 @@ import {
 } from '../../models'
 import { getIsOpen } from './helpers'
 
-export const getCreditsForCourses = async (codeGroups: string[][], unification: Unification) => {
+export const getCreditsForCourses = async (codeGroups: string[][], unification: Unification, from: Date, to: Date) => {
   const allCourseCodes = codeGroups.flatMap(group => group)
 
   // We need the credits grouped by student numbers so that we can check if a student has
@@ -41,6 +41,7 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
           },
           is_open: getIsOpen(unification),
           credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
+          attainment_date: { [Op.between]: [from, to] },
         },
         order: [['attainment_date', 'ASC']],
         include: [
@@ -134,7 +135,12 @@ export const getStudentNumberToSrElementsMap = async (studentNumbers: string[]) 
   }, {})
 }
 
-export const getEnrollmentsForCourses = async (codeGroups: string[][], unification: Unification) => {
+export const getEnrollmentsForCourses = async (
+  codeGroups: string[][],
+  unification: Unification,
+  from: Date,
+  to: Date
+) => {
   const allCourseCodes = codeGroups.flatMap(group => group)
 
   const students = await StudentModel.findAll({
@@ -160,8 +166,13 @@ export const getEnrollmentsForCourses = async (codeGroups: string[][], unificati
           course_code: {
             [Op.in]: allCourseCodes,
           },
-          // Date when OK changed from Oodi to Sisu data, studyright_id is null before that date
-          enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
+          enrollment_date_time: {
+            [Op.and]: {
+              [Op.between]: [from, to],
+              // Date when OK changed from Oodi to Sisu data, studyright_id is null before that date
+              [Op.gte]: enrollmentTimeDateThreshold,
+            },
+          },
           state: EnrollmentState.ENROLLED,
           is_open: getIsOpen(unification),
         },

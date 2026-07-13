@@ -14,4 +14,6 @@ export type CourseYearlyStatsQuery = {
   codes: string[]
   separate: string
   combineSubstitutions: string
+  fromYear: string
+  toYear: string
 }
