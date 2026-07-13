@@ -1,3 +1,4 @@
+export type { Banner } from './banner'
 export type { CustomPopulationSearch } from './customPopulationSearch'
 export type { ExcludedCourse } from './excludedCourse'
 export type { OpenUniPopulationSearch } from './openUniPopulationSearch'

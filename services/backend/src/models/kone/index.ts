@@ -1,3 +1,4 @@
+export { BannerModel } from './banner'
 export { CustomPopulationSearchModel } from './customPopulationSearch'
 export { ExcludedCourseModel } from './excludedCourse'
 export { OpenUniPopulationSearchModel } from './openUniPopulationSearch'
