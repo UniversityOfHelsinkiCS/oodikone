@@ -58,7 +58,7 @@ const onlyStudyGuidanceGroupsUser = {
   hypersonsisuid: 'hy-hlo-2222222',
 }
 
-const userHeaders = [
+export const userHeaders = [
   adminUserHeaders,
   basicUserHeaders,
   onlycoursestatisticsUserHeaders,
