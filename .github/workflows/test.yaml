@@ -328,6 +328,8 @@ jobs:
             spec: cypress/e2e/University.js
           - name: 'Test numbers match'
             spec: cypress/e2e/Numbers_match.js
+          - name: 'Test access rights'
+            spec: cypress/e2e/Routes.js
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
