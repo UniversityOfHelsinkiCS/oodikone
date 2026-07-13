@@ -201,9 +201,7 @@ router.get('/allgraduationstats', async (_req: Request, res: Response<University
       if (!facultyData[degreeType]) continue
 
       for (const facultyYearStats of facultyData[degreeType]) {
-        if (!mediansForUniversity[degreeType][facultyYearStats.name]) {
-          mediansForUniversity[degreeType][facultyYearStats.name] = { programmes: [], data: [] }
-        }
+        mediansForUniversity[degreeType][facultyYearStats.name] ??= { programmes: [], data: [] }
         const uniYearStats = mediansForUniversity[degreeType][facultyYearStats.name]
         if (!uniYearStats.programmes.find(prog => prog === facultyCode)) {
           uniYearStats.programmes.push(facultyCode)
