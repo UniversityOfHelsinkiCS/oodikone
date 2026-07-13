@@ -48,9 +48,7 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
 
     if (!programmeOtherCountriesCount) continue
     for (const [year, countryStats] of Object.entries(programmeOtherCountriesCount)) {
-      if (!(year in facultyTableStatsExtra)) {
-        facultyTableStatsExtra[year] = {}
-      }
+      facultyTableStatsExtra[year] ??= {}
       facultyTableStatsExtra[year][programmeCode] = countryStats
     }
   }
