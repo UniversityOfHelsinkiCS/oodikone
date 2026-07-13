@@ -27,9 +27,7 @@ export const DegreeCoursesTab = ({
     const modules: Record<string, ProgrammeCourse[]> = {}
     courses.forEach(course => {
       const code = course.parent_code!
-      if (!modules[code]) {
-        modules[code] = []
-      }
+      modules[code] ??= []
       modules[code].push(course)
     })
 
