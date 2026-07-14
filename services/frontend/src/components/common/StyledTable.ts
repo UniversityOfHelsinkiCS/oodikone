@@ -7,32 +7,52 @@ import Table from '@mui/material/Table'
  */
 export const StyledTable = styled(Table, {
   shouldForwardProp: prop =>
-    prop !== 'showCellBorders' && prop !== 'zebraStriped' && prop !== 'slimHeader' && prop !== 'slimBody',
-})<{ showCellBorders?: true; zebraStriped?: true; slimHeader?: true; slimBody?: true }>(({
-  theme,
-  showCellBorders,
-  zebraStriped,
-  slimHeader,
-  slimBody,
-}) => {
+    prop !== 'showCellBorders' &&
+    prop !== 'zebraStriped' &&
+    prop !== 'slimHeader' &&
+    prop !== 'slimBody' &&
+    prop !== 'nowrapBody' &&
+    prop !== 'nowrapHeader',
+})<{
+  showCellBorders?: true
+  zebraStriped?: true
+  slimHeader?: true
+  slimBody?: true
+  nowrapBody?: true
+  nowrapHeader?: true
+}>(({ theme, showCellBorders, zebraStriped, slimHeader, slimBody, nowrapHeader, nowrapBody }) => {
   return {
     '&': {
       border: `1px solid ${theme.palette.grey[300]}`,
     },
 
-    '& .MuiTableHead-root .MuiTableCell-root': slimHeader
-      ? {
-          paddingTop: '0.5em',
-          paddingBottom: '0.5em',
-        }
-      : {},
+    '& .MuiTableHead-root .MuiTableCell-root': {
+      ...(slimHeader
+        ? {
+            paddingTop: '0.5em',
+            paddingBottom: '0.5em',
+          }
+        : {}),
+      ...(nowrapHeader
+        ? {
+            whiteSpace: 'nowrap',
+          }
+        : {}),
+    },
 
-    '& .MuiTableBody-root .MuiTableCell-root': slimBody
-      ? {
-          paddingTop: '0.5em',
-          paddingBottom: '0.5em',
-        }
-      : {},
+    '& .MuiTableBody-root .MuiTableCell-root': {
+      ...(slimBody
+        ? {
+            paddingTop: '0.5em',
+            paddingBottom: '0.5em',
+          }
+        : {}),
+      ...(nowrapBody
+        ? {
+            whiteSpace: 'nowrap',
+          }
+        : {}),
+    },
 
     '& .MuiTableHead-root': {
       backgroundColor: theme.palette.grey[100],
