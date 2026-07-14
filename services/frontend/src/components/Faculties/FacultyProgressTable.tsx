@@ -5,6 +5,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import Typography from '@mui/material/Typography'
 import { Fragment, useState } from 'react'
 
 import { ExpandableRow } from '@/components/common/ExpandableRow'
@@ -44,11 +45,11 @@ export const FacultyProgressTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={`${cypress}-faculty-progress-table`} showCellBorders size="small">
+      <StyledTable data-cy={`${cypress}-faculty-progress-table`} nowrapBody showCellBorders slimBody slimHeader>
         <TableHead>
           <TableRow>
             {titles.map(title => (
-              <TableCell align="right" key={title}>
+              <TableCell align="center" key={title}>
                 {title}
               </TableCell>
             ))}
@@ -89,7 +90,9 @@ export const FacultyProgressTable = ({
                 <TableRow>
                   {yearArray.map((value, index) => (
                     <TableCell align="right" key={getKey(value, index)}>
-                      <b>{value}</b>
+                      <Typography fontSize="inherit" fontWeight="bold">
+                        {value}
+                      </Typography>
                     </TableCell>
                   ))}
                 </TableRow>

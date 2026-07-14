@@ -119,11 +119,11 @@ export const InteractiveDataTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy={`${cypress}-interactive-data-table`} showCellBorders size="small">
+      <StyledTable data-cy={`${cypress}-interactive-data-table`} nowrapBody showCellBorders size="small">
         <TableHead>
           <TableRow>
             {titles.map((title, index) => (
-              <TableCell key={title} sx={{ px: 0, py: 0.5 }}>
+              <TableCell key={title}>
                 <Box alignItems="center" display="flex" justifyContent={index === 0 ? 'left' : 'right'}>
                   {index === 0 && (
                     <Box sx={{ marginRight: 1 }}>

@@ -28,7 +28,7 @@ export const ExpandableRow = ({
   return (
     <TableRow>
       {yearArray?.map((value, index) => (
-        <TableCell align="right" key={getKey(value, index)} sx={{ px: 0.5, py: 0.75 }}>
+        <TableCell align="right" key={getKey(value, index)}>
           {index === 0 ? (
             <Box alignItems="center" display="flex" justifyContent="left">
               <IconButton data-cy={`${cypress}${yearIndex}`} onClick={toggleVisibility} size="small">
@@ -37,7 +37,7 @@ export const ExpandableRow = ({
               <Typography variant="body2">{value}</Typography>
             </Box>
           ) : (
-            roundValue(value)
+            <Typography fontSize="inherit">{roundValue(value)}</Typography>
           )}
         </TableCell>
       ))}

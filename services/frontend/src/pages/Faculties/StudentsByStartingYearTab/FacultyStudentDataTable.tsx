@@ -126,12 +126,7 @@ export const FacultyStudentDataTable = ({
 
   return (
     <TableContainer>
-      <StyledTable
-        data-cy="faculty-student-stats-table"
-        showCellBorders
-        slimBody
-        sx={{ '& td': { whiteSpace: 'nowrap' } }}
-      >
+      <StyledTable data-cy="faculty-student-stats-table" nowrapBody showCellBorders slimBody>
         <TableHead>
           <TableRow key="FirstHeader">
             <TableCell colSpan={!showPercentages ? 3 : 4} />
