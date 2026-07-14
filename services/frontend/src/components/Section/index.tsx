@@ -30,19 +30,22 @@ export const Section = ({
   contentSx?: SxProps<Theme>
   wrapperSx?: SxProps<Theme>
 }) => {
+  const shouldRenderTopBar = !!title || !!exportOnClick || !!infoBoxContent
   return (
     <Paper data-cy={`${cypress}-section`} sx={{ padding: 2, ...wrapperSx }} variant="outlined">
-      <Stack alignItems="center" direction="row" justifyContent="space-between" sx={{ paddingBottom: 1 }}>
-        <Typography component="h2" variant="h5">
-          {title}
-        </Typography>
-        <Stack direction="row" gap={1}>
-          {exportOnClick ? (
-            <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
-          ) : null}
-          {infoBoxContent ? <InfoBox content={infoBoxContent} cypress={cypress} /> : null}
+      {shouldRenderTopBar ? (
+        <Stack alignItems="center" direction="row" justifyContent="space-between" sx={{ paddingBottom: 1 }}>
+          <Typography component="h2" variant="h5">
+            {title}
+          </Typography>
+          <Stack direction="row" gap={1}>
+            {exportOnClick ? (
+              <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
+            ) : null}
+            {infoBoxContent ? <InfoBox content={infoBoxContent} cypress={cypress} /> : null}
+          </Stack>
         </Stack>
-      </Stack>
+      ) : null}
       <Box sx={{ marginTop: title ? 2 : 0, ...contentSx }}>
         {isError ? <ErrorMessage /> : isLoading ? <LoadingSkeleton /> : children}
       </Box>
