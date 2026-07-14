@@ -1,3 +1,4 @@
+import Stack from '@mui/material/Stack'
 import { getFilteredRowModel } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
@@ -17,15 +18,18 @@ import { useColumns } from '@/components/ColorizedCoursesTable/SemestersTab/logi
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { Section } from '@/components/Section'
 import { useDebouncedState } from '@/hooks/debouncedState'
 
-export const SemestersTab = () => {
+type TotalRow = ReturnType<typeof calculateTotals>
+
+export const SemestersTab = ({ languagecenterview }: { languagecenterview: boolean }) => {
   const { getTextIn } = useLanguage()
   const { semesters, numberMode, colorMode, selectedSemesters, data } = useColorizedCoursesTableContext()
   const [courseFilter, setCourseFilter] = useDebouncedState('', 250)
 
-  const totalRow = useMemo(() => {
-    if (!data) return {}
+  const totalRow = useMemo<TotalRow>(() => {
+    if (!data) return {} as TotalRow
     return calculateTotals(data.tableData, selectedSemesters)
   }, [data, selectedSemesters])
 
@@ -59,17 +63,16 @@ export const SemestersTab = () => {
       useZebrastripes: colorMode === 'none',
       columnFilters: [{ id: 'Course', value: courseFilter }],
     },
-    onColumnFiltersChange: setCourseFilter,
     getFilteredRowModel: getFilteredRowModel(),
   }
 
   return (
-    <div>
-      <div className="options-container">
+    <Section title={languagecenterview ? undefined : 'Programme courses by semester'} wrapperSx={{ width: '100%' }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent={{ xs: 'center', sm: 'space-evenly' }} spacing={5}>
         <SemesterRangeSelector />
         <NumberModeSelector />
         <ColorModeSelector />
-      </div>
+      </Stack>
       <OodiTable
         columns={cols}
         cy="ooditable-semesters"
@@ -82,6 +85,6 @@ export const SemestersTab = () => {
           </>
         }
       />
-    </div>
+    </Section>
   )
 }

@@ -1,4 +1,3 @@
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
@@ -11,7 +10,7 @@ import { LoadingSection } from '@/components/Loading'
 import { useSemesters } from '@/hooks/useSemesters'
 import '@/components/ColorizedCoursesTable/index.css'
 
-export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes }) => {
+export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes, mode }) => {
   const { semesters: allSemesters, currentSemester } = useSemesters()
   const semesters = Object.values(allSemesters).filter(
     // 135 = Fall 2017
@@ -59,7 +58,7 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
     {
       name: 'Semesters',
       label: 'By semesters',
-      render: () => <SemestersTab />,
+      render: () => <SemestersTab languagecenterview={mode === 'languagecenterview'} />,
     },
   ]
 
@@ -96,11 +95,9 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
           ))}
         </Tabs>
       )}
-      <Paper variant="outlined">
-        <ColorizedCoursesTableContext.Provider value={settingsContext}>
-          {displayedPanes.at(tab)?.render() ?? null}
-        </ColorizedCoursesTableContext.Provider>
-      </Paper>
+      <ColorizedCoursesTableContext.Provider value={settingsContext}>
+        {displayedPanes.at(tab)?.render() ?? null}
+      </ColorizedCoursesTableContext.Provider>
     </Stack>
   )
 }

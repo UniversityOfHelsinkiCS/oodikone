@@ -18,6 +18,7 @@ export const Section = ({
   isError = false,
   title,
   contentSx = {},
+  wrapperSx = {},
 }: {
   children: React.ReactNode
   cypress?: string
@@ -27,9 +28,10 @@ export const Section = ({
   isError?: boolean
   title?: string
   contentSx?: SxProps<Theme>
+  wrapperSx?: SxProps<Theme>
 }) => {
   return (
-    <Paper data-cy={`${cypress}-section`} sx={{ padding: 2 }} variant="outlined">
+    <Paper data-cy={`${cypress}-section`} sx={{ padding: 2, ...wrapperSx }} variant="outlined">
       <Stack alignItems="center" direction="row" justifyContent="space-between" sx={{ paddingBottom: 1 }}>
         <Typography component="h2" variant="h5">
           {title}

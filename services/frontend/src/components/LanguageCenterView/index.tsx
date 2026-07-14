@@ -18,6 +18,7 @@ export const LanguageCenterView = () => {
       <ColorizedCoursesTable
         fetchDataHook={useGetLanguageCenterDataQuery}
         fetchDataHookParams={undefined}
+        mode="languagecenterview"
         panes={['Faculties', 'Semesters']}
       />
     </>

@@ -46,6 +46,8 @@ export const ProgrammeCoursesTab = ({
         <ColorizedCoursesTable
           fetchDataHook={useGetColorizedTableCourseStatsQuery}
           fetchDataHookParams={{ id: studyProgramme }}
+          key="BySemesterTab"
+          mode="programmeCourses"
           panes={['Semesters']}
         />
       ),
@@ -53,7 +55,7 @@ export const ProgrammeCoursesTab = ({
   ]
 
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Tabs data-cy="programme-courses-tabs" onChange={(_event, newTab) => setCurrentTab(newTab)} value={currentTab}>
         {tabs.map(tab => (
           <Tab data-cy={tab.cypress} icon={tab.icon} iconPosition="start" key={tab.key} label={tab.label} />

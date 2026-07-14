@@ -1,6 +1,7 @@
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import { createContext, useContext, useState, useEffect } from 'react'
+import { theme, SearchIcon } from '@/theme'
 
 export const ColorizedCoursesTableContext = createContext()
 
@@ -93,7 +94,13 @@ export const CourseFilter = ({ setCourseFilter }) => {
   }, [textField])
 
   return (
-    <TextField label="Course name/code filter" onChange={event => setTextField(event.target.value)} value={textField} />
+    <TextField
+      label="Filter by code or name"
+      onChange={event => setTextField(event.target.value)}
+      size="small"
+      slotProps={{ input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} /> } }}
+      value={textField}
+    />
   )
 }
 
