@@ -21,7 +21,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { Section } from '@/components/Section'
 import { useDebouncedState } from '@/hooks/debouncedState'
 
-type TotalRow = ReturnType<typeof calculateTotals>
+export type TotalRow = ReturnType<typeof calculateTotals>
 
 export const SemestersTab = ({ languagecenterview }: { languagecenterview: boolean }) => {
   const { getTextIn } = useLanguage()
@@ -47,7 +47,7 @@ export const SemestersTab = ({ languagecenterview }: { languagecenterview: boole
     }))
 
     return [tableData, excelData]
-  }, [data, selectedSemesters])
+  }, [semesters, data, selectedSemesters, getTextIn, numberMode])
 
   const cols = useColumns(
     getTextIn,
@@ -67,8 +67,16 @@ export const SemestersTab = ({ languagecenterview }: { languagecenterview: boole
   }
 
   return (
-    <Section title={languagecenterview ? undefined : 'Programme courses by semester'} wrapperSx={{ width: '100%' }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent={{ xs: 'center', sm: 'space-evenly' }} spacing={5}>
+    <Section
+      title={languagecenterview ? undefined : 'Programme courses by semester'}
+      wrapperSx={{ width: '100%', mt: '1em' }}
+    >
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent={{ xs: 'center', sm: 'space-evenly' }}
+        spacing={5}
+        sx={{ my: '1em' }}
+      >
         <SemesterRangeSelector />
         <NumberModeSelector />
         <ColorModeSelector />

@@ -1,14 +1,15 @@
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
-
 import { ColorizedCoursesTableContext } from '@/components/ColorizedCoursesTable/common'
 import { FacultiesTab } from '@/components/ColorizedCoursesTable/FacultiesTab'
 import { SemestersTab } from '@/components/ColorizedCoursesTable/SemestersTab'
 import { LoadingSection } from '@/components/Loading'
 import { useSemesters } from '@/hooks/useSemesters'
 import '@/components/ColorizedCoursesTable/index.css'
+import { CalendarMonthIcon, SchoolIcon } from '@/theme'
 
 export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, panes, mode }) => {
   const { semesters: allSemesters, currentSemester } = useSemesters()
@@ -47,25 +48,31 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
         end: semesters[semesters.length - 1].semestercode,
       })
     }
-  }, [semesters])
+  }, [semesters, semesterFilter])
 
   const possiblePanes = [
     {
       name: 'Faculties',
       label: 'By faculties',
+      icon: <SchoolIcon />,
       render: () => <FacultiesTab />,
     },
     {
       name: 'Semesters',
       label: 'By semesters',
+      icon: <CalendarMonthIcon />,
       render: () => <SemestersTab languagecenterview={mode === 'languagecenterview'} />,
     },
   ]
 
-  const displayedPanes = panes.map(tab => possiblePanes.find(pane => pane.name === tab))
+  const displayedPanes = possiblePanes.filter(pane => panes.includes(pane.name))
 
   if (isError) {
-    return <h3>Something went wrong, please try refreshing the page.</h3>
+    return (
+      <Typography alignSelf="center" component="h6" variant="h5">
+        Something went wrong, please try refreshing the page.
+      </Typography>
+    )
   }
 
   if (!data || isFetching || isLoading || !semesterFilter || !semesters?.length) {
@@ -90,8 +97,8 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
     <Stack alignItems="center">
       {displayedPanes.length > 1 && (
         <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
-          {displayedPanes.map(({ label }) => (
-            <Tab key={label} label={label} />
+          {displayedPanes.map(pane => (
+            <Tab icon={pane.icon} iconPosition="start" key={pane.label} label={pane.label} />
           ))}
         </Tabs>
       )}

@@ -1,6 +1,6 @@
+import Stack from '@mui/material/Stack'
 import { getFilteredRowModel } from '@tanstack/react-table'
 import { useMemo } from 'react'
-
 import {
   calculateTotals,
   emptyFields,
@@ -17,12 +17,13 @@ import {
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { Section } from '@/components/Section'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
+import { TotalRow } from '../SemestersTab'
 
 export const FacultiesTab = () => {
-  const { numberMode, colorMode, semesterFilter, setSemesterFilter, selectedSemesters, data } =
-    useColorizedCoursesTableContext()
+  const { numberMode, colorMode, selectedSemesters, data } = useColorizedCoursesTableContext()
 
   const { getTextIn } = useLanguage()
   const facultyQuery = useGetFacultiesQuery()
@@ -38,10 +39,10 @@ export const FacultiesTab = () => {
     [facultyQuery?.data]
   )
 
-  const totalRow = useMemo(() => {
-    if (!data) return {}
+  const totalRow = useMemo<TotalRow>(() => {
+    if (!data) return {} as TotalRow
     return calculateTotals(data.tableData, selectedSemesters, data.faculties)
-  }, [data, facultyMap])
+  }, [data, selectedSemesters])
 
   const [tableData, excelData] = useMemo(() => {
     if (!data) return []
@@ -79,7 +80,7 @@ export const FacultiesTab = () => {
     }))
 
     return [tableData, excelData]
-  }, [selectedSemesters, data])
+  }, [selectedSemesters, data, numberMode])
 
   const cols = useColumns(
     getTextIn,
@@ -96,17 +97,21 @@ export const FacultiesTab = () => {
       useZebrastripes: colorMode === 'none',
       columnFilters: [{ id: 'Course', value: courseFilter }],
     },
-    onColumnFiltersChange: setCourseFilter,
     getFilteredRowModel: getFilteredRowModel(),
   }
 
   return (
-    <div>
-      <div className="options-container">
-        <SemesterRangeSelector semesterFilter={semesterFilter} setSemesterFilter={setSemesterFilter} />
+    <Section wrapperSx={{ width: '100%', my: '1em' }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent={{ xs: 'center', sm: 'space-evenly' }}
+        spacing={5}
+        sx={{ my: '1em' }}
+      >
+        <SemesterRangeSelector />
         <NumberModeSelector />
         <ColorModeSelector />
-      </div>
+      </Stack>
       <OodiTable
         columns={cols}
         cy="ooditable-faculties"
@@ -119,6 +124,6 @@ export const FacultiesTab = () => {
           </>
         }
       />
-    </div>
+    </Section>
   )
 }
