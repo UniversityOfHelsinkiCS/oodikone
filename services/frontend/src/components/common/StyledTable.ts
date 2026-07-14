@@ -57,7 +57,6 @@ export const StyledTable = styled(Table, {
     '& .MuiTableHead-root': {
       backgroundColor: theme.palette.grey[100],
       border: `1px solid ${theme.palette.grey[300]}`,
-      boxShadow: `1px 1px ${theme.palette.grey[300]}`,
     },
 
     '& .MuiTableCell-root': showCellBorders

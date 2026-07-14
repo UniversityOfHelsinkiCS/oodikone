@@ -1,4 +1,4 @@
-import Paper from '@mui/material/Paper'
+import Box from '@mui/material/Box'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
@@ -20,7 +20,7 @@ export const ProgressTable = ({ data, titles }: { data: (string | number)[][]; t
   })
 
   return (
-    <TableContainer component={Paper} variant="outlined">
+    <TableContainer component={Box}>
       <StyledTable data-cy="study-programme-progress-data-table" showCellBorders size="small">
         <TableHead>
           <TableRow>
