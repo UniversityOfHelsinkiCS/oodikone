@@ -152,32 +152,34 @@ export const InteractiveDataTable = ({
                 yearArray={yearArray}
                 yearIndex={yearIndex}
               />
-              <TableRow style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                <TableCell colSpan={100}>
-                  <CollapsedStackedBar
-                    data={
-                      columnIndex === 0
-                        ? sortedKeys
-                            ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
-                            .filter(programme => !!programme)
-                        : keyOrder[yearIndex]
-                            ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
-                            .filter(programme => !!programme)
-                    }
-                    differenceData={Object.keys(differenceToPrevYears)?.reduce(
-                      (yearlyObject, programme) => ({
-                        ...yearlyObject,
-                        [programme]: differenceToPrevYears[programme][yearIndex],
-                      }),
-                      {}
-                    )}
-                    labels={columnIndex === 0 ? sortedKeys : keyOrder[yearIndex]}
-                    longLabels={programmeNames}
-                    names={titles?.slice(sliceStart)}
-                    plotLinePlaces={plotLinePlaces}
-                  />
-                </TableCell>
-              </TableRow>
+              {visible[yearIndex] ? (
+                <TableRow>
+                  <TableCell colSpan={100}>
+                    <CollapsedStackedBar
+                      data={
+                        columnIndex === 0
+                          ? sortedKeys
+                              ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
+                              .filter(programme => !!programme)
+                          : keyOrder[yearIndex]
+                              ?.map(programme => dataProgrammeStats[programme]?.[yearIndex]?.slice(sliceStart) ?? null)
+                              .filter(programme => !!programme)
+                      }
+                      differenceData={Object.keys(differenceToPrevYears)?.reduce(
+                        (yearlyObject, programme) => ({
+                          ...yearlyObject,
+                          [programme]: differenceToPrevYears[programme][yearIndex],
+                        }),
+                        {}
+                      )}
+                      labels={columnIndex === 0 ? sortedKeys : keyOrder[yearIndex]}
+                      longLabels={programmeNames}
+                      names={titles?.slice(sliceStart)}
+                      plotLinePlaces={plotLinePlaces}
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : null}
             </Fragment>
           ))}
         </TableBody>
