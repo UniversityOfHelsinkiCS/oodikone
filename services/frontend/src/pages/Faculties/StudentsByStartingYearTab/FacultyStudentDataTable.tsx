@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid2'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
@@ -126,7 +126,12 @@ export const FacultyStudentDataTable = ({
 
   return (
     <TableContainer>
-      <StyledTable data-cy="faculty-student-stats-table" showCellBorders sx={{ '& td': { whiteSpace: 'nowrap' } }}>
+      <StyledTable
+        data-cy="faculty-student-stats-table"
+        showCellBorders
+        slimBody
+        sx={{ '& td': { whiteSpace: 'nowrap' } }}
+      >
         <TableHead>
           <TableRow key="FirstHeader">
             <TableCell colSpan={!showPercentages ? 3 : 4} />
@@ -167,18 +172,22 @@ export const FacultyStudentDataTable = ({
                   {tableStats[year]?.map((value, valueIndex) => {
                     if (valueIndex === 0)
                       return (
-                        <TableCell key={`${year}-faculty-cell}`}>
-                          <Box
-                            alignItems="center"
-                            display="flex"
-                            justifyContent="center"
-                            key={`${year}-studentsTableButton}`}
-                          >
-                            <IconButton onClick={() => toggleVisibility(yearIndex)} size="small">
-                              {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                            </IconButton>
-                            <Typography variant="body2">{value}</Typography>
-                          </Box>
+                        <TableCell key={`${year}-faculty-cell}`} sx={{ minWidth: '180px', maxWidth: '180px' }}>
+                          <Grid container>
+                            <Grid
+                              key={`${year}-studentsTableButton}`}
+                              sx={{
+                                alignItems: 'center',
+                                display: 'flex',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <IconButton onClick={() => toggleVisibility(yearIndex)} size="small">
+                                {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                              </IconButton>
+                              <Typography variant="body2">{value}</Typography>
+                            </Grid>
+                          </Grid>
                         </TableCell>
                       )
                     if (
@@ -209,25 +218,36 @@ export const FacultyStudentDataTable = ({
                                 theme.palette.degreeProgrammeType[
                                   degreeToIndex[programmeNames[programme].degreeProgrammeType]
                                 ],
-                                0.15
+                                0.3
                               ),
+                              textAlign: 'left',
                             })}
                           >
-                            <TableCell key={`${year}-${programme}`} sx={{ paddingLeft: '50px', textAlign: 'left' }}>
-                              <Stack alignItems="center" direction="row" gap={0.5}>
-                                <Tooltip
-                                  title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
-                                >
-                                  <b>{programmeNames[programme].progId}</b>
-                                </Tooltip>
-                                {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                                  (requiredRights.fullAccessToStudentData && (
-                                    <PopulationLink
-                                      programme={programmeNames[programme].code}
-                                      years={populationLinkYear}
-                                    />
-                                  ))}
-                              </Stack>
+                            <TableCell key={`${year}-${programme}`} sx={{ minWidth: '180px', maxWidth: '180px' }}>
+                              <Grid container>
+                                <Grid size={10} sx={{ my: 'auto' }}>
+                                  <Tooltip
+                                    title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
+                                  >
+                                    <Typography
+                                      fontSize="inherit"
+                                      fontWeight="bold"
+                                      sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+                                    >
+                                      {programmeNames[programme].progId}
+                                    </Typography>
+                                  </Tooltip>
+                                </Grid>
+                                <Grid size={2}>
+                                  {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
+                                    (requiredRights.fullAccessToStudentData && (
+                                      <PopulationLink
+                                        programme={programmeNames[programme].code}
+                                        years={populationLinkYear}
+                                      />
+                                    ))}
+                                </Grid>
+                              </Grid>
                             </TableCell>
                             {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
                           </TableRow>
