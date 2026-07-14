@@ -56,7 +56,7 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
         />
       </Box>
 
-      <Section title="DKN-BE (Oodikone Banner Editor)">
+      <Section title={`${isNew ? 'Create' : 'Edit'} banner`}>
         <Stack spacing={2}>
           <TextField
             fullWidth
@@ -81,7 +81,7 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
                   value={values.color}
                 >
                   <MenuItem value={'white'}>White</MenuItem>
-                  <MenuItem value={'dark'}>Black</MenuItem>
+                  <MenuItem value={'black'}>Black</MenuItem>
                   <MenuItem value={'info'}>Blue</MenuItem>
                   <MenuItem value={'success'}>Green</MenuItem>
                   <MenuItem value={'warning'}>Orange</MenuItem>
@@ -110,6 +110,7 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
           <Grid2 container>
             <Grid2 size={6} sx={{ pr: 1 }}>
               <DateTimePicker
+                ampm={false}
                 format="L HH:mm"
                 label="Start date"
                 name="startDate"
@@ -122,6 +123,7 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
             </Grid2>
             <Grid2 size={6} sx={{ pl: 1 }}>
               <DateTimePicker
+                ampm={false}
                 format="L HH:mm"
                 label="End date"
                 name="endDate"
@@ -134,7 +136,7 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
             </Grid2>
           </Grid2>
           <Button onClick={() => onSave(values, false, isNew)} type="submit" variant="contained">
-            {isNew ? 'Create' : 'Save'}
+            {isNew ? 'Create' : 'Save changes'}
           </Button>
         </Stack>
       </Section>

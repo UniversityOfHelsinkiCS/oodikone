@@ -26,8 +26,6 @@ const baseTheme = {
     text: { primary: grey[900], secondary: grey[600] },
     info: { main: blue[700], light: blue[500], dark: blue[900] },
 
-    dark: { main: grey[800], light: grey[700], dark: grey[900] },
-
     success: { main: green[600] },
     disabled: { main: grey[500] },
 
