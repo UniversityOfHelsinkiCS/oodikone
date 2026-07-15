@@ -67,6 +67,3 @@ export const {
   useGetMaxYearsToCreatePopulationFromQuery,
   useGetProgrammesQuery,
 } = populationApi
-
-// TODO: This was used in the PopulationSearchForm
-// export const clearPopulations = () => populationApi.util.resetApiState()
