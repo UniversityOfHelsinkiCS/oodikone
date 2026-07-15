@@ -1,8 +1,9 @@
 import { styled, SxProps, Theme } from '@mui/material/styles'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
-import type { HeaderGroup } from '@tanstack/react-table'
+import type { Header, HeaderGroup } from '@tanstack/react-table'
 
+import { useRef } from 'react'
 import { OodiTableSortIcons, OtSortIconWrapper } from '@/components/OodiTable/components/SortIcons'
 import { flexRender } from '@/components/OodiTable/components/util'
 import { getCommonPinningStyles, verticalStyles } from '@/components/OodiTable/styles'
@@ -29,46 +30,63 @@ const OtVerticalContentWrapper = styled('div')({
   margin: '0 auto',
 })
 
+const OodiTableHeaderSinglton = <OTData,>({
+  header,
+  isVerticalHeader,
+}: {
+  header: Header<OTData, unknown>
+  isVerticalHeader: boolean
+}) => {
+  const base = useRef(null)
+  let rowSpan = 1
+  if (header.isPlaceholder) {
+    const leafs = header.getLeafHeaders()
+    rowSpan = leafs[leafs.length - 1].depth - header.depth
+  }
+
+  const canSort = header.column.getCanSort()
+
+  const sx = {
+    cursor: canSort ? 'pointer' : 'inherit',
+    ...(isVerticalHeader && verticalStyles),
+    ...getCommonPinningStyles(header.column),
+  }
+
+  return (
+    <OtHeaderCell
+      colSpan={header.colSpan}
+      key={header.id}
+      onClick={header.column.getToggleSortingHandler()}
+      ref={base}
+      rowSpan={rowSpan}
+      sx={sx as SxProps<Theme>}
+    >
+      {isVerticalHeader ? (
+        <OtVerticalContentWrapper>
+          {flexRender(header.column.columnDef.header, header.getContext())}
+        </OtVerticalContentWrapper>
+      ) : (
+        <>{flexRender(header.column.columnDef.header, header.getContext())}</>
+      )}
+      <OtSortIconWrapper>
+        <OodiTableSortIcons canSort={canSort} isSorted={header.column.getIsSorted()} />
+      </OtSortIconWrapper>
+    </OtHeaderCell>
+  )
+}
+
 export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, verticalHeaders: string[]) => (
   <TableRow key={headerGroup.id}>
     {headerGroup.headers.map(header => {
       if (header.depth - header.column.depth > 1) return null
-
-      let rowSpan = 1
-      if (header.isPlaceholder) {
-        const leafs = header.getLeafHeaders()
-        rowSpan = leafs[leafs.length - 1].depth - header.depth
-      }
-
-      const isVertical = verticalHeaders.includes(header.id)
-      const canSort = header.column.getCanSort()
-
-      const sx = {
-        cursor: canSort ? 'pointer' : 'inherit',
-        ...(isVertical && verticalStyles),
-        ...getCommonPinningStyles(header.column),
-      }
-
-      return (
-        <OtHeaderCell
-          colSpan={header.colSpan}
-          key={header.id}
-          onClick={header.column.getToggleSortingHandler()}
-          rowSpan={rowSpan}
-          sx={sx as SxProps<Theme>}
-        >
-          {isVertical ? (
-            <OtVerticalContentWrapper>
-              {flexRender(header.column.columnDef.header, header.getContext())}
-            </OtVerticalContentWrapper>
-          ) : (
-            <>{flexRender(header.column.columnDef.header, header.getContext())}</>
-          )}
-          <OtSortIconWrapper>
-            <OodiTableSortIcons canSort={canSort} isSorted={header.column.getIsSorted()} />
-          </OtSortIconWrapper>
-        </OtHeaderCell>
-      )
+      else
+        return (
+          <OodiTableHeaderSinglton
+            header={header}
+            isVerticalHeader={verticalHeaders.includes(header.id)}
+            key={header.id}
+          />
+        )
     })}
   </TableRow>
 )
