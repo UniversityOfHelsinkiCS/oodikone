@@ -308,7 +308,7 @@ export const CloseToGraduation = () => {
         visibleInShowHideMenu: false,
       })),
     ],
-    [getSemesterEnrollmentsContent, getSemesterEnrollmentsVal, getTextIn, semesters, semestersToInclude]
+    [semesters, semestersToInclude]
   )
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
