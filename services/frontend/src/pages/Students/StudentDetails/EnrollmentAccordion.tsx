@@ -56,34 +56,14 @@ const getProgrammeEndDateForStudyright = (studyright, phase) => {
 
 const processStudyrights = (studyrights, student, firstDisplayedYear: number, getTextIn, semesters: SemestersData) =>
   studyrights.reduce((acc, studyright) => {
-    const studentToStudyrightEndMap = new Map([[student.studentNumber, null]])
-    const studentToSecondStudyrightEndMap = new Map([[student.studentNumber, null]])
-
-    const baseArguments = {
-      year: firstDisplayedYear,
-      getTextIn,
-      programme: null,
-      semesters,
-    }
-
-    const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
-    if (masterInfo) {
-      const { endDate, programmeCode } = masterInfo
-      baseArguments.programme = programmeCode
-      studentToSecondStudyrightEndMap[student.studentNumber] = endDate
-    }
-
     const bachelorInfo = getProgrammeEndDateForStudyright(studyright, 1)
-    if (bachelorInfo) {
-      const { endDate, programmeCode } = bachelorInfo
-      baseArguments.programme = programmeCode
-      studentToStudyrightEndMap[student.studentNumber] = endDate
-    }
+    const masterInfo = getProgrammeEndDateForStudyright(studyright, 2)
 
     const { getSemesterEnrollmentsContent } = getSemestersPresentFunctions({
-      ...baseArguments,
-      studentToStudyrightEndMap,
-      studentToSecondStudyrightEndMap,
+      year: firstDisplayedYear,
+      getTextIn,
+      programme: bachelorInfo?.programmeCode ?? masterInfo?.programmeCode ?? null,
+      semesters,
       semestersToAddToStart: null,
     })
 

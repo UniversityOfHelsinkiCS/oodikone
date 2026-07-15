@@ -52,8 +52,6 @@ export const CloseToGraduation = () => {
         getTextIn,
         year: new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2),
         programme: null,
-        studentToSecondStudyrightEndMap: null,
-        studentToStudyrightEndMap: null,
         semestersToAddToStart: null,
         semesters: semesterData,
       }),
