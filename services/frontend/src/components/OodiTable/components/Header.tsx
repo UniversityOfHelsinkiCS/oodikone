@@ -3,7 +3,7 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import type { HeaderGroup } from '@tanstack/react-table'
 
-import { OodiTableSortIcons } from '@/components/OodiTable/components/SortIcons'
+import { OodiTableSortIcons, OtSortIconWrapper } from '@/components/OodiTable/components/SortIcons'
 import { flexRender } from '@/components/OodiTable/components/util'
 import { getCommonPinningStyles, verticalStyles } from '@/components/OodiTable/styles'
 
@@ -64,7 +64,9 @@ export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, 
           ) : (
             <>{flexRender(header.column.columnDef.header, header.getContext())}</>
           )}
-          <OodiTableSortIcons canSort={canSort} isSorted={header.column.getIsSorted()} />
+          <OtSortIconWrapper>
+            <OodiTableSortIcons canSort={canSort} isSorted={header.column.getIsSorted()} />
+          </OtSortIconWrapper>
         </OtHeaderCell>
       )
     })}
