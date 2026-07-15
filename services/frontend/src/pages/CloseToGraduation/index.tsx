@@ -189,11 +189,10 @@ export const CloseToGraduation = () => {
         accessorFn: row => getSemesterEnrollmentsVal(row.studyright),
         Cell: ({ row }) => {
           const content = getSemesterEnrollmentsContent(row.original.student, row.original.studyright)
-          if (!content) return null
 
           return (
             <Box sx={{ display: 'flex', m: 0.5 }}>
-              {content.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
+              {content?.map(({ key, onHoverString, typeLabel, graduationCrown }) => (
                 <Tooltip key={key} placement="top" title={onHoverString}>
                   <span className={`enrollment-label label-${typeLabel} ${graduationCrown}`} />
                 </Tooltip>
