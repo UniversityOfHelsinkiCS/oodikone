@@ -41,8 +41,9 @@ Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 **Current status** kuvastaa opiskelijoiden tilannetta tällä hetkellä.
 - **Present**: Käynnissä olevalle lukukaudelle **läsnäolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
 - **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
-- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
 - **Passive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
+- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
+- **Has recent attainment**: Opiskelijat, jotka ovat kuluneen vuoden (365vrk) aikana suorittaneet ensisijaiseen opintosuunnitelmaansa sisällytettyjä opintoja
 
 Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
 
