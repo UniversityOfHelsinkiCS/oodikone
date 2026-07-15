@@ -1,29 +1,21 @@
-import dayjs, { extend as dayjsExtend } from 'dayjs'
-import isBetween from 'dayjs/plugin/isBetween'
-
 import { isFall, isMastersProgramme } from '@/common'
 import type { GetTextIn } from '@/components/LanguagePicker/useLanguage'
+import { getSemesterEnrollmentsContent } from '@/components/PopulationComponents/Students/Table/GeneralTab/format/util'
 import type { SemestersData } from '@/hooks/useSemesters'
 
 import './semestersPresent.css'
 import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 import { EnrollmentType } from '@oodikone/shared/types'
 
-dayjsExtend(isBetween)
-
 export const getSemestersPresentFunctions = ({
   getTextIn,
   programme,
-  studentToSecondStudyrightEndMap,
-  studentToStudyrightEndMap,
   year,
   semestersToAddToStart,
   semesters,
 }: {
   getTextIn: GetTextIn
   programme: string | null
-  studentToSecondStudyrightEndMap: Map<string, string | null> | null
-  studentToStudyrightEndMap: Map<string, string | null> | null
   year: number
   semestersToAddToStart: number | null
   semesters: SemestersData
@@ -45,74 +37,14 @@ export const getSemestersPresentFunctions = ({
 
   const [firstSemester, lastSemester] = getFirstAndLastSemester()
 
-  const getSemesterEnrollmentsContent = (
-    student: Pick<CloseToGraduationData['student'], 'studentNumber'>,
-    studyright: Pick<CloseToGraduationData['studyright'], 'semesterEnrollments'>
-  ) => {
-    if (!studyright) return []
-
-    const enrollmentTypeText = (enrollmenttype: EnrollmentType | undefined, statutoryAbsence: boolean | undefined) => {
-      switch (enrollmenttype) {
-        case EnrollmentType.PRESENT:
-          return 'Enrolled as present'
-        case EnrollmentType.ABSENT:
-          return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-        case EnrollmentType.PASSIVE:
-          return 'Not enrolled'
-        default:
-          return 'No study right'
-      }
-    }
-
-    const enrollmentTypeLabel = (enrollmenttype: EnrollmentType | undefined, statutoryAbsence: boolean | undefined) => {
-      switch (enrollmenttype) {
-        case EnrollmentType.PRESENT:
-          return 'present'
-        case EnrollmentType.ABSENT:
-          return statutoryAbsence ? 'absent-statutory' : 'absent'
-        case EnrollmentType.PASSIVE:
-          return 'passive'
-        default:
-          return 'none'
-      }
-    }
-
-    const isMasters = isMastersProgramme(programme ?? '')
-
-    const firstGraduation = studentToStudyrightEndMap?.get(student.studentNumber)
-    const secondGraduation = studentToSecondStudyrightEndMap?.get(student.studentNumber)
-
-    return Array.from(Array(lastSemester - firstSemester + 1).keys()).map((_, index) => {
-      const semester = index + firstSemester
-      const key = `${student.studentNumber}-${semester}`
-
-      const enrollmenttype = studyright?.semesterEnrollments?.find(enrollment => enrollment.semester === semester)?.type
-      const statutoryAbsence = studyright?.semesterEnrollments?.find(
-        enrollment => enrollment.semester === semester
-      )?.statutoryAbsence
-
-      const { startdate, enddate, name: semesterName } = allSemesters[semester]
-      const graduated = programme
-        ? (() => {
-            if (firstGraduation && dayjs(firstGraduation).isBetween(startdate, enddate))
-              return 1 + 1 * Number(isMasters)
-            if (secondGraduation && dayjs(secondGraduation).isBetween(startdate, enddate))
-              return 2 - 1 * Number(isMasters)
-            return 0
-          })()
-        : 0
-
-      const typeLabel = enrollmentTypeLabel(enrollmenttype, statutoryAbsence)
-      const typeText = enrollmentTypeText(enrollmenttype, statutoryAbsence)
-
-      const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
-      const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
-
-      const graduationCrown = graduated ? (graduated === 2 ? 'graduated-higher' : 'graduated') : ''
-
-      return { key, onHoverString, typeLabel, graduationCrown }
-    })
-  }
+  const getSemesterEnrollmentsContentProxy = getSemesterEnrollmentsContent({
+    getTextIn,
+    programme: programme ?? '',
+    isMastersProgramme: isMastersProgramme(programme ?? ''),
+    allSemesters,
+    lastSemester,
+    firstSemester,
+  })
 
   const getSemesterEnrollmentsVal = (studyright: CloseToGraduationData['studyright']) => {
     const enrollmentsToCount = studyright?.semesterEnrollments ?? []
@@ -131,7 +63,7 @@ export const getSemestersPresentFunctions = ({
   }
 
   return {
-    getSemesterEnrollmentsContent,
+    getSemesterEnrollmentsContent: getSemesterEnrollmentsContentProxy,
     getSemesterEnrollmentsVal,
   }
 }
