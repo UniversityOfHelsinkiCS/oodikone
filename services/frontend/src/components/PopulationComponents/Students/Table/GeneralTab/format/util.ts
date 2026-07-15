@@ -61,6 +61,24 @@ const getFirstAndLastSemester = (
   return [firstSemester, lastSemester]
 }
 
+const enrollmentType = (
+  enrollmenttype: EnrollmentType | undefined,
+  statutoryAbsence: boolean | undefined
+): [string, string] => {
+  switch (enrollmenttype) {
+    case EnrollmentType.PRESENT:
+      return ['Enrolled as present', 'present']
+    case EnrollmentType.ABSENT:
+      return statutoryAbsence
+        ? ['Enrolled as absent (statutory)', 'absent-statutory']
+        : ['Enrolled as absent', 'absent']
+    case EnrollmentType.PASSIVE:
+      return ['Not enrolled', 'passive']
+    default:
+      return ['No study right', 'none']
+  }
+}
+
 export const getSemesterEnrollmentsContent =
   ({
     getTextIn,
@@ -110,31 +128,7 @@ export const getSemesterEnrollmentsContent =
           })()
         : 0
 
-      const typeText = (() => {
-        switch (enrollmenttype) {
-          case EnrollmentType.PRESENT:
-            return 'Enrolled as present'
-          case EnrollmentType.ABSENT:
-            return statutoryAbsence ? 'Enrolled as absent (statutory)' : 'Enrolled as absent'
-          case EnrollmentType.PASSIVE:
-            return 'Not enrolled'
-          default:
-            return 'No study right'
-        }
-      })()
-
-      const typeLabel = (() => {
-        switch (enrollmenttype) {
-          case EnrollmentType.PRESENT:
-            return 'present'
-          case EnrollmentType.ABSENT:
-            return statutoryAbsence ? 'absent-statutory' : 'absent'
-          case EnrollmentType.PASSIVE:
-            return 'passive'
-          default:
-            return 'none'
-        }
-      })()
+      const [typeText, typeLabel] = enrollmentType(enrollmenttype, statutoryAbsence)
 
       const graduationText = graduated ? `(graduated as ${graduated === 1 ? 'Bachelor' : 'Master'})` : ''
       const onHoverString = `${typeText} in ${getTextIn(semesterName)} ${graduationText}`
