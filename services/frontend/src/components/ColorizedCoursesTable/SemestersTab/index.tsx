@@ -67,10 +67,7 @@ export const SemestersTab = ({ languagecenterview }: { languagecenterview: boole
   }
 
   return (
-    <Section
-      title={languagecenterview ? undefined : 'Programme courses by semester'}
-      wrapperSx={{ width: '100%', mt: '1em' }}
-    >
+    <Section title={languagecenterview ? undefined : 'Programme courses by semester'} wrapperSx={{ width: '100%' }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent={{ xs: 'center', sm: 'space-evenly' }}

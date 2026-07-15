@@ -94,9 +94,9 @@ export const ColorizedCoursesTable = ({ fetchDataHook, fetchDataHookParams, pane
   }
 
   return (
-    <Stack alignItems="center">
+    <Stack alignItems="left">
       {displayedPanes.length > 1 && (
-        <Tabs onChange={(_, newTab) => setTab(newTab)} value={tab}>
+        <Tabs onChange={(_, newTab) => setTab(newTab)} sx={{ mb: '1em' }} value={tab}>
           {displayedPanes.map(pane => (
             <Tab icon={pane.icon} iconPosition="start" key={pane.label} label={pane.label} />
           ))}

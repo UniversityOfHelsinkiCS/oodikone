@@ -101,7 +101,7 @@ export const FacultiesTab = () => {
   }
 
   return (
-    <Section wrapperSx={{ width: '100%', my: '1em' }}>
+    <Section wrapperSx={{ width: '100%' }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent={{ xs: 'center', sm: 'space-evenly' }}

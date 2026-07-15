@@ -95,10 +95,11 @@ export const CourseFilter = ({ setCourseFilter }) => {
 
   return (
     <TextField
-      label="Filter by code or name"
+      label="Filter courses by code or name"
       onChange={event => setTextField(event.target.value)}
       size="small"
       slotProps={{ input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} /> } }}
+      sx={{ width: '320px' }}
       value={textField}
     />
   )
