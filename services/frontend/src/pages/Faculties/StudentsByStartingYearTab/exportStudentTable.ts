@@ -60,16 +60,16 @@ export const exportStudentTable = (
   const tableSheet = utils.json_to_sheet(tableStats)
   utils.book_append_sheet(book, tableSheet, 'TotalTableStats')
 
-  const progressStats: Record<string, string | number>[] = sortedkeys.flatMap(programme => [
-    ...Object.keys(programmeStats[programme])
+  const progressStats: Record<string, string | number>[] = sortedkeys.flatMap(programme =>
+    Object.keys(programmeStats[programme])
       .sort(sortByYear)
       .map(yearRow => ({
         'Academic Year': yearRow,
         Programme: programme,
         Name: getTextIn(programmeNames[programme].name) ?? '',
         ...processTableData([programmeStats[programme][yearRow]], tableHeaders)[0],
-      })),
-  ])
+      }))
+  )
 
   const sheet = utils.json_to_sheet(progressStats)
   utils.book_append_sheet(book, sheet, 'FacultyProgrammeStats')
@@ -78,9 +78,7 @@ export const exportStudentTable = (
     (result, year) => ({
       ...result,
       [year]: Array.from(
-        new Set(
-          Object.keys(countriesExtra[year]).flatMap(programme => [...Object.keys(countriesExtra[year][programme])])
-        )
+        new Set(Object.keys(countriesExtra[year]).flatMap(programme => Object.keys(countriesExtra[year][programme])))
       ).sort(),
     }),
     {} as Record<string, string[]>
