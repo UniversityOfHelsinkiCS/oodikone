@@ -70,7 +70,7 @@ export const BreakdownDisplay = ({
             sx={{ display: 'flex', flex: '1', justifyContent: 'center', mx: '10%', my: 'auto', textAlign: 'center' }}
           >
             <Typography fontSize="1.2em" fontWeight="light" variant="subtitle1">
-              Click on a bar on the chart to open a {mode} level breakdown for that year
+              Click any bar on the chart to open a {mode} level breakdown for that year
             </Typography>
           </Box>
         )}
