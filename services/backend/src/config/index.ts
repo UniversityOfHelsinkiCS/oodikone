@@ -38,9 +38,6 @@ export const { DB_URL_KONE, DB_URL_USER, SECRET_TOKEN, SIS_DB_URL, SIS_UPDATER_U
 
 export const rootOrgId = process.env.ROOT_ORG_ID ?? 'hy-university-root-id'
 
-export const languageCenterViewEnabled =
-  process.env.LANGUAGE_CENTER_VIEW_ENABLED == null ? true : process.env.LANGUAGE_CENTER_VIEW_ENABLED === 'true'
-
 export const concurrentWorkers = parseInt(process.env.CONCURRENT_WORKERS!, 10) || 2
 
 export const DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS!, 10) || 5 // sequelize's default

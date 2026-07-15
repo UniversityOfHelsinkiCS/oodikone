@@ -24,7 +24,6 @@ import { ExternalLink } from '@/components/common/ExternalLink'
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { Section } from '@/components/Section'
-import { languageCenterViewEnabled } from '@/conf'
 import { useTitle } from '@/hooks/title'
 import { RefreshIcon } from '@/theme'
 
@@ -216,11 +215,9 @@ export const Updater = () => {
             <Button onClick={refreshStudyProgrammes} variant="contained">
               Refresh degree programmes
             </Button>
-            {languageCenterViewEnabled ? (
-              <Button onClick={refreshLanguageCenterData} variant="contained">
-                Refresh language center data
-              </Button>
-            ) : null}
+            <Button onClick={refreshLanguageCenterData} variant="contained">
+              Refresh language center data
+            </Button>
             <Button onClick={refreshCloseToGraduationData} variant="contained">
               Refresh close to graduation data
             </Button>

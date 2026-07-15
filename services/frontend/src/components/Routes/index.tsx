@@ -9,7 +9,6 @@ import { ProtectedRoute } from '@/components/Routes/ProtectedRoute'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
 import { StudyGuidanceGroups } from '@/components/StudyGuidanceGroups'
 import { Teachers } from '@/components/Teachers'
-import { languageCenterViewEnabled } from '@/conf'
 import { Banners } from '@/pages/Banners'
 import { Changelog } from '@/pages/Changelog'
 import { CloseToGraduation } from '@/pages/CloseToGraduation'
@@ -81,7 +80,7 @@ export const Routes = () => (
 
         {/* Access control inside ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
-          {languageCenterViewEnabled ? <Route element={<LanguageCenterView />} path="/languagecenterview" /> : null}
+          <Route element={<LanguageCenterView />} path="/languagecenterview" />
         </Route>
 
         {/* Catch all route */}

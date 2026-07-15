@@ -7,7 +7,6 @@ import { useLocation } from 'react-router'
 
 import { Link } from '@/components/common/Link'
 import { NavigationItem } from '@/components/NavigationBar/navigationItems'
-import { languageCenterViewEnabled } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { ArrowDropDownIcon } from '@/theme'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
@@ -35,8 +34,7 @@ export const NavigationButton = ({ item }: { item: NavigationItem }) => {
 
     if (
       (checkUserAccess(['admin'], roles) || iamGroups.includes('grp-kielikeskus-esihenkilot')) &&
-      subItemKey === 'languageCenterView' &&
-      languageCenterViewEnabled
+      subItemKey === 'languageCenterView'
     ) {
       return true
     }

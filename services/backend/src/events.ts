@@ -1,6 +1,6 @@
 import { CronJob } from 'cron'
 
-import { isProduction, runningInCI, languageCenterViewEnabled, CRON_SCHEDULE } from './config'
+import { isProduction, runningInCI, CRON_SCHEDULE } from './config'
 import { getDegreeProgrammesOfFaculty } from './services/faculty/faculty'
 import { getFaculties } from './services/faculty/facultyHelpers'
 import { updateFacultyOverview, updateFacultyProgressOverview } from './services/faculty/facultyUpdates'
@@ -98,10 +98,7 @@ const dailyJobs = async () => {
     await refreshTeacherLeaderboard()
     await refreshProgrammesAndFaculties()
 
-    if (languageCenterViewEnabled) {
-      jobQueue.refreshLanguagecenter()
-    }
-
+    jobQueue.refreshLanguagecenter()
     jobQueue.refreshCloseToGraduation()
   } catch (error) {
     logger.error('Daily jobs failed', error)

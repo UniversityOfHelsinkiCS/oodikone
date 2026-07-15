@@ -23,10 +23,5 @@ export const sourceCodeUrl = 'https://github.com/UniversityOfHelsinkiCS/oodikone
 export const licenseUrl = `${sourceCodeUrl}/blob/master/LICENSE`
 export const dataProtectionUrl = `${sourceCodeUrl}/blob/master/documentation/tietosuoja.md`
 
-// Variable that can be used to disable the language center view, by default the view is enabled
-export const languageCenterViewEnabled = !process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED
-  ? true
-  : process.env.REACT_APP_LANGUAGE_CENTER_VIEW_ENABLED === 'true'
-
 // SISU url
 export const sisUrl = process.env.REACT_APP_SIS_URL ?? 'https://sisu.helsinki.fi'
