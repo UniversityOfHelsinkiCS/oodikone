@@ -206,7 +206,7 @@ studyProgrammeToolTips.common.studyTrackOverviewCombinedProgramme = studyProgram
   )
   .replace(
     '- **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat',
-    '- **Graduated bachelor**: Kandidaatiksi valmistuneet opiskelijat\n  - **Graduated licentiate**: Lisensiaatiksi valmistuneet opiskelijat'
+    '- **Graduated bachelor**: Kandidaatiksi valmistuneet opiskelijat\n- **Graduated licentiate**: Lisensiaatiksi valmistuneet opiskelijat'
   )
   .replace(/valmistuneet koulutusohjelmasta/g, 'valmistuneet lisensiaatiksi')
   .replace(
