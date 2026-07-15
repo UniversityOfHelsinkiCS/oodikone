@@ -14,7 +14,7 @@ ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY ./.npmrc .
 COPY ./package*.json ./
-RUN npm ci --omit-dev
+RUN npm ci --omit=dev
 COPY . .
 
 CMD ["node", "src/index.js"]

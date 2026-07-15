@@ -11,7 +11,7 @@ USER 1001
 COPY --chown=1001:1001 ./.npmrc .
 COPY --chown=1001:1001 ./package*.json ./
 
-RUN npm ci --include dev
+RUN npm ci --include=dev
 COPY --chown=1001:1001 . .
 
 EXPOSE 8082
