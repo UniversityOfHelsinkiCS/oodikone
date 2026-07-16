@@ -1,4 +1,4 @@
-import { TableFeature } from '@tanstack/react-table'
+import type { TableFeature } from '@tanstack/react-table'
 
 export interface Zebrastripes {
   useZebrastripes: boolean

@@ -1,34 +1,35 @@
-import { Cell, CellContext, Column, Row, Table, TableFeature } from '@tanstack/react-table'
+import type { Cell, CellContext, Column, Row, RowData, Table, TableFeature } from '@tanstack/react-table'
 
 /**
  * This doesn't implement all the features of Row, so be aware of that
  */
-/* eslint-disable-line import-x/no-unused-modules */ export interface AggregationRow<TData> extends Row<TData> {
+/* eslint-disable-line import-x/no-unused-modules */ export interface AggregationRow<TData extends RowData>
+  extends Row<TData> {
   getIsAggregationRow: () => true
 }
 
-type AggregationRowValueFn<TData, TValue = unknown> = (ctx: {
+type AggregationRowValueFn<TData extends RowData, TValue = unknown> = (ctx: {
   table: Table<TData>
   rowId: string
   column: Column<TData, TValue>
 }) => TValue
 
-interface AggregationRowCellDef<TData, TValue = unknown> {
+interface AggregationRowCellDef<TData extends RowData, TValue = unknown> {
   id: string
   value: TValue | AggregationRowValueFn<TData, TValue>
 }
 
-export type AggregationRowsInput<TData, TValue = unknown> =
+export type AggregationRowsInput<TData extends RowData, TValue = unknown> =
   | AggregationRowCellDef<TData, TValue>[]
   | ((ctx: { table: Table<TData>; column: Column<TData> }) => AggregationRowCellDef<TData, TValue>[])
 
-export interface AggregationRowModel<TData> {
+export interface AggregationRowModel<TData extends RowData> {
   rows: AggregationRow<TData>[]
   flatRows: AggregationRow<TData>[]
   rowsById: Record<string, AggregationRow<TData>>
 }
 
-const resolveAggregationRowsArray = <TData, TValue>(
+const resolveAggregationRowsArray = <TData extends RowData, TValue>(
   table: Table<TData>,
   column: Column<TData, TValue>
 ): AggregationRowCellDef<TData, TValue>[] => {
@@ -37,7 +38,7 @@ const resolveAggregationRowsArray = <TData, TValue>(
   return typeof input === 'function' ? (input({ table, column }) ?? []) : input
 }
 
-const collectAggregationRowIds = <TData>(table: Table<TData>): string[] => {
+const collectAggregationRowIds = <TData extends RowData>(table: Table<TData>): string[] => {
   const seen: string[] = []
   const set = new Set<string>()
 
@@ -54,26 +55,28 @@ const collectAggregationRowIds = <TData>(table: Table<TData>): string[] => {
   return seen
 }
 
-const resolveAggregationCellValue = <TData, TValue>(
+const resolveAggregationCellValue = <TData extends RowData, TValue>(
   table: Table<TData>,
-  column: Column<TData, unknown>,
+  column: Column<TData, TValue>,
   aggRowId: string
 ): TValue | undefined => {
   const defs = resolveAggregationRowsArray(table, column)
   const def = defs.find(def => def.id === aggRowId)
   if (!def) return undefined
   const { value } = def
+
   if (typeof value === 'function') {
-    return (value as AggregationRowValueFn<TData>)({
+    return (value as AggregationRowValueFn<TData, TValue>)({
       table,
       rowId: aggRowId,
       column,
-    }) as TValue
+    })
   }
-  return value as TValue
+
+  return value
 }
 
-const buildAggregationRowModel = <TData>(table: Table<TData>): AggregationRowModel<TData> => {
+const buildAggregationRowModel = <TData extends RowData>(table: Table<TData>): AggregationRowModel<TData> => {
   const aggRowIds = collectAggregationRowIds(table)
 
   if (!aggRowIds.length) {
@@ -81,7 +84,7 @@ const buildAggregationRowModel = <TData>(table: Table<TData>): AggregationRowMod
       rows: [],
       flatRows: [],
       rowsById: {},
-    } as unknown as AggregationRowModel<TData>
+    }
   }
 
   const visibleLeafColumns =
@@ -96,13 +99,13 @@ const buildAggregationRowModel = <TData>(table: Table<TData>): AggregationRowMod
       id: aggRowId,
       index,
       depth: 0,
-      original: undefined as any,
+      original: undefined as TData,
       parentId: undefined,
       _valuesCache: {},
       _uniqueValuesCache: {},
       _groupingValuesCache: {},
       getValue: <TValue>(columnId: string): TValue => {
-        const column = table.getColumn(columnId)
+        const column = table.getColumn(columnId) as Column<TData, TValue> | undefined
         return column
           ? (resolveAggregationCellValue<TData, TValue>(table, column, aggRowId) as TValue)
           : (undefined as TValue)

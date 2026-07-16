@@ -1,4 +1,4 @@
-import type { ColumnDef, TableOptions } from '@tanstack/react-table'
+import type { ColumnDef, RowData, Table, TableOptions } from '@tanstack/react-table'
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
 import { useState, type ReactNode } from 'react'
 
@@ -19,7 +19,7 @@ import { OodiTableContainer } from '@/components/OodiTable/OodiTable'
  * @returns Table instance
  */
 
-export const OodiTable = <TData,>({
+export const OodiTable = <TData extends RowData>({
   data,
   columns,
   isExportView,
@@ -36,17 +36,18 @@ export const OodiTable = <TData,>({
 }) => {
   const [fallbackData] = useState()
 
-  // should maybe use a deep merging tool or write own
-  const { ...config }: Partial<TableOptions<TData>> = options
-
-  const table = useReactTable<TData>({
-    _features: [VerticalHeaderFeature, AggregationRowFeature, ZebrastripesFeature],
-    data: data ?? fallbackData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    ...config,
-  })
+  const table: Table<TData> = useReactTable<TData>(
+    Object.assign<TableOptions<TData>, Partial<TableOptions<TData>>>(
+      {
+        _features: [VerticalHeaderFeature, AggregationRowFeature, ZebrastripesFeature],
+        data: data ?? fallbackData,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+      },
+      options
+    )
+  )
   return <OodiTableContainer cy={cy} isExportView={isExportView} table={table} toolbarContent={toolbarContent} />
 }

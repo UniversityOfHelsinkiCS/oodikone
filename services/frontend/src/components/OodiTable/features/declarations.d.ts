@@ -11,7 +11,7 @@ declare module '@tanstack/react-table' {
   interface TableState extends VerticalHeaders {}
   interface TableState extends Zebrastripes {}
 
-  interface ColumnDefBase<TData, TValue = unknown> {
+  interface ColumnDefBase<TData extends RowData, TValue> {
     /**
      * Accepts two kinds of inputs:
      *
@@ -28,7 +28,7 @@ declare module '@tanstack/react-table' {
     aggregationRows?: AggregationRowsInput<TData, TValue>
   }
 
-  interface Table<TData> {
+  interface Table<TData extends RowData> {
     /**
      * Aggregation rows are not included in pagination/sorting.
      */

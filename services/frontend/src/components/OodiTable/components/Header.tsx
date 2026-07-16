@@ -1,7 +1,7 @@
 import { styled, SxProps, Theme } from '@mui/material/styles'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
-import type { Header, HeaderGroup } from '@tanstack/react-table'
+import type { Header, HeaderGroup, RowData } from '@tanstack/react-table'
 
 import { useRef } from 'react'
 import { OodiTableSortIcons, OtSortIconWrapper } from '@/components/OodiTable/components/SortIcons'
@@ -30,11 +30,11 @@ const OtVerticalContentWrapper = styled('div')({
   margin: '0 auto',
 })
 
-const OodiTableHeaderSinglton = <OTData,>({
+const OodiTableHeaderSinglton = <OTData extends RowData, OTValue = unknown>({
   header,
   isVerticalHeader,
 }: {
-  header: Header<OTData, unknown>
+  header: Header<OTData, OTValue>
   isVerticalHeader: boolean
 }) => {
   const base = useRef(null)
@@ -75,7 +75,10 @@ const OodiTableHeaderSinglton = <OTData,>({
   )
 }
 
-export const OodiTableHeaderGroup = <OTData,>(headerGroup: HeaderGroup<OTData>, verticalHeaders: string[]) => (
+export const OodiTableHeaderGroup = <OTData extends RowData>(
+  headerGroup: HeaderGroup<OTData>,
+  verticalHeaders: string[]
+) => (
   <TableRow key={headerGroup.id}>
     {headerGroup.headers.map(header => {
       if (header.depth - header.column.depth > 1) return null

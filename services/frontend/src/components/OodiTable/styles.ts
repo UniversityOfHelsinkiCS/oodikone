@@ -1,7 +1,9 @@
 import type { SxProps, Theme } from '@mui/material/styles'
-import type { Column } from '@tanstack/react-table'
+import type { Column, RowData } from '@tanstack/react-table'
 
-export const getCommonPinningStyles = <TData>(column: Column<TData>): SxProps<Theme> => {
+export const getCommonPinningStyles = <TData extends RowData, TValue = unknown>(
+  column: Column<TData, TValue>
+): SxProps<Theme> => {
   const isPinned = column.getIsPinned()
   return isPinned
     ? {

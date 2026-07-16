@@ -2,12 +2,12 @@ import './styles.css'
 
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
-import type { Row } from '@tanstack/react-table'
+import type { Row, RowData } from '@tanstack/react-table'
 
 import { flexRender } from '@/components/OodiTable/components/util'
 import { getCommonPinningStyles } from '@/components/OodiTable/styles'
 
-export const OodiTableDataRow = <OTData,>(row: Row<OTData>, aggregate = false) => (
+export const OodiTableDataRow = <OTData extends RowData>(row: Row<OTData>, aggregate = false) => (
   <TableRow key={row.id}>
     {row.getVisibleCells().map(cell => {
       const { size, maxSize } = cell.column.columnDef
