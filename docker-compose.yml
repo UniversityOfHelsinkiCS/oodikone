@@ -207,8 +207,8 @@ services:
     profiles:
       - updater
     volumes:
-      - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-worker/:/opt/app-root/src
+      - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
 
   sis-updater-scheduler:
     <<: *defaults
@@ -235,8 +235,8 @@ services:
     profiles:
       - updater
     volumes:
-      - sis-updater-scheduler-nodemod:/opt/app-root/src/node_modules
       - ./updater/sis-updater-scheduler/:/opt/app-root/src
+      - sis-updater-scheduler-nodemod:/opt/app-root/src/node_modules
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8082/health']
       <<: *healthcheck-defaults

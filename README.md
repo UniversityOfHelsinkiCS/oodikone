@@ -193,7 +193,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 ### Modules are missing after updating package.json
 
-You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container or `npm run install:docker` to install modules inside all packages (backend, frontend, sis-updater-scheduler and sis-updater-worker).
+You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Prefer `npm run ci:docker` or `npm run install:docker`, which also fix `node_modules` ownership for the non-root runtime user. If you run installs manually, use root inside the container and restore ownership afterwards (`chown -R 1001:0 node_modules`) to avoid permission issues.
 
 ### Study guidance groups don't work on my machine
 
