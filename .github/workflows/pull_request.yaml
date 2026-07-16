@@ -23,7 +23,7 @@ jobs:
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Lint backend, frontend and shared
         uses: ./.github/actions/lint
 
@@ -35,7 +35,7 @@ jobs:
       - lint_packages
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/test/unit
 
   test_api:
@@ -46,7 +46,7 @@ jobs:
       - lint_packages
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/test/api
 
   test_end_to_end:
@@ -91,7 +91,7 @@ jobs:
             spec: cypress/e2e/Numbers_match.js
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Run tests'
         uses: ./.github/actions/test/e2e
         with:

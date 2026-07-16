@@ -29,7 +29,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: 'Build backend'
         id: build-image
@@ -53,7 +53,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: 'Build frontend'
         id: build-image
@@ -77,7 +77,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: 'Build worker'
         id: build-image
@@ -101,7 +101,7 @@ jobs:
     needs: test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: 'Build scheduler'
         id: build-image
@@ -130,7 +130,7 @@ jobs:
       - release_updater_scheduler
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
@@ -150,7 +150,7 @@ jobs:
       - release_updater_scheduler
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
