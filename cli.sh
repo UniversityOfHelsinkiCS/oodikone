@@ -68,8 +68,8 @@ while true; do
     case $opt in
       "Set up Oodikone from scratch")
         set_up_oodikone_from_scratch;;
-      "Reset all real data")
-        reset_all_real_data;;
+      "Reset all data")
+        reset_all_data;;
       "Reset single database")
         reset_single_database
         set_custom_select_prompt # Set prompt back to initial values

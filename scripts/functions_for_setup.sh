@@ -138,7 +138,7 @@ reset_databases() {
   successmsg "Database setup finished"
 }
 
-reset_all_real_data() {
+reset_all_data() {
   infomsg "Downloading real data dumps"
   for i in ${!DATABASES[*]}; do
     local database="${DATABASES[$i]}"
