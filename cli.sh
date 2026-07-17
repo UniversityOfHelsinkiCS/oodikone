@@ -53,6 +53,7 @@ set_custom_select_prompt() {
     "Reset single database"
     "Restore data from dumps"
     "Docker system prune"
+    "Nuke local node_modules"
     "Quit"
   )
 }
@@ -78,6 +79,8 @@ while true; do
       restore_data_from_dumps;;
       "Docker system prune")
         docker_prune;;
+      "Nuke local node_modules")
+        nuke_node_modules;;
       "Quit")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY

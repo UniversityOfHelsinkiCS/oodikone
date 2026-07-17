@@ -209,6 +209,47 @@ reset_single_database() {
   fi
 }
 
+nuke_node_modules() {
+  folders_to_set_up=(
+    "$PROJECT_ROOT"
+    "$PROJECT_ROOT/services/frontend"
+    "$PROJECT_ROOT/services/backend"
+    "$PROJECT_ROOT/services/shared"
+    "$PROJECT_ROOT/updater/sis-updater-scheduler"
+    "$PROJECT_ROOT/updater/sis-updater-worker"
+  )
+
+  named_volumes=(
+    "oodikone-shared-nodemod"
+    "oodikone-frontend-nodemod"
+    "oodikone-backend-nodemod"
+    "oodikone-updater-worker-nodemod"
+    "oodikone-updater-scheduler-nodemod"
+  )
+
+  infomsg "Running docker compose down"
+  "$PROJECT_ROOT"/run.sh both down --remove-orphans || infomsg "brr"
+  for folder in "${folders_to_set_up[@]}"; do
+    cd "$folder" || die "Couldn't change directory to folder $folder"
+    rm -rf node_modules || die "Couldn't remove node_modules in folder $folder"
+  done
+
+  for volume in "${named_volumes[@]}"; do
+    docker volume rm "$volume" || infomsg "Couldn't delete volume $volume (already gone?)"
+  done
+
+  infomsg "Installing npm packages locally to root and each subfolder to enable linting and formatting (and LSP)"
+
+  for folder in "${folders_to_set_up[@]}"; do
+    cd "$folder" || die "Couldn't change directory to folder $folder"
+    ([[ -d node_modules ]] && die "$folder already has node_modules, exiting!") || npm ci
+  done
+
+  cd "$PROJECT_ROOT" || die "Couldn't change directory to project root"
+
+  successmsg "Node_module nuke performed"
+}
+
 set_up_oodikone_from_scratch() {
   draw_mopo
   folders_to_set_up=(
