@@ -23,6 +23,7 @@ import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { TotalRow } from '../SemestersTab'
 
 export const FacultiesTab = () => {
+  'use memo'
   const { numberMode, colorMode, selectedSemesters, data } = useColorizedCoursesTableContext()
 
   const { getTextIn } = useLanguage()
@@ -36,7 +37,7 @@ export const FacultiesTab = () => {
         obj[cur.code] = cur.name
         return obj
       }, {}),
-    [facultyQuery?.data]
+    [facultyQuery.data]
   )
 
   const totalRow = useMemo<TotalRow>(() => {
@@ -51,7 +52,9 @@ export const FacultiesTab = () => {
       const facultiesTotal = { ...emptyFields }
       selectedSemesters.forEach(semestercode => {
         data.faculties.forEach(faculty => {
-          course.bySemesters.cellStats[faculty] ??= { ...emptyFields }
+          if (!course.bySemesters.cellStats[faculty]) {
+            course.bySemesters.cellStats[faculty] = { ...emptyFields }
+          }
           const stats = course.bySemesters[semestercode]?.[faculty]
           if (!stats) return
           course.bySemesters.cellStats[faculty].completions += stats.completions

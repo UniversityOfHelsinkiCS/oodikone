@@ -123,6 +123,7 @@ export default tseslint.config(
       '@typescript-eslint/consistent-return': 'error', // NOTE: This is weaker than tsconfig.json noImplicitReturns, and should be replaced once ts migration complete
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/dot-notation': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
       '@typescript-eslint/prefer-destructuring': ['error', { VariableDeclarator: { object: true } }],
       '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'with-single-extends' }],
       '@typescript-eslint/no-explicit-any': 'off', // TODO: enable when feeling brave
