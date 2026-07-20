@@ -7,10 +7,15 @@ const relativeFilePaths = files => [...files.map(file => relative(cwd, file))].j
 export default {
   '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
     `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
+
   'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
   'services/frontend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
-  '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files => `prettier --write ${files.join(' ')}`,
+  'services/shared/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/shared/tsconfig.json',
+
+  '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files => `oxfmt ${files.join(' ')} --no-error-on-unmatched-pattern`,
+
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
+
   Dockerfile: files =>
     `${dockerCmdBase} hadolint/hadolint:v2.12.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
   '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.7.2 ${relativeFilePaths(files)} -x`,

@@ -35,8 +35,8 @@ export const TableInfo = () => (
       at all.
     </Typography>
     <Typography sx={{ display: 'flex' }}>
-      <span className="enrollment-label label-none" style={{ margin: 'auto 0' }} />
-      : Student has no enrollment, but also no study right for the semester. <br />
+      <span className="enrollment-label label-none" style={{ margin: 'auto 0' }} />: Student has no enrollment, but also
+      no study right for the semester. <br />
     </Typography>
   </Alert>
 )

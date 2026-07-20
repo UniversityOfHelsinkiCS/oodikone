@@ -155,9 +155,11 @@ void describe('Course yearly statistics (2016-2023)', () => {
 
         assert(
           !(
-            '457686' in studentNumbers || // SPRING 2019
-            '455478' in studentNumbers || // FALL 2020
-            '547994' in studentNumbers // FALL 2022
+            (
+              '457686' in studentNumbers || // SPRING 2019
+              '455478' in studentNumbers || // FALL 2020
+              '547994' in studentNumbers
+            ) // FALL 2022
           ),
           "Students that have completed course later should not be included in the previous year's stats"
         )
