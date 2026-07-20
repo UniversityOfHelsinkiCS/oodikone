@@ -66,12 +66,12 @@ export const useShowAsUser = () => {
   return showAsUser
 }
 
-const { useLogoutMutation: internalMutation } = authorizationApi
+const { useLogoutMutation: useInternalLogoutMutation } = authorizationApi
 
 const devLogout = () => window.location.reload()
 
 export const useLogoutMutation = () => {
-  const [productionLogout] = internalMutation()
+  const [productionLogout] = useInternalLogoutMutation()
   const showAsUser = useShowAsUser()
 
   const handleLogout = () => {
