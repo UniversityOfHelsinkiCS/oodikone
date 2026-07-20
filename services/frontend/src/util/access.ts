@@ -11,7 +11,7 @@ export const getFullStudyProgrammeRights = (programmeRights: DetailedProgrammeRi
 }
 
 export const hasAccessToAllCourseStats = (roles: Role[], studyProgrammeRights: string[]) => {
-  return roles.some(role => ['admin', 'fullSisuAccess'].includes(role)) || studyProgrammeRights.length > 0
+  return (!!roles && roles.some(role => ['admin', 'fullSisuAccess'].includes(role))) || studyProgrammeRights.length > 0
 }
 
 export const hasFullAccessToTeacherData = (roles: Role[], iamGroups: string[]) => {
