@@ -71,7 +71,7 @@ jobs:
 
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.sis_db_migrations == 'true'
@@ -98,7 +98,7 @@ jobs:
 
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.kone_db_migrations == 'true'
@@ -126,7 +126,7 @@ jobs:
 
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.user_db_migrations == 'true'
@@ -175,7 +175,7 @@ jobs:
 
   run_updater_updates:
     name: 'Run updater tests and updates'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
       (needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
@@ -226,7 +226,7 @@ jobs:
   # === Backend api-tests ===
   test_api:
     name: 'Run backend api tests'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
@@ -245,7 +245,7 @@ jobs:
   # === Backend service-tests ===
   test_services:
     name: 'Run backend service-tests'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
@@ -264,7 +264,7 @@ jobs:
   # === Unit testing ===
   test_unit:
     name: 'Run unit tests'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
@@ -278,7 +278,7 @@ jobs:
   # === Frontend component testing ===
   test_components:
     name: 'Test frontend components'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
@@ -291,7 +291,7 @@ jobs:
 
   # === End-to-end tests ===
   test_end_to_end:
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
@@ -351,7 +351,7 @@ jobs:
   # === Other tests ===
   test_service_exit_statuses:
     name: 'Check services run correctly'
-    runs-on: runner-scaleset-docker
+    runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
