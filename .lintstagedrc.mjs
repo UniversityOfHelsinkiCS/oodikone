@@ -10,7 +10,7 @@ export default {
     `oxlint --fix --type-aware --type-check --no-error-on-unmatched-pattern --quiet ${files.join(' ')}`,
 
   '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files =>
-    `oxfmt --no-error-on-unmatched-pattern --quiet ${files.join(' ')} `,
+    `oxfmt --no-error-on-unmatched-pattern ${files.join(' ')} `,
 
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
 
