@@ -116,7 +116,7 @@ export const MedianDisplay = ({
               handleClick={handleClick}
               level={level}
               mode={mode}
-              names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode> as any) : undefined}
+              names={mode === 'faculty' ? (names as Record<string, Name | NameWithCode>) : undefined}
               title={title}
               variant={variant}
               yearLabel={yearLabel}

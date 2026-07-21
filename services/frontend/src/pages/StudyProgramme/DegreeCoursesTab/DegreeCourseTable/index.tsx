@@ -60,7 +60,7 @@ export const DegreeCourseTable = ({
             return {
               ...course,
               visible: { ...course.visible, visibility: newVisibility },
-            } as ProgrammeCourse
+            }
           }
           return course
         }),
@@ -79,7 +79,7 @@ export const DegreeCourseTable = ({
           return {
             ...course,
             visible: { ...course.visible, visibility: newVisibility },
-          } as ProgrammeCourse
+          }
         }),
       }))
     )

@@ -43,7 +43,7 @@ export const NumericTextField = ({
       const raw = event.target.value.trim()
       if (raw === '') {
         setValue(0)
-        onChange(event as React.ChangeEvent<HTMLInputElement>)
+        onChange(event)
         return
       }
       const parsed = Number(raw)
@@ -51,8 +51,8 @@ export const NumericTextField = ({
         setValue(parsed)
         onChange({
           ...event,
-          target: { ...(event.target as HTMLInputElement), value: String(parsed) },
-        } as React.ChangeEvent<HTMLInputElement>)
+          target: { ...event.target, value: String(parsed) },
+        })
       }
     },
     [onChange]
