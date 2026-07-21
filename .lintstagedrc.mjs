@@ -6,30 +6,31 @@ const relativeFilePaths = files => [...files.map(file => relative(cwd, file))].j
 
 export default {
   '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
-    `eslint --fix ${files.join(' ')} --report-unused-disable-directives`,
+    `oxlint --fix --no-error-on-unmatched-pattern --quiet ${files.join(' ')}`,
+
+  '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files =>
+    `oxfmt --no-error-on-unmatched-pattern --quiet ${files.join(' ')} `,
+
+  '*.css': files => `stylelint --fix ${files.join(' ')}`,
 
   'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
   'services/frontend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
   'services/shared/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/shared/tsconfig.json',
 
-  '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files => `oxfmt ${files.join(' ')} --no-error-on-unmatched-pattern`,
-
-  '*.css': files => `stylelint --fix ${files.join(' ')}`,
-
   Dockerfile: files =>
-    `${dockerCmdBase} hadolint/hadolint:v2.12.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
-  '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.7.2 ${relativeFilePaths(files)} -x`,
-  'docker-compose*': files => {
-    const composeFiles = file => {
-      if (['docker-compose.ci.yml', 'docker-compose.test.yml'].some(f => file.includes(f))) {
-        return `--file ${file}`
+    `${dockerCmdBase} hadolint/hadolint:v2.14.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
+    '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.11.0 ${relativeFilePaths(files)} -x`,
+    'docker-compose*': files => {
+      const composeFiles = file => {
+        if (['docker-compose.ci.yml', 'docker-compose.test.yml'].some(f => file.includes(f))) {
+          return `--file ${file}`
+        }
+        if (file.includes('docker-compose.real.yml')) {
+          return `--file ${cwd}/docker-compose.yml --file ${file}`
+        }
+        return ''
       }
-      if (file.includes('docker-compose.real.yml')) {
-        return `--file ${cwd}/docker-compose.yml --file ${file}`
-      }
-      return ''
-    }
 
-    return files.map(file => `docker-compose ${composeFiles(file)} config --quiet`)
-  },
+      return files.map(file => `docker compose ${composeFiles(file)} config --quiet`)
+    },
 }
