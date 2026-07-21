@@ -85,9 +85,65 @@ const baseTheme = {
     },
     graphColors: ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1'],
   },
-} as const
+}
 
-type CustomPalette = typeof baseTheme.palette
+type CustomPalette = {
+  activeNavigationTab: string
+  graduationTimes: {
+    onTime: string
+    yearOver: string
+    wayOver: string
+  }
+  ooditable: {
+    hops: string
+    recentEnrollment: string
+    success: string
+    enrollment: string
+  }
+  grades: {
+    all: string
+    enrolledNoGrade: string
+    fail: string
+    tt: string
+    ht: string
+    pass: string
+    grade1: string
+    grade2: string
+    grade3: string
+    grade4: string
+    grade5: string
+    i: string
+    a: string
+    nsla: string
+    lub: string
+    cl: string
+    mcla: string
+    ecla: string
+    l: string
+  }
+  studyProgrammePin: {
+    pinned: string
+    unpinned: string
+  }
+  roles: {
+    admin: string
+    fullSisuAccess: string
+  }
+  courseVisibility: {
+    noCourses: string
+    hidden: string
+    partial: string
+    visible: string
+  }
+  degreeProgrammeType: {
+    bachelor: string
+    master: string
+    licentiate: string
+    doctor: string
+    postgrad: string
+  }
+  graphColors: string[]
+}
 
 declare module '@mui/material/styles' {
   interface Palette extends CustomPalette {}
