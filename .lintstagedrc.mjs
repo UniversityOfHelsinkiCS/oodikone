@@ -5,17 +5,14 @@ const dockerCmdBase = `docker run --rm --volume ${cwd}:/oodikone --workdir /oodi
 const relativeFilePaths = files => [...files.map(file => relative(cwd, file))].join(' ')
 
 export default {
+  // INFO: oxlint --type-check is equivalent to running tsc --noEmit
   '{services,updater}/**/*.{js,jsx,ts,tsx}': files =>
-    `oxlint --fix --no-error-on-unmatched-pattern --quiet ${files.join(' ')}`,
+    `oxlint --fix --type-aware --type-check --no-error-on-unmatched-pattern --quiet ${files.join(' ')}`,
 
   '*.{js,jsx,ts,tsx,json,md,yml,yaml,html,css}': files =>
     `oxfmt --no-error-on-unmatched-pattern --quiet ${files.join(' ')} `,
 
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
-
-  'services/backend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/backend/tsconfig.json',
-  'services/frontend/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/frontend/tsconfig.json',
-  'services/shared/**/*.{ts,tsx}': () => 'npx tsc --noEmit --project services/shared/tsconfig.json',
 
   Dockerfile: files =>
     `${dockerCmdBase} hadolint/hadolint:v2.14.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
