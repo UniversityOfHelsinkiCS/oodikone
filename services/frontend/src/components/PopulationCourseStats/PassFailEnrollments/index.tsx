@@ -55,7 +55,7 @@ export const PassFailEnrollments = ({
       }))
 
     return [courseStatistics, excelData]
-  }, [courseStatistics, getTextIn, calculatePercentage])
+  }, [courseStatistics, getTextIn])
 
   const accessorKeys = useMemo(
     () => [

@@ -5,7 +5,6 @@ import tseslint from 'typescript-eslint'
 
 import globals from 'globals'
 import eslintPluginCypress from 'eslint-plugin-cypress'
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import eslintPluginReact from 'eslint-plugin-react'
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
 import eslintPluginImportX from 'eslint-plugin-import-x'
@@ -286,7 +285,5 @@ export default tseslint.config(
       'import-x/no-default-export': 'off',
       'react/jsx-filename-extension': 'off',
     },
-  },
-
-  eslintPluginPrettierRecommended // This must be the last plugin so it can override other configs
+  }
 )

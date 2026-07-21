@@ -227,7 +227,9 @@ export const Updater = () => {
             <Stack alignItems="flex-start" spacing={2} sx={{ width: '100%', my: 2 }}>
               <Typography variant="h6">Jobs running: {jobs.active?.length ?? 0}</Typography>
               <Grid container spacing={2}>
-                {jobs.active?.map(job => <JobCard job={job} key={`${job.name}-${job.processedOn}`} />)}
+                {jobs.active?.map(job => (
+                  <JobCard job={job} key={`${job.name}-${job.processedOn}`} />
+                ))}
               </Grid>
 
               <Typography variant="h6">Jobs in queue: {jobs.waiting?.length ?? 0}</Typography>

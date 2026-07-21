@@ -307,7 +307,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         )}
       </Section>
 
-      {isSuccess && studyTrack in studyTrackStats?.graduationTimes ? (
+      {isSuccess && studyTrack in studyTrackStats.graduationTimes ? (
         <Section
           cypress="average-graduation-times"
           infoBoxContent={

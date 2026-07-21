@@ -311,7 +311,7 @@ export const CoursesTabContainer = ({ curriculum, students, courses }: CoursesTa
       students.map(student =>
         studentMapper(student, includeSubstitutions, curriculumCourseCodes, substitutionsForCourseCode)
       ),
-    [students, studentMapper, includeSubstitutions]
+    [students, includeSubstitutions]
   )
 
   const columns = useGetColumnDefinitions(coursesByParentModule)

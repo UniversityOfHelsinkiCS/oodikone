@@ -72,8 +72,8 @@ const hasGraduatedBetweenDates = (
   // If we want cumulative graduations, we only want to check for correct end date. If not, check also the start date
   return Boolean(
     studyRightElement?.graduated &&
-      (start.isBefore(studyRightElement?.endDate, 'day') || cumulative) &&
-      end.isAfter(studyRightElement?.endDate, 'day')
+    (start.isBefore(studyRightElement?.endDate, 'day') || cumulative) &&
+    end.isAfter(studyRightElement?.endDate, 'day')
   )
 }
 

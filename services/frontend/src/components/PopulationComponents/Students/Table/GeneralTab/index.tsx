@@ -2,7 +2,6 @@ import Box from '@mui/material/Box'
 import type { TableOptions } from '@tanstack/react-table'
 import { ReactNode, useMemo } from 'react'
 
-import { isMastersProgramme } from '@/common'
 import { StudentNameVisibilityToggle } from '@/components/common/StudentNameVisibilityToggle'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
@@ -102,7 +101,7 @@ export const GeneralTab = ({
     }
 
     return columns.flatMap(squashGroups)
-  }, [combinedProgramme, includePrimaryProgramme, isMastersProgramme])
+  }, [combinedProgramme, includePrimaryProgramme])
 
   const data = formattingFunction()
   const [visible, excelVisible] = columnFunction()

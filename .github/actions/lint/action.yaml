@@ -1,5 +1,5 @@
 name: 'Lint code'
-description: 'Runs ESLint and Stylelint for frontend and backend'
+description: 'Runs Oxlint and Stylelint for frontend and backend'
 
 runs:
   using: composite
@@ -13,6 +13,6 @@ runs:
     - name: 'Run Stylelint for CSS files'
       shell: bash
       run: npm run stylelint "services/frontend/src/**/*.css"
-    - name: 'Run ESLint for JS and TS files'
+    - name: 'Run Oxlint for the whole repository'
       shell: bash
-      run: npm run eslint -- services
+      run: npm run lint

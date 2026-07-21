@@ -3,8 +3,9 @@ import type { Cell, CellContext, Column, Row, RowData, Table, TableFeature } fro
 /**
  * This doesn't implement all the features of Row, so be aware of that
  */
-/* eslint-disable-line import-x/no-unused-modules */ export interface AggregationRow<TData extends RowData>
-  extends Row<TData> {
+/* eslint-disable-line import-x/no-unused-modules */ export interface AggregationRow<
+  TData extends RowData,
+> extends Row<TData> {
   getIsAggregationRow: () => true
 }
 
