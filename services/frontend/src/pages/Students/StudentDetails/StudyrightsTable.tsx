@@ -31,6 +31,26 @@ import { StudentPageStudent } from '@oodikone/shared/types/studentData'
 // the state should be based on studyright validity period, see issue #4795
 const NON_DEGREE_LEADING_STUDY_RIGHT_URN = 'urn:code:study-right-expiration-rules:no-automatic-calculation'
 
+const RenderStatus = ({ studyRight }) => {
+  let text = <span style={{ color: 'red', fontWeight: 'bolder' }}>PASSIVE</span>
+
+  if (studyRight.graduated) {
+    text = (
+      <>
+        <span style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</span>
+        <span style={{ color: 'grey' }}>{reformatDate(studyRight.endDate, DateFormat.DISPLAY_DATE)}</span>
+      </>
+    )
+  } else if (studyRight.absent) {
+    text = <span style={{ color: 'orange', fontWeight: 'bolder' }}>ABSENT</span>
+  } else if (studyRight.active) {
+    text = <span style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</span>
+  } else if (studyRight.cancelled) {
+    text = <span style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</span>
+  }
+  return <div style={{ display: 'flex', flexDirection: 'column' }}>{text}</div>
+}
+
 const isBetweenDays = (startDate: Date | string, endDate: Date | string) => {
   const current = new Date()
   const start = new Date(startDate)
@@ -111,26 +131,6 @@ export const StudyrightsTable = ({
   )
 
   if (studyRightRows.length === 0) return null
-
-  const RenderStatus = ({ studyRight }: { studyRight: (typeof studyRightRows)[number] }) => {
-    let text = <span style={{ color: 'red', fontWeight: 'bolder' }}>PASSIVE</span>
-
-    if (studyRight.graduated) {
-      text = (
-        <>
-          <span style={{ color: 'green', fontWeight: 'bolder' }}>GRADUATED</span>
-          <span style={{ color: 'grey' }}>{reformatDate(studyRight.endDate, DateFormat.DISPLAY_DATE)}</span>
-        </>
-      )
-    } else if (studyRight.absent) {
-      text = <span style={{ color: 'orange', fontWeight: 'bolder' }}>ABSENT</span>
-    } else if (studyRight.active) {
-      text = <span style={{ color: 'blue', fontWeight: 'bolder' }}>ACTIVE</span>
-    } else if (studyRight.cancelled) {
-      text = <span style={{ color: 'black', fontWeight: 'bolder' }}>CANCELLED</span>
-    }
-    return <div style={{ display: 'flex', flexDirection: 'column' }}>{text}</div>
-  }
 
   const renderCompletionPercent = (studyright, student) => {
     const newestProgrammeCode = studyright.programmes[0].code

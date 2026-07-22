@@ -2,7 +2,6 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
-import { useEffect, useState } from 'react'
 
 import { filterInternalReleases } from '@/common'
 import { Link } from '@/components/common/Link'
@@ -15,15 +14,14 @@ import { SectionTitle } from '@/pages/FrontPage/SectionTitle'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetChangelogQuery } from '@/redux/changelog'
 import { checkUserAccess, getFullStudyProgrammeRights } from '@/util/access'
-import { Release } from '@oodikone/shared/types'
 
 export const FrontPage = () => {
+  'use memo'
   useTitle()
 
   const { data: releaseData, isLoading } = useGetChangelogQuery()
   const { roles, programmeRights } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
-  const [visibleReleases, setVisibleReleases] = useState<Release[]>([])
 
   // TODO: Add missing features and extract access right checking
   const featureItems = [
@@ -65,12 +63,7 @@ export const FrontPage = () => {
     },
   ]
 
-  useEffect(() => {
-    if (!releaseData) {
-      return
-    }
-    setVisibleReleases([...releaseData.filter(filterInternalReleases).slice(0, 2)])
-  }, [releaseData])
+  const visibleReleases = releaseData?.filter(filterInternalReleases).slice(0, 2) ?? []
 
   return (
     <PageLayout maxWidth="lg">

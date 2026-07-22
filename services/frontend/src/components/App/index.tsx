@@ -52,7 +52,7 @@ export const App = () => {
 
   useEffect(() => {
     if (isProduction && !isLoading && id && username) Sentry.setUser({ id, username, mockedBy })
-  }, [id, username, mockedBy])
+  }, [id, isLoading, username, mockedBy])
 
   if (isLoading) return <SegmentDimmer isLoading />
   if (error) return <AccessDenied />

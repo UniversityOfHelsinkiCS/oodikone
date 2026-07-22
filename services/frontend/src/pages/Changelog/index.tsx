@@ -1,5 +1,4 @@
 import Stack from '@mui/material/Stack'
-import { useEffect, useState } from 'react'
 
 import { filterInternalReleases } from '@/common'
 import { PageLayout } from '@/components/common/PageLayout'
@@ -7,18 +6,12 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { useTitle } from '@/hooks/title'
 import { ReleaseCard } from '@/pages/Changelog/ReleaseCard'
 import { useGetChangelogQuery } from '@/redux/changelog'
-import type { Release } from '@oodikone/shared/types'
 
 export const Changelog = () => {
   useTitle('Changelog')
-  const [visibleReleases, setVisibleReleases] = useState<Release[]>([])
+  const { data: releaseData, isFetching: isLoading } = useGetChangelogQuery()
 
-  const { data: releaseData, isSuccess, isFetching: isLoading } = useGetChangelogQuery()
-
-  useEffect(() => {
-    if (!releaseData) return
-    setVisibleReleases(releaseData.filter(filterInternalReleases).slice(0, 20))
-  }, [isSuccess])
+  const visibleReleases = releaseData?.filter(filterInternalReleases).slice(0, 20) ?? []
 
   return (
     <PageLayout maxWidth="lg">

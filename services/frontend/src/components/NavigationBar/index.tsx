@@ -3,7 +3,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import Toolbar from '@mui/material/Toolbar'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useLocation } from 'react-router'
 
 import { Link } from '@/components/common/Link'
@@ -14,14 +14,13 @@ import { UserButton } from '@/components/NavigationBar/UserButton'
 import { isDev } from '@/conf'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { checkUserAccess, getFullStudyProgrammeRights, hasFullAccessToTeacherData } from '@/util/access'
-import { formatToArray } from '@oodikone/shared/util'
 
 export const NavigationBar = () => {
+  'use memo'
   const { isFetching, fullAccessToStudentData, isAdmin, programmeRights, roles, iamGroups } =
     useGetAuthorizedUserQuery()
 
   const location = useLocation()
-  const [activeTab, setActiveTab] = useState<number>(-1)
 
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
 
@@ -63,21 +62,20 @@ export const NavigationBar = () => {
           return false
         })
         .map(([_, value]) => value),
-    [isFetching, fullAccessToStudentData, isAdmin, programmeRights, roles, iamGroups]
+    [isFetching, fullAccessToStudentData, fullStudyProgrammeRights.length, isAdmin, programmeRights, roles, iamGroups]
   )
 
   const isActivePath = (paths: string[]) =>
     paths.filter((path): path is string => Boolean(path)).some(currentPath => location.pathname.includes(currentPath))
 
-  useEffect(
-    () =>
-      setActiveTab(
-        visibleNavigationItems.findIndex(item =>
-          isActivePath(formatToArray(item.path ?? item.items?.map(subPath => subPath.path!) ?? []))
-        )
-      ),
-    [location.pathname, visibleNavigationItems]
-  )
+  const activeTab = useMemo(() => {
+    return visibleNavigationItems.findIndex(item => {
+      const paths =
+        item.path !== undefined ? [item.path] : (item.items ?? []).map(sub => sub.path).filter(sp => sp !== undefined)
+
+      return isActivePath(paths)
+    })
+  }, [visibleNavigationItems, isActivePath, location.pathname])
 
   return (
     <AppBar
@@ -107,7 +105,7 @@ export const NavigationBar = () => {
         }}
       >
         <OodikoneLogo />
-        {!isFetching && location ? (
+        {!isFetching && location && (
           <Tabs
             sx={{ '& .MuiTabs-indicator': { backgroundColor: 'activeNavigationTab' } }}
             textColor="inherit"
@@ -132,7 +130,7 @@ export const NavigationBar = () => {
               />
             ))}
           </Tabs>
-        ) : null}
+        )}
         <UserButton />
       </Toolbar>
     </AppBar>

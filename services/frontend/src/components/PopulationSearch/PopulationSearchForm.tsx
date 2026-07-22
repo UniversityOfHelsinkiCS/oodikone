@@ -28,6 +28,12 @@ const getDefaultYear = () => {
   return date.getMonth() < 7 ? date.getFullYear() - 1 : date.getFullYear()
 }
 
+const Subtitle = ({ text, disabled = false }) => (
+  <Typography color={disabled ? 'textDisabled' : 'inherit'} fontWeight="bold" sx={{ mb: '1em' }} variant="subtitle1">
+    {text}
+  </Typography>
+)
+
 export const PopulationSearchForm = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -97,12 +103,6 @@ export const PopulationSearchForm = () => {
   if (location.search !== '') {
     return null
   }
-
-  const Subtitle = ({ text, disabled = false }) => (
-    <Typography color={disabled ? 'textDisabled' : 'inherit'} fontWeight="bold" sx={{ mb: '1em' }} variant="subtitle1">
-      {text}
-    </Typography>
-  )
 
   return (
     <Stack spacing={3}>

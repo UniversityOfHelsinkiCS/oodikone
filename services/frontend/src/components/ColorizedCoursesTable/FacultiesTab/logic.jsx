@@ -117,6 +117,6 @@ export const useColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
         })
       ),
     ],
-    [numberMode, colorMode, allTotal, facultyMap === undefined]
+    [numberMode, colorMode, allTotal, facultyMap, faculties, getTextIn, faculties]
   )
 }

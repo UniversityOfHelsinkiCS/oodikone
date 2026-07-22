@@ -74,8 +74,9 @@ export const StudentCreditAccumulation = ({
   }, [selectedStudyRight, student.studyRights])
 
   const pointData = useMemo(() => {
+    const now = new Date().getTime()
     const filteredCourses = filterCoursesByStudyPlan(student.courses, selectedStudyPlan)
-      .filter(course => new Date(course.date).getTime() <= Date.now())
+      .filter(course => new Date(course.date).getTime() <= now)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
     let credits = 0

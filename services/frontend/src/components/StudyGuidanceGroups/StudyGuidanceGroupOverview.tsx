@@ -15,7 +15,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { StyledMessage } from '@/components/common/StyledMessage'
@@ -49,6 +49,13 @@ const addText = (tagName: string) => {
   return 'Add starting year'
 }
 
+const getInitialFormValues = (tagName: 'year' | 'studyProgramme', initialState: any) => {
+  const defaultYear = new Date().getFullYear() - 1
+  return {
+    [tagName]: initialState ?? (tagName === 'year' ? defaultYear : ''),
+  }
+}
+
 const EditTagModal = ({
   group,
   open,
@@ -66,20 +73,13 @@ const EditTagModal = ({
 }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
   const { getTextIn } = useLanguage()
-  const [formValues, setFormValues] = useState({ [tagName]: initialState ?? '' })
+  const [formValues, setFormValues] = useState(() => getInitialFormValues(tagName, initialState))
   const [formErrors, setFormErrors] = useState({})
 
   // Remove duplicate entries in Associated degree programme selector
   const filteredProgrammeCodes = selectFieldItems?.filteredProgrammes.map(programme => programme.key) ?? []
   const filteredAllProgrammes =
     selectFieldItems?.allProgrammes.filter(programme => !filteredProgrammeCodes.includes(programme.key)) ?? []
-
-  useEffect(() => {
-    // Magic number: previous year (if initialState not set)
-    const initialYear = formValues[tagName] === '' ? new Date().getFullYear() - 1 : Number(formValues[tagName])
-    setFormValues({ [tagName]: initialState ?? (tagName === 'year' ? initialYear : '') })
-    setFormErrors({})
-  }, [group, tagName, open])
 
   const validate = values => {
     const tags = { studyProgramme: 'Degree programme', year: 'Starting year' }
@@ -171,7 +171,10 @@ const EditTagModal = ({
                 </FormControl>
               ) : (
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <EnrollmentDateSelector setYear={value => handleChange(tagName, value)} year={formValues[tagName]} />
+                  <EnrollmentDateSelector
+                    setYear={value => handleChange(tagName, value)}
+                    year={formValues[tagName] as number}
+                  />
                 </Box>
               )}
             </Box>

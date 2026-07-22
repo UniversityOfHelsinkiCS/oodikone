@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
 
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useModifyLanguageMutation } from '@/redux/users'
@@ -26,6 +26,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 }
 
 export const useLanguage = () => {
+  'use memo'
   const [state, setState] = useContext(LanguageContext)
   const [changeLanguage] = useModifyLanguageMutation()
 

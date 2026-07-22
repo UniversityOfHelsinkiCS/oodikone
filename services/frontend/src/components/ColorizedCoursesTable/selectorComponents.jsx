@@ -5,7 +5,6 @@ import RadioGroup from '@mui/material/RadioGroup'
 
 import Select from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
-import { useMemo } from 'react'
 
 import './index.css'
 import { useColorizedCoursesTableContext } from '@/components/ColorizedCoursesTable/common'
@@ -97,17 +96,14 @@ export const ColorModeSelector = () => {
 }
 
 const SemesterSelector = ({ allSemesters, semester, setSemester, dataCy }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
   const currentValue = allSemesters.find(({ semestercode }) => semester === semestercode) ?? allSemesters[0]
-  const options = useMemo(
-    () =>
-      allSemesters.map(semester => ({
-        key: semester.semestercode,
-        text: getTextIn(semester.name),
-        value: semester.semestercode,
-      })),
-    [allSemesters]
-  )
+  const options = allSemesters.map(semester => ({
+    key: semester.semestercode,
+    text: getTextIn(semester.name),
+    value: semester.semestercode,
+  }))
 
   return (
     <div className="selector-container">
