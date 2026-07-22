@@ -397,6 +397,7 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
+      - run_updater_updates
       - cache_cypress_image
     strategy:
       fail-fast: false
