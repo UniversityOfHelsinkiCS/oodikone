@@ -56,6 +56,10 @@ What different CLI options do:
    - Runs `docker system prune -a && docker volume prune -a`
    - This will remove all your Docker data, also related to any other applications than Oodikone!
    - Sometimes necessary after strange errors due to caching
+6. Clear node_nodules
+   - Deletes "nodemod" docker volumes and all local node_modules from each each service
+   - Useful when resolving permission issues without the need to reset all data
+   - Runs `npm ci` for every service locally
 
 ## ⌨️ Development
 
@@ -133,8 +137,9 @@ Some useful commands are defined in `package.json` and can be run with `npm run 
 - `npm run testupdater`: runs tests for updater
 - `npm run flushredis`: clears Redis, which forces big calculations to be redone in e.g. studyprogramme overview and faculty views
 - `npm run install:local`: installs `node_modules` for each package (backend, frontend, sis-updater-scheduler and sis-updater-worker) locally
-- `npm run install:docker`: installs `node_modules` for each package inside containers
-- `npm run install:both`: runs both `npm run install:local` and `npm run install:docker`
+- `npm run ci:local`: same as above, but sticks to the package versions pinned in package-lock
+- `npm run ci:docker`: installs `node_modules` for each package inside containers
+- `npm run ci:both`: runs both `npm run ci:local` and `npm run ci:docker`
 
 Once you have ran setup for Oodikone , you can just execute the first one (`npm run oodikone`). After starting and waiting for a while for containers to compile, Oodikone can be accessed at [http://localhost:3000](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
 
@@ -191,9 +196,13 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 ## ❓FAQ
 
-### Modules are missing after updating package.json
+### How to install a new package
 
-You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Prefer `npm run ci:docker` or `npm run install:docker`, which also fix `node_modules` ownership for the non-root runtime user. If you run installs manually, use root inside the container and restore ownership afterwards (`chown -R 1001:0 node_modules`) to avoid permission issues.
+Install the package locally to the relevant service with `npm install`. Follow with `npm ci:docker`. The application running inside container uses your host-mounted package-lock. Therefore when making any changes to packages do them first locally, followed by `npm ci` in container. Avoid running `npm install` inside docker containers. Our docker images run as non-root, and cannot write on the host mounted package-lock files (without sudo'ing and changing back the permissions later). The CLI has an option to clear all node_modules should the need arise.
+
+### Modules are missing after an update to package.json
+
+Module might be missing for example when someone else installs a new library and you only pull the changes in the package files, without installing the acual packages. In this case run `npm ci:both`.
 
 ### Study guidance groups don't work on my machine
 
