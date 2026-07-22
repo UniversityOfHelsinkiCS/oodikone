@@ -43,6 +43,9 @@
   "bugs": {
     "url": "https://github.com/UniversityOfHelsinkiCS/oodikone/issues"
   },
+  "allowScripts": {
+    "cypress": true
+  },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "cypress": "^15.13.0",
