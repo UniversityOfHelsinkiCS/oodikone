@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "composite": true,
-    "target": "es2021",
+    "target": "ES2024",
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true
   },
   "include": ["vite.config.ts"]
