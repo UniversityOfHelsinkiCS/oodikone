@@ -88,7 +88,8 @@ describe('Numbers should match between', () => {
       test.forEach(course => {
         // Academic years between 2017-2023
         cy.init(
-          `/coursepopulation?from=68&to=74&coursecodes=%5B%22${course.at(1)}%22%5D&includeSubstitutions=false`,
+          // year - 1949 yields the correct year code
+          `/coursepopulation?from=${2017 - 1949}&to=${2023 - 1949}&coursecodes=%5B%22${course.at(1)}%22%5D&includeSubstitutions=false`,
           'basic'
         )
         cy.contains(course.at(2)) // Course name
