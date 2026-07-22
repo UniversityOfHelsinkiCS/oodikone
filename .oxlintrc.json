@@ -299,6 +299,8 @@
     {
       "files": ["services/frontend/**/*.{js,jsx,mjs,cjs,ts,tsx}"],
       "rules": {
+        "react/react-compiler": "warn",
+
         "react/display-name": "error",
         "react/jsx-key": "error",
         "react/jsx-no-comment-textnodes": "error",
@@ -321,6 +323,7 @@
         "react/exhaustive-deps": "warn",
         "react/no-array-index-key": "error",
         "react/no-unstable-nested-components": "warn",
+
         "react/no-this-in-sfc": "error",
         "react/jsx-boolean-value": ["error", "never"],
         "react/jsx-filename-extension": [
@@ -330,8 +333,7 @@
             "extensions": [".jsx", ".tsx"]
           }
         ],
-        "react/jsx-no-useless-fragment": "error",
-        "react/jsx-props-no-spreading": "warn"
+        "react/jsx-no-useless-fragment": "error"
       },
       "plugins": ["react"]
     },
