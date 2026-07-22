@@ -3,6 +3,7 @@ import request from 'supertest'
 import { describe, it, beforeAll, assert } from 'vitest'
 
 import { Unarray } from '@oodikone/shared/types'
+import { yearToYearCode } from '@oodikone/shared/util'
 import { CourseYearlyStatsResBody } from '../../../src/routes/courses'
 import { initTests, ResponseWithBody } from '../../utils'
 
@@ -27,7 +28,9 @@ void describe('Course yearly statistics (2016-2023)', () => {
     let body: Unarray<CourseYearlyStatsResBody>
     beforeAll(async () => {
       const res = (await request(app)
-        .get('/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYear=2016&toYear=2023')
+        .get(
+          `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
+        )
         .set('shib-session-id', 'test')
         .set('uid', 'basic')
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
@@ -135,7 +138,9 @@ void describe('Course yearly statistics (2016-2023)', () => {
       let body: Unarray<CourseYearlyStatsResBody>
       beforeAll(async () => {
         const res = (await request(app)
-          .get('/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYear=2016&toYear=2023')
+          .get(
+            `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
+          )
           .set('shib-session-id', 'test')
           .set('uid', 'basic')
           .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
@@ -447,7 +452,9 @@ describe('Course yearly statistics (smaller timeframes)', () => {
     ['2016-2024', 2016, 2023],
   ])('should include correct years for smaller timeframe (MAT21003 $0)', async (name, from, to) => {
     const res = (await request(app)
-      .get(`/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYear=${from}&toYear=${to}`)
+      .get(
+        `/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYearCode=${yearToYearCode(from)}&toYearCode=${yearToYearCode(to)}`
+      )
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
       .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
@@ -518,7 +525,7 @@ describe('Course yearly statistics (smaller timeframes)', () => {
   ])('should include correct stats for one academic year (TKT10002, $0)', async (year, categories, grades) => {
     const res = (await request(app)
       .get(
-        `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYear=${year.split('-').at(0)}&toYear=${parseInt(year.split('-').at(1)!) - 1}`
+        `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0)!)}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
       )
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
@@ -580,7 +587,9 @@ describe('Course yearly statistics (smaller timeframes)', () => {
   describe('should count duplicate grades if an attainment falls out of the timespan (MAT21003)', () => {
     it('- 2017-2018 should include a failed grade', async () => {
       const res = (await request(app)
-        .get('/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYear=2017&toYear=2017')
+        .get(
+          `/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2017)}`
+        )
         .set('shib-session-id', 'test')
         .set('uid', 'basic')
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
@@ -604,7 +613,9 @@ describe('Course yearly statistics (smaller timeframes)', () => {
 
     it('- 2018-2019 should include a failed grade', async () => {
       const res = (await request(app)
-        .get('/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYear=2018&toYear=2018')
+        .get(
+          `/courseyearlystats?codes=MAT21003&combineSubstitutions=false&fromYearCode=${yearToYearCode(2018)}&toYearCode=${yearToYearCode(2018)}`
+        )
         .set('shib-session-id', 'test')
         .set('uid', 'basic')
         .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
