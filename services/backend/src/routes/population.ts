@@ -286,13 +286,13 @@ router.get<
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery
 >('/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const courseCodes = JSON.parse(req.query.courseCodes) as string[]
-  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
-  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)
   const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(courseCodes, Unification.UNIFY)
+  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)
+  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
   return res.json({
-    openCourses: maxYearsToCreatePopulationFromOpen,
-    uniCourses: maxYearsToCreatePopulationFromUni,
     unifyCourses: maxYearsToCreatePopulationFromBoth,
+    uniCourses: maxYearsToCreatePopulationFromUni,
+    openCourses: maxYearsToCreatePopulationFromOpen,
   })
 })
 
