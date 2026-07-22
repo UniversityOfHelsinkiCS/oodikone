@@ -34,9 +34,13 @@ runs:
       with:
         browser: firefox
         spec: ${{ inputs.spec }}
-        install: npm ci && npx cypress install
+        install-command: npm ci && npx cypress install
       env:
         CYPRESS_baseUrl: http://localhost:1337
+
+    - name: Dump cypress info
+      shell: bash
+      run: npx cypress info
 
     - name: 'Upload video if tests fail'
       uses: actions/upload-artifact@v7
