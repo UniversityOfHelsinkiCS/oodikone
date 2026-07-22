@@ -32,7 +32,7 @@ runs:
     - name: Run Cypress inside docker container
       shell: bash
       run: |
-        docker run -it -v $PWD:/e2e -w /e2e --add-host host.docker.internal:host-gateway -e CYPRESS_VIDEO -e CYPRESS_baseUrl=http://host.docker.internal:1337 --entrypoint cypress cypress/included:15.18.1 run --browser firefox --spec ${{ inputs.spec }}
+        docker run -v $PWD:/e2e -w /e2e --add-host host.docker.internal:host-gateway -e CYPRESS_VIDEO -e CYPRESS_baseUrl=http://host.docker.internal:1337 --entrypoint cypress cypress/included:15.18.1 run --browser firefox --spec ${{ inputs.spec }}
 
     - name: 'Upload video if tests fail'
       uses: actions/upload-artifact@v7
