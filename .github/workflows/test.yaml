@@ -390,7 +390,7 @@ jobs:
 
       - name: Save Cypress images for downstream jobs
         run: |
-          docker save cypress/includeD:15.18.1 | zstd -T0 -3 -o /tmp/cypress-image.tar.zst
+          docker save cypress/included:15.18.1 | zstd -T0 -3 -o /tmp/cypress-image.tar.zst
 
   test_end_to_end:
     runs-on: ubuntu-latest
