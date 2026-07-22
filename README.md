@@ -57,7 +57,7 @@ What different CLI options do:
    - This will remove all your Docker data, also related to any other applications than Oodikone!
    - Sometimes necessary after strange errors due to caching
 6. Clear node_nodules
-   - Deletes "nodemod" docker volumes and all local node_modules from each each service
+   - Deletes "nodemod" docker volumes and all local node_modules from each service
    - Useful when resolving permission issues without the need to reset all data
    - Runs `npm ci` for every service locally
 
@@ -198,11 +198,11 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 ### How to install a new package
 
-Install the package locally to the relevant service with `npm install`. Follow with `npm ci:docker`. The application running inside container uses your host-mounted package-lock. Therefore when making any changes to packages do them first locally, followed by `npm ci` in container. Avoid running `npm install` inside docker containers. Our docker images run as non-root, and cannot write on the host mounted package-lock files (without sudo'ing and changing back the permissions later). The CLI has an option to clear all node_modules should the need arise.
+Install the package locally to the relevant service with `npm install` followed by the script `npm run ci:docker`. The application running inside container uses your host-mounted package-lock; therefore when making any changes to packages do them first locally. Avoid running `npm install` inside docker containers. Our docker images run as non-root, and cannot write on the host mounted package-lock files (without sudo'ing and changing back the permissions later). The CLI has an option to clear all node_modules should the need arise.
 
 ### Modules are missing after an update to package.json
 
-Module might be missing for example when someone else installs a new library and you only pull the changes in the package files, without installing the acual packages. In this case run `npm ci:both`.
+Module might be missing for example when someone else installs a new library and you pull the changes to the package files, without installing the acual packages. To sync the node_modules with the package files run `npm run ci:both`.
 
 ### Study guidance groups don't work on my machine
 
