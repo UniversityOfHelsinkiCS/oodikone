@@ -25,6 +25,10 @@ runs:
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 
+    # TODO: Move this somewhere higher up
+    - name: Install Cypress
+      run: npx cypress install
+
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
@@ -34,7 +38,6 @@ runs:
       with:
         browser: firefox
         spec: ${{ inputs.spec }}
-        cache-key: cypress-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       env:
         CYPRESS_baseUrl: http://localhost:1337
 
