@@ -24,6 +24,18 @@ runs:
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 
+    - name: Restore cached docker images
+      id: cache-images-restore
+      uses: actions/cache/restore@v6
+      with:
+        path: |
+          /tmp/docker-images.tar.zst
+        key: docker-images-${{ github.sha }}
+
+    - name: 'Load Docker images'
+      shell: bash
+      run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+
     - name: Start oodikone (without frontend and backend)
       shell: bash
       run: docker compose --file docker-compose.ci.yml up --quiet-pull --detach --wait

@@ -34,6 +34,7 @@ runs:
         key: docker-images-${{ github.sha }}
 
     - name: 'Load Docker images'
+      shell: bash
       run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
     - name: 'Run services, pull rest of the needed images'
