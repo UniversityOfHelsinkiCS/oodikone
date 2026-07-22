@@ -29,18 +29,10 @@ runs:
       shell: bash
       run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull
 
-    - name: 'Run cypress'
-      uses: cypress-io/github-action@v7
-      with:
-        browser: firefox
-        spec: ${{ inputs.spec }}
-        install-command: npm ci && npx cypress install
-      env:
-        CYPRESS_baseUrl: http://localhost:1337
-
-    - name: Dump cypress info
+    - name: Run Cypress inside docker container
       shell: bash
-      run: npx cypress info
+      run: |
+        docker run -it -v $PWD:/e2e -w /e2e --add-host host.docker.internal:host-gateway -e CYPRESS_VIDEO -e CYPRESS_baseUrl=http://host.docker.internal:1337 --entrypoint cypress cypress/included:15.18.1 run --browser firefox --spec ${{ inputs.spec }}
 
     - name: 'Upload video if tests fail'
       uses: actions/upload-artifact@v7
