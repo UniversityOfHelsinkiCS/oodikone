@@ -383,7 +383,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /tmp/cypress-image.tar.zst
-          key: cypress/included:15.18.1
+          key: cypress-image-${{ github.sha }}
 
       - name: Pull Cypress image
         run: docker pull cypress/included:15.18.1
@@ -457,7 +457,7 @@ jobs:
         with:
           path: |
             /tmp/cypress-image.tar.zst
-          key: cypress/included:15.18.1
+          key: cypress-image-${{ github.sha }}
 
       - name: Load pulled docker images
         run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
