@@ -25,11 +25,6 @@ export default defineConfig({
                   console.error(`Details: ${event.detail.description}`)
                 }
 
-                if ('loc' in event.detail && !!event.detail.loc) {
-                  const { line, column } = event.detail.loc[Symbol('start')]
-                  console.error(`Location: Line ${line}, Column ${column}`)
-                }
-
                 if (event.detail.suggestions) {
                   console.error('Suggestions:', event.detail.suggestions)
                 }
