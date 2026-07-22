@@ -130,7 +130,7 @@ const parseEnrollment = (
     studyRightElements.find(studyRightElement => studyRightElement.studyRightId === studyRightId) ??
     studyRightElements
       .filter(({ startDate, endDate }) => dateIsBetween(enrollmentDateTime, startDate, endDate))
-      .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+      .sort((a, b) => b.startDate?.getTime() - a.startDate?.getTime())
       .at(0) // The newest studyRightElement
 
   const programme = programmeOfEnrollment
