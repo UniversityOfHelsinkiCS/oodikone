@@ -74,7 +74,7 @@ Cypress.Commands.add('init', { prevSubject: false }, (path, userId = 'basic') =>
   const headersToUse = userHeaders.find(({ uid }) => uid === userId)
   if (!headersToUse) throw Error(`${userId} is not valid user id!`)
 
-  cy.intercept({ hostname: 'localhost', url: '**', method: '*' }, req => {
+  cy.intercept('*', req => {
     req.headers = headersToUse
   })
 
