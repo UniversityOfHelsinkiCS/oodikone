@@ -48,13 +48,20 @@ jobs:
     name: 'Pull all needed docker images and cache them'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Login to toska docker registry
         uses: docker/login-action@v4
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+
+      - name: Set up cache for pulled docker images (saved in Post-step)
+        id: cache-images
+        uses: actions/cache@v6
+        with:
+          path: /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
 
       - name: Pull required images
         run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
@@ -63,20 +70,14 @@ jobs:
         run: |
           docker save \
             registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
             registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db \
             "quay.io/toska/jami:production" \
             redis:7.2.6 \
             postgres:15.10 \
             nginx:latest \
           | zstd -T0 -3 -o /tmp/docker-images.tar.zst
-
-      - name: Cache pulled docker images
-        id: cache-images
-        uses: actions/cache@v6
-        with:
-          path: /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
 
   # === Update databases ===
   check_migration_files:
@@ -166,6 +167,17 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
 
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
@@ -194,6 +206,17 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
@@ -247,6 +270,17 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: Start worker containers
         run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --quiet-pull --detach --wait
@@ -414,6 +448,17 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --wait
