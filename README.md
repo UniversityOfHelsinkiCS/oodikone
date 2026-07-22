@@ -58,7 +58,7 @@ What different CLI options do:
    - Sometimes necessary after strange errors due to caching
 6. Clear node_nodules
    - Deletes "nodemod" docker volumes and all local node_modules from each service
-   - Useful when resolving permission issues without the need to reset all data
+   - Useful when resolving permission/installation/library issues without the need to reset all data
    - Runs `npm ci` for every service locally
 
 ## ⌨️ Development
