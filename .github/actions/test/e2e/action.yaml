@@ -34,6 +34,7 @@ runs:
       with:
         browser: firefox
         spec: ${{ inputs.spec }}
+        install: npm ci && npx cypress install
       env:
         CYPRESS_baseUrl: http://localhost:1337
 
