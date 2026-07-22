@@ -27,6 +27,7 @@ runs:
 
     # TODO: Move this somewhere higher up
     - name: Install Cypress
+      shell: bash
       run: npx cypress install
 
     - name: 'Run services, pull rest of the needed images'
