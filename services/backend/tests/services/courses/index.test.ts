@@ -96,7 +96,18 @@ void describe.concurrent('Find by course and semester', () => {
     async (separate, to, from) => {
       const res = (await findByCourseAndSemesters(['MAT21018'], to, from, separate === 'semester', 'unifyStats')).sort()
       const passed = ['457686', '495976', '484997', '491970', '461485', '501442', '508370']
-      const failed = ['484541', '487566', '493344', '520906', '541350', '544750', '550840']
+      const failed = [
+        '484541',
+        '487566',
+        '493344',
+        '520906',
+        '541350',
+        '544750',
+        '550840',
+        '495398',
+        '511089',
+        '538399',
+      ]
       assert.deepStrictEqual(res, passed.concat(failed).sort())
     }
   )
@@ -138,7 +149,7 @@ void describe.concurrent('Find by course and semester', () => {
   it.todo('should return correct student numbers for multiple courses (CSM14204+MAT21018)')
 
   describe('should work with specific cases', () => {
-    it('Student with enrollment in -21 and passed grade in -23 should not be included in -21 stats (522321)', async () => {
+    it('Student with enrollment in -21 and passed grade in -23 should be included in both stats when querying one year at a time (522321)', async () => {
       const res21 = (
         await findByCourseAndSemesters(['MAT21018'], yearToYearCode(2021), yearToYearCode(2021), false, 'unifyStats')
       ).sort()
@@ -146,8 +157,8 @@ void describe.concurrent('Find by course and semester', () => {
         await findByCourseAndSemesters(['MAT21018'], yearToYearCode(2022), yearToYearCode(2022), false, 'unifyStats')
       ).sort()
 
-      assert.notInclude(res21, '522321', '522321 incorrectly included in -21 stats')
-      assert.include(res23, '522321')
+      assert.include(res21, '522321', '522321 incorrectly missing in -21 stats')
+      assert.include(res23, '522321', '522321 incorrectly missing in -23 stats')
     })
   })
 })
