@@ -25,18 +25,6 @@ runs:
         username: ${{ inputs.username }}
         password: ${{ inputs.password }}
 
-    - name: Restore cached docker images
-      id: cache-images-restore
-      uses: actions/cache/restore@v6
-      with:
-        path: |
-          /tmp/docker-images.tar.zst
-        key: docker-images-${{ github.sha }}
-
-    - name: 'Load Docker images'
-      shell: bash
-      run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-
     - name: 'Run services, pull rest of the needed images'
       shell: bash
       run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull

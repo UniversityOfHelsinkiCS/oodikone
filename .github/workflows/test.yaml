@@ -373,12 +373,31 @@ jobs:
         uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
+  cache_cypress_image:
+    runs-on: ubuntu-latest
+    if: |
+      !cancelled() && !failure()
+    steps:
+      - name: Set up cache for Cypress image (saved in Post-step)
+        id: cache-cypress-image
+        uses: actions/cache@v6
+        with:
+          path: /tmp/cypress-image.tar.zst
+          key: cypress/included:15.18.1
+
+      - name: Pull Cypress image
+        run: docker pull cypress/included:15.18.1
+
+      - name: Save Cypress images for downstream jobs
+        run: |
+          docker save cypress/includeD:15.18.1 | zstd -T0 -3 -o /tmp/cypress-image.tar.zst
+
   test_end_to_end:
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
+      - cache_cypress_image
     strategy:
       fail-fast: false
       matrix:
@@ -423,7 +442,29 @@ jobs:
         with:
           node-version: 24
 
-      - name: 'Run tests'
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: Restore cached Cypress image
+        id: cache-cypress-image-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/cypress-image.tar.zst
+          key: cypress/included:15.18.1
+
+      - name: Load pulled docker images
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+
+      - name: Load pulled Cypress image
+        run: zstd -d /tmp/cypress-image.tar.zst --stdout | docker load
+
+      - name: Run tests
         uses: ./.github/actions/test/e2e
         with:
           username: ${{ secrets.username }}
