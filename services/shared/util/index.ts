@@ -148,3 +148,11 @@ export const enrollmentTimeDateThreshold = new Date('2021-05-31')
 /** The start of the academic year after Oodi <-> Sisu transfer */
 export const enrollmentTimeDateThresholdAcademicYear = new Date('2021-08-01')
 export const enrollmentTimeDateThresholdYearCode = 72
+
+export const yearToYearCode = (year: number | string) => {
+  return (typeof year === 'string' ? parseInt(year) : year) - 1949
+}
+
+export const yearCodeToYear = (year: number | string) => {
+  return (typeof year === 'string' ? parseInt(year) : year) + 1949
+}

@@ -49,6 +49,7 @@ export const CourseTab = ({
     name: getTextIn(name)!,
   }))
 
+  if (courses.length === 0) return null
   const multipleCourses = courses.length > 1
 
   return (
@@ -78,10 +79,10 @@ export const CourseTab = ({
       <SingleCourseStats
         availableStats={availableStats}
         combineSubstitutions={combineSubstitutions}
+        coursecode={courses.at(0)!.code}
         loading={loading}
         openOrRegular={openOrRegular}
         programmes={programmes}
-        stats={stats[selected]}
         toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
         userHasAccessToAllStats={userHasAccessToAllStats}
       />

@@ -3,7 +3,7 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
-import { enrollmentTimeDateThreshold, getSemesterCodeAt } from '@oodikone/shared/util'
+import { enrollmentTimeDateThreshold, getSemesterCodeAt, yearCodeToYear, yearToYearCode } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
@@ -332,9 +332,13 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
 
   if (lastAttainmentDate?.date == null) return 0
 
-  const newestAttainmentDate = lastAttainmentDate?.date.getFullYear()
-  const attainmentDateThreshold = new Date(newestAttainmentDate - 6, 0, 1)
+  /** Amount of years before latest attainment that the attainment count is calcucated for */
+  const yearRange = 6
 
+  const newestAttainmentYear = lastAttainmentDate?.date.getFullYear()
+  const attainmentDateThreshold = new Date(newestAttainmentYear - yearRange, 0, 1)
+
+  /** Amount of attainments between latest-attainment-year - yearRange and latest attainment date */
   const attainmentsWithinThreshold = await CreditModel.count({
     where: {
       course_code: { [Op.in]: courseCodes },
@@ -343,9 +347,9 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
     },
   })
 
-  // MAGIC NUMBER
-  const maxAllowedAttainments = 1_000_000 // * Lower this value to get a smaller result if necessary
-  return Math.max(1, maxAllowedAttainments / attainmentsWithinThreshold)
+  /** Limit the allowed attainments to 15_000 during the $yearRange years */
+  const maxAllowedAttainments = 15_000 * yearRange
+  return Math.round(Math.max(1, maxAllowedAttainments / attainmentsWithinThreshold))
 }
 
 export const getCourseYearlyStats = async (
@@ -353,12 +357,12 @@ export const getCourseYearlyStats = async (
   separate: boolean,
   anonymizationSalt: string | null,
   combineSubstitutions: boolean,
-  fromYear = '1900',
-  toYear: string = new Date().getFullYear().toString()
+  fromYearCode = yearToYearCode(1950).toString(),
+  toYearCode: string = yearToYearCode(new Date().getFullYear()).toString()
 ) => {
   // Default to 1900 - currentYear+1 so that without parameters the api returns stats for all years
-  const from = new Date(`${fromYear}-08-01`) // FALL
-  const to = new Date(`${parseInt(toYear) + 1}-07-31`) // SPRING next year
+  const from = new Date(`${yearCodeToYear(fromYearCode)}-08-01`) // FALL
+  const to = new Date(`${yearCodeToYear(toYearCode) + 1}-07-31`) // SPRING next year
 
   const [credits, enrollments] = await Promise.all([
     CreditModel.findAll({

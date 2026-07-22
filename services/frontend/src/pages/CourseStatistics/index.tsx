@@ -28,6 +28,7 @@ import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetCourseStatsQuery } from '@/redux/courseStats'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 import { parseQueryParams } from '@/util/queryparams'
+import { yearToYearCode } from '@oodikone/shared/util'
 
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 
@@ -43,7 +44,7 @@ export const CourseStatistics = () => {
   const location = useLocation()
   const { courseCodes, separate, combineSubstitutions } = parseQueryParams(location.search)
 
-  const codes = JSON.parse(courseCodes ?? '[]')
+  const codes = JSON.parse(courseCodes ?? '[]') as string[]
   const [initialCourseCode] = codes
   const singleCourseStats = codes.length === 1
 
@@ -55,7 +56,16 @@ export const CourseStatistics = () => {
     data: courseStatsData = {},
     isFetching: isLoading,
     isSuccess,
-  } = useGetCourseStatsQuery({ codes, separate, combineSubstitutions }, { skip: skipQuery })
+  } = useGetCourseStatsQuery(
+    {
+      codes,
+      separate: separate === 'true',
+      combineSubstitutions: combineSubstitutions === 'true',
+      fromYearCode: '1',
+      toYearCode: yearToYearCode(new Date().getFullYear()).toString(),
+    },
+    { skip: skipQuery }
+  )
 
   useEffect(() => {
     setSelected(initialCourseCode)

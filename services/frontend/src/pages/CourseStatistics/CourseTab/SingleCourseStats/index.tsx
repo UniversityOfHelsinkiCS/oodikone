@@ -10,12 +10,14 @@ import { useLocation, useNavigate } from 'react-router'
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
+import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
 import { useSemesters } from '@/hooks/useSemesters'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { countTotalStats } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/countTotalStats'
 import { ResultTabs } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs'
 import { YearFilter } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/YearFilter'
 import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
+import { useGetCourseStatsQuery } from '@/redux/courseStats'
 import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
@@ -32,7 +34,7 @@ import {
 import { DropdownOption } from '@/types/dropdownOption'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
-import { enrollmentTimeDateThresholdYearCode } from '@oodikone/shared/util'
+import { enrollmentTimeDateThresholdYearCode, yearToYearCode } from '@oodikone/shared/util'
 
 const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
   if (!stat) {
@@ -51,8 +53,8 @@ const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentN
 }
 
 export const SingleCourseStats = ({
+  coursecode,
   availableStats,
-  stats,
   userHasAccessToAllStats,
 
   loading,
@@ -61,8 +63,8 @@ export const SingleCourseStats = ({
   programmes,
   combineSubstitutions,
 }: {
+  coursecode: string
   availableStats: AvailableStats
-  stats: CourseStat
   userHasAccessToAllStats: boolean
 
   loading: boolean
@@ -71,18 +73,50 @@ export const SingleCourseStats = ({
   programmes: CourseStudyProgramme[]
   combineSubstitutions: boolean
 }) => {
+  const [primary, setPrimary] = useState<string[]>([ALL.value])
+  const [comparison, setComparison] = useState<string[]>([])
+
+  // These are "incorrectly" reversed to allow them to be replaced with min/max when stats arrive
+  const [minFromYearCode, setMinFromYearCode] = useState(yearToYearCode(new Date().getFullYear()))
+  const [maxToYearCode, setMaxToYearCode] = useState(yearToYearCode(1950))
+
+  const [fromYearCode, setFromYearCode] = useState(yearToYearCode(1950))
+  const [toYearCode, setToYearCode] = useState(yearToYearCode(new Date().getFullYear()))
+  const [separate, setSeparate] = useState<boolean>(false)
+
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
   const { getTextIn } = useLanguage()
-  const [primary, setPrimary] = useState<string[]>([ALL.value])
-  const [comparison, setComparison] = useState<string[]>([])
-  const [fromYear, setFromYear] = useState(0)
-  const [toYear, setToYear] = useState(0)
-  const [separate, setSeparate] = useState<boolean>(false)
-  const { coursecode } = stats
-
   const { semesters, years: semesterYears } = useSemesters()
+  const {
+    data: courseStatistics = {},
+    isFetching: isLoading,
+    isSuccess,
+  } = useGetCourseStatsQuery(
+    {
+      codes: [coursecode],
+      separate,
+      combineSubstitutions,
+      fromYearCode: fromYearCode.toString(),
+      toYearCode: toYearCode.toString(),
+    },
+    { skip: loading }
+  )
+  const uniqueCourseCodes = [
+    ...new Set(
+      [coursecode].concat(
+        courseStatistics?.[coursecode]?.[openOrRegular]?.alternatives.flatMap(group =>
+          group.flatMap(({ code }) => code)
+        ) ?? []
+      )
+    ),
+  ]
+  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery(
+    { courseCodes: JSON.stringify(uniqueCourseCodes) },
+    { skip: isLoading || !isSuccess }
+  )
+
   const semestersReversed = Object.values(semesters ?? [])
     .map(({ semestercode, name, yearcode }) => ({
       key: semestercode,
@@ -106,13 +140,8 @@ export const SingleCourseStats = ({
     }
   }
 
-  const uniqueCourseCodes = [
-    ...new Set([coursecode].concat(stats.alternatives.flatMap(group => group.flatMap(({ code }) => code)))),
-  ]
-
-  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
-    courseCodes: JSON.stringify(uniqueCourseCodes),
-  })
+  // NOTE: Can be undefined if query is still querying
+  const stats: CourseStat | undefined = courseStatistics[coursecode]?.[openOrRegular]
 
   let maxYearsToCreatePopulationFrom = 0
   if (maxYears) {
@@ -135,16 +164,21 @@ export const SingleCourseStats = ({
     }
     dispatch(setSelectedCourse(coursecode))
 
-    const yearCodes = stats.statistics.map(stat => stat.yearCode)
-    const initFromYear = min(yearCodes) ?? 0
-    const initToYear = max(yearCodes) ?? 0
-    setFromYear(initFromYear)
-    setToYear(initToYear)
+    const yearCodes = stats?.statistics.map(stat => stat.yearCode)
+    const initFromYear = min(yearCodes) ?? yearToYearCode(1950)
+    const initToYear = max(yearCodes) ?? yearToYearCode(new Date().getFullYear())
+    setFromYearCode(initFromYear)
+    setToYearCode(initToYear)
+
+    if (yearCodes) {
+      setMaxToYearCode(max([maxToYearCode, ...yearCodes]))
+      setMinFromYearCode(min([minFromYearCode, ...yearCodes]))
+    }
 
     return () => {
       dispatch(clearSelectedCourse())
     }
-  }, [])
+  }, [isSuccess])
 
   useEffect(() => {
     if (location.search) {
@@ -204,9 +238,9 @@ export const SingleCourseStats = ({
   }
 
   const filteredYearsAndSemesters = () => {
-    const yearCodes = stats.statistics.map(stat => stat.yearCode)
-    const from = min(yearCodes)
-    const to = max(yearCodes)
+    const from = minFromYearCode
+    const to = maxToYearCode
+
     if (from == null || to == null) {
       return {
         filteredYears: semesterYearsReversed,
@@ -221,7 +255,7 @@ export const SingleCourseStats = ({
   }
 
   const isStatInYearRange = ({ name }: { name: Name | string }) => {
-    const timeFilter = ({ value }: { value: number }) => value >= fromYear && value <= toYear
+    const timeFilter = ({ value }: { value: number }) => value >= fromYearCode && value <= toYearCode
     const filteredSemesters = semestersReversed.filter(timeFilter)
     const filteredYears = semesterYearsReversed.filter(timeFilter)
     if (separate) {
@@ -305,7 +339,7 @@ export const SingleCourseStats = ({
   }
 
   const statsForProgrammes = (programmeCodes: string[], name: string) => {
-    if (programmeCodes.length === 0) {
+    if (programmeCodes.length === 0 || !stats) {
       return undefined
     }
     const { statistics } = stats
@@ -389,15 +423,17 @@ export const SingleCourseStats = ({
 
   const handleToYearChange = event => {
     const newYear = event.target.value as number
-    if (newYear >= fromYear) {
-      setToYear(newYear)
+    if (newYear >= fromYearCode) {
+      setToYearCode(newYear)
+      setMaxToYearCode(max([maxToYearCode, newYear]))
     }
   }
 
   const handleFromYearChange = event => {
     const newYear = event.target.value as number
-    if (newYear <= toYear) {
-      setFromYear(newYear)
+    if (newYear <= toYearCode) {
+      setFromYearCode(newYear)
+      setMinFromYearCode(min([minFromYearCode, newYear]))
     }
   }
 
@@ -450,8 +486,8 @@ export const SingleCourseStats = ({
 
   const showPopulation = () => {
     const queryObject = {
-      from: fromYear,
-      to: toYear,
+      from: fromYearCode,
+      to: toYearCode,
       coursecodes: JSON.stringify([coursecode]),
       separate,
       unifyCourses: openOrRegular,
@@ -475,7 +511,7 @@ export const SingleCourseStats = ({
   const statistics = filteredProgrammeStatistics()
   const { filteredYears } = filteredYearsAndSemesters()
 
-  const timeFilter = (_, value: string) => Number(value) >= fromYear && Number(value) <= toYear
+  const timeFilter = (_, value: string) => Number(value) >= fromYearCode && Number(value) <= toYearCode
   const filteredProgrammes = programmes
     .map(programme => {
       const students = new Set(flatten(Object.values(pickBy(programme.students, timeFilter))))
@@ -483,7 +519,7 @@ export const SingleCourseStats = ({
     })
     .filter(programme => programme.size > 0)
 
-  if (stats.statistics.length < 1) {
+  if (stats?.statistics.length < 1) {
     return <Section>No data for selected course</Section>
   }
 
@@ -506,13 +542,13 @@ export const SingleCourseStats = ({
       <Section title="Statistics by time range">
         <Stack direction="row" gap={2}>
           <YearFilter
-            fromYear={fromYear}
+            fromYear={fromYearCode}
             handleFromYearChange={handleFromYearChange}
             handleToYearChange={handleToYearChange}
-            toYear={toYear}
+            toYear={toYearCode}
             years={filteredYears}
           />
-          {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
+          {maxYearsToCreatePopulationFrom < toYearCode - fromYearCode + 1 ? (
             <Tooltip arrow placement="right" title={maxYearText}>
               <span>{renderShowPopulation(true)}</span>
             </Tooltip>
@@ -557,17 +593,21 @@ export const SingleCourseStats = ({
           </Stack>
         </Section>
       ) : null}
-      <ResultTabs
-        availableStats={availableStats}
-        combineSubstitutions={combineSubstitutions}
-        comparison={statistics.comparison}
-        courseCodes={[coursecode]}
-        loading={loading}
-        openOrRegular={openOrRegular}
-        primary={statistics.primary}
-        separate={separate}
-        toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
-      />
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : (
+        <ResultTabs
+          availableStats={availableStats}
+          combineSubstitutions={combineSubstitutions}
+          comparison={statistics.comparison}
+          courseCodes={[coursecode]}
+          loading={loading}
+          openOrRegular={openOrRegular}
+          primary={statistics.primary}
+          separate={separate}
+          toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
+        />
+      )}
     </Stack>
   )
 }
