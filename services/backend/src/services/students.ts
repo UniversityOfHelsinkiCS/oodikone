@@ -4,7 +4,7 @@ import type { Credit, Student } from '@oodikone/shared/models'
 import { CreditTypeCode, EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
-import { dateIsBetween, dateMaxFromList } from '@oodikone/shared/util/datetime'
+import { dateMaxFromList } from '@oodikone/shared/util/datetime'
 import {
   StudentModel,
   CreditModel,
@@ -141,7 +141,7 @@ export const findByCourseAndSemesters = async (
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
     },
-    order: ['semestercode'],
+    order: [['semestercode', 'ASC']],
     limit: 1,
     raw: true,
   })
@@ -159,8 +159,8 @@ export const findByCourseAndSemesters = async (
     return []
   }
 
-  const { startdate } = startSemester
-  const { enddate } = endSemester
+  const { startdate: startDate } = startSemester
+  const { enddate: endDate } = endSemester
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
@@ -175,6 +175,7 @@ export const findByCourseAndSemesters = async (
     where: {
       course_code: { [Op.in]: codes },
       is_open: unifyStatus,
+      attainment_date: { [Op.between]: [startDate, endDate] },
       credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
     },
     order: [
@@ -195,6 +196,9 @@ export const findByCourseAndSemesters = async (
     where: {
       course_code: { [Op.in]: codes },
       is_open: unifyStatus,
+      enrollment_date_time: {
+        [Op.between]: [dateMaxFromList(startDate, enrollmentTimeDateThresholdAcademicYear), endDate],
+      },
       state: EnrollmentState.ENROLLED,
     },
     order: [['enrollment_date_time', 'DESC']],
@@ -236,26 +240,11 @@ export const findByCourseAndSemesters = async (
       entry => entry.type === 'enrollment' && codes.includes(entry.course_code)
     )
 
-    if (
-      latestCredit &&
-      passedCreditTypes.includes(latestCredit.credittypecode!) &&
-      dateIsBetween(latestCredit.date, startdate, enddate)
-    ) {
+    if (latestCredit && passedCreditTypes.includes(latestCredit.credittypecode!)) {
       filteredStudentNumbers.add(studentNumber)
-    } else if (
-      latestCredit &&
-      latestCredit.credittypecode === CreditTypeCode.FAILED &&
-      dateIsBetween(latestCredit.date, startdate, enddate)
-    ) {
+    } else if (latestCredit?.credittypecode === CreditTypeCode.FAILED) {
       filteredStudentNumbers.add(studentNumber)
-    } else if (
-      latestEnrollment &&
-      dateIsBetween(
-        latestEnrollment.date,
-        dateMaxFromList(startdate, enrollmentTimeDateThresholdAcademicYear)!,
-        enddate
-      )
-    ) {
+    } else if (latestEnrollment) {
       filteredStudentNumbers.add(studentNumber)
     }
   })
