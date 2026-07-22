@@ -14,6 +14,9 @@ inputs:
   test_name:
     required: true
     description: 'Name of the test'
+  cache-key:
+    required: true
+    description: Name of the custom cache key
 
 runs:
   using: composite
@@ -34,6 +37,8 @@ runs:
       with:
         browser: firefox
         spec: ${{ inputs.spec }}
+        cache-key: ${{ inputs.cache-key }}
+        install: false
       env:
         CYPRESS_baseUrl: http://localhost:1337
 

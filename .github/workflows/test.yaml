@@ -350,6 +350,7 @@ jobs:
         with:
           path: |
             ~/.cache/Cypress
+            ~/.npm
           key: cypress-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install cypress
@@ -362,6 +363,7 @@ jobs:
           password: ${{ secrets.password }}
           spec: ${{ matrix.spec }}
           test_name: ${{ matrix.name }}
+          cache-key: cypress-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
   # === Other tests ===
   test_service_exit_statuses:
