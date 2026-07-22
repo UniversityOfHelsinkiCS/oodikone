@@ -340,6 +340,23 @@ jobs:
         with:
           node-version: 24
 
+      # Cache npm modules and Cypress binary folder
+      # we can use "package-lock.json" as the key file
+      # to make sure we use the precise Cypress version
+      # (which is important when using ^ version in package.json)
+      # see https://github.com/actions/cache
+      - name: Cache npm and Cypress 📦
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/Cypress
+            node_modules
+          key: cypress-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci
+
       - name: 'Run tests'
         uses: ./.github/actions/test/e2e
         with:
