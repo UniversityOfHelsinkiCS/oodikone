@@ -31,8 +31,6 @@
     "flushredis": "docker exec -it oodikone-redis redis-cli flushall",
     "prepare": "husky",
     "install:local": "npm i && npm i --prefix services/shared && npm i --prefix services/frontend && npm i --prefix services/backend && npm i --prefix updater/sis-updater-scheduler && npm i --prefix updater/sis-updater-worker",
-    "install:docker": "docker exec oodikone-frontend sh -lc \"npm i --prefix /opt/app-root/shared && npm i \" && docker exec oodikone-backend npm i && docker exec oodikone-updater-scheduler npm i && docker exec oodikone-updater-worker npm i",
-    "install:both": "npm run install:local && npm run install:docker",
     "ci:local": "npm ci && npm ci --prefix services/shared && npm ci --prefix services/frontend && npm ci --prefix services/backend && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker",
     "ci:docker": "docker exec oodikone-frontend sh -lc \"npm ci --prefix /opt/app-root/shared && npm ci\" && docker exec oodikone-backend npm ci && docker exec oodikone-updater-scheduler npm ci && docker exec oodikone-updater-worker npm ci",
     "ci:both": "npm run ci:local && npm run ci:docker"
