@@ -43,6 +43,41 @@ jobs:
           environment: 'staging'
           release_version: ${{ github.sha }}
 
+  # === Cache docker images ===
+  pull_docker_images:
+    name: 'Pull all needed docker images and cache them'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Login to toska docker registry
+        uses: docker/login-action@v4
+        with:
+          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+
+      - name: Pull required images
+        run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
+
+      - name: Save Docker images for downstream jobs
+        run: |
+          docker save \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
+            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db \
+            "quay.io/toska/jami:production" \
+            redis:7.2.6 \
+            postgres:15.10 \
+            nginx:latest \
+          | zstd -T0 -3 -o /tmp/docker-images.tar.zst
+
+      - name: Cache pulled docker images
+        id: cache-images
+        uses: actions/cache@v6
+        with:
+          path: /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
   # === Update databases ===
   check_migration_files:
     name: Check if new migrations have been added
@@ -77,6 +112,7 @@ jobs:
       needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
       - check_migration_files
+      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
@@ -89,6 +125,17 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: 'Load Docker images'
+        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
@@ -104,6 +151,7 @@ jobs:
       needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
       - check_migration_files
+      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
@@ -132,6 +180,7 @@ jobs:
       needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
       - check_migration_files
+      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
