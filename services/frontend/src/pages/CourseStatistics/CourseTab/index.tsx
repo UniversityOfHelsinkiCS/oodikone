@@ -79,7 +79,7 @@ export const CourseTab = ({
       <SingleCourseStats
         availableStats={availableStats}
         combineSubstitutions={combineSubstitutions}
-        coursecode={courses.at(0)!.code}
+        coursecode={selected}
         loading={loading}
         openOrRegular={openOrRegular}
         programmes={programmes}
