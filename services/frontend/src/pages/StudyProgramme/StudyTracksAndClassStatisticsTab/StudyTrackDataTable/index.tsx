@@ -1,6 +1,4 @@
-import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
@@ -15,6 +13,7 @@ import { SingleStudyTrackRow } from '@/pages/StudyProgramme/StudyTracksAndClassS
 import { getRowKey } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
+import { StyledTable } from '@/components/common/StyledTable'
 
 const getSpanValue = (combinedProgramme: string, index: number, showPercentages: boolean) => {
   if (combinedProgramme && showPercentages) return index + 2
@@ -89,16 +88,21 @@ export const StudyTrackDataTable = ({
   titles: string[]
   years: string[]
 }) => {
-  const [show, setShow] = useState<boolean[]>([])
+  'use memo'
+  const [expandedRows, setExpandedRows] = useState<boolean[]>([])
 
   if (!dataOfAllTracks && !dataOfSingleTrack) {
     return null
   }
 
-  const firstCellClicked = (index: number) => {
-    const newShow = [...show]
-    show[index] = newShow[index] === undefined ? true : !show[index]
-    setShow([...show])
+  const handleRowExpand = (index: number) => {
+    setExpandedRows(prev => {
+      const updatedVisibleRows = [...prev]
+
+      updatedVisibleRows[index] = !updatedVisibleRows[index]
+
+      return updatedVisibleRows
+    })
   }
 
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
@@ -106,8 +110,8 @@ export const StudyTrackDataTable = ({
   const calendarYears = getCalendarYears(years)
 
   return (
-    <TableContainer component={Card} variant="outlined">
-      <Table data-cy="study-tracks-and-class-statistics-data-table" size="small">
+    <TableContainer>
+      <StyledTable data-cy="study-tracks-and-class-statistics-data-table" showCellBorders slimBody>
         <TableHead>
           <TableRow>
             <TableCell colSpan={!showPercentages ? 3 : 4} />
@@ -169,8 +173,8 @@ export const StudyTrackDataTable = ({
                       otherCountriesStats={otherCountriesStats}
                       populationLinkVisible={populationLinkVisible}
                       row={row}
-                      setShow={() => firstCellClicked(index)}
-                      show={show[index]}
+                      setShow={() => handleRowExpand(index)}
+                      show={expandedRows[index]}
                       showPercentages={showPercentages}
                       studyTracks={studyTracks}
                       yearlyData={yearlyData}
@@ -180,7 +184,7 @@ export const StudyTrackDataTable = ({
                 )}
           </TableBody>
         ) : null}
-      </Table>
+      </StyledTable>
     </TableContainer>
   )
 }
