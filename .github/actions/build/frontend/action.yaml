@@ -37,6 +37,16 @@ runs:
         username: toska+github
         password: ${{ inputs.registry_password }}
 
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v6
+      with:
+        images: |
+          quay.io/toska/oodikone-frontend
+        tags: |
+          ${{ inputs.environment }}
+          ${{ github.sha }}
+
     - name: Get current time
       id: get_current_time
       shell: bash
@@ -57,8 +67,6 @@ runs:
           BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '') }}
         push: ${{ inputs.push }}
-        tags: |
-          ${{ inputs.environment }}
-          ${{ github.sha }}
+        tags: ${{ steps.meta.outputs.tags }}
       env:
         DOCKER_BUILD_SUMMARY: false

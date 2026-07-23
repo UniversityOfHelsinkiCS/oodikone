@@ -33,6 +33,16 @@ runs:
         username: toska+github
         password: ${{ inputs.registry_password }}
 
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v6
+      with:
+        images: |
+          quay.io/toska/updater-scheduler
+        tags: |
+          ${{ inputs.environment }}
+          ${{ github.sha }}
+
     - name: 'Build image and export it'
       id: build-image-action
       uses: docker/build-push-action@v7
@@ -45,8 +55,6 @@ runs:
           SENTRY_ENVIRONMENT=${{ inputs.environment }}
           SENTRY_RELEASE=${{ inputs.release_version }}
         push: ${{ inputs.push }}
-        tags: |
-          ${{ inputs.environment }}
-          ${{ github.sha }}
+        tags: ${{ steps.meta.outputs.tags }}
       env:
         DOCKER_BUILD_SUMMARY: false
