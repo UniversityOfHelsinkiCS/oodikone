@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
-      ${{ !needs.check_docker_cache_expired.outputs.expired }}
+      ${{ needs.check_docker_cache_expired.outputs.expired != 'true' }}
     needs: check_docker_cache_expired
     steps:
       - uses: actions/checkout@v7
