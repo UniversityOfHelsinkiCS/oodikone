@@ -100,7 +100,9 @@ export const GradeDistribution = ({
               <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
                 <CourseFilterToggle courseCode={code} courseName={name} />
                 {!onlyIamRights ? (
-                  <Link to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false`}>
+                  <Link
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=true`}
+                  >
                     <NorthEastIcon sx={{ ml: 1 }} />
                   </Link>
                 ) : null}
