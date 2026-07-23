@@ -32,9 +32,12 @@ runs:
           /tmp/docker-images.tar.zst
         key: docker-images-${{ github.sha }}
 
-    - name: 'Load Docker images'
+    - name: Load Docker images (or skip if missing)
       shell: bash
-      run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      run: |
+        if [ -f /tmp/docker-images.tar.zst ]; then
+          zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+        fi
 
     - name: Start oodikone (without frontend and backend)
       shell: bash

@@ -46,9 +46,26 @@ jobs:
           push: false
 
   # === Cache docker images ===
+  check_docker_cache_expired:
+    name: Check if docker image cache has been "expired", eg. one of the db's has been updated
+    runs-on: ubuntu-latest
+    needs:
+      - check_migration_files
+      - check_updater_changed
+    outputs:
+      expired: ${{
+        (needs.check_updater_changed.outputs.has_updater_changed == 'true') ||
+        (needs.check_migration_files.outputs.kone_db_migrations  == 'true') ||
+        (needs.check_migration_files.outputs.user_db_migrations  == 'true') ||
+        (needs.check_migration_files.outputs.sis_db_migrations   == 'true') }}
+
   pull_docker_images:
     name: 'Pull all needed docker images and cache them'
     runs-on: ubuntu-latest
+    if: |
+      !cancelled() && !failure() &&
+      ${{ !needs.check_docker_cache_expired.outputs.expired }}
+    needs: check_docker_cache_expired
     steps:
       - uses: actions/checkout@v7
       - name: Login to toska docker registry
@@ -137,8 +154,11 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
@@ -177,8 +197,11 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
@@ -217,8 +240,11 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
@@ -281,8 +307,11 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
       - name: Start worker containers
         run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --quiet-pull --detach --wait
@@ -501,8 +530,11 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: 'Load Docker images'
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
       - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --wait
