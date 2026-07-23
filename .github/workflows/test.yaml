@@ -61,8 +61,8 @@ jobs:
 
     # This action has no steps as all is done inside outputs
     steps:
-      name: All done
-      run: exit 0
+      - name: All done
+        run: exit 0
 
   pull_docker_images:
     name: 'Pull all needed docker images and cache them'
