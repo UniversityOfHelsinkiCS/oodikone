@@ -31,6 +31,7 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
+          push: false
 
   build_frontend:
     name: 'Build frontend'
@@ -42,6 +43,7 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
+          push: false
 
   # === Cache docker images ===
   pull_docker_images:

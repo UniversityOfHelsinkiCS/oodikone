@@ -37,15 +37,8 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
-
-      - name: Push to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          push: true
+          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
 
   release_frontend:
     name: 'Build and release frontend'
@@ -61,15 +54,8 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
-
-      - name: Push to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          push: true
+          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
 
   release_updater_worker:
     name: 'Build and release updater worker'
@@ -85,15 +71,8 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
-
-      - name: Push to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          push: true
+          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
 
   release_updater_scheduler:
     name: 'Build and release updater scheduler'
@@ -109,15 +88,8 @@ jobs:
         with:
           environment: 'staging'
           release_version: ${{ github.sha }}
-
-      - name: Push to quay.io
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
-          registry: quay.io/toska
-          username: toska+github
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          push: true
+          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
 
   report_success:
     name: 'Report deployment success to the "oodikone_notifications" channel'
