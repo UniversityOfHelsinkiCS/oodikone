@@ -46,31 +46,17 @@ jobs:
           push: false
 
   # === Cache docker images ===
-  check_docker_cache_expired:
-    name: Check if docker image cache has been "expired", eg. one of the db's has been updated
-    runs-on: ubuntu-latest
-    needs:
-      - check_migration_files
-      - check_updater_changed
-    outputs:
-      expired: ${{
-        (needs.check_updater_changed.outputs.has_updater_changed == 'true') ||
-        (needs.check_migration_files.outputs.kone_db_migrations  == 'true') ||
-        (needs.check_migration_files.outputs.user_db_migrations  == 'true') ||
-        (needs.check_migration_files.outputs.sis_db_migrations   == 'true') }}
-
-    # This action has no steps as all is done inside outputs
-    steps:
-      - name: All done
-        run: exit 0
-
   pull_docker_images:
-    name: 'Pull all needed docker images and cache them'
+    name: Pull all needed docker images and cache them (if dbs have not changed)
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
-      ${{ needs.check_docker_cache_expired.outputs.expired != 'true' }}
-    needs: check_docker_cache_expired
+      ${{
+        (needs.check_updater_changed.outputs.has_updater_changed != 'true') &&
+        (needs.check_migration_files.outputs.kone_db_migrations  != 'true') &&
+        (needs.check_migration_files.outputs.user_db_migrations  != 'true') &&
+        (needs.check_migration_files.outputs.sis_db_migrations   != 'true')
+      }}
     steps:
       - uses: actions/checkout@v7
       - name: Login to toska docker registry
