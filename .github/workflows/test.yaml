@@ -418,9 +418,10 @@ jobs:
           - name: 'Test degree programme overview'
             spec: cypress/e2e/Degree_programme_overview.js
           - name: 'Test teachers and users'
+            # For multifile specs the latter ones need to be prefixed with --spec
             spec: |
               cypress/e2e/Teachers.js
-              cypress/e2e/Users.js
+              --spec cypress/e2e/Users.js
           - name: 'Test faculty statistics'
             spec: cypress/e2e/Faculty_statistics.js
           - name: 'Test language center view'
