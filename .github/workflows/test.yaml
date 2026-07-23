@@ -137,7 +137,6 @@ jobs:
       needs.check_migration_files.outputs.sis_db_migrations == 'true'
     needs:
       - check_migration_files
-      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
@@ -150,20 +149,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         run: |
@@ -179,7 +164,6 @@ jobs:
       needs.check_migration_files.outputs.kone_db_migrations == 'true'
     needs:
       - check_migration_files
-      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
@@ -193,20 +177,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
@@ -222,7 +192,6 @@ jobs:
       needs.check_migration_files.outputs.user_db_migrations == 'true'
     needs:
       - check_migration_files
-      - pull_docker_images
       - build_backend
       - build_frontend
       - lint_packages
@@ -236,20 +205,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
         run: |
@@ -304,20 +259,6 @@ jobs:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
 
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
-
       - name: Start worker containers
         run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --quiet-pull --detach --wait
 
@@ -350,6 +291,7 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
+      - pull_docker_images
     strategy:
       fail-fast: false
 
@@ -369,6 +311,7 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
+      - pull_docker_images
     strategy:
       fail-fast: false
 
@@ -402,6 +345,7 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
+      - pull_docker_images
 
     steps:
       - uses: actions/checkout@v7
@@ -434,6 +378,7 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
+      - pull_docker_images
       - cache_cypress_image
     strategy:
       fail-fast: false
@@ -517,6 +462,7 @@ jobs:
       !cancelled() && !failure()
     needs:
       - run_updater_updates
+      - pull_docker_images
 
     steps:
       - uses: actions/checkout@v7
