@@ -197,7 +197,12 @@ export const FacultyStudentDataTable = ({
                         key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
                         sx={{ textAlign: 'right' }}
                       >
-                        {value}
+                        <Typography
+                          color={value.toString().includes('%') ? 'text.secondary' : 'text.primary'}
+                          variant="body2"
+                        >
+                          {value}
+                        </Typography>
                       </TableCell>
                     )
                   })}
