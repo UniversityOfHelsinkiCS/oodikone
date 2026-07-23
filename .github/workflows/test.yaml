@@ -430,11 +430,17 @@ jobs:
             /tmp/cypress-image.tar.zst
           key: cypress-image-${{ github.sha }}
 
-      - name: Load pulled docker images
-        run: zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
 
-      - name: Load pulled Cypress image
-        run: zstd -d /tmp/cypress-image.tar.zst --stdout | docker load
+      - name: Load Cypress image (or skip if missing)
+        run: |
+          if [ -f /tmp/cypress-image.tar.zst ]; then
+            zstd -d /tmp/cypress-image.tar.zst --stdout | docker load
+          fi
 
       - name: Run tests
         uses: ./.github/actions/test/e2e
