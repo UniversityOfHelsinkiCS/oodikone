@@ -525,7 +525,7 @@ describe('Course yearly statistics (smaller timeframes)', () => {
   ])('should include correct stats for one academic year (TKT10002, $0)', async (year, categories, grades) => {
     const res = (await request(app)
       .get(
-        `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0)!)}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
+        `/courseyearlystats?codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0))}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
       )
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
