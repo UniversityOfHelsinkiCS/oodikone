@@ -277,8 +277,10 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
       - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
     strategy:
       fail-fast: false
 
@@ -297,8 +299,10 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
       - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
     strategy:
       fail-fast: false
 
@@ -331,8 +335,10 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
       - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
 
     steps:
       - uses: actions/checkout@v7
@@ -365,8 +371,10 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
       - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
       - cache_cypress_image
     strategy:
       fail-fast: false
@@ -455,8 +463,10 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - run_updater_updates
       - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
 
     steps:
       - uses: actions/checkout@v7
