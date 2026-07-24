@@ -193,7 +193,7 @@ describe('Numbers should match between', () => {
       })
     })
     it('in Course population', () => {
-      test.forEach(([year, total, passed, _notCompleted, failed, enrolledNoGrade]) => {
+      test.forEach(([year, total, passed, failed, enrolledNoGrade, _notCompleted]) => {
         cy.init(
           // year - 1949 yields the correct year code
           `/coursepopulation?from=${year - 1949}&to=${year - 1949}&coursecodes=%5B%22MAT21003%22%5D&includeSubstitutions=false`,
@@ -208,16 +208,16 @@ describe('Numbers should match between', () => {
           cy.contains('li', 'MAT21003 - Vektorianalyysi I').click() // "code - name"
         })
 
-        selectCourseStatus(course.at(1), 'All')
+        selectCourseStatus('MAT21003', 'All')
         cy.contains(`Students (${total})`)
 
-        selectCourseStatus(course.at(1), 'Passed')
+        selectCourseStatus('MAT21003', 'Passed')
         cy.contains(`Students (${passed})`)
 
-        selectCourseStatus(course.at(1), 'Failed')
+        selectCourseStatus('MAT21003', 'Failed')
         cy.contains(`Students (${failed})`)
 
-        selectCourseStatus(course.at(1), 'Enrolled, No Grade')
+        selectCourseStatus('MAT21003', 'Enrolled, No Grade')
         cy.contains(`Students (${enrolledNoGrade})`)
       })
     })
