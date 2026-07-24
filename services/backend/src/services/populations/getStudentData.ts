@@ -50,8 +50,12 @@ export type StudentEnrollment = Pick<
   Enrollment,
   'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
 >
-export const getEnrollments = (studentNumbers: string[], startDate: string): Promise<Array<StudentEnrollment>> => {
-  return EnrollmentModel.findAll({
+export const getEnrollments = (
+  studentNumbers: string[],
+  startDate: string,
+  endDate: string
+): Promise<Array<StudentEnrollment>> =>
+  EnrollmentModel.findAll({
     attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
     where: {
       studentnumber: {
@@ -59,12 +63,11 @@ export const getEnrollments = (studentNumbers: string[], startDate: string): Pro
       },
       state: EnrollmentState.ENROLLED,
       enrollment_date_time: {
-        [Op.gte]: dateMaxFromList(new Date(startDate), enrollmentTimeDateThreshold),
+        [Op.between]: [dateMaxFromList(new Date(startDate), enrollmentTimeDateThreshold), new Date(endDate)],
       },
     },
     raw: true,
   })
-}
 
 type StudentPersonalData = Pick<
   Student,
@@ -195,8 +198,13 @@ export type StudentCredit = Pick<
   | 'studyright_id'
 >
 
-export const getCredits = async (studentNumbers: string[]): Promise<Array<StudentCredit>> =>
+export const getCredits = async (
+  studentNumbers: string[],
+  startDate: string,
+  endDate: string
+): Promise<Array<StudentCredit>> =>
   CreditModel.findAll({
+    raw: true,
     attributes: [
       'grade',
       'credits',
@@ -210,8 +218,8 @@ export const getCredits = async (studentNumbers: string[]): Promise<Array<Studen
     ],
     where: {
       student_studentnumber: { [Op.in]: studentNumbers },
+      attainment_date: { [Op.between]: [startDate, endDate] },
     },
-    raw: true,
   })
 
 export const getStudyRightElementsForStudyRight = async (studentNumbers: string[], code: string) =>

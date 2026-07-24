@@ -29,7 +29,7 @@ import { getStudentTagMap } from '../services/populations/getStudentData'
 import { parseDateRangeFromParams } from '../services/populations/shared'
 import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
-import { findByCourseAndSemesters } from '../services/students'
+import { findByCourseAndSemesters, getStartAndEndDates } from '../services/students'
 import { getFullStudyProgrammeRights, handleQueryArrays, hasFullAccessToStudentData } from '../util'
 
 const router = Router()
@@ -208,9 +208,17 @@ router.get<
     ? new Set(studentNumbers)
     : new Set(allStudentsUserCanAccess)
 
+  const { startDate: startDate, endDate: endDate } = await getStartAndEndDates(Number(from), Number(to), isSeparate)
+
   const studyRights = []
   const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
-  const result = await statisticsOf(studentNumbers, studyRights, tagMap)
+  const result = await statisticsOf(
+    studentNumbers,
+    studyRights,
+    tagMap,
+    startDate?.toISOString(),
+    endDate?.toISOString()
+  )
   const processed = obfuscateStuff({
     result,
 

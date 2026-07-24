@@ -122,21 +122,7 @@ const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] =>
   }
 }
 
-/**
-  Returns students whose latest "active" attainment/enrollment is between to and from.
-
-  NOTE: If you have failed a course in 2021 and passed the same course in 2023
-  you would not be included in from=2020 to=2022 query
-
- */
-export const findByCourseAndSemesters = async (
-  codes: string[],
-  from: number,
-  to: number,
-  separate: boolean,
-  unifyCourses: UnifyStatus = 'unifyStats'
-) => {
-  /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
+export const getStartAndEndDates = async (from: number, to: number, separate: boolean) => {
   const startSemester = await SemesterModel.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
@@ -156,11 +142,28 @@ export const findByCourseAndSemesters = async (
   })
 
   if (!startSemester || !endSemester) {
-    return []
+    return {}
   }
 
   const { startdate: startDate } = startSemester
   const { enddate: endDate } = endSemester
+
+  return { startDate, endDate }
+}
+
+/**
+  Returns students who have an attainment/enrollment between to and from.
+ */
+export const findByCourseAndSemesters = async (
+  codes: string[],
+  from: number,
+  to: number,
+  separate: boolean,
+  unifyCourses: UnifyStatus = 'unifyStats'
+) => {
+  /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
+
+  const { startDate: startDate, endDate: endDate } = await getStartAndEndDates(from, to, separate)
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
@@ -197,7 +200,7 @@ export const findByCourseAndSemesters = async (
       course_code: { [Op.in]: codes },
       is_open: unifyStatus,
       enrollment_date_time: {
-        [Op.between]: [dateMaxFromList(startDate, enrollmentTimeDateThresholdAcademicYear), endDate],
+        [Op.between]: [dateMaxFromList(startDate ?? new Date(0), enrollmentTimeDateThresholdAcademicYear), endDate],
       },
       state: EnrollmentState.ENROLLED,
     },

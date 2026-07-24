@@ -30,16 +30,18 @@ export const statisticsOf = async (
   studentNumbers: string[],
   studyRights: string[],
   tagMap: Map<string, StudentTags[]>,
-  startDate?: string
+  startDate?: string,
+  endDate?: string
 ) => {
   const code = studyRights[0] ?? ''
   const mockedStartDate = startDate ?? new Date(1900, 0, 1).toISOString()
+  const mockedEndDate = endDate ?? new Date(new Date().getFullYear(), 0, 1).toISOString()
 
   const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
     await Promise.all([
       getStudents(studentNumbers),
-      getEnrollments(studentNumbers, mockedStartDate),
-      getCredits(studentNumbers),
+      getEnrollments(studentNumbers, mockedStartDate, mockedEndDate),
+      getCredits(studentNumbers, mockedStartDate, mockedEndDate),
       getDegreeProgrammeType(code),
       getCriteria(code),
       getStudyRightElementsForStudyRight(studentNumbers, code),
