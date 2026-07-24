@@ -1,7 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 
 import { Section } from '@/components/Section'
-import { GraphStat } from '@/types/graphStat'
+import { GraphStat } from '@oodikone/shared/types/studyProgramme'
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
@@ -20,6 +20,7 @@ const formatNumber = (value: unknown) => {
 }
 
 export const BarChart = ({ id, graphStats, years }: { id: string; graphStats: GraphStat[]; years: number[] }) => {
+  'use memo'
   if (!graphStats || !id || !years) {
     return null
   }

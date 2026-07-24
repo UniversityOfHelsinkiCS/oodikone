@@ -38,14 +38,16 @@ export type CreditStats = {
 
 export type CreditStatsPayload = Record<string, CreditStats>
 
+export type GraphStat = {
+  data: number[]
+  name: string
+}
+
 export type BasicStats = {
   id: string
-  years: number[]
-  graphStats: {
-    name: string
-    data: number[]
-  }[]
-  tableStats: number[][]
+  years: number[] | string[] // a year "2024" or a year range "2024 - 2025"
+  graphStats: GraphStat[]
+  tableStats: (string | number)[][]
   titles: string[]
 }
 

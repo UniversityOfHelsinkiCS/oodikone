@@ -1,4 +1,4 @@
-import { GraphStat } from '@/types/graphStat'
+import { GraphStat } from '@oodikone/shared/types/studyProgramme'
 
 const getFormattedYear = (year: number, isAcademicYear: boolean) => {
   if (isAcademicYear) {

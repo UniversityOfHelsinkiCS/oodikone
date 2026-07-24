@@ -1,6 +1,6 @@
-import { GraphStat } from '@/types/graphStat'
 import { DegreeProgrammeType, Name, NameWithCode } from '@oodikone/shared/types'
 import { ProgrammeFilter, SpecialGroups, YearType } from '@oodikone/shared/types/faculty'
+import { GraphStat } from '@oodikone/shared/types/studyProgramme'
 
 type Info = {
   graphStats: GraphStat[]

@@ -2,7 +2,7 @@ import ReactECharts from 'echarts-for-react'
 
 import { Section } from '@/components/Section'
 import { theme } from '@/theme'
-import { GraphStat } from '@/types/graphStat'
+import { GraphStat } from '@oodikone/shared/types/studyProgramme'
 
 export const LineGraph = ({
   cypress,
@@ -13,8 +13,9 @@ export const LineGraph = ({
   cypress: string
   exportFileName: string
   graphStats: GraphStat[]
-  years: number[]
+  years: number[] | string[]
 }) => {
+  'use memo'
   if (!graphStats) {
     return null
   }

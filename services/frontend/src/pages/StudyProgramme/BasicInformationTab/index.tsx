@@ -43,6 +43,7 @@ export const BasicInformationTab = ({
   specialGroupsExcluded: boolean
   studyProgramme: string
 }) => {
+  'use memo'
   const [view, setView] = useState<GraduationTimesProps['view']>('breakdown')
   const { getTextIn } = useLanguage()
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'

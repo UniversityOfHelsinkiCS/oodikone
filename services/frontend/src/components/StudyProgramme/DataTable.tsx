@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box'
+/* oxlint-disable react/no-array-index-key */
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
@@ -7,9 +7,11 @@ import TableRow from '@mui/material/TableRow'
 
 import { StyledTable } from '@/components/common/StyledTable'
 
-const getRowKey = (row: number) => `row-${row}`
-
-const getCellKey = (row: number, cell: number) => `row-${row}-cell-${cell}`
+const textAlign = (value: string | number, index: number) => {
+  if (index === 0) return 'center'
+  if (Number.isInteger(value)) return 'right'
+  return 'left'
+}
 
 export const DataTable = ({
   cypress,
@@ -20,23 +22,14 @@ export const DataTable = ({
   data: (number | string)[][]
   titles: (number | string)[]
 }) => {
+  'use memo'
   if (!data || !titles) {
     return null
   }
 
-  const textAlign = (value: string | number, index: number) => {
-    if (index === 0) {
-      return 'center'
-    }
-    if (Number.isInteger(value)) {
-      return 'right'
-    }
-    return 'left'
-  }
-
   return (
-    <TableContainer component={Box}>
-      <StyledTable data-cy={`${cypress}-data-table`} showCellBorders>
+    <TableContainer>
+      <StyledTable data-cy={`${cypress}-data-table`} nowrapBody slimHeader showCellBorders>
         <TableHead>
           <TableRow>
             {titles.map(title => (
@@ -48,9 +41,9 @@ export const DataTable = ({
         </TableHead>
         <TableBody>
           {data.map((yearArray, rowIndex) => (
-            <TableRow key={getRowKey(rowIndex)}>
+            <TableRow key={`row-${yearArray[0]}`}>
               {yearArray?.map((value, cellIndex) => (
-                <TableCell align={textAlign(value, cellIndex)} key={getCellKey(rowIndex, cellIndex)}>
+                <TableCell align={textAlign(value, cellIndex)} key={`row-${data[rowIndex]}-cell-${cellIndex}`}>
                   {value}
                 </TableCell>
               ))}
