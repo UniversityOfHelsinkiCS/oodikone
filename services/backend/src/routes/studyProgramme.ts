@@ -20,6 +20,7 @@ import { getStudyRightsInProgramme, getStudyTracksForProgramme } from '../servic
 import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
+import { yearToYearCode } from '@oodikone/shared/util'
 
 const router = Router()
 
@@ -103,16 +104,25 @@ router.get<StudyProgrammeParams, unknown, never, StatsRequestQuery>('/:id/gradua
 type CourseStatsQuery = {
   combinedProgramme: string
   yearType: YearType
+  fromYearCode?: string
+  toYearCode?: string
 }
 
 router.get<StudyProgrammeParams, unknown, never, CourseStatsQuery>('/:id/coursestats', async (req, res) => {
   const code = req.params.id
-  const { combinedProgramme, yearType } = req.query
+  const { combinedProgramme, yearType, fromYearCode, toYearCode } = req.query
   const date = new Date()
   date.setHours(23, 59, 59, 999)
   void logInfoForGrafana(code, combinedProgramme)
   try {
-    const data = await getStudyProgrammeCoursesForStudyTrack(date.getTime(), code, yearType, combinedProgramme)
+    const data = await getStudyProgrammeCoursesForStudyTrack(
+      date.getTime(),
+      code,
+      yearType,
+      combinedProgramme,
+      fromYearCode ?? '1', // 1950
+      toYearCode ?? yearToYearCode(new Date().getFullYear()).toString() // Current year
+    )
     return res.json(data)
   } catch (error) {
     logger.error({ message: `Failed to get code ${code} programme courses stats`, meta: `${error}` })

@@ -1,5 +1,5 @@
 import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
-import { mapToProviders, range } from '@oodikone/shared/util'
+import { mapToProviders, range, yearCodeToYear } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
@@ -127,10 +127,13 @@ const finalizeYearStats = (yearAccumulator: YearAccumulator): YearStats => {
   return stats
 }
 
-const getYearRange = async (unixMillis: number, isAcademicYear: boolean) => {
+/** Get all years between 2017 or fromYear and current academic/calendar year or toYear,
+ * whichever results in a smaller timeframe
+ */
+const getYearRange = async (unixMillis: number, isAcademicYear: boolean, fromYearCode: string, toYearCode: string) => {
   const startDate = isAcademicYear ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const lastYear = startDate.getFullYear()
-  return range(START_YEAR, lastYear + 1)
+  return range(Math.max(START_YEAR, yearCodeToYear(fromYearCode)), Math.min(lastYear, yearCodeToYear(toYearCode)) + 1)
 }
 
 /**
@@ -140,10 +143,12 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
   unixMillis: number,
   studyProgramme: string,
   academicYear: YearType,
-  combinedProgramme: string
+  combinedProgramme: string,
+  fromYearCode: string,
+  toYearCode: string
 ) => {
   const isAcademicYear = academicYear === 'ACADEMIC_YEAR'
-  const yearRange = await getYearRange(unixMillis, isAcademicYear)
+  const yearRange = await getYearRange(unixMillis, isAcademicYear, fromYearCode, toYearCode)
   if (yearRange.length === 0) {
     return []
   }
@@ -246,7 +251,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     yearRange.map(year => {
       const yearFrom = getFrom(academicYear, year)
       const yearTo = getTo(academicYear, year)
-      return getNotCompletedForProgrammeCourses(yearFrom, yearTo, programmeCourses)
+      return getNotCompletedForProgrammeCourses(yearFrom, yearTo, programmeCourses, from, to)
     })
   )
 

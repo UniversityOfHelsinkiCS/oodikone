@@ -29,7 +29,13 @@ export const getAllProgrammeCourses = async (providerCode: string) => {
   return courses
 }
 
-export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, programmeCourses: string[]) => {
+export const getNotCompletedForProgrammeCourses = async (
+  from: Date,
+  to: Date,
+  programmeCourses: string[],
+  start: Date,
+  end: Date
+) => {
   try {
     const enrollments: Array<
       Pick<EnrollmentModel, 'studentnumber' | 'course_code' | 'enrollment_date_time' | 'course'>
@@ -46,7 +52,10 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
           [Op.in]: programmeCourses,
         },
         enrollment_date_time: {
-          [Op.gte]: enrollmentTimeDateThresholdAcademicYear, // This has to be Academic year to match with Course statistics which doesn't display enrollments for ...-2021
+          [Op.and]: {
+            [Op.between]: [start, end],
+            [Op.gte]: enrollmentTimeDateThresholdAcademicYear, // This has to be Academic year to match with Course statistics which doesn't display enrollments for ...-2021
+          },
         },
         state: EnrollmentState.ENROLLED,
       },
@@ -65,6 +74,9 @@ export const getNotCompletedForProgrammeCourses = async (from: Date, to: Date, p
       where: {
         course_code: {
           [Op.in]: programmeCourses,
+        },
+        attainment_date: {
+          [Op.between]: [start, end],
         },
       },
       order: [

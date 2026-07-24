@@ -4,6 +4,7 @@ import { describe, it, beforeAll, assert } from 'vitest'
 
 import { StudyProgrammeCourse } from '@oodikone/shared/types'
 import { initTests, ResponseWithBody } from '../../utils'
+import { yearToYearCode } from '@oodikone/shared/util'
 
 const testData = [
   {
@@ -82,7 +83,7 @@ const testData = [
 ]
 
 /** This mostly checks that values are the same as in Course stats */
-void describe("Study programme's course stats", () => {
+void describe("Study programme's course stats (all years)", () => {
   let app: Express
   beforeAll(async () => {
     app = await initTests()
@@ -204,5 +205,131 @@ void describe("Study programme's course stats", () => {
       assert.strictEqual(year?.allNotPassed, 3, 'Incorrect amount of Not completed')
       assert.strictEqual(year?.allStudents, 20, 'Incorrect amount of Total students')
     })
+  })
+})
+
+void describe("Study programme's course stats (single year)", () => {
+  let app: Express
+  beforeAll(async () => {
+    app = await initTests()
+  })
+
+  it('should return stats for only queried years', async () => {
+    const res = (await request(app)
+      .get('/studyprogrammes/KH50_001/coursestats?yearType=ACADEMIC_YEAR&fromYearCode=68&toYearCode=68&')
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
+
+    assert.strictEqual(res.status, 200)
+
+    assert(!!res.body.find(course => course.code === 'MAT11002'), "Didn't find required course")
+    const course = res.body.find(course => course.code === 'MAT11002')!
+
+    assert.deepStrictEqual(
+      Object.keys(course.years),
+      ['2017'],
+      'Returned stats for incorrect years when querying only 2017'
+    )
+    assert.strictEqual(
+      Object.keys(course.years).length,
+      1,
+      'Returned incorrect amount of years when querying only 2017'
+    )
+  })
+
+  it('should count student with multiple grades multiple times in their respective years', async () => {
+    const res2017 = (await request(app)
+      .get(
+        `/studyprogrammes/KH50_001/coursestats?yearType=ACADEMIC_YEAR&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2017)}&`
+      )
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
+
+    const res2018 = (await request(app)
+      .get(
+        `/studyprogrammes/KH50_001/coursestats?yearType=ACADEMIC_YEAR&fromYearCode=${yearToYearCode(2018)}&toYearCode=${yearToYearCode(2018)}&`
+      )
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
+
+    // 2017
+    assert.strictEqual(res2017.status, 200)
+    assert(!!res2017.body.find(course => course.code === 'MAT21003'), "Didn't find required course")
+    const course2017 = res2017.body.find(course => course.code === 'MAT21003')!
+
+    assert('2017' in course2017.years, 'Stats for 2017 not found')
+    assert.strictEqual(course2017.years['2017'].allNotPassed, 1, 'Failed students should include only 539036')
+
+    // 2018
+    assert.strictEqual(res2018.status, 200)
+    assert(!!res2018.body.find(course => course.code === 'MAT21003'), "Didn't find required course")
+    const course2018 = res2018.body.find(course => course.code === 'MAT21003')!
+
+    assert('2018' in course2018.years, 'Stats for 2018 not found')
+    assert.strictEqual(
+      course2018.years['2018'].allNotPassed,
+      4,
+      'Failed students should include 539036, 540698, 542927 and 544688'
+    )
+  })
+})
+
+void describe("Study programme's course stats (few years)", () => {
+  let app: Express
+  beforeAll(async () => {
+    app = await initTests()
+  })
+
+  it('should return stats for only queried years', async () => {
+    const res = (await request(app)
+      .get(
+        `/studyprogrammes/KH50_001/coursestats?yearType=ACADEMIC_YEAR&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2018)}&`
+      )
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
+
+    assert.strictEqual(res.status, 200)
+
+    assert(!!res.body.find(course => course.code === 'MAT11002'), "Didn't find required course")
+    const course = res.body.find(course => course.code === 'MAT11002')!
+
+    assert.deepStrictEqual(
+      Object.keys(course.years),
+      ['2017', '2018'],
+      'Returned stats for incorrect years when querying 2017-2018'
+    )
+    assert.strictEqual(
+      Object.keys(course.years).length,
+      2,
+      'Returned incorrect amount of years when querying only 2017-2018'
+    )
+  })
+
+  it('should count student with multiple grades only once inside the timeframe', async () => {
+    const res = (await request(app)
+      .get(
+        `/studyprogrammes/KH50_001/coursestats?yearType=ACADEMIC_YEAR&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2018)}&`
+      )
+      .set('shib-session-id', 'test')
+      .set('uid', 'basic')
+      .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
+
+    assert.strictEqual(res.status, 200)
+    assert(!!res.body.find(course => course.code === 'MAT21003'), "Didn't find required course")
+    const course = res.body.find(course => course.code === 'MAT21003')!
+
+    assert('2017' in course.years, 'Stats for 2017 not found')
+    assert.strictEqual(course.years['2017'].allNotPassed, 0, 'Failed students should not contain anything')
+
+    assert('2018' in course.years, 'Stats for 2018 not found')
+    assert.strictEqual(
+      course.years['2018'].allNotPassed,
+      4,
+      'Failed students should include 539036, 540698, 542927 and 544688'
+    )
   })
 })
