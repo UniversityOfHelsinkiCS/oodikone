@@ -45,7 +45,7 @@ const getStartedStats = async ({
   isAcademicYear,
 }: {
   studyProgramme: string
-  years: number[]
+  years: number[] | string[]
   isAcademicYear: boolean
 }) => {
   const studyRightsOfProgramme = await getStudyRightsInProgramme(studyProgramme, false)
@@ -54,6 +54,7 @@ const getStartedStats = async ({
   const { semesters } = await getSemestersAndYears()
   const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
 
+  const now = new Date()
   for (const studyRight of studyRightsOfProgramme) {
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) {
@@ -68,7 +69,7 @@ const getStartedStats = async ({
     const startedInProgramme = new Date(studyRightElement.startDate)
     const startedInProgrammeYear = defineYear(startedInProgramme, isAcademicYear)
 
-    if (startedInProgramme >= new Date()) {
+    if (startedInProgramme >= now) {
       continue
     }
 
@@ -101,7 +102,7 @@ export const getGraduatedStats = async ({
   includeAllSpecials,
 }: {
   studyProgramme: string
-  years: number[]
+  years: number[] | string[]
   isAcademicYear: boolean
   includeAllSpecials: boolean
 }) => {
@@ -127,14 +128,14 @@ export const getGraduatedStats = async ({
   return { graphStats, tableStats }
 }
 
-const getTransferredStats = async ({
+const getTransferAndCancellationStats = async ({
   studyProgramme,
   years,
   isAcademicYear,
   combinedProgramme,
 }: {
   studyProgramme: string
-  years: number[]
+  years: number[] | string[]
   isAcademicYear: boolean
   combinedProgramme: string
 }) => {
@@ -142,9 +143,18 @@ const getTransferredStats = async ({
   const secondStudyRights = combinedProgramme ? await getStudyRightsInProgramme(combinedProgramme, false) : []
   const transferredAway = getStatsBasis(years)
   const transferredTo = getStatsBasis(years)
+  const cancelled = getStatsBasis(years)
 
-  const calculateTransferredStats = (studyRights, programme: string) => {
+  const calculateStats = (studyRights, programme: string, includeCancelled = false) => {
     for (const studyRight of studyRights) {
+      if (includeCancelled && studyRight.cancelled) {
+        // Cancellation is per study right (not element) -> only count it once
+        // endDate is always defined for cancelled study rights
+        const cancellationYear = defineYear(studyRight.endDate, isAcademicYear)
+        cancelled.graphStats[indexOf(years, cancellationYear)]++
+        cancelled.tableStats[cancellationYear]++
+      }
+
       const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)
       const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
       if (studyRightElementsWithSamePhase.length === 1) {
@@ -169,10 +179,10 @@ const getTransferredStats = async ({
     }
   }
 
-  calculateTransferredStats(studyRights, studyProgramme)
-  calculateTransferredStats(secondStudyRights, combinedProgramme)
+  calculateStats(studyRights, studyProgramme, true)
+  calculateStats(secondStudyRights, combinedProgramme)
 
-  return { transferredAway, transferredTo }
+  return { cancelled, transferredAway, transferredTo }
 }
 
 type Stats = {
@@ -188,11 +198,12 @@ const initializeGraphStats = (
   accepted: Stats,
   acceptedSecondProg: Stats,
   graduated: Stats,
+  cancelled: Stats,
   transferredAway: Stats,
   transferredTo: Stats,
   graduatedSecondProg: Stats
 ) => {
-  const basicTable = [] as Array<{ name: string; data: number[] }>
+  const basicTable = [] as { name: string; data: number[] }[]
   if (combinedProgramme) {
     basicTable.push(
       { name: 'Started studying bachelor', data: started.graphStats },
@@ -200,13 +211,15 @@ const initializeGraphStats = (
       { name: 'Accepted bachelor', data: accepted.graphStats },
       { name: 'Accepted licentiate', data: acceptedSecondProg.graphStats },
       { name: 'Graduated bachelor', data: graduated.graphStats },
-      { name: 'Graduated licentiate', data: graduatedSecondProg.graphStats }
+      { name: 'Graduated licentiate', data: graduatedSecondProg.graphStats },
+      { name: 'Cancelled', data: cancelled.graphStats }
     )
   } else {
     basicTable.push(
       { name: 'Started studying', data: started.graphStats },
       { name: 'Accepted', data: accepted.graphStats },
-      { name: 'Graduated', data: graduated.graphStats }
+      { name: 'Graduated', data: graduated.graphStats },
+      { name: 'Cancelled', data: cancelled.graphStats }
     )
   }
   if (includeAllSpecials) {
@@ -219,7 +232,7 @@ const initializeGraphStats = (
 }
 
 const initializeTableStats = (
-  year: number,
+  year: string | number,
   combinedProgramme: string,
   includeAllSpecials: boolean,
   started: Stats,
@@ -228,6 +241,7 @@ const initializeTableStats = (
   acceptedSecondProg: Stats,
   graduated: Stats,
   graduatedSecondProg: Stats,
+  cancelled: Stats,
   transferredAway: Stats,
   transferredTo: Stats
 ) => {
@@ -240,6 +254,7 @@ const initializeTableStats = (
       acceptedSecondProg.tableStats[year],
       graduated.tableStats[year],
       graduatedSecondProg.tableStats[year],
+      cancelled.tableStats[year],
       transferredAway.tableStats[year],
       transferredTo.tableStats[year],
     ]
@@ -253,6 +268,7 @@ const initializeTableStats = (
       acceptedSecondProg.tableStats[year],
       graduated.tableStats[year],
       graduatedSecondProg.tableStats[year],
+      cancelled.tableStats[year],
     ]
   }
   if (includeAllSpecials) {
@@ -261,11 +277,18 @@ const initializeTableStats = (
       started.tableStats[year],
       accepted.tableStats[year],
       graduated.tableStats[year],
+      cancelled.tableStats[year],
       transferredAway.tableStats[year],
       transferredTo.tableStats[year],
     ]
   }
-  return [year, started.tableStats[year], accepted.tableStats[year], graduated.tableStats[year]]
+  return [
+    year,
+    started.tableStats[year],
+    accepted.tableStats[year],
+    graduated.tableStats[year],
+    cancelled.tableStats[year],
+  ]
 }
 
 export const getBasicStatsForStudytrack = async ({
@@ -282,7 +305,7 @@ export const getBasicStatsForStudytrack = async ({
 }): Promise<BasicStats> => {
   const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), isAcademicYear) as number[]
+  const years = getYearsArray(since.getFullYear(), isAcademicYear) as string[] | number[]
   const queryParameters = { studyProgramme, years, isAcademicYear, includeAllSpecials, combinedProgramme }
   const queryParametersCombinedProg = { studyProgramme: combinedProgramme, years, isAcademicYear, includeAllSpecials }
   const { startedStudying, accepted } = await getStartedStats(queryParameters)
@@ -291,11 +314,11 @@ export const getBasicStatsForStudytrack = async ({
 
   const graduated = await getGraduatedStats(queryParameters)
   const graduatedSecondProg = await getGraduatedStats(queryParametersCombinedProg)
-  const { transferredAway, transferredTo } = await getTransferredStats(queryParameters)
+  const { cancelled, transferredAway, transferredTo } = await getTransferAndCancellationStats(queryParameters)
 
-  const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse() as number[]
+  const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse() as string[] | number[]
   const key = includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
-  const titles = tableTitles.basics[combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key] as string[]
+  const titles: string[] = tableTitles.basics[combinedProgramme ? `${key}_COMBINED_PROGRAMME` : key]
   const tableStats = reversedYears.map(year =>
     initializeTableStats(
       year,
@@ -307,6 +330,7 @@ export const getBasicStatsForStudytrack = async ({
       acceptedSecondProg,
       graduated,
       graduatedSecondProg,
+      cancelled,
       transferredAway,
       transferredTo
     )
@@ -323,6 +347,7 @@ export const getBasicStatsForStudytrack = async ({
       accepted,
       acceptedSecondProg,
       graduated,
+      cancelled,
       transferredAway,
       transferredTo,
       graduatedSecondProg

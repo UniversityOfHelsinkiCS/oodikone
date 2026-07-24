@@ -61,7 +61,7 @@ export const getAverage = (values: number[]) => {
   return Number((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(2))
 }
 
-/** @returns academic starting year e.g. "2019-2020" */
+/** @returns academic starting year e.g. "2019 - 2020" */
 export function defineYear(date: Date, isAcademicYear: true): string
 export function defineYear(date: Date, isAcademicYear: false): number
 export function defineYear(date: Date, isAcademicYear: boolean): string | number
@@ -224,8 +224,16 @@ export const getPercentage = (value: any, total: any) => {
 
 export const tableTitles = {
   basics: {
-    SPECIAL_EXCLUDED: ['', 'Started studying', 'Accepted', 'Graduated'],
-    SPECIAL_INCLUDED: ['', 'Started studying', 'Accepted', 'Graduated', 'Transferred away', 'Transferred to'],
+    SPECIAL_EXCLUDED: ['', 'Started studying', 'Accepted', 'Graduated', 'Cancelled'],
+    SPECIAL_INCLUDED: [
+      '',
+      'Started studying',
+      'Accepted',
+      'Graduated',
+      'Cancelled',
+      'Transferred away',
+      'Transferred to',
+    ],
     SPECIAL_EXCLUDED_COMBINED_PROGRAMME: [
       '',
       'Started studying bachelor',
@@ -234,6 +242,7 @@ export const tableTitles = {
       'Accepted licentiate',
       'Graduated bachelor',
       'Graduated licentiate',
+      'Cancelled',
     ],
     SPECIAL_INCLUDED_COMBINED_PROGRAMME: [
       '',
@@ -243,6 +252,7 @@ export const tableTitles = {
       'Accepted licentiate',
       'Graduated bachelor',
       'Graduated licentiate',
+      'Cancelled',
       'Transferred away',
       'Transferred to',
     ],

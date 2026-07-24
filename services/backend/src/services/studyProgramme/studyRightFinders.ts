@@ -68,7 +68,7 @@ export const getStudyRightsInProgramme = async (
 
   return (
     await SISStudyRightModel.findAll({
-      attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber', 'transferInfo'],
+      attributes: ['id', 'extentCode', 'semesterEnrollments', 'studentNumber', 'transferInfo', 'endDate', 'cancelled'],
       include,
       where: {
         id: {
