@@ -1,15 +1,18 @@
 export const studyProgrammeToolTips = {
   common: {
     yearToggle: `
-**Calendar year**: Näyttää tilastot kalenterivuosille jaoteltuna (esim. 1.1.–31.12.2024)  
+**Calendar year**: Näyttää tilastot kalenterivuosille jaoteltuna (esim. 1.1.–31.12.2024)
+
 **Academic year**: Näyttää tilastot lukuvuosille jaoteltuna (esim. 1.8.2023–31.7.2024)
 `,
     studyRightToggle: `
-**All study rights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.  
+**All study rights**: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.
+
 **Special study rights excluded**: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
 `,
     graduatedToggle: `
-**Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.  
+**Graduated included**: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
+
 **Graduated excluded**: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
 `,
     studentsOfTheStudyProgramme: `
@@ -18,6 +21,8 @@ export const studyProgrammeToolTips = {
 **Accepted**: Sisältää opiskelijat, joiden opiskeluoikeus koulutusohjelmassa on alkanut kyseisenä vuonna. Opiskelija on saattanut ilmoittautua poissaolevaksi tai jättää lukuvuosi-ilmoittautumisen kokonaan tekemättä.
 
 **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty.
+
+**Cancelled**: Sisältää kyseisenä vuonna opinto-oikeudestaan luopuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Sisältää myös hallintohenkilöstön perumat opinto-oikeudet.
 
 **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opiskelijat (opiskeluoikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt ohjelmaan ja siitä pois useasti.
 
@@ -111,7 +116,8 @@ Opintopisteet ja opiskelijamäärät suoritusvuosittain. Suoritukset on jaoteltu
 Huom: Oodi/Sisu -datassa olevien puutteiden vuoksi kategorioiden välillä voi esiintyä pieniä eroja (esim. suoritukseen ei liitetty opinto-oikeutta, suoritus kirjattu opinto-oikeuden voimassaoloaikojen ulkopuolelle, yms.).
 `,
     studentSwitch: `
-**Show credits**: Näyttää hyväksytyistä suorituksesta kertyneet **opintopisteet**  
+**Show credits**: Näyttää hyväksytyistä suorituksesta kertyneet **opintopisteet**
+
 **Show students**: Näyttää kaikki ilmoittautuneet ja/tai arvosanan saaneet **opiskelijat**
 `,
   },
