@@ -349,8 +349,10 @@ jobs:
   # TODO: Remove entirely if running on ubuntu-latest or remove false from if: ... && false
   cache_cypress_image:
     runs-on: ubuntu-latest
+    # if: |
+    #   !cancelled() && !failure() && false
     if: |
-      !cancelled() && !failure() && false
+      !cancelled() && !failure()
     steps:
       - name: Set up cache for Cypress image (saved in Post-step)
         id: cache-cypress-image
