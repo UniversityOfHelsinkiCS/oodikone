@@ -149,10 +149,12 @@ export const enrollmentTimeDateThreshold = new Date('2021-05-31')
 export const enrollmentTimeDateThresholdAcademicYear = new Date('2021-08-01')
 export const enrollmentTimeDateThresholdYearCode = 72
 
-export const yearToYearCode = (year: number | string) => {
-  return (typeof year === 'string' ? parseInt(year) : year) - 1949
+/** NOTE: Defaults to yearCode 1 if year undefined */
+export const yearToYearCode = (year: number | string | undefined) => {
+  return (typeof year === 'string' ? parseInt(year) : (year ?? 1950)) - 1949
 }
 
-export const yearCodeToYear = (year: number | string) => {
-  return (typeof year === 'string' ? parseInt(year) : year) + 1949
+/** NOTE: Defaults to year 1950 if yearCode undefined */
+export const yearCodeToYear = (year: number | string | undefined) => {
+  return (typeof year === 'string' ? Number(year) : (year ?? 1)) + 1949
 }
