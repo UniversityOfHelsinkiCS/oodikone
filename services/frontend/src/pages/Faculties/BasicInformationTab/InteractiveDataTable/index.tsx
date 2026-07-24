@@ -36,6 +36,7 @@ export const InteractiveDataTable = ({
   sortedKeys: string[]
   titles?: string[]
 }) => {
+  'use memo'
   const [sorter, setSorter] = useState('Code')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [columnIndex, setSelectedIndex] = useState(0)

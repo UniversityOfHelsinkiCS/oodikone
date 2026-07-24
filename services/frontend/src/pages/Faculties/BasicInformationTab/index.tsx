@@ -128,6 +128,7 @@ export const BasicInformationTab = ({
   specialGroups: boolean
   studyProgrammes: boolean
 }) => {
+  'use memo'
   const [academicYear, setAcademicYear] = useState(true)
 
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'

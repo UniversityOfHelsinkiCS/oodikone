@@ -16,7 +16,7 @@ const calculateCombinedStats = async (
     graphStats: [] as BasicStats['graphStats'],
     programmeTableStats: {} as Record<string, BasicStats['tableStats']>,
     tableStats: [] as BasicStats['tableStats'],
-    titles: ['Code', 'Started\nstudying', 'Accepted', 'Graduated'],
+    titles: ['Code', 'Started\nstudying', 'Accepted', 'Graduated', 'Cancelled'],
   }
   if (includeAllSpecials) {
     studentInfo.titles.push('Transferred out\nof programme', 'Transferred into\nprogramme')
@@ -103,7 +103,8 @@ const calculateCombinedStats = async (
     } else {
       for (let i = 0; i < tableStatsForProgramme.length; i++) {
         for (let j = 1; j < tableStatsForProgramme[i].length; j++) {
-          ;(combinedTableStats[i][j] as number) += tableStatsForProgramme[i][j]
+          // @ts-expect-error the only string is in index 0 (the year label) which we skip over
+          combinedTableStats[i][j] += tableStatsForProgramme[i][j]
         }
       }
     }
@@ -126,6 +127,7 @@ const calculateCombinedStats = async (
     } else {
       for (let i = 0; i < stats.tableStats.length; i++) {
         for (let j = 1; j < stats.tableStats[i].length; j++) {
+          // @ts-expect-error the only string is in index 0 (the year label) which we skip over
           studentInfo.tableStats[i][j] += stats.tableStats[i][j]
         }
       }
