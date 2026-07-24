@@ -53,10 +53,16 @@ const studyProgrammeApi = RTKApi.injectEndpoints({
     }),
     getProgrammeCoursesStats: builder.query<
       StudyProgrammeCourse[],
-      { id: string; yearType: YearType; combinedProgramme: string }
+      {
+        id: string
+        yearType: YearType
+        combinedProgramme: string
+        fromYearCode: string | number
+        toYearCode: string | number
+      }
     >({
-      query: ({ id, yearType, combinedProgramme }) =>
-        `/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}`,
+      query: ({ id, yearType, combinedProgramme, fromYearCode, toYearCode }) =>
+        `/studyprogrammes/${id}/coursestats?yearType=${yearType}&combinedProgramme=${combinedProgramme}&fromYearCode=${fromYearCode}&toYearCode=${toYearCode}`,
     }),
     getStudyTracks: builder.query<Record<string, Name | string>, { id: string }>({
       query: ({ id }) => `/studyprogrammes/${id}/studytracks`,

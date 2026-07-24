@@ -10,6 +10,7 @@ import { Section } from '@/components/Section'
 import { CourseYearFilter } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/CourseYearFilter'
 import { OverallStatsTable } from '@/pages/StudyProgramme/ProgrammeCoursesTab/ByCreditTypeTab/OverallStatsTable'
 import { useGetProgrammeCoursesStatsQuery } from '@/redux/studyProgramme'
+import { yearToYearCode } from '@oodikone/shared/util'
 
 type YearOption = {
   key: number
@@ -28,16 +29,21 @@ export const ByCreditTypeTab = ({
   studyProgramme: string
   setAcademicYear: (value: boolean) => void
 }) => {
-  const { data, isError, isLoading } = useGetProgrammeCoursesStatsQuery({
-    id: studyProgramme,
-    combinedProgramme,
-    yearType: academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
-  })
+  const [minFromYear, setMinFromYear] = useState<number>(1950)
+  const [maxToYear, setMaxToYear] = useState<number>(new Date().getFullYear())
 
   const [fromYear, setFromYear] = useState<number | null>(null)
   const [toYear, setToYear] = useState<number | null>(null)
   const [years, setYears] = useState<{ academic: YearOption[]; calendar: YearOption[] } | null>(null)
   const [showStudents, setShowStudents] = useState(true)
+
+  const { data, isError, isLoading } = useGetProgrammeCoursesStatsQuery({
+    id: studyProgramme,
+    combinedProgramme,
+    yearType: academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
+    fromYearCode: yearToYearCode(fromYear ?? minFromYear),
+    toYearCode: yearToYearCode(toYear ?? maxToYear),
+  })
 
   useEffect(() => {
     if (!data) {
@@ -48,9 +54,11 @@ export const ByCreditTypeTab = ({
     const initToYear = Number(max(yearCodes))
     if (!fromYear) {
       setFromYear(initFromYear)
+      setMinFromYear(initFromYear)
     }
     if (!toYear) {
       setToYear(initToYear)
+      setMaxToYear(initToYear)
     }
     const academic: YearOption[] = []
     const calendar: YearOption[] = []
