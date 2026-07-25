@@ -13,6 +13,7 @@ import {
   tableTitles,
 } from './studyProgrammeHelpers'
 import { getStudyRightsInProgramme } from './studyRightFinders'
+import { SISStudyRight } from '@oodikone/shared/models'
 
 export const getDateOfFirstSemesterPresent = (
   semesterEnrollments: SemesterEnrollment[] | null,
@@ -145,7 +146,7 @@ const getTransferAndCancellationStats = async ({
   const transferredTo = getStatsBasis(years)
   const cancelled = getStatsBasis(years)
 
-  const calculateStats = (studyRights, programme: string, includeCancelled = false) => {
+  const calculateStats = (studyRights: SISStudyRight[], programme: string, includeCancelled = false) => {
     for (const studyRight of studyRights) {
       if (includeCancelled && studyRight.cancelled) {
         // Cancellation is per study right (not element) -> only count it once
@@ -155,7 +156,7 @@ const getTransferAndCancellationStats = async ({
         cancelled.tableStats[cancellationYear]++
       }
 
-      const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)
+      const studyRightElement = studyRight.studyRightElements.find(element => element.code === programme)!
       const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
       if (studyRightElementsWithSamePhase.length === 1) {
         continue
