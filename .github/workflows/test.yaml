@@ -78,10 +78,20 @@ jobs:
           path: /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
+      - name: Check if cache already exists
+        id: cache_check
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            exists:
+              - '/tmp/docker-images.tar.zst'
+
       - name: Pull required images
+        if: steps.cache_check.outputs.exists != "true"
         run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
 
       - name: Save Docker images for downstream jobs
+        if: steps.cache_check.outputs.exists != "true"
         run: |
           docker save \
             registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
@@ -361,10 +371,20 @@ jobs:
           path: /tmp/cypress-image.tar.zst
           key: cypress-image-${{ github.sha }}
 
+      - name: Check if cache already exists
+        id: cache_check
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            exists:
+              - '/tmp/docker-images.tar.zst'
+
       - name: Pull Cypress image
+        if: steps.cache_check.outputs.exists != "true"
         run: docker pull cypress/included:15.18.1
 
       - name: Save Cypress images for downstream jobs
+        if: steps.cache_check.outputs.exists != "true"
         run: |
           docker save cypress/included:15.18.1 | zstd -T0 -3 -o /tmp/cypress-image.tar.zst
 
