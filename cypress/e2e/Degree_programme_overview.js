@@ -61,15 +61,15 @@ describe('Degree programme overview', () => {
     it('Basic information contains correct students', () => {
       const years = getEmptyYears()
       const tableContents = [
-        // [Year, Started studying, Accepted, Graduated, Transferred Away, Transferred to]
+        // [Year, Started studying, Accepted, Graduated, Cancelled, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        [2023, 8, 8, 26, 0, 0],
-        [2022, 25, 26, 47, 1, 3],
-        [2021, 29, 32, 48, 0, 2],
-        [2020, 26, 27, 12, 1, 3],
-        [2019, 28, 34, 1, 0, 1],
-        [2018, 40, 45, 0, 0, 1],
-        [2017, 41, 47, 0, 0, 0],
+        [2023, 8, 8, 26, 2, 0, 0],
+        [2022, 25, 26, 47, 0, 1, 3],
+        [2021, 29, 32, 48, 1, 0, 2],
+        [2020, 26, 27, 12, 0, 1, 3],
+        [2019, 28, 34, 1, 0, 0, 1],
+        [2018, 40, 45, 0, 0, 0, 1],
+        [2017, 41, 47, 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'students-of-the-study-programme')
@@ -280,7 +280,9 @@ describe('Degree programme overview', () => {
         cy.cs('progress-of-students-info-box-content').contains('Kuvaa koulutusohjelmassa')
       })
 
+      // HACK: Do this properly
       it('Average graduation times section', () => {
+        cy.wait(500)
         cy.cs('average-graduation-times-info-box-button').click()
         cy.cs('average-graduation-times-info-box-content').contains('Yksittäinen palkki')
       })
