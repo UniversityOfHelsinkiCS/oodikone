@@ -2,10 +2,14 @@
   "name": "@oodikone/shared",
   "private": true,
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest ./tests",
+    "test:unit": "vitest ./tests",
+    "test:silent": "SILENT_TESTING=true vitest"
   },
   "devDependencies": {
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "4.1.10"
   },
   "dependencies": {
     "dayjs": "1.11.21"
