@@ -353,7 +353,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled() && !failure() &&
-      github.runner.name != 'self-hosted' &&
+      github.runner.name != 'self-hosted'
 
     steps:
       - name: Set up cache for Cypress image (saved in Post-step)
