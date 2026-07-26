@@ -34,6 +34,7 @@ export const parseDateRangeFromParams = (query: QueryParams): ParsedQueryParams 
 
   return { startDate, endDate }
 }
+
 export const getCurriculumVersion = (curriculumPeriodId: string | undefined) => {
   if (!curriculumPeriodId) {
     return null
