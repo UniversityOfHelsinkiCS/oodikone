@@ -61,7 +61,6 @@ jobs:
     needs:
       - check_updater_changed
       - check_migration_files
-      - test_unit
 
     steps:
       - uses: actions/checkout@v7
