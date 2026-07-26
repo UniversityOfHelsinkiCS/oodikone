@@ -4,6 +4,13 @@ const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
   projectId: 'c3jsph',
+
+  // Fixes Github <-> Cypress permission errors in CI
+  downloadsFolder: '/tmp/cypress/downloads',
+  screenshotsFolder: '/tmp/cypress/screenshots',
+  videosFolder: '/tmp/cypress/videos',
+  video: true,
+
   defaultCommandTimeout: 30000,
   requestTimeout: 30000,
   videoCompression: false,
@@ -19,5 +26,4 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:3000',
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
   },
-  video: true,
 })
