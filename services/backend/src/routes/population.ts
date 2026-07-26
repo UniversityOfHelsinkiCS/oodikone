@@ -150,8 +150,9 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
     const studyRights = [programme]
     const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
+    const filterCreditsAndEnrollmentsByDate = false
 
-    const result = await statisticsOf(studentNumbers, studyRights, tagMap, startDate)
+    const result = await statisticsOf(studentNumbers, studyRights, tagMap, filterCreditsAndEnrollmentsByDate, startDate)
     const processed = obfuscateStuff({
       result,
 
@@ -212,10 +213,12 @@ router.get<
 
   const studyRights = []
   const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
+  const filterCreditsAndEnrollmentsByDate = true
   const result = await statisticsOf(
     studentNumbers,
     studyRights,
     tagMap,
+    filterCreditsAndEnrollmentsByDate,
     startDate?.toISOString(),
     endDate?.toISOString()
   )
@@ -251,12 +254,19 @@ router.post<never, CanError<GetCustomPopulationResBody>, CustomPopulationQuery>(
 
     const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
     const tagMap = await getStudentTagMap(studyRights, filteredStudentNumbers, userId)
+    const filterCreditsAndEnrollmentsByDate = false
 
     const { startDate } = tags?.year
       ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
       : { startDate: undefined }
 
-    const result = await statisticsOf(filteredStudentNumbers, studyRights, tagMap, startDate)
+    const result = await statisticsOf(
+      filteredStudentNumbers,
+      studyRights,
+      tagMap,
+      filterCreditsAndEnrollmentsByDate,
+      startDate
+    )
 
     const resultWithStudyProgramme = { ...result, studyProgramme: tags?.studyProgramme }
     const discardedStudentNumbers = difference(students, filteredStudentNumbers)

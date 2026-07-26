@@ -56,7 +56,7 @@ export const getStudentTotalCredits = (
 
   return student.courses
     .filter(course => !course.isStudyModuleCredit && validCreditTypes.includes(course.credittypecode))
-    .reduce((a, b) => a + b.credits, 0)
+    .reduce((acc, studentCourse) => acc + studentCourse.credits, 0)
 }
 
 const getGradedCourses = (student: FormattedStudent, includeTransferredCredits = true) =>

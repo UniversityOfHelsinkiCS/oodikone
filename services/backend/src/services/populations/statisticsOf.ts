@@ -30,18 +30,33 @@ export const statisticsOf = async (
   studentNumbers: string[],
   studyRights: string[],
   tagMap: Map<string, StudentTags[]>,
+  filterByDates: boolean,
   startDate?: string,
   endDate?: string
 ) => {
+  const defaultStartDate = new Date(1900, 0, 1).toISOString()
+  const defaultEndDate = new Date(new Date().getFullYear() + 1, 0, 1).toISOString()
+
   const code = studyRights[0] ?? ''
-  const mockedStartDate = startDate ?? new Date(1900, 0, 1).toISOString()
-  const mockedEndDate = endDate ?? new Date(new Date().getFullYear(), 0, 1).toISOString()
+  const mockedStartDate = startDate ?? defaultStartDate
+  const mockedEndDate = endDate ?? defaultEndDate
 
   const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
     await Promise.all([
       getStudents(studentNumbers),
-      getEnrollments(studentNumbers, mockedStartDate, mockedEndDate),
-      getCredits(studentNumbers, mockedStartDate, mockedEndDate),
+
+      // NOTE: If filterByDates is set, use default values for filtering credits and enrollments
+      getEnrollments(
+        studentNumbers,
+        filterByDates ? mockedStartDate : defaultStartDate,
+        filterByDates ? mockedEndDate : defaultEndDate
+      ),
+      getCredits(
+        studentNumbers,
+        filterByDates ? mockedStartDate : defaultStartDate,
+        filterByDates ? mockedEndDate : defaultEndDate
+      ),
+
       getDegreeProgrammeType(code),
       getCriteria(code),
       getStudyRightElementsForStudyRight(studentNumbers, code),
