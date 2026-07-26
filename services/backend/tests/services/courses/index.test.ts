@@ -6,6 +6,7 @@ import {
   searchAndCombineSubstitutionGroupsToCodes,
 } from '../../../src/services/courses'
 import { findByCourseAndSemesters } from '../../../src/services/students'
+import { yearToYearCode } from '@oodikone/shared/util'
 
 void describe.concurrent('Search and complete substitution groups to codes', () => {
   beforeAll(async () => {
@@ -66,7 +67,6 @@ type TestList = [string, number, number][]
 const semesterToSemesterCode = (semesterYear: number, springOrFall: 'spring' | 'fall') => {
   return (semesterYear - 1950) * 2 + (springOrFall === 'spring' ? 0 : 1)
 }
-const yearToYearCode = (year: number) => year - 1949
 
 void describe.concurrent('Find by course and semester', () => {
   it.each([
