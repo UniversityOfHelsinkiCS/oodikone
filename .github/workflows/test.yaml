@@ -51,7 +51,7 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      github.runner.name != 'self-hosted' &&
+      github.runner.environment != 'self-hosted' &&
       !(
         needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
         needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
@@ -353,7 +353,7 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      github.runner.name != 'self-hosted'
+      github.runner.environment != 'self-hosted'
 
     steps:
       - name: Set up cache for Cypress image (saved in Post-step)
