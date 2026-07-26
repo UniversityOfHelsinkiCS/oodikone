@@ -351,10 +351,8 @@ jobs:
   # TODO: Remove entirely if running on self-hosted or remove false from if: ... && false
   cache_cypress_image:
     runs-on: self-hosted
-    # if: |
-    #   !cancelled() && !failure() && false
     if: |
-      !cancelled() && !failure()
+      !cancelled() && !failure() && false
     steps:
       - name: Set up cache for Cypress image (saved in Post-step)
         id: cache-cypress-image
