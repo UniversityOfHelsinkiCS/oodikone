@@ -285,7 +285,7 @@ jobs:
 
       - name: Dump logs on failure
         if: failure()
-        run: npm run logs:ci
+        run: docker compose --file docker-compose.ci.yml --profile updater logs
 
       - name: Teardown containers started by compose
         if: always()
