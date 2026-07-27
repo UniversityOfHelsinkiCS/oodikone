@@ -145,15 +145,15 @@ describe('Degree programme overview', () => {
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
-        // [Year, Started studying, Accepted, Graduated, Transferred away, Transferred to]
+        // [Year, Started studying, Accepted, Graduated, Cancelled, Transferred away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        ['2023 - 2024', 8, 8, 4, 0, 0],
-        ['2022 - 2023', 25, 26, 35, 0, 0],
-        ['2021 - 2022', 29, 32, 58, 1, 5],
-        ['2020 - 2021', 26, 27, 30, 0, 3],
-        ['2019 - 2020', 28, 34, 7, 1, 1],
-        ['2018 - 2019', 40, 45, 0, 0, 1],
-        ['2017 - 2018', 41, 47, 0, 0, 0],
+        ['2023 - 2024', 8, 8, 4, 1, 0, 0],
+        ['2022 - 2023', 25, 26, 35, 1, 0, 0],
+        ['2021 - 2022', 29, 32, 58, 1, 1, 5],
+        ['2020 - 2021', 26, 27, 30, 0, 0, 3],
+        ['2019 - 2020', 28, 34, 7, 0, 1, 1],
+        ['2018 - 2019', 40, 45, 0, 0, 0, 1],
+        ['2017 - 2018', 41, 47, 0, 0, 0, 0],
       ]
       cy.checkTableStats(studentTableContents, 'students-of-the-study-programme')
 
