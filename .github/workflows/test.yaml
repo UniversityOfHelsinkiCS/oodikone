@@ -264,7 +264,7 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: Start worker containers
-        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --quiet-pull --detach --wait
+        run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-worker --scale sis-updater-worker=5 --quiet-pull --detach --wait
 
       - name: Run hourly jobs
         run: docker compose -f docker-compose.ci.yml --profile updater up sis-updater-scheduler --exit-code-from sis-updater-scheduler

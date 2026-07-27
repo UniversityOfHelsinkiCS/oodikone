@@ -203,7 +203,8 @@ services:
 
   sis-updater-worker:
     <<: *defaults
-    container_name: oodikone-updater-worker
+    # Disabled so that container can be scaled
+    # container_name: oodikone-updater-worker
     build:
       context: updater/sis-updater-worker
       dockerfile: ./Dockerfile
