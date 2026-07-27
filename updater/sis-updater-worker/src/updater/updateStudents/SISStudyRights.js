@@ -321,7 +321,7 @@ export const updateSISStudyRightElements = async (groupedStudyRights, moduleGrou
 
   for (const sre of studyRightElements) {
     if (!sre.startDate)
-      logger.warning(`Creating study right element with no startDate for study right: ${sre.studyRightId}`)
+      logger.warn(`Creating study right element with no startDate for study right: ${sre.studyRightId}`)
   }
 
   await bulkCreate(SISStudyRightElement, studyRightElements)
