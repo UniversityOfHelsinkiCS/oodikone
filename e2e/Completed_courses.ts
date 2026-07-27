@@ -1,24 +1,27 @@
 import { test, expect } from '@playwright/test'
-/// <reference types="cypress" />
 const openCompletedCoursesModal = async page => {
   page.locator('text=button', 'text=Search completed courses of students').click()
 }
+
 const hasLanded = async page => {
   cy.contains('Search completed courses')
   cy.contains(
     'Here you can search by a list of student and course numbers to see whether students have completed certain courses yet'
   )
 }
+
 const openSearch = async page => {
   cy.init('/completedcoursessearch')
   hasLanded(page)
 }
+
 const selectSavedCourselist = async (page, name) => {
   cy.cs('history-search').click()
   cy.cs('history-search').type(name)
   cy.cs('history-search').type('{downarrow}')
   cy.cs('history-search').type('{enter}')
 }
+
 const createCourseList = async (page, courseCodes, courseListName) => {
   openSearch(page)
   openCompletedCoursesModal(page)
