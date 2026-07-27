@@ -17,9 +17,6 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
       programmeCode
     ]
 
-    const programmeOtherCountriesCount = stats.find(programmeStats => programmeStats.id === programmeCode)
-      ?.otherCountriesCount?.[programmeCode]
-
     if (!statsForProgramme) continue
 
     for (const yearStats of statsForProgramme) {
@@ -30,7 +27,8 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
         if (facultyTableStats[yearStats[0]][i] == null) {
           facultyTableStats[yearStats[0]].push(yearStats[i])
         } else if (typeof facultyTableStats[yearStats[0]][i] === 'number') {
-          ;(facultyTableStats[yearStats[0]][i] as number) += yearStats[i] as number
+          // @ts-expect-error values at given indices are numbers
+          facultyTableStats[yearStats[0]][i] += yearStats[i]
         } else {
           const allStudentsCount = facultyTableStats[yearStats[0]][1]
           const categoryStudentsCount = facultyTableStats[yearStats[0]][i - 1]
@@ -45,6 +43,9 @@ const calculateCombinedStats = (programmeCodes: string[], stats: StudyTrackStats
         programmeTableStats[programmeCode][yearStats[0]] = yearStats.slice(1)
       }
     }
+
+    const programmeOtherCountriesCount = stats.find(programmeStats => programmeStats.id === programmeCode)
+      ?.otherCountriesCount?.[programmeCode]
 
     if (!programmeOtherCountriesCount) continue
     for (const [year, countryStats] of Object.entries(programmeOtherCountriesCount)) {

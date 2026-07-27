@@ -83,6 +83,7 @@ const getEmptyYear = () => ({
   present: 0,
   absent: 0,
   passive: 0,
+  cancelled: 0,
   graduated: 0,
   graduatedCombinedProgramme: 0,
   attainmentWithinYear: 0,
@@ -133,6 +134,8 @@ const combineStats = (
         getPercentage(yearStats.passive, yearStats.all),
         yearStats.graduated,
         getPercentage(yearStats.graduated, yearStats.all),
+        yearStats.cancelled,
+        getPercentage(yearStats.cancelled, yearStats.all),
         yearStats.attainmentWithinYear,
         getPercentage(yearStats.attainmentWithinYear, yearStats.all),
         yearStats.male,
@@ -215,27 +218,6 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
-    const latestAttainmentWithinYearAndInHops = dayjs(
-      studyRight.student.credits
-        .filter(credit => studyRight.studyPlans.some(sp => sp.included_courses.includes(credit.course_code)))
-        .reduce((latest, { attainment_date }) => {
-          return attainment_date > latest ? attainment_date : latest
-        }, new Date('1900-01-01'))
-    ).isSameOrAfter(yearAgo)
-
-    if (latestAttainmentWithinYearAndInHops) {
-      yearlyStats[year][programmeOrStudyTrack].attainmentWithinYear++
-    }
-
-    /* Gender cols */
-    if (studyRight.student.gender_code === GenderCode.MALE) {
-      yearlyStats[year][programmeOrStudyTrack].male += 1
-    } else if (studyRight.student.gender_code === GenderCode.FEMALE) {
-      yearlyStats[year][programmeOrStudyTrack].female += 1
-    } else {
-      yearlyStats[year][programmeOrStudyTrack].otherUnknown += 1
-    }
-
     /* Current status cols */
     const hasGraduated = studyRightElement.graduated
     const hasGraduatedFromCombinedProgramme = combinedProgramme
@@ -259,6 +241,31 @@ const getMainStatsByTrackAndYear = async (
       } else {
         yearlyStats[year][programmeOrStudyTrack].passive += 1
       }
+    }
+
+    if (studyRight.cancelled) {
+      yearlyStats[year][programmeOrStudyTrack].cancelled += 1
+    }
+
+    const latestAttainmentWithinYearAndInHops = dayjs(
+      studyRight.student.credits
+        .filter(credit => studyRight.studyPlans.some(sp => sp.included_courses.includes(credit.course_code)))
+        .reduce((latest, { attainment_date }) => {
+          return attainment_date > latest ? attainment_date : latest
+        }, new Date('1900-01-01'))
+    ).isSameOrAfter(yearAgo)
+
+    if (latestAttainmentWithinYearAndInHops) {
+      yearlyStats[year][programmeOrStudyTrack].attainmentWithinYear++
+    }
+
+    /* Gender cols */
+    if (studyRight.student.gender_code === GenderCode.MALE) {
+      yearlyStats[year][programmeOrStudyTrack].male += 1
+    } else if (studyRight.student.gender_code === GenderCode.FEMALE) {
+      yearlyStats[year][programmeOrStudyTrack].female += 1
+    } else {
+      yearlyStats[year][programmeOrStudyTrack].otherUnknown += 1
     }
 
     /* Citizenship cols */
@@ -552,7 +559,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
   combinedProgramme?: string
   settings: { specialGroups: boolean }
   studyRightsOfProgramme: SISStudyRight[]
-}) => {
+}): Promise<StudyTrackStats> => {
   const years = getYearsArray(getStartDate(true).getFullYear(), true, true)
 
   const studyTracks = await getStudyTracksForProgramme(studyProgramme)
@@ -623,8 +630,7 @@ export const getStudyTrackStatsForStudyProgramme = async ({
       : tableTitles.studytracksCombined.master
     : tableTitles.studytracksBasic
 
-  // FIXME: Clean this object. Thanks.
-  const studyTrackStats: StudyTrackStats = {
+  return {
     creditCounts: stats.creditCounts,
     creditCountsByTrack: stats.creditCountsByTrack,
     creditCountsCombo: stats.creditCountsCombo,
@@ -644,5 +650,4 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     studyTracks,
     years,
   }
-  return studyTrackStats
 }

@@ -274,7 +274,7 @@ export const tableTitles = {
     licentiate: ['Graduated bachelor', 'Graduated licentiate'],
     master: ['Graduated bachelor', 'Graduated master'],
   },
-  studytracksEnd: ['Has recent attainment', 'Men', 'Women', 'Other / Unknown', 'Finland', 'Other'],
+  studytracksEnd: ['Cancelled', 'Has recent attainment', 'Men', 'Women', 'Other / Unknown', 'Finland', 'Other'],
 } as const
 
 export const getId = (code: string) => {
