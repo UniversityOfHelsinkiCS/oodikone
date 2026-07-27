@@ -22,7 +22,7 @@ export const studyProgrammeToolTips = {
 
 **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty.
 
-**Cancelled**: Sisältää kyseisenä vuonna opinto-oikeudestaan luopuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Sisältää myös hallintohenkilöstön perumat opinto-oikeudet.
+**Cancelled**: Sisältää kyseisenä vuonna opinto-oikeudestaan luopuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Sisältää myös hallinnon perumat opinto-oikeudet.
 
 **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opiskelijat (opiskeluoikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt ohjelmaan ja siitä pois useasti.
 
@@ -48,6 +48,7 @@ Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 - **Absent**: Käynnissä olevalle lukukaudelle **poissaolevaksi** ilmoittautuneet opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta
 - **Passive**: Opiskelijat, jotka eivät ole valmistuneet koulutusohjelmasta eivätkä ilmoittautuneet läsnä- tai poissaolevaksi käynnissä olevalle lukukaudelle
 - **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
+- **Cancelled**: Opinto-oikeudestaan luopuneet opiskelijat. Sisältää myös hallinnon perumat oikeudet.
 - **Has recent attainment**: Opiskelijat, jotka ovat kuluneen vuoden (365vrk) aikana suorittaneet ensisijaiseen opintosuunnitelmaansa sisällytettyjä opintoja
 
 Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
