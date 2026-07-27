@@ -114,6 +114,7 @@ export const FacultyStudentDataTable = ({
   titles: string[]
   years: string[]
 }) => {
+  'use memo'
   const [yearsVisible, setVisible] = useState(new Array<boolean>(years.length).fill(false))
   const { getTextIn } = useLanguage()
   const toggleVisibility = (yearIndex: number) => {
@@ -130,7 +131,7 @@ export const FacultyStudentDataTable = ({
         <TableHead>
           <TableRow key="FirstHeader">
             <TableCell colSpan={!showPercentages ? 3 : 4} />
-            <TableCell colSpan={!showPercentages ? 5 : 10}>Current status</TableCell>
+            <TableCell colSpan={!showPercentages ? 6 : 12}>Current status</TableCell>
             <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
             <TableCell colSpan={!showPercentages ? 2 : 4}>
               <Stack direction="row" gap={1}>

@@ -29,6 +29,7 @@ export const StudentsByStartingYearTab = ({
   setSpecialGroups: (value: boolean) => void
   specialGroups: boolean
 }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
   const [showPercentages, setShowPercentages] = useState(false)
 
