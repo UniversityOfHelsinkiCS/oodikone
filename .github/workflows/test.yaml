@@ -2,12 +2,6 @@ name: 'Lint and test'
 
 on:
   workflow_call:
-    inputs:
-      runner_environment:
-        required: true
-        type: string
-        default: 'unknown-runner'
-        description: 'runner.environment variable from top level context'
     secrets:
       username:
         required: true
@@ -52,12 +46,12 @@ jobs:
           push: false
 
   # === Cache docker images ===
+  # TODO: Disabled when running in self-hosted runner
   pull_docker_images:
     name: Pull all needed docker images and cache them (if dbs have not changed)
     runs-on: self-hosted
     if: |
-      !cancelled() && !failure() &&
-      ${{ inputs.runner_environment }} != 'self-hosted' &&
+      !cancelled() && !failure() && false &&
       !(
         needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
         needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
@@ -355,29 +349,6 @@ jobs:
         uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
-  cache_cypress_image:
-    runs-on: self-hosted
-    if: |
-      !cancelled() && !failure() &&
-      ${{ inputs.runner_environment }} != 'self-hosted'
-
-    steps:
-      - name: Set up cache for Cypress image (saved in Post-step)
-        id: cache-cypress-image
-        uses: actions/cache@v6
-        with:
-          path: /tmp/cypress-image.tar.zst
-          key: cypress-image-${{ github.sha }}
-
-      - name: Pull Cypress image
-        if: steps.cache-cypress-image.outputs.cache-hit != 'true'
-        run: docker pull cypress/included:15.18.1
-
-      - name: Save Cypress images for downstream jobs
-        if: steps.cache-cypress-image.outputs.cache-hit != 'true'
-        run: |
-          docker save cypress/included:15.18.1 | zstd -T0 -3 -o /tmp/cypress-image.tar.zst
-
   test_end_to_end:
     runs-on: self-hosted
     if: |
@@ -387,7 +358,6 @@ jobs:
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
-      - cache_cypress_image
     strategy:
       fail-fast: false
       matrix:
@@ -440,24 +410,10 @@ jobs:
             /tmp/docker-images.tar.zst
           key: docker-images-${{ github.sha }}
 
-      - name: Restore cached Cypress image
-        id: cache-cypress-image-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/cypress-image.tar.zst
-          key: cypress-image-${{ github.sha }}
-
       - name: Load Docker images (or skip if missing)
         run: |
           if [ -f /tmp/docker-images.tar.zst ]; then
             zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
-
-      - name: Load Cypress image (or skip if missing)
-        run: |
-          if [ -f /tmp/cypress-image.tar.zst ]; then
-            zstd -d /tmp/cypress-image.tar.zst --stdout | docker load
           fi
 
       - name: Run tests
