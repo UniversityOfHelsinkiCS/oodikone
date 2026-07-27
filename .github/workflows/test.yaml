@@ -2,6 +2,12 @@ name: 'Lint and test'
 
 on:
   workflow_call:
+    inputs:
+      runner_environment:
+        required: true
+        type: string
+        default: 'unknown-runner'
+        description: 'runner.environment variable from top level context'
     secrets:
       username:
         required: true
@@ -51,7 +57,7 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      ${{ runner.environment }} != 'self-hosted' &&
+      ${{ inputs.runner_environment }} != 'self-hosted' &&
       !(
         needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
         needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
@@ -353,7 +359,7 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      ${{ runner.environment }} != 'self-hosted'
+      ${{ inputs.runner_environment }} != 'self-hosted'
 
     steps:
       - name: Set up cache for Cypress image (saved in Post-step)
