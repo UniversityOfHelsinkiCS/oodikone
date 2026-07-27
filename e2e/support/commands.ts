@@ -85,7 +85,3 @@ export const init = async (page: Page, path: string, userId: UserId) => {
 
   await page.goto(path || '/')
 }
-
-// export const cs = (page: Page, subject: string) => {
-//   const selector = `[data-cy="${name}"]`
-// }
