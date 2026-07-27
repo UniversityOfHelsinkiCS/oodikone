@@ -150,6 +150,10 @@ jobs:
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
+      - name: Teardown containers started by compose
+        if: always()
+        uses: ./.github/actions/teardown
+
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
     runs-on: self-hosted
@@ -179,6 +183,10 @@ jobs:
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
+      - name: Teardown containers started by compose
+        if: always()
+        uses: ./.github/actions/teardown
+
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
     runs-on: self-hosted
@@ -207,6 +215,10 @@ jobs:
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
+
+      - name: Teardown containers started by compose
+        if: always()
+        uses: ./.github/actions/teardown
 
   # === Update sis-db with updater ===
   check_updater_changed:
@@ -274,6 +286,10 @@ jobs:
       - name: Dump logs on failure
         if: failure()
         run: npm run logs:ci
+
+      - name: Teardown containers started by compose
+        if: always()
+        uses: ./.github/actions/teardown
 
   # === Backend api-tests ===
   test_api:

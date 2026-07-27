@@ -47,3 +47,7 @@ runs:
       shell: bash
       if: failure()
       run: npm run logs:ci && sleep 15
+
+    - name: Teardown containers started by compose
+      if: always()
+      uses: ./.github/actions/teardown

@@ -1,0 +1,9 @@
+name: Teardown docker compose (docker-compose.ci.yml)
+description: 'Teardown all containers started by docker (docker-compose.ci.yml)'
+
+runs:
+  using: composite
+  steps:
+    - name: 'Teardown docker compose'
+      shell: bash
+      run: docker compose --file docker-compose.ci.yml --profile="*" down --remove-orphans

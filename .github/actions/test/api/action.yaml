@@ -50,3 +50,7 @@ runs:
     - name: Run api-tests
       shell: bash
       run: npm run test:api --prefix ./services/backend
+
+    - name: Teardown containers started by compose
+      if: always()
+      uses: ./.github/actions/teardown
