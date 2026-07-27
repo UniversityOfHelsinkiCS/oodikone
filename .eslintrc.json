@@ -8,6 +8,7 @@
     "**/coverage/**",
     "nyc-config.cjs",
     ".lintstagedrc.mjs",
-    "cypress.config.js"
+    "cypress.config.js",
+    "playwright/**/*.js"
   ]
 }
