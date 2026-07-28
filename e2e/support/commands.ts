@@ -1,7 +1,7 @@
 // ! IMPORTANT: here we need to set keys to be all lowercase, since
 // ! we're replacing headers after they've left browser / frontend.
 
-import { Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
 
 // All of these users are available in anon user-db
 const adminUserHeaders = {
@@ -70,7 +70,7 @@ export const userHeaders = [
 
 type UserId = 'admin' | 'basic' | 'onlycoursestatistics' | 'norights' | 'onlyiamrights' | 'onlystudyguidancegroups'
 
-export const init = async (page: Page, path: string, userId: UserId) => {
+export const init = async (page: Page, path: string, userId: UserId = 'basic') => {
   const headersToUse = userHeaders.find(({ uid }) => uid === userId)
   if (!headersToUse) throw Error(`${userId} is not valid user id!`)
 
@@ -84,4 +84,13 @@ export const init = async (page: Page, path: string, userId: UserId) => {
   })
 
   await page.goto(path || '/')
+}
+
+export const checkTableStats = async (page: Page, correctStats: (string | number)[][], tableName: string) => {
+  const testId = tableName + '-data-table'
+  await expect(page.getByTestId(testId).getByText('Loading content')).not.toBeVisible()
+
+  const table = page.getByTestId(testId).locator('tbody')
+  await expect(table).toBeVisible()
+  await expect(table.locator('tr > td')).toHaveText(correctStats.flatMap(stats => stats.map(value => value.toString())))
 }
