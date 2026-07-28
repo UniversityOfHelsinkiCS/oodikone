@@ -5,6 +5,7 @@ const unknownModule = mod => ({ name: mod.name, type: 'unknown' })
 
 export class ModuleResolver {
   constructor(knex) {
+    /** @type {import('knex').Knex} */
     this.knex = knex
     this.moduleCache = {}
     this.orderTable = {}
