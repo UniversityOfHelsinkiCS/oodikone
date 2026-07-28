@@ -29,6 +29,19 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const mapCourse = courseMapper(courseIdToAttainments)
 
   for (const [groupId, courses] of Object.entries(groupIdToCourse)) {
+    const now = new Date()
+    const { id: primaryCourseId } = courses.reduce(
+      (acc, cur) => {
+        const start = new Date(cur.validity_period.startDate)
+        if (start > acc.startDate && start < now) {
+          acc.id = cur.id
+          acc.startDate = start
+        }
+        return acc
+      },
+      { startDate: new Date(0), id: courses[0].id }
+    )
+
     for (const course of courses) {
       /** @type string[][] @description nested arrays of courseUnit groupIds. Modules have no substitutions. */
       const substitutionGroups = course.substitutions?.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId)) ?? []
@@ -55,7 +68,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
       const mapCourseProvider = courseProviderMapper(groupId)
 
       courseProviders.push(...Object.values(organisationsById).map(mapCourseProvider))
-      mappedCourses.push(mapCourse(groupId, course, substitutionGroups))
+      mappedCourses.push(mapCourse(groupId, course, substitutionGroups, primaryCourseId))
     }
   }
 

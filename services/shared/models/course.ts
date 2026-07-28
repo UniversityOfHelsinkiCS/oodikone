@@ -6,21 +6,25 @@ import type { Enrollment } from './enrollment'
 import type { Organization } from './organization'
 
 export type Course = {
+  /* COLUMNS */
   id: string
+  groupId: string
   code: string
   coursetypecode: string
+  isStudyModule: boolean
+  isPrimary: boolean
+  name: Name
+  maxAttainmentDate: Date | null
+  minAttainmentDate: Date | null
+  createdAt: Date
+  updatedAt: Date
+  substitutionGroups: string[][]
+  validityPeriod: { startDate?: Date; endDate?: Date } | null
+  courseUnitType: string
+
+  /* RELATIONS */
   courseType: CourseType
   credits: Credit[]
   enrollments: Enrollment[]
   organizations: Organization[]
-  is_study_module: boolean
-  name: Name
-  max_attainment_date: Date
-  min_attainment_date: Date
-  createdAt: Date
-  updatedAt: Date
-  substitutions: string[]
-  substitution_groups: string[][]
-  course_unit_type: string
-  mainCourseCode: string
 }

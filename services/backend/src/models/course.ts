@@ -21,14 +21,18 @@ import { EnrollmentModel } from './enrollment'
 import { OrganizationModel } from './organization'
 
 @Table({
-  underscored: false,
+  underscored: true,
   modelName: 'course',
   tableName: 'course',
 })
 export class CourseModel extends Model implements Course {
+  /* COLUMNS */
   @PrimaryKey
   @Column(DataType.STRING)
   declare id: Course['id']
+
+  @Column(DataType.STRING)
+  declare groupId: Course['id']
 
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
@@ -38,6 +42,39 @@ export class CourseModel extends Model implements Course {
   @Column(DataType.STRING)
   declare coursetypecode: Course['coursetypecode']
 
+  @Column(DataType.BOOLEAN)
+  declare isStudyModule: Course['isStudyModule']
+
+  @Column(DataType.JSONB)
+  declare name: Course['name']
+
+  @Column(DataType.DATE)
+  declare maxAttainmentDate: Course['maxAttainmentDate']
+
+  @Column(DataType.DATE)
+  declare minAttainmentDate: Course['minAttainmentDate']
+
+  @CreatedAt
+  @Column({ field: 'created_at', type: DataType.DATE })
+  declare createdAt: Course['createdAt']
+
+  @UpdatedAt
+  @Column({ field: 'updated_at', type: DataType.DATE })
+  declare updatedAt: Course['updatedAt']
+
+  @Column(DataType.JSONB)
+  declare validityPeriod: Course['validityPeriod']
+
+  @Column(DataType.JSONB)
+  declare substitutionGroups: Course['substitutionGroups']
+
+  @Column(DataType.BOOLEAN)
+  declare isPrimary: Course['isPrimary']
+
+  @Column(DataType.STRING)
+  declare courseUnitType: Course['courseUnitType']
+
+  /* RELATIONS */
   @BelongsTo(() => CourseTypeModel, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
   declare courseType: Course['courseType']
 
@@ -49,36 +86,4 @@ export class CourseModel extends Model implements Course {
 
   @BelongsToMany(() => OrganizationModel, () => CourseProviderModel, 'coursecode')
   declare organizations: Course['organizations']
-
-  @Column(DataType.BOOLEAN)
-  declare is_study_module: Course['is_study_module']
-
-  @Column(DataType.JSONB)
-  declare name: Course['name']
-
-  @Column(DataType.DATE)
-  declare max_attainment_date: Course['max_attainment_date']
-
-  @Column(DataType.DATE)
-  declare min_attainment_date: Course['min_attainment_date']
-
-  @CreatedAt
-  @Column({ field: 'created_at', type: DataType.DATE })
-  declare createdAt: Course['createdAt']
-
-  @UpdatedAt
-  @Column({ field: 'updated_at', type: DataType.DATE })
-  declare updatedAt: Course['updatedAt']
-
-  @Column(DataType.JSONB)
-  declare substitutions: Course['substitutions']
-
-  @Column(DataType.JSONB)
-  declare substitution_groups: Course['substitution_groups']
-
-  @Column(DataType.STRING)
-  declare course_unit_type: Course['course_unit_type']
-
-  @Column({ field: 'main_course_code', type: DataType.STRING })
-  declare mainCourseCode: Course['mainCourseCode']
 }
