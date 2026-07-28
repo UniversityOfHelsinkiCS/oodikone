@@ -228,7 +228,7 @@ export const StudyrightsTable = ({
                   <TableCell>
                     <Stack alignItems="center" direction="row">
                       {`${getTextIn(name)} (${reformatDate(startDate, DateFormat.DISPLAY_DATE)}–${reformatDate(endDate, DateFormat.DISPLAY_DATE)})`}
-                      {studyProgrammes != null && code in studyProgrammes && (
+                      {studyProgrammes != null && code in studyProgrammes && startDate && (
                         <IconButton
                           color="primary"
                           component={Link}
