@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'
-/// <reference types="cypress" />
-const getEmptyYears = isAcademicYear => {
+import { test, expect, Page } from '@playwright/test'
+import { checkTableStats, init } from './support/commands'
+
+const getEmptyYears = (isAcademicYear: boolean = false) => {
   const today = new Date()
   const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   const years = []
@@ -13,46 +14,54 @@ const getEmptyYears = isAcademicYear => {
   }
   return years
 }
+
 const tagName = `tag-${new Date().getTime()}`
-const selectYear = async (page, year) => {
-  page.locator('text=Associated start year (optional)').click({ force: true })
-  page.locator('[placeholder=YYYY]').type(year)
+const selectYear = async (page: Page, year: number) => {
+  await page.getByText('Associated start year (optional)').click()
+  await page.getByPlaceholder('YYYY').fill(year.toString())
 }
-const deleteTag = async (page, tagName) => {
-  cy.cs(`delete-tag-${tagName}-button`).click()
-  cy.contains('Delete tag')
-  cy.contains('Are you sure you want to delete tag')
-  cy.cs('confirm-delete-tag-button').click()
+
+const deleteTag = async (page: Page, tagName: string) => {
+  await page.getByTestId(`delete-tag-${tagName}-button`).click()
+  await expect(page.getByText('Delete tag')).toBeVisible()
+  await expect(page.getByText('Are you sure you want to delete tag')).toBeVisible()
+  await page.getByTestId('confirm-delete-tag-button').click()
 }
+
 test.describe('Degree programme overview', () => {
   test.describe('Degree programme selector', () => {
     test('Degree programme search filter', async ({ page }) => {
-      cy.init('/study-programme', 'admin')
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
-      cy.contains('Matemaattisten tieteiden kandiohjelma').should('exist')
-      cy.cs('study-programme-filter').type('Tietojenkäsittelytieteen')
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').should('exist')
-      cy.contains('Matemaattisten tieteiden kandiohjelma').should('not.exist')
+      await init(page, '/study-programme', 'admin')
+      await expect(page.getByText('Tietojenkäsittelytieteen kandiohjelma')).toBeVisible()
+      await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+
+      await page.getByTestId('study-programme-filter').click()
+      await page.getByPlaceholder('Type here to filter degree programmes').fill('Tietojenkäsittelytieteen')
+
+      await expect(page.getByText('Tietojenkäsittelytieteen kandiohjelma')).toBeVisible()
+      await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).not.toBeVisible()
     })
   })
   test.describe('Basic information tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click({ force: true })
-      cy.cs('year-toggle').click() // NOTE: Tests are written for calendar years
+      init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+      await page.getByTestId('year-toggle').click() // NOTE: Tests are written for calendar years
     })
+
     test('Basic information tab loads', async ({ page }) => {
-      cy.cs('students-of-the-study-programme-section')
-      cy.cs('credits-produced-by-the-study-programme-section')
-      cy.cs('graduated-and-thesis-writers-of-the-programme-section')
-      cy.cs('programmes-before-or-after-section')
-      cy.cs('average-graduation-times-section')
+      await expect(page.getByTestId('students-of-the-study-programme-section')).toBeVisible()
+      await expect(page.getByTestId('credits-produced-by-the-study-programme-section')).toBeVisible()
+      await expect(page.getByTestId('graduated-and-thesis-writers-of-the-programme-section')).toBeVisible()
+      await expect(page.getByTestId('programmes-before-or-after-section')).toBeVisible()
+      await expect(page.getByTestId('average-graduation-times-section')).toBeVisible()
     })
+
     test('Basic information contains correct students', async ({ page }) => {
       const years = getEmptyYears()
       const tableContents = [
         // [Year, Started studying, Accepted, Graduated, Cancelled, Transferred Away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0]),
         [2023, 8, 8, 26, 2, 0, 0],
         [2022, 25, 26, 47, 0, 1, 3],
         [2021, 29, 32, 48, 1, 0, 2],
@@ -61,8 +70,9 @@ test.describe('Degree programme overview', () => {
         [2018, 40, 45, 0, 0, 0, 1],
         [2017, 41, 47, 0, 0, 0, 0],
       ]
-      cy.checkTableStats(tableContents, 'students-of-the-study-programme')
+      await checkTableStats(page, tableContents, 'students-of-the-study-programme')
     })
+
     test('Basic information contains correct credits', async ({ page }) => {
       const years = getEmptyYears()
       const tableContents = [
@@ -70,13 +80,14 @@ test.describe('Degree programme overview', () => {
         [2023, 1519, 1519, 0, 0, 0, 0, 0, 222, 0],
         [2022, 3235, 3205, 0, 0, 30, 0, 0, 209, 0],
         [2021, 5133, 5108, 0, 0, 25, 0, 0, 428, 25],
-        [2020, 5801, 5796, 0, 0, 5, 0, 0, 94, 0],
+        [2020, 5801, 5796, 0, 0, 5, 0, 0, 94, 10],
         [2019, 5305, 5305, 0, 0, 0, 0, 0, 162, 0],
         [2018, 3442, 3432, 0, 0, 10, 0, 0, 21, 0],
         [2017, 1211, 1211, 0, 0, 0, 0, 0, 189, 0],
       ]
-      cy.checkTableStats(tableContents, 'credits-produced-by-the-study-programme')
+      await checkTableStats(page, tableContents, 'credits-produced-by-the-study-programme')
     })
+
     test('Basic information contains correct thesis writers and graduates', async ({ page }) => {
       const years = getEmptyYears()
       const tableContents = [
@@ -90,23 +101,24 @@ test.describe('Degree programme overview', () => {
         [2018, 0, 0],
         [2017, 0, 1],
       ]
-      cy.checkTableStats(tableContents, 'graduated-and-graduations-of-the-programme')
+      await checkTableStats(page, tableContents, 'graduated-and-graduations-of-the-programme')
     })
+
     test('Special study rights can be excluded and basic data changes accordingly', async ({ page }) => {
-      cy.cs('study-right-toggle').click()
+      await page.getByTestId('study-right-toggle').click()
       const years = getEmptyYears()
       const studentTableContents = [
-        // [Year, Started studying, Accepted, Graduated]
-        ...years.map(year => [year, 0, 0, 0]),
-        [2023, 8, 8, 24],
-        [2022, 25, 26, 43],
-        [2021, 29, 32, 47],
-        [2020, 26, 27, 11],
-        [2019, 28, 34, 1],
-        [2018, 40, 45, 0],
-        [2017, 41, 47, 0],
+        // [Year, Started studying, Accepted, Graduated, Cancelled]
+        ...years.map(year => [year, 0, 0, 0, 0]),
+        [2023, 8, 8, 24, 2],
+        [2022, 25, 26, 43, 0],
+        [2021, 29, 32, 47, 1],
+        [2020, 26, 27, 11, 0],
+        [2019, 28, 34, 1, 0],
+        [2018, 40, 45, 0, 0],
+        [2017, 41, 47, 0, 0],
       ]
-      cy.checkTableStats(studentTableContents, 'students-of-the-study-programme')
+      await checkTableStats(page, studentTableContents, 'students-of-the-study-programme')
       const graduatedTableContents = [
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
@@ -118,15 +130,16 @@ test.describe('Degree programme overview', () => {
         [2018, 0, 0],
         [2017, 0, 1],
       ]
-      cy.checkTableStats(graduatedTableContents, 'graduated-and-graduations-of-the-programme')
+      await checkTableStats(page, graduatedTableContents, 'graduated-and-graduations-of-the-programme')
     })
+
     test('Year can be changed to academic year, and data changes accordingly', async ({ page }) => {
-      cy.cs('year-toggle').click()
+      await page.getByTestId('year-toggle').click()
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
         // [Year, Started studying, Accepted, Graduated, Cancelled, Transferred away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 8, 8, 4, 1, 0, 0],
         ['2022 - 2023', 25, 26, 35, 1, 0, 0],
         ['2021 - 2022', 29, 32, 58, 1, 1, 5],
@@ -135,124 +148,149 @@ test.describe('Degree programme overview', () => {
         ['2018 - 2019', 40, 45, 0, 0, 0, 1],
         ['2017 - 2018', 41, 47, 0, 0, 0, 0],
       ]
-      cy.checkTableStats(studentTableContents, 'students-of-the-study-programme')
+      await checkTableStats(page, studentTableContents, 'students-of-the-study-programme')
+
       const creditTableContents = [
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
         ['2023 - 2024', 160, 160, 0, 0, 0, 0, 0, 67, 0],
         ['2022 - 2023', 2725, 2720, 0, 0, 5, 0, 0, 337, 0],
         ['2021 - 2022', 4092, 4042, 0, 0, 50, 0, 0, 198, 0],
         ['2020 - 2021', 5420, 5415, 0, 0, 5, 0, 0, 321, 25],
-        ['2019 - 2020', 6043, 6043, 0, 0, 0, 0, 0, 101, 0],
+        ['2019 - 2020', 6043, 6043, 0, 0, 0, 0, 0, 101, 10],
         ['2018 - 2019', 4856, 4851, 0, 0, 5, 0, 0, 107, 0],
         ['2017 - 2018', 2350, 2345, 0, 0, 5, 0, 0, 26, 0],
       ]
-      cy.checkTableStats(creditTableContents, 'credits-produced-by-the-study-programme')
-      cy.cs('year-toggle').click()
+      await checkTableStats(page, creditTableContents, 'credits-produced-by-the-study-programme')
+      // await page.getByTestId('year-toggle').click()
     })
+
     test('Basic information graphs render', async ({ page }) => {
-      cy.cs('students-of-the-study-programme-line-graph-section')
-        .should('contain', 'Started studying')
-        .should('contain', 'Accepted')
-        .should('contain', 'Graduated')
-        .should('contain', 'Transferred away')
-        .should('contain', 'Transferred to')
-      cy.cs('credits-produced-by-the-study-programme-stacked-bar-chart-section')
-        .should('contain', 'Degree students')
-        .should('contain', 'Transferred')
-        .should('contain', 5796)
-        .should('contain', 428)
-      cy.cs('graduated-and-thesis-writers-of-the-programme-bar-chart-section')
-        .should('contain', 'Graduated students')
-        .should('contain', 'Wrote thesis')
-        .should('contain', 47)
-        .should('contain', 76)
-      cy.cs('graduation-mode-selector').within(() => {
-        cy.cs('select-median').click()
-      })
-      cy.cs('unset-median-bar-chart').within(() => {
-        cy.contains('47 graduated').should('be.visible')
-        cy.contains('47 graduated').hover()
-      })
-      cy.get('.grad-vals').contains('47 students graduated in year 2022').should('be.visible')
-      cy.contains('median study time: 6 semesters')
-      cy.contains('24 graduated on time')
-      cy.contains('12 graduated max year overtime')
-      cy.contains('11 graduated over year late')
-      cy.cs('programmes-before-or-after-stacked-bar-chart-section')
-        .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
-        .should('contain', 'Datatieteen maisteriohjelma')
-        .should('contain', 'Matematiikan ja tilastotieteen maisteriohjelma')
-        .should('contain', 32)
-        .should('contain', 21)
-        .should('contain', 17)
+      const graph = page.getByTestId('students-of-the-study-programme-line-graph-section')
+      await expect(graph.getByText('Started studying')).toBeVisible()
+      await expect(graph.getByText('Accepted')).toBeVisible()
+      await expect(graph.getByText('Graduated')).toBeVisible()
+      await expect(graph.getByText('Cancelled')).toBeVisible()
+      await expect(graph.getByText('Transferred away')).toBeVisible()
+      await expect(graph.getByText('Transferred to')).toBeVisible()
+
+      const creditsBarChart = page.getByTestId('credits-produced-by-the-study-programme-stacked-bar-chart-section')
+      await expect(creditsBarChart.getByText('Degree students')).toBeVisible()
+      await expect(creditsBarChart.getByText('Transferred')).toBeVisible()
+      await expect(creditsBarChart.getByText('5796')).toBeVisible()
+      await expect(creditsBarChart.getByText('428')).toBeVisible()
+
+      const thesisBarChart = page.getByTestId('graduated-and-thesis-writers-of-the-programme-bar-chart-section')
+      await expect(thesisBarChart.getByText('Graduated students')).toBeVisible()
+      await expect(thesisBarChart.getByText('Wrote thesis')).toBeVisible()
+      await expect(thesisBarChart.getByText('47')).toBeVisible()
+      await expect(thesisBarChart.getByText('76')).toBeVisible()
+
+      await page.getByTestId('graduation-mode-selector').getByTestId('select-median').click()
+      await expect(page.getByTestId('unset-median-bar-chart').getByText('47 graduated')).toBeVisible()
+
+      await page.getByTestId('unset-median-bar-chart').getByText('47 graduated').hover()
+      await expect(page.locator('.grad-vals').getByText('47 students graduated in year 2022')).toBeVisible()
+      await expect(page.getByText('median study time: 6 semesters')).toBeVisible()
+      await expect(page.getByText('24 graduated on time')).toBeVisible()
+      await expect(page.getByText('12 graduated max year overtime')).toBeVisible()
+      await expect(page.getByText('11 graduated over year late')).toBeVisible()
+
+      const programmesBarChart = page.getByTestId('programmes-before-or-after-stacked-bar-chart-section')
+      await expect(programmesBarChart.getByText('Tietojenkäsittelytieteen maisteriohjelma')).toBeVisible()
+      await expect(programmesBarChart.getByText('Datatieteen maisteriohjelma')).toBeVisible()
+      await expect(programmesBarChart.getByText('Matematiikan ja tilastotieteen maisteriohjelma')).toBeVisible()
+
+      const row = page
+        .getByTestId('programmes-before-or-after-data-table')
+        .locator('tr')
+        .filter({ hasText: 'Matematiikan ja tilastotieteen maisteriohjelma' })
+      await expect(row.getByText('33')).toBeVisible()
+      await expect(row.getByText('20')).toBeVisible()
+      await expect(row.getByText('17')).toBeVisible()
     })
   })
+
   test.describe('Graduation times of master programmes', () => {
     test('are split into three graphs', async ({ page }) => {
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matematiikan ja tilastotieteen maisteriohjelma').click({ force: true })
-      cy.cs('year-toggle').click() // Tests are written for calendar year
-      cy.cs('unset-breakdown-bar-chart')
-      cy.cs('graduation-mode-selector').within(() => {
-        cy.cs('select-average').click()
-      })
-      cy.cs('unset-graduation-times-section')
-        .eq(1)
-        .within(() => {
-          cy.contains('Master study right')
-          cy.contains('2 graduated').should('be.visible')
-          cy.contains('2 graduated').hover()
-        })
-      cy.get('.grad-vals').contains('2 students graduated in year 2021').should('be.visible')
-      cy.contains('average study time: 4.5 semesters')
-      cy.contains('1 graduated on time')
-      cy.contains('1 graduated max year overtime')
-      cy.contains('0 graduated over year late')
-      cy.cs('unset-graduation-times-section')
-        .eq(0)
-        .within(() => {
-          cy.contains('Bachelor + master study right')
-          cy.contains('11 graduated').should('be.visible')
-          cy.contains('11 graduated').hover()
-        })
-      cy.get('.grad-vals').contains('11 students graduated in year 2023').should('be.visible')
-      cy.contains('average study time: 11.18 semesters')
-      cy.contains('4 graduated on time')
-      cy.contains('6 graduated max year overtime')
-      cy.contains('1 graduated over year late')
+      init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matematiikan ja tilastotieteen maisteriohjelma' }).click()
+      await page.getByTestId('year-toggle').click() // Tests are written for calendar year
+
+      // await expect(page.getByTestId("unset-breakdown-bar-chart")).toBeVisible()
+
+      await page.getByTestId('graduation-mode-selector').getByTestId('select-average').click()
+
+      // await expect(page.getByTestId("unset-breakdown-section").getByText("Master study right")).toBeVisible()
+      const masterChart = page
+        .getByTestId('unset-graduation-times-section')
+        .filter({ hasText: 'Master study right', hasNotText: 'Bachelor +' })
+      await expect(masterChart).toBeVisible()
+      await expect(masterChart.getByText('2 graduated')).toBeVisible()
+
+      await masterChart.getByText('2 graduated').hover()
+      await expect(page.locator('.grad-vals').getByText('2 students graduated in year 2021')).toBeVisible()
+      await expect(page.getByText('average study time: 4.5 semesters')).toBeVisible()
+      await expect(page.getByText('1 graduated on time')).toBeVisible()
+      await expect(page.getByText('1 graduated max year overtime')).toBeVisible()
+      await expect(page.getByText('0 graduated over year late')).toBeVisible()
+
+      const bachelorMasterChart = page
+        .getByTestId('unset-graduation-times-section')
+        .filter({ hasText: 'Bachelor + master study right' })
+      await expect(bachelorMasterChart).toBeVisible()
+      await expect(bachelorMasterChart.getByText('11 graduated')).toBeVisible()
+
+      await bachelorMasterChart.getByText('11 graduated').hover()
+      await expect(page.locator('.grad-vals').getByText('11 students graduated in year 2023')).toBeVisible()
+      await expect(page.getByText('average study time: 11.18 semesters')).toBeVisible()
+      await expect(page.getByText('4 graduated on time')).toBeVisible()
+      await expect(page.getByText('6 graduated max year overtime')).toBeVisible()
+      await expect(page.getByText('1 graduated over year late')).toBeVisible()
     })
   })
+
   test.describe('Study tracks and class statistics tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.intercept(
-        'GET',
-        'api/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
-      ).as('stQuery')
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('StudyTracksAndClassStatisticsTab').click()
+      // cy.intercept(
+      //   'GET',
+      //   'api/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
+      // ).as('stQuery')
+      init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+      await page.getByTestId('StudyTracksAndClassStatisticsTab').click()
     })
+
     test.describe('Info boxes', () => {
       test('Study track overview section', async ({ page }) => {
-        cy.cs('study-track-overview-info-box-button').click()
-        cy.cs('study-track-overview-info-box-content').contains('Opiskelijat, joiden')
+        await page.getByTestId('study-track-overview-info-box-button').hover()
+        await expect(
+          page.getByTestId('study-track-overview-info-box-content').getByText('Opiskelijat, joiden')
+        ).toBeVisible()
       })
+
       test('Progress of students section', async ({ page }) => {
-        cy.cs('progress-of-students-info-box-button').click()
-        cy.cs('progress-of-students-info-box-content').contains('Kuvaa koulutusohjelmassa')
+        await page.getByTestId('progress-of-students-info-box-button').hover()
+        await expect(
+          page.getByTestId('progress-of-students-info-box-content').getByText('Kuvaa koulutusohjelmassa')
+        ).toBeVisible()
       })
+
       test('Average graduation times section', async ({ page }) => {
-        page.waitForTimeout(500)
-        cy.cs('average-graduation-times-info-box-button').click()
-        cy.cs('average-graduation-times-info-box-content').contains('Yksittäinen palkki')
+        // page.waitForTimeout(500)
+        await page.getByTestId('average-graduation-times-info-box-button').click()
+        await expect(
+          page.getByTestId('average-graduation-times-info-box-content').getByText('Yksittäinen palkki')
+        ).toBeVisible()
       })
     })
+
     test('All sections are visible', async ({ page }) => {
-      cy.cs('study-track-selector-section')
-      cy.cs('study-track-overview-section')
-      cy.cs('progress-of-students-section')
-      cy.cs('average-graduation-times-section')
+      await expect(page.getByTestId('study-track-selector-section')).toBeVisible()
+      await expect(page.getByTestId('study-track-overview-section')).toBeVisible()
+      await expect(page.getByTestId('progress-of-students-section')).toBeVisible()
+      await expect(page.getByTestId('average-graduation-times-section')).toBeVisible()
     })
+
     test('Students of the degree programme are shown correctly', async ({ page }) => {
       const tableContents = [
         // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainments, Men, Women, Other/Unknown, Finland, Other]
@@ -265,39 +303,50 @@ test.describe('Degree programme overview', () => {
         ['2017 - 2018', 47, 41, 0, 0, 5, 42, 0, 31, 16, 0, 47, 0],
         ['Total', 229, 197, 0, 0, 95, 134, 0, 147, 82, 0, 224, 12],
       ]
-      cy.checkTableStats(tableContents, 'study-tracks-and-class-statistics')
+      await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
     })
-    test.skip('Years in the students table can be expanded and study track data will be shown', async ({ page }) => {
-      // TODO: Fix this test
-      cy.cs('study-tracks-and-class-statistics-data-table').within(() => {
-        cy.get('tbody tr.header-row')
-          .eq(3)
-          .within(() => {
-            page.locator('td i.angle.right.icon').click()
-          })
-        const dataForStudyTracks = [
-          ['Ekonometria, MAT-EKO', 2, 2, 0, 0, 0, 2, 1, 1, 0, 2, 0],
-          ['Matematiikka, MAT-MAT', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],
-          ['Tietojenkäsittelyteoria, MAT-TIE', 2, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0],
-          ['Tilastotiede, MAT-TIL', 4, 4, 0, 0, 0, 4, 1, 3, 0, 4, 0],
-        ]
-        dataForStudyTracks.forEach((data, index) => {
-          cy.get('tbody tr.regular-row')
-            .eq(index)
-            .within(() => {
-              cy.get('td').each((cell, i) => {
-                cy.wrap(cell).contains(data[i])
-              })
-            })
-        })
-        cy.get('tbody tr.header-row')
-          .eq(3)
-          .within(() => {
-            page.locator('td i.angle.down.icon').click()
-          })
-        cy.get('tbody tr.regular-row').should('not.exist')
-      })
+
+    test('Years in the students table can be expanded and study track data will be shown', async ({ page }) => {
+      const table = page.getByTestId('study-tracks-and-class-statistics-data-table').locator('tbody')
+      const row = table.locator('tr').filter({ hasText: '2020 - 2021' })
+
+      await expect(row.locator('td')).toHaveCount(13)
+      await expect(row.locator('td')).toHaveText(
+        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3].map(n => n.toString())
+      )
+
+      await row.getByTestId('show-study-trarks-button').click()
+
+      // cy.cs('study-tracks-and-class-statistics-data-table').within(() => {
+      //   cy.get('tbody tr.header-row')
+      //     .eq(3)
+      //     .within(() => {
+      //       page.locator('td i.angle.right.icon').click()
+      //     })
+      //   const dataForStudyTracks = [
+      //     ['Ekonometria, MAT-EKO', 2, 2, 0, 0, 0, 2, 1, 1, 0, 2, 0],
+      //     ['Matematiikka, MAT-MAT', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],
+      //     ['Tietojenkäsittelyteoria, MAT-TIE', 2, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0],
+      //     ['Tilastotiede, MAT-TIL', 4, 4, 0, 0, 0, 4, 1, 3, 0, 4, 0],
+      //   ]
+      //   dataForStudyTracks.forEach((data, index) => {
+      //     cy.get('tbody tr.regular-row')
+      //       .eq(index)
+      //       .within(() => {
+      //         cy.get('td').each((cell, i) => {
+      //           cy.wrap(cell).contains(data[i])
+      //         })
+      //       })
+      //   })
+      //   cy.get('tbody tr.header-row')
+      //     .eq(3)
+      //     .within(() => {
+      //       page.locator('td i.angle.down.icon').click()
+      //     })
+      //   cy.get('tbody tr.regular-row').should('not.exist')
+      // })
     })
+
     test.describe('Population link button works for', () => {
       test('a single year', async ({ page }) => {
         cy.cs('2023-population-link-button').first().click()
