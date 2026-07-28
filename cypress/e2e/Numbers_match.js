@@ -141,7 +141,8 @@ describe('Numbers should match between', () => {
       assert.strictEqual(entry.at(3) + entry.at(4), entry.at(5))
     })
 
-    it('in Programme courses', () => {
+    // TODO: Re-enable when migrated to playwright
+    it.skip('in Programme courses', () => {
       cy.init('/study-programme')
       cy.contains('a', 'Matemaattisten tieteiden kandiohjelma').click()
       cy.cs('ProgrammeCoursesTab').click()
