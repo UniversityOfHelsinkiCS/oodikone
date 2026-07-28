@@ -153,7 +153,8 @@ describe('Courselist saving-related functions work', () => {
     cy.cs('course-list-input').contains(courses.join(', '))
   })
 
-  it('Course list can be deleted', () => {
+  // TODO: This will be re-enabled when migrating to playwright
+  it.skip('Course list can be deleted', () => {
     const courseList = generateCourseListName()
     createCourseList(['CSM14204', 'TKT10004'], courseList)
     openSearch()

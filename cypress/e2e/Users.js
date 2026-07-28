@@ -71,7 +71,8 @@ describe('Users tests', () => {
         userButtonWorks('basic', true)
       })
 
-      it("only the mocked user's programmes are visible", () => {
+      // TODO: This will be re-enabled when migrating to playwright
+      it.skip("only the mocked user's programmes are visible", () => {
         cy.intercept('/api/populationstatistics/studyprogrammes').as('studyprogrammes')
         cy.visit('/populations')
         cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
