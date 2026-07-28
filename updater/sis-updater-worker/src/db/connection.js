@@ -22,7 +22,9 @@ class DbConnections extends EventEmitter {
   RETRY_ATTEMPTS = 15
   knexConnection = false
   seqConnection = false
+  /** @type {import('knex').Knex | undefined}
   knex = undefined
+  /** @type {import('sequelize').Sequelize | undefined} */
   sequelize = undefined
 
   constructor() {
