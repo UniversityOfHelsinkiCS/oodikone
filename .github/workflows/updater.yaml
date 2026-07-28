@@ -20,7 +20,7 @@ jobs:
       - name: 'Install dependencies'
         run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
       - name: 'Run linter'
-        run: npm run eslint -- updater
+        run: npm run lint -- updater
 
   build_worker:
     name: 'Build Updater worker'
