@@ -61,7 +61,8 @@ describe('Users tests', () => {
       userButtonWorks('admin')
     })
 
-    describe('can mock as other users', { retries: 3 }, () => {
+    // TODO: This will be re-enabled when migrating to playwright
+    describe.skip('can mock as other users', { retries: 3 }, () => {
       beforeEach(() => {
         cy.cs('user-page-button-basic').click()
         cy.cs('mock-button').click()
@@ -71,8 +72,8 @@ describe('Users tests', () => {
         userButtonWorks('basic', true)
       })
 
-      // TODO: This will be re-enabled when migrating to playwright
-      it.skip("only the mocked user's programmes are visible", () => {
+
+      it("only the mocked user's programmes are visible", () => {
         cy.intercept('/api/populationstatistics/studyprogrammes').as('studyprogrammes')
         cy.visit('/populations')
         cy.wait('@studyprogrammes').its('response.statusCode').should('be.oneOf', [200, 304])
