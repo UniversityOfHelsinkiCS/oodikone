@@ -236,14 +236,14 @@ export const courseProviderMapper =
     shares,
   })
 
-export const courseMapper = courseIdToAttainments => (groupId, course, substitution_groups) => {
+export const courseMapper = courseIdToAttainments => (groupId, course, substitutionGroups, primaryId) => {
   const { id, code, name, study_level, course_unit_type, validity_period } = course
 
   const courseAttainments = courseIdToAttainments[id] ?? []
 
   // Attainments are sorted by attainment_date ASC
-  const min_attainment_date = courseAttainments[0]?.attainment_date ?? null
-  const max_attainment_date = courseAttainments[courseAttainments.length - 1]?.attainment_date ?? null
+  const minAttainmentDate = courseAttainments[0]?.attainment_date ?? null
+  const maxAttainmentDate = courseAttainments[courseAttainments.length - 1]?.attainment_date ?? null
 
   return {
     id,
@@ -251,12 +251,13 @@ export const courseMapper = courseIdToAttainments => (groupId, course, substitut
     name,
     code,
     coursetypecode: study_level,
-    min_attainment_date,
-    max_attainment_date,
-    validity_period,
-    is_study_module: !course_unit_type, // Only course units have a course_unit_type. If null -> must be a study module
-    substitution_groups,
-    course_unit_type,
+    minAttainmentDate,
+    maxAttainmentDate,
+    validityPeriod: validity_period,
+    isStudyModule: !course_unit_type, // Only course units have a course_unit_type. If null -> must be a study module
+    isPrimary: primaryId === id,
+    substitutionGroups,
+    courseUnitType: course_unit_type,
   }
 }
 
