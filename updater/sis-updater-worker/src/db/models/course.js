@@ -10,22 +10,28 @@ Course.init(
       type: STRING,
       primaryKey: true,
     },
+    groupId: {
+      type: STRING,
+    },
     code: {
       type: STRING,
     },
     name: {
       type: JSONB,
     },
-    is_study_module: {
+    isStudyModule: {
+      type: BOOLEAN,
+    },
+    isPrimary: {
       type: BOOLEAN,
     },
     coursetypecode: {
       type: STRING,
     },
-    max_attainment_date: {
+    maxAttainmentDate: {
       type: DATE,
     },
-    min_attainment_date: {
+    minAttainmentDate: {
       type: DATE,
     },
     createdAt: {
@@ -36,22 +42,18 @@ Course.init(
       field: 'updated_at',
       type: DATE,
     },
-    substitutions: {
+    substitutionGroups: {
       type: JSONB,
     },
-    substitution_groups: {
+    validityPeriod: {
       type: JSONB,
     },
-    course_unit_type: {
-      type: STRING,
-    },
-    mainCourseCode: {
-      field: 'main_course_code',
+    courseUnitType: {
       type: STRING,
     },
   },
   {
-    underscored: false,
+    underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'course',
     tableName: 'course',
