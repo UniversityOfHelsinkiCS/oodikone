@@ -17,13 +17,12 @@ const getEmptyYears = (isAcademicYear: boolean = false) => {
 
 const tagName = `tag-${new Date().getTime()}`
 const selectYear = async (page: Page, year: number) => {
-  await page.getByText('Associated start year (optional)').click()
-  await page.getByPlaceholder('YYYY').fill(year.toString())
+  await page.getByLabel('Associated start year (optional)').fill(year.toString())
 }
 
 const deleteTag = async (page: Page, tagName: string) => {
   await page.getByTestId(`delete-tag-${tagName}-button`).click()
-  await expect(page.getByText('Delete tag')).toBeVisible()
+  await expect(page.getByText('Delete tag', { exact: true })).toBeVisible()
   await expect(page.getByText('Are you sure you want to delete tag')).toBeVisible()
   await page.getByTestId('confirm-delete-tag-button').click()
 }
@@ -49,6 +48,7 @@ test.describe('Degree programme overview', () => {
       await page.getByTestId('year-toggle').click() // NOTE: Tests are written for calendar years
     })
 
+    // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     test('Basic information tab loads', async ({ page }) => {
       await expect(page.getByTestId('students-of-the-study-programme-section')).toBeVisible()
       await expect(page.getByTestId('credits-produced-by-the-study-programme-section')).toBeVisible()
@@ -276,7 +276,6 @@ test.describe('Degree programme overview', () => {
       })
 
       test('Average graduation times section', async ({ page }) => {
-        // page.waitForTimeout(500)
         await page.getByTestId('average-graduation-times-info-box-button').click()
         await expect(
           page.getByTestId('average-graduation-times-info-box-content').getByText('Yksittäinen palkki')
@@ -307,68 +306,67 @@ test.describe('Degree programme overview', () => {
     })
 
     test('Years in the students table can be expanded and study track data will be shown', async ({ page }) => {
+      const totalStats: [string, ...Array<number>] = ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3]
       const table = page.getByTestId('study-tracks-and-class-statistics-data-table').locator('tbody')
       const row = table.locator('tr').filter({ hasText: '2020 - 2021' })
 
       await expect(row.locator('td')).toHaveCount(13)
-      await expect(row.locator('td')).toHaveText(
-        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3].map(n => n.toString())
+      await expect(row.locator('td')).toHaveText(totalStats.map(n => n.toString()))
+
+      const studyTrackStats: [string, ...Array<number>][] = [
+        ['Ekonometria (MAT-EKO)', 2, 2, 0, 0, 0, 2, 0, 1, 1, 0, 2, 0],
+        ['Matematiikka (MAT-MAT)', 13, 10, 0, 0, 1, 12, 0, 7, 6, 0, 12, 3],
+        ['Tietojenkäsittelyteoria (MAT-TIE)', 2, 1, 0, 0, 1, 1, 0, 2, 0, 0, 2, 0],
+        ['Tilastotiede (MAT-TIL)', 4, 4, 0, 0, 0, 4, 0, 1, 3, 0, 4, 0],
+      ]
+
+      await row.getByTestId('show-study-tracks-button').click()
+
+      await Promise.all(
+        studyTrackStats.map(async ([studyTrack, ...stats]) => {
+          await expect(page.getByText(studyTrack)).toBeVisible()
+          const studyTrackRow = table.locator('tr').filter({ hasText: studyTrack })
+
+          await expect(studyTrackRow.locator('td')).toHaveCount(13)
+          await expect(studyTrackRow.locator('td')).toHaveText([studyTrack, ...stats].map(n => n.toString()))
+        })
       )
 
-      await row.getByTestId('show-study-trarks-button').click()
-
-      // cy.cs('study-tracks-and-class-statistics-data-table').within(() => {
-      //   cy.get('tbody tr.header-row')
-      //     .eq(3)
-      //     .within(() => {
-      //       page.locator('td i.angle.right.icon').click()
-      //     })
-      //   const dataForStudyTracks = [
-      //     ['Ekonometria, MAT-EKO', 2, 2, 0, 0, 0, 2, 1, 1, 0, 2, 0],
-      //     ['Matematiikka, MAT-MAT', 13, 10, 0, 0, 1, 12, 7, 6, 0, 12, 3],
-      //     ['Tietojenkäsittelyteoria, MAT-TIE', 2, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0],
-      //     ['Tilastotiede, MAT-TIL', 4, 4, 0, 0, 0, 4, 1, 3, 0, 4, 0],
-      //   ]
-      //   dataForStudyTracks.forEach((data, index) => {
-      //     cy.get('tbody tr.regular-row')
-      //       .eq(index)
-      //       .within(() => {
-      //         cy.get('td').each((cell, i) => {
-      //           cy.wrap(cell).contains(data[i])
-      //         })
-      //       })
-      //   })
-      //   cy.get('tbody tr.header-row')
-      //     .eq(3)
-      //     .within(() => {
-      //       page.locator('td i.angle.down.icon').click()
-      //     })
-      //   cy.get('tbody tr.regular-row').should('not.exist')
-      // })
+      await row.getByTestId('show-study-tracks-button').click()
+      await Promise.all(
+        studyTrackStats.map(async ([studyTrack]) => {
+          await expect(page.getByText(studyTrack)).not.toBeVisible()
+        })
+      )
     })
 
     test.describe('Population link button works for', () => {
       test('a single year', async ({ page }) => {
-        cy.cs('2023-population-link-button').first().click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Class of 2023 - 2024, 8 students')
+        await page.getByTestId('2023-population-link-button').click()
+        await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+        await expect(page.getByText('Class of 2023 - 2024, 8 students')).toBeVisible()
       })
+
       test('total', async ({ page }) => {
-        cy.cs('total-population-link-button').click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Class of 2017 - 2026, 227 students')
+        await page.getByTestId('total-population-link-button').click()
+        await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+        await expect(page.getByText('Class of 2017 - 2026, 227 students')).toBeVisible()
       })
+
       test('Links to class statistics page with study track info included work', async ({ page }) => {
-        cy.cs('show-study-tracks-button').first().click()
-        cy.contains('td', 'Matematiikka (MAT-MAT)').within(() => {
-          page.locator('a').click()
-        })
-        cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Studytrack MAT-MAT')
-        cy.contains('Class of 2022 - 2023, 26 students')
-        cy.contains('Showing 3 out of 26 students')
+        const table = page.getByTestId('study-tracks-and-class-statistics-data-table').locator('tbody')
+        const row = table.locator('tr').filter({ hasText: '2022 - 2023' })
+
+        await row.getByTestId('show-study-tracks-button').click()
+        await table.locator('tr').filter({ hasText: 'Matematiikka (MAT-MAT)' }).getByRole('link').click()
+
+        await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+        await expect(page.getByText('Studytrack MAT-MAT')).toBeVisible()
+        await expect(page.getByText('Class of 2022 - 2023, 26 students')).toBeVisible()
+        await expect(page.getByText('Showing 3 out of 26 students')).toBeVisible()
       })
     })
+
     test('Student progress data is shown correctly', async ({ page }) => {
       const years = getEmptyYears(true)
       const tableContents = [
@@ -383,59 +381,79 @@ test.describe('Degree programme overview', () => {
         ['2017 - 2018', 47, 0, 1, 3, 0, 0, 1, 0, 42],
         ['Total', 229, 28, 15, 21, 19, 4, 1, 7, 134],
       ]
-      cy.checkTableStats(tableContents, 'study-programme-progress')
+      await checkTableStats(page, tableContents, 'study-programme-progress')
     })
+
     test('Progress section', async ({ page }) => {
-      cy.cs('programme-progress-bar-chart-section').scrollIntoView()
-      cy.cs('programme-progress-bar-chart-section')
-        .should('contain', 'Less than 30 credits')
-        .should('contain', '30–60 credits')
-        .should('contain', 'At least 180 credits')
-        .should('contain', '58.5%') // The percentage for total graduated, to check that the graph renders
-      cy.cs('programme-progress-bar-chart-section').contains('58.5%').hover()
-      cy.contains('Graduated: 134')
+      const barChart = page.getByTestId('programme-progress-bar-chart-section')
+      await expect(barChart.getByText('Less than 30 credits')).toBeVisible()
+      await expect(barChart.getByText('30–60 credits')).toBeVisible()
+      await expect(barChart.getByText('At least 180 credits')).toBeVisible()
+      await expect(barChart.getByText('58.5%')).toBeVisible() // The percentage for total graduated, to check that the graph renders
+
+      await page.getByTestId('programme-progress-bar-chart-section').getByText('58.5%').hover()
+      await expect(page.getByText('Graduated: 134')).toBeVisible()
     })
-    test.skip('Average graduation times section', async ({ page }) => {
-      cy.cs('average-graduation-times-section').scrollIntoView()
-      cy.cs('average-graduation-times-section').within(() => {
-        cy.cs('unset-graduation-times-section').within(() => {
-          cy.contains('2020 - 2021')
-        })
-        cy.get('text').contains('16').hover()
-        cy.contains('On time: 16')
-        cy.cs('unset-graduation-times-section').within(() => {
-          cy.contains("Click a bar to view that year's study track level breakdown")
-          cy.get('text').contains('22').click()
-        })
-        cy.contains('Year 2019 - 2020 by start year')
-        cy.get('text').contains('13').hover()
-        cy.contains('Matematiikka')
-        cy.contains('MAT-MAT')
-        cy.contains('On time: 13')
+
+    test.describe('Average graduation times section', () => {
+      test('Shows correct data for all years and one year', async ({ page }) => {
+        // NOTE: This test could be flaky. Many nth and first/last used
+        await expect(page.getByTestId('unset-graduation-times-section').getByText('2019 - 2020')).toBeVisible()
+        await page.getByTestId('unset-graduation-times-section').getByText('21', { exact: true }).hover()
+        await expect(page.getByText('On time: 21')).toBeVisible()
+
+        await expect(
+          page
+            .getByTestId('unset-graduation-times-section')
+            .getByText('Click any bar on the chart to open a study track level breakdown for that year')
+        ).toBeVisible()
+        await page.getByTestId('unset-graduation-times-section').getByText('15', { exact: true }).nth(1).click() // Skip legend
+        await expect(
+          page
+            .getByTestId('unset-graduation-times-section')
+            .getByText('Click any bar on the chart to open a study track level breakdown for that year')
+        ).not.toBeVisible()
+
+        await expect(page.getByText('Year 2020 - 2021 by start year')).toBeVisible()
+        await expect(page.getByText('MAT-MAT')).toBeVisible()
+
+        await page.getByText('9').last().hover()
+        await expect(page.getByText('Matematiikka')).toBeVisible()
+        await expect(page.getByText('MAT-MAT').last()).toBeVisible()
+        await expect(page.getByText('On time: 9')).toBeVisible()
       })
-      cy.cs('graduation-time-toggle').click()
-      cy.cs('average-graduation-times-section').within(() => {
-        cy.contains('2020 - 2021')
-        cy.contains('19 graduated').hover()
-        cy.contains('From class of 2020 - 2021, 19/30 students have graduated')
-        cy.contains('median study time: 6 semesters')
-        cy.contains('16 graduated on time')
-        cy.contains('2 graduated max year overtime')
-        cy.contains('1 graduated over year late')
+      test('Shows correct average', async ({ page }) => {
+        await page.getByTestId('select-average').click()
+        const section = page.getByTestId('average-graduation-times-section')
+
+        await expect(section.getByText('2020 - 2021')).toBeVisible()
+        await section.getByText('19 graduated').hover()
+
+        await expect(page.getByText('From class of 2020 - 2021, 19/30 students have graduated')).toBeVisible()
+        await expect(page.getByText('average study time: 5.79 semesters')).toBeVisible()
+        await expect(page.getByText('15 graduated on time')).toBeVisible()
+        await expect(page.getByText('3 graduated max year overtime')).toBeVisible()
+        await expect(page.getByText('1 graduated over year late')).toBeVisible()
       })
     })
+
     test.describe('Study track can be changed', () => {
       test.beforeEach(async ({ page }) => {
-        page.waitForTimeout('@stQuery')
-        cy.contains('All students of the programme')
-        cy.cs('study-track-select').click()
-        cy.contains('Ekonometria')
-        cy.contains('Tietojenkäsittelyteoria')
-        cy.contains('Tilastotiede')
-        page.locator('text=Matematiikka').click()
+        // page.waitForTimeout('@stQuery')
+        await expect(page.getByText('All students of the programme')).toBeVisible()
+        await page.getByTestId('study-track-select').click()
+        await expect(page.getByText('Ekonometria')).toBeVisible()
+        await expect(page.getByText('Tietojenkäsittelyteoria')).toBeVisible()
+        await expect(page.getByText('Tilastotiede')).toBeVisible()
+        await page.getByText('Matematiikka').click()
       })
+
       test('Students of the study track are shown correctly', async ({ page }) => {
-        cy.cs('study-track-overview-section').contains('Students of the study track MAT-MAT by starting year')
+        await expect(
+          page
+            .getByTestId('study-track-overview-section')
+            .getByText('Students of the study track MAT-MAT by starting year')
+        ).toBeVisible()
         const tableContents = [
           // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainment, Men, Women, Other/Unknown, Finland, Other]
           ['2022 - 2023', 3, 3, 0, 0, 1, 2, 0, 2, 1, 0, 3, 0],
@@ -446,363 +464,337 @@ test.describe('Degree programme overview', () => {
           ['2017 - 2018', 28, 24, 0, 0, 1, 27, 0, 15, 13, 0, 28, 0],
           ['Total', 89, 73, 0, 0, 6, 83, 0, 48, 41, 0, 88, 4],
         ]
-        cy.checkTableStats(tableContents, 'study-tracks-and-class-statistics')
+        await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
       })
+
       test('Links to class statistics page with study track info included work', async ({ page }) => {
-        cy.cs('2020-population-link-button').first().click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Studytrack MAT-MAT')
-        cy.contains('Class of 2020 - 2021, 30 students')
-        cy.contains('Showing 10 out of 30 students')
+        await page.getByTestId('2020-population-link-button').click()
+        await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+        await expect(page.getByText('Studytrack MAT-MAT')).toBeVisible()
+        await expect(page.getByText('Class of 2020 - 2021, 30 students')).toBeVisible()
+        await expect(page.getByText('Showing 10 out of 30 students')).toBeVisible()
       })
-      test.skip('Info message about missing progress stats is displayed', async ({ page }) => {
-        cy.contains('Progress of students of the study track MAT-MAT by starting year')
-        cy.contains('Progress data is currently only available for all students of the degree programme.')
-      })
-      test.skip('Average graduation times are displayed correctly', async ({ page }) => {
-        cy.get("[data-cy='Section-averageGraduationTimesStudyTracks']")
-        cy.get("[data-cy='graduation-times-graph-breakdownBachelor']").within(() => {
-          cy.contains('Start year')
-          cy.contains('2020 - 2021')
-          cy.get('[aria-label="2020 - 2021, 9. On time."]').hover()
-          cy.contains('Graduated On time: 9 students')
-        })
-        cy.cs('graduation-time-toggle').click()
-        cy.cs('bachelor-median-time-bar-chart').within(() => {
-          cy.contains('Start year')
-          cy.contains('2020 - 2021')
-          cy.contains('12 graduated').hover()
-          cy.contains('From class of 2020 - 2021, 12/13 students have graduated')
-          cy.contains('median study time: 34 months')
-          cy.contains('9 graduated on time')
-          cy.contains('2 graduated max year overtime')
-          cy.contains('1 graduated over year late')
-        })
+
+      // FIXME: This feature was implemented. The data is no-good, so maybe reimplement this when it's clean.
+      test.fixme('Info message about missing progress stats is displayed', async ({ page }) => {
+        await expect(page.getByText('Progress of students of the study track MAT-MAT by starting year')).toBeVisible()
+        await expect(
+          page.getByText('Progress data is currently only available for all students of the degree programme.')
+        ).toBeVisible()
       })
     })
   })
+
   test.describe('Programme courses tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('ProgrammeCoursesTab').click()
-      cy.cs('by-credit-type-section')
-      cy.cs('by-credit-type-tab')
-      cy.cs('by-semester-tab')
+      await init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+      await page.getByTestId('ProgrammeCoursesTab').click()
+      await expect(page.getByTestId('by-credit-type-section')).toBeVisible()
+      await expect(page.getByTestId('by-credit-type-tab')).toBeVisible()
+      await expect(page.getByTestId('by-semester-tab')).toBeVisible()
     })
+
     test.describe('By credit type tab', () => {
       test.beforeEach(async ({ page }) => {
-        cy.cs('show-credits-students-toggle').click()
-        cy.cs('year-toggle').click()
-        cy.get('thead').within(() => {
-          cy.get('tr')
-            .eq(0)
-            .within(() => {
-              cy.get('th').eq(3).click()
-            })
-        })
-        cy.get('tbody').within(() => {
-          cy.get('tr')
-            .eq(8)
-            .within(() => {
-              cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT11004')
-              cy.get('td').eq(2).contains('Differentiaalilaskenta')
-              cy.get('td').eq(3).contains('1240')
-            })
-        })
+        await expect(page.getByText('Programme courses by credit type')).toBeVisible()
+        await expect(page.getByText('Loading content')).not.toBeVisible()
+        await page.getByText('Total students').click()
       })
-      test('time range selection works', async ({ page }) => {
-        cy.cs('from-year-select').click()
-        cy.cs('from-year-select-option-2021').click()
-        cy.cs('to-year-select').click()
-        cy.cs('to-year-select-option-2022').click()
-        cy.get('tbody').within(() => {
-          cy.get('tr')
-            .eq(9)
-            .within(() => {
-              cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT21009')
-              cy.get('td').eq(2).contains('Kandidaatintutkielma')
-              cy.get('td').eq(3).contains('414')
-            })
-        })
+
+      test('shows correct data', async ({ page }) => {
+        await expect(
+          page
+            .locator('tbody')
+            .locator('tr')
+            .filter({ hasText: 'Johdatus yliopistomatematiikkaan', hasNotText: 'Avoin yo' })
+            .locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11001', 'Johdatus yliopistomatematiikkaan', 272, 253, 19, 240, 0, 4, 0, 0, 0, 1, 9].map(n =>
+            n.toString()
+          )
+        )
+        await expect(
+          page.locator('tbody').locator('tr').filter({ hasText: 'Raja-arvot', hasNotText: 'Avoin yo' }).locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11003', 'Raja-arvot', 270, 249, 21, 237, 0, 4, 0, 0, 0, 1, 8].map(n => n.toString())
+        )
+        await expect(
+          page
+            .locator('tbody')
+            .locator('tr')
+            .filter({ hasText: 'Differentiaalilaskenta', hasNotText: 'Avoin yo' })
+            .locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11004', 'Differentiaalilaskenta', 262, 248, 14, 230, 0, 4, 0, 0, 0, 1, 14].map(n =>
+            n.toString()
+          )
+        )
       })
+
       test('year toggle works', async ({ page }) => {
-        cy.cs('year-toggle').click() // Default view now Academic years
-        cy.cs('from-year-select').click()
-        cy.cs('from-year-select-option-2017').click()
-        cy.cs('to-year-select').click()
-        cy.cs('to-year-select-option-2023').click()
-        cy.get('tbody').within(() => {
-          cy.get('tr')
-            .eq(5)
-            .within(() => {
-              cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT11001')
-              cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('1265')
-            })
-        })
+        await page.getByTestId('year-toggle').click()
+
+        await expect(
+          page
+            .locator('tbody')
+            .locator('tr')
+            .filter({ hasText: 'Johdatus yliopistomatematiikkaan', hasNotText: 'Avoin yo' })
+            .locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11001', 'Johdatus yliopistomatematiikkaan', 278, 259, 19, 240, 0, 4, 0, 0, 0, 1, 15].map(n =>
+            n.toString()
+          )
+        )
+        await expect(
+          page.locator('tbody').locator('tr').filter({ hasText: 'Raja-arvot', hasNotText: 'Avoin yo' }).locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11003', 'Raja-arvot', 274, 253, 21, 237, 0, 4, 0, 0, 0, 1, 12].map(n => n.toString())
+        )
+        await expect(
+          page
+            .locator('tbody')
+            .locator('tr')
+            .filter({ hasText: 'Differentiaalilaskenta', hasNotText: 'Avoin yo' })
+            .locator('td')
+        ).toHaveText(
+          ['Course', 'MAT11004', 'Differentiaalilaskenta', 264, 250, 14, 230, 0, 4, 0, 0, 0, 1, 16].map(n =>
+            n.toString()
+          )
+        )
       })
-      test.skip('different sorting options work', async ({ page }) => {
-        cy.cs('CoursesSortableTable').within(() => {
-          // Course code
-          cy.get('th').eq(0).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('odgi-zef0')
-              cy.get('td').eq(1).contains('Työ- ja organisaatiopsykologian perusopinnot')
-            })
-          cy.get('th').eq(0).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('MAT-yht')
-              cy.get('td').eq(1).contains('Muut opinnot')
-            })
-          // Course name
-          cy.get('th').eq(1).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('MAT20003')
-              cy.get('td').eq(1).contains('Äidinkielen opinnot')
-            })
-          cy.get('th').eq(1).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('MAT11008')
-              cy.get('td').eq(1).contains('Advanced calculus')
-            })
-          // Total credits
-          cy.get('th').eq(2).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('MAT110')
-              cy.get('td').eq(1).contains('Matematiikka, perusopinnot')
-            })
-          cy.get('th').eq(2).click()
-          cy.get('tr')
-            .eq(1)
-            .within(() => {
-              cy.get('td').eq(0).contains('MAT20001')
-              cy.get('td').eq(1).contains('Kypsyysnäyte')
-            })
-        })
+
+      test('time range selection works', async ({ page }) => {
+        await page.getByTestId('from-year-select').click()
+        await page.getByTestId('from-year-select-option-2020').click()
+        await page.getByTestId('to-year-select').click()
+        await page.getByTestId('to-year-select-option-2021').click()
+
+        await expect(
+          page
+            .locator('tbody')
+            .locator('tr')
+            .filter({ hasText: 'Vektorianalyysi I', hasNotText: 'Avoin yo' })
+            .filter({ hasNotText: 'Vektorianalyysi II' })
+            .locator('td')
+        ).toHaveText(
+          ['Course', 'MAT21003', 'Vektorianalyysi I', 104, 97, 7, 89, 0, 1, 0, 0, 0, 0, 10].map(n => n.toString())
+        )
+        await expect(
+          page.locator('tbody').locator('tr').filter({ hasText: 'Sarjat', hasNotText: 'Avoin yo' }).locator('td')
+        ).toHaveText(['Course', 'MAT21002', 'Sarjat', 83, 77, 6, 70, 0, 1, 0, 0, 0, 0, 7].map(n => n.toString()))
+        await expect(
+          page.locator('tbody').locator('tr').filter({ hasText: 'Raja-arvot', hasNotText: 'Avoin yo' }).locator('td')
+        ).toHaveText(['Course', 'MAT11003', 'Raja-arvot', 80, 73, 7, 69, 0, 2, 0, 0, 0, 1, 1].map(n => n.toString()))
       })
+
       test("'Show credits/Show students' toggle works", async ({ page }) => {
-        cy.cs('year-toggle').click()
-        page.waitForTimeout(500)
-        cy.get('thead tr')
-          .eq(0)
-          .within(() => {
-            expect(page.locator('th')).toHaveCount(6)
-            const headers = ['Type', 'Code', 'Name', 'Total credits', 'Credits produced by', 'Transferred credits']
-            headers.forEach((header, index) => {
-              cy.get('th').eq(index).contains(header)
-            })
-          })
-        cy.get('thead tr')
-          .eq(1)
-          .within(() => {
-            expect(page.locator('th')).toHaveCount(7)
-            const headers = [
-              'Degree students',
-              'Open university (hetu)',
-              'Open university (no hetu)',
-              'Exchange students',
-              'Other universities',
-              'Separate studies',
-              'Other',
-            ]
-            headers.forEach((header, index) => {
-              cy.get('th').eq(index).contains(header)
-            })
-          })
-        cy.cs('show-credits-students-toggle').click()
-        cy.get('thead tr')
-          .eq(0)
-          .within(() => {
-            expect(page.locator('th')).toHaveCount(7)
-            const headers = [
-              'Type',
-              'Code',
-              'Name',
-              'Total students',
-              'Breakdown of total',
-              'Breakdown of passed',
-              'Not included in total or passed',
-            ]
-            headers.forEach((header, index) => {
-              cy.get('th').eq(index).contains(header)
-            })
-          })
-        cy.get('thead tr')
-          .eq(1)
-          .within(() => {
-            expect(page.locator('th')).toHaveCount(10)
-            const headers = [
-              'Passed',
-              'Not completed',
-              'Degree students',
-              'Open university students (with hetu)',
-              'Open university students (without hetu)',
-              'Exchange students',
-              'Other university students',
-              'Separate studies',
-              'Other students',
-              'Students with transferred credits',
-            ]
-            headers.forEach((header, index) => {
-              cy.get('th').eq(index).contains(header)
-            })
-          })
-        cy.get('tbody').within(() => {
-          cy.get('tr')
-            .eq(5)
-            .within(() => {
-              cy.get('td').eq(0).contains('Course')
-              cy.get('td').eq(1).contains('MAT11001')
-              cy.get('td').eq(2).contains('Johdatus yliopistomatematiikkaan')
-              cy.get('td').eq(3).contains('272')
-            })
-        })
+        const headers = page.getByRole('columnheader')
+        await expect(headers).toHaveCount(17)
+        await expect(headers).toHaveText([
+          'Type',
+          'Code',
+          'Name',
+          'Total students',
+          'Breakdown of total',
+          'Breakdown of passed',
+          'Not included in total or passed',
+          'Passed',
+          'Not completed',
+          'Degree students',
+          'Open university students (with hetu)',
+          'Open university students (without hetu)',
+          'Exchange students',
+          'Other university students',
+          'Separate studies',
+          'Other students',
+          'Students with transferred credits',
+        ])
+
+        await page.getByTestId('show-credits-students-toggle').click()
+        await expect(headers).toHaveCount(13)
+        await expect(headers).toHaveText([
+          'Type',
+          'Code',
+          'Name',
+          'Total credits',
+          'Credits produced by',
+          'Transferred credits',
+          'Degree students',
+          'Open university (hetu)',
+          'Open university (no hetu)',
+          'Exchange students',
+          'Other universities',
+          'Separate studies',
+          'Other',
+        ])
       })
     })
+
     test.describe('By semester tab', () => {
       test.beforeEach(async ({ page }) => {
-        cy.cs('by-semester-tab').click()
+        await page.getByTestId('by-semester-tab').click()
       })
-      test.skip('test', async ({ page }) => {
-        // TODO: Implement some real tests for this tab
-        cy.contains('From')
+
+      // TODO: Implement proper tests
+      test('can be opened', async ({ page }) => {
+        await expect(page.getByText('Programme courses by semester')).toBeVisible()
+        await expect(page.getByText('From')).toBeVisible()
+        await expect(page.getByText('Until')).toBeVisible()
       })
     })
   })
+
   test.describe('Degree courses tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click()
-      cy.cs('DegreeCoursesTab').click()
+      await init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+      await page.getByTestId('DegreeCoursesTab').click()
     })
-    test('Curriculum section', async ({ page }) => {
-      cy.cs('curriculum-section')
-      cy.contains('Select curriculum to edit:')
-      cy.cs('curriculum-picker').contains('2023–2026')
-      // TODO: Test changing the curriculum
+
+    test.describe('Curriculum section', () => {
+      test('is shown', async ({ page }) => {
+        await expect(page.getByTestId('curriculum-section')).toBeVisible()
+        await expect(page.getByText('Select curriculum to edit:')).toBeVisible()
+        await expect(page.getByTestId('curriculum-picker').getByText('2023–2026')).toBeVisible()
+      })
+      test.skip('can be changed', async () => {})
     })
+
     test.describe('Credit criteria section', () => {
       test('info box', async ({ page }) => {
-        cy.cs('credit-criteria-section')
-        cy.cs('credit-criteria-info-box-button').click()
-        cy.cs('credit-criteria-info-box-content').contains('Here you can change')
+        await expect(page.getByTestId('credit-criteria-section')).toBeVisible()
+        await page.getByTestId('credit-criteria-info-box-button').click()
+        await expect(
+          page.getByTestId('credit-criteria-info-box-content').getByText('Here you can change')
+        ).toBeVisible()
       })
+
       test.skip('changing the credit criteria works', async ({ page }) => {
         // TODO: Test using the inputs
         // TODO: Button status
         // TODO: Test "previously set to _" text changing when saving
       })
     })
+
     test('Degree course table', async ({ page }) => {
-      cy.cs('degree-course-table')
+      await expect(page.getByTestId('degree-course-table')).toBeVisible()
       // TODO: Test clicking the arrow buttons
       // TODO: Test toggling visibility for MODULES and COURSES
       // TODO: Test changing criterion labels
     })
   })
+
   test.describe('Tags tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.init('/study-programme')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click({ force: true })
-      cy.cs('TagsTab').click()
+      await init(page, '/study-programme')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+      await page.getByTestId('TagsTab').click()
     })
+
     test('info box', async ({ page }) => {
-      cy.cs('create-new-tag-info-box-button').click()
-      cy.cs('create-new-tag-info-box-content').contains('Here you can create')
+      await page.getByTestId('create-new-tag-info-box-button').click()
+      await expect(page.getByTestId('create-new-tag-info-box-content').getByText('Here you can create')).toBeVisible()
     })
+
     test.describe('Adding tags to populations and removing them works', () => {
       test.beforeEach(async ({ page }) => {
-        cy.contains('This degree programme does not have any tags yet')
-        cy.cs('tag-name-text-field').type(tagName)
+        await expect(page.getByText('This degree programme does not have any tags yet')).toBeVisible()
+        await page.getByTestId('tag-name-text-field').getByRole('textbox').fill(tagName)
       })
+
       test.afterEach(async ({ page }) => {
-        deleteTag(page)
-        cy.contains('This degree programme does not have any tags yet')
+        await deleteTag(page, tagName)
+        await expect(page.getByText('This degree programme does not have any tags yet')).toBeVisible()
       })
+
       test('can create and delete tags without start year', async ({ page }) => {
-        cy.cs('create-button').click()
-        cy.contains(tagName)
-        cy.contains('No associated start year')
+        await page.getByTestId('create-button').click()
+        await expect(page.getByText(tagName)).toBeVisible()
+        await expect(page.getByText('No associated start year')).toBeVisible()
       })
-      test.skip('can create and delete tags with start year', async ({ page }) => {
-        selectYear(page)
-        cy.cs('create-button').click()
-        cy.contains(tagName)
-        cy.contains('Associated start year 2022')
+
+      test('can create and delete tags with start year', async ({ page }) => {
+        await selectYear(page, 2022)
+        await page.getByTestId('create-button').click()
+        await expect(page.getByText(tagName)).toBeVisible()
+        await expect(page.getByText('Associated start year 2022')).toBeVisible()
       })
-      test.skip('population link works', async ({ page }) => {
-        selectYear(page)
-        cy.cs('create-button').click()
-        cy.contains(tagName)
-        cy.cs('population-link-button').click()
-        cy.contains(`Tagged with: ${tagName}`)
-        cy.go('back')
+
+      test.fixme('population link works', async ({ page }) => {
+        await selectYear(page, 2022)
+        await page.getByTestId('create-button').click()
+        await expect(page.getByText(tagName)).toBeVisible()
+        await page.getByTestId('population-link-button').click()
+        // FIXME: If no students are tagged with the tag, it shows "Invalid tag id"
+        await expect(page.getByText(`Tagged with: ${tagName}`)).toBeVisible()
+        await page.goBack()
       })
+
       test('can create personal tags', async ({ page }) => {
-        cy.cs('personal-tag-toggle').click()
-        cy.cs('create-button').click()
-        cy.contains(tagName)
-        cy.cs(`${tagName}-visibility-icon`)
+        await page.getByTestId('personal-tag-toggle').click()
+        await page.getByTestId('create-button').click()
+        await expect(page.getByText(tagName)).toBeVisible()
+        await expect(page.getByTestId(`${tagName}-visibility-icon`)).toBeVisible()
       })
     })
+
     test.describe('Adding tags to students and removing them works', () => {
       const studentInput = '477806,478275;   478953  479239\n   480080'
-      const studentNumbers = studentInput.match(/[^\s,;]+/g)
-      test.skip('can add tags to students', async ({ page }) => {
-        // TODO: This test fails in the pipeline, but works locally. Investigate.
-        cy.cs('tag-name-text-field').type(tagName)
-        selectYear(page)
-        cy.cs('create-button').click()
-        cy.contains(tagName)
-        cy.cs('add-students-button').click()
-        cy.cs('add-students-text-field').type(studentInput)
-        cy.cs('add-students-confirm-button').click()
-        cy.contains('Students added to tag')
-        cy.cs('population-link-button').click()
-        cy.contains('Matemaattisten tieteiden kandiohjelma')
-        cy.contains('Class of 2022 - 2023')
-        cy.contains(`Tagged with: ${tagName}`)
-        cy.contains('Students (5)')
-          .parent()
-          .then($parentDiv => {
-            if (!$parentDiv.hasClass('active')) page.locator('text=Students (5)').click()
-          })
+      const studentNumbers = studentInput.match(/[^\s,;]+/g)!
+      test('can add tags to students', async ({ page, context }) => {
+        // NOTE: Navigating to each students' page takes time, fix?
+        test.slow()
+
+        await page.getByTestId('tag-name-text-field').getByRole('textbox').fill(tagName)
+        await selectYear(page, 2022)
+        await page.getByTestId('create-button').click()
+        await expect(page.getByText(tagName)).toBeVisible()
+        await page.getByTestId('add-students-button').click()
+        await page.getByTestId('add-students-text-field').getByRole('textbox').fill(studentInput)
+        await page.getByTestId('add-students-confirm-button').click()
+
+        await expect(page.getByText('Students added to tag')).toBeVisible()
+
+        await page.getByTestId('population-link-button').click()
+        await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
+        await expect(page.getByText('Class of 2022 - 2023')).toBeVisible()
+        await expect(page.getByText(`Tagged with: ${tagName}`)).toBeVisible()
+        await expect(page.getByText('Students (5)')).toBeVisible()
+
+        await page.getByText('Students (5)').click()
+
         for (const studentNumber of studentNumbers) {
-          cy.contains(studentNumber)
+          await expect(page.getByText(studentNumber)).toBeVisible()
         }
+
         for (const studentNumber of studentNumbers) {
-          page.goto(`/students/${studentNumber}`)
-          cy.contains('Tags')
-          cy.contains(tagName)
+          await page.goto(`/students/${studentNumber}`)
+          await expect(page.getByRole('heading', { name: 'Tags' })).toBeVisible()
+          await expect(page.getByText(tagName)).toBeVisible()
         }
-        cy.get('a').contains('Matemaattisten tieteiden kandiohjelma').invoke('removeAttr', 'target').click()
-        cy.url().should('include', '/study-programme/KH50_001?tab=4')
-        deleteTag(page)
+
+        // Change to other tab
+        const pagePromise = context.waitForEvent('page')
+        await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+        const newPage = await pagePromise
+        await deleteTag(newPage, tagName)
       })
+
       test('deleting a tag from tag view also removes it from students', async ({ page }) => {
-        cy.contains(tagName).should('not.exist')
+        // NOTE: Navigating to each students' page takes time, fix?
+        test.slow()
+
+        await expect(page.getByText(tagName)).not.toBeVisible()
         for (const studentNumber of studentNumbers) {
-          page.goto(`/students/${studentNumber}`)
-          cy.contains('Tags').should('not.exist')
-          cy.contains(tagName).should('not.exist')
+          await page.goto(`/students/${studentNumber}`)
+          await expect(page.getByRole('heading', { name: 'Tags' })).not.toBeVisible()
+          await expect(page.getByText(tagName)).not.toBeVisible()
         }
       })
     })
   })
+
   test.describe('IAM user', () => {
     test.beforeEach(async ({ page }) => {
       cy.init('/study-programme', 'onlyiamrights')
