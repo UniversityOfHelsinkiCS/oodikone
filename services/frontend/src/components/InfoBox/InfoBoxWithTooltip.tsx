@@ -15,6 +15,10 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 700,
+    maxHeight: '80vh',
+    overflowY: 'auto',
+    cursor: 'auto',
+    userSelect: 'text',
   },
 })
 
@@ -32,8 +36,14 @@ export const InfoBox = ({
   return (
     <CustomWidthTooltip
       arrow
+      leaveDelay={300}
       title={
-        <Typography component="div" data-cy={`${cypress}-info-box-content`} sx={{ padding: 1 }} variant="body2">
+        <Typography
+          component="div"
+          data-cy={`${cypress}-info-box-content`}
+          sx={{ padding: 1, userSelect: 'text' }}
+          variant="body2"
+        >
           <ReactMarkdown>{useFormatContent(content)}</ReactMarkdown>
         </Typography>
       }
