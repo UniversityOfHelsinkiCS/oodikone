@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test'
 import { checkTableStats, init } from './support/commands'
 
-const getEmptyYears = (isAcademicYear: boolean = false) => {
+const getEmptyYears = (isAcademicYear = false) => {
   const today = new Date()
   const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   const years = []
@@ -43,7 +43,7 @@ test.describe('Degree programme overview', () => {
   })
   test.describe('Basic information tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      init(page, '/study-programme')
+      await init(page, '/study-programme')
       await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
       await page.getByTestId('year-toggle').click() // NOTE: Tests are written for calendar years
     })
@@ -212,15 +212,12 @@ test.describe('Degree programme overview', () => {
 
   test.describe('Graduation times of master programmes', () => {
     test('are split into three graphs', async ({ page }) => {
-      init(page, '/study-programme')
+      await init(page, '/study-programme')
       await page.getByRole('link', { name: 'Matematiikan ja tilastotieteen maisteriohjelma' }).click()
       await page.getByTestId('year-toggle').click() // Tests are written for calendar year
 
-      // await expect(page.getByTestId("unset-breakdown-bar-chart")).toBeVisible()
-
       await page.getByTestId('graduation-mode-selector').getByTestId('select-average').click()
 
-      // await expect(page.getByTestId("unset-breakdown-section").getByText("Master study right")).toBeVisible()
       const masterChart = page
         .getByTestId('unset-graduation-times-section')
         .filter({ hasText: 'Master study right', hasNotText: 'Bachelor +' })
@@ -251,11 +248,7 @@ test.describe('Degree programme overview', () => {
 
   test.describe('Study tracks and class statistics tab works for basic user', () => {
     test.beforeEach(async ({ page }) => {
-      // cy.intercept(
-      //   'GET',
-      //   'api/studyprogrammes/KH50_001/studytrackstats?special_groups=SPECIAL_INCLUDED&combined_programme='
-      // ).as('stQuery')
-      init(page, '/study-programme')
+      await init(page, '/study-programme')
       await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
       await page.getByTestId('StudyTracksAndClassStatisticsTab').click()
     })
@@ -659,7 +652,9 @@ test.describe('Degree programme overview', () => {
         await expect(page.getByText('Select curriculum to edit:')).toBeVisible()
         await expect(page.getByTestId('curriculum-picker').getByText('2023–2026')).toBeVisible()
       })
-      test.skip('can be changed', async () => {})
+      test.skip('can be changed', () => {
+        return
+      })
     })
 
     test.describe('Credit criteria section', () => {
@@ -671,7 +666,7 @@ test.describe('Degree programme overview', () => {
         ).toBeVisible()
       })
 
-      test.skip('changing the credit criteria works', async ({ page }) => {
+      test.skip('changing the credit criteria works', () => {
         // TODO: Test using the inputs
         // TODO: Button status
         // TODO: Test "previously set to _" text changing when saving
@@ -765,15 +760,17 @@ test.describe('Degree programme overview', () => {
 
         await page.getByText('Students (5)').click()
 
-        for (const studentNumber of studentNumbers) {
-          await expect(page.getByText(studentNumber)).toBeVisible()
-        }
+        await Promise.all(studentNumbers.map(studentNumber => expect(page.getByText(studentNumber)).toBeVisible()))
 
-        for (const studentNumber of studentNumbers) {
-          await page.goto(`/students/${studentNumber}`)
-          await expect(page.getByRole('heading', { name: 'Tags' })).toBeVisible()
-          await expect(page.getByText(tagName)).toBeVisible()
-        }
+        await Promise.all(
+          studentNumbers.map(async studentNumber => {
+            const studentPage = await context.newPage()
+            await studentPage.goto(`/students/${studentNumber}`)
+            await expect(studentPage.getByRole('heading', { name: 'Tags' })).toBeVisible()
+            await expect(studentPage.getByText(tagName)).toBeVisible()
+            await studentPage.close()
+          })
+        )
 
         // Change to other tab
         const pagePromise = context.waitForEvent('page')
@@ -782,16 +779,20 @@ test.describe('Degree programme overview', () => {
         await deleteTag(newPage, tagName)
       })
 
-      test('deleting a tag from tag view also removes it from students', async ({ page }) => {
+      test('deleting a tag from tag view also removes it from students', async ({ page, context }) => {
         // NOTE: Navigating to each students' page takes time, fix?
         test.slow()
 
         await expect(page.getByText(tagName)).not.toBeVisible()
-        for (const studentNumber of studentNumbers) {
-          await page.goto(`/students/${studentNumber}`)
-          await expect(page.getByRole('heading', { name: 'Tags' })).not.toBeVisible()
-          await expect(page.getByText(tagName)).not.toBeVisible()
-        }
+        await Promise.all(
+          studentNumbers.map(async studentNumber => {
+            const studentPage = await context.newPage()
+            await studentPage.goto(`/students/${studentNumber}`)
+            await expect(studentPage.getByRole('heading', { name: 'Tags' })).not.toBeVisible()
+            await expect(studentPage.getByText(tagName)).not.toBeVisible()
+            await studentPage.close()
+          })
+        )
       })
     })
   })
@@ -802,7 +803,7 @@ test.describe('Degree programme overview', () => {
       await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
     })
 
-    test.skip('year selector', async ({ page }) => {
+    test.skip('year selector', () => {
       // TODO: Implement this test
       // Things to test:
       // - Clicking the button works
