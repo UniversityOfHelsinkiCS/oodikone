@@ -13,9 +13,7 @@ visibleLinks.admin = [...visibleLinks.basic, 'Teachers', 'Admin']
 
 const containsLinks = async (page: Page, links: string[]) => {
   const navBar = page.getByTestId('nav-bar')
-  for (const link of links) {
-    await expect(navBar.getByText(link)).toBeVisible()
-  }
+  await Promise.all(links.map(link => expect(navBar.getByText(link)).toBeVisible()))
 }
 
 const userButtonWorks = async (page: Page, username: string, mocking = false) => {
@@ -81,10 +79,10 @@ test.describe('Users tests', () => {
       })
 
       test("only the mocked user's programmes are visible", async ({ page }) => {
-        page.route('**/api/populationstatistics/studyprogrammes', async route => {
+        await page.route('**/api/populationstatistics/studyprogrammes', async route => {
           const response = await route.fetch()
           expect(response.status()).toBeLessThanOrEqual(304)
-          route.fulfill({ response })
+          await route.fulfill({ response })
         })
 
         await page.goto('/populations')
