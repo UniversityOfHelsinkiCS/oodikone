@@ -7,6 +7,9 @@
   "scripts": {
     "cypress": "cypress",
     "cypress:run": "cypress run --browser firefox",
+    "playwright": "playwright test -c playwright.config.ts",
+    "playwright:ui": "playwright test --ui -c playwright.config.ts",
+    "playwright:headed": "playwright test --headed -c playwright.config.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "lint:quiet": "oxlint --quiet",
@@ -33,10 +36,7 @@
     "install:local": "npm i && npm i --prefix services/shared && npm i --prefix services/frontend && npm i --prefix services/backend && npm i --prefix updater/sis-updater-scheduler && npm i --prefix updater/sis-updater-worker",
     "ci:local": "npm ci && npm ci --prefix services/shared && npm ci --prefix services/frontend && npm ci --prefix services/backend && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker",
     "ci:docker": "docker exec oodikone-frontend sh -lc \"npm ci --prefix /opt/app-root/shared && npm ci\" && docker exec oodikone-backend npm ci && docker exec oodikone-updater-scheduler npm ci && docker exec oodikone-updater-worker npm ci",
-    "ci:both": "npm run ci:local && npm run ci:docker",
-    "playwright": "playwright test -c playwright.config.ts",
-    "playwright:ui": "playwright test --ui -c playwright.config.ts",
-    "playwright:headed": "playwright test --headed -c playwright.config.ts"
+    "ci:both": "npm run ci:local && npm run ci:docker"
   },
   "repository": {
     "type": "git",
