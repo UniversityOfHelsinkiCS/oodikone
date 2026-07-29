@@ -797,9 +797,10 @@ test.describe('Degree programme overview', () => {
 
   test.describe('IAM user', () => {
     test.beforeEach(async ({ page }) => {
-      cy.init('/study-programme', 'onlyiamrights')
-      page.locator('text=a', 'text=Matemaattisten tieteiden kandiohjelma').click()
+      await init(page, '/study-programme', 'onlyiamrights')
+      await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
     })
+
     test.skip('year selector', async ({ page }) => {
       // TODO: Implement this test
       // Things to test:
@@ -808,30 +809,34 @@ test.describe('Degree programme overview', () => {
       // - The button is disabled if only one year is selected
       // - The slider is not visible if the user does not have correct programme rights
     })
+
     test('can access programme and correct tabs are visible', async ({ page }) => {
-      cy.contains('Basic information')
-      cy.contains('Study tracks and class statistics')
-      cy.contains('Update statistics').should('not.exist')
-      cy.contains('Degree courses').should('not.exist')
+      await expect(page.getByText('Basic information')).toBeVisible()
+      await expect(page.getByText('Study tracks and class statistics')).toBeVisible()
+      await expect(page.getByText('Update statistics')).not.toBeVisible()
+      await expect(page.getByText('Degree courses')).not.toBeVisible()
     })
+
     test('can access basic information', async ({ page }) => {
-      cy.cs('BasicInformationTab').click()
-      cy.cs('students-of-the-study-programme-section')
-      cy.cs('credits-produced-by-the-study-programme-section')
-      cy.cs('graduated-and-thesis-writers-of-the-programme-section')
-      cy.cs('average-graduation-times-section')
-      cy.cs('programmes-before-or-after-section')
+      await page.getByTestId('BasicInformationTab').click()
+      await expect(page.getByTestId('students-of-the-study-programme-section')).toBeVisible()
+      await expect(page.getByTestId('credits-produced-by-the-study-programme-section')).toBeVisible()
+      await expect(page.getByTestId('graduated-and-thesis-writers-of-the-programme-section')).toBeVisible()
+      await expect(page.getByTestId('average-graduation-times-section')).toBeVisible()
+      await expect(page.getByTestId('programmes-before-or-after-section')).toBeVisible()
     })
+
     test('can access study tracks', async ({ page }) => {
-      cy.cs('StudyTracksAndClassStatisticsTab').click()
-      cy.cs('study-track-overview-section')
-      cy.cs('progress-of-students-section')
-      cy.cs('average-graduation-times-section')
+      await page.getByTestId('StudyTracksAndClassStatisticsTab').click()
+      await expect(page.getByTestId('study-track-overview-section')).toBeVisible()
+      await expect(page.getByTestId('progress-of-students-section')).toBeVisible()
+      await expect(page.getByTestId('average-graduation-times-section')).toBeVisible()
     })
+
     test("doesn't see other tabs", async ({ page }) => {
-      cy.cs('DegreeCoursesTab').should('not.exist')
-      cy.cs('TagsTab').should('not.exist')
-      cy.cs('UpdateStatisticsTab').should('not.exist')
+      await expect(page.getByTestId('DegreeCoursesTab')).not.toBeVisible()
+      await expect(page.getByTestId('TagsTab')).not.toBeVisible()
+      await expect(page.getByTestId('UpdateStatisticsTab')).not.toBeVisible()
     })
   })
 })
