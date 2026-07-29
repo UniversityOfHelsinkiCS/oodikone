@@ -195,28 +195,32 @@ test.describe('Population statistics tests', () => {
           'Percentage of population',
         ])
 
-        for (const category of [
-          getTableData('All students of the class', [9, 5, 7, 4, 2, 0]),
-          getTableData('Avoin väylä', [0, 1, 3, 2, 0, 0]),
-          getTableData('Muu', [0, 1, 1, 1, 0, 0]),
-          getTableData('Todistusvalinta', [9, 3, 3, 1, 2, 0]),
-        ]) {
-          category.forEach(async ({ selector, start, end, students, percentage }, index) => {
-            let value
-            if (start === null) {
-              value = '0 credits'
-            } else if (end === null) {
-              value = `${start} ≤ credits`
-            } else {
-              value = `${start} ≤ credits < ${end}`
-            }
-            const bodyLocator = page.getByTestId(selector).getByTestId('credits-gained-table-body')
-            await expect(bodyLocator).toBeVisible()
-            const row = bodyLocator.locator('tr').nth(index)
-            await expect(row.locator('td')).toHaveCount(4)
-            await expect(row.locator('td')).toHaveText(['' /* Icon */, value, students.toString(), percentage])
-          })
-        }
+        await Promise.all(
+          [
+            getTableData('All students of the class', [9, 5, 7, 4, 2, 0]),
+            getTableData('Avoin väylä', [0, 1, 3, 2, 0, 0]),
+            getTableData('Muu', [0, 1, 1, 1, 0, 0]),
+            getTableData('Todistusvalinta', [9, 3, 3, 1, 2, 0]),
+          ].map(category =>
+            Promise.all(
+              category.map(async ({ selector, start, end, students, percentage }, index) => {
+                let value
+                if (start === null) {
+                  value = '0 credits'
+                } else if (end === null) {
+                  value = `${start} ≤ credits`
+                } else {
+                  value = `${start} ≤ credits < ${end}`
+                }
+                const bodyLocator = page.getByTestId(selector).getByTestId('credits-gained-table-body')
+                await expect(bodyLocator).toBeVisible()
+                const row = bodyLocator.locator('tr').nth(index)
+                await expect(row.locator('td')).toHaveCount(4)
+                await expect(row.locator('td')).toHaveText(['' /* Icon */, value, students.toString(), percentage])
+              })
+            )
+          )
+        )
 
         const numberOfStudentCounts = await page
           .getByTestId('credits-gained-table-All students of the class')
@@ -258,18 +262,22 @@ test.describe('Population statistics tests', () => {
           },
         ]
 
-        for (const { selector, data, size } of categories) {
-          const tableLocator = page.getByTestId(`statistics-table-${selector}`)
-          await expect(tableLocator).toBeVisible()
-          await expect(tableLocator.getByRole('heading', { level: 5, name: selector })).toBeVisible()
+        await Promise.all(
+          categories.map(async ({ selector, data, size }) => {
+            const tableLocator = page.getByTestId(`statistics-table-${selector}`)
+            await expect(tableLocator).toBeVisible()
+            await expect(tableLocator.getByRole('heading', { level: 5, name: selector })).toBeVisible()
 
-          await expect(tableLocator.getByTestId('credit-stats-population-size')).toContainText(`n = ${size}`)
+            await expect(tableLocator.getByTestId('credit-stats-population-size')).toContainText(`n = ${size}`)
 
-          for (let index = 0; index < rows.length; index++) {
-            const row = tableLocator.locator('table tbody tr').nth(index)
-            await expect(row.locator('td')).toHaveText([rows[index], data[index]])
-          }
-        }
+            await Promise.all(
+              rows.map((_, index) => {
+                const row = tableLocator.locator('table tbody tr').nth(index)
+                return expect(row.locator('td')).toHaveText([rows[index], data[index]])
+              })
+            )
+          })
+        )
       })
     })
 

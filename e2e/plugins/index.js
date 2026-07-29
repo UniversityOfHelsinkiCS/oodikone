@@ -13,9 +13,9 @@
 /**
  * @type {Cypress.PluginConfig}
  */
-module.exports = (on, config) => {
+export function setup(on, _config) {
   // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
+  // `_config` is the resolved Cypress config (unused)
   on('before:browser:launch', (browser = {}, launchOptions) => {
     // By manually setting the browser width and height in headless
     // mode, screenshots and videos will have a better quality
