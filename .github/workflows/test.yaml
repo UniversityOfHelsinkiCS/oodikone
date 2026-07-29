@@ -365,6 +365,66 @@ jobs:
         uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
+  test_end_to_end_playwright:
+    runs-on: self-hosted
+    if: |
+      !cancelled() && !failure()
+    needs:
+      - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Test population statistics'
+            spec: e2e/Population_statistics.spec.ts
+          - name: 'Test degree programme overview'
+            spec: e2e/Degree_programme_overview.spec.ts
+          - name: 'Test teachers'
+            spec: e2e/Teachers.spec.ts
+          - name: 'Test users'
+            spec: e2e/Users.spec.ts
+    name: ${{ matrix.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install node-24 for playwright
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
+
+      - name: Run tests
+        uses: ./.github/actions/test/e2e-playwright
+        with:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+          spec: ${{ matrix.spec }}
+          test_name: ${{ matrix.name }}
+
   test_end_to_end:
     runs-on: self-hosted
     if: |
@@ -382,8 +442,6 @@ jobs:
             spec: cypress/e2e/Course_statistics.js
           - name: 'Test custom population'
             spec: cypress/e2e/Custom_population.js
-          - name: 'Test population statistics'
-            spec: cypress/e2e/Population_statistics.js
           - name: 'Test filters'
             spec: cypress/e2e/Filters.js
           - name: 'Test students'
@@ -391,12 +449,6 @@ jobs:
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
           - name: 'Test degree programme overview'
-            spec: cypress/e2e/Degree_programme_overview.js
-          - name: 'Test teachers'
-            spec: cypress/e2e/Teachers.js
-          - name: 'Test users'
-            spec: cypress/e2e/Users.js
-          - name: 'Test faculty statistics'
             spec: cypress/e2e/Faculty_statistics.js
           - name: 'Test language center view'
             spec: cypress/e2e/Language_center.js
