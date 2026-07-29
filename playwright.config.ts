@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// oxlint-disable-next-line no-default-export
 export default defineConfig({
   testDir: './e2e',
   testMatch: ['**/*.spec.ts'],
