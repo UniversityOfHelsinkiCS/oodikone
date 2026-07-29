@@ -417,11 +417,12 @@ test.describe('Degree programme overview', () => {
         await expect(page.getByText('Year 2020 - 2021 by start year')).toBeVisible()
         await expect(page.getByText('MAT-MAT')).toBeVisible()
 
-        await page.getByText('9').last().hover()
+        await page.getByTestId('unsetBreakdownBarChartFaculty').getByText('9', { exact: true }).hover()
         await expect(page.getByText('Matematiikka')).toBeVisible()
         await expect(page.getByText('MAT-MAT').last()).toBeVisible()
         await expect(page.getByText('On time: 9')).toBeVisible()
       })
+
       test('Shows correct average', async ({ page }) => {
         await page.getByTestId('select-average').click()
         const section = page.getByTestId('average-graduation-times-section')
