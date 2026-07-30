@@ -39,8 +39,8 @@ const CourseRow = ({
       data-cy={`course-${course.code}`}
       hover
       key={course.id}
-      onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
-      style={{ cursor: course.min_attainment_date ? 'pointer' : 'default' }}
+      onClick={() => (course.minAttainmentDate ? onSelectCourse(course) : null)}
+      style={{ cursor: course.minAttainmentDate ? 'pointer' : 'default' }}
     >
       <TableCell>
         <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
@@ -54,7 +54,7 @@ const CourseRow = ({
       <TableCell>
         {combineSubstitutions ? (
           <Stack>
-            {course?.substitution_groups.map(group => (
+            {course?.substitutionGroups.map(group => (
               <GroupChip getTextIn={getTextIn} group={group} key={group.map(({ code }) => code).join(':')} />
             )) ?? <Typography fontSize="0.9rem">Equivalent groups not available!</Typography>}
           </Stack>

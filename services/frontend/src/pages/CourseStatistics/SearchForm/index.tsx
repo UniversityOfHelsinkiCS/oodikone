@@ -135,12 +135,12 @@ export const SearchForm = () => {
   const courses = matchingCourses
     .filter(course => !selectedCourses[course.code])
     .sort((a, b) => {
-      const yearA = dayjs(a.max_attainment_date).year()
-      const yearB = dayjs(b.max_attainment_date).year()
+      const yearA = dayjs(a.maxAttainmentDate).year()
+      const yearB = dayjs(b.maxAttainmentDate).year()
       if (yearA !== yearB) return yearB - yearA
 
-      const isFallA = dayjs(a.max_attainment_date).month() >= 7 ? 1 : 0
-      const isFallB = dayjs(b.max_attainment_date).month() >= 7 ? 1 : 0
+      const isFallA = dayjs(a.maxAttainmentDate).month() >= 7 ? 1 : 0
+      const isFallB = dayjs(b.maxAttainmentDate).month() >= 7 ? 1 : 0
       if (isFallA !== isFallB) return isFallB - isFallA
 
       return a.code.localeCompare(b.code)

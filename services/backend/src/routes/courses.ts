@@ -9,7 +9,6 @@ import {
   CourseYearlyStatsReqBody,
   CourseYearlyStatsQuery,
 } from '@oodikone/shared/routes/courses'
-import type { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 import { getCourseDetails, getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
 import {
@@ -24,30 +23,13 @@ const router = Router()
 router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMultiQuery>(
   '/coursesmulti',
   async (req, res) => {
-    const { name, code, includeSpecial } = req.query
+    const { name, code } = req.query
     if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
       return res.status(400).json({ error: 'Query parameter name or code is invalid' })
     }
 
-    const courses = await getCoursesByNameAndOrCode(name, code, includeSpecial === 'true')
-
-    const mergedCourses = new Map<string, CourseWithSubsDetails>()
-
-    for (const course of courses) {
-      if (!(course.max_attainment_date && course.min_attainment_date)) continue
-
-      if (!mergedCourses.has(course.code)) mergedCourses.set(course.code, structuredClone(course))
-      const mergedCourse = mergedCourses.get(course.code)!
-
-      if (mergedCourse.max_attainment_date < course.max_attainment_date) {
-        mergedCourse.max_attainment_date = course.max_attainment_date
-      }
-      if (mergedCourse.min_attainment_date > course.min_attainment_date) {
-        mergedCourse.min_attainment_date = course.min_attainment_date
-      }
-    }
-
-    res.json({ courses: Array.from(mergedCourses.values()) })
+    const courses = await getCoursesByNameAndOrCode(name, code)
+    res.json({ courses }).end()
   }
 )
 

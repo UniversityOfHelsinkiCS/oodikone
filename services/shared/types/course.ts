@@ -1,3 +1,4 @@
 import { Course } from '../models'
 
-export type CourseWithSubsDetails = Omit<Course, 'substitution_groups'> & { substitution_groups: Course[][] }
+type CourseSubstitution = Pick<Course, 'code' | 'groupId' | 'name'>
+export type CourseWithSubsDetails = Omit<Course, 'substitutionGroups'> & { substitutionGroups: CourseSubstitution[][] }
