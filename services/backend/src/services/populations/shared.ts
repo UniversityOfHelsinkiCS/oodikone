@@ -79,7 +79,7 @@ export const getOptionsForStudents = (
 
 export const getCourses = (courses: string[]): Promise<Array<CourseStats>> =>
   CourseModel.findAll({
-    attributes: ['code', 'name', 'substitution_groups', 'is_study_module'],
+    attributes: ['code', 'name', 'substitutionGroups', 'isStudyModule'],
     where: {
       code: { [Op.in]: courses },
     },
