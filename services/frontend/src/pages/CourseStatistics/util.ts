@@ -1,4 +1,5 @@
 import type { CourseSearchState } from '@/pages/CourseStatistics'
+import { SearchResultCourse } from '@/types/api/courses'
 import { AvailableStats, CourseStat, Realisation } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
 import { isSpring } from '@oodikone/shared/util'
@@ -35,16 +36,16 @@ const MAX_YEAR = 2112
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year: number, spring: boolean) => (spring ? `Spring ${year}` : `Fall ${year}`)
 
-export const getActiveYears = course => {
-  if (!course.min_attainment_date && !course.max_attainment_date) return 'No attainments yet'
+export const getActiveYears = (course: SearchResultCourse) => {
+  if (!(course.minAttainmentDate && course.maxAttainmentDate)) return 'No attainments yet'
 
-  const min_attainment_date = new Date(course.min_attainment_date)
-  const max_attainment_date = new Date(course.max_attainment_date)
+  const minAttainmentDate = new Date(course.minAttainmentDate)
+  const maxAttainmentDate = new Date(course.maxAttainmentDate)
 
-  const [startYear, endYear] = [min_attainment_date.getFullYear(), max_attainment_date.getFullYear()]
+  const [startYear, endYear] = [minAttainmentDate.getFullYear(), maxAttainmentDate.getFullYear()]
 
-  const startYearText = getYearText(startYear, isSpring(min_attainment_date))
-  const endYearText = getYearText(endYear, isSpring(max_attainment_date))
+  const startYearText = getYearText(startYear, isSpring(minAttainmentDate))
+  const endYearText = getYearText(endYear, isSpring(maxAttainmentDate))
 
   if (endYear === MAX_YEAR && isPre2016Course(course)) return `— ${getYearText(2016, false)}`
   else if (startYear === MIN_YEAR) return `— ${endYearText}`
