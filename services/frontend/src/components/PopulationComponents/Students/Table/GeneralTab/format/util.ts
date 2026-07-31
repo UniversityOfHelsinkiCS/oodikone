@@ -97,7 +97,7 @@ export const getSemesterEnrollmentsContent =
     firstSemester: number
   }) =>
   (
-    student: { studentNumber: string; studyrightEnd: Date | null; secondStudyrightEnd: Date | null },
+    student: { studentNumber: string; studyrightEnd?: Date | null; secondStudyrightEnd: Date | null },
     studyright: StudentStudyRight | undefined
   ) => {
     if (!studyright) return []
