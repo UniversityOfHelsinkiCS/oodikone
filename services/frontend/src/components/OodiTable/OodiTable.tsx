@@ -9,6 +9,7 @@ import { ReactNode } from 'react'
 import { OodiTableDataRow } from '@/components/OodiTable/components/Cell'
 import { OodiTableHeaderGroup } from '@/components/OodiTable/components/Header'
 import { OodiTablePagination } from '@/components/OodiTable/components/Pagination'
+import { OodiTableFilters } from './components/Filter'
 
 export const OodiTableContainer = <OTData extends RowData>({
   table,
@@ -70,6 +71,7 @@ export const OodiTableContainer = <OTData extends RowData>({
               },
             }}
           >
+            {OodiTableFilters(table)}
             {table.getAggregationRowModel().rows.map(row => OodiTableDataRow(row, true))}
             {table.getRowModel().rows.map(row => OodiTableDataRow(row))}
           </TableBody>

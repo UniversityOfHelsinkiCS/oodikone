@@ -9,9 +9,10 @@ type FilterRangeProps = {
   max: number
   range: [number, number]
   setRange: (value: any) => void
+  hideIncrements?: true
 }
 
-export const FilterRange = ({ text, min, max, range, setRange }: FilterRangeProps) => (
+export const FilterRange = ({ text, min, max, range, setRange, hideIncrements }: FilterRangeProps) => (
   <Stack spacing={2}>
     <Typography>{text}</Typography>
     <Slider
@@ -27,7 +28,7 @@ export const FilterRange = ({ text, min, max, range, setRange }: FilterRangeProp
         data-cy="FilterRangeStart"
         onChange={({ target }) => setRange([target.value === '' || +target.value, range[1]])}
         size="small"
-        type="number"
+        type={hideIncrements ? "text" : "number"}
         value={range[0]}
       />
       <Typography component="span" sx={{ alignContent: 'center' }} variant="h6">
@@ -37,7 +38,7 @@ export const FilterRange = ({ text, min, max, range, setRange }: FilterRangeProp
         data-cy="FilterRangeEnd"
         onChange={({ target }) => setRange([range[0], target.value === '' || +target.value])}
         size="small"
-        type="number"
+        type={hideIncrements ? "text" : "number"}
         value={range[1]}
       />
     </Stack>
