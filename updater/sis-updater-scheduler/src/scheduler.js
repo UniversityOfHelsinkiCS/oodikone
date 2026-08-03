@@ -211,8 +211,8 @@ const scheduleProgrammes = async () => {
 
 const scheduleWeekly = async () => {
   try {
-    await scheduleMeta()
     await scheduleProgrammes()
+    await scheduleMeta()
     await scheduleStudents()
   } catch (error) {
     logger.error({ message: 'Weekly scheduling failed', meta: error.stack })
