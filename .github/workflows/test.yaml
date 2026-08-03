@@ -396,6 +396,8 @@ jobs:
             spec: e2e/Teachers.spec.ts
           - name: 'Test users'
             spec: e2e/Users.spec.ts
+          - name: 'Test access rights'
+            spec: e2e/Routes.spec.ts
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -468,8 +470,6 @@ jobs:
             spec: cypress/e2e/University.js
           - name: 'Test numbers match'
             spec: cypress/e2e/Numbers_match.js
-          - name: 'Test access rights'
-            spec: cypress/e2e/Routes.js
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
