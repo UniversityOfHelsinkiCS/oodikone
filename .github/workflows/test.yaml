@@ -2,6 +2,12 @@ name: 'Lint and test'
 
 on:
   workflow_call:
+    inputs:
+      skip_db_update:
+        description: 'When true, skip committing/pushing anon DB images (used for PR runs)'
+        required: false
+        type: boolean
+        default: false
     secrets:
       username:
         required: true
@@ -127,7 +133,8 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.sis_db_migrations == 'true'
+      needs.check_migration_files.outputs.sis_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -159,7 +166,8 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.kone_db_migrations == 'true'
+      needs.check_migration_files.outputs.kone_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -192,7 +200,8 @@ jobs:
     runs-on: self-hosted
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.user_db_migrations == 'true'
+      needs.check_migration_files.outputs.user_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -280,7 +289,8 @@ jobs:
 
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
       # - name: Push newly build db to toska hub
-      #   if: success()
+      #   if: |
+      #   success() && inputs.skip_db_update != 'true'
       #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
       - name: Dump logs on failure
