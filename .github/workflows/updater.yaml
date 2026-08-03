@@ -10,7 +10,7 @@ on:
 jobs:
   lint_scheduler_and_worker:
     name: 'Lint scheduler and worker'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -24,7 +24,7 @@ jobs:
 
   build_worker:
     name: 'Build Updater worker'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
 
     steps:
       - uses: actions/checkout@v7
@@ -48,7 +48,7 @@ jobs:
 
   build_scheduler:
     name: 'Build Updater scheduler'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
 
     steps:
       - uses: actions/checkout@v7
@@ -72,7 +72,7 @@ jobs:
 
   test_updater:
     name: 'Test Updater'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     needs:
       - lint_scheduler_and_worker
       - build_worker
@@ -127,7 +127,7 @@ jobs:
 
   release_worker:
     name: 'Build and release Updater worker'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     needs: test_updater
     steps:
       - uses: actions/checkout@v7
@@ -143,7 +143,7 @@ jobs:
 
   release_scheduler:
     name: 'Build and release Updater scheduler'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     needs: test_updater
     steps:
       - uses: actions/checkout@v7

@@ -20,7 +20,7 @@ jobs:
   # === Static tests / linting ===
   lint_packages:
     name: 'Lint packages'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Lint backend, frontend and shared
@@ -29,7 +29,7 @@ jobs:
   # === Build database images ===
   build_backend:
     name: 'Build backend'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Build backend
@@ -41,7 +41,7 @@ jobs:
 
   build_frontend:
     name: 'Build frontend'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Build frontend
@@ -52,10 +52,10 @@ jobs:
           push: false
 
   # === Cache docker images ===
-  # TODO: Disabled when running in self-hosted runner
+  # TODO: Disabled when running in ubuntu-latest runner
   pull_docker_images:
     name: Pull all needed docker images and cache them (if dbs have not changed)
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() && false &&
       !(
@@ -105,7 +105,7 @@ jobs:
   # === Update databases ===
   check_migration_files:
     name: Check if new migrations have been added
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     outputs:
       kone_db_migrations: ${{ steps.check_migrations.outputs.kone_db_migrations }}
       user_db_migrations: ${{ steps.check_migrations.outputs.user_db_migrations }}
@@ -130,7 +130,7 @@ jobs:
 
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.sis_db_migrations == 'true' &&
@@ -163,7 +163,7 @@ jobs:
 
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.kone_db_migrations == 'true' &&
@@ -197,7 +197,7 @@ jobs:
 
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.user_db_migrations == 'true' &&
@@ -232,7 +232,7 @@ jobs:
   # === Update sis-db with updater ===
   check_updater_changed:
     name: 'Check if updater has been updated'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     outputs:
@@ -252,7 +252,7 @@ jobs:
 
   run_updater_updates:
     name: 'Run updater tests and updates'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
       (needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
@@ -304,7 +304,7 @@ jobs:
   # === Backend api-tests ===
   test_api:
     name: 'Run backend api tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -326,7 +326,7 @@ jobs:
   # === Backend service-tests ===
   test_services:
     name: 'Run backend service-tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -348,7 +348,7 @@ jobs:
   # === Unit testing ===
   test_unit:
     name: 'Run unit tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
 
@@ -360,7 +360,7 @@ jobs:
   # === Frontend component testing ===
   test_components:
     name: 'Test frontend components'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -376,7 +376,7 @@ jobs:
 
   # === End-to-end tests ===
   test_end_to_end_playwright:
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -436,7 +436,7 @@ jobs:
           test_name: ${{ matrix.name }}
 
   test_end_to_end:
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -505,7 +505,7 @@ jobs:
   # === Other tests ===
   test_service_exit_statuses:
     name: 'Check services run correctly'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
