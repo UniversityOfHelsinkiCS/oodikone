@@ -45,7 +45,8 @@
     ".lintstagedrc.mjs",
     "cypress.config.js",
     "cypress/**/*.js",
-    "playwright/**/*.js"
+    "playwright/**/*.js",
+    "playwright.config.ts"
   ],
   "rules": {
     "constructor-super": "error",
