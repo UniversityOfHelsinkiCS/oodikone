@@ -6,8 +6,8 @@ on:
       skip_db_update:
         description: 'When true, skip committing/pushing anon DB images (used for PR runs)'
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: 'false'
     secrets:
       username:
         required: true
