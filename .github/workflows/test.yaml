@@ -52,12 +52,12 @@ jobs:
           push: false
 
   # === Cache docker images ===
-  # TODO: Disabled when running in ubuntu-latest runner
   pull_docker_images:
     name: Pull all needed docker images and cache them (if dbs have not changed)
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
-      !cancelled() && !failure() && false &&
+      !cancelled() && !failure() &&
+      (vars.RUNS_ON == 'ubuntu-latest' || vars.RUNS_ON == '') &&
       !(
         needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
         needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
