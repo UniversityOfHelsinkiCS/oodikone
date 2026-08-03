@@ -19,7 +19,7 @@ on:
 jobs:
   test:
     if: ${{ github.event.pull_request.user.login != 'renovate[bot]' }}
-    uses: UniversityOfHelsinkiCS/oodikone/.github/workflows/test.yaml@master
+    uses: ./.github/workflows/test.yaml
     with:
       skip_db_update: true
     secrets:
