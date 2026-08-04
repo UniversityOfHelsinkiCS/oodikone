@@ -390,6 +390,8 @@ jobs:
         include:
           - name: 'Test population statistics'
             spec: e2e/Population_statistics.spec.ts
+          - name: 'Test course statistics'
+            spec: e2e/Course_statistics.spec.ts
           - name: 'Test degree programme overview'
             spec: e2e/Degree_programme_overview.spec.ts
           - name: 'Test teachers'
@@ -450,8 +452,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Test course statistics'
-            spec: cypress/e2e/Course_statistics.js
           - name: 'Test custom population'
             spec: cypress/e2e/Custom_population.js
           - name: 'Test filters'
