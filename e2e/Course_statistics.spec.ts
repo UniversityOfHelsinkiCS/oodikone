@@ -238,7 +238,7 @@ test.describe('Basic user', () => {
     )
 
     await page.getByTestId('course-population-for-2023-2024').click()
-    await expect(page.getByText('Introduction to Programming')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Introduction to Programming' })).toBeVisible()
     await expect(page.getByText('Class of 2023-2024')).toBeVisible()
     await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
 

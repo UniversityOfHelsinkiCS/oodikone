@@ -188,9 +188,9 @@ test.describe('Population statistics tests', () => {
         await expect(page.getByTestId('credits-gained-table-All students of the class')).toBeVisible()
 
         await expect(page.getByTestId('credits-gained-table-All students of the class').locator('th')).toHaveCount(4)
-        await expect(page.getByTestId('credits-gained-table-All students of the class').locator('th')).toHaveText([
+        await expect(page.getByTestId('credits-gained-table-All students of the class').locator('th')).toContainText([
           '',
-          'Credits gained between 01.08.2020 and 29.07.2026' + '(72 months)',
+          'Credits gained between 01.08.2020 and ', // Current date
           `Number of students` + `(n = ${totalStudents})`,
           'Percentage of population',
         ])
