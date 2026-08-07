@@ -5,7 +5,10 @@ import Typography from '@mui/material/Typography'
 export const BasicCell = ({ tooltip = null, value }: { tooltip?: JSX.Element | null; value: string | number }) => {
   const cellContent = (
     <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-      <Typography color={value.toString().includes('%') ? 'text.secondary' : 'text.primary'} variant="body2">
+      <Typography
+        color={value.toString().includes('%') || value.toString() === 'NA' ? 'text.secondary' : 'text.primary'}
+        variant="body2"
+      >
         {value}
       </Typography>
     </TableCell>
