@@ -2,9 +2,11 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-healthcheck-defaults: &healthcheck-defaults
-  interval: 1s
-  timeout: 3s
-  retries: 30
+  interval: 30s # Normal healthcehck interval
+  timeout: 5s
+  retries: 10 # Retries until SIGKILl
+  start_interval: 3s # How often healthcheck runs while starting
+  start_period: 15s # How long startup period is
 
 services:
   kone-db:

@@ -4,9 +4,11 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-healthcheck-defaults: &healthcheck-defaults
-  interval: 1s
-  timeout: 3s
-  retries: 30
+  interval: 30s # Normal healthcehck interval
+  timeout: 5s
+  retries: 10 # Retries until SIGKILl
+  start_interval: 3s # How often healthcheck runs while starting
+  start_period: 30s # How long startup period is
 
 services:
   sis-db:
@@ -23,5 +25,5 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
