@@ -123,7 +123,10 @@ const testProgrammes = {
 }
 
 test.describe('StudyProgrammeSelector', () => {
-  test.beforeEach(async ({ router }) => {
+  test.beforeEach(async ({ page, router }) => {
+    // Set time to spring 2026 so that curriculums work
+    await page.clock.setSystemTime('2026-03-01')
+
     void (await router.route('**/api/populationstatistics/studyprogrammes', async route => {
       const json = {}
       await route.fulfill({ json })
@@ -151,6 +154,11 @@ test.describe('StudyProgrammeSelector', () => {
       await route.fulfill({ json })
     }))
 
+    void (await router.route('**/api/banners', async route => {
+      const json = {}
+      await route.fulfill({ json })
+    }))
+
     void (await router.route('**/api/login', async route => {
       const json = { user: { roles: ['admin'] } }
       await route.fulfill({ json })
@@ -160,6 +168,7 @@ test.describe('StudyProgrammeSelector', () => {
   test('should mount correctly', async ({ mount }) => {
     const component = await mount(<ReduxWrapper component={<StudyProgrammeSelector />} />)
     await expect(component).toContainText('Degree programmes')
+    await expect(component.getByText('Degree programmes')).toBeVisible()
   })
 
   test('should display correct categories', async ({ mount, router }) => {
