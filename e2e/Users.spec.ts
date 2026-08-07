@@ -85,7 +85,7 @@ test.describe('Users tests', () => {
           await route.fulfill({ response })
         })
 
-        await page.goto('/populations')
+        await init(page, '/populations', 'basic')
         await expect(page.getByRole('heading', { name: 'Degree programme' })).toBeVisible()
 
         const populationProgrammeSelector = page.getByTestId('population-programme-selector')
