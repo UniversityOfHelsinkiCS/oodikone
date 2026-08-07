@@ -14,7 +14,7 @@ export const GraduationTarget = {
 export const countTimeCategories = (times: number[], target: number) => {
   const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
 
-  for (const time of times) {
+  for (const time of times ?? []) {
     if (time <= target) {
       statistics.onTime++
     } else if (time <= target + GraduationTarget.ONE_YEAR) {
