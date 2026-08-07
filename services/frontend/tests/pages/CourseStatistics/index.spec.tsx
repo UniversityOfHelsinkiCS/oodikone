@@ -4,7 +4,10 @@ import { CourseStatistics } from '@/pages/CourseStatistics'
 import { ReduxWrapper } from '../../ReduxWrapper'
 
 test.describe('Course statistics search', () => {
-  test.beforeEach(async ({ router }) => {
+  test.beforeEach(async ({ page, router }) => {
+    // Set time to spring 2026 so that curriculums work
+    await page.clock.setSystemTime('2026-03-01')
+
     void (await router.route('**/api/login', async route => {
       const json = { user: { roles: ['admin'] } }
       await route.fulfill({ json })
