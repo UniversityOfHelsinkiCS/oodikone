@@ -43,8 +43,8 @@ export const getStatsBasis = (years: Array<string | number>) => {
   }
 }
 
-export const getMedian = (values: number[]) => {
-  if (!values.length) return 0
+export const getMedian = (values: number[] | undefined) => {
+  if (!values?.length) return 0
 
   // compareFn mandatory
   const sorted = values.toSorted((a, b) => a - b)
@@ -56,8 +56,8 @@ export const getMedian = (values: number[]) => {
   return (sorted[half - 1] + sorted[half]) / 2.0
 }
 
-export const getAverage = (values: number[]) => {
-  if (!values.length) return 0
+export const getAverage = (values: number[] | undefined) => {
+  if (!values?.length) return 0
   return Number((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(2))
 }
 
