@@ -392,6 +392,12 @@
       }
     },
     {
+      "files": ["e2e/**/*.ts"],
+      "rules": {
+        "no-await-in-loop": "off"
+      }
+    },
+    {
       "files": [
         "services/frontend/tests/**/*.{ts,tsx}",
         "services/frontend/playwright/**/*.{ts,tsx}",
