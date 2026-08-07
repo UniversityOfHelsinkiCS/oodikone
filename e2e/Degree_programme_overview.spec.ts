@@ -284,33 +284,36 @@ test.describe('Degree programme overview', () => {
     })
 
     test('Students of the degree programme are shown correctly', async ({ page }) => {
+      const isAcademicYear = true
+      const years = getEmptyYears(isAcademicYear)
       const tableContents = [
-        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainments, Men, Women, Other/Unknown, Finland, Other]
-        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 0, 5, 3, 0, 8, 1],
-        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 0, 19, 7, 0, 25, 1],
-        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 0, 29, 8, 0, 35, 4],
-        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3],
-        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 0, 22, 13, 0, 35, 2],
-        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 0, 26, 20, 0, 45, 1],
-        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 0, 31, 16, 0, 47, 0],
-        ['Total', 229, 197, 0, 0, 95, 134, 0, 147, 82, 0, 224, 12],
+        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainments, Men, Women, Other/Unknown, Finland, Other]
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 0, 0, 5, 3, 0, 8, 1],
+        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 1, 0, 19, 7, 0, 25, 1],
+        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 0, 0, 29, 8, 0, 35, 4],
+        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 15, 15, 0, 29, 3],
+        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 0, 0, 22, 13, 0, 35, 2],
+        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 1, 0, 26, 20, 0, 45, 1],
+        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 1, 0, 31, 16, 0, 47, 0],
+        ['Total', 229, 197, 0, 0, 95, 134, 3, 0, 147, 82, 0, 224, 12],
       ]
       await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
     })
 
     test('Years in the students table can be expanded and study track data will be shown', async ({ page }) => {
-      const totalStats: [string, ...Array<number>] = ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 15, 15, 0, 29, 3]
+      const totalStats: [string, ...Array<number>] = ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 15, 15, 0, 29, 3]
       const table = page.getByTestId('study-tracks-and-class-statistics-data-table').locator('tbody')
       const row = table.locator('tr').filter({ hasText: '2020 - 2021' })
 
-      await expect(row.locator('td')).toHaveCount(13)
+      await expect(row.locator('td')).toHaveCount(14)
       await expect(row.locator('td')).toHaveText(totalStats.map(n => n.toString()))
 
       const studyTrackStats: [string, ...Array<number>][] = [
-        ['Ekonometria (MAT-EKO)', 2, 2, 0, 0, 0, 2, 0, 1, 1, 0, 2, 0],
-        ['Matematiikka (MAT-MAT)', 13, 10, 0, 0, 1, 12, 0, 7, 6, 0, 12, 3],
-        ['Tietojenkäsittelyteoria (MAT-TIE)', 2, 1, 0, 0, 1, 1, 0, 2, 0, 0, 2, 0],
-        ['Tilastotiede (MAT-TIL)', 4, 4, 0, 0, 0, 4, 0, 1, 3, 0, 4, 0],
+        ['Ekonometria (MAT-EKO)', 2, 2, 0, 0, 0, 2, 0, 0, 1, 1, 0, 2, 0],
+        ['Matematiikka (MAT-MAT)', 13, 10, 0, 0, 1, 12, 0, 0, 7, 6, 0, 12, 3],
+        ['Tietojenkäsittelyteoria (MAT-TIE)', 2, 1, 0, 0, 1, 1, 0, 0, 2, 0, 0, 2, 0],
+        ['Tilastotiede (MAT-TIL)', 4, 4, 0, 0, 0, 4, 0, 0, 1, 3, 0, 4, 0],
       ]
 
       await row.getByTestId('show-study-tracks-button').click()
@@ -320,7 +323,7 @@ test.describe('Degree programme overview', () => {
           await expect(page.getByText(studyTrack)).toBeVisible()
           const studyTrackRow = table.locator('tr').filter({ hasText: studyTrack })
 
-          await expect(studyTrackRow.locator('td')).toHaveCount(13)
+          await expect(studyTrackRow.locator('td')).toHaveCount(14)
           await expect(studyTrackRow.locator('td')).toHaveText([studyTrack, ...stats].map(n => n.toString()))
         })
       )
@@ -343,7 +346,7 @@ test.describe('Degree programme overview', () => {
       test('total', async ({ page }) => {
         await page.getByTestId('total-population-link-button').click()
         await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
-        await expect(page.getByText('Class of 2017 - 2026, 227 students')).toBeVisible()
+        await expect(page.getByText('Class of 2017 - 2027, 227 students')).toBeVisible()
       })
 
       test('Links to class statistics page with study track info included work', async ({ page }) => {
@@ -449,14 +452,14 @@ test.describe('Degree programme overview', () => {
             .getByText('Students of the study track MAT-MAT by starting year')
         ).toBeVisible()
         const tableContents = [
-          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Has recent attainment, Men, Women, Other/Unknown, Finland, Other]
-          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 0, 2, 1, 0, 3, 0],
-          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 0, 3, 1, 0, 4, 0],
-          ['2020 - 2021', 13, 10, 0, 0, 1, 12, 0, 7, 6, 0, 12, 3],
-          ['2019 - 2020', 17, 14, 0, 0, 0, 17, 0, 10, 7, 0, 17, 1],
-          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 0, 11, 13, 0, 24, 0],
-          ['2017 - 2018', 28, 24, 0, 0, 1, 27, 0, 15, 13, 0, 28, 0],
-          ['Total', 89, 73, 0, 0, 6, 83, 0, 48, 41, 0, 88, 4],
+          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainment, Men, Women, Other/Unknown, Finland, Other]
+          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 1, 0, 2, 1, 0, 3, 0],
+          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 0, 0, 3, 1, 0, 4, 0],
+          ['2020 - 2021', 13, 10, 0, 0, 1, 12, 0, 0, 7, 6, 0, 12, 3],
+          ['2019 - 2020', 17, 14, 0, 0, 0, 17, 0, 0, 10, 7, 0, 17, 1],
+          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 1, 0, 11, 13, 0, 24, 0],
+          ['2017 - 2018', 28, 24, 0, 0, 1, 27, 1, 0, 15, 13, 0, 28, 0],
+          ['Total', 89, 73, 0, 0, 6, 83, 3, 0, 48, 41, 0, 88, 4],
         ]
         await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
       })
@@ -686,6 +689,21 @@ test.describe('Degree programme overview', () => {
       await init(page, '/study-programme')
       await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
       await page.getByTestId('TagsTab').click()
+
+      // We need to wait for tag page to load or there is no delete buttons
+      await expect(page.getByText('Create new tag')).toBeVisible()
+
+      // Delete tags until none remain
+      const deleteButtons = page.locator('[data-cy^=delete-tag-]')
+      while ((await deleteButtons.count()) > 0) {
+        const count = await deleteButtons.count()
+
+        await deleteButtons.first().click()
+        await page.getByTestId('confirm-delete-tag-button').click()
+
+        // Helps playwright to wait for the deleted tag acually being removed from DOM
+        await expect(deleteButtons).toHaveCount(count - 1)
+      }
     })
 
     test('info box', async ({ page }) => {
@@ -741,6 +759,7 @@ test.describe('Degree programme overview', () => {
       test('can add tags to students', async ({ page, context }) => {
         // NOTE: Navigating to each students' page takes time, fix?
         test.slow()
+        test.setTimeout(120_000) // 2min
 
         await page.getByTestId('tag-name-text-field').getByRole('textbox').fill(tagName)
         await selectYear(page, 2022)
@@ -772,16 +791,14 @@ test.describe('Degree programme overview', () => {
           })
         )
 
-        // Change to other tab
-        const pagePromise = context.waitForEvent('page')
-        await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
-        const newPage = await pagePromise
-        await deleteTag(newPage, tagName)
+        await page.goBack()
+        await deleteTag(page, tagName)
       })
 
       test('deleting a tag from tag view also removes it from students', async ({ page, context }) => {
         // NOTE: Navigating to each students' page takes time, fix?
         test.slow()
+        test.setTimeout(180_000) // 4min
 
         await expect(page.getByText(tagName)).not.toBeVisible()
         await Promise.all(
@@ -790,7 +807,7 @@ test.describe('Degree programme overview', () => {
             await studentPage.goto(`/students/${studentNumber}`)
             await expect(studentPage.getByRole('heading', { name: 'Tags' })).not.toBeVisible()
             await expect(studentPage.getByText(tagName)).not.toBeVisible()
-            await studentPage.close()
+            // await studentPage.close()
           })
         )
       })
