@@ -175,19 +175,19 @@ Pre-commit hooks will fix auto-fixable problems. To set up quick formatting: In 
 
 ## 🔨 Testing & CI
 
-We use cypress for end-to-end testing. No unit tests are currently used.
+We use Playwright for end-to-end testing.
 
-Cypress
+Playwright
 
-- Can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
-- Are defined in cypress -folder and cypress.config.json
-- The entire cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
-- Running tests locally sometimes causes problems after running the whole tests suite due to some login-related issue. Also for this reason, it is usually best practice to only run single views locally, and let the CI run the entire test suite.
-- There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
+- E2E specs are in the `playwright/` folder.
+- Run all migrated specs with `npm run playwright`.
+- Run headed mode with `npm run playwright:headed`.
+- Open UI mode with `npm run playwright:ui`.
+- The migration from Cypress was done with an automated converter. The generated files are a baseline and still need manual cleanup in places where `cy.*` logic is left over.
 
 Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
 
-- Oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
+- Oodikone setup for e2e and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
 - Tests are run on every push
 - After a successful test run, Oodikone is deployed to staging
 - After creating a release, Oodikone is deployed to production
@@ -216,38 +216,36 @@ If that does not help, try option 5: _Docker system prune_. Notice that this cle
 
 ### How to run tests locally faster
 
-Vite simplifies development but can be **very slow** when running tests. If you're curious about the reasons for this, you can read more in [this GitHub issue](https://github.com/cypress-io/cypress/issues/22968).
+Vite simplifies development but can be **very slow** when running tests.
 
 To speed up testing, you can use Vite's preview mode. This will make the tests run faster, but keep in mind that you must rebuild the frontend code every time you make changes to it. To use the preview mode, follow these steps:
 
 1. Run `npm run build` in the `services/frontend` directory.
 2. Run `npm run preview` in the `services/frontend` directory and keep it running.
-3. Update the `baseUrl` in [cypress.config.js](./cypress.config.js) to `http://localhost:4173`.
+3. Set `PLAYWRIGHT_BASE_URL=http://localhost:4173` for Playwright.
 4. Start Oodikone with `npm run oodikone`.
 
 After these steps, you can run your tests:
 
-- Use `npm run cypress open` to open the Cypress UI and run the tests interactively.
+- Use `npm run playwright:ui` to open Playwright UI and run tests interactively.
 
 Tests can also be run in headless mode, similar to how they are run in the CI/CD pipeline. To do this, use:
 
 ```bash
-npm run cypress:run -- --spec <file path>
+npm run playwright -- <file path>
 ```
 
 For example:
 
 ```bash
-npm run cypress:run -- --spec "cypress/e2e/Language_center.js"
+npm run playwright -- playwright/Language_center.js
 ```
 
 Running tests in headless mode may also help if your browser keeps crashing when running tests interactively. If you want to run all tests, use:
 
 ```bash
-npm run cypress:run
+npm run playwright
 ```
-
-Remember to revert the `baseUrl` in [cypress.config.js](./cypress.config.js) to its original value when you're done.
 
 ## How to read clients minds
 

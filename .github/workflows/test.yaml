@@ -2,6 +2,12 @@ name: 'Lint and test'
 
 on:
   workflow_call:
+    inputs:
+      skip_db_update:
+        description: 'When true, skip committing/pushing anon DB images (used for PR runs)'
+        required: false
+        type: string
+        default: 'false'
     secrets:
       username:
         required: true
@@ -14,7 +20,7 @@ jobs:
   # === Static tests / linting ===
   lint_packages:
     name: 'Lint packages'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Lint backend, frontend and shared
@@ -23,7 +29,7 @@ jobs:
   # === Build database images ===
   build_backend:
     name: 'Build backend'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Build backend
@@ -35,7 +41,7 @@ jobs:
 
   build_frontend:
     name: 'Build frontend'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
       - name: Build frontend
@@ -46,12 +52,12 @@ jobs:
           push: false
 
   # === Cache docker images ===
-  # TODO: Disabled when running in self-hosted runner
   pull_docker_images:
     name: Pull all needed docker images and cache them (if dbs have not changed)
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
-      !cancelled() && !failure() && false &&
+      !cancelled() && !failure() &&
+      (vars.RUNS_ON == 'ubuntu-latest' || vars.RUNS_ON == '') &&
       !(
         needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
         needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
@@ -99,7 +105,7 @@ jobs:
   # === Update databases ===
   check_migration_files:
     name: Check if new migrations have been added
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     outputs:
       kone_db_migrations: ${{ steps.check_migrations.outputs.kone_db_migrations }}
       user_db_migrations: ${{ steps.check_migrations.outputs.user_db_migrations }}
@@ -124,10 +130,11 @@ jobs:
 
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.sis_db_migrations == 'true'
+      needs.check_migration_files.outputs.sis_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -148,7 +155,8 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+          # TODO: Disable this until fixed
+          # ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -156,10 +164,11 @@ jobs:
 
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.kone_db_migrations == 'true'
+      needs.check_migration_files.outputs.kone_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -181,7 +190,8 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
+          # TODO: Disable this until fixed
+          # ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -189,10 +199,11 @@ jobs:
 
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
-      needs.check_migration_files.outputs.user_db_migrations == 'true'
+      needs.check_migration_files.outputs.user_db_migrations == 'true' &&
+      inputs.skip_db_update != 'true'
     needs:
       - check_migration_files
       - build_backend
@@ -214,7 +225,8 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
+          # TODO: Disable this until fixed
+          # ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -223,7 +235,7 @@ jobs:
   # === Update sis-db with updater ===
   check_updater_changed:
     name: 'Check if updater has been updated'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     outputs:
@@ -243,7 +255,7 @@ jobs:
 
   run_updater_updates:
     name: 'Run updater tests and updates'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure() &&
       (needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
@@ -280,7 +292,8 @@ jobs:
 
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
       # - name: Push newly build db to toska hub
-      #   if: success()
+      #   if: |
+      #   success() && inputs.skip_db_update != 'true'
       #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
 
       - name: Dump logs on failure
@@ -294,7 +307,7 @@ jobs:
   # === Backend api-tests ===
   test_api:
     name: 'Run backend api tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -316,7 +329,7 @@ jobs:
   # === Backend service-tests ===
   test_services:
     name: 'Run backend service-tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -338,7 +351,7 @@ jobs:
   # === Unit testing ===
   test_unit:
     name: 'Run unit tests'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
 
@@ -350,7 +363,7 @@ jobs:
   # === Frontend component testing ===
   test_components:
     name: 'Test frontend components'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -365,8 +378,8 @@ jobs:
         uses: ./.github/actions/test/component
 
   # === End-to-end tests ===
-  test_end_to_end:
-    runs-on: self-hosted
+  test_end_to_end_playwright:
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:
@@ -378,36 +391,88 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: 'Test population statistics'
+            spec: e2e/Population_statistics.spec.ts
           - name: 'Test course statistics'
-            spec: cypress/e2e/Course_statistics.js
+            spec: e2e/Course_statistics.spec.ts
+          - name: 'Test degree programme overview'
+            spec: e2e/Degree_programme_overview.spec.ts
+          - name: 'Test Faculty statistics'
+            spec: e2e/Faculty_statistics.spec.ts
+          - name: 'Test teachers'
+            spec: e2e/Teachers.spec.ts
+          - name: 'Test users'
+            spec: e2e/Users.spec.ts
+          - name: 'Test access rights'
+            spec: e2e/Routes.spec.ts
+          - name: 'Test university'
+            spec: e2e/University.spec.ts
+          - name: 'Test language center view'
+            spec: e2e/Language_center.spec.ts
+    name: ${{ matrix.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install node-24 for playwright
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install firefox --with-deps
+
+      - name: Restore cached docker images
+        id: cache-images-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            /tmp/docker-images.tar.zst
+          key: docker-images-${{ github.sha }}
+
+      - name: Load Docker images (or skip if missing)
+        run: |
+          if [ -f /tmp/docker-images.tar.zst ]; then
+            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
+          fi
+
+      - name: Run tests
+        uses: ./.github/actions/test/e2e-playwright
+        with:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+          spec: ${{ matrix.spec }}
+          test_name: ${{ matrix.name }}
+
+  test_end_to_end:
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    if: |
+      !cancelled() && !failure()
+    needs:
+      - pull_docker_images
+      - run_updater_updates
+      - build_and_push_anon_user_db
+      - build_and_push_anon_kone_db
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
           - name: 'Test custom population'
             spec: cypress/e2e/Custom_population.js
-          - name: 'Test population statistics'
-            spec: cypress/e2e/Population_statistics.js
           - name: 'Test filters'
             spec: cypress/e2e/Filters.js
           - name: 'Test students'
             spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
-          - name: 'Test degree programme overview'
-            spec: cypress/e2e/Degree_programme_overview.js
-          - name: 'Test teachers'
-            spec: cypress/e2e/Teachers.js
-          - name: 'Test users'
-            spec: cypress/e2e/Users.js
-          - name: 'Test faculty statistics'
-            spec: cypress/e2e/Faculty_statistics.js
-          - name: 'Test language center view'
-            spec: cypress/e2e/Language_center.js
           - name: 'Test study guidance groups'
             spec: cypress/e2e/Study_guidance_groups.js
-          - name: 'Test university'
-            spec: cypress/e2e/University.js
           - name: 'Test numbers match'
             spec: cypress/e2e/Numbers_match.js
-          - name: 'Test access rights'
-            spec: cypress/e2e/Routes.js
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -443,7 +508,7 @@ jobs:
   # === Other tests ===
   test_service_exit_statuses:
     name: 'Check services run correctly'
-    runs-on: self-hosted
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     if: |
       !cancelled() && !failure()
     needs:

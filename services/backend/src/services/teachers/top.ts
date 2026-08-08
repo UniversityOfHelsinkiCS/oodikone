@@ -3,6 +3,7 @@ import { col, Op } from 'sequelize'
 import { CreditTypeCode } from '@oodikone/shared/types'
 import { CreditModel, SemesterModel, TeacherModel } from '../../models'
 import logger from '../../util/logger'
+import { now } from '../../util/clock'
 import { redisClient } from '../redis'
 import { getCurrentSemester, getSemestersAndYears } from '../semesters'
 import { TeacherStats } from './helpers'
@@ -25,7 +26,7 @@ export const getTeacherStats = async (categoryId: string, yearCode: number) => {
 
 const setTeacherStats = async (categoryId: string, yearCode: number, stats: TeacherStats[]) => {
   const { redisKey } = categories[categoryId]
-  const data = { stats, updated: new Date() }
+  const data = { stats, updated: now() }
   await redisClient.hSet(redisKey, yearCode, JSON.stringify(data))
 }
 

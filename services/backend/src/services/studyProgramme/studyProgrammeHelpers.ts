@@ -6,6 +6,7 @@ import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
 import { programmeCodes } from '../../config/programmeCodes'
 import { ProgrammeModuleModel } from '../../models'
 import { getDegreeProgrammeType } from '../../util'
+import { now } from '../../util/clock'
 import { GraduationTarget } from '../graduationHelpers'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
@@ -13,7 +14,7 @@ export function getYearsArray(since: number, isAcademicYear: false, yearsCombine
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined?: false): number[]
 export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean): Array<string | number>
 export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombined?: boolean) {
-  const today = new Date()
+  const today = now()
   const until = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   const years: Array<string | number> = []
 
@@ -43,8 +44,8 @@ export const getStatsBasis = (years: Array<string | number>) => {
   }
 }
 
-export const getMedian = (values: number[]) => {
-  if (!values.length) return 0
+export const getMedian = (values: number[] | undefined) => {
+  if (!values?.length) return 0
 
   // compareFn mandatory
   const sorted = values.toSorted((a, b) => a - b)
@@ -56,8 +57,8 @@ export const getMedian = (values: number[]) => {
   return (sorted[half - 1] + sorted[half]) / 2.0
 }
 
-export const getAverage = (values: number[]) => {
-  if (!values.length) return 0
+export const getAverage = (values: number[] | undefined) => {
+  if (!values?.length) return 0
   return Number((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(2))
 }
 
@@ -124,7 +125,7 @@ export const getStartDate = (isAcademicYear: boolean, year = 2017) => {
 
 export const getYearlyMonthlyCreditsObj = () => {
   const yearlyMonthlyCredits: Record<string, ReturnType<typeof getMonthlyCreditsObj>> = {}
-  const today = new Date()
+  const today = now()
 
   for (let year = getStartDate(true).getFullYear(); year <= today.getFullYear(); year++) {
     yearlyMonthlyCredits[year] = getMonthlyCreditsObj(year)
@@ -134,7 +135,7 @@ export const getYearlyMonthlyCreditsObj = () => {
 }
 
 const getMonthlyCreditsObj = (academicStartYear?: number) => {
-  const today = new Date()
+  const today = now()
   const time = getStartDate(true, academicStartYear)
 
   const monthlyCredits: Record<string, number[]> = {}
@@ -288,7 +289,7 @@ export const getGoal = async (programme?: string) => {
     where: {
       code: programme,
       valid_from: {
-        [Op.lte]: new Date(),
+        [Op.lte]: now(),
       },
     },
     order: [['valid_from', 'DESC']],
@@ -322,10 +323,10 @@ export const hasTransferredFromOrToProgramme = (
 ): [boolean, boolean] => {
   const studyRightElementsWithSamePhase = getStudyRightElementsWithPhase(studyRight, studyRightElement.phase)
   const hasTransferredToProgramme =
-    studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < new Date()
+    studyRightElementsWithSamePhase[0].code !== studyRightElement.code && studyRightElement.startDate < now()
   const hasTransferredFromProgramme =
     studyRightElementsWithSamePhase[studyRightElementsWithSamePhase.length - 1].code !== studyRightElement.code &&
-    studyRightElement.endDate < new Date()
+    studyRightElement.endDate < now()
 
   return [hasTransferredFromProgramme, hasTransferredToProgramme]
 }

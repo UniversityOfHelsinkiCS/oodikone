@@ -9,6 +9,7 @@ import {
   SemesterEnrollment,
 } from '@oodikone/shared/types'
 import { createLocaleComparator, keysOf } from '../../util'
+import { now } from '../../util/clock'
 import { countTimeCategories, GraduationTarget } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
@@ -37,6 +38,7 @@ const getGraduationTimeStats = async (
   graduationTimes: Record<string, Record<string, number[]>>,
   graduationTimesCombo: Record<string, Record<string, number[]>>,
   mainStatsByTrack: ReturnType<typeof combineStats>['mainStatsByTrack'],
+  years: string[],
   combinedProgramme?: string
 ) => {
   const goal = await getGoal(combinedProgramme ?? studyProgramme)
@@ -49,21 +51,20 @@ const getGraduationTimeStats = async (
     for (const programmeOrTrack of Object.keys(graduationTimes)) {
       const stats = graduationTimes[programmeOrTrack]
       finalGraduationTimes[programmeOrTrack] ??= { medians: { basic: [], combo: [] } }
-      for (const [year, oneYearStats] of Object.entries(stats)) {
+      for (const year of years) {
+        const oneYearStats: number[] | undefined = stats[year]
         const classSize = mainStatsByTrack[combinedProgramme ? studyProgramme : programmeOrTrack].find(
           stats => stats[0] === year
-        )?.[1]
-        if (classSize === 0 || typeof classSize !== 'number') {
-          continue
-        }
+        )?.[1] // This will always be a number, the type is from poor typing
+
         const final = {
-          amount: oneYearStats.length,
-          classSize,
+          amount: oneYearStats?.length ?? 0,
+          classSize: Number(classSize),
           name: year,
           statistics: countTimeCategories(oneYearStats, finalGraduationTimes.goals[type]),
           median: getMedian(oneYearStats),
           average: getAverage(oneYearStats),
-          times: [...oneYearStats],
+          times: [...(oneYearStats ?? [])],
         }
         finalGraduationTimes[programmeOrTrack].medians[type].push(final)
       }
@@ -101,23 +102,20 @@ type StudyRightWithSemesterEnrollments = SISStudyRight & {
   semesterEnrollments: SemesterEnrollment[]
 }
 
-const combineStats = (
+export const combineStats = (
   years: string[],
   yearlyStats: Record<string, YearlyData>,
   studyProgramme: string,
   combinedProgramme?: string
 ) => {
   type MainStats = Record<string, Array<Array<string | number>>>
-
   const mainStatsByYear: MainStats = getYearsObject({ years, emptyArrays: true })
-
   const mainStatsByTrack: MainStats = {}
-
   const otherCountriesCount: Record<string, Record<string, Record<string, number>>> = {}
 
-  for (const year of Object.keys(yearlyStats)) {
-    for (const programmeOrStudyTrack of Object.keys(yearlyStats[year])) {
-      const yearStats = yearlyStats[year][programmeOrStudyTrack]
+  for (const year of years) {
+    for (const programmeOrStudyTrack of Object.keys(yearlyStats[year] ?? { [studyProgramme]: {} })) {
+      const yearStats = yearlyStats[year]?.[programmeOrStudyTrack] ?? getEmptyYear()
 
       mainStatsByYear[year] ??= []
       mainStatsByTrack[programmeOrStudyTrack] ??= []
@@ -183,7 +181,7 @@ const getMainStatsByTrackAndYear = async (
   const yearlyStats: Record<string, YearlyData> = {}
 
   const { semesters } = await getSemestersAndYears()
-  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
+  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= now())!
 
   const yearAgo = dayjs().subtract(1, 'year')
 
@@ -517,7 +515,8 @@ const getMainStatsByTrackAndYear = async (
     studyProgramme,
     graduationTimes,
     graduationTimesCombo,
-    mainStatsByTrack
+    mainStatsByTrack,
+    years
   )
 
   const finalCombinedGraduationTimes = await getGraduationTimeStats(
@@ -525,6 +524,7 @@ const getMainStatsByTrackAndYear = async (
     {},
     graduationTimesCombinedProgrammeCombo,
     mainStatsByTrack,
+    years,
     combinedProgramme
   )
 

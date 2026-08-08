@@ -1,4 +1,5 @@
 import { getDegreeProgrammeType } from '../../util'
+import { now } from '../../util/clock'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { formatStudentForAPI } from './formatStatisticsForApi'
 import {
@@ -35,7 +36,7 @@ export const statisticsOf = async (
   endDate?: string
 ) => {
   const defaultStartDate = new Date(1900, 0, 1).toISOString()
-  const defaultEndDate = new Date(new Date().getFullYear() + 1, 0, 1).toISOString()
+  const defaultEndDate = new Date(now().getFullYear() + 1, 0, 1).toISOString()
 
   const code = studyRights[0] ?? ''
   const mockedStartDate = startDate ?? defaultStartDate

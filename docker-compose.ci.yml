@@ -4,9 +4,11 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-healthcheck-defaults: &healthcheck-defaults
-  interval: 1s
-  timeout: 3s
-  retries: 30
+  interval: 30s # Normal healthcehck interval
+  timeout: 5s
+  retries: 10 # Retries until SIGKILl
+  start_interval: 3s # How often healthcheck runs while starting
+  start_period: 30s # How long startup period is
 
 services:
   backend:
@@ -71,7 +73,7 @@ services:
     ports:
       - 4321:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
 
   user-db:
@@ -85,7 +87,7 @@ services:
     ports:
       - 4320:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
 
   redis:
@@ -112,7 +114,7 @@ services:
     ports:
       - 12345:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
 
   sis-importer-db:
@@ -124,7 +126,7 @@ services:
     ports:
       - 12346:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
 
   jami:
@@ -145,14 +147,14 @@ services:
   jami-db:
     <<: *defaults
     container_name: oodikone-jami-db
-    image: postgres:15.10
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/jami-db
     environment:
       - PGDATA=/data
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5433:5432
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', '127.0.0.1']
       <<: *healthcheck-defaults
 
   # This is still needed to make backend calls correctly route from localhost:5000/api to localhost:8080

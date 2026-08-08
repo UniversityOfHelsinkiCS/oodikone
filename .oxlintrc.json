@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["import", "typescript"],
+  "jsPlugins": ["./.oxlint-backend-rules.cjs"],
   "categories": {
     "correctness": "off"
   },
@@ -36,6 +37,7 @@
   },
   "ignorePatterns": [
     "eslint.config.mjs",
+    ".oxlint-backend-rules.cjs",
     "**/build/**",
     "**/dist/**",
     "**/node_modules/**",
@@ -44,7 +46,9 @@
     "nyc-config.cjs",
     ".lintstagedrc.mjs",
     "cypress.config.js",
-    "cypress/**/*.js"
+    "cypress/**/*.js",
+    "playwright/**/*.js",
+    "playwright.config.ts"
   ],
   "rules": {
     "constructor-super": "error",
@@ -234,6 +238,13 @@
       }
     },
     {
+      "files": ["services/backend/src/**/*.{js,ts,tsx}"],
+      "excludeFiles": ["services/backend/src/util/clock.ts"],
+      "rules": {
+        "oodikone/no-new-date": "error"
+      }
+    },
+    {
       "files": ["services/backend/src/routes/*.{ts,js}"],
       "rules": {
         "typescript/no-misused-promises": "off",
@@ -387,6 +398,12 @@
         "no-await-in-loop": "off",
         "no-promise-executor-return": "off",
         "import/no-default-export": "off"
+      }
+    },
+    {
+      "files": ["e2e/**/*.ts"],
+      "rules": {
+        "no-await-in-loop": "off"
       }
     },
     {
