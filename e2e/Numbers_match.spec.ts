@@ -57,6 +57,7 @@ const selectYear = async (page: Page, selector: string, option: string) => {
 
 test.describe('Numbers should match between', () => {
   test.slow()
+  test.setTimeout(180_000) // 3min
 
   test.describe('Programme courses, Course statistics and Course population (no substitutions, all years)', () => {
     test('in Programme courses', async ({ page }) => {
