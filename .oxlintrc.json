@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["import", "typescript"],
+  "jsPlugins": ["./.oxlint-backend-rules.cjs"],
   "categories": {
     "correctness": "off"
   },
@@ -36,6 +37,7 @@
   },
   "ignorePatterns": [
     "eslint.config.mjs",
+    ".oxlint-backend-rules.cjs",
     "**/build/**",
     "**/dist/**",
     "**/node_modules/**",
@@ -233,6 +235,13 @@
         "no-with": "off",
         "prefer-rest-params": "error",
         "prefer-spread": "error"
+      }
+    },
+    {
+      "files": ["services/backend/src/**/*.{js,ts,tsx}"],
+      "excludeFiles": ["services/backend/src/util/clock.ts"],
+      "rules": {
+        "oodikone/no-new-date": "error"
       }
     },
     {
