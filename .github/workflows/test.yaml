@@ -417,6 +417,10 @@ jobs:
             spec: e2e/Filters.spec.ts
           - name: 'Test students'
             spec: e2e/Students.spec.ts
+          - name: 'Test completed courses'
+            spec: e2e/Completed_courses.spec.ts
+          - name: 'Test numbers match'
+            spec: e2e/Numbers_match.spec.ts
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -450,55 +454,6 @@ jobs:
 
       - name: Run tests
         uses: ./.github/actions/test/e2e-playwright
-        with:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-          spec: ${{ matrix.spec }}
-          test_name: ${{ matrix.name }}
-
-  test_end_to_end:
-    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
-    if: |
-      !cancelled() && !failure()
-    needs:
-      - pull_docker_images
-      - run_updater_updates
-      - build_and_push_anon_user_db
-      - build_and_push_anon_kone_db
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: 'Test completed courses'
-            spec: cypress/e2e/Completed_courses.js
-          - name: 'Test numbers match'
-            spec: cypress/e2e/Numbers_match.js
-    name: ${{ matrix.name }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install node-24 for cypress
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
-
-      - name: Run tests
-        uses: ./.github/actions/test/e2e
         with:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
