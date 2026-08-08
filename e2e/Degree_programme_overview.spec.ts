@@ -346,7 +346,7 @@ test.describe('Degree programme overview', () => {
       test('total', async ({ page }) => {
         await page.getByTestId('total-population-link-button').click()
         await expect(page.getByText('Matemaattisten tieteiden kandiohjelma')).toBeVisible()
-        await expect(page.getByText('Class of 2017 - 2027, 227 students')).toBeVisible()
+        await expect(page.getByText('Class of 2017 - 2026, 227 students')).toBeVisible()
       })
 
       test('Links to class statistics page with study track info included work', async ({ page }) => {
