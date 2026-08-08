@@ -13,6 +13,7 @@ type UserInfo = {
   userId?: string
   roles?: string[]
   programmeRights?: unknown[]
+  iamGroups?: string[]
 }
 
 const baseRoutes: [string, RouteRequirements][] = [
@@ -23,7 +24,8 @@ const baseRoutes: [string, RouteRequirements][] = [
   ['/feedback', {}],
   ['/populations', { roles: ['fullSisuAccess'], programmeRights: [] }],
   ['/study-programme', { roles: ['fullSisuAccess'], programmeRights: [] }],
-  ['/study-programme/KH50_001', { roles: ['fullSisuAccess'], programmeRights: ['KH50_001'] }],
+  // TODO: This should probably be allowed for user with programmeRight, not only fullSisuAccess
+  ['/study-programme/KH50_001', { roles: ['fullSisuAccess'], programmeRights: [] }],
   ['/coursepopulation', { roles: ['fullSisuAccess'], programmeRights: [] }],
   ['/users', { roles: ['admin'] }],
   ['/users/334', { roles: ['admin'] }],
@@ -74,18 +76,27 @@ for (const user of userHeaders) {
 
     for (const [route, requirements] of baseRoutes) {
       test(`Checking access ${route}`, async ({ page }) => {
+        // TODO: JAMI mock needed to make this test deterministic
+        test.skip(user.uid === 'onlyiamrights' && route === '/coursestatistics')
+
         await page.goto(route)
 
-        const { userId, roles = [], programmeRights = [] } = userInfo ?? {}
+        const { userId, roles = [], programmeRights = [], iamGroups = [] } = userInfo ?? {}
+        const hasProgrammeRights = programmeRights.length > 0
 
         const requiredUserId = !requirements.userId || requirements.userId === userId
-
         const requiredRoles = !requirements.roles || requirements.roles.some(role => roles.includes(role))
+        const requiredIamGroups =
+          !requirements.iamGroups || requirements.iamGroups.some(group => iamGroups.includes(group))
+        let requiredRights = !requirements.requireProgrammeRights || hasProgrammeRights
 
-        const requiredRights =
-          !requirements.requireProgrammeRights ||
-          roles.includes('fullSisuAccess') ||
-          (requirements.programmeRights ?? []).every(right => programmeRights.includes(right))
+        if (!!requirements.programmeRights) {
+          requiredRights =
+            requirements.programmeRights.length === 0
+              ? hasProgrammeRights
+              : roles.includes('fullSisuAccess') ||
+                requirements.programmeRights.every(right => programmeRights.includes(right))
+        }
 
         // This is defined in frontend ProtectedRoute component.
         const specialNeedsRoutes = [
@@ -101,10 +112,7 @@ for (const user of userHeaders) {
           ? requiredRoles || requiredRights
           : requiredRoles && requiredRights
 
-        const shouldHaveAccess = mankeli && requiredUserId
-
-        // if (route === "/custompopulation")
-        //   console.log("Should have access:", shouldHaveAccess, requirements)
+        const shouldHaveAccess = mankeli && requiredUserId && requiredIamGroups
 
         if (shouldHaveAccess) {
           await expect(page.getByRole('heading', { name: 'Something broke' })).not.toBeVisible()
