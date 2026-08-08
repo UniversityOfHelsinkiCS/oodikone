@@ -8,6 +8,7 @@ import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
 import { isOpenUniCourseCode } from '../../util'
+import { now } from '../../util/clock'
 import { getSemestersAndYears, SemestersAndYears } from '../semesters'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
 import {
@@ -169,7 +170,7 @@ const getSemesterAndYearByDate = (
   semesters: SemestersAndYears['semesters'],
   years: SemestersAndYears['years']
 ) => {
-  const semesterCode = getSemesterCodeAt(semesters, date) ?? getSemesterCodeAt(semesters, new Date())!
+  const semesterCode = getSemesterCodeAt(semesters, date) ?? getSemesterCodeAt(semesters, now())!
 
   const semester = semesters[semesterCode]
   const year = years[semester.yearcode]
@@ -358,7 +359,7 @@ export const getCourseYearlyStats = async (
   anonymizationSalt: string | null,
   combineSubstitutions: boolean,
   fromYearCode = yearToYearCode(1950).toString(),
-  toYearCode: string = yearToYearCode(new Date().getFullYear()).toString()
+  toYearCode: string = yearToYearCode(now().getFullYear()).toString()
 ) => {
   // Default to 1900 - currentYear+1 so that without parameters the api returns stats for all years
   const from = new Date(`${yearCodeToYear(fromYearCode)}-08-01`) // FALL

@@ -2,16 +2,17 @@ import { Op } from 'sequelize'
 import { Banner } from '@oodikone/shared/models/kone'
 import { BannerModel } from '../models/kone/banner'
 import { SetOptional } from '../types'
+import { now } from '../util/clock'
 
 export const getActiveBanners = async () =>
   await BannerModel.findAll({
     attributes: ['id', 'text', 'lightness', 'color', 'startDate', 'endDate'],
     where: {
       endDate: {
-        [Op.gt]: new Date(),
+        [Op.gt]: now(),
       },
       startDate: {
-        [Op.lt]: new Date(),
+        [Op.lt]: now(),
       },
     },
     raw: true,

@@ -7,6 +7,7 @@ import { programmeCodes } from '../../config/programmeCodes'
 import { dbConnections } from '../../database/connection'
 import { OrganizationModel } from '../../models'
 import { ApplicationError } from '../../util/customErrors'
+import { now } from '../../util/clock'
 import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
 
 const { sequelize } = dbConnections
@@ -27,7 +28,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
   const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { validFrom: Date }> =
     await sequelize.query(
       `
-      SELECT 
+      SELECT
         code,
         curriculum_period_ids as "curriculumPeriodIds",
         degree_programme_type as "degreeProgrammeType",
@@ -64,7 +65,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
     // Programmes are ordered by valid_from in descending order, so the first one whose valid_from date isn't in the future, is the newest version
-    const newestProgrammeVersion = programmeVersions.find(prog => new Date() >= prog.validFrom)
+    const newestProgrammeVersion = programmeVersions.find(prog => now() >= prog.validFrom)
     if (!newestProgrammeVersion) {
       continue
     }
@@ -79,8 +80,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       .flat()
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
-      (onlyCurrentProgrammes &&
-        yearsOfProgramme.some(year => year.startDate <= new Date() && new Date() <= year.endDate))
+      (onlyCurrentProgrammes && yearsOfProgramme.some(year => year.startDate <= now() && now() <= year.endDate))
 
     if (isRelevantProgramme) {
       relevantProgrammes.push({
@@ -98,7 +98,8 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 export type ProgrammesOfOrganization = ProgrammeModuleWithRelevantAttributes[]
 
 export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
-  const organization = await OrganizationModel.findOne({
+  const organization: Pick<OrganizationModel, 'id'> | null = await OrganizationModel.findOne({
+    raw: true,
     attributes: ['id'],
     where: {
       code: facultyCode,

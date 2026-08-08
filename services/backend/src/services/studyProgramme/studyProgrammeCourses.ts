@@ -1,6 +1,7 @@
 import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
 import { mapToProviders, range, yearCodeToYear } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
+import { now } from '../../util/clock'
 
 import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
 import { getStudentHetuStateMap, getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
@@ -9,7 +10,7 @@ const START_YEAR = 2017
 const JULY = 6
 const AUGUST = 7
 
-const getCurrentYearStartDate = () => new Date(new Date().getFullYear(), 0, 1)
+const getCurrentYearStartDate = () => new Date(now().getFullYear(), 0, 1)
 
 const getFrom = (yearType: YearType, year: number) =>
   yearType === 'ACADEMIC_YEAR' ? new Date(year, AUGUST, 1, 0, 0, 0) : new Date(year, 0, 1, 0, 0, 0)

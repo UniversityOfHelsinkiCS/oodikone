@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 
 import { SECRET_TOKEN, SIS_UPDATER_URL } from '../config'
 import { StudyplanModel } from '../models'
+import { now } from '../util/clock'
 
 const client = axios.create({ baseURL: SIS_UPDATER_URL })
 const params = { params: { token: SECRET_TOKEN } }
@@ -50,7 +51,7 @@ export const nukeRedis = async () => {
 }
 
 export const updateSISStudyPlans = async (days: number) => {
-  const limitDate = new Date()
+  const limitDate = now()
   limitDate.setDate(limitDate.getDate() - days)
   const result = await StudyplanModel.findAll({
     where: { updatedAt: { [Op.lte]: limitDate } },

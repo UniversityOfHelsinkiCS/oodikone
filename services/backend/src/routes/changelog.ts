@@ -3,6 +3,7 @@ import { Router } from 'express'
 
 import { Release } from '@oodikone/shared/types'
 import { isDev, isTest } from '../config'
+import { now } from '../util/clock'
 
 const router = Router()
 
@@ -18,19 +19,19 @@ router.get<never, Release[]>('/', async (_, res) => {
       {
         description: '**Feature 1**\n- Added a fancy new feature \n\n**Feature 2**\n- Fixed a bug\n- Fixed another bug',
         title: 'Release 3',
-        time: new Date().toISOString(),
+        time: now().toISOString(),
         version: '0.0.3',
       },
       {
         description: "Let's not spam the GitHub API in development!",
         title: 'Release 2',
-        time: new Date().toISOString(),
+        time: now().toISOString(),
         version: '0.0.2',
       },
       {
         description: 'This release should not be visible on the frontpage',
         title: 'Release 1',
-        time: new Date().toISOString(),
+        time: now().toISOString(),
         version: '0.0.1',
       },
     ]

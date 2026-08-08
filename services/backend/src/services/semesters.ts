@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 import { Name } from '@oodikone/shared/types'
 import { dateMinFromList, dateMaxFromList } from '@oodikone/shared/util/datetime'
 import { SemesterModel } from '../models'
+import { now } from '../util/clock'
 
 export type SemestersAndYears = {
   years: Record<
@@ -39,7 +40,7 @@ export const getSemesterNamesByCode = async (semesterCodes: number[]): Promise<R
 }
 
 export const getCurrentSemester = async () => {
-  const today = new Date()
+  const today = now()
   const currentSemester = await SemesterModel.findOne({
     where: {
       startdate: {
