@@ -415,6 +415,8 @@ jobs:
             spec: e2e/Custom_population.spec.ts
           - name: 'Test filters'
             spec: e2e/Filters.spec.ts
+          - name: 'Test students'
+            spec: e2e/Students.spec.ts
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -467,8 +469,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Test students'
-            spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
           - name: 'Test numbers match'
