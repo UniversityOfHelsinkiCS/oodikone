@@ -69,7 +69,7 @@ export const SearchHistory = ({
             renderOption={(props, option) => {
               const { key, ...optionProps } = props
               return (
-                <Box component="li" key={key} {...optionProps}>
+                <Box component="li" key={key} {...optionProps} data-cy={option.id}>
                   <Stack direction="row" justifyContent="space-between" sx={{ width: '100%' }}>
                     {option.text}
                     <Typography color="text.secondary">
