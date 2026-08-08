@@ -84,6 +84,7 @@ export const init = async (page: Page, path: string, userId: UserId = 'basic', c
       headers: {
         ...route.request().headers(),
         ...headersToUse,
+        'x-test-now': testMockTime,
       },
     })
   })
