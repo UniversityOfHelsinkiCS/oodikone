@@ -1,8 +1,8 @@
 import { test, expect, Page } from '@playwright/test'
-import { checkTableStats, init } from './support/commands'
+import { checkTableStats, init, testMockTime } from './support/commands'
 
 const getEmptyYears = (isAcademicYear = false) => {
-  const today = new Date()
+  const today = new Date(testMockTime)
   const latestYear = isAcademicYear && today.getMonth() < 7 ? today.getFullYear() - 1 : today.getFullYear()
   const years = []
   for (let year = latestYear; year >= 2024; year--) {
