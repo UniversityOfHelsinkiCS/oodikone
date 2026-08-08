@@ -90,7 +90,7 @@ for (const user of userHeaders) {
           !requirements.iamGroups || requirements.iamGroups.some(group => iamGroups.includes(group))
         let requiredRights = !requirements.requireProgrammeRights || hasProgrammeRights
 
-        if (!!requirements.programmeRights) {
+        if (requirements.programmeRights) {
           requiredRights =
             requirements.programmeRights.length === 0
               ? hasProgrammeRights
