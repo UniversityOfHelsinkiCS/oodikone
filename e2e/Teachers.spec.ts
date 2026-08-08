@@ -46,6 +46,8 @@ test.describe('Teachers page tests', () => {
   })
 
   test('Can check teacher page', async ({ page, context }) => {
+    // Re-init with context so the tab opened from the teacher link gets mocked headers too.
+    await init(page, '/teachers', 'admin', context)
     await page.getByTestId('Search').click()
     await page.getByTestId('teacher-search').getByPlaceholder('Search by entering a name or an id').fill(teacher2)
 
@@ -54,7 +56,7 @@ test.describe('Teachers page tests', () => {
 
     // Change to other tab
     const pagePromise = context.waitForEvent('page')
-    await page.getByText(teacher2).click()
+    await page.getByRole('link', { name: teacher2 }).click()
     const newPage = await pagePromise
 
     await newPage.waitForURL('**/teachers/hy-hlo-49026530')
@@ -66,9 +68,9 @@ test.describe('Teachers page tests', () => {
     await expect(newPage.getByText('MAT22002')).toBeVisible()
     await expect(newPage.getByText('MAT22003')).toBeVisible()
 
-    const courseRow = newPage.locator('tr').getByText('MAT12004')
+    const courseRow = newPage.locator('tr').filter({ hasText: 'MAT12004' })
     const rowContent = ['MAT12004', 'Tilastollinen päättely I', '120', '0', '92.31%']
-    rowContent.map(content => expect(courseRow.getByText(content)))
+    await expect(courseRow.locator('td')).toHaveText(rowContent)
   })
 
   test('Check leaderboad works', async ({ page }) => {

@@ -756,6 +756,13 @@ test.describe('Degree programme overview', () => {
     test.describe('Adding tags to students and removing them works', () => {
       const studentInput = '477806,478275;   478953  479239\n   480080'
       const studentNumbers = studentInput.match(/[^\s,;]+/g)!
+
+      test.beforeEach(async ({ page, context }) => {
+        await init(page, '/study-programme', 'basic', context)
+        await page.getByRole('link', { name: 'Matemaattisten tieteiden kandiohjelma' }).click()
+        await page.getByTestId('TagsTab').click()
+      })
+
       test('can add tags to students', async ({ page, context }) => {
         // NOTE: Navigating to each students' page takes time, fix?
         test.slow()

@@ -1,7 +1,7 @@
 // ! IMPORTANT: here we need to set keys to be all lowercase, since
 // ! we're replacing headers after they've left browser / frontend.
 
-import { expect, Page } from '@playwright/test'
+import { BrowserContext, expect, Page } from '@playwright/test'
 
 // All of these users are available in anon user-db
 const adminUserHeaders = {
@@ -70,11 +70,14 @@ export const userHeaders = [
 
 type UserId = 'admin' | 'basic' | 'onlycoursestatistics' | 'norights' | 'onlyiamrights' | 'onlystudyguidancegroups'
 
-export const init = async (page: Page, path: string, userId: UserId = 'basic') => {
+export const init = async (page: Page, path: string, userId: UserId = 'basic', context?: BrowserContext) => {
   const headersToUse = userHeaders.find(({ uid }) => uid === userId)
   if (!headersToUse) throw Error(`${userId} is not valid user id!`)
 
-  await page.route('**/api/**', async route => {
+  // Prefer context-level routing when provided so new tabs inherit header injection.
+  const routeTarget = context ?? page
+
+  await routeTarget.route('**/api/**', async route => {
     await route.continue({
       headers: {
         ...route.request().headers(),
