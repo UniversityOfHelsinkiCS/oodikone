@@ -89,6 +89,7 @@ export const init = async (page: Page, path: string, userId: UserId = 'basic', c
     })
   })
 
+  await page.clock.install({ time: testMockTime })
   await page.goto(path || '/')
 }
 
