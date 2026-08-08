@@ -13,6 +13,7 @@ import { updateBasicView, updateStudyTrackView } from './services/studyProgramme
 import { findAndSaveTeachers } from './services/teachers/top'
 import { deleteOutdatedUsers } from './services/userService'
 import logger from './util/logger'
+import { now } from './util/clock'
 import { jobQueue } from './worker/queue'
 
 const schedule = (cronTime: string, onTick: () => void) => {
@@ -27,7 +28,7 @@ export const refreshCloseToGraduating = async () => {
   const updatedData = await findStudentsCloseToGraduation()
   await redisClient.set(
     CLOSE_TO_GRADUATION_REDIS_KEY,
-    JSON.stringify({ ...updatedData, lastUpdated: new Date().toISOString() })
+    JSON.stringify({ ...updatedData, lastUpdated: now().toISOString() })
   )
   logger.info('Students close to graduating updated!')
 }

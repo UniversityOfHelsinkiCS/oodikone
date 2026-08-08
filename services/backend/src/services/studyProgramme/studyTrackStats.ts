@@ -9,6 +9,7 @@ import {
   SemesterEnrollment,
 } from '@oodikone/shared/types'
 import { createLocaleComparator, keysOf } from '../../util'
+import { now } from '../../util/clock'
 import { countTimeCategories, GraduationTarget } from '../graduationHelpers'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
@@ -180,7 +181,7 @@ const getMainStatsByTrackAndYear = async (
   const yearlyStats: Record<string, YearlyData> = {}
 
   const { semesters } = await getSemestersAndYears()
-  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
+  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= now())!
 
   const yearAgo = dayjs().subtract(1, 'year')
 

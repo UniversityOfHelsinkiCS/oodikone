@@ -13,6 +13,7 @@ import {
   SISStudyRightModel,
   SISStudyRightElementModel,
 } from '../../models'
+import { now } from '../../util/clock'
 import { redisClient } from '../redis'
 import { getCurrentSemester } from '../semesters'
 import { getCurriculumVersion } from './shared'
@@ -176,7 +177,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                   where: {
                     graduated: false,
                     endDate: {
-                      [Op.gte]: new Date(),
+                      [Op.gte]: now(),
                     },
                     '$studyplans.programme_code$': {
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
@@ -289,7 +290,7 @@ export const getCloseToGraduationData = async (studentNumbers?: string[]) => {
 
     const students = await findStudentsCloseToGraduation()
 
-    const freshData = { ...students, lastUpdated: new Date().toISOString() }
+    const freshData = { ...students, lastUpdated: now().toISOString() }
     await redisClient.set(CLOSE_TO_GRADUATION_REDIS_KEY, JSON.stringify(freshData))
 
     return freshData

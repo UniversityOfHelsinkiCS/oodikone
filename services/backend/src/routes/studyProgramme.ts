@@ -18,6 +18,7 @@ import { getGraduationStatsForStudyTrack } from '../services/studyProgramme/stud
 import { updateBasicView, updateStudyTrackView } from '../services/studyProgramme/studyProgrammeUpdates'
 import { getStudyRightsInProgramme, getStudyTracksForProgramme } from '../services/studyProgramme/studyRightFinders'
 import { getStudyTrackStatsForStudyProgramme } from '../services/studyProgramme/studyTrackStats'
+import { now } from '../util/clock'
 import logger from '../util/logger'
 import { logInfoForGrafana } from '../util/logInfoForGrafana'
 import { yearToYearCode } from '@oodikone/shared/util'
@@ -111,7 +112,7 @@ type CourseStatsQuery = {
 router.get<StudyProgrammeParams, unknown, never, CourseStatsQuery>('/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const { combinedProgramme, yearType, fromYearCode, toYearCode } = req.query
-  const date = new Date()
+  const date = now()
   date.setHours(23, 59, 59, 999)
   void logInfoForGrafana(code, combinedProgramme)
   try {
@@ -121,7 +122,7 @@ router.get<StudyProgrammeParams, unknown, never, CourseStatsQuery>('/:id/courses
       yearType,
       combinedProgramme,
       fromYearCode ?? '1', // 1950
-      toYearCode ?? yearToYearCode(new Date().getFullYear()).toString() // Current year
+      toYearCode ?? yearToYearCode(now().getFullYear()).toString() // Current year
     )
     return res.json(data)
   } catch (error) {
