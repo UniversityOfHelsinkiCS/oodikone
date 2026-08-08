@@ -249,8 +249,9 @@ test.describe('Basic user', () => {
 
     // Check the link has updated correctly
     await expect(page.getByTestId('course-population-for-2022-2023')).toHaveAttribute('href', /BSCS1003/)
-    await page.getByTestId('course-population-for-2022-2023').click()
     await expect(page.getByTestId('CourseSelector').getByText('Data Structures and Algorithms')).toBeVisible()
+
+    await page.getByTestId('course-population-for-2022-2023').click()
     await expect(page.getByText('Class of 2022-2023')).toBeVisible()
     await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
   })
