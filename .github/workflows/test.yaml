@@ -407,6 +407,8 @@ jobs:
             spec: e2e/Routes.spec.ts
           - name: 'Test university'
             spec: e2e/University.spec.ts
+          - name: 'Test language center view'
+            spec: e2e/Language_center.spec.ts
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -467,8 +469,6 @@ jobs:
             spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
-          - name: 'Test language center view'
-            spec: cypress/e2e/Language_center.js
           - name: 'Test study guidance groups'
             spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test numbers match'
