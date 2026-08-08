@@ -397,6 +397,8 @@ jobs:
             spec: e2e/Course_statistics.spec.ts
           - name: 'Test degree programme overview'
             spec: e2e/Degree_programme_overview.spec.ts
+          - name: 'Test Faculty statistics'
+            spec: e2e/Faculty_statistics.spec.ts
           - name: 'Test teachers'
             spec: e2e/Teachers.spec.ts
           - name: 'Test users'
@@ -465,8 +467,6 @@ jobs:
             spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
-          - name: 'Test Faculty statistics'
-            spec: cypress/e2e/Faculty_statistics.js
           - name: 'Test language center view'
             spec: cypress/e2e/Language_center.js
           - name: 'Test study guidance groups'
