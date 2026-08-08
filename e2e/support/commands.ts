@@ -70,7 +70,13 @@ export const userHeaders = [
 
 export const testMockTime = '2026-03-01'
 
-type UserId = 'admin' | 'basic' | 'onlycoursestatistics' | 'norights' | 'onlyiamrights' | 'onlystudyguidancegroups'
+export type UserId =
+  | 'admin'
+  | 'basic'
+  | 'onlycoursestatistics'
+  | 'norights'
+  | 'onlyiamrights'
+  | 'onlystudyguidancegroups'
 
 export const init = async (page: Page, path: string, userId: UserId = 'basic', context?: BrowserContext) => {
   const headersToUse = userHeaders.find(({ uid }) => uid === userId)
