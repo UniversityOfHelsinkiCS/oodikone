@@ -5,6 +5,7 @@ import { CreditTypeCode, EnrollmentState, UnifyStatus } from '@oodikone/shared/t
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
 import { dateMaxFromList } from '@oodikone/shared/util/datetime'
+import { now } from '../util/clock'
 import {
   StudentModel,
   CreditModel,
@@ -385,7 +386,7 @@ export const bySearchTermAndStudentNumbers = async (searchTerm: string, studentN
             required: true,
             where: {
               endDate: {
-                [Op.gte]: new Date(),
+                [Op.gte]: now(),
               },
             },
           },

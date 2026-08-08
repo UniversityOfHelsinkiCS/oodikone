@@ -3,6 +3,7 @@ import { indexOf } from 'lodash-es'
 import { Name, EnrollmentType, SemesterEnrollment } from '@oodikone/shared/types'
 import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { getSemestersAndYears } from '../semesters'
+import { now } from '../../util/clock'
 import {
   defineYear,
   getStartDate,
@@ -53,9 +54,8 @@ const getStartedStats = async ({
   const startedStudying = getStatsBasis(years)
   const accepted = getStatsBasis(years)
   const { semesters } = await getSemestersAndYears()
-  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= new Date())!
+  const { semestercode: currentSemester } = Object.values(semesters).find(semester => semester.enddate >= now())!
 
-  const now = new Date()
   for (const studyRight of studyRightsOfProgramme) {
     const studyRightElement = studyRight.studyRightElements.find(element => element.code === studyProgramme)
     if (!studyRightElement) {
@@ -70,7 +70,7 @@ const getStartedStats = async ({
     const startedInProgramme = new Date(studyRightElement.startDate)
     const startedInProgrammeYear = defineYear(startedInProgramme, isAcademicYear)
 
-    if (startedInProgramme >= now) {
+    if (startedInProgramme >= now()) {
       continue
     }
 
@@ -147,6 +147,7 @@ const getTransferAndCancellationStats = async ({
   const cancelled = getStatsBasis(years)
 
   const calculateStats = (studyRights: SISStudyRight[], programme: string, includeCancelled = false) => {
+    const currentTime = now()
     for (const studyRight of studyRights) {
       if (includeCancelled && studyRight.cancelled) {
         // Cancellation is per study right (not element) -> only count it once
@@ -164,14 +165,14 @@ const getTransferAndCancellationStats = async ({
       const [firstStudyRightElementWithSamePhase] = studyRightElementsWithSamePhase
       if (
         firstStudyRightElementWithSamePhase.code !== studyRightElement.code &&
-        studyRightElement.startDate <= new Date()
+        studyRightElement.startDate <= currentTime
       ) {
         const transferYear = defineYear(studyRightElement.startDate, isAcademicYear)
         transferredTo.graphStats[indexOf(years, transferYear)] += 1
         transferredTo.tableStats[transferYear] += 1
       } else if (
         firstStudyRightElementWithSamePhase.code === studyRightElement.code &&
-        studyRightElement.endDate <= new Date()
+        studyRightElement.endDate <= currentTime
       ) {
         const transferYear = defineYear(studyRightElement.endDate, isAcademicYear)
         transferredAway.graphStats[indexOf(years, transferYear)] += 1

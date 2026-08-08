@@ -9,6 +9,7 @@ import * as auth from './middleware/auth'
 import currentUserMiddleware from './middleware/currentUser'
 import errorHandler from './middleware/errorHandler'
 import headersMiddleware from './middleware/headers'
+import { testTimeMiddleware } from './middleware/testTime'
 import banners from './routes/banners'
 import changelog from './routes/changelog'
 import closeToGraduation from './routes/closeToGraduation'
@@ -43,6 +44,7 @@ const routes = (app: Express, url: string) => {
   app.use(compression())
 
   app.use(headersMiddleware)
+  app.use(testTimeMiddleware)
   app.use(currentUserMiddleware)
   app.use(accessLogger)
   app.use(`${url}/login`, login)

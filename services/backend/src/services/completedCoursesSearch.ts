@@ -9,6 +9,7 @@ import {
 } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold, omitKeys } from '@oodikone/shared/util'
 import { CourseModel, CreditModel, EnrollmentModel, StudentModel, StudyplanModel } from '../models'
+import { now } from '../util/clock'
 
 type StudentWithStudyplanNested = Pick<
   StudentModel,
@@ -83,7 +84,7 @@ const getPassedCredits = async (
                 groupCreditCodes.includes(course.code) && groupCreditCodes.length === 1 ? null : groupCreditCodes,
               studentNumber,
               creditType: groupCredits.length > 1 ? CreditTypeCode.PASSED : groupCredits.at(0)!.credittypecode,
-              date: groupCredits?.at(0)?.attainment_date ?? new Date(), // Credits are sorted by date in desc. order
+              date: groupCredits?.at(0)?.attainment_date ?? now(), // Credits are sorted by date in desc. order
             })
           }
         }
@@ -144,7 +145,7 @@ const getEnrollments = async (
                   ? null
                   : groupEnrollmentCodes,
               studentNumber,
-              date: groupEnrollments?.at(0)?.enrollment_date_time ?? new Date(), // Enrollments are sorted by date in desc. order
+              date: groupEnrollments?.at(0)?.enrollment_date_time ?? now(), // Enrollments are sorted by date in desc. order
             })
           }
         }

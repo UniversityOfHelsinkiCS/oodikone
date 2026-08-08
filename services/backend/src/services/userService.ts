@@ -9,6 +9,7 @@ import { UserModel } from '../models/user'
 
 import { createLocaleComparator, getFullStudyProgrammeRights, hasFullAccessToStudentData } from '../util'
 import * as jami from '../util/jami'
+import { now } from '../util/clock'
 import { sendNotificationAboutNewUser } from './mailService'
 import { getStudentnumbersByElementdetails } from './students'
 import { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } from './studyGuidanceGroups'
@@ -262,7 +263,7 @@ export const getUser = async ({
     username,
     email,
     sisuPersonId: sisId,
-    lastLogin: new Date(),
+    lastLogin: now(),
   })
 
   await updateAccessGroups(iamGroups, specialGroup, sisId, upsertResult)

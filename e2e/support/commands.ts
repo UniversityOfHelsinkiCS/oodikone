@@ -68,6 +68,8 @@ export const userHeaders = [
   onlyStudyGuidanceGroupsUser,
 ]
 
+export const testMockTime = '2026-03-01'
+
 type UserId = 'admin' | 'basic' | 'onlycoursestatistics' | 'norights' | 'onlyiamrights' | 'onlystudyguidancegroups'
 
 export const init = async (page: Page, path: string, userId: UserId = 'basic', context?: BrowserContext) => {

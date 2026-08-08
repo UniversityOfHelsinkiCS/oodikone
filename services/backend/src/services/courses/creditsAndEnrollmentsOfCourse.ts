@@ -12,6 +12,7 @@ import {
   SISStudyRightModel,
   SISStudyRightElementModel,
 } from '../../models'
+import { now } from '../../util/clock'
 import { getIsOpen } from './helpers'
 
 export const getCreditsForCourses = async (codeGroups: string[][], unification: Unification, from: Date, to: Date) => {
@@ -50,7 +51,7 @@ export const getCreditsForCourses = async (codeGroups: string[][], unification: 
             attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
             where: {
               startdate: {
-                [Op.lte]: new Date(),
+                [Op.lte]: now(),
               },
             },
           },
@@ -157,7 +158,7 @@ export const getEnrollmentsForCourses = async (
             attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
             where: {
               startdate: {
-                [Op.lte]: new Date(),
+                [Op.lte]: now(),
               },
             },
           },
