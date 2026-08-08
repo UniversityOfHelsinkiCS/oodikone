@@ -68,7 +68,7 @@ export const userHeaders = [
   onlyStudyGuidanceGroupsUser,
 ]
 
-export const testMockTime = '2026-03-01'
+export const testMockTime = '2026-03-06'
 
 export type UserId =
   | 'admin'

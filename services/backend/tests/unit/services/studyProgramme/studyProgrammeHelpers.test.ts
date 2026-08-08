@@ -36,7 +36,7 @@ void describe('Get years object', () => {
 
 void describe('Get years array', () => {
   beforeAll(() => {
-    const mockedCurrentDate = new Date('2026-03-01')
+    const mockedCurrentDate = new Date('2026-03-06')
     vi.useFakeTimers()
     vi.setSystemTime(mockedCurrentDate)
 
