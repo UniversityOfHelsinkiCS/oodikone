@@ -183,7 +183,6 @@ Playwright
 - Run all migrated specs with `npm run playwright`.
 - Run headed mode with `npm run playwright:headed`.
 - Open UI mode with `npm run playwright:ui`.
-- The migration from Cypress was done with an automated converter. The generated files are a baseline and still need manual cleanup in places where `cy.*` logic is left over.
 
 Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
 
