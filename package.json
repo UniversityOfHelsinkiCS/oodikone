@@ -5,8 +5,6 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "cypress": "cypress",
-    "cypress:run": "cypress run --browser firefox",
     "playwright": "playwright test -c playwright.config.ts",
     "playwright:ui": "playwright test --ui -c playwright.config.ts",
     "playwright:headed": "playwright test --headed -c playwright.config.ts",
@@ -46,14 +44,9 @@
   "bugs": {
     "url": "https://github.com/UniversityOfHelsinkiCS/oodikone/issues"
   },
-  "allowScripts": {
-    "cypress": true
-  },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "@playwright/test": "1.61.0",
-    "cypress": "15.18.1",
-    "eslint-plugin-cypress": "^6.2.3",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",

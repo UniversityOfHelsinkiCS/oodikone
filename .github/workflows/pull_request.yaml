@@ -13,8 +13,6 @@ on:
       - 'docker-compose.ci.yml'
       - 'docker-compose.test.yml'
       - 'package*.json'
-      - 'cypress/**'
-      - 'cypress.config.json'
 
 jobs:
   test:

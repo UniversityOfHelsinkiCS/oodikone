@@ -45,8 +45,6 @@
     "**/coverage/**",
     "nyc-config.cjs",
     ".lintstagedrc.mjs",
-    "cypress.config.js",
-    "cypress/**/*.js",
     "playwright/**/*.js",
     "playwright.config.ts"
   ],
@@ -347,26 +345,6 @@
         "react/jsx-no-useless-fragment": "error"
       },
       "plugins": ["react"]
-    },
-    {
-      "files": ["cypress/**/*.js"],
-      "rules": {
-        "cypress/no-assigning-return-values": "error",
-        "cypress/no-unnecessary-waiting": "error",
-        "cypress/no-async-tests": "error",
-        "cypress/unsafe-to-chain-command": "error"
-      },
-      "jsPlugins": ["eslint-plugin-cypress"],
-      "globals": {
-        "cy": "readonly",
-        "Cypress": "readonly",
-        "expect": "readonly",
-        "assert": "readonly",
-        "chai": "readonly"
-      },
-      "env": {
-        "mocha": true
-      }
     },
     {
       "files": ["services/backend/tests/**/*.ts"],
