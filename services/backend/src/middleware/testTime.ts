@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 
-import { isTest } from '../config'
+import { runningInCI } from '../config'
 import { clockStorage } from '../util/clock'
+import logger from '../util/logger'
 
-export function testTimeMiddleware(req: Request, res: Response, next: NextFunction) {
+export function testTimeMiddleware(req: Request, _res: Response, next: NextFunction) {
   const testNow = req.header('x-test-now')
 
-  if (isTest && testNow) {
+  if (runningInCI && testNow) {
+    logger.info(`Setting test time: ${testNow}`)
     return clockStorage.run({ now: new Date(testNow) }, next)
   }
 
