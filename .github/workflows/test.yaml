@@ -409,6 +409,10 @@ jobs:
             spec: e2e/University.spec.ts
           - name: 'Test language center view'
             spec: e2e/Language_center.spec.ts
+          - name: 'Test study guidance groups'
+            spec: e2e/Study_guidance_groups.spec.ts
+          - name: 'Test custom population'
+            spec: e2e/Custom_population.spec.ts
     name: ${{ matrix.name }}
     steps:
       - name: Checkout
@@ -461,16 +465,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Test custom population'
-            spec: cypress/e2e/Custom_population.js
           - name: 'Test filters'
             spec: cypress/e2e/Filters.js
           - name: 'Test students'
             spec: cypress/e2e/Students.js
           - name: 'Test completed courses'
             spec: cypress/e2e/Completed_courses.js
-          - name: 'Test study guidance groups'
-            spec: cypress/e2e/Study_guidance_groups.js
           - name: 'Test numbers match'
             spec: cypress/e2e/Numbers_match.js
     name: ${{ matrix.name }}
