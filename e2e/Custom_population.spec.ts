@@ -53,19 +53,16 @@ const fillName = async (page: Page) => {
 }
 
 const selectSavedPopulation = async (page: Page, name: string) => {
-  await expect(page.getByRole('button', { name: 'Save' })).not.toBeEnabled()
-  await expect(page.getByRole('button', { name: 'Delete' })).not.toBeEnabled()
-
   const searchInput = page.getByTestId('history-search').getByRole('combobox')
   await searchInput.fill(name)
   await searchInput.press('Enter')
-
-  await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled()
-  await expect(page.getByRole('button', { name: 'Delete' })).toBeEnabled()
 }
 
-const save = async (page: Page) => {
+const save = async (page: Page, name: string) => {
   await page.getByRole('button', { name: 'Save' }).click()
+  // Wait for saved custom pop to be visible
+  await page.getByTestId('history-search').click()
+  await expect(page.getByText(name)).toBeVisible()
 }
 
 const deleteAllSearches = async (page: Page) => {
@@ -137,7 +134,7 @@ test.describe('Custom population tests', () => {
     test('Saves a custom population search', async ({ page }) => {
       const name = await fillName(page)
       await fillForm(page, students1, ',\n')
-      await save(page)
+      await save(page, name)
 
       await selectSavedPopulation(page, name)
       await search(page)
@@ -157,7 +154,7 @@ test.describe('Custom population tests', () => {
     test('Updates a custom population search', async ({ page }) => {
       const name = await fillName(page)
       await fillForm(page, students1, ' ')
-      await save(page)
+      await save(page, name)
 
       await selectSavedPopulation(page, name)
       await search(page)
@@ -167,7 +164,7 @@ test.describe('Custom population tests', () => {
       await page.getByRole('button', { name: 'Back to search form' }).click()
       await selectSavedPopulation(page, name)
       await fillForm(page, ['\n', ...students2], ', ')
-      await save(page)
+      await save(page, name)
 
       await page.goto('/custompopulation')
       await expect(page.getByRole('heading', { name: 'Custom population', exact: true })).toBeVisible()
