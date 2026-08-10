@@ -5,7 +5,6 @@ A collection of useful tools, documentation and other resources.
 ## Code style and maintainability
 
 - [ESLint documentation](https://eslint.org/docs/v8.x)
-- [Prettier documentation](https://prettier.io/docs/en)
 - [qlty.sh](https://qlty.sh/gh/UniversityOfHelsinkiCS/projects/oodikone)
   - Qlty.sh replaced Code climate which was introduced by Riku
   - The usefulness of qlty.sh is sometimes questionable

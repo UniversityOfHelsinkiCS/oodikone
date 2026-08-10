@@ -14,7 +14,6 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "stylelint": "stylelint",
-    "prettier": "prettier",
     "cli": "./cli.sh",
     "logs": "docker compose --file docker-compose.yml logs backend frontend sis-updater-worker sis-updater-scheduler jami -f",
     "logs:all": "docker compose --file docker-compose.yml --profile oodikone --profile updater logs -f",
@@ -56,7 +55,6 @@
     "oxfmt": "0.58.0",
     "oxlint": "1.73.0",
     "oxlint-tsgolint": "0.25.0",
-    "prettier": "3.5.3",
     "stylelint": "^17.6.0",
     "stylelint-config-standard": "^40.0.0"
   }
