@@ -40,7 +40,7 @@ export const rootOrgId = process.env.ROOT_ORG_ID ?? 'hy-university-root-id'
 
 export const concurrentWorkers = parseInt(process.env.CONCURRENT_WORKERS!, 10) || 2
 
-export const DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS!, 10) || 5 // sequelize's default
+export const DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS!, 10) || 25
 export const DB_MAX_CRON_CONNECTIONS = Math.max(1, DB_MAX_CONNECTIONS - 5)
 export const CRON_SCHEDULE = process.env.CRON_SCHEDULE ?? '0 23 * * *' // Default to 23:00 daily
 

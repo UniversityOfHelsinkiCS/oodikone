@@ -53,10 +53,10 @@ class DbConnection extends EventEmitter {
     this.sequelize = new Sequelize(conf.SIS_DB_URL!, {
       dialect: 'postgres',
       pool: {
-        max: 25,
+        max: conf.DB_MAX_CONNECTIONS,
         min: 0,
         acquire: 30000,
-        idle: 300000000,
+        idle: 30000,
       },
       logging: false,
       password: conf.SIS_PASSWORD,
@@ -107,6 +107,12 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE!, {
   schema: conf.DB_SCHEMA_KONE,
   logging: false,
   password: conf.KONE_PASSWORD,
+  pool: {
+    max: conf.DB_MAX_CONNECTIONS,
+    min: 0,
+    acquire: 30000,
+    idle: 30000,
+  },
   models: [
     BannerModel,
     CustomPopulationSearchModel,
@@ -125,6 +131,12 @@ void sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 const sequelizeUser = new Sequelize(conf.DB_URL_USER!, {
   logging: false,
   password: conf.USER_PASSWORD,
+  pool: {
+    max: conf.DB_MAX_CONNECTIONS,
+    min: 0,
+    acquire: 30000,
+    idle: 30000,
+  },
   models: [UserModel],
 })
 
