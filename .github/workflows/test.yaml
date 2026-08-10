@@ -51,57 +51,6 @@ jobs:
           release_version: ${{ github.sha }}
           push: false
 
-  # === Cache docker images ===
-  pull_docker_images:
-    name: Pull all needed docker images and cache them (if dbs have not changed)
-    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
-    if: |
-      !cancelled() && !failure() &&
-      (vars.RUNS_ON == 'ubuntu-latest' || vars.RUNS_ON == '') &&
-      !(
-        needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
-        needs.check_migration_files.outputs.kone_db_migrations == 'true' ||
-        needs.check_migration_files.outputs.user_db_migrations == 'true' ||
-        needs.check_migration_files.outputs.sis_db_migrations == 'true'
-      )
-    needs:
-      - check_updater_changed
-      - check_migration_files
-
-    steps:
-      - uses: actions/checkout@v7
-      - name: Login to toska docker registry
-        uses: docker/login-action@v4
-        with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
-
-      - name: Set up cache for pulled docker images (saved in Post-step)
-        id: cache-images
-        uses: actions/cache@v6
-        with:
-          path: /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Pull required images
-        if: steps.cache-images.outputs.cache-hit != 'true'
-        run: docker compose --file docker-compose.ci.yml --profile oodikone --profile updater pull --ignore-buildable --quiet
-
-      - name: Save Docker images for downstream jobs
-        if: steps.cache-images.outputs.cache-hit != 'true'
-        run: |
-          docker save \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/kone-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/user-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-db \
-            registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db \
-            "quay.io/toska/jami:production" \
-            redis:7.2.6 \
-            postgres:15.10 \
-            nginx:latest \
-          | zstd -T0 -3 -o /tmp/docker-images.tar.zst
-
   # === Update databases ===
   check_migration_files:
     name: Check if new migrations have been added
@@ -311,7 +260,6 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - pull_docker_images
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
@@ -333,7 +281,6 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - pull_docker_images
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
@@ -367,7 +314,6 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - pull_docker_images
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
@@ -383,7 +329,6 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - pull_docker_images
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
@@ -438,20 +383,6 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install firefox --with-deps
 
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
-
       - name: Run tests
         uses: ./.github/actions/test/e2e-playwright
         with:
@@ -467,7 +398,6 @@ jobs:
     if: |
       !cancelled() && !failure()
     needs:
-      - pull_docker_images
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
@@ -480,20 +410,6 @@ jobs:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-
-      - name: Restore cached docker images
-        id: cache-images-restore
-        uses: actions/cache/restore@v6
-        with:
-          path: |
-            /tmp/docker-images.tar.zst
-          key: docker-images-${{ github.sha }}
-
-      - name: Load Docker images (or skip if missing)
-        run: |
-          if [ -f /tmp/docker-images.tar.zst ]; then
-            zstd -d /tmp/docker-images.tar.zst --stdout | docker load
-          fi
 
       - name: 'Run services, build rest of the needed images'
         run: docker compose --file docker-compose.ci.yml --profile oodikone up --detach --quiet-pull --wait
