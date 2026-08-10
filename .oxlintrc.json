@@ -239,7 +239,8 @@
       "files": ["services/backend/src/**/*.{js,ts,tsx}"],
       "excludeFiles": ["services/backend/src/util/clock.ts"],
       "rules": {
-        "oodikone/no-new-date": "error"
+        "oodikone/no-new-date": "error",
+        "oodikone/no-date-now": "error"
       }
     },
     {
