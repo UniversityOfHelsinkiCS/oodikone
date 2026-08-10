@@ -8,6 +8,7 @@ import { ProgrammeModuleModel } from '../../models'
 import { getDegreeProgrammeType } from '../../util'
 import { now } from '../../util/clock'
 import { GraduationTarget } from '../graduationHelpers'
+import logger from '../../util/logger'
 
 export function getYearsArray(since: number, isAcademicYear: true, yearsCombined?: boolean): string[]
 export function getYearsArray(since: number, isAcademicYear: false, yearsCombined: true): Array<'Total' | number>
@@ -103,7 +104,11 @@ export const getMonthlyCredits = (
   /* Add all credits to a per-month credit map */
   for (const credit of filteredCredits) {
     const creditKey = `${credit.attainment_date.getFullYear()}-${credit.attainment_date.getMonth() + 1}`
-    studentMonthlyCredits[creditKey].push(credit.credits)
+    try {
+      studentMonthlyCredits[creditKey].push(credit.credits)
+    } catch (err) {
+      logger.error(`Could not add credits. key: ${creditKey}, credit: ${JSON.stringify(credit)}\nError: ${err}`)
+    }
   }
 
   /* Add monthly cumulative credits of individual student to the main obj,
