@@ -1,0 +1,75 @@
+# This compose file is used update test dbs
+
+x-defaults: &defaults
+  restart: unless-stopped
+  volumes: !reset [] # Remove previous volume definitions
+
+x-healthcheck-defaults: &healthcheck-defaults
+  test: ['CMD', 'pg_isready', '-U', 'postgres']
+  interval: 30s # Normal healthcehck interval
+  timeout: 5s
+  retries: 10 # Retries until SIGKILl
+  start_interval: 3s # How often healthcheck runs while starting
+  start_period: 15s # How long startup period is
+
+services:
+  kone-db:
+    <<: *defaults
+    container_name: oodikone-kone-db
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+      args:
+        DB_NAME: kone-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: kone-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      <<: *healthcheck-defaults
+
+  user-db:
+    <<: *defaults
+    container_name: oodikone-user-db
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+      args:
+        DB_NAME: user-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: user-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      <<: *healthcheck-defaults
+
+  sis-db:
+    <<: *defaults
+    container_name: oodikone-sis-db
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+      args:
+        DB_NAME: sis-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    shm_size: 2gb
+    healthcheck:
+      <<: *healthcheck-defaults
+
+  sis-importer-db:
+    <<: *defaults
+    container_name: oodikone-sis-importer-db
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+      args:
+        DB_NAME: sis-importer-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-importer-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      <<: *healthcheck-defaults
