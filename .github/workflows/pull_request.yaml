@@ -10,6 +10,7 @@ on:
       - '.github/workflows/test.yaml'
       - 'services/**'
       - 'updater/**'
+      - 'e2e/**'
       - 'docker-compose.ci.yml'
       - 'docker-compose.test.yml'
       - 'package*.json'
