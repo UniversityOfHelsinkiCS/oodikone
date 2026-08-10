@@ -179,10 +179,11 @@ We use Playwright for end-to-end testing.
 
 Playwright
 
-- E2E specs are in the `playwright/` folder.
-- Run all migrated specs with `npm run playwright`.
-- Run headed mode with `npm run playwright:headed`.
-- Open UI mode with `npm run playwright:ui`.
+- E2E specs are in the `e2e/` folder.
+- Run all e2e specs with `npm run playwright`.
+- Run in headed mode with `npm run playwright:headed`.
+- Open in UI mode with `npm run playwright:ui`.
+- If using a command that runs `docker-compose.ci.yml`, remember to add CI=true before the playwright command, eg. `CI=true npm run playwright`.
 
 Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
 
@@ -237,7 +238,7 @@ npm run playwright -- <file path>
 For example:
 
 ```bash
-npm run playwright -- playwright/Language_center.js
+npm run playwright -- e2e/Language_center.js
 ```
 
 Running tests in headless mode may also help if your browser keeps crashing when running tests interactively. If you want to run all tests, use:
