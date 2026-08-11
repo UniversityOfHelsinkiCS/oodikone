@@ -13,6 +13,8 @@ on:
       - 'e2e/**'
       - 'docker-compose.ci.yml'
       - 'docker-compose.test.yml'
+      - '.oxlintrc.json'
+      - '.oxlint-backend-rules.cjs'
       - 'package*.json'
 
 jobs:
