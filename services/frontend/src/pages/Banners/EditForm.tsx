@@ -38,7 +38,6 @@ export const BannerEditForm = ({ initialValues, onSave }) => {
   })
 
   const handleValueChange = (key: string, value: Date | string | null) => {
-    if (!value) return
     setValues(prev => ({
       ...prev,
       [key]: value,
