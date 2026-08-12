@@ -1,5 +1,4 @@
 import { flatten, sortBy, uniqBy } from 'lodash-es'
-import { Op } from 'sequelize'
 import { rootOrgId } from '../../config.js'
 import { dbConnections } from '../../db/connection.js'
 import { selectFromByIds, bulkCreate, selectOneById } from '../../db/index.js'
@@ -35,25 +34,32 @@ export const updateAttainments = async (
   studyRightIdToEducationType
 ) => {
   await updateTeachers(attainments)
+
+  const { cuIds, modGroupIds } = attainments.reduce(
+    (acc, { course_unit_id, module_group_id }) => {
+      if (course_unit_id) {
+        acc.cuIds.push(course_unit_id)
+      }
+      if (module_group_id) {
+        acc.modGroupIds.push(module_group_id)
+      }
+      return acc
+    },
+    { cuIds: [], modGroupIds: [] }
+  )
+
   const [courseUnits, modules] = await Promise.all([
-    selectFromByIds(
-      'course_units',
-      attainments.map(a => a.course_unit_id).filter(id => !!id)
-    ),
-    selectFromByIds(
-      'modules',
-      attainments.map(a => a.module_group_id).filter(id => !!id),
-      'group_id'
-    ),
+    dbConnections.knex('course_units').select(['id', 'code']).whereIn('id', cuIds),
+    dbConnections.knex('modules').select(['group_id', 'code']).whereIn('group_id', modGroupIds),
   ])
 
-  const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
-    res[curr.id] = curr.group_id
+  const courseUnitIdToCourseCode = courseUnits.reduce((res, cu) => {
+    res[cu.id] = cu.code
     return res
   }, {})
 
-  const moduleGroupIdToModuleCode = modules.reduce((res, curr) => {
-    res[curr.group_id] = curr.code
+  const moduleGroupIdToModuleCode = modules.reduce((res, module) => {
+    res[module.group_id] = module.code
     return res
   }, {})
 
@@ -64,19 +70,6 @@ export const updateAttainments = async (
       org => org.id
     )
   )
-
-  const sisDbCoursesForStudentAttainments = await Course.findAll({
-    where: {
-      id: {
-        [Op.in]: Object.values(courseUnitIdToCourseGroupId),
-      },
-    },
-  })
-
-  const courseGroupIdToCourseCode = sisDbCoursesForStudentAttainments.reduce((res, curr) => {
-    res[curr.id] = curr.code
-    return res
-  }, {})
 
   const creditTeachers = []
 
@@ -89,14 +82,15 @@ export const updateAttainments = async (
       if (att.module_group_id) {
         const studyModule = await selectOneById('modules', att.module_group_id, 'group_id')
 
-        // Fix attainments with missing modules (see for example issue #4761)
+        // Sometimes attainments point to a module that does not exist in db. likely because
+        // the module document_state is "DRAFT", and thus dropped by importer. (see for example issue #4761)
         if (!studyModule) {
           if (att.module_group_id === 'hy-SM-89304486') {
-            const course = await Course.findOne({ where: { code: '71066' } })
+            const course = await Course.findOne({ attributes: ['id'], where: { code: '71066' }, raw: true })
             return { ...att, module_group_id: course.id }
           }
           if (att.module_group_id === 'hy-SM-100017957') {
-            const course = await Course.findOne({ where: { code: '523102' } })
+            const course = await Course.findOne({ attributes: ['id'], where: { code: '523102' }, raw: true })
             return { ...att, module_group_id: course.id }
           }
           const education = await selectOneById('educations', att.module_group_id.replace('DP', 'EDU'))
@@ -106,10 +100,9 @@ export const updateAttainments = async (
               id: att.module_group_id,
               name: education.name,
               code: education.code,
-              main_course_code: education.code,
               coursetypecode: att.study_level_urn,
               course_unit_type: att.course_unit_type_urn,
-              substitutions: [],
+              substitution_groups: [],
             })
             return att
           }
@@ -122,10 +115,9 @@ export const updateAttainments = async (
               sv: 'Okänd studiehelhet',
             },
             code: att.module_group_id,
-            main_course_code: att.module_group_id,
             coursetypecode: att.study_level_urn,
             course_unit_type: att.course_unit_type_urn,
-            substitutions: [],
+            substitution_groups: [],
           })
           return att
         }
@@ -162,7 +154,7 @@ export const updateAttainments = async (
         const parsedCourseCode = attIdToCourseCode[att.id]
 
         // see if course exists
-        course = await Course.findOne({ where: { code: parsedCourseCode, id: parsedCourseCode } })
+        course = await Course.findOne({ where: { code: parsedCourseCode, id: parsedCourseCode }, raw: true })
 
         // If course doesn't exist, create it
         if (!course) {
@@ -174,7 +166,7 @@ export const updateAttainments = async (
             coursetypecode: att.study_level_urn,
             max_attainment_date: att.attainment_date,
             min_attainment_date: att.attainment_date,
-            substitutions: [],
+            substitution_groups: [],
             course_unit_type: att.course_unit_type_urn,
           }
 
@@ -207,31 +199,24 @@ export const updateAttainments = async (
         courseUnit.group_id = courseUnit.id
       }
 
-      // Add the course to the mapping objects for creditMapper to work properly.
-      courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
-      courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
+      // Add the CU to the mapping objects for creditMapper to work properly.
+      courseUnitIdToCourseCode[courseUnit.id] = courseUnit.code
 
       return { ...att, course_unit_id: courseUnit.id }
     }
 
     const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
-      if (!customAttainmentTypes.includes(att.type)) {
+      if (!customAttainmentTypes.includes(att.type) || !att.code) {
         return attainmentIdCodeMap
       }
-      if (!att.code) return attainmentIdCodeMap
 
       const codeParts = att.code.split('-')
       if (!codeParts.length) return attainmentIdCodeMap
 
-      let parsedCourseCode = ''
+      const parsedCourseCode = codeParts[1]?.length < 7 ? `${codeParts[0]}-${codeParts[1]}` : codeParts[0]
 
-      if (codeParts.length === 1) parsedCourseCode = codeParts[0]
-      else if (codeParts[1].length < 7) {
-        parsedCourseCode = `${codeParts[0]}-${codeParts[1]}`
-      } else {
-        parsedCourseCode = codeParts[0]
-      }
-      return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
+      attainmentIdCodeMap[att.id] = parsedCourseCode
+      return attainmentIdCodeMap
     }
 
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
@@ -267,9 +252,8 @@ export const updateAttainments = async (
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
+    courseUnitIdToCourseCode,
     moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode,
     studyRightIdToEducationType
   )
 
@@ -277,21 +261,20 @@ export const updateAttainments = async (
 
   for (const attainment of fixedAttainments) {
     if (
-      attainment == null ||
-      attainment.id == null ||
+      !attainment?.id ||
       !validAttainmentTypes.includes(attainment.type) ||
       attainment.misregistration ||
-      attainmentsToBeExluced.has(attainment.id) ||
       doubleAttachment(attainment, fixedAttainments)
     ) {
       continue
     }
+
     const mappedCredit = mapCredit(attainment)
     if (mappedCredit) {
       for (const person of attainment.acceptor_persons) {
         if (person.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && person.personId) {
-          const teacher = await Teacher.findOne({ where: { id: person.personId } })
-          if (teacher !== null) {
+          const teacher = await Teacher.findOne({ where: { id: person.personId }, raw: true })
+          if (teacher) {
             creditTeachers.push({
               credit_id: attainment.id,
               teacher_id: person.personId,
@@ -306,7 +289,7 @@ export const updateAttainments = async (
   const courses = Array.from(coursesToBeCreated.values())
 
   await bulkCreate(Course, courses)
-  await bulkCreate(Credit, credits)
+  await bulkCreate(Credit, credits.filter(Boolean))
   await bulkCreate(
     CreditTeacher,
     uniqBy(creditTeachers, cT => `${cT.credit_id}-${cT.teacher_id}`),

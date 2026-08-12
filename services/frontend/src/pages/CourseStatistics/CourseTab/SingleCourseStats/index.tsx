@@ -22,19 +22,12 @@ import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { DoNotDisturbIcon } from '@/theme'
-import {
-  Attempts,
-  AvailableStats,
-  CourseStat,
-  Enrollment,
-  FormattedStats,
-  ProgrammeStats,
-  Students,
-} from '@/types/courseStat'
+import { AvailableStats, FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
 import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
 import { enrollmentTimeDateThresholdYearCode, yearToYearCode } from '@oodikone/shared/util'
+import { Attempts, Enrollment, Students } from '@oodikone/shared/types/courseYearlyStats'
 
 const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
   if (!stat) {
@@ -53,7 +46,7 @@ const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentN
 }
 
 export const SingleCourseStats = ({
-  coursecode,
+  courseGroupId,
   availableStats,
   userHasAccessToAllStats,
 
@@ -63,7 +56,7 @@ export const SingleCourseStats = ({
   programmes,
   combineSubstitutions,
 }: {
-  coursecode: string
+  courseGroupId: string
   availableStats: AvailableStats
   userHasAccessToAllStats: boolean
 
@@ -73,6 +66,7 @@ export const SingleCourseStats = ({
   programmes: CourseStudyProgramme[]
   combineSubstitutions: boolean
 }) => {
+  'use memo'
   const [primary, setPrimary] = useState<string[]>([ALL.value])
   const [comparison, setComparison] = useState<string[]>([])
 
@@ -90,12 +84,12 @@ export const SingleCourseStats = ({
   const { getTextIn } = useLanguage()
   const { semesters, years: semesterYears } = useSemesters()
   const {
-    data: courseStatistics = {},
+    data: courseStatistics,
     isFetching: isLoading,
     isSuccess,
   } = useGetCourseStatsQuery(
     {
-      codes: [coursecode],
+      courses: [courseGroupId],
       separate,
       combineSubstitutions,
       fromYearCode: fromYearCode.toString(),
@@ -103,10 +97,11 @@ export const SingleCourseStats = ({
     },
     { skip: loading }
   )
+
   const uniqueCourseCodes = [
     ...new Set(
-      [coursecode].concat(
-        courseStatistics?.[coursecode]?.[openOrRegular]?.alternatives.flatMap(group =>
+      [courseGroupId].concat(
+        courseStatistics?.[courseGroupId]?.[openOrRegular]?.substitutionGroups.flatMap(group =>
           group.flatMap(({ code }) => code)
         ) ?? []
       )
@@ -140,8 +135,8 @@ export const SingleCourseStats = ({
     }
   }
 
-  // NOTE: Can be undefined if query is still querying
-  const stats: CourseStat | undefined = courseStatistics[coursecode]?.[openOrRegular]
+  // Undefined if query is still querying
+  const stats = courseStatistics?.[courseGroupId]?.[openOrRegular]
 
   let maxYearsToCreatePopulationFrom = 0
   if (maxYears) {
@@ -162,7 +157,7 @@ export const SingleCourseStats = ({
       const { separate } = parseQueryFromUrl()
       setSeparate([true, false].includes(separate) ? separate : false)
     }
-    dispatch(setSelectedCourse(coursecode))
+    dispatch(setSelectedCourse(courseGroupId))
 
     const yearCodes = stats?.statistics.map(stat => stat.yearCode)
     const initFromYear = min(yearCodes) ?? yearToYearCode(1950)
@@ -200,7 +195,7 @@ export const SingleCourseStats = ({
     if (programmeCode === 'EXCLUDED') {
       return 'Excluded'
     }
-    const { name } = stats.programmes[programmeCode]
+    const name = stats?.programmes[programmeCode]['name']
     return getTextIn(name)!
   }
 
@@ -221,10 +216,10 @@ export const SingleCourseStats = ({
       return () => true
     }
 
-    const { programmes } = stats
+    const programmes = stats?.programmes
     const studentNumbers = new Set()
     codes.forEach(code => {
-      if (programmes[code]) {
+      if (programmes?.[code]) {
         const students = Object.values(programmes[code].students).flat()
         students.forEach(student => studentNumbers.add(student))
       }
@@ -234,7 +229,7 @@ export const SingleCourseStats = ({
   }
 
   const isValidProgrammeCode = (code: string) => {
-    return stats.programmes[code] || code === ALL.value || code === 'EXCLUDED'
+    return stats?.programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
 
   const filteredYearsAndSemesters = () => {
@@ -488,7 +483,7 @@ export const SingleCourseStats = ({
     const queryObject = {
       from: fromYearCode,
       to: toYearCode,
-      coursecodes: JSON.stringify([coursecode]),
+      coursecodes: JSON.stringify([courseGroupId]),
       separate,
       unifyCourses: openOrRegular,
       includeSubstitutions: combineSubstitutions,
@@ -519,7 +514,7 @@ export const SingleCourseStats = ({
     })
     .filter(programme => programme.size > 0)
 
-  if (stats?.statistics.length < 1) {
+  if (!stats?.statistics || stats.statistics.length < 1) {
     return <Section>No data for selected course</Section>
   }
 
@@ -538,9 +533,9 @@ export const SingleCourseStats = ({
   )} ${maxYearsToCreatePopulationFrom === 1 ? 'year' : 'years'}`
 
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Section title="Statistics by time range">
-        <Stack direction="row" gap={2}>
+        <Stack direction="row" spacing={2}>
           <YearFilter
             fromYear={fromYearCode}
             handleFromYearChange={handleFromYearChange}
@@ -559,7 +554,7 @@ export const SingleCourseStats = ({
       </Section>
       {userHasAccessToAllStats ? (
         <Section title="Filter statistics by degree programme">
-          <Stack direction="row" gap={2}>
+          <Stack direction="row" spacing={2}>
             <Box width="50%">
               <ProgrammeDropdown
                 label="Primary group"
@@ -571,7 +566,7 @@ export const SingleCourseStats = ({
               />
             </Box>
             <Box width="50%">
-              <Stack gap={1}>
+              <Stack spacing={1}>
                 <ProgrammeDropdown
                   label="Comparison group"
                   name="comparison"
@@ -600,7 +595,7 @@ export const SingleCourseStats = ({
           availableStats={availableStats}
           combineSubstitutions={combineSubstitutions}
           comparison={statistics.comparison}
-          courseCodes={[coursecode]}
+          courseCodes={[courseGroupId]}
           loading={loading}
           openOrRegular={openOrRegular}
           primary={statistics.primary}

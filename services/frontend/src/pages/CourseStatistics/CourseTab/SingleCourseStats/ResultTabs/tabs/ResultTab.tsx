@@ -45,6 +45,7 @@ export const ResultTab = ({
   combineSubstutitions: boolean
   courseCodes: string[]
 }) => {
+  'use memo'
   const [settings, setSettings] = useState<ResultTabSettings>({
     isRelative: false,
     separate: initialSettings.separate,

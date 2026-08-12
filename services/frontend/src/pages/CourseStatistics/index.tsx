@@ -33,6 +33,7 @@ import { yearToYearCode } from '@oodikone/shared/util'
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 
 export const CourseStatistics = () => {
+  'use memo'
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
@@ -42,40 +43,46 @@ export const CourseStatistics = () => {
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
   const location = useLocation()
-  const { courseCodes, separate, combineSubstitutions } = parseQueryParams(location.search)
+  const { courses, separate, combineSubstitutions } = parseQueryParams(location.search)
 
-  const codes = JSON.parse(courseCodes ?? '[]') as string[]
-  const [initialCourseCode] = codes
-  const singleCourseStats = codes.length === 1
+  const courseGroupIds: string[] = JSON.parse(courses ?? '[]')
+  const [initialCourseCode] = courseGroupIds
+  const singleCourseStats = courseGroupIds.length === 1
 
   const [selected, setSelected] = useState<string>('')
-  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
 
-  const skipQuery = !initialCourseCode
+  const shouldShowSearchForm = !initialCourseCode
+
   const {
     data: courseStatsData = {},
     isFetching: isLoading,
     isSuccess,
   } = useGetCourseStatsQuery(
     {
-      codes,
+      courses: courseGroupIds,
       separate: separate === 'true',
       combineSubstitutions: combineSubstitutions === 'true',
       fromYearCode: '1',
       toYearCode: yearToYearCode(new Date().getFullYear()).toString(),
     },
-    { skip: skipQuery }
+    { skip: shouldShowSearchForm }
   )
 
   useEffect(() => {
     setSelected(initialCourseCode)
   }, [initialCourseCode])
 
+  useTitle(
+    selected && !isLoading
+      ? `${courseStatsData[selected]?.regularStats.courseCode} - Course statistics`
+      : 'Course statistics'
+  )
+
   if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && !fullStudyProgrammeRights.length) {
     return <AccessDeniedMessage />
   }
 
-  if (skipQuery)
+  if (shouldShowSearchForm)
     return (
       <PageLayout maxWidth="lg">
         <PageTitle title="Course statistics" />
@@ -84,7 +91,7 @@ export const CourseStatistics = () => {
     )
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
-  const alternatives = stats[selected]?.alternatives
+  const substitutionGroups = stats[selected]?.substitutionGroups
   const allProgrammes = getAllStudyProgrammes(stats, undefined)
   const programmes = getAllStudyProgrammes(stats, selected)
   const summaryStatistics = getSummaryStatistics(
@@ -96,8 +103,8 @@ export const CourseStatistics = () => {
 
   const availableStats = getAvailableStats(courseStatsData)
 
-  const switchToCourse = (courseCode: string) => {
-    setSelected(courseCode)
+  const switchToCourse = (groupId: string) => {
+    setSelected(groupId)
   }
 
   return (
@@ -119,7 +126,7 @@ export const CourseStatistics = () => {
       </Box>
       {tab === 0 && (
         <CourseTab
-          alternatives={alternatives}
+          substitutionGroups={substitutionGroups}
           availableStats={availableStats[selected]}
           combineSubstitutions={combineSubstitutions === 'true'}
           loading={isLoading || !isSuccess}

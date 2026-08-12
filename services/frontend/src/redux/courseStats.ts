@@ -1,31 +1,31 @@
 import { RTKApi } from '@/apiConnection'
-import { CourseStat } from '@/types/courseStat'
+import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const courseStatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getCourseStats: builder.query({
       query: ({
-        codes,
+        courses,
         separate,
         combineSubstitutions,
         fromYearCode,
         toYearCode,
       }: {
-        codes: string[]
+        courses: string[]
         separate?: boolean
         combineSubstitutions?: boolean
         fromYearCode: string
         toYearCode: string
       }) => ({
         url: '/courseyearlystats',
-        params: { codes, separate, combineSubstitutions, fromYearCode, toYearCode },
+        params: { courses, separate, combineSubstitutions, fromYearCode, toYearCode },
       }),
-      transformResponse: (
-        courseStats: { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }[]
-      ) => {
-        const data: Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }> = {}
+      transformResponse: (courseStats: CourseYearlyStats[]) => {
+        const data: Record<string, CourseYearlyStats> = {}
         courseStats.forEach(stat => {
-          data[stat.unifyStats.coursecode] = stat
+          if (stat.unifyStats) {
+            data[stat.unifyStats.groupId] = stat
+          }
         })
 
         return data
@@ -41,4 +41,3 @@ const courseStatsApi = RTKApi.injectEndpoints({
 })
 
 export const { useGetCourseStatsQuery, useGetCourseDetailsQuery } = courseStatsApi
-// export const clearCourseStats = () => courseStatsApi.util.resetApiState()
