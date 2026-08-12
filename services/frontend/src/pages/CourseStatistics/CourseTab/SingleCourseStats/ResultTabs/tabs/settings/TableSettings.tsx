@@ -26,7 +26,7 @@ export const TableSettings = ({
   openOrRegular: CourseSearchState
 }) => {
   return (
-    <Stack direction="row" gap={1}>
+    <Stack direction="row" spacing={1}>
       <Setting
         control={<Switch checked={showGrades} data-cy="gradeToggle" onChange={() => onShowGradesChange(!showGrades)} />}
         labelText="Show grades"

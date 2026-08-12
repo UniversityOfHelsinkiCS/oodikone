@@ -11,7 +11,7 @@ export type CoursesMultiQuery = {
 
 export type CourseYearlyStatsReqBody = never
 export type CourseYearlyStatsQuery = {
-  codes: string[]
+  courses: string[]
   separate: string
   combineSubstitutions: string
   fromYearCode: string
