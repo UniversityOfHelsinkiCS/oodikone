@@ -32,6 +32,7 @@ const CourseRow = ({
   onSelectCourse: (course: SearchResultCourse) => void
   combineSubstitutions: boolean
 }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
 
   return (
@@ -86,13 +87,10 @@ export const CourseTable = ({
   onSelectCourse: (course: SearchResultCourse) => void
   title: string
 }) => {
-  // TODO: Figure a better type for this
+  'use memo'
+  if (hidden) return null
 
   const noContent = courses.length === 0
-
-  if (hidden) {
-    return null
-  }
 
   return (
     <StyledTable>
@@ -108,11 +106,11 @@ export const CourseTable = ({
         {noContent ? (
           <EmptyListRow />
         ) : (
-          courses?.map(course => (
+          courses.map(course => (
             <CourseRow
               combineSubstitutions={combineSubstitutions}
               course={course}
-              key={course.code}
+              key={`${course.groupId}-${course.code}`}
               onSelectCourse={onSelectCourse}
               title={title}
             />

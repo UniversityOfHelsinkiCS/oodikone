@@ -8,7 +8,7 @@ export type Programme = {
 }
 
 type Faculty = {
-  name: Name | null
+  name: Name
   students: string[]
   passed: string[]
   credits: number
@@ -37,6 +37,7 @@ type GroupStudents = {
   studentNumbers: string[]
 }
 
+// TODO: combine with "Realisation" brought here from frontend.
 export type Group = {
   code: number
   // string: Year number as string
@@ -53,4 +54,74 @@ export type Group = {
 export type Student = {
   code: number
   earliestAttainment: Date
+}
+
+// Fields are undefined only in case of early return due to error
+export type CourseYearlyStats = { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }
+
+export type YearlyStatsByCourse = Record<string, CourseYearlyStats>
+
+export type Realisation = {
+  allEnrollments: Enrollment[]
+  attempts: Attempts
+  code: number
+  coursecode: string
+  enrollments: Enrollment[]
+  name: string | Name
+  obfuscated?: boolean
+  students: Students
+  yearCode: number
+}
+
+export type Enrollment = {
+  enrollmentDateTime: Date
+  studentNumber: string
+}
+
+export type FacultyStat = {
+  allCredits: number
+  allPassed: string[]
+  allStudents: string[]
+  faculties: Record<
+    string,
+    {
+      credits: number
+      name: Name
+      passed: string[]
+      students: string[]
+    }
+  >
+  year: string
+}
+
+export type Attempts = {
+  categories: {
+    failed: string[]
+    passed: string[]
+  }
+  grades: Record<string, string[]>
+}
+
+export type Students = {
+  grades: Record<string, string[]>
+  studentNumbers: string[]
+}
+
+export type CourseStat = {
+  substitutionGroups: { code: string; name: Name; groupId: string }[][]
+  courseCode: string
+  groupId: string
+  facultyStats: Record<string, FacultyStat>
+  name: Name
+  obfuscated: boolean
+  programmes: Record<
+    string,
+    {
+      credits: Record<string, number>
+      name: Name
+      passed: Record<string, string[]>
+      students: Record<string, string[]>
+    }
+  >
+  statistics: Realisation[]
 }

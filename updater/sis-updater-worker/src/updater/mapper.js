@@ -133,13 +133,7 @@ export const mapTeacher = person => ({
 })
 
 export const creditMapper =
-  (
-    personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
-    moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode,
-    studyRightIdToEducationType
-  ) =>
+  (personIdToStudentNumber, courseUnitIdToCourseCode, moduleGroupIdToModuleCode, studyRightIdToEducationType) =>
   attainment => {
     try {
       const {
@@ -167,16 +161,22 @@ export const creditMapper =
 
       if (!targetSemester) return null
 
-      const course_code = !isModule(type)
-        ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+      // Check if attainment is a module type
+      const isStudyModule = isModule(type)
+
+      const course_code = !isStudyModule
+        ? courseUnitIdToCourseCode[course_unit_id]
         : moduleGroupIdToModuleCode[module_group_id]
 
-      const course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+      const course_id = !isStudyModule ? course_unit_id : module_group_id
+
+      // TODO: Some legitimate (pre 2020) CustomAttainments are skipped, because code/id mapping is incomplete.
+      if (!course_id || !course_code) return null
 
       let is_open = false
 
       // check if ay code or ay study right or ay responsible organisation
-      if (course_code && !isModule(type)) {
+      if (course_code && !isStudyModule) {
         if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
           is_open = true
         } else if (study_right_id !== null) {
@@ -188,14 +188,11 @@ export const creditMapper =
         } else if (
           organisations
             .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-            .some(org => org.organisationid === 'hy-org-48645785')
+            .some(org => org.organisationid === 'hy-org-48645785') // NB: corresponds to code H930
         ) {
           is_open = true
         }
       }
-
-      // Check if attainment is a module type
-      const isStudyModule = isModule(type)
 
       const gradeObject = getGrade(grade_scale_id, grade_id)
       const grade = gradeObject.value
@@ -280,32 +277,34 @@ export const mapCurriculumPeriod = curriculumPeriod => ({
 })
 
 export const enrollmentMapper =
-  (
-    personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
-    realisationIdToActivityPeriod,
-    courseGroupIdToCourseCode,
-    studyRightIdToEducationType
-  ) =>
+  (personIdToStudentNumber, courseUnitIdToCourseUnit, realisationIdToActivityPeriod, studyRightIdToEducationType) =>
   enrollment => {
     const studentnumber = personIdToStudentNumber[enrollment.person_id]
     if (!studentnumber) return null
 
+    const courseUnit = courseUnitIdToCourseUnit[enrollment.course_unit_id]
+    // This happens if the CU is in draft state (filtered out), while the enrollment is active
+    // for now skip, plan is to bring (non-future) drafts to oodikone at some point.
+    if (!courseUnit) return null
+
+    // TODO: add a separate field to enrollments, so we can have both acual enrollment datetime, and
+    // time when the course instance acually happened
     const startOfCURActivityPeriod = realisationIdToActivityPeriod[enrollment.course_unit_realisation_id]?.startDate
     const targetSemester = getSemesterByDate(new Date(startOfCURActivityPeriod ?? enrollment.enrolment_date_time))
-    const course_id = courseUnitIdToCourseGroupId[enrollment.course_unit_id]
+
     return {
       id: enrollment.id,
       studentnumber,
       state: enrollment.state,
-      course_code: courseGroupIdToCourseCode[course_id],
+      course_code: courseUnit.code,
       semestercode: targetSemester.semestercode,
       semester_composite: targetSemester.composite,
       enrollment_date_time: enrollment.enrolment_date_time,
       is_open:
         studyRightIdToEducationType[enrollment.study_right_id] ===
         'urn:code:education-type:non-degree-education:open-university-studies',
-      course_id,
+      course_id: enrollment.course_unit_id,
+      course_group_id: courseUnit.group_id,
       studyright_id: enrollment.study_right_id,
     }
   }

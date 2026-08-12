@@ -21,7 +21,7 @@ export const exportToExcel = (data: AttemptData[]) => {
       'Pass rate': formatPassRate(course.passRate),
     }
     const years: Row[] = course.realisations.map(realisation => ({
-      Title: realisation.realisation,
+      Title: realisation.realisation as string,
       Passed: realisation.passed.toString(),
       Failed: realisation.failed.toString(),
       'Pass rate': formatPassRate(realisation.passRate),

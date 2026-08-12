@@ -8,15 +8,16 @@ import { flatten, uniq } from 'lodash-es'
 import { useState } from 'react'
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { CourseTable } from '@/pages/CourseStatistics/FacultyStatisticsTab/CourseTable'
-import { CourseStats } from '@/pages/CourseStatistics/util'
+import { YearlyStatsByCourse } from '@oodikone/shared/types/courseYearlyStats'
 
 export const FacultyStatisticsTab = ({
   courseStats,
   openOrRegular,
 }: {
-  courseStats: CourseStats
+  courseStats: YearlyStatsByCourse
   openOrRegular: CourseSearchState
 }) => {
+  'use memo'
   const yearCodes = uniq(
     flatten(Object.values(courseStats).map(course => Object.keys(course[openOrRegular].facultyStats)))
   )
@@ -39,11 +40,11 @@ export const FacultyStatisticsTab = ({
     .sort((a, b) => Number(a.courseInstance == null) - Number(b.courseInstance == null))
 
   const courseTables = yearsCourseStats.map(({ course, courseInstance }) => (
-    <CourseTable course={course[openOrRegular]} courseInstance={courseInstance} key={course.unifyStats.coursecode} />
+    <CourseTable course={course[openOrRegular]} courseInstance={courseInstance} key={course.unifyStats.courseCode} />
   ))
 
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <FormControl fullWidth>
         <InputLabel id="academic-year-select-label">Select academic year</InputLabel>
         <Select

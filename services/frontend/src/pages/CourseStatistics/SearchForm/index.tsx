@@ -30,6 +30,7 @@ import { queryParamsToString } from '@/util/queryparams'
 import { omitKeys } from '@oodikone/shared/util'
 
 export const SearchForm = () => {
+  'use memo'
   const { getTextIn } = useLanguage()
   const navigate = useNavigate()
   const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
@@ -68,23 +69,23 @@ export const SearchForm = () => {
   }
 
   const onSelectCourse = (course: SearchResultCourse) => {
-    const isSelected = !!selectedCourses[course.code]
+    const isSelected = !!selectedCourses[course.groupId]
 
     if (isSelected) {
-      setSelectedCourses(previousSelectedCourses => omitKeys(previousSelectedCourses, [course.code]))
+      setSelectedCourses(previousSelectedCourses => omitKeys(previousSelectedCourses, [course.groupId]))
     } else {
       setSelectedCourses(previousSelectedCourses => ({
         ...previousSelectedCourses,
-        [course.code]: { ...course, selected: true },
+        [course.groupId]: { ...course, selected: true },
       }))
     }
   }
 
   const pushQueryToUrl = query => {
-    const { courseCodes, ...rest } = query
+    const { courses, ...rest } = query
     const queryObject = {
       ...rest,
-      courseCodes: JSON.stringify(courseCodes),
+      courses: JSON.stringify(courses),
       combineSubstitutions: JSON.stringify(combineSubstitutions),
     }
     const searchString = queryParamsToString(queryObject)
@@ -96,13 +97,15 @@ export const SearchForm = () => {
   }
 
   const onSubmitFormClick = () => {
-    const codes = sortBy(Object.keys(selectedCourses))
+    const groupIds = sortBy(Object.keys(selectedCourses))
     const params = {
-      courseCodes: codes,
+      courses: groupIds,
       separate: false,
       combineSubstitutions,
     }
-    const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name)} ${code}`)
+    const searchHistoryText = groupIds.map(
+      groupId => `${getTextIn(selectedCourses[groupId].name)} ${selectedCourses[groupId].code}`
+    )
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
       params,
@@ -110,10 +113,7 @@ export const SearchForm = () => {
     pushQueryToUrl(params)
   }
 
-  const clearSelectedCourses = () => {
-    setSelectedCourses({})
-  }
-
+  // If course clicked on single course mode, call submit hook
   useEffect(() => {
     if (Object.keys(selectedCourses).length === 0 || selectMultipleCourses) {
       return
@@ -121,19 +121,13 @@ export const SearchForm = () => {
     onSubmitFormClick()
   }, [selectedCourses])
 
+  // Reset state after toggle
   useEffect(() => {
-    clearSelectedCourses()
-  }, [combineSubstitutions])
-
-  useEffect(() => {
-    if (selectMultipleCourses) {
-      return
-    }
-    clearSelectedCourses()
-  }, [selectMultipleCourses])
+    setSelectedCourses({})
+  }, [combineSubstitutions, selectMultipleCourses])
 
   const courses = matchingCourses
-    .filter(course => !selectedCourses[course.code])
+    .filter(course => !selectedCourses[course.groupId])
     .sort((a, b) => {
       const yearA = dayjs(a.maxAttainmentDate).year()
       const yearB = dayjs(b.maxAttainmentDate).year()
@@ -243,8 +237,8 @@ export const SearchForm = () => {
               </Alert>
             ) : (
               <Section isLoading={isFetching || debouncedChanged ? isInputValid : false}>
-                {selected.length > 0 && selectMultipleCourses ? (
-                  <Stack gap={2}>
+                {selectMultipleCourses ? (
+                  <Stack spacing={1} sx={{ mb: 2 }}>
                     <CourseTable
                       combineSubstitutions={combineSubstitutions}
                       courses={selected}

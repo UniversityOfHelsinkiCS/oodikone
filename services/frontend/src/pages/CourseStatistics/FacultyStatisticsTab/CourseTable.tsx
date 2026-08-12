@@ -8,9 +8,10 @@ import Typography from '@mui/material/Typography'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
-import { CourseStat, FacultyStat } from '@/types/courseStat'
+import { CourseStat, FacultyStat } from '@oodikone/shared/types/courseYearlyStats'
 
 export const CourseTable = ({ course, courseInstance }: { course: CourseStat; courseInstance: FacultyStat }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
 
   const rows = courseInstance ? (
@@ -18,7 +19,7 @@ export const CourseTable = ({ course, courseInstance }: { course: CourseStat; co
       ...Object.entries(courseInstance.faculties)
         .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
         .map(([facultyCode, instanceFaculty]) => (
-          <TableRow key={`${course.coursecode}-${facultyCode}`}>
+          <TableRow key={`${course.courseCode}-${facultyCode}`}>
             <TableCell align="left">
               {facultyCode} • {getTextIn(instanceFaculty.name)}
             </TableCell>
@@ -26,7 +27,7 @@ export const CourseTable = ({ course, courseInstance }: { course: CourseStat; co
             <TableCell align="right">{instanceFaculty.credits}</TableCell>
           </TableRow>
         )),
-      <TableRow key={`${course.coursecode}-total`} sx={{ backgroundColor: theme => theme.palette.grey[50] }}>
+      <TableRow key={`${course.courseCode}-total`} sx={{ backgroundColor: theme => theme.palette.grey[50] }}>
         <TableCell align="left" sx={{ fontWeight: 'bold' }}>
           Total
         </TableCell>
@@ -49,7 +50,7 @@ export const CourseTable = ({ course, courseInstance }: { course: CourseStat; co
   )
 
   return (
-    <Section title={`${getTextIn(course.name)} (${course.coursecode})`}>
+    <Section title={`${getTextIn(course.name)} (${course.courseCode})`}>
       <TableContainer>
         <Table size="small">
           <TableHead>

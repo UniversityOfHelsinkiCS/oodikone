@@ -17,6 +17,7 @@ import {
   hasFullAccessToStudentData,
   validateParamLength,
 } from '../util'
+import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const router = Router()
 
@@ -33,16 +34,16 @@ router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMul
   }
 )
 
-export type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearlyStats>>
+export type CourseYearlyStatsResBody = CourseYearlyStats[]
 
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
   '/courseyearlystats',
   async (req, res) => {
-    const { codes, combineSubstitutions, separate, fromYearCode, toYearCode } = req.query
+    const { courses, combineSubstitutions, separate, fromYearCode, toYearCode } = req.query
 
-    const courseCodes = handleQueryArrays(codes)
+    const courseGroupIds = handleQueryArrays(courses)
 
-    if (!courseCodes?.length) {
+    if (!courseGroupIds.length) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 
@@ -65,7 +66,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const useSeparate = separate === 'true'
 
     const results = await getCourseYearlyStats(
-      courseCodes,
+      courseGroupIds,
       useSeparate,
       anonymizationSalt,
       useCombineSubstitutions,

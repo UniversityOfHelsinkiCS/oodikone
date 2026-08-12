@@ -1,8 +1,7 @@
 import { flatten, groupBy, orderBy } from 'lodash-es'
-import { Op } from 'sequelize'
 
 import { bulkCreate, selectFromActiveSnapshotsByIds, selectFromByIds } from '../../db/index.js'
-import { Course, Enrollment, Student } from '../../db/models/index.js'
+import { Enrollment, Student } from '../../db/models/index.js'
 import logger from '../../utils/logger.js'
 import { studentMapper, enrollmentMapper } from '../mapper.js'
 import { getEducation, loadMapsIfNeeded } from '../shared.js'
@@ -10,6 +9,7 @@ import { updateAttainments } from './attainments.js'
 import { getAttainmentsToBeExcluded } from './excludedPartialAttainments.js'
 import { updateSISStudyRights, updateSISStudyRightElements } from './SISStudyRights.js'
 import { updateStudyplans, findStudentsToReupdate } from './studyPlans.js'
+import { dbConnections } from '../../db/connection.js'
 
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
@@ -101,46 +101,39 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber, studyRigh
   const validEnrollments = enrollments.filter(
     ({ state, document_state }) => document_state === 'ACTIVE' && ['ENROLLED', 'REJECTED'].includes(state)
   )
+
+  const { curIds, cuIds } = validEnrollments.reduce(
+    (acc, enrollment) => {
+      acc.curIds.push(enrollment.course_unit_realisation_id)
+      acc.cuIds.push(enrollment.course_unit_id)
+      return acc
+    },
+    { curIds: [], cuIds: [] }
+  )
+
   const [courseUnitRealisations, courseUnits] = await Promise.all([
-    selectFromByIds(
-      'course_unit_realisations',
-      validEnrollments.map(({ course_unit_realisation_id }) => course_unit_realisation_id).filter(id => !!id)
-    ),
-    selectFromByIds(
-      'course_units',
-      validEnrollments.map(({ course_unit_id }) => course_unit_id).filter(id => !!id)
-    ),
+    dbConnections
+      .knex('course_unit_realisations')
+      .select(['id', 'activity_period'])
+      .whereIn('id', curIds)
+      .where('document_state', 'ACTIVE'),
+    dbConnections.knex('course_units').select(['id', 'code', 'group_id']).whereIn('id', cuIds),
   ])
 
-  const realisationIdToActivityPeriod = courseUnitRealisations
-    .filter(cur => cur.document_state === 'ACTIVE')
-    .reduce((res, cur) => {
-      res[cur.id] = cur.activity_period
-      return res
-    }, {})
-
-  const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
-    res[curr.id] = curr.group_id
+  const realisationIdToActivityPeriod = courseUnitRealisations.reduce((res, cur) => {
+    res[cur.id] = cur.activity_period
     return res
   }, {})
 
-  const sisDbCoursesForStudentAttainments = await Course.findAll({
-    where: {
-      id: {
-        [Op.in]: Object.values(courseUnitIdToCourseGroupId),
-      },
-    },
-  })
-  const courseGroupIdToCourseCode = sisDbCoursesForStudentAttainments.reduce((res, curr) => {
-    res[curr.id] = curr.code
+  const courseUnitIdToCourseUnit = courseUnits.reduce((res, { id, ...rest }) => {
+    res[id] = rest
     return res
   }, {})
 
   const mapEnrollment = enrollmentMapper(
     personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
+    courseUnitIdToCourseUnit,
     realisationIdToActivityPeriod,
-    courseGroupIdToCourseCode,
     studyRightIdToEducationType
   )
 

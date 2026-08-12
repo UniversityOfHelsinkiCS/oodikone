@@ -46,13 +46,13 @@ export const ResultTabs = ({
       return
     }
 
-    const { courseCodes, ...params } = parseQueryParams(location.search)
+    const { courses, ...params } = parseQueryParams(location.search)
     const query = {
       ...params,
-      courseCodes: JSON.parse(courseCodes as string),
+      courses: JSON.parse(courses as string),
       separate,
     }
-    const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
+    const queryToString = { ...query, courses: JSON.stringify(query.courses) }
     void navigate({ search: queryParamsToString(queryToString) }, { replace: true })
   }
 
