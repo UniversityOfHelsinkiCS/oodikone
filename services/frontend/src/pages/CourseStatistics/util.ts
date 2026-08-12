@@ -1,10 +1,10 @@
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { SearchResultCourse } from '@/types/api/courses'
-import { AvailableStats, CourseStat, Realisation } from '@/types/courseStat'
+import { AvailableStats } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
+import { CourseStat, Realisation, YearlyStatsByCourse } from '@oodikone/shared/types/courseYearlyStats'
 import { isSpring } from '@oodikone/shared/util'
 
-export type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
 export type CourseStudyProgramme = {
   key: string
   value: string
@@ -16,7 +16,13 @@ export type CourseStatisticsSummary = {
   coursecode: string
   name: Name
   summary: { passed: number; failed: number; passRate: string | null }
-  realisations: { realisation: string; passed: number; failed: number; passRate: string | null; obfuscated?: boolean }[]
+  realisations: {
+    realisation: Name | string
+    passed: number
+    failed: number
+    passRate: string | null
+    obfuscated?: boolean
+  }[]
 }[]
 
 export const ALL = {
@@ -62,13 +68,10 @@ export const formatPassRate = (passRate: string | null) => {
   return `${passRate} %`
 }
 
-export const getCourseStats = (
-  courseStats: CourseStats,
-  openOrRegular: CourseSearchState
-): Record<string, CourseStat> =>
-  Object.fromEntries(Object.entries(courseStats).map(([courseCode, value]) => [courseCode, value[openOrRegular]]))
+export const getCourseStats = (courseStats: YearlyStatsByCourse, openOrRegular: CourseSearchState) =>
+  Object.fromEntries(Object.entries(courseStats).map(([groupId, value]) => [groupId, value[openOrRegular]]))
 
-export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
+export const getAvailableStats = (courseStats: YearlyStatsByCourse): Record<string, AvailableStats> =>
   Object.fromEntries(
     Object.entries(courseStats).map(([courseCode, { unifyStats, openStats, regularStats }]) => [
       courseCode,

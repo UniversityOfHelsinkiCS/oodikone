@@ -17,6 +17,7 @@ import {
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
 import { FormattedProgramme, getIsOpen } from './helpers'
+import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): FormattedProgramme => ({
   code: studyRightElement.code,
@@ -45,6 +46,7 @@ type FormattedCredit = {
 }
 
 // Is group in question for a single course (original or 1-to-1 substitution) or a substitution group with multiple courses
+// TODO: Change from course_code to group_id
 const isSingleCourse = (group: Credit[] | Enrollment[]): boolean =>
   group?.length === 1 || [...new Set(group?.map((course: Credit | Enrollment) => course.course_code))].length === 1
 
@@ -153,17 +155,20 @@ const parseEnrollment = (
   }
 }
 
-const getSubstitutionGroupDetails = async (codeGroups: string[][]) => {
+const getSubstitutionGroupDetails = async (
+  groupIdGroups: string[][]
+): Promise<Pick<CourseModel, 'code' | 'name' | 'groupId'>[][]> => {
   const substitutionGroupDetails = await CourseModel.findAll({
-    attributes: ['code', 'name'],
+    attributes: ['code', 'name', 'groupId'],
     where: {
-      code: { [Op.in]: codeGroups.flatMap(group => group) },
+      groupId: { [Op.in]: groupIdGroups.flatMap(group => group) },
+      isPrimary: true,
     },
     raw: true,
   })
 
-  return codeGroups.map(group =>
-    group.map(code => substitutionGroupDetails.find(subCourse => subCourse.code === code)!)
+  return groupIdGroups.map(group =>
+    group.map(groupId => substitutionGroupDetails.find(subCourse => subCourse.groupId === groupId)!)
   )
 }
 
@@ -180,186 +185,183 @@ const getSemesterAndYearByDate = (
   return { year, semester }
 }
 
-export const getYearlyStatsOfNew = async (
-  course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null,
-  courseCode: string,
-  separate: boolean,
-  unification: Unification,
-  anonymizationSalt: string | null,
-  combineSubstitutions: boolean,
-  studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>,
-  from: Date,
-  to: Date
-) => {
-  // Includes main course code and substitutions (if enabled)
-  const creditGroupCodes =
-    combineSubstitutions && course?.substitution_groups
-      ? [[courseCode]].concat(course.substitution_groups)
-      : [[courseCode]]
+export const getYearlyStatsOfNew =
+  (
+    primaryCourse: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name' | 'substitutionGroups'>,
+    separate: boolean,
+    anonymizationSalt: string | null,
+    combineSubstitutions: boolean,
+    studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>,
+    from: Date,
+    to: Date
+  ) =>
+  async (unification: Unification): Promise<CourseYearlyStats['openStats']> => {
+    const { id, groupId, name, code: courseCode } = primaryCourse
 
-  let filteredCreditGroupCodes: string[][]
-  switch (unification) {
-    // Include only course codes / group of course codes WITHOUT ANY AY prefix
-    case Unification.REGULAR:
-      filteredCreditGroupCodes = creditGroupCodes.filter(group => group.every(course => !isOpenUniCourseCode(course)))
-      break
-    // Include all courses / group of courses
-    case Unification.OPEN:
-    case Unification.UNIFY:
-    default:
-      filteredCreditGroupCodes = creditGroupCodes
-      break
-  }
+    // Includes main course code and substitutions (if enabled)
+    const creditGroupIds = combineSubstitutions
+      ? [[groupId]].concat(primaryCourse.substitutionGroups ?? [])
+      : [[groupId]]
 
-  const { semesters, years } = await getSemestersAndYears()
+    const filteredCreditGroupIds =
+      unification === Unification.REGULAR
+        ? // FIXME: isOpenUniCourseCode does not work yet with groupIds
+          creditGroupIds.filter(group => group.every(course => !isOpenUniCourseCode(course)))
+        : creditGroupIds
 
-  const [creditGroups, enrollmentGroups] = await Promise.all([
-    getCreditsForCourses(filteredCreditGroupCodes, unification, from, to),
-    getEnrollmentsForCourses(filteredCreditGroupCodes, unification, from, to),
-  ])
+    const allCourseIds = (
+      await CourseModel.findAll({
+        raw: true,
+        attributes: ['id'],
+        where: { groupId: { [Op.in]: filteredCreditGroupIds.flat() } },
+      })
+    ).map(({ id }) => id)
 
-  const counter = new CourseYearlyStatsCounter()
+    const { semesters, years } = await getSemestersAndYears()
 
-  // A single-course credit group can contain more than one real attempt for the same course code
-  // (e.g. failed once and passed on a retry). parseCredit collapses a group into a single
-  // attainment for student-stats (no student is counted twice), but attempt-stats (include all attempts for a course)
-  // need every attempt counted in its own year/semester.
-  // Substitution groups are left untouched
-  const splitIntoAttempts = (group: Credit[]): Credit[][] =>
-    isSingleCourse(group) && group.length > 1 ? group.map(credit => [credit]) : [group]
+    const [creditGroups, enrollmentGroups] = await Promise.all([
+      getCreditsForCourses(filteredCreditGroupIds, allCourseIds, unification, from, to),
+      getEnrollmentsForCourses(filteredCreditGroupIds, allCourseIds, unification, from, to),
+    ])
 
-  for (const creditGroup of creditGroups) {
-    if (!creditGroup?.length) continue
+    const counter = new CourseYearlyStatsCounter()
 
-    const studyRightElements = studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? []
+    // A single-course credit group can contain more than one real attempt for the same course code
+    // (e.g. failed once and passed on a retry). parseCredit collapses a group into a single
+    // attainment for student-stats (no student is counted twice), but attempt-stats (include all attempts for a course)
+    // need every attempt counted in its own year/semester.
+    // Substitution groups are left untouched
+    const splitIntoAttempts = (group: Credit[]): Credit[][] =>
+      isSingleCourse(group) && group.length > 1 ? group.map(credit => [credit]) : [group]
 
-    const {
-      studentNumber,
-      grade,
-      passed,
-      semesterCode,
-      semesterName,
-      yearCode,
-      yearName,
-      attainmentDate,
-      programme,
-      courseCode: creditCourseCode,
-      credits,
-      creditTypeCode,
-    } = parseCredit(creditGroup, anonymizationSalt, courseCode, studyRightElements)
+    for (const creditGroup of creditGroups) {
+      if (!creditGroup?.length) continue
 
-    counter.markStudyProgramme(
-      studentNumber,
-      yearCode,
-      passed,
-      credits,
-      programme.code,
-      programme.name,
-      programme.facultyCode,
-      programme.organization
-    )
+      const studyRightElements = studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? []
 
-    // Credits/attainments have quaranteed matching attainment_date and semesters/years
-    const groupCode = separate ? semesterCode : yearCode
-    const groupName = separate ? semesterName : yearName
-    counter.markStudentGradeToGroup(
-      studentNumber,
-      passed,
-      grade,
-      groupCode,
-      groupName,
-      creditCourseCode,
-      yearCode,
-      creditTypeCode
-    )
-
-    // Don't add students to student stats based on improved grades
-    if (creditTypeCode !== CreditTypeCode.IMPROVED) {
-      counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
-    }
-
-    // The same group can include a failed and a passed credit in which case the parseCredit
-    // would return only the passed credit. Hence we split the failed and passed credit into
-    // two separate groups
-    for (const attemptCredits of splitIntoAttempts(creditGroup)) {
-      const attempt = parseCredit(attemptCredits, anonymizationSalt, courseCode, studyRightElements)
-      const attemptGroupCode = separate ? attempt.semesterCode : attempt.yearCode
-      const attemptGroupName = separate ? attempt.semesterName : attempt.yearName
-      counter.markAttemptToGroup(
-        attempt.studentNumber,
-        attempt.passed,
-        attempt.grade,
-        attemptGroupCode,
-        attemptGroupName,
-        attempt.courseCode,
-        attempt.yearCode
-      )
-    }
-  }
-
-  for (const enrollments of enrollmentGroups) {
-    if (!enrollments?.length) continue
-
-    for (const enrollment of enrollments) {
       const {
         studentNumber,
-        courseCode: enrollmentCourseCode,
-        enrollmentDateTime,
+        grade,
+        passed,
+        semesterCode,
+        semesterName,
+        yearCode,
+        yearName,
+        attainmentDate,
         programme,
-      } = parseEnrollment(
-        enrollment,
-        anonymizationSalt,
-        studentNumberToSrElementsMap[enrollment.studentnumber ?? 0] ?? []
-      )
-
-      // Enrollments can have conflicting enrollment_date_time and semestercode, so we need to manually select
-      // semestercode matching enrollment_date_time
-      const { semester, year } = getSemesterAndYearByDate(enrollment.enrollment_date_time, semesters, years)
+        courseCode: creditCourseCode,
+        credits,
+        creditTypeCode,
+      } = parseCredit(creditGroup, anonymizationSalt, courseCode, studyRightElements)
 
       counter.markStudyProgramme(
         studentNumber,
-        year.yearcode,
-        false, // passed
-        0, // credits
+        yearCode,
+        passed,
+        credits,
         programme.code,
         programme.name,
         programme.facultyCode,
         programme.organization
       )
 
-      const groupCode = separate ? semester.semestercode : year.yearcode
-      const groupName = separate ? semester.name : year.yearname
-
-      counter.markEnrollmentToGroup(
+      // Credits/attainments have quaranteed matching attainment_date and semesters/years
+      const groupCode = separate ? semesterCode : yearCode
+      const groupName = separate ? semesterName : yearName
+      counter.markStudentGradeToGroup(
         studentNumber,
-        enrollmentDateTime,
+        passed,
+        grade,
         groupCode,
         groupName,
-        enrollmentCourseCode,
-        year.yearcode
+        creditCourseCode,
+        yearCode,
+        creditTypeCode
       )
+
+      // Don't add students to student stats based on improved grades
+      if (creditTypeCode !== CreditTypeCode.IMPROVED) {
+        counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
+      }
+
+      // The same group can include a failed and a passed credit in which case the parseCredit
+      // would return only the passed credit. Hence we split the failed and passed credit into
+      // two separate groups
+      for (const attemptCredits of splitIntoAttempts(creditGroup)) {
+        const attempt = parseCredit(attemptCredits, anonymizationSalt, courseCode, studyRightElements)
+        const attemptGroupCode = separate ? attempt.semesterCode : attempt.yearCode
+        const attemptGroupName = separate ? attempt.semesterName : attempt.yearName
+        counter.markAttemptToGroup(
+          attempt.studentNumber,
+          attempt.passed,
+          attempt.grade,
+          attemptGroupCode,
+          attemptGroupName,
+          attempt.courseCode,
+          attempt.yearCode
+        )
+      }
+    }
+
+    for (const enrollments of enrollmentGroups) {
+      for (const enrollment of enrollments) {
+        const studyRightElements = studentNumberToSrElementsMap[enrollment.studentnumber ?? 0] ?? []
+
+        const {
+          studentNumber,
+          courseCode: enrollmentCourseCode,
+          enrollmentDateTime,
+          programme,
+        } = parseEnrollment(enrollment, anonymizationSalt, studyRightElements)
+
+        // Enrollments can have conflicting enrollment_date_time and semestercode, so we need to manually select
+        // semestercode matching enrollment_date_time
+        const { semester, year } = getSemesterAndYearByDate(enrollment.enrollment_date_time, semesters, years)
+
+        counter.markStudyProgramme(
+          studentNumber,
+          year.yearcode,
+          false, // passed
+          0, // credits
+          programme.code,
+          programme.name,
+          programme.facultyCode,
+          programme.organization
+        )
+
+        const groupCode = separate ? semester.semestercode : year.yearcode
+        const groupName = separate ? semester.name : year.yearname
+
+        counter.markEnrollmentToGroup(
+          studentNumber,
+          enrollmentDateTime,
+          groupCode,
+          groupName,
+          enrollmentCourseCode,
+          year.yearcode
+        )
+      }
+    }
+
+    const statistics = await counter.getFinalStatistics(anonymizationSalt)
+
+    const substitutionGroups =
+      combineSubstitutions && primaryCourse.substitutionGroups?.length
+        ? await getSubstitutionGroupDetails(primaryCourse.substitutionGroups)
+        : [[{ code: courseCode, name, groupId }]]
+
+    return {
+      ...statistics,
+      courseCode,
+      groupId,
+      substitutionGroups,
+      name,
     }
   }
-
-  const statistics = await counter.getFinalStatistics(anonymizationSalt)
-
-  const substitutionGroups: Pick<CourseModel, 'code' | 'name'>[][] =
-    combineSubstitutions && course?.substitution_groups?.length
-      ? await getSubstitutionGroupDetails(course.substitution_groups)
-      : [[{ code: course!.code, name: course!.name }]]
-
-  return {
-    ...statistics,
-    coursecode: courseCode,
-    alternatives: substitutionGroups,
-    name: course?.name,
-  }
-}
 
 /**
   Mostly-legacy function that prevents user from opening too big of a populations.
   At the moment the threshold to prevent a population is so high it will never trigger.
-
  */
 export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
   const lastAttainmentDate = (await CourseModel.findOne({
@@ -393,7 +395,7 @@ export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unif
 }
 
 export const getCourseYearlyStats = async (
-  courseCodes: string[],
+  courseGroupIds: string[],
   separate: boolean,
   anonymizationSalt: string | null,
   combineSubstitutions: boolean,
@@ -403,31 +405,50 @@ export const getCourseYearlyStats = async (
   // Default to 1900 - currentYear+1 so that without parameters the api returns stats for all years
   const from = new Date(`${yearCodeToYear(fromYearCode)}-08-01`) // FALL
   const to = new Date(`${yearCodeToYear(toYearCode) + 1}-07-31`) // SPRING next year
+  console.log('FUNCTIONARGUMENTS:')
+  console.log('groupIds', courseGroupIds)
+  console.log('separate', separate)
+  console.log('anonymizationSalt', anonymizationSalt)
+  console.log('combineSubstitutions', combineSubstitutions)
+  console.log('fromYearCode ', fromYearCode)
+  console.log('toYearCode', toYearCode)
+
+  const relevantCourseIds = (
+    await CourseModel.findAll({
+      attributes: ['id'],
+      raw: true,
+      where: {
+        groupId: { [Op.in]: courseGroupIds },
+      },
+    })
+  ).map(({ id }) => id)
 
   const [credits, enrollments] = await Promise.all([
     CreditModel.findAll({
       attributes: ['student_studentnumber'],
+      raw: true,
       where: {
-        course_code: { [Op.in]: courseCodes },
+        course_id: { [Op.in]: relevantCourseIds },
         attainment_date: { [Op.between]: [from, to] },
       },
     }),
     EnrollmentModel.findAll({
       attributes: ['studentnumber'],
+      raw: true,
       where: {
-        course_code: {
-          [Op.in]: courseCodes,
+        course_id: {
+          [Op.in]: relevantCourseIds,
         },
         state: EnrollmentState.ENROLLED,
         enrollment_date_time: {
-          [Op.and]: {
-            [Op.between]: [from, to],
-            [Op.gte]: enrollmentTimeDateThreshold,
-          },
+          [Op.between]: [from, to],
+          [Op.gte]: enrollmentTimeDateThreshold,
         },
       },
     }),
   ])
+
+  console.log(from, to, credits.length, enrollments.length)
 
   const studentNumbers = new Set<string>()
 
@@ -441,60 +462,43 @@ export const getCourseYearlyStats = async (
 
   const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap([...studentNumbers])
 
-  const statsRegular = await Promise.all(
-    courseCodes.map(async courseCode => {
-      const course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null = await CourseModel.findOne({
-        raw: true,
-        attributes: ['code', 'name', 'substitution_groups'],
-        where: { code: courseCode },
-      })
+  console.log('studentnumbers', [...studentNumbers].join(','))
 
-      if (!course) {
-        logger.error('Course for course stats not found with code' + courseCode)
+  const stats = await Promise.all(
+    courseGroupIds.map(async groupId => {
+      const primaryCourse: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name' | 'substitutionGroups'> | null =
+        await CourseModel.findOne({
+          raw: true,
+          attributes: ['groupId', 'id', 'code', 'name', 'substitutionGroups'],
+          where: { groupId, isPrimary: true },
+        })
+
+      if (!primaryCourse) {
+        logger.error(`Primary course for course stats not found with groupId: ${groupId}`)
         return {}
       }
 
+      const getYearlyStatsOfUnification = getYearlyStatsOfNew(
+        primaryCourse,
+        separate,
+        anonymizationSalt,
+        combineSubstitutions,
+        studentNumberToSrElementsMap,
+        from,
+        to
+      )
+
       const [openStats, regularStats, unifyStats] = await Promise.all([
-        getYearlyStatsOfNew(
-          course,
-          courseCode,
-          separate,
-          Unification.OPEN,
-          anonymizationSalt,
-          combineSubstitutions,
-          studentNumberToSrElementsMap,
-          from,
-          to
-        ),
-        getYearlyStatsOfNew(
-          course,
-          courseCode,
-          separate,
-          Unification.REGULAR,
-          anonymizationSalt,
-          combineSubstitutions,
-          studentNumberToSrElementsMap,
-          from,
-          to
-        ),
-        getYearlyStatsOfNew(
-          course,
-          courseCode,
-          separate,
-          Unification.UNIFY,
-          anonymizationSalt,
-          combineSubstitutions,
-          studentNumberToSrElementsMap,
-          from,
-          to
-        ),
+        getYearlyStatsOfUnification(Unification.OPEN),
+        getYearlyStatsOfUnification(Unification.REGULAR),
+        getYearlyStatsOfUnification(Unification.UNIFY),
       ])
 
       return { unifyStats, regularStats, openStats }
     })
   )
 
-  return statsRegular
+  return stats as CourseYearlyStats[]
 }
 
 export const getCourseProvidersForCourses = async (codes: string[]) =>
@@ -533,7 +537,7 @@ export const searchAndCombineSubstitutionGroupsToCodes = async (coursecodes: str
   return [
     ...new Set(
       coursecodes.concat(
-        substitutionGroups.flatMap(({ substitution_groups }) => substitution_groups.flatMap(code => code))
+        substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(code => code))
       )
     ),
   ]
