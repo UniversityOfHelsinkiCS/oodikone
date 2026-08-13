@@ -31,10 +31,9 @@ export const useLanguage = () => {
   const [changeLanguage] = useModifyLanguageMutation()
 
   const getTextIn = useCallback(
-    (text: Name | null | undefined, lang?: string): string | null | undefined => {
-      if (text == null || Object.values(text).length === 0) {
-        return null
-      }
+    (text: Name | null | undefined | string, lang?: string): string | null | undefined => {
+      if (text == null || Object.values(text).length === 0) return null
+      if (typeof text === 'string') return text
       const languageToUse = lang ?? state
       return text[languageToUse] ?? text.fi ?? text.en ?? text.sv ?? Object.values(text)[0]
     },
