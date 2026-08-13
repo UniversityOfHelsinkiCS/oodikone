@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip'
 
 import { difference, flatten, max, min, pickBy, uniq } from 'lodash-es'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -17,32 +17,26 @@ import { countTotalStats } from '@/pages/CourseStatistics/CourseTab/SingleCourse
 import { ResultTabs } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs'
 import { YearFilter } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/YearFilter'
 import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { useGetCourseStatsQuery } from '@/redux/courseStats'
-import { useAppDispatch } from '@/redux/hooks'
 import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
-import { setSelectedCourse, clearSelectedCourse } from '@/redux/selectedCourse'
 import { DoNotDisturbIcon } from '@/theme'
 import { AvailableStats, FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
-import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
 import { enrollmentTimeDateThresholdYearCode, yearToYearCode } from '@oodikone/shared/util'
-import { Attempts, Enrollment, Students } from '@oodikone/shared/types/courseYearlyStats'
+import { Attempts, CourseStat, Enrollment, Students } from '@oodikone/shared/types/courseYearlyStats'
 
-const countFilteredStudents = (stat: Record<string, string[]>, filter: (studentNumber: string) => boolean) => {
-  if (!stat) {
-    return {} as Record<string, number>
+const countFilteredStudents = (
+  stat: Record<string, string[]>,
+  filter: (studentNumber: string) => boolean
+): Record<string, number> => {
+  if (!stat) return {}
+
+  const result = {}
+  for (const [category, students] of Object.entries(stat)) {
+    result[category] = students.filter(filter).length
   }
-  return Object.entries(stat).reduce(
-    (acc, entry) => {
-      const [category, students] = entry
-      return {
-        ...acc,
-        [category]: students.filter(filter).length,
-      }
-    },
-    {} as Record<string, number>
-  )
+  return result
 }
 
 export const SingleCourseStats = ({
@@ -50,67 +44,68 @@ export const SingleCourseStats = ({
   availableStats,
   userHasAccessToAllStats,
 
+  stats,
   loading,
   toggleOpenAndRegularCourses,
   openOrRegular,
   programmes,
-  combineSubstitutions,
+  substitutions,
+  toYearCode,
+  fromYearCode,
+  setToYearCode,
+  setFromYearCode,
 }: {
   courseGroupId: string
   availableStats: AvailableStats
   userHasAccessToAllStats: boolean
 
+  stats: Record<string, CourseStat>
   loading: boolean
   toggleOpenAndRegularCourses: (state: CourseSearchState) => void
   openOrRegular: CourseSearchState
   programmes: CourseStudyProgramme[]
-  combineSubstitutions: boolean
+  substitutions: boolean
+  toYearCode: number
+  fromYearCode: number
+  setToYearCode: any
+  setFromYearCode: any
 }) => {
   'use memo'
   const [primary, setPrimary] = useState<string[]>([ALL.value])
   const [comparison, setComparison] = useState<string[]>([])
 
-  // These are "incorrectly" reversed to allow them to be replaced with min/max when stats arrive
-  const [minFromYearCode, setMinFromYearCode] = useState(yearToYearCode(new Date().getFullYear()))
-  const [maxToYearCode, setMaxToYearCode] = useState(yearToYearCode(1950))
-
-  const [fromYearCode, setFromYearCode] = useState(yearToYearCode(1950))
-  const [toYearCode, setToYearCode] = useState(yearToYearCode(new Date().getFullYear()))
-  const [separate, setSeparate] = useState<boolean>(false)
-
   const navigate = useNavigate()
-  const location = useLocation()
-  const dispatch = useAppDispatch()
   const { getTextIn } = useLanguage()
   const { semesters, years: semesterYears } = useSemesters()
-  const {
-    data: courseStatistics,
-    isFetching: isLoading,
-    isSuccess,
-  } = useGetCourseStatsQuery(
-    {
-      courses: [courseGroupId],
-      separate,
-      combineSubstitutions,
-      fromYearCode: fromYearCode.toString(),
-      toYearCode: toYearCode.toString(),
-    },
-    { skip: loading }
-  )
+
+  const params = useParseQueryParams()
+  const separate = params.separate?.[0] === 'true'
+
+  const courseStats = stats[courseGroupId]
+
+  const minYearCode = min(courseStats.statistics.map(r => r.yearCode))!
+  const maxYearCode = max(courseStats.statistics.map(r => r.yearCode))!
+
+  const [minFromYearCode, setMinFromYearCode] = useState(minYearCode)
+  const [maxToYearCode, setMaxToYearCode] = useState(maxYearCode)
+
+  // Initialize filters with proper yearcodes
+  useEffect(() => {
+    setFromYearCode(minYearCode)
+    setToYearCode(maxYearCode)
+  }, [])
 
   const uniqueCourseCodes = [
     ...new Set(
       [courseGroupId].concat(
-        courseStatistics?.[courseGroupId]?.[openOrRegular]?.substitutionGroups.flatMap(group =>
-          group.flatMap(({ code }) => code)
-        ) ?? []
+        courseStats?.substitutionGroups.flatMap(group => group.flatMap(({ groupId }) => groupId)) ?? []
       )
     ),
   ]
-  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery(
-    { courseCodes: JSON.stringify(uniqueCourseCodes) },
-    { skip: isLoading || !isSuccess }
-  )
+
+  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
+    courseCodes: JSON.stringify(uniqueCourseCodes),
+  })
 
   const semestersReversed = Object.values(semesters ?? [])
     .map(({ semestercode, name, yearcode }) => ({
@@ -128,16 +123,6 @@ export const SingleCourseStats = ({
     }))
     .reverse()
 
-  const parseQueryFromUrl = () => {
-    const { separate } = parseQueryParams(location.search)
-    return {
-      separate: JSON.parse((separate ?? 'false') as string),
-    }
-  }
-
-  // Undefined if query is still querying
-  const stats = courseStatistics?.[courseGroupId]?.[openOrRegular]
-
   let maxYearsToCreatePopulationFrom = 0
   if (maxYears) {
     switch (openOrRegular) {
@@ -153,36 +138,6 @@ export const SingleCourseStats = ({
   }
 
   useEffect(() => {
-    if (location.search) {
-      const { separate } = parseQueryFromUrl()
-      setSeparate([true, false].includes(separate) ? separate : false)
-    }
-    dispatch(setSelectedCourse(courseGroupId))
-
-    const yearCodes = stats?.statistics.map(stat => stat.yearCode)
-    const initFromYear = min(yearCodes) ?? yearToYearCode(1950)
-    const initToYear = max(yearCodes) ?? yearToYearCode(new Date().getFullYear())
-    setFromYearCode(initFromYear)
-    setToYearCode(initToYear)
-
-    if (yearCodes) {
-      setMaxToYearCode(max([maxToYearCode, ...yearCodes]))
-      setMinFromYearCode(min([minFromYearCode, ...yearCodes]))
-    }
-
-    return () => {
-      dispatch(clearSelectedCourse())
-    }
-  }, [isSuccess])
-
-  useEffect(() => {
-    if (location.search) {
-      const { separate } = parseQueryFromUrl()
-      setSeparate([true, false].includes(separate) ? separate : false)
-    }
-  }, [location.search])
-
-  useEffect(() => {
     if (primary.every(course => !programmes.map(programme => programme.key).includes(course))) {
       setPrimary([ALL.value])
     }
@@ -195,7 +150,7 @@ export const SingleCourseStats = ({
     if (programmeCode === 'EXCLUDED') {
       return 'Excluded'
     }
-    const name = stats?.programmes[programmeCode]['name']
+    const name = courseStats?.programmes[programmeCode]['name']
     return getTextIn(name)!
   }
 
@@ -216,7 +171,7 @@ export const SingleCourseStats = ({
       return () => true
     }
 
-    const programmes = stats?.programmes
+    const programmes = courseStats?.programmes
     const studentNumbers = new Set()
     codes.forEach(code => {
       if (programmes?.[code]) {
@@ -229,24 +184,18 @@ export const SingleCourseStats = ({
   }
 
   const isValidProgrammeCode = (code: string) => {
-    return stats?.programmes[code] || code === ALL.value || code === 'EXCLUDED'
+    return courseStats?.programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
 
-  const filteredYearsAndSemesters = () => {
+  const getFilteredYears = () => {
     const from = minFromYearCode
     const to = maxToYearCode
 
-    if (from == null || to == null) {
-      return {
-        filteredYears: semesterYearsReversed,
-        filteredSemesters: semestersReversed,
-      }
+    if (!from || !to) {
+      return semesterYearsReversed
     }
     const timeFilter = ({ value }: { value: number }) => value >= from && value <= to
-    return {
-      filteredYears: semesterYearsReversed.filter(timeFilter),
-      filteredSemesters: semestersReversed.filter(timeFilter),
-    }
+    return semesterYearsReversed.filter(timeFilter)
   }
 
   const isStatInYearRange = ({ name }: { name: Name | string }) => {
@@ -334,10 +283,10 @@ export const SingleCourseStats = ({
   }
 
   const statsForProgrammes = (programmeCodes: string[], name: string) => {
-    if (programmeCodes.length === 0 || !stats) {
+    if (programmeCodes.length === 0 || !courseStats) {
       return undefined
     }
-    const { statistics } = stats
+    const { statistics } = courseStats
     const filter = belongsToAtLeastOneProgramme(programmeCodes)
 
     const allStudents = statistics.filter(isStatInYearRange).reduce(
@@ -375,7 +324,7 @@ export const SingleCourseStats = ({
           const parsedName = separate ? getTextIn(name as Name)! : name
 
           return {
-            name: parsedName,
+            name: getTextIn(parsedName) ?? '',
             students: { ...studentStats, ...studentsEnrollments },
             attempts: { ...attemptStats, totalEnrollments },
             enrollments: filteredEnrollments,
@@ -483,10 +432,10 @@ export const SingleCourseStats = ({
     const queryObject = {
       from: fromYearCode,
       to: toYearCode,
-      coursecodes: JSON.stringify([courseGroupId]),
+      courses: courseGroupId,
       separate,
       unifyCourses: openOrRegular,
-      includeSubstitutions: combineSubstitutions,
+      substitutions: substitutions,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate(`/coursepopulation?${searchString}`)
@@ -504,7 +453,7 @@ export const SingleCourseStats = ({
   }
 
   const statistics = filteredProgrammeStatistics()
-  const { filteredYears } = filteredYearsAndSemesters()
+  const filteredYears = getFilteredYears()
 
   const timeFilter = (_, value: string) => Number(value) >= fromYearCode && Number(value) <= toYearCode
   const filteredProgrammes = programmes
@@ -514,7 +463,7 @@ export const SingleCourseStats = ({
     })
     .filter(programme => programme.size > 0)
 
-  if (!stats?.statistics || stats.statistics.length < 1) {
+  if (!courseStats?.statistics.length) {
     return <Section>No data for selected course</Section>
   }
 
@@ -588,12 +537,12 @@ export const SingleCourseStats = ({
           </Stack>
         </Section>
       ) : null}
-      {isLoading ? (
+      {loading ? (
         <LoadingSkeleton />
       ) : (
         <ResultTabs
           availableStats={availableStats}
-          combineSubstitutions={combineSubstitutions}
+          combineSubstitutions={substitutions}
           comparison={statistics.comparison}
           courseCodes={[courseGroupId]}
           loading={loading}
