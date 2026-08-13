@@ -39,11 +39,9 @@ export type CourseYearlyStatsResBody = CourseYearlyStats[]
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
   '/courseyearlystats',
   async (req, res) => {
-    const { courses, combineSubstitutions, separate, fromYearCode, toYearCode } = req.query
+    const { courses, substitutions, separate, fromYearCode, toYearCode } = req.query
 
-    const courseGroupIds = handleQueryArrays(courses)
-
-    if (!courseGroupIds.length) {
+    if (!courses || !courses.length) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 
@@ -62,14 +60,13 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const anonymize = !userHasFullAccessToStudentData && fullStudyProgrammeRights.length === 0
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
 
-    const useCombineSubstitutions = combineSubstitutions !== 'false'
     const useSeparate = separate === 'true'
 
     const results = await getCourseYearlyStats(
-      courseGroupIds,
+      handleQueryArrays(courses),
       useSeparate,
       anonymizationSalt,
-      useCombineSubstitutions,
+      substitutions === 'true',
       fromYearCode,
       toYearCode
     )

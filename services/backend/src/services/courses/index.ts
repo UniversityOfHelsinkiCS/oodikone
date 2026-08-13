@@ -190,38 +190,30 @@ export const getYearlyStatsOfNew =
     primaryCourse: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name' | 'substitutionGroups'>,
     separate: boolean,
     anonymizationSalt: string | null,
-    combineSubstitutions: boolean,
+    substitutions: boolean,
     studentNumberToSrElementsMap: Record<string, SISStudyRightElementModel[]>,
     from: Date,
     to: Date
   ) =>
   async (unification: Unification): Promise<CourseYearlyStats['openStats']> => {
-    const { id, groupId, name, code: courseCode } = primaryCourse
+    const { groupId, name, code: courseCode } = primaryCourse
 
     // Includes main course code and substitutions (if enabled)
-    const creditGroupIds = combineSubstitutions
-      ? [[groupId]].concat(primaryCourse.substitutionGroups ?? [])
-      : [[groupId]]
-
-    const filteredCreditGroupIds =
-      unification === Unification.REGULAR
-        ? // FIXME: isOpenUniCourseCode does not work yet with groupIds
-          creditGroupIds.filter(group => group.every(course => !isOpenUniCourseCode(course)))
-        : creditGroupIds
+    const creditGroupIds = substitutions ? [[groupId]].concat(primaryCourse.substitutionGroups ?? []) : [[groupId]]
 
     const allCourseIds = (
       await CourseModel.findAll({
         raw: true,
         attributes: ['id'],
-        where: { groupId: { [Op.in]: filteredCreditGroupIds.flat() } },
+        where: { groupId: { [Op.in]: creditGroupIds.flat() } },
       })
     ).map(({ id }) => id)
 
     const { semesters, years } = await getSemestersAndYears()
 
     const [creditGroups, enrollmentGroups] = await Promise.all([
-      getCreditsForCourses(filteredCreditGroupIds, allCourseIds, unification, from, to),
-      getEnrollmentsForCourses(filteredCreditGroupIds, allCourseIds, unification, from, to),
+      getCreditsForCourses(creditGroupIds, allCourseIds, unification, from, to),
+      getEnrollmentsForCourses(creditGroupIds, allCourseIds, unification, from, to),
     ])
 
     const counter = new CourseYearlyStatsCounter()
@@ -346,7 +338,7 @@ export const getYearlyStatsOfNew =
     const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
     const substitutionGroups =
-      combineSubstitutions && primaryCourse.substitutionGroups?.length
+      substitutions && primaryCourse.substitutionGroups?.length
         ? await getSubstitutionGroupDetails(primaryCourse.substitutionGroups)
         : [[{ code: courseCode, name, groupId }]]
 
@@ -398,7 +390,7 @@ export const getCourseYearlyStats = async (
   courseGroupIds: string[],
   separate: boolean,
   anonymizationSalt: string | null,
-  combineSubstitutions: boolean,
+  substitutions: boolean,
   fromYearCode = yearToYearCode(1950).toString(),
   toYearCode: string = yearToYearCode(now().getFullYear()).toString()
 ) => {
@@ -409,7 +401,7 @@ export const getCourseYearlyStats = async (
   console.log('groupIds', courseGroupIds)
   console.log('separate', separate)
   console.log('anonymizationSalt', anonymizationSalt)
-  console.log('combineSubstitutions', combineSubstitutions)
+  console.log('substitutions', substitutions)
   console.log('fromYearCode ', fromYearCode)
   console.log('toYearCode', toYearCode)
 
@@ -448,8 +440,6 @@ export const getCourseYearlyStats = async (
     }),
   ])
 
-  console.log(from, to, credits.length, enrollments.length)
-
   const studentNumbers = new Set<string>()
 
   credits.forEach(credit => {
@@ -462,8 +452,6 @@ export const getCourseYearlyStats = async (
 
   const studentNumberToSrElementsMap = await getStudentNumberToSrElementsMap([...studentNumbers])
 
-  console.log('studentnumbers', [...studentNumbers].join(','))
-
   const stats = await Promise.all(
     courseGroupIds.map(async groupId => {
       const primaryCourse: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name' | 'substitutionGroups'> | null =
@@ -474,7 +462,7 @@ export const getCourseYearlyStats = async (
         })
 
       if (!primaryCourse) {
-        logger.error(`Primary course for course stats not found with groupId: ${groupId}`)
+        logger.error(`Primary course for course stats not found for: ${groupId}`)
         return {}
       }
 
@@ -482,7 +470,7 @@ export const getCourseYearlyStats = async (
         primaryCourse,
         separate,
         anonymizationSalt,
-        combineSubstitutions,
+        substitutions,
         studentNumberToSrElementsMap,
         from,
         to

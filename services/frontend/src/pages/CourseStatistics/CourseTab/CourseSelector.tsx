@@ -5,10 +5,6 @@ import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
 
-import { useAppDispatch } from '@/redux/hooks'
-
-import { setSelectedCourse } from '@/redux/selectedCourse'
-
 export const CourseSelector = ({
   courses,
   selected,
@@ -18,15 +14,10 @@ export const CourseSelector = ({
   selected: string
   setSelected: (courseCode: string) => void
 }) => {
-  const dispatch = useAppDispatch()
-
   const onCourseChange = (event: SelectChangeEvent<string>) => {
     const selectedCourse = event.target.value
     setSelected(selectedCourse)
-    dispatch(setSelectedCourse(selectedCourse))
   }
-
-  console.log(courses, selected)
 
   return (
     <FormControl fullWidth>

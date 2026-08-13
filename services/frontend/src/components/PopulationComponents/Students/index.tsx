@@ -15,7 +15,7 @@ import { ProgressTable as ProgressTab } from '@/components/PopulationComponents/
 import { TagsTab } from '@/components/PopulationComponents/Students/Table/TagsTab'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { FormattedStudent } from '@oodikone/shared/types'
 
@@ -74,9 +74,10 @@ export const PopulationStudents = ({
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
-  const { years } = parseQueryParams(location.search)
+  const { stringYears } = useParseQueryParams()
+  const years = stringYears.map(Number)
   const months = years
-    ? dayjs().diff(dayjs(`${Math.min(years)}-08-01`), 'months')
+    ? dayjs().diff(dayjs(`${Math.min(...years)}-08-01`), 'months')
     : studyGuidanceGroup?.tags?.year
       ? dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
       : undefined

@@ -86,7 +86,7 @@ export const AttemptsTable = ({
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(courseCodes),
+        courses: courseCodes,
         separate,
         unifyCourses: openOrRegular,
         includeSubstitutions: combineSubstitutions,

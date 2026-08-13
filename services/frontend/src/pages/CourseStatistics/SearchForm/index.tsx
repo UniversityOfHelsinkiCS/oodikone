@@ -33,9 +33,10 @@ export const SearchForm = () => {
   'use memo'
   const { getTextIn } = useLanguage()
   const navigate = useNavigate()
-  const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
+  const [substitutions, toggleSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
-  const [includeSpecialCourses, setIncludeSpecialCourses] = useToggle(false)
+  const [includeSpecialCourses, toggleIncludeSpecialCourses] = useToggle(false)
+
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
   const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState('')
@@ -82,11 +83,9 @@ export const SearchForm = () => {
   }
 
   const pushQueryToUrl = query => {
-    const { courses, ...rest } = query
     const queryObject = {
-      ...rest,
-      courses: JSON.stringify(courses),
-      combineSubstitutions: JSON.stringify(combineSubstitutions),
+      ...query,
+      substitutions,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate({ search: searchString })
@@ -101,7 +100,7 @@ export const SearchForm = () => {
     const params = {
       courses: groupIds,
       separate: false,
-      combineSubstitutions,
+      substitutions,
     }
     const searchHistoryText = groupIds.map(
       groupId => `${getTextIn(selectedCourses[groupId].name)} ${selectedCourses[groupId].code}`
@@ -115,16 +114,15 @@ export const SearchForm = () => {
 
   // If course clicked on single course mode, call submit hook
   useEffect(() => {
-    if (Object.keys(selectedCourses).length === 0 || selectMultipleCourses) {
-      return
+    if (!selectMultipleCourses && Object.keys(selectedCourses).length === 1) {
+      onSubmitFormClick()
     }
-    onSubmitFormClick()
   }, [selectedCourses])
 
   // Reset state after toggle
   useEffect(() => {
     setSelectedCourses({})
-  }, [combineSubstitutions, selectMultipleCourses])
+  }, [substitutions, selectMultipleCourses])
 
   const courses = matchingCourses
     .filter(course => !selectedCourses[course.groupId])
@@ -145,7 +143,7 @@ export const SearchForm = () => {
 
   const addAllCourses = () => {
     const newSelectedCourses = courses.reduce<Record<string, SearchResultCourse>>((newSelected, course) => {
-      newSelected[course.code] = { ...course }
+      newSelected[course.groupId] = course
       return newSelected
     }, {})
 
@@ -207,10 +205,10 @@ export const SearchForm = () => {
                   onChange={toggleSelectMultipleCourses}
                 />
                 <ToggleWithTooltip
-                  checked={combineSubstitutions}
+                  checked={substitutions}
                   cypress="combine-substitutions-toggle"
                   label="Combine substitutions"
-                  onChange={toggleCombineSubstitutions}
+                  onChange={toggleSubstitutions}
                   tooltipText={getTextIn({
                     fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
                     en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
@@ -220,7 +218,7 @@ export const SearchForm = () => {
                   checked={includeSpecialCourses}
                   cypress="show-special-courses-toggle"
                   label="Show special courses"
-                  onChange={setIncludeSpecialCourses}
+                  onChange={toggleIncludeSpecialCourses}
                   tooltipText={getTextIn({
                     fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
                     en: 'Includes course instances formed by transferred credits and other special courses',
@@ -240,7 +238,7 @@ export const SearchForm = () => {
                 {selectMultipleCourses ? (
                   <Stack spacing={1} sx={{ mb: 2 }}>
                     <CourseTable
-                      combineSubstitutions={combineSubstitutions}
+                      combineSubstitutions={substitutions}
                       courses={selected}
                       hidden={noSelectedCourses}
                       onSelectCourse={onSelectCourse}
@@ -255,7 +253,7 @@ export const SearchForm = () => {
                   </Stack>
                 ) : null}
                 <CourseTable
-                  combineSubstitutions={combineSubstitutions}
+                  combineSubstitutions={substitutions}
                   courses={courses}
                   hidden={false}
                   onSelectCourse={onSelectCourse}

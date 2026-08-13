@@ -24,9 +24,13 @@ export const CourseTab = ({
   openOrRegular,
   stats,
   availableStats,
-  combineSubstitutions,
+  substitutions,
   substitutionGroups,
   programmes,
+  toYearCode,
+  fromYearCode,
+  setToYearCode,
+  setFromYearCode,
 }: {
   selected: string | undefined
   setSelected: (courseCode: string) => void
@@ -37,9 +41,14 @@ export const CourseTab = ({
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: AvailableStats
-  combineSubstitutions: boolean
+  substitutions: boolean
   substitutionGroups: { code: string; name: Name; groupId: string }[][]
   programmes: CourseStudyProgramme[]
+
+  toYearCode: number
+  fromYearCode: number
+  setToYearCode: any
+  setFromYearCode: any
 }) => {
   'use memo'
   const { getTextIn } = useLanguage()
@@ -52,7 +61,7 @@ export const CourseTab = ({
     groupId,
   }))
 
-  if (courses.length === 0) return null
+  if (!courses.length) return null
   const multipleCourses = courses.length > 1
 
   return (
@@ -68,30 +77,37 @@ export const CourseTab = ({
                 name={getTextIn(stats[selected].name)!}
               />
             </Box>
-            {substitutionGroups.length ? (
+            {substitutionGroups.length && (
               <>
                 <Typography component="h6" variant="subtitle2">
-                  Substitution groups
+                  {`Substitution${!substitutions ? 's not enabled' : ' groups'}`}
                 </Typography>
-                <Grid container spacing={1}>
-                  {substitutionGroups.map(group => (
-                    <SecondaryCourseLabel getTextIn={getTextIn} group={group} key={JSON.stringify(group)} />
-                  ))}
-                </Grid>
+                {substitutions && (
+                  <Grid container spacing={1}>
+                    {substitutionGroups.map(group => (
+                      <SecondaryCourseLabel getTextIn={getTextIn} group={group} key={JSON.stringify(group)} />
+                    ))}
+                  </Grid>
+                )}
               </>
-            ) : null}
+            )}
           </Stack>
         </Stack>
       </Section>
       <SingleCourseStats
         availableStats={availableStats}
-        combineSubstitutions={combineSubstitutions}
+        substitutions={substitutions}
         courseGroupId={selected}
         loading={loading}
+        stats={stats}
         openOrRegular={openOrRegular}
         programmes={programmes}
         toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
         userHasAccessToAllStats={userHasAccessToAllStats}
+        toYearCode={toYearCode}
+        fromYearCode={fromYearCode}
+        setToYearCode={setToYearCode}
+        setFromYearCode={setFromYearCode}
       />
     </Stack>
   )

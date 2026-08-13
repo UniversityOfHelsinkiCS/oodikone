@@ -56,6 +56,11 @@ export const getCreditsForCourses = async (
           },
         },
       },
+      {
+        model: CourseModel,
+        attributes: ['groupId'],
+        required: true,
+      },
     ],
   })
 
@@ -169,6 +174,7 @@ export const getEnrollmentsForCourses = async (
       {
         model: CourseModel,
         attributes: ['groupId'],
+        required: true,
       },
     ],
   })

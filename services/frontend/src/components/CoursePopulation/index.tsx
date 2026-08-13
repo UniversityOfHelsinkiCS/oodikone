@@ -39,14 +39,13 @@ import { useSemesters } from '@/hooks/useSemesters'
 import { useGetCourseDetailsQuery } from '@/redux/courseStats'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
 
 export const CoursePopulation = () => {
   useTitle('Course population')
 
-  const location = useLocation()
   const { getTextIn } = useLanguage()
 
   const [codes, setCodes] = useState<{ allCodes: string[]; mainCodes: string[] }>({
@@ -54,14 +53,21 @@ export const CoursePopulation = () => {
     mainCodes: [],
   })
 
-  const { coursecodes, from, to, separate, unifyCourses, includeSubstitutions } = parseQueryParams(location.search)
+  const {
+    coursecodes,
+    from: [from],
+    to: [to],
+    separate: [separate],
+    unifyCourses: [unifyCourses],
+    includeSubstitutions: [includeSubstitutions],
+  } = useParseQueryParams()
 
   const { data: courseDetails } = useGetCourseDetailsQuery(
     { codes: codes.mainCodes },
     { skip: !codes.mainCodes.length }
   )
   const { data: population } = useGetPopulationStatisticsByCourseQuery({
-    coursecodes,
+    coursecodes: coursecodes[0],
     from,
     to,
     separate,
@@ -70,8 +76,7 @@ export const CoursePopulation = () => {
   })
 
   useEffect(() => {
-    const parsedCourseCodes = JSON.parse(coursecodes)
-    if (parsedCourseCodes.length) setCodes({ ...codes, mainCodes: parsedCourseCodes })
+    if (coursecodes.length) setCodes({ ...codes, mainCodes: coursecodes })
   }, [coursecodes])
 
   useEffect(() => {
@@ -106,7 +111,7 @@ export const CoursePopulation = () => {
   }
 
   const isSeparate = separate ? JSON.parse(separate) : false
-  const { dateFrom, dateTo } = getFromToDates(from, to, isSeparate)
+  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate)
 
   // Dates must be set
   if (!dateFrom || !dateTo) return null

@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 
 export const useTabs = (totalTabs: number, prefix?: string) => {
   'use memo'
   const navigate = useNavigate()
   const location = useLocation()
+  const params = useParseQueryParams()
 
   const id = prefix ? `${prefix}-tab` : 'tab'
 
@@ -16,14 +17,11 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
     return Number.isNaN(tabIndex) || tabIndex < 0 || tabIndex >= totalTabs ? initialTab : tabIndex
   }
 
-  const tab = useMemo(() => {
-    return normalizeTab(parseQueryParams(location.search)[id])
-  }, [location.search, id, normalizeTab])
+  const tab = useMemo(() => normalizeTab(params[id]), [id, normalizeTab])
 
   const switchToTab = (newTab: number) => {
     const nextTab = normalizeTab(newTab)
 
-    const params = parseQueryParams(location.search)
     const currentTab = normalizeTab(params[id])
 
     if (currentTab === nextTab) return
