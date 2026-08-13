@@ -8,7 +8,7 @@ import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { ResultTab } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/ResultTab'
 import { PersonIcon, RefreshIcon } from '@/theme'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
-import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 
 export const ResultTabs = ({
   availableStats,
@@ -34,26 +34,20 @@ export const ResultTabs = ({
   courseCodes: string[]
 }) => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [tab, setTab] = useState(0)
+
+  const params = useParseQueryParams()
 
   if (!primary) {
     return null
   }
 
   const updateSeparate = (separate: boolean) => {
-    if (!location.pathname.includes('coursestatistics')) {
-      return
-    }
-
-    const { courses, ...params } = parseQueryParams(location.search)
-    const query = {
+    const newQueryParams = {
       ...params,
-      courses: JSON.parse(courses as string),
       separate,
     }
-    const queryToString = { ...query, courses: JSON.stringify(query.courses) }
-    void navigate({ search: queryParamsToString(queryToString) }, { replace: true })
+    void navigate({ search: queryParamsToString(newQueryParams) }, { replace: true })
   }
 
   return (
