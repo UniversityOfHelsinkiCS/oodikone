@@ -11,9 +11,9 @@ export type CoursesMultiQuery = {
 
 export type CourseYearlyStatsReqBody = never
 export type CourseYearlyStatsQuery = {
-  courses: string[]
+  courses: string | string[] // Non-array when only one course
   separate: string
-  combineSubstitutions: string
+  substitutions: string
   fromYearCode: string
   toYearCode: string
 }

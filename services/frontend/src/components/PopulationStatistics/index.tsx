@@ -46,7 +46,7 @@ import type { PopulationQuery } from '@/types/populationSearch'
 
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { formatToArray } from '@oodikone/shared/util'
 
@@ -55,7 +55,7 @@ const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${y
 const parseQueryFromUrl = (location: Location): [boolean, PopulationQuery] => {
   const skipQuery = !location.search
   const { years, semesters, programme, studentStatuses, combinedProgramme, studyTrack, showBachelorAndMaster, tag } =
-    parseQueryParams(location.search)
+    useParseQueryParams(location.search)
 
   const dirtyQuery = {
     years: formatToArray(years).map(year => parseInt(year, 10)),

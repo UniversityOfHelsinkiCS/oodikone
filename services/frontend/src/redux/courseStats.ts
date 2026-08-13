@@ -7,18 +7,18 @@ const courseStatsApi = RTKApi.injectEndpoints({
       query: ({
         courses,
         separate,
-        combineSubstitutions,
+        substitutions,
         fromYearCode,
         toYearCode,
       }: {
         courses: string[]
         separate?: boolean
-        combineSubstitutions?: boolean
+        substitutions?: boolean
         fromYearCode: string
         toYearCode: string
       }) => ({
         url: '/courseyearlystats',
-        params: { courses, separate, combineSubstitutions, fromYearCode, toYearCode },
+        params: { courses, separate, substitutions, fromYearCode, toYearCode },
       }),
       transformResponse: (courseStats: CourseYearlyStats[]) => {
         const data: Record<string, CourseYearlyStats> = {}
