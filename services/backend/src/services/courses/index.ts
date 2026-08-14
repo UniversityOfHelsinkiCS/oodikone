@@ -317,20 +317,6 @@ const getYearlyStatsOfNew =
     }
   }
 
-/**
- * Prevents user from opening a (course)population too large for server to handle
- */
-export const getPopulationSizeAllowed = async (courseGroupIds: string[], unification: Unification) => {
-  const courseIds = await getAllCourseIds(courseGroupIds)
-  const populationStudentAmount = await CreditModel.count({
-    col: 'student_studentnumber',
-    distinct: true,
-    where: { course_id: { [Op.in]: courseIds }, is_open: getIsOpen(unification) },
-  })
-
-  return populationStudentAmount <= MAX_POPULATION_SIZE
-}
-
 export const getCourseYearlyStats = async (
   courseGroupIds: string[],
   separate: boolean,
@@ -468,9 +454,9 @@ export const searchAndCombineSubstitutionGroupsToCodes = async (courseGroupIds: 
   })
 
   return [
-    ...new Set(
+    ...new Set([
       ...courseGroupIds,
-      ...substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(groupId => groupId))
-    ),
+      ...substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(groupId => groupId)),
+    ]),
   ]
 }
