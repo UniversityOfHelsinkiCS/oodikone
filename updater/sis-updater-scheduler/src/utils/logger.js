@@ -1,6 +1,4 @@
-const os = require('os')
 const winston = require('winston')
-const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 const LokiTransport = require('winston-loki')
 const Sentry = require('winston-transport-sentry-node').default
 
@@ -44,22 +42,6 @@ transports.push(
     labels: { app: 'updater-scheduler', environment: process.env.NODE_ENV ?? 'production' },
   })
 )
-
-if (isProduction && !isStaging) {
-  transports.push(
-    new WinstonGelfTransporter({
-      handleExceptions: true,
-      host: 'svm-116.cs.helsinki.fi',
-      port: 9503,
-      protocol: 'udp',
-      hostName: os.hostname(),
-      additional: {
-        app: 'updater-scheduler',
-        environment: 'production',
-      },
-    })
-  )
-}
 
 const logger = winston.createLogger({ transports })
 

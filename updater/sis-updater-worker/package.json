@@ -17,19 +17,15 @@
     "sequelize": "^6.37.8",
     "umzug": "^3.8.3",
     "winston": "^3.19.0",
-    "winston-gelf-transporter": "^1.0.2",
     "winston-loki": "^6.1.5",
     "winston-transport-sentry-node": "^3.0.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.18.0"
+    "nodemon": "3.1.14"
   },
   "overrides": {
     "winston-gelf-transporter": {
       "gelf-pro": "~1.4"
     }
-  },
-  "devDependencies": {
-    "nodemon": "3.1.14"
   }
 }

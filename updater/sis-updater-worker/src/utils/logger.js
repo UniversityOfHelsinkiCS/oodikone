@@ -1,6 +1,4 @@
-import os from 'os'
 import { format as winstonFormat, transports as winstonTransports, createLogger } from 'winston'
-import { WinstonGelfTransporter } from 'winston-gelf-transporter'
 import LokiTransport from 'winston-loki'
 import WinstonSentry from 'winston-transport-sentry-node'
 
@@ -46,22 +44,6 @@ transports.push(
     labels: { app: 'updater-worker', environment: process.env.NODE_ENV ?? 'production' },
   })
 )
-
-if (isProduction && !isStaging) {
-  transports.push(
-    new WinstonGelfTransporter({
-      handleExceptions: true,
-      host: 'svm-116.cs.helsinki.fi',
-      port: 9503,
-      protocol: 'udp',
-      hostName: os.hostname(),
-      additional: {
-        app: 'updater-worker',
-        environment: 'production',
-      },
-    })
-  )
-}
 
 const logger = createLogger({ transports })
 
