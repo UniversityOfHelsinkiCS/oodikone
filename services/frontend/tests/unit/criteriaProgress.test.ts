@@ -1,11 +1,9 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
-
 import { getProgressCriteria } from '@/redux/populations/criteriaProgress'
 import { CreditTypeCode, ProgressCriteria } from '@oodikone/shared/types'
 import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 import { PopulationCourseStatsCredit } from '@/redux/populations/util'
+import { describe, it, assert } from 'vitest'
 
 const createCriteria = (overrides: Partial<ProgressCriteria> = {}): ProgressCriteria => ({
   allCourseGroups: {

@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it, assert } from 'vitest'
 
 import { makeTableStats } from '@/util/creditsProduced'
 
