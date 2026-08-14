@@ -156,3 +156,6 @@ export const yearToYearCode = (year: number | string | undefined) =>
 /** NOTE: Defaults to year 1950 if yearCode undefined or < 1 and caps at 2100 */
 export const yearCodeToYear = (year: number | string | undefined) =>
   Math.min(Math.max((typeof year === 'string' ? Number(year) : (year ?? 1)) + 1949, 1950), 2100)
+
+/** Limit population statistics queries to this to avoid gateway timeout */
+export const MAX_POPULATION_SIZE = 15_000

@@ -58,6 +58,8 @@ export const CourseStatistics = () => {
   useEffect(() => {
     setSelected(current => {
       if (courses?.includes(current)) return current
+      setFromYearCode(1)
+      setToYearCode(yearToYearCode(new Date().getFullYear()))
       return courses?.[0] ?? ''
     })
   }, [coursesKey])

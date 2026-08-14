@@ -7,7 +7,6 @@ import { enrollmentTimeDateThreshold, getSemesterCodeAt, yearCodeToYear, yearToY
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
-import { isOpenUniCourseCode } from '../../util'
 import { now } from '../../util/clock'
 import { getSemestersAndYears, SemestersAndYears } from '../semesters'
 import { CourseYearlyStatsCounter } from './courseYearlyStatsCounter'
