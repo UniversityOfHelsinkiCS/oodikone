@@ -1,5 +1,7 @@
 import { CreditTypeCode, CriteriaYear, ProgressCriteria } from '@oodikone/shared/types'
-import { dateYearsFromNow, dateDaysFromNow } from '@oodikone/shared/util/datetime'
+import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
+import { dateYearsFromNow } from '@oodikone/shared/util/datetime'
+import { PopulationCourseStatsCredit } from './util'
 
 const yearMap: [string, keyof ProgressCriteria['courses']][] = [
   ['year1', 'yearOne'],
@@ -34,63 +36,85 @@ const getCriteriaBase = (criteria: ProgressCriteria): [boolean, Record<string, C
 
 export const getProgressCriteria = (
   criteria: ProgressCriteria,
-  criteriaCoursesBySubstitutionMap: Map<string, string>,
-  startDate: string,
-  hops: any, // StudentStudyPlan | undefined,
-  credits: any[] // AnonymousCredit[],
+  studyRightStartDate: string,
+  hops: StudentStudyPlan | undefined,
+  credits: PopulationCourseStatsCredit[]
 ) => {
   const [thereAreCriteria, criteriaChecked] = getCriteriaBase(criteria)
   if (!thereAreCriteria) return criteriaChecked
+  const passedCreditTypeCodes = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED]
+  const studyRightStartDateFromISO = new Date(studyRightStartDate)
 
-  const startDateFromISO = new Date(startDate)
-
+  /** Number of credits completed during each academic year */
   const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
-  const courses = credits.map(({ attainment_date, course_code, credits, credittypecode }) => ({
-    course_code,
-    credits,
-    credittypecode,
-    date: attainment_date < startDateFromISO ? dateDaysFromNow(startDateFromISO, 1).toISOString() : attainment_date,
-  }))
+  /** Credits produced by a student */
+  const courses = credits
+    .map(({ attainment_date, course_code, credits, credittypecode }) => ({
+      course_code,
+      credits,
+      credittypecode,
+      date: attainment_date,
+    }))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-  courses
-    .filter(({ course_code }) => !!criteriaCoursesBySubstitutionMap.get(course_code))
-    .filter(({ credittypecode }) =>
-      [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(credittypecode)
+  Object.entries(criteria.allCourseGroups).map(([mainCourseCode, substitutionGroups]) => {
+    const mainCourse = courses.find(
+      course => course.course_code === mainCourseCode && passedCreditTypeCodes.includes(course.credittypecode)
     )
-    .forEach(course => {
-      const courseDate = new Date(course.date)
-      const correctCode = criteriaCoursesBySubstitutionMap.get(course.course_code)!
+    yearMap.forEach(([yearToAdd, criteriaYear]) => {
+      if (criteria.courses[criteriaYear].includes(mainCourseCode)) {
+        const currentDate = criteriaChecked[yearToAdd].coursesSatisfied[mainCourseCode]
 
-      yearMap.forEach(([yearToAdd, criteriaYear]) => {
-        if (criteria.courses[criteriaYear].includes(correctCode)) {
-          const currentDate = criteriaChecked[yearToAdd].coursesSatisfied[correctCode]
+        // Credit found, course was passed normally
+        if (mainCourse) {
+          const courseDate = new Date(mainCourse.date)
+          // Add date to courses that have been passed
           if (!currentDate || courseDate < new Date(currentDate)) {
-            criteriaChecked[yearToAdd].coursesSatisfied[correctCode] = course.date
+            criteriaChecked[yearToAdd].coursesSatisfied[mainCourseCode] = mainCourse.date.toLocaleString()
+          }
+        } else {
+          // Credit for mainCourseCode not found, checking substitution_groups
+          const passedCourseCodes = courses
+            .filter(course => passedCreditTypeCodes.includes(course.credittypecode))
+            .map(({ course_code }) => course_code)
+          for (const group of substitutionGroups) {
+            // Add date to the course that has a completed substitution group
+            if (group.every(code => passedCourseCodes.includes(code))) {
+              criteriaChecked[yearToAdd].coursesSatisfied[mainCourseCode] = 'substituted'
+            }
           }
         }
-      })
+      }
+    })
+  })
+
+  // Count all passed credits from the student's study plan towards each academic year's credit criterion
+  courses.forEach(course => {
+    if (!passedCreditTypeCodes.includes(course.credittypecode) || !hops) return
+    const courseDate = new Date(course.date)
+    if (!(studyRightStartDateFromISO < courseDate)) return
+
+    const mainCourseCodes = Object.keys(criteria.allCourseGroups).filter(mainCourseCode => {
+      if (mainCourseCode === course.course_code) return true
+      return criteria.allCourseGroups[mainCourseCode].some(group => group.includes(course.course_code))
     })
 
-  courses.forEach(course => {
-    const courseDate = new Date(course.date)
-    const correctCode = criteriaCoursesBySubstitutionMap.get(course.course_code)!
+    const isInStudyPlan =
+      hops.included_courses.includes(course.course_code) ||
+      mainCourseCodes.some(code => hops.included_courses.includes(code))
+    if (!isInStudyPlan) return
 
-    if (
-      startDateFromISO < courseDate &&
-      !!hops &&
-      (hops.included_courses.includes(course.course_code) || hops.included_courses.includes(correctCode))
-    )
-      Object.keys(academicYears)
-        .filter((_, index) => courseDate < dateYearsFromNow(startDateFromISO, index + 1))
-        .forEach(year => (academicYears[year] += course.credits))
+    Object.keys(academicYears)
+      .filter((_, index) => courseDate < dateYearsFromNow(studyRightStartDateFromISO, index + 1))
+      .forEach(year => (academicYears[year] += course.credits))
   })
 
   yearMap.forEach(([yearToAdd, criteriaYear]) => {
     criteriaChecked[yearToAdd].totalSatisfied +=
       Object.values(criteriaChecked[yearToAdd].coursesSatisfied).filter(course => !!course).length ?? 0
     // UPDATE CREDIT CRITERIA
-    if (!!criteria.credits[criteriaYear] && criteria.credits[criteriaYear] < academicYears[yearToAdd]) {
+    if (!!criteria.credits[criteriaYear] && criteria.credits[criteriaYear] <= academicYears[yearToAdd]) {
       criteriaChecked[yearToAdd].credits = true
       criteriaChecked[yearToAdd].totalSatisfied += 1
     }

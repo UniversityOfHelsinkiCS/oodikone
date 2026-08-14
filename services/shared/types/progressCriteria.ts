@@ -1,5 +1,5 @@
 export type ProgressCriteria = {
-  allCourses: Record<string, string[]>
+  allCourseGroups: Record<string, string[][]>
   courses: {
     yearOne: string[]
     yearTwo: string[]

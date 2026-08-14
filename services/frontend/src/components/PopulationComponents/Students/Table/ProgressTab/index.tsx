@@ -40,37 +40,85 @@ dayjsExtend(isSameOrAfter)
 
 const columnHelper = createColumnHelper<FormattedStudent>()
 
-const getCourses = (
+/** Return course + all of it's substitution groups */
+const getCourseGroups = (
   courseCode: string,
   criteria: ProgressCriteria | undefined,
   student: FormattedStudent
-): StudentCourse[] => {
-  return student.courses.filter(
-    course => course.course_code === courseCode || criteria?.allCourses[courseCode]?.includes(course.course_code)
-  )
+): StudentCourse[][] => {
+  const studentCourseCodes = student.courses.map(({ course_code }) => course_code)
+
+  // Return groups that have all courses in student.courses
+  const courseGroups: StudentCourse[][] = []
+  for (const group of [[courseCode]].concat(criteria?.allCourseGroups[courseCode] ?? [])) {
+    if (group.every(code => studentCourseCodes.includes(code))) {
+      // We know all of the group's courses exist, we just checked that
+      courseGroups.push(
+        ...group.map(code =>
+          student.courses
+            .filter(course => course.course_code === code)
+            .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        )
+      )
+    }
+  }
+  return courseGroups
 }
 
-const hasCreditTransfer = (courses: StudentCourse[]) =>
-  courses?.some(course => course.credittypecode === CreditTypeCode.APPROVED)
+/**
+  Filter out failed courses that don't "break" a given group eg. remove the only instance of a course code
 
-const hasPassedDuringAcademicYear = (courses: StudentCourse[], start: dayjs.Dayjs, end: dayjs.Dayjs) => {
-  return (
-    courses.some(course => course.passed) &&
-    courses.some(course => dayjs(course.date).isBetween(dayjs(start), dayjs(end)))
-  )
+  NOTE: Does not automatically remove all failed courses!
+*/
+const filterFailed = (group: StudentCourse[]) => (course: StudentCourse) =>
+  course.passed || !group.find(otherCourse => course.course_code === otherCourse.course_code && otherCourse.passed)
+
+const hasCreditTransfer = (courseGroups: StudentCourse[][]) =>
+  courseGroups.some(group => {
+    const passedCredits = group.filter(filterFailed(group))
+    return passedCredits.length === 0
+      ? false
+      : passedCredits.some(course => course.credittypecode === CreditTypeCode.APPROVED)
+  })
+
+/** Check if any courseGroup has
+  1. all courses passed
+  2. *LATEST* attainment gotten during the wanted academic year
+  3. All attainments gotten before the wanted academic year's end
+  */
+const hasPassedDuringAcademicYear = (courseGroups: StudentCourse[][], start: dayjs.Dayjs, end: dayjs.Dayjs) => {
+  return courseGroups.some(group => {
+    const passedCredits = group.filter(filterFailed(group))
+    return passedCredits.length === 0
+      ? false
+      : passedCredits.some(credit => dayjs(credit.date).isBetween(dayjs(start), dayjs(end))) &&
+          passedCredits.every(credit => dayjs(credit.date).isBefore(dayjs(end)))
+  })
 }
 
-const hasPassedOutsideAcademicYear = (courses: StudentCourse[]) => courses?.some(course => course.passed)
+/** Check if any group has only passed courses */
+const hasPassedOutsideAcademicYear = (courseGroups: StudentCourse[][]) =>
+  courseGroups.some(group => {
+    const passedCredits = group.filter(filterFailed(group))
+    return passedCredits.length === 0 ? false : passedCredits.every(credit => credit.passed)
+  })
 
-const hasFailed = (courses: StudentCourse[]) => courses?.some(course => course.passed === false)
+/**
+  Check if there is a failed course that was not removed by the filterFailed eg. there is
+  a failed course that has no passed attainment
+*/
+const hasFailed = (courseGroups: StudentCourse[][]) =>
+  courseGroups.some(group => {
+    const passedCredits = group.filter(filterFailed(group))
+    return passedCredits.length === 0 ? false : passedCredits.some(course => !course.passed)
+  })
 
-const hasEnrolled = (student: FormattedStudent, courseCode: string) => {
-  return student.enrollments?.map(course => course.course_code).includes(courseCode)
-}
+/** Return enrollments only for main course codes */
+const hasEnrolled = (student: FormattedStudent, courseCode: string) =>
+  student.enrollments?.map(course => course.course_code).includes(courseCode)
 
-const getEnrollment = (student: FormattedStudent, courseCode: string) => {
-  return student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
-}
+const getEnrollment = (student: FormattedStudent, courseCode: string) =>
+  student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
 
 const getRowContent = (
   student: FormattedStudent,
@@ -87,7 +135,7 @@ const getRowContent = (
     return null
   }
 
-  const courses = getCourses(courseCode, criteria, student)
+  const courses = getCourseGroups(courseCode, criteria, student)
 
   if (hasCreditTransfer(courses)) {
     return <SwapHorizIcon color="success" />
@@ -122,14 +170,18 @@ const getExcelText = (
     return student.criteriaProgress[year]?.credits ? 'Passed' : ''
   }
 
-  const courses = getCourses(courseCode, criteria, student)
+  const courseGroups = getCourseGroups(courseCode, criteria, student)
 
-  if (hasPassedOutsideAcademicYear(courses)) {
-    return `Passed ${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
+  if (hasPassedOutsideAcademicYear(courseGroups)) {
+    const latestCompletedGroup = courseGroups.find(group => group.every(course => course.passed))
+    return `Passed ${latestCompletedGroup?.length === 1 ? formatDate(latestCompletedGroup[0]?.date, DateFormat.ISO_DATE) : '(substituted)'}`
   }
 
-  if (hasFailed(courses)) {
-    return `Failed ${formatDate(courses[0].date, DateFormat.ISO_DATE)}`
+  if (hasFailed(courseGroups)) {
+    const latestFailedCourse = courseGroups
+      .find(group => group.some(course => !course.passed))
+      ?.find(course => !course.passed)
+    return `Failed ${formatDate(latestFailedCourse ? latestFailedCourse.date : '(substituted)', DateFormat.ISO_DATE)}`
   }
 
   if (hasEnrolled(student, courseCode)) {

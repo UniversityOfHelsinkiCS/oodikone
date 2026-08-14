@@ -2,10 +2,13 @@ import type { FetchBaseQueryMeta } from '@reduxjs/toolkit/query'
 import { getProgressCriteria } from '@/redux/populations/criteriaProgress'
 import type { PopulationCourseStats } from '@oodikone/shared/routes/populations'
 import { CreditTypeCode } from '@oodikone/shared/types'
-import type { FormattedStudent, ProgressCriteria } from '@oodikone/shared/types'
+import type { FormattedStudent, ProgressCriteria, Unarray } from '@oodikone/shared/types'
+
+type PopulationCourseStatsEnrollment = Omit<Unarray<PopulationCourseStats['enrollments']>, 'studentnumber'>
+export type PopulationCourseStatsCredit = Omit<Unarray<PopulationCourseStats['credits']>, 'student_studentnumber'>
 
 export interface ExpandedCourseStats extends PopulationCourseStats {
-  dataByStudent: Map<string, [any[], any[]]>
+  dataByStudent: Map<string, [PopulationCourseStatsEnrollment[], PopulationCourseStatsCredit[]]>
 }
 
 type RequiredFields = {
@@ -25,7 +28,13 @@ export const formatPopulationData = <T extends RequiredFields>(
   query: any
 ) => {
   const code = query?.programme ?? ''
-  const { credits, enrollments } = coursestatistics
+  // TODO: These are typed incorrectly with attainment_date and enrollment_date_time as Dates (they are strings)
+  const credits = coursestatistics.credits.sort(
+    (a, b) => new Date(b.attainment_date).getTime() - new Date(a.attainment_date).getTime()
+  )
+  const enrollments = coursestatistics.enrollments.sort(
+    (a, b) => new Date(b.enrollment_date_time).getTime() - new Date(a.enrollment_date_time).getTime()
+  )
 
   const studentNumbers = students.map(({ studentNumber }) => studentNumber)
   const creditsAndEnrollmentsByStudent: ExpandedCourseStats['dataByStudent'] = new Map(
@@ -42,32 +51,15 @@ export const formatPopulationData = <T extends RequiredFields>(
     creditsAndEnrollmentsByStudent.get(studentnumber)![1].push(rest)
   }
 
-  const criteriaCoursesBySubstitutionMap = new Map<string, string>()
-  for (const [courseCode, substitutionCodes] of Object.entries(otherParams.criteria.allCourses)) {
-    criteriaCoursesBySubstitutionMap.set(courseCode, courseCode)
-
-    for (const substitutionCode of substitutionCodes) {
-      criteriaCoursesBySubstitutionMap.set(substitutionCode, courseCode)
-    }
-  }
-
   const formattedStudents = students.map(student => {
     const [enrollments, credits] = creditsAndEnrollmentsByStudent.get(student.studentNumber)!
     const hops = student.studyplans.find(plan => plan.programme_code === code)
 
     return {
       ...student,
-      criteriaProgress: getProgressCriteria(
-        otherParams.criteria,
-        criteriaCoursesBySubstitutionMap,
-        student.studyrightStart,
-        hops,
-        credits
-      ),
+      criteriaProgress: getProgressCriteria(otherParams.criteria, student.studyrightStart, hops, credits),
       courses: credits.map(credit => {
-        const passed = [CreditTypeCode.PASSED, CreditTypeCode.IMPROVED, CreditTypeCode.APPROVED].includes(
-          credit.credittypecode
-        )
+        const passed = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
 
         return {
           course_code: credit.course_code,

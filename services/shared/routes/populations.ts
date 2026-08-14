@@ -58,7 +58,10 @@ export type CloseToGraduationData = {
 
 export type PopulationCourseStats = {
   courses: CourseStats[]
-  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber'>[]
+  enrollments: Pick<
+    Enrollment,
+    'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
+  >[]
   credits: Pick<
     Credit,
     | 'grade'

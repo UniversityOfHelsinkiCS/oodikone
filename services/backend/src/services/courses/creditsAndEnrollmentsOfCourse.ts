@@ -198,7 +198,7 @@ export const getEnrollmentsForCourses = async (
         completedEnrollments.push(
           studentEnrollments
             .filter(enrollment => group.includes(enrollment.course_code))
-            .sort((a, b) => b.enrollment_date_time.getTime() - a.enrollment_date_time.getTime())
+            .sort((a, b) => new Date(b.enrollment_date_time).getTime() - new Date(a.enrollment_date_time).getTime())
         )
       } else {
         // Partially completed enrollments for a group, skipping...

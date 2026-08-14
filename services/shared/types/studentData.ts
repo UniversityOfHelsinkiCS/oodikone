@@ -103,7 +103,7 @@ export type StudentPageStudent = {
 
 export type StudentCourse = {
   course_code: string
-  date: string
+  date: Date
   passed: boolean
   grade: string
   credits: number
