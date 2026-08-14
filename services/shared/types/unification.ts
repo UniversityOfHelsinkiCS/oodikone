@@ -1,9 +1,9 @@
-// ? Are these two the same? Should they be combined?
-
 export enum Unification {
   REGULAR = 'regular',
   OPEN = 'open',
   UNIFY = 'unify',
 }
 
-export type UnifyStatus = 'unifyStats' | 'openStats' | 'regularStats' | undefined
+/** @returns valid Unification state if exists, else undefined */
+export const parseUnification = (text = '') =>
+  ['regular', 'open', 'unify'].includes(text) ? (text as Unification) : undefined
