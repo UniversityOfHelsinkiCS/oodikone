@@ -3,9 +3,8 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 
-import { difference, flatten, max, min, pickBy, uniq } from 'lodash-es'
+import { difference, pickBy, uniq } from 'lodash-es'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
 
 import { ProgrammeDropdown } from '@/components/CourseStatistics/ProgrammeDropdown'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -17,14 +16,41 @@ import { countTotalStats } from '@/pages/CourseStatistics/CourseTab/SingleCourse
 import { ResultTabs } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs'
 import { YearFilter } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/YearFilter'
 import { ALL, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { useGetMaxYearsToCreatePopulationFromQuery } from '@/redux/populations'
 import { DoNotDisturbIcon } from '@/theme'
 import { AvailableStats, FormattedStats, ProgrammeStats } from '@/types/courseStat'
 import { DropdownOption } from '@/types/dropdownOption'
 import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 import { Name } from '@oodikone/shared/types'
-import { enrollmentTimeDateThresholdYearCode, yearToYearCode } from '@oodikone/shared/util'
+import { enrollmentTimeDateThresholdYearCode, MAX_POPULATION_SIZE } from '@oodikone/shared/util'
 import { Attempts, CourseStat, Enrollment, Students } from '@oodikone/shared/types/courseYearlyStats'
+import { Link } from '@/components/common/Link'
+
+const RenderShowPopulation = ({
+  disabled,
+  to,
+  accessToStats,
+}: {
+  disabled: boolean
+  to: string
+  accessToStats: boolean
+}) => {
+  if (!accessToStats) return null
+  const maxPopulationSizeText = `The maximum population size is ${MAX_POPULATION_SIZE} students. Please select fewer years.`
+
+  return disabled ? (
+    <Tooltip arrow placement="right" title={maxPopulationSizeText}>
+      <span>
+        <Button disabled variant="contained">
+          Show population
+        </Button>
+      </span>
+    </Tooltip>
+  ) : (
+    <Link to={to}>
+      <Button variant="contained">Show population</Button>
+    </Link>
+  )
+}
 
 const countFilteredStudents = (
   stat: Record<string, string[]>,
@@ -74,7 +100,6 @@ export const SingleCourseStats = ({
   const [primary, setPrimary] = useState<string[]>([ALL.value])
   const [comparison, setComparison] = useState<string[]>([])
 
-  const navigate = useNavigate()
   const { getTextIn } = useLanguage()
   const { semesters, years: semesterYears } = useSemesters()
 
@@ -83,8 +108,8 @@ export const SingleCourseStats = ({
 
   const courseStats = stats[courseGroupId]
 
-  const minYearCode = min(courseStats.statistics.map(r => r.yearCode))!
-  const maxYearCode = max(courseStats.statistics.map(r => r.yearCode))!
+  const minYearCode = Math.min(...courseStats.statistics.map(r => r.yearCode))!
+  const maxYearCode = Math.max(...courseStats.statistics.map(r => r.yearCode))
 
   const [minFromYearCode, setMinFromYearCode] = useState(minYearCode)
   const [maxToYearCode, setMaxToYearCode] = useState(maxYearCode)
@@ -94,18 +119,6 @@ export const SingleCourseStats = ({
     setFromYearCode(minYearCode)
     setToYearCode(maxYearCode)
   }, [])
-
-  const uniqueCourseCodes = [
-    ...new Set(
-      [courseGroupId].concat(
-        courseStats?.substitutionGroups.flatMap(group => group.flatMap(({ groupId }) => groupId)) ?? []
-      )
-    ),
-  ]
-
-  const { data: maxYears } = useGetMaxYearsToCreatePopulationFromQuery({
-    courseCodes: JSON.stringify(uniqueCourseCodes),
-  })
 
   const semestersReversed = Object.values(semesters ?? [])
     .map(({ semestercode, name, yearcode }) => ({
@@ -123,19 +136,9 @@ export const SingleCourseStats = ({
     }))
     .reverse()
 
-  let maxYearsToCreatePopulationFrom = 0
-  if (maxYears) {
-    switch (openOrRegular) {
-      case 'openStats':
-        maxYearsToCreatePopulationFrom = maxYears.openCourses
-        break
-      case 'regularStats':
-        maxYearsToCreatePopulationFrom = maxYears.uniCourses
-        break
-      default:
-        maxYearsToCreatePopulationFrom = maxYears.unifyCourses
-    }
-  }
+  const populationSize = courseStats.statistics
+    .flatMap(stat => stat.students.studentNumbers.length)
+    .reduce((acc, cur) => acc + cur, 0)
 
   useEffect(() => {
     if (primary.every(course => !programmes.map(programme => programme.key).includes(course))) {
@@ -369,7 +372,7 @@ export const SingleCourseStats = ({
     const newYear = event.target.value as number
     if (newYear >= fromYearCode) {
       setToYearCode(newYear)
-      setMaxToYearCode(max([maxToYearCode, newYear]))
+      setMaxToYearCode(Math.max(maxToYearCode, newYear))
     }
   }
 
@@ -377,7 +380,7 @@ export const SingleCourseStats = ({
     const newYear = event.target.value as number
     if (newYear <= toYearCode) {
       setFromYearCode(newYear)
-      setMinFromYearCode(min([minFromYearCode, newYear]))
+      setMinFromYearCode(Math.min(minFromYearCode, newYear))
     }
   }
 
@@ -412,7 +415,7 @@ export const SingleCourseStats = ({
     if (!primary.includes(ALL.value)) {
       const excludedStudents = result
         .filter(({ key }) => excludedProgrammes.includes(key) && key !== 'ALL')
-        .reduce((res, { students }) => [...res, ...flatten(Object.values(students))], [] as string[])
+        .reduce((res, { students }) => [...res, ...Object.values(students).flat()], [] as string[])
       const uniqueExcludedStudents = uniq(excludedStudents)
       result.push({
         key: 'EXCLUDED',
@@ -428,37 +431,13 @@ export const SingleCourseStats = ({
     )
   }
 
-  const showPopulation = () => {
-    const queryObject = {
-      from: fromYearCode,
-      to: toYearCode,
-      courses: courseGroupId,
-      separate,
-      unifyCourses: openOrRegular,
-      substitutions: substitutions,
-    }
-    const searchString = queryParamsToString(queryObject)
-    void navigate(`/coursepopulation?${searchString}`)
-  }
-
-  const renderShowPopulation = (disabled = false) => {
-    if (!userHasAccessToAllStats) {
-      return null
-    }
-    return (
-      <Button disabled={disabled} onClick={showPopulation} variant="contained">
-        Show population
-      </Button>
-    )
-  }
-
   const statistics = filteredProgrammeStatistics()
   const filteredYears = getFilteredYears()
 
   const timeFilter = (_, value: string) => Number(value) >= fromYearCode && Number(value) <= toYearCode
   const filteredProgrammes = programmes
     .map(programme => {
-      const students = new Set(flatten(Object.values(pickBy(programme.students, timeFilter))))
+      const students = new Set(Object.values(pickBy(programme.students, timeFilter)).flat())
       return { ...programme, students: [...students], size: students.size }
     })
     .filter(programme => programme.size > 0)
@@ -476,10 +455,15 @@ export const SingleCourseStats = ({
     value: programme.value,
   }))
 
-  const maxYearText = `The maximum time range to generate a population for this course is ${Math.max(
-    0,
-    maxYearsToCreatePopulationFrom
-  )} ${maxYearsToCreatePopulationFrom === 1 ? 'year' : 'years'}`
+  const queryObject = {
+    from: fromYearCode,
+    to: toYearCode,
+    courses: courseGroupId,
+    separate,
+    unifyCourses: openOrRegular,
+    substitutions: substitutions,
+  }
+  const populationLink = `/coursepopulation?${queryParamsToString(queryObject)}`
 
   return (
     <Stack spacing={2}>
@@ -492,13 +476,11 @@ export const SingleCourseStats = ({
             toYear={toYearCode}
             years={filteredYears}
           />
-          {maxYearsToCreatePopulationFrom < toYearCode - fromYearCode + 1 ? (
-            <Tooltip arrow placement="right" title={maxYearText}>
-              <span>{renderShowPopulation(true)}</span>
-            </Tooltip>
-          ) : (
-            renderShowPopulation()
-          )}
+          <RenderShowPopulation
+            disabled={MAX_POPULATION_SIZE < populationSize}
+            to={populationLink}
+            accessToStats={userHasAccessToAllStats}
+          />
         </Stack>
       </Section>
       {userHasAccessToAllStats ? (
