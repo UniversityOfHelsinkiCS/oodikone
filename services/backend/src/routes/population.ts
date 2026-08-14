@@ -18,11 +18,7 @@ import {
 import { Unification } from '@oodikone/shared/types'
 import { keyBy, mapToProviders, MAX_POPULATION_SIZE } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
-import {
-  getCourseProvidersForCourses,
-  getPopulationSizeAllowed,
-  searchAndCombineSubstitutionGroupsToCodes,
-} from '../services/courses'
+import { getCourseProvidersForCourses, searchAndCombineSubstitutionGroupsToCodes } from '../services/courses'
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
@@ -184,26 +180,20 @@ router.get<
     studentsUserCanAccess: allStudentsUserCanAccess,
   } = req.user
   const { courses, from, to, separate, unifyCourses, substitutions } = req.query
-  console.dir(req.query, { depth: null })
 
-  if (!courses?.length || !from || !to) {
+  const coursesArray = handleQueryArrays(courses) as string[]
+
+  if (!coursesArray.length || !from || !to) {
     return res.status(400).json({ error: 'Missing required parameters.' })
   }
 
   const includeSubstitutions = substitutions === 'true'
   const isSeparate = separate === 'true'
   const unification = parseUnification(unifyCourses) ?? Unification.UNIFY
-  const coursesArray = handleQueryArrays(courses)
 
   const courseGroupIds = includeSubstitutions
     ? await searchAndCombineSubstitutionGroupsToCodes(coursesArray)
     : coursesArray
-
-  const populationWithinSallitutRaamit = await getPopulationSizeAllowed(courseGroupIds, unification)
-  if (!populationWithinSallitutRaamit) {
-    logger.warn(`Attempted to load course population beyond allowed limits. ${JSON.stringify(req.query)}`)
-    return res.status(400).json({ error: 'Population size too large.' }).end()
-  }
 
   const relevantCourseIds = await getAllCourseIds(courseGroupIds)
   const studentNumbers = await findByCourseAndSemesters(
@@ -213,6 +203,11 @@ router.get<
     isSeparate,
     unification
   )
+
+  if (studentNumbers.size > MAX_POPULATION_SIZE) {
+    logger.warn(`Attempted to load course population beyond allowed limits. ${JSON.stringify(req.query)}`)
+    return res.status(400).json({ error: 'Population size too large.' }).end()
+  }
 
   const courseProviders = await getCourseProvidersForCourses(relevantCourseIds)
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
@@ -227,7 +222,6 @@ router.get<
   const studyRights = []
   const tagMap = await getStudentTagMap(studyRights, [...studentNumbers], userId)
   const filterCreditsAndEnrollmentsByDate = true
-  console.log('statisticsOf')
   const result = await statisticsOf(
     [...studentNumbers],
     studyRights,
@@ -236,7 +230,6 @@ router.get<
     startDate?.toISOString(),
     endDate?.toISOString()
   )
-  console.log('end statisticsOf')
   const processed = obfuscateStuff({
     result,
 
@@ -245,7 +238,7 @@ router.get<
     studentsUserCanAccess,
   })
 
-  return res.json({ ...processed, mainCourseCodes: [], allCourseCodes: [] })
+  return res.json({ ...processed, mainCourseCodes: [], allCourseCodes: [] }).end()
 })
 
 // Used in custom population and single study guidance groups
