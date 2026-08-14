@@ -106,7 +106,7 @@ export const getTextInWithOpen = (
   return courseName
 }
 
-export const getUnifyTextIn = (unifyCourses: string) => {
+export const getUnifyTextIn = (unifyCourses?: string) => {
   switch (unifyCourses) {
     case 'regularStats':
       return 'Normal'
