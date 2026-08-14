@@ -19,11 +19,6 @@
     "winston-loki": "^6.1.5",
     "winston-transport-sentry-node": "^3.0.0"
   },
-  "overrides": {
-    "winston-gelf-transporter": {
-      "gelf-pro": "~1.4"
-    }
-  },
   "devDependencies": {
     "nodemon": "3.1.14"
   }

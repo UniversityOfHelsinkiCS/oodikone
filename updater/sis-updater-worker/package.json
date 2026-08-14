@@ -22,10 +22,5 @@
   },
   "devDependencies": {
     "nodemon": "3.1.14"
-  },
-  "overrides": {
-    "winston-gelf-transporter": {
-      "gelf-pro": "~1.4"
-    }
   }
 }
