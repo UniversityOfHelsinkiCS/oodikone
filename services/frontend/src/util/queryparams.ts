@@ -9,8 +9,8 @@ import { useLocation } from 'react-router'
  * @example
  * const args = useParseQueryParams()
  * const string1 = args.item1?.[0]
- * const string2 = [args.item2!]
  * const arrayType = args.noDestructuring
+ * const bool = !!args.isBool?.[0]
  */
 export const useParseQueryParams = (): Record<string, undefined | string[]> => {
   const location = useLocation()

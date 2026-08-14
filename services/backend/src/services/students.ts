@@ -1,7 +1,7 @@
-import { Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
-import { CreditTypeCode, EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
+import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
 import { dateMaxFromList } from '@oodikone/shared/util/datetime'
@@ -18,6 +18,7 @@ import {
   SISStudyRightElementModel,
 } from '../models'
 import { TagModel, TagStudentModel } from '../models/kone'
+import { dbConnections } from '../database/connection'
 
 const byStudentNumber = async (studentNumber: string) => {
   const [student, tags] = await Promise.all([
@@ -110,13 +111,13 @@ const byStudentNumber = async (studentNumber: string) => {
   }
 }
 
-const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] => {
+const getUnifyStatus = (unifyCourses: Unification): [boolean] | [true, false] => {
   switch (unifyCourses) {
-    case 'unifyStats':
+    case 'unify':
       return [true, false]
-    case 'openStats':
+    case 'open':
       return [true]
-    case 'regularStats':
+    case 'regular':
       return [false]
     default:
       return [true, false]
@@ -156,104 +157,47 @@ export const getStartAndEndDates = async (from: number, to: number, separate: bo
   Returns students who have an attainment/enrollment between to and from.
  */
 export const findByCourseAndSemesters = async (
-  codes: string[],
+  courseIds: string[],
   from: number,
   to: number,
   separate: boolean,
-  unifyCourses: UnifyStatus = 'unifyStats'
+  unifyCourses: Unification = Unification.UNIFY
 ) => {
   /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
-
-  const { startDate: startDate, endDate: endDate } = await getStartAndEndDates(from, to, separate)
+  const { startDate, endDate } = await getStartAndEndDates(from, to, separate)
+  if (!courseIds.length || !startDate || !endDate) return new Set<string>()
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
-  const credits = (await CreditModel.findAll({
-    raw: true,
-    attributes: [
-      ['student_studentnumber', 'studentnumber'],
-      'course_code',
-      ['attainment_date', 'date'],
-      'credittypecode',
-    ],
-    where: {
-      course_code: { [Op.in]: codes },
-      is_open: unifyStatus,
-      attainment_date: { [Op.between]: [startDate, endDate] },
-      credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
-    },
-    order: [
-      ['attainment_date', 'DESC'],
-      ['credittypecode', 'ASC'],
-    ],
-  })) as unknown as Array<{
-    studentnumber: CreditModel['student_studentnumber']
-    course_code: CreditModel['course_code']
-    date: CreditModel['attainment_date']
-    credittypecode: CreditModel['credittypecode']
-  }>
-  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
-
-  const enrollments = (await EnrollmentModel.findAll({
-    raw: true,
-    attributes: ['studentnumber', 'course_code', ['enrollment_date_time', 'date']],
-    where: {
-      course_code: { [Op.in]: codes },
-      is_open: unifyStatus,
-      enrollment_date_time: {
-        [Op.between]: [dateMaxFromList(startDate ?? new Date(0), enrollmentTimeDateThresholdAcademicYear), endDate],
+  const creditStudents = (
+    await CreditModel.findAll({
+      raw: true,
+      attributes: ['student_studentnumber'],
+      where: {
+        course_id: { [Op.in]: courseIds },
+        is_open: unifyStatus,
+        attainment_date: { [Op.between]: [startDate, endDate] },
+        credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
       },
-      state: EnrollmentState.ENROLLED,
-    },
-    order: [['enrollment_date_time', 'DESC']],
-  })) as unknown as Array<{
-    studentnumber: EnrollmentModel['studentnumber']
-    course_code: EnrollmentModel['course_code']
-    date: EnrollmentModel['enrollment_date_time']
-  }>
-  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
+    })
+  ).map(({ student_studentnumber }) => student_studentnumber)
 
-  const studentCreditsAndEnrollments: Record<
-    string,
-    Array<{
-      studentnumber: string
-      course_code: string
-      date: Date
-      type: 'credit' | 'enrollment'
-      credittypecode?: CreditTypeCode
-    }>
-  > = {}
+  const enrollmentStudents = (
+    await EnrollmentModel.findAll({
+      raw: true,
+      attributes: ['studentnumber'],
+      where: {
+        course_id: { [Op.in]: courseIds },
+        is_open: unifyStatus,
+        enrollment_date_time: {
+          [Op.between]: [dateMaxFromList(startDate ?? new Date(0), enrollmentTimeDateThresholdAcademicYear), endDate],
+        },
+        state: EnrollmentState.ENROLLED,
+      },
+    })
+  ).map(({ studentnumber }) => studentnumber)
 
-  for (const credit of credits) {
-    studentCreditsAndEnrollments[credit.studentnumber] ??= []
-    studentCreditsAndEnrollments[credit.studentnumber].push({ ...credit, type: 'credit' })
-  }
-  for (const enrollment of enrollments) {
-    studentCreditsAndEnrollments[enrollment.studentnumber] ??= []
-    studentCreditsAndEnrollments[enrollment.studentnumber].push({ ...enrollment, type: 'enrollment' })
-  }
-
-  const passedCreditTypes = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED]
-
-  const filteredStudentNumbers = new Set<string>()
-  Object.entries(studentCreditsAndEnrollments).map(([studentNumber, creditsOrEnrollments]) => {
-    const latestCredit = creditsOrEnrollments.find(
-      entry => entry.type === 'credit' && codes.includes(entry.course_code)
-    )
-    const latestEnrollment = creditsOrEnrollments.find(
-      entry => entry.type === 'enrollment' && codes.includes(entry.course_code)
-    )
-
-    if (latestCredit && passedCreditTypes.includes(latestCredit.credittypecode!)) {
-      filteredStudentNumbers.add(studentNumber)
-    } else if (latestCredit?.credittypecode === CreditTypeCode.FAILED) {
-      filteredStudentNumbers.add(studentNumber)
-    } else if (latestEnrollment) {
-      filteredStudentNumbers.add(studentNumber)
-    }
-  })
-
-  return [...filteredStudentNumbers]
+  return new Set([...creditStudents, ...enrollmentStudents])
 }
 
 const formatSharedStudentData = ({

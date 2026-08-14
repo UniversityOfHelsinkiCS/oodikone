@@ -3,7 +3,13 @@ import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
-import { enrollmentTimeDateThreshold, getSemesterCodeAt, yearCodeToYear, yearToYearCode } from '@oodikone/shared/util'
+import {
+  enrollmentTimeDateThreshold,
+  getSemesterCodeAt,
+  MAX_POPULATION_SIZE,
+  yearCodeToYear,
+  yearToYearCode,
+} from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
@@ -15,8 +21,9 @@ import {
   getEnrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
-import { FormattedProgramme, getIsOpen } from './helpers'
+import { FormattedProgramme, getAllCourseIds, getIsOpen } from './helpers'
 import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
+import { difference } from 'lodash-es'
 
 const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): FormattedProgramme => ({
   code: studyRightElement.code,
@@ -311,38 +318,17 @@ const getYearlyStatsOfNew =
   }
 
 /**
-  Mostly-legacy function that prevents user from opening too big of a populations.
-  At the moment the threshold to prevent a population is so high it will never trigger.
+ * Prevents user from opening a (course)population too large for server to handle
  */
-export const maxYearsToCreatePopulationFrom = async (courseCodes: string[], unification: Unification) => {
-  const lastAttainmentDate = (await CourseModel.findOne({
-    attributes: [[dbFn('MAX', dbCol('max_attainment_date')), 'date']],
-    where: {
-      code: { [Op.in]: courseCodes },
-    },
-    raw: true,
-  })) as { date: Date } | null
-
-  if (lastAttainmentDate?.date == null) return 0
-
-  /** Amount of years before latest attainment that the attainment count is calcucated for */
-  const yearRange = 6
-
-  const newestAttainmentYear = lastAttainmentDate?.date.getFullYear()
-  const attainmentDateThreshold = new Date(newestAttainmentYear - yearRange, 0, 1)
-
-  /** Amount of attainments between latest-attainment-year - yearRange and latest attainment date */
-  const attainmentsWithinThreshold = await CreditModel.count({
-    where: {
-      course_code: { [Op.in]: courseCodes },
-      attainment_date: { [Op.gt]: attainmentDateThreshold },
-      is_open: getIsOpen(unification),
-    },
+export const getPopulationSizeAllowed = async (courseGroupIds: string[], unification: Unification) => {
+  const courseIds = await getAllCourseIds(courseGroupIds)
+  const populationStudentAmount = await CreditModel.count({
+    col: 'student_studentnumber',
+    distinct: true,
+    where: { course_id: { [Op.in]: courseIds }, is_open: getIsOpen(unification) },
   })
 
-  /** Limit the allowed attainments to 15_000 during the $yearRange years */
-  const maxAllowedAttainments = 15_000 * yearRange
-  return Math.round(Math.max(1, maxAllowedAttainments / attainmentsWithinThreshold))
+  return populationStudentAmount <= MAX_POPULATION_SIZE
 }
 
 export const getCourseYearlyStats = async (
@@ -448,15 +434,15 @@ export const getCourseYearlyStats = async (
   return stats as CourseYearlyStats[]
 }
 
-export const getCourseProvidersForCourses = async (codes: string[]) =>
+export const getCourseProvidersForCourses = async (courseIds: string[]) =>
   (
     await OrganizationModel.findAll({
       attributes: ['code'],
       include: {
         model: CourseModel,
         where: {
-          code: {
-            [Op.in]: codes,
+          id: {
+            [Op.in]: courseIds,
           },
         },
       },
@@ -471,21 +457,20 @@ export const getCourseDetails = async (codes: string[]) =>
     raw: true,
   })
 
-// Add all substitution_groups and coursecodes together
-export const searchAndCombineSubstitutionGroupsToCodes = async (coursecodes: string[]) => {
+// Get main course and all substitutions
+export const searchAndCombineSubstitutionGroupsToCodes = async (courseGroupIds: string[]) => {
   const substitutionGroups = await CourseModel.findAll({
     raw: true,
-    attributes: ['substitution_groups'],
+    attributes: ['substitutionGroups'],
     where: {
-      code: { [Op.in]: coursecodes },
+      groupId: { [Op.in]: courseGroupIds },
     },
   })
 
   return [
     ...new Set(
-      coursecodes.concat(
-        substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(code => code))
-      )
+      ...courseGroupIds,
+      ...substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(groupId => groupId))
     ),
   ]
 }
