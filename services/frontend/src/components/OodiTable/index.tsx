@@ -1,5 +1,5 @@
 import type { ColumnDef, RowData, Table, TableOptions } from '@tanstack/react-table'
-import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/react-table'
 import { useState, type ReactNode } from 'react'
 
 import { AggregationRowFeature, VerticalHeaderFeature, ZebrastripesFeature } from '@/components/OodiTable/features'
@@ -45,6 +45,7 @@ export const OodiTable = <TData extends RowData>({
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
       },
       options
     )
