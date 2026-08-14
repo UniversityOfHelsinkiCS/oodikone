@@ -2,11 +2,11 @@ import { Credit, Enrollment, Course } from '../models'
 import {
   Name,
   ProgrammeModuleWithRelevantAttributes,
-  UnifyStatus,
   Unarray,
   SemesterEnrollment,
   DegreeProgrammeType,
   ProgressCriteria,
+  Unification,
 } from '../types'
 import { FormattedStudent } from '../types/studentData'
 
@@ -99,12 +99,12 @@ export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody & 
 }
 export type PopulationstatisticsbycourseReqBody = never
 export type PopulationstatisticsbycourseParams = {
-  coursecodes: string
-  from: string
-  to: string
-  separate: string
-  unifyCourses: UnifyStatus
-  includeSubstitutions: string
+  courses: string | string[] | undefined
+  from: string | undefined
+  to: string | undefined
+  separate: string | undefined
+  unifyCourses: Unification | string | undefined
+  substitutions: string | undefined
 }
 
 // populationstatisticsbystudentnumbers
@@ -133,11 +133,3 @@ export type PopulationstatisticsStudyprogrammesResBody = Record<
   'allProgrammes' | 'filteredProgrammes',
   Record<string, Unarray<ProgrammeModuleWithRelevantAttributes[]>>
 >
-
-// populationstatistics/maxYearsToCreatePopulationFrom
-export type PopulationstatisticsMaxYearsToCreatePopulationFormResBody = {
-  openCourses: number
-  uniCourses: number
-  unifyCourses: number
-}
-export type PopulationstatisticsMaxYearsToCreatePopulationFormQuery = { courseCodes: string }

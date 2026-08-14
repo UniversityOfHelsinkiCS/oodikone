@@ -50,20 +50,11 @@ const populationApi = RTKApi.injectEndpoints({
       Output<PopulationstatisticsbycourseResBody>,
       PopulationstatisticsbycourseParams
     >({
-      query: ({ coursecodes, from, to, separate, unifyCourses, includeSubstitutions }) => ({
+      query: ({ courses, from, to, separate, unifyCourses, substitutions }) => ({
         url: '/populationstatisticsbycourse',
-        params: { coursecodes, from, to, separate, unifyCourses, includeSubstitutions },
+        params: { courses, from, to, separate, unifyCourses, substitutions },
       }),
       transformResponse: formatPopulationData<PopulationstatisticsbycourseResBody>,
-    }),
-    getMaxYearsToCreatePopulationFrom: builder.query<
-      PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
-      PopulationstatisticsMaxYearsToCreatePopulationFormQuery
-    >({
-      query: ({ courseCodes }) => ({
-        url: '/populationstatistics/maxYearsToCreatePopulationFrom',
-        params: { courseCodes },
-      }),
     }),
     getProgrammes: builder.query<PopulationstatisticsStudyprogrammesResBody, void>({
       query: () => '/populationstatistics/studyprogrammes',
@@ -78,6 +69,5 @@ export const {
   useGetCustomPopulationByStudentNumbersQuery,
   useGetCustomPopulationByProgrammesQuery,
   useGetPopulationStatisticsByCourseQuery,
-  useGetMaxYearsToCreatePopulationFromQuery,
   useGetProgrammesQuery,
 } = populationApi

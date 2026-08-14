@@ -1,7 +1,7 @@
 import { describe, it, assert, beforeAll, vi } from 'vitest'
 import { Unification } from '@oodikone/shared/types'
 import { initializeDatabaseConnection } from '@/database/connection'
-import { maxYearsToCreatePopulationFrom, searchAndCombineSubstitutionGroupsToCodes } from '@/services/courses'
+import { populationSizeAllowed, searchAndCombineSubstitutionGroupsToCodes } from '@/services/courses'
 import { findByCourseAndSemesters } from '@/services/students'
 import { yearToYearCode } from '@oodikone/shared/util'
 
@@ -41,12 +41,12 @@ void describe.skip('Max years to generate population from', () => {
   })
 
   it('should return no years without a course code', async () => {
-    const res = await maxYearsToCreatePopulationFrom([], Unification.UNIFY)
+    const res = await populationSizeAllowed([], Unification.UNIFY)
     assert.strictEqual(res, 0, 'Got something else than 0 years')
   })
 
   it('should return correct years for MAT11001', async () => {
-    const res = await maxYearsToCreatePopulationFrom(['MAT11001'], Unification.UNIFY)
+    const res = await populationSizeAllowed(['MAT11001'], Unification.UNIFY)
     assert.strictEqual(res, 6)
   })
 

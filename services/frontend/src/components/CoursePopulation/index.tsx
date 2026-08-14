@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
 
 import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -42,6 +41,7 @@ import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { useParseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { getFromToDates } from './util'
 
 export const CoursePopulation = () => {
   useTitle('Course population')
@@ -53,31 +53,35 @@ export const CoursePopulation = () => {
     mainCodes: [],
   })
 
-  const {
-    coursecodes,
-    from: [from],
-    to: [to],
-    separate: [separate],
-    unifyCourses: [unifyCourses],
-    includeSubstitutions: [includeSubstitutions],
-  } = useParseQueryParams()
+  const params = useParseQueryParams()
+  const courses = params.courses
+  const from = params.from?.[0]
+  const to = params.to?.[0]
+  const separate = params.separate?.[0]
+  const substitutions = params.substitutions?.[0]
+  const unifyCourses = params.unifyCourses?.[0]
 
   const { data: courseDetails } = useGetCourseDetailsQuery(
     { codes: codes.mainCodes },
     { skip: !codes.mainCodes.length }
   )
-  const { data: population } = useGetPopulationStatisticsByCourseQuery({
-    coursecodes: coursecodes[0],
-    from,
-    to,
-    separate,
-    unifyCourses,
-    includeSubstitutions,
-  })
+  const { data: population } = useGetPopulationStatisticsByCourseQuery(
+    {
+      courses: courses?.[0],
+      from,
+      to,
+      separate,
+      unifyCourses,
+      substitutions,
+    },
+    {
+      skip: !courses?.length || !from || !to,
+    }
+  )
 
   useEffect(() => {
-    if (coursecodes.length) setCodes({ ...codes, mainCodes: coursecodes })
-  }, [coursecodes])
+    if (courses?.length) setCodes({ ...codes, mainCodes: courses })
+  }, [courses?.join('-') ?? ''])
 
   useEffect(() => {
     if (population?.allCourseCodes?.length) setCodes({ ...codes, allCodes: population.allCourseCodes })
@@ -95,25 +99,12 @@ export const CoursePopulation = () => {
     isLoading: semestersFetching,
   } = useSemesters()
 
-  const getFromToDates = (from: number, to: number, separate: boolean) => {
-    if (semestersFetching) return {}
+  const isSeparate = separate === 'true'
 
-    const dataValues = separate ? Object.values(allSemesters) : Object.values(semesterYears)
-
-    const key = separate ? 'semestercode' : 'yearcode'
-
-    const findDateByCode = (code: number) => dataValues.find(item => item[key] === code)
-
-    return {
-      dateFrom: findDateByCode(Number(from))?.startdate,
-      dateTo: findDateByCode(Number(to))?.enddate,
-    }
-  }
-
-  const isSeparate = separate ? JSON.parse(separate) : false
-  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate)
+  if (semestersFetching || !courses?.length) return null
 
   // Dates must be set
+  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate, allSemesters, semesterYears)
   if (!dateFrom || !dateTo) return null
 
   const singleSemester =
@@ -128,7 +119,7 @@ export const CoursePopulation = () => {
     students.reduce<Map<string, string>>((programmes, student) => {
       const programme = findCorrectProgramme(
         student,
-        coursecodes,
+        courses,
         allSemesters,
         new Date(dateFrom),
         new Date(dateTo),
@@ -226,7 +217,7 @@ export const CoursePopulation = () => {
     ageFilter(),
     courseFilter({
       courses: population?.coursestatistics.courses,
-      includeSubstitutions: includeSubstitutions === 'true',
+      includeSubstitutions: substitutions === 'true',
     }),
     creditsEarnedFilter(),
     hetuFilter(),
@@ -278,9 +269,7 @@ export const CoursePopulation = () => {
               variant="h6"
             >{`Class of ${dateRange}, ${population.students.length} students`}</Typography>
             <Typography color="text.secondary" variant="h6">
-              {(includeSubstitutions === 'true' ? 'Include' : 'Exclude') +
-                ' substitutions, ' +
-                getUnifyTextIn(unifyCourses)}
+              {(substitutions === 'true' ? 'Include' : 'Exclude') + ' substitutions, ' + getUnifyTextIn(unifyCourses)}
             </Typography>
           </PageTitle>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />

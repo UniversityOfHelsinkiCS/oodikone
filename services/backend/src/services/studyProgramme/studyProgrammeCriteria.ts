@@ -13,15 +13,15 @@ const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithou
 
 /** Construct course_code => substitution_groups object */
 const getSubstitutions = async (codes: string[]) => {
-  const courses: Array<Pick<CourseModel, 'code' | 'substitution_groups'>> = await CourseModel.findAll({
-    attributes: ['code', 'substitution_groups'],
+  const courses: Array<Pick<CourseModel, 'code' | 'substitutionGroups'>> = await CourseModel.findAll({
+    attributes: ['code', 'substitutionGroups'],
     where: { code: codes },
     raw: true,
   })
 
   // Sort substitution_groups by length, because (usually) the shortest substitution is the "correct" one
   return Object.fromEntries(
-    courses.map(({ code, substitution_groups }) => [code, substitution_groups.sort((a, b) => b.length - a.length)])
+    courses.map(({ code, substitutionGroups }) => [code, substitutionGroups.sort((a, b) => b.length - a.length)])
   )
 }
 

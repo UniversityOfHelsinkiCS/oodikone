@@ -51,7 +51,6 @@ export type {
 export type { NewTag, StudentTag, Tag } from './tag'
 export type { SemesterEnrollment } from './semesterEnrollment'
 export type { StudyTrack } from './studyTrack'
-export type { UnifyStatus } from './unification'
 export type { FormattedStudent } from './studentData'
 export type { TransferInfo } from './transferInfo'
 export type { IamAccess, FormattedUser, ExpandedUser } from './user'

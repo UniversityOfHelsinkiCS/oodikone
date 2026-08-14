@@ -14,15 +14,13 @@ import {
   type CustomPopulationByProgrammesQuery,
   type CustomPopulationByProgrammesResBody,
   type PopulationstatisticsStudyprogrammesResBody,
-  PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
-  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
 } from '@oodikone/shared/routes/populations'
 import { Unification } from '@oodikone/shared/types'
-import { keyBy, mapToProviders } from '@oodikone/shared/util'
+import { keyBy, mapToProviders, MAX_POPULATION_SIZE } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
 import {
   getCourseProvidersForCourses,
-  maxYearsToCreatePopulationFrom,
+  getPopulationSizeAllowed,
   searchAndCombineSubstitutionGroupsToCodes,
 } from '../services/courses'
 import { encrypt } from '../services/encrypt'
@@ -33,6 +31,9 @@ import { statisticsOf } from '../services/populations/statisticsOf'
 import { getStudentNumbersWithStudyRights } from '../services/populations/studentNumbersWithStudyRights'
 import { findByCourseAndSemesters, getStartAndEndDates } from '../services/students'
 import { getFullStudyProgrammeRights, handleQueryArrays, hasFullAccessToStudentData } from '../util'
+import { parseUnification } from '@oodikone/shared/types/unification'
+import logger from '../util/logger'
+import { getAllCourseIds } from 'src/services/courses/helpers'
 
 const router = Router()
 
@@ -182,48 +183,60 @@ router.get<
     programmeRights: userProgrammeRights,
     studentsUserCanAccess: allStudentsUserCanAccess,
   } = req.user
-  const { coursecodes: coursecodeJSON, from, to, separate, unifyCourses, ...restParams } = req.query
-  const includeSubstitutions = restParams.includeSubstitutions === 'true'
+  const { courses, from, to, separate, unifyCourses, substitutions } = req.query
+  console.dir(req.query, { depth: null })
 
-  if (!coursecodeJSON || !from || !to) {
-    return res.status(400).json({ error: 'The body should have a yearcode and coursecode defined' })
+  if (!courses?.length || !from || !to) {
+    return res.status(400).json({ error: 'Missing required parameters.' })
   }
 
+  const includeSubstitutions = substitutions === 'true'
   const isSeparate = separate === 'true'
-  const coursecodes = JSON.parse(coursecodeJSON)
-  const codes = includeSubstitutions ? await searchAndCombineSubstitutionGroupsToCodes(coursecodes) : coursecodes
+  const unification = parseUnification(unifyCourses) ?? Unification.UNIFY
+  const coursesArray = handleQueryArrays(courses)
 
-  const toFromDiff = Math.abs(Number(to) - Number(from) + 1)
-  const requestedYearsToCreatePopulationFrom = Math.ceil(isSeparate ? toFromDiff / 2 : toFromDiff) // 2 semesters = 1 year
+  const courseGroupIds = includeSubstitutions
+    ? await searchAndCombineSubstitutionGroupsToCodes(coursesArray)
+    : coursesArray
 
-  const maxYearsForPopulation = await maxYearsToCreatePopulationFrom(codes, Unification.REGULAR)
-  if (requestedYearsToCreatePopulationFrom > maxYearsForPopulation) {
-    return res.status(400).json({ error: `Max years to create population from is ${maxYearsForPopulation}` })
+  const populationWithinSallitutRaamit = await getPopulationSizeAllowed(courseGroupIds, unification)
+  if (!populationWithinSallitutRaamit) {
+    logger.warn(`Attempted to load course population beyond allowed limits. ${JSON.stringify(req.query)}`)
+    return res.status(400).json({ error: 'Population size too large.' }).end()
   }
 
-  const studentNumbers = await findByCourseAndSemesters(codes, Number(from), Number(to), isSeparate, unifyCourses)
+  const relevantCourseIds = await getAllCourseIds(courseGroupIds)
+  const studentNumbers = await findByCourseAndSemesters(
+    relevantCourseIds,
+    Number(from),
+    Number(to),
+    isSeparate,
+    unification
+  )
 
-  const courseProviders: string[] = await getCourseProvidersForCourses(coursecodes)
+  const courseProviders = await getCourseProvidersForCourses(relevantCourseIds)
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(userProgrammeRights)
   const rightsMappedToProviders = mapToProviders(fullStudyProgrammeRights)
 
   const studentsUserCanAccess = courseProviders.some(provider => rightsMappedToProviders.includes(provider))
-    ? new Set(studentNumbers)
+    ? studentNumbers
     : new Set(allStudentsUserCanAccess)
 
-  const { startDate: startDate, endDate: endDate } = await getStartAndEndDates(Number(from), Number(to), isSeparate)
+  const { startDate, endDate } = await getStartAndEndDates(Number(from), Number(to), isSeparate)
 
   const studyRights = []
-  const tagMap = await getStudentTagMap(studyRights, studentNumbers, userId)
+  const tagMap = await getStudentTagMap(studyRights, [...studentNumbers], userId)
   const filterCreditsAndEnrollmentsByDate = true
+  console.log('statisticsOf')
   const result = await statisticsOf(
-    studentNumbers,
+    [...studentNumbers],
     studyRights,
     tagMap,
     filterCreditsAndEnrollmentsByDate,
     startDate?.toISOString(),
     endDate?.toISOString()
   )
+  console.log('end statisticsOf')
   const processed = obfuscateStuff({
     result,
 
@@ -232,7 +245,7 @@ router.get<
     studentsUserCanAccess,
   })
 
-  return res.json({ ...processed, mainCourseCodes: coursecodes, allCourseCodes: codes })
+  return res.json({ ...processed, mainCourseCodes: [], allCourseCodes: [] })
 })
 
 // Used in custom population and single study guidance groups
@@ -354,22 +367,5 @@ router.get<never, PopulationstatisticsStudyprogrammesResBody>(
     })
   }
 )
-
-router.get<
-  never,
-  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
-  never,
-  PopulationstatisticsMaxYearsToCreatePopulationFormQuery
->('/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
-  const courseCodes = JSON.parse(req.query.courseCodes) as string[]
-  const maxYearsToCreatePopulationFromBoth = await maxYearsToCreatePopulationFrom(courseCodes, Unification.UNIFY)
-  const maxYearsToCreatePopulationFromUni = await maxYearsToCreatePopulationFrom(courseCodes, Unification.REGULAR)
-  const maxYearsToCreatePopulationFromOpen = await maxYearsToCreatePopulationFrom(courseCodes, Unification.OPEN)
-  return res.json({
-    unifyCourses: maxYearsToCreatePopulationFromBoth,
-    uniCourses: maxYearsToCreatePopulationFromUni,
-    openCourses: maxYearsToCreatePopulationFromOpen,
-  })
-})
 
 export default router
