@@ -74,8 +74,8 @@ export const PopulationStudents = ({
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
-  const { stringYears } = useParseQueryParams()
-  const years = stringYears.map(Number)
+  const { years: stringYears } = useParseQueryParams()
+  const years = stringYears?.map(Number) ?? []
   const months = years
     ? dayjs().diff(dayjs(`${Math.min(...years)}-08-01`), 'months')
     : studyGuidanceGroup?.tags?.year
