@@ -165,6 +165,8 @@ export const getEnrollmentsForCourses = async (
     },
     include: [
       {
+        model: SemesterModel,
+        attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
         where: {
           startdate: {
             [Op.lte]: now(),
