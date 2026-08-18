@@ -63,10 +63,10 @@ export const statisticsOf = async (
       getStudyRightElementsForStudyRight(studentNumbers, code),
     ])
 
-  const courseCodes = new Set<string>()
-  for (const { course_code } of credits) courseCodes.add(course_code)
-  for (const { course_code } of enrollments) courseCodes.add(course_code)
-  const courses = await getCourses(Array.from(courseCodes))
+  const courseIds = new Set<string>()
+  for (const { course_id } of credits) courseIds.add(course_id)
+  for (const { course_id } of enrollments) courseIds.add(course_id)
+  const courses = await getCourses([...courseIds])
 
   const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
   const formattedStudents = students.map(student => {

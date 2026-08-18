@@ -33,6 +33,7 @@ const handleOpenUniversity = (
   semesterCode?: number,
   date?: string
 ) => {
+  // @STUDYPLAN FIXME: Studyplans have only course codes. however we mainly use course ids now.
   const hopsWithCourse = student.studyplans.find(sp => sp.included_courses.some(course => coursecodes.includes(course)))
 
   if (hopsWithCourse) {
@@ -60,7 +61,7 @@ const handleOpenUniversity = (
  */
 export const findCorrectProgramme = (
   student: FormattedStudent,
-  coursecodes: string[],
+  courseIds: string[],
   semesters: SemestersData['semesters'],
   startDate: Date,
   endDate: Date,
@@ -68,7 +69,7 @@ export const findCorrectProgramme = (
 ) => {
   const courseAttainment = student.courses.find(
     attainment =>
-      coursecodes.includes(attainment.course_code) &&
+      courseIds.includes(attainment.course_id) &&
       dayjs(attainment.date).isBetween(startDate, endDate, 'date', '[]') &&
       attainment.credittypecode !== CreditTypeCode.IMPROVED
   )
@@ -81,7 +82,7 @@ export const findCorrectProgramme = (
     return correctStudyRight
       ? (getNewestProgrammeOfStudentAt([correctStudyRight], attainmentSemesterCode, false, attainmentDate) ??
           NO_PROGRAMME)
-      : handleOpenUniversity(student, coursecodes, attainmentSemesterCode, attainmentDate)
+      : handleOpenUniversity(student, courseIds, attainmentSemesterCode, attainmentDate)
   }
 
   const correctSemesters = Object.values(semesters)
@@ -93,7 +94,7 @@ export const findCorrectProgramme = (
     .map(semester => semester.semestercode)
 
   const courseEnrollment = student.enrollments?.find(
-    enrollment => coursecodes.includes(enrollment.course_code) && correctSemesters.includes(enrollment.semestercode)
+    enrollment => courseIds.includes(enrollment.course_id) && correctSemesters.includes(enrollment.semestercode)
   )
 
   if (courseEnrollment?.studyright_id) {
@@ -107,7 +108,7 @@ export const findCorrectProgramme = (
         ) ?? NO_PROGRAMME)
       : handleOpenUniversity(
           student,
-          coursecodes,
+          courseIds,
           courseEnrollment.semestercode,
           courseEnrollment.enrollment_date_time.toString()
         )
@@ -116,7 +117,7 @@ export const findCorrectProgramme = (
   // If course is in studyplan without a studyright associated with the attainment or the enrollment
   // Unclear if this is ever reached
   const correctStudyplan = student.studyplans.find(studyplan =>
-    studyplan.included_courses.some(course => coursecodes.includes(course))
+    studyplan.included_courses.some(course => courseIds.includes(course))
   )
   if (correctStudyplan) {
     const correctStudyRight = student.studyRights.find(
@@ -131,7 +132,7 @@ export const findCorrectProgramme = (
         ) ?? NO_PROGRAMME)
       : handleOpenUniversity(
           student,
-          coursecodes,
+          courseIds,
           currentSemester,
           attainmentDate ?? courseEnrollment?.enrollment_date_time?.toString()
         )

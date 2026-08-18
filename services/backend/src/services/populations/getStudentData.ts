@@ -48,15 +48,15 @@ export const getStudentTagMap = async (studyRights: string[], studentNumbers: st
 
 export type StudentEnrollment = Pick<
   Enrollment,
-  'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
+  'course_id' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
 >
 export const getEnrollments = (
   studentNumbers: string[],
   startDate: string,
   endDate: string
-): Promise<Array<StudentEnrollment>> =>
+): Promise<StudentEnrollment[]> =>
   EnrollmentModel.findAll({
-    attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
+    attributes: ['course_id', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -193,7 +193,7 @@ export type StudentCredit = Pick<
   | 'attainment_date'
   | 'isStudyModule'
   | 'student_studentnumber'
-  | 'course_code'
+  | 'course_id'
   | 'language'
   | 'studyright_id'
 >
@@ -202,7 +202,7 @@ export const getCredits = async (
   studentNumbers: string[],
   startDate: string,
   endDate: string
-): Promise<Array<StudentCredit>> =>
+): Promise<StudentCredit[]> =>
   CreditModel.findAll({
     raw: true,
     attributes: [
@@ -212,7 +212,7 @@ export const getCredits = async (
       'attainment_date',
       'isStudyModule',
       'student_studentnumber',
-      'course_code',
+      'course_id',
       'language',
       'studyright_id',
     ],
