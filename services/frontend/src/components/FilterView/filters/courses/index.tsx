@@ -24,7 +24,7 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options,
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
-    .filter(cs => !courseFilters[cs.code])
+    .filter(cs => !courseFilters[cs.id])
     .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
     .map(cs => ({
       key: `courseFilter-option-${cs.code}`,
@@ -85,9 +85,9 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     }
   }) => {
     const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
-      const { code, substitution_groups } = course
-      if (substitution_groups) {
-        for (const group of substitution_groups) {
+      const { code, substitutionGroups } = course
+      if (substitutionGroups) {
+        for (const group of substitutionGroups) {
           acc[code] ??= []
           acc[code].push(group)
         }
@@ -109,20 +109,22 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
   filter(student: FormattedStudent, { options }) {
     const { courses, enrollments } = student
-    const passedCoursesCodes = courses
+    const passedCourseIds = courses
       .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
-      .map(({ course_code }) => course_code)
-    const courseCodes = courses.map(({ course_code }) => course_code)
-    const enrollmentCodes = enrollments.map(({ course_code }) => course_code)
+      .map(({ course_id }) => course_id)
+
+    const courseIds = courses.map(({ course_id }) => course_id)
+    const enrollmentCodes = enrollments.map(({ course_id }) => course_id)
+
     for (const [mainCode, filterType] of Object.entries(options.courseFilters)) {
       let foundPassed = false
       let foundAttainment = false
       let foundEnrollment = false
 
-      void [[mainCode], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainCode] ?? []) : [])].forEach(
+      ;[[mainCode], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainCode] ?? []) : [])].forEach(
         group => {
-          foundPassed = foundPassed ? true : group.every(code => passedCoursesCodes.includes(code))
-          foundAttainment = foundAttainment ? true : group.every(code => courseCodes.includes(code))
+          foundPassed = foundPassed ? true : group.every(code => passedCourseIds.includes(code))
+          foundAttainment = foundAttainment ? true : group.every(code => courseIds.includes(code))
           foundEnrollment = foundEnrollment ? true : group.every(code => enrollmentCodes.includes(code))
         }
       )

@@ -5,8 +5,6 @@ import type {
   PopulationstatisticsResBody,
   PopulationstatisticsbycourseResBody,
   PopulationstatisticsbycourseParams,
-  PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
-  PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsStudyprogrammesResBody,
   CustomPopulationByStudentNumbersQuery,
   CustomPopulationByStudentNumbersResBody,

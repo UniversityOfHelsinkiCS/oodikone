@@ -18,7 +18,7 @@ import {
 import { Unification } from '@oodikone/shared/types'
 import { keyBy, mapToProviders, MAX_POPULATION_SIZE } from '@oodikone/shared/util'
 import { rootOrgId } from '../config'
-import { getCourseProvidersForCourses, searchAndCombineSubstitutionGroupsToCodes } from '../services/courses'
+import { getCourseProvidersForCourses, getRelevantCourseIdMap } from '../services/courses'
 import { encrypt } from '../services/encrypt'
 import { getDegreeProgrammesOfOrganization } from '../services/faculty/faculty'
 import { getStudentTagMap } from '../services/populations/getStudentData'
@@ -191,11 +191,9 @@ router.get<
   const isSeparate = separate === 'true'
   const unification = parseUnification(unifyCourses) ?? Unification.UNIFY
 
-  const courseGroupIds = includeSubstitutions
-    ? await searchAndCombineSubstitutionGroupsToCodes(coursesArray)
-    : coursesArray
+  const idToGroupIdMap = await getRelevantCourseIdMap(coursesArray, includeSubstitutions)
+  const relevantCourseIds = Object.keys(idToGroupIdMap)
 
-  const relevantCourseIds = await getAllCourseIds(courseGroupIds)
   const studentNumbers = await findByCourseAndSemesters(
     relevantCourseIds,
     Number(from),
@@ -238,7 +236,7 @@ router.get<
     studentsUserCanAccess,
   })
 
-  return res.json({ ...processed, mainCourseCodes: [], allCourseCodes: [] }).end()
+  return res.json({ ...processed, idToGroupIdMap }).end()
 })
 
 // Used in custom population and single study guidance groups

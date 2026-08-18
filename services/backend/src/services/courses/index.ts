@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { Op, fn as dbFn, col as dbCol } from 'sequelize'
+import { Op, fn as dbFn, col as dbCol, fn, col } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification, CreditTypeCode } from '@oodikone/shared/types'
@@ -368,13 +368,6 @@ export const getCourseYearlyStats = async (
   // Default to 1900 - currentYear+1 so that without parameters the api returns stats for all years
   const from = new Date(`${yearCodeToYear(fromYearCode)}-08-01`) // FALL
   const to = new Date(`${yearCodeToYear(toYearCode) + 1}-07-31`) // SPRING next year
-  console.log('FUNCTIONARGUMENTS:')
-  console.log('groupIds', courseGroupIds)
-  console.log('separate', separate)
-  console.log('anonymizationSalt', anonymizationSalt)
-  console.log('substitutions', substitutions)
-  console.log('fromYearCode ', fromYearCode)
-  console.log('toYearCode', toYearCode)
 
   const relevantCourseIds = (
     await CourseModel.findAll({
@@ -476,27 +469,47 @@ export const getCourseProvidersForCourses = async (courseIds: string[]) =>
     })
   ).map(({ code }) => code)
 
-export const getCourseDetails = async (codes: string[]) =>
+export const getCourseDetails = async (courseGroupIds: string[]) =>
   CourseModel.findAll({
-    attributes: ['code', 'name', 'substitution_groups'],
-    where: { code: { [Op.in]: codes } },
+    attributes: ['groupId', 'code', 'name', 'substitution_groups'],
+    where: { groupId: { [Op.in]: courseGroupIds }, isPrimary: true },
     raw: true,
   })
 
-// Get main course and all substitutions
-export const searchAndCombineSubstitutionGroupsToCodes = async (courseGroupIds: string[]) => {
-  const substitutionGroups = await CourseModel.findAll({
-    raw: true,
-    attributes: ['substitutionGroups'],
-    where: {
-      groupId: { [Op.in]: courseGroupIds },
-    },
-  })
+/** First gets all unique groupIds from main course and substitutions (if enabled)
+ * Then returns an id-groupId map for all courses that match above groupId
+ */
+export const getRelevantCourseIdMap = async (courseGroupIds: string[], substitutions: boolean) => {
+  const combinedGroupIds = substitutions
+    ? [
+        ...new Set(
+          (
+            await CourseModel.findAll({
+              raw: true,
+              attributes: ['groupId', 'substitutionGroups'],
+              where: {
+                groupId: { [Op.in]: courseGroupIds },
+              },
+            })
+          )
+            .flatMap(({ groupId, substitutionGroups }) => [groupId, substitutionGroups])
+            .flat(2)
+        ),
+      ]
+    : courseGroupIds
 
-  return [
-    ...new Set([
-      ...courseGroupIds,
-      ...substitutionGroups.flatMap(({ substitutionGroups }) => substitutionGroups.flatMap(groupId => groupId)),
-    ]),
-  ]
+  const idToGroupIdMap = (
+    await CourseModel.findAll({
+      raw: true,
+      attributes: ['id', 'groupId'],
+      where: {
+        groupId: { [Op.in]: combinedGroupIds },
+      },
+    })
+  ).reduce<Record<string, string>>((acc, { id, groupId }) => {
+    acc[id] = groupId
+    return acc
+  }, {})
+
+  return idToGroupIdMap
 }

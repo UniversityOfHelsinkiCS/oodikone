@@ -20,13 +20,13 @@ import { FormattedStudent, Name } from '@oodikone/shared/types'
 export const CustomPopulationProgrammeDist = ({
   infotext,
   students,
-  coursecodes,
+  courseIds,
   from,
   to,
 }: {
   infotext: Name
   students: FormattedStudent[]
-  coursecodes?: string[]
+  courseIds?: string[]
   from?: string
   to?: string
 }) => {
@@ -37,11 +37,11 @@ export const CustomPopulationProgrammeDist = ({
   const allProgrammes: Record<string, { name: Name; programmeStudents: number }> = {}
   for (const student of students) {
     let programme: { code: string; name: Name } | null
-    if (coursecodes) {
-      // If coursecodes is provided, from/to need to be as well
+    if (courseIds) {
+      // If courseIds are provided, from/to need to be as well
       programme = findCorrectProgramme(
         student,
-        coursecodes,
+        courseIds,
         semesters,
         new Date(from!),
         new Date(to!),
