@@ -219,7 +219,6 @@ export class CourseYearlyStatsCounter {
       const previous = this.groups[i - 1]
       const name = typeof previous.name === 'string' ? getNextYear(previous.name) : semesters[i]
 
-      console.log('INIT GROUP', i)
       this.initGroup(i, name, previous.coursecode, i)
     })
   }

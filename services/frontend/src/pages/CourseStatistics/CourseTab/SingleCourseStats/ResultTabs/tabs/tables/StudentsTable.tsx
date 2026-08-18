@@ -73,7 +73,7 @@ export const StudentsTable = ({
         courses: courseCodes,
         separate,
         unifyCourses: openOrRegular,
-        includeSubstitutions: combineSubstitutions,
+        substitutions: combineSubstitutions,
       }
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`

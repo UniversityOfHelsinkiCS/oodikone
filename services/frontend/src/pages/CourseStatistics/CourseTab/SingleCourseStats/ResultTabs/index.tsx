@@ -2,7 +2,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { ResultTab } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/ResultTab'
