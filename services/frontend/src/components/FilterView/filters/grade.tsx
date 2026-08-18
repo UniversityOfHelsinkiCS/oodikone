@@ -11,10 +11,6 @@ type Options = any
 type Args = any
 type Precompute = any
 
-/**
- * Grade filter.
- * Only applicable to a single course.
- */
 const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps<Options, Args, Precompute>) => {
   const { grades } = precomputed
   const { selected } = options
@@ -58,6 +54,10 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
   )
 }
 
+/**
+ * Grade filter.
+ * Only applicable to a single course.
+ */
 export const gradeFilter = createFilter<Options, Args, Precompute>({
   key: 'gradeFilter',
 
@@ -76,17 +76,17 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
           student =>
             [
               student.studentNumber,
-              student.courses.filter((course: any) => args.courseCodes.includes(course.course_code)),
+              student.courses.filter((course: any) => args.courseIds.includes(course.course_id)),
             ] as [string, FormattedStudent['courses']]
         )
         .map(([studentNumber, courses]) => [
           studentNumber,
           getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
         ])
-        .filter(([_, grade]) => grade !== undefined)
         .reduce((acc, [studentNumber, grade]) => {
-          acc[grade!] ??= []
-          acc[grade!].push(studentNumber)
+          const fixedGrade = grade ?? 'No grade'
+          acc[fixedGrade] ??= []
+          acc[fixedGrade].push(studentNumber)
           return acc
         }, {}),
     }
