@@ -10,7 +10,7 @@ import {
 } from '../types'
 import { FormattedStudent } from '../types/studentData'
 
-export type CourseStats = Pick<Course, 'code' | 'name' | 'isStudyModule' | 'substitutionGroups'>
+export type CourseStats = Pick<Course, 'code' | 'id' | 'groupId' | 'name' | 'isStudyModule' | 'substitutionGroups'>
 
 export type AttainmentDates = {
   latestTotal?: Date
@@ -60,7 +60,7 @@ export type PopulationCourseStats = {
   courses: CourseStats[]
   enrollments: Pick<
     Enrollment,
-    'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
+    'course_id' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
   >[]
   credits: Pick<
     Credit,
@@ -70,7 +70,7 @@ export type PopulationCourseStats = {
     | 'attainment_date'
     | 'isStudyModule'
     | 'student_studentnumber'
-    | 'course_code'
+    | 'course_id'
     | 'language'
     | 'studyright_id'
   >[]
@@ -94,8 +94,7 @@ export type PopulationstatisticsQuery = {
 
 // populationstatisticsbycourse
 export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody & {
-  mainCourseCodes: string[]
-  allCourseCodes: string[]
+  idToGroupIdMap: Record<string, string>
 }
 export type PopulationstatisticsbycourseReqBody = never
 export type PopulationstatisticsbycourseParams = {

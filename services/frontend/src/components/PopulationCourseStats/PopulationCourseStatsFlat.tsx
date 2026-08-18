@@ -39,7 +39,7 @@ export const PopulationCourseStatsFlat = ({
 
   const courseStatistics: UnionOfFilteredModuleCourse = filteredCourses
     .filter(({ stats }) => studentAmountLimit <= stats.students)
-    .filter(({ course }) => (showModules ? course.is_study_module : !course.is_study_module))
+    .filter(({ course }) => (showModules ? course.isStudyModule : !course.isStudyModule))
     .map(course => {
       const { students, passed, passedOfPopulation } = course.stats
       // Modules have only some stats while courses have all

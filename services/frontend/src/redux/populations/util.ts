@@ -62,7 +62,7 @@ export const formatPopulationData = <T extends RequiredFields>(
         const passed = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
 
         return {
-          course_code: credit.course_code,
+          course_id: credit.course_id,
           date: credit.attainment_date,
           passed,
           grade: passed ? credit.grade : 'Hyl.',

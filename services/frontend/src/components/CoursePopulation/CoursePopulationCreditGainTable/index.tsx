@@ -29,6 +29,7 @@ const CreditGainTable = ({
   totalStudents: number
   headerText: string
 }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
 
   return (
@@ -64,12 +65,12 @@ const CreditGainTable = ({
 
 export const CoursePopulationCreditGainTable = ({
   students,
-  codes,
+  courseIds,
   from,
   to,
 }: {
   students: FormattedStudent[]
-  codes: string[]
+  courseIds: string[]
   from: string
   to: string
 }) => {
@@ -89,11 +90,11 @@ export const CoursePopulationCreditGainTable = ({
   let totalStudents = 0
 
   students.forEach(student => {
-    const courses = student.courses.filter(course => codes.includes(course.course_code))
+    const courses = student.courses.filter(course => courseIds.includes(course.course_id))
 
     const programme = findCorrectProgramme(
       student,
-      codes,
+      courseIds,
       semesters,
       new Date(from),
       new Date(to),

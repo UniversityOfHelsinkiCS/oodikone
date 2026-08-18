@@ -1,3 +1,4 @@
+import { Course } from 'models'
 import { CourseWithSubsDetails } from '../types/course'
 
 export type CoursesMultiReqBody = never
@@ -17,3 +18,9 @@ export type CourseYearlyStatsQuery = {
   fromYearCode: string
   toYearCode: string
 }
+
+export type CourseDetailsQuery = {
+  courses: string | string[]
+}
+
+export type CourseDetails = Pick<Course, 'groupId' | 'code' | 'name' | 'substitutionGroups'>[]

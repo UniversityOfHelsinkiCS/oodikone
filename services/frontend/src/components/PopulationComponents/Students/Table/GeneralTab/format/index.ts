@@ -45,7 +45,7 @@ export const useFormat = ({
   /* COURSE POPULATION specific */
   from,
   to,
-  coursecodes,
+  courseIds,
   relatedProgrammeMap,
 }: {
   variant: Variant
@@ -60,7 +60,7 @@ export const useFormat = ({
   includePrimaryProgramme: boolean
 
   /* COURSE POPULATION specific */
-  coursecodes: string[]
+  courseIds: string[]
   from: string | undefined // Date string
   to: string | undefined // Date string
   relatedProgrammeMap?: Map<string, string> // Programme based on time of course attainment/enrollment etc.
@@ -155,8 +155,8 @@ export const useFormat = ({
     }
 
     const attainmentsBeforeStudyRight = getAttainmentsBeforeStudyRight(studentBlob)
-    const courseInformation = getCourseInformation(studentBlob, from, to, coursecodes)
-    const enrollmentDate = getEnrollmentDate(studentBlob, fromSemester, toSemester, coursecodes)
+    const courseInformation = getCourseInformation(studentBlob, from, to, courseIds)
+    const enrollmentDate = getEnrollmentDate(studentBlob, fromSemester, toSemester, courseIds)
 
     return {
       /* EXCEL ONLY */

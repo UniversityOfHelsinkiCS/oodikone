@@ -8,6 +8,8 @@ import {
   CoursesMultiQuery,
   CourseYearlyStatsReqBody,
   CourseYearlyStatsQuery,
+  CourseDetails,
+  CourseDetailsQuery,
 } from '@oodikone/shared/routes/courses'
 import { getCourseDetails, getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
@@ -74,12 +76,12 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
   }
 )
 
-router.get<never, CanError<unknown>, never, { codes: string | string[] }>('/coursedetails', async (req, res) => {
-  const { codes: coursecodes } = req.query
-  const codes = handleQueryArrays(coursecodes)
+router.get<never, CanError<CourseDetails>, never, CourseDetailsQuery>('/coursedetails', async (req, res) => {
+  const { courses } = req.query
+  const courseIds = handleQueryArrays(courses)
 
-  if (!codes?.length) return res.status(500).end()
-  const details = await getCourseDetails(codes)
+  if (!courseIds.length) return res.status(422).send({ error: 'Missing required parameters' })
+  const details = await getCourseDetails(courseIds)
 
   return res.json(details)
 })

@@ -15,12 +15,12 @@ dayjsExtend(isBetween)
 
 export const CoursePopulationLanguageDist = ({
   students,
-  codes,
+  courseIds,
   from,
   to,
 }: {
   students: FormattedStudent[]
-  codes: string[]
+  courseIds: string[]
   from: string
   to: string
 }) => {
@@ -28,7 +28,7 @@ export const CoursePopulationLanguageDist = ({
 
   students.forEach(student => {
     const filteredCourse = student.courses
-      .filter(course => codes.includes(course.course_code))
+      .filter(course => courseIds.includes(course.course_id))
       .filter(course => dayjs(course.date).isBetween(dayjs(from), dayjs(to)))
       .sort((a, b) => Number(new Date(b.date) < new Date(a.date)))
       .find(({ language }) => !!language)

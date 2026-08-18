@@ -102,7 +102,7 @@ export type StudentPageStudent = {
 }
 
 export type StudentCourse = {
-  course_code: string
+  course_id: string
   date: Date
   passed: boolean
   grade: string
@@ -143,5 +143,5 @@ export type FormattedStudent = {
   studyRights: StudentStudyRight[]
   studyplans: StudentStudyPlan[]
   courses: StudentCourse[]
-  enrollments: Pick<Enrollment, 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studyright_id'>[]
+  enrollments: Pick<Enrollment, 'course_id' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studyright_id'>[]
 }

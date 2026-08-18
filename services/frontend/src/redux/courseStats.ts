@@ -1,4 +1,5 @@
 import { RTKApi } from '@/apiConnection'
+import { CourseDetails, CourseDetailsQuery } from '@oodikone/shared/routes/courses'
 import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const courseStatsApi = RTKApi.injectEndpoints({
@@ -31,10 +32,10 @@ const courseStatsApi = RTKApi.injectEndpoints({
         return data
       },
     }),
-    getCourseDetails: builder.query({
-      query: ({ codes }: { codes: string | string[] }) => ({
+    getCourseDetails: builder.query<CourseDetails, CourseDetailsQuery>({
+      query: ({ courses }: { courses: string[] }) => ({
         url: '/coursedetails',
-        params: { codes },
+        params: { courses },
       }),
     }),
   }),

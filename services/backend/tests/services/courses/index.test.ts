@@ -1,7 +1,7 @@
 import { describe, it, assert, beforeAll, vi } from 'vitest'
 import { Unification } from '@oodikone/shared/types'
 import { initializeDatabaseConnection } from '@/database/connection'
-import { populationSizeAllowed, searchAndCombineSubstitutionGroupsToCodes } from '@/services/courses'
+import { populationSizeAllowed, getRelevantCourseIdMap } from '@/services/courses'
 import { findByCourseAndSemesters } from '@/services/students'
 import { yearToYearCode } from '@oodikone/shared/util'
 
@@ -11,16 +11,16 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
   })
 
   it('should return correct course codes for MAT11001 (only single-length groups)', async () => {
-    const res = await searchAndCombineSubstitutionGroupsToCodes(['MAT11001'])
+    const res = await getRelevantCourseIdMap(['MAT11001'])
     assert.deepStrictEqual(res, ['MAT11001', '57033', 'AYMAT11001', 'A57033'])
   })
 
   it('should return correct course codes for MAT21016 (also multicourse groups)', async () => {
-    const res = await searchAndCombineSubstitutionGroupsToCodes(['MAT21016'])
+    const res = await getRelevantCourseIdMap(['MAT21016'])
     assert.deepStrictEqual(res, ['MAT21016', '57282', 'MFK-M310', 'MAT21023'])
   })
   it('should return correct course codes for MAT11001 + MAT21016', async () => {
-    const res = await searchAndCombineSubstitutionGroupsToCodes(['MAT11001', 'MAT21016'])
+    const res = await getRelevantCourseIdMap(['MAT11001', 'MAT21016'])
     assert.deepStrictEqual(res, [
       'MAT11001',
       'MAT21016',
