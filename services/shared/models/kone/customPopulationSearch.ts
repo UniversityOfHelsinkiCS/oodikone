@@ -6,7 +6,10 @@ export type CustomPopulationSearch = {
   id: string
   userId: string
   name: string
+  mode: 'studentNumbers' | 'programmes'
   students: string[]
+  programmes: { code: string; name: string }[]
+  year: string
   createdAt?: string // Both are dates
   updatedAt?: string
 }

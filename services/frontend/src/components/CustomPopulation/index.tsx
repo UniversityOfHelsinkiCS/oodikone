@@ -7,6 +7,8 @@ import { CustomPopulationSearch } from '@oodikone/shared/models/kone'
 export type CustomPopulationState = {
   selectedSearch: CustomPopulationSearch | null
   studentNumbers: string[]
+  programmes: string[]
+  years: string[]
   associatedProgramme?: string // programme code
 }
 
@@ -21,6 +23,8 @@ export const CustomPopulation = () => {
   const defaultState = {
     selectedSearch: null,
     studentNumbers: [],
+    programmes: [],
+    years: [],
     associatedProgramme: '',
   }
 

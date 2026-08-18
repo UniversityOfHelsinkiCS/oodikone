@@ -10,7 +10,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { SingleStudyGuidanceGroupPanels } from '@/components/StudyGuidanceGroups/SingleStudyGuidanceGroupPanels'
 import { startYearToAcademicYear, useGetFilters } from '@/components/StudyGuidanceGroups/utils'
-import { useGetCustomPopulationQuery } from '@/redux/populations'
+import { useGetCustomPopulationByStudentNumbersQuery } from '@/redux/populations'
 import { useFilteredAndFormattedStudyProgrammes } from '@/redux/studyProgramme'
 import { CalendarMonthIcon, LabelIcon } from '@/theme'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
@@ -18,7 +18,7 @@ import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWithTags | undefined }) => {
   // Sorting is needed for RTK query cache to work properly
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber).sort() ?? []
-  const { data: population, isLoading } = useGetCustomPopulationQuery({
+  const { data: population, isLoading } = useGetCustomPopulationByStudentNumbersQuery({
     studentNumbers: groupStudentNumbers,
     tags: {
       studyProgramme: group?.tags?.studyProgramme,

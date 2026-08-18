@@ -8,22 +8,28 @@ const customPopulationSearchApi = RTKApi.injectEndpoints({
       providesTags: [{ type: 'CustomPopulationSearches', id: 'LIST' }],
     }),
     createCustomPopulationSearch: builder.mutation({
-      query: ({ name, students }) => ({
+      query: ({ name, mode, students, programmes, year }) => ({
         url: '/custom-population-search',
         method: 'POST',
         body: {
           name,
+          mode,
           students,
+          programmes,
+          year,
         },
       }),
       invalidatesTags: [{ type: 'CustomPopulationSearches', id: 'LIST' }],
     }),
     updateCustomPopulationSearch: builder.mutation({
-      query: ({ id, students }) => ({
+      query: ({ id, mode, students, programmes, year }) => ({
         url: `/custom-population-search/${id}`,
         method: 'PUT',
         body: {
+          mode,
           students,
+          programmes,
+          year,
         },
       }),
       invalidatesTags: [{ type: 'CustomPopulationSearches', id: 'LIST' }],

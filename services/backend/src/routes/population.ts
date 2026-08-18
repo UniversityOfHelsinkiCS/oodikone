@@ -9,8 +9,10 @@ import {
   type PopulationstatisticsbycourseResBody,
   type PopulationstatisticsbycourseReqBody,
   type PopulationstatisticsbycourseParams,
-  type GetCustomPopulationResBody,
-  type CustomPopulationQuery,
+  type CustomPopulationByStudentNumbersQuery,
+  type CustomPopulationByStudentNumbersResBody,
+  type CustomPopulationByProgrammesQuery,
+  type CustomPopulationByProgrammesResBody,
   type PopulationstatisticsStudyprogrammesResBody,
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
@@ -109,7 +111,7 @@ router.get<never, CanError<PopulationstatisticsResBody>, PopulationstatisticsReq
 
     const years = handleQueryArrays(req.query.years)
     const semesters = handleQueryArrays(req.query.semesters)
-    const studentStatuses = handleQueryArrays(req.query.studentStatuses) // NOTE: TRANSFERRED means transferred out of the program
+    const studentStatuses = handleQueryArrays(req.query.studentStatuses ?? []) // NOTE: TRANSFERRED means transferred out of the program
 
     const requiredFields = [years, semesters, programme]
     if (requiredFields.some(field => !field.length)) {
@@ -234,13 +236,13 @@ router.get<
 })
 
 // Used in custom population and single study guidance groups
-router.post<never, CanError<GetCustomPopulationResBody>, CustomPopulationQuery>(
+router.post<never, CanError<CustomPopulationByStudentNumbersResBody>, CustomPopulationByStudentNumbersQuery>(
   '/populationstatisticsbystudentnumbers',
   async (req, res) => {
     const { studentNumbers, tags } = req.body ?? { studentNumbers: [] }
     const { id: userId, roles, studentsUserCanAccess } = req.user
 
-    const students = handleQueryArrays(studentNumbers)
+    const students = handleQueryArrays(studentNumbers ?? [])
 
     if (!students.length) {
       return res.status(422).json({ error: 'Body should include student numbers' })
@@ -251,14 +253,14 @@ router.post<never, CanError<GetCustomPopulationResBody>, CustomPopulationQuery>(
       : intersection(students, studentsUserCanAccess)
 
     const studyProgrammeCode = tags?.studyProgramme?.split('+')[0]
-
     const studyRights = [studyProgrammeCode].filter(value => value !== undefined)
+
     const tagMap = await getStudentTagMap(studyRights, filteredStudentNumbers, userId)
     const filterCreditsAndEnrollmentsByDate = false
 
-    const { startDate } = tags?.year
-      ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] })
-      : { startDate: undefined }
+    const startDate = tags?.year
+      ? parseDateRangeFromParams({ semesters: ['FALL', 'SPRING'], years: [tags?.year] }).startDate
+      : undefined
 
     const result = await statisticsOf(
       filteredStudentNumbers,
@@ -272,6 +274,62 @@ router.post<never, CanError<GetCustomPopulationResBody>, CustomPopulationQuery>(
     const discardedStudentNumbers = difference(students, filteredStudentNumbers)
 
     res.status(200).json({ ...resultWithStudyProgramme, discardedStudentNumbers })
+  }
+)
+
+// Used in custom population
+router.post<never, CanError<CustomPopulationByProgrammesResBody>, CustomPopulationByProgrammesQuery>(
+  '/populationstatisticsbyprogrammecodes',
+  async (req, res) => {
+    const { programmes: programmesParam, years: yearsParam } = req.body ?? {}
+    const { id: userId, roles, studentsUserCanAccess, programmeRights: userProgrammeRights } = req.user
+
+    const programmes = handleQueryArrays(programmesParam ?? [])
+    const years = handleQueryArrays(yearsParam ?? [])
+
+    if (!years?.length) {
+      return res.status(400).json({ error: 'Programme based populations require years to be defined' })
+    }
+
+    const hasFullAccessToStudents = hasFullAccessToStudentData(roles)
+    const userProgrammeRightsCodes = userProgrammeRights.map(({ code }) => code)
+    const unauthorizedProgrammes = programmes.filter(code => !userProgrammeRightsCodes.includes(code))
+
+    if (!hasFullAccessToStudents && unauthorizedProgrammes.length) {
+      return res.status(403).json({ error: 'Trying to request unauthorized students data' })
+    }
+
+    const { startDate: parsedStartDate, endDate } = parseDateRangeFromParams({
+      semesters: ['FALL', 'SPRING'],
+      years,
+    })
+
+    const studentNumbersWithStudyRights = await getStudentNumbersWithStudyRights({
+      programmeCodes: programmes,
+      startDate: parsedStartDate,
+      endDate,
+      // Continuing education programmes (e.g. EEL) have non-degree study rights
+      studentStatuses: ['NONDEGREE'],
+    })
+
+    const filteredStudentNumbers = hasFullAccessToStudents
+      ? studentNumbersWithStudyRights
+      : intersection(studentNumbersWithStudyRights, studentsUserCanAccess)
+
+    const studyRights = programmes
+
+    const tagMap = await getStudentTagMap(studyRights, filteredStudentNumbers, userId)
+    const filterCreditsAndEnrollmentsByDate = false
+
+    const result = await statisticsOf(
+      filteredStudentNumbers,
+      studyRights,
+      tagMap,
+      filterCreditsAndEnrollmentsByDate,
+      parsedStartDate
+    )
+
+    res.status(200).json(result)
   }
 )
 

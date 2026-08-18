@@ -130,6 +130,25 @@ test.describe('Custom population tests', () => {
     })
   })
 
+  test.describe('Custom population by programme', () => {
+    test('Finds students of programmes matching a prefix', async ({ page }) => {
+      await page.getByTestId('search-mode').click()
+      await expect(page.getByTestId('search-button')).toBeDisabled()
+
+      await page.getByTestId('custom-population-programme-prefix-input').fill('KH50')
+      await page.getByTestId('custom-population-add-by-prefix-button').click()
+      await expect(page.getByText('KH50_001')).toBeVisible()
+
+      await page.getByTestId('population-year-selector').click()
+      await page.getByText('2020 - 2021').click()
+
+      await page.getByTestId('search-button').click()
+      await expect(page.getByText('Credit accumulation')).toBeVisible()
+      await expect(page.getByText('Courses of population')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Back to search form' })).toBeVisible()
+    })
+  })
+
   test.describe('Custom population search saving', () => {
     test('Saves a custom population search', async ({ page }) => {
       const name = await fillName(page)

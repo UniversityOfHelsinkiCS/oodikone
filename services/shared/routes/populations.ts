@@ -108,17 +108,25 @@ export type PopulationstatisticsbycourseParams = {
 }
 
 // populationstatisticsbystudentnumbers
-export type GetCustomPopulationResBody = PopulationstatisticsResBody & {
-  studyProgramme?: string | null
-  discardedStudentNumbers: string[]
-}
-export type CustomPopulationQuery = {
+export type CustomPopulationByStudentNumbersQuery = {
   studentNumbers: string[]
+
   tags?: {
     studyProgramme?: string | null
     year?: string | null
   }
 }
+export type CustomPopulationByStudentNumbersResBody = PopulationstatisticsResBody & {
+  studyProgramme?: string | null
+  discardedStudentNumbers: string[]
+}
+
+// populationstatisticsbyprogrammecodes
+export type CustomPopulationByProgrammesQuery = {
+  programmes: string | string[]
+  years: string | string[]
+}
+export type CustomPopulationByProgrammesResBody = PopulationstatisticsResBody
 
 // populationstatistics/studyprogrammes
 export type PopulationstatisticsStudyprogrammesResBody = Record<

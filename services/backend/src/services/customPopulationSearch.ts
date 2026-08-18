@@ -8,15 +8,32 @@ export const getCustomPopulationSearchesByUser = async (userId: string) => {
   })
 }
 
-export const createCustomPopulationSearch = async (name: string, userId: string, students: string[]) => {
+export const createCustomPopulationSearch = async (
+  name: string,
+  userId: string,
+  mode: 'studentNumbers' | 'programmes',
+  students: string[],
+  programmes: { code: string; name: string }[],
+  year: string
+) => {
   return CustomPopulationSearchModel.create({
     name,
     userId,
-    students,
+    mode,
+    students: mode === 'studentNumbers' ? students : [],
+    programmes: mode === 'programmes' ? programmes : [],
+    year: mode === 'programmes' ? year : null,
   })
 }
 
-export const updateCustomPopulationSearch = async (userId: string, id: string, students: string[]) => {
+export const updateCustomPopulationSearch = async (
+  userId: string,
+  id: string,
+  mode: 'studentNumbers' | 'programmes',
+  students: string[],
+  programmes: { code: string; name: string }[],
+  year: string
+) => {
   const targetCustomPopulationSearch = await CustomPopulationSearchModel.findOne({
     where: {
       id,
@@ -29,7 +46,10 @@ export const updateCustomPopulationSearch = async (userId: string, id: string, s
   }
 
   return targetCustomPopulationSearch.update({
-    students,
+    mode,
+    students: mode === 'studentNumbers' ? students : [],
+    programmes: mode === 'programmes' ? programmes : [],
+    year: mode === 'programmes' ? year : null,
   })
 }
 

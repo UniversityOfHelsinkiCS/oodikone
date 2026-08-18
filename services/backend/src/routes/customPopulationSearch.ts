@@ -21,51 +21,75 @@ router.get<never, GetCustomPopulationSearchResBody>('/', async (req, res) => {
 
 type PostCustomPopulationSearchReqBody = {
   name: string
+  mode: 'studentNumbers' | 'programmes'
   students: string[]
+  programmes: { code: string; name: string }[]
+  year: string
 }
 type PostCustomPopulationSearchResBody = CustomPopulationSearch
 
 router.post<never, CanError<PostCustomPopulationSearchResBody>, PostCustomPopulationSearchReqBody>(
   '/',
   async (req, res) => {
-    const { name, students } = req.body
+    const { name, mode, students, programmes, year } = req.body
     const { id } = req.user
 
     if (!name) {
       return res.status(400).json({ error: 'Name missing' })
     }
-    if (students && !Array.isArray(students)) {
-      return res.status(400).json({ error: 'Students must be of type array' })
+    if (!mode) {
+      return res.status(400).json({ error: 'Search mode missing!!!' })
     }
 
-    const customPopulationSearch = await createCustomPopulationSearch(name, id, students ?? [])
+    if (mode === 'studentNumbers' && students && !Array.isArray(students))
+      return res.status(400).json({ error: 'Students must be of type array' })
+
+    if (mode === 'programmes' && !year) return res.status(400).json({ error: 'Year missing' })
+    if (mode === 'programmes' && programmes && !Array.isArray(programmes))
+      return res.status(400).json({ error: 'Programmes must be of type array' })
+
+    const customPopulationSearch = await createCustomPopulationSearch(
+      name,
+      id,
+      mode,
+      students ?? [],
+      programmes ?? [],
+      year
+    )
     res.json(customPopulationSearch)
   }
 )
 
 type PutCustomPopulationSearchReqBody = {
+  mode: 'studentNumbers' | 'programmes'
   students: string[]
+  programmes: { code: string; name: string }[]
+  year: string
 }
 type PutCustomPopulationSearchResBody = CustomPopulationSearch
 
 router.put<never, CanError<PutCustomPopulationSearchResBody>, PutCustomPopulationSearchReqBody>(
   '/:id',
   async (req, res) => {
-    const { students } = req.body
+    const { mode, students, programmes, year } = req.body
     const { id } = req.params
     const { id: userId } = req.user
 
     if (!id) {
       return res.status(400).json({ error: 'Id missing' })
     }
-    if (!students) {
-      return res.status(400).json({ error: 'Students missing' })
-    }
-    if (!Array.isArray(students)) {
-      return res.status(400).json({ error: 'Students must be of type array' })
+    if (!mode) {
+      return res.status(400).json({ error: 'Search mode missing' })
     }
 
-    const updatedPopulationSearch = await updateCustomPopulationSearch(userId, id, students)
+    if (mode === 'studentNumbers' && students && !Array.isArray(students))
+      return res.status(400).json({ error: 'Students must be of type array' })
+
+    if (mode === 'programmes' && !year) return res.status(400).json({ error: 'Year missing' })
+    if (mode === 'programmes' && programmes && !Array.isArray(programmes))
+      return res.status(400).json({ error: 'Programmes must be of type array' })
+
+    const updatedPopulationSearch = await updateCustomPopulationSearch(userId, id, mode, students, programmes, year)
     if (!updatedPopulationSearch) {
       return res.status(404).json({ error: 'Custom population search not found' })
     }

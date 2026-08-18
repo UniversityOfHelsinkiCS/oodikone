@@ -19,7 +19,10 @@ import {
 } from '@/components/FilterView/filters'
 import { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { useSemesters } from '@/hooks/useSemesters'
-import { useGetCustomPopulationQuery } from '@/redux/populations'
+import {
+  useGetCustomPopulationByProgrammesQuery,
+  useGetCustomPopulationByStudentNumbersQuery,
+} from '@/redux/populations'
 
 export const CustomPopulationWrapper = ({
   customPopulationState,
@@ -30,7 +33,7 @@ export const CustomPopulationWrapper = ({
 }) => {
   const { semesters } = useSemesters()
 
-  const { data: population, isFetching } = useGetCustomPopulationQuery(
+  const studentNumbersPopulation = useGetCustomPopulationByStudentNumbersQuery(
     {
       studentNumbers: customPopulationState.studentNumbers,
       tags: { studyProgramme: customPopulationState.associatedProgramme },
@@ -38,9 +41,21 @@ export const CustomPopulationWrapper = ({
     { skip: !customPopulationState.studentNumbers.length }
   )
 
+  const programmesPopulation = useGetCustomPopulationByProgrammesQuery(
+    {
+      programmes: customPopulationState.programmes,
+      years: customPopulationState.years,
+    },
+    { skip: !customPopulationState.programmes.length }
+  )
+
+  const { data: population, isFetching } = customPopulationState.studentNumbers.length
+    ? studentNumbersPopulation
+    : programmesPopulation
+
   const populationStudents = population?.students ?? []
-  const associatedProgramme = population?.studyProgramme
-  const discardedStudentNumbers = population?.discardedStudentNumbers ?? []
+  const associatedProgramme = studentNumbersPopulation.data?.studyProgramme
+  const discardedStudentNumbers = studentNumbersPopulation.data?.discardedStudentNumbers ?? []
 
   const filters: GenericFilter[] = useMemo(() => {
     const filtersList = [
@@ -80,6 +95,7 @@ export const CustomPopulationWrapper = ({
           filteredStudents={filteredStudents}
           isFetchingPopulation={isFetching}
           populationName={customPopulationState.selectedSearch?.name}
+          programmes={customPopulationState.programmes}
           resetState={resetState}
           unfilteredPopulationLength={populationStudents.length}
         />

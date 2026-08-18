@@ -8,8 +8,10 @@ import type {
   PopulationstatisticsMaxYearsToCreatePopulationFormResBody,
   PopulationstatisticsMaxYearsToCreatePopulationFormQuery,
   PopulationstatisticsStudyprogrammesResBody,
-  CustomPopulationQuery,
-  GetCustomPopulationResBody,
+  CustomPopulationByStudentNumbersQuery,
+  CustomPopulationByStudentNumbersResBody,
+  CustomPopulationByProgrammesQuery,
+  CustomPopulationByProgrammesResBody,
 } from '@oodikone/shared/routes/populations'
 
 const populationApi = RTKApi.injectEndpoints({
@@ -22,16 +24,27 @@ const populationApi = RTKApi.injectEndpoints({
       }),
       transformResponse: formatPopulationData<PopulationstatisticsResBody>,
     }),
-    getCustomPopulation: builder.query<Output<GetCustomPopulationResBody>, CustomPopulationQuery>({
+    getCustomPopulationByStudentNumbers: builder.query<
+      Output<CustomPopulationByStudentNumbersResBody>,
+      CustomPopulationByStudentNumbersQuery
+    >({
       query: ({ studentNumbers, tags }) => ({
         url: '/populationstatisticsbystudentnumbers',
         method: 'POST',
-        body: {
-          studentNumbers,
-          tags,
-        },
+        body: { studentNumbers, tags },
       }),
-      transformResponse: formatPopulationData<GetCustomPopulationResBody>,
+      transformResponse: formatPopulationData<CustomPopulationByStudentNumbersResBody>,
+    }),
+    getCustomPopulationByProgrammes: builder.query<
+      Output<CustomPopulationByProgrammesResBody>,
+      CustomPopulationByProgrammesQuery
+    >({
+      query: ({ programmes, years }) => ({
+        url: '/populationstatisticsbyprogrammecodes',
+        method: 'POST',
+        body: { programmes, years },
+      }),
+      transformResponse: formatPopulationData<CustomPopulationByProgrammesResBody>,
     }),
     getPopulationStatisticsByCourse: builder.query<
       Output<PopulationstatisticsbycourseResBody>,
@@ -54,7 +67,7 @@ const populationApi = RTKApi.injectEndpoints({
     }),
     getProgrammes: builder.query<PopulationstatisticsStudyprogrammesResBody, void>({
       query: () => '/populationstatistics/studyprogrammes',
-      keepUnusedDataFor: 60 * 60,
+      // keepUnusedDataFor: 60 * 60,
     }),
   }),
   overrideExisting: false,
@@ -62,7 +75,8 @@ const populationApi = RTKApi.injectEndpoints({
 
 export const {
   useGetPopulationStatisticsQuery,
-  useGetCustomPopulationQuery,
+  useGetCustomPopulationByStudentNumbersQuery,
+  useGetCustomPopulationByProgrammesQuery,
   useGetPopulationStatisticsByCourseQuery,
   useGetMaxYearsToCreatePopulationFromQuery,
   useGetProgrammesQuery,

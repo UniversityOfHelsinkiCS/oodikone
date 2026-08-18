@@ -4,7 +4,7 @@ import { isMastersProgramme } from '@/common'
 import * as filters from '@/components/FilterView/filters'
 import { GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { useSemesters } from '@/hooks/useSemesters'
-import { GetCustomPopulationResBody } from '@oodikone/shared/routes/populations'
+import { CustomPopulationByStudentNumbersResBody } from '@oodikone/shared/routes/populations'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
 export const createAcademicYearStartDate = (year: number) => new Date(year, 7, 1)
@@ -14,7 +14,7 @@ export const startYearToAcademicYear = (year: string | null | undefined) =>
 
 export const useGetFilters = (
   group: GroupsWithTags | undefined,
-  population: Pick<GetCustomPopulationResBody, 'coursestatistics'> | undefined
+  population: Pick<CustomPopulationByStudentNumbersResBody, 'coursestatistics'> | undefined
 ) => {
   const { semesters } = useSemesters()
 

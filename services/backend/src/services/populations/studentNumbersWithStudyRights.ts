@@ -22,7 +22,17 @@ type StudentStudyRights = Pick<SISStudyRightModel, 'studentNumber' | 'studyRight
   studyRightElements: Array<Pick<SISStudyRightElementModel, 'code' | 'endDate' | 'startDate' | 'phase'>>
 }
 
-export const getStudentNumbersWithStudyRights = async ({ programmeCodes, startDate, endDate, studentStatuses }) => {
+export const getStudentNumbersWithStudyRights = async ({
+  programmeCodes,
+  startDate,
+  endDate,
+  studentStatuses,
+}: {
+  programmeCodes: string[]
+  startDate: string
+  endDate: string
+  studentStatuses: string[]
+}) => {
   const includeExchangeStudents = !!studentStatuses?.includes('EXCHANGE')
   const includeNondegreeStudents = !!studentStatuses?.includes('NONDEGREE')
   const includeTransferredOutStudents = !!studentStatuses?.includes('TRANSFERRED')

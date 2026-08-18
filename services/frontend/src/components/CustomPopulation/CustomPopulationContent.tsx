@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useEffect } from 'react'
@@ -11,6 +12,7 @@ import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
 import { StudentAmountLimiter } from '@/components/common/StudentAmountLimiter'
 import { StyledMessage } from '@/components/common/StyledMessage'
+import { CourseMatrixExport } from '@/components/CustomPopulation/CourseMatrixExport'
 import { useColumns as columnsGeneralTab } from '@/components/CustomPopulation/studentColumns'
 import { UnihowDataExport } from '@/components/CustomPopulation/UnihowDataExport'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
@@ -34,6 +36,7 @@ export const CustomPopulationContent = ({
   discardedStudentNumbers,
   unfilteredPopulationLength,
   associatedProgramme,
+  programmes,
   isFetchingPopulation,
   resetState,
 }: {
@@ -43,6 +46,7 @@ export const CustomPopulationContent = ({
   discardedStudentNumbers: string[]
   unfilteredPopulationLength: number
   associatedProgramme?: string | null
+  programmes: string[]
   isFetchingPopulation: boolean
   resetState: () => void
 }) => {
@@ -94,7 +98,12 @@ export const CustomPopulationContent = ({
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
-          dataExport={<UnihowDataExport students={filteredStudents} />}
+          dataExport={
+            <Stack direction="row" spacing={1}>
+              <UnihowDataExport students={filteredStudents} />
+              <CourseMatrixExport courses={filteredCourses} students={filteredStudents} />
+            </Stack>
+          }
           filteredStudents={filteredStudents}
           generalTabColumnFunction={() =>
             columnsGeneralTab({
@@ -137,7 +146,20 @@ export const CustomPopulationContent = ({
                 Back to search form
               </Button>
               <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                {associatedProgramme ? (
+                {programmes.length > 0 ? (
+                  <Stack direction="row" spacing={1}>
+                    {programmes.map(programme => (
+                      <Chip
+                        key={programme}
+                        color="primary"
+                        icon={<LabelIcon fontSize="small" />}
+                        label={programme}
+                        sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
+                        variant="filled"
+                      />
+                    ))}
+                  </Stack>
+                ) : associatedProgramme ? (
                   <Tooltip title="Degree programme associated with the custom population">
                     <Chip
                       color="primary"

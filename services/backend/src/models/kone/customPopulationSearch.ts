@@ -19,6 +19,15 @@ export class CustomPopulationSearchModel extends Model implements CustomPopulati
   @Column(DataType.STRING)
   declare name: CustomPopulationSearch['name']
 
+  @Column(DataType.STRING)
+  declare mode: CustomPopulationSearch['mode']
+
+  @Column(DataType.JSONB)
+  declare programmes: CustomPopulationSearch['programmes']
+
+  @Column(DataType.STRING)
+  declare year: CustomPopulationSearch['year']
+
   @Column(DataType.ARRAY(DataType.STRING))
   declare students: CustomPopulationSearch['students']
 }

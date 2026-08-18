@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { sortBy } from 'lodash-es'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { DateFormat } from '@/constants/date'
 import { AccessTimeIcon } from '@/theme'
@@ -43,12 +43,9 @@ export const SearchHistory = ({
     }
   }
 
-  useEffect(() => {
-    if (selected === null) return
-    if (items.every(item => item.id !== selected.id)) {
-      setSelected(null)
-    }
-  }, [items, selected])
+  if (selected && items.every(item => item.id !== selected.id)) {
+    setSelected(null)
+  }
 
   return (
     <Card variant="outlined">
@@ -65,6 +62,7 @@ export const SearchHistory = ({
             getOptionLabel={option => option.text}
             onChange={handleChange}
             options={sortedItems}
+            getOptionKey={(option: SearchHistoryItem) => `${option.text}-${option?.id}`}
             renderInput={params => <TextField {...params} data-cy="history-search" label="Select a previous search" />}
             renderOption={(props, option) => {
               const { key, ...optionProps } = props
