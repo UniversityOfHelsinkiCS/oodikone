@@ -95,7 +95,7 @@ export const CourseTables = ({ student, selectedStudyPlanId }) => {
         size="small"
         sx={{ height: 20, width: 20 }}
         title={`View course statistics for ${getTextIn(course.name)} (${course.code})`}
-        to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&combineSubstitutions=true`}
+        to={`/coursestatistics?courses=${course.groupId}&separate=false&substitutions=true`}
       >
         <NorthEastIcon fontSize="small" />
       </IconButton>,
