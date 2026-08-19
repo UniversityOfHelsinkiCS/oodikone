@@ -214,7 +214,7 @@ export const getTargetCreditsForProgramme = (code: string) => {
   if (code === 'MH30_004') return 150
   if (code === 'MH90_001') return 180
   if (code.includes('MH')) return 120
-  if (code.includes('T')) return 40
+  if (code.includes('T') || code.startsWith('DP')) return 30
   return 180
   // Those codes begin with 'LIS' is it 40 credits or something else?
 }
