@@ -10,7 +10,7 @@ const DEFAULT_STATE = '0' as const
 
 const BACHELORS = DegreeProgrammeType.BACHELOR
 const MASTERS = DegreeProgrammeType.MASTER
-const GRADUATION_PHASE = {
+export const GRADUATION_PHASE = {
   NOT_GRADUATED: '-1',
   NOT_GRADUATED_BACHELOR: '-1',
   NOT_GRADUATED_MASTER: '-2',
@@ -19,6 +19,7 @@ const GRADUATION_PHASE = {
   GRADUATED_BACHELOR: '1',
   GRADUATED_MASTER: '2',
 } as const
+export type GraduationPhase = (typeof GRADUATION_PHASE)[keyof typeof GRADUATION_PHASE]
 
 const GraduatedFromProgrammeFilterCard = ({ args, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
   const isCombinedExtent = !!args.code && (!!args.combinedProgrammeCode || !!args.showBachelorAndMaster)
