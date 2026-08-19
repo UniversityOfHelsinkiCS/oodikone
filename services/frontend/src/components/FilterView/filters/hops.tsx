@@ -111,7 +111,9 @@ export const hopsFilter = createFilter<Options, Args, Precompute>({
   mutate: (student, { args, options }) => {
     const { activeProgramme, activeCombinedProgramme } = options
 
-    const studyRights = student.studyRights.filter(({ cancelled }) => !cancelled).map(({ id }) => id)
+    const studyRights = student.studyRights
+      .filter(({ cancelled, studyRightElements }) => !cancelled || studyRightElements.some(sre => sre.graduated))
+      .map(({ id }) => id)
     const hops = student.studyplans.find(
       ({ programme_code, sis_study_right_id }) =>
         programme_code === args.programmeCode && studyRights.includes(sis_study_right_id)
