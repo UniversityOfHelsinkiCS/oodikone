@@ -1,0 +1,61 @@
+import { assert, describe, it } from 'vitest'
+
+import { gradeFilter } from '@/components/FilterView/filters/grade'
+
+import { createCourse, createStudent } from './helpers'
+
+const ARGS = { courseCodes: ['TKT002'], from: '2024-01-01', to: '2024-12-31' }
+
+void describe('gradeFilter', () => {
+  void it('should group student numbers by their highest grade for the given courses', () => {
+    const student = createStudent({
+      courses: [
+        createCourse({ course_code: 'TKT002', grade: '5' }),
+        createCourse({ course_code: 'TKT002', grade: '3' }),
+      ],
+    })
+
+    const precomputed = gradeFilter().precompute!({ students: [student], options: { selected: [] }, args: ARGS })
+
+    assert.deepStrictEqual(precomputed.grades, { 5: [student.studentNumber] })
+  })
+
+  void it('should ignore courses outside the requested date range', () => {
+    const student = createStudent({
+      courses: [createCourse({ course_code: 'TKT002', grade: '5', date: new Date('2023-01-01') })],
+    })
+
+    const precomputed = gradeFilter().precompute!({ students: [student], options: { selected: [] }, args: ARGS })
+
+    assert.deepStrictEqual(precomputed.grades, {})
+  })
+
+  void it('should include a student whose grade is selected', () => {
+    const student = createStudent({ courses: [createCourse({ grade: '5' })] })
+
+    const result = gradeFilter().filter(student, {
+      args: ARGS,
+      options: { selected: ['5'] },
+      precomputed: { grades: { 5: [student.studentNumber] } },
+    })
+
+    assert.strictEqual(result, true)
+  })
+
+  void it('should exclude a student whose grade is not selected', () => {
+    const student = createStudent({ courses: [createCourse({ course_code: 'TKT002', grade: '3' })] })
+
+    const result = gradeFilter().filter(student, {
+      args: ARGS,
+      options: { selected: ['5'] },
+      precomputed: { grades: { 3: [student.studentNumber] } },
+    })
+
+    assert.strictEqual(result, false)
+  })
+
+  void it('isActive should match the filter state', () => {
+    assert.strictEqual(gradeFilter().isActive({ selected: ['5'] }, undefined), true)
+    assert.strictEqual(gradeFilter().isActive({ selected: [] }, undefined), false)
+  })
+})
