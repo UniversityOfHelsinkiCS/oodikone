@@ -1,6 +1,7 @@
 import { getDegreeProgrammeType } from '../../util'
 import { now } from '../../util/clock'
 import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
+import { getCourseDetails } from '../courses'
 import { formatStudentForAPI } from './formatStatisticsForApi'
 import {
   type StudentEnrollment,
@@ -11,7 +12,7 @@ import {
   getCredits,
   getStudyRightElementsForStudyRight,
 } from './getStudentData'
-import { getCourses, getOptionsForStudents } from './shared'
+import { getCourseGroupIds, getOptionsForStudents } from './shared'
 
 export type OptimizedStatisticsQuery = {
   userId: string
@@ -66,7 +67,10 @@ export const statisticsOf = async (
   const courseIds = new Set<string>()
   for (const { course_id } of credits) courseIds.add(course_id)
   for (const { course_id } of enrollments) courseIds.add(course_id)
-  const courses = await getCourses([...courseIds])
+  const idToGroupIdRows = await getCourseGroupIds([...courseIds])
+  const idToGroupIdMap = Object.fromEntries(idToGroupIdRows.map(({ id, groupId }) => [id, groupId]))
+  const groupIds = [...new Set(idToGroupIdRows.map(({ groupId }) => groupId))]
+  const courses = await getCourseDetails(groupIds)
 
   const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
   const formattedStudents = students.map(student => {
@@ -79,6 +83,6 @@ export const statisticsOf = async (
   return {
     students: formattedStudents,
     criteria,
-    coursestatistics: { courses, enrollments, credits },
+    coursestatistics: { courses, idToGroupIdMap, enrollments, credits },
   }
 }

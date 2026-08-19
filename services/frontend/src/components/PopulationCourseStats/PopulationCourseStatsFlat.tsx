@@ -49,6 +49,7 @@ export const PopulationCourseStatsFlat = ({
         ...course,
         name: course.course.name,
         code: course.course.code,
+        groupId: course.course.groupId,
         stats,
       }
     })

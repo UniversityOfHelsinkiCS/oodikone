@@ -194,7 +194,7 @@ export const PopulationStatistics = () => {
   const filters: GenericFilter[] = [
     !useUserHasRestrictedAccess() ? ageFilter() : null,
     citizenshipFilter(),
-    courseFilter({ courses }),
+    courseFilter({ courses, idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {} }),
     creditDateFilter(),
     creditsEarnedFilter(),
     curriculumPeriodFilter(),

@@ -77,9 +77,9 @@ export const getOptionsForStudents = (
   return optionMap
 }
 
-export const getCourses = (courseIds: string[]): Promise<Array<CourseStats>> =>
+export const getCourseGroupIds = (courseIds: string[]): Promise<Array<Pick<CourseStats, 'id' | 'groupId'>>> =>
   CourseModel.findAll({
-    attributes: ['id', 'groupId', 'code', 'name', 'substitutionGroups', 'isStudyModule'],
+    attributes: ['id', 'groupId'],
     where: {
       id: { [Op.in]: courseIds },
     },

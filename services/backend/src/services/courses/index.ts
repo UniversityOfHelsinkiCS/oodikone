@@ -1,15 +1,9 @@
 import crypto from 'crypto'
-import { Op, fn as dbFn, col as dbCol, fn, col } from 'sequelize'
+import { Op } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
 import { Name, EnrollmentState, Unification, CreditTypeCode } from '@oodikone/shared/types'
-import {
-  enrollmentTimeDateThreshold,
-  getSemesterCodeAt,
-  MAX_POPULATION_SIZE,
-  yearCodeToYear,
-  yearToYearCode,
-} from '@oodikone/shared/util'
+import { enrollmentTimeDateThreshold, getSemesterCodeAt, yearCodeToYear, yearToYearCode } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
 import { CourseModel, CreditModel, EnrollmentModel, OrganizationModel, SISStudyRightElementModel } from '../../models'
@@ -21,9 +15,8 @@ import {
   getEnrollmentsForCourses,
   getStudentNumberToSrElementsMap,
 } from './creditsAndEnrollmentsOfCourse'
-import { FormattedProgramme, getAllCourseIds, getIsOpen } from './helpers'
+import { FormattedProgramme } from './helpers'
 import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
-import { difference } from 'lodash-es'
 
 const formatStudyRightElement = (studyRightElement: SISStudyRightElementModel): FormattedProgramme => ({
   code: studyRightElement.code,
@@ -471,7 +464,7 @@ export const getCourseProvidersForCourses = async (courseIds: string[]) =>
 
 export const getCourseDetails = async (courseGroupIds: string[]) =>
   CourseModel.findAll({
-    attributes: ['groupId', 'code', 'name', 'substitution_groups'],
+    attributes: ['id', 'groupId', 'code', 'name', 'substitutionGroups', 'isStudyModule'],
     where: { groupId: { [Op.in]: courseGroupIds }, isPrimary: true },
     raw: true,
   })
