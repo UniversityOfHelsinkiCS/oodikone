@@ -35,6 +35,7 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 LOCAL_DUMP_DIR="$PROJECT_ROOT/.databasedumps/local_containers"
 S3_DUMP_DIR="$PROJECT_ROOT/.databasedumps/s3"
 TEST_DUMP_DIR="$PROJECT_ROOT/.databasedumps/test" # Location where docker pulls .sql files
+DUMP_DIRS=("$LOCAL_DUMP_DIR" "$S3_DUMP_DIR" "$TEST_DUMP_DIR")
 
 S3_CONFIG_FILE=~/.s3cfg
 S3_BUCKET="s3://oodikone-test"
@@ -87,9 +88,10 @@ upload_s3_db () {
 # Update registry with an existing dump located in .databasedumps/$2
 build_and_push_image () {
   local database="$1"
+  local location="$2"
 
   infomsg "Building docker image for $database\n"
-  docker build "$PROJECT_ROOT" -t "$REGISTRY/$database" -f db.Dockerfile --build-arg DB_NAME="$database"
+  docker build "$PROJECT_ROOT" -t "$REGISTRY/$database" -f db.Dockerfile --build-arg DB_NAME="$database" --build-arg DUMP_LOCATION="$location"
   successmsg "$database docker image built"
   infomsg "Pushing $database to $REGISTRY\n"
   docker push "$REGISTRY/$database"
@@ -125,35 +127,91 @@ do_for_all () {
   successmsg "$1 ran successfully"
 }
 
-init_menu () {
+ask_for_input () {
+  local cmd="$1"
+  shift # Removes $1 from "$@"
+
+  echo
+
+  init_database_menu
+  select database in "${options[@]}"; do
+    "$cmd" "$database" "$@"
+    break
+  done
+}
+
+
+init_action_menu () {
   PS3="Please enter your choice: "
 
   options=(
     "Pull dumps from s3"
-    "Update dumps in s3 (s3 dumps)"
     "Dump from running docker images"
-    "Update dumps in s3 (local docker dumps)"
+    "Update dumps in s3"
     "Push new images to registry"
   )
 }
 
+init_mode_menu () {
+  PS3="Select command mode: "
+  options=(
+    "Run command for all databases"
+    "Select single database"
+  )
+}
+
+init_database_menu () {
+  PS3="Select database: "
+  options=("${DATABASES[@]}")
+}
+
+init_dump_location_menu () {
+  PS3="Select dump location: "
+  options=("${DUMP_DIRS[@]}")
+}
+
 
 # === RUN ===
-init_menu
-
 while true; do
+  init_mode_menu
+  select mode in "${options[@]}"; do
+    case "$mode" in
+      "Run command for all databases")
+        cmd="do_for_all"
+        break;;
+      "Select single database")
+        cmd="ask_for_input"
+        break;;
+    esac
+  done
+
+  echo
+
+  init_dump_location_menu
+  select loc in "${options[@]}"; do
+    location="$loc"
+    break
+  done
+
+  echo
+
+  init_action_menu
   select opt in "${options[@]}"; do
     case "$opt" in
       "Pull dumps from s3")
-        do_for_all download_s3_db "$S3_DUMP_DIR";;
-      "Update dumps in s3 (s3 dumps)")
-        do_for_all upload_s3_db;;
+        $cmd download_s3_db "$S3_DUMP_DIR"
+        break;;
       "Dump from running docker images")
-        do_for_all dump_local_db "$LOCAL_DUMP_DIR";;
-      "Update dumps in s3 (local docker dumps)")
-        do_for_all upload_s3_db "$LOCAL_DUMP_DIR";;
+        $cmd dump_local_db "$LOCAL_DUMP_DIR"
+        break;;
+      "Update dumps in s3")
+        $cmd upload_s3_db "$location"
+        break;;
       "Push new images to registry")
-        do_for_all build_and_push_image;;
+        $cmd build_and_push_image "$location"
+        break;;
     esac
   done
+
+  echo
 done
