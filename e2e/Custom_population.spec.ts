@@ -135,7 +135,7 @@ test.describe('Custom population tests', () => {
       await page.getByTestId('search-mode').click()
       await expect(page.getByTestId('search-button')).toBeDisabled()
 
-      await page.getByTestId('custom-population-programme-prefix-input').fill('KH50')
+      await page.getByTestId('custom-population-programme-prefix-input').getByRole('textbox').fill('KH50')
       await page.getByTestId('custom-population-add-by-prefix-button').click()
       await expect(page.getByText('KH50_001')).toBeVisible()
 
