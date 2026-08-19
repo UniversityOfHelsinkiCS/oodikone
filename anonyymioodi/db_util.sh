@@ -31,11 +31,20 @@ else
   NOFORMAT='' RED='' GREEN='' ORANGE='' BLUE=''
 fi
 
+
+# === #
+
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-LOCAL_DUMP_DIR="$PROJECT_ROOT/.databasedumps/local_containers"
-S3_DUMP_DIR="$PROJECT_ROOT/.databasedumps/s3"
-TEST_DUMP_DIR="$PROJECT_ROOT/.databasedumps/test" # Location where docker pulls .sql files
-DUMP_DIRS=("$LOCAL_DUMP_DIR" "$S3_DUMP_DIR" "$TEST_DUMP_DIR")
+
+get_project_relative_path () {
+  local absolute_path="$1"
+  local root="$2"
+  realpath -s --relative-to="${root:-$PROJECT_ROOT}" "$absolute_path"
+}
+
+LOCAL_DUMP_DIR="$(get_project_relative_path ".databasedumps/local_containers" "$PWD")" # Dumps from running docker containers
+S3_DUMP_DIR="$(get_project_relative_path ".databasedumps/s3" "$PWD")" # Dumps from s3
+TEST_DUMP_DIR="$(get_project_relative_path ".databasedumps/test" "$PWD")" # Location where .sql files are pulled while building the new image
 
 S3_CONFIG_FILE=~/.s3cfg
 S3_BUCKET="s3://oodikone-test"
@@ -68,7 +77,6 @@ download_s3_db () {
 
 upload_s3_db () {
   local database="$1"
-  local dump_location="$2"
 
   if [[ $(s3cmd ls s3:// | grep -q oodikone-test; echo $?) -eq 0 ]]
     then
@@ -78,22 +86,22 @@ upload_s3_db () {
       s3cmd -c "$S3_CONFIG_FILE" mb "s3://oodikone-test"
   fi
 
-  infomsg "Pushing $dump_location/$database.sql to $S3_BUCKET"
+  infomsg "Pushing $TEST_DUMP_DIR/$database.sql to $S3_BUCKET"
   # TODO: Also compress files
-  s3cmd -c "$S3_CONFIG_FILE" put "$dump_location/$database.sql" "$S3_BUCKET/$database.sql"
+  s3cmd -c "$S3_CONFIG_FILE" put "$TEST_DUMP_DIR/$database.sql" "$S3_BUCKET/$database.sql"
 }
 
 
 # === Build images ===
-# Update registry with an existing dump located in .databasedumps/$2
+# Update registry with an existing dump located in .databasedumps/test/$1.sql
 build_and_push_image () {
   local database="$1"
-  local location="$2"
 
   infomsg "Building docker image for $database\n"
-  docker build "$PROJECT_ROOT" -t "$REGISTRY/$database" -f db.Dockerfile --build-arg DB_NAME="$database" --build-arg DUMP_LOCATION="$location"
+  docker build "$(get_project_relative_path "$PROJECT_ROOT" "$PWD")" -t "$REGISTRY/$database:latest" -f db.Dockerfile --build-arg DB_NAME="$database"
   successmsg "$database docker image built"
   infomsg "Pushing $database to $REGISTRY\n"
+  infomsg "$REGISTRY/$database"
   docker push "$REGISTRY/$database"
   successmsg "Image $REGISTRY/$database pushed successfully"
 }
@@ -111,7 +119,7 @@ dump_local_db () {
   infomsg "Trying to dump $database to $LOCAL_DUMP_DIR/$database.sql"
   docker exec -i "$container_name" pg_dump -Fp -U postgres -d "$database_name" > "$LOCAL_DUMP_DIR/$database.sql"
   successmsg "Dumped $database to $LOCAL_DUMP_DIR/$database.sql"
-  cp --remove-destination -r "$LOCAL_DUMP_DIR" "$TEST_DUMP_DIR" # Move dump to the place where docker build pulls the .sql file from
+  cp --remove-destination -r "$LOCAL_DUMP_DIR/$database.sql" "$TEST_DUMP_DIR" # Move dump to the place where docker build pulls the .sql file from
 }
 
 
@@ -120,11 +128,11 @@ do_for_all () {
   local cmd="$1"
   shift # Removes $1 from "$@"
 
-  infomsg "Running $1 for all databases"
+  infomsg "Running $cmd for all databases"
   for database in "${DATABASES[@]}"; do
     "$cmd" "$database" "$@"
   done
-  successmsg "$1 ran successfully"
+  successmsg "$cmd ran successfully"
 }
 
 ask_for_input () {
@@ -165,11 +173,6 @@ init_database_menu () {
   options=("${DATABASES[@]}")
 }
 
-init_dump_location_menu () {
-  PS3="Select dump location: "
-  options=("${DUMP_DIRS[@]}")
-}
-
 
 # === RUN ===
 while true; do
@@ -187,28 +190,22 @@ while true; do
 
   echo
 
-  init_dump_location_menu
-  select loc in "${options[@]}"; do
-    location="$loc"
-    break
-  done
-
   echo
 
   init_action_menu
   select opt in "${options[@]}"; do
     case "$opt" in
       "Pull dumps from s3")
-        $cmd download_s3_db "$S3_DUMP_DIR"
+        "$cmd" download_s3_db "$S3_DUMP_DIR"
         break;;
       "Dump from running docker images")
-        $cmd dump_local_db "$LOCAL_DUMP_DIR"
+        "$cmd" dump_local_db "$LOCAL_DUMP_DIR"
         break;;
       "Update dumps in s3")
-        $cmd upload_s3_db "$location"
+        "$cmd" upload_s3_db
         break;;
       "Push new images to registry")
-        $cmd build_and_push_image "$location"
+        "$cmd" build_and_push_image
         break;;
     esac
   done
