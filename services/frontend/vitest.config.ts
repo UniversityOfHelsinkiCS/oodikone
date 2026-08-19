@@ -11,6 +11,7 @@ export default defineConfig({
   test: {
     reporters: ['tree'],
     exclude: ['./dist', 'node_modules'],
+    setupFiles: ['./tests/unit/setup.ts'],
     pool: 'threads',
     testTimeout: 10_000, // 10s timeout
     sequence: {
