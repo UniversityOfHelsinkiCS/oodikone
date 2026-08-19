@@ -1,4 +1,4 @@
-import { Op, QueryTypes } from 'sequelize'
+import { Op } from 'sequelize'
 
 import type { Credit, Student } from '@oodikone/shared/models'
 import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
@@ -18,7 +18,6 @@ import {
   SISStudyRightElementModel,
 } from '../models'
 import { TagModel, TagStudentModel } from '../models/kone'
-import { dbConnections } from '../database/connection'
 
 const byStudentNumber = async (studentNumber: string) => {
   const [student, tags] = await Promise.all([
@@ -44,7 +43,7 @@ const byStudentNumber = async (studentNumber: string) => {
           include: [
             {
               model: CourseModel,
-              attributes: ['code', 'name'],
+              attributes: ['code', 'name', 'groupId'],
               required: true,
             },
           ],
@@ -113,11 +112,11 @@ const byStudentNumber = async (studentNumber: string) => {
 
 const getUnifyStatus = (unifyCourses: Unification): [boolean] | [true, false] => {
   switch (unifyCourses) {
-    case 'unify':
+    case Unification.UNIFY:
       return [true, false]
-    case 'open':
+    case Unification.OPEN:
       return [true]
-    case 'regular':
+    case Unification.REGULAR:
       return [false]
     default:
       return [true, false]
@@ -220,6 +219,7 @@ const formatSharedStudentData = ({
       course: {
         code: course.code,
         name: course.name,
+        groupId: course.groupId,
       },
       date: attainment_date,
       passed: CreditModel.passed({ credittypecode }) || CreditModel.improved({ credittypecode }),
