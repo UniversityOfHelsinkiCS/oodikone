@@ -53,6 +53,7 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options,
       {Object.entries(courseFilters).map(([groupId, type]) => (
         <CourseCard
           course={courseStats[groupId]}
+          courses={courseStats}
           filterType={type}
           key={`courseFilter-selected-course-${groupId}`}
           onChange={type => setCourseFilter(groupId, type as FTValue)}

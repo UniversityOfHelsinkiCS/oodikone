@@ -7,6 +7,7 @@ import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelec
 import { FilterType } from '@/components/FilterView/filters/courses/filterType'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ClearIcon } from '@/theme'
+import { CourseStats } from '@oodikone/shared/routes/populations'
 
 const filterTexts = {
   [FilterType.ALL]: {
@@ -26,19 +27,19 @@ const filterTexts = {
     label: 'Enrolled, No Grade',
   },
 }
-const SubstitutionTooltip = ({ substitutionGroups }: { substitutionGroups: string[][] }) => (
+const SubstitutionTooltip = ({ substitutionGroupCodes }: { substitutionGroupCodes: string[][] }) => (
   <Typography fontSize="0.9rem" whiteSpace="pre-line">
-    Included course's equivalent groups:
-    <br />
-    {substitutionGroups.map(group => group.join(', ')).join('\n\n')}
+    {`Included equivalent courses:\n${substitutionGroupCodes.map(group => group.join(', ')).join('\n')}`}
   </Typography>
 )
 export const CourseCard = ({
   course,
+  courses,
   filterType,
   onChange,
 }: {
-  course: any
+  course: CourseStats
+  courses: Record<string, CourseStats>
   filterType: number
   onChange: (type: number | null) => any
 }) => {
@@ -49,6 +50,11 @@ export const CourseCard = ({
     text: label,
     value: type,
   }))
+
+  // Only substitute courses that some student in the current population acually has
+  const substitutionGroupCodes = (course?.substitutionGroups ?? [])
+    .map(group => group.map(groupId => courses[groupId]?.code).filter((code): code is string => Boolean(code)))
+    .filter(group => group.length > 0)
 
   return (
     <Box
@@ -64,10 +70,10 @@ export const CourseCard = ({
       <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ mb: 2 }}>
           <Typography>{getTextIn(course?.name)}</Typography>
-          {course?.substitutionGroups?.length ? (
-            <Tooltip title={<SubstitutionTooltip substitutionGroups={course.substitutionGroups} />}>
+          {substitutionGroupCodes.length ? (
+            <Tooltip title={<SubstitutionTooltip substitutionGroupCodes={substitutionGroupCodes} />}>
               <Typography sx={{ color: 'text.secondary' }}>
-                {course?.code}... +{course?.substitutionGroups?.length}
+                {course?.code}... +{substitutionGroupCodes.length}
               </Typography>
             </Tooltip>
           ) : (
