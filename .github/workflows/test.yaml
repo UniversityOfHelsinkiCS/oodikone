@@ -263,8 +263,6 @@ jobs:
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v7
@@ -284,8 +282,6 @@ jobs:
       - run_updater_updates
       - build_and_push_anon_user_db
       - build_and_push_anon_kone_db
-    strategy:
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v7
