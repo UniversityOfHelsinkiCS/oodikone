@@ -56,11 +56,11 @@ export const PopulationCourseStats = ({
       .flatMap(course => {
         const defaultProgrammeCourses: FilteredProgrammeCourse[] = curriculum.defaultProgrammeCourses
           .filter(pg => pg.code === course.course.code)
-          .map(programmeCourse => ({ ...course, ...programmeCourse }))
+          .map(programmeCourse => ({ ...course, ...programmeCourse, groupId: course.course.groupId }))
 
         const secondProgrammeCourses: FilteredProgrammeCourse[] = curriculum.secondProgrammeCourses
           .filter(pg => pg.code === course.course.code)
-          .map(programmeCourse => ({ ...course, ...programmeCourse }))
+          .map(programmeCourse => ({ ...course, ...programmeCourse, groupId: course.course.groupId }))
 
         return [defaultProgrammeCourses, secondProgrammeCourses].flat()
       })

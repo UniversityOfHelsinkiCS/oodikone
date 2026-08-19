@@ -37,6 +37,7 @@ export const useGetFilters = (
     filters.tagsFilter(),
     filters.courseFilter({
       courses: population?.coursestatistics.courses ?? [],
+      idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {},
     }),
     filters.creditDateFilter(),
     filters.creditsEarnedFilter(),

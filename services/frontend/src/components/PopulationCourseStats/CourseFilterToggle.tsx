@@ -4,10 +4,16 @@ import { FilterToggleIcon } from '@/components/common/FilterToggleIcon'
 import { isCourseSelected, toggleCourseSelection } from '@/components/FilterView/filters/courses'
 import { useFilters } from '@/components/FilterView/useFilters'
 
-export const CourseFilterToggle = ({ courseCode, courseName }: { courseCode: string; courseName: string }) => {
+export const CourseFilterToggle = ({
+  courseGroupId,
+  courseName,
+}: {
+  courseGroupId: string
+  courseName: string
+}) => {
   const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
-  const isActive = useFilterSelector(isCourseSelected(courseCode))
+  const isActive = useFilterSelector(isCourseSelected(courseGroupId))
 
   const title = (
     <span>
@@ -18,7 +24,10 @@ export const CourseFilterToggle = ({ courseCode, courseName }: { courseCode: str
   return (
     <Tooltip arrow placement="top" title={title}>
       <div>
-        <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(courseCode))} />
+        <FilterToggleIcon
+          isActive={isActive}
+          onClick={() => filterDispatch(toggleCourseSelection(courseGroupId))}
+        />
       </div>
     </Tooltip>
   )

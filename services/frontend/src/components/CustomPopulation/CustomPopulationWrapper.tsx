@@ -61,7 +61,10 @@ export const CustomPopulationWrapper = ({
     const filtersList = [
       genderFilter(),
       ageFilter(),
-      courseFilter({ courses: population?.coursestatistics.courses ?? [] }),
+      courseFilter({
+        courses: population?.coursestatistics.courses ?? [],
+        idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {},
+      }),
       creditsEarnedFilter(),
       transferredToProgrammeFilter(),
       startYearAtUniFilter(),

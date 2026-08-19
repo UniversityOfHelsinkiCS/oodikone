@@ -29,7 +29,6 @@ import { findByCourseAndSemesters, getStartAndEndDates } from '../services/stude
 import { getFullStudyProgrammeRights, handleQueryArrays, hasFullAccessToStudentData } from '../util'
 import { parseUnification } from '@oodikone/shared/types/unification'
 import logger from '../util/logger'
-import { getAllCourseIds } from 'src/services/courses/helpers'
 
 const router = Router()
 
@@ -88,6 +87,7 @@ const obfuscateStuff = ({
     }),
     coursestatistics: {
       courses: coursestatistics.courses,
+      idToGroupIdMap: coursestatistics.idToGroupIdMap,
       enrollments: coursestatistics.enrollments.map(enrollment => ({
         ...enrollment,
         studentnumber: encryptionMap.get(enrollment.studentnumber) ?? enrollment.studentnumber,

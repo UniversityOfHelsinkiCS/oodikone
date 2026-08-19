@@ -20,9 +20,10 @@ export type CourseModule = Pick<Module, 'code'> & {
   name: Name
   courses: FilteredProgrammeCourse[]
   stats?: Partial<FilteredCourseStats>
+  groupId?: string
 }
-export type FilteredProgrammeCourse = FilteredCourse & ProgrammeCourse
-type FilteredCourseModule = FilteredCourse & { name: Name; code: string }
+export type FilteredProgrammeCourse = FilteredCourse & ProgrammeCourse & { groupId: string }
+type FilteredCourseModule = FilteredCourse & { name: Name; code: string; groupId: string }
 export type UnionOfFilteredModuleCourse = (
   | (Omit<FilteredCourseModule, 'stats'> & { stats: Partial<FilteredCourseStats> })
   | CourseModule
@@ -235,14 +236,14 @@ export const filterCourses = (
   if (!courseStatistics) return []
 
   const coursestats = new Map(
-    courseStatistics.courses.map(course => [course.id, { course, ...structuredClone(courseBaseStats) }])
+    courseStatistics.courses.map(course => [course.groupId, { course, ...structuredClone(courseBaseStats) }])
   )
 
   for (const { studentNumber, studyrightStart, enrollments, courses } of filteredStudents) {
     const studentStartingYear = new Date(studyrightStart).getFullYear()
 
     for (const { course_id, state, enrollment_date_time } of enrollments) {
-      const course = coursestats.get(course_id)
+      const course = coursestats.get(courseStatistics.idToGroupIdMap[course_id])
       if (!course) continue
 
       const initialDate = new Date(enrollment_date_time)
@@ -255,7 +256,7 @@ export const filterCourses = (
     }
 
     for (const { course_id, grade, credittypecode, date } of courses) {
-      const course = coursestats.get(course_id)
+      const course = coursestats.get(courseStatistics.idToGroupIdMap[course_id])
       if (!course) continue
 
       const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)
