@@ -85,6 +85,7 @@ export type StudentPageStudent = {
     course: {
       code: string
       name: Name
+      groupId: string
     }
     date: Date
     passed: boolean
