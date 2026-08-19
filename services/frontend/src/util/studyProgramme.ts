@@ -9,7 +9,12 @@ export const getGraduationGraphTitle = (programmeCode: string, doCombo = false) 
 }
 
 export const isNewProgramme = (programmeCode: string) => {
-  return programmeCode.includes('KH') || programmeCode.includes('MH') || /^(T)[0-9]{6}$/.test(programmeCode)
+  return (
+    programmeCode.includes('KH') ||
+    programmeCode.includes('MH') ||
+    /^(T)[0-9]{6}$/.test(programmeCode) ||
+    /^(DP)\d{3}$/.test(programmeCode)
+  )
 }
 
 export const isMedicalProgramme = (programmeCode: string) => {
