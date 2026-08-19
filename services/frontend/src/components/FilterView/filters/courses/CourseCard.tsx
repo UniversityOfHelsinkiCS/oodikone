@@ -26,11 +26,11 @@ const filterTexts = {
     label: 'Enrolled, No Grade',
   },
 }
-const getSubstitutionTooltip = (substitution_groups: string[][]) => (
+const SubstitutionTooltip = ({ substitutionGroups }: { substitutionGroups: string[][] }) => (
   <Typography fontSize="0.9rem" whiteSpace="pre-line">
     Included course's equivalent groups:
     <br />
-    {substitution_groups.map(group => group.join(', ')).join('\n\n')}
+    {substitutionGroups.map(group => group.join(', ')).join('\n\n')}
   </Typography>
 )
 export const CourseCard = ({
@@ -64,10 +64,10 @@ export const CourseCard = ({
       <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Box sx={{ mb: 2 }}>
           <Typography>{getTextIn(course?.name)}</Typography>
-          {course?.substitutions?.length ? (
-            <Tooltip title={getSubstitutionTooltip(course.substitution_groups)}>
+          {course?.substitutionGroups?.length ? (
+            <Tooltip title={<SubstitutionTooltip substitutionGroups={course.substitutionGroups} />}>
               <Typography sx={{ color: 'text.secondary' }}>
-                {course?.code}... +{course?.substitutions?.length}
+                {course?.code}... +{course?.substitutionGroups?.length}
               </Typography>
             </Tooltip>
           ) : (
@@ -75,7 +75,7 @@ export const CourseCard = ({
           )}
         </Box>
         <ClearIcon
-          data-cy={`courseFilter-${course?.code}-clear`}
+          data-cy={`courseFilter-${course?.groupId}-clear`}
           onClick={() => onChange(null)}
           sx={{
             color: theme => theme.palette.error.dark,
@@ -86,7 +86,7 @@ export const CourseCard = ({
         />
       </Stack>
       <FilterSelect
-        filterKey={`courseFilter-${course?.code}`}
+        filterKey={`courseFilter-${course?.groupId}`}
         label="Select course"
         onChange={({ target }) => onChange(Number(target.value))}
         options={dropdownOptions}
