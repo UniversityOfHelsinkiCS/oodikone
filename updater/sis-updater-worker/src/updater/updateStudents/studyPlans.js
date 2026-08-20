@@ -116,13 +116,6 @@ export const updateStudyplans = async (
     }
   )
 
-  const programmeModuleIdToStudyModuleCode = programmeModules.reduce((res, mod) => {
-    if (mod.type === 'StudyModule') {
-      res[mod.id] = mod.code
-    }
-    return res
-  }, {})
-
   const courseUnitIdToCode = courseUnits.reduce((res, cur) => {
     res[cur.id] = cur.code
     return res
@@ -148,7 +141,8 @@ export const updateStudyplans = async (
     return programmes
   }
 
-  const getCourseCodesFromAttainment = attainment => {
+  // Custom attainments aren't backed by an existing CU, so they fall back to their own code
+  const getCourseIdsFromAttainment = attainment => {
     if (!attainment) return []
 
     if (attainment.code && attainment.type === 'CustomCourseUnitAttainment')
@@ -158,18 +152,18 @@ export const updateStudyplans = async (
       return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
-          .map(node => getCourseCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
+          .map(node => getCourseIdsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
 
     if (attainment.code) return [attainment.code]
 
     const { course_unit_id, module_id } = attainment
-    const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
+    const id = course_unit_id || module_id
 
-    return code ? [code] : []
+    return id ? [id] : []
   }
 
-  const getModuleCodesFromAttainment = attainment => {
+  const getModuleIdsFromAttainment = attainment => {
     if (!attainment) return []
 
     if (attainment.code && attainment.type === 'CustomModuleAttainment') return [sanitizeCourseCode(attainment.code)]
@@ -178,11 +172,11 @@ export const updateStudyplans = async (
       return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
-          .map(node => getModuleCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
+          .map(node => getModuleIdsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
 
-    const code = programmeModuleIdToStudyModuleCode[attainment.module_id]
-    return code ? [code] : []
+    const { module_id } = attainment
+    return module_id && programmeModuleIdToType[module_id] === 'StudyModule' ? [module_id] : []
   }
 
   const getAttainmentsFromAttainment = attainment => {
@@ -241,7 +235,7 @@ export const updateStudyplans = async (
     programmeModuleIdToValidityPeriod,
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    programmeModuleIdToStudyModuleCode,
+    programmeModuleIdToType,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,
@@ -249,8 +243,8 @@ export const updateStudyplans = async (
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
     educationStudyrights,
-    getCourseCodesFromAttainment,
-    getModuleCodesFromAttainment,
+    getCourseIdsFromAttainment,
+    getModuleIdsFromAttainment,
     getAttainmentsFromAttainment,
     attainments
   )

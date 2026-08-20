@@ -328,7 +328,7 @@ export const studyplanMapper =
     programmeModuleIdToValidityPeriod,
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    programmeModuleIdToStudyModuleCode,
+    programmeModuleIdToType,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,
@@ -336,8 +336,8 @@ export const studyplanMapper =
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
     educationStudyrights,
-    getCourseCodesFromAttainment,
-    getModuleCodesFromAttainment,
+    getCourseIdsFromAttainment,
+    getModuleIdsFromAttainment,
     getAttainmentsFromAttainment,
     attainments
   ) =>
@@ -351,18 +351,19 @@ export const studyplanMapper =
       const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
       const id = `${studentnumber}-${code}-${studyrightId}`
 
+      // NB: values are course_unit_ids, matching Credit/Enrollment's course_id
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId]?.has(code))
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
-        .map(({ substitutedBy, courseUnitId }) => {
-          if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
-          return courseUnitIdToCode[courseUnitId]
-        })
+        .map(({ substitutedBy, courseUnitId }) => (substitutedBy.length ? substitutedBy[0] : courseUnitId))
 
+      // Custom attainments aren't backed by an existing CU, so they fall back to their own code
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
         .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
-        .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId]?.code)
-        .map(sanitizeCourseCode)
+        .map(({ customCourseUnitAttainmentId }) => {
+          const attainment = attainmentIdToAttainment[customCourseUnitAttainmentId]
+          return attainment?.course_unit_id ?? sanitizeCourseCode(attainment?.code)
+        })
         .filter(course => !!course)
 
       const coursesFromAttainedModules = flatten(
@@ -373,7 +374,7 @@ export const studyplanMapper =
               moduleAttainments[moduleId] &&
               moduleAttainments[moduleId][studyplan.user_id]
           )
-          .map(({ moduleId }) => getCourseCodesFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
+          .map(({ moduleId }) => getCourseIdsFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
       )
 
       const attainmentsToCalculate = uniqBy(
@@ -439,18 +440,17 @@ export const studyplanMapper =
       const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
 
       const includedCourses = graduated
-        ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+        ? getCourseIdsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
         : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules)
       if (includedCourses.length === 0) return null
 
       const includedModules = graduated
         ? // If graduated, find modules from within the graduated programme attainment
-          getModuleCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+          getModuleIdsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
         : Array.from(
             studyplan.module_selections.reduce((modules, { moduleId }) => {
-              const studyModuleCode = programmeModuleIdToStudyModuleCode[moduleId]
-              if (studyModuleCode) {
-                modules.add(studyModuleCode)
+              if (programmeModuleIdToType[moduleId] === 'StudyModule') {
+                modules.add(moduleId)
               }
               return modules
             }, new Set())
