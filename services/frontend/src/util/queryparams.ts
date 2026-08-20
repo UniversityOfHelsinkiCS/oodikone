@@ -1,5 +1,7 @@
 import { useLocation } from 'react-router'
 
+export type QueryParams = Record<string, undefined | string[]>
+
 /** Reactive query param parser.
  *
  * @returns all query parameters in object, destructure as needed.
@@ -12,7 +14,7 @@ import { useLocation } from 'react-router'
  * const arrayType = args.noDestructuring
  * const bool = !!args.isBool?.[0]
  */
-export const useParseQueryParams = (): Record<string, undefined | string[]> => {
+export const useParseQueryParams = (): QueryParams => {
   const location = useLocation()
   const searchString = location.search
   const params = new URLSearchParams(searchString)
