@@ -21,6 +21,7 @@ jobs:
   lint_packages:
     name: 'Lint packages'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - name: Lint backend, frontend and shared
@@ -30,6 +31,7 @@ jobs:
   build_backend:
     name: 'Build backend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - name: Build backend
@@ -42,6 +44,7 @@ jobs:
   build_frontend:
     name: 'Build frontend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - name: Build frontend
@@ -55,6 +58,7 @@ jobs:
   check_migration_files:
     name: Check if new migrations have been added
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     outputs:
       kone_db_migrations: ${{ steps.check_migrations.outputs.kone_db_migrations }}
       user_db_migrations: ${{ steps.check_migrations.outputs.user_db_migrations }}
@@ -80,6 +84,7 @@ jobs:
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.sis_db_migrations == 'true' &&
@@ -114,6 +119,7 @@ jobs:
   build_and_push_anon_kone_db:
     name: 'Build anon kone-db and push to toska hub if new migrations have been added'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.kone_db_migrations == 'true' &&
@@ -149,6 +155,7 @@ jobs:
   build_and_push_anon_user_db:
     name: 'Build anon user-db and push to toska hub if new migrations have been added'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure() &&
       needs.check_migration_files.outputs.user_db_migrations == 'true' &&
@@ -185,6 +192,7 @@ jobs:
   check_updater_changed:
     name: 'Check if updater has been updated'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     outputs:
@@ -205,6 +213,7 @@ jobs:
   run_updater_updates:
     name: 'Run updater tests and updates'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure() &&
       (needs.check_updater_changed.outputs.has_updater_changed == 'true' ||
@@ -257,6 +266,7 @@ jobs:
   test_api:
     name: 'Run backend api tests'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     needs:
@@ -276,6 +286,7 @@ jobs:
   test_services:
     name: 'Run backend service-tests'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     needs:
@@ -295,6 +306,7 @@ jobs:
   test_unit:
     name: 'Run unit tests'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
 
@@ -307,6 +319,7 @@ jobs:
   test_components:
     name: 'Test frontend components'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     needs:
@@ -322,6 +335,7 @@ jobs:
   # === End-to-end tests ===
   test_end_to_end_playwright:
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     needs:
@@ -391,6 +405,7 @@ jobs:
   test_service_exit_statuses:
     name: 'Check services run correctly'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: |
       !cancelled() && !failure()
     needs:

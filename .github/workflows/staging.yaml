@@ -27,6 +27,7 @@ jobs:
   release_backend:
     name: 'Build and release backend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -44,6 +45,7 @@ jobs:
   release_frontend:
     name: 'Build and release frontend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -61,6 +63,7 @@ jobs:
   release_updater_worker:
     name: 'Build and release updater worker'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -78,6 +81,7 @@ jobs:
   release_updater_scheduler:
     name: 'Build and release updater scheduler'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs: test
 
     steps:
@@ -95,6 +99,7 @@ jobs:
   report_success:
     name: 'Report deployment success to the "oodikone_notifications" channel'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: success()
     needs:
       - release_frontend
@@ -115,6 +120,7 @@ jobs:
   report_failure:
     name: 'Report deployment failure to the "oodikone_notifications" channel'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     if: failure()
     needs:
       - release_frontend

@@ -8,6 +8,7 @@ jobs:
   release_backend:
     name: 'Build and release backend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v7
@@ -28,6 +29,7 @@ jobs:
   release_frontend:
     name: 'Build and release frontend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v7
@@ -49,6 +51,7 @@ jobs:
   sentry_release_frontend:
     name: 'Create Sentry release for frontend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs:
       - release_frontend
       - release_backend
@@ -83,6 +86,7 @@ jobs:
   sentry_release_backend:
     name: 'Create Sentry release for backend'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs:
       - release_frontend
       - release_backend
@@ -117,6 +121,7 @@ jobs:
   report_success:
     name: 'Report deployment success to the "oodikone_notifications" channel'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs:
       - release_frontend
       - release_backend
@@ -138,6 +143,7 @@ jobs:
   report_failure:
     name: 'Report deployment failure to the "oodikone_notifications" channel'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
     needs:
       - release_frontend
       - release_backend
