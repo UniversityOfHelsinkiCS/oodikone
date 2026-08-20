@@ -4,6 +4,7 @@ import { Name } from './name'
 
 export type StudyProgrammeCourse = {
   code: string
+  groupId: string
   isStudyModule: boolean
   name: Name
   years: Record<

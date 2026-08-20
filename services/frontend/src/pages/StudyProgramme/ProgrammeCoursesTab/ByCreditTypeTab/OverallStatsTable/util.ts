@@ -47,6 +47,7 @@ export const filterDataByYear = (
       return {
         ...values,
         code: course.code,
+        groupId: course.groupId,
         name: getTextIn(course.name),
       }
     })

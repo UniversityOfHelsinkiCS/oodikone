@@ -61,7 +61,7 @@ export const TeacherStatisticsTable = ({ statistics, variant }) => {
               {row.original.id}
               <Link
                 target="_blank"
-                to={`/coursestatistics?combineSubstitutions=true&courseCodes=["${row.original.id}"]&separate=false`}
+                to={`/coursestatistics?courses=${encodeURIComponent(row.original.groupId)}&separate=false&substitutions=true`}
               >
                 <NorthEastIcon />
               </Link>

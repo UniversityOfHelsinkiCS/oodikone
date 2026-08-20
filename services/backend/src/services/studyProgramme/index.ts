@@ -104,16 +104,16 @@ export const getNotCompletedForProgrammeCourses = async (
       })
       .filter(enrollment => dateIsBetween(enrollment.enrollment_date_time, from, to))
 
-    const courseCodeToName = (
+    const courseCodeToDetails = (
       await CourseModel.findAll({
         raw: true,
-        attributes: ['code', 'name'],
+        attributes: ['code', 'name', 'groupId'],
         where: {
           code: programmeCourses,
         },
       })
-    ).reduce<Map<string, Name>>((acc, val) => {
-      acc.set(val.code, val.name)
+    ).reduce<Map<string, { name: Name; groupId: string }>>((acc, val) => {
+      acc.set(val.code, { name: val.name, groupId: val.groupId })
       return acc
     }, new Map())
 
@@ -121,7 +121,8 @@ export const getNotCompletedForProgrammeCourses = async (
       code: credit.course_code,
       studentNumber: credit.student_studentnumber,
       creditTypeCode: credit.credittypecode,
-      courseName: courseCodeToName.get(credit.course_code)!,
+      courseName: courseCodeToDetails.get(credit.course_code)!.name,
+      groupId: courseCodeToDetails.get(credit.course_code)!.groupId,
       isStudyModule: credit.isStudyModule,
       attainmentDate: credit.attainment_date,
     }))
@@ -129,7 +130,7 @@ export const getNotCompletedForProgrammeCourses = async (
     const passedByCourseCodes = new Map<string, Set<string>>()
     const failedByCourseCodes = new Map<string, Set<string>>()
     const notCompletedByCourseCodes = new Map<string, Set<string>>()
-    const courses = new Map<string, { name: Name; isStudyModule: boolean }>()
+    const courses = new Map<string, { name: Name; groupId: string; isStudyModule: boolean }>()
 
     const studentHasPassedCourse = (studentNumber: string, courseCode: string): boolean =>
       (passedByCourseCodes.get(courseCode)?.has(studentNumber) ?? false) ||
@@ -161,6 +162,7 @@ export const getNotCompletedForProgrammeCourses = async (
     for (const {
       code: courseCode,
       courseName,
+      groupId,
       creditTypeCode,
       isStudyModule,
       studentNumber,
@@ -170,6 +172,7 @@ export const getNotCompletedForProgrammeCourses = async (
         courses.set(courseCode, {
           isStudyModule,
           name: courseName,
+          groupId,
         })
         passedByCourseCodes.set(courseCode, new Set())
         failedByCourseCodes.set(courseCode, new Set())
@@ -193,7 +196,8 @@ export const getNotCompletedForProgrammeCourses = async (
       if (!courses.has(courseCode)) {
         courses.set(courseCode, {
           isStudyModule: course.is_study_module,
-          name: courseCodeToName.get(courseCode)!,
+          name: courseCodeToDetails.get(courseCode)!.name,
+          groupId: courseCodeToDetails.get(courseCode)!.groupId,
         })
         passedByCourseCodes.set(courseCode, new Set())
         failedByCourseCodes.set(courseCode, new Set())
@@ -205,10 +209,11 @@ export const getNotCompletedForProgrammeCourses = async (
       }
     }
 
-    return [...courses.entries()].map(([code, { isStudyModule, name }]) => {
+    return [...courses.entries()].map(([code, { isStudyModule, name, groupId }]) => {
       return {
         code,
         name,
+        groupId,
         isStudyModule,
         allNotPassed: (notCompletedByCourseCodes.get(code)?.size ?? 0) + (failedByCourseCodes.get(code)?.size ?? 0),
       }

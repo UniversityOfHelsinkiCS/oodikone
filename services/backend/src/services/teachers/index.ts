@@ -34,7 +34,7 @@ const findTeacherCredits = async (teacherId: string) => {
       include: [
         {
           model: CourseModel,
-          attributes: ['name', 'code'],
+          attributes: ['name', 'code', 'groupId'],
           required: true,
         },
         {
@@ -105,9 +105,9 @@ const markCreditForYear = (years: Record<number, any>, credit: Credit) => {
 
 const markCreditForCourse = (courses: Record<string, any>, credit: Credit) => {
   const { passed, failed, credits, course, semester, transferred } = parseCreditInfo(credit)
-  const { code, name } = course
+  const { code, name, groupId } = course
   const { semestercode } = semester
-  const { stats, semesters = {}, ...rest } = courses[code] ?? { id: code, name }
+  const { stats, semesters = {}, ...rest } = courses[code] ?? { id: code, groupId, name }
   return {
     ...courses,
     [code]: {
