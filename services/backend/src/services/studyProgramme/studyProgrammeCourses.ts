@@ -59,6 +59,7 @@ type YearAccumulator = {
 
 type CourseAccumulator = {
   code: string
+  groupId: string
   name: Name
   isStudyModule: boolean
   years: Map<number, YearAccumulator>
@@ -81,12 +82,14 @@ const createYearAccumulator = (isStudyModule: boolean): YearAccumulator => ({
 const ensureCourse = (
   courseMap: Map<string, CourseAccumulator>,
   code: string,
+  groupId: string,
   name: Name,
   isStudyModule: boolean
 ): CourseAccumulator => {
   if (!courseMap.has(code)) {
     courseMap.set(code, {
       code,
+      groupId,
       name,
       isStudyModule,
       years: new Map(),
@@ -96,6 +99,7 @@ const ensureCourse = (
   const course = courseMap.get(code)!
   course.isStudyModule = course.isStudyModule || isStudyModule
   course.name = course.name ?? name
+  course.groupId = course.groupId ?? groupId
   return course
 }
 
@@ -194,7 +198,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     if (!yearRange.includes(year)) continue
     maxYear = Math.max(maxYear, year)
 
-    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const course = ensureCourse(courseMap, row.courseCode, row.groupId, row.courseName, row.isStudyModule)
     const yearAccumulator = ensureYear(course, year, row.isStudyModule)
     const { stats } = yearAccumulator
 
@@ -242,7 +246,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     if (!yearRange.includes(year)) continue
     maxYear = Math.max(maxYear, year)
 
-    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const course = ensureCourse(courseMap, row.courseCode, row.groupId, row.courseName, row.isStudyModule)
     const yearAccumulator = ensureYear(course, year, row.isStudyModule)
     yearAccumulator.transferStudents.add(row.studentNumber)
     yearAccumulator.stats.transferStudentsCredits += row.credits
@@ -263,7 +267,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
       maxYear = Math.max(maxYear, year)
     }
     for (const result of results) {
-      const course = ensureCourse(courseMap, result.code, result.name, result.isStudyModule ?? false)
+      const course = ensureCourse(courseMap, result.code, result.groupId, result.name, result.isStudyModule ?? false)
       const yearAccumulator = ensureYear(course, year, result.isStudyModule ?? false)
       yearAccumulator.stats.allNotPassed += result.allNotPassed
     }
@@ -288,6 +292,7 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
 
     coursesRecord[code] = {
       code,
+      groupId: course.groupId,
       name: course.name,
       isStudyModule: course.isStudyModule,
       years,
