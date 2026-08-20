@@ -70,7 +70,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
           if (
             (course.credittypecode === CreditTypeCode.PASSED || course.credittypecode === CreditTypeCode.APPROVED) &&
             new Date(course.date) < studyRightStart &&
-            primaryStudyplan?.included_courses.includes(course.course_code)
+            primaryStudyplan?.included_courses.includes(course.course_id)
           ) {
             creditCount += course.credits
             courseCount += 1
@@ -298,7 +298,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
         if (!primaryStudyplan) return null
 
         const courses = originalCourses.filter(
-          ({ course_code, passed }) => primaryStudyplan.included_courses.includes(course_code) && passed
+          ({ course_id, passed }) => primaryStudyplan.included_courses.includes(course_id) && passed
         )
 
         if (!courses.length) return null
