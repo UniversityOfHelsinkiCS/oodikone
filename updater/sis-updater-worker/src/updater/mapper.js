@@ -147,6 +147,7 @@ export const creditMapper =
         attainment_date,
         type,
         course_unit_id,
+        module_id,
         module_group_id,
         study_right_id,
         attainment_language_urn,
@@ -168,7 +169,7 @@ export const creditMapper =
         ? courseUnitIdToCourseCode[course_unit_id]
         : moduleGroupIdToModuleCode[module_group_id]
 
-      const course_id = !isStudyModule ? course_unit_id : module_group_id
+      const course_id = !isStudyModule ? course_unit_id : (module_id ?? module_group_id)
 
       // TODO: Some legitimate (pre 2020) CustomAttainments are skipped, because code/id mapping is incomplete.
       if (!course_id || !course_code) return null
