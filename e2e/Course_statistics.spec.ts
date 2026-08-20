@@ -423,7 +423,7 @@ test.describe('Basic user', () => {
       await page.getByTestId(`course-TKT20001`).click()
 
       await expect(page.getByText('TKT20001', { exact: true })).toBeVisible() //  Tietorakenteet ja algoritmit
-      await expect(page.getByText('AYTKT20001')).toBeVisible() // Avoin yo: Tietorakenteet ja algoritmit
+      await expect(page.getByText('AYTKT20001', { exact: true })).toBeVisible() // Avoin yo: Tietorakenteet ja algoritmit
       await expect(page.getByText('BSCS1003')).toBeVisible() // Data Structures and Algorithms
       await expect(page.getByText('58131')).toBeVisible() // Tietorakenteet
 
