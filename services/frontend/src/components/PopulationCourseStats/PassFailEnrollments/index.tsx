@@ -103,7 +103,7 @@ export const PassFailEnrollments = ({
                 <CourseFilterToggle courseGroupId={groupId!} courseName={name ?? ''} />
                 {!onlyIamRights ? (
                   <Link
-                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=true`}
+                    to={`/coursestatistics?courses=${encodeURIComponent(groupId!)}&separate=false&substitutions=true`}
                   >
                     <NorthEastIcon sx={{ ml: 1 }} />
                   </Link>

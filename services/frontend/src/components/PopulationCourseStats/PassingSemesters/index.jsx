@@ -91,7 +91,7 @@ export const PassingSemesters = ({ onlyIamRights, courseStatistics, courseTableM
         header: 'Name',
         cell: ({ row }) => {
           const name = getTextIn(row.original.name)
-          const { code } = row.original
+          const { groupId } = row.original
 
           const expansionStyle = row.getIsExpanded() ? { transform: 'rotate(90deg)' } : {}
           const expansionArrow = row.getCanExpand() ? (
@@ -109,10 +109,10 @@ export const PassingSemesters = ({ onlyIamRights, courseStatistics, courseTableM
           const linkComponent =
             row.originalSubRows === undefined ? (
               <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
-                <CourseFilterToggle courseCode={code} courseName={name} />
+                <CourseFilterToggle courseGroupId={groupId} courseName={name} />
                 {!onlyIamRights ? (
                   <Link
-                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=true`}
+                    to={`/coursestatistics?courses=${encodeURIComponent(groupId)}&separate=false&substitutions=true`}
                   >
                     <NorthEastIcon sx={{ ml: 1 }} />
                   </Link>

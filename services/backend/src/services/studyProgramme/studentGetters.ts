@@ -34,6 +34,7 @@ const openUniversityExtentCodes = [ExtentCode.OPEN_UNIVERSITY_STUDIES]
 export type ProgrammeCourseCreditRow = {
   courseCode: string
   courseName: Name
+  groupId: string
   studentNumber: string
   attainmentDate: string
   credits: number
@@ -46,6 +47,7 @@ export type ProgrammeCourseCreditRow = {
 export type TransferCourseCreditRow = {
   courseCode: string
   courseName: Name
+  groupId: string
   studentNumber: string
   attainmentDate: string
   credits: number
@@ -85,6 +87,7 @@ export const getProgrammeCourseAggregates = async (params: {
           SELECT
             cr.course_code AS "courseCode",
             co.name AS "courseName",
+            co.group_id AS "groupId",
             cr.student_studentnumber AS "studentNumber",
             cr.attainment_date AS "attainmentDate",
             cr.credits AS credits,
@@ -100,6 +103,7 @@ export const getProgrammeCourseAggregates = async (params: {
         SELECT
           fc."courseCode",
           fc."courseName",
+          fc."groupId",
           fc."studentNumber",
           fc."attainmentDate",
           fc.credits,
@@ -209,6 +213,7 @@ export const getTransferCourseAggregates = async (params: {
         SELECT
           cr.course_code AS "courseCode",
           co.name AS "courseName",
+          co.group_id AS "groupId",
           cr.student_studentnumber AS "studentNumber",
           cr.attainment_date AS "attainmentDate",
           cr.credits AS credits,

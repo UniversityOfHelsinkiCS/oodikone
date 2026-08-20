@@ -86,8 +86,9 @@ export const CoursesTab = ({ courses, semesters }) => {
     }
     return Object.values(courses)
       .filter(course => !!course.semesters[semesterid])
-      .map(({ id, name, semesters }) => ({
+      .map(({ id, groupId, name, semesters }) => ({
         id,
+        groupId,
         name: getTextIn(name),
         ...semesters[semesterid],
       }))
