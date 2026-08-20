@@ -57,7 +57,6 @@ const studentMapper = (
   curriculumGroupIds: string[],
   substitutionsForGroupId: Record<string, string[][]>,
   idToGroupIdMap: Record<string, string>,
-  codeToGroupId: Record<string, string>,
   groupIdToCode: Record<string, string>
 ) => {
   const courseMap = {}
@@ -72,7 +71,7 @@ const studentMapper = (
   )
   const hopsGroupIds = student.studyplans.flatMap(studyPlan =>
     studyPlan.included_courses
-      .map(code => codeToGroupId[code] ?? code)
+      .map(id => idToGroupIdMap[id] ?? id)
       .filter(groupId => curriculumGroupIds.includes(groupId))
   )
 
@@ -346,19 +345,10 @@ export const CoursesTabContainer = ({ curriculum, students, courses, idToGroupId
           curriculumGroupIds,
           substitutionsForGroupId,
           idToGroupIdMap,
-          codeToGroupId,
           groupIdToCode
         )
       ),
-    [
-      students,
-      includeSubstitutions,
-      curriculumGroupIds,
-      substitutionsForGroupId,
-      idToGroupIdMap,
-      codeToGroupId,
-      groupIdToCode,
-    ]
+    [students, includeSubstitutions, curriculumGroupIds, substitutionsForGroupId, idToGroupIdMap, groupIdToCode]
   )
 
   const columns = useGetColumnDefinitions(coursesByParentModule)
