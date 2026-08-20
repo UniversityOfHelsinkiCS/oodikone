@@ -39,7 +39,7 @@ export const OverallStatsTable = ({
     }),
     columnHelper.accessor('code', {
       header: 'Code',
-      cell: ({ row }) => <CodeCell code={row.original.code} />,
+      cell: ({ row }) => <CodeCell code={row.original.code} groupId={row.original.groupId} />,
     }),
     columnHelper.accessor('name', {
       header: 'Name',
