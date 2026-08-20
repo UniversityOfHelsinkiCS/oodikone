@@ -390,7 +390,6 @@ export const SingleCourseStats = ({
           }
         }
       )
-      .sort((a, b) => a.code - b.code) // Needs to be sorted back to ASC so that years on the barchart go from left to right
 
     const totals = countTotalStats(formattedStats)
     const programmeStats: ProgrammeStats = {

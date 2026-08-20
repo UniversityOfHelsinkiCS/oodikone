@@ -148,15 +148,18 @@ export const ResultTab = ({
           />
           {datasets
             .filter(data => data !== undefined)
-            .map(data => (
-              <PassRateChart
-                data={data}
-                isRelative={settings.isRelative}
-                key={data.name}
-                userHasAccessToAllStats={userHasAccessToAllStats}
-                viewMode={settings.viewMode}
-              />
-            ))}
+            .map(data => {
+              data.stats.sort((a, b) => a.code - b.code) // Needs to be sorted ASC so that years on the barchart go from left to right
+              return (
+                <PassRateChart
+                  data={data}
+                  isRelative={settings.isRelative}
+                  key={data.name}
+                  userHasAccessToAllStats={userHasAccessToAllStats}
+                  viewMode={settings.viewMode}
+                />
+              )
+            })}
         </Section>
       )}
     </>
