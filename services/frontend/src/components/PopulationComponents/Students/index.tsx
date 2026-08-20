@@ -106,7 +106,14 @@ export const PopulationStudents = ({
         students={filteredStudents}
       />
     ),
-    Modules: <ModulesTab curriculum={curriculum} students={filteredStudents} />,
+    Modules: (
+      <ModulesTab
+        courses={filteredCourses ?? []}
+        curriculum={curriculum}
+        idToGroupIdMap={idToGroupIdMap ?? {}}
+        students={filteredStudents}
+      />
+    ),
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: (
       <ProgressTab

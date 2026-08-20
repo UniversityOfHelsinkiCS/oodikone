@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { ModulesTab } from '@/components/PopulationComponents/Students/Table/ModulesTab/ModulesTable'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
 import { Name, ProgrammeCourse, FormattedStudent as Student } from '@oodikone/shared/types'
@@ -18,7 +19,12 @@ export type FormattedModules = Record<string, Name>
 
 type StudyModuleData = { code: string; completed: boolean; completionDate: string | null }
 
-const getModulesFromRelevantStudyPlan = (student: Student, degreeProgrammeCodes: string[]): StudyModuleData[] => {
+const getModulesFromRelevantStudyPlan = (
+  student: Student,
+  degreeProgrammeCodes: string[],
+  idToGroupIdMap: Record<string, string>,
+  groupIdToCode: Record<string, string>
+): StudyModuleData[] => {
   if (!student.studyRights || !Array.isArray(student.studyRights)) {
     return []
   }
@@ -35,9 +41,10 @@ const getModulesFromRelevantStudyPlan = (student: Student, degreeProgrammeCodes:
       )?.includedModules ?? []
 
     return studyModules.map(studyModule => {
-      const completion = student.courses.find(course => course.course_code === studyModule && course.passed)
+      const moduleGroupId = idToGroupIdMap[studyModule] ?? studyModule
+      const completion = student.courses.find(course => course.course_id === moduleGroupId && course.passed)
       return {
-        code: studyModule,
+        code: groupIdToCode[moduleGroupId] ?? studyModule,
         completed: !!completion,
         completionDate: completion ? formatISODate(completion.date) : null,
       }
@@ -47,12 +54,17 @@ const getModulesFromRelevantStudyPlan = (student: Student, degreeProgrammeCodes:
   return []
 }
 
-const formatStudent = (student: Student, degreeProgrammeCodes: string[]): ModuleTabStudent => {
+const formatStudent = (
+  student: Student,
+  degreeProgrammeCodes: string[],
+  idToGroupIdMap: Record<string, string>,
+  groupIdToCode: Record<string, string>
+): ModuleTabStudent => {
   return {
     firstNames: student.firstnames,
     lastName: student.lastname,
     studentNumber: student.studentNumber,
-    studyModulesInHOPS: getModulesFromRelevantStudyPlan(student, degreeProgrammeCodes),
+    studyModulesInHOPS: getModulesFromRelevantStudyPlan(student, degreeProgrammeCodes, idToGroupIdMap, groupIdToCode),
     sisPersonID: student.sis_person_id,
   }
 }
@@ -76,9 +88,13 @@ const getDegreeProgrammeCodes = (curriculumModules): string[] => {
 export const ModulesTabContainer = ({
   curriculum,
   students,
+  courses,
+  idToGroupIdMap,
 }: {
   curriculum: ExtendedCurriculumDetails | null | undefined
   students: Student[]
+  courses: FilteredCourse[]
+  idToGroupIdMap: Record<string, string>
 }) => {
   const curriculumModules = useMemo(
     () => (curriculum ? [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules] : []),
@@ -93,9 +109,14 @@ export const ModulesTabContainer = ({
 
   const formattedModules = useMemo(() => getAllModules(curriculumCourses), [curriculumCourses])
 
+  const groupIdToCode: Record<string, string> = useMemo(
+    () => Object.fromEntries(courses.map(({ course }) => [course.groupId, course.code])),
+    [courses]
+  )
+
   const formattedStudents = useMemo(
-    () => students.map(student => formatStudent(student, degreeProgrammeCodes)),
-    [students, degreeProgrammeCodes]
+    () => students.map(student => formatStudent(student, degreeProgrammeCodes, idToGroupIdMap, groupIdToCode)),
+    [students, degreeProgrammeCodes, idToGroupIdMap, groupIdToCode]
   )
 
   return <ModulesTab formattedModules={formattedModules} formattedStudents={formattedStudents} />

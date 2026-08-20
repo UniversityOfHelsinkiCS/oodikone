@@ -100,6 +100,8 @@ export type StudentPageStudent = {
   updatedAt: Date
   studyplans: Studyplan[]
   sisPersonId: string
+  // Resolves the ids in each studyplan's included_courses/includedModules to their groupId.
+  idToGroupIdMap: Record<string, string>
 }
 
 export type StudentCourse = {

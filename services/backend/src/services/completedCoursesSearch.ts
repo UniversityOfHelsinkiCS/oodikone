@@ -173,9 +173,26 @@ const getStudents = async (studentNumbers: string[]): Promise<StudentWithCourses
     ],
   })
 
-  return students.map(student => {
-    const { studyplans, ...rest }: StudentWithStudyplanNested = student.toJSON()
-    const coursesInStudyPlan = studyplans.flatMap(studyplan => studyplan.included_courses)
+  const plainStudents = students.map((student): StudentWithStudyplanNested => student.toJSON())
+
+  // included_courses holds course ids, with a rare fallback to a raw code for "custom" (non-catalogued)
+  // entries. Resolve ids to their current code for display - anything missing from the map is already a code.
+  const includedCourseIds = [
+    ...new Set(
+      plainStudents.flatMap(student => student.studyplans.flatMap(({ included_courses }) => included_courses))
+    ),
+  ]
+  const courses: Pick<CourseModel, 'id' | 'code'>[] = await CourseModel.findAll({
+    attributes: ['id', 'code'],
+    where: { id: { [Op.in]: includedCourseIds } },
+    raw: true,
+  })
+  const idToCode = Object.fromEntries(courses.map(({ id, code }) => [id, code]))
+
+  return plainStudents.map(({ studyplans, ...rest }) => {
+    const coursesInStudyPlan = studyplans.flatMap(studyplan =>
+      studyplan.included_courses.map(idOrCode => idToCode[idOrCode] ?? idOrCode)
+    )
     return { ...rest, coursesInStudyPlan }
   })
 }

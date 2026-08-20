@@ -247,7 +247,7 @@ const getMainStatsByTrackAndYear = async (
 
     const latestAttainmentWithinYearAndInHops = dayjs(
       studyRight.student.credits
-        .filter(credit => studyRight.studyPlans.some(sp => sp.included_courses.includes(credit.course_code)))
+        .filter(credit => studyRight.studyPlans.some(sp => sp.included_courses.includes(credit.course_id)))
         .reduce((latest, { attainment_date }) => {
           return attainment_date > latest ? attainment_date : latest
         }, new Date('1900-01-01'))

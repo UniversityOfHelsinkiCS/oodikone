@@ -19,13 +19,14 @@ import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 const creditsColumnIndex = 3
 
-// Some courses are without AY in the beginning in the studyplan even though the credits are registered with AY.
-const isInStudyPlan = (plan: StudentStudyPlan, code: string) =>
+const isInStudyPlan = (
+  plan: StudentStudyPlan,
+  idToGroupIdMap: Record<string, string>,
+  course: { code: string; groupId: string }
+) =>
   plan &&
-  (plan.included_courses.includes(code) ||
-    plan.included_courses.includes(code.replace('AY', '')) ||
-    plan.includedModules.includes(code) ||
-    code === plan.programme_code)
+  ([...plan.included_courses, ...plan.includedModules].some(id => (idToGroupIdMap[id] ?? id) === course.groupId) ||
+    course.code === plan.programme_code)
 
 const getAcademicYear = (date: string) => {
   const year = new Date(date).getFullYear()
@@ -52,7 +53,7 @@ export const CourseTables = ({ student, selectedStudyPlanId }) => {
     const attainment = student.courses[i]
 
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = attainment
-    const isIncluded = isInStudyPlan(studyPlan, course.code)
+    const isIncluded = isInStudyPlan(studyPlan, student.idToGroupIdMap, course)
     const academicYear = getAcademicYear(date)
 
     groupedCourses[academicYear] ??= []
