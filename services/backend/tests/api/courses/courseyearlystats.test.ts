@@ -432,6 +432,31 @@ void describe('Course yearly statistics (2016-2023)', () => {
           )
         })
       })
+
+      describe('should not count students with only improved grades as passed', () => {
+        let body: Unarray<CourseYearlyStatsResBody>
+        beforeAll(async () => {
+          const res = (await request(app)
+            .get('/courseyearlystats?codes=MAT11002&combineSubstitutions=false')
+            .set('shib-session-id', 'test')
+            .set('uid', 'basic')
+            .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<CourseYearlyStatsResBody>
+
+          assert.strictEqual(res.status, 200)
+          assert.strictEqual(res.body.length, 1)
+          body = res.body.at(0)!
+          assert(
+            'unifyStats' in body && 'regularStats' in body && 'openStats' in body,
+            'All keys of courseyearlystats not defined'
+          )
+        })
+
+        it('2018-2019 MAT11002 should not include student with only improved grade (509770)', () => {
+          const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
+          assert.notInclude(year?.attempts.categories.passed, ['509770'])
+          assert.strictEqual(year?.attempts.categories.passed.length, 57)
+        })
+      })
     })
   })
 
