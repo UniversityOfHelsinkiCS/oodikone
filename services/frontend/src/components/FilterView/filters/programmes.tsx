@@ -132,7 +132,8 @@ const getStudentProgrammes = (student: FormattedStudent) =>
 
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
-const createStudentToProgrammeMap = (students: FormattedStudent[], studyRightPredicate) => {
+// TODO: Implement a better type for predicate
+const createStudentToProgrammeMap = (students: FormattedStudent[], studyRightPredicate: (..._: any[]) => boolean) => {
   const studentToProgrammeMap = {}
 
   for (const student of students) {
