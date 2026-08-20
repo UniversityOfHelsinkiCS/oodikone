@@ -33,10 +33,12 @@ export const SingleStudyGuidanceGroupPanels = ({
   filteredStudents,
   filteredCourses,
   group,
+  idToGroupIdMap,
 }: {
   filteredStudents: FormattedStudent[]
   filteredCourses: FilteredCourse[]
   group: GroupsWithTags
+  idToGroupIdMap: Record<string, string>
 }) => {
   const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
@@ -118,6 +120,7 @@ export const SingleStudyGuidanceGroupPanels = ({
           filteredCourses={filteredCourses}
           filteredStudents={filteredStudents}
           generalTabColumnFunction={() => columnsGeneralTab({ group })}
+          idToGroupIdMap={idToGroupIdMap}
           generalTabFormattingFunction={() =>
             formatGeneralTab({
               variant: 'studyGuidanceGroupPopulation',
@@ -131,7 +134,7 @@ export const SingleStudyGuidanceGroupPanels = ({
               showBachelorAndMaster: false,
               includePrimaryProgramme: true,
 
-              coursecodes: [],
+              courseIds: [],
               from: undefined,
               to: undefined,
             })

@@ -31,6 +31,7 @@ type PopulationDetails = CommonProps & {
   combinedProgramme?: string
   curriculum: ExtendedCurriculumDetails | null
   filteredCourses: FilteredCourse[]
+  idToGroupIdMap: Record<string, string>
 }
 
 type CoursePopulation = CommonProps & {
@@ -43,6 +44,7 @@ type StudyGuidanceGroup = CommonProps & {
   studyGuidanceGroup: any
   year: string
   filteredCourses: FilteredCourse[]
+  idToGroupIdMap: Record<string, string>
 }
 
 type CustomPopulation = CommonProps & {
@@ -64,6 +66,7 @@ export const PopulationStudents = ({
   curriculum,
   filteredStudents,
   filteredCourses,
+  idToGroupIdMap,
   dataExport,
   studyGuidanceGroup,
   generalTabColumnFunction,
@@ -99,6 +102,7 @@ export const PopulationStudents = ({
       <CoursesTab
         courses={filteredCourses ?? []}
         curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
+        idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
       />
     ),
