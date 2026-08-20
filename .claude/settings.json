@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/.env*)",
+      "Read(./.databasedumps/**)",
+      "Read(**/*.sqz)",
+      "Read(**/*.sql)",
+      "Bash(docker exec *-db *)"
+    ]
+  }
+}

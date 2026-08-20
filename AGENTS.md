@@ -23,6 +23,9 @@ update dependencies locally, then run `npm run ci:docker`; do not install in con
 - Treat migrations as production-impacting. They are in `services/backend/src/database/migrations_kone`,
   `services/backend/src/database/migrations_user`, and `updater/sis-updater-worker/src/db/migrations`; test migration
   changes against the relevant database service.
+- Do not access the database directly (e.g. `docker exec` into a database container, `psql`, Adminer, or similar).
+  Go through the application's models or services instead.
+- Add tests, especially unit tests, when adding or changing behavior.
 
 ## Local Commands
 
