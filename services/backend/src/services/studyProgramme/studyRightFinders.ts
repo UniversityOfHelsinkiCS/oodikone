@@ -43,7 +43,7 @@ export const getStudyRightsInProgramme = async (
         include: [
           {
             model: CreditModel,
-            attributes: ['attainment_date', 'credits', 'course_code'],
+            attributes: ['attainment_date', 'credits', 'course_code', 'course_id'],
             required: false,
             where: {
               isStudyModule: false,

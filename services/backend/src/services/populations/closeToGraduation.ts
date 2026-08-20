@@ -41,7 +41,7 @@ const findThesisAndLatestAndEarliestAttainments = (
       thesisData = attainment
     }
     attainmentDates.latestTotal ??= attainment.attainment_date
-    if (studyPlan.included_courses.includes(attainment.course?.code)) {
+    if (studyPlan.included_courses.includes(attainment.course_id)) {
       attainmentDates.latestHops ??= attainment.attainment_date
       if (
         !attainmentDates.earliestHops ||
@@ -230,7 +230,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         },
         {
           model: CreditModel,
-          attributes: ['attainment_date', 'grade', 'studyright_id'],
+          attributes: ['attainment_date', 'grade', 'studyright_id', 'course_id'],
           where: { credittypecode: CreditTypeCode.PASSED },
           include: [
             {

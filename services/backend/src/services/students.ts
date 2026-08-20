@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 
-import type { Credit, Student } from '@oodikone/shared/models'
+import type { Credit, Student, Studyplan } from '@oodikone/shared/models'
 import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
@@ -213,7 +213,7 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: Student): Omit<StudentPageStudent, 'tags'> => {
+}: Student): Omit<StudentPageStudent, 'tags' | 'idToGroupIdMap'> => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     return {
       course: {
@@ -251,13 +251,25 @@ const formatSharedStudentData = ({
   }
 }
 
+const getIdToGroupIdMap = async (studyplans: Pick<Studyplan, 'included_courses' | 'includedModules'>[]) => {
+  const ids = [...new Set(studyplans.flatMap(plan => [...plan.included_courses, ...plan.includedModules]))]
+  const courses = await CourseModel.findAll({
+    attributes: ['id', 'groupId'],
+    where: { id: { [Op.in]: ids } },
+    raw: true,
+  })
+  return Object.fromEntries(courses.map(({ id, groupId }) => [id, groupId]))
+}
+
 export const withStudentNumber = async (studentNumber: string, userId: string): Promise<StudentPageStudent | null> => {
   const student = await byStudentNumber(studentNumber)
   if (student == null) {
     return null
   }
+  const idToGroupIdMap = await getIdToGroupIdMap(student.studyplans)
   return {
     ...formatSharedStudentData(student),
+    idToGroupIdMap,
     tags: student.tags
       .filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
       .map(tag => ({
