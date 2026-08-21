@@ -1,8 +1,12 @@
 import { describe, it, assert } from 'vitest'
 
 import { CreditTypeCode } from '@oodikone/shared/types'
-import { createCredit as credit, createStudyRightElementModel as studyRightElement } from '@oodikone/shared/test/utils'
+import { createCredit as credit, createStudyRightElementModel } from '@oodikone/shared/test/utils'
 import { parseCredit } from '@/services/courses'
+import { SISStudyRightElementModel } from '@/models'
+
+const studyRightElement = (...args: Parameters<typeof createStudyRightElementModel>) =>
+  createStudyRightElementModel(...args) as SISStudyRightElementModel
 
 void describe('parseCredit', () => {
   it('should parse a single passed credit', () => {

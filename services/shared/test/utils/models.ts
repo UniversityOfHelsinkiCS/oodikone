@@ -1,4 +1,3 @@
-import type { SISStudyRightElementModel } from '../../../backend/src/models'
 import type { SISStudyRightElement } from '../../models'
 
 export const createStudyRightElementModel = (overrides: Partial<SISStudyRightElement> = {}) =>
@@ -13,4 +12,4 @@ export const createStudyRightElementModel = (overrides: Partial<SISStudyRightEle
       organization: { name: { en: 'Faculty', fi: 'Tiedekunta', sv: 'Fakultet' } },
     } as Partial<SISStudyRightElement['studyRight']>,
     ...overrides,
-  }) as SISStudyRightElementModel
+  }) as SISStudyRightElement
