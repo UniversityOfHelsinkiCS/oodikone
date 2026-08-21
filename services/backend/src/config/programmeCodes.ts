@@ -1,4 +1,4 @@
-// Map programme codes to "letter indentifier"
+// Map programme codes to "letter indentifiers" i.e. abbreviations
 
 export const programmeCodes = {
   KH10_001: 'TUK',
@@ -159,9 +159,9 @@ export const programmeCodes = {
   DP007: 'DPDR',
   DP008: 'SciDoc',
   DP009: 'LLD',
-  DP0010: 'TRES',
-  DP0011: 'RENEW',
-  DP0012: 'PopBe',
-  DP0013: 'HEAL',
-  DP0014: 'SOC',
+  DP010: 'TRES',
+  DP011: 'RENEW',
+  DP012: 'PopBe',
+  DP013: 'HEAL',
+  DP014: 'SOC',
 } as const
