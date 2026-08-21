@@ -6,7 +6,7 @@ Oodikone is a Docker-based Node.js/TypeScript application for analysing Universi
 - `services/backend`: Express, Sequelize, PostgreSQL, Redis, and BullMQ.
 - `services/shared`: shared types and utilities.
 - `updater/`: Sisu data workers and scheduler.
-- `e2e/`: Playwright tests; `cypress/` contains legacy tests.
+- `e2e/`: Playwright e2e tests
 
 Use Node.js 24 or newer. Packages have separate dependencies and lockfiles. Install locally with
 `npm run install:local`, or use `npm run ci:local` for lockfile-exact installs. Docker uses host-mounted locks:
@@ -31,6 +31,7 @@ update dependencies locally, then run `npm run ci:docker`; do not install in con
 
 ```text
 npm run oodikone       # start the anonymized environment
+npm run oodikone:ci    # start the test mode
 npm run both           # start Oodikone and the updater
 npm run docker:down    # stop containers
 docker compose ps      # show service status
