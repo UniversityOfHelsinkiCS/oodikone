@@ -80,6 +80,8 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       .flat()
     const isRelevantProgramme =
       !onlyCurrentProgrammes ||
+      // Include also older doctoral programmes so that there are stats for 2017-2025
+      (onlyCurrentProgrammes && code.startsWith('T')) ||
       (onlyCurrentProgrammes && yearsOfProgramme.some(year => year.startDate <= now() && now() <= year.endDate))
 
     if (isRelevantProgramme) {
