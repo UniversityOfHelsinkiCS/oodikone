@@ -1,21 +1,9 @@
 import dayjs from 'dayjs'
 import { assert, describe, it } from 'vitest'
 
-import { EnrollmentState } from '@oodikone/shared/types'
-import { FormattedStudent } from '@oodikone/shared/types/studentData'
-
-import { createCourse, createStudent } from './helpers'
+import { createCourse, createEnrollment, createStudent } from '@oodikone/shared/test/utils'
 
 const { creditDateFilter } = await import('@/components/FilterView/filters/date')
-
-const createEnrollment = (overrides: Partial<FormattedStudent['enrollments'][number]> = {}) => ({
-  course_code: 'TKT002',
-  state: EnrollmentState.ENROLLED,
-  enrollment_date_time: new Date('2024-09-01'),
-  semestercode: 100,
-  studyright_id: 'sr-1',
-  ...overrides,
-})
 
 void describe('creditDateFilter', () => {
   void it('should not filter students out directly', () => {

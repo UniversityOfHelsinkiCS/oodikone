@@ -2,15 +2,15 @@ import { assert, describe, it } from 'vitest'
 
 import { tagsFilter } from '@/components/FilterView/filters/tags'
 import type { Tag } from '@oodikone/shared/models/kone'
-import { FormattedStudent, StudentTags } from '@oodikone/shared/types/studentData'
+import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent, createTag as createBaseTag } from '@oodikone/shared/test/utils'
 
-const createTag = (tagId: string): StudentTags => ({
-  tag_id: tagId,
-  studentnumber: '123456789',
-  tag: { tag_id: tagId, tagname: `Tag ${tagId}`, personal_user_id: null } as unknown as Tag,
-})
+const createTag = (tagId: string) =>
+  createBaseTag({
+    tag_id: tagId,
+    tag: { tag_id: tagId, tagname: `Tag ${tagId}`, personal_user_id: null } as unknown as Tag,
+  })
 
 const filterStudent = (student: FormattedStudent, includedTags: string[], excludedTags: string[]) =>
   tagsFilter().filter(student, { args: undefined, options: { includedTags, excludedTags }, precomputed: undefined })

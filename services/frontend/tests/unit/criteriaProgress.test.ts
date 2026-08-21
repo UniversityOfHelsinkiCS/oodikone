@@ -1,8 +1,8 @@
 import { getProgressCriteria } from '@/redux/populations/criteriaProgress'
 import { CreditTypeCode, ProgressCriteria } from '@oodikone/shared/types'
-import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 import { PopulationCourseStatsCredit } from '@/redux/populations/util'
+import { createCredit as createBaseCredit, createStudyPlan } from '@oodikone/shared/test/utils'
 import { describe, it, assert } from 'vitest'
 
 const createCriteria = (overrides: Partial<ProgressCriteria> = {}): ProgressCriteria => ({
@@ -29,30 +29,15 @@ const createCriteria = (overrides: Partial<ProgressCriteria> = {}): ProgressCrit
   ...overrides,
 })
 
-const createHops = (includedCourses: string[]): StudentStudyPlan => ({
-  included_courses: includedCourses,
-  programme_code: 'TEST',
-  includedModules: [],
-  completed_credits: 0,
-  curriculum_period_id: 'cp-1',
-  sis_study_right_id: 'sr-1',
-})
+const createHops = (includedCourses: string[]) => createStudyPlan({ included_courses: includedCourses })
 
 const createCredit = (
   course_code: string,
   credits: number,
   credittypecode: CreditTypeCode,
   date: Date
-): PopulationCourseStatsCredit => ({
-  grade: '',
-  credits,
-  credittypecode,
-  attainment_date: date,
-  isStudyModule: false,
-  course_code,
-  language: 'fi',
-  studyright_id: 'sr-1',
-})
+): PopulationCourseStatsCredit =>
+  createBaseCredit({ grade: '', credits, credittypecode, attainment_date: date, course_code })
 
 const STUDY_RIGHT_START = new Date('2024-08-01')
 

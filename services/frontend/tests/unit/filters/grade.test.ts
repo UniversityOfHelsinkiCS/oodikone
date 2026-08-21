@@ -2,7 +2,7 @@ import { assert, describe, it } from 'vitest'
 
 import { gradeFilter } from '@/components/FilterView/filters/grade'
 
-import { createCourse, createStudent } from './helpers'
+import { createCourse, createStudent } from '@oodikone/shared/test/utils'
 
 const ARGS = { courseCodes: ['TKT002'], from: '2024-01-01', to: '2024-12-31' }
 

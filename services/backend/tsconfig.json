@@ -9,6 +9,7 @@
     "emitDecoratorMetadata": true,
     "outDir": "dist",
     "paths": {
+      "@/*": ["./src/*"],
       "*": ["./*"]
     },
     "esModuleInterop": true,

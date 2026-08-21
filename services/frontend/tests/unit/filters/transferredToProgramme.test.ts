@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { transferredToProgrammeFilter } from '@/components/FilterView/filters/transferredToProgramme'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, transferred: string) =>
   transferredToProgrammeFilter().filter(student, { args: undefined, options: { transferred }, precomputed: undefined })

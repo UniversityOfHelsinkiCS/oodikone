@@ -4,7 +4,7 @@ import { describe, it, beforeAll, assert } from 'vitest'
 
 import { Unarray } from '@oodikone/shared/types'
 import { yearToYearCode } from '@oodikone/shared/util'
-import { CourseYearlyStatsResBody } from '../../../src/routes/courses'
+import { CourseYearlyStatsResBody } from '@/routes/courses'
 import { initTests, ResponseWithBody } from '../../utils'
 
 void describe('Course yearly statistics (2016-2023)', () => {

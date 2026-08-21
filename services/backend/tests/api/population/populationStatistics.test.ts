@@ -5,7 +5,7 @@ import { describe, it, beforeAll, assert } from 'vitest'
 
 import { CanError } from '@oodikone/shared/routes'
 import { PopulationstatisticsResBody } from '@oodikone/shared/routes/populations'
-import { dbConnections } from '../../../src/database/connection'
+import { dbConnections } from '@/database/connection'
 import { initTests, ResponseWithBody } from '../../utils'
 
 const populationUrl = (

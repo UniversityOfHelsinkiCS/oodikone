@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { parseDateRangeFromParams } from '../../../../../src/services/populations/shared'
+import { parseDateRangeFromParams } from '@/services/populations/shared'
 import { describe, it, assert } from 'vitest'
 
 void describe('parseDateRangeFromParams', () => {

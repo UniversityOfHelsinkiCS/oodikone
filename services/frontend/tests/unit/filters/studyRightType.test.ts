@@ -4,7 +4,11 @@ import { studyRightTypeFilter } from '@/components/FilterView/filters/studyRight
 import { ExtentCode } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
-import { createStudent, createStudyRight as createBaseStudyRight, createStudyRightElement } from './helpers'
+import {
+  createStudent,
+  createStudyRight as createBaseStudyRight,
+  createStudyRightElement,
+} from '@oodikone/shared/test/utils'
 
 const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): StudentStudyRight =>
   createBaseStudyRight({ studyRightElements: [createStudyRightElement({ code: 'KH50' })], ...overrides })

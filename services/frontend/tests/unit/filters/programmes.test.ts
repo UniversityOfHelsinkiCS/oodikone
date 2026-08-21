@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest'
 
-import { createStudent, createStudyRight, createStudyRightElement } from './helpers'
+import { createStudent, createStudyRight, createStudyRightElement } from '@oodikone/shared/test/utils'
 
 const { programmeFilter } = await import('@/components/FilterView/filters/programmes')
 

@@ -2,7 +2,7 @@ import { assert, describe, it } from 'vitest'
 
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent } from '@oodikone/shared/test/utils'
 
 const { citizenshipFilter } = await import('@/components/FilterView/filters/citizenship')
 

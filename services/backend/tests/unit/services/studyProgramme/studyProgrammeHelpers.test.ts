@@ -1,9 +1,5 @@
 import { describe, it, assert, vi, beforeAll } from 'vitest'
-import {
-  getPercentage,
-  getYearsArray,
-  getYearsObject,
-} from '../../../../src/services/studyProgramme/studyProgrammeHelpers'
+import { getPercentage, getYearsArray, getYearsObject } from '@/services/studyProgramme/studyProgrammeHelpers'
 
 void describe('Get years object', () => {
   it('should return nothing with empty years', () => {

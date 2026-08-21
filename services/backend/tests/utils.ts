@@ -1,10 +1,10 @@
 import express from 'express'
 import { Response } from 'supertest'
 
-import { baseUrl, silentTesting } from '../src/config'
-import { initializeDatabaseConnection, dbConnections } from '../src/database/connection'
-import routes from '../src/routes'
-import logger from '../src/util/logger'
+import { baseUrl, silentTesting } from '@/config'
+import { initializeDatabaseConnection, dbConnections } from '@/database/connection'
+import routes from '@/routes'
+import logger from '@/util/logger'
 
 /** Override Supertest's Response body with our own type */
 export type ResponseWithBody<T> = Omit<Response, 'body'> & { body: T }

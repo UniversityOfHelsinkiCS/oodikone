@@ -2,7 +2,7 @@ import { assert, describe, it } from 'vitest'
 
 import { admissionTypeFilter, filter } from '@/components/FilterView/filters/admissionType'
 
-import { createStudent, createStudyRight, createStudyRightElement } from './helpers'
+import { createStudent, createStudyRight, createStudyRightElement } from '@oodikone/shared/test/utils'
 
 const ARGS = { programme: 'KH50_001' }
 

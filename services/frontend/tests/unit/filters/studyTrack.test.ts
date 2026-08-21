@@ -2,7 +2,11 @@ import { assert, describe, it } from 'vitest'
 
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
-import { createStudent, createStudyRight as createBaseStudyRight, createStudyRightElement } from './helpers'
+import {
+  createStudent,
+  createStudyRight as createBaseStudyRight,
+  createStudyRightElement,
+} from '@oodikone/shared/test/utils'
 
 const { studyTrackFilter } = await import('@/components/FilterView/filters/studyTrack')
 

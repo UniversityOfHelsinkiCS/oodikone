@@ -5,7 +5,7 @@ import { describe, it, beforeAll, assert } from 'vitest'
 import { initTests } from '../../utils'
 import { yearToYearCode } from '@oodikone/shared/util'
 import { PopulationstatisticsbycourseResBody } from '@oodikone/shared/routes/populations'
-import { CreditModel } from '../../../src/models'
+import { CreditModel } from '@/models'
 import { EnrollmentState } from '@oodikone/shared/types'
 
 void describe('Population statistics by course', () => {

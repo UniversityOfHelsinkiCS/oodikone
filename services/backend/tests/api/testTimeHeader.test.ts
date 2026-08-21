@@ -2,8 +2,8 @@ import express from 'express'
 import request from 'supertest'
 import { describe, it, assert } from 'vitest'
 
-import { testTimeMiddleware } from '../../src/middleware/testTime'
-import { now } from '../../src/util/clock'
+import { testTimeMiddleware } from '@/middleware/testTime'
+import { now } from '@/util/clock'
 
 describe('test time middleware', () => {
   it('uses the date from the x-test-now header', async () => {

@@ -4,7 +4,7 @@ import { studyRightStatusFilter } from '@/components/FilterView/filters/studyRig
 import { DegreeProgrammeType, EnrollmentType, Phase } from '@oodikone/shared/types'
 import { StudentStudyRight } from '@oodikone/shared/types/studentData'
 
-import { createStudent, createStudyRight as createBaseStudyRight } from './helpers'
+import { createStudent, createStudyRight as createBaseStudyRight } from '@oodikone/shared/test/utils'
 
 const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): StudentStudyRight =>
   createBaseStudyRight({ semesterEnrollments: [{ type: EnrollmentType.PRESENT, semester: 1 }], ...overrides })

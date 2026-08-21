@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { curriculumPeriodFilter } from '@/components/FilterView/filters/curriculumPeriod'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, selected: string) =>
   curriculumPeriodFilter().filter(student, { args: undefined, options: { selected }, precomputed: null })

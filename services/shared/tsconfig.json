@@ -24,5 +24,6 @@
     "sourceRoot": "/",
     "inlineSources": true,
     "resolveJsonModule": true
-  }
+  },
+  "exclude": ["tests", "test", "dist"]
 }

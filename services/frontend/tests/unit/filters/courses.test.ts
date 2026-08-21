@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { FilterType } from '@/components/FilterView/filters/courses/filterType'
 import { CreditTypeCode } from '@oodikone/shared/types'
 
-import { createCourse, createStudent } from './helpers'
+import { createCourse, createStudent } from '@oodikone/shared/test/utils'
 
 const { courseFilter } = await import('@/components/FilterView/filters/courses')
 

@@ -7,7 +7,11 @@ import {
 } from '@/components/FilterView/filters/graduatedFromProgramme'
 import { FormattedStudent, StudentStudyRight, StudentStudyRightElement } from '@oodikone/shared/types/studentData'
 
-import { createStudent, createStudyRight as createBaseStudyRight, createStudyRightElement } from './helpers'
+import {
+  createStudent,
+  createStudyRight as createBaseStudyRight,
+  createStudyRightElement,
+} from '@oodikone/shared/test/utils'
 
 const createElement = (overrides: Partial<StudentStudyRightElement> = {}): StudentStudyRightElement =>
   createStudyRightElement({ code: 'KH50_001', endDate: new Date('2024-08-01'), ...overrides })

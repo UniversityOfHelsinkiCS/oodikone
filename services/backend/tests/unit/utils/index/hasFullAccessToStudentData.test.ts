@@ -1,4 +1,4 @@
-import { hasFullAccessToStudentData } from '../../../../src/util'
+import { hasFullAccessToStudentData } from '@/util'
 import { describe, it, assert } from 'vitest'
 
 void describe('hasFullAccessToStudentData', () => {

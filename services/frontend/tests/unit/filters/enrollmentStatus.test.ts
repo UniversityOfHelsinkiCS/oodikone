@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { DegreeProgrammeType, EnrollmentType, Phase } from '@oodikone/shared/types'
 import { FormattedStudent, StudentStudyRight } from '@oodikone/shared/types/studentData'
 
-import { createStudent, createStudyRight as createBaseStudyRight } from './helpers'
+import { createStudent, createStudyRight as createBaseStudyRight } from '@oodikone/shared/test/utils'
 
 const { enrollmentStatusFilter } = await import('@/components/FilterView/filters/enrollmentStatus')
 

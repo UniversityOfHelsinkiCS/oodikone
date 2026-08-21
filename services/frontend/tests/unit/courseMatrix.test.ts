@@ -2,7 +2,8 @@ import { assert, describe, it } from 'vitest'
 
 import { calculateExcelData, getHopsCourses } from '@/components/CustomPopulation/courseMatrix'
 import { CreditTypeCode } from '@oodikone/shared/types'
-import { FormattedStudent, StudentCourse, StudentStudyPlan } from '@oodikone/shared/types/studentData'
+
+import { createCourse as createBaseCourse, createStudent, createStudyPlan } from '@oodikone/shared/test/utils'
 
 const createCourse = (
   course_code: string,
@@ -10,57 +11,9 @@ const createCourse = (
   passed: boolean,
   date: Date,
   credittypecode: CreditTypeCode = passed ? CreditTypeCode.PASSED : CreditTypeCode.FAILED
-): StudentCourse => ({
-  course_code,
-  date,
-  passed,
-  grade: passed ? '5' : 'Hyl.',
-  credits,
-  isStudyModuleCredit: false,
-  credittypecode,
-  language: 'fi',
-  studyright_id: 'sr-1',
-})
+) => createBaseCourse({ course_code, date, passed, grade: passed ? '5' : 'Hyl.', credits, credittypecode })
 
-const createHops = (includedCourses: string[]): StudentStudyPlan => ({
-  included_courses: includedCourses,
-  programme_code: 'TEST',
-  includedModules: [],
-  completed_credits: 0,
-  curriculum_period_id: 'cp-1',
-  sis_study_right_id: 'sr-1',
-})
-
-const createStudent = (overrides: Partial<FormattedStudent>): FormattedStudent => ({
-  firstnames: 'Testi',
-  lastname: 'Opiskelija',
-  started: new Date('2024-08-01'),
-  studentNumber: '123456789',
-  credits: 0,
-  hopsCredits: 0,
-  name: 'Testi Opiskelija',
-  gender_code: '1',
-  email: 'testi@example.com',
-  secondaryEmail: '',
-  phoneNumber: '',
-  updatedAt: new Date(),
-  tags: [],
-  studyrightStart: '2024-08-01',
-  option: null,
-  birthdate: new Date('2000-01-01'),
-  sis_person_id: '1',
-  citizenships: [],
-  criteriaProgress: {},
-  curriculumVersion: null,
-  hasPersonalIdentityCode: false,
-  transferredStudyright: false,
-  transferSource: undefined,
-  studyRights: [],
-  studyplans: [],
-  courses: [],
-  enrollments: [],
-  ...overrides,
-})
+const createHops = (includedCourses: string[]) => createStudyPlan({ included_courses: includedCourses })
 
 void describe('getHopsCourses', () => {
   void it('returns only passed courses included in the student HOPS', () => {

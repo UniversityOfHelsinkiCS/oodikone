@@ -4,7 +4,7 @@ import { ageFilter } from '@/components/FilterView/filters/age'
 import { getAge } from '@/util/timeAndDate'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, options: { min: number | null; max: number | null }) =>
   ageFilter().filter(student, { args: undefined, options, precomputed: { min: null, max: null } })

@@ -4,7 +4,7 @@ import { hopsFilter } from '@/components/FilterView/filters/hops'
 import { DegreeProgrammeType, Phase } from '@oodikone/shared/types'
 import { FormattedStudent, StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
-import { createCourse, createStudent, createStudyRight } from './helpers'
+import { createCourse, createStudent, createStudyRight } from '@oodikone/shared/test/utils'
 
 const createHops = (programmeCode: string, sisStudyRightId: string, includedCourses: string[]): StudentStudyPlan => ({
   included_courses: includedCourses,

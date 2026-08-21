@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { startYearAtUniFilter } from '@/components/FilterView/filters/startYearAtUni'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createStudent } from './helpers'
+import { createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, selected: number | string) =>
   startYearAtUniFilter().filter(student, { args: undefined, options: { selected }, precomputed: undefined })

@@ -1,10 +1,13 @@
-import { CreditTypeCode, DegreeProgrammeType, ExtentCode, Phase } from '@oodikone/shared/types'
+import type { Tag } from '../../models/kone'
+import { CreditTypeCode, DegreeProgrammeType, EnrollmentState, ExtentCode, Phase } from '../../types'
 import {
   FormattedStudent,
   StudentCourse,
   StudentStudyRight,
   StudentStudyRightElement,
-} from '@oodikone/shared/types/studentData'
+  StudentStudyPlan,
+  StudentTags,
+} from '../../types/studentData'
 
 export const createStudent = (overrides: Partial<FormattedStudent> = {}): FormattedStudent => ({
   firstnames: 'Testi',
@@ -74,5 +77,52 @@ export const createCourse = (overrides: Partial<StudentCourse> = {}): StudentCou
   credittypecode: CreditTypeCode.PASSED,
   language: 'fi',
   studyright_id: 'sr-1',
+  ...overrides,
+})
+
+export const createStudyPlan = (overrides: Partial<StudentStudyPlan> = {}): StudentStudyPlan => ({
+  included_courses: [],
+  programme_code: 'TEST',
+  includedModules: [],
+  completed_credits: 0,
+  curriculum_period_id: 'cp-1',
+  sis_study_right_id: 'sr-1',
+  ...overrides,
+})
+
+export const createEnrollment = (
+  overrides: Partial<FormattedStudent['enrollments'][number]> = {}
+): FormattedStudent['enrollments'][number] => ({
+  course_code: 'MAT001',
+  state: EnrollmentState.ENROLLED,
+  enrollment_date_time: new Date('2024-09-01'),
+  semestercode: 149,
+  studyright_id: 'sr-1',
+  ...overrides,
+})
+
+export const createTag = (overrides: Partial<StudentTags> = {}): StudentTags => ({
+  tag_id: '1',
+  studentnumber: '123456789',
+  tag: { tag_id: '1', tagname: 'Tag 1', personal_user_id: null } as unknown as Tag,
+  ...overrides,
+})
+
+export const createCredit = (overrides: Partial<Record<string, unknown>> = {}) => ({
+  grade: '5',
+  course_code: 'MAT11002',
+  credits: 5,
+  attainment_date: new Date(2020, 0, 1),
+  student_studentnumber: '111',
+  studyright_id: 'sr-1',
+  credittypecode: CreditTypeCode.PASSED,
+  isStudyModule: false,
+  language: 'fi',
+  semester: {
+    yearcode: 2020,
+    yearname: '2019-2020',
+    semestercode: 140,
+    name: { en: 'Spring 2020', fi: 'Kevät 2020', sv: 'Våren 2020' },
+  },
   ...overrides,
 })

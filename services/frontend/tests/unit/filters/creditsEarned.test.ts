@@ -3,7 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { creditsEarnedFilter } from '@/components/FilterView/filters/creditsEarned'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-import { createCourse, createStudent } from './helpers'
+import { createCourse, createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, options: { min: number | null; max: number | null }) =>
   creditsEarnedFilter().filter(student, { args: undefined, options, precomputed: { min: undefined, max: undefined } })

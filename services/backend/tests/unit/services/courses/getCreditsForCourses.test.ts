@@ -2,19 +2,9 @@ import { describe, it, assert, vi, afterEach } from 'vitest'
 import { Op } from 'sequelize'
 
 import { CreditTypeCode, Unification } from '@oodikone/shared/types'
-import { StudentModel } from '../../../../src/models'
-import { getCreditsForCourses } from '../../../../src/services/courses/creditsAndEnrollmentsOfCourse'
-
-const credit = (overrides: Partial<Record<string, unknown>> = {}) => ({
-  grade: '5',
-  course_code: 'MAT11002',
-  credits: 5,
-  attainment_date: new Date(2020, 0, 1),
-  student_studentnumber: '111',
-  studyright_id: 'sr-1',
-  credittypecode: CreditTypeCode.PASSED,
-  ...overrides,
-})
+import { createCredit as credit } from '@oodikone/shared/test/utils'
+import { StudentModel } from '@/models'
+import { getCreditsForCourses } from '@/services/courses/creditsAndEnrollmentsOfCourse'
 
 const mockStudents = (students: Array<{ studentnumber: string; credits: Array<Record<string, unknown>> }>) =>
   vi.spyOn(StudentModel, 'findAll').mockResolvedValue(students as any)

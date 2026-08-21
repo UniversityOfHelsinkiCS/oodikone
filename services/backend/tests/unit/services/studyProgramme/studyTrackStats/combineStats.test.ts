@@ -1,6 +1,6 @@
 import { describe, it, assert } from 'vitest'
-import { combineStats } from '../../../../../src/services/studyProgramme/studyTrackStats'
-import { getPercentage } from '../../../../../src/services/studyProgramme/studyProgrammeHelpers'
+import { combineStats } from '@/services/studyProgramme/studyTrackStats'
+import { getPercentage } from '@/services/studyProgramme/studyProgrammeHelpers'
 
 const constructStats = (mainStatsByYear = {}, mainStatsByTrack = {}, otherCountriesCount = {}) => {
   return {
