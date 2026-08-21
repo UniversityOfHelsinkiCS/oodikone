@@ -178,7 +178,7 @@ const getSemesterAndYearByDate = (
   return { year, semester }
 }
 
-const getYearlyStatsOfNew = async (
+export const getYearlyStatsOfNew = async (
   course: Pick<CourseModel, 'code' | 'name' | 'substitution_groups'> | null,
   courseCode: string,
   separate: boolean,
