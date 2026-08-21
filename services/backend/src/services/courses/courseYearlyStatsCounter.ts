@@ -1,4 +1,4 @@
-import type { Name } from '@oodikone/shared/types'
+import { CreditTypeCode, type Name } from '@oodikone/shared/types'
 import type { Programme, FacultyYearStats, Grades, Group, Student } from '@oodikone/shared/types/courseYearlyStats'
 import { getSemesterNamesByCode } from '../semesters'
 import type { OrganizationDetails } from './helpers'
@@ -100,7 +100,8 @@ export class CourseYearlyStatsCounter {
     groupCode: number,
     groupName: string | Name,
     courseCode: string,
-    yearCode: number
+    yearCode: number,
+    creditTypeCode: CreditTypeCode
   ) {
     this.initGroup(groupCode, groupName, courseCode, yearCode)
 
@@ -118,6 +119,9 @@ export class CourseYearlyStatsCounter {
 
     // mark best effort grade
     const current = this.groups[groupCode].students.grades[studentNumber]
+
+    // Don't add students to student stats based on improved grades
+    if (creditTypeCode === CreditTypeCode.IMPROVED) return
 
     if (current?.passed && !passed) return
     if (current?.passed && Number(grade) <= Number(current?.grade)) return

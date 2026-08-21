@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import { Op, fn as dbFn, col as dbCol } from 'sequelize'
 
 import { Credit, Enrollment } from '@oodikone/shared/models'
-import { Name, EnrollmentState, Unification } from '@oodikone/shared/types'
+import { Name, EnrollmentState, Unification, CreditTypeCode } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold, getSemesterCodeAt, yearCodeToYear, yearToYearCode } from '@oodikone/shared/util'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 import logger from '../../../src/util/logger'
@@ -53,7 +53,7 @@ export const parseCredit = (
   anonymizationSalt: string | null,
   mainCourseCode: string,
   studyRightElements: Array<SISStudyRightElementModel>
-): FormattedCredit => {
+): FormattedCredit & { creditTypeCode: CreditTypeCode } => {
   const singleCourse = isSingleCourse(creditGroup)
 
   // TODO: Calculate substitutions correctly once course_unit_realisation hits
@@ -67,6 +67,7 @@ export const parseCredit = (
   const courseCode = singleCourse ? attainment.course_code : mainCourseCode
   const grade = singleCourse ? attainment.grade : 'substituted'
   const credits = singleCourse ? attainment.credits : creditGroup.reduce((acc, credit) => acc + credit.credits, 0)
+  const creditTypeCode = singleCourse ? attainment.credittypecode : CreditTypeCode.PASSED
 
   const {
     semester,
@@ -105,6 +106,7 @@ export const parseCredit = (
     studentNumber: anonymizationSalt ? anonymizeStudentNumber(studentNumber, anonymizationSalt) : studentNumber,
     programme,
     credits,
+    creditTypeCode,
   }
 }
 
@@ -220,6 +222,7 @@ export const getYearlyStatsOfNew = async (
 
   for (const creditGroup of creditGroups) {
     if (!creditGroup?.length) continue
+    // if (creditGroup.every(credit => CreditModel.improved(credit))) continue
 
     const {
       studentNumber,
@@ -233,6 +236,7 @@ export const getYearlyStatsOfNew = async (
       programme,
       courseCode: creditCourseCode,
       credits,
+      creditTypeCode,
     } = parseCredit(
       creditGroup,
       anonymizationSalt,
@@ -254,7 +258,19 @@ export const getYearlyStatsOfNew = async (
     // Credits/attainments have quaranteed matching attainment_date and semesters/years
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
-    counter.markCreditToGroup(studentNumber, passed, grade, groupCode, groupName, creditCourseCode, yearCode)
+    counter.markCreditToGroup(
+      studentNumber,
+      passed,
+      grade,
+      groupCode,
+      groupName,
+      creditCourseCode,
+      yearCode,
+      creditTypeCode
+    )
+
+    // Don't add students to student stats based on improved grades
+    if (creditTypeCode === CreditTypeCode.IMPROVED) continue
     counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
   }
 

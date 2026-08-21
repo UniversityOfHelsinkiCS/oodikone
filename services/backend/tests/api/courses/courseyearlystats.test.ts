@@ -3,9 +3,20 @@ import request from 'supertest'
 import { describe, it, beforeAll, assert } from 'vitest'
 
 import { Unarray } from '@oodikone/shared/types'
+import { Grades } from '@oodikone/shared/types/courseYearlyStats'
 import { yearToYearCode } from '@oodikone/shared/util'
 import { CourseYearlyStatsResBody } from '@/routes/courses'
 import { initTests, ResponseWithBody } from '../../utils'
+
+// students.grades buckets failed students under grade key '0', regardless of their actual
+// grade, so passed/failed here are derived per student rather than per attempt.
+const calculatePassedAndFailed = (studentGrades: Grades) => {
+  const categories: { passed: string[]; failed: string[] } = { passed: [], failed: [] }
+  Object.entries(studentGrades).forEach(([grade, studentNumbers]) => {
+    categories[grade === '0' ? 'failed' : 'passed'].push(...studentNumbers)
+  })
+  return categories
+}
 
 void describe('Course yearly statistics (2016-2023)', () => {
   let app: Express
@@ -60,55 +71,59 @@ void describe('Course yearly statistics (2016-2023)', () => {
       [
         '2016-2017',
         { total: 1, passed: 1, failed: 0, enrolledNoGrade: 0 },
-        { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 0, 4: 1, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyv.': 0 },
       ],
       [
         '2017-2018',
         { total: 23, passed: 19, failed: 4, enrolledNoGrade: 0 },
-        { 5: 11, 4: 5, 3: 2, 2: 1, 1: 0, 0: 0, 'Hyl.': 4, 'Hyv.': 0 },
+        // NOTE: If looking at credits, all Hyl. will be added as grade '0'
+        // eg. here 0 students got grade 0 and 4 students got grade Hyl.
+        { 5: 11, 4: 5, 3: 2, 2: 1, 1: 0, 0: 4, 'Hyv.': 0 },
       ],
       [
         '2018-2019',
         { total: 28, passed: 26, failed: 2, enrolledNoGrade: 0 },
-        { 5: 18, 4: 3, 3: 2, 2: 1, 1: 2, 0: 2, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 18, 4: 3, 3: 2, 2: 1, 1: 2, 0: 2, 'Hyv.': 0 },
       ],
       [
         '2019-2020',
         { total: 28, passed: 28, failed: 0, enrolledNoGrade: 0 },
-        { 5: 17, 4: 5, 3: 1, 2: 4, 1: 1, 0: 0, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 17, 4: 5, 3: 1, 2: 4, 1: 1, 0: 0, 'Hyv.': 0 },
       ],
       [
         '2020-2021',
         { total: 23, passed: 23, failed: 0, enrolledNoGrade: 0 },
-        { 5: 18, 4: 2, 3: 0, 2: 2, 1: 0, 0: 0, 'Hyl.': 0, 'Hyv.': 1 },
+        { 5: 18, 4: 2, 3: 0, 2: 2, 1: 0, 0: 0, 'Hyv.': 1 },
       ],
       [
         '2021-2022',
         { total: 15, passed: 15, failed: 0, enrolledNoGrade: 20 },
-        { 5: 13, 4: 2, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 13, 4: 2, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyv.': 0 },
       ],
       [
         '2022-2023',
         { total: 27, passed: 27, failed: 0, enrolledNoGrade: 34 },
-        { 5: 21, 4: 6, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 21, 4: 6, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyv.': 0 },
       ],
       [
         '2023-2024',
         { total: 1, passed: 1, failed: 0, enrolledNoGrade: 7 },
-        { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyl.': 0, 'Hyv.': 0 },
+        { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyv.': 0 },
       ],
     ])('for statistic content during ($0)', (year, categories, grades) => {
       const stats = body.unifyStats!.statistics.find(yearStats => yearStats.name === year)!
       assert('enrollments' in stats, 'Missing field enrollment in statsitics')
 
+      const studentCategories = calculatePassedAndFailed(stats.students.grades)
+
       if (categories) {
         assert.strictEqual(
-          stats.attempts.categories.failed.length,
+          studentCategories.failed.length,
           categories.failed,
           `Incorrect amount of failed students for ${year}`
         )
         assert.strictEqual(
-          stats.attempts.categories.passed.length,
+          studentCategories.passed.length,
           categories.passed,
           `Incorrect amount of passed students for ${year}`
         )
@@ -126,7 +141,7 @@ void describe('Course yearly statistics (2016-2023)', () => {
       if (grades) {
         Object.entries(grades).forEach(([grade, count]) =>
           assert.strictEqual(
-            stats.attempts.grades[grade]?.length ?? 0,
+            stats.students.grades[grade]?.length ?? 0,
             count,
             `Incorrect amount of students with grade ${grade}`
           )
@@ -169,60 +184,44 @@ void describe('Course yearly statistics (2016-2023)', () => {
           "Students that have completed course later should not be included in the previous year's stats"
         )
 
+        const year2017 = body.unifyStats!.statistics.find(year => year.name === '2017-2018')
+        const year2018 = body.unifyStats!.statistics.find(year => year.name === '2018-2019')
+        const year2020 = body.unifyStats!.statistics.find(year => year.name === '2020-2021')
+        const year2022 = body.unifyStats!.statistics.find(year => year.name === '2022-2023')
+        assert(year2017 && 'enrollments' in year2017, 'Missing stats for 2017-2018')
+        assert(year2018 && 'enrollments' in year2018, 'Missing stats for 2018-2019')
+        assert(year2020 && 'enrollments' in year2020, 'Missing stats for 2020-2021')
+        assert(year2022 && 'enrollments' in year2022, 'Missing stats for 2022-2023')
+
+        const studentCategories2017 = calculatePassedAndFailed(year2017.students.grades)
+        const studentCategories2018 = calculatePassedAndFailed(year2018.students.grades)
+        const studentCategories2020 = calculatePassedAndFailed(year2020.students.grades)
+        const studentCategories2022 = calculatePassedAndFailed(year2022.students.grades)
+
         assert(
-          !body
-            .unifyStats!.statistics.find(year => year.name === '2017-2018')
-            ?.attempts.categories.passed.includes('457686') &&
-            !body
-              .unifyStats!.statistics.find(year => year.name === '2017-2018')
-              ?.attempts.categories.failed.includes('457686'),
+          !studentCategories2017.passed.includes('457686') && !studentCategories2017.failed.includes('457686'),
           "Student was incorrectly included to the failed course code's year stats (457686)"
         )
         assert(
-          body
-            .unifyStats!.statistics.find(year => year.name === '2018-2019')
-            ?.attempts.categories.passed.includes('457686') &&
-            body
-              .unifyStats!.statistics.find(year => year.name === '2018-2019')
-              ?.attempts.grades['5'].includes('457686'),
+          studentCategories2018.passed.includes('457686') && year2018.students.grades['5'].includes('457686'),
           "Student was incorrectly excluded from the passed course's completion year stats (457686)"
         )
 
         assert(
-          !body
-            .unifyStats!.statistics.find(year => year.name === '2017-2018')
-            ?.attempts.categories.passed.includes('455478') &&
-            !body
-              .unifyStats!.statistics.find(year => year.name === '2017-2018')
-              ?.attempts.categories.failed.includes('455478'),
+          !studentCategories2017.passed.includes('455478') && !studentCategories2017.failed.includes('455478'),
           "Student was incorrectly included to the failed course code's year stats (455478)"
         )
         assert(
-          body
-            .unifyStats!.statistics.find(year => year.name === '2020-2021')
-            ?.attempts.categories.passed.includes('455478') &&
-            body
-              .unifyStats!.statistics.find(year => year.name === '2020-2021')
-              ?.attempts.grades['2'].includes('455478'),
+          studentCategories2020.passed.includes('455478') && year2020.students.grades['2'].includes('455478'),
           "Student was incorrectly excluded from the passed course's completion year stats (455478)"
         )
 
         assert(
-          !body
-            .unifyStats!.statistics.find(year => year.name === '2017-2018')
-            ?.attempts.categories.passed.includes('547994') &&
-            !body
-              .unifyStats!.statistics.find(year => year.name === '2017-2018')
-              ?.attempts.categories.failed.includes('547994'),
+          !studentCategories2017.passed.includes('547994') && !studentCategories2017.failed.includes('547994'),
           "Student was incorrectly included to the failed course code's year stats (547994)"
         )
         assert(
-          body
-            .unifyStats!.statistics.find(year => year.name === '2022-2023')
-            ?.attempts.categories.passed.includes('547994') &&
-            body
-              .unifyStats!.statistics.find(year => year.name === '2022-2023')
-              ?.attempts.grades['5'].includes('547994'),
+          studentCategories2022.passed.includes('547994') && year2022.students.grades['5'].includes('547994'),
           "Student was incorrectly excluded from the passed course's completion year stats (547994)"
         )
       })
@@ -263,12 +262,14 @@ void describe('Course yearly statistics (2016-2023)', () => {
         const stats = body.unifyStats?.statistics!.find(year => year.name === '2018-2019')
         assert(stats && 'enrollments' in stats, 'Missing field enrollment in statsitics')
 
+        const studentCategories = calculatePassedAndFailed(stats.students.grades)
+
         assert(
-          stats.attempts.categories.failed.includes('542874'),
+          studentCategories.failed.includes('542874'),
           "Stats didn't include student with only failed course attainment (failed)"
         )
         assert(
-          !stats.attempts.categories.passed.includes('542874'),
+          !studentCategories.passed.includes('542874'),
           'Stats did incorrectly include student with only failed course attainment (passed)'
         )
         assert(
@@ -299,52 +300,56 @@ void describe('Course yearly statistics (2016-2023)', () => {
       it('should not include students for AY code', () => {
         const stats = body.unifyStats?.statistics!.find(year => year.name === '2017-2018')
         assert(stats && 'enrollments' in stats, 'Missing field enrollment in statsitics')
-        assert(!('534980' in stats.attempts.categories.failed))
+        const studentCategories = calculatePassedAndFailed(stats.students.grades)
+        assert(!studentCategories.failed.includes('534980'))
       })
 
       it('should not include student with failed grade after passed grade', () => {
         const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
-        assert(year, 'Stats missing completely')
+        assert(year && 'enrollments' in year, 'Stats missing completely')
+        const studentCategories = calculatePassedAndFailed(year.students.grades)
         assert(
-          !year.attempts.categories.failed.includes('501716'),
+          !studentCategories.failed.includes('501716'),
           'Failed students included incorrectly the student in question'
         )
         assert(
-          year.attempts.categories.passed.includes('501716'),
+          studentCategories.passed.includes('501716'),
           "Passed students didn't include student with a passed grade"
         )
-        assert(year.attempts.grades['1'].includes('501716'), 'Grades should include the student in the correct grade')
+        assert(year.students.grades['1'].includes('501716'), 'Grades should include the student in the correct grade')
       })
 
       it('should include student with failed grade and passed AY grade', () => {
         const year = body.unifyStats?.statistics.find(year => year.name === '2020-2021')
-        assert(year, 'Stats missing completely')
+        assert(year && 'enrollments' in year, 'Stats missing completely')
+        const studentCategories = calculatePassedAndFailed(year.students.grades)
         assert(
-          year.attempts.categories.failed.includes('0011812135'),
+          studentCategories.failed.includes('0011812135'),
           "Failed students didn't incorrectly include student in question"
         )
         assert(
-          !year.attempts.categories.passed.includes('0011812135'),
+          !studentCategories.passed.includes('0011812135'),
           'Passed students incorrectly included student without a passing grade'
         )
         assert(
-          year.attempts.grades['Hyl.'].includes('0011812135'),
+          year.students.grades['0'].includes('0011812135'),
           'Grades should include the student in the correct grade'
         )
       })
 
       it('should include student with only approved grade', () => {
         const year = body.unifyStats?.statistics.find(year => year.name === '2022-2023')
-        assert(year, 'Stats missing completely')
+        assert(year && 'enrollments' in year, 'Stats missing completely')
+        const studentCategories = calculatePassedAndFailed(year.students.grades)
         assert(
-          !year.attempts.categories.failed.includes('543385'),
+          !studentCategories.failed.includes('543385'),
           'Failed students included incorrectly the student in question'
         )
         assert(
-          year.attempts.categories.passed.includes('543385'),
+          studentCategories.passed.includes('543385'),
           "Passed students didn't include student with a passed grade"
         )
-        assert(year.attempts.grades['5'].includes('543385'), 'Grades should include the student in the correct grade')
+        assert(year.students.grades['5'].includes('543385'), 'Grades should include the student in the correct grade')
       })
 
       describe('should calculate enrollments correctly', () => {
@@ -382,14 +387,14 @@ void describe('Course yearly statistics (2016-2023)', () => {
           )
           assert.strictEqual(
             body.unifyStats?.statistics.reduce(
-              (acc, yearStats) => acc + yearStats.attempts.categories.failed.length,
+              (acc, yearStats) => acc + calculatePassedAndFailed(yearStats.students.grades).failed.length,
               0
             ),
             1
           )
           assert.strictEqual(
             body.unifyStats?.statistics.reduce(
-              (acc, yearStats) => acc + yearStats.attempts.categories.passed.length,
+              (acc, yearStats) => acc + calculatePassedAndFailed(yearStats.students.grades).passed.length,
               0
             ),
             249
@@ -419,17 +424,17 @@ void describe('Course yearly statistics (2016-2023)', () => {
 
         it('- 2017-2018 should not include failed grade', () => {
           const year = body.unifyStats?.statistics.find(year => year.name === '2017-2018')
-          assert.strictEqual(year?.attempts.categories.failed.length, 0, 'Failed stats should not include any students')
-          assert.deepStrictEqual(year?.attempts.categories.failed, [], 'Failed stats should not include any students')
+          assert(year && 'enrollments' in year, 'Missing stats for 2017-2018')
+          const studentCategories = calculatePassedAndFailed(year.students.grades)
+          assert.strictEqual(studentCategories.failed.length, 0, 'Failed stats should not include any students')
+          assert.deepStrictEqual(studentCategories.failed, [], 'Failed stats should not include any students')
         })
         it('- 2018-2019 should include a failed grade', () => {
           const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
-          assert.strictEqual(year?.attempts.categories.failed.length, 1, 'Failed stats should include only one student')
-          assert.deepStrictEqual(
-            year?.attempts.categories.failed,
-            ['539036'],
-            'Failed stats included the incorrect student'
-          )
+          assert(year && 'enrollments' in year, 'Missing stats for 2018-2019')
+          const studentCategories = calculatePassedAndFailed(year.students.grades)
+          assert.strictEqual(studentCategories.failed.length, 1, 'Failed stats should include only one student')
+          assert.deepStrictEqual(studentCategories.failed, ['539036'], 'Failed stats included the incorrect student')
         })
       })
 
@@ -451,10 +456,15 @@ void describe('Course yearly statistics (2016-2023)', () => {
           )
         })
 
-        it('2018-2019 MAT11002 should not include student with only improved grade (509770)', () => {
+        it('2018-2019 MAT11002 should not include student with improved grade (509770)', () => {
           const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
-          assert.notInclude(year?.attempts.categories.passed, ['509770'])
-          assert.strictEqual(year?.attempts.categories.passed.length, 57)
+          assert(year && 'enrollments' in year, 'Missing stats for 2018-2019')
+
+          const studentCategories = calculatePassedAndFailed(year.students.grades)
+          assert.notInclude(studentCategories.passed, '509770')
+          assert.strictEqual(studentCategories.passed.length, 57)
+
+          assert.notInclude(year.students.studentNumbers, '509770')
         })
       })
     })
@@ -515,12 +525,13 @@ describe('Course yearly statistics (smaller timeframes)', () => {
         enrolledNoGrade: 0,
         extra: { failed: ['455478', '457686', '474032', '497183', '509165', '547994', '550840'] },
       },
-      { 5: 11, 4: 5, 3: 2, 2: 1, 1: 0, 0: 0, 'Hyl.': 7, 'Hyv.': 0 },
+      // students.grades buckets every failing grade under '0', so 'Hyl.' is folded into it here.
+      { 5: 11, 4: 5, 3: 2, 2: 1, 1: 0, 0: 7, 'Hyl.': 0, 'Hyv.': 0 },
     ],
     [
       '2018-2019',
       { total: 30, passed: 26, failed: 4, enrolledNoGrade: 0, extra: {} },
-      { 5: 18, 4: 3, 3: 2, 2: 1, 1: 2, 0: 3, 'Hyl.': 1, 'Hyv.': 0 },
+      { 5: 18, 4: 3, 3: 2, 2: 1, 1: 2, 0: 4, 'Hyl.': 0, 'Hyv.': 0 },
     ],
     [
       '2019-2020',
@@ -566,10 +577,12 @@ describe('Course yearly statistics (smaller timeframes)', () => {
     const stats = body.unifyStats!.statistics.find(yearStats => yearStats.name === year)!
     assert('enrollments' in stats, 'Missing field enrollment in statsitics')
 
+    const studentCategories = calculatePassedAndFailed(stats.students.grades)
+
     if (Object.keys(categories.extra).length) {
       Object.keys(categories.extra).forEach(category => {
         assert.deepStrictEqual(
-          stats.attempts.categories[category].sort(),
+          studentCategories[category as 'passed' | 'failed'].sort(),
           categories.extra[category].sort(),
           `"${category}" included incorrect students`
         )
@@ -578,12 +591,12 @@ describe('Course yearly statistics (smaller timeframes)', () => {
 
     if (categories) {
       assert.strictEqual(
-        stats.attempts.categories.failed.length,
+        studentCategories.failed.length,
         categories.failed,
         `Incorrect amount of failed students for ${year}`
       )
       assert.strictEqual(
-        stats.attempts.categories.passed.length,
+        studentCategories.passed.length,
         categories.passed,
         `Incorrect amount of passed students for ${year}`
       )
@@ -601,7 +614,7 @@ describe('Course yearly statistics (smaller timeframes)', () => {
     if (grades) {
       Object.entries(grades).forEach(([grade, count]) =>
         assert.strictEqual(
-          stats.attempts.grades[grade]?.length ?? 0,
+          stats.students.grades[grade]?.length ?? 0,
           count,
           `Incorrect amount of students with grade ${grade}`
         )
@@ -626,14 +639,12 @@ describe('Course yearly statistics (smaller timeframes)', () => {
         'unifyStats' in body && 'regularStats' in body && 'openStats' in body,
         'All keys of courseyearlystats not defined'
       )
-      const year = body.unifyStats!.statistics.find(year => year.name === '2017-2018')!
+      const year = body.unifyStats!.statistics.find(year => year.name === '2017-2018')
+      assert(year && 'enrollments' in year, 'Missing stats for 2017-2018')
+      const studentCategories = calculatePassedAndFailed(year.students.grades)
 
-      assert.deepStrictEqual(year.attempts.categories.failed, ['539036'], 'Failed stats should have include a students')
-      assert.strictEqual(
-        year.attempts.categories.failed.length,
-        1,
-        'Failed stats should have included a failed student'
-      )
+      assert.deepStrictEqual(studentCategories.failed, ['539036'], 'Failed stats should have include a students')
+      assert.strictEqual(studentCategories.failed.length, 1, 'Failed stats should have included a failed student')
     })
 
     it('- 2018-2019 should include a failed grade', async () => {
@@ -654,12 +665,14 @@ describe('Course yearly statistics (smaller timeframes)', () => {
       )
 
       const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
+      assert(year && 'enrollments' in year, 'Missing stats for 2018-2019')
+      const studentCategories = calculatePassedAndFailed(year.students.grades)
       assert.deepStrictEqual(
-        year?.attempts.categories.failed,
+        studentCategories.failed,
         ['539036', '540698', '542927', '544688'],
         'Failed stats included the incorrect students'
       )
-      assert.strictEqual(year?.attempts.categories.failed.length, 4, 'Failed stats should include only one student')
+      assert.strictEqual(studentCategories.failed.length, 4, 'Failed stats should include only one student')
     })
   })
 })
