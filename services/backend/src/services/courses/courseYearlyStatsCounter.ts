@@ -2,6 +2,7 @@ import { CreditTypeCode, type Name } from '@oodikone/shared/types'
 import type { Programme, FacultyYearStats, Grades, Group, Student } from '@oodikone/shared/types/courseYearlyStats'
 import { getSemesterNamesByCode } from '../semesters'
 import type { OrganizationDetails } from './helpers'
+import { yearCodeToYear } from '@oodikone/shared/util'
 
 export class CourseYearlyStatsCounter {
   private groups: Record<number, Group>
@@ -55,7 +56,7 @@ export class CourseYearlyStatsCounter {
       credits: {},
     }
 
-    const year = `${1949 + Number(yearCode)}-${1950 + Number(yearCode)}`
+    const year = `${yearCodeToYear(yearCode)}-${yearCodeToYear(yearCode) + 1}`
     this.facultyStats[yearCode] ??= {
       year,
       allStudents: [],
