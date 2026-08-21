@@ -1,3 +1,4 @@
+import type { Credit } from '../../models'
 import type { Tag } from '../../models/kone'
 import { CreditTypeCode, DegreeProgrammeType, EnrollmentState, ExtentCode, Phase } from '../../types'
 import {
@@ -108,21 +109,22 @@ export const createTag = (overrides: Partial<StudentTags> = {}): StudentTags => 
   ...overrides,
 })
 
-export const createCredit = (overrides: Partial<Record<string, unknown>> = {}) => ({
-  grade: '5',
-  course_code: 'MAT11002',
-  credits: 5,
-  attainment_date: new Date(2020, 0, 1),
-  student_studentnumber: '111',
-  studyright_id: 'sr-1',
-  credittypecode: CreditTypeCode.PASSED,
-  isStudyModule: false,
-  language: 'fi',
-  semester: {
-    yearcode: 2020,
-    yearname: '2019-2020',
-    semestercode: 140,
-    name: { en: 'Spring 2020', fi: 'Kevät 2020', sv: 'Våren 2020' },
-  },
-  ...overrides,
-})
+export const createCredit = (overrides: Partial<Credit> = {}) =>
+  ({
+    grade: '5',
+    course_code: 'MAT11002',
+    credits: 5,
+    attainment_date: new Date(2020, 0, 1),
+    student_studentnumber: '111',
+    studyright_id: 'sr-1',
+    credittypecode: CreditTypeCode.PASSED,
+    isStudyModule: false,
+    language: 'fi',
+    semester: {
+      yearcode: 2020,
+      yearname: '2019-2020',
+      semestercode: 140,
+      name: { en: 'Spring 2020', fi: 'Kevät 2020', sv: 'Våren 2020' },
+    } as Partial<Credit['semester']>,
+    ...overrides,
+  }) as Credit

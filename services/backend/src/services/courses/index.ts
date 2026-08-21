@@ -48,7 +48,7 @@ type FormattedCredit = {
 const isSingleCourse = (group: Credit[] | Enrollment[]): boolean =>
   group?.length === 1 || [...new Set(group?.map((course: Credit | Enrollment) => course.course_code))].length === 1
 
-const parseCredit = (
+export const parseCredit = (
   creditGroup: Credit[],
   anonymizationSalt: string | null,
   mainCourseCode: string,
