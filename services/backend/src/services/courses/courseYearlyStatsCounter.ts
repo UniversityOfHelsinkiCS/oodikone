@@ -94,7 +94,32 @@ export class CourseYearlyStatsCounter {
     }
   }
 
-  public markCreditToGroup(
+  /** Add student's credit to attempts, attempt-stats include possibly duplicate students */
+  public markAttemptToGroup(
+    studentNumber: string,
+    passed: boolean,
+    grade: string,
+    groupCode: number,
+    groupName: string | Name,
+    courseCode: string,
+    yearCode: number
+  ) {
+    this.initGroup(groupCode, groupName, courseCode, yearCode)
+
+    const { grades, categories } = this.groups[groupCode].attempts
+
+    grades[grade] ??= []
+    grades[grade].push(studentNumber)
+
+    if (passed) {
+      categories.passed.push(studentNumber)
+    } else {
+      categories.failed.push(studentNumber)
+    }
+  }
+
+  /** Add student's credit to student-stats, student-stats include only unique students */
+  public markStudentGradeToGroup(
     studentNumber: string,
     passed: boolean,
     grade: string,
@@ -106,23 +131,10 @@ export class CourseYearlyStatsCounter {
   ) {
     this.initGroup(groupCode, groupName, courseCode, yearCode)
 
-    // mark credit to attempts
-    const { grades, categories } = this.groups[groupCode].attempts
-
-    grades[grade] ??= []
-    grades[grade].push(studentNumber)
-
-    if (passed) {
-      categories.passed.push(studentNumber)
-    } else {
-      categories.failed.push(studentNumber)
-    }
-
-    // mark best effort grade
-    const current = this.groups[groupCode].students.grades[studentNumber]
-
     // Don't add students to student stats based on improved grades
     if (creditTypeCode === CreditTypeCode.IMPROVED) return
+
+    const current = this.groups[groupCode].students.grades[studentNumber]
 
     if (current?.passed && !passed) return
     if (current?.passed && Number(grade) <= Number(current?.grade)) return

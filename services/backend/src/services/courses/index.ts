@@ -220,9 +220,18 @@ export const getYearlyStatsOfNew = async (
 
   const counter = new CourseYearlyStatsCounter()
 
+  // A single-course credit group can contain more than one real attempt for the same course code
+  // (e.g. failed once and passed on a retry). parseCredit collapses a group into a single
+  // attainment for student-stats (no student is counted twice), but attempt-stats (include all attempts for a course)
+  // need every attempt counted in its own year/semester.
+  // Substitution groups are left untouched
+  const splitIntoAttempts = (group: Credit[]): Credit[][] =>
+    isSingleCourse(group) && group.length > 1 ? group.map(credit => [credit]) : [group]
+
   for (const creditGroup of creditGroups) {
     if (!creditGroup?.length) continue
-    // if (creditGroup.every(credit => CreditModel.improved(credit))) continue
+
+    const studyRightElements = studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? []
 
     const {
       studentNumber,
@@ -237,12 +246,7 @@ export const getYearlyStatsOfNew = async (
       courseCode: creditCourseCode,
       credits,
       creditTypeCode,
-    } = parseCredit(
-      creditGroup,
-      anonymizationSalt,
-      courseCode,
-      studentNumberToSrElementsMap[creditGroup.at(0)?.student_studentnumber ?? 0] ?? []
-    )
+    } = parseCredit(creditGroup, anonymizationSalt, courseCode, studyRightElements)
 
     counter.markStudyProgramme(
       studentNumber,
@@ -258,7 +262,7 @@ export const getYearlyStatsOfNew = async (
     // Credits/attainments have quaranteed matching attainment_date and semesters/years
     const groupCode = separate ? semesterCode : yearCode
     const groupName = separate ? semesterName : yearName
-    counter.markCreditToGroup(
+    counter.markStudentGradeToGroup(
       studentNumber,
       passed,
       grade,
@@ -270,8 +274,27 @@ export const getYearlyStatsOfNew = async (
     )
 
     // Don't add students to student stats based on improved grades
-    if (creditTypeCode === CreditTypeCode.IMPROVED) continue
-    counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
+    if (creditTypeCode !== CreditTypeCode.IMPROVED) {
+      counter.markCreditToStudentCategories(studentNumber, attainmentDate, groupCode)
+    }
+
+    // The same group can include a failed and a passed credit in which case the parseCredit
+    // would return only the passed credit. Hence we split the failed and passed credit into
+    // two separate groups
+    for (const attemptCredits of splitIntoAttempts(creditGroup)) {
+      const attempt = parseCredit(attemptCredits, anonymizationSalt, courseCode, studyRightElements)
+      const attemptGroupCode = separate ? attempt.semesterCode : attempt.yearCode
+      const attemptGroupName = separate ? attempt.semesterName : attempt.yearName
+      counter.markAttemptToGroup(
+        attempt.studentNumber,
+        attempt.passed,
+        attempt.grade,
+        attemptGroupCode,
+        attemptGroupName,
+        attempt.courseCode,
+        attempt.yearCode
+      )
+    }
   }
 
   for (const enrollments of enrollmentGroups) {
