@@ -72,8 +72,6 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     }
   }
 
-  // console.log('Creating:')
-  // console.dir(mappedCourses, { depth: null })
   await bulkCreate(Course, mappedCourses)
   await bulkCreate(
     CourseProvider,

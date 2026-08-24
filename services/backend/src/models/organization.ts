@@ -45,7 +45,11 @@ export class OrganizationModel extends Model implements Organization {
   @HasMany(() => SISStudyRightModel, { foreignKey: 'facultyCode', sourceKey: 'code' })
   declare SISStudyRights: Organization['SISStudyRights']
 
-  @BelongsToMany(() => CourseModel, () => CourseProviderModel, 'organizationcode')
+  @BelongsToMany(() => CourseModel, {
+    through: () => CourseProviderModel,
+    foreignKey: 'organizationcode',
+    targetKey: 'groupId',
+  })
   declare courses: Organization['courses']
 
   @CreatedAt

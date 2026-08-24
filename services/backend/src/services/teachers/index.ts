@@ -151,7 +151,7 @@ const getActiveTeachers = async (providers: string[], startSemester: number, end
     JOIN credit_teachers ON teacher.id = credit_teachers.teacher_id
     JOIN credit ON credit.id = credit_teachers.credit_id
     JOIN course ON credit.course_id = course.id
-    JOIN course_providers ON course.id = course_providers.coursecode
+    JOIN course_providers ON course.group_id = course_providers.coursecode
     JOIN organization ON organization.id = course_providers.organizationcode
     WHERE credit.semestercode BETWEEN :startSemester AND :endSemester
       AND organization.code IN (:providers)

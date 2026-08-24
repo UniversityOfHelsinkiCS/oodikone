@@ -59,7 +59,7 @@ const { sequelize } = dbConnections
 /**
 NOTE:
  1. There are some attainments that are linked to a valid study right, but the attainmentdate
-    is outside the study right's validity period. (maybe human error when the credits were registered)
+    is outside the study right's validity period.
  2. There are some attainments with no attached study right at all.
  3. Possibly some other edge cases.
 
@@ -69,24 +69,18 @@ NOTE:
    degree student -> has any degree (bsc / msc) study right in the university
    openuni -> only if no other study rights
 **/
-export const getProgrammeCourseAggregates = async (params: {
-  courseCodes: string[]
-  from: Date
+export const getProgrammeCourseAggregates = async (
+  courseIds: string[],
+  from: Date,
   to: Date
-}): Promise<ProgrammeCourseCreditRow[]> => {
-  const { courseCodes, from, to } = params
-
-  if (courseCodes.length === 0) {
-    return []
-  }
+): Promise<ProgrammeCourseCreditRow[]> => {
+  if (!courseIds.length) return []
 
   try {
     return await sequelize.query<ProgrammeCourseCreditRow>(
       `
         WITH filtered_credits AS (
           SELECT
-            cr.course_code AS "courseCode",
-            co.name AS "courseName",
             co.group_id AS "groupId",
             cr.student_studentnumber AS "studentNumber",
             cr.attainment_date AS "attainmentDate",
@@ -94,15 +88,14 @@ export const getProgrammeCourseAggregates = async (params: {
             cr."isStudyModule" AS "isStudyModule"
           FROM
             credit cr
-            INNER JOIN course co ON co.code = cr.course_code
+            INNER JOIN course co ON co.id = cr.course_id
           WHERE
-            cr.course_code IN (:courseCodes)
+            cr.course_id IN (:courseIds)
+            AND co.group_id is NOT NULL
             AND cr.attainment_date BETWEEN :from AND :to
             AND cr.credittypecode IN (:creditTypes)
         )
         SELECT
-          fc."courseCode",
-          fc."courseName",
           fc."groupId",
           fc."studentNumber",
           fc."attainmentDate",
@@ -177,7 +170,7 @@ export const getProgrammeCourseAggregates = async (params: {
       {
         type: QueryTypes.SELECT,
         replacements: {
-          courseCodes,
+          courseIds,
           from,
           to,
           creditTypes: [CreditTypeCode.PASSED, CreditTypeCode.APPROVED],
@@ -196,23 +189,17 @@ export const getProgrammeCourseAggregates = async (params: {
   }
 }
 
-export const getTransferCourseAggregates = async (params: {
-  courseCodes: string[]
-  from: Date
+export const getTransferCourseAggregates = async (
+  courseIds: string[],
+  from: Date,
   to: Date
-}): Promise<TransferCourseCreditRow[]> => {
-  const { courseCodes, from, to } = params
-
-  if (courseCodes.length === 0) {
-    return []
-  }
+): Promise<TransferCourseCreditRow[]> => {
+  if (!courseIds.length) return []
 
   try {
     return await sequelize.query<TransferCourseCreditRow>(
       `
         SELECT
-          cr.course_code AS "courseCode",
-          co.name AS "courseName",
           co.group_id AS "groupId",
           cr.student_studentnumber AS "studentNumber",
           cr.attainment_date AS "attainmentDate",
@@ -220,16 +207,17 @@ export const getTransferCourseAggregates = async (params: {
           cr."isStudyModule" AS "isStudyModule"
         FROM
           credit cr
-          INNER JOIN course co ON co.code = cr.course_code
+          INNER JOIN course co ON co.id = cr.course_id
         WHERE
-          cr.course_code IN (:courseCodes)
+          cr.course_id IN (:courseIds)
+          AND co.group_id IS NOT NULL
           AND cr.attainment_date BETWEEN :from AND :to
           AND cr.credittypecode = :creditType
       `,
       {
         type: QueryTypes.SELECT,
         replacements: {
-          courseCodes,
+          courseIds,
           from,
           to,
           creditType: CreditTypeCode.APPROVED,
