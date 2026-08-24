@@ -84,6 +84,10 @@ export class CourseModel extends Model implements Course {
   @HasMany(() => EnrollmentModel, { foreignKey: 'course_id' })
   declare enrollments: Course['enrollments']
 
-  @BelongsToMany(() => OrganizationModel, () => CourseProviderModel, 'coursecode')
+  @BelongsToMany(() => OrganizationModel, {
+    through: () => CourseProviderModel,
+    foreignKey: 'coursecode',
+    sourceKey: 'groupId',
+  })
   declare organizations: Course['organizations']
 }

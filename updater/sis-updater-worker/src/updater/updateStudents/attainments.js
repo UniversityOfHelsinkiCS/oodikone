@@ -98,17 +98,23 @@ export const updateAttainments = async (
           if (education) {
             coursesToBeCreated.set(education.code, {
               id: att.module_group_id,
+              groupId: att.module_group_id,
+              isPrimary: true,
+              isStudyModule: isModule(att.type),
               name: education.name,
               code: education.code,
               coursetypecode: att.study_level_urn,
-              course_unit_type: att.course_unit_type_urn,
-              substitution_groups: [],
+              courseUnitType: att.course_unit_type_urn,
+              substitutionGroups: [],
             })
             return att
           }
 
           coursesToBeCreated.set(att.module_group_id, {
             id: att.module_group_id,
+            groupId: att.module_group_id,
+            isPrimary: true,
+            isStudyModule: isModule(att.type),
             name: {
               fi: 'Tuntematon opintokokonaisuus',
               en: 'Unknown study module',
@@ -116,8 +122,8 @@ export const updateAttainments = async (
             },
             code: att.module_group_id,
             coursetypecode: att.study_level_urn,
-            course_unit_type: att.course_unit_type_urn,
-            substitution_groups: [],
+            courseUnitType: att.course_unit_type_urn,
+            substitutionGroups: [],
           })
           return att
         }
@@ -160,14 +166,16 @@ export const updateAttainments = async (
         if (!course) {
           courseUnit = {
             id: parsedCourseCode,
+            groupId: parsedCourseCode,
+            isPrimary: true,
             name: att.name,
             code: parsedCourseCode,
-            is_study_module: isModule(att.type),
+            isStudyModule: isModule(att.type),
             coursetypecode: att.study_level_urn,
-            max_attainment_date: att.attainment_date,
-            min_attainment_date: att.attainment_date,
-            substitution_groups: [],
-            course_unit_type: att.course_unit_type_urn,
+            maxAttainmentDate: att.attainment_date,
+            minAttainmentDate: att.attainment_date,
+            substitutionGroups: [],
+            courseUnitType: att.course_unit_type_urn,
           }
 
           coursesToBeCreated.set(parsedCourseCode, courseUnit)
