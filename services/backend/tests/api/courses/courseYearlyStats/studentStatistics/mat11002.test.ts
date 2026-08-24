@@ -1,8 +1,8 @@
 import { Express } from 'express'
 import { describe, it, beforeAll, assert } from 'vitest'
 
-import { initTests } from '../../../utils'
-import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from './helpers'
+import { initTests } from '../../../../utils'
+import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
 void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
   let app: Express
@@ -28,7 +28,8 @@ void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
     assert(year.students.grades['1'].includes('501716'), 'Grades should include the student in the correct grade')
   })
 
-  it('should include student with failed grade and passed AY grade', () => {
+  // FIXME: Doesn't test anything acually. Student doesn't have a passed AY grade
+  it.skip('should include student with failed grade and passed AY grade', () => {
     const year = body.unifyStats?.statistics.find(year => year.name === '2020-2021')
     assert(year && 'enrollments' in year, 'Stats missing completely')
     const studentCategories = calculatePassedAndFailed(year.students.grades)

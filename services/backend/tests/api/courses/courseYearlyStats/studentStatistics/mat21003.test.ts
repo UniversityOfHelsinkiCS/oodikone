@@ -2,8 +2,8 @@ import { Express } from 'express'
 import { describe, it, beforeAll, assert } from 'vitest'
 
 import { yearToYearCode } from '@oodikone/shared/util'
-import { initTests } from '../../../utils'
-import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from './helpers'
+import { initTests } from '../../../../utils'
+import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
 void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
   let app: Express
