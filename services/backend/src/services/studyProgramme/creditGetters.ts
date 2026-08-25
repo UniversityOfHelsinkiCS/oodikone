@@ -4,22 +4,27 @@ import { CreditTypeCode } from '@oodikone/shared/types'
 import { CourseModel, CourseProviderModel, CreditModel, OrganizationModel } from '../../models'
 import { formatCredit } from './format'
 
-export const getCreditsForProvider = async (provider: string, codes: string[], since: Date) => {
+export const getCreditsForProvider = async (provider: string, courseIds: string[], since: Date) => {
   const credits = await CreditModel.findAll({
+    include: {
+      model: CourseModel,
+      attributes: ['groupId'],
+    },
     where: {
-      course_code: { [Op.in]: codes },
+      course_id: { [Op.in]: courseIds },
       attainment_date: { [Op.gte]: since },
       isStudyModule: { [Op.not]: true },
       credittypecode: CreditTypeCode.PASSED,
     },
     raw: true,
+    nest: true,
   })
 
-  const courseIds = credits.map(cr => cr.course_id)
+  const courseGroupIds = credits.map(cr => cr.course.groupId)
 
   const providers = await CourseProviderModel.findAll({
     where: {
-      coursecode: { [Op.in]: courseIds },
+      coursecode: { [Op.in]: courseGroupIds },
     },
     raw: true,
   })
@@ -38,14 +43,14 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
     return obj
   }, {})
 
-  const courseIdToShareMap = providers.reduce<Record<string, CourseProviderModel[]>>((obj, provider) => {
+  const courseGroupIdToShareMap = providers.reduce<Record<string, CourseProviderModel[]>>((obj, provider) => {
     obj[provider.coursecode] ??= []
     obj[provider.coursecode].push(provider)
     return obj
   }, {})
 
-  const courseIdToShare = (courseId: string, attainmentDate: Date) => {
-    const providers = courseIdToShareMap[courseId]
+  const courseGroupIdToShare = (courseGroupId: string, attainmentDate: Date) => {
+    const providers = courseGroupIdToShareMap[courseGroupId]
     const relevantProvider = providers?.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
     if (!relevantProvider?.shares) return 0
     const relevantShare = relevantProvider.shares
@@ -71,7 +76,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
         return bTime - aTime
       })[0]
 
-    // Odd logic, but if there are multiple providers for same course code, if no fitting dates are
+    // Odd logic, but if there are multiple providers for same course group, if no fitting dates are
     // not found for our relevant provider, we can assume the share of that date is of some other provider.
     // But if only 1 provider exists, we can assume it has share of 1.
     if (!relevantShare) {
@@ -82,7 +87,7 @@ export const getCreditsForProvider = async (provider: string, codes: string[], s
   }
 
   return credits
-    .map(cr => ({ ...cr, credits: cr.credits * courseIdToShare(cr.course_id, cr.attainment_date) }))
+    .map(cr => ({ ...cr, credits: cr.credits * courseGroupIdToShare(cr.course.groupId, cr.attainment_date) }))
     .map(formatCredit)
 }
 

@@ -3,7 +3,7 @@ import { EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import { CreditStats } from '@oodikone/shared/types/studyProgramme'
 import { mapToProviders } from '@oodikone/shared/util'
 import { getCreditStats, setCreditStats } from './analyticsService'
-import { getCourseCodesOfProvider } from './providers'
+import { getCourseIdsOfProvider } from './providers'
 import { getCreditsForProvider, getTransferredCredits } from './studyProgramme/creditGetters'
 import { getStudentHetuStateMap } from './studyProgramme/studentGetters'
 import { defineYear } from './studyProgramme/studyProgrammeHelpers'
@@ -107,8 +107,8 @@ const getBasicDegreeStudyRight = (
 export const computeCreditsProduced = async (providerCode: string, isAcademicYear: boolean): Promise<CreditStats> => {
   const since = new Date('2017-01-01')
   const rapoFormattedProviderCode = mapToProviders([providerCode])[0]
-  const courses = await getCourseCodesOfProvider(rapoFormattedProviderCode)
-  const credits = await getCreditsForProvider(rapoFormattedProviderCode, courses, since)
+  const courseIds = await getCourseIdsOfProvider(rapoFormattedProviderCode)
+  const credits = await getCreditsForProvider(rapoFormattedProviderCode, courseIds, since)
 
   // This part also adds oikis Vaasa which is provided by a different organization.
   // Unknown if there are other similar cases!
@@ -119,8 +119,8 @@ export const computeCreditsProduced = async (providerCode: string, isAcademicYea
   const vaasaProvider =
     rapoFormattedProviderCode in vaasaCodes ? vaasaCodes[rapoFormattedProviderCode as keyof typeof vaasaCodes] : null
   if (vaasaProvider) {
-    const courses = await getCourseCodesOfProvider(vaasaProvider)
-    const vaasaCredits = await getCreditsForProvider(vaasaProvider, courses, since)
+    const vaasaCourseIds = await getCourseIdsOfProvider(vaasaProvider)
+    const vaasaCredits = await getCreditsForProvider(vaasaProvider, vaasaCourseIds, since)
     credits.push(...vaasaCredits)
   }
 
