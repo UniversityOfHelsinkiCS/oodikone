@@ -45,9 +45,8 @@ type FormattedCredit = {
 }
 
 // Is group in question for a single course (original or 1-to-1 substitution) or a substitution group with multiple courses
-// TODO: Change from course_code to group_id
 const isSingleCourse = (group: Credit[] | Enrollment[]): boolean =>
-  group?.length === 1 || [...new Set(group?.map((course: Credit | Enrollment) => course.course_code))].length === 1
+  group?.length === 1 || [...new Set(group?.map((course: Credit | Enrollment) => course.course.groupId))].length === 1
 
 export const parseCredit = (
   creditGroup: Credit[],

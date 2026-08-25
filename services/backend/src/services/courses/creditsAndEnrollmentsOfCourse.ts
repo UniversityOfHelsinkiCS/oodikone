@@ -87,7 +87,7 @@ export const getCreditsForCourses = async (
       else if (group.every(groupId => groupIdsOfPassedCredits.includes(groupId))) {
         // The credit in question should always exist because we just checked that it does
         completedGroups.push(
-          studentCredits.filter(credit => group.includes(credit.course_id) && CreditModel.passed(credit))
+          studentCredits.filter(credit => group.includes(credit.course.groupId) && CreditModel.passed(credit))
         )
       } else {
         // "Partially completed substitution, do not count towards anything"

@@ -11,7 +11,7 @@ const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithou
     where: { code },
   })
 
-/** Construct course_code => substitution_groups object */
+/** Construct course_code => substitutionGroups object */
 const getSubstitutions = async (codes: string[]) => {
   const courses: Array<Pick<CourseModel, 'code' | 'substitutionGroups'>> = await CourseModel.findAll({
     attributes: ['code', 'substitutionGroups'],
@@ -19,7 +19,7 @@ const getSubstitutions = async (codes: string[]) => {
     raw: true,
   })
 
-  // Sort substitution_groups by length, because (usually) the shortest substitution is the "correct" one
+  // Sort substitutionGroups by length, because (usually) the shortest substitution is the "correct" one
   return Object.fromEntries(
     courses.map(({ code, substitutionGroups }) => [code, substitutionGroups.sort((a, b) => b.length - a.length)])
   )
