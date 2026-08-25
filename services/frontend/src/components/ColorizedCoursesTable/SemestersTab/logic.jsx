@@ -34,11 +34,11 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
               sx={{
                 'td:has(> &)':
                   colorMode !== 'course'
-                    ? getColor(row.original[numberMode], semesters.length, colorMode, numberMode, null, allTotal)
+                    ? getColor(row.original.bySemesters, semesters.length, colorMode, numberMode, null, allTotal)
                     : {},
               }}
             >
-              {row.original[numberMode] ?? 0}
+              {row.original.bySemesters[numberMode] ?? 0}
             </Box>
           )
         },
@@ -56,6 +56,8 @@ export const useColumns = (getTextIn, semesters, numberMode, colorMode, allTotal
                 ),
               0
             ),
+        sortingFn: (rowA, rowB) =>
+          (rowA.original.bySemesters[numberMode] ?? 0) - (rowB.original.bySemesters[numberMode] ?? 0),
       }),
       ...semesters.map(({ name, semestercode }) =>
         columnHelper.accessor(() => undefined, {
