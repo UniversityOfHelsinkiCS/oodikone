@@ -42,7 +42,6 @@ export const getCreditsForCourses = async (
         [Op.in]: allCourseIds,
       },
       is_open: getIsOpen(unification),
-      credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
       attainment_date: { [Op.between]: [from, to] },
     },
     order: [['attainment_date', 'ASC']],
