@@ -23,39 +23,58 @@ type StudentWithCourses = Omit<StudentWithStudyplanNested, 'studyplans'> & {
 }
 
 const getCourses = async (courseCodes: string[]) => {
-  const courses: CompletedCoursesCourse[] = (
-    await CourseModel.findAll({
-      attributes: ['code', 'name', 'substitution_groups'],
-      where: where(fn('LOWER', col('code')), {
-        [Op.in]: courseCodes.map(code => code.toLowerCase()),
-      }),
-    })
-  ).map(course => course.toJSON())
+  if (courseCodes.length === 0) return []
+
+  const matchedCourses: Pick<CourseModel, 'groupId'>[] = await CourseModel.findAll({
+    attributes: ['groupId'],
+    where: where(fn('LOWER', col('code')), {
+      [Op.in]: courseCodes.map(code => code.toLowerCase()),
+    }),
+    raw: true,
+  })
+  const groupIds = [...new Set(matchedCourses.map(({ groupId }) => groupId))]
+  if (groupIds.length === 0) return []
+
+  const courses: CompletedCoursesCourse[] = await CourseModel.findAll({
+    attributes: ['code', 'name', 'groupId', 'substitutionGroups'],
+    where: { groupId: { [Op.in]: groupIds }, isPrimary: true },
+    raw: true,
+  })
   return courses
 }
 
+// Every course-position a student must hold a credit/enrollment for, in order to satisfy a substitution
+// combination: the main course's own groupId, plus each substitution group's member groupIds.
+const getGroupIdCombinationsFor = (course: CompletedCoursesCourse): string[][] => [
+  [course.groupId],
+  ...(course.substitutionGroups ?? []),
+]
+
 const getPassedCredits = async (
   courses: CompletedCoursesCourse[],
-  fullCourseCodes: string[],
-  studentNumbers: string[]
+  courseIds: string[],
+  studentNumbers: string[],
+  idToGroupId: Record<string, string>
 ) => {
-  const credits: Pick<CreditModel, 'course_code' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'>[] =
-    await CreditModel.findAll({
-      raw: true,
-      attributes: ['course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
-      order: [['attainment_date', 'DESC']],
-      where: {
-        course_code: {
-          [Op.in]: fullCourseCodes,
-        },
-        student_studentnumber: {
-          [Op.in]: studentNumbers,
-        },
-        credittypecode: {
-          [Op.not]: CreditTypeCode.FAILED,
-        },
+  const credits: Pick<
+    CreditModel,
+    'course_code' | 'course_id' | 'student_studentnumber' | 'credittypecode' | 'attainment_date'
+  >[] = await CreditModel.findAll({
+    raw: true,
+    attributes: ['course_code', 'course_id', 'student_studentnumber', 'credittypecode', 'attainment_date'],
+    order: [['attainment_date', 'DESC']],
+    where: {
+      course_id: {
+        [Op.in]: courseIds,
       },
-    })
+      student_studentnumber: {
+        [Op.in]: studentNumbers,
+      },
+      credittypecode: {
+        [Op.not]: CreditTypeCode.FAILED,
+      },
+    },
+  })
 
   const creditsByStudentNumber = Object.groupBy(credits, ({ student_studentnumber }) => student_studentnumber)
 
@@ -69,26 +88,28 @@ const getPassedCredits = async (
 
   Object.entries(creditsByStudentNumber).map(([studentNumber, credits]) => {
     // We know that credits will exist, because of the way we created the previous object
-    const studentCreditCourseCodes = credits!.map(({ course_code }) => course_code)
+    const studentCreditGroupIds = credits!.map(credit => idToGroupId[credit.course_id])
     for (const course of courses) {
-      // Also handle the main course code by adding it as a group
-      for (const group of [[course.code]].concat(course.substitution_groups)) {
-        if (group.every(code => studentCreditCourseCodes.includes(code))) {
-          // We just checked that (group) course code exists in credits so .find(...)! is ok
-          const groupCredits = group.map(code => credits!.find(credit => credit.course_code === code)!)
+      // The first combination is always the main course itself; the rest are substitution groups
+      getGroupIdCombinationsFor(course).forEach((positions, index) => {
+        const isMainCourse = index === 0
+        if (positions.every(groupId => studentCreditGroupIds.includes(groupId))) {
+          // We just checked that each position has a matching credit so .find(...)! is ok
+          const groupCredits = positions.map(
+            groupId => credits!.find(credit => idToGroupId[credit.course_id] === groupId)!
+          )
           if (groupCredits.length) {
             const groupCreditCodes = groupCredits.map(({ course_code }) => course_code)
             formattedCredits.push({
               courseCode: course.code,
-              substitution:
-                groupCreditCodes.includes(course.code) && groupCreditCodes.length === 1 ? null : groupCreditCodes,
+              substitution: isMainCourse ? null : groupCreditCodes,
               studentNumber,
               creditType: groupCredits.length > 1 ? CreditTypeCode.PASSED : groupCredits.at(0)!.credittypecode,
               date: groupCredits?.at(0)?.attainment_date ?? now(), // Credits are sorted by date in desc. order
             })
           }
         }
-      }
+      })
     }
   })
 
@@ -97,26 +118,28 @@ const getPassedCredits = async (
 
 const getEnrollments = async (
   courses: CompletedCoursesCourse[],
-  fullCourseCodes: string[],
-  studentNumbers: string[]
+  courseIds: string[],
+  studentNumbers: string[],
+  idToGroupId: Record<string, string>
 ) => {
-  const enrollments: Array<Pick<EnrollmentModel, 'course_code' | 'enrollment_date_time' | 'studentnumber'>> =
-    await EnrollmentModel.findAll({
-      attributes: ['course_code', 'enrollment_date_time', 'studentnumber'],
-      order: [['enrollment_date_time', 'DESC']],
-      where: {
-        course_code: {
-          [Op.in]: fullCourseCodes,
-        },
-        studentnumber: {
-          [Op.in]: studentNumbers,
-        },
-        state: {
-          [Op.eq]: EnrollmentState.ENROLLED,
-        },
-        enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
+  const enrollments: Array<
+    Pick<EnrollmentModel, 'course_code' | 'course_id' | 'enrollment_date_time' | 'studentnumber'>
+  > = await EnrollmentModel.findAll({
+    attributes: ['course_code', 'course_id', 'enrollment_date_time', 'studentnumber'],
+    order: [['enrollment_date_time', 'DESC']],
+    where: {
+      course_id: {
+        [Op.in]: courseIds,
       },
-    })
+      studentnumber: {
+        [Op.in]: studentNumbers,
+      },
+      state: {
+        [Op.eq]: EnrollmentState.ENROLLED,
+      },
+      enrollment_date_time: { [Op.gte]: enrollmentTimeDateThreshold },
+    },
+  })
 
   const enrollmentsByStudents = Object.groupBy(enrollments, ({ studentnumber }) => studentnumber)
 
@@ -129,27 +152,27 @@ const getEnrollments = async (
 
   Object.entries(enrollmentsByStudents).map(([studentNumber, enrollments]) => {
     // We know that enrollments will exist, because of the way we created the previous object
-    const studentEnrollmentCourseCodes = enrollments!.map(({ course_code }) => course_code)
+    const studentEnrollmentGroupIds = enrollments!.map(enrollment => idToGroupId[enrollment.course_id])
     for (const course of courses) {
-      // Also handle the main course code by adding it as a group
-      for (const group of [[course.code]].concat(course.substitution_groups)) {
-        if (group.every(code => studentEnrollmentCourseCodes.includes(code))) {
-          // We just checked that (group) course code exists in enrollments so .find(...)! is ok
-          const groupEnrollments = group.map(code => enrollments!.find(enrollment => enrollment.course_code === code)!)
+      // The first combination is always the main course itself; the rest are substitution groups
+      getGroupIdCombinationsFor(course).forEach((positions, index) => {
+        const isMainCourse = index === 0
+        if (positions.every(groupId => studentEnrollmentGroupIds.includes(groupId))) {
+          // We just checked that each position has a matching enrollment so .find(...)! is ok
+          const groupEnrollments = positions.map(
+            groupId => enrollments!.find(enrollment => idToGroupId[enrollment.course_id] === groupId)!
+          )
           if (groupEnrollments.length) {
             const groupEnrollmentCodes = groupEnrollments.map(({ course_code }) => course_code)
             formattedEnrollments.push({
               courseCode: course.code,
-              substitution:
-                groupEnrollmentCodes.includes(course.code) && groupEnrollmentCodes.length === 1
-                  ? null
-                  : groupEnrollmentCodes,
+              substitution: isMainCourse ? null : groupEnrollmentCodes,
               studentNumber,
               date: groupEnrollments?.at(0)?.enrollment_date_time ?? now(), // Enrollments are sorted by date in desc. order
             })
           }
         }
-      }
+      })
     }
   })
 
@@ -202,22 +225,21 @@ export const getCompletedCourses = async (
   courseCodes: string[]
 ): Promise<{ students: Omit<CompletedCoursesStudent, 'allEnrollments'>[]; courses: CompletedCoursesCourse[] }> => {
   const courses = await getCourses(courseCodes)
-  const courseCodesSet = new Set(courseCodes)
 
-  // Get *ALL* courses including any courses in any substitution groups
-  for (const course of courses) {
-    courseCodesSet.add(course.code)
-    for (const group of course.substitution_groups) {
-      for (const code of group) {
-        courseCodesSet.add(code)
-      }
-    }
-  }
+  // Get *ALL* courses' ids, including any courses in any substitution groups
+  const substitutionGroupIds = courses.flatMap(course => (course.substitutionGroups ?? []).flat())
+  const allGroupIds = [...new Set([...courses.map(course => course.groupId), ...substitutionGroupIds])]
 
-  const fullCourseCodes = Array.from(courseCodesSet)
+  const relevantCourses: Pick<CourseModel, 'id' | 'groupId'>[] = await CourseModel.findAll({
+    attributes: ['id', 'groupId'],
+    where: { groupId: { [Op.in]: allGroupIds } },
+    raw: true,
+  })
+  const courseIds = relevantCourses.map(({ id }) => id)
+  const idToGroupId = Object.fromEntries(relevantCourses.map(({ id, groupId }) => [id, groupId]))
 
-  const credits = await getPassedCredits(courses, fullCourseCodes, studentNumbers)
-  const enrollments = await getEnrollments(courses, fullCourseCodes, studentNumbers)
+  const credits = await getPassedCredits(courses, courseIds, studentNumbers, idToGroupId)
+  const enrollments = await getEnrollments(courses, courseIds, studentNumbers, idToGroupId)
   const studentInfo = await getStudents(studentNumbers)
 
   const studentCredits: StudentCredits = {}
@@ -293,7 +315,7 @@ export const getCompletedCourses = async (
   )
 
   students.forEach(student => {
-    courseCodes.forEach(courseCode => {
+    courses.forEach(({ code: courseCode }) => {
       const [latestEnrollment] = student.allEnrollments
         .filter(enrollment => enrollment.courseCode === courseCode)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
