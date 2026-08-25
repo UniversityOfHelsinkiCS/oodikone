@@ -51,8 +51,6 @@ export const hasFullAccessToStudentData = (roles?: Role[]): boolean => {
 
 // Only open uni courses
 export const isOpenUniCourseCode = (code: string): boolean => /^AY.+?(?:en|fi|sv)?$/.test(code)
-// Open uni AND normal courses
-export const getOpenUniCourseCode = (code: string): string[] | null => /^AY?(.+?)(?:en|fi|sv)?$/.exec(code)
 
 /**
  * Returns the keys of the given object as an array of strings, typed as the keys of the object.
