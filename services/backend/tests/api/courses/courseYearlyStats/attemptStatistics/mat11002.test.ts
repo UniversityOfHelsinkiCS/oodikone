@@ -4,12 +4,12 @@ import { describe, it, beforeAll, assert } from 'vitest'
 import { initTests } from '../../../../utils'
 import { getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-void describe('Course yearly attempt statistics - MAT11002 (no substitutions)', () => {
+void describe('Course yearly attempt statistics - MAT11002 (hy-CU-117375394, no substitutions)', () => {
   let app: Express
   let body: CourseYearlyStats
   beforeAll(async () => {
     app = await initTests()
-    body = await getCourseYearlyStats(app, 'codes=MAT11002&combineSubstitutions=false')
+    body = await getCourseYearlyStats(app, 'courses=hy-CU-117375394&substitutions=false')
   })
 
   // FIXME: What is this even testing??

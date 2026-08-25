@@ -4,16 +4,16 @@ import { describe, it, beforeAll, assert } from 'vitest'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-void describe('Course yearly statistics - MAT11001 (no substitutions)', () => {
+void describe('Course yearly statistics - MAT11001 (hy-CU-117375151, no substitutions)', () => {
   let app: Express
   let body: CourseYearlyStats
   beforeAll(async () => {
     app = await initTests()
-    body = await getCourseYearlyStats(app, 'codes=MAT11001&combineSubstitutions=false')
+    body = await getCourseYearlyStats(app, 'courses=hy-CU-117375151&substitutions=false')
   })
 
   it('should include a student who has only failed the course', () => {
-    const stats = body.unifyStats?.statistics!.find(year => year.name === '2018-2019')
+    const stats = body.unifyStats.statistics.find(year => year.name === '2018-2019')
     assert(stats && 'enrollments' in stats, 'Missing field enrollment in statsitics')
 
     const studentCategories = calculatePassedAndFailed(stats.students.grades)
