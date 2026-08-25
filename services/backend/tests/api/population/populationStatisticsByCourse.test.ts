@@ -8,7 +8,12 @@ import { PopulationstatisticsbycourseResBody } from '@oodikone/shared/routes/pop
 import { CreditModel } from '@/models'
 import { EnrollmentState } from '@oodikone/shared/types'
 
-void describe('Population statistics by course', () => {
+const courseCodeToGroupId = {
+  MAT21003: 'hy-CU-117375829',
+  MAT21005: 'hy-CU-117376344',
+}
+
+void describe('Population statistics by course MAT21003 + MAT21005 (hy-CU-117375829 + hy-CU-117376344)', () => {
   let app: Express
   beforeAll(async () => {
     app = await initTests()
@@ -22,7 +27,7 @@ void describe('Population statistics by course', () => {
       .set('hygroupcn', 'grp-oodikone-basic-users')
 
     assert.strictEqual(res.status, 400)
-    assert.deepStrictEqual(res.body.error, 'The body should have a yearcode and coursecode defined')
+    assert.deepStrictEqual(res.body.error, 'Missing required parameters.')
   })
 
   // Vektorianalyysi I, MAT21003
@@ -41,7 +46,7 @@ void describe('Population statistics by course', () => {
   ])('should return correct amount of students for single year ($0)', async (year, total, passed, failed, enrolled) => {
     const res = await request(app)
       .get(
-        `/populationstatisticsbycourse?coursecodes=["MAT21003"]&from=${yearToYearCode(year)}&to=${yearToYearCode(year)}`
+        `/populationstatisticsbycourse?courses=${courseCodeToGroupId.MAT21003}&from=${yearToYearCode(year)}&to=${yearToYearCode(year)}`
       )
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
@@ -50,22 +55,28 @@ void describe('Population statistics by course', () => {
     assert.strictEqual(res.status, 200)
     const body: PopulationstatisticsbycourseResBody = res.body
 
+    // console.log('Body credits:', body.coursestatistics.credits)
+    // console.log('Body students:', body.students)
     assert.strictEqual(body.students.length, total, 'Incorrect amount of students')
     assert.strictEqual(
-      body.coursestatistics.credits.filter(credit => credit.course_code === 'MAT21003' && CreditModel.passed(credit))
-        .length,
+      body.coursestatistics.credits.filter(
+        credit => body.idToGroupIdMap[credit.course_id] === courseCodeToGroupId.MAT21003 && CreditModel.passed(credit)
+      ).length,
       passed,
       'Incorrect amount of passed credits'
     )
     assert.strictEqual(
-      body.coursestatistics.credits.filter(credit => credit.course_code === 'MAT21003' && CreditModel.failed(credit))
-        .length,
+      body.coursestatistics.credits.filter(
+        credit => body.idToGroupIdMap[credit.course_id] === courseCodeToGroupId.MAT21003 && CreditModel.failed(credit)
+      ).length,
       failed,
       'Incorrect amount of failed credits'
     )
     assert.strictEqual(
       body.coursestatistics.enrollments.filter(
-        enrollment => enrollment.course_code === 'MAT21003' && enrollment.state === EnrollmentState.ENROLLED
+        enrollment =>
+          body.idToGroupIdMap[enrollment.course_id] === courseCodeToGroupId.MAT21003 &&
+          enrollment.state === EnrollmentState.ENROLLED
       ).length,
       enrolled,
       'Incorrect amount of enrollments'
@@ -74,7 +85,7 @@ void describe('Population statistics by course', () => {
 
   it('should return correct amount of students for a course', async () => {
     const res = await request(app)
-      .get('/populationstatisticsbycourse?coursecodes=["MAT21005"]&from=70&to=70')
+      .get(`/populationstatisticsbycourse?courses=${courseCodeToGroupId.MAT21005}&from=70&to=70`)
       .set('shib-session-id', 'test')
       .set('uid', 'basic')
       .set('hygroupcn', 'grp-oodikone-basic-users')
