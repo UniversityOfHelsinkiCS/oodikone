@@ -43,7 +43,7 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
   async (req, res) => {
     const { courses, substitutions, separate, fromYearCode, toYearCode } = req.query
 
-    if (!courses || !courses.length) {
+    if (!courses?.length) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 

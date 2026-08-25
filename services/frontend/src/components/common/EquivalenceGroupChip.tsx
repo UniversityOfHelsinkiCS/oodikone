@@ -37,7 +37,7 @@ const CourseCodes = ({
 }) => (
   <Stack direction="row" divider={<span>{separator}</span>} spacing={0.5}>
     {courses.map(course => (
-      <CourseCode code={course.code} getTextIn={getTextIn} key={course.code} name={course.name} />
+      <CourseCode code={course?.code} getTextIn={getTextIn} key={course?.code} name={course?.name} />
     ))}
   </Stack>
 )
