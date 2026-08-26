@@ -69,8 +69,8 @@ export const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): St
 })
 
 export const createCourse = (overrides: Partial<StudentCourse> = {}): StudentCourse => ({
-  course_code: 'MAT001',
-  date: new Date('2024-09-01'),
+  course_id: 'hy-CU-000000001-2024-08-01',
+  date: new Date('2024-08-01'),
   passed: true,
   grade: '5',
   credits: 5,
@@ -94,9 +94,9 @@ export const createStudyPlan = (overrides: Partial<StudentStudyPlan> = {}): Stud
 export const createEnrollment = (
   overrides: Partial<FormattedStudent['enrollments'][number]> = {}
 ): FormattedStudent['enrollments'][number] => ({
-  course_code: 'MAT001',
+  course_id: 'hy-CU-000000001-2024-08-01',
   state: EnrollmentState.ENROLLED,
-  enrollment_date_time: new Date('2024-09-01'),
+  enrollment_date_time: new Date('2024-08-01'),
   semestercode: 149,
   studyright_id: 'sr-1',
   ...overrides,
@@ -113,6 +113,7 @@ export const createCredit = (overrides: Partial<Credit> = {}) =>
   ({
     grade: '5',
     course_code: 'MAT11002',
+    course: { groupId: 'hy-CU-117375394' } as Credit['course'],
     credits: 5,
     attainment_date: new Date(2020, 0, 1),
     student_studentnumber: '111',

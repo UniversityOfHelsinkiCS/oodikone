@@ -5,9 +5,7 @@ import { yearToYearCode } from '@oodikone/shared/util'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-const courseCodeToGroupId = {
-  MAT21003: 'hy-CU-117375829',
-}
+const MAT21003 = 'hy-CU-117375829'
 
 void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
   let app: Express
@@ -18,7 +16,7 @@ void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
   describe('duplicate failed grades across a large timespan are not double-counted', () => {
     let body: CourseYearlyStats
     beforeAll(async () => {
-      body = await getCourseYearlyStats(app, `courses=${courseCodeToGroupId.MAT21003}&substitutions=false`)
+      body = await getCourseYearlyStats(app, `courses=${MAT21003}&substitutions=false`)
     })
 
     it('2017-2018 should not include a failed grade', () => {
@@ -46,7 +44,7 @@ void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
     ])('should include correct years for %s', async (name, from, to) => {
       const body = await getCourseYearlyStats(
         app,
-        `courses=${courseCodeToGroupId.MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(from)}&toYearCode=${yearToYearCode(to)}`
+        `courses=${MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(from)}&toYearCode=${yearToYearCode(to)}`
       )
 
       const years: string[] = []
@@ -65,7 +63,7 @@ void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
     it('2017-2018 should include a failed grade', async () => {
       const body = await getCourseYearlyStats(
         app,
-        `courses=${courseCodeToGroupId.MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2017)}`
+        `courses=${MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(2017)}&toYearCode=${yearToYearCode(2017)}`
       )
       const year = body.unifyStats.statistics.find(year => year.name === '2017-2018')
       assert(year && 'enrollments' in year, 'Missing stats for 2017-2018')
@@ -78,7 +76,7 @@ void describe('Course yearly statistics - MAT21003 (no substitutions)', () => {
     it('2018-2019 should include a failed grade', async () => {
       const body = await getCourseYearlyStats(
         app,
-        `courses=${courseCodeToGroupId.MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(2018)}&toYearCode=${yearToYearCode(2018)}`
+        `courses=${MAT21003}&substitutions=false&fromYearCode=${yearToYearCode(2018)}&toYearCode=${yearToYearCode(2018)}`
       )
       const year = body.unifyStats.statistics.find(year => year.name === '2018-2019')
       assert(year && 'enrollments' in year, 'Missing stats for 2018-2019')

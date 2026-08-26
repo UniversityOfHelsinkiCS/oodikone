@@ -5,11 +5,8 @@ import { yearToYearCode } from '@oodikone/shared/util'
 import { Unification } from '@oodikone/shared/types'
 import { getRelevantCourseIdMap } from '@/services/courses'
 
-const courseCodeToGroupId = {
-  MAT11001: 'hy-CU-117375151',
-  CSM14204: 'hy-CU-119366777',
-  MAT21018: 'hy-CU-117377764',
-}
+const CSM14204 = 'hy-CU-119366777'
+const MAT21018 = 'hy-CU-117377764'
 
 void describe.concurrent('Search and complete substitution groups to codes', () => {
   beforeAll(async () => {
@@ -29,7 +26,7 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
     ] as TestList)(
       'should return correct student numbers for a short course (CSM14204, 2019-2023) by $0',
       async (separate, to, from) => {
-        const courseIds = await getRelevantCourseIdMap([courseCodeToGroupId.CSM14204], false)
+        const courseIds = await getRelevantCourseIdMap([CSM14204], false)
         const res = await findByCourseAndSemesters(
           Object.keys(courseIds),
           to,
@@ -46,7 +43,7 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
       ['semester', semesterToSemesterCode(2020, 'fall'), semesterToSemesterCode(2023, 'spring')],
       ['year', yearToYearCode(2020), yearToYearCode(2023)],
     ] as TestList)('should filter out students outside of 2020-2023 by $0', async (separate, to, from) => {
-      const courseIds = await getRelevantCourseIdMap([courseCodeToGroupId.CSM14204], false)
+      const courseIds = await getRelevantCourseIdMap([CSM14204], false)
       const res = await findByCourseAndSemesters(
         Object.keys(courseIds),
         to,
@@ -63,7 +60,7 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
     ] as TestList)(
       'should return correct student numbers for a longer course (MAT21018, 2017-2021) by $0',
       async (separate, to, from) => {
-        const courseIds = await getRelevantCourseIdMap([courseCodeToGroupId.MAT21018], false)
+        const courseIds = await getRelevantCourseIdMap([MAT21018], false)
         const res = await findByCourseAndSemesters(
           Object.keys(courseIds),
           to,
@@ -94,7 +91,7 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
     ] as TestList)(
       'should return correct student numbers for a longer course (MAT21018, 2021-2023) by $0',
       async (separate, to, from) => {
-        const courseIds = await getRelevantCourseIdMap([courseCodeToGroupId.MAT21018], false)
+        const courseIds = await getRelevantCourseIdMap([MAT21018], false)
         const res = await findByCourseAndSemesters(
           Object.keys(courseIds),
           to,
@@ -133,7 +130,7 @@ void describe.concurrent('Search and complete substitution groups to codes', () 
 
     describe('should work with specific cases', () => {
       it('Student with enrollment in -21 and passed grade in -23 should be included in both stats when querying one year at a time (522321)', async () => {
-        const courseIds = await getRelevantCourseIdMap([courseCodeToGroupId.MAT21018], false)
+        const courseIds = await getRelevantCourseIdMap([MAT21018], false)
         const res21 = await findByCourseAndSemesters(
           Object.keys(courseIds),
           yearToYearCode(2021),
