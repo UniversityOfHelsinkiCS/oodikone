@@ -4,16 +4,14 @@ import { describe, it, beforeAll, assert } from 'vitest'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-const courseCodeToGroupId = {
-  MAT11002: 'hy-CU-117375394',
-}
+const MAT11002 = 'hy-CU-117375394'
 
 void describe('Course yearly statistics - MAT11002 (hy-CU-117375394, no substitutions)', () => {
   let app: Express
   let body: CourseYearlyStats
   beforeAll(async () => {
     app = await initTests()
-    body = await getCourseYearlyStats(app, `courses=${courseCodeToGroupId.MAT11002}&combineSubstitutions=false`)
+    body = await getCourseYearlyStats(app, `courses=${MAT11002}&combineSubstitutions=false`)
   })
 
   it('should not include students for AY code', () => {

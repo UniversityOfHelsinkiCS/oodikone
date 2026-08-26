@@ -5,9 +5,7 @@ import { yearToYearCode } from '@oodikone/shared/util'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-const courseCodeToGroupId = {
-  TKT10002: 'hy-CU-118023867',
-}
+const TKT10002 = 'hy-CU-118023867'
 
 void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
   let app: Express
@@ -20,7 +18,7 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     beforeAll(async () => {
       body = await getCourseYearlyStats(
         app,
-        `courses=${courseCodeToGroupId.TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
+        `courses=${TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
       )
     })
 
@@ -236,7 +234,7 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     ])('should include correct stats for one academic year ($0)', async (year, categories, grades) => {
       const body = await getCourseYearlyStats(
         app,
-        `courses=${courseCodeToGroupId.TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0))}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
+        `courses=${TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0))}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
       )
       const stats = body.unifyStats.statistics.find(yearStats => yearStats.name === year)!
       assert('enrollments' in stats, 'Missing field enrollment in statsitics')
