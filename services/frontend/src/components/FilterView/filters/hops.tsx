@@ -133,7 +133,7 @@ export const hopsFilter = createFilter<Options, Args, Precompute>({
       const courses = new Set(hops && activeProgramme ? hops.included_courses : [])
       const secondProgrammeCourses = new Set(secondHops && activeCombinedProgramme ? secondHops.included_courses : [])
       const hopsCourses = student.courses.filter(
-        ({ course_code }) => courses.has(course_code) || secondProgrammeCourses.has(course_code)
+        ({ course_id }) => courses.has(course_id) || secondProgrammeCourses.has(course_id)
       )
 
       return {
