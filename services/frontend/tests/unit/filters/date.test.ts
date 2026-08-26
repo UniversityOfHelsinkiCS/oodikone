@@ -21,8 +21,8 @@ void describe('creditDateFilter', () => {
   void it('should keep only courses within the selected date range when mutating', () => {
     const student = createStudent({
       courses: [
-        createCourse({ course_code: 'TKT-IN', date: new Date('2024-06-01') }),
-        createCourse({ course_code: 'TKT-OUT', date: new Date('2023-01-01') }),
+        createCourse({ course_id: 'TKT-IN', date: new Date('2024-06-01') }),
+        createCourse({ course_id: 'TKT-OUT', date: new Date('2023-01-01') }),
       ],
     })
 
@@ -33,7 +33,7 @@ void describe('creditDateFilter', () => {
     })
 
     assert.deepStrictEqual(
-      result.courses.map(({ course_code }) => course_code),
+      result.courses.map(({ course_id }) => course_id),
       ['TKT-IN']
     )
   })
@@ -41,8 +41,8 @@ void describe('creditDateFilter', () => {
   void it('should keep only enrollments within the selected date range when mutating', () => {
     const student = createStudent({
       enrollments: [
-        createEnrollment({ course_code: 'TKT-IN', enrollment_date_time: new Date('2024-06-01') }),
-        createEnrollment({ course_code: 'TKT-OUT', enrollment_date_time: new Date('2023-01-01') }),
+        createEnrollment({ course_id: 'TKT-IN', enrollment_date_time: new Date('2024-06-01') }),
+        createEnrollment({ course_id: 'TKT-OUT', enrollment_date_time: new Date('2023-01-01') }),
       ],
     })
 
@@ -53,7 +53,7 @@ void describe('creditDateFilter', () => {
     })
 
     assert.deepStrictEqual(
-      result.enrollments.map(({ course_code }) => course_code),
+      result.enrollments.map(({ course_id }) => course_id),
       ['TKT-IN']
     )
   })
