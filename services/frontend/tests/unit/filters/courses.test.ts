@@ -7,19 +7,28 @@ import { createCourse, createStudent } from '@oodikone/shared/test/utils'
 
 const { courseFilter } = await import('@/components/FilterView/filters/courses')
 
+const TKT001_GROUP = 'group-tkt001'
+const TKT002_ID = 'course-tkt002'
+const TKT002_GROUP = 'group-tkt002'
+const TKT003_ID = 'course-tkt003'
+const TKT003_GROUP = 'group-tkt003'
+
 const baseOptions = () => ({
   courseFilters: {},
   courses: {},
   substitutedBy: {},
   includeSubstitutions: true,
+  idToGroupIdMap: {},
 })
+
+const baseArgs = () => ({ courses: [], idToGroupIdMap: {} })
 
 void describe('courseFilter', () => {
   void it('should keep every student when no course filters are selected', () => {
     const student = createStudent()
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
+      args: baseArgs(),
       options: baseOptions(),
       precomputed: undefined,
     })
@@ -28,11 +37,15 @@ void describe('courseFilter', () => {
   })
 
   void it('should include a student who passed the course when filtering for PASSED', () => {
-    const student = createStudent({ courses: [createCourse({ course_code: 'TKT002', passed: true })] })
+    const student = createStudent({ courses: [createCourse({ course_id: TKT002_ID, passed: true })] })
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
-      options: { ...baseOptions(), courseFilters: { TKT002: FilterType.PASSED } },
+      args: baseArgs(),
+      options: {
+        ...baseOptions(),
+        courseFilters: { [TKT002_GROUP]: FilterType.PASSED },
+        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
+      },
       precomputed: undefined,
     })
 
@@ -43,8 +56,8 @@ void describe('courseFilter', () => {
     const student = createStudent({ courses: [] })
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
-      options: { ...baseOptions(), courseFilters: { TKT002: FilterType.PASSED } },
+      args: baseArgs(),
+      options: { ...baseOptions(), courseFilters: { [TKT002_GROUP]: FilterType.PASSED } },
       precomputed: undefined,
     })
 
@@ -53,12 +66,16 @@ void describe('courseFilter', () => {
 
   void it('should include a student who failed the course when filtering for FAILED', () => {
     const student = createStudent({
-      courses: [createCourse({ course_code: 'TKT002', passed: false, credittypecode: CreditTypeCode.FAILED })],
+      courses: [createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED })],
     })
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
-      options: { ...baseOptions(), courseFilters: { TKT002: FilterType.FAILED } },
+      args: baseArgs(),
+      options: {
+        ...baseOptions(),
+        courseFilters: { [TKT002_GROUP]: FilterType.FAILED },
+        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
+      },
       precomputed: undefined,
     })
 
@@ -68,14 +85,18 @@ void describe('courseFilter', () => {
   void it('should include a student who failed and passed the course when filtering for PASSED', () => {
     const student = createStudent({
       courses: [
-        createCourse({ course_code: 'TKT002', passed: false, credittypecode: CreditTypeCode.FAILED }),
-        createCourse({ course_code: 'TKT003', passed: true, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED }),
+        createCourse({ course_id: TKT003_ID, passed: true, credittypecode: CreditTypeCode.PASSED }),
       ],
     })
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
-      options: { ...baseOptions(), courseFilters: { TKT003: FilterType.PASSED } },
+      args: baseArgs(),
+      options: {
+        ...baseOptions(),
+        courseFilters: { [TKT003_GROUP]: FilterType.PASSED },
+        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP, [TKT003_ID]: TKT003_GROUP },
+      },
       precomputed: undefined,
     })
 
@@ -85,14 +106,18 @@ void describe('courseFilter', () => {
   void it('should exclude a student who failed and passed the course when filtering for FAILED', () => {
     const student = createStudent({
       courses: [
-        createCourse({ course_code: 'TKT002', passed: false, credittypecode: CreditTypeCode.FAILED }),
-        createCourse({ course_code: 'TKT003', passed: true, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED }),
+        createCourse({ course_id: TKT003_ID, passed: true, credittypecode: CreditTypeCode.PASSED }),
       ],
     })
 
     const result = courseFilter().filter(student, {
-      args: { courses: [] },
-      options: { ...baseOptions(), courseFilters: { TKT002: FilterType.FAILED } },
+      args: baseArgs(),
+      options: {
+        ...baseOptions(),
+        courseFilters: { [TKT002_GROUP]: FilterType.FAILED },
+        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP, [TKT003_ID]: TKT003_GROUP },
+      },
       precomputed: undefined,
     })
 
@@ -103,28 +128,30 @@ void describe('courseFilter', () => {
     const args = {
       courses: [
         {
+          id: TKT002_ID,
           code: 'TKT002',
+          groupId: TKT002_GROUP,
           name: { fi: 'Testi' },
-          is_study_module: false,
-          substitutions: [],
-          substitution_groups: [['TKT001', 'TKT003']],
+          isStudyModule: false,
+          substitutionGroups: [[TKT001_GROUP, TKT003_GROUP]],
         },
       ],
       includeSubstitutions: false,
+      idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
     }
     const options = baseOptions()
 
     // Modifies passed options
     courseFilter().precompute!({ students: [], options, args })
 
-    assert.deepStrictEqual(Object.keys(options.courses), ['TKT002'])
+    assert.deepStrictEqual(Object.keys(options.courses), [TKT002_GROUP])
     assert.strictEqual(options.includeSubstitutions, false)
-    assert.deepStrictEqual(options.substitutedBy, { TKT002: [['TKT001', 'TKT003']] })
+    assert.deepStrictEqual(options.substitutedBy, { [TKT002_GROUP]: [[TKT001_GROUP, TKT003_GROUP]] })
   })
 
   void it('isActive should match filter state', () => {
     assert.strictEqual(
-      courseFilter().isActive({ ...baseOptions(), courseFilters: { TKT002: FilterType.ALL } }, undefined),
+      courseFilter().isActive({ ...baseOptions(), courseFilters: { [TKT002_GROUP]: FilterType.ALL } }, undefined),
       true
     )
     assert.strictEqual(courseFilter().isActive(baseOptions(), undefined), false)
