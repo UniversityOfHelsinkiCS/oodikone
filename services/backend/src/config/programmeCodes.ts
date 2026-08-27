@@ -69,7 +69,7 @@ export const programmeCodes = {
   MH50_013: 'USP',
   MH50_014: 'EnCHiL',
   MH50_015: 'ATM-MP-CE"',
-  MH50_015_ATMCE: 'ATM-MP-CE"',
+  MH50_015_ATMCE: 'ATM-MP-CE',
   KH55_001: 'FARM',
   MH55_001: 'PROV',
   MH55_002: 'MPHARM',
