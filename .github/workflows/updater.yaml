@@ -23,6 +23,15 @@ jobs:
       - name: 'Run linter'
         run: npm run lint -- updater
 
+  test_updater_unit:
+    name: 'Run updater unit tests'
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run updater unit tests
+        uses: ./.github/actions/test/updater-unit
+
   build_worker:
     name: 'Build Updater worker'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
@@ -79,6 +88,7 @@ jobs:
     timeout-minutes: 15
     needs:
       - lint_scheduler_and_worker
+      - test_updater_unit
       - build_worker
       - build_scheduler
 

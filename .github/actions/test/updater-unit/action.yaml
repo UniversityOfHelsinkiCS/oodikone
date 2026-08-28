@@ -1,0 +1,18 @@
+name: 'Run updater unit tests'
+description: 'Runs unit tests in sis-updater-worker'
+
+runs:
+  using: composite
+  steps:
+    - name: Install node-24
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci --prefix ./updater/sis-updater-worker
+
+    - name: Run updater unit tests
+      shell: bash
+      run: npm run test:unit --prefix ./updater/sis-updater-worker
