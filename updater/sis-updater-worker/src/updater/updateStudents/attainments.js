@@ -12,6 +12,9 @@ import {
   isModule,
 } from '../mapper.js'
 
+const earlierOf = (a, b) => (new Date(a) < new Date(b) ? a : b)
+const laterOf = (a, b) => (new Date(a) > new Date(b) ? a : b)
+
 const updateTeachers = async attainments => {
   const acceptorPersonIds = flatten(
     attainments.map(attainment =>
@@ -184,6 +187,18 @@ export const updateAttainments = async (
               coursecode: parsedCourseCode,
             },
           })
+        } else {
+          // If the course exists, update it
+          coursesToBeCreated.set(parsedCourseCode, {
+            ...course,
+            groupId: course.groupId ?? course.id,
+            name: att.name,
+            isPrimary: course.isPrimary ?? true,
+            coursetypecode: att.study_level_urn,
+            courseUnitType: att.course_unit_type_urn,
+            minAttainmentDate: earlierOf(course.minAttainmentDate, att.attainment_date),
+            maxAttainmentDate: laterOf(course.maxAttainmentDate, att.attainment_date),
+          })
         }
 
         const courseIdToUse = attIdToCourseCode[att.id]
@@ -204,7 +219,6 @@ export const updateAttainments = async (
         }
 
         courseUnit = course || { id: courseIdToUse, code: courseIdToUse }
-        courseUnit.group_id = courseUnit.id
       }
 
       // Add the CU to the mapping objects for creditMapper to work properly.
@@ -230,6 +244,7 @@ export const updateAttainments = async (
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await selectFromByIds('course_units', missingCodes, 'code')
+
     return await Promise.all(
       attainments.map(
         addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
