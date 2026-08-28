@@ -8,9 +8,9 @@ import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/c
 import { FormattedStudent } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 
-type Options = any
-type Args = any
-type Precompute = any
+type Options = { selected: string[] }
+type Args = { courseIds: string[]; from: string; to: string }
+type Precompute = { grades: Record<string, string[]> }
 
 const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps<Options, Args, Precompute>) => {
   const { grades } = precomputed
@@ -21,9 +21,9 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
   // Therefore this cannot be filtered by Number
   const choices = Object.keys(grades).sort((a, b) => +b - +a)
 
-  const checked = grade => selected.includes(grade)
+  const checked = (grade: string) => selected.includes(grade)
 
-  const onChange = grade => () => {
+  const onChange = (grade: string) => () => {
     if (checked(grade)) {
       onOptionsChange({
         ...options,
@@ -78,12 +78,14 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
             [
               student.studentNumber,
               student.courses.filter(
-                (course: any) =>
+                course =>
                   args.courseIds.includes(course.course_id) &&
                   dateIsBetween(new Date(course.date), new Date(args.from), new Date(args.to))
               ),
             ] as [string, FormattedStudent['courses']]
         )
+        // Students with no courses get assigned "No grade" incorrectly
+        .filter(([_, courses]) => courses.length > 0)
         .map(([studentNumber, courses]) => [
           studentNumber,
           getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
@@ -113,7 +115,7 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
 
   actions: {
     selectGrade(options, grade) {
-      if (options.selected.indexOf(grade) === -1) {
+      if (!options.selected.includes(grade)) {
         options.selected.push(grade)
       }
 
