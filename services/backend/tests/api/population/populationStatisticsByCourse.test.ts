@@ -51,8 +51,6 @@ void describe('Population statistics by course MAT21003 + MAT21005 (hy-CU-117375
     assert.strictEqual(res.status, 200)
     const body: PopulationstatisticsbycourseResBody = res.body
 
-    // console.log('Body credits:', body.coursestatistics.credits)
-    // console.log('Body students:', body.students)
     assert.strictEqual(body.students.length, total, 'Incorrect amount of students')
     assert.strictEqual(
       body.coursestatistics.credits.filter(
