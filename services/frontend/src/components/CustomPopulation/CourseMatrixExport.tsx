@@ -20,8 +20,10 @@ export const CourseMatrixExport = ({
   const { getTextIn } = useLanguage()
 
   const getXlsx = () => {
-    const courseNameByCode = new Map(courses.map(({ course }) => [course.code, getTextIn(course.name) ?? '']))
-    const { completedCoursesRows, courseCounterRows } = calculateExcelData(students, courseNameByCode)
+    const courseInfoById = new Map(
+      courses.map(({ course }) => [course.id, { code: course.code, name: getTextIn(course.name) ?? '' }])
+    )
+    const { completedCoursesRows, courseCounterRows } = calculateExcelData(students, courseInfoById)
 
     // Columns: Student number, Name, student's attainments in the format: "course name (course code)"
     const completedCoursesSheet = utils.aoa_to_sheet([['Student number', 'Name'], ...completedCoursesRows])

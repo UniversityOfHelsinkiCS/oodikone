@@ -6,12 +6,12 @@ import { CreditTypeCode } from '@oodikone/shared/types'
 import { createCourse as createBaseCourse, createStudent, createStudyPlan } from '@oodikone/shared/test/utils'
 
 const createCourse = (
-  course_code: string,
+  course_id: string,
   credits: number,
   passed: boolean,
   date: Date,
   credittypecode: CreditTypeCode = passed ? CreditTypeCode.PASSED : CreditTypeCode.FAILED
-) => createBaseCourse({ course_code, date, passed, grade: passed ? '5' : 'Hyl.', credits, credittypecode })
+) => createBaseCourse({ course_id, date, passed, grade: passed ? '5' : 'Hyl.', credits, credittypecode })
 
 const createHops = (includedCourses: string[]) => createStudyPlan({ included_courses: includedCourses })
 
@@ -29,7 +29,7 @@ void describe('getHopsCourses', () => {
     const result = getHopsCourses(student)
 
     assert.equal(result.length, 1)
-    assert.equal(result[0].course_code, 'A')
+    assert.equal(result[0].course_id, 'A')
   })
 
   void it('returns an empty list when the student has no HOPS', () => {
@@ -55,28 +55,28 @@ void describe('getHopsCourses', () => {
 })
 
 void describe('calculateExcelData', () => {
-  void it('builds completed-course rows and aggregates credits per course', () => {
+  void it('builds completed-course rows and aggregates credits per course, displaying code rather than id', () => {
     const students = [
       createStudent({
         studentNumber: '1',
-        courses: [createCourse('A', 5, true, new Date('2024-09-01'))],
-        studyplans: [createHops(['A'])],
+        courses: [createCourse('course-a', 5, true, new Date('2024-09-01'))],
+        studyplans: [createHops(['course-a'])],
       }),
       createStudent({
         studentNumber: '2',
         courses: [
-          createCourse('A', 5, true, new Date('2024-09-01')),
-          createCourse('B', 3, true, new Date('2024-10-01')),
+          createCourse('course-a', 5, true, new Date('2024-09-01')),
+          createCourse('course-b', 3, true, new Date('2024-10-01')),
         ],
-        studyplans: [createHops(['A', 'B'])],
+        studyplans: [createHops(['course-a', 'course-b'])],
       }),
     ]
-    const courseNameByCode = new Map([
-      ['A', 'Course A'],
-      ['B', 'Course B'],
+    const courseInfoById = new Map([
+      ['course-a', { code: 'A', name: 'Course A' }],
+      ['course-b', { code: 'B', name: 'Course B' }],
     ])
 
-    const data = calculateExcelData(students, courseNameByCode)
+    const data = calculateExcelData(students, courseInfoById)
 
     assert.deepEqual(data.completedCoursesRows, [
       ['1', 'Testi Opiskelija', 'Course A (A)'],
@@ -88,18 +88,18 @@ void describe('calculateExcelData', () => {
     ])
   })
 
-  void it('uses an empty name for courses missing from the course map', () => {
+  void it('falls back to id as the code for courses missing from the course map', () => {
     const students = [
       createStudent({
         studentNumber: '1',
-        courses: [createCourse('RANDOMCODE', 5, true, new Date('2024-09-01'))],
-        studyplans: [createHops(['RANDOMCODE'])],
+        courses: [createCourse('unknown-course-id', 5, true, new Date('2024-09-01'))],
+        studyplans: [createHops(['unknown-course-id'])],
       }),
     ]
 
     const data = calculateExcelData(students, new Map())
 
-    assert.deepEqual(data.completedCoursesRows, [['1', 'Testi Opiskelija', ' (RANDOMCODE)']])
-    assert.deepEqual(data.courseCounterRows, [['RANDOMCODE', '', '1', '5']])
+    assert.deepEqual(data.completedCoursesRows, [['1', 'Testi Opiskelija', ' (unknown-course-id)']])
+    assert.deepEqual(data.courseCounterRows, [['unknown-course-id', '', '1', '5']])
   })
 })

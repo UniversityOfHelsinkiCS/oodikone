@@ -21,41 +21,43 @@ export type CourseMatrixAggregate = {
 
 /**
  * Passed completions of the student that are included in one of the student's study plans (HOPS).
- * Returns the latest completion per course code, sorted by course code.
+ * Returns the latest completion per course id, sorted by course id.
  */
 export const getHopsCourses = (student: FormattedStudent): StudentCourse[] => {
-  const hopsCourseCodes = new Set(student.studyplans?.flatMap(plan => plan.included_courses ?? []) ?? [])
-  const passedCoursesInHops = student.courses.filter(course => course.passed && hopsCourseCodes.has(course.course_code))
+  const hopsCourseIds = new Set(student.studyplans?.flatMap(plan => plan.included_courses ?? []) ?? [])
+  const passedCoursesInHops = student.courses.filter(course => course.passed && hopsCourseIds.has(course.course_id))
 
-  const latestByCode = new Map<string, StudentCourse>()
+  const latestById = new Map<string, StudentCourse>()
   for (const course of passedCoursesInHops) {
-    if (!course.course_code) continue
+    if (!course.course_id) continue
 
-    const existing = latestByCode.get(course.course_code)
+    const existing = latestById.get(course.course_id)
     if (!existing || new Date(course.date).getTime() > new Date(existing.date).getTime()) {
-      latestByCode.set(course.course_code, course)
+      latestById.set(course.course_id, course)
     }
   }
 
-  return [...latestByCode.values()].sort((a, b) => a.course_code.localeCompare(b.course_code))
+  return [...latestById.values()].sort((a, b) => a.course_id.localeCompare(b.course_id))
 }
 
-export const calculateExcelData = (students: FormattedStudent[], courseNameByCode: Map<string, string>) => {
-  const counters = new Map<string, { name: string; credits: number; students: Set<string> }>()
+export const calculateExcelData = (
+  students: FormattedStudent[],
+  courseInfoById: Map<string, { code: string; name: string }>
+) => {
+  // Keyed by course_id internally so different courses are never accidentally merged;
+  // code/name are only for display.
+  const counters = new Map<string, { code: string; name: string; credits: number; students: Set<string> }>()
 
   const rows = students.map(student => {
     const courses = getHopsCourses(student).map(course => {
-      const code = course.course_code
-      const counter = counters.get(code) ?? {
-        name: courseNameByCode.get(code) ?? '',
-        credits: 0,
-        students: new Set(),
-      }
-      counters.set(code, counter)
+      const id = course.course_id
+      const { code, name } = courseInfoById.get(id) ?? { code: id, name: '' }
+      const counter = counters.get(id) ?? { code, name, credits: 0, students: new Set() }
+      counters.set(id, counter)
       counter.credits += course.credits ?? 0
       counter.students.add(student.studentNumber)
 
-      return { code, name: courseNameByCode.get(code) ?? '', credits: course.credits ?? 0 }
+      return { code, name, credits: course.credits ?? 0 }
     })
 
     return { studentNumber: student.studentNumber, studentName: student.name, courses }
@@ -67,8 +69,8 @@ export const calculateExcelData = (students: FormattedStudent[], courseNameByCod
     ...courses.map(course => `${course.name} (${course.code})`),
   ])
 
-  const courseCounterRows = [...counters.entries()]
-    .map(([code, { name, credits, students }]) => [code, name, students.size.toString(), credits.toString()])
+  const courseCounterRows = [...counters.values()]
+    .map(({ code, name, credits, students }) => [code, name, students.size.toString(), credits.toString()])
     .sort(([_a, __a, aStudents], [_b, __b, bStudents]) => parseInt(bStudents) - parseInt(aStudents))
 
   return { completedCoursesRows, courseCounterRows }
