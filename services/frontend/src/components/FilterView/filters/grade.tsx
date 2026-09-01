@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 import { getHighestGradeOfCourseBetweenRange } from '@/common'
 import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { dateIsBetween } from '@oodikone/shared/util/datetime'
 
 type Options = any
 type Args = any
@@ -76,17 +77,21 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
           student =>
             [
               student.studentNumber,
-              student.courses.filter((course: any) => args.courseCodes.includes(course.course_code)),
+              student.courses.filter(
+                (course: any) =>
+                  args.courseCodes.includes(course.course_code) &&
+                  dateIsBetween(course.date, new Date(args.from), new Date(args.to))
+              ),
             ] as [string, FormattedStudent['courses']]
         )
         .map(([studentNumber, courses]) => [
           studentNumber,
           getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
         ])
-        .filter(([_, grade]) => grade !== undefined)
         .reduce((acc, [studentNumber, grade]) => {
-          acc[grade!] ??= []
-          acc[grade!].push(studentNumber)
+          const fixedGrade = grade ?? 'No grade'
+          acc[fixedGrade] ??= []
+          acc[fixedGrade].push(studentNumber)
           return acc
         }, {}),
     }

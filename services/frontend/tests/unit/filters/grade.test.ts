@@ -27,7 +27,7 @@ void describe('gradeFilter', () => {
 
     const precomputed = gradeFilter().precompute!({ students: [student], options: { selected: [] }, args: ARGS })
 
-    assert.deepStrictEqual(precomputed.grades, {})
+    assert.deepStrictEqual(precomputed.grades, { 'No grade': [student.studentNumber] })
   })
 
   void it('should include a student whose grade is selected', () => {
@@ -52,6 +52,18 @@ void describe('gradeFilter', () => {
     })
 
     assert.strictEqual(result, false)
+  })
+
+  void it('should include student with no grade in No grade', () => {
+    const student = createStudent({ courses: [] })
+
+    const result = gradeFilter().filter(student, {
+      args: ARGS,
+      options: { selected: ['No grade'] },
+      precomputed: { grades: { 'No grade': [student.studentNumber] } },
+    })
+
+    assert.strictEqual(result, true)
   })
 
   void it('isActive should match the filter state', () => {
