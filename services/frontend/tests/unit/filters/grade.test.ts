@@ -68,7 +68,7 @@ void describe('gradeFilter', () => {
 
   void it('should handle string-dates properly', () => {
     // @ts-expect-error: FIXME: Courses have date incorrectly types as Date, not string
-    const student = createStudent({ courses: [createCourse({ course_code: 'TKT002', date: '2024-09-01' })] })
+    const student = createStudent({ courses: [createCourse({ course_id: 'hy-CU-TKT002', date: '2024-09-01' })] })
 
     const precomputed = gradeFilter().precompute!({
       students: [student],
