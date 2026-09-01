@@ -1,4 +1,4 @@
-import { Credit, Enrollment, Course } from '../models'
+import { Course } from '../models'
 import {
   Name,
   ProgrammeModuleWithRelevantAttributes,
@@ -8,7 +8,7 @@ import {
   ProgressCriteria,
   Unification,
 } from '../types'
-import { FormattedStudent } from '../types/studentData'
+import { FormattedStudent, StudentCredit, StudentEnrollment } from '../types/studentData'
 
 export type CourseStats = Pick<Course, 'code' | 'id' | 'groupId' | 'name' | 'isStudyModule' | 'substitutionGroups'>
 
@@ -60,22 +60,8 @@ export type PopulationCourseStats = {
   // One row per groupId (isPrimary=true course for that group)
   courses: CourseStats[]
   idToGroupIdMap: Record<string, string>
-  enrollments: Pick<
-    Enrollment,
-    'course_id' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
-  >[]
-  credits: Pick<
-    Credit,
-    | 'grade'
-    | 'credits'
-    | 'credittypecode'
-    | 'attainment_date'
-    | 'isStudyModule'
-    | 'student_studentnumber'
-    | 'course_id'
-    | 'language'
-    | 'studyright_id'
-  >[]
+  enrollments: (StudentEnrollment & { studentnumber: string })[]
+  credits: StudentCredit[]
 }
 
 // populationstatistics

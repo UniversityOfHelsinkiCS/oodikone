@@ -1,4 +1,4 @@
-import type { Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
+import type { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
 import type { Tag, TagStudent } from '../models/kone'
 
 import type { CriteriaYear, CreditTypeCode, Name, ProgrammeModule } from '../types'
@@ -106,6 +106,7 @@ export type StudentPageStudent = {
 
 export type StudentCourse = {
   course_id: string
+  course_code: string
   date: Date
   passed: boolean
   grade: string
@@ -115,6 +116,25 @@ export type StudentCourse = {
   language: string
   studyright_id: string
 }
+
+export type StudentCredit = Pick<
+  Credit,
+  | 'grade'
+  | 'credits'
+  | 'credittypecode'
+  | 'attainment_date'
+  | 'isStudyModule'
+  | 'student_studentnumber'
+  | 'course_id'
+  | 'course_code'
+  | 'language'
+  | 'studyright_id'
+>
+
+export type StudentEnrollment = Pick<
+  Enrollment,
+  'course_id' | 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
+>
 
 export type FormattedStudent = {
   obfuscated?: true
@@ -146,5 +166,5 @@ export type FormattedStudent = {
   studyRights: StudentStudyRight[]
   studyplans: StudentStudyPlan[]
   courses: StudentCourse[]
-  enrollments: Pick<Enrollment, 'course_id' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studyright_id'>[]
+  enrollments: Omit<StudentEnrollment, 'studentnumber'>[]
 }
