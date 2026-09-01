@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { formatPassRate } from '@/pages/CourseStatistics/util'
 import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { AttemptData } from '@/types/attemptData'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 const ContentCell = ({ content, obfuscated }: { content: string; obfuscated: boolean }) => {
   return (
@@ -29,6 +30,7 @@ export const FoldableRow = ({
 }) => {
   const [isUnfolded, setIsUnfolded] = useState(true)
   const { id, category, realisations } = courseData
+  const { getTextIn } = useLanguage()
 
   const hasRealisations = realisations.length && realisations.length > 0
   const showCourseRealisations = hasRealisations && isUnfolded
@@ -83,7 +85,7 @@ export const FoldableRow = ({
       {showCourseRealisations
         ? realisations.map(row => {
             const { realisation } = row
-            const realisationId = `${id}-${realisation}`
+            const realisationId = `${id}-${getTextIn(realisation)}`
             return getRow(realisationId, row, false)
           })
         : null}
