@@ -79,7 +79,7 @@ const handleImmediates = async () => {
     }
   } catch (error) {
     logger.error({
-      message: `Running immediate job failed: ${error.message}`,
+      message: `Running immediate job failed: ${error?.message}`,
       meta: error.stack,
     })
 
@@ -113,7 +113,7 @@ knexConnection.on('connect', async () => {
       await scheduleHourly()
     } catch (error) {
       logger.error({
-        message: `Hourly run failed: ${error.message}`,
+        message: `Hourly run failed: ${error?.message}`,
         meta: error.stack,
       })
     }
@@ -130,7 +130,7 @@ knexConnection.on('connect', async () => {
       await scheduleWeekly()
     } catch (error) {
       logger.error({
-        message: `Weekly run failed: ${error.message}`,
+        message: `Weekly run failed: ${error?.message}`,
         meta: error.stack,
       })
     }
@@ -147,7 +147,7 @@ knexConnection.on('connect', async () => {
       await schedulePrePurge()
     } catch (error) {
       logger.error({
-        message: `Prepurge failed: ${error.message}`,
+        message: `Prepurge failed: ${error?.message}`,
         meta: error.stack,
       })
     }
@@ -163,7 +163,7 @@ knexConnection.on('connect', async () => {
       await schedulePurge()
     } catch (error) {
       logger.error({
-        message: `Purge failed: ${error.message}`,
+        message: `Purge failed: ${error?.message}`,
         meta: error.stack,
       })
     }
