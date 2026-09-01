@@ -393,7 +393,7 @@ export const languageAbbreviations = {
 
 export const showAsUserKey = 'showAsUser'
 
-export const getEnrollmentTypeTextForExcel = (type: number, statutoryAbsence?: boolean) => {
+export const getEnrollmentTypeTextForExcel = (type: EnrollmentType | undefined, statutoryAbsence: boolean | undefined) => {
   if (type === 1) return 'Present'
   if (type === 2 && statutoryAbsence) return 'Absent (statutory)'
   if (type === 2) return 'Absent'
