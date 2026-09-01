@@ -70,6 +70,7 @@ export const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): St
 
 export const createCourse = (overrides: Partial<StudentCourse> = {}): StudentCourse => ({
   course_id: 'hy-CU-000000001-2024-08-01',
+  course_code: 'MAT001',
   date: new Date('2024-08-01'),
   passed: true,
   grade: '5',
@@ -95,6 +96,7 @@ export const createEnrollment = (
   overrides: Partial<FormattedStudent['enrollments'][number]> = {}
 ): FormattedStudent['enrollments'][number] => ({
   course_id: 'hy-CU-000000001-2024-08-01',
+  course_code: 'MAT001',
   state: EnrollmentState.ENROLLED,
   enrollment_date_time: new Date('2024-08-01'),
   semestercode: 149,

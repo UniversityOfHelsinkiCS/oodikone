@@ -4,8 +4,6 @@ import { getCriteria } from '../studyProgramme/studyProgrammeCriteria'
 import { getCourseDetails } from '../courses'
 import { formatStudentForAPI } from './formatStatisticsForApi'
 import {
-  type StudentEnrollment,
-  type StudentCredit,
   type StudentTags,
   getStudents,
   getEnrollments,
@@ -13,6 +11,7 @@ import {
   getStudyRightElementsForStudyRight,
 } from './getStudentData'
 import { getCourseGroupIds, getOptionsForStudents } from './shared'
+import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
 
 export type OptimizedStatisticsQuery = {
   userId: string
