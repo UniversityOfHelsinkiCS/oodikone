@@ -84,8 +84,6 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
               ),
             ] as [string, FormattedStudent['courses']]
         )
-        // Students with no courses get assigned "No grade" incorrectly
-        .filter(([_, courses]) => courses.length > 0)
         .map(([studentNumber, courses]) => [
           studentNumber,
           getHighestGradeOfCourseBetweenRange(courses, args.from, args.to),
