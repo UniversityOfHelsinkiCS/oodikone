@@ -90,7 +90,7 @@ export const Row = ({
   const title =
     studyTracks[correctStudyTrack] === undefined
       ? correctStudyTrack
-      : `${getTextIn(studyTracks[correctStudyTrack] as Name)} (${correctStudyTrack})`
+      : `${getTextIn(studyTracks[correctStudyTrack])} (${correctStudyTrack})`
 
   return (
     <TableRow>

@@ -108,7 +108,7 @@ export const SingleCourseStats = ({
 
   const courseStats = stats[courseGroupId]
 
-  const minYearCode = Math.min(...courseStats.statistics.map(r => r.yearCode))!
+  const minYearCode = Math.min(...courseStats.statistics.map(r => r.yearCode))
   const maxYearCode = Math.max(...courseStats.statistics.map(r => r.yearCode))
 
   const [minFromYearCode, setMinFromYearCode] = useState(minYearCode)
@@ -153,7 +153,7 @@ export const SingleCourseStats = ({
     if (programmeCode === 'EXCLUDED') {
       return 'Excluded'
     }
-    const name = courseStats?.programmes[programmeCode]['name']
+    const name = courseStats?.programmes[programmeCode].name
     return getTextIn(name)!
   }
 
@@ -324,7 +324,7 @@ export const SingleCourseStats = ({
           const studentsEnrollments = countStudentEnrollmentStats(filteredEnrollments, allStudents, displayEnrollments)
           const attemptStats = countAttemptStats(attempts, totalEnrollments, filter)
           const studentStats = countStudentStats(students, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
-          const parsedName = separate ? getTextIn(name as Name)! : name
+          const parsedName = separate ? getTextIn(name)! : name
 
           return {
             name: getTextIn(parsedName) ?? '',
@@ -461,7 +461,7 @@ export const SingleCourseStats = ({
     courses: courseGroupId,
     separate,
     unifyCourses: openOrRegular,
-    substitutions: substitutions,
+    substitutions,
   }
   const populationLink = `/coursepopulation?${queryParamsToString(queryObject)}`
 
