@@ -1,4 +1,4 @@
-import { Course } from 'models'
+import { Course } from '../models'
 import { CourseWithSubsDetails } from '../types/course'
 
 export type CoursesMultiReqBody = never
