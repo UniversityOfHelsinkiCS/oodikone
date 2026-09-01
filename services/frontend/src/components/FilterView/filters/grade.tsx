@@ -80,7 +80,7 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
               student.courses.filter(
                 (course: any) =>
                   args.courseCodes.includes(course.course_code) &&
-                  dateIsBetween(course.date, new Date(args.from), new Date(args.to))
+                  dateIsBetween(new Date(course.date), new Date(args.from), new Date(args.to))
               ),
             ] as [string, FormattedStudent['courses']]
         )

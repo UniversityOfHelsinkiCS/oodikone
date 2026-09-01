@@ -66,6 +66,19 @@ void describe('gradeFilter', () => {
     assert.strictEqual(result, true)
   })
 
+  void it('should handle string-dates properly', () => {
+    // @ts-expect-error: FIXME: Courses have date incorrectly types as Date, not string
+    const student = createStudent({ courses: [createCourse({ course_code: 'TKT002', date: '2024-09-01' })] })
+
+    const precomputed = gradeFilter().precompute!({
+      students: [student],
+      args: ARGS,
+      options: { selected: ['5'] },
+    })
+
+    assert.deepStrictEqual(precomputed, { grades: { '5': [student.studentNumber] } })
+  })
+
   void it('isActive should match the filter state', () => {
     assert.strictEqual(gradeFilter().isActive({ selected: ['5'] }, undefined), true)
     assert.strictEqual(gradeFilter().isActive({ selected: [] }, undefined), false)
