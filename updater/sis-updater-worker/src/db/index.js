@@ -157,13 +157,21 @@ export const bulkCreate = async (
           })
         }
       } catch (error) {
-        logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
-          error,
-          entity,
-        })
-        // Do not throw here: a single bad entity must not stop the rest of the batch from being retried, else
-        // every entity after it in iteration order is silently left unprocessed
-        failures.push({ entity, error })
+        // Skip errors with credits pointing to non-existent course_ids. Credit just doesn't get created
+        if (
+          error.name === 'SequelizeForeignKeyConstraintError' &&
+          error.parent.constraint === 'credit_course_id_fkey'
+        ) {
+          logger.warn('Skipping credit with course_id pointing to non-existent course', { entity })
+        } else {
+          logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
+            error,
+            entity,
+          })
+          // Do not throw here: a single bad entity must not stop the rest of the batch from being retried, else
+          // every entity after it in iteration order is silently left unprocessed
+          failures.push({ entity, error })
+        }
       }
     }
 
