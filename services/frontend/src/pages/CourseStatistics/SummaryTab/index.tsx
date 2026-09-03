@@ -45,11 +45,12 @@ export const SummaryTab = ({
   }
 
   const data = statistics.map(stat => {
-    const { coursecode, name, realisations, summary } = stat
+    const { groupId, courseCode, name, realisations, summary } = stat
     const { passed, failed, passRate } = summary
 
     return {
-      id: coursecode,
+      groupId,
+      courseCode,
       category: getTextIn(name),
       passed,
       failed,

@@ -29,7 +29,7 @@ export const FoldableRow = ({
   userHasAccessToAllStats: boolean
 }) => {
   const [isUnfolded, setIsUnfolded] = useState(true)
-  const { id, category, realisations } = courseData
+  const { groupId, courseCode, category, realisations } = courseData
   const { getTextIn } = useLanguage()
 
   const hasRealisations = realisations.length && realisations.length > 0
@@ -53,7 +53,7 @@ export const FoldableRow = ({
             <IconButton size="small">{isUnfolded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}</IconButton>
           ) : null}
         </TableCell>
-        <TableCell align="left" onClick={() => onClickCourse(id)}>
+        <TableCell align="left" onClick={() => onClickCourse(groupId)}>
           <Typography color={obfuscated ? 'text.secondary' : 'text.primary'} sx={{ cursor: 'pointer' }} variant="body2">
             {isMainRow ? (
               <>
@@ -62,7 +62,7 @@ export const FoldableRow = ({
                 </Typography>
                 {!userHasAccessToAllStats && <strong>*</strong>}{' '}
                 <Typography component="span" sx={{ color: 'text.secondary' }} variant="body2">
-                  {id}
+                  {courseCode}
                 </Typography>
               </>
             ) : (
@@ -81,11 +81,11 @@ export const FoldableRow = ({
 
   return (
     <>
-      {getRow(id, courseData)}
+      {getRow(groupId, courseData)}
       {showCourseRealisations
         ? realisations.map(row => {
             const { realisation } = row
-            const realisationId = `${id}-${getTextIn(realisation)}`
+            const realisationId = `${groupId}-${getTextIn(realisation)}`
             return getRow(realisationId, row, false)
           })
         : null}
