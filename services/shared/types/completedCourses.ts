@@ -38,4 +38,4 @@ export type CompletedCoursesStudent = StudentInfo & {
   allEnrollments: StudentEnrollment[]
 }
 
-export type CompletedCoursesCourse = Pick<Course, 'code' | 'name' | 'substitution_groups'>
+export type CompletedCoursesCourse = Pick<Course, 'code' | 'name' | 'groupId' | 'substitutionGroups'>

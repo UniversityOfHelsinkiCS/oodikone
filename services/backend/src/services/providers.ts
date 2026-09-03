@@ -1,4 +1,5 @@
-import { getOpenUniCourseCode } from '../../src/util'
+import { Op } from 'sequelize'
+
 import { CourseModel, OrganizationModel } from '../models'
 
 export const getAllProviders = async () => {
@@ -9,10 +10,10 @@ export const getAllProviders = async () => {
   return providers
 }
 
-export const getCourseCodesOfProvider = async (provider: string) => {
+export const getCourseIdsOfProvider = async (provider: string): Promise<string[]> => {
   const coursesByProvider = await CourseModel.findAll({
     raw: true,
-    attributes: ['id', 'code', 'substitution_groups'],
+    attributes: ['id', 'substitutionGroups'],
     include: {
       model: OrganizationModel,
       required: true,
@@ -25,14 +26,28 @@ export const getCourseCodesOfProvider = async (provider: string) => {
     },
   })
 
-  const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitution_groups }) => {
-    if (!substitution_groups?.length) {
-      return [code]
-    }
-    // This is ok to flatten, because we only want all credits completed by students, not what courses are
-    // completed and how => we don't care about substitutions
-    return [code].concat(substitution_groups.filter(group => group.some(code => getOpenUniCourseCode(code))).flat())
+  const directIds = coursesByProvider.map(({ id }) => id)
+  const substitutionGroupIds = [
+    ...new Set(coursesByProvider.flatMap(({ substitutionGroups }) => substitutionGroups ?? []).flat()),
+  ]
+
+  if (substitutionGroupIds.length === 0) return directIds
+
+  const substitutionCourses = await CourseModel.findAll({
+    raw: true,
+    attributes: ['id'],
+    where: { groupId: { [Op.in]: substitutionGroupIds } },
+    include: {
+      model: OrganizationModel,
+      required: true,
+      where: {
+        code: provider,
+      },
+      through: {
+        attributes: [],
+      },
+    },
   })
 
-  return coursesWithOpenUniSubstitutions.flat()
+  return [...new Set([...directIds, ...substitutionCourses.map(({ id }) => id)])]
 }

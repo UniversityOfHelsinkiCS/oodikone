@@ -1,9 +1,7 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router'
 
-import { getStudentToTargetCourseDateMap, getUnifyTextIn } from '@/common'
+import { getStudentToCourseCompletionDateTimeMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PageTitle } from '@/components/common/PageTitle'
 import { PanelView } from '@/components/common/PanelView'
@@ -39,49 +37,40 @@ import { useSemesters } from '@/hooks/useSemesters'
 import { useGetCourseDetailsQuery } from '@/redux/courseStats'
 import { useGetPopulationStatisticsByCourseQuery } from '@/redux/populations'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
+import { getFromToDates, getStudentRelevantProgrammes } from './util'
 
 export const CoursePopulation = () => {
+  'use memo'
   useTitle('Course population')
 
-  const location = useLocation()
   const { getTextIn } = useLanguage()
 
-  const [codes, setCodes] = useState<{ allCodes: string[]; mainCodes: string[] }>({
-    allCodes: [],
-    mainCodes: [],
-  })
+  const params = useParseQueryParams()
+  const courses = params.courses
+  const from = params.from?.[0]
+  const to = params.to?.[0]
+  const separate = params.separate?.[0]
+  const substitutions = params.substitutions?.[0]
+  const unifyCourses = params.unifyCourses?.[0]
 
-  const { coursecodes, from, to, separate, unifyCourses, includeSubstitutions } = parseQueryParams(location.search)
-
-  const { data: courseDetails } = useGetCourseDetailsQuery(
-    { codes: codes.mainCodes },
-    { skip: !codes.mainCodes.length }
+  const { data: population, isFetching: populationFetching } = useGetPopulationStatisticsByCourseQuery(
+    {
+      courses: courses?.[0],
+      from,
+      to,
+      separate,
+      unifyCourses,
+      substitutions,
+    },
+    {
+      skip: !courses?.length || !from || !to,
+    }
   )
-  const { data: population } = useGetPopulationStatisticsByCourseQuery({
-    coursecodes,
-    from,
-    to,
-    separate,
-    unifyCourses,
-    includeSubstitutions,
-  })
 
-  useEffect(() => {
-    const parsedCourseCodes = JSON.parse(coursecodes)
-    if (parsedCourseCodes.length) setCodes({ ...codes, mainCodes: parsedCourseCodes })
-  }, [coursecodes])
-
-  useEffect(() => {
-    if (population?.allCourseCodes?.length) setCodes({ ...codes, allCodes: population.allCourseCodes })
-  }, [population])
-
-  const studentToTargetCourseDateMap = useMemo(
-    () => getStudentToTargetCourseDateMap(population?.students ?? [], codes.allCodes),
-    [population?.students, codes]
-  )
+  const { data: courseDetails } = useGetCourseDetailsQuery({ courses: courses ?? [] }, { skip: !courses?.length })
 
   const {
     semesters: allSemesters,
@@ -90,25 +79,15 @@ export const CoursePopulation = () => {
     isLoading: semestersFetching,
   } = useSemesters()
 
-  const getFromToDates = (from: number, to: number, separate: boolean) => {
-    if (semestersFetching) return {}
+  const isSeparate = separate === 'true'
 
-    const dataValues = separate ? Object.values(allSemesters) : Object.values(semesterYears)
+  if (!courses?.length) return null
+  if (populationFetching || !population || semestersFetching || !currentSemester) return <PageLoading isLoading />
 
-    const key = separate ? 'semestercode' : 'yearcode'
-
-    const findDateByCode = (code: number) => dataValues.find(item => item[key] === code)
-
-    return {
-      dateFrom: findDateByCode(Number(from))?.startdate,
-      dateTo: findDateByCode(Number(to))?.enddate,
-    }
-  }
-
-  const isSeparate = separate ? JSON.parse(separate) : false
-  const { dateFrom, dateTo } = getFromToDates(from, to, isSeparate)
+  const populationCourseIds = Object.keys(population.idToGroupIdMap)
 
   // Dates must be set
+  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate, allSemesters, semesterYears)
   if (!dateFrom || !dateTo) return null
 
   const singleSemester =
@@ -117,33 +96,29 @@ export const CoursePopulation = () => {
     ? (getTextIn(singleSemester.name) ?? '')
     : `${new Date(dateFrom).getFullYear()}-${new Date(dateTo).getFullYear()}`
 
-  if (!population || !currentSemester) return <PageLoading isLoading />
-
-  const getStudentRelevantProgrammes = (students: FormattedStudent[]) =>
-    students.reduce<Map<string, string>>((programmes, student) => {
-      const programme = findCorrectProgramme(
-        student,
-        coursecodes,
-        allSemesters,
-        new Date(dateFrom),
-        new Date(dateTo),
-        currentSemester?.semestercode
-      )
-
-      programmes.set(student.studentNumber, getTextIn(programme.name) ?? '')
-      return programmes
-    }, new Map())
-
   // Page title data
   const courseNames = courseDetails?.map(({ name }) => getTextIn(name)) ?? []
   const header = courseNames.length ? `${courseNames?.join(', ')}` : undefined
 
+  const getRelatedProgrammeMap = getStudentRelevantProgrammes(
+    populationCourseIds,
+    allSemesters,
+    dateFrom,
+    dateTo,
+    currentSemester.semestercode,
+    getTextIn
+  )
+
+  const studentToTargetCourseDateMap = getStudentToCourseCompletionDateTimeMap(
+    population.students ?? [],
+    populationCourseIds
+  )
   const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FilteredCourse[]) => [
     {
       title: 'Grade distribution',
       content: (
         <CoursePopulationGradeDist
-          courseCodes={codes.allCodes}
+          courseIds={populationCourseIds}
           from={dateFrom}
           students={filteredStudents}
           to={dateTo}
@@ -153,14 +128,19 @@ export const CoursePopulation = () => {
     {
       title: 'Language distribution',
       content: (
-        <CoursePopulationLanguageDist codes={codes.allCodes} from={dateFrom} students={filteredStudents} to={dateTo} />
+        <CoursePopulationLanguageDist
+          courseIds={populationCourseIds}
+          from={dateFrom}
+          students={filteredStudents}
+          to={dateTo}
+        />
       ),
     },
     {
       title: 'Programme distribution',
       content: (
         <CustomPopulationProgrammeDist
-          coursecodes={codes.allCodes}
+          courseIds={populationCourseIds}
           from={dateFrom}
           infotext={populationStatisticsToolTips.programmeDistributionCoursePopulation}
           students={filteredStudents}
@@ -176,7 +156,7 @@ export const CoursePopulation = () => {
       title: 'Credit gains',
       content: (
         <CoursePopulationCreditGainTable
-          codes={codes.allCodes}
+          courseIds={populationCourseIds}
           from={dateFrom}
           students={filteredStudents}
           to={dateTo}
@@ -202,10 +182,10 @@ export const CoursePopulation = () => {
               showBachelorAndMaster: false,
               includePrimaryProgramme: true,
 
-              coursecodes: codes.allCodes,
+              courseIds: populationCourseIds,
               from: dateFrom,
               to: dateTo,
-              relatedProgrammeMap: getStudentRelevantProgrammes(filteredStudents),
+              relatedProgrammeMap: getRelatedProgrammeMap(filteredStudents),
             })
           }
           studentToTargetCourseDateMap={studentToTargetCourseDateMap}
@@ -220,8 +200,9 @@ export const CoursePopulation = () => {
     studentNumberFilter(),
     ageFilter(),
     courseFilter({
-      courses: population?.coursestatistics.courses,
-      includeSubstitutions: includeSubstitutions === 'true',
+      courses: population?.coursestatistics.courses ?? [],
+      includeSubstitutions: substitutions === 'true',
+      idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {},
     }),
     creditsEarnedFilter(),
     hetuFilter(),
@@ -234,7 +215,7 @@ export const CoursePopulation = () => {
           predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
             const correctProgramme = findCorrectProgramme(
               student,
-              codes.allCodes,
+              populationCourseIds,
               allSemesters,
               new Date(dateFrom),
               new Date(dateTo),
@@ -247,11 +228,16 @@ export const CoursePopulation = () => {
       ],
     }),
     gradeFilter({
-      courseCodes: codes.allCodes,
+      courseIds: populationCourseIds,
       from: dateFrom,
       to: dateTo,
     }),
   ]
+
+  const courseCodes = courses
+    .map(course => courseDetails?.find(cd => cd.groupId === course)?.code)
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <FilterView
@@ -266,16 +252,14 @@ export const CoursePopulation = () => {
         <>
           <PageTitle title={header}>
             <Typography color="text.secondary" variant="h6">
-              {codes.mainCodes.join(', ')}
+              {courseCodes}
             </Typography>
             <Typography
               color="text.secondary"
               variant="h6"
             >{`Class of ${dateRange}, ${population.students.length} students`}</Typography>
             <Typography color="text.secondary" variant="h6">
-              {(includeSubstitutions === 'true' ? 'Include' : 'Exclude') +
-                ' substitutions, ' +
-                getUnifyTextIn(unifyCourses)}
+              {`Substitutions ${substitutions === 'true' ? 'included' : 'excluded'}, ${getUnifyTextIn(unifyCourses)}`}
             </Typography>
           </PageTitle>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />

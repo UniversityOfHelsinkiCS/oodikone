@@ -30,11 +30,13 @@ import { queryParamsToString } from '@/util/queryparams'
 import { omitKeys } from '@oodikone/shared/util'
 
 export const SearchForm = () => {
+  'use memo'
   const { getTextIn } = useLanguage()
   const navigate = useNavigate()
-  const [combineSubstitutions, toggleCombineSubstitutions] = useToggle(true)
+  const [substitutions, toggleSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
-  const [includeSpecialCourses, setIncludeSpecialCourses] = useToggle(false)
+  const [includeSpecialCourses, toggleIncludeSpecialCourses] = useToggle(false)
+
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
   const [debouncedCourseName, setDebouncedCourseName] = useDebouncedState('')
@@ -68,24 +70,22 @@ export const SearchForm = () => {
   }
 
   const onSelectCourse = (course: SearchResultCourse) => {
-    const isSelected = !!selectedCourses[course.code]
+    const isSelected = !!selectedCourses[course.groupId]
 
     if (isSelected) {
-      setSelectedCourses(previousSelectedCourses => omitKeys(previousSelectedCourses, [course.code]))
+      setSelectedCourses(previousSelectedCourses => omitKeys(previousSelectedCourses, [course.groupId]))
     } else {
       setSelectedCourses(previousSelectedCourses => ({
         ...previousSelectedCourses,
-        [course.code]: { ...course, selected: true },
+        [course.groupId]: { ...course, selected: true },
       }))
     }
   }
 
   const pushQueryToUrl = query => {
-    const { courseCodes, ...rest } = query
     const queryObject = {
-      ...rest,
-      courseCodes: JSON.stringify(courseCodes),
-      combineSubstitutions: JSON.stringify(combineSubstitutions),
+      ...query,
+      substitutions,
     }
     const searchString = queryParamsToString(queryObject)
     void navigate({ search: searchString })
@@ -96,13 +96,15 @@ export const SearchForm = () => {
   }
 
   const onSubmitFormClick = () => {
-    const codes = sortBy(Object.keys(selectedCourses))
+    const groupIds = sortBy(Object.keys(selectedCourses))
     const params = {
-      courseCodes: codes,
+      courses: groupIds,
       separate: false,
-      combineSubstitutions,
+      substitutions,
     }
-    const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name)} ${code}`)
+    const searchHistoryText = groupIds.map(
+      groupId => `${getTextIn(selectedCourses[groupId].name)} ${selectedCourses[groupId].code}`
+    )
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
       params,
@@ -110,37 +112,27 @@ export const SearchForm = () => {
     pushQueryToUrl(params)
   }
 
-  const clearSelectedCourses = () => {
-    setSelectedCourses({})
-  }
-
+  // If course clicked on single course mode, call submit hook
   useEffect(() => {
-    if (Object.keys(selectedCourses).length === 0 || selectMultipleCourses) {
-      return
+    if (!selectMultipleCourses && Object.keys(selectedCourses).length === 1) {
+      onSubmitFormClick()
     }
-    onSubmitFormClick()
   }, [selectedCourses])
 
+  // Reset state after toggle
   useEffect(() => {
-    clearSelectedCourses()
-  }, [combineSubstitutions])
-
-  useEffect(() => {
-    if (selectMultipleCourses) {
-      return
-    }
-    clearSelectedCourses()
-  }, [selectMultipleCourses])
+    setSelectedCourses({})
+  }, [substitutions, selectMultipleCourses])
 
   const courses = matchingCourses
-    .filter(course => !selectedCourses[course.code])
+    .filter(course => !selectedCourses[course.groupId])
     .sort((a, b) => {
-      const yearA = dayjs(a.max_attainment_date).year()
-      const yearB = dayjs(b.max_attainment_date).year()
+      const yearA = dayjs(a.maxAttainmentDate).year()
+      const yearB = dayjs(b.maxAttainmentDate).year()
       if (yearA !== yearB) return yearB - yearA
 
-      const isFallA = dayjs(a.max_attainment_date).month() >= 7 ? 1 : 0
-      const isFallB = dayjs(b.max_attainment_date).month() >= 7 ? 1 : 0
+      const isFallA = dayjs(a.maxAttainmentDate).month() >= 7 ? 1 : 0
+      const isFallB = dayjs(b.maxAttainmentDate).month() >= 7 ? 1 : 0
       if (isFallA !== isFallB) return isFallB - isFallA
 
       return a.code.localeCompare(b.code)
@@ -151,7 +143,7 @@ export const SearchForm = () => {
 
   const addAllCourses = () => {
     const newSelectedCourses = courses.reduce<Record<string, SearchResultCourse>>((newSelected, course) => {
-      newSelected[course.code] = { ...course }
+      newSelected[course.groupId] = course
       return newSelected
     }, {})
 
@@ -213,10 +205,10 @@ export const SearchForm = () => {
                   onChange={toggleSelectMultipleCourses}
                 />
                 <ToggleWithTooltip
-                  checked={combineSubstitutions}
+                  checked={substitutions}
                   cypress="combine-substitutions-toggle"
                   label="Combine substitutions"
-                  onChange={toggleCombineSubstitutions}
+                  onChange={toggleSubstitutions}
                   tooltipText={getTextIn({
                     fi: 'Jos "Combine substitutions" on valittuna (oletuksena), niin kurssi ja leikkaavat kurssit yhdistetään tilastoissa.',
                     en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
@@ -226,7 +218,7 @@ export const SearchForm = () => {
                   checked={includeSpecialCourses}
                   cypress="show-special-courses-toggle"
                   label="Show special courses"
-                  onChange={setIncludeSpecialCourses}
+                  onChange={toggleIncludeSpecialCourses}
                   tooltipText={getTextIn({
                     fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
                     en: 'Includes course instances formed by transferred credits and other special courses',
@@ -243,10 +235,10 @@ export const SearchForm = () => {
               </Alert>
             ) : (
               <Section isLoading={isFetching || debouncedChanged ? isInputValid : false}>
-                {selected.length > 0 && selectMultipleCourses ? (
-                  <Stack gap={2}>
+                {selectMultipleCourses ? (
+                  <Stack spacing={1} sx={{ mb: 2 }}>
                     <CourseTable
-                      combineSubstitutions={combineSubstitutions}
+                      combineSubstitutions={substitutions}
                       courses={selected}
                       hidden={noSelectedCourses}
                       onSelectCourse={onSelectCourse}
@@ -261,7 +253,7 @@ export const SearchForm = () => {
                   </Stack>
                 ) : null}
                 <CourseTable
-                  combineSubstitutions={combineSubstitutions}
+                  combineSubstitutions={substitutions}
                   courses={courses}
                   hidden={false}
                   onSelectCourse={onSelectCourse}

@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 
-import { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
+import { SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
 import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
@@ -14,6 +14,7 @@ import {
   SISStudyRightElementModel,
 } from '../../models'
 import { TagModel, TagStudentModel } from '../../models/kone'
+import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
 
 export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
@@ -46,17 +47,21 @@ export const getStudentTagMap = async (studyRights: string[], studentNumbers: st
   return studentTagMap
 }
 
-export type StudentEnrollment = Pick<
-  Enrollment,
-  'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
->
 export const getEnrollments = (
   studentNumbers: string[],
   startDate: string,
   endDate: string
-): Promise<Array<StudentEnrollment>> =>
+): Promise<StudentEnrollment[]> =>
   EnrollmentModel.findAll({
-    attributes: ['course_code', 'state', 'enrollment_date_time', 'semestercode', 'studentnumber', 'studyright_id'],
+    attributes: [
+      'course_id',
+      'course_code',
+      'state',
+      'enrollment_date_time',
+      'semestercode',
+      'studentnumber',
+      'studyright_id',
+    ],
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -185,24 +190,11 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
     },
   }).then(data => data.map(x => x.get({ plain: true })))
 
-export type StudentCredit = Pick<
-  Credit,
-  | 'grade'
-  | 'credits'
-  | 'credittypecode'
-  | 'attainment_date'
-  | 'isStudyModule'
-  | 'student_studentnumber'
-  | 'course_code'
-  | 'language'
-  | 'studyright_id'
->
-
 export const getCredits = async (
   studentNumbers: string[],
   startDate: string,
   endDate: string
-): Promise<Array<StudentCredit>> =>
+): Promise<StudentCredit[]> =>
   CreditModel.findAll({
     raw: true,
     attributes: [
@@ -212,6 +204,7 @@ export const getCredits = async (
       'attainment_date',
       'isStudyModule',
       'student_studentnumber',
+      'course_id',
       'course_code',
       'language',
       'studyright_id',

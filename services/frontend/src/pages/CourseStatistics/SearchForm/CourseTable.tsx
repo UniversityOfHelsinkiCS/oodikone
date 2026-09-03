@@ -32,6 +32,7 @@ const CourseRow = ({
   onSelectCourse: (course: SearchResultCourse) => void
   combineSubstitutions: boolean
 }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
 
   return (
@@ -39,8 +40,8 @@ const CourseRow = ({
       data-cy={`course-${course.code}`}
       hover
       key={course.id}
-      onClick={() => (course.min_attainment_date ? onSelectCourse(course) : null)}
-      style={{ cursor: course.min_attainment_date ? 'pointer' : 'default' }}
+      onClick={() => (course.minAttainmentDate ? onSelectCourse(course) : null)}
+      style={{ cursor: course.minAttainmentDate ? 'pointer' : 'default' }}
     >
       <TableCell>
         <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
@@ -54,7 +55,7 @@ const CourseRow = ({
       <TableCell>
         {combineSubstitutions ? (
           <Stack>
-            {course?.substitution_groups.map(group => (
+            {course?.substitutionGroups.map(group => (
               <GroupChip getTextIn={getTextIn} group={group} key={group.map(({ code }) => code).join(':')} />
             )) ?? <Typography fontSize="0.9rem">Equivalent groups not available!</Typography>}
           </Stack>
@@ -86,13 +87,10 @@ export const CourseTable = ({
   onSelectCourse: (course: SearchResultCourse) => void
   title: string
 }) => {
-  // TODO: Figure a better type for this
+  'use memo'
+  if (hidden) return null
 
   const noContent = courses.length === 0
-
-  if (hidden) {
-    return null
-  }
 
   return (
     <StyledTable>
@@ -108,11 +106,11 @@ export const CourseTable = ({
         {noContent ? (
           <EmptyListRow />
         ) : (
-          courses?.map(course => (
+          courses.map(course => (
             <CourseRow
               combineSubstitutions={combineSubstitutions}
               course={course}
-              key={course.code}
+              key={`${course.groupId}-${course.code}`}
               onSelectCourse={onSelectCourse}
               title={title}
             />

@@ -133,13 +133,7 @@ export const mapTeacher = person => ({
 })
 
 export const creditMapper =
-  (
-    personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
-    moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode,
-    studyRightIdToEducationType
-  ) =>
+  (personIdToStudentNumber, courseUnitIdToCourseCode, moduleGroupIdToModuleCode, studyRightIdToEducationType) =>
   attainment => {
     try {
       const {
@@ -153,6 +147,7 @@ export const creditMapper =
         attainment_date,
         type,
         course_unit_id,
+        module_id,
         module_group_id,
         study_right_id,
         attainment_language_urn,
@@ -167,16 +162,22 @@ export const creditMapper =
 
       if (!targetSemester) return null
 
-      const course_code = !isModule(type)
-        ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+      // Check if attainment is a module type
+      const isStudyModule = isModule(type)
+
+      const course_code = !isStudyModule
+        ? courseUnitIdToCourseCode[course_unit_id]
         : moduleGroupIdToModuleCode[module_group_id]
 
-      const course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+      const course_id = !isStudyModule ? course_unit_id : (module_id ?? module_group_id)
+
+      // TODO: Some legitimate (pre 2020) CustomAttainments are skipped, because code/id mapping is incomplete.
+      if (!course_id || !course_code) return null
 
       let is_open = false
 
       // check if ay code or ay study right or ay responsible organisation
-      if (course_code && !isModule(type)) {
+      if (course_code && !isStudyModule) {
         if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
           is_open = true
         } else if (study_right_id !== null) {
@@ -188,14 +189,11 @@ export const creditMapper =
         } else if (
           organisations
             .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-            .some(org => org.organisationid === 'hy-org-48645785')
+            .some(org => org.organisationid === 'hy-org-48645785') // NB: corresponds to code H930
         ) {
           is_open = true
         }
       }
-
-      // Check if attainment is a module type
-      const isStudyModule = isModule(type)
 
       const gradeObject = getGrade(grade_scale_id, grade_id)
       const grade = gradeObject.value
@@ -236,44 +234,30 @@ export const courseProviderMapper =
     shares,
   })
 
-const timify = date => new Date(date).getTime()
+export const courseMapper = courseIdToAttainments => (groupId, course, substitutionGroups, primaryId) => {
+  const { id, code, name, study_level, course_unit_type, validity_period } = course
 
-export const courseMapper =
-  courseIdToAttainments =>
-  ([groupId, courses], substitutions, substitution_groups) => {
-    const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
+  const courseAttainments = courseIdToAttainments[id] ?? []
 
-    const { min_attainment_date, max_attainment_date } = courses.reduce(
-      (res, curr) => {
-        const courseAttainments = courseIdToAttainments[curr.id]
-        if (!courseAttainments || courseAttainments.length === 0) return res
-        let { min_attainment_date, max_attainment_date } = res
-        if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
-          min_attainment_date = courseAttainments[0].attainment_date
-        if (
-          !max_attainment_date ||
-          timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date)
-        )
-          max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
+  // Attainments are sorted by attainment_date ASC
+  const minAttainmentDate = courseAttainments[0]?.attainment_date ?? null
+  const maxAttainmentDate = courseAttainments[courseAttainments.length - 1]?.attainment_date ?? null
 
-        return { min_attainment_date, max_attainment_date }
-      },
-      { min_attainment_date: null, max_attainment_date: null }
-    )
-
-    return {
-      id: groupId,
-      name,
-      code,
-      coursetypecode,
-      min_attainment_date,
-      max_attainment_date,
-      is_study_module: course_unit_type == null, // Only course units have a course_unit_type so if it's null, it must be a study module
-      substitutions,
-      substitution_groups,
-      course_unit_type,
-    }
+  return {
+    id,
+    groupId,
+    name,
+    code,
+    coursetypecode: study_level,
+    minAttainmentDate,
+    maxAttainmentDate,
+    validityPeriod: validity_period,
+    isStudyModule: !course_unit_type, // Only course units have a course_unit_type. If null -> must be a study module
+    isPrimary: primaryId === id,
+    substitutionGroups,
+    courseUnitType: course_unit_type,
   }
+}
 
 export const mapCourseType = studyLevel => ({
   coursetypecode: studyLevel.id,
@@ -294,32 +278,34 @@ export const mapCurriculumPeriod = curriculumPeriod => ({
 })
 
 export const enrollmentMapper =
-  (
-    personIdToStudentNumber,
-    courseUnitIdToCourseGroupId,
-    realisationIdToActivityPeriod,
-    courseGroupIdToCourseCode,
-    studyRightIdToEducationType
-  ) =>
+  (personIdToStudentNumber, courseUnitIdToCourseUnit, realisationIdToActivityPeriod, studyRightIdToEducationType) =>
   enrollment => {
     const studentnumber = personIdToStudentNumber[enrollment.person_id]
     if (!studentnumber) return null
 
+    const courseUnit = courseUnitIdToCourseUnit[enrollment.course_unit_id]
+    // This happens if the CU is in draft state (filtered out), while the enrollment is active
+    // for now skip, plan is to bring (non-future) drafts to oodikone at some point.
+    if (!courseUnit) return null
+
+    // TODO: add a separate field to enrollments, so we can have both acual enrollment datetime, and
+    // time when the course instance acually happened
     const startOfCURActivityPeriod = realisationIdToActivityPeriod[enrollment.course_unit_realisation_id]?.startDate
     const targetSemester = getSemesterByDate(new Date(startOfCURActivityPeriod ?? enrollment.enrolment_date_time))
-    const course_id = courseUnitIdToCourseGroupId[enrollment.course_unit_id]
+
     return {
       id: enrollment.id,
       studentnumber,
       state: enrollment.state,
-      course_code: courseGroupIdToCourseCode[course_id],
+      course_code: courseUnit.code,
       semestercode: targetSemester.semestercode,
       semester_composite: targetSemester.composite,
       enrollment_date_time: enrollment.enrolment_date_time,
       is_open:
         studyRightIdToEducationType[enrollment.study_right_id] ===
         'urn:code:education-type:non-degree-education:open-university-studies',
-      course_id,
+      course_id: enrollment.course_unit_id,
+      course_group_id: courseUnit.group_id,
       studyright_id: enrollment.study_right_id,
     }
   }
@@ -343,7 +329,7 @@ export const studyplanMapper =
     programmeModuleIdToValidityPeriod,
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    programmeModuleIdToStudyModuleCode,
+    programmeModuleIdToType,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
     moduleAttainments,
@@ -351,8 +337,8 @@ export const studyplanMapper =
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
     educationStudyrights,
-    getCourseCodesFromAttainment,
-    getModuleCodesFromAttainment,
+    getCourseIdsFromAttainment,
+    getModuleIdsFromAttainment,
     getAttainmentsFromAttainment,
     attainments
   ) =>
@@ -366,18 +352,19 @@ export const studyplanMapper =
       const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
       const id = `${studentnumber}-${code}-${studyrightId}`
 
+      // NB: values are course_unit_ids, matching Credit/Enrollment's course_id
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId]?.has(code))
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
-        .map(({ substitutedBy, courseUnitId }) => {
-          if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
-          return courseUnitIdToCode[courseUnitId]
-        })
+        .map(({ substitutedBy, courseUnitId }) => (substitutedBy.length ? substitutedBy[0] : courseUnitId))
 
+      // Custom attainments aren't backed by an existing CU, so they fall back to their own code
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
         .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId]?.has(code))
-        .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId]?.code)
-        .map(sanitizeCourseCode)
+        .map(({ customCourseUnitAttainmentId }) => {
+          const attainment = attainmentIdToAttainment[customCourseUnitAttainmentId]
+          return attainment?.course_unit_id ?? sanitizeCourseCode(attainment?.code)
+        })
         .filter(course => !!course)
 
       const coursesFromAttainedModules = flatten(
@@ -388,7 +375,7 @@ export const studyplanMapper =
               moduleAttainments[moduleId] &&
               moduleAttainments[moduleId][studyplan.user_id]
           )
-          .map(({ moduleId }) => getCourseCodesFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
+          .map(({ moduleId }) => getCourseIdsFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
       )
 
       const attainmentsToCalculate = uniqBy(
@@ -454,18 +441,17 @@ export const studyplanMapper =
       const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
 
       const includedCourses = graduated
-        ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+        ? getCourseIdsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
         : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules)
       if (includedCourses.length === 0) return null
 
       const includedModules = graduated
         ? // If graduated, find modules from within the graduated programme attainment
-          getModuleCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+          getModuleIdsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
         : Array.from(
             studyplan.module_selections.reduce((modules, { moduleId }) => {
-              const studyModuleCode = programmeModuleIdToStudyModuleCode[moduleId]
-              if (studyModuleCode) {
-                modules.add(studyModuleCode)
+              if (programmeModuleIdToType[moduleId] === 'StudyModule') {
+                modules.add(moduleId)
               }
               return modules
             }, new Set())

@@ -1,5 +1,4 @@
-import { uniqBy, flatten, groupBy, memoize } from 'lodash-es'
-import { Op } from 'sequelize'
+import { uniqBy, groupBy } from 'lodash-es'
 import { rootOrgId } from '../config.js'
 import { bulkCreate, selectFromByIdsOrderBy } from '../db/index.js'
 import {
@@ -23,122 +22,57 @@ export const updateOrganisations = async organisations => {
   await bulkCreate(Organization, organisations)
 }
 
-// sort substitutions so that main code is first
-const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
-const oldNumericCode = /^\d/ // old numeric codes come second
-const openUniCode = /^AY?(.+?)(?:en|fi|sv)?$/ // open university codes come last
-const openUniCodeA = /A\d/ // open university with just A come last
-const digi = /DIGI-A?(.+?)(?:en|fi|sv)?$/ // digi-a goes on top courses goes third
-const bscsCode = /BSCS??/
-
-const codeRegexes = [openUniCodeA, openUniCode, bscsCode, oldNumericCode, newLetterBasedCode, digi]
-
-// Compile the above RegEx'es into one. This saves considerable amount of time
-// compared to executing each one independently.
-const codeRegex = RegExp(codeRegexes.map(r => `(${r.source})`).join('|'))
-
-const getSubstitutionPriority = memoize(code => {
-  const match = codeRegex.exec(code)
-
-  if (!match) {
-    return 3 // if no hit, put before open uni courses
-  }
-
-  // Use the index of the first matched and captured subgroup as the priority
-  return match.splice(1).findIndex(x => x !== undefined)
-})
-
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
-  const courses = Object.entries(groupIdToCourse).map(([groupId, courses]) => {
-    // Take substitutions from all course units
-    // NOTE: Modules DO NOT have substitutions fields.
-    const substitutionArrays = courses.flatMap(
-      course => course.substitutions?.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId)) ?? []
+  const mappedCourses = []
+
+  const mapCourse = courseMapper(courseIdToAttainments)
+
+  for (const [groupId, courses] of Object.entries(groupIdToCourse)) {
+    const now = new Date()
+    const { id: primaryCourseId } = courses.reduce(
+      (acc, cur) => {
+        const start = new Date(cur.validity_period.startDate)
+        if (start > acc.startDate && start < now) {
+          acc.id = cur.id
+          acc.startDate = start
+        }
+        return acc
+      },
+      { startDate: new Date(0), id: courses[0].id }
     )
-    const uniqueSubstitutionArrays = uniqBy(substitutionArrays, a => [...a].sort().join('|'))
 
-    // TODO: Replace this old implementation of substitutions
-    // Take substitutions from all course units
-    const substitutions = [
-      ...new Set(
-        courses.reduce((acc, curr) => {
-          return [...acc, ...flatten(curr.substitutions).map(({ courseUnitGroupId }) => courseUnitGroupId)]
-        }, [])
-      ),
-    ]
+    for (const course of courses) {
+      /** @type string[][] @description nested arrays of courseUnit groupIds. Modules have no substitutions. */
+      const substitutionGroups = course.substitutions?.map(subGroup => subGroup.map(sub => sub.courseUnitGroupId)) ?? []
 
-    const organisationsById = {}
+      const organisationsById = {}
+      const { organisations, validity_period: courseValidityPeriod } = course
 
-    for (const { organisations, validity_period: courseValidityPeriod } of courses) {
-      if (!organisations) continue
-      for (const { share, organisationId, roleUrn, validityPeriod } of organisations) {
-        const { startDate, endDate } = validityPeriod ?? courseValidityPeriod ?? {}
+      if (organisations) {
+        for (const { share, organisationId, roleUrn, validityPeriod: orgValidityPeriod } of organisations) {
+          if (roleUrn !== 'urn:code:organisation-role:responsible-organisation') continue
 
-        organisationsById[organisationId] ??= { organisationId, roleUrn, shares: [] }
-        organisationsById[organisationId].shares.push({
-          share,
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
-        })
+          // OrgValidityPeriod is never defined in importer? Leaving it, as it doesn't matter because of the fallback.
+          const { startDate, endDate } = orgValidityPeriod ?? courseValidityPeriod ?? {}
+
+          organisationsById[organisationId] ??= { organisationId, roleUrn, shares: [] }
+          organisationsById[organisationId].shares.push({
+            share,
+            ...(startDate && { startDate }),
+            ...(endDate && { endDate }),
+          })
+        }
       }
+
+      const mapCourseProvider = courseProviderMapper(groupId)
+
+      courseProviders.push(...Object.values(organisationsById).map(mapCourseProvider))
+      mappedCourses.push(mapCourse(groupId, course, substitutionGroups, primaryCourseId))
     }
-
-    const mapCourseProvider = courseProviderMapper(groupId)
-    const organisations = Object.values(organisationsById)
-      .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-      .map(mapCourseProvider)
-
-    courseProviders.push(...organisations)
-
-    // TODO: Remove OLD substitutions when done
-    return courseMapper(courseIdToAttainments)([groupId, courses], substitutions, uniqueSubstitutionArrays)
-  })
-
-  // change substitutions ids to course codes and update
-  for (const course of courses) {
-    // TODO: OLD substitutions
-    const newSubstitutions = []
-    for (const sub of course.substitutions) {
-      const subs = await Course.findOne({
-        attributes: ['code'],
-        where: { id: sub },
-      })
-
-      if (subs) newSubstitutions.push(subs.dataValues.code)
-    }
-
-    course.substitutions = newSubstitutions
-
-    const substitutionSet = new Set()
-    for (const group of course.substitution_groups) {
-      for (const course of group) substitutionSet.add(course)
-    }
-
-    const idToCodePairs = (
-      await Course.findAll({
-        attributes: ['id', 'code'],
-        where: {
-          id: { [Op.in]: Array.from(substitutionSet) },
-        },
-        raw: true,
-      })
-    ).map(({ id, code }) => [id, code])
-    const idToCodeMap = new Map(idToCodePairs)
-
-    course.substitution_groups = course.substitution_groups
-      .map(group => group.map(id => idToCodeMap.get(id)))
-      .filter(group => group.filter(Boolean).length > 0) // Filter out empty groups or groups with only undefined
-
-    course.mainCourseCode = [course.code, ...course.substitution_groups]
-      .sort((a, b) => getSubstitutionPriority(b) - getSubstitutionPriority(a))
-      .at(0)
-
-    // HACK: Fix updater explosion, delete this after substitutions are finished
-    if (Array.isArray(course.mainCourseCode)) course.mainCourseCode = course.mainCourseCode.at(0)
   }
 
-  await bulkCreate(Course, courses)
+  await bulkCreate(Course, mappedCourses)
   await bulkCreate(
     CourseProvider,
     uniqBy(courseProviders, cP => `${cP.coursecode}-${cP.organizationcode}`),
@@ -149,6 +83,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
 export const updateStudyModules = async studyModules => {
   const organizationStudyModules = studyModules.filter(s => s.university_org_ids.includes(rootOrgId))
+  // Attainments are later assumed to be sorted
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
     organizationStudyModules.map(s => s.id),
@@ -163,6 +98,7 @@ export const updateStudyModules = async studyModules => {
 }
 
 export const updateCourseUnits = async courseUnits => {
+  // Attainments are later assumed to be sorted
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
     courseUnits.map(course => course.id),

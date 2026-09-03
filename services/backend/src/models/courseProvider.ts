@@ -13,6 +13,7 @@ import { OrganizationModel } from './organization'
 export class CourseProviderModel extends Model implements CourseProvider {
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
+  // TODO: RENAME: this is courseGroupId, not code
   declare coursecode: CourseProvider['coursecode']
 
   @Column(DataType.JSONB)
@@ -20,6 +21,7 @@ export class CourseProviderModel extends Model implements CourseProvider {
 
   @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
+  // TODO: RENAME: this is organizationId, not code
   declare organizationcode: CourseProvider['organizationcode']
 
   @CreatedAt

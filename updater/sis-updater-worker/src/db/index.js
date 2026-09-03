@@ -144,6 +144,7 @@ export const bulkCreate = async (
       : { ignoreDuplicates: true, transaction }
     await model.bulkCreate(entities, options)
   } catch (_error) {
+    const failures = []
     for (const entity of entities) {
       try {
         if (upsertStyle) await model.upsert(entity, { fields: getColumnsToUpdate(model, properties) })
@@ -156,12 +157,29 @@ export const bulkCreate = async (
           })
         }
       } catch (error) {
-        logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
-          error,
-          entity,
-        })
-        throw error
+        // Skip errors with credits pointing to non-existent course_ids. Credit just doesn't get created
+        if (
+          error.name === 'SequelizeForeignKeyConstraintError' &&
+          error.parent.constraint === 'credit_course_id_fkey'
+        ) {
+          logger.warn('Skipping credit with course_id pointing to non-existent course', { entity })
+        } else {
+          logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
+            error,
+            entity,
+          })
+          // Do not throw here: a single bad entity must not stop the rest of the batch from being retried, else
+          // every entity after it in iteration order is silently left unprocessed
+          failures.push({ entity, error })
+        }
       }
+    }
+
+    if (failures.length > 0) {
+      throw new AggregateError(
+        failures,
+        `${failures.length}/${entities.length} entities failed to upsert into ${model.name}`
+      )
     }
   }
 }

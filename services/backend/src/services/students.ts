@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 
-import type { Credit, Student } from '@oodikone/shared/models'
-import { CreditTypeCode, EnrollmentState, UnifyStatus } from '@oodikone/shared/types'
+import type { Credit, Student, Studyplan } from '@oodikone/shared/models'
+import { CreditTypeCode, EnrollmentState, Unification } from '@oodikone/shared/types'
 import { FormattedStudentForSearch, StudentPageStudent } from '@oodikone/shared/types/studentData'
 import { enrollmentTimeDateThresholdAcademicYear, splitByEmptySpace } from '@oodikone/shared/util'
 import { dateMaxFromList } from '@oodikone/shared/util/datetime'
@@ -43,7 +43,7 @@ const byStudentNumber = async (studentNumber: string) => {
           include: [
             {
               model: CourseModel,
-              attributes: ['code', 'name'],
+              attributes: ['code', 'name', 'groupId'],
               required: true,
             },
           ],
@@ -110,13 +110,13 @@ const byStudentNumber = async (studentNumber: string) => {
   }
 }
 
-const getUnifyStatus = (unifyCourses: UnifyStatus): [boolean] | [true, false] => {
+const getUnifyStatus = (unifyCourses: Unification): [boolean] | [true, false] => {
   switch (unifyCourses) {
-    case 'unifyStats':
+    case Unification.UNIFY:
       return [true, false]
-    case 'openStats':
+    case Unification.OPEN:
       return [true]
-    case 'regularStats':
+    case Unification.REGULAR:
       return [false]
     default:
       return [true, false]
@@ -156,104 +156,47 @@ export const getStartAndEndDates = async (from: number, to: number, separate: bo
   Returns students who have an attainment/enrollment between to and from.
  */
 export const findByCourseAndSemesters = async (
-  codes: string[],
+  courseIds: string[],
   from: number,
   to: number,
   separate: boolean,
-  unifyCourses: UnifyStatus = 'unifyStats'
+  unifyCourses: Unification = Unification.UNIFY
 ) => {
   /* from & to are semestercodes if separate = false, or yearcodes in case separate is true. */
-
-  const { startDate: startDate, endDate: endDate } = await getStartAndEndDates(from, to, separate)
+  const { startDate, endDate } = await getStartAndEndDates(from, to, separate)
+  if (!courseIds.length || !startDate || !endDate) return new Set<string>()
 
   const unifyStatus = getUnifyStatus(unifyCourses)
 
-  const credits = (await CreditModel.findAll({
-    raw: true,
-    attributes: [
-      ['student_studentnumber', 'studentnumber'],
-      'course_code',
-      ['attainment_date', 'date'],
-      'credittypecode',
-    ],
-    where: {
-      course_code: { [Op.in]: codes },
-      is_open: unifyStatus,
-      attainment_date: { [Op.between]: [startDate, endDate] },
-      credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
-    },
-    order: [
-      ['attainment_date', 'DESC'],
-      ['credittypecode', 'ASC'],
-    ],
-  })) as unknown as Array<{
-    studentnumber: CreditModel['student_studentnumber']
-    course_code: CreditModel['course_code']
-    date: CreditModel['attainment_date']
-    credittypecode: CreditModel['credittypecode']
-  }>
-  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
-
-  const enrollments = (await EnrollmentModel.findAll({
-    raw: true,
-    attributes: ['studentnumber', 'course_code', ['enrollment_date_time', 'date']],
-    where: {
-      course_code: { [Op.in]: codes },
-      is_open: unifyStatus,
-      enrollment_date_time: {
-        [Op.between]: [dateMaxFromList(startDate ?? new Date(0), enrollmentTimeDateThresholdAcademicYear), endDate],
+  const creditStudents = (
+    await CreditModel.findAll({
+      raw: true,
+      attributes: ['student_studentnumber'],
+      where: {
+        course_id: { [Op.in]: courseIds },
+        is_open: unifyStatus,
+        attainment_date: { [Op.between]: [startDate, endDate] },
+        credittypecode: { [Op.not]: CreditTypeCode.IMPROVED }, // We do not care about improved grades
       },
-      state: EnrollmentState.ENROLLED,
-    },
-    order: [['enrollment_date_time', 'DESC']],
-  })) as unknown as Array<{
-    studentnumber: EnrollmentModel['studentnumber']
-    course_code: EnrollmentModel['course_code']
-    date: EnrollmentModel['enrollment_date_time']
-  }>
-  // HACK: Sequelize doesn't like renaming attributes so we have to force-cast
+    })
+  ).map(({ student_studentnumber }) => student_studentnumber)
 
-  const studentCreditsAndEnrollments: Record<
-    string,
-    Array<{
-      studentnumber: string
-      course_code: string
-      date: Date
-      type: 'credit' | 'enrollment'
-      credittypecode?: CreditTypeCode
-    }>
-  > = {}
+  const enrollmentStudents = (
+    await EnrollmentModel.findAll({
+      raw: true,
+      attributes: ['studentnumber'],
+      where: {
+        course_id: { [Op.in]: courseIds },
+        is_open: unifyStatus,
+        enrollment_date_time: {
+          [Op.between]: [dateMaxFromList(startDate ?? new Date(0), enrollmentTimeDateThresholdAcademicYear), endDate],
+        },
+        state: EnrollmentState.ENROLLED,
+      },
+    })
+  ).map(({ studentnumber }) => studentnumber)
 
-  for (const credit of credits) {
-    studentCreditsAndEnrollments[credit.studentnumber] ??= []
-    studentCreditsAndEnrollments[credit.studentnumber].push({ ...credit, type: 'credit' })
-  }
-  for (const enrollment of enrollments) {
-    studentCreditsAndEnrollments[enrollment.studentnumber] ??= []
-    studentCreditsAndEnrollments[enrollment.studentnumber].push({ ...enrollment, type: 'enrollment' })
-  }
-
-  const passedCreditTypes = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED]
-
-  const filteredStudentNumbers = new Set<string>()
-  Object.entries(studentCreditsAndEnrollments).map(([studentNumber, creditsOrEnrollments]) => {
-    const latestCredit = creditsOrEnrollments.find(
-      entry => entry.type === 'credit' && codes.includes(entry.course_code)
-    )
-    const latestEnrollment = creditsOrEnrollments.find(
-      entry => entry.type === 'enrollment' && codes.includes(entry.course_code)
-    )
-
-    if (latestCredit && passedCreditTypes.includes(latestCredit.credittypecode!)) {
-      filteredStudentNumbers.add(studentNumber)
-    } else if (latestCredit?.credittypecode === CreditTypeCode.FAILED) {
-      filteredStudentNumbers.add(studentNumber)
-    } else if (latestEnrollment) {
-      filteredStudentNumbers.add(studentNumber)
-    }
-  })
-
-  return [...filteredStudentNumbers]
+  return new Set([...creditStudents, ...enrollmentStudents])
 }
 
 const formatSharedStudentData = ({
@@ -270,12 +213,13 @@ const formatSharedStudentData = ({
   updatedAt,
   createdAt,
   sis_person_id,
-}: Student): Omit<StudentPageStudent, 'tags'> => {
+}: Student): Omit<StudentPageStudent, 'tags' | 'idToGroupIdMap'> => {
   const toCourse = ({ grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }: Credit) => {
     return {
       course: {
         code: course.code,
         name: course.name,
+        groupId: course.groupId,
       },
       date: attainment_date,
       passed: CreditModel.passed({ credittypecode }) || CreditModel.improved({ credittypecode }),
@@ -307,13 +251,25 @@ const formatSharedStudentData = ({
   }
 }
 
+const getIdToGroupIdMap = async (studyplans: Pick<Studyplan, 'included_courses' | 'includedModules'>[]) => {
+  const ids = [...new Set(studyplans.flatMap(plan => [...plan.included_courses, ...plan.includedModules]))]
+  const courses = await CourseModel.findAll({
+    attributes: ['id', 'groupId'],
+    where: { id: { [Op.in]: ids } },
+    raw: true,
+  })
+  return Object.fromEntries(courses.map(({ id, groupId }) => [id, groupId]))
+}
+
 export const withStudentNumber = async (studentNumber: string, userId: string): Promise<StudentPageStudent | null> => {
   const student = await byStudentNumber(studentNumber)
   if (student == null) {
     return null
   }
+  const idToGroupIdMap = await getIdToGroupIdMap(student.studyplans)
   return {
     ...formatSharedStudentData(student),
+    idToGroupIdMap,
     tags: student.tags
       .filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
       .map(tag => ({

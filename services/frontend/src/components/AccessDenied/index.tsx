@@ -6,7 +6,7 @@ import { ErrorBackground } from '@/components/ErrorBoundary/ErrorBackground'
 export const AccessDenied = () => {
   const [easterEggVisible, setEasterEggVisible] = useState(false)
   useEffect(() => {
-    setTimeout(() => setEasterEggVisible(true), Math.floor(Math.random() * 25000 + 5000))
+    setTimeout(() => setEasterEggVisible(true), Math.floor(Math.random() * (20 * 60 * 1000) + 30 * 1000))
   }, [])
 
   const header = 'Welcome to Oodikone!'

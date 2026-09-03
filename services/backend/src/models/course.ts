@@ -21,14 +21,18 @@ import { EnrollmentModel } from './enrollment'
 import { OrganizationModel } from './organization'
 
 @Table({
-  underscored: false,
+  underscored: true,
   modelName: 'course',
   tableName: 'course',
 })
 export class CourseModel extends Model implements Course {
+  /* COLUMNS */
   @PrimaryKey
   @Column(DataType.STRING)
   declare id: Course['id']
+
+  @Column(DataType.STRING)
+  declare groupId: Course['id']
 
   @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
@@ -38,29 +42,17 @@ export class CourseModel extends Model implements Course {
   @Column(DataType.STRING)
   declare coursetypecode: Course['coursetypecode']
 
-  @BelongsTo(() => CourseTypeModel, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
-  declare courseType: Course['courseType']
-
-  @HasMany(() => CreditModel, { foreignKey: 'course_id', sourceKey: 'id' })
-  declare credits: Course['credits']
-
-  @HasMany(() => EnrollmentModel, { foreignKey: 'course_id' })
-  declare enrollments: Course['enrollments']
-
-  @BelongsToMany(() => OrganizationModel, () => CourseProviderModel, 'coursecode')
-  declare organizations: Course['organizations']
-
   @Column(DataType.BOOLEAN)
-  declare is_study_module: Course['is_study_module']
+  declare isStudyModule: Course['isStudyModule']
 
   @Column(DataType.JSONB)
   declare name: Course['name']
 
   @Column(DataType.DATE)
-  declare max_attainment_date: Course['max_attainment_date']
+  declare maxAttainmentDate: Course['maxAttainmentDate']
 
   @Column(DataType.DATE)
-  declare min_attainment_date: Course['min_attainment_date']
+  declare minAttainmentDate: Course['minAttainmentDate']
 
   @CreatedAt
   @Column({ field: 'created_at', type: DataType.DATE })
@@ -71,14 +63,31 @@ export class CourseModel extends Model implements Course {
   declare updatedAt: Course['updatedAt']
 
   @Column(DataType.JSONB)
-  declare substitutions: Course['substitutions']
+  declare validityPeriod: Course['validityPeriod']
 
   @Column(DataType.JSONB)
-  declare substitution_groups: Course['substitution_groups']
+  declare substitutionGroups: Course['substitutionGroups']
+
+  @Column(DataType.BOOLEAN)
+  declare isPrimary: Course['isPrimary']
 
   @Column(DataType.STRING)
-  declare course_unit_type: Course['course_unit_type']
+  declare courseUnitType: Course['courseUnitType']
 
-  @Column({ field: 'main_course_code', type: DataType.STRING })
-  declare mainCourseCode: Course['mainCourseCode']
+  /* RELATIONS */
+  @BelongsTo(() => CourseTypeModel, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
+  declare courseType: Course['courseType']
+
+  @HasMany(() => CreditModel, { foreignKey: 'course_id', sourceKey: 'id' })
+  declare credits: Course['credits']
+
+  @HasMany(() => EnrollmentModel, { foreignKey: 'course_id' })
+  declare enrollments: Course['enrollments']
+
+  @BelongsToMany(() => OrganizationModel, {
+    through: () => CourseProviderModel,
+    foreignKey: 'coursecode',
+    sourceKey: 'groupId',
+  })
+  declare organizations: Course['organizations']
 }

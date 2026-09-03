@@ -4,6 +4,7 @@ import { Op } from 'sequelize'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { CourseModel, CreditModel, EnrollmentModel, SISStudyRightModel } from '../models'
 import { redisClient } from './redis'
+import { getPrimaryCoursesByGroupIds } from './studyProgramme'
 
 export const LANGUAGE_CENTER_REDIS_KEY = 'LANGUAGE_CENTER_DATA'
 
@@ -25,8 +26,8 @@ const getDifference = stats => {
 }
 
 const getLanguageCenterCourses = async () => {
-  const courses: Pick<CourseModel, 'code' | 'name'>[] = await CourseModel.findAll({
-    attributes: ['code', 'name'],
+  const courses: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name'>[] = await CourseModel.findAll({
+    attributes: ['id', 'groupId', 'code', 'name'],
     where: {
       [Op.or]: [{ code: { [Op.like]: 'KK%' } }, { code: { [Op.like]: 'AYKK%' } }],
     },
@@ -111,12 +112,22 @@ type Attempt = {
 export const computeLanguageCenterData = async () => {
   const courses = await getLanguageCenterCourses()
   const autumnSemester2017 = 135
+  const courseIds = courses.map(course => course.id)
+  const idToGroupId = new Map(courses.map(course => [course.id, course.groupId]))
+
+  const primaryCourses = await getPrimaryCoursesByGroupIds([...new Set(courses.map(course => course.groupId))])
+  const groupIdToPrimaryCode = new Map(primaryCourses.map(course => [course.groupId, course.code]))
+
+  const courseCodeOf = (courseId: string) => {
+    const groupId = idToGroupId.get(courseId)
+    return groupId ? groupIdToPrimaryCode.get(groupId) : undefined
+  }
 
   const credits = await CreditModel.findAll({
     raw: true,
-    attributes: ['course_code', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
+    attributes: ['course_id', 'student_studentnumber', 'semestercode', 'attainment_date', 'studyright_id'],
     where: {
-      [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      course_id: { [Op.in]: courseIds },
       semestercode: { [Op.gte]: autumnSemester2017 },
       credittypecode: 4,
     },
@@ -124,9 +135,9 @@ export const computeLanguageCenterData = async () => {
 
   const enrollments = await EnrollmentModel.findAll({
     raw: true,
-    attributes: ['studentnumber', 'semestercode', 'course_code', 'enrollment_date_time', 'studyright_id', 'state'],
+    attributes: ['studentnumber', 'semestercode', 'course_id', 'enrollment_date_time', 'studyright_id', 'state'],
     where: {
-      [Op.or]: [{ course_code: { [Op.like]: 'KK%' } }, { course_code: { [Op.like]: 'AYKK%' } }],
+      course_id: { [Op.in]: courseIds },
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
       // EnrollmentDateTimeThreshold need not be used here as we are not counting failed courses
     },
@@ -149,12 +160,14 @@ export const computeLanguageCenterData = async () => {
   const attemptsByStudents: Record<string, Attempt[]> = {}
 
   credits.forEach(credit => {
+    const courseCode = courseCodeOf(credit.course_id)
+    if (!courseCode) return
     const studentNumber = credit.student_studentnumber
     studentNumbers.add(studentNumber)
     attemptsByStudents[studentNumber] ??= []
     attemptsByStudents[studentNumber].push({
       studentNumber,
-      courseCode: credit.course_code,
+      courseCode,
       completed: true,
       date: credit.attainment_date,
       faculty: attemptStudyRightToFacultyMap[credit.studyright_id],
@@ -163,15 +176,15 @@ export const computeLanguageCenterData = async () => {
   })
 
   enrollments.forEach(enrollment => {
+    const courseCode = courseCodeOf(enrollment.course_id)
+    if (!courseCode) return
     const studentNumber = enrollment.studentnumber
     studentNumbers.add(studentNumber)
     attemptsByStudents[studentNumber] ??= []
     if (
       attemptsByStudents[studentNumber].find(
         attempt =>
-          !attempt.completed &&
-          attempt.semestercode === enrollment.semestercode &&
-          attempt.courseCode === enrollment.course_code
+          !attempt.completed && attempt.semestercode === enrollment.semestercode && attempt.courseCode === courseCode
       )
     ) {
       return
@@ -179,7 +192,7 @@ export const computeLanguageCenterData = async () => {
 
     attemptsByStudents[studentNumber].push({
       studentNumber,
-      courseCode: enrollment.course_code,
+      courseCode,
       completed: false,
       date: enrollment.enrollment_date_time,
       faculty: attemptStudyRightToFacultyMap[enrollment.studyright_id],
@@ -226,7 +239,7 @@ export const computeLanguageCenterData = async () => {
     }
   })
 
-  const unorderedTableData = createArrayOfCourses(attempts, courses)
+  const unorderedTableData = createArrayOfCourses(attempts, primaryCourses)
   const tableData = orderBy(unorderedTableData, 'code')
 
   const faculties = [...new Set(attempts.map(({ faculty }) => faculty))]

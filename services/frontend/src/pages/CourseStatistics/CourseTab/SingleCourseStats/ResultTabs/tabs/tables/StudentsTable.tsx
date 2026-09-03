@@ -62,6 +62,7 @@ export const StudentsTable = ({
   combineSubstitutions: boolean
   courseCodes: string[]
 }) => {
+  'use memo'
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
   const showPopulation = useCallback(
@@ -69,10 +70,10 @@ export const StudentsTable = ({
       const queryObject = {
         from: yearCode,
         to: yearCode,
-        coursecodes: JSON.stringify(courseCodes),
+        courses: courseCodes,
         separate,
         unifyCourses: openOrRegular,
-        includeSubstitutions: combineSubstitutions,
+        substitutions: combineSubstitutions,
       }
       const searchString = queryParamsToString(queryObject)
       return `/coursepopulation?${searchString}`

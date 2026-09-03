@@ -2,13 +2,13 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import type { CourseSearchState } from '@/pages/CourseStatistics'
 import { ResultTab } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats/ResultTabs/tabs/ResultTab'
 import { PersonIcon, RefreshIcon } from '@/theme'
 import { AvailableStats, ProgrammeStats } from '@/types/courseStat'
-import { parseQueryParams, queryParamsToString } from '@/util/queryparams'
+import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 
 export const ResultTabs = ({
   availableStats,
@@ -34,26 +34,20 @@ export const ResultTabs = ({
   courseCodes: string[]
 }) => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [tab, setTab] = useState(0)
+
+  const params = useParseQueryParams()
 
   if (!primary) {
     return null
   }
 
   const updateSeparate = (separate: boolean) => {
-    if (!location.pathname.includes('coursestatistics')) {
-      return
-    }
-
-    const { courseCodes, ...params } = parseQueryParams(location.search)
-    const query = {
+    const newQueryParams = {
       ...params,
-      courseCodes: JSON.parse(courseCodes as string),
       separate,
     }
-    const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
-    void navigate({ search: queryParamsToString(queryToString) }, { replace: true })
+    void navigate({ search: queryParamsToString(newQueryParams) }, { replace: true })
   }
 
   return (

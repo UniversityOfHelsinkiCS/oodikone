@@ -95,6 +95,7 @@ jobs:
       - build_frontend
       - lint_packages
       - test_unit
+      - test_updater_unit
 
     steps:
       - uses: actions/checkout@v7
@@ -109,8 +110,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+          ./anonyymioodi/db_utils.sh local sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -130,6 +130,7 @@ jobs:
       - build_frontend
       - lint_packages
       - test_unit
+      - test_updater_unit
 
     steps:
       - uses: actions/checkout@v7
@@ -145,8 +146,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
+          ./anonyymioodi/db_utils.sh local kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -166,6 +166,7 @@ jobs:
       - build_frontend
       - lint_packages
       - test_unit
+      - test_updater_unit
 
     steps:
       - uses: actions/checkout@v7
@@ -181,8 +182,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
+          ./anonyymioodi/db_utils.sh local user-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -251,8 +251,8 @@ jobs:
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
       # - name: Push newly build db to toska hub
       #   if: |
-      #   success() && inputs.skip_db_update != 'true'
-      #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+      #     success() && inputs.skip_db_update != 'true'
+      #   run: ./anonyymioodi/db_utils.sh local sis-db
 
       - name: Dump logs on failure
         if: failure()
@@ -314,6 +314,19 @@ jobs:
       - uses: actions/checkout@v7
       - name: Run unit tests (frontend and backend)
         uses: ./.github/actions/test/unit
+
+  # === Updater unit testing ===
+  test_updater_unit:
+    name: 'Run updater unit tests'
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    if: |
+      !cancelled() && !failure()
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run updater unit tests
+        uses: ./.github/actions/test/updater-unit
 
   # === Frontend component testing ===
   test_components:

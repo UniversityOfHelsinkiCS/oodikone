@@ -4,23 +4,25 @@ import { describe, it, beforeAll, assert } from 'vitest'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
-void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
+const MAT11002 = 'hy-CU-117375394'
+
+void describe('Course yearly statistics - MAT11002 (hy-CU-117375394, no substitutions)', () => {
   let app: Express
   let body: CourseYearlyStats
   beforeAll(async () => {
     app = await initTests()
-    body = await getCourseYearlyStats(app, 'codes=MAT11002&combineSubstitutions=false')
+    body = await getCourseYearlyStats(app, `courses=${MAT11002}&combineSubstitutions=false`)
   })
 
   it('should not include students for AY code', () => {
-    const stats = body.unifyStats?.statistics!.find(year => year.name === '2017-2018')
+    const stats = body.unifyStats.statistics.find(year => year.name === '2017-2018')
     assert(stats && 'enrollments' in stats, 'Missing field enrollment in statsitics')
     const studentCategories = calculatePassedAndFailed(stats.students.grades)
     assert(!studentCategories.failed.includes('534980'))
   })
 
   it('should not include student with failed grade after passed grade', () => {
-    const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
+    const year = body.unifyStats.statistics.find(year => year.name === '2018-2019')
     assert(year && 'enrollments' in year, 'Stats missing completely')
     const studentCategories = calculatePassedAndFailed(year.students.grades)
     assert(!studentCategories.failed.includes('501716'), 'Failed students included incorrectly the student in question')
@@ -30,7 +32,7 @@ void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
 
   // FIXME: Doesn't test anything acually. Student doesn't have a passed AY grade
   it.skip('should include student with failed grade and passed AY grade', () => {
-    const year = body.unifyStats?.statistics.find(year => year.name === '2020-2021')
+    const year = body.unifyStats.statistics.find(year => year.name === '2020-2021')
     assert(year && 'enrollments' in year, 'Stats missing completely')
     const studentCategories = calculatePassedAndFailed(year.students.grades)
     assert(
@@ -45,7 +47,7 @@ void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
   })
 
   it('should include student with only approved grade', () => {
-    const year = body.unifyStats?.statistics.find(year => year.name === '2022-2023')
+    const year = body.unifyStats.statistics.find(year => year.name === '2022-2023')
     assert(year && 'enrollments' in year, 'Stats missing completely')
     const studentCategories = calculatePassedAndFailed(year.students.grades)
     assert(!studentCategories.failed.includes('543385'), 'Failed students included incorrectly the student in question')
@@ -54,7 +56,7 @@ void describe('Course yearly statistics - MAT11002 (no substitutions)', () => {
   })
 
   it('should not count a student with only improved grades as passed (509770)', () => {
-    const year = body.unifyStats?.statistics.find(year => year.name === '2018-2019')
+    const year = body.unifyStats.statistics.find(year => year.name === '2018-2019')
     assert(year && 'enrollments' in year, 'Missing stats for 2018-2019')
 
     const studentCategories = calculatePassedAndFailed(year.students.grades)

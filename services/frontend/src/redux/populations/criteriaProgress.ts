@@ -38,7 +38,9 @@ export const getProgressCriteria = (
   criteria: ProgressCriteria,
   studyRightStartDate: string,
   hops: StudentStudyPlan | undefined,
-  credits: PopulationCourseStatsCredit[]
+  credits: PopulationCourseStatsCredit[],
+  idToCode: Record<string, string>,
+  groupIdToCode: Record<string, string>
 ) => {
   const [thereAreCriteria, criteriaChecked] = getCriteriaBase(criteria)
   if (!thereAreCriteria) return criteriaChecked
@@ -48,14 +50,15 @@ export const getProgressCriteria = (
   /** Number of credits completed during each academic year */
   const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
-  /** Credits produced by a student */
+  /** Credits produced by a student, resolved from their (possibly historical) course_id to the course's current code */
   const courses = credits
-    .map(({ attainment_date, course_code, credits, credittypecode }) => ({
-      course_code,
+    .map(({ attainment_date, course_id, credits, credittypecode }) => ({
+      course_code: idToCode[course_id],
       credits,
       credittypecode,
       date: attainment_date,
     }))
+    .filter((course): course is typeof course & { course_code: string } => !!course.course_code)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   Object.entries(criteria.allCourseGroups).map(([mainCourseCode, substitutionGroups]) => {
@@ -74,13 +77,13 @@ export const getProgressCriteria = (
             criteriaChecked[yearToAdd].coursesSatisfied[mainCourseCode] = mainCourse.date.toLocaleString()
           }
         } else {
-          // Credit for mainCourseCode not found, checking substitution_groups
+          // Credit for mainCourseCode not found, checking substitution groups (each entry is a groupId, not a code)
           const passedCourseCodes = courses
             .filter(course => passedCreditTypeCodes.includes(course.credittypecode))
             .map(({ course_code }) => course_code)
           for (const group of substitutionGroups) {
             // Add date to the course that has a completed substitution group
-            if (group.every(code => passedCourseCodes.includes(code))) {
+            if (group.every(groupId => passedCourseCodes.includes(groupIdToCode[groupId]))) {
               criteriaChecked[yearToAdd].coursesSatisfied[mainCourseCode] = 'substituted'
             }
           }
@@ -97,12 +100,15 @@ export const getProgressCriteria = (
 
     const mainCourseCodes = Object.keys(criteria.allCourseGroups).filter(mainCourseCode => {
       if (mainCourseCode === course.course_code) return true
-      return criteria.allCourseGroups[mainCourseCode].some(group => group.includes(course.course_code))
+      return criteria.allCourseGroups[mainCourseCode].some(group =>
+        group.some(groupId => groupIdToCode[groupId] === course.course_code)
+      )
     })
 
+    // included_courses holds course ids, with a rare fallback to a raw code for "custom" entries
+    const hopsCodes = hops.included_courses.map(idOrCode => idToCode[idOrCode] ?? idOrCode)
     const isInStudyPlan =
-      hops.included_courses.includes(course.course_code) ||
-      mainCourseCodes.some(code => hops.included_courses.includes(code))
+      hopsCodes.includes(course.course_code) || mainCourseCodes.some(code => hopsCodes.includes(code))
     if (!isInStudyPlan) return
 
     Object.keys(academicYears)

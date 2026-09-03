@@ -1,44 +1,44 @@
 import { RTKApi } from '@/apiConnection'
-import { CourseStat } from '@/types/courseStat'
+import { CourseDetails, CourseDetailsQuery } from '@oodikone/shared/routes/courses'
+import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const courseStatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getCourseStats: builder.query({
       query: ({
-        codes,
+        courses,
         separate,
-        combineSubstitutions,
+        substitutions,
         fromYearCode,
         toYearCode,
       }: {
-        codes: string[]
+        courses: string[]
         separate?: boolean
-        combineSubstitutions?: boolean
+        substitutions?: boolean
         fromYearCode: string
         toYearCode: string
       }) => ({
         url: '/courseyearlystats',
-        params: { codes, separate, combineSubstitutions, fromYearCode, toYearCode },
+        params: { courses, separate, substitutions, fromYearCode, toYearCode },
       }),
-      transformResponse: (
-        courseStats: { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }[]
-      ) => {
-        const data: Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }> = {}
+      transformResponse: (courseStats: CourseYearlyStats[]) => {
+        const data: Record<string, CourseYearlyStats> = {}
         courseStats.forEach(stat => {
-          data[stat.unifyStats.coursecode] = stat
+          if (stat.unifyStats) {
+            data[stat.unifyStats.groupId] = stat
+          }
         })
 
         return data
       },
     }),
-    getCourseDetails: builder.query({
-      query: ({ codes }: { codes: string | string[] }) => ({
+    getCourseDetails: builder.query<CourseDetails, CourseDetailsQuery>({
+      query: ({ courses }: { courses: string[] }) => ({
         url: '/coursedetails',
-        params: { codes },
+        params: { courses },
       }),
     }),
   }),
 })
 
 export const { useGetCourseStatsQuery, useGetCourseDetailsQuery } = courseStatsApi
-// export const clearCourseStats = () => courseStatsApi.util.resetApiState()

@@ -16,12 +16,12 @@ import { FormattedStudent } from '@oodikone/shared/types'
 
 export const CoursePopulationGradeDist = ({
   students,
-  courseCodes,
+  courseIds,
   from,
   to,
 }: {
   students: FormattedStudent[]
-  courseCodes: string[]
+  courseIds: string[]
   from: string
   to: string
 }) => {
@@ -31,7 +31,7 @@ export const CoursePopulationGradeDist = ({
     const grades = {}
 
     students.forEach(student => {
-      const courses = student.courses.filter(course => courseCodes.includes(course.course_code))
+      const courses = student.courses.filter(course => courseIds.includes(course.course_id))
       const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
       if (!highestGrade) {
         grades['No grade'] ??= []

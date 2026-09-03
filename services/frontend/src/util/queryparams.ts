@@ -1,12 +1,25 @@
-export const parseQueryParams = <T extends object = Record<any, any>>(input: string): T => {
-  const params = new URLSearchParams(input)
+import { useLocation } from 'react-router'
 
-  const construct = Array.from(params.keys())
-    .map(key => [key, params.getAll(key)])
-    // This is done on purpose to mimic query-strings behavior
-    .map(([key, val]) => [key, val.length <= 1 ? val[0] : val])
+export type QueryParams = Record<string, undefined | string[]>
 
-  return Object.fromEntries(construct)
+/** Reactive query param parser.
+ *
+ * @returns all query parameters in object, destructure as needed.
+ *
+ * By default all values are string arrays. Array can also be destuctured as follows.
+ *
+ * @example
+ * const args = useParseQueryParams()
+ * const string1 = args.item1?.[0]
+ * const arrayType = args.noDestructuring
+ * const bool = !!args.isBool?.[0]
+ */
+export const useParseQueryParams = (): QueryParams => {
+  const location = useLocation()
+  const searchString = location.search
+  const params = new URLSearchParams(searchString)
+
+  return Object.fromEntries([...params.keys()].map(key => [key, params.getAll(key)]))
 }
 
 const setQueryParams = (input: Record<any, any>) => {

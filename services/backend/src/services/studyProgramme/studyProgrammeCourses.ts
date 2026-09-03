@@ -1,10 +1,17 @@
-import { Name, StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
+import { StudyProgrammeCourse, YearType } from '@oodikone/shared/types'
 import { mapToProviders, range, yearCodeToYear } from '@oodikone/shared/util'
 import { createEmptyStats, YearStats } from '@oodikone/shared/util/studyProgramme'
 import { now } from '../../util/clock'
 
-import { getAllProgrammeCourses, getCurrentStudyYearStartDate, getNotCompletedForProgrammeCourses } from '.'
+import {
+  getAllProgrammeCourses,
+  getCoursesByGroupIds,
+  getCurrentStudyYearStartDate,
+  getNotCompletedForProgrammeCourses,
+  getPrimaryCoursesByGroupIds,
+} from '.'
 import { getStudentHetuStateMap, getProgrammeCourseAggregates, getTransferCourseAggregates } from './studentGetters'
+import logger from '../../util/logger'
 
 const START_YEAR = 2017
 const JULY = 6
@@ -18,22 +25,12 @@ const getFrom = (yearType: YearType, year: number) =>
 const getTo = (yearType: YearType, year: number) =>
   yearType === 'ACADEMIC_YEAR' ? new Date(year + 1, JULY, 31, 23, 59, 59) : new Date(year, 11, 31, 23, 59, 59)
 
-const getAllStudyProgrammeCourses = async (studyProgramme: string) => {
+const getAllStudyProgrammeCourseGroupIds = async (studyProgramme: string): Promise<string[]> => {
   const providerCode = mapToProviders([studyProgramme])[0]
   if (!providerCode) return []
 
   const normalCourses = await getAllProgrammeCourses(providerCode)
-  const courseCodes = new Set<string>()
-
-  for (const course of normalCourses) {
-    courseCodes.add(course.code)
-    // We want all AY course codes variants, even from partially completed susbtitution groups
-    for (const code of course?.substitution_groups?.flat() ?? []) {
-      if (code === 'AY' + course.code) courseCodes.add(code)
-    }
-  }
-
-  return [...courseCodes]
+  return [...new Set(normalCourses.map(course => course.groupId))]
 }
 
 const getYearKey = (date: Date, isAcademicYear: boolean) => {
@@ -58,8 +55,7 @@ type YearAccumulator = {
 }
 
 type CourseAccumulator = {
-  code: string
-  name: Name
+  groupId: string
   isStudyModule: boolean
   years: Map<number, YearAccumulator>
 }
@@ -80,23 +76,18 @@ const createYearAccumulator = (isStudyModule: boolean): YearAccumulator => ({
 
 const ensureCourse = (
   courseMap: Map<string, CourseAccumulator>,
-  code: string,
-  name: Name,
+  groupId: string,
   isStudyModule: boolean
 ): CourseAccumulator => {
-  if (!courseMap.has(code)) {
-    courseMap.set(code, {
-      code,
-      name,
+  if (!courseMap.has(groupId)) {
+    courseMap.set(groupId, {
+      groupId,
       isStudyModule,
       years: new Map(),
     })
   }
 
-  const course = courseMap.get(code)!
-  course.isStudyModule = course.isStudyModule || isStudyModule
-  course.name = course.name ?? name
-  return course
+  return courseMap.get(groupId)!
 }
 
 const ensureYear = (course: CourseAccumulator, year: number, isStudyModule: boolean) => {
@@ -154,30 +145,35 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     return []
   }
 
-  const mainProgrammeCourses = await getAllStudyProgrammeCourses(studyProgramme)
-  const secondProgrammeCourses = combinedProgramme ? await getAllStudyProgrammeCourses(combinedProgramme) : []
-  const programmeCourses = [...new Set([...mainProgrammeCourses, ...secondProgrammeCourses])]
+  const [mainProgrammeGroupIds, secondProgrammeGroupIds] = await Promise.all([
+    getAllStudyProgrammeCourseGroupIds(studyProgramme),
+    combinedProgramme ? getAllStudyProgrammeCourseGroupIds(combinedProgramme) : [],
+  ])
 
-  if (programmeCourses.length === 0) {
-    return []
-  }
+  const programmeGroupIds = [...new Set([...mainProgrammeGroupIds, ...secondProgrammeGroupIds])]
+
+  if (!programmeGroupIds.length) return []
+
+  const programmeCourseIds = [...new Set(await getCoursesByGroupIds(programmeGroupIds))]
 
   const firstYear = yearRange[0]
   const lastYear = yearRange[yearRange.length - 1]
   const from = getFrom(academicYear, firstYear)
   const to = getTo(academicYear, lastYear)
 
+  const notCompletedByYearPromise = getNotCompletedForProgrammeCourses(
+    programmeCourseIds,
+    yearRange.map(year => ({ year, from: getFrom(academicYear, year), to: getTo(academicYear, year) })),
+    from,
+    to
+  )
+  const primaryByGroupIdPromise = getPrimaryCoursesByGroupIds(programmeGroupIds).then(
+    rows => new Map(rows.map(({ groupId, code, name }) => [groupId, { code, name }]))
+  )
+
   const [programmeCredits, transferCredits] = await Promise.all([
-    getProgrammeCourseAggregates({
-      courseCodes: programmeCourses,
-      from,
-      to,
-    }),
-    getTransferCourseAggregates({
-      courseCodes: programmeCourses,
-      from,
-      to,
-    }),
+    getProgrammeCourseAggregates(programmeCourseIds, from, to),
+    getTransferCourseAggregates(programmeCourseIds, from, to),
   ])
 
   const openUniStudentHetuMap = await getStudentHetuStateMap(
@@ -194,7 +190,8 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     if (!yearRange.includes(year)) continue
     maxYear = Math.max(maxYear, year)
 
-    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const course = ensureCourse(courseMap, row.groupId, row.isStudyModule)
+
     const yearAccumulator = ensureYear(course, year, row.isStudyModule)
     const { stats } = yearAccumulator
 
@@ -242,53 +239,56 @@ export const getStudyProgrammeCoursesForStudyTrack = async (
     if (!yearRange.includes(year)) continue
     maxYear = Math.max(maxYear, year)
 
-    const course = ensureCourse(courseMap, row.courseCode, row.courseName, row.isStudyModule)
+    const course = ensureCourse(courseMap, row.groupId, row.isStudyModule)
     const yearAccumulator = ensureYear(course, year, row.isStudyModule)
     yearAccumulator.transferStudents.add(row.studentNumber)
     yearAccumulator.stats.transferStudentsCredits += row.credits
   }
 
-  const notCompletedResults = await Promise.all(
-    yearRange.map(year => {
-      const yearFrom = getFrom(academicYear, year)
-      const yearTo = getTo(academicYear, year)
-      return getNotCompletedForProgrammeCourses(yearFrom, yearTo, programmeCourses, from, to)
-    })
-  )
+  const notCompletedByYear = await notCompletedByYearPromise
 
-  notCompletedResults.forEach((results, index) => {
-    const year = yearRange[index]
-    if (!results) return
+  for (const year of yearRange) {
+    const results = notCompletedByYear.get(year)
+    if (!results) continue
     if (results.length > 0) {
       maxYear = Math.max(maxYear, year)
     }
     for (const result of results) {
-      const course = ensureCourse(courseMap, result.code, result.name, result.isStudyModule ?? false)
+      const course = ensureCourse(courseMap, result.groupId, result.isStudyModule ?? false)
       const yearAccumulator = ensureYear(course, year, result.isStudyModule ?? false)
       yearAccumulator.stats.allNotPassed += result.allNotPassed
     }
-  })
+  }
 
   if (maxYear === 0) {
     maxYear = lastYear
   }
 
+  const primaryByGroupId = await primaryByGroupIdPromise
+
   const coursesRecord: Record<string, StudyProgrammeCourse> = {}
 
-  for (const [code, course] of courseMap.entries()) {
+  // Code and name for each CU group is fetched from the "primary" instance
+  for (const [groupId, course] of courseMap.entries()) {
     const years: Record<number, YearStats> = {}
     for (const [year, yearAccumulator] of course.years.entries()) {
       if (year > maxYear) continue
       years[year] = finalizeYearStats(yearAccumulator)
     }
 
-    if (Object.keys(years).length === 0) {
+    if (!Object.keys(years).length) continue
+
+    const primary = primaryByGroupId.get(groupId)
+
+    if (!primary?.code || !primary?.name) {
+      logger.warn(`Warning: Programme courses: No primary course for groupId: ${groupId ?? '(groupId is undefined)'}`)
       continue
     }
 
-    coursesRecord[code] = {
-      code,
-      name: course.name,
+    coursesRecord[groupId] = {
+      code: primary.code,
+      groupId,
+      name: primary.name,
       isStudyModule: course.isStudyModule,
       years,
     }

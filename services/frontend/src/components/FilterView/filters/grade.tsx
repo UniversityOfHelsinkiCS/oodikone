@@ -8,14 +8,10 @@ import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/c
 import { FormattedStudent } from '@oodikone/shared/types'
 import { dateIsBetween } from '@oodikone/shared/util/datetime'
 
-type Options = any
-type Args = any
-type Precompute = any
+type Options = { selected: string[] }
+type Args = { courseIds: string[]; from: string; to: string }
+type Precompute = { grades: Record<string, string[]> }
 
-/**
- * Grade filter.
- * Only applicable to a single course.
- */
 const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps<Options, Args, Precompute>) => {
   const { grades } = precomputed
   const { selected } = options
@@ -25,9 +21,9 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
   // Therefore this cannot be filtered by Number
   const choices = Object.keys(grades).sort((a, b) => +b - +a)
 
-  const checked = grade => selected.includes(grade)
+  const checked = (grade: string) => selected.includes(grade)
 
-  const onChange = grade => () => {
+  const onChange = (grade: string) => () => {
     if (checked(grade)) {
       onOptionsChange({
         ...options,
@@ -59,6 +55,10 @@ const GradeFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayPr
   )
 }
 
+/**
+ * Grade filter.
+ * Only applicable to a single course.
+ */
 export const gradeFilter = createFilter<Options, Args, Precompute>({
   key: 'gradeFilter',
 
@@ -78,8 +78,8 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
             [
               student.studentNumber,
               student.courses.filter(
-                (course: any) =>
-                  args.courseCodes.includes(course.course_code) &&
+                course =>
+                  args.courseIds.includes(course.course_id) &&
                   dateIsBetween(new Date(course.date), new Date(args.from), new Date(args.to))
               ),
             ] as [string, FormattedStudent['courses']]
@@ -113,7 +113,7 @@ export const gradeFilter = createFilter<Options, Args, Precompute>({
 
   actions: {
     selectGrade(options, grade) {
-      if (options.selected.indexOf(grade) === -1) {
+      if (!options.selected.includes(grade)) {
         options.selected.push(grade)
       }
 

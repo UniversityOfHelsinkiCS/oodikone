@@ -24,6 +24,7 @@ const mapCourseData = course =>
     : {
         name: course.course.name,
         code: course.course.code,
+        groupId: course.groupId,
         attempts: Object.values(course.grades)
           .map(grade => grade.count ?? 0)
           .reduce((prev, acc) => prev + acc, 0),
@@ -80,7 +81,7 @@ export const GradeDistribution = ({
         header: 'Name',
         cell: ({ row }) => {
           const name = getTextIn(row.original.name)
-          const { code } = row.original
+          const { groupId } = row.original
 
           const expansionStyle = row.getIsExpanded() ? { transform: 'rotate(90deg)' } : {}
           const expansionArrow = row.getCanExpand() ? (
@@ -98,10 +99,10 @@ export const GradeDistribution = ({
           const linkComponent =
             row.originalSubRows === undefined ? (
               <Stack flexDirection="row" sx={{ m: 'auto', mr: '0' }}>
-                <CourseFilterToggle courseCode={code} courseName={name} />
+                <CourseFilterToggle courseGroupId={groupId} courseName={name} />
                 {!onlyIamRights ? (
                   <Link
-                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(code)}"]&separate=false&combineSubstitutions=true`}
+                    to={`/coursestatistics?courses=${encodeURIComponent(groupId)}&separate=false&substitutions=true`}
                   >
                     <NorthEastIcon sx={{ ml: 1 }} />
                   </Link>

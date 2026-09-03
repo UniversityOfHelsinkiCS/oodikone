@@ -5,7 +5,6 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router'
 
 import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
@@ -27,55 +26,73 @@ import {
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetCourseStatsQuery } from '@/redux/courseStats'
 import { checkUserAccess, getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { yearToYearCode } from '@oodikone/shared/util'
 
 export type CourseSearchState = 'openStats' | 'regularStats' | 'unifyStats'
 
+// TODO: This view would probably benefit from using a context
+// (We do _a little bit_ of prop drilling)
 export const CourseStatistics = () => {
+  'use memo'
   const { programmeRights, roles } = useGetAuthorizedUserQuery()
   const fullStudyProgrammeRights = getFullStudyProgrammeRights(programmeRights)
   const userHasAccessToAllStats = hasAccessToAllCourseStats(roles, fullStudyProgrammeRights)
 
   const [courseSummaryFormProgrammes, setCourseSummaryFormProgrammes] = useState<string[]>([ALL.value])
-  const [openOrRegular, toggleOpenAndRegularCourses] = useState<CourseSearchState>('unifyStats')
+  const [openOrRegular, setOpenOrRegular] = useState<CourseSearchState>('unifyStats')
   const [tab, setTab] = useTabs(/* max tabs */ 3)
 
-  const location = useLocation()
-  const { courseCodes, separate, combineSubstitutions } = parseQueryParams(location.search)
+  const [fromYearCode, setFromYearCode] = useState(1)
+  const [toYearCode, setToYearCode] = useState(yearToYearCode(new Date().getFullYear()))
 
-  const codes = JSON.parse(courseCodes ?? '[]') as string[]
-  const [initialCourseCode] = codes
-  const singleCourseStats = codes.length === 1
+  const { courses, separate, substitutions } = useParseQueryParams()
+  const initialCourseCode = courses?.[0] ?? ''
+  const singleCourseStats = courses?.length === 1
 
-  const [selected, setSelected] = useState<string>('')
-  useTitle(selected ? `${selected} - Course statistics` : 'Course statistics')
+  const [selected, setSelected] = useState(initialCourseCode)
 
-  const skipQuery = !initialCourseCode
+  const coursesKey = courses?.join(',') ?? 'empty'
+
+  // Prevent state from becoming stale
+  useEffect(() => {
+    setSelected(current => {
+      if (courses?.includes(current)) return current
+      setFromYearCode(1)
+      setToYearCode(yearToYearCode(new Date().getFullYear()))
+      return courses?.[0] ?? ''
+    })
+  }, [coursesKey])
+
+  const noCourseProvided = !initialCourseCode
+
   const {
     data: courseStatsData = {},
-    isFetching: isLoading,
+    isFetching,
+    isLoading,
     isSuccess,
   } = useGetCourseStatsQuery(
     {
-      codes,
-      separate: separate === 'true',
-      combineSubstitutions: combineSubstitutions === 'true',
-      fromYearCode: '1',
-      toYearCode: yearToYearCode(new Date().getFullYear()).toString(),
+      courses: courses!,
+      separate: separate?.[0] === 'true',
+      substitutions: substitutions?.[0] === 'true',
+      fromYearCode: fromYearCode.toString(),
+      toYearCode: toYearCode.toString(),
     },
-    { skip: skipQuery }
+    { skip: noCourseProvided }
   )
 
-  useEffect(() => {
-    setSelected(initialCourseCode)
-  }, [initialCourseCode])
+  useTitle(
+    selected && !isFetching
+      ? `${courseStatsData[selected]?.regularStats.courseCode} - Course statistics`
+      : 'Course statistics'
+  )
 
   if (!checkUserAccess(['courseStatistics', 'admin', 'fullSisuAccess'], roles) && !fullStudyProgrammeRights.length) {
     return <AccessDeniedMessage />
   }
 
-  if (skipQuery)
+  if (noCourseProvided)
     return (
       <PageLayout maxWidth="lg">
         <PageTitle title="Course statistics" />
@@ -84,7 +101,7 @@ export const CourseStatistics = () => {
     )
 
   const stats = getCourseStats(courseStatsData, openOrRegular)
-  const alternatives = stats[selected]?.alternatives
+  const substitutionGroups = stats[selected]?.substitutionGroups
   const allProgrammes = getAllStudyProgrammes(stats, undefined)
   const programmes = getAllStudyProgrammes(stats, selected)
   const summaryStatistics = getSummaryStatistics(
@@ -96,14 +113,10 @@ export const CourseStatistics = () => {
 
   const availableStats = getAvailableStats(courseStatsData)
 
-  const switchToCourse = (courseCode: string) => {
-    setSelected(courseCode)
-  }
-
   return (
     <PageLayout maxWidth="lg">
       <Backdrop
-        open={isLoading}
+        open={isLoading || !stats[selected]}
         sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
       >
         <CircularProgress color="inherit" size="3em" />
@@ -119,23 +132,27 @@ export const CourseStatistics = () => {
       </Box>
       {tab === 0 && (
         <CourseTab
-          alternatives={alternatives}
+          substitutionGroups={substitutionGroups}
           availableStats={availableStats[selected]}
-          combineSubstitutions={combineSubstitutions === 'true'}
-          loading={isLoading || !isSuccess}
+          substitutions={substitutions?.[0] === 'true'}
+          loading={isFetching || !isSuccess}
           openOrRegular={openOrRegular}
           programmes={programmes}
           selected={selected}
           setSelected={setSelected}
           stats={stats}
-          toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
+          toggleOpenAndRegularCourses={setOpenOrRegular}
           userHasAccessToAllStats={userHasAccessToAllStats}
+          toYearCode={toYearCode}
+          fromYearCode={fromYearCode}
+          setToYearCode={setToYearCode}
+          setFromYearCode={setFromYearCode}
         />
       )}
       {tab === 1 && !singleCourseStats && (
         <SummaryTab
           courseSummaryFormProgrammes={courseSummaryFormProgrammes}
-          onClickCourse={switchToCourse}
+          onClickCourse={groupId => setSelected(groupId)}
           programmes={programmes}
           setCourseSummaryFormProgrammes={setCourseSummaryFormProgrammes}
           statistics={summaryStatistics}

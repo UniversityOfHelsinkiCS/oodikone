@@ -46,13 +46,13 @@ void describe('hopsFilter', () => {
         }),
       ],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, { activeProgramme: true })
 
     assert.deepStrictEqual(
-      result.courses.map(({ course_code }) => course_code),
+      result.courses.map(({ course_id }) => course_id),
       ['MAT001']
     )
   })
@@ -61,7 +61,7 @@ void describe('hopsFilter', () => {
     const student = createStudent({
       studyRights: [createStudyRight({ id: 'sr-1', cancelled: true })],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, { activeProgramme: true })
@@ -73,13 +73,13 @@ void describe('hopsFilter', () => {
     const student = createStudent({
       studyRights: [createStudyRight({ id: 'sr-1', cancelled: false })],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, { activeProgramme: true })
 
     assert.deepStrictEqual(
-      result.courses.map(({ course_code }) => course_code),
+      result.courses.map(({ course_id }) => course_id),
       ['MAT001']
     )
   })
@@ -88,13 +88,13 @@ void describe('hopsFilter', () => {
     const student = createStudent({
       studyRights: [createStudyRight({ id: 'sr-1', cancelled: false })],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001']), createHops('MH50', 'sr-1', ['TKT002'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, { activeProgramme: true })
 
     assert.deepStrictEqual(
-      result.courses.map(({ course_code }) => course_code),
+      result.courses.map(({ course_id }) => course_id),
       ['MAT001']
     )
   })
@@ -103,13 +103,13 @@ void describe('hopsFilter', () => {
     const student = createStudent({
       studyRights: [createStudyRight({ id: 'sr-1', cancelled: false })],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001']), createHops('MH50', 'sr-1', ['TKT002'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, { activeCombinedProgramme: true })
 
     assert.deepStrictEqual(
-      result.courses.map(({ course_code }) => course_code),
+      result.courses.map(({ course_id }) => course_id),
       ['TKT002']
     )
   })
@@ -118,7 +118,7 @@ void describe('hopsFilter', () => {
     const student = createStudent({
       studyRights: [createStudyRight({ id: 'sr-1', cancelled: false })],
       studyplans: [createHops('KH50', 'sr-1', ['MAT001'])],
-      courses: [createCourse({ course_code: 'MAT001' }), createCourse({ course_code: 'TKT002' })],
+      courses: [createCourse({ course_id: 'MAT001' }), createCourse({ course_id: 'TKT002' })],
     })
 
     const result = mutate(student, {})

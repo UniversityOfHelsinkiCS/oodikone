@@ -1,16 +1,16 @@
-import { Credit, Enrollment, Course } from '../models'
+import { Course } from '../models'
 import {
   Name,
   ProgrammeModuleWithRelevantAttributes,
-  UnifyStatus,
   Unarray,
   SemesterEnrollment,
   DegreeProgrammeType,
   ProgressCriteria,
+  Unification,
 } from '../types'
-import { FormattedStudent } from '../types/studentData'
+import { FormattedStudent, StudentCredit, StudentEnrollment } from '../types/studentData'
 
-export type CourseStats = Pick<Course, 'code' | 'name' | 'is_study_module' | 'substitutions' | 'substitution_groups'>
+export type CourseStats = Pick<Course, 'code' | 'id' | 'groupId' | 'name' | 'isStudyModule' | 'substitutionGroups'>
 
 export type AttainmentDates = {
   latestTotal?: Date
@@ -57,23 +57,11 @@ export type CloseToGraduationData = {
 }
 
 export type PopulationCourseStats = {
+  // One row per groupId (isPrimary=true course for that group)
   courses: CourseStats[]
-  enrollments: Pick<
-    Enrollment,
-    'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
-  >[]
-  credits: Pick<
-    Credit,
-    | 'grade'
-    | 'credits'
-    | 'credittypecode'
-    | 'attainment_date'
-    | 'isStudyModule'
-    | 'student_studentnumber'
-    | 'course_code'
-    | 'language'
-    | 'studyright_id'
-  >[]
+  idToGroupIdMap: Record<string, string>
+  enrollments: (StudentEnrollment & { studentnumber: string })[]
+  credits: StudentCredit[]
 }
 
 // populationstatistics
@@ -94,17 +82,16 @@ export type PopulationstatisticsQuery = {
 
 // populationstatisticsbycourse
 export type PopulationstatisticsbycourseResBody = PopulationstatisticsResBody & {
-  mainCourseCodes: string[]
-  allCourseCodes: string[]
+  idToGroupIdMap: Record<string, string>
 }
 export type PopulationstatisticsbycourseReqBody = never
 export type PopulationstatisticsbycourseParams = {
-  coursecodes: string
-  from: string
-  to: string
-  separate: string
-  unifyCourses: UnifyStatus
-  includeSubstitutions: string
+  courses: string | string[] | undefined
+  from: string | undefined
+  to: string | undefined
+  separate: string | undefined
+  unifyCourses: Unification | string | undefined
+  substitutions: string | undefined
 }
 
 // populationstatisticsbystudentnumbers
@@ -133,11 +120,3 @@ export type PopulationstatisticsStudyprogrammesResBody = Record<
   'allProgrammes' | 'filteredProgrammes',
   Record<string, Unarray<ProgrammeModuleWithRelevantAttributes[]>>
 >
-
-// populationstatistics/maxYearsToCreatePopulationFrom
-export type PopulationstatisticsMaxYearsToCreatePopulationFormResBody = {
-  openCourses: number
-  uniCourses: number
-  unifyCourses: number
-}
-export type PopulationstatisticsMaxYearsToCreatePopulationFormQuery = { courseCodes: string }

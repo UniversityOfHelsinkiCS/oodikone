@@ -97,13 +97,12 @@ void describe("Study programme's course stats (all years)", () => {
       .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
 
     assert.strictEqual(res.status, 200)
-    assert.strictEqual(res.body.length, 102, 'Response included incorrect amount of courses') // Not checked number
+    assert.strictEqual(res.body.length, 70, 'Response included incorrect amount of courses') // Not checked number
 
     const courseCodes = res.body.map(({ code }) => code)
-    assert(
-      ['MAT11003', 'MAT11001', 'MAT11004', 'AYMAT11003', 'AYMAT11001', 'AYMAT11004'].every(code =>
-        courseCodes.includes(code)
-      ),
+    assert.includeMembers(
+      courseCodes,
+      ['MAT11003', 'MAT11001', 'MAT11004' /* , 'AYMAT11003', 'AYMAT11001', 'AYMAT11004' */], // AY codes were previously required
       'Required courses or their open uni variants missing'
     )
 

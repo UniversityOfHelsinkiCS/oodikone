@@ -106,28 +106,29 @@ export const getTextInWithOpen = (
   return courseName
 }
 
-export const getUnifyTextIn = (unifyCourses: string) => {
+export const getUnifyTextIn = (unifyCourses?: string) => {
   switch (unifyCourses) {
     case 'regularStats':
-      return 'Normal'
+      return 'normal'
     case 'openStats':
-      return 'Open'
+      return 'open'
     case 'unifyStats':
-      return 'Open and normal'
+      return 'open and normal'
     default:
       return ''
   }
 }
 
-// Gives students course completion date
-export const getStudentToTargetCourseDateMap = (
-  students: Pick<FormattedStudent, 'studentNumber' | 'courses'>[],
-  codes: string[]
-) => {
-  const uniqueCourses = new Set(codes)
+export const getStudentToCourseCompletionDateTimeMap = (
+  students: Pick<FormattedStudent, 'studentNumber' | 'courses'>[] | undefined,
+  courseIds: string[] | undefined
+): Record<string, Date | null> => {
+  if (!students?.length || !courseIds?.length) return {}
+
+  const uniqueCourseIds = new Set(courseIds)
   return students.reduce((acc, student) => {
     const targetCourse = student.courses
-      .filter(course => uniqueCourses.has(course.course_code))
+      .filter(course => uniqueCourseIds.has(course.course_id))
       .sort((a, b) => +new Date(b.date) - +new Date(a.date))[0]
     acc[student.studentNumber] = targetCourse ? targetCourse.date : null
     return acc

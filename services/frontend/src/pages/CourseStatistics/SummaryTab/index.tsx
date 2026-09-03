@@ -9,7 +9,6 @@ import { AttemptsTable } from '@/pages/CourseStatistics/SummaryTab/AttemptsTable
 import { exportToExcel } from '@/pages/CourseStatistics/SummaryTab/export'
 import { ALL, CourseStatisticsSummary, CourseStudyProgramme } from '@/pages/CourseStatistics/util'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
-import { AttemptData } from '@/types/attemptData'
 import { DropdownOption } from '@/types/dropdownOption'
 import { getFullStudyProgrammeRights, hasAccessToAllCourseStats } from '@/util/access'
 
@@ -45,13 +44,14 @@ export const SummaryTab = ({
     setCourseSummaryFormProgrammes(selected)
   }
 
-  const data: AttemptData[] = statistics.map(stat => {
-    const { coursecode, name, realisations, summary } = stat
+  const data = statistics.map(stat => {
+    const { groupId, courseCode, name, realisations, summary } = stat
     const { passed, failed, passRate } = summary
 
     return {
-      id: coursecode,
-      category: getTextIn(name)!,
+      groupId,
+      courseCode,
+      category: getTextIn(name),
       passed,
       failed,
       passRate,

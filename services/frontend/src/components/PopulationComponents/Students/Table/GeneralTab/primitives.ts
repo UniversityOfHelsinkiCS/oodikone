@@ -70,7 +70,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
           if (
             (course.credittypecode === CreditTypeCode.PASSED || course.credittypecode === CreditTypeCode.APPROVED) &&
             new Date(course.date) < studyRightStart &&
-            primaryStudyplan?.included_courses.includes(course.course_code)
+            primaryStudyplan?.included_courses.includes(course.course_id)
           ) {
             creditCount += course.credits
             courseCount += 1
@@ -298,7 +298,7 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
         if (!primaryStudyplan) return null
 
         const courses = originalCourses.filter(
-          ({ course_code, passed }) => primaryStudyplan.included_courses.includes(course_code) && passed
+          ({ course_id, passed }) => primaryStudyplan.included_courses.includes(course_id) && passed
         )
 
         if (!courses.length) return null
@@ -334,10 +334,10 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
     : nullFunction
 
   const getCourseInformation = variantIsOneOf('coursePopulation')
-    ? ({ courses }: StudentBlob, from: string | undefined, to: string | undefined, coursecodes: string[]) => {
+    ? ({ courses }: StudentBlob, from: string | undefined, to: string | undefined, courseIds: string[]) => {
         if (!from || !to) return { grade: '-', attainmentDate: '', language: '' }
 
-        const validCourses = courses.filter(({ course_code }) => coursecodes.includes(course_code))
+        const validCourses = courses.filter(({ course_id }) => courseIds.includes(course_id))
         const grade = getHighestGradeOfCourseBetweenRange(validCourses, from, to)
         if (!grade) return { grade: '-', attainmentDate: '', language: '' }
 
@@ -351,11 +351,11 @@ export const useGeneratePrimitiveFunctions = (variant: Variant, allSemesters: Se
     : nullFunction
 
   const getEnrollmentDate = variantIsOneOf('coursePopulation')
-    ? ({ enrollments }: StudentBlob, fromSemester: number | null, toSemester: number | null, coursecodes: string[]) => {
+    ? ({ enrollments }: StudentBlob, fromSemester: number | null, toSemester: number | null, courseIds: string[]) => {
         if (!fromSemester || !toSemester || !enrollments?.length) return null
         return (
           enrollments
-            ?.filter(({ course_code }) => coursecodes.includes(course_code))
+            ?.filter(({ course_id }) => courseIds.includes(course_id))
             ?.filter(({ semestercode }) => fromSemester <= semestercode && semestercode <= toSemester)
             ?.shift()?.enrollment_date_time ?? null
         )

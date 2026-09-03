@@ -33,7 +33,7 @@ export const AttemptsTable = ({
           {data.map(course => (
             <FoldableRow
               courseData={course}
-              key={course.id}
+              key={course.groupId}
               onClickCourse={onClickCourse}
               userHasAccessToAllStats={userHasAccessToAllStats}
             />

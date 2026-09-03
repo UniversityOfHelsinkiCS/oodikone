@@ -1,5 +1,13 @@
 import { CreditTypeCode, type Name } from '@oodikone/shared/types'
-import type { Programme, FacultyYearStats, Grades, Group, Student } from '@oodikone/shared/types/courseYearlyStats'
+import type {
+  Programme,
+  FacultyYearStats,
+  Grades,
+  Group,
+  Student,
+  CourseStat,
+  Realisation,
+} from '@oodikone/shared/types/courseYearlyStats'
 import { getSemesterNamesByCode } from '../semesters'
 import type { OrganizationDetails } from './helpers'
 import { yearCodeToYear } from '@oodikone/shared/util'
@@ -215,7 +223,7 @@ export class CourseYearlyStatsCounter {
     })
   }
 
-  private async parseGroupStatistics(anonymizationSalt: string | null) {
+  private async parseGroupStatistics(anonymizationSalt: string | null): Promise<Realisation[]> {
     await this.insertEmptyRows()
     for (const [studentNumber, data] of this.students) {
       this.groups[data.code].students.studentNumbers.push(studentNumber)
@@ -230,8 +238,8 @@ export class CourseYearlyStatsCounter {
           coursecode: group.coursecode,
           attempts: {
             categories: {
-              failed: [] as string[],
-              passed: [] as string[],
+              failed: [],
+              passed: [],
             },
             grades: Object.keys(group.attempts.grades).reduce<Grades>((grades, grade) => {
               grades[grade] = []
@@ -240,8 +248,11 @@ export class CourseYearlyStatsCounter {
           },
           yearCode: group.yearCode,
           students: {
-            studentNumbers: [] as string[],
+            studentNumbers: [],
+            grades: {},
           },
+          allEnrollments: [],
+          enrollments: [],
         }
       }
 
@@ -293,7 +304,9 @@ export class CourseYearlyStatsCounter {
     return this.facultyStats
   }
 
-  public async getFinalStatistics(anonymizationSalt: string | null) {
+  public async getFinalStatistics(
+    anonymizationSalt: string | null
+  ): Promise<Pick<CourseStat, 'obfuscated' | 'statistics' | 'programmes' | 'facultyStats'>> {
     const statistics = await this.parseGroupStatistics(anonymizationSalt)
     const obfuscated = statistics.some(row => row.obfuscated)
 

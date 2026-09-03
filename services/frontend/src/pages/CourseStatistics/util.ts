@@ -1,9 +1,10 @@
 import type { CourseSearchState } from '@/pages/CourseStatistics'
-import { AvailableStats, CourseStat, Realisation } from '@/types/courseStat'
+import { SearchResultCourse } from '@/types/api/courses'
+import { AvailableStats } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
+import { CourseStat, Realisation, YearlyStatsByCourse } from '@oodikone/shared/types/courseYearlyStats'
 import { isSpring } from '@oodikone/shared/util'
 
-export type CourseStats = Record<string, { openStats: CourseStat; regularStats: CourseStat; unifyStats: CourseStat }>
 export type CourseStudyProgramme = {
   key: string
   value: string
@@ -12,10 +13,17 @@ export type CourseStudyProgramme = {
   students: Record<string, string[]>
 }
 export type CourseStatisticsSummary = {
-  coursecode: string
+  groupId: string
+  courseCode: string
   name: Name
   summary: { passed: number; failed: number; passRate: string | null }
-  realisations: { realisation: string; passed: number; failed: number; passRate: string | null; obfuscated?: boolean }[]
+  realisations: {
+    realisation: Name | string
+    passed: number
+    failed: number
+    passRate: string | null
+    obfuscated?: boolean
+  }[]
 }[]
 
 export const ALL = {
@@ -35,16 +43,16 @@ const MAX_YEAR = 2112
 const isPre2016Course = course => !Number.isNaN(Number(course.code.charAt(0)))
 const getYearText = (year: number, spring: boolean) => (spring ? `Spring ${year}` : `Fall ${year}`)
 
-export const getActiveYears = course => {
-  if (!course.min_attainment_date && !course.max_attainment_date) return 'No attainments yet'
+export const getActiveYears = (course: SearchResultCourse) => {
+  if (!(course.minAttainmentDate && course.maxAttainmentDate)) return 'No attainments yet'
 
-  const min_attainment_date = new Date(course.min_attainment_date)
-  const max_attainment_date = new Date(course.max_attainment_date)
+  const minAttainmentDate = new Date(course.minAttainmentDate)
+  const maxAttainmentDate = new Date(course.maxAttainmentDate)
 
-  const [startYear, endYear] = [min_attainment_date.getFullYear(), max_attainment_date.getFullYear()]
+  const [startYear, endYear] = [minAttainmentDate.getFullYear(), maxAttainmentDate.getFullYear()]
 
-  const startYearText = getYearText(startYear, isSpring(min_attainment_date))
-  const endYearText = getYearText(endYear, isSpring(max_attainment_date))
+  const startYearText = getYearText(startYear, isSpring(minAttainmentDate))
+  const endYearText = getYearText(endYear, isSpring(maxAttainmentDate))
 
   if (endYear === MAX_YEAR && isPre2016Course(course)) return `— ${getYearText(2016, false)}`
   else if (startYear === MIN_YEAR) return `— ${endYearText}`
@@ -61,13 +69,10 @@ export const formatPassRate = (passRate: string | null) => {
   return `${passRate} %`
 }
 
-export const getCourseStats = (
-  courseStats: CourseStats,
-  openOrRegular: CourseSearchState
-): Record<string, CourseStat> =>
-  Object.fromEntries(Object.entries(courseStats).map(([courseCode, value]) => [courseCode, value[openOrRegular]]))
+export const getCourseStats = (courseStats: YearlyStatsByCourse, openOrRegular: CourseSearchState) =>
+  Object.fromEntries(Object.entries(courseStats).map(([groupId, value]) => [groupId, value[openOrRegular]]))
 
-export const getAvailableStats = (courseStats: CourseStats): Record<string, AvailableStats> =>
+export const getAvailableStats = (courseStats: YearlyStatsByCourse): Record<string, AvailableStats> =>
   Object.fromEntries(
     Object.entries(courseStats).map(([courseCode, { unifyStats, openStats, regularStats }]) => [
       courseCode,
@@ -177,8 +182,9 @@ export const getSummaryStatistics = (
 
   const filterStudentFn = (studentNumber: string) => students.has(studentNumber)
 
-  return Object.entries(courseStats).map(([coursecode, { statistics, name }]) => ({
-    coursecode,
+  return Object.entries(courseStats).map(([groupId, { statistics, name, courseCode }]) => ({
+    groupId,
+    courseCode,
     name,
     summary: parseSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats),
     // No filters based on programmes can be applied, if the

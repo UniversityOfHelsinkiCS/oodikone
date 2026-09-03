@@ -5,7 +5,6 @@ import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import type { ReactNode } from 'react'
-import { useLocation, type Location } from 'react-router'
 
 import { PageTitle } from '@/components/common/PageTitle'
 import { FilterView } from '@/components/FilterView'
@@ -46,26 +45,23 @@ import type { PopulationQuery } from '@/types/populationSearch'
 
 import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
-import { parseQueryParams } from '@/util/queryparams'
+import { QueryParams, useParseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
-import { formatToArray } from '@oodikone/shared/util'
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 
-const parseQueryFromUrl = (location: Location): [boolean, PopulationQuery] => {
-  const skipQuery = !location.search
-  const { years, semesters, programme, studentStatuses, combinedProgramme, studyTrack, showBachelorAndMaster, tag } =
-    parseQueryParams(location.search)
+const parseQueryFromUrl = (params: QueryParams): [boolean, PopulationQuery] => {
+  const skipQuery = !Object.keys(params).length
 
   const dirtyQuery = {
-    years: formatToArray(years).map(year => parseInt(year, 10)),
-    semesters: semesters ? formatToArray(semesters) : ['FALL', 'SPRING'],
-    programme,
-    studentStatuses: studentStatuses ? formatToArray(studentStatuses) : [],
-    combinedProgramme,
-    studyTrack,
-    showBachelorAndMaster: showBachelorAndMaster === 'true',
-    tag,
+    years: (params.years ?? []).map(year => parseInt(year, 10)),
+    semesters: params.semesters ?? ['FALL', 'SPRING'],
+    programme: params.programme?.[0],
+    studentStatuses: params.studentStatuses ?? [],
+    combinedProgramme: params.combinedProgramme?.[0],
+    studyTrack: params.studyTrack?.[0],
+    showBachelorAndMaster: params.showBachelorAndMaster?.[0] === 'true',
+    tag: params.tag?.[0],
   }
 
   // Drop undefined fields from obj
@@ -157,9 +153,9 @@ const StudyTrackNames = () => {
 
 export const PopulationStatistics = () => {
   useTitle('Class statistics')
-  const location = useLocation()
 
-  const [skipQuery, query] = parseQueryFromUrl(location)
+  const params = useParseQueryParams()
+  const [skipQuery, query] = parseQueryFromUrl(params)
   const isSingleYear = query.years.length === 1
 
   const {
@@ -194,7 +190,7 @@ export const PopulationStatistics = () => {
   const filters: GenericFilter[] = [
     !useUserHasRestrictedAccess() ? ageFilter() : null,
     citizenshipFilter(),
-    courseFilter({ courses }),
+    courseFilter({ courses, idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {} }),
     creditDateFilter(),
     creditsEarnedFilter(),
     curriculumPeriodFilter(),
@@ -295,6 +291,7 @@ export const PopulationStatistics = () => {
             <PopulationDetails
               filteredCourses={filteredCourses}
               filteredStudents={filteredStudents}
+              idToGroupIdMap={population?.coursestatistics.idToGroupIdMap ?? {}}
               isLoading={isLoading}
               populationTags={populationTags}
               query={query}

@@ -10,8 +10,9 @@ import { PrimaryCourseLabel, SecondaryCourseLabel } from '@/pages/CourseStatisti
 import { CourseSelector } from '@/pages/CourseStatistics/CourseTab/CourseSelector'
 import { SingleCourseStats } from '@/pages/CourseStatistics/CourseTab/SingleCourseStats'
 import { CourseStudyProgramme } from '@/pages/CourseStatistics/util'
-import { AvailableStats, CourseStat } from '@/types/courseStat'
+import { AvailableStats } from '@/types/courseStat'
 import { Name } from '@oodikone/shared/types'
+import { CourseStat } from '@oodikone/shared/types/courseYearlyStats'
 
 export const CourseTab = ({
   selected,
@@ -23,9 +24,13 @@ export const CourseTab = ({
   openOrRegular,
   stats,
   availableStats,
-  combineSubstitutions,
-  alternatives,
+  substitutions,
+  substitutionGroups,
   programmes,
+  toYearCode,
+  fromYearCode,
+  setToYearCode,
+  setFromYearCode,
 }: {
   selected: string | undefined
   setSelected: (courseCode: string) => void
@@ -36,55 +41,73 @@ export const CourseTab = ({
   openOrRegular: CourseSearchState
   stats: Record<string, CourseStat>
   availableStats: AvailableStats
-  combineSubstitutions: boolean
-  alternatives: { code: string; name: Name }[][]
+  substitutions: boolean
+  substitutionGroups: { code: string; name: Name; groupId: string }[][]
   programmes: CourseStudyProgramme[]
+
+  toYearCode: number
+  fromYearCode: number
+  setToYearCode: any
+  setFromYearCode: any
 }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
   if (!selected || !stats[selected]) return null
 
-  const courses = Object.values(stats).map(({ name, coursecode: code }) => ({
+  const courses = Object.values(stats).map(({ name, courseCode: code, groupId }) => ({
     key: code,
     code,
-    name: getTextIn(name)!,
+    name: getTextIn(name),
+    groupId,
   }))
 
-  if (courses.length === 0) return null
+  if (!courses.length) return null
   const multipleCourses = courses.length > 1
 
   return (
-    <Stack>
+    <Stack spacing={2}>
       <Section title={multipleCourses ? 'Selected courses' : 'Selected course'}>
-        <Stack gap={2}>
+        <Stack spacing={2}>
           {multipleCourses ? <CourseSelector courses={courses} selected={selected} setSelected={setSelected} /> : null}
-          <Stack gap={1}>
+          <Stack spacing={1}>
             <Box>
-              <PrimaryCourseLabel code={selected} key={selected} name={getTextIn(stats[selected].name)!} />
+              <PrimaryCourseLabel
+                code={stats[selected].courseCode}
+                key={selected}
+                name={getTextIn(stats[selected].name)!}
+              />
             </Box>
-            {alternatives.length ? (
+            {substitutionGroups.length && (
               <>
                 <Typography component="h6" variant="subtitle2">
-                  Substitution groups
+                  {`Substitution${!substitutions ? 's not enabled' : ' groups'}`}
                 </Typography>
-                <Grid container spacing={1}>
-                  {alternatives.map(group => (
-                    <SecondaryCourseLabel getTextIn={getTextIn} group={group} key={JSON.stringify(group)} />
-                  ))}
-                </Grid>
+                {substitutions && (
+                  <Grid container spacing={1}>
+                    {substitutionGroups.map(group => (
+                      <SecondaryCourseLabel getTextIn={getTextIn} group={group} key={JSON.stringify(group)} />
+                    ))}
+                  </Grid>
+                )}
               </>
-            ) : null}
+            )}
           </Stack>
         </Stack>
       </Section>
       <SingleCourseStats
         availableStats={availableStats}
-        combineSubstitutions={combineSubstitutions}
-        coursecode={selected}
+        substitutions={substitutions}
+        courseGroupId={selected}
         loading={loading}
+        stats={stats}
         openOrRegular={openOrRegular}
         programmes={programmes}
         toggleOpenAndRegularCourses={toggleOpenAndRegularCourses}
         userHasAccessToAllStats={userHasAccessToAllStats}
+        toYearCode={toYearCode}
+        fromYearCode={fromYearCode}
+        setToYearCode={setToYearCode}
+        setFromYearCode={setFromYearCode}
       />
     </Stack>
   )

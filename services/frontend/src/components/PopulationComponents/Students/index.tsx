@@ -15,7 +15,7 @@ import { ProgressTable as ProgressTab } from '@/components/PopulationComponents/
 import { TagsTab } from '@/components/PopulationComponents/Students/Table/TagsTab'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
-import { parseQueryParams } from '@/util/queryparams'
+import { useParseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { FormattedStudent } from '@oodikone/shared/types'
 
@@ -31,6 +31,7 @@ type PopulationDetails = CommonProps & {
   combinedProgramme?: string
   curriculum: ExtendedCurriculumDetails | null
   filteredCourses: FilteredCourse[]
+  idToGroupIdMap: Record<string, string>
 }
 
 type CoursePopulation = CommonProps & {
@@ -43,6 +44,7 @@ type StudyGuidanceGroup = CommonProps & {
   studyGuidanceGroup: any
   year: string
   filteredCourses: FilteredCourse[]
+  idToGroupIdMap: Record<string, string>
 }
 
 type CustomPopulation = CommonProps & {
@@ -64,6 +66,7 @@ export const PopulationStudents = ({
   curriculum,
   filteredStudents,
   filteredCourses,
+  idToGroupIdMap,
   dataExport,
   studyGuidanceGroup,
   generalTabColumnFunction,
@@ -74,9 +77,10 @@ export const PopulationStudents = ({
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
-  const { years } = parseQueryParams(location.search)
+  const { years: stringYears } = useParseQueryParams()
+  const years = stringYears?.map(Number) ?? []
   const months = years
-    ? dayjs().diff(dayjs(`${Math.min(years)}-08-01`), 'months')
+    ? dayjs().diff(dayjs(`${Math.min(...years)}-08-01`), 'months')
     : studyGuidanceGroup?.tags?.year
       ? dayjs().diff(dayjs(`${studyGuidanceGroup?.tags?.year}-08-01`), 'months')
       : undefined
@@ -98,10 +102,18 @@ export const PopulationStudents = ({
       <CoursesTab
         courses={filteredCourses ?? []}
         curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
+        idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
       />
     ),
-    Modules: <ModulesTab curriculum={curriculum} students={filteredStudents} />,
+    Modules: (
+      <ModulesTab
+        courses={filteredCourses ?? []}
+        curriculum={curriculum}
+        idToGroupIdMap={idToGroupIdMap ?? {}}
+        students={filteredStudents}
+      />
+    ),
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: (
       <ProgressTab

@@ -35,7 +35,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
   const noStudentsMsg = "This study guidance group doesn't contain any students."
 
   if (!group) {
-    return <StyledMessage>{noGroupMsg}</StyledMessage>
+    return <StyledMessage sx={{ my: 2 }}>{noGroupMsg}</StyledMessage>
   }
   if (!groupStudentNumbers.length) {
     return <StyledMessage>{noStudentsMsg}</StyledMessage>
@@ -94,6 +94,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             group={group}
+            idToGroupIdMap={population?.coursestatistics.idToGroupIdMap ?? {}}
           />
         </>
       )}

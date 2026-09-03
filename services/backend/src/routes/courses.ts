@@ -8,8 +8,9 @@ import {
   CoursesMultiQuery,
   CourseYearlyStatsReqBody,
   CourseYearlyStatsQuery,
+  CourseDetails,
+  CourseDetailsQuery,
 } from '@oodikone/shared/routes/courses'
-import type { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 import { getCourseDetails, getCourseYearlyStats } from '../services/courses'
 import { getCoursesByNameAndOrCode } from '../services/courses/courseFinders'
 import {
@@ -18,49 +19,31 @@ import {
   hasFullAccessToStudentData,
   validateParamLength,
 } from '../util'
+import { CourseYearlyStats } from '@oodikone/shared/types/courseYearlyStats'
 
 const router = Router()
 
 router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMultiQuery>(
   '/coursesmulti',
   async (req, res) => {
-    const { name, code, includeSpecial } = req.query
+    const { name, code } = req.query
     if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
       return res.status(400).json({ error: 'Query parameter name or code is invalid' })
     }
 
-    const courses = await getCoursesByNameAndOrCode(name, code, includeSpecial === 'true')
-
-    const mergedCourses = new Map<string, CourseWithSubsDetails>()
-
-    for (const course of courses) {
-      if (!(course.max_attainment_date && course.min_attainment_date)) continue
-
-      if (!mergedCourses.has(course.code)) mergedCourses.set(course.code, structuredClone(course))
-      const mergedCourse = mergedCourses.get(course.code)!
-
-      if (mergedCourse.max_attainment_date < course.max_attainment_date) {
-        mergedCourse.max_attainment_date = course.max_attainment_date
-      }
-      if (mergedCourse.min_attainment_date > course.min_attainment_date) {
-        mergedCourse.min_attainment_date = course.min_attainment_date
-      }
-    }
-
-    res.json({ courses: Array.from(mergedCourses.values()) })
+    const courses = await getCoursesByNameAndOrCode(name, code)
+    res.json({ courses }).end()
   }
 )
 
-export type CourseYearlyStatsResBody = Awaited<ReturnType<typeof getCourseYearlyStats>>
+export type CourseYearlyStatsResBody = CourseYearlyStats[]
 
 router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, CourseYearlyStatsQuery>(
   '/courseyearlystats',
   async (req, res) => {
-    const { codes, combineSubstitutions, separate, fromYearCode, toYearCode } = req.query
+    const { courses, substitutions, separate, fromYearCode, toYearCode } = req.query
 
-    const courseCodes = handleQueryArrays(codes)
-
-    if (!courseCodes?.length) {
+    if (!courses?.length) {
       return res.status(422).send({ error: 'Missing required query parameters' })
     }
 
@@ -79,14 +62,13 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
     const anonymize = !userHasFullAccessToStudentData && fullStudyProgrammeRights.length === 0
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
 
-    const useCombineSubstitutions = combineSubstitutions !== 'false'
     const useSeparate = separate === 'true'
 
     const results = await getCourseYearlyStats(
-      courseCodes,
+      handleQueryArrays(courses),
       useSeparate,
       anonymizationSalt,
-      useCombineSubstitutions,
+      substitutions === 'true',
       fromYearCode,
       toYearCode
     )
@@ -94,12 +76,12 @@ router.get<never, CanError<CourseYearlyStatsResBody>, CourseYearlyStatsReqBody, 
   }
 )
 
-router.get<never, CanError<unknown>, never, { codes: string | string[] }>('/coursedetails', async (req, res) => {
-  const { codes: coursecodes } = req.query
-  const codes = handleQueryArrays(coursecodes)
+router.get<never, CanError<CourseDetails>, never, CourseDetailsQuery>('/coursedetails', async (req, res) => {
+  const { courses } = req.query
+  const courseIds = handleQueryArrays(courses)
 
-  if (!codes?.length) return res.status(500).end()
-  const details = await getCourseDetails(codes)
+  if (!courseIds.length) return res.status(422).send({ error: 'Missing required parameters' })
+  const details = await getCourseDetails(courseIds)
 
   return res.json(details)
 })

@@ -1,6 +1,7 @@
 import { describe, it, assert } from 'vitest'
 
 import { CreditTypeCode } from '@oodikone/shared/types'
+import { Credit } from '@oodikone/shared/models'
 import { createCredit as credit, createStudyRightElementModel } from '@oodikone/shared/test/utils'
 import { parseCredit } from '@/services/courses'
 import { SISStudyRightElementModel } from '@/models'
@@ -30,7 +31,10 @@ void describe('parseCredit', () => {
 
   it('should combine a substitution group into one credit with summed credits', () => {
     const res = parseCredit(
-      [credit({ course_code: 'MAT11002', credits: 5 }), credit({ course_code: 'MAT21001', credits: 5 })],
+      [
+        credit({ course_code: 'MAT11002', course: { groupId: 'hy-CU-117375394' } as Credit['course'], credits: 5 }),
+        credit({ course_code: 'MAT21001', course: { groupId: 'hy-CU-117375754' } as Credit['course'], credits: 5 }),
+      ],
       null,
       'MAT11002',
       [studyRightElement()]

@@ -24,7 +24,8 @@ const findThesisAndLatestAndEarliestAttainments = (
   studyPlan: Studyplan,
   attainments: Credit[],
   degreeProgrammeType: DegreeProgrammeType,
-  studyRightId: string
+  studyRightId: string,
+  idToGroupIdMap: Record<string, string>
 ) => {
   let thesisData: Credit | undefined
   const attainmentDates: AttainmentDates = {}
@@ -32,16 +33,19 @@ const findThesisAndLatestAndEarliestAttainments = (
     [DegreeProgrammeType.BACHELOR]: 'urn:code:course-unit-type:bachelors-thesis',
     [DegreeProgrammeType.MASTER]: 'urn:code:course-unit-type:masters-thesis',
   }
+  const includedCourseGroupIds = new Set(
+    studyPlan.included_courses.map(id => idToGroupIdMap[id]).filter((groupId): groupId is string => !!groupId)
+  )
 
   for (const attainment of attainments) {
     if (
-      attainment.course?.course_unit_type === thesisCodes[degreeProgrammeType] &&
+      attainment.course?.courseUnitType === thesisCodes[degreeProgrammeType] &&
       attainment.studyright_id === studyRightId
     ) {
       thesisData = attainment
     }
     attainmentDates.latestTotal ??= attainment.attainment_date
-    if (studyPlan.included_courses.includes(attainment.course?.code)) {
+    if (attainment.course?.groupId && includedCourseGroupIds.has(attainment.course.groupId)) {
       attainmentDates.latestHops ??= attainment.attainment_date
       if (
         !attainmentDates.earliestHops ||
@@ -55,7 +59,12 @@ const findThesisAndLatestAndEarliestAttainments = (
   return { attainmentDates, thesisData }
 }
 
-const formatStudent = (student: Student, facultyMap: Record<string, Name>, currentSemesterCode: number) => {
+const formatStudent = (
+  student: Student,
+  facultyMap: Record<string, Name>,
+  currentSemesterCode: number,
+  idToGroupIdMap: Record<string, string>
+) => {
   const {
     studentnumber: studentNumber,
     abbreviatedname: name,
@@ -101,7 +110,8 @@ const formatStudent = (student: Student, facultyMap: Record<string, Name>, curre
       studyPlan,
       student.credits,
       degreeProgrammeType,
-      studyRightId
+      studyRightId,
+      idToGroupIdMap
     )
 
     acc.push({
@@ -230,12 +240,12 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
         },
         {
           model: CreditModel,
-          attributes: ['attainment_date', 'grade', 'studyright_id'],
+          attributes: ['attainment_date', 'grade', 'studyright_id', 'course_id'],
           where: { credittypecode: CreditTypeCode.PASSED },
           include: [
             {
               model: CourseModel,
-              attributes: ['code', 'course_unit_type'],
+              attributes: ['code', 'course_unit_type', 'groupId'],
             },
           ],
         },
@@ -264,10 +274,20 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
     facultyMap[programme.code] = programme['organization.name']
   }
 
+  const includedCourseIds = [
+    ...new Set(students.flatMap(student => student.studyplans.flatMap(sp => sp.included_courses))),
+  ]
+  const includedCourses = await CourseModel.findAll({
+    attributes: ['id', 'groupId'],
+    where: { id: { [Op.in]: includedCourseIds } },
+    raw: true,
+  })
+  const idToGroupIdMap = Object.fromEntries(includedCourses.map(({ id, groupId }) => [id, groupId]))
+
   const { semestercode: currentSemesterCode } = await getCurrentSemester()
 
   return students
-    .flatMap(student => formatStudent(student, facultyMap, currentSemesterCode))
+    .flatMap(student => formatStudent(student, facultyMap, currentSemesterCode, idToGroupIdMap))
     .reduce(
       (acc, student) => {
         if (student.programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {

@@ -5,6 +5,8 @@ import { yearToYearCode } from '@oodikone/shared/util'
 import { initTests } from '../../../../utils'
 import { calculatePassedAndFailed, getCourseYearlyStats, CourseYearlyStats } from '../helpers'
 
+const TKT10002 = 'hy-CU-118023867'
+
 void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
   let app: Express
   beforeAll(async () => {
@@ -16,19 +18,19 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     beforeAll(async () => {
       body = await getCourseYearlyStats(
         app,
-        `codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
+        `courses=${TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(2016)}&toYearCode=${yearToYearCode(2023)}`
       )
     })
 
     it('has one entry per statistic year', () => {
-      assert.strictEqual(body.unifyStats!.statistics.length, 8, 'unifyStats years')
-      assert.strictEqual(body.regularStats!.statistics.length, 8, 'regularStats years')
-      assert.strictEqual(body.openStats!.statistics.length, 4, 'openStats years')
+      assert.strictEqual(body.unifyStats.statistics.length, 8, 'unifyStats years')
+      assert.strictEqual(body.regularStats.statistics.length, 8, 'regularStats years')
+      assert.strictEqual(body.openStats.statistics.length, 4, 'openStats years')
 
       // Faculties should have the same amount of years as normal statistics (above)
-      assert.strictEqual(Object.keys(body.unifyStats!.facultyStats).length, 8, 'unifyStats years')
-      assert.strictEqual(Object.keys(body.regularStats!.facultyStats).length, 8, 'regularStats years')
-      assert.strictEqual(Object.keys(body.openStats!.facultyStats).length, 4, 'openStats years')
+      assert.strictEqual(Object.keys(body.unifyStats.facultyStats).length, 8, 'unifyStats years')
+      assert.strictEqual(Object.keys(body.regularStats.facultyStats).length, 8, 'regularStats years')
+      assert.strictEqual(Object.keys(body.openStats.facultyStats).length, 4, 'openStats years')
     })
 
     // TODO: Rewrite /courseyearlystats so that total = passed + failed + enrolledNoGrade
@@ -76,7 +78,7 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
         { 5: 1, 4: 0, 3: 0, 2: 0, 1: 0, 0: 0, 'Hyv.': 0 },
       ],
     ])('for statistic content during ($0)', (year, categories, grades) => {
-      const stats = body.unifyStats!.statistics.find(yearStats => yearStats.name === year)!
+      const stats = body.unifyStats.statistics.find(yearStats => yearStats.name === year)!
       assert('enrollments' in stats, 'Missing field enrollment in statsitics')
 
       const studentCategories = calculatePassedAndFailed(stats.students.grades)
@@ -115,24 +117,18 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     })
 
     it('should include students who have failed a course and then completed it only once', () => {
-      const stats2017 = body.unifyStats!.statistics.find(year => year.name === '2017-2018')!
+      const stats2017 = body.unifyStats.statistics.find(year => year.name === '2017-2018')!
       const { studentNumbers } = stats2017.students
-
-      assert(
-        !(
-          (
-            '457686' in studentNumbers || // SPRING 2019
-            '455478' in studentNumbers || // FALL 2020
-            '547994' in studentNumbers
-          ) // FALL 2022
-        ),
+      assert.notIncludeMembers(
+        studentNumbers,
+        ['457686' /* SPRING 2019*/, '455478' /* FALL 2020 */, '547994' /* FALL 2022*/],
         "Students that have completed course later should not be included in the previous year's stats"
       )
 
-      const year2017 = body.unifyStats!.statistics.find(year => year.name === '2017-2018')
-      const year2018 = body.unifyStats!.statistics.find(year => year.name === '2018-2019')
-      const year2020 = body.unifyStats!.statistics.find(year => year.name === '2020-2021')
-      const year2022 = body.unifyStats!.statistics.find(year => year.name === '2022-2023')
+      const year2017 = body.unifyStats.statistics.find(year => year.name === '2017-2018')
+      const year2018 = body.unifyStats.statistics.find(year => year.name === '2018-2019')
+      const year2020 = body.unifyStats.statistics.find(year => year.name === '2020-2021')
+      const year2022 = body.unifyStats.statistics.find(year => year.name === '2022-2023')
       assert(year2017 && 'enrollments' in year2017, 'Missing stats for 2017-2018')
       assert(year2018 && 'enrollments' in year2018, 'Missing stats for 2018-2019')
       assert(year2020 && 'enrollments' in year2020, 'Missing stats for 2020-2021')
@@ -172,8 +168,8 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     })
 
     it("should mark student's enrollment time correctly with mismatched semestercode and enrollment_date_time", () => {
-      const stats2021 = body.unifyStats!.statistics.find(year => year.name === '2021-2022')!
-      const stats2022 = body.unifyStats!.statistics.find(year => year.name === '2022-2023')!
+      const stats2021 = body.unifyStats.statistics.find(year => year.name === '2021-2022')!
+      const stats2022 = body.unifyStats.statistics.find(year => year.name === '2022-2023')!
       assert('enrollments' in stats2021, 'Missing field enrollment in statsitics (2021)')
       assert('enrollments' in stats2022, 'Missing field enrollment in statsitics (2022)')
       // Student with enrollment_date_time outside of semestert start and end dates
@@ -238,9 +234,9 @@ void describe('Course yearly statistics - TKT10002 (no substitutions)', () => {
     ])('should include correct stats for one academic year ($0)', async (year, categories, grades) => {
       const body = await getCourseYearlyStats(
         app,
-        `codes=TKT10002&combineSubstitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0))}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
+        `courses=${TKT10002}&substitutions=false&fromYearCode=${yearToYearCode(year.split('-').at(0))}&toYearCode=${yearToYearCode(parseInt(year.split('-').at(1)!)) - 1}`
       )
-      const stats = body.unifyStats!.statistics.find(yearStats => yearStats.name === year)!
+      const stats = body.unifyStats.statistics.find(yearStats => yearStats.name === year)!
       assert('enrollments' in stats, 'Missing field enrollment in statsitics')
 
       const studentCategories = calculatePassedAndFailed(stats.students.grades)

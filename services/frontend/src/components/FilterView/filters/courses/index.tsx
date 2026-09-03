@@ -13,8 +13,9 @@ type Options = {
   courses: Record<string, CourseStats>
   substitutedBy: Record<string, string[][]>
   includeSubstitutions: boolean
+  idToGroupIdMap: Record<string, string>
 }
-type Args = { courses: CourseStats[]; includeSubstitutions?: boolean }
+type Args = { courses: CourseStats[]; includeSubstitutions?: boolean; idToGroupIdMap: Record<string, string> }
 type Precompute = any
 
 const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
@@ -24,18 +25,18 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options,
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
-    .filter(cs => !courseFilters[cs.code])
+    .filter(cs => !courseFilters[cs.groupId])
     .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
     .map(cs => ({
-      key: `courseFilter-option-${cs.code}`,
+      key: `courseFilter-option-${cs.groupId}`,
       text: `${cs.code} - ${getTextIn(cs.name)}`,
-      value: cs.code,
+      value: cs.groupId,
     }))
 
-  const setCourseFilter = (code: string, type: FTValue | null) => {
+  const setCourseFilter = (groupId: string, type: FTValue | null) => {
     const newOpts = structuredClone(options)
-    if (type === null) delete newOpts.courseFilters[code]
-    else newOpts.courseFilters[code] = type
+    if (type === null) delete newOpts.courseFilters[groupId]
+    else newOpts.courseFilters[groupId] = type
 
     onOptionsChange(newOpts)
   }
@@ -49,12 +50,13 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options,
         options={dropdownOptions}
         value={null}
       />
-      {Object.entries(courseFilters).map(([code, type]) => (
+      {Object.entries(courseFilters).map(([groupId, type]) => (
         <CourseCard
-          course={courseStats[code]}
+          course={courseStats[groupId]}
+          courses={courseStats}
           filterType={type}
-          key={`courseFilter-selected-course-${code}`}
-          onChange={type => setCourseFilter(code, type as FTValue)}
+          key={`courseFilter-selected-course-${groupId}`}
+          onChange={type => setCourseFilter(groupId, type as FTValue)}
         />
       ))}
     </>
@@ -71,25 +73,27 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     courses: {},
     substitutedBy: {},
     includeSubstitutions: true,
+    idToGroupIdMap: {},
   },
 
   precompute: ({
     args,
     options,
   }: {
-    args: { courses: CourseStats[]; includeSubstitutions?: boolean }
+    args: Args
     options: {
       courses?: Record<string, CourseStats>
       substitutedBy?: Record<string, string[][]>
       includeSubstitutions?: boolean
+      idToGroupIdMap?: Record<string, string>
     }
   }) => {
     const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
-      const { code, substitution_groups } = course
-      if (substitution_groups) {
-        for (const group of substitution_groups) {
-          acc[code] ??= []
-          acc[code].push(group)
+      const { groupId, substitutionGroups } = course
+      if (substitutionGroups) {
+        for (const group of substitutionGroups) {
+          acc[groupId] ??= []
+          acc[groupId].push(group)
         }
       }
 
@@ -98,34 +102,42 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
     /* option.courses maybe frozen even when it should be used only within the scope of createFilter factory. */ {
       delete options.courses
-      options.courses = Object.fromEntries(args.courses.map(course => [course.code, course]))
+      options.courses = Object.fromEntries(args.courses.map(course => [course.groupId, course]))
     }
 
     options.includeSubstitutions = args.includeSubstitutions ?? true
     options.substitutedBy = substitutedBy
+    options.idToGroupIdMap = args.idToGroupIdMap
   },
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
   filter(student: FormattedStudent, { options }) {
     const { courses, enrollments } = student
-    const passedCoursesCodes = courses
-      .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
-      .map(({ course_code }) => course_code)
-    const courseCodes = courses.map(({ course_code }) => course_code)
-    const enrollmentCodes = enrollments.map(({ course_code }) => course_code)
-    for (const [mainCode, filterType] of Object.entries(options.courseFilters)) {
+    const toGroupIds = (courseIds: string[]) => courseIds.map(id => options.idToGroupIdMap[id]).filter(Boolean)
+
+    const passedCourseGroupIds = toGroupIds(
+      courses
+        .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
+        .map(({ course_id }) => course_id)
+    )
+
+    const courseGroupIds = toGroupIds(courses.map(({ course_id }) => course_id))
+    const enrollmentGroupIds = toGroupIds(enrollments.map(({ course_id }) => course_id))
+
+    for (const [mainGroupId, filterType] of Object.entries(options.courseFilters)) {
       let foundPassed = false
       let foundAttainment = false
       let foundEnrollment = false
 
-      void [[mainCode], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainCode] ?? []) : [])].forEach(
-        group => {
-          foundPassed = foundPassed ? true : group.every(code => passedCoursesCodes.includes(code))
-          foundAttainment = foundAttainment ? true : group.every(code => courseCodes.includes(code))
-          foundEnrollment = foundEnrollment ? true : group.every(code => enrollmentCodes.includes(code))
-        }
-      )
+      ;[
+        [mainGroupId],
+        ...(options.includeSubstitutions ? (options.substitutedBy?.[mainGroupId] ?? []) : []),
+      ].forEach(group => {
+        foundPassed = foundPassed ? true : group.every(groupId => passedCourseGroupIds.includes(groupId))
+        foundAttainment = foundAttainment ? true : group.every(groupId => courseGroupIds.includes(groupId))
+        foundEnrollment = foundEnrollment ? true : group.every(groupId => enrollmentGroupIds.includes(groupId))
+      })
 
       switch (filterType) {
         case FilterType.ALL:
@@ -148,16 +160,16 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
   selectors: {
     // NOTE: Remember FilterType.ALL === 0 when checking if courseFilters[course] exists
-    isCourseSelected: ({ courseFilters }, course) => Object.values(FilterType).includes(courseFilters[course]),
-    selectedCourseName: ({ courses }, courseCodes) => courses[courseCodes[0]]?.name,
+    isCourseSelected: ({ courseFilters }, courseGroupId) => Object.values(FilterType).includes(courseFilters[courseGroupId]),
+    selectedCourseName: ({ courses }, courseGroupIds) => courses[courseGroupIds[0]]?.name,
   },
 
   actions: {
-    toggleCourseSelection: (options, code: string) => {
-      if (!Object.values(FilterType).includes(options.courseFilters[code])) {
-        options.courseFilters[code] = FilterType.ALL
+    toggleCourseSelection: (options, groupId: string) => {
+      if (!Object.values(FilterType).includes(options.courseFilters[groupId])) {
+        options.courseFilters[groupId] = FilterType.ALL
       } else {
-        delete options.courseFilters[code]
+        delete options.courseFilters[groupId]
       }
 
       return options

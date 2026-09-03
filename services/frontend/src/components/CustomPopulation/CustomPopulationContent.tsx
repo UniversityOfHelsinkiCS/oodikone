@@ -55,7 +55,7 @@ export const CustomPopulationContent = ({
 
   useEffect(() => {
     setStudentAmountLimit(Math.round(filteredStudents.length ? filteredStudents.length * 0.3 : 0))
-  }, [filteredStudents.length])
+  }, [filteredStudents.length, setStudentAmountLimit])
 
   const onStudentAmountLimitChange = value => {
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
@@ -123,7 +123,7 @@ export const CustomPopulationContent = ({
               showBachelorAndMaster: false,
               includePrimaryProgramme: false,
 
-              coursecodes: [],
+              courseIds: [],
               from: undefined,
               to: undefined,
             })
