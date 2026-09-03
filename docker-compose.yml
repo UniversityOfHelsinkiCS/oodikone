@@ -19,7 +19,7 @@ services:
     container_name: oodikone-adminer
     environment:
       ADMINER_DESIGN: pepa-linha
-    image: adminer:4.8.1
+    image: adminer:5.5.1
     ports:
       - 5050:8080
     volumes:
