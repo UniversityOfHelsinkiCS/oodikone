@@ -175,6 +175,27 @@ init_database_menu () {
 
 
 # === RUN ===
+
+# For running as non-interactive CI-mode
+# $1: Command to be run
+# $2: Database name
+case "$1" in
+ "local")
+   if [ "$#" -lt 2 ]; then echo "Missing database name"; exit 1; fi
+   dump_local_db "$2"
+   build_and_push_image "$2"
+   exit 0;;
+
+ # TODO: NOT YET IMPLEMENTED, should use s3 storage
+ "ci")
+   exit 1
+   # if [ "$#" -lt 2 ]; then echo "Missing database name"; exit 1; fi
+   # download_s3_db "$2"
+   # build_and_push_image "$2"
+   # exit 0;;
+esac
+
+# For interactive running
 while true; do
   init_mode_menu
   select mode in "${options[@]}"; do
