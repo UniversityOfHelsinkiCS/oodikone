@@ -3,7 +3,8 @@ import { Name } from '@oodikone/shared/types'
 export type AttemptData = {
   category: string | null | undefined
   failed: number
-  id: string
+  courseCode: string
+  groupId: string
   passed: number
   passRate: string | null
   realisations: {

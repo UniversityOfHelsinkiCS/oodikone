@@ -13,7 +13,8 @@ export type CourseStudyProgramme = {
   students: Record<string, string[]>
 }
 export type CourseStatisticsSummary = {
-  coursecode: string
+  groupId: string
+  courseCode: string
   name: Name
   summary: { passed: number; failed: number; passRate: string | null }
   realisations: {
@@ -181,8 +182,9 @@ export const getSummaryStatistics = (
 
   const filterStudentFn = (studentNumber: string) => students.has(studentNumber)
 
-  return Object.entries(courseStats).map(([coursecode, { statistics, name }]) => ({
-    coursecode,
+  return Object.entries(courseStats).map(([groupId, { statistics, name, courseCode }]) => ({
+    groupId,
+    courseCode,
     name,
     summary: parseSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats),
     // No filters based on programmes can be applied, if the
