@@ -64,6 +64,16 @@ const clickAway = async (page: Page) => {
   await page.locator('body').click({ position: { x: 0, y: 0 } })
 }
 
+const TKT20003 = { code: 'TKT20003', groupId: 'hy-CU-118024775' }
+const TKT20001 = { code: 'TKT20001', groupId: 'hy-CU-118024656' }
+const TKT10002 = { code: 'TKT10002', groupId: 'hy-CU-118023867' }
+const KK_RUKIRJ = { code: 'KK-RUKIRJ', groupId: 'hy-CU-117995649' }
+const course50131 = { code: '50131', groupId: 'hy-CU-2014787' }
+const course200012 = { code: '200012', groupId: 'hy-CU-53928369' }
+const BSCS1001 = { code: 'BSCS1001', groupId: 'hy-CU-128548227' }
+const BSCS1003 = { code: 'BSCS1003', groupId: 'hy-CU-128550261' }
+const TKT10004 = { code: 'TKT10004', groupId: 'hy-CU-118023990' }
+
 test.describe('Basic user', () => {
   test.beforeEach(async ({ page }) => {
     await init(page, '/coursestatistics')
@@ -71,38 +81,35 @@ test.describe('Basic user', () => {
   })
 
   test('Search should work on consecutive searches', async ({ page }) => {
-    const courseCode1 = 'TKT20003'
-    await searchByCourseCode(page, courseCode1)
-    await page.getByTestId(`course-${courseCode1}`).click()
+    await searchByCourseCode(page, TKT20003.code)
+    await page.getByTestId(`course-${TKT20003.code}`).click()
 
-    await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([courseCode1]))
+    await expect(page).toHaveURL(url => url.searchParams.get('courses') === TKT20003.groupId)
 
     await expect(page.getByRole('button', { name: 'Show population' })).toBeEnabled()
     await page.getByRole('button', { name: 'Show population' }).click()
 
-    await expect(page.getByRole('heading', { name: courseCode1 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: TKT20003.code })).toBeVisible()
 
     await page.getByTestId('nav-bar-button-courseStatistics').click()
 
-    const courseCode2 = 'TKT20001'
-    await searchByCourseCode(page, courseCode2)
-    await page.getByTestId(`course-${courseCode2}`).click()
+    await searchByCourseCode(page, TKT20001.code)
+    await page.getByTestId(`course-${TKT20001.code}`).click()
 
-    await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([courseCode2]))
+    await expect(page).toHaveURL(url => url.searchParams.get('courses') === TKT20001.groupId)
 
     await expect(page.getByRole('button', { name: 'Show population' })).toBeEnabled()
     await page.getByRole('button', { name: 'Show population' }).click()
 
-    await expect(page.getByText(courseCode2, { exact: true })).toBeVisible()
+    await expect(page.getByText(TKT20001.code, { exact: true })).toBeVisible()
   })
 
   test.describe('Course table can show non-standard grades', () => {
     test('Course table can show HT-TT grade scales', async ({ page }) => {
-      const coursecode = 'KK-RUKIRJ'
-      await searchByCourseCode(page, coursecode)
-      await page.getByTestId(`course-${coursecode}`).click()
+      await searchByCourseCode(page, KK_RUKIRJ.code)
+      await page.getByTestId(`course-${KK_RUKIRJ.code}`).click()
 
-      await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([coursecode]))
+      await expect(page).toHaveURL(url => url.searchParams.get('courses') === KK_RUKIRJ.groupId)
 
       await selectFromYear(page, '2019-2020')
       await expect(page.getByRole('button', { name: 'Show population' })).toBeEnabled()
@@ -117,11 +124,10 @@ test.describe('Basic user', () => {
     })
 
     test("Course table can show old master's thesis grade scales", async ({ page }) => {
-      const coursecode = '50131'
-      await searchByCourseCode(page, coursecode)
-      await page.getByTestId(`course-${coursecode}`).click()
+      await searchByCourseCode(page, course50131.code)
+      await page.getByTestId(`course-${course50131.code}`).click()
 
-      await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([coursecode]))
+      await expect(page).toHaveURL(url => url.searchParams.get('courses') === course50131.groupId)
 
       await expect(page.getByText('Pro gradu -tutkielma tietojenkäsittelytieteessä')).toBeVisible() // 50131
 
@@ -130,7 +136,7 @@ test.describe('Basic user', () => {
 
       await expect(page.getByText('Pro gradu -tutkielma tietojenkäsittelytieteessä')).toBeVisible()
       await expect(page.getByText('Class of 2007-2020, 10 students')).toBeVisible()
-      await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+      await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
       await expect(page.getByText('Showing 10 out of 10 students')).toBeVisible()
 
       const gradesTableContents = [
@@ -143,11 +149,10 @@ test.describe('Basic user', () => {
     })
 
     test('Shows correct statistics for courses with scale passed-failed', async ({ page }) => {
-      const coursecode = '200012'
-      await searchByCourseCode(page, coursecode)
-      await page.getByTestId(`course-${coursecode}`).click()
+      await searchByCourseCode(page, course200012.code)
+      await page.getByTestId(`course-${course200012.code}`).click()
 
-      await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([coursecode]))
+      await expect(page).toHaveURL(url => url.searchParams.get('courses') === course200012.groupId)
 
       await expect(page.getByText('ON-310')).toBeVisible() // Tieteellisen kirjoittamisen seminaarin alkuopetus: Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot
       await expect(page.getByText('200012')).toBeVisible() // Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot
@@ -157,7 +162,7 @@ test.describe('Basic user', () => {
 
       await expect(page.getByText('Tieteellisen kirjallisen työn ja tiedonhankinnan perustaidot')).toBeVisible()
       await expect(page.getByText('Class of 2011-2018, 4 students')).toBeVisible()
-      await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+      await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
       await expect(page.getByText('Showing 4 out of 4 students')).toBeVisible()
 
       const gradesTableContents = [
@@ -170,11 +175,10 @@ test.describe('Basic user', () => {
 
   test.describe('Course mappings work', () => {
     test('Searching single course having substitution mappings shows course statistics', async ({ page }) => {
-      const coursecode = 'TKT20001'
-      await searchByCourseCode(page, coursecode)
-      await page.getByTestId(`course-${coursecode}`).click()
+      await searchByCourseCode(page, TKT20001.code)
+      await page.getByTestId(`course-${TKT20001.code}`).click()
 
-      await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([coursecode]))
+      await expect(page).toHaveURL(url => url.searchParams.get('courses') === TKT20001.groupId)
 
       await expect(page.getByText('Tietorakenteet ja algoritmit', { exact: true })).toBeVisible() // The old 10credit variant
       await expect(page.getByText('TKT20001', { exact: true })).toBeVisible()
@@ -196,14 +200,15 @@ test.describe('Basic user', () => {
       await expect(page.getByTestId('select-multiple-courses-toggle')).toBeChecked()
 
       await searchByCourseCode(page, 'TKT')
-      await page.getByTestId(`course-TKT20001`).click()
-      await page.getByTestId(`course-TKT10002`).click()
+      await page.getByTestId(`course-${TKT20001.code}`).click()
+      await page.getByTestId(`course-${TKT10002.code}`).click()
 
       await expect(page.getByText('Fetch statistics')).toBeEnabled()
       await page.getByText('Fetch statistics').click()
 
       await expect(page).toHaveURL(
-        url => url.searchParams.get('courseCodes') === JSON.stringify(['TKT10002', 'TKT20001'])
+        url =>
+          JSON.stringify(url.searchParams.getAll('courses')) === JSON.stringify([TKT10002.groupId, TKT20001.groupId])
       )
 
       await openSummaryTab(page)
@@ -227,20 +232,20 @@ test.describe('Basic user', () => {
     await expect(page.getByTestId('select-multiple-courses-toggle')).toBeChecked()
 
     await searchByCourseCode(page, 'BSCS')
-    await page.getByTestId(`course-BSCS1003`).click()
-    await page.getByTestId(`course-BSCS1001`).click()
+    await page.getByTestId(`course-${BSCS1003.code}`).click()
+    await page.getByTestId(`course-${BSCS1001.code}`).click()
 
     await expect(page.getByText('Fetch statistics')).toBeEnabled()
     await page.getByText('Fetch statistics').click()
 
     await expect(page).toHaveURL(
-      url => url.searchParams.get('courseCodes') === JSON.stringify(['BSCS1001', 'BSCS1003'])
+      url => JSON.stringify(url.searchParams.getAll('courses')) === JSON.stringify([BSCS1001.groupId, BSCS1003.groupId])
     )
 
     await page.getByTestId('course-population-for-2023-2024').click()
     await expect(page.getByRole('heading', { name: 'Introduction to Programming' })).toBeVisible()
     await expect(page.getByText('Class of 2023-2024')).toBeVisible()
-    await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+    await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
 
     await page.goBack()
 
@@ -248,12 +253,15 @@ test.describe('Basic user', () => {
     await page.getByTestId('CourseSelectorOptionBSCS1003').click()
 
     // Check the link has updated correctly
-    await expect(page.getByTestId('course-population-for-2022-2023')).toHaveAttribute('href', /BSCS1003/)
+    await expect(page.getByTestId('course-population-for-2022-2023')).toHaveAttribute(
+      'href',
+      new RegExp(BSCS1003.groupId)
+    )
     await expect(page.getByTestId('CourseSelector').getByText('Data Structures and Algorithms')).toBeVisible()
 
     await page.getByTestId('course-population-for-2022-2023').click()
     await expect(page.getByText('Class of 2022-2023')).toBeVisible()
-    await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+    await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
   })
 
   test('Searching course by name displays right courses', async ({ page }) => {
@@ -279,11 +287,13 @@ test.describe('Basic user', () => {
     ).toBeVisible()
   })
 
+  // FIXME
   test('Searching course by name displays right courses, 10 credit courses', async ({ page }) => {
     await expect(page.getByText('Search for courses')).toBeVisible()
     await searchByCourseName(page, 'tietorakenteet ja algoritmit')
 
-    await expect(page.getByText('Tietorakenteet ja algoritmit', { exact: true })).toBeVisible()
+    // There should be two identically named Tietorakenteet ja algoritmit courses.
+    await expect(page.getByText('Tietorakenteet ja algoritmit', { exact: true })).toHaveCount(2)
     await page.getByTestId(`course-TKT20001`).click()
     await expect(page.getByText('Search for courses')).not.toBeVisible()
 
@@ -378,7 +388,7 @@ test.describe('Basic user', () => {
 
       await expect(page.getByText('Käyttöjärjestelmät')).toBeVisible()
       await expect(page.getByText('Class of 2020-2021, 19 students')).toBeVisible()
-      await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+      await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
 
       await expect(page.getByText('TKT20003')).toBeVisible()
 
@@ -388,9 +398,9 @@ test.describe('Basic user', () => {
     })
 
     test('Population of course shows grades for each student', async ({ page }) => {
-      await searchByCourseCode(page, 'TKT20001')
-      await page.getByTestId(`course-TKT20001`).click()
-      await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify(['TKT20001']))
+      await searchByCourseCode(page, TKT20001.code)
+      await page.getByTestId(`course-${TKT20001.code}`).click()
+      await expect(page).toHaveURL(url => url.searchParams.get('courses') === TKT20001.groupId)
 
       // This step should *not* be needed to make this test work (but it is)
       await expect(page.getByRole('heading', { name: 'Selected course' })).toBeVisible()
@@ -404,7 +414,7 @@ test.describe('Basic user', () => {
 
       await expect(page.getByText('Tietorakenteet ja algoritmit')).toBeVisible()
       await expect(page.getByText('Class of 2019-2020, 33 students')).toBeVisible()
-      await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+      await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
 
       // Check grade field in Students tab
       await page.getByText('Students (33)').click()
@@ -434,7 +444,7 @@ test.describe('Basic user', () => {
 
       await expect(page.getByText('Tietorakenteet ja algoritmit')).toBeVisible()
       await expect(page.getByText('Class of 2019-2020, 33 students')).toBeVisible()
-      await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+      await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
 
       await page.getByText('Students (33)').click()
       await expect(page.locator('tbody > tr').filter({ hasText: 'Hidden' })).toHaveCount(9)
@@ -451,7 +461,7 @@ test.describe('Basic user', () => {
 
     await expect(page.getByText('Käyttöjärjestelmät')).toBeVisible()
     await expect(page.getByText('Class of 2021-2022')).toBeVisible()
-    await expect(page.getByText('Include substitutions, Open and normal')).toBeVisible()
+    await expect(page.getByText('Substitutions included, open and normal')).toBeVisible()
 
     // Check count column of Language distribution
     await page.getByText('Language distribution').click()
@@ -1185,7 +1195,7 @@ test.describe('Basic user', () => {
     })
 
     test('Has right to see all the students, because course provider is TKT', async ({ page }) => {
-      await page.goto('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&separate=false')
+      await page.goto(`coursestatistics?courses=${encodeURIComponent(TKT10004.groupId)}&separate=false`)
       await page.getByTestId('course-population-for-2021-2022').click()
       await expect(page.getByText('Students (28)')).toBeVisible()
     })
@@ -1201,11 +1211,10 @@ test.describe('Only course statistics', () => {
   test('Some features of Course Statistics are hidden for courseStatistics-users without other rights', async ({
     page,
   }) => {
-    const coursecode = 'TKT10002'
-    await searchByCourseCode(page, coursecode)
-    await page.getByTestId(`course-${coursecode}`).click()
+    await searchByCourseCode(page, TKT10002.code)
+    await page.getByTestId(`course-${TKT10002.code}`).click()
 
-    await expect(page).toHaveURL(url => url.searchParams.get('courseCodes') === JSON.stringify([coursecode]))
+    await expect(page).toHaveURL(url => url.searchParams.get('courses') === TKT10002.groupId)
 
     await expect(page.getByText('Filter statistics by degree programmes')).not.toBeVisible()
     await expect(page.getByText('Show population')).not.toBeVisible()
