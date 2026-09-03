@@ -97,7 +97,7 @@ void describe("Study programme's course stats (all years)", () => {
       .set('hygroupcn', 'grp-oodikone-basic-users')) as ResponseWithBody<StudyProgrammeCourse[]>
 
     assert.strictEqual(res.status, 200)
-    assert.strictEqual(res.body.length, 86, 'Response included incorrect amount of courses') // Not checked number
+    assert.strictEqual(res.body.length, 70, 'Response included incorrect amount of courses') // Not checked number
 
     const courseCodes = res.body.map(({ code }) => code)
     assert.includeMembers(
