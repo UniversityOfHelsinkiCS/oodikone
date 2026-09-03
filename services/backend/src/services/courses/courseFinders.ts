@@ -104,9 +104,10 @@ export const getCoursesByNameAndOrCode = async (name: string, code: string): Pro
   const coursesWithSubstitutionDetails = primaryCourses.map(course => ({
     ...course,
     // NOTE: There are some substitutions that just don't exist in importer -> don't send undefined to client
-    substitutionGroups: course.substitutionGroups
-      .map(groupIds => groupIds.flatMap(groupId => substitutionCourses[groupId]).filter(sub => !!sub))
-      .filter(group => group.length),
+    substitutionGroups:
+      course.substitutionGroups
+        ?.map(groupIds => groupIds.flatMap(groupId => substitutionCourses[groupId]).filter(sub => !!sub))
+        .filter(group => group.length) ?? [],
   }))
 
   return coursesWithSubstitutionDetails
