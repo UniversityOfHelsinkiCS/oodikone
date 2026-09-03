@@ -110,8 +110,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+          ./anonyymioodi/db_utils.sh local sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -147,8 +146,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh kone-db
+          ./anonyymioodi/db_utils.sh local kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -184,8 +182,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # TODO: Disable this until fixed
-          # ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
+          ./anonyymioodi/db_utils.sh local user-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -254,8 +251,8 @@ jobs:
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
       # - name: Push newly build db to toska hub
       #   if: |
-      #   success() && inputs.skip_db_update != 'true'
-      #   run: ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+      #     success() && inputs.skip_db_update != 'true'
+      #   run: ./anonyymioodi/db_utils.sh local sis-db
 
       - name: Dump logs on failure
         if: failure()
