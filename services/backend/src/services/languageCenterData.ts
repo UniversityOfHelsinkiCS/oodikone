@@ -131,6 +131,7 @@ export const computeLanguageCenterData = async () => {
       semestercode: { [Op.gte]: autumnSemester2017 },
       credittypecode: 4,
     },
+    order: [['attainment_date', 'DESC']],
   })
 
   const enrollments = await EnrollmentModel.findAll({
@@ -141,11 +142,16 @@ export const computeLanguageCenterData = async () => {
       state: { [Op.in]: ['ENROLLED', 'REJECTED'] },
       // EnrollmentDateTimeThreshold need not be used here as we are not counting failed courses
     },
+    order: [['enrollment_date_time', 'DESC']],
   })
 
   const studyRights = await SISStudyRightModel.findAll({
     raw: true,
-    order: [['end_date', 'DESC NULLS LAST']],
+    order: [
+      ['end_date', 'DESC NULLS LAST'],
+      ['start_date', 'DESC'],
+      ['id', 'DESC'],
+    ],
   })
 
   const attemptStudyRightToFacultyMap = studyRights.reduce<
