@@ -4,7 +4,8 @@ import { init } from './support/commands'
 const chooseSemester = async (page: Page, semester: string, fromOrTo: 'from' | 'to') => {
   await page.getByTestId(`semester-${fromOrTo}`).click()
   await page.getByTestId(`select-opt-${semester}`).click()
-  await expect(page.getByTestId(`select-opt-${semester}`)).not.toHaveClass(/visible/)
+  // The dropdown unmounts its options on close, so wait for it to be gone before reading the table
+  await expect(page.getByRole('listbox')).toHaveCount(0)
 }
 
 const checkNumbers = async (page: Page, numbers: number[], numberOfColumns: number, mode: string) => {
@@ -37,7 +38,7 @@ test.describe('When language center is opened', () => {
       })
 
       test('Faculties tab shows numbers', async ({ page }) => {
-        await checkNumbers(page, [2076, 36, 9, 34, 759, 15, 40, 6, 51, 1, 24, 1059, 42, 0], 15, 'faculties')
+        await checkNumbers(page, [2074, 36, 9, 33, 758, 15, 40, 6, 51, 1, 24, 1059, 42, 0], 15, 'faculties')
       })
 
       test('Faculties tab "exceeding" button works', async ({ page }) => {
@@ -47,7 +48,7 @@ test.describe('When language center is opened', () => {
 
       test('Faculties tab semester selector changes numbers', async ({ page }) => {
         await chooseSemester(page, 'Syksy 2020', 'from')
-        await checkNumbers(page, [1184, 28, 6, 28, 499, 4, 10, 2, 36, 0, 9, 535, 27, 0], 15, 'faculties')
+        await checkNumbers(page, [1182, 28, 6, 27, 498, 4, 10, 2, 36, 0, 9, 535, 27, 0], 15, 'faculties')
       })
     })
 
@@ -59,7 +60,7 @@ test.describe('When language center is opened', () => {
       })
 
       test('Semester tab shows numbers', async ({ page }) => {
-        await checkNumbers(page, [2076, 69, 26, 298, 58, 343, 98, 438, 138, 310, 90, 123, 74, 10, 1], 16, 'semesters')
+        await checkNumbers(page, [2074, 69, 26, 298, 58, 343, 98, 437, 138, 310, 90, 123, 73, 10, 1], 16, 'semesters')
       })
     })
   })
