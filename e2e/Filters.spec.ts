@@ -190,7 +190,8 @@ test.describe('Custom Population Statistics', () => {
     await page.getByRole('combobox').fill('MAT11005 - Integraalilaskenta')
     await page.getByRole('option', { name: 'MAT11005 - Integraalilaskenta' }).click()
     await checkFilteredStudentCount(page, 7)
-    await page.getByTestId('courseFilter-MAT11005-selector').click()
+    // MAT11005 = hy-CU-117375607
+    await page.getByTestId('courseFilter-hy-CU-117375607-selector').click()
     await page.getByRole('option', { name: 'Passed' }).click()
     await checkFilteredStudentCount(page, 6)
   })
