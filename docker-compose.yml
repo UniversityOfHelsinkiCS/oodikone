@@ -6,6 +6,12 @@ x-defaults: &defaults
 x-build_defaults: &build_defaults
   dockerfile: dev.Dockerfile
 
+x-user_defaults: &user_defaults
+  # Run containers as user:group defined in .env
+  # If run as $(id -u):$(id -g) will reduce permission errors when mounting
+  # Defaults to registry.access.redhat.com/ubi10/nodejs-24-minimal's default user:group
+  user: '${DOCKER_UID:-1001}:${DOCKER_GID:-0}'
+
 x-healthcheck-defaults: &healthcheck-defaults
   interval: 30s # Normal healthcehck interval
   timeout: 5s
@@ -26,7 +32,7 @@ services:
       - ./adminer-plugins:/var/www/html/plugins-enabled
 
   backend:
-    <<: *defaults
+    <<: [*defaults, *user_defaults]
     container_name: oodikone-backend
     build:
       dockerfile: backend/dev.Dockerfile
@@ -67,7 +73,7 @@ services:
       <<: *healthcheck-defaults
 
   frontend:
-    <<: *defaults
+    <<: [*defaults, *user_defaults]
     container_name: oodikone-frontend
     build:
       dockerfile: frontend/dev.Dockerfile
@@ -186,7 +192,7 @@ services:
       <<: *healthcheck-defaults
 
   sis-updater-worker:
-    <<: *defaults
+    <<: [*defaults, *user_defaults]
     container_name: oodikone-updater-worker
     build:
       <<: *build_defaults
@@ -213,7 +219,7 @@ services:
       - sis-updater-worker-nodemod:/opt/app-root/src/node_modules
 
   sis-updater-scheduler:
-    <<: *defaults
+    <<: [*defaults, *user_defaults]
     container_name: oodikone-updater-scheduler
     build:
       <<: *build_defaults
