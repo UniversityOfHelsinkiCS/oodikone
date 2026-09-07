@@ -37,14 +37,22 @@ test.describe('Course statistics search', () => {
       const json = {
         courses: [
           {
+            id: 'tkt10002-id',
+            groupId: 'hy-CU-tkt10002',
             code: 'TKT10002',
             name: { fi: 'Ohjelmoinnin perusteet' },
-            substitution_groups: [],
+            substitutionGroups: [],
+            minAttainmentDate: new Date('2021-08-01').toISOString(),
+            maxAttainmentDate: new Date('2022-08-01').toISOString(),
           },
           {
+            id: 'tkt10003-id',
+            groupId: 'hy-CU-tkt10003',
             code: 'TKT10003',
             name: { fi: 'Ohjelmoinnin jatkokurssi' },
-            substitution_groups: [],
+            substitutionGroups: [],
+            minAttainmentDate: new Date('2021-08-01').toISOString(),
+            maxAttainmentDate: new Date('2022-08-01').toISOString(),
           },
         ],
       }
@@ -115,18 +123,22 @@ test.describe('Course statistics', () => {
       const json = {
         courses: [
           {
+            id: 'tkt10002-id',
+            groupId: 'hy-CU-tkt10002',
             code: 'TKT10002',
             name: { fi: 'Ohjelmoinnin perusteet' },
-            substitution_groups: [],
-            min_attainment_date: new Date('2021-08-01').toString(),
-            max_attainment_date: new Date('2022-08-01').toString(),
+            substitutionGroups: [],
+            minAttainmentDate: new Date('2021-08-01').toISOString(),
+            maxAttainmentDate: new Date('2022-08-01').toISOString(),
           },
           {
+            id: 'tkt10003-id',
+            groupId: 'hy-CU-tkt10003',
             code: 'TKT10003',
             name: { fi: 'Ohjelmoinnin jatkokurssi' },
-            substitution_groups: [],
-            min_attainment_date: new Date('2021-08-01').toString(),
-            max_attainment_date: new Date('2022-08-01').toString(),
+            substitutionGroups: [],
+            minAttainmentDate: new Date('2021-08-01').toISOString(),
+            maxAttainmentDate: new Date('2022-08-01').toISOString(),
           },
         ],
       }
