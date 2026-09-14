@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@playwright/experimental-ct-react": "1.61.0",
-    "@rolldown/plugin-babel": "0.2.3",
+    "@rolldown/plugin-babel": "0.2.4",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.10.1",
     "@types/react": "^18.3.23",
