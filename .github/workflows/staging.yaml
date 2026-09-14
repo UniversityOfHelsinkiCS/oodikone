@@ -112,7 +112,7 @@ jobs:
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          webhook-url: ${{ secrets.NEW_WEBHOOK_URL }}
           message-type: deployment
           softa-url: https://toska-staging.cs.helsinki.fi/oodikone
           deployment-target: staging
@@ -133,6 +133,6 @@ jobs:
       - name: 'Send notification to Slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
         with:
-          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          webhook-url: ${{ secrets.NEW_WEBHOOK_URL }}
           message-type: deployment-failure
           deployment-target: staging
