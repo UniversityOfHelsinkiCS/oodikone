@@ -216,7 +216,7 @@ test.describe('StudyProgrammeSelector', () => {
     const component = await mount(<ReduxWrapper component={<StudyProgrammeSelector />} />)
 
     await expect(component).not.toContainText('Biotekniikka (ylempi)')
-    await component.getByLabel('Filter out old and specialized programmes').click()
+    await component.getByLabel('Filter out programmes prior to 2017 and specialized programmes').click()
     await expect(component).toContainText('Biotekniikka (ylempi)')
   })
 })
