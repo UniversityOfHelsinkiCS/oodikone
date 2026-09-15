@@ -4,6 +4,7 @@ import { init } from './support/commands'
 type CourseData = [
   courseOrModule: string,
   code: string,
+  groupId: string,
   name: string,
   total: number,
   passed: number,
@@ -13,19 +14,21 @@ type CourseData = [
 ]
 
 const courseData: CourseData[] = [
-  ['Course', 'MAT11001', 'Johdatus yliopistomatematiikkaan', 272, 253, 1 + 18, 1, 18],
-  ['Course', 'MAT11003', 'Raja-arvot', 270, 249, 1 + 20, 1, 20],
-  ['Course', 'MAT11004', 'Differentiaalilaskenta', 262, 248, 1 + 13, 1, 13],
-  ['Course', 'MAT21002', 'Sarjat', 256, 250, 0 + 6, 0, 6],
-  ['Course', 'MAT11005', 'Integraalilaskenta', 251, 234, 0 + 17, 0, 17],
-  ['Course', 'MAT11002', 'Lineaarialgebra ja matriisilaskenta I', 247, 242, 1 + 4, 1, 4],
-  ['Course', 'MAT12003', 'Todennäköisyyslaskenta I', 234, 227, 3 + 4, 3, 4],
-  ['Course', 'MAT21001', 'Lineaarialgebra ja matriisilaskenta II', 230, 216, 4 + 10, 4, 10],
-  ['Course', 'MAT21003', 'Vektorianalyysi I', 228, 202, 3 + 23, 3, 23],
-  ['Course', 'MAT20005', 'Akateemiset taidot', 201, 178, 0 + 23, 0, 23],
-  ['Module', 'MAT110', 'Matematiikka, perusopinnot', 195, 195, 0 + 0, 0, 0],
-  ['Course', 'MAT21014', 'Johdatus logiikkaan I', 188, 170, 0 + 18, 0, 18],
+  ['Course', 'MAT11001', 'hy-CU-117375151', 'Johdatus yliopistomatematiikkaan', 272, 253, 1 + 18, 1, 18],
+  ['Course', 'MAT11003', 'hy-CU-117375413', 'Raja-arvot', 270, 249, 1 + 20, 1, 20],
+  ['Course', 'MAT11004', 'hy-CU-117375487', 'Differentiaalilaskenta', 262, 248, 1 + 13, 1, 13],
+  ['Course', 'MAT21002', 'hy-CU-117375793', 'Sarjat', 256, 250, 0 + 6, 0, 6],
+  ['Course', 'MAT11005', 'hy-CU-117375607', 'Integraalilaskenta', 251, 234, 0 + 17, 0, 17],
+  ['Course', 'MAT11002', 'hy-CU-117375394', 'Lineaarialgebra ja matriisilaskenta I', 247, 242, 1 + 4, 1, 4],
+  ['Course', 'MAT12003', 'hy-CU-117376940', 'Todennäköisyyslaskenta I', 234, 227, 3 + 4, 3, 4],
+  ['Course', 'MAT21001', 'hy-CU-117375754', 'Lineaarialgebra ja matriisilaskenta II', 230, 216, 4 + 10, 4, 10],
+  ['Course', 'MAT21003', 'hy-CU-117375829', 'Vektorianalyysi I', 228, 202, 3 + 23, 3, 23],
+  ['Course', 'MAT20005', 'hy-CU-120230575', 'Akateemiset taidot', 201, 178, 0 + 23, 0, 23],
+  ['Module', 'MAT110', 'hy-SM-117412902', 'Matematiikka, perusopinnot', 195, 195, 0 + 0, 0, 0],
+  ['Course', 'MAT21014', 'hy-CU-117377242', 'Johdatus logiikkaan I', 188, 170, 0 + 18, 0, 18],
 ]
+
+const MAT21003_GROUP_ID = 'hy-CU-117375829'
 
 const yearlyData = [
   [2017, 1, 0, 1, 0, 1 + 0],
@@ -45,8 +48,8 @@ const getPercentage = (value: any, total: any) => {
   return `${((value / total) * 100).toFixed(2)} %`
 }
 
-const selectCourseStatus = async (page: Page, courseCode: string, status: string) => {
-  await page.getByTestId(`courseFilter-${courseCode}-selector`).click()
+const selectCourseStatus = async (page: Page, courseGroupId: string, status: string) => {
+  await page.getByTestId(`courseFilter-${courseGroupId}-selector`).click()
   await page.getByRole('listbox').getByRole('option', { name: status }).click()
 }
 
@@ -71,18 +74,32 @@ test.describe('Numbers should match between', () => {
       const rows = page.locator('tbody tr')
       for (const [index, course] of courseData.entries()) {
         const row = rows.nth(index)
+        const [courseOrModule, code, , name, total, passed, notCompleted] = course
         // Not optimal, but not checking all locator("td") matches directly with toHaveText is hard.
-        for (const [fieldIndex, field] of course.slice(0, 6).entries()) {
+        for (const [fieldIndex, field] of [courseOrModule, code, name, total, passed, notCompleted].entries()) {
           await expect(row.locator('td').nth(fieldIndex)).toHaveText(String(field))
         }
       }
     })
 
     test('in Course statistics', async ({ page }) => {
-      for (const [_courseOrModule, code, name, total, passed, _notCompleted, failed, enrolledNoGrade] of courseData) {
-        await init(page, `/coursestatistics?courseCodes=%5B%22${code}%22%5D&combineSubstitutions=false`, 'basic')
+      for (const [
+        _courseOrModule,
+        _code,
+        groupId,
+        name,
+        total,
+        passed,
+        _notCompleted,
+        failed,
+        enrolledNoGrade,
+      ] of courseData) {
+        await init(page, `/coursestatistics?courses=${groupId}&substitutions=false`, 'basic')
         await expect(page).toHaveURL(
-          url => url.pathname === '/coursestatistics' && url.searchParams.get('courseCodes') === JSON.stringify([code])
+          url =>
+            url.pathname === '/coursestatistics' &&
+            url.searchParams.get('courses') === groupId &&
+            url.searchParams.get('substitutions') === 'false'
         )
         await expect(page.getByText('Course statistics')).toBeVisible()
         await expect(page.getByText(name)).toBeVisible()
@@ -105,11 +122,27 @@ test.describe('Numbers should match between', () => {
     })
 
     test('in Course population', async ({ page }) => {
-      for (const [_courseOrModule, code, name, total, passed, _notCompleted, failed, enrolledNoGrade] of courseData) {
+      for (const [
+        _courseOrModule,
+        code,
+        groupId,
+        name,
+        total,
+        passed,
+        _notCompleted,
+        failed,
+        enrolledNoGrade,
+      ] of courseData) {
         await init(
           page,
-          `/coursepopulation?from=${2017 - 1949}&to=${2023 - 1949}&coursecodes=%5B%22${code}%22%5D&includeSubstitutions=false`,
+          `/coursepopulation?from=${2017 - 1949}&to=${2023 - 1949}&courses=${groupId}&substitutions=false`,
           'basic'
+        )
+        await expect(page).toHaveURL(
+          url =>
+            url.pathname === '/coursepopulation' &&
+            url.searchParams.get('courses') === groupId &&
+            url.searchParams.get('substitutions') === 'false'
         )
         await expect(page.getByText(name)).toBeVisible()
 
@@ -126,7 +159,7 @@ test.describe('Numbers should match between', () => {
           ['Failed', failed],
           ['Enrolled, No Grade', enrolledNoGrade],
         ] as const) {
-          await selectCourseStatus(page, code, status)
+          await selectCourseStatus(page, groupId, status)
           await expect(page.getByText(`Students (${expected})`)).toBeVisible()
         }
       }
@@ -152,7 +185,13 @@ test.describe('Numbers should match between', () => {
 
     test('in Course statistics', async ({ page }) => {
       for (const [year, total, passed, failed, enrolledNoGrade] of yearlyData) {
-        await init(page, '/coursestatistics?courseCodes=%5B%22MAT21003%22%5D&combineSubstitutions=false', 'basic')
+        await init(page, `/coursestatistics?courses=${MAT21003_GROUP_ID}&substitutions=false`, 'basic')
+        await expect(page).toHaveURL(
+          url =>
+            url.pathname === '/coursestatistics' &&
+            url.searchParams.get('courses') === MAT21003_GROUP_ID &&
+            url.searchParams.get('substitutions') === 'false'
+        )
         const yearString = `${year}-${year + 1}`
 
         await selectYear(page, 'ToYearSelector', `ToYearSelectorOption${yearString}`)
@@ -180,8 +219,14 @@ test.describe('Numbers should match between', () => {
       for (const [year, _total, passed, failed, enrolledNoGrade] of yearlyData) {
         await init(
           page,
-          `/coursepopulation?from=${year - 1949}&to=${year - 1949}&coursecodes=%5B%22MAT21003%22%5D&includeSubstitutions=false`,
+          `/coursepopulation?from=${year - 1949}&to=${year - 1949}&courses=${MAT21003_GROUP_ID}&substitutions=false`,
           'basic'
+        )
+        await expect(page).toHaveURL(
+          url =>
+            url.pathname === '/coursepopulation' &&
+            url.searchParams.get('courses') === MAT21003_GROUP_ID &&
+            url.searchParams.get('substitutions') === 'false'
         )
         await expect(page.getByText('Vektorianalyysi I')).toBeVisible()
 
@@ -198,7 +243,7 @@ test.describe('Numbers should match between', () => {
           ['Failed', failed],
           ['Enrolled, No Grade', enrolledNoGrade],
         ] as const) {
-          await selectCourseStatus(page, 'MAT21003', status)
+          await selectCourseStatus(page, MAT21003_GROUP_ID, status)
           await expect(page.getByText(`Students (${expected})`)).toBeVisible()
         }
       }
