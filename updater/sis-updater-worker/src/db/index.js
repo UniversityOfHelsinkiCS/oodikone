@@ -162,7 +162,16 @@ export const bulkCreate = async (
           error.name === 'SequelizeForeignKeyConstraintError' &&
           error.parent.constraint === 'credit_course_id_fkey'
         ) {
-          logger.warn('Skipping credit with course_id pointing to non-existent course', { entity })
+          logger.warn('Skipping credit with course_id pointing to non-existent course', {
+            attainment_id: entity?.id,
+            course_id: entity?.course_id,
+          })
+          // Skip errors where that credit was not created and other rows in teacher_credits reference it
+        } else if (
+          error.name === 'SequelizeForeignKeyConstraintError' &&
+          error.parent.constraint === 'credit_teachers_credit_id_fkey'
+        ) {
+          logger.warn("Skipping adding teacher's credit with missing credit_id", { entity })
         } else {
           logger.error(`Single-entity upsert failed. ${error.name?.startsWith('Sequelize') ? error.toString() : ''}`, {
             error,
