@@ -133,7 +133,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: 'Send notification to Slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.6.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
@@ -155,7 +155,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: 'Send notification to Slack'
-        uses: UniversityOfHelsinkiCS/slackbot-action@v1.5
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.6.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure
