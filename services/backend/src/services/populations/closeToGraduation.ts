@@ -245,7 +245,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
           include: [
             {
               model: CourseModel,
-              attributes: ['code', 'course_unit_type', 'groupId'],
+              attributes: ['code', 'courseUnitType', 'groupId'],
             },
           ],
         },

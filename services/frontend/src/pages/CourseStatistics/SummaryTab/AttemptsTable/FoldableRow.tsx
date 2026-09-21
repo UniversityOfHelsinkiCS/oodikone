@@ -67,7 +67,7 @@ export const FoldableRow = ({
               </>
             ) : (
               <Typography component="span" variant="body2">
-                {realisation}
+                {getTextIn(realisation)}
               </Typography>
             )}
           </Typography>
