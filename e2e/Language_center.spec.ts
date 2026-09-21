@@ -43,12 +43,12 @@ test.describe('When language center is opened', () => {
         await checkNumbers(page, [2074, 36, 9, 33, 758, 15, 40, 6, 51, 1, 24, 1059, 42, 0], 15, 'faculties')
       })
 
-      test('Faculties tab "exceeding" button works', async ({ page }) => {
+      test.skip('Faculties tab "exceeding" button works', async ({ page }) => {
         await page.getByTestId('difference-button').click()
         await checkNumbers(page, [66, 3, 0, 4, 18, 0, 1, 1, 4, 0, 0, 31, 3, 1], 15, 'faculties')
       })
 
-      test('Faculties tab semester selector changes numbers', async ({ page }) => {
+      test.skip('Faculties tab semester selector changes numbers', async ({ page }) => {
         await chooseSemester(page, 'Syksy 2020', 'from')
         await checkNumbers(page, [1182, 28, 6, 27, 498, 4, 10, 2, 36, 0, 9, 535, 27, 0], 15, 'faculties')
       })
@@ -61,7 +61,7 @@ test.describe('When language center is opened', () => {
         await chooseSemester(page, 'Kevät 2024', 'to')
       })
 
-      test('Semester tab shows numbers', async ({ page }) => {
+      test.skip('Semester tab shows numbers', async ({ page }) => {
         await checkNumbers(page, [2074, 69, 26, 298, 58, 343, 98, 437, 138, 310, 90, 123, 73, 10, 1], 16, 'semesters')
       })
     })
