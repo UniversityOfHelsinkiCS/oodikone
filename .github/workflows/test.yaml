@@ -359,35 +359,35 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Test population statistics'
+          - name: 'Population statistics'
             spec: e2e/Population_statistics.spec.ts
-          - name: 'Test course statistics'
+          - name: 'Course statistics'
             spec: e2e/Course_statistics.spec.ts
-          - name: 'Test degree programme overview'
+          - name: 'Degree programme overview'
             spec: e2e/Degree_programme_overview.spec.ts
-          - name: 'Test Faculty statistics'
+          - name: 'faculty statistics'
             spec: e2e/Faculty_statistics.spec.ts
-          - name: 'Test teachers'
+          - name: 'Teachers'
             spec: e2e/Teachers.spec.ts
-          - name: 'Test users'
+          - name: 'Users'
             spec: e2e/Users.spec.ts
-          - name: 'Test access rights'
+          - name: 'Access rights'
             spec: e2e/Routes.spec.ts
-          - name: 'Test university'
+          - name: 'University'
             spec: e2e/University.spec.ts
-          - name: 'Test language center view'
+          - name: 'Language center view'
             spec: e2e/Language_center.spec.ts
-          - name: 'Test study guidance groups'
+          - name: 'Study guidance groups'
             spec: e2e/Study_guidance_groups.spec.ts
-          - name: 'Test custom population'
+          - name: 'Custom population'
             spec: e2e/Custom_population.spec.ts
-          - name: 'Test filters'
+          - name: 'Filters'
             spec: e2e/Filters.spec.ts
-          - name: 'Test students'
+          - name: 'Students'
             spec: e2e/Students.spec.ts
-          - name: 'Test completed courses'
+          - name: 'Completed courses'
             spec: e2e/Completed_courses.spec.ts
-          - name: 'Test numbers match'
+          - name: 'Numbers match'
             spec: e2e/Numbers_match.spec.ts
     name: ${{ matrix.name }}
     steps:
