@@ -110,7 +110,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          ./anonyymioodi/db_utils.sh local sis-db
+          # ./anonyymioodi/db_utils.sh local sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -146,7 +146,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          ./anonyymioodi/db_utils.sh local kone-db
+          # ./anonyymioodi/db_utils.sh local kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -182,7 +182,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          ./anonyymioodi/db_utils.sh local user-db
+          # ./anonyymioodi/db_utils.sh local user-db
 
       - name: Teardown containers started by compose
         if: always()
