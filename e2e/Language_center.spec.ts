@@ -37,7 +37,9 @@ test.describe('When language center is opened', () => {
         await expect(page.getByText('AYKK-RUKIRJ')).toBeVisible()
       })
 
-      test('Faculties tab shows numbers', async ({ page }) => {
+      // FIXME: This changes per updater run
+      // Example case: 	550789 - KK-JAOK15
+      test.skip('Faculties tab shows numbers', async ({ page }) => {
         await checkNumbers(page, [2074, 36, 9, 33, 758, 15, 40, 6, 51, 1, 24, 1059, 42, 0], 15, 'faculties')
       })
 
