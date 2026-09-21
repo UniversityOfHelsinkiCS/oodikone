@@ -4,8 +4,8 @@ import { CourseWithSubsDetails } from '@oodikone/shared/types/course'
 import { CourseModel } from '../../models'
 import { dbConnections } from '../../database/connection'
 
-const likeTerm = (userInput: string, type: 'name' | 'code') => {
-  const searchTerm = userInput.trim().replace(/[\\%_]/g, '')
+const likeTerm = (userInput: string | undefined, type: 'name' | 'code') => {
+  const searchTerm = userInput?.trim().replace(/[\\%_]/g, '')
   if (!searchTerm) return undefined
 
   return type === 'name'
