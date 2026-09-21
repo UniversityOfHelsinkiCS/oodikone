@@ -11,6 +11,19 @@ x-healthcheck-defaults: &healthcheck-defaults
   start_period: 30s # How long startup period is
 
 services:
+  adminer:
+    <<: *defaults
+    container_name: oodikone-adminer
+    environment:
+      ADMINER_DESIGN: pepa-linha
+    image: adminer:5.5.1
+    ports:
+      - 5050:8080
+    profiles:
+      - adminer
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+
   backend:
     <<: *defaults
     container_name: oodikone-backend
