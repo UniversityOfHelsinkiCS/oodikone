@@ -214,16 +214,19 @@ export const SearchForm = () => {
                     en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
                   })}
                 />
-                <ToggleWithTooltip
-                  checked={includeSpecialCourses}
-                  cypress="show-special-courses-toggle"
-                  label="Show special courses"
-                  onChange={toggleIncludeSpecialCourses}
-                  tooltipText={getTextIn({
-                    fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
-                    en: 'Includes course instances formed by transferred credits and other special courses',
-                  })}
-                />
+                {/* oxlint-disable-next-line no-constant-binary-expression */}
+                {false /* TEMP, TODO: Enable after production data mankeled and feature fixd */ && (
+                  <ToggleWithTooltip
+                    checked={includeSpecialCourses}
+                    cypress="show-special-courses-toggle"
+                    label="Show special courses"
+                    onChange={toggleIncludeSpecialCourses}
+                    tooltipText={getTextIn({
+                      fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
+                      en: 'Includes course instances formed by transferred credits and other special courses',
+                    })}
+                  />
+                )}
               </Grid>
             </Grid>
             {selectMultipleCourses ? (
