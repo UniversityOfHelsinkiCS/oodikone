@@ -1,10 +1,16 @@
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 
-export const IncludeSubstitutionsToggle = ({ includeSubstitutions, toggleIncludeSubstitutions }) => (
+export const IncludeSubstitutionsToggle = ({
+  includeSubstitutions,
+  toggleIncludeSubstitutions,
+}: {
+  includeSubstitutions: boolean
+  toggleIncludeSubstitutions: () => void
+}) => (
   <FormControlLabel
     control={<Switch checked={includeSubstitutions} onChange={toggleIncludeSubstitutions} />}
     label="Include substitutions"
-    sx={{ margin: 0 }}
+    sx={{ m: 0 }}
   />
 )
