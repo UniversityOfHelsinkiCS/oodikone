@@ -10,12 +10,14 @@ import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedStudent, StudentCourse } from '@oodikone/shared/types/studentData'
+import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 
 type CoursesTabContainerProps = {
   curriculum: ExtendedCurriculumDetails
   students: FormattedStudent[]
   courses: FilteredCourse[]
   idToGroupIdMap: Record<string, string>
+  programme: string
 }
 
 export type SubstitutedByEntry = {
@@ -261,7 +263,13 @@ const gradeOrdering = ['0', 'Hyl.', 'TT', 'HT', '1', '2', '3', '4', '5', 'Hyv.']
 const compareCourseGrades = (previous: StudentCourse, current: StudentCourse) =>
   gradeOrdering.indexOf(previous.grade) <= gradeOrdering.indexOf(current.grade)
 
-export const CoursesTabContainer = ({ curriculum, students, courses, idToGroupIdMap }: CoursesTabContainerProps) => {
+export const CoursesTabContainer = ({
+  curriculum,
+  students,
+  courses,
+  idToGroupIdMap,
+  programme,
+}: CoursesTabContainerProps) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
@@ -388,6 +396,7 @@ export const CoursesTabContainer = ({ curriculum, students, courses, idToGroupId
       toolbarContent={
         <>
           <OodiTableExcelExport data={formattedStudents} exportColumnKeys={keysForExport} />
+          <FilterDegreeCoursesModal degreeProgramme={programme} />
           <StudentNameVisibilityToggle />
           <IncludeSubstitutionsToggle
             includeSubstitutions={includeSubstitutions}
