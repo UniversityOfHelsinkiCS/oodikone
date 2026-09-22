@@ -3,35 +3,30 @@ import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { useState, Fragment } from 'react'
+import { useState } from 'react'
 
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 import { VisibilityIcon } from '@/theme'
+import { ManageCoursesShownInfo } from '@/pages/StudyProgramme/DegreeCoursesTab/InfoBox'
 
 export const FilterDegreeCoursesModal = ({ degreeProgramme }: { degreeProgramme: string }) => {
-  const [open, setOpen] = useState(false)
-
-  const setModalOpenState = (state: boolean) => setOpen(state)
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
-    <Fragment>
-      <Button onClick={() => setModalOpenState(true)} startIcon={<VisibilityIcon />} variant="outlined">
+    <>
+      <Button onClick={() => setModalOpen(true)} startIcon={<VisibilityIcon />} variant="outlined">
         Manage Courses Shown
       </Button>
-      <Dialog className="MyDialogThings" maxWidth="md" onClose={() => setModalOpenState(false)} open={open}>
-        <DialogTitle>Hide degree courses</DialogTitle>
-        <DialogContent className="MyDialogContent">
+      <Dialog maxWidth="md" onClose={() => setModalOpen(false)} open={modalOpen}>
+        <DialogTitle>Degree programme settings</DialogTitle>
+        <DialogContent>
+          <ManageCoursesShownInfo />
           <DegreeCoursesTab combinedProgramme="" degreeProgramme={degreeProgramme} />
-          <Button
-            color="primary"
-            onClick={() => setModalOpenState(false)}
-            style={{ marginTop: '10px' }}
-            variant="contained"
-          >
+          <Button color="primary" onClick={() => setModalOpen(false)} style={{ marginTop: '10px' }} variant="contained">
             Close
           </Button>
         </DialogContent>
       </Dialog>
-    </Fragment>
+    </>
   )
 }
