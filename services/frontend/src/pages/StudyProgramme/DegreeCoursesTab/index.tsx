@@ -10,6 +10,9 @@ import { DegreeCourseTable } from '@/pages/StudyProgramme/DegreeCoursesTab/Degre
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse } from '@oodikone/shared/types'
+import { Section } from '@/components/Section'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 
 export const DegreeCoursesTab = ({
   combinedProgramme,
@@ -22,6 +25,7 @@ export const DegreeCoursesTab = ({
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
   const [curriculum, curriculumList, setCurriculum] = useCurriculumState(degreeProgramme, new Date().getFullYear())
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
+  const { getTextIn } = useLanguage()
 
   const getModules = (courses: ProgrammeCourse[]): Module[] => {
     const modules: Record<string, ProgrammeCourse[]> = {}
@@ -60,24 +64,31 @@ export const DegreeCoursesTab = ({
       {isBachelorOrLicentiateProgramme(degreeProgramme) && (
         <CreditCriteriaSection criteria={criteria} degreeProgramme={degreeProgramme} />
       )}
-      {defaultProgrammeModules.length > 1 && curriculum ? (
-        <DegreeCourseTable
-          combinedProgramme=""
-          criteria={criteria}
-          curriculumVersion={curriculum.periodIds}
-          modules={defaultProgrammeModules}
-          studyProgramme={degreeProgramme}
-        />
-      ) : null}
-      {secondProgrammeModules.length > 0 && curriculum ? (
-        <DegreeCourseTable
-          combinedProgramme={combinedProgramme}
-          criteria={criteria}
-          curriculumVersion={curriculum.periodIds}
-          modules={secondProgrammeModules}
-          studyProgramme={degreeProgramme}
-        />
-      ) : null}
+      {curriculum && (!!defaultProgrammeModules.length || !!secondProgrammeModules.length) && (
+        <Section
+          title="Course & module criterion and visibility"
+          infoBoxContent={getTextIn(studyProgrammeToolTips.degreeCoursesTab.programmeCriteriaAndVisibility) ?? ''}
+        >
+          {!!defaultProgrammeModules.length && (
+            <DegreeCourseTable
+              combinedProgramme=""
+              criteria={criteria}
+              curriculumVersion={curriculum.periodIds}
+              modules={defaultProgrammeModules}
+              studyProgramme={degreeProgramme}
+            />
+          )}
+          {!!secondProgrammeModules.length && (
+            <DegreeCourseTable
+              combinedProgramme={combinedProgramme}
+              criteria={criteria}
+              curriculumVersion={curriculum.periodIds}
+              modules={secondProgrammeModules}
+              studyProgramme={degreeProgramme}
+            />
+          )}
+        </Section>
+      )}
     </Stack>
   )
 }

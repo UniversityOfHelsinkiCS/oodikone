@@ -14,6 +14,7 @@ import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
 import { SaveIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { ProgressCriteria } from '@oodikone/shared/types'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 const emptyCredits = {
   year1: null,
@@ -32,6 +33,7 @@ export const CreditCriteriaSection = ({
   degreeProgramme: string
 }) => {
   const [creditLimits, setCreditLimits] = useState<Record<string, null | number>>(emptyCredits)
+  const { getTextIn } = useLanguage()
 
   const [addProgressCriteriaCredits, { isError, isSuccess }] = useAddProgressCriteriaCreditsMutation()
   const { setStatusNotification } = useStatusNotification()
@@ -109,7 +111,7 @@ export const CreditCriteriaSection = ({
   return (
     <Section
       cypress="credit-criteria"
-      infoBoxContent={studyProgrammeToolTips.degreeCoursesTab.creditCriteria}
+      infoBoxContent={getTextIn(studyProgrammeToolTips.degreeCoursesTab.creditCriteria) ?? ''}
       title="Credit criteria"
     >
       <Stack gap={2}>

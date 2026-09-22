@@ -190,16 +190,26 @@ However this is optional and you can create a new tag without selecting year.
   },
 
   degreeCoursesTab: {
-    creditCriteria: `
-Here you can change visibility of degree courses as and set course and credits criteria, for each year their
-own. Credits criteria is computed as follows: for the first academic year the credits are taken into account
-if they are completed during the first 12 months. For the second year, we take into account the completions
-during the first 24 months, for the third year the first 36 months.
-
-The progress of the students by these criteria will be shown in class statistics view.
+    creditCriteria: {
+      en: `The criteria set here will affect the Progress tab within Class Statistics → Students tab.
+Credit criteria is computed as follows: for the first academic year, the credits are counted
+if they are completed during the first 12 months. For the second year, completions
+within the first 24 months, and so on.
 `,
-  },
+    },
+    programmeCriteriaAndVisibility: {
+      en: `Click the arrow next to the module to view courses belonging to the module in the curriculum. Setting a criterion label for a course will affect which academic year the course is placed under in Class Statistics → Students → Progress tab.
 
+Courses' visibilities can also be toggled here; hiding a course here will additionally hide it in the Courses of Class view and Students → Courses tab.
+
+Note: If hiding a module, all courses belonging to the module will also be hidden.`,
+      fi: `Klikkaa nuolta opintokokonaisuuden nimen vieressä näyttääksesi opetussuunitelmassa opintokokonaisuuden alle sijoitetut kurssit. Kursseille voi asettaa "Criterion label":eita, jotka vaikuttavat minkä akateemisen vuoden alla kurssi näytetään Class Statistics → Students → Progress tab näkymässä.
+
+Kurssien näkyvyyttä voidaan myös muuttaa tällä sivulla. Kurssin piilottaminen piilottaa sen myös Courses of Class ja Students → Courses tab näkymissä.
+
+Huom: Opintokokonaisuuden piilottaminen piilottaa myös kaikki sen alla olevat kurssit.`,
+    },
+  },
   // Not used
   notCompleted: `
 Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.

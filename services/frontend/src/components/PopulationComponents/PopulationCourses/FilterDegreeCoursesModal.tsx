@@ -15,7 +15,7 @@ export const FilterDegreeCoursesModal = ({ degreeProgramme }: { degreeProgramme:
   return (
     <>
       <Button onClick={() => setModalOpen(true)} startIcon={<VisibilityIcon />} variant="outlined">
-        Manage Courses Shown
+        Manage shown courses
       </Button>
       <Dialog maxWidth="md" onClose={() => setModalOpen(false)} open={modalOpen}>
         <DialogTitle>Degree programme settings</DialogTitle>
