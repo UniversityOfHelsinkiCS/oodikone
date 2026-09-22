@@ -191,10 +191,15 @@ However this is optional and you can create a new tag without selecting year.
 
   degreeCoursesTab: {
     creditCriteria: {
-      en: `The criteria set here will affect the Progress tab within Class Statistics → Students tab.
+      en: `The criteria set here will affect the Class Statistics → Students tab → Progress tab view.
+
 Credit criteria is computed as follows: for the first academic year, the credits are counted
 if they are completed during the first 12 months. For the second year, completions
-within the first 24 months, and so on.
+within the first 24 months. Third year, the first 36 months, and so on.
+`,
+      fi: `Tässä asetettu "criteria" vaikuttaa Class Statistics → Students tab → Progress tab näkymään.
+
+Laskenta toimii seuraavasti: ensimmäisen akateemisen vuoden opintopisteet lasketaan, jos ne ovat suoritettu ensimmäisen 12 kuukauden ajalla. Toisen vuoden opintopisteet, jos ne ovat suoritettu ensimmäisen 24 kuukauden aikana. Kolmas, ensimmäiset 36kk, ja niin edelleen.
 `,
     },
     programmeCriteriaAndVisibility: {
