@@ -664,9 +664,7 @@ test.describe('Degree programme overview', () => {
       test('info box', async ({ page }) => {
         await expect(page.getByTestId('credit-criteria-section')).toBeVisible()
         await page.getByTestId('credit-criteria-info-box-button').click()
-        await expect(
-          page.getByTestId('credit-criteria-info-box-content').getByText('Here you can change')
-        ).toBeVisible()
+        await expect(page.getByTestId('credit-criteria-info-box-content').getByText('Tässä asetettu')).toBeVisible()
       })
 
       test.skip('changing the credit criteria works', () => {
