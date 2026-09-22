@@ -13,6 +13,7 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
+import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStudentNumbersHeader'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { TableInfo } from '@/components/PopulationComponents/Students/Table/ProgressTab/info'
 import { DateFormat } from '@/constants/date'
@@ -541,7 +542,9 @@ export const ProgressTable = ({
         header: 'Student',
         columns: [
           columnHelper.accessor('studentNumber', {
-            header: 'Student number',
+            header: ({ table }) => (
+              <CopyStudentNumbersHeader getStudentNumber={row => row.studentNumber} table={table} />
+            ),
             cell: ({ row }) => (
               <StudentInfoItem sisPersonId={row.original.sis_person_id} studentNumber={row.original.studentNumber} />
             ),

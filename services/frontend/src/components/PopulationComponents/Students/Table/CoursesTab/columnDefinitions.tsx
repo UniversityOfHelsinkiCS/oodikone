@@ -1,19 +1,13 @@
-import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import Stack from '@mui/material/Stack'
-
 import { useTheme } from '@mui/material/styles'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { handleClipboardCopy } from '@/components/OodiTable/utils'
+import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStudentNumbersHeader'
 import { Courses, CourseTabModule, CourseTabStudent } from '@/components/PopulationComponents/Students/Table/CoursesTab'
-import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { DateFormat } from '@/constants/date'
-import { CheckIcon, ContentCopyIcon, CropSquareIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
+import { CheckIcon, CropSquareIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { CreditTypeCode } from '@oodikone/shared/types'
 
@@ -29,38 +23,11 @@ const getSortingValue = (course: Courses['number'] | undefined) => {
 export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): ColumnDef<CourseTabStudent, any>[] => {
   const { getTextIn } = useLanguage()
   const theme = useTheme()
-  const { setStatusNotification, closeNotification } = useStatusNotification()
   return useMemo(() => {
     return [
       // Static columns
       columnHelper.accessor('studentNumber', {
-        header: ({ table }) => {
-          const allStudentNumbers = table
-            .getFilteredRowModel()
-            .rows.map(row => row.original.studentNumber)
-            .filter(Boolean)
-          const copyText = `Copied ${allStudentNumbers.length} student numbers`
-          return (
-            <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
-              <Box sx={{ alignSelf: 'center' }}>Student number</Box>
-              <Tooltip title="Copy all student numbers to system clipboard">
-                <IconButton
-                  onClick={event =>
-                    void handleClipboardCopy(
-                      event,
-                      allStudentNumbers,
-                      copyText,
-                      setStatusNotification,
-                      closeNotification
-                    )
-                  }
-                >
-                  <ContentCopyIcon color="action" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          )
-        },
+        header: ({ table }) => <CopyStudentNumbersHeader getStudentNumber={row => row.studentNumber} table={table} />,
         cell: cell => {
           const studentNumber = cell.getValue()
           if (studentNumber === 'Hidden') return studentNumber

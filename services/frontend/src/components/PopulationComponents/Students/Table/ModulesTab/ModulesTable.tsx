@@ -1,6 +1,4 @@
 import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -11,11 +9,10 @@ import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
+import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStudentNumbersHeader'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
-import { handleClipboardCopy } from '@/components/OodiTable/utils'
 import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationComponents/Students/Table/ModulesTab'
-import { useStatusNotification } from '@/components/StatusNotification/Context'
-import { CheckIcon, ContentCopyIcon, CropSquareIcon } from '@/theme'
+import { CheckIcon, CropSquareIcon } from '@/theme'
 
 const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
@@ -32,35 +29,11 @@ export const ModulesTab = ({
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
   const theme = useTheme()
-  const { setStatusNotification, closeNotification } = useStatusNotification()
 
   const ooditableStaticColumns = useMemo(
     () => [
       ooditableColumnHelper.accessor('studentNumber', {
-        header: ({ table }) => {
-          const allStudentNumbers = table.getFilteredRowModel().rows.map(row => row.original.studentNumber)
-          const copyText = `Copied ${allStudentNumbers.length} student numbers`
-          return (
-            <Stack direction="row" spacing={1} sx={{ verticalAlign: 'middle' }}>
-              <Box sx={{ alignSelf: 'center' }}>Student number</Box>
-              <Tooltip title="Copy all student numbers to clipboard">
-                <IconButton
-                  onClick={event =>
-                    void handleClipboardCopy(
-                      event,
-                      allStudentNumbers,
-                      copyText,
-                      setStatusNotification,
-                      closeNotification
-                    )
-                  }
-                >
-                  <ContentCopyIcon color="action" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          )
-        },
+        header: ({ table }) => <CopyStudentNumbersHeader getStudentNumber={row => row.studentNumber} table={table} />,
         cell: cell => <StudentInfoItem sisPersonId={cell.row.original.sisPersonID} studentNumber={cell.getValue()} />,
         filterFn: (row, columnId, filterValue) => {
           const value: string = row.getValue(columnId)
