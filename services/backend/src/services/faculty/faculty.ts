@@ -59,7 +59,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
     progId:
       programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
   }))
-  const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['valid_from'], ['desc']), prog => prog.code)
+  const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['validFrom'], ['desc']), prog => prog.code)
   const curriculumPeriods = await getCurriculumPeriods()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
 
