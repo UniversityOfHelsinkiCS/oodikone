@@ -313,11 +313,12 @@ export const CoursesTabContainer = ({ curriculum, students, courses, idToGroupId
         if (!acc.has(parent)) {
           acc.set(parent, { name: course.parent_name, courses: [] })
         }
-        acc.get(parent)!.courses.push({
-          code: course.code,
-          name: course.name,
-          groupId: codeToGroupId[course.code] ?? course.code,
-        })
+        const groupId = codeToGroupId[course.code] ?? course.code
+        const studyModule = acc.get(parent)!
+        // Prevent course from appearing under the same module twice
+        if (!studyModule.courses.some(existing => existing.groupId === groupId)) {
+          studyModule.courses.push({ code: course.code, name: course.name, groupId })
+        }
       }
       return acc
     }, new Map<string, CourseTabModule>())
