@@ -135,7 +135,7 @@ export const PopulationStudents = ({
   > = {
     population: {
       tabs:
-        Array.isArray(years) || (programme && !isBachelorOrLicentiateProgramme(programme))
+        years.length > 1 || (programme && !isBachelorOrLicentiateProgramme(programme))
           ? ['General', 'Courses', 'Modules', 'Tags']
           : ['General', 'Courses', 'Modules', 'Tags', 'Progress'],
       tooltip: populationStudentsToolTips.studentsClass,
