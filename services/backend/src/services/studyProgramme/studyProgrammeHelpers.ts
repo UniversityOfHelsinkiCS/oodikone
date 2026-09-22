@@ -312,7 +312,9 @@ export const getGoal = async (programme?: string) => {
   return ((minimumCredits / 60) * 12) / 6 // 60 Credits per year divided to semesters
 }
 
-export const isRelevantProgramme = (code: string) => /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^DP\d{3}$/.test(code)
+/** Returns true for all programme codes that are determined to be newer than 2017 */
+export const isRelevantProgramme = (code: string) =>
+  /^(KH|MH)\d{2}_\d{3}$/.test(code) || /^T\d{6}$/.test(code) || /^DP\d{3}$/.test(code)
 
 export const getStudyRightElementsWithPhase = (studyRight: Pick<SISStudyRight, 'studyRightElements'>, phase: Phase) => {
   return orderBy(
