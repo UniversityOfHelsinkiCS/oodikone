@@ -1,12 +1,9 @@
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
@@ -18,10 +15,11 @@ import { CriterionLabelSelectButton } from '@/pages/StudyProgramme/DegreeCourses
 import { ToggleVisibilityButton } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/ToggleVisibilityButton'
 import { VisibilityChip } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/VisibilityChip'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
-import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
+import { FormatListNumberedIcon, KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseVisibility } from '@/types/courseVisibility'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
+import { StyledTable } from '@/components/common/StyledTable'
 
 export const DegreeCourseTable = ({
   combinedProgramme,
@@ -155,37 +153,37 @@ export const DegreeCourseTable = ({
   }
 
   return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table data-cy="degree-course-table" size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Code</TableCell>
-            <TableCell>Visibility</TableCell>
-            {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell>Criterion labels</TableCell>}
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {modules.map(({ code: moduleCode, courses }) => (
-            <Fragment key={`${moduleCode}-fragment`}>
-              <TableRow key={moduleCode}>
-                <TableCell>
-                  <Box alignItems="center" display="flex" justifyContent="left">
-                    <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
-                      {areModuleCoursesVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                    </IconButton>
-                    <Typography fontWeight="bold" variant="body2">
-                      {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>{moduleCode}</TableCell>
-                <TableCell>
-                  <VisibilityChip visibility={getVisibility(moduleCode)} />
-                </TableCell>
-                {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell />}
-                <TableCell>
+    <StyledTable showCellBorders data-cy="degree-course-table" size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>Name</TableCell>
+          <TableCell>Code</TableCell>
+          <TableCell>Visibility</TableCell>
+          {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell>Criterion labels</TableCell>}
+          <TableCell colSpan={2}>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {modules.map(({ code: moduleCode, courses }) => (
+          <Fragment key={`${moduleCode}-fragment`}>
+            <TableRow key={moduleCode}>
+              <TableCell>
+                <Box alignItems="center" display="flex" justifyContent="left">
+                  <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
+                    {areModuleCoursesVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                  </IconButton>
+                  <Typography fontWeight="bold" variant="body2">
+                    {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
+                  </Typography>
+                </Box>
+              </TableCell>
+              <TableCell>{moduleCode}</TableCell>
+              <TableCell>
+                <VisibilityChip visibility={getVisibility(moduleCode)} />
+              </TableCell>
+              {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell />}
+              <TableCell>
+                <Stack direction="row" gap={1}>
                   <ToggleVisibilityButton
                     onClick={() =>
                       getVisibility(moduleCode) === CourseVisibility.HIDDEN
@@ -194,59 +192,64 @@ export const DegreeCourseTable = ({
                     }
                     visible={getVisibility(moduleCode) !== CourseVisibility.HIDDEN}
                   />
-                </TableCell>
-              </TableRow>
-              {areModuleCoursesVisible(moduleCode) &&
-                courses
-                  .sort((a, b) => a.code.localeCompare(b.code))
-                  .map(course => (
-                    <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
-                      <TableCell>{getTextIn(course.name)}</TableCell>
-                      <TableCell>{course.code}</TableCell>
+                  {isBachelorOrLicentiateProgramme(studyProgramme) && (
+                    <IconButton disabled sx={{ visibility: 'hidden' }}>
+                      <FormatListNumberedIcon />
+                    </IconButton>
+                  )}
+                </Stack>
+              </TableCell>
+            </TableRow>
+            {areModuleCoursesVisible(moduleCode) &&
+              courses
+                .sort((a, b) => a.code.localeCompare(b.code))
+                .map(course => (
+                  <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
+                    <TableCell>{getTextIn(course.name)}</TableCell>
+                    <TableCell>{course.code}</TableCell>
+                    <TableCell>
+                      <VisibilityChip
+                        visibility={course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN}
+                      />
+                    </TableCell>
+                    {isBachelorOrLicentiateProgramme(studyProgramme) && (
                       <TableCell>
-                        <VisibilityChip
-                          visibility={course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN}
+                        {Object.values(criteria.courses).length > 0 ? (
+                          <Stack direction="row" gap={1}>
+                            {Object.keys(criteria.courses).map(
+                              (year, index) =>
+                                criteria.courses[year].includes(course.code) && (
+                                  <Chip color="primary" key={year} label={`year ${index + 1}`} size="small" />
+                                )
+                            )}
+                          </Stack>
+                        ) : (
+                          <Typography color="text.secondary" variant="body2">
+                            No labels set
+                          </Typography>
+                        )}
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <Stack direction="row" gap={1}>
+                        <ToggleVisibilityButton
+                          onClick={() => (course.visible.visibility ? excludeOne(course) : removeOne(course))}
+                          visible={course.visible.visibility}
                         />
-                      </TableCell>
-                      {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                        <TableCell>
-                          {Object.values(criteria.courses).length > 0 ? (
-                            <Stack direction="row" gap={1}>
-                              {Object.keys(criteria.courses).map(
-                                (year, index) =>
-                                  criteria.courses[year].includes(course.code) && (
-                                    <Chip color="primary" key={year} label={`year ${index + 1}`} size="small" />
-                                  )
-                              )}
-                            </Stack>
-                          ) : (
-                            <Typography color="text.secondary" variant="body2">
-                              No labels set
-                            </Typography>
-                          )}
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <Stack direction="row" gap={1}>
-                          <ToggleVisibilityButton
-                            onClick={() => (course.visible.visibility ? excludeOne(course) : removeOne(course))}
-                            visible={course.visible.visibility}
+                        {isBachelorOrLicentiateProgramme(studyProgramme) && (
+                          <CriterionLabelSelectButton
+                            course={course}
+                            criteria={criteria}
+                            studyProgramme={studyProgramme}
                           />
-                          {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                            <CriterionLabelSelectButton
-                              course={course}
-                              criteria={criteria}
-                              studyProgramme={studyProgramme}
-                            />
-                          )}
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-            </Fragment>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                        )}
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+          </Fragment>
+        ))}
+      </TableBody>
+    </StyledTable>
   )
 }
