@@ -20,7 +20,7 @@ import { DateFormat } from '@/constants/date'
 import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
-import { CheckIcon, CloseIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
+import { CheckIcon, CloseIcon, EditIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
 import { isMedicalProgramme } from '@/util/studyProgramme'
 import { formatDate } from '@/util/timeAndDate'
 import {
@@ -34,6 +34,7 @@ import {
 import { StudentCourse } from '@oodikone/shared/types/studentData'
 import { keyBy, range } from '@oodikone/shared/util'
 import '@/components/PopulationComponents/Students/Table/ProgressTab/index.css'
+import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 
 dayjsExtend(isBetween)
 dayjsExtend(isSameOrBefore)
@@ -614,6 +615,7 @@ export const ProgressTable = ({
               toolbarContent={
                 <>
                   <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+                  <FilterDegreeCoursesModal degreeProgramme={programme} text="Modify criteria" icon={<EditIcon />} />
                   <StudentNameVisibilityToggle />
                 </>
               }

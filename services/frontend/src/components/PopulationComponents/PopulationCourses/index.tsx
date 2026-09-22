@@ -38,7 +38,9 @@ export const PopulationCourses = ({
   return (
     <>
       <Stack direction="row" spacing={2} sx={{ my: 1, justifyContent: 'space-between' }}>
-        {query.programme && !onlyIamRights ? <FilterDegreeCoursesModal degreeProgramme={query.programme} /> : null}
+        {query.programme && !onlyIamRights ? (
+          <FilterDegreeCoursesModal degreeProgramme={query.programme} text="Manage course / module visibility" />
+        ) : null}
         <InfoBox content={tooltipText} />
       </Stack>
       <SegmentDimmer isLoading={isLoading} />

@@ -104,7 +104,7 @@ export const PopulationStudents = ({
         curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
         idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
-        programme={programme ?? ''}
+        programme={programme}
       />
     ),
     Modules: (
@@ -113,6 +113,7 @@ export const PopulationStudents = ({
         curriculum={curriculum}
         idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
+        programme={programme}
       />
     ),
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,

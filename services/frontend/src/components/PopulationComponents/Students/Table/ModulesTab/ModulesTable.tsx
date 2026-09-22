@@ -13,6 +13,7 @@ import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStud
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationComponents/Students/Table/ModulesTab'
 import { CheckIcon, CropSquareIcon } from '@/theme'
+import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 
 const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
@@ -22,9 +23,11 @@ const ooditableColumnHelper = createColumnHelper<ModuleTabStudent>()
 export const ModulesTab = ({
   formattedModules,
   formattedStudents,
+  programme,
 }: {
   formattedModules: FormattedModules
   formattedStudents: ModuleTabStudent[]
+  programme: string
 }) => {
   const { getTextIn } = useLanguage()
   const { visible: namesVisible } = useStudentNameVisibility()
@@ -189,6 +192,7 @@ export const ModulesTab = ({
       toolbarContent={
         <>
           <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
+          <FilterDegreeCoursesModal degreeProgramme={programme} text="Manage module visibility" />
           <StudentNameVisibilityToggle />
         </>
       }

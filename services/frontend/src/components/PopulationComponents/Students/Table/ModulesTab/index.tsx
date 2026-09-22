@@ -90,11 +90,13 @@ export const ModulesTabContainer = ({
   students,
   courses,
   idToGroupIdMap,
+  programme,
 }: {
   curriculum: ExtendedCurriculumDetails | null | undefined
   students: Student[]
   courses: FilteredCourse[]
   idToGroupIdMap: Record<string, string>
+  programme: string
 }) => {
   const curriculumModules = useMemo(
     () => (curriculum ? [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules] : []),
@@ -119,5 +121,5 @@ export const ModulesTabContainer = ({
     [students, degreeProgrammeCodes, idToGroupIdMap, groupIdToCode]
   )
 
-  return <ModulesTab formattedModules={formattedModules} formattedStudents={formattedStudents} />
+  return <ModulesTab formattedModules={formattedModules} formattedStudents={formattedStudents} programme={programme} />
 }
