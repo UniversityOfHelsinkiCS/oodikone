@@ -1,0 +1,137 @@
+import { EventEmitter } from 'events'
+import knex, { type Knex } from 'knex'
+import { Sequelize } from 'sequelize'
+import { Umzug, SequelizeStorage } from 'umzug'
+
+import {
+  MIGRATIONS_LOCK,
+  isDev,
+  runningInCI,
+  DB_URL,
+  SIS_IMPORTER_HOST,
+  SIS_IMPORTER_PORT,
+  SIS_IMPORTER_USER,
+  SIS_IMPORTER_PASSWORD,
+  SIS_IMPORTER_DATABASE,
+  SIS_PASSWORD,
+} from '../config'
+import logger from '../utils/logger'
+import { lock } from '../utils/redis'
+
+class DbConnections extends EventEmitter {
+  RETRY_ATTEMPTS = 15
+  knexConnection = false
+  seqConnection = false
+  /** @type {import('knex').Knex | undefined} */
+  knex!: Knex
+  /** @type {import('sequelize').Sequelize | undefined} */
+  sequelize: Sequelize
+
+  constructor() {
+    super()
+    this.sequelize = new Sequelize(DB_URL!, {
+      dialect: 'postgres',
+      pool: {
+        max: 25,
+        min: 0,
+        acquire: 20000,
+        idle: 300000000,
+      },
+      logging: false,
+      password: SIS_PASSWORD,
+    })
+  }
+
+  /**
+   * Registers named connection as established and emits 'connect' to the scheduler.
+   * @param {'knexConnection' | 'seqConnection'} conn
+   */
+  establish(conn: 'knexConnection' | 'seqConnection') {
+    this[conn] = true
+    if (this.knexConnection && this.seqConnection) this.emit('connect')
+  }
+
+  /**
+   * Tries to connect to the importer. Calls itself recursively if the connection fails.
+   * @param {number} [attempt=1] - Current connection attempt.
+   */
+  async connect(attempt = 1) {
+    try {
+      if (!this.knexConnection) {
+        this.knex = knex({
+          client: 'pg',
+          connection: {
+            host: SIS_IMPORTER_HOST,
+            user: SIS_IMPORTER_USER,
+            password: SIS_IMPORTER_PASSWORD,
+            database: SIS_IMPORTER_DATABASE,
+            port: SIS_IMPORTER_PORT,
+            ssl: !isDev && !runningInCI ? { rejectUnauthorized: false } : false,
+          },
+          pool: {
+            min: 0,
+            max: 25,
+          },
+        })
+        await this.knex.raw('select 1+1 as result')
+        this.establish('knexConnection')
+      }
+
+      if (!this.seqConnection) {
+        await this.sequelize.authenticate()
+        await this.runMigrations()
+        this.establish('seqConnection')
+      }
+    } catch (error) {
+      if (attempt > this.RETRY_ATTEMPTS) {
+        this.emit('error', error)
+        return
+      }
+      logger.error(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      setTimeout(() => void this.connect(attempt + 1), 1000 * attempt)
+    }
+  }
+
+  /**
+   * Runs migrations from `src/db/migrations` using Umzug.
+   */
+  async runMigrations() {
+    const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
+    try {
+      const migrator = new Umzug({
+        storage: new SequelizeStorage({
+          sequelize: this.sequelize,
+          tableName: 'migrations',
+        }),
+        migrations: {
+          glob: ['migrations/*.cjs', { cwd: __dirname }],
+          resolve: ({ name, path, context }) => {
+            const getMigration = async () => await import(path!)
+            return {
+              // Migration names need to end in .js for legacy reasons
+              // modifying this behaviour requires manually altering the db 'migrations' table
+              // else umzug will attempt to reapply all migrations
+              // which will not work for many of them -> would need to rewrite migration files..
+              name: name.replace(/\.cjs$/, '.js'),
+              up: async () => (await getMigration()).up(context, Sequelize),
+              down: async () => (await getMigration()).down(context, Sequelize),
+            }
+          },
+        },
+        context: this.sequelize.getQueryInterface(),
+        logger,
+      })
+
+      const newMigrations = (await migrator.up()).map(m => m.name)
+      const executedMigrations = await migrator.executed()
+      logger.info({ message: 'Migrations up to date', meta: newMigrations, latest: executedMigrations.at(-1)?.name })
+    } catch (error) {
+      logger.error({ message: 'Migration error', meta: JSON.stringify(error) })
+      throw error
+    } finally {
+      await unlock()
+    }
+  }
+}
+
+export const dbConnections = new DbConnections()

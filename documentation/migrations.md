@@ -56,7 +56,7 @@ If you need to **revert a migration locally**, follow these steps:
 
 1. Locate the `migrator.up()` function in the code:
    - For `user-db` and `kone-db`: [`services/backend/src/database/connection.ts`](../services/backend/src/database/connection.ts)
-   - For `sis-db`: [`updater/sis-updater-worker/src/db/connection.js`](../updater/sis-updater-worker/src/db/connection.js)
+   - For `sis-db`: [`updater/sis-updater-worker/src/db/connection.ts`](../updater/sis-updater-worker/src/db/connection.ts)
 1. Change `migrator.up()` to `migrator.down()` and save the file. The latest migration will be reverted automatically when the server reloads.
 1. **Important:** After the migration is reverted, change `migrator.down()` back to `migrator.up()` to ensure future migrations run correctly.
 1. For more instructions, see the [umzug documentation](https://github.com/sequelize/umzug?tab=readme-ov-file#usage).

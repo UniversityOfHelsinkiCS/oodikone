@@ -7,8 +7,10 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
 
-    "rootDir": ".",
     "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -20,5 +22,5 @@
     "inlineSources": true,
     "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src", "tests", "vitest.config.mts"]
 }
