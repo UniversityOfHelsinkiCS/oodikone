@@ -1,23 +1,25 @@
-const winston = require('winston')
-const LokiTransport = require('winston-loki')
-const Sentry = require('winston-transport-sentry-node').default
+import winston from 'winston'
+import LokiTransport from 'winston-loki'
+import SentryTransport from 'winston-transport-sentry-node'
 
-const { isDev, isStaging, isProduction, runningInCI, SENTRY_DSN } = require('../config')
+import { isDev, isStaging, isProduction, runningInCI, SENTRY_DSN } from '../config'
 
 const { combine, timestamp, printf, colorize, uncolorize } = winston.format
 
-const transports = []
+const transports: winston.transport[] = []
 
 if (isProduction && !isStaging && !runningInCI && SENTRY_DSN) {
-  transports.push(new Sentry({ level: 'error' }))
+  transports.push(new SentryTransport({ level: 'error' }))
 }
 
+// TODO: Type this
 const devFormat = printf(
-  ({ timestamp, level, message, error, ...rest }) =>
+  ({ timestamp, level, message, error, ...rest }: any) =>
     `${timestamp} ${level}: ${message}${error ? ` ${error.stack}` : ''}${rest ? ` ${JSON.stringify(rest)}` : ''}`
 )
 
-const prodFormat = printf(({ timestamp, level, message, error, ...rest }) => {
+// TODO: Type this
+const prodFormat = printf(({ timestamp, level, message, error, ...rest }: any) => {
   const log = { timestamp, level, message, ...rest }
   if (error) {
     log.error = error.stack
@@ -43,10 +45,6 @@ transports.push(
   })
 )
 
-const logger = winston.createLogger({ transports })
+export const logger = winston.createLogger({ transports })
 
 logger.on('error', error => console.error('Logging failed! Reason: ', error)) // eslint-disable-line no-console
-
-module.exports = {
-  logger,
-}

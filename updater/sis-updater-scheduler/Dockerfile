@@ -1,3 +1,16 @@
+FROM registry.access.redhat.com/ubi10/nodejs-24-minimal AS build
+
+WORKDIR /opt/app-root/src
+
+ENV TZ="Europe/Helsinki"
+
+COPY ./.npmrc .
+COPY ./package*.json ./
+RUN npm ci --include=dev
+COPY . .
+RUN npm run build
+
+
 FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
 
 WORKDIR /opt/app-root/src
@@ -12,11 +25,11 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 
-COPY ./.npmrc .
-COPY ./package*.json ./
+COPY --from=build /opt/app-root/src/.npmrc .
+COPY --from=build /opt/app-root/src/package*.json ./
+COPY --from=build /opt/app-root/src/dist ./dist
 RUN npm ci --omit=dev
-COPY . .
 
 EXPOSE 8082
 
-CMD ["node", "src/index.js"]
+CMD ["node", "dist/index.js"]

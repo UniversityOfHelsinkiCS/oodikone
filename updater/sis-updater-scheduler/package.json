@@ -2,11 +2,11 @@
   "name": "sis-updater-scheduler",
   "private": true,
   "scripts": {
-    "start": "node ./src/index.js",
-    "dev": "nodemon ./src/index.js"
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "dev": "nodemon --exec \"node --import tsx ./src/index.ts\" --ext ts,js,json --watch src"
   },
   "dependencies": {
-    "@types/pg": "^8.18.0",
     "bullmq": "^5.53.2",
     "cron": "^4.3.1",
     "express": "^4.22.2",
@@ -20,6 +20,12 @@
     "winston-transport-sentry-node": "^3.0.0"
   },
   "devDependencies": {
-    "nodemon": "3.1.14"
+    "@types/express": "^4.17.23",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^24.10.1",
+    "@types/pg": "^8.18.0",
+    "nodemon": "3.1.14",
+    "tsx": "^4.19.4",
+    "typescript": "^7.0.2"
   }
 }

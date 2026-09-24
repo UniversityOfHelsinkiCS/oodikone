@@ -1,19 +1,19 @@
-const { chunk } = require('lodash-es')
+import { chunk } from 'lodash-es'
 
-const {
+import {
   CHUNK_SIZE,
   isDev,
   DEV_SCHEDULE_COUNT,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
   LATEST_MESSAGE_RECEIVED_THRESHOLD,
-} = require('./config')
-const { knexConnection } = require('./db/connection')
-const { startPrePurge, startPurge } = require('./purge')
-const { queue } = require('./queue')
-require('./jobEvents')
-const { logger } = require('./utils/logger')
-const { redisClient } = require('./utils/redis')
+} from './config'
+import { knexConnection } from './db/connection'
+import { startPrePurge, startPurge } from './purge'
+import { queue } from './queue'
+import './jobEvents'
+import { logger } from './utils/logger'
+import { redisClient } from './utils/redis'
 
 const IMPORTER_TABLES = {
   attainments: 'attainments',
@@ -31,6 +31,17 @@ const IMPORTER_TABLES = {
   enrolments: 'enrolments',
 }
 
+type ScheduleFromDbParams = {
+  table: string
+  distinct?: string
+  pluck?: string
+  whereNotNull?: string
+  scheduleId?: string
+  limit?: typeof DEV_SCHEDULE_COUNT
+  whereIn?: [string, string[]]
+  clean?: boolean
+}
+
 const scheduleFromDb = async ({
   table,
   distinct,
@@ -40,7 +51,7 @@ const scheduleFromDb = async ({
   limit,
   whereIn,
   clean = true,
-}) => {
+}: ScheduleFromDbParams) => {
   const { knex } = knexConnection
   const knexBuilder = knex(table)
   if (distinct) knexBuilder.distinct(distinct)
@@ -54,12 +65,12 @@ const scheduleFromDb = async ({
     knexBuilder.where('updated_at', '>=', new Date(lastHourlySchedule))
   }
   const entities = await knexBuilder
-  const chunks = chunk(entities, CHUNK_SIZE)
+  const chunks = chunk<any>(entities, CHUNK_SIZE)
   await queue.addBulk(chunks.map(entities => ({ name: scheduleId ?? table, data: entities })))
   return entities.length
 }
 
-const scheduleMeta = async (clean = true) => {
+export const scheduleMeta = async (clean = true) => {
   await scheduleFromDb({
     table: IMPORTER_TABLES.organisations,
     clean,
@@ -103,7 +114,7 @@ const scheduleMeta = async (clean = true) => {
   logger.info('Scheduled meta')
 }
 
-const scheduleStudents = async () => {
+export const scheduleStudents = async () => {
   await scheduleFromDb({
     scheduleId: 'students',
     table: IMPORTER_TABLES.persons,
@@ -118,10 +129,10 @@ const getHourlyPersonsToUpdate = async () => {
   const { knex } = knexConnection
   const lastHourlyScheduleFromRedis = await redisClient.get(REDIS_LAST_HOURLY_SCHEDULE)
   const lastHourlySchedule = lastHourlyScheduleFromRedis ?? new Date(new Date().setHours(0, 0, 0, 0))
-  const getUpdatedFrom = (table, pluck) => {
+  const getUpdatedFrom = (table: string, pluck: string) => {
     const builder = knex(table).pluck(pluck)
     if (lastHourlySchedule) builder.where('updated_at', '>=', new Date(lastHourlySchedule))
-    if (isDev) builder.limit(DEV_SCHEDULE_COUNT)
+    if (isDev && DEV_SCHEDULE_COUNT) builder.limit(DEV_SCHEDULE_COUNT)
     return builder
   }
 
@@ -150,7 +161,7 @@ const getHourlyPersonsToUpdate = async () => {
   )
 }
 
-const scheduleByStudentNumbers = async studentNumbers => {
+export const scheduleByStudentNumbers = async (studentNumbers: string[]) => {
   logger.info('Scheduling by student numbers')
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
@@ -158,7 +169,7 @@ const scheduleByStudentNumbers = async studentNumbers => {
   await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students_with_purge', data: personsToUpdate })))
 }
 
-const scheduleByCourseCodes = async courseCodes => {
+export const scheduleByCourseCodes = async (courseCodes: string[]) => {
   logger.info('Scheduling course codes')
   const { knex } = knexConnection
   const coursesToUpdate = await knex(IMPORTER_TABLES.courseUnits)
@@ -170,15 +181,15 @@ const scheduleByCourseCodes = async courseCodes => {
   await queue.addBulk(courseChunks.map(courses => ({ name: 'course_units', data: courses })))
 }
 
-const isUpdaterActive = async () => {
+export const isUpdaterActive = async () => {
   const latestUpdaterHandledMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
-  return (
+  return !!(
     latestUpdaterHandledMessage &&
     new Date().getTime() - new Date(latestUpdaterHandledMessage).getTime() <= LATEST_MESSAGE_RECEIVED_THRESHOLD
   )
 }
 
-const scheduleHourly = async () => {
+export const scheduleHourly = async () => {
   try {
     // Update meta that have changed between now and the last update
     await scheduleMeta(false)
@@ -190,12 +201,14 @@ const scheduleHourly = async () => {
     const personChunks = chunk(personsToUpdate, CHUNK_SIZE)
     await queue.addBulk(personChunks.map(personsToUpdate => ({ name: 'students', data: personsToUpdate })))
   } catch (error) {
-    logger.error({ message: 'Hourly scheduling failed', meta: error.stack })
-    throw error
+    if (error instanceof Error) {
+      logger.error({ message: 'Hourly scheduling failed', meta: error.stack })
+      throw error
+    }
   }
 }
 
-const scheduleProgrammes = async () => {
+export const scheduleProgrammes = async () => {
   logger.info('Scheduling programmes')
   const { knex } = knexConnection
 
@@ -204,49 +217,44 @@ const scheduleProgrammes = async () => {
   try {
     await queue.add('programme_modules', entityIds)
   } catch (error) {
-    logger.error({ message: 'Programme module scheduling failed', meta: error.stack })
-    throw error
+    if (error instanceof Error) {
+      logger.error({ message: 'Programme module scheduling failed', meta: error.stack })
+      throw error
+    }
   }
 }
 
-const scheduleWeekly = async () => {
+export const scheduleWeekly = async () => {
   try {
     await scheduleProgrammes()
     await scheduleMeta()
     await scheduleStudents()
   } catch (error) {
-    logger.error({ message: 'Weekly scheduling failed', meta: error.stack })
-    throw error
+    if (error instanceof Error) {
+      logger.error({ message: 'Weekly scheduling failed', meta: error.stack })
+      throw error
+    }
   }
 }
 
-const schedulePrePurge = async () => {
+export const schedulePrePurge = async () => {
   try {
     await startPrePurge()
   } catch (error) {
-    logger.error({ message: 'Scheduling prepurge failed', meta: error.stack })
-    throw error
+    if (error instanceof Error) {
+      logger.error({ message: 'Scheduling prepurge failed', meta: error.stack })
+      throw error
+    }
   }
 }
 
-const schedulePurge = async () => {
+export const schedulePurge = async () => {
   try {
     await startPurge()
   } catch (error) {
-    logger.error({ message: 'Scheduling purge failed', meta: error.stack })
-    throw error
+    if (error instanceof Error) {
+      logger.error({ message: 'Scheduling purge failed', meta: error.stack })
+      throw error
+    }
   }
-}
-
-module.exports = {
-  scheduleMeta,
-  scheduleStudents,
-  scheduleProgrammes,
-  scheduleHourly,
-  scheduleWeekly,
-  schedulePrePurge,
-  schedulePurge,
-  scheduleByStudentNumbers,
-  scheduleByCourseCodes,
-  isUpdaterActive,
 }

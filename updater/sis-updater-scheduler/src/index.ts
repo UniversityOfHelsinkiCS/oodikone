@@ -1,18 +1,18 @@
-const {
+import {
   isDev,
   isStaging,
   REDIS_LAST_WEEKLY_SCHEDULE,
   REDIS_LAST_HOURLY_SCHEDULE,
   EXIT_AFTER_IMMEDIATES,
   SCHEDULE_IMMEDIATE,
-} = require('./config')
-const { knexConnection } = require('./db/connection')
-const { queue } = require('./queue')
-const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
-const { startServer } = require('./server')
-const { schedule: scheduleCron } = require('./utils/cron')
-const { logger } = require('./utils/logger')
-const { redisClient } = require('./utils/redis')
+} from './config'
+import { knexConnection } from './db/connection'
+import { queue } from './queue'
+import { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } from './scheduler'
+import { startServer } from './server'
+import { schedule as scheduleCron } from './utils/cron'
+import { logger } from './utils/logger'
+import { redisClient } from './utils/redis'
 
 knexConnection.connect().catch(error => {
   logger.error('Knex database connection failed', { error })
@@ -30,8 +30,12 @@ const JOB_TYPES = {
   purge: schedulePurge,
 }
 
-const scheduleJob = async type => {
-  if (!JOB_TYPES[type]) {
+type JobType = keyof typeof JOB_TYPES
+
+const isJobType = (type: string): type is JobType => !!JOB_TYPES[type]
+
+const scheduleJob = async (type: string) => {
+  if (!isJobType(type)) {
     logger.info(`Cannot schedule unknown job type '${type}'.`)
     return
   }
@@ -50,18 +54,18 @@ const scheduleJob = async type => {
 
 /** Wait for all jobs to finish eg. queue to be empty and then resolve the promise */
 const waitForAllJobs = async () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     setInterval(async () => {
       const jobs = await queue.getJobCounts('active', 'waiting', 'failed')
       if (jobs.failed > 0) {
         logger.error('Failed job found.')
-        clearTimeout()
-        return reject()
+        clearTimeout(undefined)
+        return reject(new Error('Failed job'))
       }
 
       if (jobs.active === 0 && jobs.waiting === 0) {
         logger.info('All jobs finished.')
-        clearTimeout()
+        clearTimeout(undefined)
         return resolve()
       }
       logger.info('Jobs still in queue:', jobs)
@@ -78,13 +82,15 @@ const handleImmediates = async () => {
       process.exit(0)
     }
   } catch (error) {
-    logger.error({
-      message: `Running immediate job failed: ${error?.message}`,
-      meta: error.stack,
-    })
+    if (error instanceof Error) {
+      logger.error({
+        message: `Running immediate job failed: ${error?.message}`,
+        meta: error.stack,
+      })
 
-    if (EXIT_AFTER_IMMEDIATES) {
-      process.exit(1)
+      if (EXIT_AFTER_IMMEDIATES) {
+        process.exit(1)
+      }
     }
   }
 }
@@ -112,10 +118,12 @@ knexConnection.on('connect', async () => {
       logger.info('Starting hourly')
       await scheduleHourly()
     } catch (error) {
-      logger.error({
-        message: `Hourly run failed: ${error?.message}`,
-        meta: error.stack,
-      })
+      if (error instanceof Error) {
+        logger.error({
+          message: `Hourly run failed: ${error?.message}`,
+          meta: error.stack,
+        })
+      }
     }
 
     await redisClient.set(REDIS_LAST_HOURLY_SCHEDULE, new Date().toISOString())
@@ -129,10 +137,12 @@ knexConnection.on('connect', async () => {
     try {
       await scheduleWeekly()
     } catch (error) {
-      logger.error({
-        message: `Weekly run failed: ${error?.message}`,
-        meta: error.stack,
-      })
+      if (error instanceof Error) {
+        logger.error({
+          message: `Weekly run failed: ${error?.message}`,
+          meta: error.stack,
+        })
+      }
     }
 
     await redisClient.set(REDIS_LAST_WEEKLY_SCHEDULE, new Date().toISOString())
@@ -146,10 +156,12 @@ knexConnection.on('connect', async () => {
     try {
       await schedulePrePurge()
     } catch (error) {
-      logger.error({
-        message: `Prepurge failed: ${error?.message}`,
-        meta: error.stack,
-      })
+      if (error instanceof Error) {
+        logger.error({
+          message: `Prepurge failed: ${error?.message}`,
+          meta: error.stack,
+        })
+      }
     }
   })
 
@@ -162,10 +174,12 @@ knexConnection.on('connect', async () => {
     try {
       await schedulePurge()
     } catch (error) {
-      logger.error({
-        message: `Purge failed: ${error?.message}`,
-        meta: error.stack,
-      })
+      if (error instanceof Error) {
+        logger.error({
+          message: `Purge failed: ${error?.message}`,
+          meta: error.stack,
+        })
+      }
     }
   })
 })

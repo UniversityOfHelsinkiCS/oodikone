@@ -1,9 +1,9 @@
-const { createClient } = require('redis')
+import { createClient } from 'redis'
 
-const { REDIS_HOST, REDIS_PORT } = require('../config')
-const { logger } = require('./logger')
+import { REDIS_HOST, REDIS_PORT } from '../config'
+import { logger } from './logger'
 
-const redisClient = createClient({
+export const redisClient = createClient({
   url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
 })
 
@@ -17,5 +17,3 @@ redisClient
   })
 
 redisClient.on('error', error => logger.error('Redis Client Error', { error }))
-
-module.exports = { redisClient }

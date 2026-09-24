@@ -251,6 +251,12 @@
       }
     },
     {
+      "files": ["updater/sis-updater-scheduler/src/**/*.ts"],
+      "rules": {
+        "typescript/no-misused-promises": "off"
+      }
+    },
+    {
       "files": ["{updater,services}/**/*.{js,cjs}"],
       "rules": {
         "typescript/await-thenable": "off",

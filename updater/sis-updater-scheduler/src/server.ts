@@ -1,38 +1,39 @@
-const express = require('express')
+import express, { Request, Response, NextFunction } from 'express'
 
-require('express-async-errors')
-const { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } = require('./config')
-const { sendToSlack } = require('./purge')
-const { queue } = require('./queue')
-const {
+import 'express-async-errors'
+import { SECRET_TOKEN, REDIS_LATEST_MESSAGE_RECEIVED } from './config'
+import { sendToSlack } from './purge'
+import { queue } from './queue'
+import {
   scheduleMeta,
   scheduleStudents,
   scheduleProgrammes,
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
-} = require('./scheduler')
-const { logger } = require('./utils/logger')
-const { redisClient } = require('./utils/redis')
+} from './scheduler'
+import { logger } from './utils/logger'
+import { redisClient } from './utils/redis'
 
 const bakeMessage =
-  res =>
+  (res: Response) =>
   (message = '', status = 200) => {
     res.status(status).json({ message })
   }
 
-const message = (_, res, next) => {
+const message = (_: Request, res: Response, next: NextFunction) => {
   res.locals.msg = bakeMessage(res)
   next()
 }
 
-const auth = (req, res, next) => {
+const auth = (req: Request, res: Response, next: NextFunction) => {
   if (req.query.token === SECRET_TOKEN) {
-    return next()
+    next()
+    return
   }
   res.locals.msg('Token missing or invalid', 403)
 }
 
-const errorBoundary = (error, _, res, next) => {
+const errorBoundary = (error: Error, _: Request, res: Response, next: NextFunction) => {
   logger.error(error.stack)
   res.locals.msg('Internal server error', 500)
   next(error)
@@ -51,9 +52,11 @@ app.get('/healthcheck', async (_, res) => {
   const latestMessage = await redisClient.get(REDIS_LATEST_MESSAGE_RECEIVED)
   const threshold = new Date().getTime() - 1000 * 60 * 60 * 6 // 6 hours ago
   if (!latestMessage || new Date(latestMessage).getTime() < threshold) {
-    return res.status(400).send()
+    res.status(400).send()
+    return
   }
   res.status(200).send()
+  return
 })
 
 app.use(auth)
@@ -72,7 +75,7 @@ app.get('/students', async (_, res) => {
 })
 
 app.post('/studyplans', async (req, res) => {
-  const { studentnumbers } = req.body
+  const studentnumbers = req.body?.studentnumbers ?? []
   const msg = `Scheduling update of ${studentnumbers.length} students whose studyplan has not been updated recently`
   logger.info(msg)
   await sendToSlack(msg)
@@ -88,7 +91,7 @@ app.get('/programmes', async (_, res) => {
 })
 
 app.post('/students', async (req, res) => {
-  const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
+  const studentnumbers = (req.body?.studentnumbers ?? []).map((n: string) => (n.startsWith('0') ? n : `0${n}`))
 
   logger.info(`Scheduling ${studentnumbers.length} custom studentnumbers`)
 
@@ -96,23 +99,23 @@ app.post('/students', async (req, res) => {
   res.locals.msg('Scheduled studentnumbers')
 })
 
-app.get('/rediscache', async (req, res) => {
-  await queue.add('reload_redis')
+app.get('/rediscache', async (_req, res) => {
+  await queue.add('reload_redis', null)
   logger.info('Scheduled redis cache reloading')
   res.locals.msg('Scheduled redis cache reloading')
 })
 
-app.get('/nuke_redis', async (req, res) => {
-  await queue.add('nuke_redis')
+app.get('/nuke_redis', async (_req, res) => {
+  await queue.add('nuke_redis', null)
   logger.info('Scheduled wiping of redis')
   res.locals.msg('Scheduled wiping of redis')
 })
 
-app.get('/abort', async (req, res) => {
+app.get('/abort', async (_req, res) => {
   const jobCountsBeforeDrain = await queue.getJobCounts()
   await queue.drain()
   const jobCountsAfterDrain = await queue.getJobCounts()
-  const differences = {}
+  const differences: Record<string, number> = {}
   for (const key in jobCountsBeforeDrain) {
     const difference = jobCountsBeforeDrain[key] - jobCountsAfterDrain[key]
     if (difference) {
@@ -127,7 +130,7 @@ app.get('/abort', async (req, res) => {
 })
 
 app.post('/courses', async (req, res) => {
-  await scheduleByCourseCodes(req.body.coursecodes)
+  await scheduleByCourseCodes(req.body?.coursecodes ?? [])
 
   logger.info('Scheduled courses')
   res.locals.msg('Scheduled courses')
@@ -136,12 +139,8 @@ app.post('/courses', async (req, res) => {
 app.use(errorBoundary)
 
 const PORT = 8082
-const startServer = () => {
+export const startServer = () => {
   app.listen(PORT, () => {
     logger.info(`Scheduler server listening on port ${PORT}`)
   })
-}
-
-module.exports = {
-  startServer,
 }

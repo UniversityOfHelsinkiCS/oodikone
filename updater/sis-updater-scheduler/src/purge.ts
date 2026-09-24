@@ -1,7 +1,7 @@
-const { REDIS_LAST_PREPURGE_INFO, SLACK_WEBHOOK } = require('./config')
-const { queue } = require('./queue')
-const { logger } = require('./utils/logger')
-const { redisClient } = require('./utils/redis')
+import { REDIS_LAST_PREPURGE_INFO, SLACK_WEBHOOK } from './config'
+import { queue } from './queue'
+import { logger } from './utils/logger'
+import { redisClient } from './utils/redis'
 
 const PURGE_ROWS_OLDER_THAN_DAYS = 30
 const MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE = 4
@@ -21,7 +21,7 @@ const TABLES_TO_PURGE = [
   'teacher',
 ]
 
-const sendToSlack = async text => {
+export const sendToSlack = async (text: string) => {
   logger.info('Sending to slack', { text })
   if (!SLACK_WEBHOOK) {
     logger.warn('SLACK_WEBHOOK environment variable is not set. Skipping Slack notification.')
@@ -69,7 +69,8 @@ const setPurgeInfo = async purgeTargetDate => {
   await redisClient.set(REDIS_LAST_PREPURGE_INFO, JSON.stringify({ purgeAfterDate: purgeStartDate, purgeTargetDate }))
 }
 
-const setupPurge = async ({ counts, before }) => {
+// TODO: Type jobs and queue
+export const setupPurge = async ({ counts, before }: { counts: number; before: any }) => {
   const rowsToBeDeleted = Object.entries(counts)
     .map(([table, count]) => (count === 0 ? null : `${count} rows from ${table}`))
     .filter(Boolean)
@@ -86,7 +87,7 @@ const setupPurge = async ({ counts, before }) => {
   await setPurgeInfo(before)
 }
 
-const startPrePurge = async () => {
+export const startPrePurge = async () => {
   const { prePurgeThresholdDate: before } = getPrePurgeDates()
   await queue.add('prepurge_start', { tables: TABLES_TO_PURGE, before })
 }
@@ -108,17 +109,10 @@ const canPurge = purgeAfterDate => {
   return true
 }
 
-const startPurge = async () => {
+export const startPurge = async () => {
   const { purgeAfterDate, purgeTargetDate } = await getPrePurgeInfo()
 
   if (canPurge(purgeAfterDate)) {
     await queue.add('purge_start', { tables: TABLES_TO_PURGE, before: purgeTargetDate })
   }
-}
-
-module.exports = {
-  startPrePurge,
-  startPurge,
-  sendToSlack,
-  setupPurge,
 }

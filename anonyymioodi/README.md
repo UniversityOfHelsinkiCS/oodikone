@@ -36,7 +36,7 @@ Dumps end up in `.databasedumps/test/<database>.sql`, which is where `db.Dockerf
 
 3. If you're updating `sis-db`:
 
-   - Modify the scheduler limit in [config.js](../updater/sis-updater-scheduler/src/config.js) by setting `module.exports.DEV_SCHEDULE_COUNT = null`.
+   - Modify the scheduler limit in [config.ts](../updater/sis-updater-scheduler/src/config.ts) by setting `export const DEV_SCHEDULE_COUNT = null` if it is not already null.
    - Follow the `sis-updater-worker` logs to ensure everything is running smoothly (`docker logs --follow oodikone-sis-updater-worker`).
 
 4. When you're satisfied with the database, create a dump:
@@ -87,7 +87,7 @@ Dumps end up in `.databasedumps/test/<database>.sql`, which is where `db.Dockerf
 
 3. Truncate all tables in `sis-db` **_except for `migrations` and `semesters`_** (the easiest way is to use Adminer).
 
-4. Modify the scheduler limit in [config.js](../updater/sis-updater-scheduler/src/config.js) by setting `module.exports.DEV_SCHEDULE_COUNT = null`.
+4. Modify the scheduler limit in [config.ts](../updater/sis-updater-scheduler/src/config.ts) by setting `export const DEV_SCHEDULE_COUNT = null` if it is not already null.
 
 5. Navigate to <http://localhost:3000/updater> and click the three buttons (Update meta, Update students, Update curriculums) one by one. This will populate `sis-db` with data from the new `sis-importer-db`. You might want to do each update a couple of times, as the database tables affect each other, and not all necessary data might be generated on the first try.
 
