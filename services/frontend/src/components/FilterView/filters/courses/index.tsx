@@ -117,9 +117,7 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     const toGroupIds = (courseIds: string[]) => courseIds.map(id => options.idToGroupIdMap[id]).filter(Boolean)
 
     const passedCourseGroupIds = toGroupIds(
-      courses
-        .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
-        .map(({ course_id }) => course_id)
+      courses.filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED).map(({ course_id }) => course_id)
     )
 
     const courseGroupIds = toGroupIds(courses.map(({ course_id }) => course_id))
@@ -130,14 +128,13 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
       let foundAttainment = false
       let foundEnrollment = false
 
-      ;[
-        [mainGroupId],
-        ...(options.includeSubstitutions ? (options.substitutedBy?.[mainGroupId] ?? []) : []),
-      ].forEach(group => {
-        foundPassed = foundPassed ? true : group.every(groupId => passedCourseGroupIds.includes(groupId))
-        foundAttainment = foundAttainment ? true : group.every(groupId => courseGroupIds.includes(groupId))
-        foundEnrollment = foundEnrollment ? true : group.every(groupId => enrollmentGroupIds.includes(groupId))
-      })
+      ;[[mainGroupId], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainGroupId] ?? []) : [])].forEach(
+        group => {
+          foundPassed = foundPassed ? true : group.every(groupId => passedCourseGroupIds.includes(groupId))
+          foundAttainment = foundAttainment ? true : group.every(groupId => courseGroupIds.includes(groupId))
+          foundEnrollment = foundEnrollment ? true : group.every(groupId => enrollmentGroupIds.includes(groupId))
+        }
+      )
 
       switch (filterType) {
         case FilterType.ALL:
@@ -160,7 +157,8 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
   selectors: {
     // NOTE: Remember FilterType.ALL === 0 when checking if courseFilters[course] exists
-    isCourseSelected: ({ courseFilters }, courseGroupId) => Object.values(FilterType).includes(courseFilters[courseGroupId]),
+    isCourseSelected: ({ courseFilters }, courseGroupId) =>
+      Object.values(FilterType).includes(courseFilters[courseGroupId]),
     selectedCourseName: ({ courses }, courseGroupIds) => courses[courseGroupIds[0]]?.name,
   },
 

@@ -296,9 +296,10 @@ export const filterCourses = (
     }
   }
 
-  return Array.from(coursestats.values()).map((course): FilteredCourse =>
-    Object.assign(course, {
-      stats: getFinalStats(course, filteredStudents.length),
-    })
+  return Array.from(coursestats.values()).map(
+    (course): FilteredCourse =>
+      Object.assign(course, {
+        stats: getFinalStats(course, filteredStudents.length),
+      })
   )
 }
