@@ -95,8 +95,9 @@ database_menu_opts() {
   msg "suffix: $dbsuffix"
   msg "1) Oodikone"
   msg "2) Importer"
-  msg "3) Toggle data source (test/real)"
-  msg "4) Go back"
+  msg "3) Kone"
+  msg "4) Toggle data source (test/real)"
+  msg "5) Go back"
   msg ""
 }
 
@@ -143,11 +144,16 @@ database_menu() {
         $pgclient -h localhost -p 12346 -U postgres -d "sis-importer-db$dbsuffix" -w
         database_menu_opts
         ;;
-      3|t|T)
+      3|k|K)
+        msg "Kone-db"
+        $pgclient -h localhost -p 4321 -U postgres -d "kone-db$dbsuffix" -w
+        database_menu_opts
+        ;;
+      4|t|T)
         msg "Toggling environment..."
         database_menu_opts
         ;;
-      4|q|Q)
+      5|q|Q)
         msg ""
         break
         ;;
