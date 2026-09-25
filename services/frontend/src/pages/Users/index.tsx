@@ -12,23 +12,17 @@ import { useLazyGetAllUsersQuery } from '@/redux/users'
 export const Users = () => {
   useTitle('Users')
   const { userid } = useParams()
-  const [getAllUsersQuery, { data: users = [], isLoading, isError }] = useLazyGetAllUsersQuery()
+  const [getAllUsersQuery, { data: users = [] }] = useLazyGetAllUsersQuery()
 
   useEffect(() => {
-    if (!userid) {
-      void getAllUsersQuery()
-    }
+    if (!userid) void getAllUsersQuery()
   }, [userid, getAllUsersQuery])
 
   return (
     <PageLayout maxWidth="lg">
       <PageTitle title="Users" />
       <Stack gap={2}>
-        {userid ? (
-          <UserPage userId={userid} />
-        ) : (
-          <UsersTable getAllUsersQuery={getAllUsersQuery} isError={isError} isLoading={isLoading} users={users} />
-        )}
+        {userid ? <UserPage userId={userid} /> : <UsersTable getAllUsersQuery={getAllUsersQuery} users={users} />}
       </Stack>
     </PageLayout>
   )

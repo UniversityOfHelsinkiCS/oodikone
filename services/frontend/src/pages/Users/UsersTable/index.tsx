@@ -2,31 +2,49 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useCallback, useMemo } from 'react'
+import TextField from '@mui/material/TextField'
+import { createColumnHelper, getFilteredRowModel } from '@tanstack/react-table'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { OodiTable } from '@/components/OodiTable'
 import { MockButton } from '@/components/Users/MockButton'
 import { RoleChip } from '@/components/Users/RoleChip'
 import { DateFormat } from '@/constants/date'
-import { CopyEmailAddressesButton } from '@/pages/Users/UsersTable/CopyEmailAddressesButton'
-import { StatusMessage } from '@/pages/Users/UsersTable/StatusMessage'
+import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetRolesQuery } from '@/redux/users'
+import { SearchIcon, theme } from '@/theme'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
 
+const FilterComponent = ({ setFilter }) => {
+  const [textField, setTextField] = useState('')
+  useEffect(() => {
+    setFilter(textField)
+  }, [textField])
+
+  return (
+    <TextField
+      label="Filter by name or username"
+      onChange={event => setTextField(event.target.value)}
+      size="small"
+      slotProps={{ input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} /> } }}
+      sx={{ width: '320px' }}
+      value={textField}
+    />
+  )
+}
+
+const columnHelper = createColumnHelper<User>()
+
 export const UsersTable = ({
   getAllUsersQuery,
-  isError,
-  isLoading,
   users,
 }: {
   getAllUsersQuery: any // TODO: What is the type?
-  isError: boolean
-  isLoading: boolean
   users: User[]
 }) => {
   const { getTextIn } = useLanguage()
@@ -34,7 +52,7 @@ export const UsersTable = ({
   const { data } = useGetProgrammesQuery()
   const studyProgrammes = data?.filteredProgrammes ?? {}
 
-  const iamGroups = [...new Set(users.map(user => user.iamGroups).flat())]
+  const iamGroups = [...new Set(users?.flatMap(user => user.iamGroups))]
 
   const formatProgrammeRights = useCallback(
     (programmeRights: DetailedProgrammeRights[]) => {
@@ -57,26 +75,27 @@ export const UsersTable = ({
     [getTextIn, studyProgrammes]
   )
 
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
+  const ooditableColumns = useMemo(
     () => [
-      {
-        accessorKey: 'name',
+      columnHelper.accessor('name', {
         header: 'Name',
-        Cell: ({ cell }) => cell.getValue<string>(),
-      },
-      {
-        accessorKey: 'username',
+        cell: cell => cell.getValue<string>(),
+      }),
+      columnHelper.accessor('username', {
         header: 'Username',
-        Cell: ({ cell, row }) => (
-          <Link data-cy={`user-page-button-${row.original.username}`} to={`/users/${row.original.id}`}>
+        cell: cell => (
+          <Link data-cy={`user-page-button-${cell.row.original.username}`} to={`/users/${cell.row.original.id}`}>
             {cell.getValue<string>()}
           </Link>
         ),
-      },
-      {
-        accessorKey: 'roles',
+        filterFn: (row, _, filterValue) => {
+          const { name, username } = row.original
+          return name.toLowerCase().includes(filterValue) || username.toLocaleLowerCase().includes(filterValue)
+        },
+      }),
+      columnHelper.accessor('roles', {
         header: 'Roles',
-        Cell: ({ cell }) => (
+        cell: cell => (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {cell
               .getValue<Role[]>()
@@ -88,19 +107,15 @@ export const UsersTable = ({
         ),
         enableSorting: false,
         size: 350,
-        filterVariant: 'multi-select',
-        filterSelectOptions: roles,
-      },
-      {
-        accessorKey: 'programmeRights',
+      }),
+      columnHelper.accessor('programmeRights', {
         header: 'Programmes',
-        Cell: ({ cell }) => formatProgrammeRights(cell.getValue<DetailedProgrammeRights[]>()),
+        cell: cell => formatProgrammeRights(cell.getValue<DetailedProgrammeRights[]>()),
         enableSorting: false,
-      },
-      {
-        accessorKey: 'iamGroups',
+      }),
+      columnHelper.accessor('iamGroups', {
         header: 'IAM groups',
-        Cell: ({ cell }) => (
+        cell: cell => (
           <Box display="flex" flexWrap="wrap" gap={1}>
             {cell
               .getValue<string[]>()
@@ -112,63 +127,41 @@ export const UsersTable = ({
         ),
         enableSorting: false,
         size: 350,
-        filterVariant: 'multi-select',
-        filterSelectOptions: iamGroups,
-      },
-      {
-        accessorKey: 'lastLogin',
+      }),
+      columnHelper.accessor('lastLogin', {
         header: 'Last login',
-        Cell: ({ cell }) => reformatDate(cell.getValue<string>(), DateFormat.DISPLAY_DATE),
+        cell: cell => reformatDate(cell.getValue<string>(), DateFormat.DISPLAY_DATE),
         enableColumnFilter: false,
-      },
-      {
+      }),
+      columnHelper.display({
         id: 'actions',
         header: 'Actions',
-        Cell: ({ row }) => (
+        cell: cell => (
           <Stack direction="row" gap={1}>
-            <MockButton username={row.original.username} />
+            <MockButton username={cell.row.original.username} />
           </Stack>
         ),
         enableSorting: false,
-      },
+      }),
     ],
     [formatProgrammeRights, getAllUsersQuery, iamGroups, roles]
   )
 
-  const table = useMaterialReactTable({
-    columns,
-    data: users,
-    defaultColumn: { size: 0 },
-    enableBottomToolbar: false,
-    enableColumnOrdering: false,
-    enableDensityToggle: false,
-    enableHiding: false,
-    enablePagination: false,
-    initialState: {
-      showGlobalFilter: true,
-    },
+  const [filter, setFilter] = useDebouncedState('', 250)
+
+  const ooditable = {
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
-      columnOrder: ['name', 'username', 'roles', 'programmeRights', 'iamGroups', 'lastLogin', 'actions'],
-      columnVisibility: {
-        name: true,
-        username: true,
-        roles: true,
-        programmeRights: true,
-        iamGroups: true,
-        lastLogin: true,
-      },
+      columnFilters: [{ id: 'username', value: filter }],
     },
-    renderTopToolbarCustomActions: ({ table }) => {
-      const visibleEmails = table.getPrePaginationRowModel().rows.map(row => row.original.email)
+  }
 
-      return (
-        <Stack alignItems="center" direction="row" gap={1}>
-          <CopyEmailAddressesButton userEmails={visibleEmails} />
-          <StatusMessage isError={isError} isLoading={isLoading} />
-        </Stack>
-      )
-    },
-  })
-
-  return <MaterialReactTable table={table} />
+  return (
+    <OodiTable
+      columns={ooditableColumns}
+      data={users}
+      options={ooditable}
+      toolbarContent={<FilterComponent setFilter={setFilter} />}
+    />
+  )
 }
