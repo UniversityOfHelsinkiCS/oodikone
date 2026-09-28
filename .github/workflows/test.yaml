@@ -15,6 +15,12 @@ on:
       password:
         required: true
         description: 'Toska registry password'
+      s3_access_key:
+        required: true
+        description: 'S3 access key for the test database dumps'
+      s3_secret_key:
+        required: true
+        description: 'S3 secret key for the test database dumps'
 
 jobs:
   # === Static tests / linting ===
@@ -107,10 +113,13 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
+        env:
+          ACCESS_KEY: ${{ secrets.s3_access_key }}
+          SECRET_KEY: ${{ secrets.s3_secret_key }}
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          # ./anonyymioodi/db_utils.sh local sis-db
+          # ./anonyymioodi/manage_test_dbs.sh release sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -143,10 +152,13 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
+        env:
+          ACCESS_KEY: ${{ secrets.s3_access_key }}
+          SECRET_KEY: ${{ secrets.s3_secret_key }}
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # ./anonyymioodi/db_utils.sh local kone-db
+          # ./anonyymioodi/manage_test_dbs.sh release kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -179,10 +191,13 @@ jobs:
           password: ${{ secrets.password }}
 
       - name: 'Let backend run migrations, then push new version of image to toska hub'
+        env:
+          ACCESS_KEY: ${{ secrets.s3_access_key }}
+          SECRET_KEY: ${{ secrets.s3_secret_key }}
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # ./anonyymioodi/db_utils.sh local user-db
+          # ./anonyymioodi/manage_test_dbs.sh release user-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -252,7 +267,10 @@ jobs:
       # - name: Push newly build db to toska hub
       #   if: |
       #     success() && inputs.skip_db_update != 'true'
-      #   run: ./anonyymioodi/db_utils.sh local sis-db
+      #   env:
+      #     ACCESS_KEY: ${{ secrets.s3_access_key }}
+      #     SECRET_KEY: ${{ secrets.s3_secret_key }}
+      #   run: ./anonyymioodi/manage_test_dbs.sh release sis-db
 
       - name: Dump logs on failure
         if: failure()
