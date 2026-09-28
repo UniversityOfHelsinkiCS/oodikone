@@ -119,7 +119,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull sis-updater-worker
           sleep 30 # wait for sis-updater-worker to start and run migrations
-          # ./anonyymioodi/manage_test_dbs.sh release sis-db
+          ./anonyymioodi/manage_test_dbs.sh release sis-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -158,7 +158,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # ./anonyymioodi/manage_test_dbs.sh release kone-db
+          ./anonyymioodi/manage_test_dbs.sh release kone-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -197,7 +197,7 @@ jobs:
         run: |
           docker compose --file docker-compose.ci.yml up --detach --quiet-pull backend --wait
           sleep 30 # wait for backend to start and run migrations
-          # ./anonyymioodi/manage_test_dbs.sh release user-db
+          ./anonyymioodi/manage_test_dbs.sh release user-db
 
       - name: Teardown containers started by compose
         if: always()
@@ -264,13 +264,13 @@ jobs:
           EXIT_AFTER_IMMEDIATES: yes
 
       # TODO: Push the updated sis-db to toska-hub when updater is deterministic with test-data
-      # - name: Push newly build db to toska hub
-      #   if: |
-      #     success() && inputs.skip_db_update != 'true'
-      #   env:
-      #     ACCESS_KEY: ${{ secrets.s3_access_key }}
-      #     SECRET_KEY: ${{ secrets.s3_secret_key }}
-      #   run: ./anonyymioodi/manage_test_dbs.sh release sis-db
+      - name: Push newly build db to toska hub
+        if: |
+          success() && inputs.skip_db_update != 'true'
+        env:
+          ACCESS_KEY: ${{ secrets.s3_access_key }}
+          SECRET_KEY: ${{ secrets.s3_secret_key }}
+        run: ./anonyymioodi/manage_test_dbs.sh release sis-db
 
       - name: Dump logs on failure
         if: failure()
