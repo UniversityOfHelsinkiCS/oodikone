@@ -71,6 +71,7 @@ export const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): St
 export const createCourse = (overrides: Partial<StudentCourse> = {}): StudentCourse => ({
   course_id: 'hy-CU-000000001-2024-08-01',
   course_code: 'MAT001',
+  courseGroupId: 'hy-CU-000000001',
   date: new Date('2024-08-01'),
   passed: true,
   grade: '5',

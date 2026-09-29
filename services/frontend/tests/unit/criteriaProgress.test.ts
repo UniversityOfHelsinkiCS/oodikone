@@ -48,8 +48,10 @@ const createCredit = (
   credits: number,
   credittypecode: CreditTypeCode,
   date: Date
-): PopulationCourseStatsCredit =>
-  createBaseCredit({ grade: '', credits, credittypecode, attainment_date: date, course_id: courseId })
+): PopulationCourseStatsCredit => ({
+  ...createBaseCredit({ grade: '', credits, credittypecode, attainment_date: date, course_id: courseId }),
+  courseGroupId: idToGroupId[courseId],
+})
 
 const STUDY_RIGHT_START = new Date('2024-08-01')
 
