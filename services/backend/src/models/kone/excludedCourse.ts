@@ -17,9 +17,6 @@ export class ExcludedCourseModel extends Model implements ExcludedCourse {
   declare programme_code: ExcludedCourse['programme_code']
 
   @Column(DataType.STRING)
-  declare course_code: ExcludedCourse['course_code']
-
-  @Column(DataType.STRING)
   declare course_group_id: ExcludedCourse['course_group_id']
 
   @Column(DataType.STRING)

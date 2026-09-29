@@ -17,24 +17,6 @@ export class ProgressCriteriaModel extends Model implements ProgressCriteria {
   declare curriculumVersion: ProgressCriteria['curriculumVersion']
 
   @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearOne: ProgressCriteria['coursesYearOne']
-
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearTwo: ProgressCriteria['coursesYearTwo']
-
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearThree: ProgressCriteria['coursesYearThree']
-
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearFour: ProgressCriteria['coursesYearFour']
-
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearFive: ProgressCriteria['coursesYearFive']
-
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare coursesYearSix: ProgressCriteria['coursesYearSix']
-
-  @Column(DataType.ARRAY(DataType.STRING))
   declare courseGroupIdsYearOne: ProgressCriteria['courseGroupIdsYearOne']
 
   @Column(DataType.ARRAY(DataType.STRING))

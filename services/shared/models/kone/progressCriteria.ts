@@ -5,19 +5,12 @@ export type ProgressCriteriaCreation = Optional<ProgressCriteria, 'curriculumVer
 export type ProgressCriteria = {
   code: string
   curriculumVersion: string
-  // TODO: Remove coursesYear* once all rows have been migrated to courseGroupIdsYear*
-  coursesYearOne: string[]
-  coursesYearTwo: string[]
-  coursesYearThree: string[]
-  coursesYearFour: string[]
-  coursesYearFive: string[]
-  coursesYearSix: string[]
-  courseGroupIdsYearOne: string[] | null
-  courseGroupIdsYearTwo: string[] | null
-  courseGroupIdsYearThree: string[] | null
-  courseGroupIdsYearFour: string[] | null
-  courseGroupIdsYearFive: string[] | null
-  courseGroupIdsYearSix: string[] | null
+  courseGroupIdsYearOne: string[]
+  courseGroupIdsYearTwo: string[]
+  courseGroupIdsYearThree: string[]
+  courseGroupIdsYearFour: string[]
+  courseGroupIdsYearFive: string[]
+  courseGroupIdsYearSix: string[]
   creditsYearOne: number
   creditsYearTwo: number
   creditsYearThree: number

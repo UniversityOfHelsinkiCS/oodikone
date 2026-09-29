@@ -4,7 +4,6 @@ import { ProgressCriteria } from '@oodikone/shared/types'
 import { CourseModel } from '../../models'
 import { ProgressCriteriaModel } from '../../models/kone'
 import logger from '../../util/logger'
-import { CRITERIA_YEARS, codesToGroupIds } from './criteriaCourseGroupIds'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>
 
@@ -13,16 +12,6 @@ const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithou
     attributes: { exclude: ['curriculumVersion'] },
     where: { code },
   })
-
-const getGroupIdByCode = async (codes: string[]) => {
-  if (codes.length === 0) return new Map<string, string>()
-  const courses: Array<Pick<CourseModel, 'code' | 'groupId'>> = await CourseModel.findAll({
-    attributes: ['code', 'groupId'],
-    where: { code: { [Op.in]: codes } },
-    raw: true,
-  })
-  return new Map(courses.map(({ code, groupId }) => [code, groupId]))
-}
 
 /** Construct course_group_id => substitutionGroups object */
 const getSubstitutions = async (courseGroupIds: string[]) => {
@@ -49,28 +38,13 @@ const getSubstitutions = async (courseGroupIds: string[]) => {
   )
 }
 
-/**
- * TODO: Remove the fallback to coursesYear* (course codes) once all rows have courseGroupIdsYear*
- * populated and the old columns are dropped.
- */
 const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null) => {
-  const legacyCodes = CRITERIA_YEARS.flatMap(year =>
-    criteria && !criteria[`courseGroupIdsYear${year}`] ? (criteria[`coursesYear${year}`] ?? []) : []
-  )
-  const groupIdByCode = await getGroupIdByCode(legacyCodes)
-
-  const getYear = (year: (typeof CRITERIA_YEARS)[number]) => {
-    const courseGroupIds = criteria?.[`courseGroupIdsYear${year}`]
-    if (courseGroupIds) return courseGroupIds
-    return codesToGroupIds(criteria?.[`coursesYear${year}`] ?? [], groupIdByCode).groupIds
-  }
-
-  const yearOne = getYear('One')
-  const yearTwo = getYear('Two')
-  const yearThree = getYear('Three')
-  const yearFour = getYear('Four')
-  const yearFive = getYear('Five')
-  const yearSix = getYear('Six')
+  const yearOne = criteria?.courseGroupIdsYearOne ?? []
+  const yearTwo = criteria?.courseGroupIdsYearTwo ?? []
+  const yearThree = criteria?.courseGroupIdsYearThree ?? []
+  const yearFour = criteria?.courseGroupIdsYearFour ?? []
+  const yearFive = criteria?.courseGroupIdsYearFive ?? []
+  const yearSix = criteria?.courseGroupIdsYearSix ?? []
   const courseGroupIds = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
 
   const formattedCriteria: ProgressCriteria = {
@@ -196,40 +170,4 @@ export const getCriteria = async (studyProgramme: string) => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
 
   return await formatCriteria(studyProgrammeCriteria)
-}
-
-/**
- * Fills courseGroupIdsYear* for rows that only have the legacy coursesYear* (course codes). Safe to run repeatedly.
- * A year whose codes cannot all be found in the course table is left untouched and reported.
- */
-export const backfillProgressCriteriaGroupIds = async () => {
-  const rows = await ProgressCriteriaModel.findAll()
-  const rowsToBackfill = rows.filter(row =>
-    CRITERIA_YEARS.some(year => !row[`courseGroupIdsYear${year}`] && row[`coursesYear${year}`])
-  )
-  if (rowsToBackfill.length === 0) return
-
-  const allCodes = rowsToBackfill.flatMap(row => CRITERIA_YEARS.flatMap(year => row[`coursesYear${year}`] ?? []))
-  const groupIdByCode = await getGroupIdByCode([...new Set(allCodes)])
-
-  let updatedYears = 0
-  for (const row of rowsToBackfill) {
-    const updates: Partial<Record<`courseGroupIdsYear${(typeof CRITERIA_YEARS)[number]}`, string[]>> = {}
-    for (const year of CRITERIA_YEARS) {
-      const codes = row[`coursesYear${year}`]
-      if (row[`courseGroupIdsYear${year}`] || !codes) continue
-
-      const { groupIds, unmapped } = codesToGroupIds(codes, groupIdByCode)
-      if (unmapped.length > 0) {
-        logger.warn(
-          `Could not find a course group id for progress criteria codes of ${row.code} (${year}): ${unmapped.join(', ')}`
-        )
-        continue
-      }
-      updates[`courseGroupIdsYear${year}`] = groupIds
-      updatedYears++
-    }
-    if (Object.keys(updates).length > 0) await row.update(updates)
-  }
-  logger.info(`Backfilled course group ids for ${updatedYears} progress criteria years`)
 }

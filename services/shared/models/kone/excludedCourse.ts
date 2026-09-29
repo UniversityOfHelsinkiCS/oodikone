@@ -5,9 +5,7 @@ export type ExcludedCourseCreation = Optional<ExcludedCourse, 'id' | 'createdAt'
 export type ExcludedCourse = {
   id: number
   programme_code: string
-  // TODO: Remove course_code once all rows have been migrated to course_group_id
-  course_code: string | null
-  course_group_id: string | null
+  course_group_id: string
   curriculum_version: string
   createdAt: Date
   updatedAt: Date

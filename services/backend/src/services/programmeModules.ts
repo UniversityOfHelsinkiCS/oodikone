@@ -142,9 +142,7 @@ const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: Exclude
       label: `${module.parent_code}\n${module.parent_name?.fi}`,
       orderNumber: module.module_order,
     }
-    const foundCourse = excludedCourses.find(course =>
-      course.course_group_id ? course.course_group_id === module.group_id : course.course_code === module.code
-    )
+    const foundCourse = excludedCourses.find(course => course.course_group_id === module.group_id)
     const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
 
     return { ...module, label, visible }
