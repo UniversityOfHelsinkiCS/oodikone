@@ -7,9 +7,7 @@ import type { FormattedStudent, ProgressCriteria, Unarray } from '@oodikone/shar
 type PopulationCourseStatsEnrollment = Omit<Unarray<PopulationCourseStats['enrollments']>, 'studentnumber'>
 export type PopulationCourseStatsCredit = Omit<Unarray<PopulationCourseStats['credits']>, 'student_studentnumber'>
 
-export interface ExpandedCourseStats extends PopulationCourseStats {
-  dataByStudent: Map<string, [PopulationCourseStatsEnrollment[], PopulationCourseStatsCredit[]]>
-}
+type DataByStudent = Map<string, [PopulationCourseStatsEnrollment[], PopulationCourseStatsCredit[]]>
 
 type RequiredFields = {
   students: Omit<FormattedStudent, 'criteriaProgress' | 'courses' | 'enrollments'>[]
@@ -19,7 +17,7 @@ type RequiredFields = {
 
 export type Output<T> = T & {
   students: FormattedStudent[]
-  coursestatistics: ExpandedCourseStats
+  coursestatistics: PopulationCourseStats
 }
 
 export const formatPopulationData = <T extends RequiredFields>(
@@ -38,9 +36,7 @@ export const formatPopulationData = <T extends RequiredFields>(
   )
 
   const studentNumbers = students.map(({ studentNumber }) => studentNumber)
-  const creditsAndEnrollmentsByStudent: ExpandedCourseStats['dataByStudent'] = new Map(
-    studentNumbers.map(n => [n, [[], []]])
-  )
+  const creditsAndEnrollmentsByStudent: DataByStudent = new Map(studentNumbers.map(n => [n, [[], []]]))
 
   for (const enrollment of enrollments) {
     const { studentnumber, ...rest } = enrollment
@@ -90,7 +86,6 @@ export const formatPopulationData = <T extends RequiredFields>(
     students: formattedStudents,
     coursestatistics: {
       ...coursestatistics,
-      dataByStudent: creditsAndEnrollmentsByStudent,
     },
     ...otherParams,
   }

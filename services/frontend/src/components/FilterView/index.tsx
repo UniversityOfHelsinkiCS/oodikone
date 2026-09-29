@@ -7,10 +7,10 @@ import { FilterViewContext } from '@/components/FilterView/context'
 import type { FilterContext, FilterOptions, GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { FilterTray } from '@/components/FilterView/FilterTray'
 import { useFilterStorage } from '@/components/FilterView/useFilterStorage'
-import type { ExpandedCourseStats } from '@/redux/populations/util'
 import type { FilteredCourse } from '@/util/coursesOfPopulation'
 import { filterCourses } from '@/util/coursesOfPopulation'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
+import type { PopulationCourseStats } from '@oodikone/shared/routes/populations'
 
 export const FilterView = <Options extends FilterOptions>({
   children,
@@ -20,7 +20,7 @@ export const FilterView = <Options extends FilterOptions>({
   initialOptions,
 }: {
   students: Student[]
-  coursestatistics: ExpandedCourseStats | undefined
+  coursestatistics: PopulationCourseStats | undefined
   children: (filteredStudents: Student[], filteredCourses: FilteredCourse[]) => ReactNode
   filters: GenericFilter<Options>[]
   initialOptions: Options

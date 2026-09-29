@@ -1,5 +1,4 @@
-import { ExpandedCourseStats } from '@/redux/populations/util'
-import { CourseStats } from '@oodikone/shared/routes/populations'
+import type { CourseStats, PopulationCourseStats } from '@oodikone/shared/routes/populations'
 import {
   CreditTypeCode,
   EnrollmentState,
@@ -230,7 +229,7 @@ const courseBaseStats = {
 }
 
 export const filterCourses = (
-  courseStatistics: ExpandedCourseStats | undefined,
+  courseStatistics: PopulationCourseStats | undefined,
   filteredStudents: FormattedStudent[]
 ): FilteredCourse[] => {
   if (!courseStatistics) return []
