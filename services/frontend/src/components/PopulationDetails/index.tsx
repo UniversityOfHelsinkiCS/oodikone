@@ -128,14 +128,12 @@ const PopulationDetailsContent = ({
         <>
           <CourseTableModeSelector
             courseTableMode={courseTableMode}
-            curriculum={curriculum}
             onStudentAmountLimitChange={onStudentAmountLimitChange}
             setCourseTableMode={setCourseTableMode}
             studentAmountLimit={studentAmountLimit}
           />
           <PopulationCourses
             courseTableMode={courseTableMode}
-            curriculum={curriculum}
             filteredCourses={filteredCourses}
             isLoading={isLoading}
             onlyIamRights={onlyIamRights}
@@ -153,7 +151,6 @@ const PopulationDetailsContent = ({
           content: (
             <PopulationStudents
               combinedProgramme={combinedProgramme}
-              curriculum={curriculum}
               filteredCourses={filteredCourses}
               filteredStudents={filteredStudents}
               idToGroupIdMap={idToGroupIdMap}

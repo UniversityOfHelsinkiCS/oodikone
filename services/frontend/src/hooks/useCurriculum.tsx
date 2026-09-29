@@ -30,7 +30,7 @@ export const CurriculumProvider = ({
   return <CurriculumContext.Provider value={value}>{children}</CurriculumContext.Provider>
 }
 
-/** Context variant of the curriculum hook */
+/** Context-aware variant of the curriculum hook. Use this in population statistics views. */
 export const useCurriculum = () => {
   const context = useContext(CurriculumContext)
   if (!context) {

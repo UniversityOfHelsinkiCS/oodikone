@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { GradeDistribution } from '@/components/PopulationCourseStats/GradeDistribution'
 import { PassFailEnrollments } from '@/components/PopulationCourseStats/PassFailEnrollments'
 import { PassingSemesters } from '@/components/PopulationCourseStats/PassingSemesters'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { FilteredCourse, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
 import type { Module, CurriculumDetails } from '@oodikone/shared/types'
@@ -14,7 +14,6 @@ type PopulationCourseStatsProps = {
   filteredCourses: FilteredCourse[]
   pending: boolean
   onlyIamRights: boolean
-  curriculum: ExtendedCurriculumDetails
   courseTableMode: 'all' | 'curriculum'
   showModules: boolean
   setShowModules: (input: boolean) => void
@@ -33,15 +32,17 @@ export const PopulationCourseStats = ({
   filteredCourses,
   pending,
   onlyIamRights,
-  curriculum,
   courseTableMode,
   showModules,
   setShowModules,
 }: PopulationCourseStatsProps) => {
+  const { curriculum } = useCurriculum()
   const [modules, setModules] = useState<CourseModule[]>([])
   const [tab, setTab] = useState(0)
 
   useEffect(() => {
+    if (!curriculum) return
+
     // Change courses type from FilteredCourse[] to FilteredProgrammeCourse[] + add module-field to object so we can deconstruct it below
     const modules: Record<
       string,

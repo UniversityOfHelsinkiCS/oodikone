@@ -5,7 +5,6 @@ import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/Popu
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { SegmentDimmer } from '@/components/SegmentDimmer'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { PopulationQuery } from '@/types/populationSearch'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 
@@ -14,7 +13,6 @@ export const PopulationCourses = ({
   query,
   filteredCourses,
   onlyIamRights,
-  curriculum,
   courseTableMode,
   studentAmountLimit,
   setShowModules,
@@ -24,7 +22,6 @@ export const PopulationCourses = ({
   query: Pick<PopulationQuery, 'programme' | 'years'>
   filteredCourses: FilteredCourse[]
   onlyIamRights: boolean
-  curriculum: ExtendedCurriculumDetails
   courseTableMode: 'curriculum' | 'all'
   studentAmountLimit: number
   setShowModules: (input: boolean) => void
@@ -47,7 +44,6 @@ export const PopulationCourses = ({
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
           courseTableMode={courseTableMode}
-          curriculum={curriculum}
           filteredCourses={filteredCourses}
           onlyIamRights={onlyIamRights}
           pending={isLoading}

@@ -17,7 +17,7 @@ import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStud
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { TableInfo } from '@/components/PopulationComponents/Students/Table/ProgressTab/info'
 import { DateFormat } from '@/constants/date'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { CheckIcon, CloseIcon, EditIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
@@ -226,14 +226,12 @@ type Label = {
 }
 
 export const ProgressTable = ({
-  curriculum,
   idToGroupIdMap,
   students,
   months,
   programme,
   studyGuidanceGroupProgramme,
 }: {
-  curriculum?: ExtendedCurriculumDetails | null
   idToGroupIdMap: IdToGroupId
   students: FormattedStudent[]
   months: number
@@ -242,6 +240,7 @@ export const ProgressTable = ({
 }) => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const { getTextIn } = useLanguage()
+  const { curriculum } = useCurriculum()
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const { semesters: allSemesters } = useSemesters()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''

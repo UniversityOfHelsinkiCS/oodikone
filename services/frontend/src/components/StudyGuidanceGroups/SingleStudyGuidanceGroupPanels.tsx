@@ -124,7 +124,6 @@ const SingleStudyGuidanceGroupPanelsContent = ({
       title: 'Courses of population',
       content: (
         <StudyGuidanceGroupPopulationCourses
-          curriculum={curriculum}
           filteredCourses={filteredCourses}
           studyProgramme={group.tags?.studyProgramme ? programme : null}
           year={groupYear}
@@ -136,7 +135,6 @@ const SingleStudyGuidanceGroupPanelsContent = ({
       content: (
         // @ts-expect-error FIX typing
         <PopulationStudents
-          curriculum={curriculum}
           filteredCourses={filteredCourses}
           filteredStudents={filteredStudents}
           generalTabColumnFunction={() => columnsGeneralTab({ group })}

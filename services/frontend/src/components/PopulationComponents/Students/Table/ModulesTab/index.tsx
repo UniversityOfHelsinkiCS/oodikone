@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { ModulesTab } from '@/components/PopulationComponents/Students/Table/ModulesTab/ModulesTable'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { createLocaleComparator } from '@/util/comparator'
 import { formatISODate } from '@/util/timeAndDate'
@@ -86,18 +86,17 @@ const getDegreeProgrammeCodes = (curriculumModules): string[] => {
 }
 
 export const ModulesTabContainer = ({
-  curriculum,
   students,
   courses,
   idToGroupIdMap,
   programme,
 }: {
-  curriculum: ExtendedCurriculumDetails | null | undefined
   students: Student[]
   courses: FilteredCourse[]
   idToGroupIdMap: Record<string, string>
   programme: string
 }) => {
+  const { curriculum } = useCurriculum()
   const curriculumModules = useMemo(
     () => (curriculum ? [...curriculum.defaultProgrammeModules, ...curriculum.secondProgrammeModules] : []),
     [curriculum]

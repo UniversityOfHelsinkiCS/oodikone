@@ -6,14 +6,13 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { IncludeSubstitutionsToggle } from '@/components/PopulationComponents/Students/IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from '@/components/PopulationComponents/Students/Table/CoursesTab/columnDefinitions'
 import { useToggle } from '@/hooks/toggle'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedStudent, StudentCourse } from '@oodikone/shared/types/studentData'
 import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 
 type CoursesTabContainerProps = {
-  curriculum: ExtendedCurriculumDetails
   students: FormattedStudent[]
   courses: FilteredCourse[]
   idToGroupIdMap: Record<string, string>
@@ -263,13 +262,8 @@ const gradeOrdering = ['0', 'Hyl.', 'TT', 'HT', '1', '2', '3', '4', '5', 'Hyv.']
 const compareCourseGrades = (previous: StudentCourse, current: StudentCourse) =>
   gradeOrdering.indexOf(previous.grade) <= gradeOrdering.indexOf(current.grade)
 
-export const CoursesTabContainer = ({
-  curriculum,
-  students,
-  courses,
-  idToGroupIdMap,
-  programme,
-}: CoursesTabContainerProps) => {
+export const CoursesTabContainer = ({ students, courses, idToGroupIdMap, programme }: CoursesTabContainerProps) => {
+  const { curriculum } = useCurriculum()
   const { visible: namesVisible } = useStudentNameVisibility()
   const [includeSubstitutions, toggleIncludeSubstitutions] = useToggle(true)
 
@@ -279,7 +273,10 @@ export const CoursesTabContainer = ({
   )
 
   const curriculumCourses = useMemo(
-    () => [...curriculum.defaultProgrammeCourses, ...curriculum.secondProgrammeCourses].filter(nonVisible),
+    () =>
+      curriculum
+        ? [...curriculum.defaultProgrammeCourses, ...curriculum.secondProgrammeCourses].filter(nonVisible)
+        : [],
     [curriculum]
   )
 

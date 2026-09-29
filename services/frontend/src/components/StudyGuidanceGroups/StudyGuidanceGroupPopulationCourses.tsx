@@ -6,7 +6,7 @@ import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
 import { useDebouncedState } from '@/hooks/debouncedState'
 
-export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProgramme, year, curriculum }) => {
+export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProgramme, year }) => {
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
   const curriculumsAvailable = studyProgramme && year
   const [courseTableMode, setCourseTableMode] = useState<'all' | 'curriculum'>(
@@ -23,7 +23,6 @@ export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProg
       {curriculumsAvailable ? (
         <CourseTableModeSelector
           courseTableMode={courseTableMode}
-          curriculum={curriculum}
           onStudentAmountLimitChange={onStudentAmountLimitChange}
           setCourseTableMode={setCourseTableMode}
           studentAmountLimit={studentAmountLimit}
@@ -37,7 +36,6 @@ export const StudyGuidanceGroupPopulationCourses = ({ filteredCourses, studyProg
       {courseTableMode === 'curriculum' ? (
         <PopulationCourseStats
           courseTableMode={courseTableMode}
-          curriculum={curriculum}
           filteredCourses={filteredCourses}
           onlyIamRights={onlyIamRights}
           pending={false}

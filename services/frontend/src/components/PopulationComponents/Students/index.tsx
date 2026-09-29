@@ -13,7 +13,6 @@ import { type FormattedStudentData, GeneralTab } from '@/components/PopulationCo
 import { ModulesTabContainer as ModulesTab } from '@/components/PopulationComponents/Students/Table/ModulesTab'
 import { ProgressTable as ProgressTab } from '@/components/PopulationComponents/Students/Table/ProgressTab'
 import { TagsTab } from '@/components/PopulationComponents/Students/Table/TagsTab'
-import { ExtendedCurriculumDetails } from '@/hooks/useCurriculums'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { useParseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
@@ -29,7 +28,6 @@ type PopulationDetails = CommonProps & {
   variant: 'population'
   programme: string
   combinedProgramme?: string
-  curriculum: ExtendedCurriculumDetails | null
   filteredCourses: FilteredCourse[]
   idToGroupIdMap: Record<string, string>
 }
@@ -40,7 +38,6 @@ type CoursePopulation = CommonProps & {
 
 type StudyGuidanceGroup = CommonProps & {
   variant: 'studyGuidanceGroupPopulation'
-  curriculum: ExtendedCurriculumDetails | null
   studyGuidanceGroup: any
   year: string
   filteredCourses: FilteredCourse[]
@@ -63,7 +60,6 @@ export const PopulationStudents = ({
   variant,
   programme,
   combinedProgramme,
-  curriculum,
   filteredStudents,
   filteredCourses,
   idToGroupIdMap,
@@ -101,7 +97,6 @@ export const PopulationStudents = ({
     Courses: (
       <CoursesTab
         courses={filteredCourses ?? []}
-        curriculum={curriculum} // TODO: add guard for missing curriculum (it should never be missing)
         idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
         programme={programme}
@@ -110,7 +105,6 @@ export const PopulationStudents = ({
     Modules: (
       <ModulesTab
         courses={filteredCourses ?? []}
-        curriculum={curriculum}
         idToGroupIdMap={idToGroupIdMap ?? {}}
         students={filteredStudents}
         programme={programme}
@@ -119,7 +113,6 @@ export const PopulationStudents = ({
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: (
       <ProgressTab
-        curriculum={curriculum}
         idToGroupIdMap={idToGroupIdMap ?? {}}
         months={months ?? Infinity}
         programme={programme}
