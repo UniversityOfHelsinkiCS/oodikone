@@ -1,7 +1,10 @@
+import { Op } from 'sequelize'
+
 import { ProgressCriteria } from '@oodikone/shared/types'
 import { CourseModel } from '../../models'
 import { ProgressCriteriaModel } from '../../models/kone'
 import logger from '../../util/logger'
+import { CRITERIA_YEARS, codesToGroupIds } from './criteriaCourseGroupIds'
 
 type CriteriaWithoutCurriculumVersion = Omit<ProgressCriteriaModel, 'curriculumVersion'>
 
@@ -11,31 +14,67 @@ const getCriteriaByStudyProgramme = async (code: string): Promise<CriteriaWithou
     where: { code },
   })
 
-/** Construct course_code => substitutionGroups object */
-const getSubstitutions = async (codes: string[]) => {
-  const courses: Array<Pick<CourseModel, 'code' | 'substitutionGroups'>> = await CourseModel.findAll({
-    attributes: ['code', 'substitutionGroups'],
-    where: { code: codes },
+const getGroupIdByCode = async (codes: string[]) => {
+  if (codes.length === 0) return new Map<string, string>()
+  const courses: Array<Pick<CourseModel, 'code' | 'groupId'>> = await CourseModel.findAll({
+    attributes: ['code', 'groupId'],
+    where: { code: { [Op.in]: codes } },
+    raw: true,
+  })
+  return new Map(courses.map(({ code, groupId }) => [code, groupId]))
+}
+
+/** Construct course_group_id => substitutionGroups object */
+const getSubstitutions = async (courseGroupIds: string[]) => {
+  const courses: Array<Pick<CourseModel, 'groupId' | 'substitutionGroups' | 'isPrimary'>> = await CourseModel.findAll({
+    attributes: ['groupId', 'substitutionGroups', 'isPrimary'],
+    where: { groupId: { [Op.in]: courseGroupIds } },
     raw: true,
   })
 
+  // A group can have several rows (one per course code), prefer the primary one
+  const substitutionsByGroupId = new Map<string, string[][]>()
+  for (const { groupId, substitutionGroups, isPrimary } of courses) {
+    if (isPrimary || !substitutionsByGroupId.has(groupId)) {
+      substitutionsByGroupId.set(groupId, substitutionGroups)
+    }
+  }
+
   // Sort substitutionGroups by length, because (usually) the shortest substitution is the "correct" one
   return Object.fromEntries(
-    courses.map(({ code, substitutionGroups }) => [code, substitutionGroups.sort((a, b) => b.length - a.length)])
+    [...substitutionsByGroupId].map(([groupId, substitutionGroups]) => [
+      groupId,
+      [...substitutionGroups].sort((a, b) => b.length - a.length),
+    ])
   )
 }
 
+/**
+ * TODO: Remove the fallback to coursesYear* (course codes) once all rows have courseGroupIdsYear*
+ * populated and the old columns are dropped.
+ */
 const formatCriteria = async (criteria: CriteriaWithoutCurriculumVersion | null) => {
-  const yearOne = criteria?.coursesYearOne ?? []
-  const yearTwo = criteria?.coursesYearTwo ?? []
-  const yearThree = criteria?.coursesYearThree ?? []
-  const yearFour = criteria?.coursesYearFour ?? []
-  const yearFive = criteria?.coursesYearFive ?? []
-  const yearSix = criteria?.coursesYearSix ?? []
-  const courseCodes = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
+  const legacyCodes = CRITERIA_YEARS.flatMap(year =>
+    criteria && !criteria[`courseGroupIdsYear${year}`] ? (criteria[`coursesYear${year}`] ?? []) : []
+  )
+  const groupIdByCode = await getGroupIdByCode(legacyCodes)
+
+  const getYear = (year: (typeof CRITERIA_YEARS)[number]) => {
+    const courseGroupIds = criteria?.[`courseGroupIdsYear${year}`]
+    if (courseGroupIds) return courseGroupIds
+    return codesToGroupIds(criteria?.[`coursesYear${year}`] ?? [], groupIdByCode).groupIds
+  }
+
+  const yearOne = getYear('One')
+  const yearTwo = getYear('Two')
+  const yearThree = getYear('Three')
+  const yearFour = getYear('Four')
+  const yearFive = getYear('Five')
+  const yearSix = getYear('Six')
+  const courseGroupIds = [...yearOne, ...yearTwo, ...yearThree, ...yearFour, ...yearFive, ...yearSix]
 
   const formattedCriteria: ProgressCriteria = {
-    allCourseGroups: await getSubstitutions(courseCodes),
+    allCourseGroups: await getSubstitutions(courseGroupIds),
     courses: { yearOne, yearTwo, yearThree, yearFour, yearFive, yearSix },
     credits: {
       yearOne: criteria?.creditsYearOne ?? 0,
@@ -56,12 +95,12 @@ const createCriteria = async (
 ) => {
   const newProgrammeCriteria = {
     code: studyProgramme,
-    coursesYearOne: courses.year1,
-    coursesYearTwo: courses.year2,
-    coursesYearThree: courses.year3,
-    coursesYearFour: courses.year4,
-    coursesYearFive: courses.year5,
-    coursesYearSix: courses.year6,
+    courseGroupIdsYearOne: courses.year1,
+    courseGroupIdsYearTwo: courses.year2,
+    courseGroupIdsYearThree: courses.year3,
+    courseGroupIdsYearFour: courses.year4,
+    courseGroupIdsYearFive: courses.year5,
+    courseGroupIdsYearSix: courses.year6,
     creditsYearOne: credits.year1,
     creditsYearTwo: credits.year2,
     creditsYearThree: credits.year3,
@@ -109,35 +148,35 @@ export const saveYearlyCreditCriteria = async (studyProgramme: string, credits: 
   }
 }
 
-export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: string[], year: number) => {
+export const saveYearlyCourseCriteria = async (studyProgramme: string, courseGroupIds: string[], year: number) => {
   const studyProgrammeToUpdate = await getCriteriaByStudyProgramme(studyProgramme)
   if (!studyProgrammeToUpdate) {
     const courseObj: Record<string, string[]> = { year1: [], year2: [], year3: [], year4: [], year5: [], year6: [] }
     const creditObj = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
     if (year === 1) {
-      courseObj.year1 = courses
+      courseObj.year1 = courseGroupIds
     } else if (year === 2) {
-      courseObj.year2 = courses
+      courseObj.year2 = courseGroupIds
     } else if (year === 3) {
-      courseObj.year3 = courses
+      courseObj.year3 = courseGroupIds
     } else if (year === 4) {
-      courseObj.year4 = courses
+      courseObj.year4 = courseGroupIds
     } else if (year === 5) {
-      courseObj.year5 = courses
+      courseObj.year5 = courseGroupIds
     } else {
-      courseObj.year6 = courses
+      courseObj.year6 = courseGroupIds
     }
     return await createCriteria(studyProgramme, courseObj, creditObj)
   }
 
   try {
     const years = {
-      1: 'coursesYearOne',
-      2: 'coursesYearTwo',
-      3: 'coursesYearThree',
-      4: 'coursesYearFour',
-      5: 'coursesYearFive',
-      6: 'coursesYearSix',
+      1: 'courseGroupIdsYearOne',
+      2: 'courseGroupIdsYearTwo',
+      3: 'courseGroupIdsYearThree',
+      4: 'courseGroupIdsYearFour',
+      5: 'courseGroupIdsYearFive',
+      6: 'courseGroupIdsYearSix',
     } as const
     if (!(year in years)) {
       throw new Error(`Invalid year: ${year}`)
@@ -145,7 +184,7 @@ export const saveYearlyCourseCriteria = async (studyProgramme: string, courses: 
 
     const yearToUpdate = years[year as keyof typeof years]
 
-    const updatedCriteria = await studyProgrammeToUpdate.update({ [yearToUpdate]: courses })
+    const updatedCriteria = await studyProgrammeToUpdate.update({ [yearToUpdate]: courseGroupIds })
     return await formatCriteria(updatedCriteria)
   } catch (error) {
     logger.error(`Updating yearly credit criteria failed: ${error}`)
@@ -157,4 +196,40 @@ export const getCriteria = async (studyProgramme: string) => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
 
   return await formatCriteria(studyProgrammeCriteria)
+}
+
+/**
+ * Fills courseGroupIdsYear* for rows that only have the legacy coursesYear* (course codes). Safe to run repeatedly.
+ * A year whose codes cannot all be found in the course table is left untouched and reported.
+ */
+export const backfillProgressCriteriaGroupIds = async () => {
+  const rows = await ProgressCriteriaModel.findAll()
+  const rowsToBackfill = rows.filter(row =>
+    CRITERIA_YEARS.some(year => !row[`courseGroupIdsYear${year}`] && row[`coursesYear${year}`])
+  )
+  if (rowsToBackfill.length === 0) return
+
+  const allCodes = rowsToBackfill.flatMap(row => CRITERIA_YEARS.flatMap(year => row[`coursesYear${year}`] ?? []))
+  const groupIdByCode = await getGroupIdByCode([...new Set(allCodes)])
+
+  let updatedYears = 0
+  for (const row of rowsToBackfill) {
+    const updates: Partial<Record<`courseGroupIdsYear${(typeof CRITERIA_YEARS)[number]}`, string[]>> = {}
+    for (const year of CRITERIA_YEARS) {
+      const codes = row[`coursesYear${year}`]
+      if (row[`courseGroupIdsYear${year}`] || !codes) continue
+
+      const { groupIds, unmapped } = codesToGroupIds(codes, groupIdByCode)
+      if (unmapped.length > 0) {
+        logger.warn(
+          `Could not find a course group id for progress criteria codes of ${row.code} (${year}): ${unmapped.join(', ')}`
+        )
+        continue
+      }
+      updates[`courseGroupIdsYear${year}`] = groupIds
+      updatedYears++
+    }
+    if (Object.keys(updates).length > 0) await row.update(updates)
+  }
+  logger.info(`Backfilled course group ids for ${updatedYears} progress criteria years`)
 }

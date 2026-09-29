@@ -120,6 +120,7 @@ export const PopulationStudents = ({
     Progress: (
       <ProgressTab
         curriculum={curriculum}
+        idToGroupIdMap={idToGroupIdMap ?? {}}
         months={months ?? Infinity}
         programme={programme}
         students={filteredStudents}

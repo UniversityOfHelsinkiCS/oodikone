@@ -7,13 +7,16 @@ const programmeProgressCriteria = RTKApi.injectEndpoints({
       query: ({ programmeCode }) => `/programme-criteria?programmeCode=${programmeCode}`,
       providesTags: ['ProgressCriteria'],
     }),
-    addProgressCriteriaCourse: builder.mutation<void, { courses: string[]; programmeCode: string; year: number }>({
-      query: ({ courses, programmeCode, year }) => ({
+    addProgressCriteriaCourse: builder.mutation<
+      void,
+      { courseGroupIds: string[]; programmeCode: string; year: number }
+    >({
+      query: ({ courseGroupIds, programmeCode, year }) => ({
         url: '/programme-criteria/courses',
         method: 'POST',
         body: {
           code: programmeCode,
-          courses,
+          courseGroupIds,
           year,
         },
       }),

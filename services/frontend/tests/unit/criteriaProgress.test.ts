@@ -6,7 +6,7 @@ import { createCredit as createBaseCredit, createStudyPlan } from '@oodikone/sha
 import { describe, it, assert } from 'vitest'
 
 // Course identities: course_id (what credits/enrollments/hops actually reference) -> groupId (stable
-// across a course's historical ids/codes) -> code (display, used to key ProgressCriteria)
+// across a course's historical ids/codes, used to key ProgressCriteria) -> code (display)
 const COURSES = {
   CS001: { id: 'id-CS001', groupId: 'group-CS001', code: 'CS001' },
   CS002: { id: 'id-CS002', groupId: 'group-CS002', code: 'CS002' },
@@ -15,17 +15,16 @@ const COURSES = {
   CS003: { id: 'id-CS003', groupId: 'group-CS003', code: 'CS003' },
 } as const
 
-const idToCode = Object.fromEntries(Object.values(COURSES).map(({ id, code }) => [id, code]))
-const groupIdToCode = Object.fromEntries(Object.values(COURSES).map(({ groupId, code }) => [groupId, code]))
+const idToGroupId = Object.fromEntries(Object.values(COURSES).map(({ id, groupId }) => [id, groupId]))
 
 const createCriteria = (overrides: Partial<ProgressCriteria> = {}): ProgressCriteria => ({
   allCourseGroups: {
-    CS001: [],
-    CS002: [[COURSES.CS002A.groupId, COURSES.CS002B.groupId]],
+    [COURSES.CS001.groupId]: [],
+    [COURSES.CS002.groupId]: [[COURSES.CS002A.groupId, COURSES.CS002B.groupId]],
   },
   courses: {
-    yearOne: ['CS001', 'CS002'],
-    yearTwo: ['CS001', 'CS002'],
+    yearOne: [COURSES.CS001.groupId, COURSES.CS002.groupId],
+    yearTwo: [COURSES.CS001.groupId, COURSES.CS002.groupId],
     yearThree: [],
     yearFour: [],
     yearFive: [],
@@ -58,7 +57,7 @@ const getProgress = (
   criteria: ProgressCriteria,
   hops: ReturnType<typeof createHops> | undefined,
   credits: PopulationCourseStatsCredit[]
-) => getProgressCriteria(criteria, STUDY_RIGHT_START.toISOString(), hops, credits, idToCode, groupIdToCode)
+) => getProgressCriteria(criteria, STUDY_RIGHT_START.toISOString(), hops, credits, idToGroupId)
 
 void describe('getProgressCriteria', () => {
   void it('returns empty criteria when no criteria courses or credits are defined', () => {
@@ -89,8 +88,8 @@ void describe('getProgressCriteria', () => {
       createCredit(COURSES.CS001.id, 5, CreditTypeCode.PASSED, new Date('2024-09-01')),
     ])
 
-    assert.ok(result.year1.coursesSatisfied.CS001)
-    assert.equal(result.year1.coursesSatisfied.CS002, null)
+    assert.ok(result.year1.coursesSatisfied[COURSES.CS001.groupId])
+    assert.equal(result.year1.coursesSatisfied[COURSES.CS002.groupId], null)
     assert.equal(result.year1.totalSatisfied, 1)
     assert.equal(result.year1.credits, false)
   })
@@ -101,8 +100,8 @@ void describe('getProgressCriteria', () => {
       createCredit(COURSES.CS002B.id, 2, CreditTypeCode.PASSED, new Date('2024-09-02')),
     ])
 
-    assert.equal(result.year1.coursesSatisfied.CS002, 'substituted')
-    assert.equal(result.year1.coursesSatisfied.CS001, null)
+    assert.equal(result.year1.coursesSatisfied[COURSES.CS002.groupId], 'substituted')
+    assert.equal(result.year1.coursesSatisfied[COURSES.CS001.groupId], null)
     assert.equal(result.year1.totalSatisfied, 1)
   })
 

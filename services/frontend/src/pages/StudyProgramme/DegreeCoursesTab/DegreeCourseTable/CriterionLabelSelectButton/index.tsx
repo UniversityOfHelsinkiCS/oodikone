@@ -27,9 +27,9 @@ export const CriterionLabelSelectButton = ({
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
   useEffect(() => {
-    const selected = Object.keys(criteria.courses).filter(key => criteria.courses[key].includes(course.code))
+    const selected = Object.keys(criteria.courses).filter(key => criteria.courses[key].includes(course.group_id))
     setSelectedOptions(selected)
-  }, [criteria, course.code])
+  }, [criteria, course.group_id])
 
   const options = [
     {
@@ -70,16 +70,16 @@ export const CriterionLabelSelectButton = ({
   }
 
   const handleCheckboxChange = (key: string, year: number) => {
-    let courses: string[]
+    let courseGroupIds: string[]
 
     if (selectedOptions.includes(key)) {
-      courses = criteria.courses[key]?.filter((courseCode: string) => courseCode !== course.code)
-      void addProgressCriteriaCourse({ programmeCode: studyProgramme, courses, year })
+      courseGroupIds = criteria.courses[key]?.filter((groupId: string) => groupId !== course.group_id)
+      void addProgressCriteriaCourse({ programmeCode: studyProgramme, courseGroupIds, year })
     } else {
-      courses = criteria.courses ? [...criteria.courses[key], course.code] : [course.code]
+      courseGroupIds = criteria.courses ? [...criteria.courses[key], course.group_id] : [course.group_id]
     }
 
-    void addProgressCriteriaCourse({ programmeCode: studyProgramme, courses, year })
+    void addProgressCriteriaCourse({ programmeCode: studyProgramme, courseGroupIds, year })
 
     setSelectedOptions(prevSelected =>
       prevSelected.includes(key) ? prevSelected.filter(item => item !== key) : [...prevSelected, key]

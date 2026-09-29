@@ -5,6 +5,7 @@ import { initializeDatabaseConnection, dbConnections } from './database/connecti
 import { startCron } from './events'
 import routes from './routes'
 import { backfillExcludedCourseGroupIds } from './services/excludedCourses'
+import { backfillProgressCriteriaGroupIds } from './services/studyProgramme/studyProgrammeCriteria'
 import logger from './util/logger'
 import './worker/worker'
 
@@ -15,6 +16,7 @@ initializeDatabaseConnection()
     dbConnections.on('connect', () => {
       logger.info('Connected to sis db successfully')
       backfillExcludedCourseGroupIds().catch(error => logger.error(error))
+      backfillProgressCriteriaGroupIds().catch(error => logger.error(error))
     })
 
     dbConnections.on('error', () => {

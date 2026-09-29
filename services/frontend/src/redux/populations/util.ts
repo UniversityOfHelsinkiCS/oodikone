@@ -29,13 +29,6 @@ export const formatPopulationData = <T extends RequiredFields>(
 ) => {
   const code = query?.programme ?? ''
 
-  const groupIdToCode = Object.fromEntries(coursestatistics.courses.map(({ code, groupId }) => [groupId, code]))
-  const idToCode = Object.fromEntries(
-    Object.entries(coursestatistics.idToGroupIdMap)
-      .map(([id, groupId]) => [id, groupIdToCode[groupId]])
-      .filter((entry): entry is [string, string] => !!entry[1])
-  )
-
   // TODO: These are typed incorrectly with attainment_date and enrollment_date_time as Dates (they are strings)
   const credits = coursestatistics.credits.sort(
     (a, b) => new Date(b.attainment_date).getTime() - new Date(a.attainment_date).getTime()
@@ -70,8 +63,7 @@ export const formatPopulationData = <T extends RequiredFields>(
         student.studyrightStart,
         hops,
         credits,
-        idToCode,
-        groupIdToCode
+        coursestatistics.idToGroupIdMap
       ),
       courses: credits.map(credit => {
         const passed = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)

@@ -1,5 +1,7 @@
 export type ProgressCriteria = {
+  /** Course group id => substitution groups (each entry is an array of course group ids) */
   allCourseGroups: Record<string, string[][]>
+  /** Course group ids of the criteria courses for each year */
   courses: {
     yearOne: string[]
     yearTwo: string[]

@@ -218,7 +218,7 @@ export const DegreeCourseTable = ({
                           <Stack direction="row" gap={1}>
                             {Object.keys(criteria.courses).map(
                               (year, index) =>
-                                criteria.courses[year].includes(course.code) && (
+                                criteria.courses[year].includes(course.group_id) && (
                                   <Chip color="primary" key={year} label={`year ${index + 1}`} size="small" />
                                 )
                             )}

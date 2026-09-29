@@ -26,17 +26,17 @@ router.get('/', async (req: StudyProgrammeCriteriaRequest, res: Response) => {
 interface CriteriaCoursesRequest extends Request {
   body: {
     code: string
-    courses: string[]
+    courseGroupIds: string[]
     year: number
   }
 }
 
 router.post('/courses', async (req: CriteriaCoursesRequest, res: Response) => {
-  const { code, courses, year } = req.body
-  if (!code || !courses || !year) {
+  const { code, courseGroupIds, year } = req.body
+  if (!code || !courseGroupIds || !year) {
     return res.status(400).end()
   }
-  const studyProgrammeCriteria = await saveYearlyCourseCriteria(code, courses, year)
+  const studyProgrammeCriteria = await saveYearlyCourseCriteria(code, courseGroupIds, year)
   if (!studyProgrammeCriteria) {
     return res.status(404).end()
   }

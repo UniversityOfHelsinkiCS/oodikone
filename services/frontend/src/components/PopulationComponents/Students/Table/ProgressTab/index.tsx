@@ -42,23 +42,26 @@ dayjsExtend(isSameOrAfter)
 
 const columnHelper = createColumnHelper<FormattedStudent>()
 
-/** Return course + all of it's substitution groups */
+type IdToGroupId = Record<string, string>
+
+/** Return course + all of it's substitution groups (courses are identified by their course group id) */
 const getCourseGroups = (
-  courseCode: string,
+  courseGroupId: string,
   criteria: ProgressCriteria | undefined,
-  student: FormattedStudent
+  student: FormattedStudent,
+  idToGroupId: IdToGroupId
 ): StudentCourse[][] => {
-  const studentCourseCodes = student.courses.map(({ course_code }) => course_code)
+  const studentGroupIds = student.courses.map(({ course_id }) => idToGroupId[course_id])
 
   // Return groups that have all courses in student.courses
   const courseGroups: StudentCourse[][] = []
-  for (const group of [[courseCode]].concat(criteria?.allCourseGroups[courseCode] ?? [])) {
-    if (group.every(code => studentCourseCodes.includes(code))) {
+  for (const group of [[courseGroupId]].concat(criteria?.allCourseGroups[courseGroupId] ?? [])) {
+    if (group.every(groupId => studentGroupIds.includes(groupId))) {
       // We know all of the group's courses exist, we just checked that
       courseGroups.push(
-        ...group.map(code =>
+        ...group.map(groupId =>
           student.courses
-            .filter(course => course.course_code === code)
+            .filter(course => idToGroupId[course.course_id] === groupId)
             .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         )
       )
@@ -115,29 +118,31 @@ const hasFailed = (courseGroups: StudentCourse[][]) =>
     return passedCredits.length === 0 ? false : passedCredits.some(course => !course.passed)
   })
 
-/** Return enrollments only for main course codes */
-const hasEnrolled = (student: FormattedStudent, courseCode: string) =>
-  student.enrollments?.map(course => course.course_code).includes(courseCode)
+/** Return enrollments only for main courses */
+const hasEnrolled = (student: FormattedStudent, courseGroupId: string, idToGroupId: IdToGroupId) =>
+  student.enrollments?.some(enrollment => idToGroupId[enrollment.course_id] === courseGroupId)
 
-const getEnrollment = (student: FormattedStudent, courseCode: string) =>
-  student.enrollments.filter(enrollment => enrollment.course_code === courseCode)
+const getEnrollment = (student: FormattedStudent, courseGroupId: string, idToGroupId: IdToGroupId) =>
+  student.enrollments.filter(enrollment => idToGroupId[enrollment.course_id] === courseGroupId)
 
 const getRowContent = (
   student: FormattedStudent,
-  courseCode: string,
+  label: Label,
   year: string,
   start: dayjs.Dayjs,
   end: dayjs.Dayjs,
-  criteria: ProgressCriteria | undefined
+  criteria: ProgressCriteria | undefined,
+  idToGroupId: IdToGroupId
 ) => {
-  if (courseCode.includes('Credits')) {
+  if (label.code.includes('Credits')) {
     if (student.criteriaProgress[year]?.credits) {
       return <CheckIcon color="success" />
     }
     return null
   }
+  if (!label.groupId) return null
 
-  const courses = getCourseGroups(courseCode, criteria, student)
+  const courses = getCourseGroups(label.groupId, criteria, student, idToGroupId)
 
   if (hasCreditTransfer(courses)) {
     return <SwapHorizIcon color="success" />
@@ -155,7 +160,7 @@ const getRowContent = (
     return <CloseIcon color="error" />
   }
 
-  if (hasEnrolled(student, courseCode)) {
+  if (hasEnrolled(student, label.groupId, idToGroupId)) {
     return <RemoveIcon color="disabled" />
   }
 
@@ -163,16 +168,18 @@ const getRowContent = (
 }
 
 const getExcelText = (
-  courseCode: string,
+  label: Label,
   criteria: ProgressCriteria | undefined,
   student: FormattedStudent,
-  year: string
+  year: string,
+  idToGroupId: IdToGroupId
 ) => {
-  if (courseCode.includes('Credits')) {
+  if (label.code.includes('Credits')) {
     return student.criteriaProgress[year]?.credits ? 'Passed' : ''
   }
+  if (!label.groupId) return ''
 
-  const courseGroups = getCourseGroups(courseCode, criteria, student)
+  const courseGroups = getCourseGroups(label.groupId, criteria, student, idToGroupId)
 
   if (hasPassedOutsideAcademicYear(courseGroups)) {
     const latestCompletedGroup = courseGroups.find(group => group.every(course => course.passed))
@@ -186,8 +193,8 @@ const getExcelText = (
     return `Failed ${formatDate(latestFailedCourse ? latestFailedCourse.date : '(substituted)', DateFormat.ISO_DATE)}`
   }
 
-  if (hasEnrolled(student, courseCode)) {
-    const enrollment = getEnrollment(student, courseCode)
+  if (hasEnrolled(student, label.groupId, idToGroupId)) {
+    const enrollment = getEnrollment(student, label.groupId, idToGroupId)
     return `Enrollment ${formatDate(enrollment[0].enrollment_date_time, DateFormat.ISO_DATE)}`
   }
 
@@ -211,18 +218,23 @@ const getCriteriaHeaders = (months: number, programme: string) => {
 }
 
 type Label = {
+  /** Course code for course labels, otherwise a special value ('Credits', 'Criteria', 'Enrollment') */
   code: string
+  /** Set for course labels */
+  groupId?: string
   name: Name | null
 }
 
 export const ProgressTable = ({
   curriculum,
+  idToGroupIdMap,
   students,
   months,
   programme,
   studyGuidanceGroupProgramme,
 }: {
   curriculum?: ExtendedCurriculumDetails | null
+  idToGroupIdMap: IdToGroupId
   students: FormattedStudent[]
   months: number
   programme: string
@@ -234,18 +246,10 @@ export const ProgressTable = ({
   const { semesters: allSemesters } = useSemesters()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
   const creditMonths = [12, 24, 36, 48, 60, 72]
-  const defaultCourses = keyBy(curriculum?.defaultProgrammeCourses, 'code')
-  const coursesSecondProgramme = keyBy(curriculum?.secondProgrammeCourses, 'code')
+  const defaultCourses = keyBy(curriculum?.defaultProgrammeCourses, 'group_id')
+  const coursesSecondProgramme = keyBy(curriculum?.secondProgrammeCourses, 'group_id')
 
-  const getCourseName = (courseCode: string): Name | null => {
-    if (defaultCourses[courseCode]) {
-      return defaultCourses[courseCode].name
-    }
-    if (coursesSecondProgramme[courseCode]) {
-      return coursesSecondProgramme[courseCode].name
-    }
-    return null
-  }
+  const getCourse = (courseGroupId: string) => defaultCourses[courseGroupId] ?? coursesSecondProgramme[courseGroupId]
 
   const labelCriteria = Object.keys(criteria?.courses ?? {}).reduce<Record<string, Label[]>>((acc, year, index) => {
     acc[year] = [
@@ -257,12 +261,12 @@ export const ProgressTable = ({
           sv: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
         },
       },
-      ...[...(criteria?.courses[year] ?? [])]
-        .sort((a: string, b: string) => a.localeCompare(b))
-        .map((courseCode: string) => ({
-          code: courseCode,
-          name: getCourseName(courseCode),
-        })),
+      ...(criteria?.courses[year] ?? [])
+        .map((courseGroupId: string): Label => {
+          const course = getCourse(courseGroupId)
+          return { code: course?.code ?? courseGroupId, groupId: courseGroupId, name: course?.name ?? null }
+        })
+        .sort((a, b) => a.code.localeCompare(b.code)),
       {
         code: 'Criteria',
         name: {
@@ -352,12 +356,13 @@ export const ProgressTable = ({
     // 0 Failed
     // 1 Enrolled
     // 2 None of aove
+    if (!label.groupId) return 2
     const criteriaCourses = student.criteriaProgress[year]?.coursesSatisfied
-    const course = criteriaCourses?.[label.code]
+    const course = criteriaCourses?.[label.groupId]
 
     if (course) return -1
-    if (student.courses.find(course => course.course_code === label.code)?.passed === false) return 0
-    if (!course && hasEnrolled(student, label.code)) return 1
+    if (student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)?.passed === false) return 0
+    if (!course && hasEnrolled(student, label.groupId, idToGroupIdMap)) return 1
     return 2
   }
 
@@ -365,18 +370,18 @@ export const ProgressTable = ({
     return (
       labels?.map(label =>
         columnHelper.accessor(() => undefined, {
-          id: `${year}-${label.code}-${label.name?.fi ?? ''}`,
+          id: `${year}-${label.groupId ?? label.code}-${label.name?.fi ?? ''}`,
           header: getTextIn(label.name) ?? label.code,
           cell: ({ row: { original: student } }) => {
             const title = label.code.includes('Criteria')
               ? `${student.criteriaProgress[year]?.totalSatisfied ?? 0} criteria fullfilled`
-              : getExcelText(label.code, criteria, student, year)
+              : getExcelText(label, criteria, student, year, idToGroupIdMap)
 
             const content = label.code.includes('Criteria')
               ? (student.criteriaProgress[year]?.totalSatisfied ?? 0)
               : label.code.includes('Enrollment')
                 ? getSemesterEnrollmentContent(student, semesters)
-                : getRowContent(student, label.code, year, start, end, criteria)
+                : getRowContent(student, label, year, start, end, criteria, idToGroupIdMap)
 
             return (
               <Tooltip title={title}>
@@ -496,8 +501,10 @@ export const ProgressTable = ({
                     }
 
                     default: {
-                      const course = student.courses.find(course => course.course_code === label.code)
-                      const enrollment = student.enrollments.find(enrollment => enrollment.course_code === label.code)
+                      const course = student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)
+                      const enrollment = student.enrollments.find(
+                        enrollment => idToGroupIdMap[enrollment.course_id] === label.groupId
+                      )
                       result = [
                         [
                           getTextIn(label.name),
@@ -514,7 +521,7 @@ export const ProgressTable = ({
             .filter(([key, _]) => !!key)
         ),
       })),
-    [students, allSemesters, programme, labelCriteria]
+    [students, allSemesters, programme, labelCriteria, idToGroupIdMap]
   )
 
   const accessorKeys = useMemo(
@@ -589,7 +596,7 @@ export const ProgressTable = ({
     }
 
     return columns
-  }, [criteria, students, curriculum, getTextIn, namesVisible])
+  }, [criteria, students, curriculum, getTextIn, namesVisible, idToGroupIdMap])
 
   const isCriteriaSet =
     criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
