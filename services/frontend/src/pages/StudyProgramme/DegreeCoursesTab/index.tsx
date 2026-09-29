@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack'
 import { orderBy } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
-import { useCurriculumState } from '@/hooks/useCurriculums'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { CreditCriteriaSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CreditCriteriaSection'
 import { CurriculumSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CurriculumSection'
 import { DegreeCourseTable } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable'
@@ -23,9 +23,9 @@ export const DegreeCoursesTab = ({
 }) => {
   const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
   const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(degreeProgramme, new Date().getFullYear())
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
   const { getTextIn } = useLanguage()
+  const { curriculum, curriculumList, setSelectedCurriculum: setCurriculum } = useCurriculum()
 
   const getModules = (courses: ProgrammeCourse[]): Module[] => {
     const modules: Record<string, ProgrammeCourse[]> = {}

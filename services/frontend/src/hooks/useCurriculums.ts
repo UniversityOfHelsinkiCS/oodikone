@@ -1,4 +1,4 @@
-import { useEffect, useState, Dispatch, SetStateAction } from 'react'
+import { useMemo, useState, Dispatch, SetStateAction } from 'react'
 
 import { useGetCurriculumsQuery, useGetCurriculumOptionsQuery } from '@/redux/curriculum'
 import { CurriculumOption, CurriculumDetails } from '@oodikone/shared/types'
@@ -7,10 +7,9 @@ export type ExtendedCurriculumDetails = CurriculumDetails & CurriculumOption
 
 export const useCurriculumState = (
   programmeCode: string,
-  year: string | number
+  year: string | number | undefined
 ): [ExtendedCurriculumDetails | null, CurriculumOption[], Dispatch<SetStateAction<CurriculumOption | null>>] => {
   const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | null>(null)
-  const [curriculum, setCurriculum] = useState<ExtendedCurriculumDetails | null>(null)
 
   const { data: curriculumList = [], isFetching: curriculumsLoading } = useGetCurriculumOptionsQuery(
     { code: programmeCode },
@@ -19,7 +18,7 @@ export const useCurriculumState = (
 
   const chosenCurriculum: CurriculumOption | null =
     selectedCurriculum ??
-    curriculumList.find(curriculum => new Date(curriculum.validFrom) <= new Date(`${year}-08-01`)) ??
+    (year ? curriculumList.find(curriculum => new Date(curriculum.validFrom) <= new Date(`${year}-08-01`)) : null) ??
     curriculumList[0] ??
     null
 
@@ -31,11 +30,10 @@ export const useCurriculumState = (
     { skip: curriculumsLoading || !chosenCurriculum?.periodIds }
   )
 
-  useEffect(() => {
-    if (curriculumData) {
-      setCurriculum({ ...curriculumData, ...chosenCurriculum })
-    }
-  }, [curriculumData, chosenCurriculum])
+  const curriculum = useMemo<ExtendedCurriculumDetails | null>(
+    () => (curriculumData ? { ...curriculumData, ...chosenCurriculum } : null),
+    [curriculumData, chosenCurriculum]
+  )
 
   return [curriculum, curriculumList, setSelectedCurriculum]
 }

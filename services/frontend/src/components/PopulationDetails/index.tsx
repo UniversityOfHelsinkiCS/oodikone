@@ -31,7 +31,7 @@ import { AdvancedSettings } from '@/components/PopulationDetails/AdvancedSetting
 import { PopulationQueryCard } from '@/components/PopulationDetails/PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from '@/components/PopulationDetails/studentColumns'
 import { useDebouncedState } from '@/hooks/debouncedState'
-import { useCurriculumState } from '@/hooks/useCurriculums'
+import { CurriculumProvider, useCurriculum } from '@/hooks/useCurriculum'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { KeyboardBackspaceIcon } from '@/theme'
 import { PopulationQuery } from '@/types/populationSearch'
@@ -48,7 +48,13 @@ type PopulationDetailsProps = {
   idToGroupIdMap: Record<string, string>
 }
 
-export const PopulationDetails = ({
+export const PopulationDetails = (props: PopulationDetailsProps) => (
+  <CurriculumProvider programmeCode={props.query.programme} year={props.query?.years?.[0]}>
+    <PopulationDetailsContent {...props} />
+  </CurriculumProvider>
+)
+
+const PopulationDetailsContent = ({
   isLoading,
   query,
   populationTags,
@@ -64,7 +70,7 @@ export const PopulationDetails = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [courseTableMode, setCourseTableMode] = useState<'curriculum' | 'all'>('curriculum')
   const [studentAmountLimit, setStudentAmountLimit] = useDebouncedState(0, 1000)
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, query?.years?.[0])
+  const { curriculum, curriculumList, setSelectedCurriculum: setCurriculum } = useCurriculum()
   const [showModules, setShowModules] = useState(false) // Shows courses if modules not selected
 
   const primaryHopsCreditFilter = useFilterSelector(hopsFilter.selectors.isPrimarySelected(undefined))

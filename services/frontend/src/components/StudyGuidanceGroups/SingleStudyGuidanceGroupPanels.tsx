@@ -21,7 +21,7 @@ import { useFormat as formatGeneralTab } from '@/components/PopulationComponents
 import { useColumns as columnsGeneralTab } from '@/components/StudyGuidanceGroups/studentColumns'
 import { StudyGuidanceGroupPopulationCourses } from '@/components/StudyGuidanceGroups/StudyGuidanceGroupPopulationCourses'
 import { createAcademicYearStartDate } from '@/components/StudyGuidanceGroups/utils'
-import { useCurriculumState } from '@/hooks/useCurriculums'
+import { CurriculumProvider, useCurriculum } from '@/hooks/useCurriculum'
 import { KeyboardBackspaceIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
@@ -29,17 +29,30 @@ import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
 
 dayjsExtend(isBetween)
 
-export const SingleStudyGuidanceGroupPanels = ({
-  filteredStudents,
-  filteredCourses,
-  group,
-  idToGroupIdMap,
-}: {
+type SingleStudyGuidanceGroupPanelsProps = {
   filteredStudents: FormattedStudent[]
   filteredCourses: FilteredCourse[]
   group: GroupsWithTags
   idToGroupIdMap: Record<string, string>
-}) => {
+}
+
+export const SingleStudyGuidanceGroupPanels = (props: SingleStudyGuidanceGroupPanelsProps) => {
+  const [programme] = props.group.tags?.studyProgramme?.split('+') ?? []
+  const year = props.group.tags?.year ?? undefined
+
+  return (
+    <CurriculumProvider programmeCode={programme} year={year}>
+      <SingleStudyGuidanceGroupPanelsContent {...props} />
+    </CurriculumProvider>
+  )
+}
+
+const SingleStudyGuidanceGroupPanelsContent = ({
+  filteredStudents,
+  filteredCourses,
+  group,
+  idToGroupIdMap,
+}: SingleStudyGuidanceGroupPanelsProps) => {
   const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
 
   const groupYear = group.tags?.year
@@ -53,7 +66,7 @@ export const SingleStudyGuidanceGroupPanels = ({
     years: groupYear ? [Number(groupYear)] : [],
   }
 
-  const [curriculum, curriculumList, setCurriculum] = useCurriculumState(programme, groupYear!) // TODO: fix year
+  const { curriculum, curriculumList, setSelectedCurriculum: setCurriculum } = useCurriculum()
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive(undefined))
   const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive(undefined))

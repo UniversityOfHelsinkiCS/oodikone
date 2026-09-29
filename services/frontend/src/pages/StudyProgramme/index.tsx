@@ -8,6 +8,7 @@ import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { GetTextIn, useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { useTabs } from '@/hooks/tabs'
+import { CurriculumProvider } from '@/hooks/useCurriculum'
 import { useTitle } from '@/hooks/title'
 import { BasicInformationTab } from '@/pages/StudyProgramme/BasicInformationTab'
 import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
@@ -136,11 +137,9 @@ export const StudyProgramme = () => {
         key: 'DegreeCoursesTab',
         label: 'Degree courses',
         component: (
-          <DegreeCoursesTab
-            combinedProgramme={secondProgrammeId}
-            degreeProgramme={programmeId}
-            key="DegreeCoursesTabContent"
-          />
+          <CurriculumProvider key="DegreeCoursesTabContent" programmeCode={programmeId} year={new Date().getFullYear()}>
+            <DegreeCoursesTab combinedProgramme={secondProgrammeId} degreeProgramme={programmeId} />
+          </CurriculumProvider>
         ),
       },
       {
