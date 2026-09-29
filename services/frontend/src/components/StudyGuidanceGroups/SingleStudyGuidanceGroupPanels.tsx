@@ -26,6 +26,7 @@ import { KeyboardBackspaceIcon } from '@/theme'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { GroupsWithTags } from '@oodikone/shared/types/studyGuidanceGroup'
+import { useLanguage } from '../LanguagePicker/useLanguage'
 
 dayjsExtend(isBetween)
 
@@ -34,6 +35,11 @@ type SingleStudyGuidanceGroupPanelsProps = {
   filteredCourses: FilteredCourse[]
   group: GroupsWithTags
   idToGroupIdMap: Record<string, string>
+}
+
+const curriculumInfoBoxContent = {
+  fi: 'Valitsee tarkasteltavan populaation opetussuunnitelman. Opetussuunnitelman valitseminen edellyttää koulutusohjelman asettamista populaatiolle.',
+  en: 'Selects the curriculum to be used for the population. Setting a curriculum requires a degree programme to be set for the population.',
 }
 
 export const SingleStudyGuidanceGroupPanels = (props: SingleStudyGuidanceGroupPanelsProps) => {
@@ -54,6 +60,7 @@ const SingleStudyGuidanceGroupPanelsContent = ({
   idToGroupIdMap,
 }: SingleStudyGuidanceGroupPanelsProps) => {
   const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
+  const { getTextIn } = useLanguage()
 
   const groupYear = group.tags?.year
   const groupProgramme = group.tags?.studyProgramme
@@ -178,7 +185,7 @@ const SingleStudyGuidanceGroupPanelsContent = ({
                   curriculumList={curriculumList}
                   setCurriculum={setCurriculum}
                 />
-                <InfoBox content={'Valitsee tarkasteltavan populaation opetussuunnitelman.'} mini />
+                <InfoBox content={getTextIn(curriculumInfoBoxContent) ?? ''} mini />
               </Stack>
             </Stack>
           </FormGroup>
