@@ -1,6 +1,6 @@
 export type ExcludedCoursesResBody = void
 export type ExcludedCoursesReqBody = {
   programmeCode: string
-  courseCodes: string[]
+  courseGroupIds: string[]
   curriculumVersion: string
 }

@@ -5,17 +5,17 @@ import type { ExcludedCoursesResBody, ExcludedCoursesReqBody } from '@oodikone/s
 const courseExclusionsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     setCourseExclusion: builder.mutation<ExcludedCoursesResBody, ExcludedCoursesReqBody>({
-      query: ({ courseCodes, curriculumVersion, programmeCode }) => ({
+      query: ({ courseGroupIds, curriculumVersion, programmeCode }) => ({
         url: `/course-exclusions/`,
         method: 'POST',
-        body: { courseCodes, curriculumVersion, programmeCode },
+        body: { courseGroupIds, curriculumVersion, programmeCode },
       }),
     }),
     removeCourseExclusion: builder.mutation<ExcludedCoursesResBody, ExcludedCoursesReqBody>({
-      query: ({ courseCodes, curriculumVersion, programmeCode }) => ({
+      query: ({ courseGroupIds, curriculumVersion, programmeCode }) => ({
         url: `/course-exclusions/`,
         method: 'DELETE',
-        body: { courseCodes, curriculumVersion, programmeCode },
+        body: { courseGroupIds, curriculumVersion, programmeCode },
       }),
     }),
   }),

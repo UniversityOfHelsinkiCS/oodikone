@@ -47,7 +47,7 @@ export const getCurriculumOptions = async (code: string) => {
   }
 }
 
-type ModuleWithChildren = Pick<ProgrammeModule, 'id' | 'type' | 'code' | 'name'> & {
+type ModuleWithChildren = Pick<ProgrammeModule, 'id' | 'group_id' | 'type' | 'code' | 'name'> & {
   // TODO: This is supposed to be in the ProgrammeModule
   degree_programme_type: DegreeProgrammeType | null
 
@@ -90,6 +90,7 @@ const recursivelyGetModuleAndChildren = async (code: string, curriculum_period_i
         GROUP BY pm.id, c.name, c.code, c.order, c.id
       ) SELECT
         id,
+        group_id,
         type,
         module_order,
         parent_code,
@@ -141,7 +142,9 @@ const labelProgrammes = (modules: ModuleWithChildren[], excludedCourses: Exclude
       label: `${module.parent_code}\n${module.parent_name?.fi}`,
       orderNumber: module.module_order,
     }
-    const foundCourse = excludedCourses.find(course => course.course_code === module.code)
+    const foundCourse = excludedCourses.find(course =>
+      course.course_group_id ? course.course_group_id === module.group_id : course.course_code === module.code
+    )
     const visible = { visibility: !foundCourse, id: foundCourse?.id ?? null }
 
     return { ...module, label, visible }
@@ -180,6 +183,7 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
 
   return {
     courses: labelProgrammes(modifiedCourses, excludedCourses).map(mod => ({
+      group_id: mod.group_id,
       code: mod.code,
       name: mod.name,
       degree_programme_type: mod.degree_programme_type,

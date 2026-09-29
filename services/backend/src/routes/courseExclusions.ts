@@ -7,7 +7,7 @@ import { hasFullAccessToStudentData } from '../util'
 const router = Router()
 
 router.post<never, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/', async (req, res) => {
-  const { programmeCode, courseCodes, curriculumVersion } = req.body
+  const { programmeCode, courseGroupIds, curriculumVersion } = req.body
   const { roles, programmeRights } = req.user
 
   const hasFullAccess = hasFullAccessToStudentData(roles)
@@ -15,7 +15,7 @@ router.post<never, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/', async (r
 
   if (!hasFullAccess && !hasAccessToProgramme) return res.status(403).end()
 
-  const result = await addExcludedCourses(courseCodes, curriculumVersion, programmeCode)
+  const result = await addExcludedCourses(courseGroupIds, curriculumVersion, programmeCode)
   if (!result) {
     res.status(400).end()
     return
@@ -24,7 +24,7 @@ router.post<never, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/', async (r
 })
 
 router.delete<never, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/', async (req, res) => {
-  const { programmeCode, courseCodes, curriculumVersion } = req.body
+  const { programmeCode, courseGroupIds, curriculumVersion } = req.body
   const { roles, programmeRights } = req.user
 
   const hasFullAccess = hasFullAccessToStudentData(roles)
@@ -32,7 +32,7 @@ router.delete<never, ExcludedCoursesResBody, ExcludedCoursesReqBody>('/', async 
 
   if (!hasFullAccess && !hasAccessToProgramme) return res.status(403).end()
 
-  const result = await removeExcludedCourses(courseCodes, curriculumVersion, programmeCode)
+  const result = await removeExcludedCourses(courseGroupIds, curriculumVersion, programmeCode)
   if (!result) {
     res.status(400).end()
     return

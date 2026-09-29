@@ -93,7 +93,7 @@ export const DegreeCourseTable = ({
 
   const excludeOne = (course: ProgrammeCourse) => {
     void setExclusion({
-      courseCodes: [course.code],
+      courseGroupIds: [course.group_id],
       curriculumVersion: version,
       programmeCode: combinedProgramme === '' ? studyProgramme : combinedProgramme,
     })
@@ -104,7 +104,7 @@ export const DegreeCourseTable = ({
     const module = getModule(moduleCode)
     const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
     void setExclusion({
-      courseCodes: module.courses.filter(course => course.visible.visibility).map(course => course.code),
+      courseGroupIds: module.courses.filter(course => course.visible.visibility).map(course => course.group_id),
       curriculumVersion: version,
       programmeCode: excludeFromProgramme,
     })
@@ -113,7 +113,7 @@ export const DegreeCourseTable = ({
 
   const removeOne = (course: ProgrammeCourse) => {
     void removeExclusion({
-      courseCodes: [course.code],
+      courseGroupIds: [course.group_id],
       curriculumVersion: version,
       programmeCode: studyProgramme,
     })
@@ -123,7 +123,7 @@ export const DegreeCourseTable = ({
   const deleteAll = (moduleCode: string) => {
     const module = getModule(moduleCode)
     void removeExclusion({
-      courseCodes: module.courses.map(course => course.code),
+      courseGroupIds: module.courses.map(course => course.group_id),
       curriculumVersion: version,
       programmeCode: studyProgramme,
     })

@@ -4,6 +4,7 @@ import { baseUrl, backendPort } from './config'
 import { initializeDatabaseConnection, dbConnections } from './database/connection'
 import { startCron } from './events'
 import routes from './routes'
+import { backfillExcludedCourseGroupIds } from './services/excludedCourses'
 import logger from './util/logger'
 import './worker/worker'
 
@@ -13,6 +14,7 @@ initializeDatabaseConnection()
 
     dbConnections.on('connect', () => {
       logger.info('Connected to sis db successfully')
+      backfillExcludedCourseGroupIds().catch(error => logger.error(error))
     })
 
     dbConnections.on('error', () => {
