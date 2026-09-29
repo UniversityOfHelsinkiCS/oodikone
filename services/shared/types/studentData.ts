@@ -1,4 +1,4 @@
-import type { Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
+import type { Course, Credit, Enrollment, SISStudyRight, SISStudyRightElement, Student, Studyplan } from '../models'
 import type { Tag, TagStudent } from '../models/kone'
 
 import type { CriteriaYear, CreditTypeCode, Name, ProgrammeModule } from '../types'
@@ -115,6 +115,7 @@ export type StudentCourse = {
   credittypecode: CreditTypeCode
   language: string
   studyright_id: string
+  courseGroupId: Course['groupId']
 }
 
 export type StudentCredit = Pick<
@@ -129,7 +130,7 @@ export type StudentCredit = Pick<
   | 'course_code'
   | 'language'
   | 'studyright_id'
->
+> & { courseGroupId: Course['groupId'] }
 
 export type StudentEnrollment = Pick<
   Enrollment,

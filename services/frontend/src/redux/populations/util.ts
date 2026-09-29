@@ -71,6 +71,7 @@ export const formatPopulationData = <T extends RequiredFields>(
         return {
           course_id: credit.course_id,
           course_code: credit.course_code,
+          courseGroupId: credit.courseGroupId,
           date: credit.attainment_date,
           passed,
           grade: passed ? credit.grade : 'Hyl.',

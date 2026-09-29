@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { col, Op } from 'sequelize'
 
 import { SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
 import { Tag, TagStudent } from '@oodikone/shared/models/kone'
@@ -12,6 +12,7 @@ import {
   StudyplanModel,
   SISStudyRightModel,
   SISStudyRightElementModel,
+  CourseModel,
 } from '../../models'
 import { TagModel, TagStudentModel } from '../../models/kone'
 import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
@@ -190,11 +191,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
     },
   }).then(data => data.map(x => x.get({ plain: true })))
 
-export const getCredits = async (
-  studentNumbers: string[],
-  startDate: string,
-  endDate: string
-): Promise<StudentCredit[]> =>
+export const getCredits = async (studentNumbers: string[], startDate: string, endDate: string) =>
   CreditModel.findAll({
     raw: true,
     attributes: [
@@ -208,12 +205,19 @@ export const getCredits = async (
       'course_code',
       'language',
       'studyright_id',
+      [col('course.group_id'), 'courseGroupId'],
     ],
+    include: {
+      model: CourseModel,
+      attributes: [],
+      as: 'course',
+      required: true,
+    },
     where: {
       student_studentnumber: { [Op.in]: studentNumbers },
       attainment_date: { [Op.between]: [startDate, endDate] },
     },
-  })
+  }) as unknown as Promise<StudentCredit[]>
 
 export const getStudyRightElementsForStudyRight = async (studentNumbers: string[], code: string) =>
   SISStudyRightElementModel.findAll({
