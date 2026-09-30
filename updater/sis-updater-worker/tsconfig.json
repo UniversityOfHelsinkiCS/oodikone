@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "allowJs": true,
+
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "noErrorTruncation": true,
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "inlineSources": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src", "tests", "vitest.config.mts"]
+}

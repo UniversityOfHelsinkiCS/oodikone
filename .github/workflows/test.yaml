@@ -24,14 +24,23 @@ on:
 
 jobs:
   # === Static tests / linting ===
-  lint_packages:
-    name: 'Lint packages'
+  lint_services:
+    name: 'Lint services (backend + frontend + shared)'
     runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - name: Lint backend, frontend and shared
-        uses: ./.github/actions/lint
+        uses: ./.github/actions/lint/services
+
+  lint_updater:
+    name: 'Lint updater'
+    runs-on: ${{ vars.RUNS_ON || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Lint updater scheduler and worker
+        uses: ./.github/actions/lint/updater
 
   # === Build database images ===
   build_backend:
@@ -99,7 +108,8 @@ jobs:
       - check_migration_files
       - build_backend
       - build_frontend
-      - lint_packages
+      - lint_services
+      - lint_updater
       - test_unit
       - test_updater_unit
 
@@ -138,7 +148,8 @@ jobs:
       - check_migration_files
       - build_backend
       - build_frontend
-      - lint_packages
+      - lint_services
+      - lint_updater
       - test_unit
       - test_updater_unit
 
@@ -178,7 +189,8 @@ jobs:
       - check_migration_files
       - build_backend
       - build_frontend
-      - lint_packages
+      - lint_services
+      - lint_updater
       - test_unit
       - test_updater_unit
 

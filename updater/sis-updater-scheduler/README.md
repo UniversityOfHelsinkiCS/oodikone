@@ -41,7 +41,7 @@ Prepurge identifies outdated rows before they are permanently deleted:
 1. The scheduler creates a BullMQ job with:
    - `tables`: List of tables to check (`TABLES_TO_PURGE`).
    - `before`: A date threshold; rows older than this will be deleted (based on the `updatedAt` column).
-1. The scheduler listens for a response from **sis-updater-worker** ([`src/jobEvents.js`](./src/jobEvents.js)).
+1. The scheduler listens for a response from **sis-updater-worker** ([`src/jobEvents.ts`](./src/jobEvents.ts)).
 1. The worker returns a count of outdated rows per table.
 1. Based on this data, the scheduler:
    - Sends a **Slack notification** about the upcoming purge.
@@ -55,4 +55,4 @@ The purge permanently removes outdated rows if the required waiting period has p
 1. If permitted, a BullMQ job is created with the same `tables` and `before` parameters as the prepurge job.
 1. The **sis-updater-worker** processes the job and deletes outdated rows.
 
-For more details, see the purge implementation in [`src/purge.js`](./src/purge.js).
+For more details, see the purge implementation in [`src/purge.ts`](./src/purge.ts).
