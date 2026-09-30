@@ -14,16 +14,17 @@ The quick guide should be enough for most purposes: updating schema, data, or th
 ./manage_test_dbs.sh release all      # dump, upload and push images for every database
 ```
 
-Actions are `download`, `dump`, `upload`, `push`, `release` (dump + upload + push) and `rebuild` (download + push). Each one is a thin call to a script in this folder, which can also be used on its own:
+Actions are `download`, `dump`, `upload` (upload + prune), `push`, `prune`, `release` (dump + upload + prune + push) and `rebuild` (download + push). Each one is a thin call to a script in this folder, which can also be used on its own:
 
-| Script                     | What it does                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `dump_local_db.sh`         | `pg_dump`s the databases from the running containers into `.databasedumps/`                           |
-| `download_dump_from_s3.sh` | Downloads the newest dump of each database from s3 (`-b <branch>` to pick dumps from a single branch) |
-| `upload_dump_to_s3.sh`     | Uploads the dumps in `.databasedumps/test` to s3 as `<database>-<git_branch>-<datetime>.sql`          |
-| `build_and_push_image.sh`  | Builds database images from the current dumps and pushes them to the Toska registry                   |
-| `create_s3_bucket.sh`      | Creates the s3 bucket if it doesn't exist yet, run automatically before an upload                     |
-| `lib/common.sh`            | Shared configuration (dump directories, s3 bucket, registry, database names)                          |
+| Script                     | What it does                                                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `dump_local_db.sh`         | `pg_dump`s the databases from the running containers into `.databasedumps/`                                            |
+| `download_dump_from_s3.sh` | Downloads the newest dump of each database from s3 (`-b <branch>` to pick dumps from a single branch)                  |
+| `upload_dump_to_s3.sh`     | Uploads the dumps in `.databasedumps/test` to s3 as `<database>-<git_branch>-<datetime>.sql`                           |
+| `prune_s3_dumps.sh`        | Deletes dumps older than 30 days from s3, always keeping the newest `master` dump of each database (`-d <days>`, `-n`) |
+| `build_and_push_image.sh`  | Builds database images from the current dumps and pushes them to the Toska registry                                    |
+| `create_s3_bucket.sh`      | Creates the s3 bucket if it doesn't exist yet, run automatically before an upload                                      |
+| `lib/common.sh`            | Shared configuration (dump directories, s3 bucket, registry, database names)                                           |
 
 Dumps end up in `.databasedumps/test/<database>.sql`, which is where `db.Dockerfile` reads them from when an image is built. The s3 commands read their credentials from the `ACCESS_KEY` and `SECRET_KEY` environment variables (e.g. in CI). If neither is set, they fall back to `~/.s3cfg`, which can be found on the toska/dokumentaatio repo.
 

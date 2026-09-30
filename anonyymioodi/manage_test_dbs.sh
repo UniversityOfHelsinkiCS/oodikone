@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$SCRIPT_DIR"/lib/common.sh
 
-ACTIONS=("download" "dump" "upload" "push" "release" "rebuild")
+ACTIONS=("download" "dump" "upload" "push" "prune" "release" "rebuild")
 
 usage() {
   cat >&2 <<EOF
@@ -28,10 +28,11 @@ Actions:
   download  Download the newest dumps from s3
   dump      Dump the databases from the running docker containers
 
-  upload    Upload the current dumps to s3
+  upload    Upload the current dumps to s3, then prune old dumps
   push      Build images from the current dumps and push them to the registry
+  prune     Delete dumps older than $S3_DUMP_RETENTION_DAYS days from s3, keeping the newest one
 
-  release   Dump from the running containers, then upload and push (shorthand)
+  release   Dump from the running containers, then upload, prune and push (shorthand)
   rebuild   Download the dumps from s3, then push (shorthand)
 
 Databases: ${DATABASES[*]} all
@@ -52,6 +53,10 @@ upload_dump() {
   "$SCRIPT_DIR"/upload_dump_to_s3.sh "$1"
 }
 
+prune_dumps() {
+  "$SCRIPT_DIR"/prune_s3_dumps.sh "$1"
+}
+
 push_image() {
   "$SCRIPT_DIR"/build_and_push_image.sh "$1"
 }
@@ -63,11 +68,16 @@ run_action() {
   case "$action" in
     download) download_dump "$database" ;;
     dump) dump_database "$database" ;;
-    upload) upload_dump "$database" ;;
+    upload)
+      upload_dump "$database"
+      prune_dumps "$database"
+      ;;
     push) push_image "$database" ;;
+    prune) prune_dumps "$database" ;;
     release)
       dump_database "$database"
       upload_dump "$database"
+      prune_dumps "$database"
       push_image "$database"
       ;;
     rebuild)

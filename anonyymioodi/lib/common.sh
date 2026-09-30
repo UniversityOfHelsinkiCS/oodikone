@@ -22,6 +22,8 @@ S3_HOST="s3.datacloud.helsinki.fi"
 S3_BUCKET="s3://oodikone"
 # Dumps live under a prefix of their own inside the bucket
 S3_TARGET="$S3_BUCKET/test-dbs"
+# Dumps older than this are pruned from s3, except for the newest dump of each database
+S3_DUMP_RETENTION_DAYS=30
 
 REGISTRY="registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi"
 
