@@ -5,6 +5,10 @@ import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { IncludeSubstitutionsToggle } from '@/components/PopulationComponents/Students/IncludeSubstitutionsToggle'
 import { useGetColumnDefinitions } from '@/components/PopulationComponents/Students/Table/CoursesTab/columnDefinitions'
+import {
+  getGroupIdToExportKey,
+  renameKeys,
+} from '@/components/PopulationComponents/Students/Table/CoursesTab/excelExport'
 import { useToggle } from '@/hooks/toggle'
 import { useCurriculum } from '@/hooks/useCurriculum'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
@@ -360,16 +364,24 @@ export const CoursesTabContainer = ({ students, courses, idToGroupIdMap, program
     },
   }
 
+  // Export courses by their code instead of the groupId
+  const groupIdToExportKey = useMemo(() => getGroupIdToExportKey(coursesByParentModule), [coursesByParentModule])
+
   const keysForExport: string[] = useMemo(() => {
     const squashGroups = column => {
       if (column.columns) return column.columns.flatMap(squashGroups)
       return [column.accessorKey ?? column.id?.split(';')?.[1]]
     }
 
-    const keys = columns.flatMap(squashGroups)
+    const keys = columns.flatMap(squashGroups).map(key => groupIdToExportKey[key] ?? key)
     // Remove duplicates preserving order of initial occurences
     return keys.filter((key, idx) => keys.indexOf(key) === idx)
-  }, [columns])
+  }, [columns, groupIdToExportKey])
+
+  const exportData = useMemo(
+    () => formattedStudents.map(student => renameKeys(student, groupIdToExportKey)),
+    [formattedStudents, groupIdToExportKey]
+  )
 
   return (
     <OodiTable
@@ -379,7 +391,7 @@ export const CoursesTabContainer = ({ students, courses, idToGroupIdMap, program
       options={tableOptions}
       toolbarContent={
         <>
-          <OodiTableExcelExport data={formattedStudents} exportColumnKeys={keysForExport} />
+          <OodiTableExcelExport data={exportData} exportColumnKeys={keysForExport} />
           <FilterDegreeCoursesModal degreeProgramme={programme} />
           <StudentNameVisibilityToggle />
           <IncludeSubstitutionsToggle
