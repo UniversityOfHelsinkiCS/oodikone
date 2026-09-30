@@ -14,4 +14,4 @@ runs:
       run: npm run stylelint "services/frontend/src/**/*.css"
     - name: 'Run Oxlint for the whole repository'
       shell: bash
-      run: npm run lint -- services
+      run: npm run lint:services

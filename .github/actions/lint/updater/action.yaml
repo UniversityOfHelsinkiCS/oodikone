@@ -11,4 +11,4 @@ runs:
       run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
     - name: 'Run Oxlint for the updater'
       shell: bash
-      run: npm run lint -- updater
+      run: npm run lint:updater
