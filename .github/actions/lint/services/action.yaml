@@ -1,6 +1,5 @@
-name: 'Lint code'
+name: 'Lint services'
 description: 'Runs Oxlint and Stylelint for frontend and backend'
-
 runs:
   using: composite
   steps:
