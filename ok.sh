@@ -28,16 +28,28 @@ Run without a command to open the interactive menu.
 
 Available commands:
 
-  up, u             Start Oodikone with real data
-  rs                Restart Oodikone with real data (down, then up)
-  test, t           Start Oodikone with test/anon data
-  down, d           Stop Oodikone
-  logs, l           Follow oodikone service logs
-  logs:updater, lu  Follow sis-updater service logs
-  importer, i       Open a psql/pgcli shell to the importer database
-  updater           Open a psql/pgcli shell to the updater (sis) database
-  install           Add the 'ok' shell function to your shell rc file
-  -h, --help        Print this help and exit
+  up, u                 Start Oodikone with real data
+  rs, rl                 Restart Oodikone with real data (down, then up)
+  anon, a               Start Oodikone with anonymous data
+  down, d               Stop Oodikone
+
+  logs, l               Follow oodikone service logs
+  logs:updater, lu      Follow sis-updater service logs
+  lint, li              Lint the project or the path given as parameter
+  format, fmt, f        Format the project or the path given as parameter
+
+  test:backend, tb      Run backend unit tests
+  test:frontend, tf     Run frontend unit tests
+  test:updater, tu      Run updater (worker) unit tests
+  test:services, ts     Run backend service tests
+  test:api, ta          Run backend api tests
+  test:component, tc    Run frontend component tests tests
+  test:e2e, te          Run all e2e tests (add --ui to run in headed mode)
+
+  importer, i           Open a psql/pgcli shell to the importer database
+  updater               Open a psql/pgcli shell to the updater (sis) database
+  install               Add the 'ok' shell function to your shell rc file
+  -h, --help            Print this help and exit
 EOF
   exit
 }
@@ -200,8 +212,8 @@ run_restart() {
   npm run both:real
 }
 
-run_test() {
-  infomsg "Starting Oodikone with test data..."
+run_anon() {
+  infomsg "Starting Oodikone with anonymous data..."
   npm run both
 }
 
@@ -214,9 +226,38 @@ run_logs() {
   npm run logs
 }
 
+run_lint() {
+  npm run lint -- "$@"
+}
+
+run_format() {
+  npm run fmt -- "$@"
+}
+
+run_unit_tests() {
+  npm run test:unit --prefix "$@"
+}
+
+run_component_tests() {
+  npm run test:component --prefix services/frontend "$@"
+}
+
+run_service_tests() {
+  npm run test:services --prefix services/backend "$@"
+}
+
+run_api_tests() {
+  npm run test:api --prefix services/backend "$@"
+}
+
+run_e2e_tests() {
+  npm run playwright -- "$@"
+}
+
 run_logs_updater() {
   docker compose --file docker-compose.yml logs sis-updater-worker sis-updater-scheduler -f
 }
+
 
 run_importer_db() {
   local pgclient
@@ -275,13 +316,13 @@ case "${1-}" in
     shift
     run_up "$@"
     ;;
-  rs)
+  rs|rl)
     shift
     run_restart "$@"
     ;;
-  test|t)
+  anon|a)
     shift
-    run_test "$@"
+    run_anon "$@"
     ;;
   down|d)
     shift
@@ -290,6 +331,42 @@ case "${1-}" in
   logs|l)
     shift
     run_logs "$@"
+    ;;
+  lint|li)
+    shift
+    run_lint "$@"
+    ;;
+  format|fmt|f)
+    shift
+    run_format "$@"
+    ;;
+  test:backend|tb)
+    shift
+    run_unit_tests services/backend "$@"
+    ;;
+  test:frontend|tf)
+    shift
+    run_unit_tests services/frontend "$@"
+    ;;
+  test:updater|tu)
+    shift
+    run_unit_tests updater/sis-updater-worker "$@"
+    ;;
+  test:services|ts)
+    shift
+    run_service_tests "$@"
+    ;;
+  test:api|ta)
+    shift
+    run_api_tests "$@"
+    ;;
+  test:component|tc)
+    shift
+    run_component_tests "$@"
+    ;;
+  test:e2e|te)
+    shift
+    run_e2e_tests "$@"
     ;;
   logs:updater|lu)
     shift
