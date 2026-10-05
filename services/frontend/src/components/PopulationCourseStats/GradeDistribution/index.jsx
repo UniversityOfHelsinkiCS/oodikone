@@ -12,6 +12,7 @@ import { CourseFilterToggle } from '@/components/PopulationCourseStats/CourseFil
 import { ModuleCourseToggle } from '@/components/PopulationCourseStats/ModuleCourseToggle'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { range } from '@oodikone/shared/util'
+import { HiddenCourseAlert } from '@/components/HiddenCourseAlert'
 
 const mapCourseData = course =>
   course.courses
@@ -182,6 +183,7 @@ export const GradeDistribution = ({
           {courseTableMode === 'all' && (
             <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
           )}
+          {courseTableMode === 'curriculum' ? <HiddenCourseAlert ooditable /> : null}
         </>
       }
     />

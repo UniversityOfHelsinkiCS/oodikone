@@ -13,6 +13,7 @@ import { CourseFilterToggle } from '@/components/PopulationCourseStats/CourseFil
 import { ModuleCourseToggle } from '@/components/PopulationCourseStats/ModuleCourseToggle'
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { range } from '@oodikone/shared/util'
+import { HiddenCourseAlert } from '@/components/HiddenCourseAlert'
 
 const columnHelper = createColumnHelper()
 
@@ -183,12 +184,13 @@ export const PassingSemesters = ({ onlyIamRights, courseStatistics, courseTableM
       toolbarContent={
         <>
           <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-          <Button onClick={() => setCumulativeStats(!cumulativeStats)} sx={{ my: 'auto', mx: 1 }} variant="outlined">
+          <Button onClick={() => setCumulativeStats(!cumulativeStats)} variant="outlined">
             {cumulativeStats ? 'Show yearly stats' : 'Show cumulative stats'}
           </Button>
           {courseTableMode === 'all' && (
             <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
           )}
+          {courseTableMode === 'curriculum' ? <HiddenCourseAlert ooditable /> : null}
         </>
       }
     />

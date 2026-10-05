@@ -14,6 +14,7 @@ import { ModuleCourseToggle } from '@/components/PopulationCourseStats/ModuleCou
 import { NorthEastIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseModule, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
 import { Unarray } from '@oodikone/shared/types'
+import { HiddenCourseAlert } from '@/components/HiddenCourseAlert'
 
 const columnHelper = createColumnHelper<Unarray<UnionOfFilteredModuleCourse>>()
 
@@ -248,6 +249,7 @@ export const PassFailEnrollments = ({
             setShowModules !== undefined && ( // Check if optional fields are set
               <ModuleCourseToggle setShowModules={setShowModules} showModules={showModules} />
             )}
+          {courseTableMode === 'curriculum' ? <HiddenCourseAlert ooditable /> : null}
         </>
       }
     />
