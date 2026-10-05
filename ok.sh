@@ -203,7 +203,7 @@ main_loop() {
 # === Direct (non-interactive) commands ===
 run_up() {
   infomsg "Starting Oodikone with real data..."
-  npm run both:real
+  npm run both:real "$@"
 }
 
 run_restart() {
@@ -214,16 +214,16 @@ run_restart() {
 
 run_anon() {
   infomsg "Starting Oodikone with anonymous data..."
-  npm run both
+  npm run both "$@"
 }
 
 run_down() {
   infomsg "Stopping Oodikone..."
-  npm run docker:down
+  npm run docker:down "$@"
 }
 
 run_logs() {
-  npm run logs
+  npm run logs "$@"
 }
 
 run_lint() {
