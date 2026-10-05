@@ -27,7 +27,7 @@ export const OodiTableContainer = <OTData extends RowData>({
   return (
     <Paper data-cy={cy} sx={{ my: 2, borderRadius: 0 }} variant="outlined">
       {!!toolbarContent && (
-        <Stack direction="row" spacing={3} sx={{ p: 2, justifyContent: 'flex-start' }}>
+        <Stack direction="row" spacing={3} sx={{ p: 2 }} useFlexGap>
           {toolbarContent}
         </Stack>
       )}

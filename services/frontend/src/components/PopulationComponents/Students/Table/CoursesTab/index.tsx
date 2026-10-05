@@ -15,6 +15,7 @@ import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { CreditTypeCode, Name, ProgrammeCourse } from '@oodikone/shared/types'
 import { FormattedStudent, StudentCourse } from '@oodikone/shared/types/studentData'
 import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
+import { HiddenCourseAlert } from '@/components/HiddenCourseAlert'
 
 type CoursesTabContainerProps = {
   students: FormattedStudent[]
@@ -398,6 +399,7 @@ export const CoursesTabContainer = ({ students, courses, idToGroupIdMap, program
             includeSubstitutions={includeSubstitutions}
             toggleIncludeSubstitutions={toggleIncludeSubstitutions}
           />
+          <HiddenCourseAlert ooditable />
         </>
       }
     />
