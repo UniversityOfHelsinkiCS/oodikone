@@ -6,6 +6,7 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 const inStaging = process.env.REACT_APP_STAGING === 'true'
+const viteCacheDir = process.env.VITE_CACHE_DIR ?? 'node_modules/.vite'
 
 // https://vitejs.dev/config/
 // eslint-disable-next-line import-x/no-unused-modules, import-x/no-default-export
@@ -38,6 +39,8 @@ export default defineConfig({
     }),
   ],
   base: inStaging ? '/oodikone' : '/',
+  // Docker runs as DOCKER_UID, which may not have write access to the node_modules volume
+  cacheDir: viteCacheDir,
   server: {
     proxy: {
       '/api/': {
