@@ -108,7 +108,10 @@ cypress/
 # additional inclusions here
 
 # exclusions here
-*/.eslintrc.json
+**/.dockerignore
+**/.gitignore
+**/.eslintrc.json
 **/*Dockerfile
 **/build
 **/dist
+**/.npm

@@ -114,3 +114,4 @@ cypress/
 **/*Dockerfile
 **/build
 **/dist
+**/.npm

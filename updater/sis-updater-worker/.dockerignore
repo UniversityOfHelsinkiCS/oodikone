@@ -109,7 +109,10 @@ cypress/
 !./src/updater/updateStudents/excludedPartialAttainments.csv
 
 # exclusions here
-*/.eslintrc.json
+**/.dockerignore
+**/.gitignore
+**/.eslintrc.json
 **/*Dockerfile
 **/build
 **/dist
+**/.npm
