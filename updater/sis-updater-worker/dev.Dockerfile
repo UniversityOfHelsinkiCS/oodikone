@@ -7,6 +7,6 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=development
 
 COPY . .
-RUN npm ci --include=dev
+RUN npm ci
 
 CMD ["node_modules/.bin/nodemon", "--exec", "node src/index.js", "--watch", "src", "--watch", "--ext", "ts, js, json", "--legacy-watch"]

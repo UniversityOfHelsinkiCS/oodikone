@@ -7,7 +7,7 @@ ENV TZ="Europe/Helsinki"
 ENV NODE_ENV=development
 
 COPY . .
-RUN npm ci --include=dev
+RUN npm ci
 
 EXPOSE 8082
 
