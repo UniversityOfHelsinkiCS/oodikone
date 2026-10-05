@@ -14,6 +14,7 @@ import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import type { FormattedModules, ModuleTabStudent } from '@/components/PopulationComponents/Students/Table/ModulesTab'
 import { CheckIcon, CropSquareIcon } from '@/theme'
 import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
+import { HiddenCourseAlert } from '@/components/HiddenCourseAlert'
 
 const getModuleIfExists = (student: ModuleTabStudent, moduleCode: string) =>
   student.studyModulesInHOPS.find(studyModule => studyModule.code === moduleCode) ?? null
@@ -194,6 +195,7 @@ export const ModulesTab = ({
           <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
           <FilterDegreeCoursesModal degreeProgramme={programme} text="Manage module visibility" />
           <StudentNameVisibilityToggle />
+          <HiddenCourseAlert ooditable modules />
         </>
       }
     />
