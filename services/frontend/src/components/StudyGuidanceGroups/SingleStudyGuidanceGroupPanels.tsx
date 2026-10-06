@@ -92,7 +92,7 @@ const SingleStudyGuidanceGroupPanelsContent = ({
   }
   const panels = [
     {
-      title: `Credit accumulation (for ${filteredStudents.length} students)`,
+      title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: (
         <>
           {!!group.tags?.year && (

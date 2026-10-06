@@ -99,7 +99,7 @@ const PopulationDetailsContent = ({
 
   const panels = [
     {
-      title: `Credit accumulation (for ${filteredStudents.length} students)`,
+      title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: filteredStudents.length ? (
         // TODO: make wrapper for when no data.
         <CreditAccumulationGraph

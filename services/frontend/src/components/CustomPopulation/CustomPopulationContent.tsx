@@ -63,7 +63,7 @@ export const CustomPopulationContent = ({
 
   const panels = [
     {
-      title: `Credit accumulation (for ${filteredStudents.length} students)`,
+      title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: (
         <CreditAccumulationGraph
           programmeCodes={[associatedProgramme].filter(Boolean) as string[]}
