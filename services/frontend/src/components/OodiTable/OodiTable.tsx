@@ -17,18 +17,19 @@ export const OodiTableContainer = <OTData extends RowData>({
   cy,
 }: {
   table: TableType<OTData>
-  toolbarContent?: ReactNode
+  toolbarContent?: ReactNode | ((table: TableType<OTData>) => ReactNode)
   isExportView?: true
   cy?: string
 }) => {
   const verticalHeaders = table.getState().useVerticalHeaders ?? []
   const zebraStriped = table.getState().useZebrastripes
+  const toolbar = typeof toolbarContent === 'function' ? toolbarContent(table) : toolbarContent
 
   return (
     <Paper data-cy={cy} sx={{ my: 2, borderRadius: 0 }} variant="outlined">
-      {!!toolbarContent && (
+      {!!toolbar && (
         <Stack direction="row" spacing={3} sx={{ p: 2 }} useFlexGap>
-          {toolbarContent}
+          {toolbar}
         </Stack>
       )}
       <TableContainer

@@ -13,7 +13,7 @@ import { OodiTableContainer } from '@/components/OodiTable/OodiTable'
  * @param data - Array of data objects of type TData
  * @param columns - Array of column definitions for type TData
  * @param isExportView (default false) Is table used in an export modal to provide preview
- * @param toolbarContent - Shown above the table
+ * @param toolbarContent - Shown above the table. Pass a function to read the table instance, e.g. filtered rows
  * @param options - Optional: Additional TableOptions
  * @param cy - Optional: data-cy tag provided to the wrapper around the TableContainer
  * @returns Table instance
@@ -31,7 +31,7 @@ export const OodiTable = <TData extends RowData>({
   columns: ColumnDef<TData, any>[]
   isExportView?: true
   options?: Partial<TableOptions<TData>>
-  toolbarContent?: ReactNode
+  toolbarContent?: ReactNode | ((table: Table<TData>) => ReactNode)
   cy?: string
 }) => {
   const [fallbackData] = useState()

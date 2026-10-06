@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
-import { createColumnHelper, getFilteredRowModel } from '@tanstack/react-table'
+import { createColumnHelper, getFilteredRowModel, type TableOptions } from '@tanstack/react-table'
 import { useCallback, useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
@@ -66,7 +66,6 @@ export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: Us
             {cell.getValue()}
           </Link>
         ),
-        filterFn: (row, _, filterValue) => matchesSearch(row.original, String(filterValue)),
       }),
       columnHelper.accessor('roles', {
         header: 'Roles',
@@ -123,28 +122,27 @@ export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: Us
 
   const [filter, setFilter] = useDebouncedState('', 250)
 
-  const ooditable = {
+  const ooditable: Partial<TableOptions<User>> = {
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, _, filterValue) => matchesSearch(row.original, String(filterValue)),
     state: {
-      columnFilters: [{ id: 'username', value: filter }],
+      globalFilter: filter,
     },
   }
 
   if (isLoading || !users) return <LoadingSkeleton />
-
-  const filteredUsers = users.filter(user => matchesSearch(user, filter))
 
   return (
     <OodiTable
       columns={ooditableColumns}
       data={users}
       options={ooditable}
-      toolbarContent={
+      toolbarContent={table => (
         <>
-          <CopyEmailAddressesButton users={filteredUsers} />
+          <CopyEmailAddressesButton users={table.getFilteredRowModel().rows.map(row => row.original)} />
           <NameSearch setFilter={setFilter} />
         </>
-      }
+      )}
     />
   )
 }

@@ -72,3 +72,17 @@ const tableOptions = {
   },
 }
 ```
+
+## Toolbar
+
+`toolbarContent` is rendered above the table. Pass a function instead of a node when the toolbar needs the table
+instance, e.g. to act on the currently filtered rows. Keep filtering in the table (column/global filters) and read the
+result from it rather than reimplementing the filter outside.
+
+```tsx
+<OodiTable
+  columns={columns}
+  data={data}
+  toolbarContent={table => <CopyButton rows={table.getFilteredRowModel().rows.map(row => row.original)} />}
+/>
+```
