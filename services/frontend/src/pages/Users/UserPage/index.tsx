@@ -32,7 +32,7 @@ export const UserPage = ({ userId }: { userId: string }) => {
   }
 
   return (
-    <PageLayout maxWidth="lg">
+    <PageLayout maxWidth="md" sx={{ width: '100%' }}>
       <Stack direction="column" gap={2}>
         <MissingIdAlert visible={!user.sisPersonId} />
         <InfoCard user={user} />
