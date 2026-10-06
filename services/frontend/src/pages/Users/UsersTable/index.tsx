@@ -1,38 +1,38 @@
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
-
 import TextField from '@mui/material/TextField'
 import { createColumnHelper, getFilteredRowModel } from '@tanstack/react-table'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
+import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
 import { MockButton } from '@/components/Users/MockButton'
 import { RoleChip } from '@/components/Users/RoleChip'
 import { DateFormat } from '@/constants/date'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { useGetRolesQuery } from '@/redux/users'
 import { SearchIcon, theme } from '@/theme'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
-import { DetailedProgrammeRights, Role } from '@oodikone/shared/types'
+import { DetailedProgrammeRights } from '@oodikone/shared/types'
 
-const FilterComponent = ({ setFilter }) => {
+const FilterComponent = ({ setFilter }: { setFilter: (value: string) => void }) => {
   const [textField, setTextField] = useState('')
-  useEffect(() => {
-    setFilter(textField)
-  }, [textField])
 
   return (
     <TextField
-      label="Filter by name or username"
-      onChange={event => setTextField(event.target.value)}
+      label="Search by name or username"
+      onChange={event => {
+        setTextField(event.target.value)
+        setFilter(event.target.value)
+      }}
       size="small"
-      slotProps={{ input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} /> } }}
-      sx={{ width: '320px' }}
+      slotProps={{
+        input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} sx={{ ml: 2 }} /> },
+      }}
       value={textField}
     />
   )
@@ -40,19 +40,11 @@ const FilterComponent = ({ setFilter }) => {
 
 const columnHelper = createColumnHelper<User>()
 
-export const UsersTable = ({
-  getAllUsersQuery,
-  users,
-}: {
-  getAllUsersQuery: any // TODO: What is the type?
-  users: User[]
-}) => {
+export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: User[] | undefined }) => {
+  'use memo'
   const { getTextIn } = useLanguage()
-  const { data: roles = [] } = useGetRolesQuery()
   const { data } = useGetProgrammesQuery()
-  const studyProgrammes = data?.filteredProgrammes ?? {}
-
-  const iamGroups = [...new Set(users?.flatMap(user => user.iamGroups))]
+  const studyProgrammes = useMemo(() => data?.filteredProgrammes ?? {}, [data])
 
   const formatProgrammeRights = useCallback(
     (programmeRights: DetailedProgrammeRights[]) => {
@@ -79,26 +71,27 @@ export const UsersTable = ({
     () => [
       columnHelper.accessor('name', {
         header: 'Name',
-        cell: cell => cell.getValue<string>(),
+        cell: cell => cell.getValue(),
       }),
       columnHelper.accessor('username', {
         header: 'Username',
         cell: cell => (
           <Link data-cy={`user-page-button-${cell.row.original.username}`} to={`/users/${cell.row.original.id}`}>
-            {cell.getValue<string>()}
+            {cell.getValue()}
           </Link>
         ),
         filterFn: (row, _, filterValue) => {
+          const search = String(filterValue).toLowerCase()
           const { name, username } = row.original
-          return name.toLowerCase().includes(filterValue) || username.toLocaleLowerCase().includes(filterValue)
+          return name.toLowerCase().includes(search) || username.toLowerCase().includes(search)
         },
       }),
       columnHelper.accessor('roles', {
         header: 'Roles',
         cell: cell => (
-          <Box display="flex" flexWrap="wrap" gap={1}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 1 }}>
             {cell
-              .getValue<Role[]>()
+              .getValue()
               .toSorted((a, b) => a.localeCompare(b))
               .map(role => (
                 <RoleChip key={role} role={role} />
@@ -110,15 +103,15 @@ export const UsersTable = ({
       }),
       columnHelper.accessor('programmeRights', {
         header: 'Programmes',
-        cell: cell => formatProgrammeRights(cell.getValue<DetailedProgrammeRights[]>()),
+        cell: cell => formatProgrammeRights(cell.getValue()),
         enableSorting: false,
       }),
       columnHelper.accessor('iamGroups', {
         header: 'IAM groups',
         cell: cell => (
-          <Box display="flex" flexWrap="wrap" gap={1}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 1 }}>
             {cell
-              .getValue<string[]>()
+              .getValue()
               .toSorted((a, b) => a.localeCompare(b))
               .map(iamGroup => (
                 <Chip key={iamGroup} label={iamGroup} size="small" />
@@ -130,8 +123,7 @@ export const UsersTable = ({
       }),
       columnHelper.accessor('lastLogin', {
         header: 'Last login',
-        cell: cell => reformatDate(cell.getValue<string>(), DateFormat.DISPLAY_DATE),
-        enableColumnFilter: false,
+        cell: cell => reformatDate(cell.getValue(), DateFormat.DISPLAY_DATE),
       }),
       columnHelper.display({
         id: 'actions',
@@ -144,7 +136,7 @@ export const UsersTable = ({
         enableSorting: false,
       }),
     ],
-    [formatProgrammeRights, getAllUsersQuery, iamGroups, roles]
+    [formatProgrammeRights]
   )
 
   const [filter, setFilter] = useDebouncedState('', 250)
@@ -155,6 +147,8 @@ export const UsersTable = ({
       columnFilters: [{ id: 'username', value: filter }],
     },
   }
+
+  if (isLoading || !users) return <LoadingSkeleton />
 
   return (
     <OodiTable

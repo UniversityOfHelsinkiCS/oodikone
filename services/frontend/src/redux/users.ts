@@ -62,7 +62,7 @@ const usersApi = RTKApi.injectEndpoints({
 export const {
   useGetUserQuery,
   useGetRolesQuery,
-  useLazyGetAllUsersQuery,
+  useGetAllUsersQuery,
   useModifyRolesMutation,
   useAddUserUnitsMutation,
   useRemoveUserUnitsMutation,
