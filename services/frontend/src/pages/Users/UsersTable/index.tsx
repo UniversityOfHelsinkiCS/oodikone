@@ -1,9 +1,8 @@
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import { createColumnHelper, getFilteredRowModel } from '@tanstack/react-table'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
@@ -14,29 +13,10 @@ import { RoleChip } from '@/components/Users/RoleChip'
 import { DateFormat } from '@/constants/date'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetProgrammesQuery } from '@/redux/populations'
-import { SearchIcon, theme } from '@/theme'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { DetailedProgrammeRights } from '@oodikone/shared/types'
-
-const FilterComponent = ({ setFilter }: { setFilter: (value: string) => void }) => {
-  const [textField, setTextField] = useState('')
-
-  return (
-    <TextField
-      label="Search by name or username"
-      onChange={event => {
-        setTextField(event.target.value)
-        setFilter(event.target.value)
-      }}
-      size="small"
-      slotProps={{
-        input: { endAdornment: <SearchIcon fontSize="small" htmlColor={theme.palette.grey[700]} sx={{ ml: 2 }} /> },
-      }}
-      value={textField}
-    />
-  )
-}
+import { NameSearch } from './NameSearch'
 
 const columnHelper = createColumnHelper<User>()
 
@@ -155,7 +135,7 @@ export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: Us
       columns={ooditableColumns}
       data={users}
       options={ooditable}
-      toolbarContent={<FilterComponent setFilter={setFilter} />}
+      toolbarContent={<NameSearch setFilter={setFilter} />}
     />
   )
 }
