@@ -6,24 +6,28 @@ import grey from '@mui/material/colors/grey'
 import yellow from '@mui/material/colors/yellow'
 import Stack from '@mui/material/Stack'
 
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
-import { useEffect, useMemo, useState } from 'react'
-import { ExportToExcelDialog } from '@/components/common/MRTExcelExport'
+import { createColumnHelper, TableOptions } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
+import { OodiTable } from '@/components/OodiTable'
+import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
 import { SearchValues } from '@/pages/CompletedCoursesSearch'
 import { useGetCompletedCoursesQuery } from '@/redux/completedCoursesSearch'
 import { CropSquareIcon, DoneIcon, RemoveIcon } from '@/theme'
-import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { formatDate, isWithinSixMonths } from '@/util/timeAndDate'
 import { CompletedCoursesStudent, CreditTypeCode } from '@oodikone/shared/types'
 
 const isPassed = (creditType: CreditTypeCode) =>
   [CreditTypeCode.PASSED, CreditTypeCode.APPROVED, CreditTypeCode.IMPROVED].includes(creditType)
 
-const getCompletion = (student: CompletedCoursesStudent, courseCode: string, icon: boolean) => {
+const getCompletion = (
+  student: Pick<CompletedCoursesStudent, 'credits' | 'enrollments' | 'coursesInStudyPlan'>,
+  courseCode: string,
+  icon: boolean
+) => {
   const completion = student.credits.find(credit => credit.courseCode === courseCode && isPassed(credit.creditType))
   const enrollment = student.enrollments[courseCode]
   const isInStudyPlan = student.coursesInStudyPlan.includes(courseCode)
@@ -54,7 +58,7 @@ const getCompletion = (student: CompletedCoursesStudent, courseCode: string, ico
   )
 }
 
-const getCellTitle = (student: CompletedCoursesStudent, courseCode: string) => {
+const getCellTitle = (student: Pick<CompletedCoursesStudent, 'credits' | 'enrollments'>, courseCode: string) => {
   const credit = student.credits.find(credit => credit.courseCode === courseCode)
   const enrollment = student.enrollments[courseCode]
   if (!credit && !enrollment) {
@@ -95,119 +99,105 @@ const RightsNotification = ({ discardedStudentNumbers }: { discardedStudentNumbe
   )
 }
 
+const columnHelper = createColumnHelper<Omit<CompletedCoursesStudent, 'allEnrollments'>>()
+
 export const SearchResults = ({ searchValues }: { searchValues: SearchValues }) => {
   const { courseList, studentList } = searchValues
   const { visible: namesVisible } = useStudentNameVisibility()
-  const { data, isFetching } = useGetCompletedCoursesQuery({ courseList, studentList })
-  const { getTextIn, language } = useLanguage()
-  const [exportModalOpen, setExportModalOpen] = useState(false)
-  const [exportData, setExportData] = useState<Record<string, unknown>[]>([])
+  const { data } = useGetCompletedCoursesQuery({ courseList, studentList })
+  const { getTextIn } = useLanguage()
 
-  const [columnVisibility, setColumnVisibility] = useState({})
+  const getTotalPassed = (student: Pick<CompletedCoursesStudent, 'credits'>) =>
+    student.credits.filter(credit => isPassed(credit.creditType)).length
+  const getTotalUnfinished = (student: Pick<CompletedCoursesStudent, 'credits'>) =>
+    (data?.courses?.length ?? 0) - student.credits.length
 
-  useEffect(() => {
-    setColumnVisibility({
-      lastname: namesVisible,
-      firstnames: namesVisible,
-      email: namesVisible,
-    })
-  }, [namesVisible])
-
-  const staticColumns = useMemo<MRT_ColumnDef<CompletedCoursesStudent>[]>(() => {
-    const getTotalPassed = (student: CompletedCoursesStudent) =>
-      student.credits.filter(credit => isPassed(credit.creditType)).length
-    const getTotalUnfinished = (student: CompletedCoursesStudent) =>
-      (data?.courses?.length ?? 0) - student.credits.length
+  const ooditableStaticColumns = useMemo(() => {
     return [
-      {
-        accessorKey: 'lastname',
+      columnHelper.accessor('lastname', {
         header: 'Last name',
-      },
-      {
-        accessorKey: 'firstnames',
+      }),
+      columnHelper.accessor('firstnames', {
         header: 'First names',
-      },
-      {
-        accessorKey: 'studentNumber',
+      }),
+      columnHelper.accessor('studentNumber', {
         header: 'Student number',
-        Cell: ({ cell }) => (
+        cell: cell => (
           <StudentInfoItem sisPersonId={cell.row.original.sis_person_id} studentNumber={cell.getValue<string>()} />
         ),
-        filterFn: 'startsWith',
-      },
-      {
-        accessorKey: 'email',
+      }),
+      columnHelper.accessor('email', {
         header: 'Email',
-      },
-      {
-        accessorFn: getTotalPassed,
+      }),
+      columnHelper.accessor(getTotalPassed, {
         id: 'passed',
         header: 'Passed',
-      },
-      {
-        accessorFn: getTotalUnfinished,
+      }),
+      columnHelper.accessor(getTotalUnfinished, {
         id: 'unfinished',
         header: 'Unfinished',
-      },
+      }),
     ]
   }, [data])
 
-  const dynamicColumns = useMemo<MRT_ColumnDef<CompletedCoursesStudent>[]>(() => {
+  const ooditableDynamicColumns = useMemo(() => {
     if (!data) return []
     const courseOrder = courseList ?? []
 
     return (
       data.courses
         .toSorted((a, b) => courseOrder.indexOf(a.code) - courseOrder.indexOf(b.code))
-        .map(course => ({
-          accessorFn: (student: CompletedCoursesStudent) => getCompletion(student, course.code, false),
-          id: course.code,
-          header: `${course.code} – ${getTextIn(course.name)}`,
-          Header: () => (
-            <Box>
-              <Box>{course.code}</Box>
-              <Box sx={{ color: 'text.secondary', fontWeight: 'normal' }}>{getTextIn(course.name)}</Box>
-            </Box>
-          ),
-          Cell: ({ cell }) => (
-            <Box
-              sx={{ display: 'flex', justifyContent: 'center' }}
-              title={getCellTitle(cell.row.original, course.code)}
-            >
-              {getCompletion(cell.row.original, course.code, true)}
-            </Box>
-          ),
-        })) ?? []
+        .map(course =>
+          columnHelper.accessor(student => getCompletion(student, course.code, false), {
+            id: course.code,
+            header: () => (
+              <Box>
+                <Box>{course.code}</Box>
+                <Box sx={{ color: 'text.secondary', fontWeight: 'normal' }}>{getTextIn(course.name)}</Box>
+              </Box>
+            ),
+            cell: cell => (
+              <Box
+                sx={{ display: 'flex', justifyContent: 'center' }}
+                title={getCellTitle(cell.row.original, course.code)}
+              >
+                {getCompletion(cell.row.original, course.code, true)}
+              </Box>
+            ),
+          })
+        ) ?? []
     )
-  }, [data, getTextIn])
+  }, [data])
 
-  const columns: any[] /* MRT getting replaced anyway */ = useMemo(
-    () => [...staticColumns, ...dynamicColumns],
-    [staticColumns, dynamicColumns]
+  // HACK: static and dynamic columns are not compatible under the old MRT typing
+  const ooditableColumns: any[] = useMemo(
+    () => [...ooditableStaticColumns, ...ooditableDynamicColumns],
+    [ooditableStaticColumns, ooditableDynamicColumns]
   )
 
-  const defaultOptions = getDefaultMRTOptions(setExportData, setExportModalOpen, language)
-
-  const table = useMaterialReactTable({
-    ...defaultOptions,
-    columns,
-    data: data?.students ?? [],
+  const table: Partial<TableOptions<Omit<CompletedCoursesStudent, 'allEnrollments'>>> = {
     state: {
-      columnVisibility,
-      showLoadingOverlay: isFetching,
+      columnVisibility: {
+        email: namesVisible,
+        firstnames: namesVisible,
+        lastname: namesVisible,
+      },
     },
-    onColumnVisibilityChange: setColumnVisibility,
-  })
+  }
+
+  const keysForExport: string[] = useMemo(() => {
+    return ooditableColumns.map(({ id, accessorKey }) => accessorKey ?? id).filter(Boolean)
+  }, [ooditableColumns])
+
+  const exportData = data?.students.flatMap(student => ({
+    ...student,
+    passed: getTotalPassed(student),
+    unfinished: getTotalUnfinished(student),
+    ...Object.fromEntries(data?.courses.map(course => [course.code, getCompletion(student, course.code, false)])),
+  }))
 
   return (
     <Stack alignItems="center" spacing={1} sx={{ width: '100%' }}>
-      <ExportToExcelDialog
-        exportColumns={columns}
-        exportData={exportData}
-        featureName="completed_courses"
-        onClose={() => setExportModalOpen(false)}
-        open={exportModalOpen}
-      />
       {!!data?.discardedStudentNumbers?.length && (
         <div style={{ width: '75%' }}>
           <RightsNotification discardedStudentNumbers={data.discardedStudentNumbers} />
@@ -215,7 +205,12 @@ export const SearchResults = ({ searchValues }: { searchValues: SearchValues }) 
       )}
       <StudentNameVisibilityToggle />
       <div data-cy="completed-courses-table-div" style={{ width: '100%' }}>
-        <MaterialReactTable table={table} />
+        <OodiTable
+          columns={ooditableColumns}
+          data={data?.students ?? []}
+          options={table}
+          toolbarContent={<OodiTableExcelExport data={exportData ?? []} exportColumnKeys={keysForExport} />}
+        />
       </div>
     </Stack>
   )

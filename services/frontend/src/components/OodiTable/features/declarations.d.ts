@@ -40,4 +40,8 @@ declare module '@tanstack/react-table' {
   interface Row {
     getIsAggregationRow?: () => boolean
   }
+
+  interface ColumnMeta<TData extends RowData, TValue> {
+    filterComponent?: ReactNode
+  }
 }
