@@ -12,13 +12,19 @@ import { MockButton } from '@/components/Users/MockButton'
 import { RoleChip } from '@/components/Users/RoleChip'
 import { DateFormat } from '@/constants/date'
 import { useDebouncedState } from '@/hooks/debouncedState'
+import { CopyEmailAddressesButton } from '@/pages/Users/UsersTable/EmailCopy'
+import { NameSearch } from '@/pages/Users/UsersTable/NameSearch'
 import { useGetProgrammesQuery } from '@/redux/populations'
 import { User } from '@/types/api/users'
 import { reformatDate } from '@/util/timeAndDate'
 import { DetailedProgrammeRights } from '@oodikone/shared/types'
-import { NameSearch } from './NameSearch'
 
 const columnHelper = createColumnHelper<User>()
+
+const matchesSearch = (user: User, search: string) => {
+  const lowerCaseSearch = search.toLowerCase()
+  return user.name.toLowerCase().includes(lowerCaseSearch) || user.username.toLowerCase().includes(lowerCaseSearch)
+}
 
 export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: User[] | undefined }) => {
   'use memo'
@@ -60,11 +66,7 @@ export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: Us
             {cell.getValue()}
           </Link>
         ),
-        filterFn: (row, _, filterValue) => {
-          const search = String(filterValue).toLowerCase()
-          const { name, username } = row.original
-          return name.toLowerCase().includes(search) || username.toLowerCase().includes(search)
-        },
+        filterFn: (row, _, filterValue) => matchesSearch(row.original, String(filterValue)),
       }),
       columnHelper.accessor('roles', {
         header: 'Roles',
@@ -130,12 +132,19 @@ export const UsersTable = ({ isLoading, users }: { isLoading: boolean; users: Us
 
   if (isLoading || !users) return <LoadingSkeleton />
 
+  const filteredUsers = users.filter(user => matchesSearch(user, filter))
+
   return (
     <OodiTable
       columns={ooditableColumns}
       data={users}
       options={ooditable}
-      toolbarContent={<NameSearch setFilter={setFilter} />}
+      toolbarContent={
+        <>
+          <CopyEmailAddressesButton users={filteredUsers} />
+          <NameSearch setFilter={setFilter} />
+        </>
+      }
     />
   )
 }
