@@ -598,7 +598,9 @@ export const ProgressTable = ({
   }, [criteria, students, curriculum, getTextIn, namesVisible, idToGroupIdMap])
 
   const isCriteriaSet =
-    criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
+    criteria &&
+    (Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0) ||
+      Object.values(criteria.credits).some(creditCriteria => creditCriteria > 0))
 
   const tableOptions = {}
 
