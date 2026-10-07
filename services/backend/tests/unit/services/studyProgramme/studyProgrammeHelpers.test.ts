@@ -1,5 +1,12 @@
 import { describe, it, assert, vi, beforeAll } from 'vitest'
-import { getPercentage, getYearsArray, getYearsObject } from '@/services/studyProgramme/studyProgrammeHelpers'
+import {
+  getMonthlyCredits,
+  getPercentage,
+  getYearlyMonthlyCreditsObj,
+  getYearsArray,
+  getYearsObject,
+} from '@/services/studyProgramme/studyProgrammeHelpers'
+import { clockStorage } from '@/util/clock'
 
 void describe('Get years object', () => {
   it('should return nothing with empty years', () => {
@@ -93,5 +100,38 @@ void describe('Get percentage', () => {
     // Should this be allowed :D
     assert.strictEqual(getPercentage(5, -10), '-50.0 %')
     assert.strictEqual(getPercentage(-5, 10), '-50.0 %')
+  })
+})
+
+void describe('Get monthly credits', () => {
+  const atTime = <T>(date: string, fn: () => T) => clockStorage.run({ now: new Date(date) }, fn)
+
+  it('should include the current month regardless of the time of day', () => {
+    const lastKey = (date: string) => Object.keys(atTime(date, () => getYearlyMonthlyCreditsObj())[2024]).at(-1)
+
+    assert.strictEqual(lastKey('2026-10-07T00:05:00'), '2026-10')
+    assert.strictEqual(lastKey('2026-10-07T23:40:00'), '2026-10')
+  })
+
+  it('should not throw when computation continues past midnight', () => {
+    const monthlyCreditsByStartingYear = atTime('2026-10-06T23:40:00', () => getYearlyMonthlyCreditsObj())
+
+    assert.doesNotThrow(() =>
+      atTime('2026-10-07T00:05:00', () =>
+        getMonthlyCredits([], new Date('2024-08-01'), 2024, monthlyCreditsByStartingYear[2024])
+      )
+    )
+  })
+
+  it('should accumulate credits cumulatively by month', () => {
+    const monthlyCredits = atTime('2024-10-15T12:00:00', () => getYearlyMonthlyCreditsObj())[2024]
+    const credits = [
+      { attainment_date: new Date('2024-08-20'), credits: 5 },
+      { attainment_date: new Date('2024-10-01'), credits: 3 },
+    ] as Parameters<typeof getMonthlyCredits>[0]
+
+    atTime('2024-10-15T12:00:00', () => getMonthlyCredits(credits, new Date('2024-08-01'), 2024, monthlyCredits))
+
+    assert.deepStrictEqual(monthlyCredits, { '2024-8': [5], '2024-9': [5], '2024-10': [8] })
   })
 })

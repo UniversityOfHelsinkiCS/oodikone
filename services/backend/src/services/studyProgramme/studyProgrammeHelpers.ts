@@ -139,17 +139,19 @@ export const getYearlyMonthlyCreditsObj = () => {
   return yearlyMonthlyCredits
 }
 
-const getMonthlyCreditsObj = (academicStartYear?: number) => {
+const getMonthlyCreditsObj = (academicStartYear = 2017) => {
   const today = now()
-  const time = getStartDate(true, academicStartYear)
+
+  /* Compare whole months instead of dates, so the result does not depend on the time of day.
+    Academic year starts in August (month index 7). */
+  const firstMonth = academicStartYear * 12 + 7
+  const lastMonth = today.getFullYear() * 12 + today.getMonth()
 
   const monthlyCredits: Record<string, number[]> = {}
-  today.setDate(1)
 
   /* NB: JS months start at 0. We need them to start at 1. */
-  while (time < today) {
-    monthlyCredits[`${time.getFullYear()}-${time.getMonth() + 1}`] = []
-    time.setMonth(time.getMonth() + 1)
+  for (let month = firstMonth; month <= lastMonth; month++) {
+    monthlyCredits[`${Math.floor(month / 12)}-${(month % 12) + 1}`] = []
   }
 
   return monthlyCredits
