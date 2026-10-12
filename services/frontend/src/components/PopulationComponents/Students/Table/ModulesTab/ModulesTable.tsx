@@ -193,7 +193,11 @@ export const ModulesTab = ({
       toolbarContent={
         <>
           <OodiTableExcelExport data={exportData} exportColumnKeys={accessorKeys} />
-          <FilterDegreeCoursesModal degreeProgramme={programme} text="Manage module visibility" />
+          <FilterDegreeCoursesModal
+            degreeProgramme={programme}
+            initialTab="visibility"
+            text="Manage module visibility"
+          />
           <StudentNameVisibilityToggle />
           <HiddenCourseAlert ooditable modules />
         </>

@@ -413,7 +413,12 @@ export const ProgressTable = ({
             toolbarContent={
               <>
                 <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-                <FilterDegreeCoursesModal degreeProgramme={programme} text="Modify criteria" icon={<EditIcon />} />
+                <FilterDegreeCoursesModal
+                  degreeProgramme={programme}
+                  initialTab="criteria"
+                  icon={<EditIcon />}
+                  text="Modify criteria"
+                />
                 <StudentNameVisibilityToggle />
               </>
             }

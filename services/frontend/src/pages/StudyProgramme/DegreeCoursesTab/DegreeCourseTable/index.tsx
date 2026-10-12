@@ -1,7 +1,12 @@
 import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
+import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
-import Stack from '@mui/material/Stack'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
@@ -11,136 +16,163 @@ import Typography from '@mui/material/Typography'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { CriterionLabelSelectButton } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/CriterionLabelSelectButton'
-import { ToggleVisibilityButton } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/ToggleVisibilityButton'
-import { VisibilityChip } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/VisibilityChip'
+import { useStatusNotification } from '@/components/StatusNotification/Context'
+import { CriteriaYearOption, getCriteriaYears } from '@/pages/StudyProgramme/DegreeCoursesTab/criteriaYears'
+import { VisibilitySwitch } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable/VisibilitySwitch'
 import { useRemoveCourseExclusionMutation, useSetCourseExclusionMutation } from '@/redux/courseExclusions'
-import { FormatListNumberedIcon, KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
+import { useAddProgressCriteriaCourseMutation } from '@/redux/progressCriteria'
+import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { CourseVisibility } from '@/types/courseVisibility'
-import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { Module, ProgrammeCourse, ProgressCriteria } from '@oodikone/shared/types'
 import { StyledTable } from '@/components/common/StyledTable'
+
+const reloadNote = 'Reload the page to see the change in other views.'
 
 export const DegreeCourseTable = ({
   combinedProgramme,
   criteria,
   curriculumVersion,
   modules: initialModules,
+  showCriteria,
+  showVisibility,
   studyProgramme,
 }: {
   combinedProgramme: string
   criteria: ProgressCriteria
   curriculumVersion: string[]
   modules: Module[]
+  showCriteria: boolean
+  showVisibility: boolean
   studyProgramme: string
 }) => {
-  const [moduleCoursesVisible, setModuleCoursesVisible] = useState<Record<string, Record<string, boolean>>>({})
+  const [expandedModules, setExpandedModules] = useState<Record<string, Record<string, boolean>>>({})
   const { getTextIn } = useLanguage()
+  const { setStatusNotification } = useStatusNotification()
   const [modules, setModules] = useState(initialModules)
+  // Unsaved criteria changes, discarded when updated criteria arrive from the server
+  const [pendingCriteria, setPendingCriteria] = useState<{
+    courses: ProgressCriteria['courses']
+    source: ProgressCriteria
+  } | null>(null)
+  const [moduleToHide, setModuleToHide] = useState<string | null>(null)
   const [setExclusion] = useSetCourseExclusionMutation()
   const [removeExclusion] = useRemoveCourseExclusionMutation()
+  const [addProgressCriteriaCourse] = useAddProgressCriteriaCourseMutation()
 
   const version = curriculumVersion.join(',')
+  const exclusionProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
+  const criteriaYears = showCriteria ? getCriteriaYears(studyProgramme) : []
+  const criteriaCourses = pendingCriteria?.source === criteria ? pendingCriteria.courses : criteria.courses
+
   useEffect(() => {
     setModules(initialModules)
   }, [initialModules])
 
   const getModule = (moduleCode: string) => modules.find(module => module.code === moduleCode)!
 
-  const setModuleVisibility = (moduleCode: string, newVisibility: boolean) => {
+  const getModuleName = (moduleCode: string) => {
+    const firstCourse = getModule(moduleCode).courses[0]
+    return firstCourse?.parent_name ? getTextIn(firstCourse.parent_name)! : moduleCode
+  }
+
+  const setCoursesVisibility = (courseCodes: string[], newVisibility: boolean) => {
     // Same course can be in many modules, so change them all
-    const courseCodes = getModule(moduleCode).courses.map(course => course.code)
-    setModules(
-      modules.map(module => ({
+    setModules(prevModules =>
+      prevModules.map(module => ({
         ...module,
-        courses: module.courses.map(course => {
-          if (courseCodes.includes(course.code)) {
-            return {
-              ...course,
-              visible: { ...course.visible, visibility: newVisibility },
-            }
-          }
-          return course
-        }),
+        courses: module.courses.map(course =>
+          courseCodes.includes(course.code)
+            ? { ...course, visible: { ...course.visible, visibility: newVisibility } }
+            : course
+        ),
       }))
     )
   }
 
-  const setCourseVisibility = (moduleCode: string, newVisibility: boolean) => {
-    setModules(
-      modules.map(module => ({
-        ...module,
-        courses: module.courses.map(course => {
-          if (course.code !== moduleCode) {
-            return course
-          }
-          return {
-            ...course,
-            visible: { ...course.visible, visibility: newVisibility },
-          }
-        }),
-      }))
+  const changeVisibility = (courses: ProgrammeCourse[], newVisibility: boolean, successMessage: string) => {
+    const request = { courseGroupIds: courses.map(course => course.group_id), curriculumVersion: version }
+    const mutation = newVisibility
+      ? removeExclusion({ ...request, programmeCode: exclusionProgramme })
+      : setExclusion({ ...request, programmeCode: exclusionProgramme })
+    setCoursesVisibility(
+      courses.map(course => course.code),
+      newVisibility
     )
+    mutation
+      .unwrap()
+      .then(() => setStatusNotification(`${successMessage} ${reloadNote}`, 'success'))
+      .catch(() => {
+        setCoursesVisibility(
+          courses.map(course => course.code),
+          !newVisibility
+        )
+        setStatusNotification('Failed to change visibility', 'error')
+      })
   }
 
-  const areModuleCoursesVisible = (moduleCode: string) => {
-    if (!moduleCoursesVisible[version]) {
-      setModuleCoursesVisible(prev => ({ ...prev, [version]: {} }))
-      return false
+  const toggleCourseVisibility = (course: ProgrammeCourse) => {
+    const newVisibility = !course.visible.visibility
+    const name = getTextIn(course.name)
+    changeVisibility([course], newVisibility, `${name} is now ${newVisibility ? 'shown' : 'hidden'}.`)
+  }
+
+  const toggleModuleVisibility = (moduleCode: string) => {
+    const { courses } = getModule(moduleCode)
+    const visibility = getVisibility(moduleCode)
+    const name = getModuleName(moduleCode)
+
+    if (visibility === CourseVisibility.HIDDEN) {
+      changeVisibility(courses, true, `All courses in ${name} are now shown.`)
+      return
     }
-    return moduleCoursesVisible[version][moduleCode]
+
+    if (visibility === CourseVisibility.PARTIAL) {
+      setModuleToHide(moduleCode)
+      return
+    }
+    hideModule(moduleCode)
   }
 
-  const excludeOne = (course: ProgrammeCourse) => {
-    void setExclusion({
-      courseGroupIds: [course.group_id],
-      curriculumVersion: version,
-      programmeCode: combinedProgramme === '' ? studyProgramme : combinedProgramme,
-    })
-    setCourseVisibility(course.code, false)
+  const hideModule = (moduleCode: string) => {
+    const visibleCourses = getModule(moduleCode).courses.filter(course => course.visible.visibility)
+    changeVisibility(visibleCourses, false, `All courses in ${getModuleName(moduleCode)} are now hidden.`)
   }
 
-  const excludeAll = (moduleCode: string) => {
-    const module = getModule(moduleCode)
-    const excludeFromProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
-    void setExclusion({
-      courseGroupIds: module.courses.filter(course => course.visible.visibility).map(course => course.group_id),
-      curriculumVersion: version,
-      programmeCode: excludeFromProgramme,
-    })
-    setModuleVisibility(moduleCode, false)
+  const toggleCriteriaYear = (course: ProgrammeCourse, { key, year }: CriteriaYearOption) => {
+    const current = criteriaCourses[key] ?? []
+    const isRequired = current.includes(course.group_id)
+    const courseGroupIds = isRequired
+      ? current.filter(groupId => groupId !== course.group_id)
+      : [...current, course.group_id]
+    const name = getTextIn(course.name)
+
+    setPendingCriteria({ courses: { ...criteriaCourses, [key]: courseGroupIds }, source: criteria })
+    addProgressCriteriaCourse({ programmeCode: studyProgramme, courseGroupIds, year })
+      .unwrap()
+      .then(() =>
+        setStatusNotification(
+          isRequired ? `${name} removed from year ${year} criteria` : `${name} added to year ${year} criteria`,
+          'success'
+        )
+      )
+      .catch(() => {
+        setPendingCriteria(null)
+        setStatusNotification('Failed to update criteria', 'error')
+      })
   }
 
-  const removeOne = (course: ProgrammeCourse) => {
-    void removeExclusion({
-      courseGroupIds: [course.group_id],
-      curriculumVersion: version,
-      programmeCode: studyProgramme,
-    })
-    setCourseVisibility(course.code, true)
-  }
+  const isModuleExpanded = (moduleCode: string) => expandedModules[version]?.[moduleCode] ?? false
 
-  const deleteAll = (moduleCode: string) => {
-    const module = getModule(moduleCode)
-    void removeExclusion({
-      courseGroupIds: module.courses.map(course => course.group_id),
-      curriculumVersion: version,
-      programmeCode: studyProgramme,
-    })
-    setModuleVisibility(moduleCode, true)
-  }
-
-  const toggleVisible = (moduleCode: string) => {
-    const newState = !areModuleCoursesVisible(moduleCode)
-    setModuleCoursesVisible({
-      ...moduleCoursesVisible,
-      [version]: { ...moduleCoursesVisible[version], [moduleCode]: newState },
+  const toggleExpanded = (moduleCode: string) => {
+    setExpandedModules({
+      ...expandedModules,
+      [version]: { ...expandedModules[version], [moduleCode]: !isModuleExpanded(moduleCode) },
     })
   }
 
   const getVisibility = (moduleCode: string) => {
     const module = getModule(moduleCode)
-    if (!module.courses) {
+    if (!module.courses?.length) {
       return CourseVisibility.NO_COURSES
     }
     if (module.courses.every(course => course.visible.visibility)) {
@@ -152,104 +184,151 @@ export const DegreeCourseTable = ({
     return CourseVisibility.PARTIAL
   }
 
+  const countRequired = (courses: ProgrammeCourse[], { key }: CriteriaYearOption) =>
+    courses.filter(course => criteriaCourses[key]?.includes(course.group_id)).length
+
+  const headerRowSpan = showCriteria ? 2 : 1
+  const remainingToHide = moduleToHide
+    ? getModule(moduleToHide).courses.filter(course => course.visible.visibility).length
+    : 0
+
   return (
-    <StyledTable showCellBorders data-cy="degree-course-table" size="small">
-      <TableHead>
-        <TableRow>
-          <TableCell>Name</TableCell>
-          <TableCell>Code</TableCell>
-          <TableCell>Visibility</TableCell>
-          {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell>Criterion labels</TableCell>}
-          <TableCell colSpan={2}>Actions</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {modules.map(({ code: moduleCode, courses }) => (
-          <Fragment key={`${moduleCode}-fragment`}>
-            <TableRow key={moduleCode}>
-              <TableCell>
-                <Box alignItems="center" display="flex" justifyContent="left">
-                  <IconButton onClick={() => toggleVisible(moduleCode)} size="small">
-                    {areModuleCoursesVisible(moduleCode) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                  </IconButton>
-                  <Typography fontWeight="bold" variant="body2">
-                    {courses[0] && courses[0].parent_name ? getTextIn(courses[0].parent_name) : moduleCode}
-                  </Typography>
-                </Box>
+    <>
+      <StyledTable showCellBorders data-cy="degree-course-table" size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell rowSpan={headerRowSpan}>Name</TableCell>
+            <TableCell rowSpan={headerRowSpan}>Code</TableCell>
+            {showVisibility && <TableCell rowSpan={headerRowSpan}>Visibility</TableCell>}
+            {showCriteria && (
+              <TableCell align="center" colSpan={criteriaYears.length}>
+                Required for year criteria
               </TableCell>
-              <TableCell>{moduleCode}</TableCell>
-              <TableCell>
-                <VisibilityChip visibility={getVisibility(moduleCode)} />
-              </TableCell>
-              {isBachelorOrLicentiateProgramme(studyProgramme) && <TableCell />}
-              <TableCell>
-                <Stack direction="row" gap={1}>
-                  <ToggleVisibilityButton
-                    onClick={() =>
-                      getVisibility(moduleCode) === CourseVisibility.HIDDEN
-                        ? deleteAll(moduleCode)
-                        : excludeAll(moduleCode)
-                    }
-                    visible={getVisibility(moduleCode) !== CourseVisibility.HIDDEN}
-                  />
-                  {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                    <IconButton disabled sx={{ visibility: 'hidden' }}>
-                      <FormatListNumberedIcon />
-                    </IconButton>
-                  )}
-                </Stack>
-              </TableCell>
+            )}
+          </TableRow>
+          {showCriteria && (
+            <TableRow>
+              {criteriaYears.map(({ year }) => (
+                <TableCell align="center" key={year}>
+                  Year {year}
+                </TableCell>
+              ))}
             </TableRow>
-            {areModuleCoursesVisible(moduleCode) &&
-              courses
-                .sort((a, b) => a.code.localeCompare(b.code))
-                .map(course => (
-                  <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
-                    <TableCell>{getTextIn(course.name)}</TableCell>
-                    <TableCell>{course.code}</TableCell>
+          )}
+        </TableHead>
+        <TableBody>
+          {modules.map(({ code: moduleCode, courses }) => {
+            const moduleName = getModuleName(moduleCode)
+            const expanded = isModuleExpanded(moduleCode)
+            return (
+              <Fragment key={`${moduleCode}-fragment`}>
+                <TableRow hover onClick={() => toggleExpanded(moduleCode)} sx={{ cursor: 'pointer' }}>
+                  <TableCell>
+                    <Box alignItems="center" display="flex" justifyContent="left">
+                      <IconButton
+                        aria-expanded={expanded}
+                        aria-label={expanded ? `Hide courses of ${moduleName}` : `Show courses of ${moduleName}`}
+                        size="small"
+                      >
+                        {expanded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                      </IconButton>
+                      <Typography fontWeight="bold" variant="body2">
+                        {moduleName}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{moduleCode}</TableCell>
+                  {showVisibility && (
                     <TableCell>
-                      <VisibilityChip
-                        visibility={course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN}
+                      <VisibilitySwitch
+                        ariaLabel={`Show all courses of ${moduleName}`}
+                        cypress={`visibility-switch-${moduleCode}`}
+                        onChange={() => toggleModuleVisibility(moduleCode)}
+                        visibility={getVisibility(moduleCode)}
                       />
                     </TableCell>
-                    {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                      <TableCell>
-                        {Object.values(criteria.courses).length > 0 ? (
-                          <Stack direction="row" gap={1}>
-                            {Object.keys(criteria.courses).map(
-                              (year, index) =>
-                                criteria.courses[year].includes(course.group_id) && (
-                                  <Chip color="primary" key={year} label={`year ${index + 1}`} size="small" />
-                                )
-                            )}
-                          </Stack>
-                        ) : (
-                          <Typography color="text.secondary" variant="body2">
-                            No labels set
+                  )}
+                  {criteriaYears.map(option => {
+                    const requiredCount = countRequired(courses, option)
+                    return (
+                      <TableCell align="center" key={option.year}>
+                        {requiredCount > 0 && (
+                          <Typography
+                            color="text.secondary"
+                            title={`${requiredCount} of ${courses.length} courses required for year ${option.year}`}
+                            variant="body2"
+                          >
+                            {requiredCount} / {courses.length}
                           </Typography>
                         )}
                       </TableCell>
-                    )}
-                    <TableCell>
-                      <Stack direction="row" gap={1}>
-                        <ToggleVisibilityButton
-                          onClick={() => (course.visible.visibility ? excludeOne(course) : removeOne(course))}
-                          visible={course.visible.visibility}
-                        />
-                        {isBachelorOrLicentiateProgramme(studyProgramme) && (
-                          <CriterionLabelSelectButton
-                            course={course}
-                            criteria={criteria}
-                            studyProgramme={studyProgramme}
-                          />
-                        )}
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-          </Fragment>
-        ))}
-      </TableBody>
-    </StyledTable>
+                    )
+                  })}
+                </TableRow>
+                {expanded &&
+                  [...courses]
+                    .sort((a, b) => a.code.localeCompare(b.code))
+                    .map(course => {
+                      const courseName = getTextIn(course.name)
+                      return (
+                        <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
+                          <TableCell sx={{ pl: 6 }}>{courseName}</TableCell>
+                          <TableCell>{course.code}</TableCell>
+                          {showVisibility && (
+                            <TableCell>
+                              <VisibilitySwitch
+                                ariaLabel={`Show ${courseName}`}
+                                cypress={`visibility-switch-${course.code}`}
+                                onChange={() => toggleCourseVisibility(course)}
+                                visibility={
+                                  course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN
+                                }
+                              />
+                            </TableCell>
+                          )}
+                          {criteriaYears.map(option => (
+                            <TableCell align="center" key={option.year} padding="checkbox">
+                              <Checkbox
+                                checked={criteriaCourses[option.key]?.includes(course.group_id) ?? false}
+                                data-cy={`criteria-checkbox-${option.year}-${course.code}`}
+                                inputProps={{ 'aria-label': `${courseName} required for year ${option.year}` }}
+                                onChange={() => toggleCriteriaYear(course, option)}
+                                size="small"
+                              />
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      )
+                    })}
+              </Fragment>
+            )
+          })}
+        </TableBody>
+      </StyledTable>
+      <Dialog onClose={() => setModuleToHide(null)} open={moduleToHide !== null}>
+        <DialogTitle>Hide the whole module?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {moduleToHide &&
+              `Some courses in ${getModuleName(moduleToHide)} are already hidden. ` +
+                `Hiding the module hides its remaining ${remainingToHide} ` +
+                `${remainingToHide === 1 ? 'course' : 'courses'} for all Oodikone users.`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModuleToHide(null)}>Cancel</Button>
+          <Button
+            data-cy="confirm-hide-module-button"
+            onClick={() => {
+              hideModule(moduleToHide!)
+              setModuleToHide(null)
+            }}
+            variant="contained"
+          >
+            Hide module
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }

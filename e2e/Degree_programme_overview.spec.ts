@@ -650,10 +650,14 @@ test.describe('Degree programme overview', () => {
     })
 
     test.describe('Curriculum section', () => {
-      test('is shown', async ({ page }) => {
-        await expect(page.getByTestId('curriculum-section')).toBeVisible()
-        await expect(page.getByText('Select curriculum to edit:')).toBeVisible()
-        await expect(page.getByTestId('curriculum-picker').getByText('2023–2026')).toBeVisible()
+      test('is shown in both settings tabs', async ({ page }) => {
+        for (const tab of ['criteria', 'visibility']) {
+          await page.getByTestId(`${tab}-tab`).click()
+          const panel = page.getByTestId(`${tab}-panel`)
+          await expect(panel.getByTestId('curriculum-section')).toBeVisible()
+          await expect(panel.getByText('Select curriculum to edit:')).toBeVisible()
+          await expect(panel.getByTestId('curriculum-picker').getByText('2023–2026')).toBeVisible()
+        }
       })
       test.skip('can be changed', () => {
         return
@@ -675,7 +679,9 @@ test.describe('Degree programme overview', () => {
     })
 
     test('Degree course table', async ({ page }) => {
-      await expect(page.getByTestId('degree-course-table')).toBeVisible()
+      await expect(page.getByTestId('criteria-panel').getByTestId('degree-course-table')).toBeVisible()
+      await page.getByTestId('visibility-tab').click()
+      await expect(page.getByTestId('visibility-panel').getByTestId('degree-course-table')).toBeVisible()
       // TODO: Test clicking the arrow buttons
       // TODO: Test toggling visibility for MODULES and COURSES
       // TODO: Test changing criterion labels

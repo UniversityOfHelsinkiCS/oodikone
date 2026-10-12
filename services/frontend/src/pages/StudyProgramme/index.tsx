@@ -135,7 +135,7 @@ export const StudyProgramme = () => {
     tabs.push(
       {
         key: 'DegreeCoursesTab',
-        label: 'Degree courses',
+        label: 'Degree programme settings',
         component: (
           <CurriculumProvider key="DegreeCoursesTabContent" programmeCode={programmeId} year={new Date().getFullYear()}>
             <DegreeCoursesTab combinedProgramme={secondProgrammeId} degreeProgramme={programmeId} />

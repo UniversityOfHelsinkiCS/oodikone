@@ -393,7 +393,7 @@ export const CoursesTabContainer = ({ students, courses, idToGroupIdMap, program
       toolbarContent={
         <>
           <OodiTableExcelExport data={exportData} exportColumnKeys={keysForExport} />
-          <FilterDegreeCoursesModal degreeProgramme={programme} />
+          <FilterDegreeCoursesModal degreeProgramme={programme} initialTab="visibility" />
           <StudentNameVisibilityToggle />
           <IncludeSubstitutionsToggle
             includeSubstitutions={includeSubstitutions}

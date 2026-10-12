@@ -13,7 +13,7 @@ const textContent = {
 export const ManageCoursesShownInfo = () => {
   const { getTextIn } = useLanguage()
   return (
-    <StyledMessage showIcon variant="outlined" severity="warning" sx={{ mb: 2, maxWidth: '100%' }}>
+    <StyledMessage showIcon variant="outlined" severity="warning" sx={{ maxWidth: '100%' }}>
       {getTextIn(textContent)}
     </StyledMessage>
   )

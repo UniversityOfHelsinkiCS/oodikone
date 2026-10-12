@@ -12,7 +12,7 @@ import { Section } from '@/components/Section'
 import { useStatusNotification } from '@/components/StatusNotification/Context'
 import { useAddProgressCriteriaCreditsMutation } from '@/redux/progressCriteria'
 import { SaveIcon } from '@/theme'
-import { isMedicalProgramme } from '@/util/studyProgramme'
+import { getCriteriaYears } from '@/pages/StudyProgramme/DegreeCoursesTab/criteriaYears'
 import { ProgressCriteria } from '@oodikone/shared/types'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
@@ -68,43 +68,11 @@ export const CreditCriteriaSection = ({
     }
   }, [isError])
 
-  const inputs = [
-    {
-      key: 'year1',
-      label: 'First',
-      previousValue: criteria.credits.yearOne,
-    },
-    {
-      key: 'year2',
-      label: 'Second',
-      previousValue: criteria.credits.yearTwo,
-    },
-    {
-      key: 'year3',
-      label: 'Third',
-      previousValue: criteria.credits.yearThree,
-    },
-  ]
-
-  if (isMedicalProgramme(degreeProgramme)) {
-    inputs.push(
-      {
-        key: 'year4',
-        label: 'Fourth',
-        previousValue: criteria.credits.yearFour,
-      },
-      {
-        key: 'year5',
-        label: 'Fifth',
-        previousValue: criteria.credits.yearFive,
-      },
-      {
-        key: 'year6',
-        label: 'Sixth',
-        previousValue: criteria.credits.yearSix,
-      }
-    )
-  }
+  const inputs = getCriteriaYears(degreeProgramme).map(({ key, label, year }) => ({
+    key: `year${year}`,
+    label,
+    previousValue: criteria.credits[key],
+  }))
 
   const disabled = Object.values(creditLimits).every(value => value === null || value < 0)
 
@@ -112,7 +80,7 @@ export const CreditCriteriaSection = ({
     <Section
       cypress="credit-criteria"
       infoBoxContent={getTextIn(studyProgrammeToolTips.degreeCoursesTab.creditCriteria) ?? ''}
-      title="Credit criteria"
+      title="Credit targets"
     >
       <Stack gap={2}>
         <Grid container spacing={1}>

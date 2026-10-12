@@ -191,28 +191,32 @@ However this is optional and you can create a new tag without selecting year.
 
   degreeCoursesTab: {
     creditCriteria: {
-      en: `The criteria set here will affect the Class Statistics → Students tab → Progress tab view.
+      en: `The targets set here will affect the Class Statistics → Students tab → Progress tab view.
 
 Credit criteria is computed as follows: for the first academic year, the credits are counted
 if they are completed during the first 12 months. For the second year, completions
 within the first 24 months. Third year, the first 36 months, and so on.
 `,
-      fi: `Tässä asetettu "criteria" vaikuttaa Class Statistics → Students tab → Progress tab näkymään.
+      fi: `Tässä asetetut tavoitteet vaikuttavat Class Statistics → Students tab → Progress tab näkymään.
 
 Laskenta toimii seuraavasti: ensimmäisen akateemisen vuoden opintopisteet lasketaan, jos ne ovat suoritettu ensimmäisen 12 kuukauden ajalla. Toisen vuoden opintopisteet, jos ne ovat suoritettu ensimmäisen 24 kuukauden aikana. Kolmas, ensimmäiset 36kk, ja niin edelleen.
 `,
     },
-    programmeCriteriaAndVisibility: {
-      en: `Click the arrow next to the module to view courses belonging to the module in the curriculum. Setting a criterion label for a course will affect which academic year the course is placed under in Class Statistics → Students → Progress tab.
+    requiredCourses: {
+      en: `Click a module to see its courses in the selected curriculum.
 
-Courses' visibilities can also be toggled here; hiding a course here will additionally hide it in the Courses of Class view and Students → Courses tab.
+Tick a year to make the course a required course for that academic year in Class Statistics → Students → Progress tab. A course can be required for several years. The numbers on a module row show how many of its courses are required for each year.`,
+      fi: `Klikkaa opintokokonaisuutta nähdäksesi sen kurssit valitussa opetussuunnitelmassa.
 
-Note: If hiding a module, all courses belonging to the module will also be hidden.`,
-      fi: `Klikkaa nuolta opintokokonaisuuden nimen vieressä näyttääksesi opetussuunitelmassa opintokokonaisuuden alle sijoitetut kurssit. Kursseille voi asettaa "Criterion label":eita, jotka vaikuttavat minkä akateemisen vuoden alla kurssi näytetään Class Statistics → Students → Progress tab näkymässä.
+Valitse vuosi, jolloin kurssi on tarkoitus suorittaa. Kurssi näytetään kyseisen akateemisen vuoden alla Class Statistics → Students → Progress tab -näkymässä. Kurssi voi olla pakollinen useammalle vuodelle. Opintokokonaisuuden rivillä olevat luvut kertovat, kuinka moni sen kursseista on pakollinen kunakin vuonna. Huom. kurssi voi kuulua useaan opintokokonaisuuteen.`,
+    },
+    courseVisibility: {
+      en: `Click a module to see its courses in the selected curriculum.
 
-Kurssien näkyvyyttä voidaan myös muuttaa tällä sivulla. Kurssin piilottaminen piilottaa sen myös Courses of Class ja Students → Courses tab näkymissä.
+Hiding a course also hides it in the Courses of Class view and Students → Courses tab for all users. Hiding a module hides all of its courses.`,
+      fi: `Klikkaa opintokokonaisuutta nähdäksesi sen kurssit valitussa opetussuunnitelmassa.
 
-Huom: Opintokokonaisuuden piilottaminen piilottaa myös kaikki sen alla olevat kurssit.`,
+Kurssin piilottaminen piilottaa sen kaikilta käyttäjiltä myös Courses of Class ja Students → Courses tab -näkymissä. Opintokokonaisuuden piilottaminen piilottaa kaikki sen kurssit.`,
     },
   },
   // Not used

@@ -5,19 +5,20 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { useState } from 'react'
 
-import { DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
+import { DegreeSettingsTab, DegreeCoursesTab } from '@/pages/StudyProgramme/DegreeCoursesTab'
 import { VisibilityIcon } from '@/theme'
-import { ManageCoursesShownInfo } from '@/pages/StudyProgramme/DegreeCoursesTab/InfoBox'
 
 const defaultText = 'Manage course visibility'
 const defaultIcon = <VisibilityIcon />
 
 export const FilterDegreeCoursesModal = ({
   degreeProgramme,
+  initialTab,
   text,
   icon,
 }: {
   degreeProgramme: string
+  initialTab: DegreeSettingsTab
   text?: string
   icon?: React.ReactNode
 }) => {
@@ -31,8 +32,7 @@ export const FilterDegreeCoursesModal = ({
       <Dialog maxWidth="md" onClose={() => setModalOpen(false)} open={modalOpen}>
         <DialogTitle>Degree programme settings</DialogTitle>
         <DialogContent>
-          <ManageCoursesShownInfo />
-          <DegreeCoursesTab combinedProgramme="" degreeProgramme={degreeProgramme} />
+          <DegreeCoursesTab combinedProgramme="" degreeProgramme={degreeProgramme} initialTab={initialTab} />
           <Button color="primary" onClick={() => setModalOpen(false)} style={{ marginTop: '10px' }} variant="contained">
             Close
           </Button>
