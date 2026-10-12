@@ -2,10 +2,7 @@ import Box from '@mui/material/Box'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { createColumnHelper } from '@tanstack/react-table'
-import dayjs, { extend as dayjsExtend } from 'dayjs'
-import isBetween from 'dayjs/plugin/isBetween'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
 import { Link } from '@/components/common/Link'
@@ -15,115 +12,43 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
 import { CopyStudentNumbersHeader } from '@/components/OodiTable/common/CopyStudentNumbersHeader'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
+import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 import { TableInfo } from '@/components/PopulationComponents/Students/Table/ProgressTab/info'
-import { DateFormat } from '@/constants/date'
+import {
+  getCellText,
+  getCourseGroups,
+  getCriteriaHeaders,
+  hasCreditTransfer,
+  hasEnrolled,
+  hasFailed,
+  hasPassedDuringAcademicYear,
+  hasPassedOutsideAcademicYear,
+  IdToGroupId,
+  Label,
+} from '@/components/PopulationComponents/Students/Table/ProgressTab/util'
 import { useCurriculum } from '@/hooks/useCurriculum'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { CheckIcon, CloseIcon, EditIcon, RemoveIcon, SwapHorizIcon } from '@/theme'
-import { isMedicalProgramme } from '@/util/studyProgramme'
-import { formatDate } from '@/util/timeAndDate'
-import {
-  CreditTypeCode,
-  EnrollmentState,
-  FormattedStudent,
-  Name,
-  ProgressCriteria,
-  SemesterEnrollment,
-} from '@oodikone/shared/types'
-import { StudentCourse } from '@oodikone/shared/types/studentData'
-import { keyBy, range } from '@oodikone/shared/util'
+import { FormattedStudent, ProgrammeCourse, ProgressCriteria, SemesterEnrollment } from '@oodikone/shared/types'
+import { keyBy } from '@oodikone/shared/util'
 import '@/components/PopulationComponents/Students/Table/ProgressTab/index.css'
-import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
-
-dayjsExtend(isBetween)
-dayjsExtend(isSameOrBefore)
-dayjsExtend(isSameOrAfter)
 
 const columnHelper = createColumnHelper<FormattedStudent>()
 
-type IdToGroupId = Record<string, string>
-
-/** Return course + all of it's substitution groups (courses are identified by their course group id) */
-const getCourseGroups = (
-  courseGroupId: string,
-  criteria: ProgressCriteria | undefined,
-  student: FormattedStudent,
-  idToGroupId: IdToGroupId
-): StudentCourse[][] => {
-  const studentGroupIds = student.courses.map(({ course_id }) => idToGroupId[course_id])
-
-  // Return groups that have all courses in student.courses
-  const courseGroups: StudentCourse[][] = []
-  for (const group of [[courseGroupId]].concat(criteria?.allCourseGroups[courseGroupId] ?? [])) {
-    if (group.every(groupId => studentGroupIds.includes(groupId))) {
-      // We know all of the group's courses exist, we just checked that
-      courseGroups.push(
-        ...group.map(groupId =>
-          student.courses
-            .filter(course => idToGroupId[course.course_id] === groupId)
-            .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        )
-      )
-    }
-  }
-  return courseGroups
+const helpTexts = {
+  0: 'No information',
+  1: 'Active',
+  2: 'Absent',
+  3: 'Passive',
 }
 
-/**
-  Filter out failed courses that don't "break" a given group eg. remove the only instance of a course code
-
-  NOTE: Does not automatically remove all failed courses!
-*/
-const filterFailed = (group: StudentCourse[]) => (course: StudentCourse) =>
-  course.passed || !group.find(otherCourse => course.course_code === otherCourse.course_code && otherCourse.passed)
-
-const hasCreditTransfer = (courseGroups: StudentCourse[][]) =>
-  courseGroups.some(group => {
-    const passedCredits = group.filter(filterFailed(group))
-    return passedCredits.length === 0
-      ? false
-      : passedCredits.some(course => course.credittypecode === CreditTypeCode.APPROVED)
-  })
-
-/** Check if any courseGroup has
-  1. all courses passed
-  2. *LATEST* attainment gotten during the wanted academic year
-  3. All attainments gotten before the wanted academic year's end
-  */
-const hasPassedDuringAcademicYear = (courseGroups: StudentCourse[][], start: dayjs.Dayjs, end: dayjs.Dayjs) => {
-  return courseGroups.some(group => {
-    const passedCredits = group.filter(filterFailed(group))
-    return passedCredits.length === 0
-      ? false
-      : passedCredits.some(credit => dayjs(credit.date).isBetween(dayjs(start), dayjs(end))) &&
-          passedCredits.every(credit => dayjs(credit.date).isBefore(dayjs(end)))
-  })
+const enrollmentClassNames = {
+  0: 'label-none',
+  1: 'label-present',
+  2: 'label-absent',
+  3: 'label-passive',
 }
-
-/** Check if any group has only passed courses */
-const hasPassedOutsideAcademicYear = (courseGroups: StudentCourse[][]) =>
-  courseGroups.some(group => {
-    const passedCredits = group.filter(filterFailed(group))
-    return passedCredits.length === 0 ? false : passedCredits.every(credit => credit.passed)
-  })
-
-/**
-  Check if there is a failed course that was not removed by the filterFailed eg. there is
-  a failed course that has no passed attainment
-*/
-const hasFailed = (courseGroups: StudentCourse[][]) =>
-  courseGroups.some(group => {
-    const passedCredits = group.filter(filterFailed(group))
-    return passedCredits.length === 0 ? false : passedCredits.some(course => !course.passed)
-  })
-
-/** Return enrollments only for main courses */
-const hasEnrolled = (student: FormattedStudent, courseGroupId: string, idToGroupId: IdToGroupId) =>
-  student.enrollments?.some(enrollment => idToGroupId[enrollment.course_id] === courseGroupId)
-
-const getEnrollment = (student: FormattedStudent, courseGroupId: string, idToGroupId: IdToGroupId) =>
-  student.enrollments.filter(enrollment => idToGroupId[enrollment.course_id] === courseGroupId)
 
 const getRowContent = (
   student: FormattedStudent,
@@ -134,7 +59,7 @@ const getRowContent = (
   criteria: ProgressCriteria | undefined,
   idToGroupId: IdToGroupId
 ) => {
-  if (label.code.includes('Credits')) {
+  if (label.code === 'Credits') {
     if (student.criteriaProgress[year]?.credits) {
       return <CheckIcon color="success" />
     }
@@ -167,63 +92,42 @@ const getRowContent = (
   return null
 }
 
-const getExcelText = (
-  label: Label,
-  criteria: ProgressCriteria | undefined,
-  student: FormattedStudent,
-  year: string,
-  idToGroupId: IdToGroupId
+const getSemesterEnrollmentStatus = (
+  semesterEnrollments: SemesterEnrollment[] | null | undefined,
+  semesters: number[]
 ) => {
-  if (label.code.includes('Credits')) {
-    return student.criteriaProgress[year]?.credits ? 'Passed' : ''
-  }
-  if (!label.groupId) return ''
-
-  const courseGroups = getCourseGroups(label.groupId, criteria, student, idToGroupId)
-
-  if (hasPassedOutsideAcademicYear(courseGroups)) {
-    const latestCompletedGroup = courseGroups.find(group => group.every(course => course.passed))
-    return `Passed ${latestCompletedGroup?.length === 1 ? formatDate(latestCompletedGroup[0]?.date, DateFormat.ISO_DATE) : '(substituted)'}`
-  }
-
-  if (hasFailed(courseGroups)) {
-    const latestFailedCourse = courseGroups
-      .find(group => group.some(course => !course.passed))
-      ?.find(course => !course.passed)
-    return `Failed ${formatDate(latestFailedCourse ? latestFailedCourse.date : '(substituted)', DateFormat.ISO_DATE)}`
-  }
-
-  if (hasEnrolled(student, label.groupId, idToGroupId)) {
-    const enrollment = getEnrollment(student, label.groupId, idToGroupId)
-    return `Enrollment ${formatDate(enrollment[0].enrollment_date_time, DateFormat.ISO_DATE)}`
-  }
-
-  return ''
+  const fall = semesterEnrollments?.find(semester => semester.semester === Math.min(...semesters))?.type ?? 0
+  const spring = semesterEnrollments?.find(semester => semester.semester === Math.max(...semesters))?.type ?? 0
+  return { fall, spring }
 }
 
-const getCriteriaHeaders = (months: number, programme: string) => {
-  const criteriaHeaders = [
-    { title: months < 12 ? 'Academic year 1 (in progress)' : 'Academic year 1', year: 'year1', label: 'yearOne' },
-    { title: months < 24 ? 'Academic year 2 (in progress)' : 'Academic year 2', year: 'year2', label: 'yearTwo' },
-    { title: months < 36 ? 'Academic year 3 (in progress)' : 'Academic year 3', year: 'year3', label: 'yearThree' },
-  ]
-  if (isMedicalProgramme(programme)) {
-    criteriaHeaders.push(
-      { title: months < 48 ? 'Academic year 4 (in progress)' : 'Academic year 4', year: 'year4', label: 'yearFour' },
-      { title: months < 60 ? 'Academic year 5 (in progress)' : 'Academic year 5', year: 'year5', label: 'yearFive' },
-      { title: months < 72 ? 'Academic year 6 (in progress)' : 'Academic year 6', year: 'year6', label: 'yearSix' }
-    )
-  }
-  return criteriaHeaders
+const getSemesterEnrollmentContent = (
+  semesterEnrollments: SemesterEnrollment[] | null | undefined,
+  semesters: number[]
+) => {
+  const { fall, spring } = getSemesterEnrollmentStatus(semesterEnrollments, semesters)
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.2rem' }}>
+      <div className={`enrollment-label ${enrollmentClassNames[fall]}`} title={`Fall: ${helpTexts[fall]}`} />
+      <div className={`enrollment-label ${enrollmentClassNames[spring]}`} title={`Spring: ${helpTexts[spring]}`} />
+    </div>
+  )
 }
 
-type Label = {
-  /** Course code for course labels, otherwise a special value ('Credits', 'Criteria', 'Enrollment') */
-  code: string
-  /** Set for course labels */
-  groupId?: string
-  name: Name | null
-}
+/** Start and end of the student's nth (0-indexed) academic year, counting from the population's start */
+const getAcademicYear = (months: number, yearIndex: number) => ({
+  start: dayjs()
+    .subtract(months - 1, 'months')
+    .startOf('month')
+    .add(yearIndex, 'years'),
+  end: dayjs()
+    .subtract(months - 12, 'months')
+    .endOf('month')
+    .add(yearIndex, 'years'),
+})
+
+/** Column title in the Excel export, unique over all years */
+const getExcelKey = (label: Label, yearIndex: number) => `Year ${yearIndex + 1}: ${label.name}`
 
 export const ProgressTable = ({
   idToGroupIdMap,
@@ -244,143 +148,159 @@ export const ProgressTable = ({
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: programme }, { skip: !programme })
   const { semesters: allSemesters } = useSemesters()
   const isStudyGuidanceGroupProgramme = studyGuidanceGroupProgramme !== ''
-  const creditMonths = [12, 24, 36, 48, 60, 72]
-  const defaultCourses = keyBy(curriculum?.defaultProgrammeCourses, 'group_id')
-  const coursesSecondProgramme = keyBy(curriculum?.secondProgrammeCourses, 'group_id')
 
-  const getCourse = (courseGroupId: string) => defaultCourses[courseGroupId] ?? coursesSecondProgramme[courseGroupId]
+  const labelCriteria = useMemo(() => {
+    const courses: Record<string, ProgrammeCourse | undefined> = {
+      ...keyBy(curriculum?.secondProgrammeCourses, 'group_id'),
+      ...keyBy(curriculum?.defaultProgrammeCourses, 'group_id'),
+    }
 
-  const labelCriteria = Object.keys(criteria?.courses ?? {}).reduce<Record<string, Label[]>>((acc, year, index) => {
-    acc[year] = [
-      {
-        code: 'Credits',
-        name: {
-          fi: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
-          en: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
-          sv: `${creditMonths[index]} mos.: ${criteria?.credits[year]}`,
+    return Object.keys(criteria?.courses ?? {}).reduce<Record<string, Label[]>>((acc, year, index) => {
+      acc[year] = [
+        {
+          code: 'Credits',
+          name: `At least ${criteria?.credits[year] ?? 0} credits during first ${(index + 1) * 12} months`,
         },
-      },
-      ...(criteria?.courses[year] ?? [])
-        .map((courseGroupId: string): Label => {
-          const course = getCourse(courseGroupId)
-          return { code: course?.code ?? courseGroupId, groupId: courseGroupId, name: course?.name ?? null }
-        })
-        .sort((a, b) => a.code.localeCompare(b.code)),
-      {
-        code: 'Criteria',
-        name: {
-          fi: `Year ${index + 1}: Fullfilled`,
-          en: `Year ${index + 1}: Fullfilled`,
-          sv: `Year ${index + 1}: Fullfilled`,
+        ...(criteria?.courses[year] ?? [])
+          .map((courseGroupId: string): Label => {
+            const course = courses[courseGroupId]
+            const code = course?.code ?? courseGroupId
+            return {
+              code,
+              groupId: courseGroupId,
+              name: `${code} ${course ? getTextIn(course.name) : 'Unknown course'}`,
+            }
+          })
+          .sort((a, b) => a.code.localeCompare(b.code)),
+        {
+          code: 'Criteria',
+          name: `Year ${index + 1} criteria fulfilled`,
         },
-      },
-      {
-        code: 'Enrollment',
-        name: { en: `Year ${index + 1}` },
-      },
-    ]
-    return acc
-  }, {})
-
-  const criteriaHeaders = getCriteriaHeaders(months, programme)
-
-  const studentNumberToSemesterEnrollmentsMap = students.reduce<Record<string, SemesterEnrollment[] | null>>(
-    (acc, student) => {
-      const correctStudyRight = student.studyRights.find(studyRight =>
-        studyRight.studyRightElements.some(element => element.code === programme)
-      )
-      if (correctStudyRight) {
-        acc[student.studentNumber] = correctStudyRight.semesterEnrollments
-      }
+        {
+          code: 'Enrollment',
+          name: 'Semester enrollments',
+        },
+      ]
       return acc
-    },
-    {}
+    }, {})
+  }, [criteria, curriculum, getTextIn])
+
+  const criteriaHeaders = useMemo(
+    () => getCriteriaHeaders(months, programme).filter((_, yearIndex) => yearIndex === 0 || yearIndex * 12 < months),
+    [months, programme]
   )
 
-  const helpTexts = {
-    0: 'No information',
-    1: 'Active',
-    2: 'Absent',
-    3: 'Passive',
-  }
+  const semesterEnrollmentsByStudent = useMemo(
+    () =>
+      students.reduce<Record<string, SemesterEnrollment[] | null>>((acc, student) => {
+        const correctStudyRight = student.studyRights.find(studyRight =>
+          studyRight.studyRightElements.some(element => element.code === programme)
+        )
+        if (correctStudyRight) {
+          acc[student.studentNumber] = correctStudyRight.semesterEnrollments
+        }
+        return acc
+      }, {}),
+    [students, programme]
+  )
 
-  const getSemesterEnrollmentStatus = (student: FormattedStudent, semesters: number[]) => {
-    const fall =
-      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
-        semester => semester.semester === Math.min(...semesters)
-      )?.type ?? 0
+  /** Academic year date range and its semester codes for each shown year */
+  const academicYears = useMemo(
+    () =>
+      criteriaHeaders.map((_, yearIndex) => {
+        const { start, end } = getAcademicYear(months, yearIndex)
+        const semesters = Object.values(allSemesters)
+          .filter(
+            semester => dayjs(semester.startdate).isSameOrAfter(start) && dayjs(semester.enddate).isSameOrBefore(end)
+          )
+          .map(semester => semester.semestercode)
+        return { start, end, semesters }
+      }),
+    [criteriaHeaders, months, allSemesters]
+  )
 
-    const spring =
-      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
-        semester => semester.semester === Math.max(...semesters)
-      )?.type ?? 0
+  const excelData = useMemo(
+    () =>
+      students.map(student => ({
+        'Student number': student.studentNumber,
+        'Last name': student.lastname,
+        'First names': student.firstnames,
+        ...Object.fromEntries(
+          criteriaHeaders.flatMap(({ year, label: yearLabel }, yearIndex) =>
+            (labelCriteria[yearLabel] ?? []).flatMap(label => {
+              const key = getExcelKey(label, yearIndex)
+              switch (label.code) {
+                case 'Criteria':
+                  return [[key, student.criteriaProgress[year]?.totalSatisfied ?? 0]]
 
-    return { fall, spring }
-  }
+                case 'Enrollment': {
+                  const { fall, spring } = getSemesterEnrollmentStatus(
+                    semesterEnrollmentsByStudent[student.studentNumber],
+                    academicYears[yearIndex].semesters
+                  )
+                  return [
+                    [`${key} - FALL`, helpTexts[fall]],
+                    [`${key} - SPRING`, helpTexts[spring]],
+                  ]
+                }
 
-  const getSemesterEnrollmentVal = (student: FormattedStudent, semesters: number[]): [string, string] => {
-    const { fall, spring } = getSemesterEnrollmentStatus(student, semesters)
-    return [helpTexts[fall], helpTexts[spring]]
-  }
+                default:
+                  return [[key, getCellText(label, criteria, student, year, idToGroupIdMap)]]
+              }
+            })
+          )
+        ),
+      })),
+    [students, criteriaHeaders, labelCriteria, semesterEnrollmentsByStudent, academicYears, criteria, idToGroupIdMap]
+  )
 
-  const getSemesterEnrollmentContent = (student: FormattedStudent, semesters: number[]) => {
-    const enrollmentTypes = {
-      0: { className: 'label-none' },
-      1: { className: 'label-present' },
-      2: { className: 'label-absent' },
-      3: { className: 'label-passive' },
+  const accessorKeys = useMemo(
+    () => [
+      'Student number',
+      'Last name',
+      'First names',
+      ...criteriaHeaders.flatMap(({ label: yearLabel }, yearIndex) =>
+        (labelCriteria[yearLabel] ?? []).flatMap(label => {
+          const key = getExcelKey(label, yearIndex)
+          return label.code === 'Enrollment' ? [`${key} - FALL`, `${key} - SPRING`] : [key]
+        })
+      ),
+    ],
+    [criteriaHeaders, labelCriteria]
+  )
+
+  const columns = useMemo(() => {
+    const getSortingValue = (student: FormattedStudent, label: Label, year: string) => {
+      // Values:
+      // -1 Course completed
+      // 0 Failed
+      // 1 Enrolled
+      // 2 None of above
+      if (!label.groupId) return 2
+      if (student.criteriaProgress[year]?.coursesSatisfied?.[label.groupId]) return -1
+      if (student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)?.passed === false) return 0
+      if (hasEnrolled(student, label.groupId, idToGroupIdMap)) return 1
+      return 2
     }
-    const fall =
-      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
-        semester => semester.semester === Math.min(...semesters)
-      )?.type ?? 0
-    const spring =
-      studentNumberToSemesterEnrollmentsMap[student.studentNumber]?.find(
-        semester => semester.semester === Math.max(...semesters)
-      )?.type ?? 0
 
-    const fallText = `Fall: ${helpTexts[fall]}`
-    const springText = `Spring: ${helpTexts[spring]}`
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.2rem' }}>
-        <div className={`enrollment-label ${enrollmentTypes[fall]?.className}`} title={fallText} />
-        <div className={`enrollment-label ${enrollmentTypes[spring]?.className}`} title={springText} />
-      </div>
-    )
-  }
-
-  const getSortingValue = (student: FormattedStudent, label: Label, year: string) => {
-    // Values:
-    // -1 Course completed
-    // 0 Failed
-    // 1 Enrolled
-    // 2 None of aove
-    if (!label.groupId) return 2
-    const criteriaCourses = student.criteriaProgress[year]?.coursesSatisfied
-    const course = criteriaCourses?.[label.groupId]
-
-    if (course) return -1
-    if (student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)?.passed === false) return 0
-    if (!course && hasEnrolled(student, label.groupId, idToGroupIdMap)) return 1
-    return 2
-  }
-
-  const createContent = (labels: Label[], year: string, start: dayjs.Dayjs, end: dayjs.Dayjs, semesters: number[]) => {
-    return (
-      labels?.map(label =>
+    const createContent = (labels: Label[], year: string, yearIndex: number) => {
+      const { start, end, semesters } = academicYears[yearIndex]
+      return labels.map(label =>
         columnHelper.accessor(() => undefined, {
-          id: `${year}-${label.groupId ?? label.code}-${label.name?.fi ?? ''}`,
-          header: getTextIn(label.name) ?? label.code,
+          id: `${year}-${label.groupId ?? label.code}`,
+          header: label.name,
           cell: ({ row: { original: student } }) => {
-            const title = label.code.includes('Criteria')
-              ? `${student.criteriaProgress[year]?.totalSatisfied ?? 0} criteria fullfilled`
-              : getExcelText(label, criteria, student, year, idToGroupIdMap)
+            const title =
+              label.code === 'Criteria'
+                ? `${student.criteriaProgress[year]?.totalSatisfied ?? 0} criteria fulfilled`
+                : getCellText(label, criteria, student, year, idToGroupIdMap)
 
-            const content = label.code.includes('Criteria')
-              ? (student.criteriaProgress[year]?.totalSatisfied ?? 0)
-              : label.code.includes('Enrollment')
-                ? getSemesterEnrollmentContent(student, semesters)
-                : getRowContent(student, label, year, start, end, criteria, idToGroupIdMap)
+            const content =
+              label.code === 'Criteria'
+                ? (student.criteriaProgress[year]?.totalSatisfied ?? 0)
+                : label.code === 'Enrollment'
+                  ? getSemesterEnrollmentContent(semesterEnrollmentsByStudent[student.studentNumber], semesters)
+                  : getRowContent(student, label, year, start, end, criteria, idToGroupIdMap)
 
             return (
               <Tooltip title={title}>
@@ -396,18 +316,26 @@ export const ProgressTable = ({
               case 'Credits':
                 // NOTE: Convert boolean to int: (true -> 1, false -> 0) with + operator
                 // Also notice rowB rowA order
-                return +rowB.original.criteriaProgress[year].credits - +rowA.original.criteriaProgress[year].credits
+                return (
+                  +!!rowB.original.criteriaProgress[year]?.credits - +!!rowA.original.criteriaProgress[year]?.credits
+                )
 
               case 'Criteria':
                 // NOTE: rowB rowA order
                 return (
-                  rowB.original.criteriaProgress[year].totalSatisfied -
-                  rowA.original.criteriaProgress[year].totalSatisfied
+                  (rowB.original.criteriaProgress[year]?.totalSatisfied ?? 0) -
+                  (rowA.original.criteriaProgress[year]?.totalSatisfied ?? 0)
                 )
 
               case 'Enrollment': {
-                const semestersA = getSemesterEnrollmentStatus(rowA.original, semesters)
-                const semestersB = getSemesterEnrollmentStatus(rowB.original, semesters)
+                const semestersA = getSemesterEnrollmentStatus(
+                  semesterEnrollmentsByStudent[rowA.original.studentNumber],
+                  semesters
+                )
+                const semestersB = getSemesterEnrollmentStatus(
+                  semesterEnrollmentsByStudent[rowB.original.studentNumber],
+                  semesters
+                )
                 return semestersA.fall + semestersA.spring - (semestersB.fall + semestersB.spring)
               }
 
@@ -416,135 +344,10 @@ export const ProgressTable = ({
             }
           },
         })
-      ) ?? []
-    )
-  }
-
-  const generateYearColumns = (startYear: dayjs.Dayjs, endYear: dayjs.Dayjs, criteriaIndex: number) => {
-    const semesters = Object.values(allSemesters)
-      .filter(
-        semester =>
-          dayjs(semester.startdate).isSameOrAfter(startYear) && dayjs(semester.enddate).isSameOrBefore(endYear)
       )
-      .map(semester => semester.semestercode)
+    }
 
-    return columnHelper.group({
-      id: criteriaHeaders[criteriaIndex].title,
-      header: criteriaHeaders[criteriaIndex].title,
-      columns: createContent(
-        labelCriteria[criteriaHeaders[criteriaIndex].label],
-        criteriaHeaders[criteriaIndex].year,
-        startYear,
-        endYear,
-        semesters
-      ),
-    })
-  }
-
-  const academicYearStart = dayjs()
-    .subtract(months - 1, 'months')
-    .startOf('month')
-  const academicYearEnd = dayjs()
-    .subtract(months - 12, 'months')
-    .endOf('month')
-
-  // HACK: Have fun with this one.
-  const excelData = useMemo(
-    () =>
-      students.map(student => ({
-        'Student number': student.studentNumber,
-        'Last name': student.lastname,
-        'First names': student.firstnames,
-        ...Object.fromEntries(
-          range(0, isMedicalProgramme(programme) ? 6 : 3)
-            .filter(year => year * 12 < months)
-            .flatMap(year => {
-              const startYear = dayjs(academicYearStart).add(year, 'years')
-              const endYear = dayjs(academicYearEnd).add(year, 'years')
-
-              const semesters = Object.values(allSemesters)
-                .filter(
-                  semester =>
-                    dayjs(semester.startdate).isSameOrAfter(startYear) &&
-                    dayjs(semester.enddate).isSameOrBefore(endYear)
-                )
-                .map(semester => semester.semestercode)
-
-              return (
-                labelCriteria[criteriaHeaders[year].label]?.flatMap(label => {
-                  let result: (string | number | null | undefined)[][] = []
-                  switch (label.code) {
-                    case 'Criteria': {
-                      result = [
-                        [getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.totalSatisfied ?? 0],
-                      ]
-                      break
-                    }
-
-                    case 'Enrollment': {
-                      result = (() => {
-                        const [fall, spring] = getSemesterEnrollmentVal(student, semesters)
-                        return [
-                          [`${getTextIn(label.name)} - FALL`, fall],
-                          [`${getTextIn(label.name)} - SPRING`, spring],
-                        ]
-                      })()
-                      break
-                    }
-
-                    case 'Credits': {
-                      result = [
-                        [getTextIn(label.name), student.criteriaProgress[`year${year + 1}`]?.credits ? 'Passed' : ''],
-                      ]
-                      break
-                    }
-
-                    default: {
-                      const course = student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)
-                      const enrollment = student.enrollments.find(
-                        enrollment => idToGroupIdMap[enrollment.course_id] === label.groupId
-                      )
-                      result = [
-                        [
-                          getTextIn(label.name),
-                          course?.passed ? 'Passed' : enrollment?.state === EnrollmentState.ENROLLED ? 'Enrolled' : '',
-                        ],
-                      ]
-                      break
-                    }
-                  }
-                  return result
-                }) ?? []
-              )
-            })
-            .filter(([key, _]) => !!key)
-        ),
-      })),
-    [students, allSemesters, programme, labelCriteria, idToGroupIdMap]
-  )
-
-  const accessorKeys = useMemo(
-    () => [
-      'Student number',
-      'Last name',
-      'First names',
-      ...range(0, isMedicalProgramme(programme) ? 6 : 3)
-        .filter(year => year * 12 < months)
-        .flatMap(year => {
-          return (
-            labelCriteria[criteriaHeaders[year].label]?.flatMap(label => {
-              const labelName = getTextIn(label.name) ?? ''
-              return label.code === 'Enrollment' ? [`${labelName} - FALL`, `${labelName} - SPRING`] : [labelName]
-            }) ?? []
-          )
-        })
-        .filter(key => !!key),
-    ],
-    [programme, labelCriteria]
-  )
-
-  const columns = useMemo(() => {
-    const columns = [
+    return [
       columnHelper.group({
         header: 'Student',
         columns: [
@@ -570,39 +373,28 @@ export const ProgressTable = ({
             : []),
         ],
       }),
-      generateYearColumns(academicYearStart, academicYearEnd, 0),
+      ...criteriaHeaders.map(({ title, year, label }, yearIndex) =>
+        columnHelper.group({
+          id: title,
+          header: title,
+          columns: createContent(labelCriteria[label] ?? [], year, yearIndex),
+        })
+      ),
     ]
-
-    const addYearColumns = (year: number) => {
-      if (months > year * 12) {
-        columns.push(
-          generateYearColumns(
-            dayjs(academicYearStart).add(year, 'years'),
-            dayjs(academicYearEnd).add(year, 'years'),
-            year
-          )
-        )
-      }
-    }
-
-    addYearColumns(1)
-    addYearColumns(2)
-
-    if (isMedicalProgramme(programme)) {
-      addYearColumns(3)
-      addYearColumns(4)
-      addYearColumns(5)
-    }
-
-    return columns
-  }, [criteria, students, curriculum, getTextIn, namesVisible, idToGroupIdMap])
+  }, [
+    criteria,
+    criteriaHeaders,
+    labelCriteria,
+    academicYears,
+    semesterEnrollmentsByStudent,
+    namesVisible,
+    idToGroupIdMap,
+  ])
 
   const isCriteriaSet =
     criteria &&
     (Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0) ||
       Object.values(criteria.credits).some(creditCriteria => creditCriteria > 0))
-
-  const tableOptions = {}
 
   return (
     <>
@@ -613,28 +405,25 @@ export const ProgressTable = ({
         </h5>
       )}
       <TableInfo />
-      <Box sx={{ display: 'flex' }}>
-        <Box sx={{ width: '100%' }}>
-          {isCriteriaSet ? (
-            <OodiTable
-              columns={columns}
-              data={students}
-              options={tableOptions}
-              toolbarContent={
-                <>
-                  <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
-                  <FilterDegreeCoursesModal degreeProgramme={programme} text="Modify criteria" icon={<EditIcon />} />
-                  <StudentNameVisibilityToggle />
-                </>
-              }
-            />
-          ) : (
-            <Typography variant="h6">
-              There is no criteria set for this programme. You can create one{' '}
-              <Link to={`/study-programme/${programme}?tab=3`}>here</Link>.
-            </Typography>
-          )}
-        </Box>
+      <Box sx={{ width: '100%' }}>
+        {isCriteriaSet ? (
+          <OodiTable
+            columns={columns}
+            data={students}
+            toolbarContent={
+              <>
+                <OodiTableExcelExport data={excelData} exportColumnKeys={accessorKeys} />
+                <FilterDegreeCoursesModal degreeProgramme={programme} text="Modify criteria" icon={<EditIcon />} />
+                <StudentNameVisibilityToggle />
+              </>
+            }
+          />
+        ) : (
+          <Typography variant="h6">
+            There is no criteria set for this programme. You can create one{' '}
+            <Link to={`/study-programme/${programme}?tab=3`}>here</Link>.
+          </Typography>
+        )}
       </Box>
     </>
   )
