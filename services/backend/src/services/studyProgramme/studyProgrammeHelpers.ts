@@ -193,8 +193,7 @@ export const computePercentiles = (
   return values
 }
 
-// In the object programmes should be {bachelorCode: masterCode}
-export const combinedStudyProgrammes = { KH90_001: 'MH90_001' } as const
+export { combinedStudyProgrammes } from '@oodikone/shared/util/studyProgramme'
 
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular

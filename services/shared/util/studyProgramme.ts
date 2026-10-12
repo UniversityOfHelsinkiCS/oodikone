@@ -2,6 +2,13 @@ import { StudyProgrammeCourse } from '../types'
 
 export type YearStats = StudyProgrammeCourse['years'][number]
 
+// In the object programmes should be {bachelorCode: masterCode}
+export const combinedStudyProgrammes = { KH90_001: 'MH90_001' } as const
+
+/** Second programme of a combined programme, eg. the licentiate programme of a combined bachelor programme */
+export const getCombinedProgramme = (programmeCode: string): string | undefined =>
+  combinedStudyProgrammes[programmeCode as keyof typeof combinedStudyProgrammes]
+
 export const createEmptyStats = (isStudyModule = false): YearStats => ({
   allCredits: 0,
   allStudents: 0,

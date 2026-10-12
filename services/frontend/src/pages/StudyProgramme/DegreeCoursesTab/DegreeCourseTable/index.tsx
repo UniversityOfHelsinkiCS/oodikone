@@ -28,21 +28,31 @@ import { StyledTable } from '@/components/common/StyledTable'
 
 const reloadNote = 'Reload the page to see the change in other views.'
 
+export type DegreeModule = Module & {
+  /** Programme whose curriculum the module is from. Course visibility is saved separately for each programme. */
+  programmeCode: string
+}
+
+const getModuleKey = (module: DegreeModule) => `${module.programmeCode}/${module.code}`
+
 export const DegreeCourseTable = ({
-  combinedProgramme,
   criteria,
   curriculumVersion,
   modules: initialModules,
+  programmeNames,
   showCriteria,
   showVisibility,
   studyProgramme,
 }: {
-  combinedProgramme: string
   criteria: ProgressCriteria
   curriculumVersion: string[]
-  modules: Module[]
+  /** Modules of the first programme first, then those of the second programme of a combined programme */
+  modules: DegreeModule[]
+  /** Shown above each programme's modules when the modules are from more than one programme */
+  programmeNames: Record<string, string>
   showCriteria: boolean
   showVisibility: boolean
+  /** Programme whose progress criteria are edited */
   studyProgramme: string
 }) => {
   const [expandedModules, setExpandedModules] = useState<Record<string, Record<string, boolean>>>({})
@@ -60,7 +70,6 @@ export const DegreeCourseTable = ({
   const [addProgressCriteriaCourse] = useAddProgressCriteriaCourseMutation()
 
   const version = curriculumVersion.join(',')
-  const exclusionProgramme = combinedProgramme === '' ? studyProgramme : combinedProgramme
   const criteriaYears = showCriteria ? getCriteriaYears(studyProgramme) : []
   const criteriaCourses = pendingCriteria?.source === criteria ? pendingCriteria.courses : criteria.courses
 
@@ -68,74 +77,93 @@ export const DegreeCourseTable = ({
     setModules(initialModules)
   }, [initialModules])
 
-  const getModule = (moduleCode: string) => modules.find(module => module.code === moduleCode)!
+  const getModule = (moduleKey: string) => modules.find(module => getModuleKey(module) === moduleKey)!
 
-  const getModuleName = (moduleCode: string) => {
-    const firstCourse = getModule(moduleCode).courses[0]
-    return firstCourse?.parent_name ? getTextIn(firstCourse.parent_name)! : moduleCode
+  const getModuleName = (module: DegreeModule) => {
+    const firstCourse = module.courses[0]
+    return firstCourse?.parent_name ? getTextIn(firstCourse.parent_name)! : module.code
   }
 
-  const setCoursesVisibility = (courseCodes: string[], newVisibility: boolean) => {
-    // Same course can be in many modules, so change them all
+  const setCoursesVisibility = (programmeCode: string, courseCodes: string[], newVisibility: boolean) => {
+    // Same course can be in many modules of the programme, so change them all
     setModules(prevModules =>
-      prevModules.map(module => ({
-        ...module,
-        courses: module.courses.map(course =>
-          courseCodes.includes(course.code)
-            ? { ...course, visible: { ...course.visible, visibility: newVisibility } }
-            : course
-        ),
-      }))
+      prevModules.map(module =>
+        module.programmeCode !== programmeCode
+          ? module
+          : {
+              ...module,
+              courses: module.courses.map(course =>
+                courseCodes.includes(course.code)
+                  ? { ...course, visible: { ...course.visible, visibility: newVisibility } }
+                  : course
+              ),
+            }
+      )
     )
   }
 
-  const changeVisibility = (courses: ProgrammeCourse[], newVisibility: boolean, successMessage: string) => {
-    const request = { courseGroupIds: courses.map(course => course.group_id), curriculumVersion: version }
-    const mutation = newVisibility
-      ? removeExclusion({ ...request, programmeCode: exclusionProgramme })
-      : setExclusion({ ...request, programmeCode: exclusionProgramme })
-    setCoursesVisibility(
-      courses.map(course => course.code),
-      newVisibility
-    )
+  const changeVisibility = (
+    programmeCode: string,
+    courses: ProgrammeCourse[],
+    newVisibility: boolean,
+    successMessage: string
+  ) => {
+    const request = {
+      courseGroupIds: courses.map(course => course.group_id),
+      curriculumVersion: version,
+      programmeCode,
+    }
+    const mutation = newVisibility ? removeExclusion(request) : setExclusion(request)
+    const courseCodes = courses.map(course => course.code)
+    setCoursesVisibility(programmeCode, courseCodes, newVisibility)
     mutation
       .unwrap()
       .then(() => setStatusNotification(`${successMessage} ${reloadNote}`, 'success'))
       .catch(() => {
-        setCoursesVisibility(
-          courses.map(course => course.code),
-          !newVisibility
-        )
+        setCoursesVisibility(programmeCode, courseCodes, !newVisibility)
         setStatusNotification('Failed to change visibility', 'error')
       })
   }
 
-  const toggleCourseVisibility = (course: ProgrammeCourse) => {
+  const toggleCourseVisibility = (module: DegreeModule, course: ProgrammeCourse) => {
     const newVisibility = !course.visible.visibility
     const name = getTextIn(course.name)
-    changeVisibility([course], newVisibility, `${name} is now ${newVisibility ? 'shown' : 'hidden'}.`)
+    changeVisibility(
+      module.programmeCode,
+      [course],
+      newVisibility,
+      `${name} is now ${newVisibility ? 'shown' : 'hidden'}.`
+    )
   }
 
-  const toggleModuleVisibility = (moduleCode: string) => {
-    const { courses } = getModule(moduleCode)
-    const visibility = getVisibility(moduleCode)
-    const name = getModuleName(moduleCode)
+  const toggleModuleVisibility = (module: DegreeModule) => {
+    const visibility = getVisibility(module)
 
     if (visibility === CourseVisibility.HIDDEN) {
-      changeVisibility(courses, true, `All courses in ${name} are now shown.`)
+      changeVisibility(
+        module.programmeCode,
+        module.courses,
+        true,
+        `All courses in ${getModuleName(module)} are now shown.`
+      )
       return
     }
 
     if (visibility === CourseVisibility.PARTIAL) {
-      setModuleToHide(moduleCode)
+      setModuleToHide(getModuleKey(module))
       return
     }
-    hideModule(moduleCode)
+    hideModule(module)
   }
 
-  const hideModule = (moduleCode: string) => {
-    const visibleCourses = getModule(moduleCode).courses.filter(course => course.visible.visibility)
-    changeVisibility(visibleCourses, false, `All courses in ${getModuleName(moduleCode)} are now hidden.`)
+  const hideModule = (module: DegreeModule) => {
+    const visibleCourses = module.courses.filter(course => course.visible.visibility)
+    changeVisibility(
+      module.programmeCode,
+      visibleCourses,
+      false,
+      `All courses in ${getModuleName(module)} are now hidden.`
+    )
   }
 
   const toggleCriteriaYear = (course: ProgrammeCourse, { key, year }: CriteriaYearOption) => {
@@ -161,17 +189,16 @@ export const DegreeCourseTable = ({
       })
   }
 
-  const isModuleExpanded = (moduleCode: string) => expandedModules[version]?.[moduleCode] ?? false
+  const isModuleExpanded = (moduleKey: string) => expandedModules[version]?.[moduleKey] ?? false
 
-  const toggleExpanded = (moduleCode: string) => {
+  const toggleExpanded = (moduleKey: string) => {
     setExpandedModules({
       ...expandedModules,
-      [version]: { ...expandedModules[version], [moduleCode]: !isModuleExpanded(moduleCode) },
+      [version]: { ...expandedModules[version], [moduleKey]: !isModuleExpanded(moduleKey) },
     })
   }
 
-  const getVisibility = (moduleCode: string) => {
-    const module = getModule(moduleCode)
+  const getVisibility = (module: DegreeModule) => {
     if (!module.courses?.length) {
       return CourseVisibility.NO_COURSES
     }
@@ -188,9 +215,10 @@ export const DegreeCourseTable = ({
     courses.filter(course => criteriaCourses[key]?.includes(course.group_id)).length
 
   const headerRowSpan = showCriteria ? 2 : 1
-  const remainingToHide = moduleToHide
-    ? getModule(moduleToHide).courses.filter(course => course.visible.visibility).length
-    : 0
+  const columnCount = 2 + Number(showVisibility) + criteriaYears.length
+  const showProgrammeRows = new Set(modules.map(module => module.programmeCode)).size > 1
+  const pendingHideModule = moduleToHide ? getModule(moduleToHide) : null
+  const remainingToHide = pendingHideModule?.courses.filter(course => course.visible.visibility).length ?? 0
 
   return (
     <>
@@ -217,12 +245,24 @@ export const DegreeCourseTable = ({
           )}
         </TableHead>
         <TableBody>
-          {modules.map(({ code: moduleCode, courses }) => {
-            const moduleName = getModuleName(moduleCode)
-            const expanded = isModuleExpanded(moduleCode)
+          {modules.map((module, index) => {
+            const { code: moduleCode, courses, programmeCode } = module
+            const moduleKey = getModuleKey(module)
+            const moduleName = getModuleName(module)
+            const expanded = isModuleExpanded(moduleKey)
+            const startsProgramme = index === 0 || modules[index - 1].programmeCode !== programmeCode
             return (
-              <Fragment key={`${moduleCode}-fragment`}>
-                <TableRow hover onClick={() => toggleExpanded(moduleCode)} sx={{ cursor: 'pointer' }}>
+              <Fragment key={moduleKey}>
+                {showProgrammeRows && startsProgramme && (
+                  <TableRow data-cy={`programme-row-${programmeCode}`}>
+                    <TableCell colSpan={columnCount} sx={{ bgcolor: 'grey.100' }}>
+                      <Typography fontWeight="bold" variant="body2">
+                        {programmeNames[programmeCode] ?? programmeCode} ({programmeCode})
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+                <TableRow hover onClick={() => toggleExpanded(moduleKey)} sx={{ cursor: 'pointer' }}>
                   <TableCell>
                     <Box alignItems="center" display="flex" justifyContent="left">
                       <IconButton
@@ -243,8 +283,8 @@ export const DegreeCourseTable = ({
                       <VisibilitySwitch
                         ariaLabel={`Show all courses of ${moduleName}`}
                         cypress={`visibility-switch-${moduleCode}`}
-                        onChange={() => toggleModuleVisibility(moduleCode)}
-                        visibility={getVisibility(moduleCode)}
+                        onChange={() => toggleModuleVisibility(module)}
+                        visibility={getVisibility(module)}
                       />
                     </TableCell>
                   )}
@@ -271,7 +311,7 @@ export const DegreeCourseTable = ({
                     .map(course => {
                       const courseName = getTextIn(course.name)
                       return (
-                        <TableRow key={`${moduleCode}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
+                        <TableRow key={`${moduleKey}/${course.code}`} sx={{ bgcolor: 'grey.50' }}>
                           <TableCell sx={{ pl: 6 }}>{courseName}</TableCell>
                           <TableCell>{course.code}</TableCell>
                           {showVisibility && (
@@ -279,7 +319,7 @@ export const DegreeCourseTable = ({
                               <VisibilitySwitch
                                 ariaLabel={`Show ${courseName}`}
                                 cypress={`visibility-switch-${course.code}`}
-                                onChange={() => toggleCourseVisibility(course)}
+                                onChange={() => toggleCourseVisibility(module, course)}
                                 visibility={
                                   course.visible.visibility ? CourseVisibility.VISIBLE : CourseVisibility.HIDDEN
                                 }
@@ -309,8 +349,8 @@ export const DegreeCourseTable = ({
         <DialogTitle>Hide the whole module?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {moduleToHide &&
-              `Some courses in ${getModuleName(moduleToHide)} are already hidden. ` +
+            {pendingHideModule &&
+              `Some courses in ${getModuleName(pendingHideModule)} are already hidden. ` +
                 `Hiding the module hides its remaining ${remainingToHide} ` +
                 `${remainingToHide === 1 ? 'course' : 'courses'} for all Oodikone users.`}
           </DialogContentText>
@@ -320,7 +360,7 @@ export const DegreeCourseTable = ({
           <Button
             data-cy="confirm-hide-module-button"
             onClick={() => {
-              hideModule(moduleToHide!)
+              hideModule(pendingHideModule!)
               setModuleToHide(null)
             }}
             variant="contained"

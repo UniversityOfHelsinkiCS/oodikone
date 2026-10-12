@@ -32,7 +32,7 @@ export const FilterDegreeCoursesModal = ({
       <Dialog maxWidth="md" onClose={() => setModalOpen(false)} open={modalOpen}>
         <DialogTitle>Degree programme settings</DialogTitle>
         <DialogContent>
-          <DegreeCoursesTab combinedProgramme="" degreeProgramme={degreeProgramme} initialTab={initialTab} />
+          <DegreeCoursesTab degreeProgramme={degreeProgramme} initialTab={initialTab} />
           <Button color="primary" onClick={() => setModalOpen(false)} style={{ marginTop: '10px' }} variant="contained">
             Close
           </Button>

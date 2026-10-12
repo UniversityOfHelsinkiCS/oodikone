@@ -4,21 +4,42 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 
 import { orderBy } from 'lodash-es'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useCurriculum } from '@/hooks/useCurriculum'
 import { CreditCriteriaSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CreditCriteriaSection'
 import { CurriculumSection } from '@/pages/StudyProgramme/DegreeCoursesTab/CurriculumSection'
-import { DegreeCourseTable } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable'
+import { DegreeCourseTable, DegreeModule } from '@/pages/StudyProgramme/DegreeCoursesTab/DegreeCourseTable'
 import { ManageCoursesShownInfo } from '@/pages/StudyProgramme/DegreeCoursesTab/InfoBox'
+import { useGetProgrammesQuery } from '@/redux/populations'
 import { useGetProgressCriteriaQuery } from '@/redux/progressCriteria'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
-import { Module, ProgrammeCourse } from '@oodikone/shared/types'
+import { ProgrammeCourse } from '@oodikone/shared/types'
+import { getCombinedProgramme } from '@oodikone/shared/util/studyProgramme'
 import { Section } from '@/components/Section'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 
 export type DegreeSettingsTab = 'criteria' | 'visibility'
+
+const getModules = (courses: ProgrammeCourse[], programmeCode: string): DegreeModule[] => {
+  const modules: Record<string, ProgrammeCourse[]> = {}
+  courses.forEach(course => {
+    const code = course.parent_code!
+    modules[code] ??= []
+    modules[code].push(course)
+  })
+
+  return orderBy(
+    Object.entries(modules).map(([code, courses]) => ({
+      code,
+      courses,
+      order: courses[0].module_order,
+      programmeCode,
+    })),
+    module => module.code
+  )
+}
 
 const sectionTexts = {
   criteria: {
@@ -32,82 +53,55 @@ const sectionTexts = {
 }
 
 export const DegreeCoursesTab = ({
-  combinedProgramme,
   degreeProgramme,
   initialTab = 'criteria',
 }: {
-  combinedProgramme: string
   degreeProgramme: string
   initialTab?: DegreeSettingsTab
 }) => {
   const [currentTab, setCurrentTab] = useState<DegreeSettingsTab>(initialTab)
-  const [defaultProgrammeModules, setDefaultProgrammeModules] = useState<Module[]>([])
-  const [secondProgrammeModules, setSecondProgrammeModules] = useState<Module[]>([])
   const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
+  const { data: programmes } = useGetProgrammesQuery()
   const { getTextIn } = useLanguage()
   const { curriculum, curriculumList, setSelectedCurriculum: setCurriculum } = useCurriculum()
+  const secondProgramme = getCombinedProgramme(degreeProgramme)
 
-  const getModules = (courses: ProgrammeCourse[]): Module[] => {
-    const modules: Record<string, ProgrammeCourse[]> = {}
-    courses.forEach(course => {
-      const code = course.parent_code!
-      modules[code] ??= []
-      modules[code].push(course)
-    })
+  // A combined programme has courses from two curriculums. Show them in one table, first programme's modules first.
+  const modules = useMemo(
+    () =>
+      curriculum
+        ? [
+            ...getModules(curriculum.defaultProgrammeCourses ?? [], degreeProgramme),
+            ...(secondProgramme ? getModules(curriculum.secondProgrammeCourses ?? [], secondProgramme) : []),
+          ]
+        : [],
+    [curriculum, degreeProgramme, secondProgramme]
+  )
 
-    return orderBy(
-      Object.entries(modules).map(([code, courses]) => ({
-        code,
-        courses,
-        order: courses[0].module_order,
-      })),
-      module => module.code
-    )
-  }
-
-  useEffect(() => {
-    if (!curriculum?.defaultProgrammeCourses?.length) {
-      return
-    }
-
-    setDefaultProgrammeModules(getModules(curriculum.defaultProgrammeCourses))
-    if (combinedProgramme) {
-      setSecondProgrammeModules(getModules(curriculum.secondProgrammeCourses))
-    }
-  }, [combinedProgramme, curriculum])
+  const programmeNames = Object.fromEntries(
+    [degreeProgramme, secondProgramme]
+      .filter(code => code !== undefined)
+      .map(code => {
+        const programme = programmes?.allProgrammes?.[code] ?? programmes?.filteredProgrammes?.[code]
+        return [code, programme ? getTextIn(programme.name)! : code]
+      })
+  )
 
   if (!curriculum || !criteria) return null
 
   const hasCriteria = isBachelorOrLicentiateProgramme(degreeProgramme)
-  const hasModules = !!defaultProgrammeModules.length || !!secondProgrammeModules.length
-
-  const renderCourseTables = (tab: DegreeSettingsTab) =>
-    hasModules && (
+  const renderCourseTable = (tab: DegreeSettingsTab) =>
+    !!modules.length && (
       <Section infoBoxContent={getTextIn(sectionTexts[tab].toolTip) ?? ''} title={sectionTexts[tab].title}>
-        <Stack gap={2}>
-          {!!defaultProgrammeModules.length && (
-            <DegreeCourseTable
-              combinedProgramme=""
-              criteria={criteria}
-              curriculumVersion={curriculum.periodIds}
-              modules={defaultProgrammeModules}
-              showCriteria={tab === 'criteria'}
-              showVisibility={tab === 'visibility'}
-              studyProgramme={degreeProgramme}
-            />
-          )}
-          {!!secondProgrammeModules.length && (
-            <DegreeCourseTable
-              combinedProgramme={combinedProgramme}
-              criteria={criteria}
-              curriculumVersion={curriculum.periodIds}
-              modules={secondProgrammeModules}
-              showCriteria={tab === 'criteria'}
-              showVisibility={tab === 'visibility'}
-              studyProgramme={degreeProgramme}
-            />
-          )}
-        </Stack>
+        <DegreeCourseTable
+          criteria={criteria}
+          curriculumVersion={curriculum.periodIds}
+          modules={modules}
+          programmeNames={programmeNames}
+          showCriteria={tab === 'criteria'}
+          showVisibility={tab === 'visibility'}
+          studyProgramme={degreeProgramme}
+        />
       </Section>
     )
 
@@ -118,7 +112,7 @@ export const DegreeCoursesTab = ({
   const visibilityPanel = (
     <Stack gap={2}>
       {curriculumSection}
-      {renderCourseTables('visibility')}
+      {renderCourseTable('visibility')}
     </Stack>
   )
 
@@ -140,7 +134,7 @@ export const DegreeCoursesTab = ({
             <Stack gap={2}>
               {curriculumSection}
               <CreditCriteriaSection criteria={criteria} degreeProgramme={degreeProgramme} />
-              {renderCourseTables('criteria')}
+              {renderCourseTable('criteria')}
             </Stack>
           </Box>
           <Box data-cy="visibility-panel" hidden={currentTab !== 'visibility'}>

@@ -34,6 +34,40 @@ test.describe('DegreeCourseTable', () => {
       'Year 3',
     ])
     await expect(component.getByText('1 / 2')).toBeVisible()
+    await expect(component.locator('[data-cy^="programme-row-"]')).toHaveCount(0)
+  })
+
+  test('combined programme shows both curriculums in one table, first programme first', async ({ mount, page }) => {
+    const component = await mount(<DegreeCourseTableWrapper combined studyProgramme="KH90_001" />)
+
+    await expect(page.locator('[data-cy="degree-course-table"]')).toHaveCount(1)
+    await expect(component.getByRole('columnheader', { name: 'Year 6' })).toBeVisible()
+    await expect(component.locator('tbody tr')).toHaveText([
+      'First programme (KH90_001)',
+      /^Basic studies/,
+      'Second programme (MH90_001)',
+      /^Clinical studies/,
+    ])
+  })
+
+  test('hiding a course of the second programme only hides it there', async ({ mount }) => {
+    const component = await mount(<DegreeCourseTableWrapper combined showCriteria={false} studyProgramme="KH90_001" />)
+
+    await component.getByText('Clinical studies').click()
+    await component.getByRole('checkbox', { name: 'Show Calculus I' }).uncheck()
+    await component.getByText('Basic studies').click()
+
+    const calculusSwitches = component.getByRole('checkbox', { name: 'Show Calculus I' })
+    await expect(calculusSwitches.first()).toBeChecked()
+    await expect(calculusSwitches.last()).not.toBeChecked()
+    await expect
+      .poll(() => exclusionRequests)
+      .toEqual([
+        {
+          method: 'POST',
+          body: { courseGroupIds: ['group-MAT101'], curriculumVersion: 'period-1', programmeCode: 'MH90_001' },
+        },
+      ])
   })
 
   test('shows six years for medicine', async ({ mount }) => {

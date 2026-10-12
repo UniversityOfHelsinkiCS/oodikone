@@ -138,7 +138,7 @@ export const StudyProgramme = () => {
         label: 'Degree programme settings',
         component: (
           <CurriculumProvider key="DegreeCoursesTabContent" programmeCode={programmeId} year={new Date().getFullYear()}>
-            <DegreeCoursesTab combinedProgramme={secondProgrammeId} degreeProgramme={programmeId} />
+            <DegreeCoursesTab degreeProgramme={programmeId} />
           </CurriculumProvider>
         ),
       },

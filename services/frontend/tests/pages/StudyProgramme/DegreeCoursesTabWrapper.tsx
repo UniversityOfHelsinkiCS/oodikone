@@ -15,7 +15,7 @@ export const DegreeCoursesTabWrapper = ({
   <ReduxWrapper
     component={
       <CurriculumProvider programmeCode={programme} year={2024}>
-        <DegreeCoursesTab combinedProgramme="" degreeProgramme={programme} initialTab={initialTab} />
+        <DegreeCoursesTab degreeProgramme={programme} initialTab={initialTab} />
       </CurriculumProvider>
     }
   />
