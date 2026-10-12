@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { generateGradientColors } from '@/util/color'
-import { NameWithCode } from '@oodikone/shared/types'
+import { Name } from '@oodikone/shared/types'
 
 export const ProgrammeProgressChart = ({
   data,
@@ -14,7 +14,7 @@ export const ProgrammeProgressChart = ({
 }: {
   data: number[][]
   labels: string[]
-  longLabels: Record<string, NameWithCode>
+  longLabels: Record<string, Name | string>
   names: string[]
 }) => {
   const { getTextIn } = useLanguage()
@@ -75,7 +75,7 @@ export const ProgrammeProgressChart = ({
     type: 'bar',
     stack: 'total',
     itemStyle: {
-      color: colors[index],
+      color: seriesItem.name === 'Graduated' ? '#ddd' : colors[index],
     },
     label: {
       show: true,

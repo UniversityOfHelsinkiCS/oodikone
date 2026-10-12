@@ -54,6 +54,7 @@ const createYearlyTitles = (limitList: CreditLimits) => {
 const calculateProgressStats = (
   level: 'bachelor' | 'master' | 'bcMs' | 'doctor',
   creditCounts: Record<string, number[]>,
+  graduatedCount: Record<string, number>,
   yearlyTitles: Record<string, string[][]>,
   progressStats: Record<string, Record<string, number[][]>>,
   progId: string
@@ -76,7 +77,7 @@ const calculateProgressStats = (
   if (level !== 'doctor' && !(level in yearlyTitles)) {
     yearlyTitles[level] = []
     for (const year of Object.values(limitsForYears)) {
-      yearlyTitles[level].unshift(createYearlyTitles(year))
+      yearlyTitles[level].unshift([...createYearlyTitles(year), 'Graduated'])
     }
   }
 
@@ -93,7 +94,7 @@ const calculateProgressStats = (
       const correctIndex = limit.length - 1 - limit.findIndex(element => credits >= (element[0] ?? 0))
       statsForYear[correctIndex] += 1
     }
-    progressStats[level][progId].unshift(statsForYear)
+    progressStats[level][progId].unshift([...statsForYear, graduatedCount[year] ?? 0])
   }
 }
 
@@ -165,11 +166,11 @@ export const combineFacultyStudentProgress = async (
     const level = programmeTypes[degreeProgrammeType]
 
     updateCreditAndGraduatedCount(level, stats.creditCounts, stats.graduatedCount)
-    calculateProgressStats(level, stats.creditCounts, yearlyTitles, progressStats, progId)
+    calculateProgressStats(level, stats.creditCounts, stats.graduatedCount, yearlyTitles, progressStats, progId)
 
     if (level === 'master' && Object.keys(stats.creditCountsCombo).length > 0) {
       updateCreditAndGraduatedCount('bcMs', stats.creditCountsCombo, stats.graduatedCount)
-      calculateProgressStats('bcMs', stats.creditCountsCombo, yearlyTitles, progressStats, progId)
+      calculateProgressStats('bcMs', stats.creditCountsCombo, stats.graduatedCount, yearlyTitles, progressStats, progId)
     }
   }
 

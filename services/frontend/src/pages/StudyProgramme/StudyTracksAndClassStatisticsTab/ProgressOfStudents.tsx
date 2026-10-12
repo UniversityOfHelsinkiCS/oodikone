@@ -2,7 +2,11 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { ProgressBarChart } from '@/components/Charts/ProgressBarChart'
-import { ProgressTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressTable'
+import {
+  ProgressTable,
+  StudyTrackProgressStats,
+} from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressTable'
+import { Name } from '@oodikone/shared/types'
 
 type ProgressStats = {
   chartStats: {
@@ -17,11 +21,17 @@ export const ProgressOfStudents = ({
   progressComboStats,
   progressStats,
   studyProgramme,
+  studyTrackComboStats,
+  studyTrackStats,
+  studyTracks,
   years,
 }: {
   progressComboStats: ProgressStats | null
   progressStats: ProgressStats | null
   studyProgramme: string
+  studyTrackComboStats?: StudyTrackProgressStats | null
+  studyTrackStats?: StudyTrackProgressStats | null
+  studyTracks?: Record<string, string | Name>
   years: string[]
 }) => {
   return (
@@ -37,7 +47,12 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressComboStats.tableStats} titles={progressComboStats.tableTitles} />
+          <ProgressTable
+            data={progressComboStats.tableStats}
+            studyTrackStats={studyTrackComboStats}
+            studyTracks={studyTracks}
+            titles={progressComboStats.tableTitles}
+          />
         </Stack>
       )}
       {progressStats !== null && (
@@ -51,7 +66,12 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressStats.tableStats} titles={progressStats.tableTitles} />
+          <ProgressTable
+            data={progressStats.tableStats}
+            studyTrackStats={studyTrackStats}
+            studyTracks={studyTracks}
+            titles={progressStats.tableTitles}
+          />
         </Stack>
       )}
     </Stack>

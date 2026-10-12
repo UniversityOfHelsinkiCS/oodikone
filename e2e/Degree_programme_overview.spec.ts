@@ -380,6 +380,18 @@ test.describe('Degree programme overview', () => {
       await checkTableStats(page, tableContents, 'study-programme-progress')
     })
 
+    test('Years in the student progress table can be expanded and study track data will be shown', async ({ page }) => {
+      const table = page.getByTestId('study-programme-progress-data-table').locator('tbody')
+      const row = table.locator('tr').filter({ hasText: '2020 - 2021' })
+      const studyTracks = ['MAT-EKO', 'MAT-MAT', 'MAT-TIE', 'MAT-TIL']
+
+      await row.getByRole('button').click()
+      await Promise.all(studyTracks.map(studyTrack => expect(table.getByText(studyTrack)).toBeVisible()))
+
+      await row.getByRole('button').click()
+      await Promise.all(studyTracks.map(studyTrack => expect(table.getByText(studyTrack)).not.toBeVisible()))
+    })
+
     test('Progress section', async ({ page }) => {
       const barChart = page.getByTestId('programme-progress-bar-chart-section')
       await expect(barChart.getByText('Less than 30 credits')).toBeVisible()
