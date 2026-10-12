@@ -28,8 +28,8 @@ Run without a command to open the interactive menu.
 
 Available commands:
 
-  up, u                 Start Oodikone with real data
-  rs, rl                 Restart Oodikone with real data (down, then up)
+  up, u, r, real        Start Oodikone with real data
+  rs, rl                Restart Oodikone with real data (down, then up)
   anon, a               Start Oodikone with anonymous data
   down, d               Stop Oodikone
 
@@ -312,7 +312,7 @@ cmd_install() {
 setup_colors
 
 case "${1-}" in
-  up|u)
+  up|u|r|real)
     shift
     run_up "$@"
     ;;
