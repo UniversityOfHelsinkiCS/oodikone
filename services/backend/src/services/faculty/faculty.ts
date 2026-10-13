@@ -8,23 +8,13 @@ import { dbConnections } from '../../database/connection'
 import { OrganizationModel } from '../../models'
 import { ApplicationError } from '../../util/customErrors'
 import { now } from '../../util/clock'
-import { CurriculumPeriods, getCurriculumPeriods } from '../curriculumPeriods'
+import { isRelevantProgramme } from '../studyProgramme/studyProgrammeHelpers'
 
 const { sequelize } = dbConnections
 
-const mapCurriculumPeriodIdToYear = (curriculumPeriodId: string, curriculumPeriods: CurriculumPeriods) => {
-  const curriculumPeriod = curriculumPeriods[curriculumPeriodId]
-
-  if (curriculumPeriod) {
-    return { startDate: curriculumPeriod.startDate, endDate: curriculumPeriod.endDate }
-  }
-  // Returns impossible default if there is not curriculumPeriods for some reason
-  return { startDate: new Date('1800-08-01'), endDate: new Date('1801-08-01') }
-}
-
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
-export const getDegreeProgrammesOfOrganization = async (organizationId: string, onlyCurrentProgrammes: boolean) => {
+export const getDegreeProgrammesOfOrganization = async (organizationId: string, onlyNewProgrammes: boolean) => {
   const programmesOfOrganization: Array<Omit<ProgrammeModuleWithRelevantAttributes, 'progId'> & { validFrom: Date }> =
     await sequelize.query(
       `
@@ -60,7 +50,6 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
       programme.code in programmeCodes ? programmeCodes[programme.code as keyof typeof programmeCodes] : programme.code,
   }))
   const programmesGroupedByCode = groupBy(orderBy(programmesWithProgIds, ['validFrom'], ['desc']), prog => prog.code)
-  const curriculumPeriods = await getCurriculumPeriods()
   const relevantProgrammes: ProgrammeModuleWithRelevantAttributes[] = []
 
   for (const programmeVersions of Object.values(programmesGroupedByCode)) {
@@ -71,20 +60,9 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
     }
     const { code, name, degreeProgrammeType, progId } = newestProgrammeVersion
 
-    const yearsOfProgramme = programmeVersions
-      .map(prog =>
-        prog.curriculumPeriodIds.map(curriculumPeriodId => {
-          return mapCurriculumPeriodIdToYear(curriculumPeriodId, curriculumPeriods)
-        })
-      )
-      .flat()
-    const isRelevantProgramme =
-      !onlyCurrentProgrammes ||
-      // Include also older doctoral programmes so that there are stats for 2017-2025
-      (onlyCurrentProgrammes && code.startsWith('T')) ||
-      (onlyCurrentProgrammes && yearsOfProgramme.some(year => year.startDate <= now() && now() <= year.endDate))
+    const shouldIncludeProgramme = !onlyNewProgrammes || isRelevantProgramme(code)
 
-    if (isRelevantProgramme) {
+    if (shouldIncludeProgramme) {
       relevantProgrammes.push({
         code,
         curriculumPeriodIds: programmeVersions.map(prog => prog.curriculumPeriodIds).flat(),
@@ -99,7 +77,7 @@ export const getDegreeProgrammesOfOrganization = async (organizationId: string, 
 
 export type ProgrammesOfOrganization = ProgrammeModuleWithRelevantAttributes[]
 
-export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurrentProgrammes: boolean) => {
+export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyNewProgrammes: boolean) => {
   const organization: Pick<OrganizationModel, 'id'> | null = await OrganizationModel.findOne({
     raw: true,
     attributes: ['id'],
@@ -110,7 +88,7 @@ export const getDegreeProgrammesOfFaculty = async (facultyCode: string, onlyCurr
   if (!organization) {
     throw new ApplicationError(`The organization with the code ${facultyCode} was not found.`)
   }
-  return getDegreeProgrammesOfOrganization(organization.id, onlyCurrentProgrammes)
+  return getDegreeProgrammesOfOrganization(organization.id, onlyNewProgrammes)
 }
 
 export const getFacultyCodeById = async (facultyId: string): Promise<Pick<Organization, 'code'> | null> =>
