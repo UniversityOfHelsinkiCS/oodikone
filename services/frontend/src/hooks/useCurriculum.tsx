@@ -7,6 +7,9 @@ type CurriculumContextType = {
   curriculum: ExtendedCurriculumDetails | null
   curriculumList: CurriculumOption[]
   setSelectedCurriculum: Dispatch<SetStateAction<CurriculumOption | null>>
+  /** The curriculum list or the selected curriculum is being loaded for the first time */
+  isLoading: boolean
+  isError: boolean
 }
 
 const CurriculumContext = createContext<CurriculumContextType | null>(null)
@@ -21,10 +24,13 @@ export const CurriculumProvider = ({
   year: string | number | undefined
   children: ReactNode
 }) => {
-  const [curriculum, curriculumList, setSelectedCurriculum] = useCurriculumState(programmeCode, year)
+  const [curriculum, curriculumList, setSelectedCurriculum, { isLoading, isError }] = useCurriculumState(
+    programmeCode,
+    year
+  )
   const value = useMemo(
-    () => ({ curriculum, curriculumList, setSelectedCurriculum }),
-    [curriculum, curriculumList, setSelectedCurriculum]
+    () => ({ curriculum, curriculumList, setSelectedCurriculum, isLoading, isError }),
+    [curriculum, curriculumList, setSelectedCurriculum, isLoading, isError]
   )
 
   return <CurriculumContext.Provider value={value}>{children}</CurriculumContext.Provider>

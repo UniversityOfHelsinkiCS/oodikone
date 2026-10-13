@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
 
 import { orderBy } from 'lodash-es'
 import { useMemo, useState } from 'react'
@@ -17,6 +18,8 @@ import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
 import { ProgrammeCourse } from '@oodikone/shared/types'
 import { getCombinedProgramme } from '@oodikone/shared/util/studyProgramme'
 import { Section } from '@/components/Section'
+import { ErrorMessage } from '@/components/Section/ErrorMessage'
+import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 
@@ -60,10 +63,20 @@ export const DegreeCoursesTab = ({
   initialTab?: DegreeSettingsTab
 }) => {
   const [currentTab, setCurrentTab] = useState<DegreeSettingsTab>(initialTab)
-  const { data: criteria } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
+  const {
+    data: criteria,
+    isLoading: criteriaLoading,
+    isError: criteriaError,
+  } = useGetProgressCriteriaQuery({ programmeCode: degreeProgramme })
   const { data: programmes } = useGetProgrammesQuery()
   const { getTextIn } = useLanguage()
-  const { curriculum, curriculumList, setSelectedCurriculum: setCurriculum } = useCurriculum()
+  const {
+    curriculum,
+    curriculumList,
+    setSelectedCurriculum: setCurriculum,
+    isLoading: curriculumLoading,
+    isError: curriculumError,
+  } = useCurriculum()
   const secondProgramme = getCombinedProgramme(degreeProgramme)
 
   // A combined programme has courses from two curriculums. Show them in one table, first programme's modules first.
@@ -87,7 +100,24 @@ export const DegreeCoursesTab = ({
       })
   )
 
-  if (!curriculum || !criteria) return null
+  if (!curriculum || !criteria) {
+    return (
+      <Stack gap={2}>
+        <ManageCoursesShownInfo />
+        {criteriaLoading || curriculumLoading ? (
+          <Box data-cy="degree-settings-loading">
+            <LoadingSkeleton />
+          </Box>
+        ) : criteriaError || curriculumError ? (
+          <ErrorMessage />
+        ) : (
+          <Typography color="text.secondary" fontStyle="italic" textAlign="center">
+            No curriculum found for this programme
+          </Typography>
+        )}
+      </Stack>
+    )
+  }
 
   const hasCriteria = isBachelorOrLicentiateProgramme(degreeProgramme)
   const renderCourseTable = (tab: DegreeSettingsTab) =>

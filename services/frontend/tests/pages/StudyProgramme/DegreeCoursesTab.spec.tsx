@@ -128,4 +128,47 @@ test.describe('DegreeCoursesTab', () => {
     await expect(criteriaPanel.getByText('Clinical studies')).toBeVisible()
     await expect(criteriaPanel.getByRole('columnheader', { name: 'Year 6' })).toBeVisible()
   })
+
+  test('shows a loading indicator until the curriculum has loaded', async ({ mount, router }) => {
+    let releaseCurriculum!: () => void
+    const curriculumGate = new Promise<void>(resolve => {
+      releaseCurriculum = resolve
+    })
+    await router.route('**/api/curriculum/*/*', async route => {
+      await curriculumGate
+      await route.fulfill({
+        json: {
+          defaultProgrammeCourses: [course],
+          defaultProgrammeModules: [],
+          secondProgrammeCourses: [],
+          secondProgrammeModules: [],
+        },
+      })
+    })
+    const component = await mount(<DegreeCoursesTabWrapper programme="KH50_001" />)
+
+    await expect(component.locator('[data-cy="degree-settings-loading"]')).toBeVisible()
+    await expect(component.getByRole('tab')).toHaveCount(0)
+
+    releaseCurriculum()
+
+    await expect(component.getByRole('tab', { name: 'Progress tab criteria' })).toBeVisible()
+    await expect(component.locator('[data-cy="degree-settings-loading"]')).toHaveCount(0)
+  })
+
+  test('tells when the programme has no curriculum', async ({ mount, router }) => {
+    await router.route('**/api/curriculum-options/*', route => route.fulfill({ json: [] }))
+    const component = await mount(<DegreeCoursesTabWrapper programme="KH50_001" />)
+
+    await expect(component.getByText('No curriculum found for this programme')).toBeVisible()
+    await expect(component.locator('[data-cy="degree-settings-loading"]')).toHaveCount(0)
+  })
+
+  test('shows an error when loading fails', async ({ mount, router }) => {
+    await router.route('**/api/programme-criteria?*', route => route.fulfill({ status: 500, json: {} }))
+    const component = await mount(<DegreeCoursesTabWrapper programme="KH50_001" />)
+
+    await expect(component.getByText('Something went wrong, please try refreshing the page')).toBeVisible()
+    await expect(component.locator('[data-cy="degree-settings-loading"]')).toHaveCount(0)
+  })
 })

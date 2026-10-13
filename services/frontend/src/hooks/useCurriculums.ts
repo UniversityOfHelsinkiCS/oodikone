@@ -8,13 +8,19 @@ export type ExtendedCurriculumDetails = CurriculumDetails & CurriculumOption
 export const useCurriculumState = (
   programmeCode: string,
   year: string | number | undefined
-): [ExtendedCurriculumDetails | null, CurriculumOption[], Dispatch<SetStateAction<CurriculumOption | null>>] => {
+): [
+  ExtendedCurriculumDetails | null,
+  CurriculumOption[],
+  Dispatch<SetStateAction<CurriculumOption | null>>,
+  { isLoading: boolean; isError: boolean },
+] => {
   const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumOption | null>(null)
 
-  const { data: curriculumList = [], isFetching: curriculumsLoading } = useGetCurriculumOptionsQuery(
-    { code: programmeCode },
-    { skip: !programmeCode }
-  )
+  const {
+    data: curriculumList = [],
+    isFetching: curriculumsLoading,
+    isError: curriculumsError,
+  } = useGetCurriculumOptionsQuery({ code: programmeCode }, { skip: !programmeCode })
 
   const chosenCurriculum: CurriculumOption | null =
     selectedCurriculum ??
@@ -22,7 +28,11 @@ export const useCurriculumState = (
     curriculumList[0] ??
     null
 
-  const { data: curriculumData } = useGetCurriculumsQuery(
+  const {
+    data: curriculumData,
+    isLoading: curriculumLoading,
+    isError: curriculumError,
+  } = useGetCurriculumsQuery(
     {
       code: programmeCode,
       periodIds: chosenCurriculum?.periodIds,
@@ -35,5 +45,10 @@ export const useCurriculumState = (
     [curriculumData, chosenCurriculum]
   )
 
-  return [curriculum, curriculumList, setSelectedCurriculum]
+  return [
+    curriculum,
+    curriculumList,
+    setSelectedCurriculum,
+    { isLoading: curriculumsLoading || curriculumLoading, isError: curriculumsError || curriculumError },
+  ]
 }
