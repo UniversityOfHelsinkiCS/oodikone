@@ -1,4 +1,4 @@
-import { orderBy } from 'lodash-es'
+import { isEqual, orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
 import { Credit, SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
@@ -29,6 +29,9 @@ export function getYearsArray(since: number, isAcademicYear: boolean, yearsCombi
 
   return years
 }
+
+export const hasCurrentYears = (years: Array<string | number>, isAcademicYear: boolean) =>
+  isEqual(years, getYearsArray(getStartDate(isAcademicYear).getFullYear(), isAcademicYear))
 
 export function getYearsObject(params: { years: Array<string | number>; emptyArrays: true }): Record<string, []>
 export function getYearsObject(params: { years: Array<string | number>; emptyArrays?: false }): Record<string, number>

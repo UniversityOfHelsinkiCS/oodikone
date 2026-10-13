@@ -5,6 +5,7 @@ import {
   getYearlyMonthlyCreditsObj,
   getYearsArray,
   getYearsObject,
+  hasCurrentYears,
 } from '@/services/studyProgramme/studyProgrammeHelpers'
 import { clockStorage } from '@/util/clock'
 
@@ -133,5 +134,30 @@ void describe('Get monthly credits', () => {
     atTime('2024-10-15T12:00:00', () => getMonthlyCredits(credits, new Date('2024-08-01'), 2024, monthlyCredits))
 
     assert.deepStrictEqual(monthlyCredits, { '2024-8': [5], '2024-9': [5], '2024-10': [8] })
+  })
+})
+
+void describe('Has current years', () => {
+  const atTime = <T>(date: string, fn: () => T) => clockStorage.run({ now: new Date(date) }, fn)
+  const academicYears = (until: number) =>
+    Array.from({ length: until - 2017 + 1 }, (_, i) => `${2017 + i} - ${2018 + i}`)
+  const calendarYears = (until: number) => Array.from({ length: until - 2017 + 1 }, (_, i) => 2017 + i)
+
+  it('should accept academic years computed in the same academic year', () => {
+    assert.isTrue(atTime('2026-10-13T12:00:00', () => hasCurrentYears(academicYears(2026), true)))
+    assert.isTrue(atTime('2026-03-01T12:00:00', () => hasCurrentYears(academicYears(2025), true)))
+  })
+
+  it('should reject academic years computed before the academic year changed', () => {
+    assert.isFalse(atTime('2026-10-13T12:00:00', () => hasCurrentYears(academicYears(2025), true)))
+  })
+
+  it('should compare calendar years against the current calendar year', () => {
+    assert.isTrue(atTime('2026-03-01T12:00:00', () => hasCurrentYears(calendarYears(2026), false)))
+    assert.isFalse(atTime('2026-03-01T12:00:00', () => hasCurrentYears(calendarYears(2025), false)))
+  })
+
+  it('should not mix up academic and calendar years', () => {
+    assert.isFalse(atTime('2026-10-13T12:00:00', () => hasCurrentYears(calendarYears(2026), true)))
   })
 })

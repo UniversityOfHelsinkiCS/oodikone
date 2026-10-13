@@ -1,9 +1,10 @@
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, isEqual } from 'lodash-es'
 
 import { NameWithCode, DegreeProgrammeType } from '@oodikone/shared/types'
 import { BasicStats } from '@oodikone/shared/types/studyProgramme'
 import { getBasicStats, setBasicStats } from '../analyticsService'
 import { getBasicStatsForStudytrack } from '../studyProgramme/studyProgrammeBasics'
+import { hasCurrentYears, tableTitles } from '../studyProgramme/studyProgrammeHelpers'
 import type { ProgrammesOfOrganization } from './faculty'
 
 const calculateCombinedStats = async (
@@ -31,7 +32,14 @@ const calculateCombinedStats = async (
       isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
       includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
     )
-    if (statsFromRedis) {
+
+    // Guard against stale state: cached data may have less data than expected if changes done or semester changed.
+    const redisDataUpToDate =
+      statsFromRedis &&
+      hasCurrentYears(statsFromRedis.years, isAcademicYear) &&
+      isEqual(statsFromRedis.titles, tableTitles.basics[includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'])
+
+    if (redisDataUpToDate) {
       statsFromAllProgrammes.push(statsFromRedis)
       continue
     }

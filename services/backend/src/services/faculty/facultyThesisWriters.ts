@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es'
 import { DegreeProgrammeType, type NameWithCode } from '@oodikone/shared/types'
 import { getGraduationStats, setGraduationStats } from '../analyticsService'
 import { getGraduationStatsForStudyTrack } from '../studyProgramme/studyProgrammeGraduations'
+import { hasCurrentYears } from '../studyProgramme/studyProgrammeHelpers'
 import { getDegreeProgrammesOfFaculty, ProgrammesOfOrganization } from './faculty'
 
 const calculateCombinedStats = async (
@@ -36,7 +37,7 @@ const calculateCombinedStats = async (
       isAcademicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR',
       includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
     )
-    if (statsFromRedis) {
+    if (statsFromRedis && hasCurrentYears(statsFromRedis.years, isAcademicYear)) {
       newStats.push(statsFromRedis)
       continue
     }
