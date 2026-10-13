@@ -191,16 +191,23 @@ However this is optional and you can create a new tag without selecting year.
 
   degreeCoursesTab: {
     creditCriteria: {
-      en: `The targets set here will affect the Class Statistics → Students tab → Progress tab view.
+      en: `Cumulative credit gain targets for the degree programme. The targets set here will affect the Class Statistics → Students tab → Progress tab view.
 
-Credit criteria is computed as follows: for the first academic year, the credits are counted
+Credits are computed as follows: for the first academic year, the credits are counted
 if they are completed during the first 12 months. For the second year, completions
-within the first 24 months. Third year, the first 36 months, and so on.
-`,
-      fi: `Tässä asetetut tavoitteet vaikuttavat Class Statistics → Students tab → Progress tab näkymään.
+within the first 24 months. Third year, the first 36 months, and so on. Credits completed before starting studies in the degree programme are therefore not counted.
 
-Laskenta toimii seuraavasti: ensimmäisen akateemisen vuoden opintopisteet lasketaan, jos ne ovat suoritettu ensimmäisen 12 kuukauden ajalla. Toisen vuoden opintopisteet, jos ne ovat suoritettu ensimmäisen 24 kuukauden aikana. Kolmas, ensimmäiset 36kk, ja niin edelleen.
+**Example:** Year 1 target 45 credits, year 2 target 90 credits.
+- A student completed 40 credits during their first year of studies -> year 1 target **not reached**.
+- The same student had completed 90 credits in total by the end of academic year 2 -> year 2 target **reached**.
 `,
+      fi: `Kumulatiiviset opintopistetavoitteet koulutusohjelmalle. Tässä asetetut tavoitteet vaikuttavat Class Statistics → Students tab → Progress tab näkymään.
+
+Laskenta toimii seuraavasti: ensimmäisen akateemisen vuoden opintopisteet lasketaan, jos ne ovat suoritettu ensimmäisen 12 kuukauden ajalla. Toisen vuoden opintopisteet, jos ne ovat suoritettu ensimmäisen 24 kuukauden aikana. Kolmas, ensimmäiset 36kk, ja niin edelleen. Opintoja, jotka ovat kirjattu ajalle ennen koulutusohjelmassa aloittamista ei huomioida.
+
+**Esimerkki:** Vuoden 1 tavoite 45 op., vuoden 2 tavoite 90 op.
+- Opiskelija suoritti ensimmäisenä vuonnaan 40 op. -> 1. vuoden tavoitteeseen **ei päästy**
+- Sama opiskelija oli suorittanut toisen vuoden loppuun mennessä yhteensä 90 op. -> 2. vuoden tavoitteeseen **päästiin**`,
     },
     requiredCourses: {
       en: `Click a module to see its courses in the selected curriculum.
@@ -216,13 +223,9 @@ Valitse vuosi, jolloin kurssi on tarkoitus suorittaa. Kurssi näytetään kyseis
 Hiding a course also hides it in the Courses of Class view and Students → Courses tab for all users. Hiding a module hides all of its courses.`,
       fi: `Klikkaa opintokokonaisuutta nähdäksesi sen kurssit valitussa opetussuunnitelmassa.
 
-Kurssin piilottaminen piilottaa sen kaikilta käyttäjiltä myös Courses of Class ja Students → Courses tab -näkymissä. Opintokokonaisuuden piilottaminen piilottaa kaikki sen kurssit.`,
+Piilotetut kurssit eivät ole näkyvissä **Courses of Class**, **Students → Courses tab** tai **Students → Modules tab** -näkymissä. Opintokokonaisuuden piilottaminen piilottaa kaikki sen kurssit.`,
     },
   },
-  // Not used
-  notCompleted: `
-Sisältää opiskelijat, jotka ovat ilmoittautuneet kurssille, mutta eivät ole suorittaneet sitä ja opiskelijat, jotka ovat saaneet hylätyn arvosanan.
-`,
 }
 
 studyProgrammeToolTips.common.studyTrackOverviewCombinedProgramme = studyProgrammeToolTips.common.studyTrackOverview

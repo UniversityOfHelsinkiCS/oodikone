@@ -92,7 +92,7 @@ export const CreditCriteriaSection = ({
                 <TextField
                   error={error}
                   fullWidth
-                  label={`${input.label} year (${(index + 1) * 12} months)`}
+                  label={`By the end of the ${input.label} year (${(index + 1) * 12} months)`}
                   onChange={event => setCreditLimits({ ...creditLimits, [input.key]: Number(event.target.value) })}
                   size="small"
                   slotProps={{
