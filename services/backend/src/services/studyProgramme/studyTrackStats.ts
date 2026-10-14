@@ -453,8 +453,8 @@ const getMainStatsByTrackAndYear = async (
             ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
             : {}
 
-          creditCountsComboByTrack[studyTrack][startYear].push(
-            getCreditCount(studyRight.student.credits, startedInProgramme)
+          creditCountsComboByTrack[studyTrack][bachelorsStartYear]?.push(
+            getCreditCount(studyRight.student.credits, startedInBachelor)
           )
         }
       } else {

@@ -15,6 +15,7 @@ import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { Section } from '@/components/Section'
 import { exportStudentTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/exportStudentTable'
 import { ProgressOfStudents } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressOfStudents'
+import { StudyTrackProgressStats } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/ProgressTable'
 import { StudentProgressPercentiles } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudentProgressPercentiles'
 import { StudyTrackDataTable } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable'
 import { StudyTrackSelector } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackSelector'
@@ -123,6 +124,41 @@ export const StudyTracksAndClassStatisticsTab = ({
   }
 
   const hasStudyTracks = Object.keys(studyTrackStats?.studyTracks ?? {}).length > 1 && studyTrack === studyProgramme
+
+  const getStudyTrackProgressStats = (combo = false): StudyTrackProgressStats | null => {
+    if (!hasStudyTracks || !studyTrackStats) return null
+
+    const creditCountsByTrack = combo ? studyTrackStats.creditCountsComboByTrack : studyTrackStats.creditCountsByTrack
+    const maximumAmountOfCredits = combo ? targetCredits + 180 : targetCredits
+    // console.log('Study track stats:', studyTrackStats, maximumAmountOfCredits)
+
+    // Tracks whose students have all graduated have no credit counts, but should still be shown
+    const tracks = new Set([
+      ...Object.keys(creditCountsByTrack ?? {}),
+      ...Object.keys(studyTrackStats.graduatedCountByTrack ?? {}),
+    ])
+    tracks.delete(studyProgramme)
+    const emptyCreditCounts = Object.fromEntries(
+      studyTrackStats.years.filter(year => year !== 'Total').map(year => [year, [] as number[]])
+    )
+
+    return Object.fromEntries(
+      [...tracks].map(track => {
+        const stats = calculateStats(
+          { ...emptyCreditCounts, ...creditCountsByTrack?.[track] },
+          studyTrackStats.graduatedCountByTrack[track],
+          maximumAmountOfCredits
+        )
+        const statsByYear = Object.fromEntries(
+          (stats?.tableStats ?? [])
+            .filter(([year]) => year !== 'Total')
+            .map(([year, , ...counts]) => [year, counts as number[]])
+        )
+        return [track, statsByYear]
+      })
+    )
+  }
+
   const isStudyProgrammeMode = studyTrack === '' || studyTrack === studyProgramme
 
   const calculateStudyTrackStats = (combo = false) => {
@@ -284,6 +320,9 @@ export const StudyTracksAndClassStatisticsTab = ({
             progressComboStats={getProgressComboStats()}
             progressStats={getProgressStats()}
             studyProgramme={studyProgramme}
+            studyTrackComboStats={getStudyTrackProgressStats(true)}
+            studyTrackStats={getStudyTrackProgressStats(false)}
+            studyTracks={studyTrackStats.studyTracks}
             years={studyTrackStats.years}
           />
         )}
