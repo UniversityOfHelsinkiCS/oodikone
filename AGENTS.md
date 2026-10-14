@@ -58,6 +58,9 @@ The app runs at `http://localhost:3000` and Adminer at `http://localhost:5050`. 
       Otherwise some tests fail.
 - API, service, component, and E2E tests require Docker; start the relevant environment with `npm run oodikone:test`
   or its documented profile. Report any checks that could not run and why.
+- Always start the anonymized containers (e.g. `npm run oodikone` or `npm run oodikone:test`) before running tests,
+  even if containers already seem to be running. They may be running with real production data, and tests must never
+  run against it.
 
 CI also validates Docker Compose files, Dockerfiles, shell scripts, workflows, and migrations. Keep such changes
 minimal and validate them locally where practical.
