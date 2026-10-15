@@ -1,86 +1,13 @@
-import Grid from '@mui/material/Grid2'
-import IconButton from '@mui/material/IconButton'
-import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { Fragment, useState } from 'react'
-
 import { PopulationLink } from '@/components/common/PopulationLink'
-import { StyledTable } from '@/components/common/StyledTable'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { StartingYearStatsTable, StatsTableGroup } from '@/components/common/StartingYearStatsTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { KeyboardArrowDownIcon, KeyboardArrowRightIcon } from '@/theme'
 import { DegreeProgramme } from '@/types/api/faculty'
+import { getCalendarYears } from '@/util/timeAndDate'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
-
-const getTableCell = (year: string, programme: string, value: number | string) => {
-  return (
-    <TableCell key={`${year}-${programme}-color-${Math.random()}`} sx={{ textAlign: 'right' }}>
-      {value}
-    </TableCell>
-  )
-}
-
-const getOtherCountriesList = ({
-  year,
-  code,
-  extraTableStats,
-}: {
-  year: string
-  code: string
-  extraTableStats: Record<string, Record<string, Record<string, number>>>
-}) => {
-  const countriesData = extraTableStats?.[year]?.[code]
-  if (!countriesData || Object.keys(countriesData).length === 0) {
-    return null
-  }
-
-  return Object.keys(countriesData)
-    .sort()
-    .map(country => (
-      <div key={country}>
-        {country}: <b>{countriesData[country]}</b>
-      </div>
-    ))
-}
-
-const getRows = (
-  extraTableStats: Record<string, Record<string, Record<string, number>>>,
-  programme: string,
-  programmeNames: Record<string, DegreeProgramme>,
-  programmeStats: Record<string, Record<string, (number | string)[]>>,
-  showPercentages: boolean,
-  year: string
-) => {
-  return programmeStats[programme][year].map((value, valIndex) => {
-    const key = `${programme}-${year}-${`${value}${valIndex}`}`
-    if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
-    const tableCell = getTableCell(year, programme, value)
-    if (valIndex === 19) {
-      const countriesPopupContent = getOtherCountriesList({
-        year,
-        code: programmeNames[programme].code,
-        extraTableStats,
-      })
-      if (!countriesPopupContent) {
-        return tableCell
-      }
-      return (
-        <Tooltip key={key} title={countriesPopupContent}>
-          {tableCell}
-        </Tooltip>
-      )
-    }
-    return tableCell
-  })
-}
 
 const degreeToIndex = {
   [DegreeProgrammeType.BACHELOR]: 'bachelor',
@@ -115,152 +42,55 @@ export const FacultyStudentDataTable = ({
   years: string[]
 }) => {
   'use memo'
-  const [yearsVisible, setVisible] = useState(new Array<boolean>(years.length).fill(false))
   const { getTextIn } = useLanguage()
-  const toggleVisibility = (yearIndex: number) => {
-    const arrayToModify = [...yearsVisible]
-    arrayToModify[yearIndex] = !yearsVisible[yearIndex]
-    setVisible(arrayToModify)
-  }
-  const infoText =
-    "Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for degree programmes."
+
+  const calendarYears = getCalendarYears(years).sort((a, b) => a - b)
+
+  const groups: StatsTableGroup[] = years
+    .filter(year => tableStats[year])
+    .map(year => ({
+      key: year,
+      label: year,
+      values: tableStats[year].slice(1),
+      children: sortedKeys
+        .filter(programme => !!programmeStats[programme][year]?.length)
+        .map(programme => {
+          const { code, degreeProgrammeType, name, progId } = programmeNames[programme]
+          const hasAccess = requiredRights.fullAccessToStudentData || requiredRights.programmeRights?.includes(code)
+
+          return {
+            key: programme,
+            label: (
+              <>
+                <Tooltip title={`${code} – ${getTextIn(name)}`}>
+                  <Typography component="span" fontSize="inherit" fontWeight="bold">
+                    {progId}
+                  </Typography>
+                </Tooltip>
+                {hasAccess ? (
+                  <PopulationLink
+                    programme={code}
+                    years={year === 'Total' ? calendarYears : [Number(year.slice(0, 4))]}
+                  />
+                ) : null}
+              </>
+            ),
+            values: programmeStats[programme][year],
+            otherCountries: extraTableStats?.[year]?.[code],
+            sx: theme => ({
+              backgroundColor: alpha(theme.palette.degreeProgrammeType[degreeToIndex[degreeProgrammeType]], 0.3),
+            }),
+          }
+        }),
+    }))
 
   return (
-    <TableContainer>
-      <StyledTable data-cy="faculty-student-stats-table" nowrapBody showCellBorders slimBody>
-        <TableHead>
-          <TableRow key="FirstHeader">
-            <TableCell colSpan={!showPercentages ? 3 : 4} />
-            <TableCell colSpan={!showPercentages ? 6 : 12}>Current status</TableCell>
-            <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
-            <TableCell colSpan={!showPercentages ? 2 : 4}>
-              <Stack direction="row" gap={1}>
-                Citizenships
-                <InfoBox content={infoText} mini />
-              </Stack>
-            </TableCell>
-          </TableRow>
-          <TableRow key="secondHeader">
-            {titles.map((title, index) => (
-              <TableCell
-                colSpan={[0, 1].includes(index) || !showPercentages ? 1 : 2}
-                key={title}
-                sx={{ textAlign: 'right' }}
-              >
-                {title}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {years.map((year, yearIndex) => {
-            // New queries only take in "years" number[]
-            const populationLinkYear =
-              year === 'Total'
-                ? years
-                    .filter(year => year !== 'Total')
-                    .map(year => Number(year.slice(0, 4)))
-                    .reverse()
-                : [Number(year.slice(0, 4))]
-            return (
-              <Fragment key={`${year}-fragment`}>
-                <TableRow key={`${year}-faculty-row}`}>
-                  {tableStats[year]?.map((value, valueIndex) => {
-                    if (valueIndex === 0)
-                      return (
-                        <TableCell key={`${year}-faculty-cell}`} sx={{ minWidth: '180px', maxWidth: '180px' }}>
-                          <Grid container>
-                            <Grid
-                              key={`${year}-studentsTableButton}`}
-                              sx={{
-                                alignItems: 'center',
-                                display: 'flex',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <IconButton onClick={() => toggleVisibility(yearIndex)} size="small">
-                                {yearsVisible[yearIndex] ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                              </IconButton>
-                              <Typography variant="body2">{value}</Typography>
-                            </Grid>
-                          </Grid>
-                        </TableCell>
-                      )
-                    if (
-                      !showPercentages &&
-                      typeof value === 'string' &&
-                      (value.includes('%') || value.includes('NA'))
-                    ) {
-                      return null
-                    }
-                    return (
-                      <TableCell
-                        key={`${year}$-cell-colorless-${valueIndex + Math.random()}`}
-                        sx={{ textAlign: 'right' }}
-                      >
-                        <Typography
-                          color={value.toString().includes('%') ? 'text.secondary' : 'text.primary'}
-                          variant="body2"
-                        >
-                          {value}
-                        </Typography>
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-                {yearsVisible[yearIndex]
-                  ? sortedKeys.map(programme => {
-                      return (
-                        !!programmeStats[programme][year]?.length && (
-                          <TableRow
-                            key={`${year}-regular-row-${programme}`}
-                            sx={theme => ({
-                              backgroundColor: alpha(
-                                theme.palette.degreeProgrammeType[
-                                  degreeToIndex[programmeNames[programme].degreeProgrammeType]
-                                ],
-                                0.3
-                              ),
-                              textAlign: 'left',
-                            })}
-                          >
-                            <TableCell key={`${year}-${programme}`} sx={{ minWidth: '180px', maxWidth: '180px' }}>
-                              <Grid container>
-                                <Grid size={10} sx={{ my: 'auto' }}>
-                                  <Tooltip
-                                    title={`${programmeNames[programme].code} – ${getTextIn(programmeNames[programme].name)}`}
-                                  >
-                                    <Typography
-                                      fontSize="inherit"
-                                      fontWeight="bold"
-                                      sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-                                    >
-                                      {programmeNames[programme].progId}
-                                    </Typography>
-                                  </Tooltip>
-                                </Grid>
-                                <Grid size={2}>
-                                  {requiredRights.programmeRights?.includes(programmeNames[programme].code) ||
-                                    (requiredRights.fullAccessToStudentData && (
-                                      <PopulationLink
-                                        programme={programmeNames[programme].code}
-                                        years={populationLinkYear}
-                                      />
-                                    ))}
-                                </Grid>
-                              </Grid>
-                            </TableCell>
-                            {getRows(extraTableStats, programme, programmeNames, programmeStats, showPercentages, year)}
-                          </TableRow>
-                        )
-                      )
-                    })
-                  : null}
-              </Fragment>
-            )
-          })}
-        </TableBody>
-      </StyledTable>
-    </TableContainer>
+    <StartingYearStatsTable
+      citizenshipInfo="Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for degree programmes."
+      cypress="faculty-student-stats-table"
+      groups={groups}
+      showPercentages={showPercentages}
+      titles={titles}
+    />
   )
 }

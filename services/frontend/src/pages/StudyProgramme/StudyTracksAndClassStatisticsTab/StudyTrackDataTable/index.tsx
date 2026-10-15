@@ -1,25 +1,8 @@
-import Stack from '@mui/material/Stack'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-
-import { useState } from 'react'
-
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
-import { Row } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/Row'
-import { SingleStudyTrackRow } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/SingleStudyTrackRow'
-import { getRowKey } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
+import { PopulationLink } from '@/components/common/PopulationLink'
+import { StartingYearStatsTable, StatsTableGroup } from '@/components/common/StartingYearStatsTable'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { getCalendarYears } from '@/util/timeAndDate'
 import { Name } from '@oodikone/shared/types'
-import { StyledTable } from '@/components/common/StyledTable'
-
-const getSpanValue = (combinedProgramme: string, index: number, showPercentages: boolean) => {
-  if (combinedProgramme && showPercentages) return index + 2
-  if (combinedProgramme) return index + 1
-  return index
-}
 
 const sortMainDataByYear = (data: (string | number)[][][]) => {
   if (!data?.length) {
@@ -89,102 +72,88 @@ export const StudyTrackDataTable = ({
   years: string[]
 }) => {
   'use memo'
-  const [expandedRows, setExpandedRows] = useState<boolean[]>([])
+  const { getTextIn } = useLanguage()
 
   if (!dataOfAllTracks && !dataOfSingleTrack) {
     return null
   }
 
-  const handleRowExpand = (index: number) => {
-    setExpandedRows(prev => {
-      const updatedVisibleRows = [...prev]
-
-      updatedVisibleRows[index] = !updatedVisibleRows[index]
-
-      return updatedVisibleRows
-    })
-  }
-
-  const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
-  const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
   const calendarYears = getCalendarYears(years)
 
+  const getPopulationLink = (year: string, studyTrack?: string) =>
+    populationLinkVisible ? (
+      <PopulationLink
+        combinedProgramme={combinedProgramme}
+        cypress={year.split(' - ')[0]}
+        programme={studyProgramme}
+        studyTrack={studyTrack}
+        years={year === 'Total' ? calendarYears : [parseInt(year.slice(0, 4), 10)]}
+      />
+    ) : null
+
+  const getStudyTrackTitle = (studyTrack: string) =>
+    studyTracks[studyTrack] === undefined ? studyTrack : `${getTextIn(studyTracks[studyTrack])} (${studyTrack})`
+
+  const getSingleTrackGroups = (code: string): StatsTableGroup[] =>
+    sortTrackDataByYear(dataOfSingleTrack).map(([label, ...values]) => {
+      const year = label.toString()
+      return {
+        key: year,
+        label: (
+          <>
+            {year}
+            {getPopulationLink(year, code)}
+          </>
+        ),
+        values,
+        otherCountries: otherCountriesStats?.[code]?.[year],
+        children: [],
+      }
+    })
+
+  const getAllTracksGroups = (): StatsTableGroup[] =>
+    sortMainDataByYear(Object.values(dataOfAllTracks)).flatMap(yearlyData => {
+      const yearRow = yearlyData.find(row => years.includes(row[0].toString()))
+      if (!yearRow) return []
+
+      const [yearLabel, ...yearValues] = yearRow
+      const year = yearLabel.toString()
+      return {
+        key: year,
+        label: (
+          <>
+            {year}
+            {getPopulationLink(year)}
+          </>
+        ),
+        values: yearValues,
+        otherCountries: otherCountriesStats?.[studyProgramme]?.[year],
+        children: yearlyData
+          .filter(row => row !== yearRow)
+          .map(([trackLabel, ...values]) => {
+            const studyTrack = trackLabel.toString()
+            return {
+              key: studyTrack,
+              label: (
+                <>
+                  {getStudyTrackTitle(studyTrack)}
+                  {getPopulationLink(year, studyTrack)}
+                </>
+              ),
+              values,
+              otherCountries: otherCountriesStats?.[studyTrack]?.[year],
+            }
+          }),
+      }
+    })
+
   return (
-    <TableContainer>
-      <StyledTable data-cy="study-tracks-and-class-statistics-data-table" showCellBorders slimBody>
-        <TableHead>
-          <TableRow>
-            <TableCell colSpan={!showPercentages ? 3 : 4} />
-            <TableCell
-              colSpan={
-                !showPercentages
-                  ? getSpanValue(combinedProgramme, 6, showPercentages)
-                  : getSpanValue(combinedProgramme, 12, showPercentages)
-              }
-            >
-              Current status
-            </TableCell>
-            <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
-            <TableCell colSpan={!showPercentages ? 2 : 4}>
-              <Stack alignItems="center" direction="row" gap={1}>
-                Citizenships
-                <InfoBox
-                  content="Hover over 'Other' cell to see which citizenships (other than Finland) students have"
-                  mini
-                />
-              </Stack>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            {titles.map((title, index) => (
-              <TableCell
-                align="center"
-                colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
-                key={getRowKey(title, index)}
-              >
-                {title}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        {sortedMainStats || sortedTrackStats ? (
-          <TableBody>
-            {singleTrack
-              ? sortedTrackStats.map((row, index) => (
-                  <SingleStudyTrackRow
-                    calendarYears={calendarYears}
-                    code={singleTrack}
-                    combinedProgramme={combinedProgramme}
-                    degreeProgramme={studyProgramme}
-                    key={getRowKey(singleTrack, index)}
-                    otherCountriesStats={otherCountriesStats}
-                    populationLinkVisible={populationLinkVisible}
-                    row={row}
-                    showPercentages={showPercentages}
-                  />
-                ))
-              : sortedMainStats?.map((yearlyData, index) =>
-                  yearlyData.map(row => (
-                    <Row
-                      calendarYears={calendarYears}
-                      combinedProgramme={combinedProgramme}
-                      degreeProgramme={studyProgramme}
-                      key={getRowKey(row[0].toString(), index)}
-                      otherCountriesStats={otherCountriesStats}
-                      populationLinkVisible={populationLinkVisible}
-                      row={row}
-                      setShow={() => handleRowExpand(index)}
-                      show={expandedRows[index]}
-                      showPercentages={showPercentages}
-                      studyTracks={studyTracks}
-                      yearlyData={yearlyData}
-                      years={years}
-                    />
-                  ))
-                )}
-          </TableBody>
-        ) : null}
-      </StyledTable>
-    </TableContainer>
+    <StartingYearStatsTable
+      combinedProgramme={!!combinedProgramme}
+      cypress="study-tracks-and-class-statistics-data-table"
+      groups={singleTrack ? getSingleTrackGroups(singleTrack) : getAllTracksGroups()}
+      showPercentages={showPercentages}
+      titles={titles}
+    />
   )
 }

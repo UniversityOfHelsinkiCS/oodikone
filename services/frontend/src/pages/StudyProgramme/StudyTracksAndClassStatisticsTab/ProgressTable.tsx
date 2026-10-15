@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import { StyledTable } from '@/components/common/StyledTable'
-import { getCellKey, getRowKey } from '@/pages/StudyProgramme/StudyTracksAndClassStatisticsTab/StudyTrackDataTable/util'
+import { getCellKey, getRowKey } from '@/components/common/StartingYearStatsTable/util'
 
 export const ProgressTable = ({ data, titles }: { data: (string | number)[][]; titles: string[] }) => {
   if (!data.length || !titles) {
