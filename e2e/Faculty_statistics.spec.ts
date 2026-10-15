@@ -167,9 +167,9 @@ test.describe('Faculty statistics', () => {
     test('percentage toggle works', async ({ page }) => {
       const table = page.getByTestId('faculty-student-stats-table')
       await expect(table).toBeVisible()
-      await expect(table).not.toContainText('92.3 %')
+      await expect(table).not.toContainText('94.3%')
       await page.getByTestId('percentage-toggle').click()
-      await expect(table).toContainText('92.3 %')
+      await expect(table).toContainText('94.3%')
     })
   })
 
