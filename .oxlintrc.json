@@ -251,6 +251,13 @@
       }
     },
     {
+      "files": ["updater/sis-updater-scheduler/src/**/*.ts", "updater/sis-updater-worker/src/**/*.ts"],
+      "rules": {
+        "typescript/no-misused-promises": "off",
+        "typescript/consistent-return": "off"
+      }
+    },
+    {
       "files": ["{updater,services}/**/*.{js,cjs}"],
       "rules": {
         "typescript/await-thenable": "off",
@@ -354,6 +361,12 @@
       }
     },
     {
+      "files": ["updater/sis-updater-worker/tests/**/*.ts"],
+      "rules": {
+        "typescript/unbound-method": "off"
+      }
+    },
+    {
       "files": [
         "services/backend/**/*.js",
         "updater/sis-updater-worker/src/db/migrations/*.cjs",
@@ -372,7 +385,7 @@
       }
     },
     {
-      "files": ["services/backend/**/*.{js,ts}", "updater/**/*.js"],
+      "files": ["services/backend/**/*.{js,ts}", "updater/**/*.{js,ts,mts}"],
       "rules": {
         "no-await-in-loop": "off",
         "no-promise-executor-return": "off",

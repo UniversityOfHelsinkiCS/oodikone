@@ -6,7 +6,7 @@ The **sis-updater-worker** is responsible for processing BullMQ jobs that have b
 
 When a job is picked up, the worker fetches the relevant entities from the **importer** database based on the `entityIds` specified in the job data. It then processes the data as needed and saves it into the **Oodikone database**.
 
-The different types of jobs are defined in [`src/processor.js`](./src/processor.js). Below is a brief overview of the job types:
+The different types of jobs are defined in [`src/processor.ts`](./src/processor.ts). Below is a brief overview of the job types:
 
 - **prepurge_start**:
 

@@ -1,0 +1,14 @@
+name: 'Lint updater'
+description: 'Runs Oxlint for sis-updater-scheduler and sis-updater-worker'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+    - name: 'Install dependencies'
+      shell: bash
+      run: npm ci && npm ci --prefix updater/sis-updater-scheduler && npm ci --prefix updater/sis-updater-worker
+    - name: 'Run Oxlint for the updater'
+      shell: bash
+      run: npm run lint:updater

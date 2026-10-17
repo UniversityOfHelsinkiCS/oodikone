@@ -9,6 +9,8 @@
     "playwright:ui": "playwright test --ui -c playwright.config.ts",
     "playwright:headed": "playwright test --headed -c playwright.config.ts",
     "lint": "oxlint",
+    "lint:services": "oxlint ./services",
+    "lint:updater": "oxlint ./updater",
     "lint:fix": "oxlint --fix",
     "lint:quiet": "oxlint --quiet",
     "fmt": "oxfmt",

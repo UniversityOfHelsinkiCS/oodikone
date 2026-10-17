@@ -1,0 +1,17 @@
+name: 'Lint services'
+description: 'Runs Oxlint and Stylelint for frontend and backend'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+    - name: 'Install dependencies'
+      shell: bash
+      run: npm ci && npm ci --prefix services/shared && npm ci --prefix services/frontend && npm ci --prefix services/backend
+    - name: 'Run Stylelint for CSS files'
+      shell: bash
+      run: npm run stylelint "services/frontend/src/**/*.css"
+    - name: 'Run Oxlint for the whole repository'
+      shell: bash
+      run: npm run lint:services
