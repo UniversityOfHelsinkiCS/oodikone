@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@types/pg": "^8.18.0",
-    "bullmq": "^5.53.2",
+    "bullmq": "^6.3.4",
     "cron": "^4.3.1",
     "express": "^4.22.2",
     "express-async-errors": "^3.1.1",
