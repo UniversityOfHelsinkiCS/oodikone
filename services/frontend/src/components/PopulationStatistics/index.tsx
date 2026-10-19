@@ -233,7 +233,7 @@ export const PopulationStatistics = () => {
     },
   }
 
-  const errorCardTitle = 'Error occured while fetching data!'
+  const errorCardTitle = 'Error occurred while fetching data!'
   const errorCardBody = (
     <Box sx={{ display: 'flex', flexDirection: 'column', pt: 1, gap: 1 }}>
       <Typography>
