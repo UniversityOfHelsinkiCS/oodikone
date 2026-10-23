@@ -54,8 +54,8 @@ export class StudyplanModel extends Model implements Studyplan {
   @Column(DataType.DOUBLE)
   declare completed_credits: Studyplan['completed_credits']
 
-  @Column(DataType.STRING)
-  declare curriculum_period_id: Studyplan['curriculum_period_id']
+  @Column(DataType.ARRAY(DataType.STRING))
+  declare curriculum_period_ids: Studyplan['curriculum_period_ids']
 
   @CreatedAt
   @Column(DataType.DATE)

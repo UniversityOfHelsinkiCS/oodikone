@@ -112,7 +112,7 @@ export type StudentStudyPlan = Pick<
   | 'programme_code'
   | 'includedModules'
   | 'completed_credits'
-  | 'curriculum_period_id'
+  | 'curriculum_period_ids'
   | 'sis_study_right_id'
 >
 
@@ -178,7 +178,7 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
           'programme_code',
           'includedModules',
           'completed_credits',
-          'curriculum_period_id',
+          'curriculum_period_ids',
           'sis_study_right_id',
         ],
         separate: true,

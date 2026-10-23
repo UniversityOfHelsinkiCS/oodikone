@@ -11,7 +11,7 @@ const createHops = (programmeCode: string, sisStudyRightId: string, includedCour
   programme_code: programmeCode,
   includedModules: [],
   completed_credits: 0,
-  curriculum_period_id: 'cp-1',
+  curriculum_period_ids: ['cp-1'],
   sis_study_right_id: sisStudyRightId,
 })
 

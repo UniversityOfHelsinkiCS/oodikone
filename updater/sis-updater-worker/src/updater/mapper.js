@@ -464,7 +464,7 @@ export const studyplanMapper =
         programme_code: code,
         included_courses: includedCourses,
         sisu_id: studyplan.id,
-        curriculum_period_id: programmeModuleIdToValidityPeriod[programmeId]?.[0] ?? '',
+        curriculum_period_ids: programmeModuleIdToValidityPeriod[programmeId] ?? [],
         sis_study_right_id: studyrightId,
         includedModules,
       }

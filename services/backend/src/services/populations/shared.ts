@@ -2,8 +2,9 @@ import { orderBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
 import { CourseStats } from '@oodikone/shared/routes/populations'
+import { CurriculumPeriod } from '@oodikone/shared/models'
 import { Name, DegreeProgrammeType } from '@oodikone/shared/types'
-import { SISStudyRightElementModel, CourseModel } from '../../models'
+import { CurriculumPeriodModel, SISStudyRightElementModel, CourseModel } from '../../models'
 import { SemesterStart } from '../../util/semester'
 
 type QueryParams = {
@@ -35,16 +36,29 @@ export const parseDateRangeFromParams = (query: QueryParams): ParsedQueryParams 
   return { startDate, endDate }
 }
 
-export const getCurriculumVersion = (curriculumPeriodId: string | undefined) => {
-  if (!curriculumPeriodId) {
+type CurriculumPeriodDates = Pick<CurriculumPeriod, 'startDate' | 'endDate'>
+
+export const getCurriculumPeriodsById = async (): Promise<Map<string, CurriculumPeriodDates>> => {
+  const curriculumPeriods = await CurriculumPeriodModel.findAll({
+    attributes: ['id', 'startDate', 'endDate'],
+    raw: true,
+  })
+  return new Map(curriculumPeriods.map(({ id, startDate, endDate }) => [id, { startDate, endDate }]))
+}
+
+export const getCurriculumVersion = (
+  curriculumPeriodIds: string[] | undefined,
+  curriculumPeriodsById: Map<string, CurriculumPeriodDates>
+) => {
+  const curriculumPeriods = (curriculumPeriodIds ?? [])
+    .map(id => curriculumPeriodsById.get(id))
+    .filter(period => period !== undefined)
+  if (!curriculumPeriods.length) {
     return null
   }
-  const versionNumber = parseInt(curriculumPeriodId.slice(-2), 10)
-  const year = versionNumber + 1949
-  const startYear = Math.floor((year - 1) / 3) * 3 + 1
-  const endYear = startYear + 3
-  const curriculumVersion = `${startYear}-${endYear}`
-  return curriculumVersion
+  const startYear = Math.min(...curriculumPeriods.map(({ startDate }) => new Date(startDate).getFullYear()))
+  const endYear = Math.max(...curriculumPeriods.map(({ endDate }) => new Date(endDate).getFullYear()))
+  return `${startYear}-${endYear}`
 }
 
 export const getOptionsForStudents = (

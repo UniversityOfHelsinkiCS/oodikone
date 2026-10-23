@@ -10,7 +10,7 @@ import {
   getCredits,
   getStudyRightElementsForStudyRight,
 } from './getStudentData'
-import { getCourseGroupIds, getOptionsForStudents } from './shared'
+import { getCourseGroupIds, getCurriculumPeriodsById, getOptionsForStudents } from './shared'
 import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
 
 export type OptimizedStatisticsQuery = {
@@ -42,26 +42,34 @@ export const statisticsOf = async (
   const mockedStartDate = startDate ?? defaultStartDate
   const mockedEndDate = endDate ?? defaultEndDate
 
-  const [students, enrollments, credits, degreeProgrammeType, criteria, studyRightElementsForStudyRight] =
-    await Promise.all([
-      getStudents(studentNumbers),
+  const [
+    students,
+    enrollments,
+    credits,
+    degreeProgrammeType,
+    criteria,
+    studyRightElementsForStudyRight,
+    curriculumPeriodsById,
+  ] = await Promise.all([
+    getStudents(studentNumbers),
 
-      // NOTE: If filterByDates is set, use default values for filtering credits and enrollments
-      getEnrollments(
-        studentNumbers,
-        filterByDates ? mockedStartDate : defaultStartDate,
-        filterByDates ? mockedEndDate : defaultEndDate
-      ),
-      getCredits(
-        studentNumbers,
-        filterByDates ? mockedStartDate : defaultStartDate,
-        filterByDates ? mockedEndDate : defaultEndDate
-      ),
+    // NOTE: If filterByDates is set, use default values for filtering credits and enrollments
+    getEnrollments(
+      studentNumbers,
+      filterByDates ? mockedStartDate : defaultStartDate,
+      filterByDates ? mockedEndDate : defaultEndDate
+    ),
+    getCredits(
+      studentNumbers,
+      filterByDates ? mockedStartDate : defaultStartDate,
+      filterByDates ? mockedEndDate : defaultEndDate
+    ),
 
-      getDegreeProgrammeType(code),
-      getCriteria(code),
-      getStudyRightElementsForStudyRight(studentNumbers, code),
-    ])
+    getDegreeProgrammeType(code),
+    getCriteria(code),
+    getStudyRightElementsForStudyRight(studentNumbers, code),
+    getCurriculumPeriodsById(),
+  ])
 
   const courseIds = new Set<string>()
   for (const { course_id } of credits) courseIds.add(course_id)
@@ -76,7 +84,7 @@ export const statisticsOf = async (
     const tags = tagMap.get(student.studentnumber) ?? []
     const options = optionData.get(student.studentnumber)
 
-    return formatStudentForAPI(code, mockedStartDate, student, tags, options)
+    return formatStudentForAPI(code, mockedStartDate, student, tags, options, curriculumPeriodsById)
   })
 
   return {

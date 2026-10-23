@@ -1,6 +1,6 @@
 import { col, Op, where } from 'sequelize'
 
-import { Credit, Student, Studyplan } from '@oodikone/shared/models'
+import { Credit, CurriculumPeriod, Student, Studyplan } from '@oodikone/shared/models'
 import { CloseToGraduationData, AttainmentDates } from '@oodikone/shared/routes/populations'
 import { Name, CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import {
@@ -16,7 +16,7 @@ import {
 import { now } from '../../util/clock'
 import { redisClient } from '../redis'
 import { getCurrentSemester } from '../semesters'
-import { getCurriculumVersion } from './shared'
+import { getCurriculumPeriodsById, getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
 
@@ -63,7 +63,8 @@ const formatStudent = (
   student: Student,
   facultyMap: Record<string, Name>,
   currentSemesterCode: number,
-  idToGroupIdMap: Record<string, string>
+  idToGroupIdMap: Record<string, string>,
+  curriculumPeriodsById: Map<string, Pick<CurriculumPeriod, 'startDate' | 'endDate'>>
 ) => {
   const {
     studentnumber: studentNumber,
@@ -139,7 +140,7 @@ const formatStudent = (
       attainmentDates,
       numberOfAbsentSemesters,
       numberOfUsedSemesters,
-      curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_id),
+      curriculumPeriod: getCurriculumVersion(studyPlan.curriculum_period_ids, curriculumPeriodsById),
       credits: {
         hops: studyPlan.completed_credits,
         all: student.creditcount,
@@ -172,7 +173,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
       include: [
         {
           model: StudyplanModel,
-          attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_id'],
+          attributes: ['completed_credits', 'included_courses', 'programme_code', 'curriculum_period_ids'],
           required: true,
           include: [
             {
@@ -285,9 +286,10 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
   const idToGroupIdMap = Object.fromEntries(includedCourses.map(({ id, groupId }) => [id, groupId]))
 
   const { semestercode: currentSemesterCode } = await getCurrentSemester()
+  const curriculumPeriodsById = await getCurriculumPeriodsById()
 
   return students
-    .flatMap(student => formatStudent(student, facultyMap, currentSemesterCode, idToGroupIdMap))
+    .flatMap(student => formatStudent(student, facultyMap, currentSemesterCode, idToGroupIdMap, curriculumPeriodsById))
     .reduce(
       (acc, student) => {
         if (student.programme.degreeProgrammeType === DegreeProgrammeType.BACHELOR) {

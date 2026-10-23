@@ -38,8 +38,8 @@ Studyplan.init(
     completed_credits: {
       type: DOUBLE,
     },
-    curriculum_period_id: {
-      type: STRING,
+    curriculum_period_ids: {
+      type: ARRAY(STRING),
     },
     sis_study_right_id: {
       type: STRING,

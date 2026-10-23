@@ -1,4 +1,4 @@
-import { SISStudyRight } from '@oodikone/shared/models'
+import { CurriculumPeriod, SISStudyRight } from '@oodikone/shared/models'
 import { FormattedStudent, Name } from '@oodikone/shared/types'
 import { StudentData, StudentTags } from '@oodikone/shared/types/studentData'
 import { dateDaysFromNow, dayInMilliseconds } from '@oodikone/shared/util/datetime'
@@ -42,7 +42,8 @@ export const formatStudentForAPI = (
   startDate: string,
   student: StudentData,
   tags: StudentTags[],
-  optionData: Name | undefined
+  optionData: Name | undefined,
+  curriculumPeriodsById: Map<string, Pick<CurriculumPeriod, 'startDate' | 'endDate'>>
 ): Omit<FormattedStudent, 'criteriaProgress' | 'courses' | 'enrollments'> => {
   const { studentnumber, studyRights, studyplans } = student
 
@@ -68,7 +69,7 @@ export const formatStudentForAPI = (
     birthdate: student.birthdate,
     sis_person_id: student.sis_person_id,
     citizenships: student.citizenships,
-    curriculumVersion: getCurriculumVersion(hops?.curriculum_period_id),
+    curriculumVersion: getCurriculumVersion(hops?.curriculum_period_ids, curriculumPeriodsById),
     hasPersonalIdentityCode: student.hasPersonalIdentityCode,
 
     tags,

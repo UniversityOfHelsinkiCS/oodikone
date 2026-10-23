@@ -12,7 +12,7 @@ export type Studyplan = {
   includedModules: string[]
   sisu_id: string
   completed_credits: number
-  curriculum_period_id: string
+  curriculum_period_ids: string[]
   createdAt: Date
   updatedAt: Date
 }

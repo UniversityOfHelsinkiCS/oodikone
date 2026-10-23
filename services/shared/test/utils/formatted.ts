@@ -88,7 +88,7 @@ export const createStudyPlan = (overrides: Partial<StudentStudyPlan> = {}): Stud
   programme_code: 'TEST',
   includedModules: [],
   completed_credits: 0,
-  curriculum_period_id: 'cp-1',
+  curriculum_period_ids: ['cp-1'],
   sis_study_right_id: 'sr-1',
   ...overrides,
 })
