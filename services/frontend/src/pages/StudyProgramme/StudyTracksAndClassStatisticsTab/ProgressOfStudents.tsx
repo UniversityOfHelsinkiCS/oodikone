@@ -24,9 +24,18 @@ export const ProgressOfStudents = ({
   studyProgramme: string
   years: string[]
 }) => {
+  const hasComboStats = progressComboStats !== null
+
+  const comboTitles = hasComboStats ? ['Bachelor start year', ...progressComboStats.tableTitles.slice(1)] : []
+  const titles = progressStats
+    ? hasComboStats
+      ? ['Master start year', ...progressStats.tableTitles.slice(1)]
+      : progressStats.tableTitles
+    : []
+
   return (
     <Stack spacing={2}>
-      {progressComboStats !== null && (
+      {hasComboStats && (
         <Stack spacing={2}>
           <Typography variant="h6">Bachelor + master study right</Typography>
           <ProgressBarChart
@@ -37,12 +46,12 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressComboStats.tableStats} titles={progressComboStats.tableTitles} />
+          <ProgressTable data={progressComboStats.tableStats} titles={comboTitles} />
         </Stack>
       )}
       {progressStats !== null && (
         <Stack spacing={2}>
-          {progressComboStats != null && <Typography variant="h6">Master study right</Typography>}
+          {hasComboStats && <Typography variant="h6">Master study right</Typography>}
           <ProgressBarChart
             cypress="programme"
             data={{
@@ -51,7 +60,7 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressStats.tableStats} titles={progressStats.tableTitles} />
+          <ProgressTable data={progressStats.tableStats} titles={titles} />
         </Stack>
       )}
     </Stack>
