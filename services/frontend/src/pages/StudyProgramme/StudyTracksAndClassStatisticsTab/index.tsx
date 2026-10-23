@@ -106,8 +106,8 @@ export const StudyTracksAndClassStatisticsTab = ({
 
     const graduatedCount =
       studyTrack === studyProgramme
-        ? studyTrackStats?.graduatedCount
-        : studyTrackStats?.graduatedCountByTrack[studyTrack]
+        ? studyTrackStats?.graduatedCountCombo
+        : studyTrackStats?.graduatedCountComboByTrack[studyTrack]
 
     const progressComboStats =
       Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0

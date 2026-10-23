@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
+import { Credit, SISStudyRight, SISStudyRightElement } from '@oodikone/shared/models'
 import {
   GraduationTimes,
   StudyTrackStats,
@@ -100,6 +100,67 @@ type YearlyData = Record<string, ReturnType<typeof getEmptyYear>>
 
 type StudyRightWithSemesterEnrollments = SISStudyRight & {
   semesterEnrollments: SemesterEnrollment[]
+}
+
+type ProgressCounts = {
+  creditCounts: Record<string, number[]>
+  creditCountsByTrack: Record<string, Record<string, number[]>>
+  graduatedCount: Record<string, number>
+  graduatedCountByTrack: Record<string, Record<string, number>>
+}
+
+export const getEmptyProgressCounts = (years: string[]): ProgressCounts => ({
+  creditCounts: getYearsObject({ years, emptyArrays: true }),
+  creditCountsByTrack: {},
+  graduatedCount: getYearsObject({ years }),
+  graduatedCountByTrack: {},
+})
+
+/* Stats for "Progress of students of the degree programme by starting year" */
+/* Bachelor + master students are counted by their start year in bachelor's studies, others by their start year in
+   the programme. Graduated students are counted separately, credits are counted only for those who have not graduated */
+export const updateProgressCounts = ({
+  progressCounts,
+  comboProgressCounts,
+  countAsBachelorMaster,
+  credits,
+  hasGraduated,
+  startYear,
+  startedInProgramme,
+  bachelorsStartYear,
+  startedInBachelor,
+  studyTrack,
+  years,
+}: {
+  progressCounts: ProgressCounts
+  comboProgressCounts: ProgressCounts
+  countAsBachelorMaster: boolean
+  credits: Credit[]
+  hasGraduated: boolean
+  startYear: string
+  startedInProgramme: Date
+  bachelorsStartYear: string
+  startedInBachelor: Date
+  studyTrack: string | undefined
+  years: string[]
+}) => {
+  const counts = countAsBachelorMaster ? comboProgressCounts : progressCounts
+  const year = countAsBachelorMaster ? bachelorsStartYear : startYear
+
+  if (studyTrack) {
+    counts.creditCountsByTrack[studyTrack] ??= getYearsObject({ years, emptyArrays: true })
+    counts.graduatedCountByTrack[studyTrack] ??= getYearsObject({ years })
+  }
+
+  if (hasGraduated) {
+    counts.graduatedCount[year] += 1
+    if (studyTrack) counts.graduatedCountByTrack[studyTrack][year] += 1
+    return
+  }
+
+  const creditCount = getCreditCount(credits, countAsBachelorMaster ? startedInBachelor : startedInProgramme)
+  counts.creditCounts[year].push(creditCount)
+  if (studyTrack) counts.creditCountsByTrack[studyTrack][year].push(creditCount)
 }
 
 export const combineStats = (
@@ -336,18 +397,9 @@ const getMainStatsByTrackAndYear = async (
     graduationTimesCombinedProgrammeCombo[combinedProgramme!][startYearInNewBachelorProgramme]?.push(combinedDuration)
   }
 
-  const creditCounts: Record<string, number[]> = getYearsObject({
-    years: years.filter(year => year !== 'Total'),
-    emptyArrays: true,
-  })
-
-  const creditCountsByTrack: Record<string, Record<string, number[]>> = {}
-
-  const creditCountsCombo: Record<string, number[]> = doCombo
-    ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
-    : {}
-
-  const creditCountsComboByTrack: Record<string, Record<string, number[]>> = {}
+  const yearsWithoutTotal = years.filter(year => year !== 'Total')
+  const progressCounts = getEmptyProgressCounts(yearsWithoutTotal)
+  const comboProgressCounts = getEmptyProgressCounts(doCombo ? yearsWithoutTotal : [])
 
   const monthlyCreditsByStartingYear = getYearlyMonthlyCreditsObj()
   const monthlyCreditsByStartingYearByTrack: Record<string, ReturnType<typeof getYearlyMonthlyCreditsObj>> = {}
@@ -404,7 +456,9 @@ const getMainStatsByTrackAndYear = async (
        */
     if (doCombo && !years.includes(bachelorsStartYear)) continue
 
-    if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER) {
+    const countAsBachelorMaster = doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER
+
+    if (countAsBachelorMaster) {
       const bscStartYear = Number(bachelorsStartYear.slice(0, 4))
 
       getMonthlyCredits(
@@ -442,35 +496,21 @@ const getMainStatsByTrackAndYear = async (
       }
     }
 
-    /* Stats for Progress of students of the degree programme by starting year" */
+    /* Stats for "Progress of students of the degree programme by starting year" */
     /* the DILEMMA from above also applies */
-    if (!studyRightElement.graduated) {
-      if (doCombo && studyRight.extentCode === ExtentCode.BACHELOR_AND_MASTER) {
-        creditCountsCombo[bachelorsStartYear].push(getCreditCount(studyRight.student.credits, startedInBachelor))
-
-        if (studyTrack) {
-          creditCountsComboByTrack[studyTrack] ??= doCombo
-            ? getYearsObject({ years: years.filter(year => year !== 'Total'), emptyArrays: true })
-            : {}
-
-          creditCountsComboByTrack[studyTrack][startYear].push(
-            getCreditCount(studyRight.student.credits, startedInProgramme)
-          )
-        }
-      } else {
-        creditCounts[startYear].push(getCreditCount(studyRight.student.credits, startedInProgramme))
-        if (studyTrack) {
-          creditCountsByTrack[studyTrack] ??= getYearsObject({
-            years: years.filter(year => year !== 'Total'),
-            emptyArrays: true,
-          })
-
-          creditCountsByTrack[studyTrack][startYear].push(
-            getCreditCount(studyRight.student.credits, startedInProgramme)
-          )
-        }
-      }
-    }
+    updateProgressCounts({
+      progressCounts,
+      comboProgressCounts,
+      countAsBachelorMaster,
+      credits: studyRight.student.credits,
+      hasGraduated: studyRightElement.graduated,
+      startYear,
+      startedInProgramme,
+      bachelorsStartYear,
+      startedInBachelor,
+      studyTrack,
+      years: yearsWithoutTotal,
+    })
   }
 
   for (const year of Object.keys(yearlyStats)) {
@@ -493,22 +533,11 @@ const getMainStatsByTrackAndYear = async (
     }
   }
 
-  const graduatedCount: Record<string, number> = Object.fromEntries(
-    years.map(year => [year, yearlyStats[year]?.[studyProgramme].graduated ?? 0])
-  )
-
   const { mainStatsByYear, mainStatsByTrack, otherCountriesCount } = combineStats(
     years,
     yearlyStats,
     studyProgramme,
     combinedProgramme
-  )
-
-  const graduatedCountByTrack: Record<string, Record<string, number>> = Object.fromEntries(
-    Object.keys(mainStatsByTrack).map(track => [
-      track,
-      Object.fromEntries(years.map(year => [year, yearlyStats[year]?.[track]?.graduated ?? 0])),
-    ])
   )
 
   const finalGraduationTimes = await getGraduationTimeStats(
@@ -536,12 +565,14 @@ const getMainStatsByTrackAndYear = async (
     mainStatsByYear,
     mainStatsByTrack,
     otherCountriesCount,
-    creditCounts,
-    creditCountsByTrack,
-    creditCountsCombo,
-    creditCountsComboByTrack,
-    graduatedCount,
-    graduatedCountByTrack,
+    creditCounts: progressCounts.creditCounts,
+    creditCountsByTrack: progressCounts.creditCountsByTrack,
+    creditCountsCombo: comboProgressCounts.creditCounts,
+    creditCountsComboByTrack: comboProgressCounts.creditCountsByTrack,
+    graduatedCount: progressCounts.graduatedCount,
+    graduatedCountByTrack: progressCounts.graduatedCountByTrack,
+    graduatedCountCombo: comboProgressCounts.graduatedCount,
+    graduatedCountComboByTrack: comboProgressCounts.graduatedCountByTrack,
     graduationTimes: finalGraduationTimes,
     graduationTimesSecondProg: finalCombinedGraduationTimes,
   }
@@ -640,6 +671,8 @@ export const getStudyTrackStatsForStudyProgramme = async ({
     doCombo,
     graduatedCount: stats.graduatedCount,
     graduatedCountByTrack: stats.graduatedCountByTrack,
+    graduatedCountCombo: stats.graduatedCountCombo,
+    graduatedCountComboByTrack: stats.graduatedCountComboByTrack,
     graduationTimes: stats.graduationTimes,
     graduationTimesSecondProg: stats.graduationTimesSecondProg,
     id: combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme,

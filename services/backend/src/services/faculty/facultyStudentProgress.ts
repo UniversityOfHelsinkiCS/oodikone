@@ -168,7 +168,7 @@ export const combineFacultyStudentProgress = async (
     calculateProgressStats(level, stats.creditCounts, yearlyTitles, progressStats, progId)
 
     if (level === 'master' && Object.keys(stats.creditCountsCombo).length > 0) {
-      updateCreditAndGraduatedCount('bcMs', stats.creditCountsCombo, stats.graduatedCount)
+      updateCreditAndGraduatedCount('bcMs', stats.creditCountsCombo, stats.graduatedCountCombo)
       calculateProgressStats('bcMs', stats.creditCountsCombo, yearlyTitles, progressStats, progId)
     }
   }
