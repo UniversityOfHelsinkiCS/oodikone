@@ -111,7 +111,7 @@ export const StudyTracksAndClassStatisticsTab = ({
 
     const progressComboStats =
       Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0
-        ? calculateStats(creditCounts, graduatedCount, targetCredits + 180)
+        ? calculateStats(creditCounts, graduatedCount, targetCredits + 180, 180)
         : null
 
     progressComboStats?.chartStats?.forEach(creditCategory => {
