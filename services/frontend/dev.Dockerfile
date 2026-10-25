@@ -1,6 +1,7 @@
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
+FROM node:24-alpine
 
 ENV TZ="Europe/Helsinki"
+# FIXME: Does nothing at the moment
 # Default install location is node_modules/.vite which is not writable
 #  by user 1001 when binding the local files to the container
 ENV VITE_CACHE_DIR=/tmp/vite

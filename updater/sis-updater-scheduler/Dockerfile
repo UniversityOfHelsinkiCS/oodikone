@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
+FROM node:24-alpine
 
 WORKDIR /opt/app-root/src
 

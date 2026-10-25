@@ -1,17 +1,18 @@
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
+FROM node:24-alpine
 
 ENV TZ="Europe/Helsinki"
 
 ENV NODE_ENV=development
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-WORKDIR /opt/app-root/shared
+# Alpine doesn't contain curl, is needed for healthchecks
+RUN apk update && apk upgrade && apk --no-cache add curl
 
+WORKDIR /opt/app-root/shared
 COPY ./shared .
 RUN npm ci
 
 WORKDIR /opt/app-root/backend
-
 COPY ./backend .
 RUN npm ci
 

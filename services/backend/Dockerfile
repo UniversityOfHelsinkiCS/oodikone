@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal AS build
+FROM node:24-alpine AS build
 
 ENV TZ="Europe/Helsinki"
 
@@ -29,7 +29,7 @@ RUN npm ci --include=dev --prefix shared && npm ci --include=dev --prefix backen
 RUN npm run build --prefix shared && npm run build --prefix backend
 
 
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
+FROM node:24-alpine
 
 ENV TZ="Europe/Helsinki"
 
@@ -47,6 +47,9 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
+
+# Alpine doesn't contain curl, is needed for healthchecks
+RUN apk update && apk upgrade && apk --no-cache add curl
 
 WORKDIR /opt/app-root/shared
 COPY --from=build /opt/app-root/shared/dist .

@@ -1,11 +1,12 @@
-FROM registry.access.redhat.com/ubi10/nodejs-24-minimal
-
-WORKDIR /opt/app-root/src
+FROM node:24-alpine
 
 ENV TZ="Europe/Helsinki"
-
 ENV NODE_ENV=development
 
+# Alpine doesn't contain curl, is needed for healthchecks
+RUN apk update && apk upgrade && apk --no-cache add curl
+
+WORKDIR /opt/app-root/src
 COPY . .
 RUN npm ci
 
