@@ -14,7 +14,9 @@ export default {
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
 
   Dockerfile: files =>
-    `${dockerCmdBase} hadolint/hadolint:v2.14.0 hadolint --ignore DL3006 ${relativeFilePaths(files)}`,
+    // DL3018: "Pin versions in apk add" skipped as the only apk add is curl which should always be the
+    // newest possible version for security reasons.
+    `${dockerCmdBase} hadolint/hadolint:v2.15.1 hadolint --ignore DL3018 ${relativeFilePaths(files)}`,
   '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.11.0 ${relativeFilePaths(files)} -x`,
   'docker-compose*': files => {
     const composeFiles = file => {
