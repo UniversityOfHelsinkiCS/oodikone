@@ -25,6 +25,11 @@ Course.init(
     isPrimary: {
       type: BOOLEAN,
     },
+    isCustom: {
+      type: BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     coursetypecode: {
       type: STRING,
     },

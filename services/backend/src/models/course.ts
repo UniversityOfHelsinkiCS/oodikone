@@ -4,6 +4,7 @@ import {
   Column,
   CreatedAt,
   DataType,
+  Default,
   ForeignKey,
   HasMany,
   Model,
@@ -70,6 +71,10 @@ export class CourseModel extends Model implements Course {
 
   @Column(DataType.BOOLEAN)
   declare isPrimary: Course['isPrimary']
+
+  @Default(false)
+  @Column({ type: DataType.BOOLEAN, allowNull: false })
+  declare isCustom: Course['isCustom']
 
   @Column(DataType.STRING)
   declare courseUnitType: Course['courseUnitType']

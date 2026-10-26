@@ -13,6 +13,7 @@ export type Course = {
   coursetypecode: string
   isStudyModule: boolean
   isPrimary: boolean
+  isCustom: boolean // created based on a custom attainment (erilliskirjaus)
   name: Name
   maxAttainmentDate: Date | null
   minAttainmentDate: Date | null
