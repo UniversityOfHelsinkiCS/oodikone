@@ -40,8 +40,8 @@ const CourseRow = ({
       data-cy={`course-${course.code}`}
       hover
       key={course.id}
-      onClick={() => (course.minAttainmentDate ? onSelectCourse(course) : null)}
-      style={{ cursor: course.minAttainmentDate ? 'pointer' : 'default' }}
+      onClick={() => onSelectCourse(course)}
+      style={{ cursor: 'pointer' }}
     >
       <TableCell>
         <Typography variant="subtitle1">{getTextIn(course.name)}</Typography>
