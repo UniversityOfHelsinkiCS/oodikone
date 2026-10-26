@@ -80,6 +80,24 @@ test.describe('Course statistics search', () => {
     await expect(component).toContainText('Ohjelmoinnin perusteet')
     await expect(component).toContainText('Ohjelmoinnin jatkokurssi')
   })
+
+  test('should exclude custom courses unless the switch is on', async ({ mount, router }) => {
+    const includeCustomParams: (string | null)[] = []
+    void (await router.route('**/api/coursesmulti*', async route => {
+      includeCustomParams.push(new URL(route.request().url()).searchParams.get('includeCustom'))
+      void (await route.fulfill({ json: { courses: [] } }))
+    }))
+
+    const component = await mount(<ReduxWrapper component={<CourseStatistics />} />)
+    const includeCustomToggle = component.getByLabel('Include custom courses')
+    await expect(includeCustomToggle).not.toBeChecked()
+
+    await component.getByLabel('Code').fill('TKT')
+    await expect.poll(() => includeCustomParams.at(-1)).toBe('false')
+
+    await includeCustomToggle.check()
+    await expect.poll(() => includeCustomParams.at(-1)).toBe('true')
+  })
 })
 
 test.describe('Course statistics', () => {

@@ -26,12 +26,12 @@ const router = Router()
 router.get<never, CanError<CoursesMultiResBody>, CoursesMultiReqBody, CoursesMultiQuery>(
   '/coursesmulti',
   async (req, res) => {
-    const { name, code } = req.query
+    const { name, code, includeCustom } = req.query
     if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
       return res.status(400).json({ error: 'Query parameter name or code is invalid' })
     }
 
-    const courses = await getCoursesByNameAndOrCode(name, code)
+    const courses = await getCoursesByNameAndOrCode(name, code, includeCustom === 'true')
     res.json({ courses }).end()
   }
 )

@@ -31,7 +31,11 @@ const likeTerm = (userInput: string | undefined, type: 'name' | 'code') => {
       }
 }
 
-export const getCoursesByNameAndOrCode = async (name: string, code: string): Promise<CourseWithSubsDetails[]> => {
+export const getCoursesByNameAndOrCode = async (
+  name: string,
+  code: string,
+  includeCustom = false
+): Promise<CourseWithSubsDetails[]> => {
   // Get groupIds for the course units (CU) the user is querying
   // This step allows users to search with old or upcoming course codes and names
   // Example: searching for GEOK_2011 (old code) returns results for GEOK2011 (new code)
@@ -42,6 +46,7 @@ export const getCoursesByNameAndOrCode = async (name: string, code: string): Pro
         ...likeTerm(name, 'name'),
         ...likeTerm(code, 'code'),
         groupId: { [Op.ne]: null },
+        ...(!includeCustom && { isCustom: false }),
       },
       raw: true,
     })

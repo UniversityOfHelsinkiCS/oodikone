@@ -35,7 +35,7 @@ export const SearchForm = () => {
   const navigate = useNavigate()
   const [substitutions, toggleSubstitutions] = useToggle(true)
   const [selectMultipleCourses, toggleSelectMultipleCourses] = useToggle(false)
-  const [includeSpecialCourses, toggleIncludeSpecialCourses] = useToggle(false)
+  const [includeCustomCourses, toggleIncludeCustomCourses] = useToggle(false)
 
   const [courseName, setCourseName] = useState('')
   const [courseCode, setCourseCode] = useState('')
@@ -53,7 +53,7 @@ export const SearchForm = () => {
     {
       name: debouncedCourseName,
       code: debouncedCourseCode,
-      includeSpecial: includeSpecialCourses,
+      includeCustom: includeCustomCourses,
     },
     { skip: !isDebouncedInputValid }
   )
@@ -214,19 +214,16 @@ export const SearchForm = () => {
                     en: 'If "Combine substitutions" is on (default behavior), then course and its substitutions are combined in the statistics.',
                   })}
                 />
-                {/* oxlint-disable-next-line no-constant-binary-expression */}
-                {false /* TEMP, TODO: Enable after production data mankeled and feature fixd */ && (
-                  <ToggleWithTooltip
-                    checked={includeSpecialCourses}
-                    cypress="show-special-courses-toggle"
-                    label="Show special courses"
-                    onChange={toggleIncludeSpecialCourses}
-                    tooltipText={getTextIn({
-                      fi: 'Sisällyttää hakuun hyväksiluettujen suoritusten pohjalta luodut kurssit',
-                      en: 'Includes course instances formed by transferred credits and other special courses',
-                    })}
-                  />
-                )}
+                <ToggleWithTooltip
+                  checked={includeCustomCourses}
+                  cypress="include-custom-courses-toggle"
+                  label="Include custom courses"
+                  onChange={toggleIncludeCustomCourses}
+                  tooltipText={getTextIn({
+                    fi: 'Sisällyttää hakuun erilliskirjausten pohjalta luodut kurssit',
+                    en: 'Includes courses created from custom attainments in the search',
+                  })}
+                />
               </Grid>
             </Grid>
             {selectMultipleCourses ? (

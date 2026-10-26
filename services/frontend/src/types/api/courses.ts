@@ -11,5 +11,5 @@ export type GetCourseSearchResultRequest = {
   name?: string
   code?: string
   combineSubstitutions?: boolean
-  includeSpecial?: boolean
+  includeCustom?: boolean
 }
