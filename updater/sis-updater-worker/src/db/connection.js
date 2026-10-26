@@ -87,7 +87,7 @@ class DbConnections extends EventEmitter {
         this.emit('error', error)
         return
       }
-      logger.error(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      logger.error(`Database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`, { error })
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
@@ -126,7 +126,7 @@ class DbConnections extends EventEmitter {
       const executedMigrations = await migrator.executed()
       logger.info({ message: 'Migrations up to date', meta: newMigrations, latest: executedMigrations.at(-1)?.name })
     } catch (error) {
-      logger.error({ message: 'Migration error', meta: JSON.stringify(error) })
+      logger.error({ message: 'Migration error', error })
       throw error
     } finally {
       await unlock()
