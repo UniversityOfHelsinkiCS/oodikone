@@ -147,6 +147,7 @@ describe('updateAttainments', () => {
     const [, courses] = findBulkCreateCall('Course')
     expect(courses).toHaveLength(1)
     expect(courses[0].groupId).toBe(courses[0].id)
+    expect(courses[0].isCustom).toBe(true)
   })
 
   it('updates custom course unit with fields from a new attainment', async () => {
@@ -196,5 +197,44 @@ describe('updateAttainments', () => {
     expect(courses[0].name.fi).toBe('Uusi nimi')
     expect(courses[0].maxAttainmentDate).toBe('2020-01-15')
     expect(courses[0].minAttainmentDate).toBe('2019-01-01')
+    expect(courses[0].isCustom).toBe(true)
+  })
+
+  it('marks placeholder modules as custom only when created from a custom attainment', async () => {
+    const moduleAttainment = (id, type, moduleGroupId) => ({
+      id,
+      type,
+      misregistration: false,
+      credits: 5,
+      person_id: 'p1',
+      registration_date: '2020-01-10',
+      grade_scale_id: 'scale1',
+      grade_id: 'grade1',
+      organisations: [],
+      attainment_date: '2020-01-15',
+      course_unit_id: null,
+      module_id: null,
+      module_group_id: moduleGroupId,
+      study_right_id: null,
+      attainment_language_urn: 'urn:code:language:fi',
+      acceptor_persons: [],
+      study_level_urn: 'lvl1',
+      course_unit_type_urn: 'type1',
+    })
+
+    await updateAttainments(
+      [
+        moduleAttainment('att-module-1', 'ModuleAttainment', 'hy-SM-1'),
+        moduleAttainment('att-module-2', 'CustomModuleAttainment', 'hy-SM-2'),
+      ],
+      { p1: '014123456' },
+      new Set(),
+      {}
+    )
+
+    const [, courses] = findBulkCreateCall('Course')
+    expect(courses).toHaveLength(2)
+    expect(courses.find(({ id }) => id === 'hy-SM-1').isCustom).toBe(false)
+    expect(courses.find(({ id }) => id === 'hy-SM-2').isCustom).toBe(true)
   })
 })
