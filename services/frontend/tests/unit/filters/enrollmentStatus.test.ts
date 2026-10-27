@@ -12,7 +12,7 @@ const createStudyRight = (overrides: Partial<StudentStudyRight> = {}): StudentSt
 
 const filterStudent = (
   student: FormattedStudent,
-  options: { status: EnrollmentType | ''; semesters: number[] },
+  options: { status: EnrollmentType[]; semesters: number[] },
   args: { programme?: string } = {}
 ) => enrollmentStatusFilter().filter(student, { args, options, precomputed: undefined })
 
@@ -22,7 +22,7 @@ void describe('enrollmentStatusFilter', () => {
       studyRights: [createStudyRight({ semesterEnrollments: [{ type: EnrollmentType.PRESENT, semester: 1 }] })],
     })
 
-    assert.strictEqual(filterStudent(student, { status: EnrollmentType.PRESENT, semesters: [1] }), true)
+    assert.strictEqual(filterStudent(student, { status: [EnrollmentType.PRESENT], semesters: [1] }), true)
   })
 
   void it('should not pass a student enrolled with a different status', () => {
@@ -30,7 +30,26 @@ void describe('enrollmentStatusFilter', () => {
       studyRights: [createStudyRight({ semesterEnrollments: [{ type: EnrollmentType.ABSENT, semester: 1 }] })],
     })
 
-    assert.strictEqual(filterStudent(student, { status: EnrollmentType.PRESENT, semesters: [1] }), false)
+    assert.strictEqual(filterStudent(student, { status: [EnrollmentType.PRESENT], semesters: [1] }), false)
+  })
+
+  void it('should pass a student enrolled with any of the chosen statuses', () => {
+    const student = createStudent({
+      studyRights: [
+        createStudyRight({
+          semesterEnrollments: [
+            { type: EnrollmentType.PRESENT, semester: 1 },
+            { type: EnrollmentType.ABSENT, semester: 2 },
+          ],
+        }),
+      ],
+    })
+
+    assert.strictEqual(
+      filterStudent(student, { status: [EnrollmentType.PRESENT, EnrollmentType.ABSENT], semesters: [1, 2] }),
+      true
+    )
+    assert.strictEqual(filterStudent(student, { status: [EnrollmentType.PRESENT], semesters: [1, 2] }), false)
   })
 
   void it('should only look at the study right matching the given programme when args.programme is set', () => {
@@ -73,31 +92,31 @@ void describe('enrollmentStatusFilter', () => {
 
     // KH50_001
     assert.strictEqual(
-      filterStudent(student, { status: EnrollmentType.PRESENT, semesters: [1] }, { programme: 'KH50_001' }),
+      filterStudent(student, { status: [EnrollmentType.PRESENT], semesters: [1] }, { programme: 'KH50_001' }),
       true
     )
     assert.strictEqual(
-      filterStudent(student, { status: EnrollmentType.ABSENT, semesters: [1] }, { programme: 'KH50_001' }),
+      filterStudent(student, { status: [EnrollmentType.ABSENT], semesters: [1] }, { programme: 'KH50_001' }),
       false
     )
 
     // KH50_002
     assert.strictEqual(
-      filterStudent(student, { status: EnrollmentType.ABSENT, semesters: [1] }, { programme: 'KH50_002' }),
+      filterStudent(student, { status: [EnrollmentType.ABSENT], semesters: [1] }, { programme: 'KH50_002' }),
       true
     )
     assert.strictEqual(
-      filterStudent(student, { status: EnrollmentType.PRESENT, semesters: [1] }, { programme: 'KH50_002' }),
+      filterStudent(student, { status: [EnrollmentType.PRESENT], semesters: [1] }, { programme: 'KH50_002' }),
       false
     )
   })
 
   void it('isActive should match the filter state', () => {
-    assert.strictEqual(enrollmentStatusFilter().isActive({ status: '', semesters: [] }, undefined), false)
+    assert.strictEqual(enrollmentStatusFilter().isActive({ status: [], semesters: [] }, undefined), false)
     // Only semester selected doesn't filter anything
-    assert.strictEqual(enrollmentStatusFilter().isActive({ status: null, semesters: [1] }, undefined), false)
+    assert.strictEqual(enrollmentStatusFilter().isActive({ status: [], semesters: [1] }, undefined), false)
     assert.strictEqual(
-      enrollmentStatusFilter().isActive({ status: EnrollmentType.PRESENT, semesters: [] }, undefined),
+      enrollmentStatusFilter().isActive({ status: [EnrollmentType.PRESENT], semesters: [] }, undefined),
       true
     )
   })

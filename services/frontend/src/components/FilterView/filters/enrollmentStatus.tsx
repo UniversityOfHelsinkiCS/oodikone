@@ -39,7 +39,8 @@ const EnrollmentStatusFilterCard = ({ args, options, onOptionsChange }: FilterTr
     <Stack gap={1}>
       <FilterSelect
         filterKey={`${enrollmentStatusFilter.key}-status`}
-        label="Choose enrollment status"
+        label="Choose enrollment statuses"
+        multiple
         onChange={({ target }) => onOptionsChange({ ...options, status: target.value })}
         options={STATUS_OPTIONS}
         value={status}
@@ -63,11 +64,11 @@ export const enrollmentStatusFilter = createFilter<Options, Args, Precompute>({
 
   info: filterToolTips.enrollmentStatus,
   defaultOptions: {
-    status: '',
+    status: [],
     semesters: [],
   },
 
-  isActive: ({ status }) => !!status,
+  isActive: ({ status }) => !!status?.length,
 
   filter({ studyRights }, { args, options }) {
     const { status, semesters } = options
@@ -78,11 +79,12 @@ export const enrollmentStatusFilter = createFilter<Options, Args, Precompute>({
           !cancelled && studyRightElements.some(({ code }) => code === args.programme)
       )
 
-      return semesters.every(
-        semester =>
+      return semesters.every(semester =>
+        status.includes(
           correctStudyRight?.semesterEnrollments?.find(
             ({ semester: enrollmentSemester }) => enrollmentSemester === semester
-          )?.type === status
+          )?.type
+        )
       )
     }
 
@@ -94,7 +96,7 @@ export const enrollmentStatusFilter = createFilter<Options, Args, Precompute>({
       // HACK: If enrollment info not found, return false. This may or may not be what we want?
       return allEnrollments
         .filter(({ semester: enrollmentSemester }) => enrollmentSemester === semester)
-        .some(({ type }) => type === status)
+        .some(({ type }) => status.includes(type))
     })
   },
 

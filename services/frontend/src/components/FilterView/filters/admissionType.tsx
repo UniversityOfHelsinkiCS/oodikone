@@ -3,7 +3,7 @@ import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelec
 import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
-type Options = { selected: string }
+type Options = { selected: string[] }
 type Args = { programme: string }
 type Precompute = Record<string, number>
 
@@ -49,8 +49,9 @@ const AdmissionTypeFilterCard = ({
   return (
     <FilterSelect
       filterKey="admissionTypeFilter"
-      label="Choose admission type"
-      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      label="Choose admission types"
+      multiple
+      onChange={({ target }) => onOptionsChange({ selected: target.value as string[] })}
       options={selectOptions}
       value={selected}
     />
@@ -63,7 +64,7 @@ export const admissionTypeFilter = createFilter<Options, Args, Precompute>({
   title: 'Admission type',
 
   defaultOptions: {
-    selected: '',
+    selected: [],
   },
 
   isActive: ({ selected }) => !!selected.length,
@@ -82,7 +83,7 @@ export const admissionTypeFilter = createFilter<Options, Args, Precompute>({
         return acc
       }, {}),
 
-  filter: (student, { args, options }) => filter(args.programme, options.selected)(student),
+  filter: (student, { args, options }) => options.selected.some(value => filter(args.programme, value)(student)),
 
   render: AdmissionTypeFilterCard,
 })

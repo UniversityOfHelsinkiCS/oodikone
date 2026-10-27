@@ -5,30 +5,36 @@ import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
 import { createStudent } from '@oodikone/shared/test/utils'
 
-const filterStudent = (student: FormattedStudent, selected: number | string) =>
+const filterStudent = (student: FormattedStudent, selected: number[]) =>
   startYearAtUniFilter().filter(student, { args: undefined, options: { selected }, precomputed: undefined })
 
 void describe('startYearAtUniFilter', () => {
   void it("should return true when selected year matches the student's starting year (FALL)", () => {
     const student = createStudent({ started: new Date('2020-08-01') })
 
-    assert.strictEqual(filterStudent(student, 2020), true)
+    assert.strictEqual(filterStudent(student, [2020]), true)
   })
 
   void it("should return true when selected year matches the student's starting year (SPRING)", () => {
     const student = createStudent({ started: new Date('2020-03-01') })
 
-    assert.strictEqual(filterStudent(student, 2020), true)
+    assert.strictEqual(filterStudent(student, [2020]), true)
   })
 
   void it("should return false when selected year doesn't match the student's starting year", () => {
     const student = createStudent({ started: new Date('2020-08-01') })
 
-    assert.strictEqual(filterStudent(student, 2021), false)
+    assert.strictEqual(filterStudent(student, [2021]), false)
+  })
+
+  void it("should return true when any selected year matches the student's starting year", () => {
+    const student = createStudent({ started: new Date('2020-08-01') })
+
+    assert.strictEqual(filterStudent(student, [2019, 2020]), true)
   })
 
   void it('isActive should match the filter state', () => {
-    assert.strictEqual(startYearAtUniFilter().isActive({ selected: '' }, undefined), false)
-    assert.strictEqual(startYearAtUniFilter().isActive({ selected: 2020 }, undefined), true)
+    assert.strictEqual(startYearAtUniFilter().isActive({ selected: [] }, undefined), false)
+    assert.strictEqual(startYearAtUniFilter().isActive({ selected: [2020] }, undefined), true)
   })
 })

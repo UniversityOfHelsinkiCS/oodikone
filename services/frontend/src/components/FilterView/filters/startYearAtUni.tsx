@@ -31,6 +31,7 @@ const StartYearAtUniFilterCard = ({
     <FilterSelect
       filterKey="startYearAtUniFilter"
       label="Choose years to include"
+      multiple
       onChange={({ target }) => onOptionsChange({ selected: target.value })}
       options={dropdownOptions}
       value={selected}
@@ -44,17 +45,17 @@ export const startYearAtUniFilter = createFilter<Options, Args, Precompute>({
   title: 'Starting year',
 
   defaultOptions: {
-    selected: '',
+    selected: [],
   },
 
   info: filterToolTips.startingYear,
 
-  isActive: ({ selected }) => !!selected,
+  isActive: ({ selected }) => !!selected.length,
 
   filter: (student, { options }) => {
     const { selected } = options
 
-    return selected === new Date(student.started).getFullYear()
+    return selected.includes(new Date(student.started).getFullYear())
   },
 
   render: StartYearAtUniFilterCard,

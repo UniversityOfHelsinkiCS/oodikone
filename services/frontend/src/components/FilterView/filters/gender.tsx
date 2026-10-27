@@ -26,7 +26,8 @@ const GenderFilterCard = ({ options, onOptionsChange, students }: FilterTrayProp
   return (
     <FilterSelect
       filterKey="genderFilter"
-      label="Choose gender"
+      label="Choose genders"
+      multiple
       onChange={({ target }) => onOptionsChange({ selected: target.value })}
       options={dropdownOptions}
       value={selected}
@@ -40,15 +41,15 @@ export const genderFilter = createFilter<Options, Args, Precompute>({
   title: 'Gender',
 
   defaultOptions: {
-    selected: '',
+    selected: [],
   },
 
-  isActive: ({ selected }) => selected !== '',
+  isActive: ({ selected }) => !!selected.length,
 
   filter(student, { options }) {
     const { selected } = options
 
-    return Number(student.gender_code) === selected
+    return selected.includes(Number(student.gender_code))
   },
 
   render: GenderFilterCard,

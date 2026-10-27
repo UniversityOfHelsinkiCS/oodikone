@@ -176,6 +176,7 @@ test.describe('Custom Population Statistics', () => {
     ] as const) {
       await selectDropdownOption(page, 'genderFilter', value)
       await checkFilteredStudentCount(page, count)
+      await page.getByTestId('genderFilter-clear').click()
     }
   })
 

@@ -5,7 +5,7 @@ import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelec
 import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
-type Options = { selected: string }
+type Options = { selected: string[] }
 type Args = undefined
 type Precompute = null
 
@@ -39,8 +39,9 @@ const CitizenshipFilterCard = ({ options, onOptionsChange, students }: FilterTra
   return (
     <FilterSelect
       filterKey="citizenshipFilter"
-      label="Choose citizenship"
-      onChange={({ target }) => onOptionsChange({ selected: target.value })}
+      label="Choose citizenships"
+      multiple
+      onChange={({ target }) => onOptionsChange({ selected: target.value as string[] })}
       options={sortedDropdownOptions}
       value={selected}
     />
@@ -53,17 +54,17 @@ export const citizenshipFilter = createFilter<Options, Args, Precompute>({
   title: 'Citizenship',
 
   defaultOptions: {
-    selected: '',
+    selected: [],
   },
 
   info: filterToolTips.citizenship,
 
-  isActive: ({ selected }) => !!selected,
+  isActive: ({ selected }) => !!selected.length,
 
   filter(student, { options }) {
     const { selected } = options
 
-    return student.citizenships.some(({ en: countryName }) => countryName === selected)
+    return student.citizenships.some(({ en: countryName }) => !!countryName && selected.includes(countryName))
   },
 
   render: CitizenshipFilterCard,

@@ -55,7 +55,7 @@ void describe('admissionTypeFilter createFilter()', () => {
 
     const result = admissionTypeFilter(ARGS).filter(student, {
       args: ARGS,
-      options: { selected: 'regular' },
+      options: { selected: ['regular'] },
       precomputed: {},
     })
 
@@ -67,15 +67,39 @@ void describe('admissionTypeFilter createFilter()', () => {
 
     const result = admissionTypeFilter(ARGS).filter(student, {
       args: ARGS,
-      options: { selected: 'Ei valintatapaa' },
+      options: { selected: ['Ei valintatapaa'] },
       precomputed: {},
     })
 
     assert.strictEqual(result, true)
   })
 
+  void it('should include students matching any of the selected admission types', () => {
+    const student = createStudent({ studyRights: [createStudyRight({ admissionType: 'regular' })] })
+
+    const result = admissionTypeFilter(ARGS).filter(student, {
+      args: ARGS,
+      options: { selected: ['open-studies', 'regular'] },
+      precomputed: {},
+    })
+
+    assert.strictEqual(result, true)
+  })
+
+  void it('should exclude students matching none of the selected admission types', () => {
+    const student = createStudent({ studyRights: [createStudyRight({ admissionType: 'regular' })] })
+
+    const result = admissionTypeFilter(ARGS).filter(student, {
+      args: ARGS,
+      options: { selected: ['open-studies', 'Ei valintatapaa'] },
+      precomputed: {},
+    })
+
+    assert.strictEqual(result, false)
+  })
+
   void it('isActive should match filter state', () => {
-    assert.strictEqual(admissionTypeFilter(ARGS).isActive({ selected: '' }, undefined), false)
-    assert.strictEqual(admissionTypeFilter(ARGS).isActive({ selected: 'regular' }, undefined), true)
+    assert.strictEqual(admissionTypeFilter(ARGS).isActive({ selected: [] }, undefined), false)
+    assert.strictEqual(admissionTypeFilter(ARGS).isActive({ selected: ['regular'] }, undefined), true)
   })
 })
