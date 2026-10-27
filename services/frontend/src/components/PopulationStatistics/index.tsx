@@ -36,6 +36,7 @@ import { PopulationDetails } from '@/components/PopulationDetails'
 import { PopulationSearch } from '@/components/PopulationSearch'
 import { useDegreeProgrammeTypes } from '@/hooks/degreeProgrammeTypes'
 import { useTitle } from '@/hooks/title'
+import { CurriculumProvider, useCurriculum } from '@/hooks/useCurriculum'
 import { useSemesters } from '@/hooks/useSemesters'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetProgrammesQuery, useGetPopulationStatisticsQuery } from '@/redux/populations'
@@ -151,6 +152,13 @@ const StudyTrackNames = () => {
   )
 }
 
+const PopulationStatisticsLoading = ({ isLoading }: { isLoading: boolean }) => {
+  const { isLoading: curriculumLoading } = useCurriculum()
+  const { isFetching: authLoading } = useGetAuthorizedUserQuery()
+
+  return <PageLoading isLoading={isLoading || curriculumLoading || authLoading} />
+}
+
 export const PopulationStatistics = () => {
   useTitle('Class statistics')
 
@@ -261,44 +269,46 @@ export const PopulationStatistics = () => {
 
   // else display population from query
   return (
-    <FilterView
-      coursestatistics={population?.coursestatistics}
-      filters={filters}
-      initialOptions={initialOptions}
-      students={students}
-    >
-      {(filteredStudents, filteredCourses) => (
-        <>
-          <PageLoading isLoading={isLoading} />
-          <PageTitle title={title}>
-            <StudyTrackNames />
-            <Typography color="text.secondary" fontWeight="standard" variant="h6">
-              {programmeId} - {programmeCode}
-            </Typography>
-            <Typography color="text.secondary" fontWeight="standard" variant="h6">
-              Class of {getYearText(query.years)}
-              {semesterText}, {students.length} students
-            </Typography>
-            {showBachelorAndMaster ? (
+    <CurriculumProvider programmeCode={programmeCode} year={query.years[0]}>
+      <FilterView
+        coursestatistics={population?.coursestatistics}
+        filters={filters}
+        initialOptions={initialOptions}
+        students={students}
+      >
+        {(filteredStudents, filteredCourses) => (
+          <>
+            <PopulationStatisticsLoading isLoading={isLoading} />
+            <PageTitle title={title}>
+              <StudyTrackNames />
               <Typography color="text.secondary" fontWeight="standard" variant="h6">
-                Includes Master's studies
+                {programmeId} - {programmeCode}
               </Typography>
+              <Typography color="text.secondary" fontWeight="standard" variant="h6">
+                Class of {getYearText(query.years)}
+                {semesterText}, {students.length} students
+              </Typography>
+              {showBachelorAndMaster ? (
+                <Typography color="text.secondary" fontWeight="standard" variant="h6">
+                  Includes Master's studies
+                </Typography>
+              ) : null}
+            </PageTitle>
+            {isError ? <HelpInfoCard body={errorCardBody} severity="error" title={errorCardTitle} /> : null}
+            {dataIsReady && !students.length ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
+            {isSuccess ? (
+              <PopulationDetails
+                filteredCourses={filteredCourses}
+                filteredStudents={filteredStudents}
+                idToGroupIdMap={population?.coursestatistics.idToGroupIdMap ?? {}}
+                isLoading={isLoading}
+                populationTags={populationTags}
+                query={query}
+              />
             ) : null}
-          </PageTitle>
-          {isError ? <HelpInfoCard body={errorCardBody} severity="error" title={errorCardTitle} /> : null}
-          {dataIsReady && !students.length ? <HelpInfoCard body={helpCardBody} title={helpCardTitle} /> : null}
-          {isSuccess ? (
-            <PopulationDetails
-              filteredCourses={filteredCourses}
-              filteredStudents={filteredStudents}
-              idToGroupIdMap={population?.coursestatistics.idToGroupIdMap ?? {}}
-              isLoading={isLoading}
-              populationTags={populationTags}
-              query={query}
-            />
-          ) : null}
-        </>
-      )}
-    </FilterView>
+          </>
+        )}
+      </FilterView>
+    </CurriculumProvider>
   )
 }

@@ -31,7 +31,7 @@ import { AdvancedSettings } from '@/components/PopulationDetails/AdvancedSetting
 import { PopulationQueryCard } from '@/components/PopulationDetails/PopulationQueryCard'
 import { useColumns as columnsGeneralTab } from '@/components/PopulationDetails/studentColumns'
 import { useDebouncedState } from '@/hooks/debouncedState'
-import { CurriculumProvider, useCurriculum } from '@/hooks/useCurriculum'
+import { useCurriculum } from '@/hooks/useCurriculum'
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { KeyboardBackspaceIcon } from '@/theme'
 import { PopulationQuery } from '@/types/populationSearch'
@@ -48,13 +48,7 @@ type PopulationDetailsProps = {
   idToGroupIdMap: Record<string, string>
 }
 
-export const PopulationDetails = (props: PopulationDetailsProps) => (
-  <CurriculumProvider programmeCode={props.query.programme} year={props.query?.years?.[0]}>
-    <PopulationDetailsContent {...props} />
-  </CurriculumProvider>
-)
-
-const PopulationDetailsContent = ({
+export const PopulationDetails = ({
   isLoading,
   query,
   populationTags,
