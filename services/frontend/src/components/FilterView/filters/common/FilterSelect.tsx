@@ -1,6 +1,8 @@
 import Box from '@mui/material/Box'
+import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
+import ListItemText from '@mui/material/ListItemText'
 import MenuItem from '@mui/material/MenuItem'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { SxProps, Theme } from '@mui/material/styles'
@@ -47,6 +49,13 @@ const DefaultMenuItem = <T extends ValidValueType>(option: SelectOption<T>) => (
   </MenuItem>
 )
 
+const CheckboxMenuItem = <T extends ValidValueType>(option: SelectOption<T>, checked: boolean) => (
+  <MenuItem disabled={option.disabled} key={option.key} value={option.value} sx={{ height: '2.75rem' }}>
+    <Checkbox checked={checked} size="medium" sx={{ p: 0, mr: 1 }} />
+    <ListItemText primary={option.text} />
+  </MenuItem>
+)
+
 export const FilterSelect = <T extends ValidValueType = string>({
   label,
   value,
@@ -75,11 +84,17 @@ export const FilterSelect = <T extends ValidValueType = string>({
               labelId={filterKey}
               multiple={multiple}
               onChange={onChange}
-              renderValue={InputItem}
+              renderValue={
+                InputItem ??
+                (selected =>
+                  selected
+                    .map(selectedValue => options.find(option => option.value === selectedValue)?.text)
+                    .join(', '))
+              }
               size="small"
               value={value}
             >
-              {options.map(MenuItem ?? DefaultMenuItem)}
+              {options.map(option => MenuItem?.(option) ?? CheckboxMenuItem(option, value.includes(option.value)))}
             </Select>
           ) : (
             <Select
