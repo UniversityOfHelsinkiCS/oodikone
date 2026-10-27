@@ -77,9 +77,9 @@ export const CourseTab = ({
                 name={getTextIn(stats[selected].name)!}
               />
             </Box>
-            {substitutionGroups.length && (
+            {substitutionGroups?.length ? (
               <>
-                <Typography component="h6" variant="subtitle2">
+                <Typography component="h6" variant="subtitle2" sx={{ pt: 1 }}>
                   {`Substitution${!substitutions ? 's not enabled' : ' groups'}`}
                 </Typography>
                 {substitutions && (
@@ -90,6 +90,10 @@ export const CourseTab = ({
                   </Grid>
                 )}
               </>
+            ) : (
+              <Typography component="h6" variant="subtitle2" sx={{ pt: 1 }}>
+                Course has no substitutions
+              </Typography>
             )}
           </Stack>
         </Stack>

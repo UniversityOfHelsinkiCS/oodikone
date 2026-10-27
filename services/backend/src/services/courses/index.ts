@@ -335,10 +335,9 @@ export const getYearlyStatsOfNew =
 
     const statistics = await counter.getFinalStatistics(anonymizationSalt)
 
-    const substitutionGroups =
-      substitutions && primaryCourse.substitutionGroups?.length
-        ? await getSubstitutionGroupDetails(primaryCourse.substitutionGroups)
-        : [[{ code: courseCode, name, groupId }]]
+    const substitutionGroups = primaryCourse.substitutionGroups?.length
+      ? await getSubstitutionGroupDetails(primaryCourse.substitutionGroups)
+      : []
 
     return {
       ...statistics,
