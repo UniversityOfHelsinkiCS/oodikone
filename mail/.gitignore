@@ -1,0 +1,14 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.out
+*.run.*
+*.synctex.gz
+*.toc
+*.pdf
+*.png
+*.svg
+!toskamopo.png
+!toska.pdf

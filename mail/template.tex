@@ -1,0 +1,64 @@
+\documentclass{report}
+\usepackage[a4paper, left=1cm, right=1cm, bottom=2cm, top=1cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+\setcounter{secnumdepth}{0}
+
+
+\begin{document}
+
+\noindent
+\begin{minipage}[b]{\textwidth}
+	\parbox{.5\textwidth}{
+		Matemaattisten tieteiden kandiohjelma\\
+		Helsingin yliopisto\\
+		Matemaattis-luonnontieteellinen tiedekunta\\
+		\today\\
+	}
+	% University of Helsinki\\
+	% Faculty of Science\\
+\hfill\includegraphics[width=70pt]{toska.pdf}
+\hrule
+\end{minipage}
+
+\begingroup
+\let\clearpage\relax
+\tableofcontents
+\endgroup
+
+\chapter*{Matemaattisten tieteiden kandiohjelma}
+\addcontentsline{toc}{chapter}{Matemaattisten tieteiden kandiohjelma}
+
+\section{Graduated}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Credit progress}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Started in programme}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Programmes}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\chapter*{Tietojenkäsittelytieteen kandiohjelma}
+\addcontentsline{toc}{chapter}{Tietojenkäsittelytieteen kandiohjelma}
+
+\section{Graduated}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Credit progress}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Started in programme}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+\section{Programmes}
+\includegraphics[width=\textwidth]{oodikone-graph}
+
+
+% \lipsum
+
+\end{document}
