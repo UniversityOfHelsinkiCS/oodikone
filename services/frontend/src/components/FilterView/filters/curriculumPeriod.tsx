@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { FilterSelect } from '@/components/FilterView/filters/common/FilterSelect'
 import { createFilter, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
+import { filterToolTips } from '@/common/InfoToolTips'
 
 type Options = { selected: string[] }
 type Args = undefined
@@ -42,6 +43,8 @@ const CurriculumPeriodFilterCard = ({
 
 export const curriculumPeriodFilter = createFilter<Options, Args, Precompute>({
   key: 'CurriculumPeriod',
+
+  info: filterToolTips.curriculumPeriod,
 
   title: 'Curriculum period',
 
