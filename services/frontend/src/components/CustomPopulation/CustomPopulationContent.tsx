@@ -16,7 +16,7 @@ import { CourseMatrixExport } from '@/components/CustomPopulation/CourseMatrixEx
 import { useColumns as columnsGeneralTab } from '@/components/CustomPopulation/studentColumns'
 import { UnihowDataExport } from '@/components/CustomPopulation/UnihowDataExport'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
-import { Loading } from '@/components/Loading'
+import { PageLoading } from '@/components/Loading'
 import { CreditAccumulationGraph } from '@/components/PopulationComponents/CreditAccumulation'
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
 import { PopulationStudents } from '@/components/PopulationComponents/Students'
@@ -136,49 +136,48 @@ export const CustomPopulationContent = ({
 
   return (
     <Box>
-      {isFetchingPopulation ? (
-        <Loading />
-      ) : (
+      <PageLoading isLoading={isFetchingPopulation} />
+      <PageTitle title={populationName ? `Custom population: ${populationName}` : 'Custom population'}>
+        <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
+          <Button onClick={resetState} startIcon={<KeyboardBackspaceIcon />} variant="outlined">
+            Back to search form
+          </Button>
+          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            {programmes.length > 0 ? (
+              <Stack direction="row" spacing={1}>
+                {programmes.map(programme => (
+                  <Chip
+                    key={programme}
+                    color="primary"
+                    icon={<LabelIcon fontSize="small" />}
+                    label={programme}
+                    sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
+                    variant="filled"
+                  />
+                ))}
+              </Stack>
+            ) : associatedProgramme ? (
+              <Tooltip title="Degree programme associated with the custom population">
+                <Chip
+                  color="primary"
+                  icon={<LabelIcon fontSize="small" />}
+                  label={studyProgrammes.find(programme => programme.key === associatedProgramme)?.text}
+                  sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
+                  variant="filled"
+                />
+              </Tooltip>
+            ) : (
+              <Typography fontStyle="italic">
+                No associated degree programme. Defaults to the latest active degree programme for each student.
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ width: '220px' }} />
+        </Box>
+      </PageTitle>
+      {isFetchingPopulation ? null : (
         <>
-          <PageTitle title={populationName ? `Custom population: ${populationName}` : 'Custom population'}>
-            <Box sx={{ display: 'flex', my: 2, alignItems: 'center' }}>
-              <Button onClick={resetState} startIcon={<KeyboardBackspaceIcon />} variant="outlined">
-                Back to search form
-              </Button>
-              <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                {programmes.length > 0 ? (
-                  <Stack direction="row" spacing={1}>
-                    {programmes.map(programme => (
-                      <Chip
-                        key={programme}
-                        color="primary"
-                        icon={<LabelIcon fontSize="small" />}
-                        label={programme}
-                        sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
-                        variant="filled"
-                      />
-                    ))}
-                  </Stack>
-                ) : associatedProgramme ? (
-                  <Tooltip title="Degree programme associated with the custom population">
-                    <Chip
-                      color="primary"
-                      icon={<LabelIcon fontSize="small" />}
-                      label={studyProgrammes.find(programme => programme.key === associatedProgramme)?.text}
-                      sx={{ width: 'fit-content', p: 1, justifySelf: 'center' }}
-                      variant="filled"
-                    />
-                  </Tooltip>
-                ) : (
-                  <Typography fontStyle="italic">
-                    No associated degree programme. Defaults to the latest active degree programme for each student.
-                  </Typography>
-                )}
-              </Box>
-              <Box sx={{ width: '220px' }} />
-            </Box>
-          </PageTitle>
-          {(discardedStudentNumbers?.length ?? 0) > 0 && !isFetchingPopulation && (
+          {(discardedStudentNumbers?.length ?? 0) > 0 && (
             <RightsNotification discardedStudentNumbers={discardedStudentNumbers} />
           )}
 
