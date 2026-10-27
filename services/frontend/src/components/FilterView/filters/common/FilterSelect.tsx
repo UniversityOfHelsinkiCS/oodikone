@@ -43,6 +43,8 @@ type MultiFilterSelectProps<T extends ValidValueType> = FilterSelectBaseProps<T>
 
 type FilterSelectProps<T extends ValidValueType> = SingleFilterSelectProps<T> | MultiFilterSelectProps<T>
 
+const menuProps = { slotProps: { paper: { sx: { maxHeight: '40vh' } } } }
+
 const DefaultMenuItem = <T extends ValidValueType>(option: SelectOption<T>) => (
   <MenuItem disabled={option.disabled} key={option.key} value={option.value}>
     {option.text}
@@ -82,6 +84,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
               disabled={disabled}
               label={label}
               labelId={filterKey}
+              MenuProps={menuProps}
               multiple={multiple}
               onChange={onChange}
               renderValue={
@@ -102,6 +105,7 @@ export const FilterSelect = <T extends ValidValueType = string>({
               disabled={disabled}
               label={label}
               labelId={filterKey}
+              MenuProps={menuProps}
               multiple={multiple}
               onChange={onChange}
               renderValue={InputItem}
