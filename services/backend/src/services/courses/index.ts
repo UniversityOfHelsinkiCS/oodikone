@@ -463,7 +463,7 @@ export const getCourseProvidersForCourses = async (courseIds: string[]) =>
 
 export const getCourseDetails = async (courseGroupIds: string[]) =>
   CourseModel.findAll({
-    attributes: ['id', 'groupId', 'code', 'name', 'substitutionGroups', 'isStudyModule'],
+    attributes: ['id', 'groupId', 'code', 'name', 'substitutionGroups', 'isStudyModule', 'isCustom'],
     where: { groupId: { [Op.in]: courseGroupIds }, isPrimary: true },
     raw: true,
   })

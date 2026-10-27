@@ -25,7 +25,7 @@ const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options,
   const { getTextIn } = useLanguage()
 
   const dropdownOptions = Object.values(courseStats)
-    .filter(cs => !courseFilters[cs.groupId])
+    .filter(cs => !cs.isCustom && !courseFilters[cs.groupId])
     .sort((a, b) => getSortRank(b.code) - getSortRank(a.code))
     .map(cs => ({
       key: `courseFilter-option-${cs.groupId}`,

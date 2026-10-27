@@ -133,6 +133,7 @@ void describe('courseFilter', () => {
           groupId: TKT002_GROUP,
           name: { fi: 'Testi' },
           isStudyModule: false,
+          isCustom: false,
           substitutionGroups: [[TKT001_GROUP, TKT003_GROUP]],
         },
       ],
