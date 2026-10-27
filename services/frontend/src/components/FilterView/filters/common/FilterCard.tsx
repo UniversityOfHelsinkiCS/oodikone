@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 
 import type { Filter, FilterOptions, FilterTrayProps } from '@/components/FilterView/filters/createFilter'
 import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { ClearIcon, KeyboardArrowRightIcon } from '@/theme'
 
 export const FilterCard = <Options extends FilterOptions, Args, Precompute>({
@@ -20,6 +21,8 @@ export const FilterCard = <Options extends FilterOptions, Args, Precompute>({
   onClear: () => void
 }) => {
   const { render, isActive, info, key, title } = filter
+  const { getTextIn } = useLanguage()
+  const infoText = typeof info === 'string' ? info : getTextIn(info)
 
   const active = isActive(props.options, undefined)
   const [opened, setOpened] = useState<boolean>(active)
@@ -65,7 +68,7 @@ export const FilterCard = <Options extends FilterOptions, Args, Precompute>({
             }}
           />
         ) : null}
-        {!!info && <InfoBox content={info} mini />}
+        {!!infoText && <InfoBox content={infoText} mini />}
       </Box>
       <Collapse in={opened} sx={{ transition: '300ms' }}>
         <Paper sx={{ p: 1.5 }} variant="outlined">

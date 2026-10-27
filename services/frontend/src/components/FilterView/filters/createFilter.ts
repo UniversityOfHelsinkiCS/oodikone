@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import type { FilterViewContextState } from '@/components/FilterView/context'
+import type { Name } from '@oodikone/shared/types'
 import type { FormattedStudent as Student } from '@oodikone/shared/types/studentData'
 import { mapValues } from '@oodikone/shared/util'
 
@@ -37,9 +38,9 @@ type FilterSettings<Options extends FilterOptions, Args, Precompute, SelectorT, 
   title: string
 
   /**
-   * User visible tooltip.
+   * User visible tooltip. Either a plain string or a localized name.
    */
-  info?: string
+  info?: string | Name
 
   /**
    * Default options with which the filter is initialized.
