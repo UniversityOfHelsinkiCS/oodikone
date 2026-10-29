@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { SECTION_QUERY_PARAM } from '@/components/Section/sectionLink'
 import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
@@ -18,7 +17,7 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
     return Number.isNaN(tabIndex) || tabIndex < 0 || tabIndex >= totalTabs ? initialTab : tabIndex
   }
 
-  const tab = useMemo(() => normalizeTab(params[id]), [id, normalizeTab])
+  const tab = normalizeTab(params[id])
 
   const switchToTab = (newTab: number) => {
     const nextTab = normalizeTab(newTab)
@@ -28,9 +27,9 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
     if (currentTab === nextTab) return
 
     // Section links point to a section on the current tab, so drop them when switching tabs
-    const { [SECTION_QUERY_PARAM]: _section, ...otherParams } = params
     const search = queryParamsToString({
-      ...otherParams,
+      ...params,
+      [SECTION_QUERY_PARAM]: undefined,
       [id]: nextTab,
     })
 
