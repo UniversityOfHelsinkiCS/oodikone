@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+import { SECTION_QUERY_PARAM } from '@/components/Section/sectionLink'
 import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 
 export const useTabs = (totalTabs: number, prefix?: string) => {
@@ -26,8 +27,10 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
 
     if (currentTab === nextTab) return
 
+    // Section links point to a section on the current tab, so drop them when switching tabs
+    const { [SECTION_QUERY_PARAM]: _section, ...otherParams } = params
     const search = queryParamsToString({
-      ...params,
+      ...otherParams,
       [id]: nextTab,
     })
 
