@@ -388,7 +388,7 @@ test.describe('Degree programme overview', () => {
       await expect(barChart.getByText('58.5%')).toBeVisible() // The percentage for total graduated, to check that the graph renders
 
       await page.getByTestId('programme-progress-bar-chart-section').getByText('58.5%').hover()
-      await expect(page.getByText('Graduated: 134')).toBeVisible()
+      await expect(page.getByText('Graduated (bachelor): 134')).toBeVisible()
     })
 
     test.describe('Average graduation times section', () => {
