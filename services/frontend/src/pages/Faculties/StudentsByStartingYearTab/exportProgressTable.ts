@@ -61,14 +61,16 @@ export const exportProgressTable = (
     progressStatsBcMsProg,
     progressStatsDoctorProg,
   ]
+  const years = progressStatsBachelor.map(row => row[0])
+  // Doctoral programmes have the same headers every year, without the start year column
+  const doctorTitles = doctorStats.tableTitles.slice(1)
   const tableHeadersDataProg = [
     progressStats?.data?.yearlyBachelorTitles,
     progressStats?.data?.yearlyMasterTitles,
     progressStats?.data?.yearlyBcMsTitles,
-    doctorStats.tableTitles,
+    years.map(() => doctorTitles),
   ]
   counter = -1
-  const years = progressStatsBachelor.map(row => row[0])
 
   programmeData.forEach(programmes => {
     counter += 1
@@ -77,10 +79,7 @@ export const exportProgressTable = (
         (results, programme) => [
           ...results,
           ...programmes[programme as string].map((yearRow, yearIndex) => {
-            const yearlyHeaders =
-              tableHeadersDataProg[counter][0] !== ''
-                ? tableHeadersDataProg[counter][yearIndex]
-                : tableHeadersDataProg[counter].slice(1)
+            const yearlyHeaders = tableHeadersDataProg[counter][yearIndex]
             return {
               'Academic Year': years[yearIndex],
               Programme: programme,

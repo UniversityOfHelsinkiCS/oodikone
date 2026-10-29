@@ -50,12 +50,25 @@ const isBetween = (number: number, lowerLimit: number, upperLimit: number) => {
   return (lowerLimit === undefined || number >= lowerLimit) && (upperLimit === undefined || number < upperLimit)
 }
 
+export type DegreeLabel = 'bachelor' | 'master' | 'doctor'
+
+const withDegree = (label: string, degree?: DegreeLabel) => (degree ? `${label} (${degree})` : label)
+
 export const calculateStats = (
   creditCounts: Record<string, number[]> | undefined,
   graduatedCount: Record<string, number> | undefined,
   maximumAmountOfCredits: number,
-  minimumAmountOfCredits = 0,
-  numberOfCreditCategories = 7
+  {
+    startDegree,
+    graduatedDegree = startDegree,
+    minimumAmountOfCredits = 0,
+    numberOfCreditCategories = 7,
+  }: {
+    startDegree?: DegreeLabel
+    graduatedDegree?: DegreeLabel
+    minimumAmountOfCredits?: number
+    numberOfCreditCategories?: number
+  } = {}
 ) => {
   const tableStats: Array<Array<number | string>> = []
   if (!creditCounts || !Object.keys(creditCounts).length) return null
@@ -68,9 +81,9 @@ export const calculateStats = (
     numberOfCreditCategories - 1,
     minimumAmountOfCredits
   )
-  const tableTitles = ['', 'All'].concat(
+  const tableTitles = [withDegree('Start year', startDegree), 'All'].concat(
     limits.map(limit => {
-      if (limit == 'Graduated') return 'Graduated'
+      if (limit === 'Graduated') return withDegree('Graduated', graduatedDegree)
       else if (limit[0] === undefined) return `< ${limit[1]} credits`
       else if (limit[1] === undefined) return `≥ ${limit[0]} credits`
 

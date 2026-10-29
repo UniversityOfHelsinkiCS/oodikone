@@ -21,16 +21,20 @@ export const FacultyProgress = ({
   const creditCounts = progressStats?.creditCounts
   const graduatedCount = progressStats?.graduatedCount
 
-  const bachelorStats = calculateStats(creditCounts?.bachelor, graduatedCount?.bachelor, 180)
+  const bachelorStats = calculateStats(creditCounts?.bachelor, graduatedCount?.bachelor, 180, {
+    startDegree: 'bachelor',
+  })
   const bachelorMasterStats = calculateStats(
     creditCounts?.bachelorMaster,
     graduatedCount?.bachelorMaster,
     faculty === 'H90' ? 360 : 300,
-    180,
-    7
+    { startDegree: 'bachelor', graduatedDegree: 'master', minimumAmountOfCredits: 180 }
   )
-  const masterStats = calculateStats(creditCounts?.master, graduatedCount?.master, 120)
-  const doctorStats = calculateStats(creditCounts?.doctor, graduatedCount?.doctor, 40, 0, 5)
+  const masterStats = calculateStats(creditCounts?.master, graduatedCount?.master, 120, { startDegree: 'master' })
+  const doctorStats = calculateStats(creditCounts?.doctor, graduatedCount?.doctor, 40, {
+    startDegree: 'doctor',
+    numberOfCreditCategories: 5,
+  })
 
   const sortKeys = (stats: Record<string, number[][]>) => {
     return sortProgrammeKeys(

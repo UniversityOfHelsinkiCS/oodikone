@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack'
 
 import { useEffect, useState } from 'react'
 
-import { getTargetCreditsForProgramme } from '@/common'
+import { getTargetCreditsForProgramme, isMastersProgramme } from '@/common'
 import { studyProgrammeToolTips } from '@/common/InfoToolTips'
 import { Toggle } from '@/components/common/toggle/Toggle'
 import { ToggleContainer } from '@/components/common/toggle/ToggleContainer'
@@ -22,7 +22,7 @@ import { YearSelector } from '@/pages/StudyProgramme/StudyTracksAndClassStatisti
 import { useGetAuthorizedUserQuery } from '@/redux/auth'
 import { useGetStudyTrackStatsQuery } from '@/redux/studyProgramme'
 import { hasAccessToProgrammePopulation } from '@/util/access'
-import { calculateStats } from '@/util/faculty'
+import { calculateStats, DegreeLabel } from '@/util/faculty'
 import { getGraduationGraphTitle } from '@/util/studyProgramme'
 import { ProgrammeOrStudyTrackGraduationStats, ProgrammeClassSizes, ProgrammeMedians } from '@oodikone/shared/types'
 
@@ -80,6 +80,14 @@ export const StudyTracksAndClassStatisticsTab = ({
   const programmeCode = combinedProgramme ? `${studyProgramme}-${combinedProgramme}` : studyProgramme
   const targetCredits = getTargetCreditsForProgramme(programmeCode)
 
+  const getDegreeLabel = (): DegreeLabel | undefined => {
+    if (combinedProgramme) return undefined
+    if (isMastersProgramme(studyProgramme)) return 'master'
+    if (studyProgramme.startsWith('KH')) return 'bachelor'
+    if (studyProgramme.startsWith('T')) return 'doctor'
+    return undefined
+  }
+
   const getProgressStats = () => {
     const creditCounts =
       studyTrack === studyProgramme ? studyTrackStats?.creditCounts : studyTrackStats?.creditCountsByTrack[studyTrack]
@@ -89,7 +97,7 @@ export const StudyTracksAndClassStatisticsTab = ({
         ? studyTrackStats?.graduatedCount
         : studyTrackStats?.graduatedCountByTrack[studyTrack]
 
-    const progressStats = calculateStats(creditCounts, graduatedCount, targetCredits)
+    const progressStats = calculateStats(creditCounts, graduatedCount, targetCredits, { startDegree: getDegreeLabel() })
     progressStats?.chartStats.forEach(creditCategory => {
       const [total, ...years] = creditCategory.data
       creditCategory.data = [total, ...years.reverse()]
@@ -111,7 +119,11 @@ export const StudyTracksAndClassStatisticsTab = ({
 
     const progressComboStats =
       Object.keys(studyTrackStats?.creditCountsCombo ?? {}).length > 0
-        ? calculateStats(creditCounts, graduatedCount, targetCredits + 180, 180)
+        ? calculateStats(creditCounts, graduatedCount, targetCredits + 180, {
+            startDegree: 'bachelor',
+            graduatedDegree: 'master',
+            minimumAmountOfCredits: 180,
+          })
         : null
 
     progressComboStats?.chartStats?.forEach(creditCategory => {

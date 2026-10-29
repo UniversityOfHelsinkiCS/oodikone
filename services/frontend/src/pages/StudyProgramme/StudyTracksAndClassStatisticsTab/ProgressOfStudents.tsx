@@ -26,13 +26,6 @@ export const ProgressOfStudents = ({
 }) => {
   const hasComboStats = progressComboStats !== null
 
-  const comboTitles = hasComboStats ? ['Bachelor start year', ...progressComboStats.tableTitles.slice(1)] : []
-  const titles = progressStats
-    ? hasComboStats
-      ? ['Master start year', ...progressStats.tableTitles.slice(1)]
-      : progressStats.tableTitles
-    : []
-
   return (
     <Stack spacing={2}>
       {hasComboStats && (
@@ -46,7 +39,7 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressComboStats.tableStats} titles={comboTitles} />
+          <ProgressTable data={progressComboStats.tableStats} titles={progressComboStats.tableTitles} />
         </Stack>
       )}
       {progressStats !== null && (
@@ -60,7 +53,7 @@ export const ProgressOfStudents = ({
               years,
             }}
           />
-          <ProgressTable data={progressStats.tableStats} titles={titles} />
+          <ProgressTable data={progressStats.tableStats} titles={progressStats.tableTitles} />
         </Stack>
       )}
     </Stack>

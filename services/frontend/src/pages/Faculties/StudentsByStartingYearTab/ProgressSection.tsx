@@ -38,26 +38,26 @@ export const ProgressSection = ({
   const bachelorStats = calculateStats(
     progressStats?.data?.creditCounts?.bachelor,
     progressStats?.data?.graduatedCount?.bachelor,
-    180
+    180,
+    { startDegree: 'bachelor' }
   )
   const bachelorMasterStats = calculateStats(
     progressStats?.data?.creditCounts?.bachelorMaster,
     progressStats?.data?.graduatedCount?.bachelorMaster,
     faculty.code === 'H90' ? 360 : 300,
-    180,
-    7
+    { startDegree: 'bachelor', graduatedDegree: 'master', minimumAmountOfCredits: 180 }
   )
   const masterStats = calculateStats(
     progressStats?.data?.creditCounts?.master,
     progressStats?.data?.graduatedCount?.master,
-    120
+    120,
+    { startDegree: 'master' }
   )
   const doctorStats = calculateStats(
     progressStats?.data?.creditCounts?.doctor,
     progressStats?.data?.graduatedCount?.doctor,
     40,
-    0,
-    5
+    { startDegree: 'doctor', numberOfCreditCategories: 5 }
   )
 
   const hasNonZeroStats = stats => {
