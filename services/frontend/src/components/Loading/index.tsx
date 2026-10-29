@@ -22,9 +22,9 @@ export const LoadingSection = ({ ...sectionProps }: PaperProps) => {
 /**
  * Dims and occupies the full screen
  */
-export const PageLoading = ({ isLoading }: { isLoading: boolean }) => (
+export const PageLoading = ({ isLoading }: { isLoading: boolean | undefined }) => (
   <Backdrop
-    open={isLoading}
+    open={!!isLoading}
     sx={theme => ({ color: theme.palette.grey[300], zIndex: theme => theme.zIndex.drawer + 1 })}
   >
     <CircularProgress color="inherit" size="3em" />
