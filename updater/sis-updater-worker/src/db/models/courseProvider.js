@@ -6,14 +6,9 @@ class CourseProvider extends Model {}
 
 CourseProvider.init(
   {
+    // NB: course group id, not course code
     coursecode: {
       type: STRING,
-      references: {
-        model: 'course',
-        key: 'id',
-      },
-      onUpdate: 'cascade',
-      onDelete: 'cascade',
     },
     shares: {
       type: JSONB,
