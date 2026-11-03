@@ -155,7 +155,7 @@ export const SearchForm = () => {
 
   return (
     <Stack gap={2}>
-      <Section title="Search for courses">
+      <Section title="Search for courses and modules">
         <Box autoComplete="off" component="form" noValidate>
           <Stack gap={2}>
             <Grid alignItems="center" container spacing={2}>
