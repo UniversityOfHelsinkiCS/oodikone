@@ -54,8 +54,11 @@ const ValueCells = ({ row, showPercentages }: { row: StatsTableRow; showPercenta
   })
 }
 
+export const citizenshipDefaultInfo =
+  "Hover over the 'Other' cell to see which citizenships the students have. Students with a Finnish and 'Other' citizenship are counted in both categories."
+
 export const StartingYearStatsTable = ({
-  citizenshipInfo = "Hover over 'Other' cell to see which citizenships (other than Finland) students have",
+  citizenshipInfo = citizenshipDefaultInfo,
   combinedProgramme = false,
   cypress,
   groups,

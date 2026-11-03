@@ -3,7 +3,11 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { PopulationLink } from '@/components/common/PopulationLink'
-import { StartingYearStatsTable, StatsTableGroup } from '@/components/common/StartingYearStatsTable'
+import {
+  citizenshipDefaultInfo,
+  StartingYearStatsTable,
+  StatsTableGroup,
+} from '@/components/common/StartingYearStatsTable'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { DegreeProgramme } from '@/types/api/faculty'
 import { getCalendarYears } from '@/util/timeAndDate'
@@ -86,7 +90,7 @@ export const FacultyStudentDataTable = ({
 
   return (
     <StartingYearStatsTable
-      citizenshipInfo="Hover over 'Other' cell to see which citizenships (other than Finland) students have. Shown only for degree programmes."
+      citizenshipInfo={`${citizenshipDefaultInfo} Note: Shown only for degree programmes.`}
       cypress="faculty-student-stats-table"
       groups={groups}
       showPercentages={showPercentages}
