@@ -368,6 +368,8 @@ test.describe('Population statistics tests', () => {
             2020,
             '2020-08-01',
             '2020-08-01',
+            '',
+            '',
             '2022-06-13',
             23,
             '',
@@ -378,8 +380,6 @@ test.describe('Population statistics tests', () => {
             'Avoin väylä',
             'Male',
             'Suomi',
-            '',
-            '',
             '',
             '',
           ].map(n => n.toString())
