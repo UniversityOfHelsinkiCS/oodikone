@@ -167,6 +167,15 @@ export const useGetColumnDefinitions = ({
           columnHelper.accessor('programmeStart', { header: 'Programme' }),
         ],
       }),
+      columnHelper.accessor('curriculumPeriod', { header: 'Curriculum period' }),
+      columnHelper.accessor('mostRecentAttainment', {
+        header: _ => (
+          <TableHeaderWithTooltip
+            header="Latest attainment date"
+            tooltipText={populationStudentsToolTips.generalTab.mostRecentAttainment}
+          />
+        ),
+      }),
       columnHelper.accessor('graduationDate', {
         header: combinedProgramme ? 'Bachelor graduation date' : 'Graduation date',
       }),
@@ -277,15 +286,6 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('admissionType', { header: 'Admission Type' }),
       columnHelper.accessor('gender', { header: 'Gender' }),
       columnHelper.accessor('citizenships', { header: 'Citizenships' }),
-      columnHelper.accessor('curriculumPeriod', { header: 'Curriculum period' }),
-      columnHelper.accessor('mostRecentAttainment', {
-        header: _ => (
-          <TableHeaderWithTooltip
-            header="Latest attainment date"
-            tooltipText={populationStudentsToolTips.generalTab.mostRecentAttainment}
-          />
-        ),
-      }),
       columnHelper.accessor('tvex', {
         header: _ => <TableHeaderWithTooltip header="TVEX" tooltipText={populationStudentsToolTips.generalTab.tvex} />,
         cell: cell => {
