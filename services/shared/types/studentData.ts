@@ -160,7 +160,7 @@ export type FormattedStudent = {
   citizenships: Name[]
   criteriaProgress: Record<string, CriteriaYear>
   curriculumVersion: string | null
-  hasPersonalIdentityCode: boolean
+  hasPersonalIdentityCode: boolean | null // null for obfuscated students
 
   transferredStudyright: boolean
   transferSource: string | undefined

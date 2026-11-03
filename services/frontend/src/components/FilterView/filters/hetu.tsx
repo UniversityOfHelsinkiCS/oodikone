@@ -44,7 +44,7 @@ export const hetuFilter = createFilter<Options, Args, Precompute>({
   isActive: ({ mode }) => mode !== 0,
 
   filter(student, { options: { mode } }) {
-    const hetu = student.hasPersonalIdentityCode
+    const hetu = !!student.hasPersonalIdentityCode
 
     switch (Number(mode)) {
       case 0:

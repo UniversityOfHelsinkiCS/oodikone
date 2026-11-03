@@ -73,6 +73,9 @@ const obfuscateStuff = ({
 
         obfuscated: true,
         iv,
+        citizenships: [],
+        gender_code: '',
+        hasPersonalIdentityCode: null,
         studentNumber,
         firstnames: '',
         lastname: '',
