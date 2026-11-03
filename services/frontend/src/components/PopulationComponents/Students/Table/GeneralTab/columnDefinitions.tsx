@@ -220,7 +220,19 @@ export const useGetColumnDefinitions = ({
       }),
 
       columnHelper.accessor('option', {
-        header: isMastersProgramme ? 'Bachelor' : 'Master',
+        header: _ => {
+          const opt = isMastersProgramme ? 'Bachelor' : 'Master'
+          return (
+            <TableHeaderWithTooltip
+              header={opt}
+              tooltipText={`The ${opt.toLowerCase()}'s programme associated with the same study right${
+                !isMastersProgramme
+                  ? ". The programme is only set for students who have already graduated from the bachelor's programme and moved on to their master's studies."
+                  : ''
+              }`}
+            />
+          )
+        },
         cell: cell => {
           const value = cell.getValue()
           if (!value) return null
