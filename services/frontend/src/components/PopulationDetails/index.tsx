@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { CurriculumPicker } from '@/components/common/CurriculumPicker'
 import { Link } from '@/components/common/Link'
-import { PanelView } from '@/components/common/PanelView'
+import { Panel, PanelView } from '@/components/common/PanelView'
 import {
   hopsFilter as studyPlanFilter,
   hopsFilter,
@@ -91,8 +91,9 @@ export const PopulationDetails = ({
     !fullStudyProgrammeRights.includes(programme) &&
     !fullStudyProgrammeRights.includes(combinedProgramme ?? '')
 
-  const panels = [
+  const panels: (Panel | null)[] = [
     {
+      anchorId: 'credit-accumulation',
       title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: filteredStudents.length ? (
         // TODO: make wrapper for when no data.
@@ -108,6 +109,7 @@ export const PopulationDetails = ({
     },
     query.years.length <= 1
       ? {
+          anchorId: 'credit-statistics',
           title: 'Credit statistics',
           content: <CreditStatistics filteredStudents={filteredStudents} query={query} />,
         }
@@ -141,6 +143,7 @@ export const PopulationDetails = ({
     },
     !onlyIamRights
       ? {
+          anchorId: 'students',
           title: `Students (${filteredStudents.length})`,
           content: (
             <PopulationStudents
@@ -177,7 +180,7 @@ export const PopulationDetails = ({
           ),
         }
       : null,
-  ].filter(panel => !!panel)
+  ]
 
   return (
     <>

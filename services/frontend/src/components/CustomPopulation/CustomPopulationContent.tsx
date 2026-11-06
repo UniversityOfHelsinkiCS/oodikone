@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
 import { PageTitle } from '@/components/common/PageTitle'
-import { PanelView } from '@/components/common/PanelView'
+import { Panel, PanelView } from '@/components/common/PanelView'
 import { StudentAmountLimiter } from '@/components/common/StudentAmountLimiter'
 import { StyledMessage } from '@/components/common/StyledMessage'
 import { CourseMatrixExport } from '@/components/CustomPopulation/CourseMatrixExport'
@@ -61,8 +61,9 @@ export const CustomPopulationContent = ({
     setStudentAmountLimit(Number.isNaN(Number(value)) ? studentAmountLimit : Number(value))
   }
 
-  const panels = [
+  const panels: Panel[] = [
     {
+      anchorId: 'credit-accumulation',
       title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: (
         <CreditAccumulationGraph
@@ -95,6 +96,7 @@ export const CustomPopulationContent = ({
       ),
     },
     {
+      anchorId: 'students',
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents
@@ -188,7 +190,7 @@ export const CustomPopulationContent = ({
           )}
           {unfilteredPopulationLength > 0 && (
             <Box sx={{ mt: 2 }}>
-              <PanelView panels={panels} />
+              <PanelView linkable={false} panels={panels} />
             </Box>
           )}
         </>

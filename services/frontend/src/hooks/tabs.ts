@@ -1,4 +1,7 @@
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+
+import { ViewScopeContext } from '@/components/common/viewPath'
 import { SECTION_QUERY_PARAM } from '@/components/Section/sectionLink'
 import { useParseQueryParams, queryParamsToString } from '@/util/queryparams'
 
@@ -43,6 +46,34 @@ export const useTabs = (totalTabs: number, prefix?: string) => {
       }
     )
   }
+
+  return [tab, switchToTab] as const
+}
+
+/** Tabs inside a PanelView panel, linkable with `?view=<panel>.<key>`. Outside a panel this is like `useState(0)`. */
+export const useLinkedTabs = (keys: string[]) => {
+  const scope = useContext(ViewScopeContext)
+  const [tab, setTab] = useState(() => Math.max(0, keys.indexOf(scope?.linkedPath[0] ?? '')))
+
+  const currentKey = keys[tab]
+  const panel = scope?.panel
+  const setCurrentTab = scope?.setCurrentTab
+  const dropLink = scope?.dropLink
+
+  useEffect(() => {
+    if (panel) setCurrentTab?.(panel, currentKey)
+    return () => {
+      if (panel) setCurrentTab?.(panel, undefined)
+    }
+  }, [panel, setCurrentTab, currentKey])
+
+  const switchToTab = useCallback(
+    (newTab: number) => {
+      setTab(newTab)
+      dropLink?.()
+    },
+    [dropLink]
+  )
 
   return [tab, switchToTab] as const
 }

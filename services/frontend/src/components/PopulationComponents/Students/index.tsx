@@ -3,7 +3,6 @@ import { Theme } from '@mui/material/styles'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import dayjs from 'dayjs'
-import { useState } from 'react'
 
 import { coursePopulationToolTips, populationStudentsToolTips } from '@/common/InfoToolTips'
 
@@ -13,6 +12,8 @@ import { type FormattedStudentData, GeneralTab } from '@/components/PopulationCo
 import { ModulesTabContainer as ModulesTab } from '@/components/PopulationComponents/Students/Table/ModulesTab'
 import { ProgressTable as ProgressTab } from '@/components/PopulationComponents/Students/Table/ProgressTab'
 import { TagsTab } from '@/components/PopulationComponents/Students/Table/TagsTab'
+import { toSectionSlug } from '@/components/Section/sectionLink'
+import { useLinkedTabs } from '@/hooks/tabs'
 import { FilteredCourse } from '@/util/coursesOfPopulation'
 import { useParseQueryParams } from '@/util/queryparams'
 import { isBachelorOrLicentiateProgramme } from '@/util/studyProgramme'
@@ -68,8 +69,6 @@ export const PopulationStudents = ({
   generalTabColumnFunction,
   generalTabFormattingFunction,
 }: PopulationStudentsProps) => {
-  const [tab, setTab] = useState(0)
-
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant))
     throw new Error(`${variant} is not a proper variant!`)
 
@@ -158,6 +157,8 @@ export const PopulationStudents = ({
   const tabs = Object.entries(availableTabs)
     .filter(([key, _]) => contentToInclude.tabs.includes(key as keyof typeof availableTabs))
     .map(([key, val]) => ({ label: key, render: val }))
+
+  const [tab, setTab] = useLinkedTabs(tabs.map(({ label }) => toSectionSlug(label)))
 
   if (filteredStudents.length === 0) return null
 

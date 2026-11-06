@@ -1,9 +1,7 @@
 import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import type { SxProps, Theme } from '@mui/material/styles'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useEffect, useRef } from 'react'
 
@@ -11,33 +9,9 @@ import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { ErrorMessage } from '@/components/Section/ErrorMessage'
 import { ExportButton } from '@/components/Section/ExportButton'
 import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
+import { CopyLinkButton } from '@/components/Section/CopyLinkButton'
 import { buildSectionUrl, SECTION_QUERY_PARAM, toSectionSlug } from '@/components/Section/sectionLink'
-import { useStatusNotification } from '@/components/StatusNotification/Context'
-import { LinkIcon } from '@/theme'
 import { useParseQueryParams } from '@/util/queryparams'
-
-const CopySectionLinkButton = ({ cypress, slug }: { cypress: string; slug: string }) => {
-  const { setStatusNotification, closeNotification } = useStatusNotification()
-
-  const copyLinkToClipboard = async () => {
-    await navigator.clipboard.writeText(buildSectionUrl(window.location.href, slug))
-    setStatusNotification('Copied link to section')
-    setTimeout(() => closeNotification(), 5000)
-  }
-
-  return (
-    <Tooltip arrow title="Copy link to this section">
-      <IconButton
-        aria-label="Copy link to this section"
-        data-cy={`${cypress}-copy-link-button`}
-        onClick={() => void copyLinkToClipboard()}
-        size="small"
-      >
-        <LinkIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
-  )
-}
 
 export const Section = ({
   anchorId,
@@ -91,7 +65,9 @@ export const Section = ({
             <Typography component="h2" variant="h5">
               {title}
             </Typography>
-            {title && slug ? <CopySectionLinkButton cypress={cypress} slug={slug} /> : null}
+            {title && slug ? (
+              <CopyLinkButton buildUrl={href => buildSectionUrl(href, slug)} cypress={cypress} target="section" />
+            ) : null}
           </Stack>
           <Stack direction="row" gap={1}>
             {exportOnClick ? (

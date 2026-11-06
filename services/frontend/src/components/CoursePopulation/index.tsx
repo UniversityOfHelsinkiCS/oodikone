@@ -164,6 +164,7 @@ export const CoursePopulation = () => {
       ),
     },
     {
+      anchorId: 'students',
       title: `Students (${filteredStudents.length})`,
       content: (
         <PopulationStudents

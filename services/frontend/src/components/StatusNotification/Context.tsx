@@ -8,6 +8,7 @@ interface StatusNotificationContext {
   open: boolean
   setStatusNotification: (message: string, severity?: AlertColor) => void
   closeNotification: () => void
+  closeNotificationIfShowing: (message: string) => void
 }
 
 const StatusNotificationContext = createContext<StatusNotificationContext | undefined>(undefined)
@@ -35,8 +36,14 @@ export const StatusNotificationProvider = ({ children }: { children: ReactNode }
     setMessage('')
   }
 
+  const closeNotificationIfShowing = (expected: string) => {
+    setMessage(current => (current === expected ? '' : current))
+  }
+
   return (
-    <StatusNotificationContext.Provider value={{ message, severity, open, setStatusNotification, closeNotification }}>
+    <StatusNotificationContext.Provider
+      value={{ message, severity, open, setStatusNotification, closeNotification, closeNotificationIfShowing }}
+    >
       {children}
     </StatusNotificationContext.Provider>
   )

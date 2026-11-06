@@ -98,6 +98,8 @@ test.describe('Custom population tests', () => {
     test('Finds a proper population', async ({ page }) => {
       await searchFor(page, students1, '\n')
       await hasLanded(page)
+      // The population is not persisted, so its panels can't be linked
+      await expect(page.locator('[data-cy$="-copy-link-button"]')).toHaveCount(0)
       await containsAmountOfStudents(page, students1.length)
       await containsSpecificStudents(page, students1)
     })

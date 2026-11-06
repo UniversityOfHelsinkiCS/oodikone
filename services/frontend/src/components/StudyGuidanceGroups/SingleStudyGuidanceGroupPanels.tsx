@@ -92,6 +92,7 @@ const SingleStudyGuidanceGroupPanelsContent = ({
   }
   const panels = [
     {
+      anchorId: 'credit-accumulation',
       title: `Credit accumulation (for ${filteredStudents.length} student${filteredStudents.length > 1 ? 's' : ''})`,
       content: (
         <>
@@ -131,6 +132,7 @@ const SingleStudyGuidanceGroupPanelsContent = ({
       ),
     },
     {
+      anchorId: 'students',
       title: `Students (${filteredStudents.length})`,
       content: (
         // @ts-expect-error FIX typing

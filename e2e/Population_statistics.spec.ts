@@ -281,6 +281,32 @@ test.describe('Population statistics tests', () => {
       })
     })
 
+    test.describe('Panel links', () => {
+      test('Panel link opens the linked panel and its selected tab', async ({ page }) => {
+        const reactWarnings: string[] = []
+        page.on('console', message => {
+          if (/validateDOMNesting|cannot be given refs/.test(message.text())) reactWarnings.push(message.text())
+        })
+        await page.goto(`${pathToMathBSc2020}&view=credit-statistics.distribution-development`)
+
+        await expect(page.locator('#credit-statistics')).toBeVisible()
+        await expect(page.getByTestId('distribution-development-tab')).toHaveAttribute('aria-selected', 'true')
+        await expect(page.getByTestId('Credit statistics-data').getByText('Chart settings')).toBeVisible()
+        await expect(page.getByTestId('Courses of class-data')).not.toBeVisible()
+        expect(reactWarnings).toEqual([])
+      })
+
+      test('Panel link opens the students panel on the linked tab', async ({ page }) => {
+        await page.goto(`${pathToMathBSc2020}&view=students.modules`)
+
+        await expect(page.getByTestId('student-table-tabs').getByRole('tab', { name: 'Modules' })).toHaveAttribute(
+          'aria-selected',
+          'true'
+        )
+        await expect(page.getByTestId('ooditable-modules').getByText('MAT110')).toBeVisible()
+      })
+    })
+
     test.describe('Courses of class', () => {
       test('Is displayed and link to individual course stats page works and has substitutions enabled', async ({
         page,

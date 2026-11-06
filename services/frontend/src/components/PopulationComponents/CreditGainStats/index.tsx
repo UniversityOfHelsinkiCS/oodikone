@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import { useState } from 'react'
 
 import { getMonthsForDegree } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -9,6 +8,7 @@ import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
 import { CreditDistributionDevelopment } from '@/components/PopulationComponents/CreditGainStats/CreditDistributionDevelopment'
 import { CreditsGainedTab } from '@/components/PopulationComponents/CreditGainStats/CreditsGainedTab'
 import { StatisticsTab } from '@/components/PopulationComponents/CreditGainStats/StatisticsTab'
+import { useLinkedTabs } from '@/hooks/tabs'
 import { PopulationQuery } from '@/types/populationSearch'
 import { FormattedStudent } from '@oodikone/shared/types'
 
@@ -21,7 +21,7 @@ export const CreditStatistics = ({ filteredStudents, query }: CreditStatisticsPr
   const { programme, years, combinedProgramme } = query
   const year = years[0]
 
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useLinkedTabs(['credits-gained', 'statistics', 'distribution-development'])
 
   const programmeGoalTime = combinedProgramme
     ? getMonthsForDegree(`${programme}-${combinedProgramme}`)
@@ -32,7 +32,7 @@ export const CreditStatistics = ({ filteredStudents, query }: CreditStatisticsPr
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs data-cy="credit-stats-tab" onChange={(_, value) => setSelectedTab(value)} value={selectedTab}>
+        <Tabs data-cy="credit-stats-tab" onChange={(_, value: number) => setSelectedTab(value)} value={selectedTab}>
           <Tab data-cy="credits-gained-tab" label="Credits gained" />
           <Tab data-cy="credit-statistics-tab" label="Statistics" />
           <Tab data-cy="distribution-development-tab" label="Distribution development" />
