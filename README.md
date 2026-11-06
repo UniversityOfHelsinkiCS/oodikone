@@ -22,7 +22,9 @@ Pre-installation steps:
 
 - Clone this repo
   - `git@github.com:UniversityOfHelsinkiCS/oodikone.git`
-- Login to Toska's Docker Hub (see Toska's GitLab for more information)
+- Login to docker (2 logins), refer to Toska's GitLab
+  - Containers with test data (registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi)
+  - Default image registry (registry.version.helsinki.fi)
 - Copy the `.env.template` file to `.env` and populate with correct tokens
   - `cp .env.template .env`
 
