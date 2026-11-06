@@ -24,7 +24,7 @@ jobs:
           environment: 'production'
           release_version: ${{ steps.extract_version.outputs.VERSION }}
           push: true
-          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
+          registry_password: ${{ secrets.VERSION_PUSH_SECRET }}
 
   release_frontend:
     name: 'Build and release frontend'
@@ -46,7 +46,7 @@ jobs:
           release_version: ${{ steps.extract_version.outputs.VERSION }}
           sentry_dns: ${{ secrets.OODIKONE_FRONTEND_SENTRY_DSN }} # Used only in production
           push: true
-          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
+          registry_password: ${{ secrets.VERSION_PUSH_SECRET }}
 
   sentry_release_frontend:
     name: 'Create Sentry release for frontend'
@@ -63,8 +63,15 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Login to registry.version.helsinki.fi
+        uses: docker/login-action@v4
+        with:
+          registry: registry.version.helsinki.fi
+          username: kontit
+          password: ${{ secrets.VERSION_PULL_SECRET }}
+
       - name: Pull frontend image and create a container
-        run: docker create --name frontend quay.io/toska/oodikone-frontend:production
+        run: docker create --name frontend registry.version.helsinki.fi/toska/openshift/kontit/oodikone-frontend:production
 
       - name: Copy assets from the frontend container
         run: docker cp frontend:/opt/app-root/frontend/build ./build
@@ -98,8 +105,15 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Login to registry.version.helsinki.fi
+        uses: docker/login-action@v4
+        with:
+          registry: registry.version.helsinki.fi
+          username: kontit
+          password: ${{ secrets.VERSION_PULL_SECRET }}
+
       - name: Pull backend image and create a container
-        run: docker create --name backend quay.io/toska/oodikone-backend:production
+        run: docker create --name backend registry.version.helsinki.fi/toska/openshift/kontit/oodikone-backend:production
 
       - name: Copy assets from the backend container
         run: docker cp backend:/opt/app-root/backend/dist ./dist

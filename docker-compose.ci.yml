@@ -145,7 +145,7 @@ services:
   jami:
     <<: *defaults
     container_name: oodikone-jami
-    image: quay.io/toska/jami:production
+    image: registry.version.helsinki.fi/toska/openshift/kontit/jami:production
     depends_on:
       jami-db:
         condition: service_healthy

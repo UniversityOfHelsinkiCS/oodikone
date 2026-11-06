@@ -16,7 +16,7 @@ inputs:
     default: 'false'
   registry_password:
     required: false
-    description: Password to quay.io registry
+    description: Push token for registry.version.helsinki.fi
     default: ''
 
 runs:
@@ -30,17 +30,17 @@ runs:
       uses: docker/metadata-action@v6
       with:
         images: |
-          quay.io/toska/oodikone-backend
+          registry.version.helsinki.fi/toska/openshift/kontit/oodikone-backend
         tags: |
           ${{ inputs.environment }}
           ${{ github.sha }}
 
-    - name: Login to quay.io
+    - name: Login to registry.version.helsinki.fi
       if: ${{ inputs.push == 'true' }}
       uses: docker/login-action@v4
       with:
-        registry: quay.io/toska
-        username: toska+github
+        registry: registry.version.helsinki.fi
+        username: kontit
         password: ${{ inputs.registry_password }}
 
     - name: 'Build image and export it'

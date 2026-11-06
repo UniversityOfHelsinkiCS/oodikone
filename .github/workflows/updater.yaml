@@ -154,7 +154,7 @@ jobs:
           environment: 'production'
           release_version: ${{ github.sha }}
           push: true
-          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
+          registry_password: ${{ secrets.VERSION_PUSH_SECRET }}
 
   release_scheduler:
     name: 'Build and release Updater scheduler'
@@ -171,4 +171,4 @@ jobs:
           environment: 'production'
           release_version: ${{ github.sha }}
           push: true
-          registry_password: ${{ secrets.QUAY_IO_TOKEN }}
+          registry_password: ${{ secrets.VERSION_PUSH_SECRET }}
