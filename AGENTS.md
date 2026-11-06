@@ -45,6 +45,10 @@ The app runs at `http://localhost:3000` and Adminer at `http://localhost:5050`. 
 - TypeScript/JavaScript: 2 spaces, single quotes, no semicolons, trailing commas where valid, 120-character lines.
 - Prefer explicit types at package boundaries, API payloads, Redux state, and database interfaces. Avoid `any` except
   where needed to contain an untyped external API.
+- Write self-documenting code: make intent clear through names, types, and small functions instead of comments. Add a
+  comment only when the code cannot show the reason itself (e.g. a browser quirk, workaround, or non-obvious constraint),
+  and keep it to one short line. Do not restate what the code does, document props or fields whose names already
+  explain them, or narrate test steps. Prefer simplifying unclear logic over explaining it.
 - Run `npm run fmt` on changed source, `npm run lint`, and `npm run stylelint` when CSS changes. Do not bypass the
   type-aware Oxlint/Oxfmt pre-commit hooks.
 - Run the narrowest relevant check, then broader checks as needed:
