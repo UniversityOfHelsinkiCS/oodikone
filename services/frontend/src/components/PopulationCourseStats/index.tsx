@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { GradeDistribution } from '@/components/PopulationCourseStats/GradeDistribution'
 import { PassFailEnrollments } from '@/components/PopulationCourseStats/PassFailEnrollments'
 import { PassingSemesters } from '@/components/PopulationCourseStats/PassingSemesters'
+import { toSectionSlug } from '@/components/Section/sectionLink'
+import { useLinkedTabs } from '@/hooks/tabs'
 import { useCurriculum } from '@/hooks/useCurriculum'
 import { FilteredCourse, CourseModule, FilteredProgrammeCourse } from '@/util/coursesOfPopulation'
 import type { CourseStats } from '@oodikone/shared/routes/populations'
@@ -38,7 +40,6 @@ export const PopulationCourseStats = ({
 }: PopulationCourseStatsProps) => {
   const { curriculum } = useCurriculum()
   const [modules, setModules] = useState<CourseModule[]>([])
-  const [tab, setTab] = useState(0)
 
   useEffect(() => {
     if (!curriculum) return
@@ -134,6 +135,8 @@ export const PopulationCourseStats = ({
       ),
     },
   ]
+
+  const [tab, setTab] = useLinkedTabs(panes.map(({ label }) => toSectionSlug(label)))
 
   if (!filteredCourses || pending) return null
 

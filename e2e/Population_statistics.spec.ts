@@ -305,6 +305,15 @@ test.describe('Population statistics tests', () => {
         )
         await expect(page.getByTestId('ooditable-modules').getByText('MAT110')).toBeVisible()
       })
+
+      test('Panel link opens the courses of class panel on the linked tab', async ({ page }) => {
+        await page.goto(`${pathToMathBSc2020}&view=courses-of-class.grades`)
+
+        await expect(page.getByTestId('Courses of class-data').getByRole('tab', { name: 'Grades' })).toHaveAttribute(
+          'aria-selected',
+          'true'
+        )
+      })
     })
 
     test.describe('Courses of class', () => {

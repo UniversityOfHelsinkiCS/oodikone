@@ -1,10 +1,11 @@
 import Alert from '@mui/material/Alert'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import { useState } from 'react'
 
 import { GradeDistribution } from '@/components/PopulationCourseStats/GradeDistribution'
 import { PassFailEnrollments } from '@/components/PopulationCourseStats/PassFailEnrollments'
+import { toSectionSlug } from '@/components/Section/sectionLink'
+import { useLinkedTabs } from '@/hooks/tabs'
 import type { FilteredCourse, UnionOfFilteredModuleCourse } from '@/util/coursesOfPopulation'
 
 // TODO: When we convert <PassFailEnrollments /> to ts, check optional
@@ -17,6 +18,8 @@ type PopulationCourseStatsFlatProps = {
   showModules?: boolean
   setShowModules?: (input: boolean) => void
 }
+
+const TAB_LABELS = ['Pass/fail', 'Grades'] as const
 
 const Warning = ({ showModules, studentAmountLimit }) => (
   <Alert severity="warning">
@@ -33,7 +36,7 @@ export const PopulationCourseStatsFlat = ({
   showModules,
   setShowModules,
 }: PopulationCourseStatsFlatProps) => {
-  const [tab, setTab] = useState(0)
+  const [tab, setTab] = useLinkedTabs(TAB_LABELS.map(toSectionSlug))
 
   if (!filteredCourses) return null
 
@@ -56,7 +59,7 @@ export const PopulationCourseStatsFlat = ({
 
   const panes = [
     {
-      menuItem: 'Pass/fail',
+      menuItem: TAB_LABELS[0],
       render: () => (
         <>
           {!courseStatistics.length && <Warning showModules={showModules} studentAmountLimit={studentAmountLimit} />}
@@ -71,7 +74,7 @@ export const PopulationCourseStatsFlat = ({
       ),
     },
     {
-      menuItem: 'Grades',
+      menuItem: TAB_LABELS[1],
       render: () => (
         <>
           {!courseStatistics.length && <Warning showModules={showModules} studentAmountLimit={studentAmountLimit} />}
