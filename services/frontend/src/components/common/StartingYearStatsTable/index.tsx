@@ -29,11 +29,12 @@ type StatsTableRow = {
 
 export type StatsTableGroup = StatsTableRow & { children: StatsTableRow[] }
 
-const getSpanValue = (combinedProgramme: boolean, index: number, showPercentages: boolean) => {
-  if (combinedProgramme && showPercentages) return index + 2
-  if (combinedProgramme) return index + 1
-  return index
-}
+const LEADING_COLUMN_COUNT = 3
+const GENDER_COLUMN_COUNT = 3
+const CITIZENSHIP_COLUMN_COUNT = 2
+
+const getCurrentStatusColumnCount = (titles: string[]) =>
+  titles.length - LEADING_COLUMN_COUNT - GENDER_COLUMN_COUNT - CITIZENSHIP_COLUMN_COUNT
 
 const ValueCells = ({ row, showPercentages }: { row: StatsTableRow; showPercentages: boolean }) => {
   return row.values.map((value, index) => {
@@ -59,14 +60,12 @@ export const citizenshipDefaultInfo =
 
 export const StartingYearStatsTable = ({
   citizenshipInfo = citizenshipDefaultInfo,
-  combinedProgramme = false,
   cypress,
   groups,
   showPercentages,
   titles,
 }: {
   citizenshipInfo?: string
-  combinedProgramme?: boolean
   cypress: string
   groups: StatsTableGroup[]
   showPercentages: boolean
@@ -74,6 +73,7 @@ export const StartingYearStatsTable = ({
 }) => {
   'use memo'
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+  const percentageMultiplier = showPercentages ? 2 : 1
 
   const toggleGroup = (key: string) => {
     setExpandedGroups(prev => ({ ...prev, [key]: !prev[key] }))
@@ -85,17 +85,9 @@ export const StartingYearStatsTable = ({
         <TableHead>
           <TableRow>
             <TableCell colSpan={!showPercentages ? 3 : 4} />
-            <TableCell
-              colSpan={
-                !showPercentages
-                  ? getSpanValue(combinedProgramme, 6, showPercentages)
-                  : getSpanValue(combinedProgramme, 12, showPercentages)
-              }
-            >
-              Current status
-            </TableCell>
-            <TableCell colSpan={!showPercentages ? 3 : 6}>Gender</TableCell>
-            <TableCell colSpan={!showPercentages ? 2 : 4}>
+            <TableCell colSpan={getCurrentStatusColumnCount(titles) * percentageMultiplier}>Current status</TableCell>
+            <TableCell colSpan={GENDER_COLUMN_COUNT * percentageMultiplier}>Gender</TableCell>
+            <TableCell colSpan={CITIZENSHIP_COLUMN_COUNT * percentageMultiplier}>
               <Stack alignItems="center" direction="row" gap={1}>
                 Citizenships
                 <InfoBox content={citizenshipInfo} mini />

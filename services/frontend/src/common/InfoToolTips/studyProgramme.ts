@@ -50,6 +50,7 @@ Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 - **Graduated**: Koulutusohjelmasta valmistuneet opiskelijat
 - **Cancelled**: Opinto-oikeudestaan luopuneet opiskelijat. Sisältää myös hallinnon perumat oikeudet.
 - **Has recent attainment**: Opiskelijat, jotka ovat kuluneen vuoden (365vrk) aikana suorittaneet ensisijaiseen opintosuunnitelmaansa sisällytettyjä opintoja
+- **Close to graduation**: Lähellä valmistumista olevat opiskelijat. Lasketaan samoin kriteerein kuin *Close to graduation* -näkymässä: opiskeluoikeus on voimassa, opiskelija ei ole valmistunut koulutusohjelmasta ja opintosuunnitelmaan sisällytettyjä opintopisteitä on vähintään 140 (3v. kandiohjelmat) tai 70 (2v. maisteriohjelmat).
 
 Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
 

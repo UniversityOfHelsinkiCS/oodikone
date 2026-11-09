@@ -287,33 +287,33 @@ test.describe('Degree programme overview', () => {
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const tableContents = [
-        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainments, Men, Women, Other/Unknown, Finland, Other]
-        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 0, 0, 5, 3, 0, 8, 1],
-        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 1, 0, 19, 7, 0, 25, 1],
-        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 0, 0, 29, 8, 0, 35, 4],
-        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 15, 15, 0, 29, 3],
-        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 0, 0, 22, 13, 0, 35, 2],
-        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 1, 0, 26, 20, 0, 45, 1],
-        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 1, 0, 31, 16, 0, 47, 0],
-        ['Total', 229, 197, 0, 0, 95, 134, 3, 0, 147, 82, 0, 224, 12],
+        // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainment, Close to graduation, Men, Women, Other/Unknown, Finland, Other]
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+        ['2023 - 2024', 8, 8, 0, 0, 8, 0, 0, 0, 0, 5, 3, 0, 8, 1],
+        ['2022 - 2023', 26, 25, 0, 0, 24, 2, 1, 0, 0, 19, 7, 0, 25, 1],
+        ['2021 - 2022', 37, 29, 0, 0, 33, 4, 0, 0, 0, 29, 8, 0, 35, 4],
+        ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 0, 15, 15, 0, 29, 3],
+        ['2019 - 2020', 35, 28, 0, 0, 8, 27, 0, 0, 0, 22, 13, 0, 35, 2],
+        ['2018 - 2019', 46, 40, 0, 0, 6, 40, 1, 0, 0, 26, 20, 0, 45, 1],
+        ['2017 - 2018', 47, 41, 0, 0, 5, 42, 1, 0, 0, 31, 16, 0, 47, 0],
+        ['Total', 229, 197, 0, 0, 95, 134, 3, 0, 0, 147, 82, 0, 224, 12],
       ]
       await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
     })
 
     test('Years in the students table can be expanded and study track data will be shown', async ({ page }) => {
-      const totalStats: [string, ...Array<number>] = ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 15, 15, 0, 29, 3]
+      const totalStats: [string, ...Array<number>] = ['2020 - 2021', 30, 26, 0, 0, 11, 19, 0, 0, 0, 15, 15, 0, 29, 3]
       const table = page.getByTestId('study-tracks-and-class-statistics-data-table').locator('tbody')
       const row = table.locator('tr').filter({ hasText: '2020 - 2021' })
 
-      await expect(row.locator('td')).toHaveCount(14)
+      await expect(row.locator('td')).toHaveCount(15)
       await expect(row.locator('td')).toHaveText(totalStats.map(n => n.toString()))
 
       const studyTrackStats: [string, ...Array<number>][] = [
-        ['Ekonometria (MAT-EKO)', 2, 2, 0, 0, 0, 2, 0, 0, 1, 1, 0, 2, 0],
-        ['Matematiikka (MAT-MAT)', 13, 10, 0, 0, 1, 12, 0, 0, 7, 6, 0, 12, 3],
-        ['Tietojenkäsittelyteoria (MAT-TIE)', 2, 1, 0, 0, 1, 1, 0, 0, 2, 0, 0, 2, 0],
-        ['Tilastotiede (MAT-TIL)', 4, 4, 0, 0, 0, 4, 0, 0, 1, 3, 0, 4, 0],
+        ['Ekonometria (MAT-EKO)', 2, 2, 0, 0, 0, 2, 0, 0, 0, 1, 1, 0, 2, 0],
+        ['Matematiikka (MAT-MAT)', 13, 10, 0, 0, 1, 12, 0, 0, 0, 7, 6, 0, 12, 3],
+        ['Tietojenkäsittelyteoria (MAT-TIE)', 2, 1, 0, 0, 1, 1, 0, 0, 0, 2, 0, 0, 2, 0],
+        ['Tilastotiede (MAT-TIL)', 4, 4, 0, 0, 0, 4, 0, 0, 0, 1, 3, 0, 4, 0],
       ]
 
       await row.getByTestId('show-study-tracks-button').click()
@@ -323,7 +323,7 @@ test.describe('Degree programme overview', () => {
           await expect(page.getByText(studyTrack)).toBeVisible()
           const studyTrackRow = table.locator('tr').filter({ hasText: studyTrack })
 
-          await expect(studyTrackRow.locator('td')).toHaveCount(14)
+          await expect(studyTrackRow.locator('td')).toHaveCount(15)
           await expect(studyTrackRow.locator('td')).toHaveText([studyTrack, ...stats].map(n => n.toString()))
         })
       )
@@ -452,14 +452,14 @@ test.describe('Degree programme overview', () => {
             .getByText('Students of the study track MAT-MAT by starting year')
         ).toBeVisible()
         const tableContents = [
-          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainment, Men, Women, Other/Unknown, Finland, Other]
-          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 1, 0, 2, 1, 0, 3, 0],
-          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 0, 0, 3, 1, 0, 4, 0],
-          ['2020 - 2021', 13, 10, 0, 0, 1, 12, 0, 0, 7, 6, 0, 12, 3],
-          ['2019 - 2020', 17, 14, 0, 0, 0, 17, 0, 0, 10, 7, 0, 17, 1],
-          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 1, 0, 11, 13, 0, 24, 0],
-          ['2017 - 2018', 28, 24, 0, 0, 1, 27, 1, 0, 15, 13, 0, 28, 0],
-          ['Total', 89, 73, 0, 0, 6, 83, 3, 0, 48, 41, 0, 88, 4],
+          // [Year, All, Started studying, Present, Absent, Passive, Graduated, Cancelled, Has recent attainment, Close to graduation, Men, Women, Other/Unknown, Finland, Other]
+          ['2022 - 2023', 3, 3, 0, 0, 1, 2, 1, 0, 0, 2, 1, 0, 3, 0],
+          ['2021 - 2022', 4, 1, 0, 0, 1, 3, 0, 0, 0, 3, 1, 0, 4, 0],
+          ['2020 - 2021', 13, 10, 0, 0, 1, 12, 0, 0, 0, 7, 6, 0, 12, 3],
+          ['2019 - 2020', 17, 14, 0, 0, 0, 17, 0, 0, 0, 10, 7, 0, 17, 1],
+          ['2018 - 2019', 24, 21, 0, 0, 2, 22, 1, 0, 0, 11, 13, 0, 24, 0],
+          ['2017 - 2018', 28, 24, 0, 0, 1, 27, 1, 0, 0, 15, 13, 0, 28, 0],
+          ['Total', 89, 73, 0, 0, 6, 83, 3, 0, 0, 48, 41, 0, 88, 4],
         ]
         await checkTableStats(page, tableContents, 'study-tracks-and-class-statistics')
       })

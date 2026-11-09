@@ -11,6 +11,7 @@ import {
 import { createLocaleComparator, keysOf } from '../../util'
 import { now } from '../../util/clock'
 import { countTimeCategories, GraduationTarget } from '../graduationHelpers'
+import { isCloseToGraduation } from '../populations/closeToGraduationCriteria'
 import { getSemestersAndYears } from '../semesters'
 import { getDateOfFirstSemesterPresent } from './studyProgrammeBasics'
 import { calculateDurationOfStudies, shouldIncludeComboStats } from './studyProgrammeGraduations'
@@ -88,6 +89,7 @@ const getEmptyYear = () => ({
   graduated: 0,
   graduatedCombinedProgramme: 0,
   attainmentWithinYear: 0,
+  closeToGraduation: 0,
   male: 0,
   female: 0,
   otherUnknown: 0,
@@ -197,6 +199,8 @@ export const combineStats = (
         getPercentage(yearStats.cancelled, yearStats.all),
         yearStats.attainmentWithinYear,
         getPercentage(yearStats.attainmentWithinYear, yearStats.all),
+        yearStats.closeToGraduation,
+        getPercentage(yearStats.closeToGraduation, yearStats.all),
         yearStats.male,
         getPercentage(yearStats.male, yearStats.all),
         yearStats.female,
@@ -316,6 +320,10 @@ const getMainStatsByTrackAndYear = async (
 
     if (latestAttainmentWithinYearAndInHops) {
       yearlyStats[year][programmeOrStudyTrack].attainmentWithinYear++
+    }
+
+    if (isCloseToGraduation({ studyRight, studyRightElement })) {
+      yearlyStats[year][programmeOrStudyTrack].closeToGraduation += 1
     }
 
     /* Gender cols */

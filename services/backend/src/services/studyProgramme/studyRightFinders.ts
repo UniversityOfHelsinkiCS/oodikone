@@ -31,7 +31,7 @@ export const getStudyRightsInProgramme = async (
     {
       model: SISStudyRightElementModel,
       as: 'studyRightElements',
-      attributes: ['phase', 'code', 'name', 'startDate', 'endDate', 'graduated', 'studyTrack'],
+      attributes: ['phase', 'code', 'name', 'startDate', 'endDate', 'graduated', 'studyTrack', 'degreeProgrammeType'],
     },
   ]
 
@@ -57,7 +57,7 @@ export const getStudyRightsInProgramme = async (
       {
         model: StudyplanModel,
         as: 'studyPlans',
-        attributes: ['included_courses'],
+        attributes: ['included_courses', 'completed_credits'],
         required: false,
         where: {
           programme_code: programmeCode,

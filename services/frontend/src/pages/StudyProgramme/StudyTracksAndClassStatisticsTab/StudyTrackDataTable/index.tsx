@@ -149,7 +149,6 @@ export const StudyTrackDataTable = ({
 
   return (
     <StartingYearStatsTable
-      combinedProgramme={!!combinedProgramme}
       cypress="study-tracks-and-class-statistics-data-table"
       groups={singleTrack ? getSingleTrackGroups(singleTrack) : getAllTracksGroups()}
       showPercentages={showPercentages}

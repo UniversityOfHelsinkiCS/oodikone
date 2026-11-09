@@ -16,9 +16,28 @@ import {
 import { now } from '../../util/clock'
 import { redisClient } from '../redis'
 import { getCurrentSemester } from '../semesters'
+import {
+  CLOSE_TO_GRADUATION_CREDITS_BY_DEGREE_TYPE,
+  CLOSE_TO_GRADUATION_CREDITS_BY_PROGRAMME,
+} from './closeToGraduationCriteria'
 import { getCurriculumPeriodsById, getCurriculumVersion } from './shared'
 
 export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
+
+const completedCreditsAtLeast = (credits: number) => where(col('studyplans.completed_credits'), Op.gte, credits)
+
+const closeToGraduationCreditConditions = [
+  ...Object.entries(CLOSE_TO_GRADUATION_CREDITS_BY_DEGREE_TYPE).map(([degreeProgrammeType, credits]) => ({
+    [Op.and]: [
+      { degreeProgrammeType },
+      completedCreditsAtLeast(credits),
+      { code: { [Op.notIn]: Object.keys(CLOSE_TO_GRADUATION_CREDITS_BY_PROGRAMME) } },
+    ],
+  })),
+  ...Object.entries(CLOSE_TO_GRADUATION_CREDITS_BY_PROGRAMME).map(([code, credits]) => ({
+    [Op.and]: [{ code }, completedCreditsAtLeast(credits)],
+  })),
+]
 
 const findThesisAndLatestAndEarliestAttainments = (
   studyPlan: Studyplan,
@@ -193,45 +212,7 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
                     '$studyplans.programme_code$': {
                       [Op.eq]: col('studyplans->studyRight->studyRightElements.code'),
                     },
-                    [Op.or]: [
-                      {
-                        [Op.and]: [
-                          { degreeProgrammeType: DegreeProgrammeType.BACHELOR },
-                          where(col('studyplans.completed_credits'), Op.gte, 140),
-                        ],
-                      },
-                      {
-                        [Op.and]: [
-                          { degreeProgrammeType: DegreeProgrammeType.MASTER },
-                          where(col('studyplans.completed_credits'), Op.gte, 70),
-                          { code: { [Op.notIn]: ['MH30_001', 'MH30_003', 'MH30_004', 'MH90_001'] } },
-                        ],
-                      },
-                      {
-                        [Op.and]: [
-                          where(col('studyplans.completed_credits'), Op.gte, 330),
-                          { code: 'MH30_001' }, // De­gree Pro­gramme in Medi­cine
-                        ],
-                      },
-                      {
-                        [Op.and]: [
-                          where(col('studyplans.completed_credits'), Op.gte, 300),
-                          { code: 'MH30_003' }, // De­gree Pro­gramme in Dentistry
-                        ],
-                      },
-                      {
-                        [Op.and]: [
-                          where(col('studyplans.completed_credits'), Op.gte, 115),
-                          { code: 'MH30_004' }, // Mas­ter's Pro­gramme in Psy­cho­logy
-                        ],
-                      },
-                      {
-                        [Op.and]: [
-                          where(col('studyplans.completed_credits'), Op.gte, 150),
-                          { code: 'MH90_001' }, // De­gree Pro­gramme in Veter­in­ary Medi­cine
-                        ],
-                      },
-                    ],
+                    [Op.or]: closeToGraduationCreditConditions,
                   },
                   attributes: ['code', 'name', 'startDate', 'studyTrack', 'degreeProgrammeType'],
                 },
