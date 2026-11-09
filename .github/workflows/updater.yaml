@@ -3,9 +3,6 @@ name: 'Test (and release) Updater'
 on:
   release:
     types: [published]
-    paths:
-      - '.github/workflows/updater.yaml'
-      - 'updater/**'
 
 jobs:
   lint_scheduler_and_worker:
@@ -47,6 +44,7 @@ jobs:
           push: false
           outputs: type=docker,dest=/tmp/worker.tar
           tags: toska/sis-updater-worker:latest
+          provenance: false
         env:
           DOCKER_BUILD_SUMMARY: false
 
@@ -72,6 +70,7 @@ jobs:
           push: false
           outputs: type=docker,dest=/tmp/scheduler.tar
           tags: toska/sis-updater-scheduler:latest
+          provenance: false
         env:
           DOCKER_BUILD_SUMMARY: false
 
@@ -147,12 +146,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Extract release version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
       - name: 'Build updater worker'
         id: build-image
         uses: ./.github/actions/build/worker
         with:
           environment: 'production'
-          release_version: ${{ github.sha }}
+          release_version: ${{ steps.extract_version.outputs.VERSION }}
           push: true
           registry_password: ${{ secrets.VERSION_PUSH_SECRET }}
 
@@ -164,11 +167,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: 'Build udpater scheduler'
+      - name: Extract release version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: 'Build updater scheduler'
         id: build-image
         uses: ./.github/actions/build/scheduler
         with:
           environment: 'production'
-          release_version: ${{ github.sha }}
+          release_version: ${{ steps.extract_version.outputs.VERSION }}
           push: true
           registry_password: ${{ secrets.VERSION_PUSH_SECRET }}

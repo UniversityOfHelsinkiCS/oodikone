@@ -68,5 +68,9 @@ runs:
           SENTRY_DSN=${{ case(inputs.environment == 'production', inputs.sentry_dns, '') }}
         push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        annotations: ${{ steps.meta.outputs.annotations }}
+        provenance: false
+        sbom: false
       env:
         DOCKER_BUILD_SUMMARY: false
