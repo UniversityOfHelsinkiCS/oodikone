@@ -16,6 +16,15 @@ import '@fontsource/ibm-plex-sans/500.css'
 import '@fontsource/ibm-plex-sans/700.css'
 
 const baseTheme = {
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1440, // Default 1200. OK needs more.
+      xl: 1536,
+    },
+  },
   cssVariables: true,
   typography: {
     fontFamily: '"IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif',
