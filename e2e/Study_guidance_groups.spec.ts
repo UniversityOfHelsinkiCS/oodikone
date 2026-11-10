@@ -159,7 +159,7 @@ test.describe('Study guidance group tests', () => {
           'Prior to bachelor',
           'Start date',
           'Curriculum period',
-          'Latest attainment date',
+          'Latest attainment date (HOPS)',
           'Graduation date',
           'Semesters present',
           'Study track',

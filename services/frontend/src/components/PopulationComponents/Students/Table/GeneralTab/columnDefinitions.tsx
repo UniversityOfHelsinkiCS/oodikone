@@ -171,7 +171,7 @@ export const useGetColumnDefinitions = ({
       columnHelper.accessor('mostRecentAttainment', {
         header: _ => (
           <TableHeaderWithTooltip
-            header="Latest attainment date"
+            header="Latest attainment date (HOPS)"
             tooltipText={populationStudentsToolTips.generalTab.mostRecentAttainment}
           />
         ),
