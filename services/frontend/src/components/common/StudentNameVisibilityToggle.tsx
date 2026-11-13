@@ -14,14 +14,14 @@ export const useStudentNameVisibility = () => {
   return { visible, toggle }
 }
 
-export const StudentNameVisibilityToggle = () => {
+export const StudentNameVisibilityToggle = ({ label = 'Show student names' }: { label?: string }) => {
   const { visible, toggle } = useStudentNameVisibility()
 
   return (
     <FormControlLabel
       sx={{ m: 0 }}
       control={<Switch checked={visible} data-cy="toggleStudentNames" onChange={() => toggle()} />}
-      label="Show student names"
+      label={label}
     />
   )
 }

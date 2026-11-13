@@ -3,6 +3,7 @@ import Box from '@mui/material/Box'
 import Popper from '@mui/material/Popper'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 
 type ValidValueType = string
 
@@ -11,6 +12,7 @@ type SelectOption<T extends ValidValueType> = {
   text: string
   value: T
   disabled?: boolean
+  count?: number
 }
 
 type FilterSearchableSelectProps<T extends ValidValueType> = {
@@ -20,6 +22,8 @@ type FilterSearchableSelectProps<T extends ValidValueType> = {
   onChange: (target: any) => void // target varies per implementation
   filterKey: string
   multiple?: boolean
+  freeSolo?: boolean
+  placeholder?: string
 }
 
 /**
@@ -38,6 +42,8 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
   onChange,
   filterKey,
   multiple,
+  freeSolo = multiple,
+  placeholder,
 }: FilterSearchableSelectProps<T>) => {
   const disabled = !options.length
 
@@ -61,7 +67,7 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
           data-cy={`${filterKey}-selector`}
           disabled={disabled}
           filterSelectedOptions
-          freeSolo={multiple}
+          freeSolo={freeSolo}
           fullWidth
           getOptionLabel={opt => (typeof opt === 'string' ? opt : opt.text)}
           limitTags={5}
@@ -80,7 +86,19 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
             }
           }}
           options={options}
-          renderInput={params => <TextField {...params} id={`${filterKey}-label`} label={label} size="small" />}
+          renderOption={({ key, ...props }, option) => (
+            <Box component="li" key={key} {...props}>
+              <Box sx={{ flexGrow: 1 }}>{option.text}</Box>
+              {option.count !== undefined && (
+                <Typography color="text.secondary" sx={{ ml: 2 }} variant="body2">
+                  {option.count}
+                </Typography>
+              )}
+            </Box>
+          )}
+          renderInput={params => (
+            <TextField {...params} id={`${filterKey}-label`} label={label} placeholder={placeholder} size="small" />
+          )}
           slots={{
             popper: CustomWidthPopper,
           }}

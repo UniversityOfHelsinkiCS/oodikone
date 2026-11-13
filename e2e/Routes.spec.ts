@@ -41,6 +41,7 @@ const baseRoutes: [string, RouteRequirements][] = [
   ['/studyguidancegroups', { roles: ['studyGuidanceGroups'] }],
   ['/studyguidancegroups/otm-b3b52ff5-88f6-4d52-bd18-0588023b6322', { userId: '', roles: ['studyGuidanceGroups'] }],
   ['/close-to-graduation', { roles: ['fullSisuAccess', 'studyGuidanceGroups'] }],
+  ['/close-to-graduation/beta', { roles: ['fullSisuAccess', 'studyGuidanceGroups'] }],
   ['/languagecenterview', { iamGroups: ['grp-kielikeskus-esihenkilot'] }],
 ]
 

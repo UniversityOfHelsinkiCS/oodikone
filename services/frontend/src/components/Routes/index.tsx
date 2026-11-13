@@ -12,6 +12,7 @@ import { Teachers } from '@/components/Teachers'
 import { Banners } from '@/pages/Banners'
 import { Changelog } from '@/pages/Changelog'
 import { CloseToGraduation } from '@/pages/CloseToGraduation'
+import { CloseToGraduationBeta } from '@/pages/CloseToGraduation/Beta'
 import { CompletedCourses } from '@/pages/CompletedCoursesSearch'
 import { CourseStatistics } from '@/pages/CourseStatistics'
 import { Faculties } from '@/pages/Faculties'
@@ -76,6 +77,7 @@ export const Routes = () => (
 
         <Route element={<ProtectedRoute requiredRoles={['fullSisuAccess', 'studyGuidanceGroups']} />}>
           <Route element={<CloseToGraduation />} path="/close-to-graduation" />
+          <Route element={<CloseToGraduationBeta />} path="/close-to-graduation/beta" />
         </Route>
 
         {/* Access control inside ProtectedRoute */}

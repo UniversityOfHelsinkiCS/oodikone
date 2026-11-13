@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 
-import { getEnrollmentTypeTextForExcel, isFall } from '@/common'
+import { getEnrollmentTypeTextForExcel } from '@/common'
 import { closeToGraduationToolTips } from '@/common/InfoToolTips'
 import { ExportToExcelDialog } from '@/components/common/MRTExcelExport'
 import { PageLayout } from '@/components/common/PageLayout'
@@ -21,20 +21,15 @@ import { getSemestersPresentFunctions } from '@/components/PopulationComponents/
 import { DateFormat } from '@/constants/date'
 import { useTitle } from '@/hooks/title'
 import { useSemesters } from '@/hooks/useSemesters'
+import {
+  CheckIconWithTitle,
+  getDisplayedSemesterCodes,
+  getDisplayedSemestersStartYear,
+} from '@/pages/CloseToGraduation/common'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
-import { CheckIcon } from '@/theme'
 import { getDefaultMRTOptions } from '@/util/getDefaultMRTOptions'
 import { reformatDate } from '@/util/timeAndDate'
 import { getFullLanguage } from '@oodikone/shared/language'
-import { range } from '@oodikone/shared/util'
-
-const NUMBER_OF_DISPLAYED_SEMESTERS = 6
-
-const CheckIconWithTitle = ({ visible, title }: { visible: boolean; title?: string }) => (
-  <Box sx={{ display: 'flex', justifyContent: 'center' }} title={title}>
-    {visible ? <CheckIcon color="success" fontSize="small" /> : <Box sx={{ width: '20px', height: '20px' }} />}
-  </Box>
-)
 
 export const CloseToGraduation = () => {
   useTitle('Students close to graduation')
@@ -50,7 +45,7 @@ export const CloseToGraduation = () => {
     () =>
       getSemestersPresentFunctions({
         getTextIn,
-        year: new Date().getFullYear() - Math.floor(NUMBER_OF_DISPLAYED_SEMESTERS / 2),
+        year: getDisplayedSemestersStartYear(),
         programme: null,
         semestersToAddToStart: null,
         semesters: semesterData,
@@ -58,18 +53,7 @@ export const CloseToGraduation = () => {
     [semesters, getTextIn, students]
   )
   const currentSemesterCode = currentSemester?.semestercode
-  const semestersToInclude = useMemo(
-    () =>
-      currentSemesterCode != null
-        ? range(
-            isFall(currentSemesterCode)
-              ? currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 2
-              : currentSemesterCode - NUMBER_OF_DISPLAYED_SEMESTERS + 1,
-            isFall(currentSemesterCode) ? currentSemesterCode + 2 : currentSemesterCode + 1
-          )
-        : [],
-    [currentSemesterCode]
-  )
+  const semestersToInclude = useMemo(() => getDisplayedSemesterCodes(currentSemesterCode), [currentSemesterCode])
 
   const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
