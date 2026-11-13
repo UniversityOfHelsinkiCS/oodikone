@@ -13,8 +13,8 @@ export const navigationItems: Record<string, NavigationItem> = {
     key: 'studyProgramme',
     label: 'Programmes',
     items: [
-      { key: 'class', label: 'Class statistics', path: '/populations' },
       { key: 'overview', label: 'Overview', path: '/study-programme' },
+      { key: 'class', label: 'Search for class', path: '/populations' },
     ],
   },
   courseStatistics: { key: 'courseStatistics', label: 'Courses / Modules', path: '/coursestatistics' },
