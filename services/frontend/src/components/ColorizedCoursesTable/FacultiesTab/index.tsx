@@ -8,6 +8,7 @@ import {
   CourseFilter,
 } from '@/components/ColorizedCoursesTable/common'
 import '@/components/ColorizedCoursesTable/index.css'
+import { getFacultiesExcelRows, type FacultiesTabCourse } from '@/components/ColorizedCoursesTable/FacultiesTab/excel'
 import { useColumns } from '@/components/ColorizedCoursesTable/FacultiesTab/logic'
 import {
   ColorModeSelector,
@@ -21,6 +22,7 @@ import { Section } from '@/components/Section'
 import { useDebouncedState } from '@/hooks/debouncedState'
 import { useGetFacultiesQuery } from '@/redux/facultyStats'
 import { TotalRow } from '../SemestersTab'
+import { COURSE_EXCEL_KEYS } from '../SemestersTab/excel'
 
 export const FacultiesTab = () => {
   'use memo'
@@ -45,7 +47,9 @@ export const FacultiesTab = () => {
     return calculateTotals(data.tableData, selectedSemesters, data.faculties)
   }, [data, selectedSemesters])
 
-  const [tableData, excelData] = useMemo(() => {
+  const sortedFaculties = useMemo(() => data.faculties.toSorted(), [data.faculties])
+
+  const tableData = useMemo<FacultiesTabCourse[]>(() => {
     if (!data) return []
     const tableData = structuredClone(data.tableData)
     tableData.forEach(course => {
@@ -70,22 +74,12 @@ export const FacultiesTab = () => {
       course.bySemesters = { ...course.bySemesters, facultiesTotal }
     })
 
-    const excelData = tableData.map(({ code, bySemesters }) => ({
-      Course: code,
-      ...Object.fromEntries(
-        data.faculties
-          .toSorted()
-          .map(facultyCode => [facultyCode, bySemesters.cellStats[facultyCode]?.[numberMode] ?? 0])
-      ),
-      Total: bySemesters.facultiesTotal[numberMode],
-    }))
-
-    return [tableData, excelData]
-  }, [selectedSemesters, data, numberMode])
+    return tableData
+  }, [selectedSemesters, data])
 
   const cols = useColumns(
     getTextIn,
-    [...data.faculties].sort(),
+    sortedFaculties,
     numberMode,
     colorMode,
     facultyMap,
@@ -118,12 +112,20 @@ export const FacultiesTab = () => {
         cy="ooditable-faculties"
         data={tableData}
         options={tableOptions}
-        toolbarContent={
+        toolbarContent={table => (
           <>
-            <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ id }) => id)} />
+            <OodiTableExcelExport
+              data={getFacultiesExcelRows(
+                table.getFilteredRowModel().rows.map(row => row.original),
+                sortedFaculties,
+                numberMode,
+                getTextIn
+              )}
+              exportColumnKeys={[...COURSE_EXCEL_KEYS, ...cols.slice(1).map(({ id }) => id)]}
+            />
             <CourseFilter setCourseFilter={setCourseFilter} />
           </>
-        }
+        )}
       />
     </Section>
   )

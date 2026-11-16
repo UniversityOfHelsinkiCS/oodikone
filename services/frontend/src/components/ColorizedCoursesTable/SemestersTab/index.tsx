@@ -14,6 +14,11 @@ import {
   SemesterRangeSelector,
 } from '@/components/ColorizedCoursesTable/selectorComponents'
 import '@/components/ColorizedCoursesTable/index.css'
+import {
+  getSemestersExcelRows,
+  COURSE_EXCEL_KEYS,
+  type SemestersTabCourse,
+} from '@/components/ColorizedCoursesTable/SemestersTab/excel'
 import { useColumns } from '@/components/ColorizedCoursesTable/SemestersTab/logic'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { OodiTable } from '@/components/OodiTable'
@@ -33,29 +38,17 @@ export const SemestersTab = ({ languagecenterview }: { languagecenterview: boole
     return calculateTotals(data.tableData, selectedSemesters)
   }, [data, selectedSemesters])
 
-  const [tableData, excelData] = useMemo(() => {
-    if (!data) return []
-    const tableData = calculateNewTotalColumnValues(data.tableData, selectedSemesters.map(String))
-    const excelData = tableData.map(({ code, bySemesters }) => ({
-      Course: code,
-      ...Object.fromEntries(
-        semesters
-          .filter(({ semestercode }) => selectedSemesters.includes(semestercode))
-          .map(({ name, semestercode }) => [`${getTextIn(name)}`, bySemesters[semestercode]?.[numberMode] ?? 0])
-      ),
-      Total: bySemesters[numberMode],
-    }))
-
-    return [tableData, excelData]
-  }, [semesters, data, selectedSemesters, getTextIn, numberMode])
-
-  const cols = useColumns(
-    getTextIn,
-    semesters.filter(({ semestercode }) => selectedSemesters.includes(semestercode)),
-    numberMode,
-    colorMode,
-    totalRow.bySemesters[numberMode]
+  const shownSemesters = useMemo(
+    () => semesters.filter(({ semestercode }) => selectedSemesters.includes(semestercode)),
+    [semesters, selectedSemesters]
   )
+
+  const tableData = useMemo<SemestersTabCourse[]>(() => {
+    if (!data) return []
+    return calculateNewTotalColumnValues(data.tableData, selectedSemesters.map(String))
+  }, [data, selectedSemesters])
+
+  const cols = useColumns(getTextIn, shownSemesters, numberMode, colorMode, totalRow.bySemesters[numberMode])
 
   const tableOptions = {
     initialState: { columnPinning: { left: ['Course'] } },
@@ -83,12 +76,20 @@ export const SemestersTab = ({ languagecenterview }: { languagecenterview: boole
         cy="ooditable-semesters"
         data={tableData}
         options={tableOptions}
-        toolbarContent={
+        toolbarContent={table => (
           <>
-            <OodiTableExcelExport data={excelData} exportColumnKeys={cols.map(({ header }) => header)} />
+            <OodiTableExcelExport
+              data={getSemestersExcelRows(
+                table.getFilteredRowModel().rows.map(row => row.original),
+                shownSemesters,
+                numberMode,
+                getTextIn
+              )}
+              exportColumnKeys={[...COURSE_EXCEL_KEYS, ...cols.slice(1).map(({ header }) => header)]}
+            />
             <CourseFilter setCourseFilter={setCourseFilter} />
           </>
-        }
+        )}
       />
     </Section>
   )
