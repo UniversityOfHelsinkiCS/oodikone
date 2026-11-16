@@ -12,6 +12,7 @@ export const getAllProgrammeCourses = async (providerCode: string) => {
   const courses: Pick<CourseModel, 'id' | 'groupId' | 'code' | 'name'>[] = await CourseModel.findAll({
     raw: true,
     attributes: ['id', 'groupId', 'code', 'name'],
+    where: { isCustom: false },
     include: [
       {
         model: OrganizationModel,
