@@ -229,8 +229,8 @@ export const termRegistrationTypeToEnrollmenttype = termRegistrationType =>
 export const courseProviderMapper =
   courseGroupId =>
   ({ organisationId, shares }) => ({
-    coursecode: courseGroupId,
-    organizationcode: organisationId,
+    courseGroupId,
+    organizationId: organisationId,
     shares,
   })
 

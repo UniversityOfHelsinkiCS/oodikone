@@ -1,9 +1,7 @@
 export type CourseProvider = {
-  // TODO: RENAME: this is courseGroupId, not code
-  coursecode: string
+  courseGroupId: string
   shares: Array<{ share: number; startDate?: string; endDate?: string }> | null
-  // TODO: RENAME: this is organizationId, not code
-  organizationcode: string
+  organizationId: string
   createdAt: Date
   updatedAt: Date
 }

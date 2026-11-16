@@ -1,41 +1,45 @@
-/**
- * coursecode holds the course group id and organizationcode holds the organization id. Rename them accordingly.
- * Index and constraint names are renamed too, guarded so missing names don't fail the migration.
- */
-const renames = [
-  ['course_providers_coursecode', 'course_providers_course_group_id'],
-  ['course_providers_organizationcode', 'course_providers_organization_id'],
-  ['course_providers_coursecode_organizationcode_unique', 'course_providers_course_group_id_organization_id_unique'],
+const columnRenames = [
+  ['coursecode', 'course_group_id'],
+  ['organizationcode', 'organization_id'],
 ]
 
-const renameForeignKey = (from, to) => `
-  DO $$
-  BEGIN
-    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '${from}') THEN
-      ALTER TABLE course_providers RENAME CONSTRAINT ${from} TO ${to};
-    END IF;
-  END $$;
-`
+const indexRenames = [
+  ['course_providers_coursecode', 'course_providers_course_group_id'],
+  ['course_providers_organizationcode', 'course_providers_organization_id'],
+]
+
+const constraintRenames = [
+  ['course_providers_coursecode_organizationcode_unique', 'course_providers_course_group_id_organization_id_unique'],
+  ['course_providers_organizationcode_fkey', 'course_providers_organization_id_fkey'],
+]
+
+const reversed = renames => renames.map(([from, to]) => [to, from])
+
+const renameStatements = ({ columns, indexes, constraints }) =>
+  [
+    ...columns.map(([from, to]) => `ALTER TABLE course_providers RENAME COLUMN ${from} TO ${to};`),
+    ...indexes.map(([from, to]) => `ALTER INDEX ${from} RENAME TO ${to};`),
+    ...constraints.map(([from, to]) => `ALTER TABLE course_providers RENAME CONSTRAINT ${from} TO ${to};`),
+  ].join('\n')
+
+const runInTransaction = (queryInterface, sql) =>
+  queryInterface.sequelize.transaction(transaction => queryInterface.sequelize.query(sql, { transaction }))
 
 module.exports = {
   up: async queryInterface => {
-    await queryInterface.renameColumn('course_providers', 'coursecode', 'course_group_id')
-    await queryInterface.renameColumn('course_providers', 'organizationcode', 'organization_id')
-    await Promise.all(
-      renames.map(([from, to]) => queryInterface.sequelize.query(`ALTER INDEX IF EXISTS ${from} RENAME TO ${to}`))
-    )
-    await queryInterface.sequelize.query(
-      renameForeignKey('course_providers_organizationcode_fkey', 'course_providers_organization_id_fkey')
+    await runInTransaction(
+      queryInterface,
+      renameStatements({ columns: columnRenames, indexes: indexRenames, constraints: constraintRenames })
     )
   },
   down: async queryInterface => {
-    await queryInterface.sequelize.query(
-      renameForeignKey('course_providers_organization_id_fkey', 'course_providers_organizationcode_fkey')
+    await runInTransaction(
+      queryInterface,
+      renameStatements({
+        columns: reversed(columnRenames),
+        indexes: reversed(indexRenames),
+        constraints: reversed(constraintRenames),
+      })
     )
-    await Promise.all(
-      renames.map(([from, to]) => queryInterface.sequelize.query(`ALTER INDEX IF EXISTS ${to} RENAME TO ${from}`))
-    )
-    await queryInterface.renameColumn('course_providers', 'organization_id', 'organizationcode')
-    await queryInterface.renameColumn('course_providers', 'course_group_id', 'coursecode')
   },
 }

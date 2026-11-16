@@ -8,8 +8,8 @@ describe('courseProviderMapper', () => {
   it('maps organisation shares to a course provider row', () => {
     const mapProvider = courseProviderMapper('CG1')
     expect(mapProvider({ organisationId: 'org1', shares: 1 })).toEqual({
-      coursecode: 'CG1',
-      organizationcode: 'org1',
+      courseGroupId: 'CG1',
+      organizationId: 'org1',
       shares: 1,
     })
   })
