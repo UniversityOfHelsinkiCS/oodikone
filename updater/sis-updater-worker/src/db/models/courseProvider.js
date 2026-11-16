@@ -6,14 +6,13 @@ class CourseProvider extends Model {}
 
 CourseProvider.init(
   {
-    // NB: course group id, not course code
-    coursecode: {
+    courseGroupId: {
       type: STRING,
     },
     shares: {
       type: JSONB,
     },
-    organizationcode: {
+    organizationId: {
       type: STRING,
       references: {
         model: 'organization',

@@ -91,7 +91,8 @@ export class CourseModel extends Model implements Course {
 
   @BelongsToMany(() => OrganizationModel, {
     through: () => CourseProviderModel,
-    foreignKey: 'coursecode',
+    foreignKey: 'courseGroupId',
+    otherKey: 'organizationId',
     sourceKey: 'groupId',
   })
   declare organizations: Course['organizations']

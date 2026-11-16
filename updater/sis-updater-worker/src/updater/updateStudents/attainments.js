@@ -187,7 +187,7 @@ export const updateAttainments = async (
           coursesToBeCreated.set(parsedCourseCode, courseUnit)
           courseProvider = await CourseProvider.findOne({
             where: {
-              coursecode: parsedCourseCode,
+              courseGroupId: parsedCourseCode,
             },
           })
         } else {
@@ -325,8 +325,8 @@ export const updateAttainments = async (
   )
   await bulkCreate(
     CourseProvider,
-    uniqBy(courseProvidersToBeCreated, cP => `${cP.coursecode}-${cP.organizationcode}`),
+    uniqBy(courseProvidersToBeCreated, cP => `${cP.courseGroupId}-${cP.organizationId}`),
     null,
-    ['coursecode', 'organizationcode']
+    ['courseGroupId', 'organizationId']
   )
 }

@@ -2,7 +2,6 @@ import { Column, CreatedAt, DataType, ForeignKey, Model, Table, UpdatedAt } from
 
 import type { CourseProvider } from '@oodikone/shared/models'
 
-import { CourseModel } from './course'
 import { OrganizationModel } from './organization'
 
 @Table({
@@ -11,18 +10,15 @@ import { OrganizationModel } from './organization'
   tableName: 'course_providers',
 })
 export class CourseProviderModel extends Model implements CourseProvider {
-  @ForeignKey(() => CourseModel)
   @Column(DataType.STRING)
-  // TODO: RENAME: this is courseGroupId, not code
-  declare coursecode: CourseProvider['coursecode']
+  declare courseGroupId: CourseProvider['courseGroupId']
 
   @Column(DataType.JSONB)
   declare shares: CourseProvider['shares']
 
   @ForeignKey(() => OrganizationModel)
   @Column(DataType.STRING)
-  // TODO: RENAME: this is organizationId, not code
-  declare organizationcode: CourseProvider['organizationcode']
+  declare organizationId: CourseProvider['organizationId']
 
   @CreatedAt
   @Column(DataType.DATE)

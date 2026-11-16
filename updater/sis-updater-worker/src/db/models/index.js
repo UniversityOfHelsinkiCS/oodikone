@@ -27,8 +27,18 @@ const CREDIT_TYPE_CODES = {
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
 
-Course.belongsToMany(Organization, { through: CourseProvider, foreignKey: 'coursecode', sourceKey: 'groupId' })
-Organization.belongsToMany(Course, { through: CourseProvider, foreignKey: 'organizationcode', targetKey: 'groupId' })
+Course.belongsToMany(Organization, {
+  through: CourseProvider,
+  foreignKey: 'courseGroupId',
+  otherKey: 'organizationId',
+  sourceKey: 'groupId',
+})
+Organization.belongsToMany(Course, {
+  through: CourseProvider,
+  foreignKey: 'organizationId',
+  otherKey: 'courseGroupId',
+  targetKey: 'groupId',
+})
 
 ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
 Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })

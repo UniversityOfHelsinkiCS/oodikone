@@ -24,11 +24,11 @@ export const getCreditsForProvider = async (provider: string, courseIds: string[
 
   const providers = await CourseProviderModel.findAll({
     where: {
-      coursecode: { [Op.in]: courseGroupIds },
+      courseGroupId: { [Op.in]: courseGroupIds },
     },
     raw: true,
   })
-  const organizationIds = providers.map(p => p.organizationcode)
+  const organizationIds = providers.map(p => p.organizationId)
   const organizations = await OrganizationModel.findAll({
     where: {
       id: {
@@ -44,14 +44,14 @@ export const getCreditsForProvider = async (provider: string, courseIds: string[
   }, {})
 
   const courseGroupIdToShareMap = providers.reduce<Record<string, CourseProviderModel[]>>((obj, provider) => {
-    obj[provider.coursecode] ??= []
-    obj[provider.coursecode].push(provider)
+    obj[provider.courseGroupId] ??= []
+    obj[provider.courseGroupId].push(provider)
     return obj
   }, {})
 
   const courseGroupIdToShare = (courseGroupId: string, attainmentDate: Date) => {
     const providers = courseGroupIdToShareMap[courseGroupId]
-    const relevantProvider = providers?.find(p => organizationIdToCodeMap[p.organizationcode] === provider)
+    const relevantProvider = providers?.find(p => organizationIdToCodeMap[p.organizationId] === provider)
     if (!relevantProvider?.shares) return 0
     const relevantShare = relevantProvider.shares
       .filter(share => {
