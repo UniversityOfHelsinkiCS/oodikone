@@ -30,7 +30,10 @@ export const useColumns = (getTextIn, faculties, numberMode, colorMode, facultyM
         filterFn: (row, columnId, filterValue) => {
           const { code, name } = row.original
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          return code.toLowerCase().includes(filterValue) || getTextIn(name).toLowerCase().includes(filterValue)
+          return (
+            code.toLowerCase().includes(filterValue.toLowerCase()) ||
+            getTextIn(name).toLowerCase().includes(filterValue.toLowerCase())
+          )
         },
       }),
       columnHelper.accessor('total-column', {
