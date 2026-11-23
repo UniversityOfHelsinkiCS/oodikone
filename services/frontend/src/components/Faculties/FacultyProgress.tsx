@@ -6,6 +6,7 @@ import { FacultyProgressTable } from '@/components/Faculties/FacultyProgressTabl
 import { Section } from '@/components/Section'
 import { GetAllProgressStatsResponse } from '@/types/api/faculty'
 import { calculateStats, sortProgrammeKeys } from '@/util/faculty'
+import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 
 export const FacultyProgress = ({
   faculty,
@@ -20,6 +21,7 @@ export const FacultyProgress = ({
 }) => {
   const creditCounts = progressStats?.creditCounts
   const graduatedCount = progressStats?.graduatedCount
+  const { language } = useLanguage()
 
   const bachelorStats = calculateStats(creditCounts?.bachelor, graduatedCount?.bachelor, 180, {
     startDegree: 'bachelor',
@@ -70,7 +72,7 @@ export const FacultyProgress = ({
       </Section>
       <Section
         cypress="faculty-bachelor-masters-progress"
-        infoBoxContent={facultyToolTips.bachelorMasterProgress}
+        infoBoxContent={facultyToolTips.bachelorMasterProgress[language]}
         isError={isError}
         isLoading={isLoading ? !bachelorMasterStats : false}
         title="Bachelor + Master"

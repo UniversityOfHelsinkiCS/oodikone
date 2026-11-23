@@ -1,36 +1,10 @@
 import { studyProgrammeToolTips } from '@/common/InfoToolTips/studyProgramme'
 
-export const facultyToolTips = {
-  common: {
-    yearToggle: studyProgrammeToolTips.common.yearToggle,
-    graduatedToggle: studyProgrammeToolTips.common.graduatedToggle,
-    studyRightToggle: studyProgrammeToolTips.common.studyRightToggle,
-    studentProgress: `
-Kuvaa tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna.
-Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
-
-- Bachelor: Kandidaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
-- Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden etenenminen. Aloitusvuodeksi on merkitty kandiohjelman aloitusvuosi.
-  Opinto-ohjelmaksi on merkitty maisteriohjelma, johon opiskelija on siirtynyt kandiksi valmistumisen jälkeen.
-- Master: Pelkällä maisterintutkinnon opinto-oikeudella varustettujen opiskelijoiden eteneminen 
-- Doctor: Tohtorin opinto-oikeudella varustettujen opiskelijoiden eteneminen
-
-HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
-Opintopisteet on laskettu opinto-oikeuden alkamisesta, eikä tällä hetkellä ota huomioon mahdollisia hyväksilukuja.
-
-Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet.
-`,
-    programmeToggle: `
-**New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
-
-**All degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
-`,
-    averageGraduationTimes: `
-Opiskelijoiden keskimääräiset valmistumisajat tutkintotasoittain.
+const averageGraduationTimesBasic = `Opiskelijoiden keskimääräiset valmistumisajat tutkintotasoittain.
 
 - **Bachelor**: Kandidaatin tutkinnon suorittaneet opiskelijat
-- **Bachelor + Master**: Opiskelijat, joiden opiskeluoikeuteen kuuluu **sekä kandidaatin että maisterin** tutkinnon suoritusoikeus
-- **Master**: Opiskelijat, joiden opiskeluoikeuteen kuuluu **vain** maisterin tutkinnon suoritusoikeus
+- **Bachelor + Master**: Opiskeluoikeuteen kuuluu **sekä kandidaatin että maisterin** tutkinnon suoritusoikeus
+- **Master**: Opiskeluoikeuteen kuuluu **vain** maisterin tutkinnon suoritusoikeus
 - **Doctor**: Tohtorin tutkinnon suorittaneet opiskelijat
 
 Valmistumisajoista on **vähennetty lakisääteiset poissaolot**.
@@ -38,10 +12,43 @@ Valmistumisajoista on **vähennetty lakisääteiset poissaolot**.
 - **Breakdown**/**Median study times**:
   - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), kahden lukukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
   - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** lukukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
+`
+const progressBasic = `
+Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
+
+- **Bachelor**: Kandidaatin opinto-oikeudella opiskelevien eteneminen
+- **Bachelor + Master**: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden eteneminen. Aloitusvuosi on kandiohjelman aloitusvuosi.
+  Opinto-ohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandiksi valmistumisen jälkeen.
+- **Master**: Pelkällä maisterintutkinnon opinto-oikeudella opiskelevien eteneminen 
+- **Doctor**: Tohtorin opinto-oikeudella opiskelevien eteneminen
+
+HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tehdyt opintopisteet.
+Opintopisteet on laskettu opinto-oikeuden alkamisesta, eikä mahdollisia hyväksilukuja oteta huomioon.
+
+Mukana ovat oletusarvoisesti myös ohjelmaan siirtyneet.
+`
+export const facultyToolTips = {
+  common: {
+    yearToggle: studyProgrammeToolTips.common.yearToggle,
+    graduatedToggle: studyProgrammeToolTips.common.graduatedToggle,
+    studyRightToggle: studyProgrammeToolTips.common.studyRightToggle,
+    studentProgress: `
+Tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella opiskelevien etenemistä opintopisteissä mitattuna. `.concat(
+      progressBasic
+    ),
+    studentProgressUniversity: `
+Yliopistoon kuuluvien eri tiedekunnissa opiskelevien etenemistä opintopisteissä mitattuna. `.concat(progressBasic),
+    programmeToggle: `
+**New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
+
+**All degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.
+`,
+    averageGraduationTimesUniversity: averageGraduationTimesBasic,
+    averageGraduationTimes: averageGraduationTimesBasic.concat(`
 - **Graduation year**/**Starting year**:
   - **Graduation year**: Ryhmittelee opiskelijat valmistumisvuosittain (kalenterivuosi). Sisältää ohjelmaan siirtyneet opiskelijat.
   - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on aloitusvuosi kandiohjelmassa ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.
-`,
+`),
   },
 
   basicInformationTab: {
@@ -66,7 +73,7 @@ Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopist
 
 **Exchange students**: Saapuvat vaihto-opiskelijat: opintosuoritukset, jotka ovat saapuvan kansainvälisen opiskelijan suorittamia. Sisältää kaikki vaihto-opiskelijan opiskeluoikeuden aikana syntyneet opintopisteet.
 
-**Transferred**: Hyväksiluetut opintopisteet. Tilastointipäivämäärä on hyväksilukupäivämäärä, eli vaikka suoritus olisi vuodelta 2021, jos opintopiste hyväksiluetaan 2024, se lasketaan vuodelle 2024.
+**Transferred**: Hyväksiluetut opintopisteet. Tilastointipäivämäärä on hyväksilukupäivämäärä: esimerkiski jos suoritus olisi vuodelta 2021 ja opintopisteet hyväksiluetaan 2024, ne lasketaan vuodelle 2024.
 
 **Separate**: Opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
 
@@ -78,9 +85,13 @@ Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopist
 Sisältää kyseisenä vuonna tiedekunnasta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty.
 Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
 `,
+    graduatedOfTheUniversity: `
+Sisältää kyseisenä vuonna yliopistosta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus on myönnetty.
+Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
+`,
     thesisWritersOfTheFaculty: `
 Sisältää kyseisenä vuonna kandidaatin- tai maisterintutkielman hyväksytysti suorittaneet opiskelijat.
-Mukana ei ole mahdollisia arvosanan korotuksia.
+Ei sisällä mahdollisia arvosanan korotuksia.
 `,
   },
 
@@ -92,9 +103,17 @@ Mukana ei ole mahdollisia arvosanan korotuksia.
   },
 
   // Used under University
-  bachelorMasterProgress: `
-The starting year is the study right start in the bachelor programme. The credits are computed by the
-start date of the bachelor programme and at the moment, they do not include any transferred credits.
-Thus, in these statistics some students have fewer credits than in reality.
-`,
+  bachelorMasterProgress: {
+    fi: `Aloitusvuosi on kandiohjelman opinto-oikeuden alkamisvuosi.
+      Opintopisteiden laskeminen alkaa kandiohjelman aloittamisesta eikä hyväksiluettuja opintopisteitä lasketa.
+      Siksi opintopistekertymät voivat olla tässä todellista pienempiä.`,
+    en: `The starting year is the study right start in the bachelor programme. The credits are computed by the
+      start date of the bachelor programme and they do not include any transferred credits.
+      Thus, in these statistics some students have fewer credits than in reality.
+    `,
+    sv: `The starting year is the study right start in the bachelor programme. The credits are computed by the
+      start date of the bachelor programme and they do not include any transferred credits.
+      Thus, in these statistics some students have fewer credits than in reality.
+    `,
+  },
 }

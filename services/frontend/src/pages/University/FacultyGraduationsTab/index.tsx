@@ -19,7 +19,7 @@ export const FacultyGraduationsTab = () => {
     <Stack spacing={2}>
       <Section
         cypress="average-graduation-times"
-        infoBoxContent={facultyToolTips.common.averageGraduationTimes}
+        infoBoxContent={facultyToolTips.common.averageGraduationTimesUniversity}
         title="Average graduation times"
       >
         <ToggleContainer>
