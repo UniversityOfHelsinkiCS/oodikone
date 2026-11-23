@@ -106,7 +106,8 @@ class DbConnections extends EventEmitter {
         migrations: {
           glob: 'src/db/migrations/*.cjs',
           resolve: ({ name, path, context }) => {
-            const getMigration = () => import(path)
+            // Named exports of a .cjs import miss `down`; `default` is the full module.exports
+            const getMigration = async () => (await import(path)).default
             return {
               // Migration names need to end in .js for legacy reasons
               // modifying this behaviour requires manually altering the db 'migrations' table
