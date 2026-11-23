@@ -45,7 +45,7 @@ const contentTexts = {
     sv: 'Se detaljer om utbildningsprogrammet för det valda året',
   },
   programmesOverview: {
-    fi: 'Koulutusohjelman statistiikka vuodesta 2017 alkaen.',
+    fi: 'Koulutusohjelman tilastot vuodesta 2017 alkaen.',
     en: 'Statistics of a programme starting from 2017.',
     sv: 'Statistik över utbildningsprogrammet från och med 2017.',
   },
@@ -60,9 +60,9 @@ const contentTexts = {
     sv: 'Se statistik på studentnivå för en kurs eller en module.',
   },
   sgg: {
-    fi: 'Ohjaamiesi ryhmien opiskelijakohtainen statistiikka',
+    fi: 'Ohjaamiesi ryhmien opiskelijakohtaset tilastot.',
     en: 'Student statistics for your study guidance groups.',
-    sv: 'Studentstatistik för din handledningsgrupp',
+    sv: 'Studentstatistik för din handledningsgrupp.',
   },
   students: {
     fi: 'Tarkastele opiskelijan opintosuorituksia ja opinto-oikeuksia.',
@@ -72,7 +72,7 @@ const contentTexts = {
   teacher: {
     fi: 'Opettajien tuottamat opintopisteet. Voit myös hakea koulutusohjelma- tai opettajakohtaisia tilastoja.',
     en: 'Credits produced by teachers. You can also search for degree programme or teacher specific statistics.',
-    sv: 'Studiepoäng producerade av lärare. Du kan också söka efter statistik för specifika utbildningsprogram eller lärare..',
+    sv: 'Studiepoäng producerade av lärare. Du kan också söka efter statistik för specifika utbildningsprogram eller lärare.',
   },
   customPopsGeneric: {
     fi: 'Valitsemasi opiskelijapopulaation tilastot. Voit hakea populaation opiskelijanumeroilla tai koulutusohjelmakoodeilla.',
