@@ -8,6 +8,8 @@ import rehypeRaw from 'rehype-raw'
 
 import { useFormatContent } from '@/common'
 import { HelpOutlineIcon } from '@/theme'
+import CloseIcon from '@mui/icons-material/Close'
+import DialogTitle from '@mui/material/DialogTitle'
 
 const ScrollArea = styled('div')({
   padding: 16,
@@ -33,11 +35,15 @@ export const ExpandingInfoBox = ({
 }) => {
   const [open, setOpen] = useState(false)
 
+  const handleClose = () => {
+    setOpen(false)
+  }
   return (
     <>
       <Tooltip arrow title={'Paina avataksesi.'}>
         <Button
           color="info"
+          aria-label="info"
           data-cy={`${cypress}-info-box-button`}
           onClick={() => setOpen(true)}
           startIcon={<HelpOutlineIcon />}
@@ -46,8 +52,21 @@ export const ExpandingInfoBox = ({
           Info
         </Button>
       </Tooltip>
-      <Dialog fullWidth maxWidth="xl" onClose={() => setOpen(false)} open={open}>
-        <ScrollArea>
+      <Dialog maxWidth="lg" onClose={handleClose} open={open}>
+        <DialogTitle></DialogTitle>
+        <Button
+          aria-label="close"
+          startIcon={<CloseIcon />}
+          onClick={handleClose}
+          sx={theme => ({
+            position: 'absolute',
+            right: 2,
+            top: 8,
+            margin: 0,
+            color: theme.palette.grey[600],
+          })}
+        />
+        <ScrollArea sx={{ paddingTop: 0 }}>
           <ReactMarkdown rehypePlugins={[rehypeRaw]}>{useFormatContent(content)}</ReactMarkdown>
           <BottomFade />
         </ScrollArea>

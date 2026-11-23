@@ -4,8 +4,7 @@ import Stack from '@mui/material/Stack'
 import type { SxProps, Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useEffect, useRef } from 'react'
-
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
 import { ErrorMessage } from '@/components/Section/ErrorMessage'
 import { ExportButton } from '@/components/Section/ExportButton'
 import { LoadingSkeleton } from '@/components/Section/LoadingSkeleton'
@@ -73,7 +72,7 @@ export const Section = ({
             {exportOnClick ? (
               <ExportButton cypress={cypress} disabled={isError || isLoading} onClick={exportOnClick} />
             ) : null}
-            {infoBoxContent ? <InfoBox content={infoBoxContent} cypress={cypress} /> : null}
+            {infoBoxContent ? <ExpandingInfoBox content={infoBoxContent} cypress={cypress} /> : null}
           </Stack>
         </Stack>
       ) : null}
