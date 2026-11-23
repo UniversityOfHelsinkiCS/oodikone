@@ -506,25 +506,28 @@ test.describe('Basic user', () => {
       test.describe('Students tab', () => {
         test.describe('Info boxes', () => {
           test('Student statistics table', async ({ page }) => {
-            await page.getByTestId('StudentStatistics-info-box-button').hover()
+            await page.getByTestId('StudentStatistics-info-box-button').click()
             await expect(
               page.getByTestId('StudentStatistics-info-box-content').getByText('Table - Students')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
 
           test('Pass rate', async ({ page }) => {
-            await page.getByTestId('PassRateStudents-info-box-button').hover()
+            await page.getByTestId('PassRateStudents-info-box-button').click()
             await expect(
               page.getByTestId('PassRateStudents-info-box-content').getByText('Pass rate - Students')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
 
           test('Grade distribution', async ({ page }) => {
             await toggleShowGrades(page)
-            await page.getByTestId('GradeDistribution-info-box-button').hover()
+            await page.getByTestId('GradeDistribution-info-box-button').click()
             await expect(
               page.getByTestId('GradeDistribution-info-box-content').getByText('Grade distribution')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
         })
 
@@ -623,6 +626,7 @@ test.describe('Basic user', () => {
             await expect(
               page.getByTestId('AttemptStatistics-info-box-content').getByText('Table - Attempts')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
 
           test('Pass rate', async ({ page }) => {
@@ -630,6 +634,7 @@ test.describe('Basic user', () => {
             await expect(
               page.getByTestId('PassRateAttempts-info-box-content').getByText('Pass rate - Attempts')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
 
           test('Grade distribution', async ({ page }) => {
@@ -638,6 +643,7 @@ test.describe('Basic user', () => {
             await expect(
               page.getByTestId('GradeDistribution-info-box-content').getByText('Grade distribution')
             ).toBeVisible()
+            await page.getByLabel('close').click()
           })
         })
 

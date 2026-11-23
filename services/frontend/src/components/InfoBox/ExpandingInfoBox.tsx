@@ -52,7 +52,7 @@ export const ExpandingInfoBox = ({
           Info
         </Button>
       </Tooltip>
-      <Dialog maxWidth="lg" onClose={handleClose} open={open}>
+      <Dialog data-cy={`${cypress}-info-box-content`} maxWidth="lg" onClose={handleClose} open={open}>
         <DialogTitle></DialogTitle>
         <Button
           aria-label="close"

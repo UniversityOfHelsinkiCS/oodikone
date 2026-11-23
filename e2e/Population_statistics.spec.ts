@@ -36,14 +36,12 @@ test.describe('Population statistics tests', () => {
     test.describe('Population search', () => {
       test('Info box works', async ({ page }) => {
         await expect(page.getByTestId('PopulationSearch-info-box-content')).not.toBeVisible()
-        await page.getByTestId('PopulationSearch-info-box-button').hover()
+        await page.getByTestId('PopulationSearch-info-box-button').click()
         await expect(page.getByTestId('PopulationSearch-info-box-content')).toBeVisible()
-
         await expect(
           page.getByTestId('PopulationSearch-info-box-content').getByText('Tässä osiossa voi tarkastella')
         ).toBeVisible()
-
-        await page.getByTestId('PopulationSearch-info-box-button').dispatchEvent('mouseout')
+        await page.getByLabel('close').click()
         await expect(page.getByTestId('PopulationSearch-info-box-content')).not.toBeVisible()
       })
 

@@ -255,17 +255,19 @@ test.describe('Degree programme overview', () => {
 
     test.describe('Info boxes', () => {
       test('Study track overview section', async ({ page }) => {
-        await page.getByTestId('study-track-overview-info-box-button').hover()
+        await page.getByTestId('study-track-overview-info-box-button').click()
         await expect(
           page.getByTestId('study-track-overview-info-box-content').getByText('Opiskelijat, joiden')
         ).toBeVisible()
+        await page.getByLabel('close').click()
       })
 
       test('Progress of students section', async ({ page }) => {
-        await page.getByTestId('progress-of-students-info-box-button').hover()
+        await page.getByTestId('progress-of-students-info-box-button').click()
         await expect(
           page.getByTestId('progress-of-students-info-box-content').getByText('Kuvaa koulutusohjelmassa')
         ).toBeVisible()
+        await page.getByLabel('close').click()
       })
 
       test('Average graduation times section', async ({ page }) => {
@@ -273,6 +275,7 @@ test.describe('Degree programme overview', () => {
         await expect(
           page.getByTestId('average-graduation-times-info-box-content').getByText('Yksittäinen palkki')
         ).toBeVisible()
+        await page.getByLabel('close').click()
       })
     })
 

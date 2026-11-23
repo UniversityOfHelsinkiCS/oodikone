@@ -33,11 +33,11 @@ export const facultyToolTips = {
     graduatedToggle: studyProgrammeToolTips.common.graduatedToggle,
     studyRightToggle: studyProgrammeToolTips.common.studyRightToggle,
     studentProgress: `
-Tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella opiskelevien etenemistä opintopisteissä mitattuna. `.concat(
+Tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella opiskelevien eteneminen opintopisteissä mitattuna. `.concat(
       progressBasic
     ),
     studentProgressUniversity: `
-Yliopistoon kuuluvien eri tiedekunnissa opiskelevien etenemistä opintopisteissä mitattuna. `.concat(progressBasic),
+Yliopistoon kuuluvien eri tiedekunnissa opiskelevien eteneminen opintopisteissä mitattuna. `.concat(progressBasic),
     programmeToggle: `
 **New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
 

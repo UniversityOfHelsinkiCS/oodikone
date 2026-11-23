@@ -85,6 +85,7 @@ test.describe('Faculty statistics', () => {
         for (const [button, content, text] of infoBoxes) {
           await page.getByTestId(button).click()
           await expect(page.getByTestId(content)).toContainText(text)
+          await page.getByLabel('close').click()
         }
       })
 
@@ -162,6 +163,7 @@ test.describe('Faculty statistics', () => {
     test('info box contains the correct information', async ({ page }) => {
       await page.getByTestId('faculty-student-table-info-box-button').click()
       await expect(page.getByTestId('faculty-student-table-info-box-content')).toContainText('Opiskelijat, joiden')
+      await page.getByLabel('close').click()
     })
 
     test('percentage toggle works', async ({ page }) => {
@@ -184,6 +186,7 @@ test.describe('Faculty statistics', () => {
       await expect(page.getByTestId('average-graduation-times-info-box-content')).toContainText(
         'Opiskelijoiden keskimääräiset'
       )
+      await page.getByLabel('close').click()
     })
 
     test('graphs are visible', async ({ page }) => {

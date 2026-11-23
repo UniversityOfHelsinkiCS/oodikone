@@ -49,12 +49,16 @@ test.describe('University view', () => {
 
     test('info boxes contain correct information', async ({ page }) => {
       await page.getByTestId('faculty-progress-info-box-button').click()
-      await expect(page.getByTestId('faculty-progress-info-box-content')).toContainText('Kuvaa tiedekuntaan kuuluvien')
+      await expect(page.getByTestId('faculty-progress-info-box-content')).toContainText(
+        'Yliopistoon kuuluvien eri tiedekunnissa'
+      )
+      await page.getByLabel('close').click()
 
       await page.getByTestId('faculty-bachelor-masters-progress-info-box-button').click()
       await expect(page.getByTestId('faculty-bachelor-masters-progress-info-box-content')).toContainText(
-        'The starting year is the'
+        'Aloitusvuosi on kandiohjelman'
       )
+      await page.getByLabel('close').click()
     })
   })
 
@@ -81,10 +85,11 @@ test.describe('University view', () => {
     })
 
     test('info boxes contain correct information', async ({ page }) => {
-      await page.getByTestId('average-graduation-times-info-box-button').hover()
+      await page.getByTestId('average-graduation-times-info-box-button').click()
       await expect(page.getByTestId('average-graduation-times-info-box-content')).toContainText(
         'Opiskelijoiden keskimääräiset valmistumisajat'
       )
+      await page.getByLabel('close').click()
     })
   })
 })
