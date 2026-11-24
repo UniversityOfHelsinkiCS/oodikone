@@ -166,17 +166,18 @@ export const updateStudyplans = async (
   const getModuleIdsFromAttainment = attainment => {
     if (!attainment) return []
 
-    if (attainment.code && attainment.type === 'CustomModuleAttainment') return [sanitizeCourseCode(attainment.code)]
+    const childModuleIds = flatten(
+      (attainment.nodes ?? [])
+        .filter(node => node.attainmentId)
+        .map(node => getModuleIdsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
+    )
 
-    if (attainment.type === 'DegreeProgrammeAttainment')
-      return flatten(
-        attainment.nodes
-          .filter(node => node.attainmentId)
-          .map(node => getModuleIdsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
-      )
+    if (attainment.code && attainment.type === 'CustomModuleAttainment')
+      return [sanitizeCourseCode(attainment.code), ...childModuleIds]
 
     const { module_id } = attainment
-    return module_id && programmeModuleIdToType[module_id] === 'StudyModule' ? [module_id] : []
+    const isStudyModule = module_id && programmeModuleIdToType[module_id] === 'StudyModule'
+    return isStudyModule ? [module_id, ...childModuleIds] : childModuleIds
   }
 
   const getAttainmentsFromAttainment = attainment => {
