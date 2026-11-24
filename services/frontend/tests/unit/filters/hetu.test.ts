@@ -51,8 +51,8 @@ void describe('hetuFilter radio values', () => {
     assert.strictEqual(filterStudent(withoutHetu, '2'), true)
   })
 
-  // FIXME: Choosing "All" stores the string '0', which still counts as an active filter
-  void it.fails('should not be active when "All" is chosen from the radio buttons', () => {
+  void it('should not be active when "All" is chosen from the radio buttons', () => {
     assert.strictEqual(hetuFilter().isActive({ mode: '0' }, undefined), false)
+    assert.strictEqual(hetuFilter().isActive({ mode: '1' }, undefined), true)
   })
 })
