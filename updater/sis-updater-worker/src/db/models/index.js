@@ -14,6 +14,7 @@ import SISStudyRight from './SISStudyRight.js'
 import SISStudyRightElement from './SISStudyRightElement.js'
 import Student from './student.js'
 import Studyplan from './studyplan.js'
+import StudyplanCourse from './studyplanCourse.js'
 import StudyrightExtent from './studyrightExtent.js'
 import Teacher from './teacher.js'
 
@@ -103,6 +104,7 @@ export {
   SISStudyRightElement,
   Student,
   Studyplan,
+  StudyplanCourse,
   StudyrightExtent,
   Teacher,
 }

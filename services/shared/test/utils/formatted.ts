@@ -85,6 +85,7 @@ export const createCourse = (overrides: Partial<StudentCourse> = {}): StudentCou
 
 export const createStudyPlan = (overrides: Partial<StudentStudyPlan> = {}): StudentStudyPlan => ({
   included_courses: [],
+  courses: [],
   programme_code: 'TEST',
   includedModules: [],
   completed_credits: 0,

@@ -192,6 +192,8 @@ const getCoursesAndModulesForProgramme = async (code: string, periodIds: string)
       visible: mod.visible,
     })),
     modules: modules.map(mod => ({
+      id: mod.id,
+      group_id: mod.group_id,
       code: mod.code,
       name: mod.name,
       degree_programme_type: mod.degree_programme_type,

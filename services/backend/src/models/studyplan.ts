@@ -1,5 +1,6 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   CreatedAt,
   DataType,
@@ -12,8 +13,10 @@ import {
 
 import type { Studyplan } from '@oodikone/shared/models'
 
+import { CourseModel } from './course'
 import { SISStudyRightModel } from './SISStudyRight'
 import { StudentModel } from './student'
+import { StudyplanCourseModel } from './studyplanCourse'
 
 @Table({
   underscored: false,
@@ -47,6 +50,17 @@ export class StudyplanModel extends Model implements Studyplan {
 
   @Column({ type: DataType.ARRAY(DataType.TEXT), field: 'included_modules' })
   declare includedModules: Studyplan['includedModules']
+
+  // No db constraint: some included ids have no course row
+  // can add later if DRAFTs etc brought to oodikone
+  @BelongsToMany(() => CourseModel, {
+    through: () => StudyplanCourseModel,
+    foreignKey: 'studyplan_id',
+    otherKey: 'course_id',
+    as: 'courses',
+    constraints: false,
+  })
+  declare courses: Studyplan['courses']
 
   @Column(DataType.STRING)
   declare sisu_id: Studyplan['sisu_id']

@@ -8,6 +8,7 @@ import { createCourse, createStudent, createStudyRight } from '@oodikone/shared/
 
 const createHops = (programmeCode: string, sisStudyRightId: string, includedCourses: string[]): StudentStudyPlan => ({
   included_courses: includedCourses,
+  courses: [],
   programme_code: programmeCode,
   includedModules: [],
   completed_credits: 0,

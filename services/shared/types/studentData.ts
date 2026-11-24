@@ -34,6 +34,8 @@ export type StudentStudyRight = Pick<
   studyRightElements: Array<StudentStudyRightElement>
 }
 
+export type StudentStudyplanCourse = Pick<Course, 'groupId' | 'isStudyModule'>
+
 export type StudentStudyPlan = Pick<
   Studyplan,
   | 'included_courses'
@@ -42,7 +44,9 @@ export type StudentStudyPlan = Pick<
   | 'completed_credits'
   | 'curriculum_period_ids'
   | 'sis_study_right_id'
->
+> & {
+  courses: StudentStudyplanCourse[]
+}
 
 export type StudentData = StudentPersonalData & {
   studyplans: Array<StudentStudyPlan>

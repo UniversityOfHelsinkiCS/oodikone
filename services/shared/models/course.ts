@@ -5,13 +5,16 @@ import type { Credit } from './credit'
 import type { Enrollment } from './enrollment'
 import type { Organization } from './organization'
 
+/** Used for Courses and Modules */
 export type Course = {
   /* COLUMNS */
   id: string
   groupId: string
   code: string
   coursetypecode: string
+
   isStudyModule: boolean
+
   isPrimary: boolean
   isCustom: boolean // created based on a custom attainment (erilliskirjaus)
   name: Name

@@ -1,6 +1,6 @@
 import { col, Op } from 'sequelize'
 
-import { SISStudyRight, SISStudyRightElement, Student, Studyplan } from '@oodikone/shared/models'
+import { SISStudyRight, SISStudyRightElement, Student } from '@oodikone/shared/models'
 import { Tag, TagStudent } from '@oodikone/shared/models/kone'
 import { EnrollmentState } from '@oodikone/shared/types'
 import { enrollmentTimeDateThreshold } from '@oodikone/shared/util'
@@ -15,7 +15,7 @@ import {
   CourseModel,
 } from '../../models'
 import { TagModel, TagStudentModel } from '../../models/kone'
-import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
+import { StudentCredit, StudentEnrollment, StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 export type StudentTags = TagStudent & {
   tag: Pick<Tag, 'tag_id' | 'tagname' | 'personal_user_id'>
@@ -106,16 +106,6 @@ export type StudentStudyRight = Pick<
   studyRightElements: Array<StudentStudyRightElement>
 }
 
-export type StudentStudyPlan = Pick<
-  Studyplan,
-  | 'included_courses'
-  | 'programme_code'
-  | 'includedModules'
-  | 'completed_credits'
-  | 'curriculum_period_ids'
-  | 'sis_study_right_id'
->
-
 export type StudentData = StudentPersonalData & {
   studyplans: Array<StudentStudyPlan>
   studyRights: Array<StudentStudyRight>
@@ -180,6 +170,14 @@ export const getStudents = (studentNumbers: string[]): Promise<Array<StudentData
           'completed_credits',
           'curriculum_period_ids',
           'sis_study_right_id',
+        ],
+        include: [
+          {
+            model: CourseModel,
+            as: 'courses',
+            attributes: ['groupId', 'isStudyModule'],
+            through: { attributes: [] },
+          },
         ],
         separate: true,
       },

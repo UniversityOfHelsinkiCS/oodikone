@@ -1,11 +1,36 @@
-import { flatten, flattenDeep } from 'lodash-es'
+import { flatten, flattenDeep, keyBy } from 'lodash-es'
 import { Op } from 'sequelize'
 
+import { dbConnections } from '../../db/connection.js'
 import { selectFromByIds, bulkCreate } from '../../db/index.js'
-import { Studyplan } from '../../db/models/index.js'
+import { Studyplan, StudyplanCourse } from '../../db/models/index.js'
 import { isBaMa } from '../../utils/index.js'
-import { studyplanMapper, sanitizeCourseCode } from '../mapper.js'
+import { studyplanMapper, studyplanCourseRows, sanitizeCourseCode } from '../mapper.js'
 import { getEducation } from '../shared.js'
+
+const replaceStudyplanCourses = async studyplans => {
+  if (!studyplans.length) return
+
+  const studyplanIds = studyplans.map(({ id }) => id)
+  await dbConnections.sequelize.transaction(async transaction => {
+    await StudyplanCourse.destroy({ where: { studyplan_id: studyplanIds }, transaction })
+    // A concurrent job for the same student may have inserted the same rows
+    await StudyplanCourse.bulkCreate(studyplanCourseRows(studyplans), { transaction, ignoreDuplicates: true })
+  })
+}
+
+export const saveStudyplans = async mappedPlans => {
+  const lastPlanPerId = Object.values(keyBy(mappedPlans, 'id'))
+  try {
+    await bulkCreate(Studyplan, lastPlanPerId)
+  } catch (error) {
+    if (!(error instanceof AggregateError)) throw error
+    const failedIds = new Set(error.errors.map(({ entity }) => entity.id))
+    await replaceStudyplanCourses(lastPlanPerId.filter(({ id }) => !failedIds.has(id)))
+    throw error
+  }
+  await replaceStudyplanCourses(lastPlanPerId)
+}
 
 export const updateStudyplans = async (
   studyplansAll,
@@ -255,7 +280,7 @@ export const updateStudyplans = async (
       .filter(p => educationHasStudyRight[p.root_id] && educationHasStudyRight[p.root_id][p.user_id])
       .map(mapStudyplan)
   ).filter(p => !!p)
-  await bulkCreate(Studyplan, mappedPlans)
+  await saveStudyplans(mappedPlans)
 }
 
 // When updating students, studyplans sometimes are not updated. Check which aren't updated

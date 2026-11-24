@@ -470,3 +470,17 @@ export const studyplanMapper =
       }
     })
   }
+
+/**
+ * @param {{ id: string, included_courses?: string[], includedModules?: string[] }[]} studyplans - Mapped studyplans
+ */
+export const studyplanCourseRows = studyplans =>
+  sortBy(
+    uniqBy(
+      studyplans.flatMap(({ id, included_courses = [], includedModules = [] }) =>
+        [...included_courses, ...includedModules].filter(Boolean).map(course_id => ({ studyplan_id: id, course_id }))
+      ),
+      ({ studyplan_id, course_id }) => JSON.stringify([studyplan_id, course_id])
+    ),
+    ['studyplan_id', 'course_id']
+  )

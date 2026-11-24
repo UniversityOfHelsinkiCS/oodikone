@@ -20,6 +20,7 @@ import {
   SISStudyRightElementModel,
   StudentModel,
   StudyplanModel,
+  StudyplanCourseModel,
   StudyrightExtentModel,
   TeacherModel,
 } from '../models'
@@ -77,6 +78,7 @@ class DbConnection extends EventEmitter {
         SISStudyRightElementModel,
         StudentModel,
         StudyplanModel,
+        StudyplanCourseModel,
         StudyrightExtentModel,
         TeacherModel,
       ],
