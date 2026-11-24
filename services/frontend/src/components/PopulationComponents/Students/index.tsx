@@ -30,7 +30,6 @@ type PopulationDetails = CommonProps & {
   programme: string
   combinedProgramme?: string
   filteredCourses: FilteredCourse[]
-  idToGroupIdMap: Record<string, string>
 }
 
 type CoursePopulation = CommonProps & {
@@ -42,7 +41,6 @@ type StudyGuidanceGroup = CommonProps & {
   studyGuidanceGroup: any
   year: string
   filteredCourses: FilteredCourse[]
-  idToGroupIdMap: Record<string, string>
 }
 
 type CustomPopulation = CommonProps & {
@@ -63,7 +61,6 @@ export const PopulationStudents = ({
   combinedProgramme,
   filteredStudents,
   filteredCourses,
-  idToGroupIdMap,
   dataExport,
   studyGuidanceGroup,
   generalTabColumnFunction,
@@ -98,7 +95,6 @@ export const PopulationStudents = ({
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: (
       <ProgressTab
-        idToGroupIdMap={idToGroupIdMap ?? {}}
         months={months ?? Infinity}
         programme={programme}
         students={filteredStudents}

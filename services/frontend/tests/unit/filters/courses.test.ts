@@ -18,10 +18,9 @@ const baseOptions = () => ({
   courses: {},
   substitutedBy: {},
   includeSubstitutions: true,
-  idToGroupIdMap: {},
 })
 
-const baseArgs = () => ({ courses: [], idToGroupIdMap: {} })
+const baseArgs = () => ({ courses: [] })
 
 void describe('courseFilter', () => {
   void it('should keep every student when no course filters are selected', () => {
@@ -37,14 +36,15 @@ void describe('courseFilter', () => {
   })
 
   void it('should include a student who passed the course when filtering for PASSED', () => {
-    const student = createStudent({ courses: [createCourse({ course_id: TKT002_ID, passed: true })] })
+    const student = createStudent({
+      courses: [createCourse({ course_id: TKT002_ID, courseGroupId: TKT002_GROUP, passed: true })],
+    })
 
     const result = courseFilter().filter(student, {
       args: baseArgs(),
       options: {
         ...baseOptions(),
         courseFilters: { [TKT002_GROUP]: FilterType.PASSED },
-        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
       },
       precomputed: undefined,
     })
@@ -66,7 +66,14 @@ void describe('courseFilter', () => {
 
   void it('should include a student who failed the course when filtering for FAILED', () => {
     const student = createStudent({
-      courses: [createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED })],
+      courses: [
+        createCourse({
+          course_id: TKT002_ID,
+          courseGroupId: TKT002_GROUP,
+          passed: false,
+          credittypecode: CreditTypeCode.FAILED,
+        }),
+      ],
     })
 
     const result = courseFilter().filter(student, {
@@ -74,7 +81,6 @@ void describe('courseFilter', () => {
       options: {
         ...baseOptions(),
         courseFilters: { [TKT002_GROUP]: FilterType.FAILED },
-        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
       },
       precomputed: undefined,
     })
@@ -85,8 +91,18 @@ void describe('courseFilter', () => {
   void it('should include a student who failed and passed the course when filtering for PASSED', () => {
     const student = createStudent({
       courses: [
-        createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED }),
-        createCourse({ course_id: TKT003_ID, passed: true, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({
+          course_id: TKT002_ID,
+          courseGroupId: TKT002_GROUP,
+          passed: false,
+          credittypecode: CreditTypeCode.FAILED,
+        }),
+        createCourse({
+          course_id: TKT003_ID,
+          courseGroupId: TKT003_GROUP,
+          passed: true,
+          credittypecode: CreditTypeCode.PASSED,
+        }),
       ],
     })
 
@@ -95,7 +111,6 @@ void describe('courseFilter', () => {
       options: {
         ...baseOptions(),
         courseFilters: { [TKT003_GROUP]: FilterType.PASSED },
-        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP, [TKT003_ID]: TKT003_GROUP },
       },
       precomputed: undefined,
     })
@@ -106,8 +121,18 @@ void describe('courseFilter', () => {
   void it('should exclude a student who failed and passed the course when filtering for FAILED', () => {
     const student = createStudent({
       courses: [
-        createCourse({ course_id: TKT002_ID, passed: false, credittypecode: CreditTypeCode.FAILED }),
-        createCourse({ course_id: TKT003_ID, passed: true, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({
+          course_id: TKT002_ID,
+          courseGroupId: TKT002_GROUP,
+          passed: false,
+          credittypecode: CreditTypeCode.FAILED,
+        }),
+        createCourse({
+          course_id: TKT003_ID,
+          courseGroupId: TKT003_GROUP,
+          passed: true,
+          credittypecode: CreditTypeCode.PASSED,
+        }),
       ],
     })
 
@@ -116,7 +141,6 @@ void describe('courseFilter', () => {
       options: {
         ...baseOptions(),
         courseFilters: { [TKT002_GROUP]: FilterType.FAILED },
-        idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP, [TKT003_ID]: TKT003_GROUP },
       },
       precomputed: undefined,
     })
@@ -138,7 +162,6 @@ void describe('courseFilter', () => {
         },
       ],
       includeSubstitutions: false,
-      idToGroupIdMap: { [TKT002_ID]: TKT002_GROUP },
     }
     const options = baseOptions()
 

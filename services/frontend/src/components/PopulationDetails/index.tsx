@@ -45,7 +45,6 @@ type PopulationDetailsProps = {
   populationTags: Map<string, string>
   filteredStudents: FormattedStudent[]
   filteredCourses: FilteredCourse[]
-  idToGroupIdMap: Record<string, string>
 }
 
 export const PopulationDetails = ({
@@ -54,7 +53,6 @@ export const PopulationDetails = ({
   populationTags,
   filteredStudents,
   filteredCourses,
-  idToGroupIdMap,
 }: PopulationDetailsProps) => {
   const { useFilterDispatch: filterDispatch, useFilterSelector } = useFilters()
   const { getTextIn } = useLanguage()
@@ -150,7 +148,6 @@ export const PopulationDetails = ({
               combinedProgramme={combinedProgramme}
               filteredCourses={filteredCourses}
               filteredStudents={filteredStudents}
-              idToGroupIdMap={idToGroupIdMap}
               generalTabColumnFunction={() =>
                 columnsGeneralTab({
                   showCombinedProgrammeColumns: !!combinedProgramme || showBachelorAndMaster,

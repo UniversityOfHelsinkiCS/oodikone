@@ -22,7 +22,6 @@ export const PopulationStudentsWrapper = ({ programme }: { programme: string }) 
         filteredStudents={students}
         generalTabColumnFunction={columnFunction}
         generalTabFormattingFunction={formattingFunction}
-        idToGroupIdMap={{}}
         programme={programme}
         variant="population"
       />

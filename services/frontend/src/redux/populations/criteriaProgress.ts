@@ -38,8 +38,7 @@ export const getProgressCriteria = (
   criteria: ProgressCriteria,
   studyRightStartDate: string,
   hops: StudentStudyPlan | undefined,
-  credits: PopulationCourseStatsCredit[],
-  idToGroupId: Record<string, string>
+  credits: PopulationCourseStatsCredit[]
 ) => {
   const [thereAreCriteria, criteriaChecked] = getCriteriaBase(criteria)
   if (!thereAreCriteria) return criteriaChecked
@@ -49,10 +48,9 @@ export const getProgressCriteria = (
   /** Number of credits completed during each academic year */
   const academicYears = { year1: 0, year2: 0, year3: 0, year4: 0, year5: 0, year6: 0 }
 
-  /** Credits produced by a student, resolved from their (possibly historical) course_id to the course's group id */
   const courses = credits
-    .map(({ attainment_date, course_id, credits, credittypecode }) => ({
-      group_id: idToGroupId[course_id],
+    .map(({ attainment_date, courseGroupId, credits, credittypecode }) => ({
+      group_id: courseGroupId,
       credits,
       credittypecode,
       date: attainment_date,
@@ -102,8 +100,7 @@ export const getProgressCriteria = (
       return criteria.allCourseGroups[mainGroupId].some(group => group.includes(course.group_id))
     })
 
-    // included_courses holds course ids, resolved to group ids
-    const hopsGroupIds = hops.included_courses.map(id => idToGroupId[id]).filter(Boolean)
+    const hopsGroupIds = hops.courses.map(({ groupId }) => groupId)
     const isInStudyPlan =
       hopsGroupIds.includes(course.group_id) || mainGroupIds.some(groupId => hopsGroupIds.includes(groupId))
     if (!isInStudyPlan) return

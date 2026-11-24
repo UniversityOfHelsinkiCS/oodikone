@@ -54,13 +54,7 @@ export const formatPopulationData = <T extends RequiredFields>(
 
     return {
       ...student,
-      criteriaProgress: getProgressCriteria(
-        otherParams.criteria,
-        student.studyrightStart,
-        hops,
-        credits,
-        coursestatistics.idToGroupIdMap
-      ),
+      criteriaProgress: getProgressCriteria(otherParams.criteria, student.studyrightStart, hops, credits),
       courses: credits.map(credit => {
         const passed = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credit.credittypecode)
 

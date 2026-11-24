@@ -241,8 +241,8 @@ export const filterCourses = (
   for (const { studentNumber, studyrightStart, enrollments, courses } of filteredStudents) {
     const studentStartingYear = new Date(studyrightStart).getFullYear()
 
-    for (const { course_id, state, enrollment_date_time } of enrollments) {
-      const course = coursestats.get(courseStatistics.idToGroupIdMap[course_id])
+    for (const { courseGroupId, state, enrollment_date_time } of enrollments) {
+      const course = coursestats.get(courseGroupId)
       if (!course) continue
 
       const initialDate = new Date(enrollment_date_time)
@@ -254,8 +254,8 @@ export const filterCourses = (
       course.enrollments.semesters[semester][state].add(studentNumber)
     }
 
-    for (const { course_id, grade, credittypecode, date } of courses) {
-      const course = coursestats.get(courseStatistics.idToGroupIdMap[course_id])
+    for (const { courseGroupId, grade, credittypecode, date } of courses) {
+      const course = coursestats.get(courseGroupId)
       if (!course) continue
 
       const passingGrade = [CreditTypeCode.PASSED, CreditTypeCode.APPROVED].includes(credittypecode)

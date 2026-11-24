@@ -10,7 +10,7 @@ import {
   getCredits,
   getStudyRightElementsForStudyRight,
 } from './getStudentData'
-import { getCourseGroupIds, getCurriculumPeriodsById, getOptionsForStudents } from './shared'
+import { getCurriculumPeriodsById, getOptionsForStudents } from './shared'
 import { StudentCredit, StudentEnrollment } from '@oodikone/shared/types/studentData'
 
 export type OptimizedStatisticsQuery = {
@@ -71,12 +71,7 @@ export const statisticsOf = async (
     getCurriculumPeriodsById(),
   ])
 
-  const courseIds = new Set<string>()
-  for (const { course_id } of credits) courseIds.add(course_id)
-  for (const { course_id } of enrollments) courseIds.add(course_id)
-  const idToGroupIdRows = await getCourseGroupIds([...courseIds])
-  const idToGroupIdMap = Object.fromEntries(idToGroupIdRows.map(({ id, groupId }) => [id, groupId]))
-  const groupIds = [...new Set(idToGroupIdRows.map(({ groupId }) => groupId))]
+  const groupIds = [...new Set([...credits, ...enrollments].map(({ courseGroupId }) => courseGroupId))]
   const courses = await getCourseDetails(groupIds)
 
   const optionData = getOptionsForStudents(studyRightElementsForStudyRight, degreeProgrammeType)
@@ -90,6 +85,6 @@ export const statisticsOf = async (
   return {
     students: formattedStudents,
     criteria,
-    coursestatistics: { courses, idToGroupIdMap, enrollments, credits },
+    coursestatistics: { courses, enrollments, credits },
   }
 }

@@ -19,8 +19,6 @@ const COURSES = {
   CS002B: { id: 'id-CS002B', groupId: 'group-CS002B', code: 'CS002B' },
 } as const
 
-const idToGroupId = Object.fromEntries(Object.values(COURSES).map(({ id, groupId }) => [id, groupId]))
-
 const criteria = {
   allCourseGroups: {
     [COURSES.CS001.groupId]: [],
@@ -37,6 +35,7 @@ const createCourse = (
   ({
     course_id: COURSES[course].id,
     course_code: COURSES[course].code,
+    courseGroupId: COURSES[course].groupId,
     date: new Date(date),
     passed,
     credittypecode,
@@ -52,7 +51,7 @@ const label = (course: keyof typeof COURSES): Label => ({
 })
 
 const getGroups = (student: FormattedStudent, course: keyof typeof COURSES) =>
-  getCourseGroups(COURSES[course].groupId, criteria, student, idToGroupId)
+  getCourseGroups(COURSES[course].groupId, criteria, student)
 
 void describe('getCourseGroups', () => {
   void it('returns one group per substitution group', () => {
@@ -105,7 +104,7 @@ void describe('passed checks', () => {
 
 void describe('getCellText', () => {
   const text = (student: FormattedStudent, course: keyof typeof COURSES) =>
-    getCellText(label(course), criteria, student, 'year1', idToGroupId)
+    getCellText(label(course), criteria, student, 'year1')
 
   void it('shows the date of the latest passed attempt', () => {
     const student = createStudent([createCourse('CS001', '2023-10-01', false), createCourse('CS001', '2024-01-02')])
@@ -128,6 +127,7 @@ void describe('getCellText', () => {
   void it('shows enrollments, ignoring rejected ones', () => {
     const enrollment = (state: EnrollmentState, date: string) => ({
       course_id: COURSES.CS001.id,
+      courseGroupId: COURSES.CS001.groupId,
       state,
       enrollment_date_time: date,
     })

@@ -41,7 +41,11 @@ const createCriteria = (overrides: Partial<ProgressCriteria> = {}): ProgressCrit
   ...overrides,
 })
 
-const createHops = (includedCourseIds: string[]) => createStudyPlan({ included_courses: includedCourseIds })
+const createHops = (includedCourseIds: string[]) =>
+  createStudyPlan({
+    included_courses: includedCourseIds,
+    courses: includedCourseIds.map(id => ({ groupId: idToGroupId[id], isStudyModule: false })),
+  })
 
 const createCredit = (
   courseId: string,
@@ -59,7 +63,7 @@ const getProgress = (
   criteria: ProgressCriteria,
   hops: ReturnType<typeof createHops> | undefined,
   credits: PopulationCourseStatsCredit[]
-) => getProgressCriteria(criteria, STUDY_RIGHT_START.toISOString(), hops, credits, idToGroupId)
+) => getProgressCriteria(criteria, STUDY_RIGHT_START.toISOString(), hops, credits)
 
 void describe('getProgressCriteria', () => {
   void it('returns empty criteria when no criteria courses or credits are defined', () => {

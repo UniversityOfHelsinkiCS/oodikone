@@ -62,7 +62,6 @@ export type CloseToGraduationData = {
 export type PopulationCourseStats = {
   // One row per groupId (isPrimary=true course for that group)
   courses: CourseStats[]
-  idToGroupIdMap: Record<string, string>
   enrollments: (StudentEnrollment & { studentnumber: string })[]
   credits: StudentCredit[]
 }

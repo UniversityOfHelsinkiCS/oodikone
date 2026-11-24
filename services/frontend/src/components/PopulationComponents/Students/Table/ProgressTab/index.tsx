@@ -23,7 +23,6 @@ import {
   hasFailed,
   hasPassedDuringAcademicYear,
   hasPassedOutsideAcademicYear,
-  IdToGroupId,
   Label,
 } from '@/components/PopulationComponents/Students/Table/ProgressTab/util'
 import { useCurriculum } from '@/hooks/useCurriculum'
@@ -56,8 +55,7 @@ const getRowContent = (
   year: string,
   start: dayjs.Dayjs,
   end: dayjs.Dayjs,
-  criteria: ProgressCriteria | undefined,
-  idToGroupId: IdToGroupId
+  criteria: ProgressCriteria | undefined
 ) => {
   if (label.code === 'Credits') {
     if (student.criteriaProgress[year]?.credits) {
@@ -67,7 +65,7 @@ const getRowContent = (
   }
   if (!label.groupId) return null
 
-  const courses = getCourseGroups(label.groupId, criteria, student, idToGroupId)
+  const courses = getCourseGroups(label.groupId, criteria, student)
 
   if (hasCreditTransfer(courses)) {
     return <SwapHorizIcon color="success" />
@@ -85,7 +83,7 @@ const getRowContent = (
     return <CloseIcon color="error" />
   }
 
-  if (hasEnrolled(student, label.groupId, idToGroupId)) {
+  if (hasEnrolled(student, label.groupId)) {
     return <RemoveIcon color="disabled" />
   }
 
@@ -130,13 +128,11 @@ const getAcademicYear = (months: number, yearIndex: number) => ({
 const getExcelKey = (label: Label, yearIndex: number) => `Year ${yearIndex + 1}: ${label.name}`
 
 export const ProgressTable = ({
-  idToGroupIdMap,
   students,
   months,
   programme,
   studyGuidanceGroupProgramme,
 }: {
-  idToGroupIdMap: IdToGroupId
   students: FormattedStudent[]
   months: number
   programme: string
@@ -245,13 +241,13 @@ export const ProgressTable = ({
                 }
 
                 default:
-                  return [[key, getCellText(label, criteria, student, year, idToGroupIdMap)]]
+                  return [[key, getCellText(label, criteria, student, year)]]
               }
             })
           )
         ),
       })),
-    [students, criteriaHeaders, labelCriteria, semesterEnrollmentsByStudent, academicYears, criteria, idToGroupIdMap]
+    [students, criteriaHeaders, labelCriteria, semesterEnrollmentsByStudent, academicYears, criteria]
   )
 
   const accessorKeys = useMemo(
@@ -278,8 +274,8 @@ export const ProgressTable = ({
       // 2 None of above
       if (!label.groupId) return 2
       if (student.criteriaProgress[year]?.coursesSatisfied?.[label.groupId]) return -1
-      if (student.courses.find(course => idToGroupIdMap[course.course_id] === label.groupId)?.passed === false) return 0
-      if (hasEnrolled(student, label.groupId, idToGroupIdMap)) return 1
+      if (student.courses.find(course => course.courseGroupId === label.groupId)?.passed === false) return 0
+      if (hasEnrolled(student, label.groupId)) return 1
       return 2
     }
 
@@ -293,14 +289,14 @@ export const ProgressTable = ({
             const title =
               label.code === 'Criteria'
                 ? `${student.criteriaProgress[year]?.totalSatisfied ?? 0} criteria fulfilled`
-                : getCellText(label, criteria, student, year, idToGroupIdMap)
+                : getCellText(label, criteria, student, year)
 
             const content =
               label.code === 'Criteria'
                 ? (student.criteriaProgress[year]?.totalSatisfied ?? 0)
                 : label.code === 'Enrollment'
                   ? getSemesterEnrollmentContent(semesterEnrollmentsByStudent[student.studentNumber], semesters)
-                  : getRowContent(student, label, year, start, end, criteria, idToGroupIdMap)
+                  : getRowContent(student, label, year, start, end, criteria)
 
             return (
               <Tooltip title={title}>
@@ -381,15 +377,7 @@ export const ProgressTable = ({
         })
       ),
     ]
-  }, [
-    criteria,
-    criteriaHeaders,
-    labelCriteria,
-    academicYears,
-    semesterEnrollmentsByStudent,
-    namesVisible,
-    idToGroupIdMap,
-  ])
+  }, [criteria, criteriaHeaders, labelCriteria, academicYears, semesterEnrollmentsByStudent, namesVisible])
 
   const isCriteriaSet =
     criteria &&

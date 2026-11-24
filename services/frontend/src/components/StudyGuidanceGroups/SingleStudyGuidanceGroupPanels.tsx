@@ -34,7 +34,6 @@ type SingleStudyGuidanceGroupPanelsProps = {
   filteredStudents: FormattedStudent[]
   filteredCourses: FilteredCourse[]
   group: GroupsWithTags
-  idToGroupIdMap: Record<string, string>
 }
 
 const curriculumInfoBoxContent = {
@@ -57,7 +56,6 @@ const SingleStudyGuidanceGroupPanelsContent = ({
   filteredStudents,
   filteredCourses,
   group,
-  idToGroupIdMap,
 }: SingleStudyGuidanceGroupPanelsProps) => {
   const { useFilterSelector, useFilterDispatch: filterDispatch } = useFilters()
   const { getTextIn } = useLanguage()
@@ -140,7 +138,6 @@ const SingleStudyGuidanceGroupPanelsContent = ({
           filteredCourses={filteredCourses}
           filteredStudents={filteredStudents}
           generalTabColumnFunction={() => columnsGeneralTab({ group })}
-          idToGroupIdMap={idToGroupIdMap}
           generalTabFormattingFunction={() =>
             formatGeneralTab({
               variant: 'studyGuidanceGroupPopulation',

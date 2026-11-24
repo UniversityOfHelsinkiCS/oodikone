@@ -94,7 +94,6 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
             filteredCourses={filteredCourses}
             filteredStudents={filteredStudents}
             group={group}
-            idToGroupIdMap={population?.coursestatistics.idToGroupIdMap ?? {}}
           />
         </>
       )}

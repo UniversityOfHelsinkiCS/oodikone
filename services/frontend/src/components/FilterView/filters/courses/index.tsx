@@ -13,9 +13,8 @@ type Options = {
   courses: Record<string, CourseStats>
   substitutedBy: Record<string, string[][]>
   includeSubstitutions: boolean
-  idToGroupIdMap: Record<string, string>
 }
-type Args = { courses: CourseStats[]; includeSubstitutions?: boolean; idToGroupIdMap: Record<string, string> }
+type Args = { courses: CourseStats[]; includeSubstitutions?: boolean }
 type Precompute = any
 
 const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
@@ -73,7 +72,6 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     courses: {},
     substitutedBy: {},
     includeSubstitutions: true,
-    idToGroupIdMap: {},
   },
 
   precompute: ({
@@ -85,7 +83,6 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
       courses?: Record<string, CourseStats>
       substitutedBy?: Record<string, string[][]>
       includeSubstitutions?: boolean
-      idToGroupIdMap?: Record<string, string>
     }
   }) => {
     const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
@@ -107,21 +104,18 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
     options.includeSubstitutions = args.includeSubstitutions ?? true
     options.substitutedBy = substitutedBy
-    options.idToGroupIdMap = args.idToGroupIdMap
   },
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
   filter(student: FormattedStudent, { options }) {
     const { courses, enrollments } = student
-    const toGroupIds = (courseIds: string[]) => courseIds.map(id => options.idToGroupIdMap[id]).filter(Boolean)
+    const passedCourseGroupIds = courses
+      .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
+      .map(({ courseGroupId }) => courseGroupId)
 
-    const passedCourseGroupIds = toGroupIds(
-      courses.filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED).map(({ course_id }) => course_id)
-    )
-
-    const courseGroupIds = toGroupIds(courses.map(({ course_id }) => course_id))
-    const enrollmentGroupIds = toGroupIds(enrollments.map(({ course_id }) => course_id))
+    const courseGroupIds = courses.map(({ courseGroupId }) => courseGroupId)
+    const enrollmentGroupIds = enrollments.map(({ courseGroupId }) => courseGroupId)
 
     for (const [mainGroupId, filterType] of Object.entries(options.courseFilters)) {
       let foundPassed = false

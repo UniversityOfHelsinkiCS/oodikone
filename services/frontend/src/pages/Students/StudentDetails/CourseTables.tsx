@@ -19,14 +19,8 @@ import { StudentStudyPlan } from '@oodikone/shared/types/studentData'
 
 const creditsColumnIndex = 3
 
-const isInStudyPlan = (
-  plan: StudentStudyPlan,
-  idToGroupIdMap: Record<string, string>,
-  course: { code: string; groupId: string }
-) =>
-  plan &&
-  ([...plan.included_courses, ...plan.includedModules].some(id => (idToGroupIdMap[id] ?? id) === course.groupId) ||
-    course.code === plan.programme_code)
+const isInStudyPlan = (plan: StudentStudyPlan, course: { code: string; groupId: string }) =>
+  plan && (plan.courses.some(({ groupId }) => groupId === course.groupId) || course.code === plan.programme_code)
 
 const getAcademicYear = (date: string) => {
   const year = new Date(date).getFullYear()
@@ -53,7 +47,7 @@ export const CourseTables = ({ student, selectedStudyPlanId }) => {
     const attainment = student.courses[i]
 
     const { course, credits, credittypecode, date, grade, isOpenCourse, isStudyModuleCredit, passed } = attainment
-    const isIncluded = isInStudyPlan(studyPlan, student.idToGroupIdMap, course)
+    const isIncluded = isInStudyPlan(studyPlan, course)
     const academicYear = getAcademicYear(date)
 
     groupedCourses[academicYear] ??= []

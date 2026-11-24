@@ -203,7 +203,6 @@ export const CoursePopulation = () => {
     courseFilter({
       courses: population?.coursestatistics.courses ?? [],
       includeSubstitutions: substitutions === 'true',
-      idToGroupIdMap: population?.coursestatistics.idToGroupIdMap ?? {},
     }),
     creditsEarnedFilter(),
     hetuFilter(),

@@ -90,7 +90,6 @@ const obfuscateStuff = ({
     }),
     coursestatistics: {
       courses: coursestatistics.courses,
-      idToGroupIdMap: coursestatistics.idToGroupIdMap,
       enrollments: coursestatistics.enrollments.map(enrollment => ({
         ...enrollment,
         studentnumber: encryptionMap.get(enrollment.studentnumber) ?? enrollment.studentnumber,
