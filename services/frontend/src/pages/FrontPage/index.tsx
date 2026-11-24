@@ -172,7 +172,7 @@ export const FrontPage = () => {
       title: 'Special populations',
       content: (
         <ul style={{ margin: 2 }}>
-          {checkUserAccess(['admin', 'fullSisuAccess'], roles) && (
+          {checkUserAccess(['admin', 'fullSisuAccess', 'studyGuidanceGroups'], roles) && (
             <li>
               <strong>Custom population:</strong> {contentTexts.customPopsGeneric[language]}
             </li>
