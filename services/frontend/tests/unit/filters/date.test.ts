@@ -105,17 +105,36 @@ void describe('creditDateFilter range', () => {
   }
 
   void it('should keep everything after the start date when only the start date is set', () => {
-    assert.includeMembers(courseIdsBetween('2024-01-01', null), ['MIDDLE', 'END', 'AFTER'])
-    assert.notInclude(courseIdsBetween('2024-01-01', null), 'BEFORE')
+    assert.deepStrictEqual(courseIdsBetween('2024-01-01', null), ['START', 'MIDDLE', 'END', 'AFTER'])
   })
 
   void it('should keep everything before the end date when only the end date is set', () => {
-    assert.includeMembers(courseIdsBetween(null, '2024-12-31'), ['BEFORE', 'START', 'MIDDLE'])
-    assert.notInclude(courseIdsBetween(null, '2024-12-31'), 'AFTER')
+    assert.deepStrictEqual(courseIdsBetween(null, '2024-12-31'), ['BEFORE', 'START', 'MIDDLE', 'END'])
   })
 
-  // FIXME: The comparisons are strict, so credits on the chosen start and end days are dropped
-  void it.fails('should keep courses completed on the start and end days', () => {
+  void it('should keep courses completed on the start and end days', () => {
     assert.deepStrictEqual(courseIdsBetween('2024-01-01', '2024-12-31'), ['START', 'MIDDLE', 'END'])
+  })
+
+  void it('should keep enrollments made on the start and end days', () => {
+    const student = createStudent({
+      enrollments: [
+        createEnrollment({ course_id: 'BEFORE', enrollment_date_time: new Date('2023-12-31') }),
+        createEnrollment({ course_id: 'START', enrollment_date_time: new Date('2024-01-01') }),
+        createEnrollment({ course_id: 'END', enrollment_date_time: new Date('2024-12-31') }),
+        createEnrollment({ course_id: 'AFTER', enrollment_date_time: new Date('2025-01-01') }),
+      ],
+    })
+
+    const result = creditDateFilter().mutate!(student, {
+      args: undefined,
+      options: { startDate: dayjs('2024-01-01'), endDate: dayjs('2024-12-31') },
+      precomputed: undefined,
+    })
+
+    assert.deepStrictEqual(
+      result.enrollments.map(({ course_id }) => course_id),
+      ['START', 'END']
+    )
   })
 })

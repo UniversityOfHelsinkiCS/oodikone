@@ -63,14 +63,14 @@ export const creditDateFilter = createFilter<Options, Args, Precompute>({
     return {
       ...student,
       courses: student.courses.filter(course => {
-        const afterStart = startDate?.isBefore(course.date, 'day') ?? true
-        const beforeEnd = endDate?.isAfter(course.date, 'day') ?? true
+        const afterStart = !startDate?.isAfter(course.date, 'day')
+        const beforeEnd = !endDate?.isBefore(course.date, 'day')
 
         return afterStart && beforeEnd
       }),
       enrollments: student.enrollments.filter(enrollment => {
-        const afterStart = startDate?.isBefore(enrollment.enrollment_date_time, 'day') ?? true
-        const beforeEnd = endDate?.isAfter(enrollment.enrollment_date_time, 'day') ?? true
+        const afterStart = !startDate?.isAfter(enrollment.enrollment_date_time, 'day')
+        const beforeEnd = !endDate?.isBefore(enrollment.enrollment_date_time, 'day')
 
         return afterStart && beforeEnd
       }),
