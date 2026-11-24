@@ -93,14 +93,7 @@ export const PopulationStudents = ({
         unihowExport={dataExport}
       />
     ),
-    Courses: (
-      <CoursesTab
-        courses={filteredCourses ?? []}
-        idToGroupIdMap={idToGroupIdMap ?? {}}
-        students={filteredStudents}
-        programme={programme}
-      />
-    ),
+    Courses: <CoursesTab courses={filteredCourses ?? []} students={filteredStudents} programme={programme} />,
     Modules: <ModulesTab students={filteredStudents} programme={programme} />,
     Tags: <TagsTab combinedProgramme={combinedProgramme} programme={programme} students={filteredStudents} />,
     Progress: (

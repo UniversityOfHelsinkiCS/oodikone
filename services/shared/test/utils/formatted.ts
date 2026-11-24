@@ -99,6 +99,7 @@ export const createEnrollment = (
 ): FormattedStudent['enrollments'][number] => ({
   course_id: 'hy-CU-000000001-2024-08-01',
   course_code: 'MAT001',
+  courseGroupId: 'hy-CU-000000001',
   state: EnrollmentState.ENROLLED,
   enrollment_date_time: new Date('2024-08-01'),
   semestercode: 149,

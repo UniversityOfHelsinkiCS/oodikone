@@ -139,7 +139,7 @@ export type StudentCredit = Pick<
 export type StudentEnrollment = Pick<
   Enrollment,
   'course_id' | 'course_code' | 'state' | 'enrollment_date_time' | 'semestercode' | 'studentnumber' | 'studyright_id'
->
+> & { courseGroupId: Course['groupId'] }
 
 export type FormattedStudent = {
   obfuscated?: true

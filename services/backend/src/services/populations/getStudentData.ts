@@ -62,7 +62,14 @@ export const getEnrollments = (
       'semestercode',
       'studentnumber',
       'studyright_id',
+      [col('course.group_id'), 'courseGroupId'],
     ],
+    include: {
+      model: CourseModel,
+      attributes: [],
+      as: 'course',
+      required: true,
+    },
     where: {
       studentnumber: {
         [Op.in]: studentNumbers,
@@ -73,7 +80,7 @@ export const getEnrollments = (
       },
     },
     raw: true,
-  })
+  }) as unknown as Promise<StudentEnrollment[]>
 
 type StudentPersonalData = Pick<
   Student,
