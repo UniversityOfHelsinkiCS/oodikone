@@ -33,7 +33,6 @@ export const Routes = () => (
         {/* Public routes */}
         <Route element={<FrontPage />} path="/" />
         <Route element={<Changelog />} path="/changelog" />
-        <Route element={<CompletedCourses />} path="/completedcoursessearch" />
         <Route element={<University />} path="/university" />
         <Route element={<Feedback />} path="/feedback" />
 
@@ -47,6 +46,17 @@ export const Routes = () => (
           <Route element={<Banners />} path="/banners" />
           <Route element={<Updater />} path="/updater" />
           <Route element={<Users />} path="/users/:userid?" />
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoute
+              requireUserHasRights
+              requiredRoles={['fullSisuAccess', 'courseStatistics', 'studyGuidanceGroups']}
+            />
+          }
+        >
+          <Route element={<CompletedCourses />} path="/completedcoursessearch" />
         </Route>
 
         <Route element={<ProtectedRoute requireUserHasRights requiredRoles={['fullSisuAccess', 'courseStatistics']} />}>

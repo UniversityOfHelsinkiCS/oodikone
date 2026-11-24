@@ -19,7 +19,7 @@ type UserInfo = {
 const baseRoutes: [string, RouteRequirements][] = [
   ['/', {}],
   ['/changelog', {}],
-  ['/completedcoursessearch', {}],
+  ['/completedcoursessearch', { roles: ['fullSisuAccess', 'courseStatistics', 'studyGuidanceGroups'] }],
   ['/university', {}],
   ['/feedback', {}],
   ['/populations', { roles: ['fullSisuAccess'], programmeRights: [] }],

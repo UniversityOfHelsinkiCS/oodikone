@@ -80,7 +80,7 @@ const contentTexts = {
     sv: 'Statistik för den studentpopulation du har valt. Du kan söka efter populationen med hjälp av studentnummer eller utbildningsprogramkoder.',
   },
   customPopsCourses: {
-    fi: 'Tarkista valitsemasi opiskelijaryhmän tiedot liittyen valitsemiisi kursseihin',
+    fi: 'Tarkista valitsemasi opiskelijaryhmän tiedot liittyen valitsemiisi kursseihin.',
     en: 'Check the chosen stundents` information related to chosen courses.',
     sv: 'Kontrollera uppgifterna för den studentgrupp du har valt avseende de kurser du har valt.',
   },
@@ -177,7 +177,7 @@ export const FrontPage = () => {
               <strong>Custom population:</strong> {contentTexts.customPopsGeneric[language]}
             </li>
           )}
-          {checkUserAccess(['admin', 'courseStatistics'], roles) && (
+          {checkUserAccess(['admin', 'courseStatistics', 'fullSisuAccess', 'studyGuidanceGroups'], roles) && (
             <li>
               <strong>Completed courses of student:</strong> {contentTexts.customPopsCourses[language]}
             </li>
