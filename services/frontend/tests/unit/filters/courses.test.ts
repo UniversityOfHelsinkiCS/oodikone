@@ -148,6 +148,25 @@ void describe('courseFilter', () => {
     assert.strictEqual(result, true)
   })
 
+  void it('should require every selected course filter to match', () => {
+    const student = createStudent({
+      courses: [
+        createCourse({ course_id: TKT002_ID, courseGroupId: TKT002_GROUP, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({ course_id: TKT003_ID, courseGroupId: TKT003_GROUP, credittypecode: CreditTypeCode.PASSED }),
+      ],
+    })
+    const filterWith = (courseFilters: Record<string, (typeof FilterType)[keyof typeof FilterType]>) =>
+      courseFilter().filter(student, {
+        args: baseArgs(),
+        options: { ...baseOptions(), courseFilters },
+        precomputed: undefined,
+      })
+
+    assert.strictEqual(filterWith({ [TKT002_GROUP]: FilterType.PASSED, [TKT003_GROUP]: FilterType.PASSED }), true)
+    assert.strictEqual(filterWith({ [TKT002_GROUP]: FilterType.PASSED, [TKT003_GROUP]: FilterType.FAILED }), false)
+    assert.strictEqual(filterWith({ [TKT002_GROUP]: FilterType.PASSED, [TKT001_GROUP]: FilterType.ALL }), false)
+  })
+
   void it('should populate options from args when precomputed', () => {
     const args = {
       courses: [

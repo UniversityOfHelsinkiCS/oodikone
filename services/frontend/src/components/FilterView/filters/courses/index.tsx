@@ -130,18 +130,14 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
         }
       )
 
-      switch (filterType) {
-        case FilterType.ALL:
-          return foundEnrollment || foundAttainment
-        case FilterType.PASSED:
-          return foundPassed
-        case FilterType.FAILED:
-          return foundAttainment && !foundPassed
-        case FilterType.ENROLLED_NO_GRADE:
-          return foundEnrollment && !foundAttainment
-        default:
-          return false
+      const matchesFilterType = {
+        [FilterType.ALL]: foundEnrollment || foundAttainment,
+        [FilterType.PASSED]: foundPassed,
+        [FilterType.FAILED]: foundAttainment && !foundPassed,
+        [FilterType.ENROLLED_NO_GRADE]: foundEnrollment && !foundAttainment,
       }
+
+      if (!matchesFilterType[filterType]) return false
     }
 
     return true
