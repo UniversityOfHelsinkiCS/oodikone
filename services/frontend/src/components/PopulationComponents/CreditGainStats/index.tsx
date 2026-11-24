@@ -4,7 +4,7 @@ import Tabs from '@mui/material/Tabs'
 
 import { getMonthsForDegree } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
 import { CreditDistributionDevelopment } from '@/components/PopulationComponents/CreditGainStats/CreditDistributionDevelopment'
 import { CreditsGainedTab } from '@/components/PopulationComponents/CreditGainStats/CreditsGainedTab'
 import { StatisticsTab } from '@/components/PopulationComponents/CreditGainStats/StatisticsTab'
@@ -37,7 +37,7 @@ export const CreditStatistics = ({ filteredStudents, query }: CreditStatisticsPr
           <Tab data-cy="credit-statistics-tab" label="Statistics" />
           <Tab data-cy="distribution-development-tab" label="Distribution development" />
         </Tabs>
-        <InfoBox content={populationStatisticsToolTips.creditStatistics} sx={{ mb: 1, mr: 1 }} />
+        <ExpandingInfoBox content={populationStatisticsToolTips.creditStatistics} />
       </Box>
       {selectedTab === 0 && (
         <CreditsGainedTab

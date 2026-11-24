@@ -1,6 +1,6 @@
 import Stack from '@mui/material/Stack'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
 import { FilterDegreeCoursesModal } from '@/components/PopulationComponents/PopulationCourses/FilterDegreeCoursesModal'
 import { PopulationCourseStats } from '@/components/PopulationCourseStats'
 import { PopulationCourseStatsFlat } from '@/components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -42,7 +42,7 @@ export const PopulationCourses = ({
             text="Manage course / module visibility"
           />
         ) : null}
-        <InfoBox content={tooltipText} />
+        <ExpandingInfoBox content={tooltipText} />
       </Stack>
       <SegmentDimmer isLoading={isLoading} />
       {courseTableMode === 'curriculum' ? (

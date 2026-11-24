@@ -12,7 +12,7 @@ import {
   getGraduationsByCodes,
   getIncludedCourseCodesByProgrammeCodes,
 } from '@/components/Charts/util'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '../InfoBox/ExpandingInfoBox'
 import { DateFormat } from '@/constants/date'
 import { reformatDate } from '@/util/timeAndDate'
 import { CreditTypeCode, FormattedStudent } from '@oodikone/shared/types'
@@ -330,7 +330,7 @@ export const CreditAccumulationGraph = ({
             />
           ) : null}
         </Stack>
-        <InfoBox content={populationStatisticsToolTips.creditAccumulation} />
+        <ExpandingInfoBox content={populationStatisticsToolTips.creditAccumulation} />
       </Stack>
 
       <ReactECharts onChartReady={handleChartReady} option={option} style={{ height: graphHeight }} />

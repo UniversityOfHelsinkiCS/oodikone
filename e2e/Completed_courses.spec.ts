@@ -8,7 +8,7 @@ const hasLanded = async (page: Page) => {
   await expect(page.getByRole('button', { name: 'Search completed courses of students' })).toBeVisible()
   await expect(
     page.getByText(
-      'Here you can search by a list of student and course numbers to see whether students have completed certain courses yet'
+      'Search by a list of student and course numbers to see whether students have completed certain courses yet'
     )
   ).toBeVisible()
 }

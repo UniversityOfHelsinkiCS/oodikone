@@ -54,7 +54,7 @@ Valmistumisajoista on vähennetty lakisääteiset poissaolot.
 
 Lukukausi-ilmoittautumisissa huomioidaan vain se opiskeluoikeus, joka liittyy tarkasteltavaan koulutusohjelmaan. Vaikka opiskelija olisi ilmoittautunut toiseen opiskeluoikeuteen läsnäolevaksi, mutta hän on laiminlyönyt ilmoittautumisen tarkasteltavaan koulutusohjelmaan liittyvään opiskeluoikeuteen, hänet lasketaan ryhmään ”Passive”.
 
-Paksummilla pystyviivoilla eroteltujen kategorioiden (**Current status**, **Gender**) sarakkeet tuottavat yhteenlaskettuna kentän **All** arvon. **Citizenships**-kategoriat (**Finland** ja **Other**) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
+Sarakkeen **All** luku muodostuu _Current status_ -osion neljästä ensimmäisestä sarakkeesta (_Present, Absent, Passive_ ja _Graduated_). **Citizenships**-kategoriat (_Finland_ ja _Other_) voivat tuottaa yhteenlaskettuna suuremman tuloksen, koska opiskelijoilla voi olla useampi kuin yksi kansalaisuus.
 
 Jos sivun yläosassa on valittuna ”All study rights” (oletus), mukana ovat myös ohjelmaan siirtyneet ja ohjelmasta pois siirtyneet opiskelijat.
 
@@ -77,7 +77,7 @@ Total-lukuun lasketaan mukaan kaikki opintopisteet **hyväksiluettuja opintopist
 
 **Transferred**: Hyväksiluetut opintopisteet. Tilastointipäivämäärä on hyväksilukupäivämäärä, eli vaikka suoritus olisi vuodelta 2021, jos opintopiste hyväksiluetaan 2024, se lasketaan vuodelle 2024.
 
-**Separate**: Opintosuoritukset, joiden suorituksen luokittelu on "erillisellä opiskeluoikeudella" tai "opettajankoulutuksen erillisellä opiskeluikeudella" suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
+**Separate**: Opintosuoritukset, joiden suorituksen luokittelu on _erillisellä opiskeluoikeudella_ tai _opettajankoulutuksen erillisellä opiskeluikeudella_ suoritettu. Ei sisällä kansainvälisten vaihto-opiskelijoiden suorituksia.
 
 **Other university**: Korkeakoulujen väliset yhteistyöopinnot: opintosuoritukset, jotka on tehty korkeakoulujen väliseen yhteistyösopimukseen perustuvalla opiskeluoikeudella.
 
@@ -184,7 +184,7 @@ When viewing master’s programs, students with a combined bachelor’s and mast
 
   tagsTab: {
     createNewTag: `
-Here you can create tags for degree programme. You can either create public tags or *personal* tags. Tags can be used to combine students from other starting years.
+Create tags for degree programme. You can either create public tags or *personal* tags. Tags can be used to combine students from other starting years.
 'Associated start year' means what year you want to use as a start year for the students in that tag. For example with this you can move student from earlier starting year to next year if the student was absent during first year.
 However this is optional and you can create a new tag without selecting year.
 `,

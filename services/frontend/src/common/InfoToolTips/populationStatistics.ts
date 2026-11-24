@@ -52,15 +52,15 @@ Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää va
 **Statistics**
 
 Taulukko kertoo kaikkien tarkasteluun valittujen opiskelijoiden opintopistemääristä tähän päivään mennessä.
-Statistiikka on suodatettu käytettyjen filttereiden mukaan. Esimerkiksi, jos mukaan on valittu vain naisopiskelijat, statistiikat koskevat vain heitä.
+Tilasto on suodatettu käytettyjen filttereiden mukaan. Esimerkiksi, jos mukaan on valittu vain naisopiskelijat, statistiikat koskevat vain heitä.
 
-- **Total credits** on kokonaisopintopistemäärä kyseiselle populaatiolle.
-- **Average** kuvaa opintopistemäärän opiskelijakohtaista keskiarvoa.
-- **Median** on keskimmäinen opintopistemäärä, joka saadaan järjestämällä opintopistemäärät suuruusjärjestykseen ja valitsemalla keskimmäinen arvo. Mikäli opiskelijoita on parillinen määrä, mediaani on kahden keskimmäisen arvon keskiarvo.
-- **Standard deviation** (keskihajonta) kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
-- **Minimum** ja **Maximum** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
+- **Total credits:** kokonaisopintopistemäärä kyseiselle populaatiolle.
+- **Average:** opintopistemäärän opiskelijakohtainen keskiarvo.
+- **Median:** keskimmäinen opintopistemäärä, joka saadaan järjestämällä opintopistemäärät suuruusjärjestykseen ja valitsemalla keskimmäinen arvo. Mikäli opiskelijoita on parillinen määrä, mediaani on kahden keskimmäisen arvon keskiarvo.
+- **Standard deviation:** (keskihajonta) kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
+- **Minimum** ja **Maximum:** kyseisen populaation opsikelijoiden pienin ja suurin opintopistemäärä.
 
-Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.
+Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös valintatapakohtaiset tilastot.
 
 **Distribution development**
 
@@ -77,44 +77,43 @@ Muutoin vain pylvästä vastaavalla aikavälillä kirjatut opintopisteet otetaan
     curriculum: `
 **Courses of class**
 
-Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
+Taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
 
-Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
-Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
-
-Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
-
-Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
-Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
-
-**Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populaatioon.**
-Choose curriculum -valinta vaikuttaa siihen, minkä opetussuunnitelmakauden mukaiset kurssit näytetään taulukossa.
-
-**Taulukot**
-- **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
-  - **Total students** - sarake näyttää kaikkien opiskelijoiden määrän, mukaanlukien ilmoittautuneet ilman arvosanaa.
-  - **Enrolled, no grade** - sarake näyttää niiden opiskelijoiden määrän, joilla on ilmoittautuminen muttei arvosanaa eikä hylättyä suoritusta.
-- **Grades** - arvosanajakauma.
-- **When passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
-`,
-    showAllWithAtLeast: `
-**Courses of Population**
-
-Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
-
-Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
-Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
+Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivillä olevaa suodatinpainiketta.  
+Kurssisuodatin aukeaa suodatinvalikkoon vasemmalla ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita useamman kurssin suodattimeen.  
+Suodattimet saa tyhjennettyä painamalla **Courses**-suodattimen vieressä olevaa ruksia tai valitsemalla suodatinvalikon yläosasta **Reset column filter**.
 
 Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
 
 Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Show all courses or modules with at least N total students*.
-Lisäksi kurssin nimi **name** ja koodisarakkeissa **code** suodatinkuvaketta klikkaamalla tulee esiin hakukentät suodattamista varten.
-Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai valitsemall valikon alaosasta **Reset column filter**.
+**Huom! Tämä suodatin vaikuttaa vain tähän taulukkoon, eivät koko populaatioon.**
 
-**Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populaatioon.**
+Choose curriculum -valinta vaikuttaa siihen, minkä opetussuunnitelmakauden mukaiset kurssit näytetään taulukossa.
 
 **Taulukot**
-- **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+- **Pass/fail:** sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+  - **Total students** -sarake näyttää kaikkien opiskelijoiden määrän, mukaanlukien ilmoittautuneet ilman arvosanaa.
+  - **Enrolled, no grade** -sarake näyttää niiden opiskelijoiden määrän, joilla on ilmoittautuminen muttei arvosanaa eikä hylättyä suoritusta.
+- **Grades:** kurssikohtainen arvosanajakauma.
+- **When passed:** kurssisuorituksen ajankohta. *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Sisussa.
+`,
+    showAllWithAtLeast: `
+**Courses of Population**
+
+Taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
+
+Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivillä olevaa suodatinpainiketta.  
+Kurssisuodatin aukeaa suodatinvalikkoon vasemmalla ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita useamman kurssin suodattimeen.  
+Suodattimet saa tyhjennettyä painamalla **Courses**-suodattimen vieressä olevaa ruksia tai valitsemalla suodatinvalikon yläosasta **Reset column filter**.
+
+Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin **Course statistics** -näkymään.
+
+Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Show all courses or modules with at least N total students*.
+**Huom! Tämä suodatin vaikuttaa vain tähän taulukkoon, eivät koko populaatioon.**
+
+
+**Taulukot**
+- **Pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt, yritykset sekä ilmoittautumistiedot. Ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
 - **Grades** - arvosanajakauma.
 `,
   },
@@ -124,11 +123,11 @@ Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia tai val
   },
 
   search: `
-Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänottolukuvuoden mukaisesti, vuosikurssi kerrallaan.
+Koulutusohjelmakohtainen populaatioiden tarkastelu sisäänottolukuvuoden mukaisesti vuosikurssi kerrallaan.  
 Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017, joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
 
 - **Class of**: lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
-- **Degree programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näkyvät ensimmäisinä valikossa. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
+- **Degree programme**: haluttu koulutusohjelma. Kiinnitetyt (suosikeiksi valitut) ohjelmat näytetään ensimmäisinä. Kiinnitys on mahdollista koulutusohjelmalistauksessa.
 - **Study track**: (valinnainen) koulutusohjelman opintosuunta. Valittavissa vain, jos ohjelmalla on opintosuuntia.
 `,
   programmeDistributionCoursePopulation: {

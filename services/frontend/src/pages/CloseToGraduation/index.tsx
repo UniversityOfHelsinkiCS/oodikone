@@ -14,7 +14,7 @@ import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { StudentInfoItem } from '@/components/common/StudentInfoItem'
 import { TableHeaderWithTooltip } from '@/components/common/TableHeaderWithTooltip'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { LoadingSection } from '@/components/Loading'
 import { getSemestersPresentFunctions } from '@/components/PopulationComponents/Students/Table/GeneralTab/columnHelpers/semestersPresent'
@@ -370,7 +370,7 @@ export const CloseToGraduation = () => {
       )}
 
       <Box sx={{ my: 3, textAlign: 'center' }}>
-        <InfoBox content={closeToGraduationToolTips} />
+        <ExpandingInfoBox content={closeToGraduationToolTips} />
       </Box>
       <Tabs centered onChange={(_event, value) => setSelectedTab(value)} value={selectedTab}>
         <Tab label="Bachelor's programmes" />

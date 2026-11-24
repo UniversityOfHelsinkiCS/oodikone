@@ -26,10 +26,9 @@ export const CompletedCourses = () => {
       <Stack alignItems="center" spacing={2} sx={{ width: '100%' }}>
         <Alert severity="info">
           <Box mb={1}>
-            Here you can search by a list of student and course numbers to see whether students have completed certain
-            courses yet. The tool will also show if students have enrolled on the course, if they have not yet completed
-            it, or if they have the course selected in their primary study plan. Course substitutions are taken into
-            account.
+            Search by a list of student and course numbers to see whether students have completed certain courses yet.
+            The tool will also show if students have enrolled on the course, if they have not yet completed it, or if
+            they have the course selected in their primary study plan. Course substitutions are taken into account.
           </Box>
           <Stack direction="row">
             <DoneIcon fontSize="small" sx={{ color: green[700] }} />: Student has completed the course with a passing

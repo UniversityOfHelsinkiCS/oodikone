@@ -11,7 +11,7 @@ import { StyledCell } from '@/components/common/StyledCell'
 import { StyledTable } from '@/components/common/StyledTable'
 import { isProgrammeSelected, toggleProgrammeSelection } from '@/components/FilterView/filters/programmes'
 import { useFilters } from '@/components/FilterView/useFilters'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '@/components/InfoBox/ExpandingInfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { findCorrectProgramme, NO_PROGRAMME } from '@/components/PopulationComponents/ProgrammeDist/util'
 import { useSemesters } from '@/hooks/useSemesters'
@@ -69,7 +69,7 @@ export const CustomPopulationProgrammeDist = ({
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-        <InfoBox content={getTextIn(infotext) ?? ''} sx={{ mb: 2 }} />
+        <ExpandingInfoBox content={getTextIn(infotext) ?? ''} />
       </Box>
       <StyledTable showCellBorders>
         <TableHead>

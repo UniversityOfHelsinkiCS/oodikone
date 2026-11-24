@@ -39,7 +39,7 @@ test.describe('Population statistics tests', () => {
         await page.getByTestId('PopulationSearch-info-box-button').click()
         await expect(page.getByTestId('PopulationSearch-info-box-content')).toBeVisible()
         await expect(
-          page.getByTestId('PopulationSearch-info-box-content').getByText('Tässä osiossa voi tarkastella')
+          page.getByTestId('PopulationSearch-info-box-content').getByText('Koulutusohjelmakohtainen populaatioiden')
         ).toBeVisible()
         await page.getByLabel('close').click()
         await expect(page.getByTestId('PopulationSearch-info-box-content')).not.toBeVisible()

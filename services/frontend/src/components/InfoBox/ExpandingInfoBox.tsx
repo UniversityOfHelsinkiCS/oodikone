@@ -48,6 +48,7 @@ export const ExpandingInfoBox = ({
           onClick={() => setOpen(true)}
           startIcon={<HelpOutlineIcon />}
           variant="contained"
+          sx={{ mr: 1 }}
         >
           Info
         </Button>

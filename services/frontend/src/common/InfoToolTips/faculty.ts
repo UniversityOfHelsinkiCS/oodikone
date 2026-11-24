@@ -11,11 +11,10 @@ Valmistumisajoista on **vähennetty lakisääteiset poissaolot**.
 
 - **Breakdown**/**Median study times**:
   - **Breakdown**: Näyttää, kuinka moni opiskelija valmistui tavoiteajassa (vihreä palkki), kahden lukukauden sisällä tavoiteajasta (keltainen palkki) tai tätä myöhemmin (punainen palkki).
-  - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** lukukausina. Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + 2 lukukautta.
+  - **Median study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **mediaanin** lukukausina. **Vihreä katkoviiva** kuvastaa tavoiteaikaa. **Keltainen katkoviiva** on tavoiteaika + 2 lukukautta.
+  - **Average study times**: Näyttää kyseisenä kalenteri- tai lukuvuonna aloittaneiden/valmistuneiden opiskelijoiden opintojen keston **keskiarvon** lukukausina.
 `
 const progressBasic = `
-Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
-
 - **Bachelor**: Kandidaatin opinto-oikeudella opiskelevien eteneminen
 - **Bachelor + Master**: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden eteneminen. Aloitusvuosi on kandiohjelman aloitusvuosi.
   Opinto-ohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandiksi valmistumisen jälkeen.
@@ -33,11 +32,13 @@ export const facultyToolTips = {
     graduatedToggle: studyProgrammeToolTips.common.graduatedToggle,
     studyRightToggle: studyProgrammeToolTips.common.studyRightToggle,
     studentProgress: `
-Tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella opiskelevien eteneminen opintopisteissä mitattuna. `.concat(
+Tiedekuntaan kuuluvien eri ohjelmien opinto-oikeudella opiskelevien eteneminen opintopisteissä mitattuna vuosikurssitasolla. `.concat(
       progressBasic
     ),
     studentProgressUniversity: `
-Yliopistoon kuuluvien eri tiedekunnissa opiskelevien eteneminen opintopisteissä mitattuna. `.concat(progressBasic),
+Yliopistoon kuuluvien eri tiedekunnissa opiskelevien eteneminen opintopisteissä mitattuna vuosikurssitasolla. `.concat(
+      progressBasic
+    ),
     programmeToggle: `
 **New degree programmes**: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
 
@@ -47,7 +48,7 @@ Yliopistoon kuuluvien eri tiedekunnissa opiskelevien eteneminen opintopisteissä
     averageGraduationTimes: averageGraduationTimesBasic.concat(`
 - **Graduation year**/**Starting year**:
   - **Graduation year**: Ryhmittelee opiskelijat valmistumisvuosittain (kalenterivuosi). Sisältää ohjelmaan siirtyneet opiskelijat.
-  - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on aloitusvuosi kandiohjelmassa ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.
+  - **Starting year**: Ryhmittelee opiskelijat opiskeluoikeuden alkamisvuoden (lukuvuosi) perusteella. Bachelor + Master -kuvaajassa aloitusvuosi on kandiohjelman aloitusvuosi ja koulutusohjelma on maisteriohjelma, johon opiskelija on siirtynyt kandidaatiksi valmistumisen jälkeen.
 `),
   },
 

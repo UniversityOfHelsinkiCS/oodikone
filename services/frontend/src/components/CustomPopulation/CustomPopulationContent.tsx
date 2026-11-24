@@ -15,7 +15,7 @@ import { StyledMessage } from '@/components/common/StyledMessage'
 import { CourseMatrixExport } from '@/components/CustomPopulation/CourseMatrixExport'
 import { useColumns as columnsGeneralTab } from '@/components/CustomPopulation/studentColumns'
 import { UnihowDataExport } from '@/components/CustomPopulation/UnihowDataExport'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '../InfoBox/ExpandingInfoBox'
 import { PageLoading } from '@/components/Loading'
 import { CreditAccumulationGraph } from '@/components/PopulationComponents/CreditAccumulation'
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
@@ -86,11 +86,20 @@ export const CustomPopulationContent = ({
       title: 'Courses of population',
       content: (
         <>
-          <InfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
-          <StudentAmountLimiter
-            onStudentAmountLimitChange={onStudentAmountLimitChange}
-            studentAmountLimit={studentAmountLimit}
-          />
+          <Stack
+            direction="row"
+            sx={{
+              justifyContent: 'space-between',
+              mx: '0.5rem',
+            }}
+          >
+            <StudentAmountLimiter
+              onStudentAmountLimitChange={onStudentAmountLimitChange}
+              studentAmountLimit={studentAmountLimit}
+            />
+            <ExpandingInfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
+          </Stack>
+
           <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
         </>
       ),

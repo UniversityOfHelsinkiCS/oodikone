@@ -715,7 +715,7 @@ test.describe('Degree programme overview', () => {
 
     test('info box', async ({ page }) => {
       await page.getByTestId('create-new-tag-info-box-button').click()
-      await expect(page.getByTestId('create-new-tag-info-box-content').getByText('Here you can create')).toBeVisible()
+      await expect(page.getByTestId('create-new-tag-info-box-content').getByText('Create')).toBeVisible()
     })
 
     test.describe('Adding tags to populations and removing them works', () => {

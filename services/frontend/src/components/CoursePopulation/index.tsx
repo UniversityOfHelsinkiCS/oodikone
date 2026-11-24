@@ -24,7 +24,7 @@ import {
   studentNumberFilter,
 } from '@/components/FilterView/filters'
 import type { GenericFilter } from '@/components/FilterView/filters/createFilter'
-import { InfoBox } from '@/components/InfoBox/InfoBoxWithTooltip'
+import { ExpandingInfoBox } from '../InfoBox/ExpandingInfoBox'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
 import { PageLoading } from '@/components/Loading'
 import { CustomPopulationProgrammeDist } from '@/components/PopulationComponents/ProgrammeDist'
@@ -302,7 +302,7 @@ const CoursePopulationCoursesWrapper = ({
             studentAmountLimit={studentAmountLimit}
           />
         </Box>
-        <InfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
+        <ExpandingInfoBox content={populationStatisticsToolTips.coursesOfClass.showAllWithAtLeast} />
       </Box>
       <PopulationCourseStatsFlat filteredCourses={filteredCourses} studentAmountLimit={studentAmountLimit} />
     </>
