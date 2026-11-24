@@ -5,7 +5,7 @@ import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
 import { createStudent } from '@oodikone/shared/test/utils'
 
-const filterStudent = (student: FormattedStudent, mode: number) =>
+const filterStudent = (student: FormattedStudent, mode: number | string) =>
   hetuFilter().filter(student, { args: undefined, options: { mode }, precomputed: undefined })
 
 void describe('hetuFilter', () => {
@@ -37,5 +37,22 @@ void describe('hetuFilter', () => {
     assert.strictEqual(hetuFilter().isActive({ mode: 0 }, undefined), false)
     assert.strictEqual(hetuFilter().isActive({ mode: 1 }, undefined), true)
     assert.strictEqual(hetuFilter().isActive({ mode: 2 }, undefined), true)
+  })
+})
+
+void describe('hetuFilter radio values', () => {
+  void it('should filter with the string modes the radio buttons produce', () => {
+    const withHetu = createStudent({ hasPersonalIdentityCode: true })
+    const withoutHetu = createStudent({ hasPersonalIdentityCode: false })
+
+    assert.strictEqual(filterStudent(withHetu, '1'), true)
+    assert.strictEqual(filterStudent(withoutHetu, '1'), false)
+    assert.strictEqual(filterStudent(withHetu, '2'), false)
+    assert.strictEqual(filterStudent(withoutHetu, '2'), true)
+  })
+
+  // FIXME: Choosing "All" stores the string '0', which still counts as an active filter
+  void it.fails('should not be active when "All" is chosen from the radio buttons', () => {
+    assert.strictEqual(hetuFilter().isActive({ mode: '0' }, undefined), false)
   })
 })

@@ -12,9 +12,8 @@ void describe('programmeFilter', () => {
 
     const precomputed = programmeFilter().precompute!({
       students: [student],
-      options: { selectedProgrammes: [], mode: 'any' },
       args: ARGS,
-    })
+    })('any')
 
     assert.deepStrictEqual(
       precomputed[student.studentNumber].map(({ code }) => code),
@@ -27,9 +26,8 @@ void describe('programmeFilter', () => {
 
     const precomputed = programmeFilter().precompute!({
       students: [student],
-      options: { selectedProgrammes: [], mode: 'any' },
       args: ARGS,
-    })
+    })('any')
 
     assert.deepStrictEqual(
       precomputed[student.studentNumber].map(({ code }) => code),
@@ -40,7 +38,7 @@ void describe('programmeFilter', () => {
   void it('should include student when the student has every selected programme', () => {
     const student = createStudent({ studyRights: [createStudyRight()] })
 
-    const precomputed = { [student.studentNumber]: [{ code: 'KH50_001', name: { fi: 'Testiohjelma' } }] }
+    const precomputed = () => ({ [student.studentNumber]: [{ code: 'KH50_001', name: { fi: 'Testiohjelma' } }] })
 
     const result = programmeFilter().filter(student, {
       args: ARGS,
@@ -54,7 +52,7 @@ void describe('programmeFilter', () => {
   void it('should exclude student when the student is missing a selected programme', () => {
     const student = createStudent({ studyRights: [createStudyRight()] })
 
-    const precomputed = { [student.studentNumber]: [{ code: 'KH99_999', name: { fi: 'Testiohjelma' } }] }
+    const precomputed = () => ({ [student.studentNumber]: [{ code: 'KH99_999', name: { fi: 'Testiohjelma' } }] })
 
     const result = programmeFilter().filter(student, {
       args: ARGS,
@@ -83,7 +81,6 @@ void describe('programmeFilter', () => {
 
     const precomputed = programmeFilter().precompute!({
       students: [student],
-      options: { selectedProgrammes: ['KH50_001'], mode: 'active' },
       args: ARGS,
     })
 
@@ -114,7 +111,6 @@ void describe('programmeFilter', () => {
 
     const precomputed = programmeFilter().precompute!({
       students: [student],
-      options: { selectedProgrammes: ['KH50_001'], mode: 'active' },
       args: ARGS,
     })
 
@@ -127,15 +123,80 @@ void describe('programmeFilter', () => {
     assert.strictEqual(result, false)
   })
 
+  void it('should use the predicate of an additional mode given in args', () => {
+    const student = createStudent({
+      studyRights: [
+        createStudyRight({
+          studyRightElements: [
+            createStudyRightElement({ code: 'KH50_001' }),
+            createStudyRightElement({ code: 'MH50_001' }),
+          ],
+        }),
+      ],
+    })
+    const args = {
+      additionalModes: [
+        {
+          key: 'masters-only',
+          label: 'Masters only',
+          description: '',
+          predicate: (_: unknown, { code }: { code: string }) => code.startsWith('MH'),
+        },
+      ],
+    }
+
+    const getStudentToProgrammeMap = programmeFilter(args).precompute!({ students: [student], args })
+    const filterWith = (selectedProgrammes: string[]) =>
+      programmeFilter(args).filter(student, {
+        args,
+        options: { selectedProgrammes, mode: 'masters-only' },
+        precomputed: getStudentToProgrammeMap,
+      })
+
+    assert.deepStrictEqual(
+      getStudentToProgrammeMap('masters-only')[student.studentNumber].map(({ code }) => code),
+      ['MH50_001']
+    )
+    assert.strictEqual(filterWith(['MH50_001']), true)
+    assert.strictEqual(filterWith(['KH50_001']), false)
+  })
+
+  void it('should not count cancelled study rights as active', () => {
+    const thisYear = new Date().getFullYear()
+    const student = createStudent({
+      studyRights: [
+        createStudyRight({
+          cancelled: true,
+          studyRightElements: [
+            createStudyRightElement({
+              startDate: new Date(`${thisYear - 1}-01-01`),
+              endDate: new Date(`${thisYear + 1}-01-01`),
+            }),
+          ],
+        }),
+      ],
+    })
+
+    const getStudentToProgrammeMap = programmeFilter().precompute!({ students: [student], args: ARGS })
+
+    assert.deepStrictEqual(
+      getStudentToProgrammeMap('active')[student.studentNumber].map(({ code }) => code),
+      ['00000']
+    )
+  })
+
+  void it('should require the student to have every selected programme', () => {
+    const student = createStudent()
+    const precomputed = () => ({ [student.studentNumber]: [{ code: 'KH50_001', name: { fi: 'Testiohjelma' } }] })
+    const filterWith = (selectedProgrammes: string[]) =>
+      programmeFilter().filter(student, { args: ARGS, options: { selectedProgrammes, mode: 'any' }, precomputed })
+
+    assert.strictEqual(filterWith(['KH50_001']), true)
+    assert.strictEqual(filterWith(['KH50_001', 'MH50_001']), false)
+  })
+
   void it.todo('should include student when the student has an attainment during the timeframe (attainment)')
   void it.todo('should exclude student when the student does not have attainment during the timeframe (attainment)')
-
-  void it.todo(
-    'should include student when the student has had a study right since the start year associated with a study guidance group (assoc-year)'
-  )
-  void it.todo(
-    'should exclude student when the student has not had a study right since the start year associated with a study guidance group (assoc-year)'
-  )
 
   void it('isActive should match the filter state', () => {
     assert.strictEqual(programmeFilter().isActive({ selectedProgrammes: [], mode: 'any' }, ''), false)

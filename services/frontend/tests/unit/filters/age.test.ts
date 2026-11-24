@@ -50,11 +50,19 @@ void describe('ageFilter', () => {
 
     const result = ageFilter().precompute!({
       args: undefined,
-      options: { min: null, max: null },
       students: [young, old],
     })
 
     assert.strictEqual(result.min, getAge(young.birthdate))
     assert.strictEqual(result.max, getAge(old.birthdate))
+  })
+})
+
+void describe('ageFilter boundaries', () => {
+  void it('should include students exactly at the minimum and maximum age', () => {
+    const student = createStudent({ birthdate: new Date('2000-01-01') })
+    const age = getAge(student.birthdate)
+
+    assert.strictEqual(filterStudent(student, { min: age, max: age }), true)
   })
 })

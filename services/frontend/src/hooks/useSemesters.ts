@@ -8,6 +8,9 @@ export type SemestersData = {
   isLoading: boolean
 }
 
+const NO_SEMESTERS: SemestersData['semesters'] = {}
+const NO_YEARS: SemestersData['years'] = {}
+
 export const useSemesters = (): SemestersData => {
   const { data, isFetching } = useGetSemestersQuery()
 
@@ -18,8 +21,8 @@ export const useSemesters = (): SemestersData => {
 
   return {
     currentSemester,
-    semesters: data?.semesters ?? {},
-    years: data?.years ?? {},
+    semesters: data?.semesters ?? NO_SEMESTERS,
+    years: data?.years ?? NO_YEARS,
     isLoading: isFetching,
   }
 }

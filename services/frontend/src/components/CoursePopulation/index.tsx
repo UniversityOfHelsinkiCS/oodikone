@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { useMemo } from 'react'
 
 import { getStudentToCourseCompletionDateTimeMap, getUnifyTextIn } from '@/common'
 import { populationStatisticsToolTips } from '@/common/InfoToolTips'
@@ -42,6 +43,12 @@ import { SISStudyRightElement } from '@oodikone/shared/models'
 import { FormattedStudent } from '@oodikone/shared/types'
 import { getFromToDates, getStudentRelevantProgrammes } from './util'
 
+const NO_STUDENTS: FormattedStudent[] = []
+
+const INITIAL_OPTIONS = {
+  [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
+}
+
 export const CoursePopulation = () => {
   'use memo'
   useTitle('Course population')
@@ -80,14 +87,57 @@ export const CoursePopulation = () => {
   } = useSemesters()
 
   const isSeparate = separate === 'true'
+  const includeSubstitutions = substitutions === 'true'
+
+  const students = population?.students ?? NO_STUDENTS
+  const populationCourseIds = useMemo(() => Object.keys(population?.idToGroupIdMap ?? {}), [population])
+  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate, allSemesters, semesterYears)
+
+  const filters: GenericFilter[] = useMemo(
+    () => [
+      genderFilter(),
+      studentNumberFilter(),
+      ageFilter(),
+      courseFilter({
+        courses: population?.coursestatistics.courses ?? [],
+        includeSubstitutions,
+      }),
+      creditsEarnedFilter(),
+      hetuFilter(),
+      startYearAtUniFilter(),
+      programmeFilter({
+        additionalModes: [
+          {
+            key: 'attainment',
+            label: 'Attainment',
+            predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
+              const correctProgramme = findCorrectProgramme(
+                student,
+                populationCourseIds,
+                allSemesters,
+                new Date(dateFrom!),
+                new Date(dateTo!),
+                currentSemester?.semestercode
+              )
+              return correctProgramme?.code === studyRightElement.code
+            },
+            description: 'Student had an active study right at the time of course attainment.',
+          },
+        ],
+      }),
+      gradeFilter({
+        courseIds: populationCourseIds,
+        from: dateFrom!,
+        to: dateTo!,
+      }),
+    ],
+    [population, includeSubstitutions, populationCourseIds, allSemesters, dateFrom, dateTo, currentSemester]
+  )
 
   if (!courses?.length) return null
   if (populationFetching || !population || semestersFetching || !currentSemester) return <PageLoading isLoading />
 
-  const populationCourseIds = Object.keys(population.idToGroupIdMap)
-
   // Dates must be set
-  const { dateFrom, dateTo } = getFromToDates(Number(from), Number(to), isSeparate, allSemesters, semesterYears)
   if (!dateFrom || !dateTo) return null
 
   const singleSemester =
@@ -109,10 +159,7 @@ export const CoursePopulation = () => {
     getTextIn
   )
 
-  const studentToTargetCourseDateMap = getStudentToCourseCompletionDateTimeMap(
-    population.students ?? [],
-    populationCourseIds
-  )
+  const studentToTargetCourseDateMap = getStudentToCourseCompletionDateTimeMap(students, populationCourseIds)
   const createPanels = (filteredStudents: FormattedStudent[], filteredCourses: FilteredCourse[]) => [
     {
       title: 'Grade distribution',
@@ -196,44 +243,6 @@ export const CoursePopulation = () => {
     },
   ]
 
-  const filters: GenericFilter[] = [
-    genderFilter(),
-    studentNumberFilter(),
-    ageFilter(),
-    courseFilter({
-      courses: population?.coursestatistics.courses ?? [],
-      includeSubstitutions: substitutions === 'true',
-    }),
-    creditsEarnedFilter(),
-    hetuFilter(),
-    startYearAtUniFilter(),
-    programmeFilter({
-      additionalModes: [
-        {
-          key: 'attainment',
-          label: 'Attainment',
-          predicate: (student: FormattedStudent, studyRightElement: SISStudyRightElement) => {
-            const correctProgramme = findCorrectProgramme(
-              student,
-              populationCourseIds,
-              allSemesters,
-              new Date(dateFrom),
-              new Date(dateTo),
-              currentSemester?.semestercode
-            )
-            return correctProgramme?.code === studyRightElement.code
-          },
-          description: 'Student had an active study right at the time of course attainment.',
-        },
-      ],
-    }),
-    gradeFilter({
-      courseIds: populationCourseIds,
-      from: dateFrom,
-      to: dateTo,
-    }),
-  ]
-
   const courseCodes = courses
     .map(course => courseDetails?.find(cd => cd.groupId === course)?.code)
     .filter(Boolean)
@@ -243,10 +252,9 @@ export const CoursePopulation = () => {
     <FilterView
       coursestatistics={population?.coursestatistics}
       filters={filters}
-      initialOptions={{
-        [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
-      }}
-      students={population?.students ?? []}
+      initialOptions={INITIAL_OPTIONS}
+      key={JSON.stringify([courses, from, to, separate, unifyCourses, substitutions])}
+      students={students}
     >
       {(filteredStudents, filteredCourses) => (
         <>
@@ -259,7 +267,7 @@ export const CoursePopulation = () => {
               variant="h6"
             >{`Class of ${dateRange}, ${population.students.length} students`}</Typography>
             <Typography color="text.secondary" variant="h6">
-              {`Substitutions ${substitutions === 'true' ? 'included' : 'excluded'}, ${getUnifyTextIn(unifyCourses)}`}
+              {`Substitutions ${includeSubstitutions ? 'included' : 'excluded'}, ${getUnifyTextIn(unifyCourses)}`}
             </Typography>
           </PageTitle>
           <PanelView panels={createPanels(filteredStudents, filteredCourses)} />

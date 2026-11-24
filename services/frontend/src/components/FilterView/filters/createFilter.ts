@@ -6,6 +6,11 @@ import { mapValues } from '@oodikone/shared/util'
 
 export type FilterOptions<T = any> = Record<string, T>
 type Selector<Options extends FilterOptions, T, R> = (options: Options, args: T) => R
+type PrecomputedSelector<Options extends FilterOptions, T, R, Precompute> = (
+  options: Options,
+  args: T,
+  precomputed: Precompute
+) => R
 type Action<Option extends FilterOptions, T> = (options: Option, args: T) => Option
 
 /**
@@ -64,9 +69,7 @@ type FilterSettings<Options extends FilterOptions, Args, Precompute, SelectorT, 
    * Precompute filter;
    * This value is used instead of running the filter again for the population.
    */
-  precompute?: (
-    ctx: Pick<FilterContext<Options, Args, null>, 'options' | 'args'> & { students: Student[] }
-  ) => Precompute
+  precompute?: (ctx: Pick<FilterContext<Options, Args, null>, 'args'> & { students: Student[] }) => Precompute
 
   /**
    * Filter tray render component.
@@ -79,7 +82,7 @@ type FilterSettings<Options extends FilterOptions, Args, Precompute, SelectorT, 
    * Redux selectors.
    * `selectOptions` and `isActive` will be overwriten.
    */
-  selectors?: Record<string, Selector<Options, SelectorT, SelectorR>>
+  selectors?: Record<string, PrecomputedSelector<Options, SelectorT, SelectorR, Precompute>>
 
   /**
    * By default `setOptions` and `reset` are assigned.
@@ -88,10 +91,10 @@ type FilterSettings<Options extends FilterOptions, Args, Precompute, SelectorT, 
   actions?: Record<string, Action<Options, ActionT>>
 }
 
-const assignSelectors = <Options extends FilterOptions, T, R>(
+const assignSelectors = <Options extends FilterOptions, T, R, Precompute>(
   isActive: Selector<Options, T, R>,
-  selectors: Record<string, Selector<Options, T, R>> | undefined
-): Record<string, Selector<Options, T, R>> =>
+  selectors: Record<string, PrecomputedSelector<Options, T, R, Precompute>> | undefined
+): Record<string, PrecomputedSelector<Options, T, R, Precompute>> =>
   Object.assign(
     {
       selectOptions: (opts: Options) => opts,
@@ -172,7 +175,7 @@ export const createFilter = <
     const useSelector = (args: SelectorT) => (getContext: FilterViewContextState<Options>['getContextByKey']) => {
       const ctx = getContext(options.key)
 
-      return selector(ctx.options, args)
+      return selector(ctx.options, args, ctx.precomputed)
     }
 
     return [key, useSelector]

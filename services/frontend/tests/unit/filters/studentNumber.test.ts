@@ -51,3 +51,17 @@ void describe('studentNumberFilter', () => {
     )
   })
 })
+
+void describe('studentNumberFilter actions', () => {
+  void it('should add student numbers to the allowlist without duplicates or touching the blocklist', () => {
+    let stored = { allowlist: ['111111111'], blocklist: ['333333333'] }
+    const getContext = () => ({ options: stored, args: undefined, precomputed: undefined })
+    const setFilterOptions = (_: string, options: typeof stored) => {
+      stored = options
+    }
+
+    studentNumberFilter.actions.addToAllowlist(['111111111', '222222222'])(getContext, setFilterOptions)
+
+    assert.deepStrictEqual(stored, { allowlist: ['111111111', '222222222'], blocklist: ['333333333'] })
+  })
+})

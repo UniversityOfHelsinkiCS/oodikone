@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { useMemo } from 'react'
 
 import { isMastersProgramme } from '@/common'
 import * as filters from '@/components/FilterView/filters'
@@ -12,12 +13,19 @@ export const createAcademicYearStartDate = (year: number) => new Date(year, 7, 1
 export const startYearToAcademicYear = (year: string | null | undefined) =>
   !year ? '' : `${year} - ${parseInt(year, 10) + 1}`
 
-export const useGetFilters = (
-  group: GroupsWithTags | undefined,
-  population: Pick<CustomPopulationByStudentNumbersResBody, 'coursestatistics'> | undefined
-) => {
+type FilterPopulation = Pick<CustomPopulationByStudentNumbersResBody, 'coursestatistics'>
+
+export const useGetFilters = (group: GroupsWithTags | undefined, population: FilterPopulation | undefined) => {
   const { semesters } = useSemesters()
 
+  return useMemo(() => buildFilters(group, population, semesters), [group, population, semesters])
+}
+
+const buildFilters = (
+  group: GroupsWithTags | undefined,
+  population: FilterPopulation | undefined,
+  semesters: ReturnType<typeof useSemesters>['semesters']
+) => {
   const initialOptions = {}
 
   if (!group || population === undefined) return { viewFilters: [], initialOptions }

@@ -65,7 +65,7 @@ export const FilterTray = <Options extends FilterOptions, Args, Precompute>({
         </Button>
       </Stack>
       {filters
-        .sort(({ title: a }, { title: b }) => a.localeCompare(b))
+        .toSorted(({ title: a }, { title: b }) => a.localeCompare(b))
         .map(filter => {
           const { key } = filter
           const ctx = getContextByKey(key)

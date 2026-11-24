@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
+import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 
 import { PageTitle } from '@/components/common/PageTitle'
@@ -48,6 +49,11 @@ import { getFullStudyProgrammeRights } from '@/util/access'
 import { getCombinedProgrammeName } from '@/util/combinedProgramme'
 import { QueryParams, useParseQueryParams } from '@/util/queryparams'
 import { DegreeProgrammeType } from '@oodikone/shared/types'
+import type { CourseStats } from '@oodikone/shared/routes/populations'
+import type { FormattedStudent } from '@oodikone/shared/types/studentData'
+
+const NO_STUDENTS: FormattedStudent[] = []
+const NO_COURSES: CourseStats[] = []
 
 const getYearText = (years: number[]) => (years.length >= 1 ? `${years[0]} - ${years.at(-1)! + 1}` : '')
 
@@ -180,8 +186,8 @@ export const PopulationStatistics = () => {
 
   const { programme: programmeCode, combinedProgramme: combinedProgrammeCode, studyTrack } = query
 
-  const students = population?.students ?? []
-  const courses = population?.coursestatistics.courses ?? []
+  const students = population?.students ?? NO_STUDENTS
+  const courses = population?.coursestatistics.courses ?? NO_COURSES
 
   const populationTags = new Map<string, string>(
     students.flatMap(({ tags }) => tags.map(({ tag_id, tag }) => [tag_id, tag.tagname]))
@@ -195,51 +201,75 @@ export const PopulationStatistics = () => {
   const enableStudyRightTypeFilter =
     useDegreeProgrammeTypes([programmeCode])?.[programmeCode] === 'urn:code:degree-program-type:masters-degree'
 
-  const filters: GenericFilter[] = [
-    !useUserHasRestrictedAccess() ? ageFilter() : null,
-    citizenshipFilter(),
-    courseFilter({ courses }),
-    creditDateFilter(),
-    creditsEarnedFilter(),
-    curriculumPeriodFilter(),
-    enrollmentStatusFilter({
-      allSemesters: allSemesters ?? [],
-      programme: programmeCode,
-    }),
-    genderFilter(),
-    graduatedFromProgrammeFilter({
-      code: programmeCode,
+  const hasRestrictedAccess = useUserHasRestrictedAccess()
+  const firstYear = query.years[0]
+
+  const filters: GenericFilter[] = useMemo(
+    () =>
+      [
+        !hasRestrictedAccess ? ageFilter() : null,
+        citizenshipFilter(),
+        courseFilter({ courses }),
+        creditDateFilter(),
+        creditsEarnedFilter(),
+        curriculumPeriodFilter(),
+        enrollmentStatusFilter({
+          allSemesters,
+          programme: programmeCode,
+        }),
+        genderFilter(),
+        graduatedFromProgrammeFilter({
+          code: programmeCode,
+          combinedProgrammeCode,
+          showBachelorAndMaster,
+        }),
+        hopsFilter({ programmeCode, combinedProgrammeCode }),
+        studentNumberFilter(),
+        startYearAtUniFilter(),
+        studyTrackFilter({ code: programmeCode }),
+        studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
+        tagsFilter(),
+        transferredToProgrammeFilter(),
+        enableStudyRightTypeFilter ? studyRightTypeFilter({ programme: programmeCode }) : null,
+
+        // For combined programme admission type is the same as for those starting in bachelor programme
+        isSingleYear && firstYear >= 2020 ? admissionTypeFilter({ programme: programmeCode }) : null,
+      ].filter(item => !!item),
+    [
+      hasRestrictedAccess,
+      courses,
+      allSemesters,
+      programmeCode,
       combinedProgrammeCode,
       showBachelorAndMaster,
+      currentSemester,
+      enableStudyRightTypeFilter,
+      isSingleYear,
+      firstYear,
+    ]
+  )
+
+  const hasStudyRightStart = students.some(student => !!student?.studyrightStart)
+  const initialTag = query.tag
+
+  const initialOptions = useMemo(
+    () => ({
+      [transferredToProgrammeFilter.key]: {
+        transferred: 'false',
+      },
+      [hopsFilter.key]: {
+        studyStart: hasStudyRightStart,
+      },
+      [studyTrackFilter.key]: {
+        selected: studyTrack ? [studyTrack] : [],
+      },
+      [tagsFilter.key]: {
+        includedTags: initialTag ? [initialTag] : [],
+        excludedTags: [],
+      },
     }),
-    hopsFilter({ programmeCode, combinedProgrammeCode }),
-    studentNumberFilter(),
-    startYearAtUniFilter(),
-    studyTrackFilter({ code: programmeCode }),
-    studyRightStatusFilter({ code: programmeCode, combinedProgrammeCode, currentSemester, showBachelorAndMaster }),
-    tagsFilter(),
-    transferredToProgrammeFilter(),
-    enableStudyRightTypeFilter ? studyRightTypeFilter({ programme: programmeCode }) : null,
-
-    // For combined programme admission type is the same as for those starting in bachelor programme
-    isSingleYear ? (query.years[0] >= 2020 ? admissionTypeFilter({ programme: programmeCode }) : null) : null,
-  ].filter(item => !!item)
-
-  const initialOptions = {
-    [transferredToProgrammeFilter.key]: {
-      transferred: 'false',
-    },
-    [hopsFilter.key]: {
-      studyStart: students.some(student => !!student?.studyrightStart),
-    },
-    [studyTrackFilter.key]: {
-      selected: studyTrack ? [studyTrack] : [],
-    },
-    [tagsFilter.key]: {
-      includedTags: query.tag ? [query.tag] : [],
-      excludedTags: [],
-    },
-  }
+    [hasStudyRightStart, studyTrack, initialTag]
+  )
 
   const errorCardTitle = 'Error occurred while fetching data!'
   const errorCardBody = (
@@ -274,6 +304,7 @@ export const PopulationStatistics = () => {
         coursestatistics={population?.coursestatistics}
         filters={filters}
         initialOptions={initialOptions}
+        key={JSON.stringify(query)}
         students={students}
       >
         {(filteredStudents, filteredCourses) => (

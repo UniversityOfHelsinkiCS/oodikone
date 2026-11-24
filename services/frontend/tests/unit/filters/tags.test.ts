@@ -52,3 +52,14 @@ void describe('tagsFilter', () => {
     assert.strictEqual(tagsFilter().isActive({ includedTags: [], excludedTags: ['1'] }, undefined), true)
   })
 })
+
+void describe('tagsFilter without tags', () => {
+  void it('should exclude an untagged student when included tags are set', () => {
+    assert.strictEqual(filterStudent(createStudent({ tags: [] }), ['1'], []), false)
+  })
+
+  void it('should keep students without the excluded tag', () => {
+    assert.strictEqual(filterStudent(createStudent({ tags: [] }), [], ['1']), true)
+    assert.strictEqual(filterStudent(createStudent({ tags: [createTag('2')] }), [], ['1']), true)
+  })
+})

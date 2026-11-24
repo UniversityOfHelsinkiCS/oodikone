@@ -32,7 +32,26 @@ const setRange = async (page: Page, filter: string, min: number, max: number, ex
   await checkFilteredStudentCount(page, expected)
 }
 
+const navigateInApp = async (page: Page, path: string) => {
+  await page.evaluate(url => {
+    window.history.pushState({}, '', url)
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }, path)
+}
+
+const addCourseFilter = async (page: Page, name: string) => {
+  await page.getByTestId('courseFilter-selector').getByRole('combobox').fill(name)
+  await page.getByRole('option', { name, exact: true }).click()
+}
+
+const selectProgrammeFilterMode = async (page: Page, mode: string) => {
+  await page.getByTestId('programmeFilter-mode-selector').click()
+  await page.getByRole('option', { name: new RegExp(`^${mode}`) }).click()
+  await expect(page.getByRole('listbox')).toBeHidden()
+}
+
 const pathToMathMSc2020 = '/populations?years=2020&programme=MH50_001&semesters=FALL&semesters=SPRING'
+const pathToMathBSc2017 = '/populations?years=2017&programme=KH50_001&semesters=FALL&semesters=SPRING'
 const defaultMScStudents = 26
 
 test.describe("Population statistics with a master's programme", () => {
@@ -45,6 +64,17 @@ test.describe("Population statistics with a master's programme", () => {
     await checkFilteredStudentCount(page, 15)
     await page.getByTestId('studyTrackFilter-clear').click()
     await checkFilteredStudentCount(page, defaultMScStudents)
+  })
+
+  test('Filter selections are reset when moving to another population', async ({ page }) => {
+    await selectDropdownOption(page, 'studyTrackFilter', 'Matematiikka ja soveltava matematiikka (MAST-MSM)')
+    await checkFilteredStudentCount(page, 15)
+    await expect(page.getByTestId('studyTrackFilter-filter-card')).toHaveAttribute('data-active', 'true')
+
+    await navigateInApp(page, pathToMathBSc2017)
+
+    await expect(page.getByText('KH50_001', { exact: false }).first()).toBeVisible()
+    await expect(page.getByTestId('studyTrackFilter-filter-card')).toHaveAttribute('data-active', 'false')
   })
 
   test('Study right type filter works', async ({ page }) => {
@@ -84,7 +114,6 @@ test.describe('Population Statistics', () => {
     test('Admission type filter works', notYetImplemented)
     test('Courses filter works', notYetImplemented)
     test('Filter combinations work', notYetImplemented)
-    test('"Reset All Filters" button works', notYetImplemented)
   })
 })
 
@@ -183,6 +212,52 @@ test.describe('Custom Population Statistics', () => {
   test('Starting year filter works', async ({ page }) => {
     await selectDropdownOption(page, 'startYearAtUniFilter', 0)
     await checkFilteredStudentCount(page, 2)
+  })
+
+  test('Courses filter requires every selected course', async ({ page }) => {
+    await page.getByTestId('courseFilter-header').click()
+
+    await addCourseFilter(page, 'MAT11005 - Integraalilaskenta')
+    await checkFilteredStudentCount(page, 7)
+    await addCourseFilter(page, 'MAT21012 - Differentiaaliyhtälöt I')
+    await checkFilteredStudentCount(page, 5)
+
+    await page.getByTestId('courseFilter-clear').click()
+    await checkFilteredStudentCount(page, 8)
+
+    await addCourseFilter(page, 'MAT11005 - Integraalilaskenta')
+    await addCourseFilter(page, 'MAT11006 - Calculus IA: Limits and differentiation')
+    await checkFilteredStudentCount(page, 0)
+  })
+
+  test('Programme filter follows the selected mode', async ({ page }) => {
+    await page.getByTestId('programmeFilter-header').click()
+    await page.getByTestId('programmeFilter-selector').click()
+    await expect(page.getByRole('option', { name: 'Geotieteiden kandiohjelma' })).toBeHidden()
+    await page.keyboard.press('Escape')
+
+    await selectProgrammeFilterMode(page, 'Past or Present')
+    await selectDropdownOption(page, 'programmeFilter', 'Geotieteiden kandiohjelma')
+    await checkFilteredStudentCount(page, 1)
+
+    await selectProgrammeFilterMode(page, 'Active Study Right')
+    await checkFilteredStudentCount(page, 0)
+  })
+
+  test('"Reset All Filters" button works', async ({ page }) => {
+    const resetAll = page.getByTestId('reset-all-filters')
+    await expect(resetAll).toBeDisabled()
+
+    await selectDropdownOption(page, 'genderFilter', 'Female (5)')
+    await page.getByTestId('courseFilter-header').click()
+    await addCourseFilter(page, 'MAT21012 - Differentiaaliyhtälöt I')
+    await checkFilteredStudentCount(page, 3)
+
+    await resetAll.click()
+    await checkFilteredStudentCount(page, 8)
+    await expect(resetAll).toBeDisabled()
+    await expect(page.getByTestId('genderFilter-filter-card')).toHaveAttribute('data-active', 'false')
+    await expect(page.getByTestId('courseFilter-filter-card')).toHaveAttribute('data-active', 'false')
   })
 
   test('Courses filter works', async ({ page }) => {

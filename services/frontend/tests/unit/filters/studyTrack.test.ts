@@ -29,8 +29,8 @@ void describe('studyTrackFilter', () => {
 
     const result = studyTrackFilter().filter(student, {
       args: ARGS,
-      options: { selected: ['track-1'], studyTracks: [] },
-      precomputed: undefined,
+      options: { selected: ['track-1'] },
+      precomputed: [],
     })
 
     assert.strictEqual(result, true)
@@ -41,8 +41,8 @@ void describe('studyTrackFilter', () => {
 
     const result = studyTrackFilter().filter(student, {
       args: ARGS,
-      options: { selected: ['track-2'], studyTracks: [] },
-      precomputed: undefined,
+      options: { selected: ['track-2'] },
+      precomputed: [],
     })
 
     assert.strictEqual(result, false)
@@ -53,15 +53,47 @@ void describe('studyTrackFilter', () => {
 
     const result = studyTrackFilter().filter(student, {
       args: { code: 'OTHER' },
-      options: { selected: ['track-1'], studyTracks: [] },
-      precomputed: undefined,
+      options: { selected: ['track-1'] },
+      precomputed: [],
     })
 
     assert.strictEqual(result, false)
   })
 
   void it('isActive should match the filter state', () => {
-    assert.strictEqual(studyTrackFilter().isActive({ selected: [], studyTracks: [] }, undefined), false)
-    assert.strictEqual(studyTrackFilter().isActive({ selected: ['track-1'], studyTracks: [] }, undefined), true)
+    assert.strictEqual(studyTrackFilter().isActive({ selected: [] }, undefined), false)
+    assert.strictEqual(studyTrackFilter().isActive({ selected: ['track-1'] }, undefined), true)
+  })
+})
+
+void describe('studyTrackFilter selectors', () => {
+  void it('should resolve the selected study tracks from the precomputed tracks', () => {
+    const track1 = { code: 'track-1', name: { fi: 'Suuntautuminen 1' } }
+    const track2 = { code: 'track-2', name: { fi: 'Suuntautuminen 2' } }
+    const getContext = () => ({ options: { selected: ['track-2'] }, args: ARGS, precomputed: [track1, track2] })
+
+    const selected = studyTrackFilter.selectors.selectedStudyTracks(undefined)(getContext)
+
+    assert.deepStrictEqual(selected, [track2])
+  })
+
+  void it('should precompute the study tracks of the given programme only', () => {
+    const student = createStudent({
+      studyRights: [
+        createStudyRight(),
+        createBaseStudyRight({
+          studyRightElements: [
+            createStudyRightElement({ code: 'OTHER', studyTrack: { code: 'track-x', name: { fi: 'Muu' } } }),
+          ],
+        }),
+      ],
+    })
+
+    const studyTracks = studyTrackFilter().precompute!({ students: [student], args: ARGS })
+
+    assert.deepStrictEqual(
+      studyTracks.map(({ code }) => code),
+      ['track-1']
+    )
   })
 })

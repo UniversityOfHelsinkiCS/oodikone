@@ -103,3 +103,32 @@ void describe('admissionTypeFilter createFilter()', () => {
     assert.strictEqual(admissionTypeFilter(ARGS).isActive({ selected: ['regular'] }, undefined), true)
   })
 })
+
+void describe('admissionTypeFilter Valintakoe', () => {
+  void it('should match students stored as "Koepisteet" when "Valintakoe" is selected', () => {
+    const student = createStudent({ studyRights: [createStudyRight({ admissionType: 'Koepisteet' })] })
+
+    assert.strictEqual(filter('KH50_001', 'Valintakoe')(student), true)
+  })
+
+  void it('should count admission types per programme, excluding cancelled and other programmes', () => {
+    const students = [
+      createStudent({ studyRights: [createStudyRight({ admissionType: 'Koepisteet' })] }),
+      createStudent({ studyRights: [createStudyRight({ admissionType: 'Todistusvalinta' })] }),
+      createStudent({ studyRights: [createStudyRight({ admissionType: 'Todistusvalinta', cancelled: true })] }),
+      createStudent({
+        studyRights: [
+          createStudyRight({
+            admissionType: 'Todistusvalinta',
+            studyRightElements: [createStudyRightElement({ code: 'KH99_999' })],
+          }),
+        ],
+      }),
+      createStudent({ studyRights: [createStudyRight({ admissionType: '' })] }),
+    ]
+
+    const precomputed = admissionTypeFilter(ARGS).precompute!({ students, args: ARGS })
+
+    assert.deepStrictEqual(precomputed, { Valintakoe: 1, Todistusvalinta: 1 })
+  })
+})

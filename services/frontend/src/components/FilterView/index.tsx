@@ -1,11 +1,13 @@
 import Stack from '@mui/material/Stack'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { ReactNode } from 'react'
 
 import { PageLayout } from '@/components/common/PageLayout'
 import { FilterViewContext } from '@/components/FilterView/context'
+import { applyFilters } from '@/components/FilterView/applyFilters'
 import type { FilterContext, FilterOptions, GenericFilter } from '@/components/FilterView/filters/createFilter'
 import { FilterTray } from '@/components/FilterView/FilterTray'
+import { precomputeFilters } from '@/components/FilterView/precompute'
 import { useFilterStorage } from '@/components/FilterView/useFilterStorage'
 import type { FilteredCourse } from '@/util/coursesOfPopulation'
 import { filterCourses } from '@/util/coursesOfPopulation'
@@ -27,46 +29,35 @@ export const FilterView = <Options extends FilterOptions>({
 }) => {
   const { storedOptions, setFilterOptions, resetFilterOptions, resetAllFilterOptions } = useFilterStorage<Options>()
 
-  const filterArgs = Object.fromEntries(filters.map(({ key, args }) => [key, args]))
-  const filterOptions: Record<string, Options> = Object.fromEntries(
-    filters.map(({ key, defaultOptions }) => [key, storedOptions[key] ?? initialOptions?.[key] ?? defaultOptions])
-  )
-
-  const precomputed = useMemo(
+  const filterArgs = useMemo(() => Object.fromEntries(filters.map(({ key, args }) => [key, args])), [filters])
+  const filterOptions: Record<string, Options> = useMemo(
     () =>
       Object.fromEntries(
-        filters.map(({ key, args, precompute }) => [
-          key,
-          precompute?.({
-            students: students.slice(), // Copy instead of pass
-            options: filterOptions[key],
-            args,
-          }),
-        ])
+        filters.map(({ key, defaultOptions }) => [key, storedOptions[key] ?? initialOptions?.[key] ?? defaultOptions])
       ),
-    [filters]
+    [filters, storedOptions, initialOptions]
   )
 
-  const getContextByKey = (key: string): FilterContext<Options> => ({
-    precomputed: precomputed[key],
-    options: filterOptions[key],
-    args: filterArgs[key],
-  })
+  const precomputed = useMemo(() => precomputeFilters(filters, students), [filters, students])
+
+  const getContextByKey = useCallback(
+    (key: string): FilterContext<Options> => ({
+      precomputed: precomputed[key],
+      options: filterOptions[key],
+      args: filterArgs[key],
+    }),
+    [precomputed, filterOptions, filterArgs]
+  )
 
   const filtersInUse = filters.some(({ key, isActive }) => isActive(filterOptions[key], undefined))
 
   const [filteredStudents, filteredCourses] = useMemo(() => {
-    const fstudents = filters
-      .filter(({ key, isActive }) => isActive(filterOptions[key], undefined))
-      .reduce((students, { key, filter, mutate }) => {
-        const ctx = getContextByKey(key)
-        return students.filter(student => filter(student, ctx)).map(student => mutate?.(student, ctx) ?? student)
-      }, students)
+    const fstudents = applyFilters(filters, students, getContextByKey)
 
     const fcourses = filterCourses(coursestatistics, fstudents)
 
     return [fstudents, fcourses]
-  }, [filters, filterOptions])
+  }, [filters, students, coursestatistics, getContextByKey])
 
   return (
     <Stack flexDirection="row">

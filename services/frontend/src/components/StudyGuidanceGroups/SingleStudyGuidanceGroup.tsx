@@ -53,6 +53,7 @@ export const SingleStudyGuidanceGroupContainer = ({ group }: { group: GroupsWith
       coursestatistics={population?.coursestatistics}
       filters={viewFilters}
       initialOptions={initialOptions}
+      key={group.id}
       students={population.students}
     >
       {(filteredStudents, filteredCourses) => (

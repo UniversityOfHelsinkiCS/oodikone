@@ -23,15 +23,17 @@ type Args = {
     description: string
   }[]
 }
-type Precompute = Record<string, { code: string; name: Name }[]>
+type StudentToProgrammeMap = Record<string, { code: string; name: Name }[]>
+type Precompute = (mode: string) => StudentToProgrammeMap
 
 const ProgrammeFilterCard = ({
   args,
   onOptionsChange,
   options,
-  precomputed: studentToProgrammeMap,
+  precomputed: getStudentToProgrammeMap,
   students,
 }: FilterTrayProps<Options, Args, Precompute>) => {
+  const studentToProgrammeMap = getStudentToProgrammeMap(options.mode)
   const additionalModes = args?.additionalModes ?? []
 
   const { getTextIn } = useLanguage()
@@ -133,8 +135,11 @@ const getStudentProgrammes = (student: FormattedStudent) =>
 const NO_PROGRAMME = { code: '00000', name: { en: 'No programme', fi: 'Ei ohjelmaa' } }
 
 // TODO: Implement a better type for predicate
-const createStudentToProgrammeMap = (students: FormattedStudent[], studyRightPredicate: (..._: any[]) => boolean) => {
-  const studentToProgrammeMap = {}
+const createStudentToProgrammeMap = (
+  students: FormattedStudent[],
+  studyRightPredicate: (..._: any[]) => boolean
+): StudentToProgrammeMap => {
+  const studentToProgrammeMap: StudentToProgrammeMap = {}
 
   for (const student of students) {
     const studentProgrammes = getStudentProgrammes(student)
@@ -161,7 +166,7 @@ const createStudentToProgrammeMap = (students: FormattedStudent[], studyRightPre
   return studentToProgrammeMap
 }
 
-const MODE_PREDICATES = {
+const MODE_PREDICATES: Record<string, (student: FormattedStudent, element: any) => boolean> = {
   any: () => true,
   active: (_, studyRightElement: Unarray<ReturnType<typeof getStudentProgrammes>>) =>
     !studyRightElement.cancelled &&
@@ -169,7 +174,10 @@ const MODE_PREDICATES = {
     (dayjs().isSameOrBefore(studyRightElement.endDate, 'day') || studyRightElement.endDate == null),
 }
 
-export const programmeFilter = createFilter({
+const getModePredicate = (mode: string, args: Args | undefined) =>
+  MODE_PREDICATES[mode] ?? args?.additionalModes?.find(({ key }) => key === mode)?.predicate ?? MODE_PREDICATES.any
+
+export const programmeFilter = createFilter<Options, Args, Precompute>({
   key: 'programmeFilter',
 
   title: 'Programme',
@@ -179,32 +187,23 @@ export const programmeFilter = createFilter({
     mode: 'active',
   },
 
-  precompute: ({ students, options, args }) => {
-    let predicate = (..._: any[]) => true
+  precompute: ({ students, args }) => {
+    const mapsByMode = new Map<string, StudentToProgrammeMap>()
 
-    if (options.mode) {
-      let modePredicate = MODE_PREDICATES[options.mode]
-
-      const additional = args?.additionalModes?.find(mode => mode.key === options.mode)?.predicate
-
-      if (!modePredicate && additional) {
-        modePredicate = additional
+    return (mode: string) => {
+      if (!mapsByMode.has(mode)) {
+        mapsByMode.set(mode, createStudentToProgrammeMap(students, getModePredicate(mode, args)))
       }
 
-      if (modePredicate) {
-        const prevPredicate = predicate
-        predicate = (student, studyrightElement) =>
-          prevPredicate(student, studyrightElement) && modePredicate(student, studyrightElement)
-      }
+      return mapsByMode.get(mode)!
     }
-
-    return createStudentToProgrammeMap(students, predicate)
   },
 
   isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
 
-  filter({ studentNumber }, { precomputed: studentToProgrammeMap, options }) {
-    const { selectedProgrammes } = options
+  filter({ studentNumber }, { precomputed: getStudentToProgrammeMap, options }) {
+    const { selectedProgrammes, mode } = options
+    const studentToProgrammeMap = getStudentToProgrammeMap(mode)
 
     return selectedProgrammes.every(pcode => studentToProgrammeMap[studentNumber].some(({ code }) => code === pcode))
   },

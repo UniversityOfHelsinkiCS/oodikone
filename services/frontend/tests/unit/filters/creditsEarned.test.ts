@@ -3,6 +3,7 @@ import { assert, describe, it } from 'vitest'
 import { creditsEarnedFilter } from '@/components/FilterView/filters/creditsEarned'
 import { FormattedStudent } from '@oodikone/shared/types/studentData'
 
+import { CreditTypeCode } from '@oodikone/shared/types'
 import { createCourse, createStudent } from '@oodikone/shared/test/utils'
 
 const filterStudent = (student: FormattedStudent, options: { min: number | null; max: number | null }) =>
@@ -32,5 +33,35 @@ void describe('creditsEarnedFilter', () => {
     assert.strictEqual(creditsEarnedFilter().isActive({ min: 5, max: null }, undefined), true)
     assert.strictEqual(creditsEarnedFilter().isActive({ min: null, max: 20 }, undefined), true)
     assert.strictEqual(creditsEarnedFilter().isActive({ min: 5, max: 20 }, undefined), true)
+  })
+})
+
+void describe('creditsEarnedFilter credit counting', () => {
+  void it('should include students exactly at the minimum and maximum', () => {
+    const student = createStudent({ courses: [createCourse({ credits: 10 })] })
+
+    assert.strictEqual(filterStudent(student, { min: 10, max: 10 }), true)
+  })
+
+  void it('should only count passed and approved credits, not failed ones or study modules', () => {
+    const student = createStudent({
+      courses: [
+        createCourse({ credits: 5, credittypecode: CreditTypeCode.PASSED }),
+        createCourse({ credits: 5, credittypecode: CreditTypeCode.APPROVED }),
+        createCourse({ credits: 5, credittypecode: CreditTypeCode.FAILED }),
+        createCourse({ credits: 30, isStudyModuleCredit: true }),
+      ],
+    })
+
+    assert.strictEqual(filterStudent(student, { min: 10, max: 10 }), true)
+  })
+
+  void it('should precompute the credit bounds of the population', () => {
+    const students = [
+      createStudent({ courses: [createCourse({ credits: 5 })] }),
+      createStudent({ courses: [createCourse({ credits: 20 }), createCourse({ credits: 15 })] }),
+    ]
+
+    assert.deepStrictEqual(creditsEarnedFilter().precompute!({ students, args: undefined }), { min: 5, max: 35 })
   })
 })

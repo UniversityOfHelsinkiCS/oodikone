@@ -5,6 +5,7 @@ import {
   GRADUATION_PHASE,
   GraduationPhase,
 } from '@/components/FilterView/filters/graduatedFromProgramme'
+import { DegreeProgrammeType } from '@oodikone/shared/types'
 import { FormattedStudent, StudentStudyRight, StudentStudyRightElement } from '@oodikone/shared/types/studentData'
 
 import {
@@ -65,5 +66,49 @@ void describe('graduatedFromProgrammeFilter', () => {
       graduatedFromProgrammeFilter(ARGS).isActive({ mode: GRADUATION_PHASE.NOT_GRADUATED }, undefined),
       true
     )
+  })
+})
+
+void describe('graduatedFromProgrammeFilter with bachelor and master', () => {
+  const BA_MA_ARGS = { code: 'KH50_001', showBachelorAndMaster: true }
+
+  const filterBaMa = (student: FormattedStudent, mode: GraduationPhase) =>
+    graduatedFromProgrammeFilter(BA_MA_ARGS).filter(student, {
+      args: BA_MA_ARGS,
+      options: { mode },
+      precomputed: undefined,
+    })
+
+  const createBaMaStudent = (bachelorGraduated: boolean, masterGraduated: boolean) =>
+    createStudent({
+      studyRights: [
+        createStudyRight({
+          studyRightElements: [
+            createElement({ degreeProgrammeType: DegreeProgrammeType.BACHELOR, graduated: bachelorGraduated }),
+            createElement({
+              code: 'MH50_001',
+              degreeProgrammeType: DegreeProgrammeType.MASTER,
+              graduated: masterGraduated,
+            }),
+          ],
+        }),
+      ],
+    })
+
+  void it('should judge bachelor modes by the bachelor element of the study right', () => {
+    const student = createBaMaStudent(true, false)
+
+    assert.strictEqual(filterBaMa(student, GRADUATION_PHASE.GRADUATED_BACHELOR), true)
+    assert.strictEqual(filterBaMa(student, GRADUATION_PHASE.NOT_GRADUATED_BACHELOR), false)
+  })
+
+  void it('should judge master modes by the master element of the study right', () => {
+    const onlyBachelor = createBaMaStudent(true, false)
+    const both = createBaMaStudent(true, true)
+
+    assert.strictEqual(filterBaMa(onlyBachelor, GRADUATION_PHASE.GRADUATED_MASTER), false)
+    assert.strictEqual(filterBaMa(onlyBachelor, GRADUATION_PHASE.NOT_GRADUATED_MASTER), true)
+    assert.strictEqual(filterBaMa(both, GRADUATION_PHASE.GRADUATED_MASTER), true)
+    assert.strictEqual(filterBaMa(both, GRADUATION_PHASE.NOT_GRADUATED_MASTER), false)
   })
 })

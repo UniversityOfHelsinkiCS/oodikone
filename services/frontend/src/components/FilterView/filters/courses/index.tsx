@@ -10,15 +10,15 @@ import { getSortRank } from '@oodikone/shared/util/sortRank'
 type FTValue = (typeof FilterType)[keyof typeof FilterType]
 type Options = {
   courseFilters: Record<string, FTValue>
-  courses: Record<string, CourseStats>
-  substitutedBy: Record<string, string[][]>
-  includeSubstitutions: boolean
 }
 type Args = { courses: CourseStats[]; includeSubstitutions?: boolean }
-type Precompute = any
+type Precompute = {
+  courses: Record<string, CourseStats>
+  substitutedBy: Record<string, string[][]>
+}
 
-const CourseFilterCard = ({ options, onOptionsChange }: FilterTrayProps<Options, Args, Precompute>) => {
-  const courseStats = options.courses
+const CourseFilterCard = ({ options, onOptionsChange, precomputed }: FilterTrayProps<Options, Args, Precompute>) => {
+  const courseStats = precomputed.courses
 
   const courseFilters = options?.courseFilters
   const { getTextIn } = useLanguage()
@@ -69,46 +69,19 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
 
   defaultOptions: {
     courseFilters: {},
-    courses: {},
-    substitutedBy: {},
-    includeSubstitutions: true,
   },
 
-  precompute: ({
-    args,
-    options,
-  }: {
-    args: Args
-    options: {
-      courses?: Record<string, CourseStats>
-      substitutedBy?: Record<string, string[][]>
-      includeSubstitutions?: boolean
-    }
-  }) => {
-    const substitutedBy = args.courses.reduce<Record<string, string[][]>>((acc, course: CourseStats) => {
-      const { groupId, substitutionGroups } = course
-      if (substitutionGroups) {
-        for (const group of substitutionGroups) {
-          acc[groupId] ??= []
-          acc[groupId].push(group)
-        }
-      }
-
+  precompute: ({ args }) => ({
+    courses: Object.fromEntries(args.courses.map(course => [course.groupId, course])),
+    substitutedBy: args.courses.reduce<Record<string, string[][]>>((acc, { groupId, substitutionGroups }) => {
+      if (substitutionGroups?.length) acc[groupId] = [...substitutionGroups]
       return acc
-    }, {})
-
-    /* option.courses maybe frozen even when it should be used only within the scope of createFilter factory. */ {
-      delete options.courses
-      options.courses = Object.fromEntries(args.courses.map(course => [course.groupId, course]))
-    }
-
-    options.includeSubstitutions = args.includeSubstitutions ?? true
-    options.substitutedBy = substitutedBy
-  },
+    }, {}),
+  }),
 
   isActive: ({ courseFilters }) => Object.keys(courseFilters).length > 0,
 
-  filter(student: FormattedStudent, { options }) {
+  filter(student: FormattedStudent, { args, options, precomputed }) {
     const { courses, enrollments } = student
     const passedCourseGroupIds = courses
       .filter(({ credittypecode }) => credittypecode !== CreditTypeCode.FAILED)
@@ -122,7 +95,8 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
       let foundAttainment = false
       let foundEnrollment = false
 
-      ;[[mainGroupId], ...(options.includeSubstitutions ? (options.substitutedBy?.[mainGroupId] ?? []) : [])].forEach(
+      const includeSubstitutions = args.includeSubstitutions ?? true
+      ;[[mainGroupId], ...(includeSubstitutions ? (precomputed.substitutedBy[mainGroupId] ?? []) : [])].forEach(
         group => {
           foundPassed = foundPassed ? true : group.every(groupId => passedCourseGroupIds.includes(groupId))
           foundAttainment = foundAttainment ? true : group.every(groupId => courseGroupIds.includes(groupId))
@@ -149,7 +123,6 @@ export const courseFilter = createFilter<Options, Args, Precompute>({
     // NOTE: Remember FilterType.ALL === 0 when checking if courseFilters[course] exists
     isCourseSelected: ({ courseFilters }, courseGroupId) =>
       Object.values(FilterType).includes(courseFilters[courseGroupId]),
-    selectedCourseName: ({ courses }, courseGroupIds) => courses[courseGroupIds[0]]?.name,
   },
 
   actions: {

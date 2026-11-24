@@ -23,6 +23,10 @@ import {
   useGetCustomPopulationByProgrammesQuery,
   useGetCustomPopulationByStudentNumbersQuery,
 } from '@/redux/populations'
+import type { FormattedStudent } from '@oodikone/shared/types/studentData'
+
+const NO_STUDENTS: FormattedStudent[] = []
+const NO_INITIAL_OPTIONS = {}
 
 export const CustomPopulationWrapper = ({
   customPopulationState,
@@ -53,7 +57,7 @@ export const CustomPopulationWrapper = ({
     ? studentNumbersPopulation
     : programmesPopulation
 
-  const populationStudents = population?.students ?? []
+  const populationStudents = population?.students ?? NO_STUDENTS
   const associatedProgramme = studentNumbersPopulation.data?.studyProgramme
   const discardedStudentNumbers = studentNumbersPopulation.data?.discardedStudentNumbers ?? []
 
@@ -86,7 +90,13 @@ export const CustomPopulationWrapper = ({
     <FilterView
       coursestatistics={population?.coursestatistics}
       filters={filters}
-      initialOptions={{}}
+      initialOptions={NO_INITIAL_OPTIONS}
+      key={JSON.stringify([
+        customPopulationState.studentNumbers,
+        customPopulationState.programmes,
+        customPopulationState.years,
+        associatedProgramme,
+      ])}
       students={populationStudents}
     >
       {(filteredStudents, filteredCourses) => (
