@@ -195,7 +195,7 @@ export const useGetColumnDefinitions = (modules: Map<string, CourseTabModule>): 
                 const { passed, planned } = table.getFilteredRowModel().rows.reduce(
                   (acc, row) => {
                     const original = row.original[course.groupId]
-                    if (original?.completionDate) {
+                    if (original?.passed) {
                       acc.passed++
                     } else if (original?.enrollmentDate || original?.inHops) {
                       acc.planned++

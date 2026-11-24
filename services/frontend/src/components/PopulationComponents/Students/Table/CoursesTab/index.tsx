@@ -151,6 +151,7 @@ const studentMapper = (
     for (const [groupId, substitutionGroup] of Object.entries(coursesToAdd)) {
       courseMap[groupId] ??= {
         substitutedBy: substitutionGroup,
+        passed: true,
         exportValue: `Substitutes ${groupIdToCode[groupId] ?? groupId}`,
       }
     }
@@ -228,10 +229,7 @@ const studentMapper = (
   mapHopsSelections(hopsGroupIds)
   if (includeSubstitutions) mapSubstitutionHopsSelections(hopsGroupIdsWithSubstitutions)
 
-  const totalPassed = Object.values(courseMap).reduce(
-    (acc: number, course: any) => (course.substitutedBy?.length > 0 || !!course?.passed ? acc + 1 : acc),
-    0
-  )
+  const totalPassed = Object.values<Courses[string]>(courseMap).filter(course => course.passed).length
   const totalPlanned = Object.keys(courseMap).length - totalPassed
 
   return {
