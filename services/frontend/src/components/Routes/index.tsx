@@ -49,12 +49,7 @@ export const Routes = () => (
         </Route>
 
         <Route
-          element={
-            <ProtectedRoute
-              requireUserHasRights
-              requiredRoles={['fullSisuAccess', 'courseStatistics', 'studyGuidanceGroups']}
-            />
-          }
+          element={<ProtectedRoute requiredRoles={['fullSisuAccess', 'courseStatistics', 'studyGuidanceGroups']} />}
         >
           <Route element={<CompletedCourses />} path="/completedcoursessearch" />
         </Route>
