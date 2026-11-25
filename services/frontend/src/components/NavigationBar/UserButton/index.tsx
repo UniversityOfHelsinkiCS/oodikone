@@ -66,7 +66,7 @@ export const UserButton = () => {
           <ListItemIcon>
             <LanguageIcon />
           </ListItemIcon>
-          <Typography>Language</Typography>
+          <Typography data-cy="language">Language</Typography>
         </MenuItem>
         {languageOptions.map(({ key, text, value }) => (
           <MenuItem key={key} onClick={() => void setLanguage(value)} selected={language === value}>

@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test'
 import { init } from './support/commands'
 
 const visibleLinks = {
-  norights: ['University', 'Faculties', 'Special populations', 'Feedback'],
+  norights: ['University', 'Faculties', 'Feedback'],
   onlycoursestatistics: ['University', 'Courses', 'Special populations', 'Feedback'],
   basic: [] as string[],
   admin: [] as string[],
@@ -20,7 +20,7 @@ const userButtonWorks = async (page: Page, username: string, mocking = false) =>
   await page.getByTestId('nav-bar-user-button').click()
 
   await expect(page.getByText(mocking ? `Mocking as ${username}` : `Logged in as ${username}`)).toBeVisible()
-  await expect(page.getByText('Language')).toBeVisible()
+  await expect(page.locator("[data-cy='language']")).toBeVisible()
   await expect(page.getByText('suomi')).toBeVisible()
   await expect(page.getByText('English')).toBeVisible()
   await expect(page.getByText('svenska')).toBeVisible()
