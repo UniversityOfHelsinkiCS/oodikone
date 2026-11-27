@@ -12,7 +12,7 @@ import { PageLayout } from '@/components/common/PageLayout'
 import { PageTitle } from '@/components/common/PageTitle'
 import { StudentNameVisibilityToggle, useStudentNameVisibility } from '@/components/common/StudentNameVisibilityToggle'
 import { useLanguage } from '@/components/LanguagePicker/useLanguage'
-import { LoadingSection } from '@/components/Loading'
+import { PageLoading } from '@/components/Loading'
 import { OodiTable } from '@/components/OodiTable'
 import { OodiTableExcelExport } from '@/components/OodiTable/excelExport'
 import { DateFormat } from '@/constants/date'
@@ -109,7 +109,7 @@ export const CloseToGraduation = () => {
       </Tabs>
 
       {isFetching || semestersLoading ? (
-        <LoadingSection />
+        <PageLoading isLoading />
       ) : (
         <>
           <FilterSection
