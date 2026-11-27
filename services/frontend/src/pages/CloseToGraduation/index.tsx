@@ -22,14 +22,13 @@ import { CONTACT_COLUMN_IDS, useCloseToGraduationColumns } from '@/pages/CloseTo
 import { toExportRows } from '@/pages/CloseToGraduation/excelExport'
 import { FilterSection } from '@/pages/CloseToGraduation/FilterSection'
 import {
-  countMultiSelectFilters,
   filterStudents,
   getFilterOptions,
   getFiltersFromSearchParams,
   pruneFilters,
   type CloseToGraduationFilters,
 } from '@/pages/CloseToGraduation/filters'
-import type { CloseToGraduationTab } from '@/pages/CloseToGraduation/tabs'
+import { getInitialTab, isTabDisabled, type CloseToGraduationTab } from '@/pages/CloseToGraduation/tabs'
 import { getDisplayedSemesterCodes } from '@/pages/CloseToGraduation/common'
 import { useGetStudentsCloseToGraduationQuery } from '@/redux/closeToGraduation'
 import { reformatDate } from '@/util/timeAndDate'
@@ -52,16 +51,13 @@ export const CloseToGraduation = () => {
     }),
     [students, searchParams, getTextIn]
   )
-  const urlTab: CloseToGraduationTab =
-    countMultiSelectFilters(urlFiltersByTab.masterAndLicentiate) > countMultiSelectFilters(urlFiltersByTab.bachelor)
-      ? 'masterAndLicentiate'
-      : 'bachelor'
+  const initialTab = getInitialTab(students, urlFiltersByTab)
 
   const [userSelectedTab, setSelectedTab] = useState<CloseToGraduationTab | null>(null)
   const [userFiltersByTab, setFiltersByTab] = useState<Record<CloseToGraduationTab, CloseToGraduationFilters> | null>(
     null
   )
-  const selectedTab = userSelectedTab ?? urlTab
+  const selectedTab = userSelectedTab ?? initialTab
   const filtersByTab = userFiltersByTab ?? urlFiltersByTab
 
   const tabRows = useMemo(() => students?.[selectedTab] ?? [], [students, selectedTab])
@@ -100,8 +96,16 @@ export const CloseToGraduation = () => {
         <Link to="/close-to-graduation/legacy">here</Link>.
       </Alert>
       <Tabs centered onChange={(_event, value: CloseToGraduationTab) => setSelectedTab(value)} value={selectedTab}>
-        <Tab label="Bachelor's programmes" value="bachelor" />
-        <Tab label="Master's and licentiate's programmes" value="masterAndLicentiate" />
+        <Tab
+          disabled={isTabDisabled(students, 'bachelor', selectedTab)}
+          label="Bachelor's programmes"
+          value="bachelor"
+        />
+        <Tab
+          disabled={isTabDisabled(students, 'masterAndLicentiate', selectedTab)}
+          label="Master's and licentiate's programmes"
+          value="masterAndLicentiate"
+        />
       </Tabs>
 
       {isFetching || semestersLoading ? (

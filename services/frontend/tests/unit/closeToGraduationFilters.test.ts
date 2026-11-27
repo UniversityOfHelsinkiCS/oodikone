@@ -12,6 +12,7 @@ import {
   pruneFilters,
   type FilterOption,
 } from '@/pages/CloseToGraduation/filters'
+import { getInitialTab, isTabDisabled } from '@/pages/CloseToGraduation/tabs'
 import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 import { DegreeProgrammeType, EnrollmentType, type Name } from '@oodikone/shared/types'
 
@@ -358,6 +359,56 @@ void describe('getFiltersFromSearchParams', () => {
     assert.deepEqual(filters.faculties, [LAW.code])
     assert.deepEqual(filters.programmes, [])
     assert.deepEqual(filters.studyTracks, [])
+  })
+})
+
+void describe('getInitialTab', () => {
+  const noUrlFilters = { bachelor: emptyFilters, masterAndLicentiate: emptyFilters }
+  const [bachelorStudent, ...otherStudents] = students
+
+  void it('opens the master’s tab when only master’s students are visible', () => {
+    assert.equal(
+      getInitialTab({ bachelor: [], masterAndLicentiate: otherStudents }, noUrlFilters),
+      'masterAndLicentiate'
+    )
+  })
+
+  void it('opens the bachelor’s tab when both tabs have students or nothing is loaded', () => {
+    assert.equal(
+      getInitialTab({ bachelor: [bachelorStudent], masterAndLicentiate: otherStudents }, noUrlFilters),
+      'bachelor'
+    )
+    assert.equal(getInitialTab({ bachelor: [], masterAndLicentiate: [] }, noUrlFilters), 'bachelor')
+    assert.equal(getInitialTab(undefined, noUrlFilters), 'bachelor')
+  })
+
+  void it('opens the tab where more URL filters matched', () => {
+    const rowsByTab = { bachelor: [bachelorStudent], masterAndLicentiate: otherStudents }
+    const urlFiltersByTab = {
+      bachelor: { ...emptyFilters, faculties: [LAW.code] },
+      masterAndLicentiate: { ...emptyFilters, faculties: [SCIENCE.code], studyTracks: [MATHEMATICS.code] },
+    }
+    assert.equal(getInitialTab(rowsByTab, urlFiltersByTab), 'masterAndLicentiate')
+  })
+})
+
+void describe('isTabDisabled', () => {
+  const [bachelorStudent, ...otherStudents] = students
+
+  void it('disables the other tab when it has no students', () => {
+    const rowsByTab = { bachelor: [], masterAndLicentiate: otherStudents }
+    assert.isTrue(isTabDisabled(rowsByTab, 'bachelor', 'masterAndLicentiate'))
+    assert.isFalse(isTabDisabled(rowsByTab, 'masterAndLicentiate', 'masterAndLicentiate'))
+  })
+
+  void it('keeps tabs with students and the selected tab enabled', () => {
+    const rowsByTab = { bachelor: [bachelorStudent], masterAndLicentiate: otherStudents }
+    assert.isFalse(isTabDisabled(rowsByTab, 'bachelor', 'masterAndLicentiate'))
+    assert.isFalse(isTabDisabled({ bachelor: [], masterAndLicentiate: [] }, 'bachelor', 'bachelor'))
+  })
+
+  void it('keeps tabs enabled while the data is loading', () => {
+    assert.isFalse(isTabDisabled(undefined, 'masterAndLicentiate', 'bachelor'))
   })
 })
 
