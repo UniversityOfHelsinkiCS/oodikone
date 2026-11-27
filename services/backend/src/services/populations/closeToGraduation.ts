@@ -2,7 +2,7 @@ import { col, Op, where } from 'sequelize'
 
 import { Credit, CurriculumPeriod, Student, Studyplan } from '@oodikone/shared/models'
 import { CloseToGraduationData, AttainmentDates } from '@oodikone/shared/routes/populations'
-import { Name, CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode } from '@oodikone/shared/types'
+import { CreditTypeCode, DegreeProgrammeType, EnrollmentType, ExtentCode } from '@oodikone/shared/types'
 import {
   CourseModel,
   CreditModel,
@@ -22,7 +22,7 @@ import {
 } from './closeToGraduationCriteria'
 import { getCurriculumPeriodsById, getCurriculumVersion } from './shared'
 
-export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA'
+export const CLOSE_TO_GRADUATION_REDIS_KEY = 'CLOSE_TO_GRADUATION_DATA_V2'
 
 const completedCreditsAtLeast = (credits: number) => where(col('studyplans.completed_credits'), Op.gte, credits)
 
@@ -80,7 +80,7 @@ const findThesisAndLatestAndEarliestAttainments = (
 
 const formatStudent = (
   student: Student,
-  facultyMap: Record<string, Name>,
+  facultyMap: Record<string, CloseToGraduationData['faculty']>,
   currentSemesterCode: number,
   idToGroupIdMap: Record<string, string>,
   curriculumPeriodsById: Map<string, Pick<CurriculumPeriod, 'startDate' | 'endDate'>>
@@ -151,7 +151,7 @@ const formatStudent = (
       programme: {
         code: programmeCode,
         name: programmeName,
-        studyTrack: studyTrack ? studyTrack.name : null,
+        studyTrack: studyTrack ? { code: studyTrack.code, name: studyTrack.name } : null,
         startedAt: programmeStartDate,
         degreeProgrammeType,
       },
@@ -246,14 +246,14 @@ export const findStudentsCloseToGraduation = async (studentNumbers?: string[]) =
     },
     include: {
       model: OrganizationModel,
-      attributes: ['name'],
+      attributes: ['code', 'name'],
     },
     raw: true,
   })
 
-  const facultyMap: Record<string, Name> = {}
+  const facultyMap: Record<string, CloseToGraduationData['faculty']> = {}
   for (const programme of programmesWithFaculties) {
-    facultyMap[programme.code] = programme['organization.name']
+    facultyMap[programme.code] = { code: programme['organization.code'], name: programme['organization.name'] }
   }
 
   const includedCourseIds = [

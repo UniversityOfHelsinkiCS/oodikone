@@ -51,7 +51,7 @@ export const CloseToGraduation = () => {
   const filters = filtersByTab[selectedTab]
 
   const filterOptions = useMemo(() => getFilterOptions(tabRows, filters, getTextIn), [tabRows, filters, getTextIn])
-  const filteredRows = useMemo(() => filterStudents(tabRows, filters, getTextIn), [tabRows, filters, getTextIn])
+  const filteredRows = useMemo(() => filterStudents(tabRows, filters), [tabRows, filters])
 
   const semestersToInclude = useMemo(
     () => getDisplayedSemesterCodes(currentSemester?.semestercode),

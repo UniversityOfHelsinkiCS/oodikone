@@ -93,7 +93,7 @@ export const CloseToGraduationLegacy = () => {
         filterVariant: 'multi-select',
       },
       {
-        accessorFn: row => getTextIn(row.faculty),
+        accessorFn: row => getTextIn(row.faculty.name),
         header: 'Faculty',
         id: 'faculty',
         filterVariant: 'multi-select',
@@ -105,7 +105,7 @@ export const CloseToGraduationLegacy = () => {
         filterVariant: 'multi-select',
       },
       {
-        accessorFn: row => getTextIn(row.programme.studyTrack),
+        accessorFn: row => getTextIn(row.programme.studyTrack?.name),
         id: 'studyTrack',
         header: 'Study track',
         filterVariant: 'multi-select',

@@ -5,11 +5,12 @@ import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 export type CloseToGraduationFilters = {
   faculties: string[]
   programmes: string[]
+  studyTracks: string[]
   isBaMa: boolean | null
   thesisCompleted: boolean | null
 }
 
-type MultiSelectFilterKey = 'faculties' | 'programmes'
+type MultiSelectFilterKey = 'faculties' | 'programmes' | 'studyTracks'
 
 export type FilterOption = { text: string; value: string; count: number }
 
@@ -20,6 +21,7 @@ export type FilterDescription = { label: string; value: string }
 export const emptyFilters: CloseToGraduationFilters = {
   faculties: [],
   programmes: [],
+  studyTracks: [],
   isBaMa: null,
   thesisCompleted: null,
 }
@@ -29,9 +31,10 @@ export const UNKNOWN_LANGUAGE = 'Unknown'
 export const getPreferredLanguage = (languageCode: string) =>
   (isLanguage(languageCode) ? getFullLanguage(languageCode) : null) ?? UNKNOWN_LANGUAGE
 
-const getFilterValues = (row: CloseToGraduationData, getTextIn: GetTextIn) => ({
-  faculty: getTextIn(row.faculty, 'fi') ?? '',
+const getFilterValues = (row: CloseToGraduationData) => ({
+  faculty: row.faculty.code,
   programme: row.programme.code,
+  studyTrack: row.programme.studyTrack?.code ?? '',
   isBaMa: row.studyright.isBaMa,
   thesisCompleted: row.thesisInfo != null,
 })
@@ -41,6 +44,7 @@ type FilterValues = ReturnType<typeof getFilterValues>
 const multiSelectValueKeys = {
   faculties: 'faculty',
   programmes: 'programme',
+  studyTracks: 'studyTrack',
 } as const satisfies Record<MultiSelectFilterKey, keyof FilterValues>
 
 const multiSelectFilterKeys = Object.keys(multiSelectValueKeys) as MultiSelectFilterKey[]
@@ -56,11 +60,8 @@ const matchesFilters = (values: FilterValues, filters: CloseToGraduationFilters,
   matchesBoolean(filters.isBaMa, values.isBaMa) &&
   matchesBoolean(filters.thesisCompleted, values.thesisCompleted)
 
-export const filterStudents = (
-  rows: CloseToGraduationData[],
-  filters: CloseToGraduationFilters,
-  getTextIn: GetTextIn
-) => rows.filter(row => matchesFilters(getFilterValues(row, getTextIn), filters))
+export const filterStudents = (rows: CloseToGraduationData[], filters: CloseToGraduationFilters) =>
+  rows.filter(row => matchesFilters(getFilterValues(row), filters))
 
 const toSortedOptions = (options: Omit<FilterOption, 'count'>[], counts: Map<string, number>): FilterOption[] =>
   [...new Map(options.map(option => [option.value, option])).values()]
@@ -72,7 +73,7 @@ export const getFilterOptions = (
   filters: CloseToGraduationFilters,
   getTextIn: GetTextIn
 ): CloseToGraduationFilterOptions => {
-  const rowsWithValues = rows.map(row => ({ row, values: getFilterValues(row, getTextIn) }))
+  const rowsWithValues = rows.map(row => ({ row, values: getFilterValues(row) }))
 
   const countsFor = (key: MultiSelectFilterKey) => {
     const counts = new Map<string, number>()
@@ -84,11 +85,14 @@ export const getFilterOptions = (
     return counts
   }
   const inSelectedFaculties = rowsWithValues.filter(({ values }) => matchesAny(filters.faculties, values.faculty))
+  const inSelectedProgrammes = inSelectedFaculties.filter(({ values }) =>
+    matchesAny(filters.programmes, values.programme)
+  )
 
   return {
     faculties: toSortedOptions(
       rowsWithValues.map(({ row, values }) => ({
-        text: getTextIn(row.faculty) ?? values.faculty,
+        text: getTextIn(row.faculty.name) ?? values.faculty,
         value: values.faculty,
       })),
       countsFor('faculties')
@@ -100,6 +104,15 @@ export const getFilterOptions = (
       })),
       countsFor('programmes')
     ),
+    studyTracks: toSortedOptions(
+      inSelectedProgrammes
+        .filter(({ values }) => values.studyTrack !== '')
+        .map(({ row, values }) => ({
+          text: getTextIn(row.programme.studyTrack?.name) ?? values.studyTrack,
+          value: values.studyTrack,
+        })),
+      countsFor('studyTracks')
+    ),
   }
 }
 
@@ -110,10 +123,17 @@ export const pruneFilters = (
   rows: CloseToGraduationData[],
   filters: CloseToGraduationFilters,
   getTextIn: GetTextIn
-): CloseToGraduationFilters => ({
-  ...filters,
-  programmes: keepAvailable(filters.programmes, getFilterOptions(rows, filters, getTextIn).programmes),
-})
+): CloseToGraduationFilters => {
+  const programmes = keepAvailable(filters.programmes, getFilterOptions(rows, filters, getTextIn).programmes)
+  const withPrunedProgrammes = { ...filters, programmes }
+  return {
+    ...withPrunedProgrammes,
+    studyTracks: keepAvailable(
+      filters.studyTracks,
+      getFilterOptions(rows, withPrunedProgrammes, getTextIn).studyTracks
+    ),
+  }
+}
 
 const describeSelection = (selected: string[], options: FilterOption[], whenNoneSelected: string) => {
   if (selected.length === 0) return whenNoneSelected
@@ -139,6 +159,16 @@ export const describeFilters = (
       filters.programmes,
       options.programmes,
       filters.faculties.length ? 'all programmes of the selected faculties' : 'all programmes'
+    ),
+  },
+  {
+    label: 'Study track',
+    value: describeSelection(
+      filters.studyTracks,
+      options.studyTracks,
+      filters.faculties.length || filters.programmes.length
+        ? 'all study tracks of the selected programmes'
+        : 'all study tracks'
     ),
   },
   {

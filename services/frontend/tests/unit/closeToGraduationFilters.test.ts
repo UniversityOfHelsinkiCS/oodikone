@@ -19,6 +19,14 @@ const getTextInLanguage = (language: 'fi' | 'en') =>
 
 const getTextIn = getTextInLanguage('fi')
 
+type CodeAndName = { code: string; name: string }
+
+const LAW: CodeAndName = { code: 'H20', name: 'Oikeustieteellinen tiedekunta' }
+const SCIENCE: CodeAndName = { code: 'H50', name: 'Matemaattis-luonnontieteellinen tiedekunta' }
+const MATHEMATICS: CodeAndName = { code: 'MAT-ST', name: 'Matematiikka' }
+const STATISTICS: CodeAndName = { code: 'TIL-ST', name: 'Tilastotiede' }
+const SOFTWARE: CodeAndName = { code: 'OHJ-ST', name: 'Ohjelmistot' }
+
 const createStudent = ({
   studentNumber,
   faculty,
@@ -31,10 +39,10 @@ const createStudent = ({
   thesisCompleted = false,
 }: {
   studentNumber: string
-  faculty: string
+  faculty: CodeAndName
   programmeCode: string
   programmeName: string
-  studyTrack?: string | null
+  studyTrack?: CodeAndName | null
   curriculumPeriod?: string | null
   preferredLanguage?: string
   isBaMa?: boolean
@@ -58,11 +66,11 @@ const createStudent = ({
   programme: {
     code: programmeCode,
     name: { fi: programmeName },
-    studyTrack: studyTrack ? { fi: studyTrack } : null,
+    studyTrack: studyTrack ? { code: studyTrack.code, name: { fi: studyTrack.name } } : null,
     startedAt: new Date('2021-08-01'),
     degreeProgrammeType: DegreeProgrammeType.BACHELOR,
   },
-  faculty: { fi: faculty },
+  faculty: { code: faculty.code, name: { fi: faculty.name } },
   attainmentDates: { latestTotal: new Date('2024-05-15') },
   numberOfAbsentSemesters: 0,
   numberOfUsedSemesters: 6,
@@ -73,22 +81,22 @@ const createStudent = ({
 const students = [
   createStudent({
     studentNumber: '1',
-    faculty: 'Oikeustieteellinen tiedekunta',
+    faculty: LAW,
     programmeCode: 'KH20_001',
     programmeName: 'Oikeusnotaarin koulutusohjelma',
     isBaMa: true,
   }),
   createStudent({
     studentNumber: '2',
-    faculty: 'Matemaattis-luonnontieteellinen tiedekunta',
+    faculty: SCIENCE,
     programmeCode: 'KH50_001',
     programmeName: 'Matemaattisten tieteiden kandiohjelma',
-    studyTrack: 'Matematiikka',
+    studyTrack: MATHEMATICS,
     thesisCompleted: true,
   }),
   createStudent({
     studentNumber: '3',
-    faculty: 'Matemaattis-luonnontieteellinen tiedekunta',
+    faculty: SCIENCE,
     programmeCode: 'KH50_005',
     programmeName: 'Tietojenkäsittelytieteen kandiohjelma',
     curriculumPeriod: '2020-2023',
@@ -100,36 +108,33 @@ const studentNumbersOf = (rows: CloseToGraduationData[]) => rows.map(row => row.
 
 void describe('filterStudents', () => {
   void it('returns every student when no filter is set', () => {
-    assert.deepEqual(studentNumbersOf(filterStudents(students, emptyFilters, getTextIn)), ['1', '2', '3'])
+    assert.deepEqual(studentNumbersOf(filterStudents(students, emptyFilters)), ['1', '2', '3'])
   })
 
-  void it('filters by faculty name', () => {
-    const filters = { ...emptyFilters, faculties: ['Matemaattis-luonnontieteellinen tiedekunta'] }
-    assert.deepEqual(studentNumbersOf(filterStudents(students, filters, getTextIn)), ['2', '3'])
+  void it('filters by faculty code', () => {
+    const filters = { ...emptyFilters, faculties: [SCIENCE.code] }
+    assert.deepEqual(studentNumbersOf(filterStudents(students, filters)), ['2', '3'])
   })
 
   void it('filters by programme code', () => {
-    assert.deepEqual(
-      studentNumbersOf(filterStudents(students, { ...emptyFilters, programmes: ['KH50_005'] }, getTextIn)),
-      ['3']
-    )
+    assert.deepEqual(studentNumbersOf(filterStudents(students, { ...emptyFilters, programmes: ['KH50_005'] })), ['3'])
   })
 
   void it('filters by the yes/no toggles', () => {
-    assert.deepEqual(studentNumbersOf(filterStudents(students, { ...emptyFilters, isBaMa: true }, getTextIn)), ['1'])
-    assert.deepEqual(
-      studentNumbersOf(filterStudents(students, { ...emptyFilters, thesisCompleted: false }, getTextIn)),
-      ['1', '3']
-    )
+    assert.deepEqual(studentNumbersOf(filterStudents(students, { ...emptyFilters, isBaMa: true })), ['1'])
+    assert.deepEqual(studentNumbersOf(filterStudents(students, { ...emptyFilters, thesisCompleted: false })), [
+      '1',
+      '3',
+    ])
   })
 
   void it('combines filters', () => {
     const filters = {
       ...emptyFilters,
-      faculties: ['Matemaattis-luonnontieteellinen tiedekunta'],
+      faculties: [SCIENCE.code],
       thesisCompleted: false,
     }
-    assert.deepEqual(studentNumbersOf(filterStudents(students, filters, getTextIn)), ['3'])
+    assert.deepEqual(studentNumbersOf(filterStudents(students, filters)), ['3'])
   })
 })
 
@@ -137,7 +142,7 @@ void describe('getFilterOptions', () => {
   void it('narrows programme options by the selected faculties', () => {
     const options = getFilterOptions(
       students,
-      { ...emptyFilters, faculties: ['Matemaattis-luonnontieteellinen tiedekunta'], programmes: ['KH50_001'] },
+      { ...emptyFilters, faculties: [SCIENCE.code], programmes: ['KH50_001'] },
       getTextIn
     )
     assert.deepEqual(options.faculties.length, 2)
@@ -152,8 +157,8 @@ void describe('getFilterOptions', () => {
   void it('counts students per option when no filter is set', () => {
     const options = getFilterOptions(students, emptyFilters, getTextIn)
     assert.deepEqual(countsOf(options.faculties), [
-      ['Matemaattis-luonnontieteellinen tiedekunta', 2],
-      ['Oikeustieteellinen tiedekunta', 1],
+      [SCIENCE.code, 2],
+      [LAW.code, 1],
     ])
     assert.deepEqual(countsOf(options.programmes), [
       ['KH50_001', 1],
@@ -163,14 +168,10 @@ void describe('getFilterOptions', () => {
   })
 
   void it('ignores the filter’s own selection when counting its options', () => {
-    const options = getFilterOptions(
-      students,
-      { ...emptyFilters, faculties: ['Oikeustieteellinen tiedekunta'] },
-      getTextIn
-    )
+    const options = getFilterOptions(students, { ...emptyFilters, faculties: [LAW.code] }, getTextIn)
     assert.deepEqual(countsOf(options.faculties), [
-      ['Matemaattis-luonnontieteellinen tiedekunta', 2],
-      ['Oikeustieteellinen tiedekunta', 1],
+      [SCIENCE.code, 2],
+      [LAW.code, 1],
     ])
     assert.deepEqual(countsOf(options.programmes), [['KH20_001', 1]])
   })
@@ -178,8 +179,8 @@ void describe('getFilterOptions', () => {
   void it('applies the other filters to the counts and keeps options that drop to zero', () => {
     const options = getFilterOptions(students, { ...emptyFilters, thesisCompleted: true }, getTextIn)
     assert.deepEqual(countsOf(options.faculties), [
-      ['Matemaattis-luonnontieteellinen tiedekunta', 1],
-      ['Oikeustieteellinen tiedekunta', 0],
+      [SCIENCE.code, 1],
+      [LAW.code, 0],
     ])
   })
 })
@@ -188,24 +189,24 @@ void describe('pruneFilters', () => {
   void it('drops programmes outside the selected faculties', () => {
     const filters = {
       ...emptyFilters,
-      faculties: ['Oikeustieteellinen tiedekunta'],
+      faculties: [LAW.code],
       programmes: ['KH50_001', 'KH20_001'],
     }
     const pruned = pruneFilters(students, filters, getTextIn)
     assert.deepEqual(pruned.programmes, ['KH20_001'])
-    assert.deepEqual(pruned.faculties, ['Oikeustieteellinen tiedekunta'])
+    assert.deepEqual(pruned.faculties, [LAW.code])
   })
 })
 
 void describe('faculty selections across languages', () => {
-  const lawStudent = { ...students[0], faculty: { fi: 'Oikeustieteellinen tiedekunta', en: 'Faculty of Law' } }
-  const filters = { ...emptyFilters, faculties: ['Oikeustieteellinen tiedekunta'] }
+  const lawStudent = { ...students[0], faculty: { code: LAW.code, name: { fi: LAW.name, en: 'Faculty of Law' } } }
+  const filters = { ...emptyFilters, faculties: [LAW.code] }
 
   void it('keeps a selected faculty active and labels it in the current language', () => {
     const inEnglish = getTextInLanguage('en')
-    assert.deepEqual(studentNumbersOf(filterStudents([lawStudent], filters, inEnglish)), ['1'])
+    assert.deepEqual(studentNumbersOf(filterStudents([lawStudent], filters)), ['1'])
     assert.deepEqual(getFilterOptions([lawStudent], filters, inEnglish).faculties, [
-      { text: 'Faculty of Law', value: 'Oikeustieteellinen tiedekunta', count: 1 },
+      { text: 'Faculty of Law', value: LAW.code, count: 1 },
     ])
   })
 })
@@ -221,12 +222,12 @@ void describe('describeFilters', () => {
   void it('lists selected values by name', () => {
     const filters = {
       ...emptyFilters,
-      faculties: ['Matemaattis-luonnontieteellinen tiedekunta'],
+      faculties: [SCIENCE.code],
       programmes: ['KH50_001', 'KH50_005'],
       isBaMa: false,
     }
     const descriptions = describeFilters(filters, getFilterOptions(students, filters, getTextIn))
-    assert.deepInclude(descriptions, { label: 'Faculty', value: 'Matemaattis-luonnontieteellinen tiedekunta' })
+    assert.deepInclude(descriptions, { label: 'Faculty', value: SCIENCE.name })
     assert.deepInclude(descriptions, {
       label: 'Programme',
       value: 'Matemaattisten tieteiden kandiohjelma, Tietojenkäsittelytieteen kandiohjelma',
@@ -234,6 +235,77 @@ void describe('describeFilters', () => {
     assert.deepInclude(descriptions, {
       label: 'BSc & MSc study right',
       value: 'only students without a combined study right',
+    })
+  })
+})
+
+void describe('study track filter', () => {
+  const statisticsStudent = createStudent({
+    studentNumber: '4',
+    faculty: SCIENCE,
+    programmeCode: 'KH50_001',
+    programmeName: 'Matemaattisten tieteiden kandiohjelma',
+    studyTrack: STATISTICS,
+  })
+  const computerScienceStudent = createStudent({
+    studentNumber: '5',
+    faculty: SCIENCE,
+    programmeCode: 'KH50_005',
+    programmeName: 'Tietojenkäsittelytieteen kandiohjelma',
+    studyTrack: SOFTWARE,
+  })
+  const rows = [...students, statisticsStudent, computerScienceStudent]
+  const studyTrackValues = (options: FilterOption[]) => options.map(option => option.value)
+
+  void it('filters by study track code', () => {
+    const filters = { ...emptyFilters, studyTracks: [STATISTICS.code] }
+    assert.deepEqual(studentNumbersOf(filterStudents(rows, filters)), ['4'])
+  })
+
+  void it('offers only study tracks of the selected programmes and skips students without one', () => {
+    assert.deepEqual(studyTrackValues(getFilterOptions(rows, emptyFilters, getTextIn).studyTracks), [
+      MATHEMATICS.code,
+      SOFTWARE.code,
+      STATISTICS.code,
+    ])
+    const filters = { ...emptyFilters, programmes: ['KH50_001'] }
+    assert.deepEqual(studyTrackValues(getFilterOptions(rows, filters, getTextIn).studyTracks), [
+      MATHEMATICS.code,
+      STATISTICS.code,
+    ])
+  })
+
+  void it('drops study tracks outside the selected programmes', () => {
+    const filters = { ...emptyFilters, programmes: ['KH50_005'], studyTracks: [STATISTICS.code, SOFTWARE.code] }
+    assert.deepEqual(pruneFilters(rows, filters, getTextIn).studyTracks, [SOFTWARE.code])
+  })
+
+  void it('drops study tracks of programmes pruned by the faculty selection', () => {
+    const filters = {
+      ...emptyFilters,
+      faculties: [LAW.code],
+      programmes: ['KH50_001'],
+      studyTracks: [STATISTICS.code],
+    }
+    const pruned = pruneFilters(rows, filters, getTextIn)
+    assert.deepEqual(pruned.programmes, [])
+    assert.deepEqual(pruned.studyTracks, [])
+  })
+
+  void it('describes the study track selection', () => {
+    const unfiltered = describeFilters(emptyFilters, getFilterOptions(rows, emptyFilters, getTextIn))
+    assert.deepInclude(unfiltered, { label: 'Study track', value: 'all study tracks' })
+
+    const byProgramme = { ...emptyFilters, programmes: ['KH50_001'] }
+    assert.deepInclude(describeFilters(byProgramme, getFilterOptions(rows, byProgramme, getTextIn)), {
+      label: 'Study track',
+      value: 'all study tracks of the selected programmes',
+    })
+
+    const byStudyTrack = { ...emptyFilters, studyTracks: [MATHEMATICS.code, STATISTICS.code] }
+    assert.deepInclude(describeFilters(byStudyTrack, getFilterOptions(rows, byStudyTrack, getTextIn)), {
+      label: 'Study track',
+      value: `${MATHEMATICS.name}, ${STATISTICS.name}`,
     })
   })
 })
@@ -247,8 +319,8 @@ void describe('toExportRows', () => {
     const [row] = toExportRows([students[1]], getTextIn, semesters, [143, 144])
 
     assert.equal(row['Student number'], '2')
-    assert.equal(row.Faculty, 'Matemaattis-luonnontieteellinen tiedekunta')
-    assert.equal(row['Study track'], 'Matematiikka')
+    assert.equal(row.Faculty, SCIENCE.name)
+    assert.equal(row['Study track'], MATHEMATICS.name)
     assert.equal(row['Preferred language'], 'Finnish')
     assert.equal(row['Thesis completed'], 'Yes')
     assert.equal(row['Thesis attainment date'], '2024-05-15')

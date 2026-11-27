@@ -186,6 +186,14 @@ export const FilterSection = ({
             options={options.programmes}
             selected={filters.programmes}
           />
+          <MultiSelect
+            filterKey="studyTrack"
+            label="Study track"
+            placeholder="all study tracks"
+            onChange={studyTracks => update({ studyTracks })}
+            options={options.studyTracks}
+            selected={filters.studyTracks}
+          />
           <Stack direction="row" sx={{ gap: 4, flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <BooleanToggle
               filterKey="isBaMa"

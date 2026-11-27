@@ -6,6 +6,7 @@ import {
   SemesterEnrollment,
   DegreeProgrammeType,
   ProgressCriteria,
+  StudyTrack,
   Unification,
 } from '../types'
 import { FormattedStudent, StudentCredit, StudentEnrollment } from '../types/studentData'
@@ -44,11 +45,11 @@ export type CloseToGraduationData = {
   programme: {
     code: string
     name: Name
-    studyTrack: Name | null
+    studyTrack: StudyTrack | null
     startedAt: Date
     degreeProgrammeType: DegreeProgrammeType
   }
-  faculty: Name
+  faculty: { code: string; name: Name }
   attainmentDates: AttainmentDates
   numberOfAbsentSemesters: number
   numberOfUsedSemesters: number

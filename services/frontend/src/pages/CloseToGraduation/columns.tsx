@@ -48,9 +48,9 @@ export const useCloseToGraduationColumns = (): ColumnDef<CloseToGraduationData, 
         id: 'preferredLanguage',
         header: 'Preferred language',
       }),
-      columnHelper.accessor(row => getTextIn(row.faculty) ?? '', { id: 'faculty', header: 'Faculty' }),
+      columnHelper.accessor(row => getTextIn(row.faculty.name) ?? '', { id: 'faculty', header: 'Faculty' }),
       columnHelper.accessor(row => getTextIn(row.programme.name) ?? '', { id: 'programme', header: 'Programme' }),
-      columnHelper.accessor(row => getTextIn(row.programme.studyTrack) ?? '', {
+      columnHelper.accessor(row => getTextIn(row.programme.studyTrack?.name) ?? '', {
         id: 'studyTrack',
         header: 'Study track',
       }),
