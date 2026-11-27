@@ -1,4 +1,4 @@
-import type { CloseToGraduationTab } from '@/pages/CloseToGraduation/Beta/tabs'
+import type { CloseToGraduationTab } from '@/pages/CloseToGraduation/tabs'
 
 const creditLimitsByTab: Record<CloseToGraduationTab, { programme: string; credits: number }[]> = {
   bachelor: [{ programme: 'All bachelor’s programmes', credits: 140 }],

@@ -17,9 +17,9 @@ import {
   type CloseToGraduationFilterOptions,
   type CloseToGraduationFilters,
   type FilterOption,
-} from '@/pages/CloseToGraduation/Beta/filters'
-import { getInclusionInfoContent } from '@/pages/CloseToGraduation/Beta/inclusionInfo'
-import type { CloseToGraduationTab } from '@/pages/CloseToGraduation/Beta/tabs'
+} from '@/pages/CloseToGraduation/filters'
+import { getInclusionInfoContent } from '@/pages/CloseToGraduation/inclusionInfo'
+import type { CloseToGraduationTab } from '@/pages/CloseToGraduation/tabs'
 
 type MultiSelectProps = {
   label: string

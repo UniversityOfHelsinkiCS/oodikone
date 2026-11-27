@@ -2,7 +2,7 @@ import { getEnrollmentTypeTextForExcel } from '@/common'
 import type { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import { DateFormat } from '@/constants/date'
 import type { SemestersData } from '@/hooks/useSemesters'
-import { getPreferredLanguage } from '@/pages/CloseToGraduation/Beta/filters'
+import { getPreferredLanguage } from '@/pages/CloseToGraduation/filters'
 import { reformatDate } from '@/util/timeAndDate'
 import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 

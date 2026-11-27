@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest'
 
 import type { GetTextIn } from '@/components/LanguagePicker/useLanguage'
-import { toExportRows } from '@/pages/CloseToGraduation/Beta/excelExport'
+import { toExportRows } from '@/pages/CloseToGraduation/excelExport'
 import {
   describeFilters,
   emptyFilters,
@@ -9,7 +9,7 @@ import {
   getFilterOptions,
   pruneFilters,
   type FilterOption,
-} from '@/pages/CloseToGraduation/Beta/filters'
+} from '@/pages/CloseToGraduation/filters'
 import type { CloseToGraduationData } from '@oodikone/shared/routes/populations'
 import { DegreeProgrammeType, EnrollmentType, type Name } from '@oodikone/shared/types'
 
