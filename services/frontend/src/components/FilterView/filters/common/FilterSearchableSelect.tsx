@@ -1,4 +1,4 @@
-import Autocomplete from '@mui/material/Autocomplete'
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Popper from '@mui/material/Popper'
 import TextField from '@mui/material/TextField'
@@ -24,6 +24,7 @@ type FilterSearchableSelectProps<T extends ValidValueType> = {
   multiple?: boolean
   freeSolo?: boolean
   placeholder?: string
+  showValue?: boolean
 }
 
 /**
@@ -44,6 +45,7 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
   multiple,
   freeSolo = multiple,
   placeholder,
+  showValue = false,
 }: FilterSearchableSelectProps<T>) => {
   const disabled = !options.length
 
@@ -66,6 +68,11 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
           clearOnEscape
           data-cy={`${filterKey}-selector`}
           disabled={disabled}
+          filterOptions={
+            showValue
+              ? createFilterOptions({ stringify: (opt: SelectOption<T>) => `${opt.text} ${opt.value}` })
+              : undefined
+          }
           filterSelectedOptions
           freeSolo={freeSolo}
           fullWidth
@@ -89,6 +96,11 @@ export const FilterSearchableSelect = <T extends ValidValueType = string>({
           renderOption={({ key, ...props }, option) => (
             <Box component="li" key={key} {...props}>
               <Box sx={{ flexGrow: 1 }}>{option.text}</Box>
+              {showValue && (
+                <Typography alignSelf="flex-end" color="text.secondary" sx={{ ml: 2 }} variant="body2">
+                  {option.value}
+                </Typography>
+              )}
               {option.count !== undefined && (
                 <Typography color="text.secondary" sx={{ ml: 2 }} variant="body2">
                   {option.count}

@@ -63,6 +63,7 @@ const MultiSelect = ({ label, placeholder, filterKey, options, selected, onChang
         onChange={onChange}
         options={options}
         placeholder={selected.length ? undefined : placeholder}
+        showValue
         value={options.filter(option => selected.includes(option.value))}
       />
     </Box>
