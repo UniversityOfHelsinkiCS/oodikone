@@ -5,6 +5,7 @@ import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 import type { TableOptions } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router'
 
 import { Link } from '@/components/common/Link'
 import { PageLayout } from '@/components/common/PageLayout'
@@ -21,9 +22,10 @@ import { CONTACT_COLUMN_IDS, useCloseToGraduationColumns } from '@/pages/CloseTo
 import { toExportRows } from '@/pages/CloseToGraduation/excelExport'
 import { FilterSection } from '@/pages/CloseToGraduation/FilterSection'
 import {
-  emptyFilters,
+  countMultiSelectFilters,
   filterStudents,
   getFilterOptions,
+  getFiltersFromSearchParams,
   pruneFilters,
   type CloseToGraduationFilters,
 } from '@/pages/CloseToGraduation/filters'
@@ -41,11 +43,26 @@ export const CloseToGraduation = () => {
   const { visible: namesVisible } = useStudentNameVisibility()
   const columns = useCloseToGraduationColumns()
 
-  const [selectedTab, setSelectedTab] = useState<CloseToGraduationTab>('bachelor')
-  const [filtersByTab, setFiltersByTab] = useState<Record<CloseToGraduationTab, CloseToGraduationFilters>>({
-    bachelor: emptyFilters,
-    masterAndLicentiate: emptyFilters,
-  })
+  const [searchParams] = useSearchParams()
+
+  const urlFiltersByTab = useMemo<Record<CloseToGraduationTab, CloseToGraduationFilters>>(
+    () => ({
+      bachelor: getFiltersFromSearchParams(students?.bachelor ?? [], searchParams, getTextIn),
+      masterAndLicentiate: getFiltersFromSearchParams(students?.masterAndLicentiate ?? [], searchParams, getTextIn),
+    }),
+    [students, searchParams, getTextIn]
+  )
+  const urlTab: CloseToGraduationTab =
+    countMultiSelectFilters(urlFiltersByTab.masterAndLicentiate) > countMultiSelectFilters(urlFiltersByTab.bachelor)
+      ? 'masterAndLicentiate'
+      : 'bachelor'
+
+  const [userSelectedTab, setSelectedTab] = useState<CloseToGraduationTab | null>(null)
+  const [userFiltersByTab, setFiltersByTab] = useState<Record<CloseToGraduationTab, CloseToGraduationFilters> | null>(
+    null
+  )
+  const selectedTab = userSelectedTab ?? urlTab
+  const filtersByTab = userFiltersByTab ?? urlFiltersByTab
 
   const tabRows = useMemo(() => students?.[selectedTab] ?? [], [students, selectedTab])
   const filters = filtersByTab[selectedTab]
@@ -64,7 +81,7 @@ export const CloseToGraduation = () => {
   const exportColumnKeys = useMemo(() => Object.keys(exportRows[0] ?? {}), [exportRows])
 
   const updateFilters = (nextFilters: CloseToGraduationFilters) =>
-    setFiltersByTab(previous => ({ ...previous, [selectedTab]: pruneFilters(tabRows, nextFilters, getTextIn) }))
+    setFiltersByTab({ ...filtersByTab, [selectedTab]: pruneFilters(tabRows, nextFilters, getTextIn) })
 
   const tableOptions: Partial<TableOptions<CloseToGraduationData>> = {
     initialState: {

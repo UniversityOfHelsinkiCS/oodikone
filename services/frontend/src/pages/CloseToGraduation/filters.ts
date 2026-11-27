@@ -135,6 +135,37 @@ export const pruneFilters = (
   }
 }
 
+export const FILTER_QUERY_PARAMS = {
+  faculties: 'faculty',
+  programmes: 'programme',
+  studyTracks: 'studytrack',
+} as const satisfies Record<MultiSelectFilterKey, string>
+
+export const getFiltersFromSearchParams = (
+  rows: CloseToGraduationData[],
+  searchParams: URLSearchParams,
+  getTextIn: GetTextIn
+): CloseToGraduationFilters => {
+  const rowValues = rows.map(getFilterValues)
+  const knownValuesFor = (key: MultiSelectFilterKey) =>
+    new Set(rowValues.map(values => values[multiSelectValueKeys[key]]).filter(Boolean))
+  const knownParamValuesFor = (key: MultiSelectFilterKey) => {
+    const knownValues = knownValuesFor(key)
+    return [...new Set(searchParams.getAll(FILTER_QUERY_PARAMS[key]))].filter(value => knownValues.has(value))
+  }
+
+  const filters: CloseToGraduationFilters = {
+    ...emptyFilters,
+    faculties: knownParamValuesFor('faculties'),
+    programmes: knownParamValuesFor('programmes'),
+    studyTracks: knownParamValuesFor('studyTracks'),
+  }
+  return pruneFilters(rows, filters, getTextIn)
+}
+
+export const countMultiSelectFilters = (filters: CloseToGraduationFilters) =>
+  multiSelectFilterKeys.filter(key => filters[key].length > 0).length
+
 const describeSelection = (selected: string[], options: FilterOption[], whenNoneSelected: string) => {
   if (selected.length === 0) return whenNoneSelected
   return selected.map(value => options.find(option => option.value === value)?.text ?? value).join(', ')

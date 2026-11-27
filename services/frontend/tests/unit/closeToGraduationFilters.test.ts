@@ -3,10 +3,12 @@ import { assert, describe, it } from 'vitest'
 import type { GetTextIn } from '@/components/LanguagePicker/useLanguage'
 import { toExportRows } from '@/pages/CloseToGraduation/excelExport'
 import {
+  countMultiSelectFilters,
   describeFilters,
   emptyFilters,
   filterStudents,
   getFilterOptions,
+  getFiltersFromSearchParams,
   pruneFilters,
   type FilterOption,
 } from '@/pages/CloseToGraduation/filters'
@@ -307,6 +309,55 @@ void describe('study track filter', () => {
       label: 'Study track',
       value: `${MATHEMATICS.name}, ${STATISTICS.name}`,
     })
+  })
+})
+
+void describe('getFiltersFromSearchParams', () => {
+  const statisticsStudent = createStudent({
+    studentNumber: '4',
+    faculty: SCIENCE,
+    programmeCode: 'KH50_001',
+    programmeName: 'Matemaattisten tieteiden kandiohjelma',
+    studyTrack: STATISTICS,
+  })
+  const rows = [...students, statisticsStudent]
+  const fromUrl = (query: string) => getFiltersFromSearchParams(rows, new URLSearchParams(query), getTextIn)
+
+  void it('returns empty filters without params', () => {
+    assert.deepEqual(fromUrl(''), emptyFilters)
+  })
+
+  void it('initializes faculty, programme and study track from their codes', () => {
+    assert.deepEqual(fromUrl(`faculty=${SCIENCE.code}&programme=KH50_001&studytrack=${MATHEMATICS.code}`), {
+      ...emptyFilters,
+      faculties: [SCIENCE.code],
+      programmes: ['KH50_001'],
+      studyTracks: [MATHEMATICS.code],
+    })
+  })
+
+  void it('ignores codes that match nothing', () => {
+    assert.deepEqual(fromUrl('faculty=H99&programme=NOPE&studytrack=NOPE'), emptyFilters)
+    assert.deepEqual(fromUrl(`faculty=H99&faculty=${LAW.code}`).faculties, [LAW.code])
+  })
+
+  void it('selects every value of a repeated param once', () => {
+    assert.deepEqual(fromUrl('programme=KH50_001&programme=KH20_001&programme=KH50_001').programmes, [
+      'KH50_001',
+      'KH20_001',
+    ])
+  })
+
+  void it('counts how many of the params matched', () => {
+    assert.equal(countMultiSelectFilters(fromUrl('')), 0)
+    assert.equal(countMultiSelectFilters(fromUrl(`faculty=${SCIENCE.code}&studytrack=${STATISTICS.code}`)), 2)
+  })
+
+  void it('drops selections that conflict with the other params', () => {
+    const filters = fromUrl(`faculty=${LAW.code}&programme=KH50_001&studytrack=${STATISTICS.code}`)
+    assert.deepEqual(filters.faculties, [LAW.code])
+    assert.deepEqual(filters.programmes, [])
+    assert.deepEqual(filters.studyTracks, [])
   })
 })
 
